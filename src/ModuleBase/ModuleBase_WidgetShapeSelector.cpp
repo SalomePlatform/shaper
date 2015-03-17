@@ -127,10 +127,8 @@ ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 {
-  bool isStored = storeAttributeValues(mySelectedObject, myShape);
-  if (isStored)
-    updateObject(myFeature);
-  return isStored;
+  // the value is stored on the selection changed signal processing 
+  return true;
 }
 
 //********************************************************************
@@ -193,27 +191,10 @@ void ModuleBase_WidgetShapeSelector::clearAttribute()
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::restoreValue()
 {
-  DataPtr aData = myFeature->data();
   bool isBlocked = this->blockSignals(true);
-
-  AttributeSelectionPtr aSelect = aData->selection(attributeID());
-  if (aSelect) {
-    mySelectedObject = aSelect->context();
-    myShape = aSelect->value();
-  } else {
-    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    if (aRefAttr) {
-      mySelectedObject = aRefAttr->object();
-    } else {
-      AttributeReferencePtr aRef = aData->reference(attributeID());
-      if (aRef) {
-        mySelectedObject = aRef->value();
-      }
-    }
-  }
   updateSelectionName();
-
   this->blockSignals(isBlocked);
+
   return true;
 }
 
@@ -243,7 +224,8 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
 {
   ObjectPtr aObject = theValue.object();
-  if ((!mySelectedObject) && (!aObject))
+  ObjectPtr aCurrentObject = getObject();
+  if ((!aCurrentObject) && (!aObject))
     return false;
 
   // Check that the selected object is result (others can not be accepted)
@@ -305,9 +287,10 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  mySelectedObject = theObj;
-  myShape = theShape;
-  if (mySelectedObject) {
+  if (storeAttributeValues(theObj, theShape))
+    updateObject(myFeature);
+
+  if (theObj) {
     raisePanel();
   } 
   updateSelectionName();
@@ -356,6 +339,47 @@ bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shap
 }
 
 //********************************************************************
+ObjectPtr ModuleBase_WidgetShapeSelector::getObject() const
+{
+  ObjectPtr anObject;
+
+  DataPtr aData = myFeature->data();
+  if (aData.get() == NULL)
+    return anObject;
+
+  AttributeSelectionPtr aSelect = aData->selection(attributeID());
+  if (aSelect) {
+    anObject = aSelect->context();
+  } else {
+    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+    if (aRefAttr) {
+      anObject = aRefAttr->object();
+    } else {
+      AttributeReferencePtr aRef = aData->reference(attributeID());
+      if (aRef) {
+        anObject = aRef->value();
+      }
+    }
+  }
+  return anObject;
+}
+
+//********************************************************************
+GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
+{
+  GeomShapePtr aShape;
+  DataPtr aData = myFeature->data();
+  if (aData.get() == NULL)
+    return aShape;
+
+  AttributeSelectionPtr aSelect = aData->selection(attributeID());
+  if (aSelect)
+    aShape = aSelect->value();
+
+  return aShape;
+}
+
+//********************************************************************
 void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
   DataPtr aData = myFeature->data();
@@ -368,8 +392,9 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     }
   }
   if (!isNameUpdated) {
-    if (mySelectedObject) {
-      std::string aName = mySelectedObject->data()->name();
+    ObjectPtr anObject = getObject();
+    if (anObject.get() != NULL) {
+      std::string aName = anObject->data()->name();
       myTextLine->setText(QString::fromStdString(aName));
     } else {
       if (myIsActive) {
@@ -456,9 +481,6 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
 
     // 2. store the current values, disable the model's update
     aData->blockSendAttributeUpdated(true);
-    ObjectPtr aPrevSelectedObject = mySelectedObject;
-    GeomShapePtr aPrevShape = myShape;
-
     storeAttributeValues(theObj, theShape);
 
     // 3. check the acceptability of the current values

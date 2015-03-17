@@ -80,21 +80,17 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Returns currently selected data object
-  ObjectPtr selectedFeature() const
-  {
-    return mySelectedObject;
-  }
-
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
   virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  // Get the object from the attribute
+  /// \param theObj an object 
+  static ObjectPtr getObject(const AttributePtr& theAttribute) const;
 
  public slots:
 
@@ -128,6 +124,10 @@ Q_OBJECT
   /// \param theShape a shape
   void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
 
+  // Get the shape from the attribute it the attribute contain a shape, e.g. selection attribute
+  /// \return a shape
+  GeomShapePtr getShape() const;
+
   /// Check the selected with validators if installed
   /// \param theObj the object for checking
   /// \param theShape the shape for checking
@@ -152,12 +152,6 @@ Q_OBJECT
 
   /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
-
-  /// Pointer to selected object
-  ObjectPtr mySelectedObject;
-
-  /// Pointer to selected shape
-  GeomShapePtr myShape;
 
   /// List of accepting shapes types
   QStringList myShapeTypes;

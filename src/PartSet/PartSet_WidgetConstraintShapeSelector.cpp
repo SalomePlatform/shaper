@@ -21,8 +21,8 @@ bool PartSet_WidgetConstraintShapeSelector::storeAttributeValues(ObjectPtr theSe
   if (aFeature) {
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if ((!aSPFeature) && (!myShape->isNull())) {
-      ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(myShape->impl<TopoDS_Shape>(),
+    if ((!aSPFeature) && (!theShape->isNull())) {
+      ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
                                                                   aSelectedObject, mySketch);
       if (aObj) {
         PartSet_WidgetConstraintShapeSelector* that = (PartSet_WidgetConstraintShapeSelector*) this;
