@@ -136,8 +136,14 @@ Q_OBJECT
   /// Clear attribute
   void clearAttribute();
 
+  /// Store the values to the model attribute of the widget. It casts this attribute to
+  /// the specific type and set the given values
+  /// \param theSelectedObject an object
+  /// \param theShape a selected shape, which is used in the selection attribute
+  virtual bool storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape) const;
+
   //----------- Class members -------------
- protected:
+  protected:
   /// Label of the widget
   QLabel* myLabel;
 

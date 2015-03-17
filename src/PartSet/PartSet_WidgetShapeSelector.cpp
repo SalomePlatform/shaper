@@ -15,36 +15,38 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
-
-bool PartSet_WidgetShapeSelector::storeValueCustom() const
+bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape) const
 {
-  if (!mySelectedObject)
+  ObjectPtr aSelectedObject = theSelectedObject;
+  GeomShapePtr aShape = theShape;
+
+  if (!aSelectedObject)
     return false;
 
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aSelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
     return false;
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  if ((!aSPFeature) && (!myShape->isNull())) {
+  if ((!aSPFeature) && (!aShape->isNull())) {
     // Processing of external (non-sketch) object
-    ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(myShape->impl<TopoDS_Shape>(),
-                                                                mySelectedObject, mySketch);
+    ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(aShape->impl<TopoDS_Shape>(),
+                                                                aSelectedObject, mySketch);
     if (aObj) {
       PartSet_WidgetShapeSelector* that = (PartSet_WidgetShapeSelector*) this;
-      that->mySelectedObject = aObj;
+      aSelectedObject = aObj;
     } else 
       return false;
   } else {
     // Processing of sketch object
     DataPtr aData = myFeature->data();
-    if (myShape) {
+    if (aShape) {
       AttributePtr aAttr = aData->attribute(attributeID());
       AttributeRefAttrPtr aRefAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
       if (aRefAttr) {
-        TopoDS_Shape aShape = myShape->impl<TopoDS_Shape>();
-        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(mySelectedObject, aShape, mySketch);
+        TopoDS_Shape aTDSShape = aShape->impl<TopoDS_Shape>();
+        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aSelectedObject, aTDSShape, mySketch);
 
         // this is an alternative, whether the attribute should be set or object in the attribute
         // the first check is the attribute because the object already exist
@@ -52,13 +54,14 @@ bool PartSet_WidgetShapeSelector::storeValueCustom() const
         // test case is - preselection for distance operation, which contains two points selected on lines
         if (aPntAttr)
           aRefAttr->setAttr(aPntAttr);
-        else if (mySelectedObject)
-          aRefAttr->setObject(mySelectedObject);
-        updateObject(myFeature);
+        else if (aSelectedObject)
+          aRefAttr->setObject(aSelectedObject);
+        //updateObject(myFeature);
         return true;
       }
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeValueCustom();
+  return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, aShape);
 }
+
 

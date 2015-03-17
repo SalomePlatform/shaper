@@ -127,39 +127,47 @@ ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 {
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
+  bool isStored = storeAttributeValues(mySelectedObject, myShape);
+  if (isStored)
+    updateObject(myFeature);
+  return isStored;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject,
+                                                          GeomShapePtr theShape) const
+{
+  bool isChanged = false;
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theSelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
-    return false;
+    return isChanged;
 
   DataPtr aData = myFeature->data();
   AttributeReferencePtr aRef = aData->reference(attributeID());
   if (aRef) {
     ObjectPtr aObject = aRef->value();
-    if (!(aObject && aObject->isSame(mySelectedObject))) {
-      aRef->setValue(mySelectedObject);
-      updateObject(myFeature);
-      return true;
+    if (!(aObject && aObject->isSame(theSelectedObject))) {
+      aRef->setValue(theSelectedObject);
+      isChanged = true;
     }
   } else {
     AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
     if (aRefAttr) {
       ObjectPtr aObject = aRefAttr->object();
-      if (!(aObject && aObject->isSame(mySelectedObject))) {
-        aRefAttr->setObject(mySelectedObject);
-        updateObject(myFeature);
-        return true;
+      if (!(aObject && aObject->isSame(theSelectedObject))) {
+        aRefAttr->setObject(theSelectedObject);
+        isChanged = true;
       }
     } else {
       AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
-      if (aSelectAttr && aBody && (myShape.get() != NULL)) {
-        aSelectAttr->setValue(aBody, myShape);
-        updateObject(myFeature);
-        return true;
+      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
+      if (aSelectAttr && aBody && (theShape.get() != NULL)) {
+        aSelectAttr->setValue(aBody, theShape);
+        isChanged = true;
       }
     }
   }
-  return false;
+  return isChanged;
 }
 
 //********************************************************************
@@ -451,9 +459,7 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
     ObjectPtr aPrevSelectedObject = mySelectedObject;
     GeomShapePtr aPrevShape = myShape;
 
-    mySelectedObject = theObj;
-    myShape = theShape;
-    storeValueCustom();
+    storeAttributeValues(theObj, theShape);
 
     // 3. check the acceptability of the current values
     std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
@@ -469,8 +475,6 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
 
     // 4. if the values are not valid, restore the previous values to the attribute
     //if (!aValid) {
-    mySelectedObject = aPrevSelectedObject;
-    myShape = aPrevShape;
     if (isObject)
       aRefAttr->setObject(aPrevObject);
     else
