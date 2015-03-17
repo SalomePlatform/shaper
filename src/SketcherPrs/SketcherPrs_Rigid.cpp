@@ -18,21 +18,8 @@
 #include <AIS_Drawer.hxx>
 #include <gp_Pnt2d.hxx>
 
-#include <Prs3d_PointAspect.hxx>
-#include <Prs3d_Root.hxx>
-#include <Prs3d_LineAspect.hxx>
-
-#include <Graphic3d_MarkerImage.hxx>
-#include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Graphic3d_ArrayOfSegments.hxx>
-
-#include <Select3D_SensitivePoint.hxx>
-#include <Select3D_SensitiveSegment.hxx>
-
-#include <SelectMgr_SequenceOfOwner.hxx>
-#include <SelectMgr_Selection.hxx>
-#include <SelectMgr_EntityOwner.hxx>
+#include <Prs3d_Root.hxx>
 
 #include <GeomAdaptor_Curve.hxx>
 #include <BRep_Tool.hxx>

@@ -8,29 +8,10 @@
 #include "SketcherPrs_Tools.h"
 #include "SketcherPrs_PositionMgr.h"
 
-#include <GeomAPI_Pnt.h>
-
 #include <SketchPlugin_Constraint.h>
 
-#include <AIS_Drawer.hxx>
-#include <gp_Pnt2d.hxx>
-
-#include <Prs3d_PointAspect.hxx>
-#include <Prs3d_Root.hxx>
-#include <Prs3d_LineAspect.hxx>
-
-#include <Graphic3d_MarkerImage.hxx>
-#include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Graphic3d_ArrayOfSegments.hxx>
-
-#include <Select3D_SensitivePoint.hxx>
-#include <Select3D_SensitiveSegment.hxx>
-
-#include <SelectMgr_SequenceOfOwner.hxx>
-#include <SelectMgr_Selection.hxx>
-#include <SelectMgr_EntityOwner.hxx>
-
+#include <Prs3d_Root.hxx>
 
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Equal, SketcherPrs_SymbolPrs);
@@ -39,12 +20,12 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Equal, SketcherPrs_SymbolPrs);
 static Handle(Image_AlienPixMap) MyPixMap;
 
 SketcherPrs_Equal::SketcherPrs_Equal(SketchPlugin_Constraint* theConstraint, 
-                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
+                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
   myPntArray = new Graphic3d_ArrayOfPoints(2);
   myPntArray->AddVertex(0., 0., 0.);
-  myPntArray->AddVertex(0. ,0., 0.);
+  myPntArray->AddVertex(0., 0., 0.);
 }  
 
 void SketcherPrs_Equal::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,

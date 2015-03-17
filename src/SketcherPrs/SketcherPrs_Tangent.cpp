@@ -8,29 +8,14 @@
 #include "SketcherPrs_Tools.h"
 #include "SketcherPrs_PositionMgr.h"
 
-#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Curve.h>
 
 #include <SketchPlugin_Constraint.h>
 
-#include <AIS_Drawer.hxx>
-#include <gp_Pnt2d.hxx>
-
-#include <Prs3d_PointAspect.hxx>
+#include <GeomAdaptor_Curve.hxx>
 #include <Prs3d_Root.hxx>
-#include <Prs3d_LineAspect.hxx>
-
-#include <Graphic3d_MarkerImage.hxx>
-#include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Graphic3d_ArrayOfSegments.hxx>
-
-#include <Select3D_SensitivePoint.hxx>
-#include <Select3D_SensitiveSegment.hxx>
-
-#include <SelectMgr_SequenceOfOwner.hxx>
-#include <SelectMgr_Selection.hxx>
-#include <SelectMgr_EntityOwner.hxx>
-
+#include <StdPrs_DeflectionCurve.hxx>
 
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Tangent, SketcherPrs_SymbolPrs);
@@ -82,7 +67,25 @@ void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs, Qu
   Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
+  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+
+  std::shared_ptr<GeomAPI_Shape> aShape1 = SketcherPrs_Tools::getShape(aObj1);
+  std::shared_ptr<GeomAPI_Shape> aShape2 = SketcherPrs_Tools::getShape(aObj2);
+
+  if ((aShape1.get() == NULL) || (aShape2.get() == NULL))
+    return;
+
+  std::shared_ptr<GeomAPI_Curve> aCurve1 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape1));
+  std::shared_ptr<GeomAPI_Curve> aCurve2 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape2));
+  if (aCurve1->isLine()) {
+    addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
+    GeomAdaptor_Curve aAdaptor(aCurve2->impl<Handle(Geom_Curve)>(), aCurve2->startParam(), aCurve2->endParam());
+    StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
+  } else {
+    addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
+    GeomAdaptor_Curve aAdaptor(aCurve1->impl<Handle(Geom_Curve)>(), aCurve1->startParam(), aCurve1->endParam());
+    StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
+  }
 }
 

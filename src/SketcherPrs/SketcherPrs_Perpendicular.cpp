@@ -8,21 +8,10 @@
 #include "SketcherPrs_Tools.h"
 #include "SketcherPrs_PositionMgr.h"
 
-#include <GeomAPI_Pnt.h>
-
 #include <SketchPlugin_Constraint.h>
 
-#include <AIS_Drawer.hxx>
-#include <gp_Pnt2d.hxx>
-
-#include <Prs3d_PointAspect.hxx>
-#include <Prs3d_Root.hxx>
-#include <Prs3d_LineAspect.hxx>
-
-#include <Graphic3d_MarkerImage.hxx>
-#include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
-#include <Graphic3d_ArrayOfSegments.hxx>
+#include <Prs3d_Root.hxx>
 
 
 
