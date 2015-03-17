@@ -85,7 +85,7 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
   if (myParentFeature.get()) {
     myFeature = myParentFeature->addFeature(getDescription()->operationId().toStdString());
   } else {
-    std::shared_ptr<ModelAPI_Document> aDoc = document();
+    std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->activeDocument();
     myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
   }
   if (myFeature) {  // TODO: generate an error if feature was not created
@@ -126,13 +126,6 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
   }
   return false;
 }
-
-
-std::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
-{
-  return ModelAPI_Session::get()->moduleDocument();
-}
-
 
 void ModuleBase_Operation::start()
 {

@@ -71,7 +71,7 @@ void SketcherPrs_SymbolPrs::prepareAspect()
 void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, std::string theAttrName) const
 {
   ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, theAttrName);
-  std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getLine(aObj);
+  std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aObj);
   if (aLine.get() == NULL)
     return;
   std::shared_ptr<GeomAPI_Edge> aEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLine));

@@ -56,7 +56,6 @@ class ModelAPI_Object
 
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
-  // MODELAPI_EXPORT
   MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Initializes the default states of the object

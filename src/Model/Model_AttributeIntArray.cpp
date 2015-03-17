@@ -20,12 +20,14 @@
 
 int Model_AttributeIntArray::size()
 {
-  return myArray.IsNull() ? 0 : myArray->Length();
+  // checking the validity because attribute (as a field) may be presented,
+  // but without label: it is undoed
+  return (myArray.IsNull() || !myArray->IsValid()) ? 0 : myArray->Length();
 }
 
 void Model_AttributeIntArray::setSize(const int theSize)
 {
-  if (myArray.IsNull()) { // create array if it is not done yet
+  if (myArray.IsNull() || !myArray->IsValid()) { // create array if it is not done yet
     if (theSize != 0) { // if size is zero, nothing to do (null array means there is no array)
       myArray = TDataStd_IntegerArray::Set(myLab, 0, theSize);
       owner()->data()->sendAttributeUpdated(this);

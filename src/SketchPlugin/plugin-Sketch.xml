@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
@@ -164,13 +164,23 @@
         </sketch_constraint_shape_selector>
       </feature>
     <!--  SketchConstraintEqual  -->
-      <feature id="SketchConstraintEqual" title="Equal" tooltip="Create constraint defining equality of two objects">
+      <feature id="SketchConstraintEqual" title="Equal" tooltip="Create constraint defining equality of two objects" icon=":icons/equal.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB"
             label="Last object" tooltip="Select line, circle or arc" shape_types="edge">
+        </sketch_constraint_shape_selector>
+      </feature>
+    <!--  SketchConstraintTangent  -->
+      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects">
+        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+            label="First object" tooltip="Select line or arc" shape_types="edge">
+        </sketch_constraint_shape_selector>
+        
+        <sketch_constraint_shape_selector id="ConstraintEntityB"
+            label="Last object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
       </feature>
     </group>

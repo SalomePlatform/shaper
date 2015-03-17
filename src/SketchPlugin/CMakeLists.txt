@@ -25,6 +25,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintHorizontal.h
     SketchPlugin_ConstraintVertical.h
     SketchPlugin_ConstraintEqual.h
+    SketchPlugin_ConstraintTangent.h
     SketchPlugin_ShapeValidator.h
     SketchPlugin_Validators.h
     SketchPlugin_ResultValidators.h 
@@ -50,6 +51,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintHorizontal.cpp
     SketchPlugin_ConstraintVertical.cpp
     SketchPlugin_ConstraintEqual.cpp
+    SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ShapeValidator.cpp
     SketchPlugin_Validators.cpp
     SketchPlugin_ResultValidators.cpp
@@ -97,5 +99,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintRigid.py
                TestConstraintHorizontal.py
                TestConstraintVertical.py
+               TestConstraintEqual.py
+               TestConstraintTangent.py
                TestHighload.py
                TestSnowflake.py)

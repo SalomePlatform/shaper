@@ -6,11 +6,12 @@
 
 #include "SketcherPrs_Factory.h"
 
-#include <SketcherPrs_Coincident.h>
-#include <SketcherPrs_Parallel.h>
-#include <SketcherPrs_Perpendicular.h>
-#include <SketcherPrs_Rigid.h>
-#include <SketcherPrs_HVDirection.h>
+#include "SketcherPrs_Coincident.h"
+#include "SketcherPrs_Parallel.h"
+#include "SketcherPrs_Perpendicular.h"
+#include "SketcherPrs_Rigid.h"
+#include "SketcherPrs_HVDirection.h"
+#include "SketcherPrs_Equal.h"
 
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
 AISObjectPtr SketcherPrs_Factory::NAME(SketchPlugin_Constraint* theConstraint, \
@@ -25,7 +26,8 @@ AISObjectPtr SketcherPrs_Factory::NAME(SketchPlugin_Constraint* theConstraint, \
 CONSTRAINT_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
 CONSTRAINT_PRS_IMPL(parallelConstraint, SketcherPrs_Parallel);
 CONSTRAINT_PRS_IMPL(perpendicularConstraint, SketcherPrs_Perpendicular);
-CONSTRAINT_PRS_IMPL(rigidConstraint, SketcherPrs_Rigid)
+CONSTRAINT_PRS_IMPL(rigidConstraint, SketcherPrs_Rigid);
+CONSTRAINT_PRS_IMPL(equalConstraint, SketcherPrs_Equal);
 
 
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(SketchPlugin_Constraint* theConstraint,

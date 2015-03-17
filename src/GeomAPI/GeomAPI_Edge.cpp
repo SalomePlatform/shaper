@@ -46,8 +46,12 @@ bool GeomAPI_Edge::isCircle() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)) && aCurve->IsClosed())
-    return true;
+  if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)))
+  {
+    // Check the difference of first and last parameters to be equal to the curve period
+    if (Abs(aLast - aFirst - aCurve->Period()) < Precision::PConfusion())
+      return true;
+  }
   return false;
 }
 
@@ -56,8 +60,12 @@ bool GeomAPI_Edge::isArc() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)) && !aCurve->IsClosed())
-    return true;
+  if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)))
+  {
+    // Check the difference of first and last parameters is not equal the curve period
+    if (Abs(aLast - aFirst - aCurve->Period()) >= Precision::PConfusion())
+      return true;
+  }
   return false;
 }
 

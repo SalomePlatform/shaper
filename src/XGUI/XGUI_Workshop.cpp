@@ -1461,7 +1461,6 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   }
 
   // 4. set the value to all results
-  static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   AttributeIntArrayPtr aColorAttr;
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
@@ -1474,7 +1473,6 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
         aColorAttr->setValue(0, aRedResult);
         aColorAttr->setValue(1, aGreenResult);
         aColorAttr->setValue(2, aBlueResult);
-        ModelAPI_EventCreator::get()->sendUpdated(anObj, EVENT_DISP);
       }
     }
   }
