@@ -93,7 +93,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintConcidence.py
                TestConstraintLength.py
                TestConstraintDistance.py
-#               TestConstraintParallel.py
+               TestConstraintParallel.py
                TestConstraintPerpendicular.py
                TestConstraintRadius.py
                TestConstraintRigid.py
@@ -101,6 +101,5 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintVertical.py
                TestConstraintEqual.py
                TestConstraintTangent.py
-               TestConstraintParallel.py
                TestHighload.py
                TestSnowflake.py)

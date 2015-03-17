@@ -61,8 +61,8 @@ aSession.startOperation()
 aConstraintEqRad = aSketchFeature.addFeature("SketchConstraintEqual")
 aRefObjectA = aConstraintEqRad.refattr("ConstraintEntityA")
 aRefObjectB = aConstraintEqRad.refattr("ConstraintEntityB")
-aResultA = modelAPI_ResultConstruction(aSketchArc.firstResult())
-aResultB = modelAPI_ResultConstruction(aSketchCircle.firstResult())
+aResultA = modelAPI_ResultConstruction(aSketchArc.lastResult())
+aResultB = modelAPI_ResultConstruction(aSketchCircle.lastResult())
 assert (aResultA is not None)
 assert (aResultB is not None)
 aRefObjectA.setObject(aResultA)
@@ -72,11 +72,8 @@ aSession.finishOperation()
 aCircRadius = aCircleRadius.value();
 anArcVecX = anArcStartPoint.x() - anArcCentr.x();
 anArcVecY = anArcStartPoint.y() - anArcCentr.y();
-anArcRadius = math.sqrt(anArcVecX * anArcVecX + anArcVecY * anArcVecY)
-print anArcStartPoint.x(), anArcStartPoint.y()
-print anArcCentr.x(), anArcCentr.y()
-print aCircRadius, anArcRadius
-assert (aCircRadius == anArcRadius)
+anArcRadius = math.sqrt(anArcVecX**2 + anArcVecY**2)
+assert (math.fabs(aCircRadius - anArcRadius) <= 1.e-10)
 #=========================================================================
 # Creation of two different lines
 #=========================================================================
@@ -116,7 +113,7 @@ aVecY = aLine1StartPoint.y() - aLine1EndPoint.y();
 aLine1Len = math.sqrt(anArcVecX * anArcVecX + anArcVecY * anArcVecY)
 aVecX = aLine2StartPoint.x() - aLine2EndPoint.x();
 aVecY = aLine2StartPoint.y() - aLine2EndPoint.y();
-aLine2Len = math.sqrt(anArcVecX * anArcVecX + anArcVecY * anArcVecY)
+aLine2Len = math.sqrt(anArcVecX**2 + anArcVecY**2)
 assert (aLine1Len == aLine2Len)
 #=========================================================================
 # End of test
