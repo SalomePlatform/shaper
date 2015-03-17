@@ -57,7 +57,7 @@ void SketcherPrs_HVDirection::Compute(const Handle(PrsMgr_PresentationManager3d)
   prepareAspect();
 
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(aObj1);
+  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getShape(aObj1);
   if (aLine1.get() == NULL)
     return;
 

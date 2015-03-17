@@ -8,6 +8,9 @@
 #include "SketcherPrs_Tools.h"
 
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Curve.h>
+#include <GeomAPI_Vertex.h>
+#include <GeomAPI_Dir.h>
 
 static const int MyStep = 20;
 
@@ -46,27 +49,51 @@ int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
   }
 }
 
-gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theLine, 
+gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape, 
                                             Handle(SketcherPrs_SymbolPrs) thePrs)
 {
-  std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getLine(theLine);
-  std::shared_ptr<GeomAPI_Edge> aEdge = 
-    std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape));
+  std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(theShape);
+  gp_Pnt aP; // Central point
+  gp_Vec aVec1; // main vector
+  if (aShape->isEdge()) {
+    std::shared_ptr<GeomAPI_Curve> aCurve = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
+    std::shared_ptr<GeomAPI_Pnt> aPnt1; // Start point of main vector
+    std::shared_ptr<GeomAPI_Pnt> aPnt2; // End point of main vector
+    if (aCurve->isLine()) {
+      std::shared_ptr<GeomAPI_Edge> aEdge = 
+        std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape));
 
-  std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
-  std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
+      aPnt1 = aEdge->firstPoint();
+      aPnt2 = aEdge->lastPoint();
 
-  // Find the middle point
-  gp_Pnt aP((aPnt1->x() + aPnt2->x())/2.,
-            (aPnt1->y() + aPnt2->y())/2.,
-            (aPnt1->z() + aPnt2->z())/2.);
+      // Find the middle point
+      aP = gp_Pnt((aPnt1->x() + aPnt2->x())/2.,
+                  (aPnt1->y() + aPnt2->y())/2.,
+                  (aPnt1->z() + aPnt2->z())/2.);
 
-  gp_Vec aVec1(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
+    } else {
+      double aMidParam = (aCurve->startParam() + aCurve->endParam()) / 2.;
+      std::shared_ptr<GeomAPI_Pnt> aPnt = aCurve->getPoint(aMidParam);
+      aP = aPnt->impl<gp_Pnt>();
+
+      aPnt1 = aCurve->getPoint((aMidParam + aCurve->endParam()) / 2.);
+      aPnt2 = aCurve->getPoint((aMidParam + aCurve->startParam()) / 2.);
+    }
+    aVec1 = gp_Vec(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
+  } else {
+    // This is a point
+    std::shared_ptr<GeomAPI_Vertex> aVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+    aP = aPnt->impl<gp_Pnt>();
+
+    std::shared_ptr<GeomAPI_Dir> aDir = thePrs->plane()->dirX();
+    aVec1 = gp_Vec(aDir->impl<gp_Dir>());
+  }
   gp_Vec aShift = aVec1.Crossed(thePrs->plane()->norm()->impl<gp_Dir>());
   aShift.Normalize();
   aShift.Multiply(MyStep);
 
-  int aPos = getPositionIndex(theLine, thePrs);
+  int aPos = getPositionIndex(theShape, thePrs);
   int aM = 1;
   if ((aPos % 2) == 0) {
     // Even position

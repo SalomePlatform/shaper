@@ -20,7 +20,7 @@ namespace SketcherPrs_Tools {
   ObjectPtr getResult(SketchPlugin_Constraint* theFeature,
                       const std::string& theAttrName);
 
-  std::shared_ptr<GeomAPI_Shape> getLine(ObjectPtr theObject);
+  std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject);
 
   std::shared_ptr<GeomAPI_Pnt2d> getPoint(SketchPlugin_Constraint* theFeature,
                                           const std::string& theAttrName);

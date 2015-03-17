@@ -10,6 +10,8 @@
 #include <GeomAPI_Shape.h>
 #include <memory>
 
+class GeomAPI_Pnt;
+
 /**\class GeomAPI_Curve
  * \ingroup DataModel
  * \brief Interface to the generic curve object
@@ -33,6 +35,19 @@ class GEOMAPI_EXPORT GeomAPI_Curve : public GeomAPI_Interface
   /// Returns whether the curve is circular
   virtual bool isCircle() const;
 
+  /// Returns start parameter of the curve
+  double startParam() const { return myStart; }
+
+  /// Returns end parameter of the curve
+  double endParam() const { return myEnd; }
+
+  /// Returns point on the curve by parameter
+  /// \param theParam parameter on the curve
+  std::shared_ptr<GeomAPI_Pnt> getPoint(double theParam);
+
+private:
+  double myStart;
+  double myEnd;
 };
 
 #endif

@@ -27,7 +27,7 @@ ObjectPtr getResult(SketchPlugin_Constraint* theFeature, const std::string& theA
 }
 
 
-std::shared_ptr<GeomAPI_Shape> getLine(ObjectPtr theObject)
+std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject)
 {
   ResultConstructionPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
   if (aRes.get() != NULL) {
