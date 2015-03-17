@@ -75,6 +75,8 @@ class ModelAPI_Feature : public ModelAPI_Object
                                  const int theIndex);
   /// removes the result from the feature
   MODELAPI_EXPORT void removeResult(const std::shared_ptr<ModelAPI_Result>& theResult);
+  /// removes all results starting from the gived index (zero-based)
+  MODELAPI_EXPORT void removeResults(const int theSinceIndex);
   /// removes all results from the feature
   MODELAPI_EXPORT void eraseResults();
   /// removes all fields from this feature: results, data, etc

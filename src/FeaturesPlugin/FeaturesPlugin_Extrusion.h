@@ -30,30 +30,24 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
     static const std::string MY_EXTRUSION_ID("Extrusion");
     return MY_EXTRUSION_ID;
   }
-  /// attribute name of referenced face
-  inline static const std::string& FACE_ID()
-  {
-    static const std::string MY_FACE_ID("extrusion_face");
-    return MY_FACE_ID;
-  }
   /// attribute name of references sketch entities list, it should contain a sketch result or
   /// a pair a sketch result to sketch face
   inline static const std::string& LIST_ID()
   {
-    static const std::string MY_GROUP_LIST_ID("group_list");
+    static const std::string MY_GROUP_LIST_ID("base");
     return MY_GROUP_LIST_ID;
   }
 
   /// attribute name of extrusion size
   inline static const std::string& SIZE_ID()
   {
-    static const std::string MY_SIZE_ID("extrusion_size");
+    static const std::string MY_SIZE_ID("size");
     return MY_SIZE_ID;
   }
   /// attribute name of reverse direction
   inline static const std::string& REVERSE_ID()
   {
-    static const std::string MY_REVERSE_ID("extrusion_reverse");
+    static const std::string MY_REVERSE_ID("reverse");
     return MY_REVERSE_ID;
   }
 

@@ -75,7 +75,8 @@ static TCollection_ExtendedString DocFileName(const char* theFileName, const std
 {
   TCollection_ExtendedString aPath((const Standard_CString) theFileName);
   // remove end-separators
-  while(aPath.Length() && (aPath.Value(aPath.Length()) == '\\' || aPath.Value(aPath.Length()) == '/'))
+  while(aPath.Length() && 
+        (aPath.Value(aPath.Length()) == '\\' || aPath.Value(aPath.Length()) == '/'))
     aPath.Remove(aPath.Length());
   aPath += _separator_;
   aPath += theID.c_str();
@@ -583,8 +584,8 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 /// Appenad to the array of references a new referenced label.
 /// If theIndex is not -1, removes element at this index, not theReferenced.
 /// \returns the index of removed element
-static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, const int theIndex =
-                                  -1)
+static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, 
+  const int theIndex = -1)
 {
   int aResult = -1;  // no returned
   Handle(TDataStd_ReferenceArray) aRefs;
@@ -931,7 +932,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   static Events_ID aToHideEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->activateFlushes(false);
 
-  // update all objects by checking are they of labels or not
+  // update all objects by checking are they on labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter.More(); aLabIter.Next()) {
@@ -1052,7 +1053,8 @@ void Model_Document::synchronizeBackRefs()
     if (aFData) {
       std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
       aFData->referencesToObjects(aRefs);
-      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefsIter = aRefs.begin();
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator 
+        aRefsIter = aRefs.begin();
       for(; aRefsIter != aRefs.end(); aRefsIter++) {
         std::list<ObjectPtr>::iterator aRefTo = aRefsIter->second.begin();
         for(; aRefTo != aRefsIter->second.end(); aRefTo++) {
@@ -1099,7 +1101,11 @@ void Model_Document::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
   theResult->setDoc(aThis);
   initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) {  // if was not initialized, generate event and set a name
-    theResult->data()->setName(theFeatureData->name());
+    std::stringstream aNewName;
+    aNewName<<theFeatureData->name();
+    if (theResultIndex > 0) // if there are several results, add unique prefix starting from second
+      aNewName<<"_"<<theResultIndex + 1;
+    theResult->data()->setName(aNewName.str());
   }
 }
 
