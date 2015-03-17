@@ -20,15 +20,12 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
   ObjectPtr aSelectedObject = theSelectedObject;
   GeomShapePtr aShape = theShape;
 
-  if (!aSelectedObject)
-    return false;
-
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aSelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
     return false;
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  if ((!aSPFeature) && (!aShape->isNull())) {
+  if (aSPFeature.get() != NULL && aShape.get() != NULL && !aShape->isNull()) {
     // Processing of external (non-sketch) object
     ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(aShape->impl<TopoDS_Shape>(),
                                                                 aSelectedObject, mySketch);
@@ -56,12 +53,10 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
           aRefAttr->setAttr(aPntAttr);
         else if (aSelectedObject)
           aRefAttr->setObject(aSelectedObject);
-        //updateObject(myFeature);
         return true;
       }
     }
   }
   return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, aShape);
 }
-
 
