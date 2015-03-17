@@ -219,9 +219,6 @@ signals:
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
 
-  /// Returns pointer to the root document.
-  std::shared_ptr<ModelAPI_Document> document() const;
-
   /// Return a widget value point by the selection and the viewer position
   /// The default realization returns false
   /// \param thePrs the presentation

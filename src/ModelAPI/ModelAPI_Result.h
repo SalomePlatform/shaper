@@ -53,6 +53,10 @@ class ModelAPI_Result : public ModelAPI_Object
 
   /// Returns the shape-result produced by this feature (or null if no shapes)
   MODELAPI_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
+
+  /// On change of attribute of the result update presentation of this result:
+  /// for the current moment there are only presentation attributes assigned to results
+  MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
 };
 
 //! Pointer on feature object

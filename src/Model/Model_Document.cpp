@@ -923,6 +923,12 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
     Model_Application::getApplication()->getDocument(myID);
   // after all updates, sends a message that groups of features were created or updated
   Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aDispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID aCreateEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  static Events_ID aToHideEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->activateFlushes(false);
 
   // update all objects by checking are they of labels or not
@@ -934,8 +940,8 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
     if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
       aFeature = ModelAPI_Session::get()->createFeature(
-          TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
-              .ToCString());
+        TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
+        .ToCString());
       if (!aFeature) {  // somethig is wrong, most probably, the opened document has invalid structure
         Events_Error::send("Invalid type of object in the document");
         aLabIter.Value()->Label().ForgetAllAttributes();
@@ -947,18 +953,16 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       initData(aFeature, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
 
       // event: model is updated
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, aCreateEvent);
     } else {  // nothing is changed, both iterators are incremented
       aFeature = myObjs.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
       if (theMarkUpdated) {
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-        ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+        ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
       }
     }
   }
-  // update results of thefeatures (after features created because they may be connected, like sketch and sub elements)
+  // update results of the features (after features created because they may be connected, like sketch and sub elements)
   std::list<FeaturePtr> aComposites; // composites must be updated after their subs (issue 360)
   TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter2.More(); aLabIter2.Next()) {
@@ -979,23 +983,20 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
   while (aFIter.More()) {
     if (aKeptFeatures.find(aFIter.Value()) == aKeptFeatures.end()
-        && aNewFeatures.find(aFIter.Value()) == aNewFeatures.end()) {
-      FeaturePtr aFeature = aFIter.Value();
-      // event: model is updated
-      //if (aFeature->isInHistory()) {
+      && aNewFeatures.find(aFIter.Value()) == aNewFeatures.end()) {
+        FeaturePtr aFeature = aFIter.Value();
+        // event: model is updated
+        //if (aFeature->isInHistory()) {
         ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
-      //}
-      // results of this feature must be redisplayed (hided)
-      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      // redisplay also removed feature (used for sketch and AISObject)
-      ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
-      aFeature->erase();
-      // unbind after the "erase" call: on abort sketch is removes sub-objects that corrupts aFIter
-      myObjs.UnBind(aFIter.Key());
-      // reinitialize iterator because unbind may corrupt the previous order in the map
-      aFIter.Initialize(myObjs);
+        //}
+        // results of this feature must be redisplayed (hided)
+        // redisplay also removed feature (used for sketch and AISObject)
+        ModelAPI_EventCreator::get()->sendUpdated(aFeature, aRedispEvent);
+        aFeature->erase();
+        // unbind after the "erase" call: on abort sketch is removes sub-objects that corrupts aFIter
+        myObjs.UnBind(aFIter.Key());
+        // reinitialize iterator because unbind may corrupt the previous order in the map
+        aFIter.Initialize(myObjs);
     } else
       aFIter.Next();
   }
@@ -1007,11 +1008,11 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   myExecuteFeatures = false;
   aLoop->activateFlushes(true);
 
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
+  aLoop->flush(aCreateEvent);
+  aLoop->flush(aDeleteEvent);
+  aLoop->flush(anUpdateEvent);
+  aLoop->flush(aRedispEvent);
+  aLoop->flush(aToHideEvent);
   myExecuteFeatures = true;
 }
 
