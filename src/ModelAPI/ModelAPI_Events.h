@@ -150,15 +150,16 @@ class ModelAPI_DocumentCreatedMessage : public Events_Message
   MODELAPI_EXPORT ModelAPI_DocumentCreatedMessage(const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_DocumentCreatedMessage();
-
+  /// Static. Returns EventID of the message.
   MODELAPI_EXPORT static Events_ID eventId()
   {
     static const char * MY_DOCUMENT_CREATED_EVENT_ID("DocumentCreated");
     return Events_Loop::eventByName(MY_DOCUMENT_CREATED_EVENT_ID);
   }
 
-
+  /// Returns a document stored in the message
   MODELAPI_EXPORT DocumentPtr document() const;
+  /// Sets a document to the message
   MODELAPI_EXPORT void setDocument(DocumentPtr theDocument);
 };
 
