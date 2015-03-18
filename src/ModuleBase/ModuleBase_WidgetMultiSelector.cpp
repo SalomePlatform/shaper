@@ -214,7 +214,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   for (aIt = aOwnersList.cbegin(); aIt != aOwnersList.cend(); aShpIt.Next(), aIt++) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
     // this case should be moved to PartSet module after redesign this class
-    if (aShpIt.Value().ShapeType() == TopAbs_COMPOUND) {
+    /*if (aShpIt.Value().ShapeType() == TopAbs_COMPOUND) {
       int aValue = 0;
       AIS_ListOfInteractive aList;
       aSelection->selectedAISObjects(aList);
@@ -237,7 +237,8 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
         }
       }
     }
-    else {
+    else*/
+    {
       if (myFeature) {
         // We can not select a result of our feature
         const std::list<ResultPtr>& aResList = myFeature->results();
@@ -255,7 +256,12 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
       aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
 
-      mySelection.append(GeomSelection(aResult, aShape));
+      if (aShape->isEqual(aResult->shape())) {
+        aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        mySelection.append(GeomSelection(aResult, aShape));
+      }
+      else
+        mySelection.append(GeomSelection(aResult, aShape));
     }
   }
   //updateSelectionList();
