@@ -5,17 +5,28 @@ INCLUDE(FindSolveSpace)
 
 SET(PROJECT_HEADERS
     SketchSolver.h
+    SketchSolver_Error.h
     SketchSolver_Solver.h
     SketchSolver_Constraint.h
-    SketchSolver_ConstraintGroup.h
+    SketchSolver_ConstraintCoincidence.h
+    SketchSolver_ConstraintRigid.h
+    SketchSolver_Builder.h
+    SketchSolver_Group.h
     SketchSolver_ConstraintManager.h
+    SketchSolver_Storage.h
+    SketchSolver_FeatureStorage.h
 )
 
 SET(PROJECT_SOURCES
     SketchSolver_Solver.cpp
     SketchSolver_Constraint.cpp
-    SketchSolver_ConstraintGroup.cpp
+    SketchSolver_ConstraintCoincidence.cpp
+    SketchSolver_ConstraintRigid.cpp
+    SketchSolver_Builder.cpp
+    SketchSolver_Group.cpp
     SketchSolver_ConstraintManager.cpp
+    SketchSolver_Storage.cpp
+    SketchSolver_FeatureStorage.cpp
 )
 
 SET(PROJECT_LIBRARIES
