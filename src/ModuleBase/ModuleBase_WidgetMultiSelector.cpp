@@ -133,7 +133,7 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
     // Store shapes type
     TopAbs_ShapeEnum aCurrentType =
           ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
-    aSelectionListAttr->setSelectionType((int) aCurrentType);
+    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
     // Store selection in the attribute
     foreach (GeomSelection aSelec, mySelection) {
       aSelectionListAttr->append(aSelec.first, aSelec.second);
@@ -158,8 +158,8 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
   if (aSelectionListAttr) {
     mySelection.clear();
     // Restore shape type
-    TopAbs_ShapeEnum aShapeType = (TopAbs_ShapeEnum) aSelectionListAttr->selectionType();
-    setCurrentShapeType(aShapeType);
+    setCurrentShapeType(
+      ModuleBase_WidgetShapeSelector::shapeType(aSelectionListAttr->selectionType().c_str()));
     // Restore selection in the list
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);

@@ -32,11 +32,11 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
 
   /// The type of all elements selection
   /// \returns the index of the enumeration of the type of shape
-  virtual int selectionType() = 0;
+  virtual const std::string selectionType() const = 0;
 
   /// Sets the type of all elements selection
   /// \param theType the index of the enumeration of the type of shape
-  virtual void setSelectionType(int theType) = 0;
+  virtual void setSelectionType(const std::string& theType) = 0;
 
   /// Returns the attribute selection by the index (zero based)
   virtual std::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex) = 0;

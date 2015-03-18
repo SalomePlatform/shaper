@@ -134,7 +134,9 @@ class Model_Data : public ModelAPI_Data
   /// for each attribute of the object
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
-  MODEL_EXPORT virtual void addAttribute(const std::string& theID, const std::string theAttrType);
+  /// \returns the just created attribute
+  MODEL_EXPORT virtual AttributePtr 
+    addAttribute(const std::string& theID, const std::string theAttrType);
 
   /// Useful method for "set" methods of the attributes: sends an UPDATE event and
   /// makes attribute initialized
