@@ -64,7 +64,8 @@ void SketchPlugin_ConstraintMirror::execute()
       if (aMirrorIter != aMirroredList.end())
         break; // the lists are inconsistent
       // There is no mirrored object yet, create it
-      FeaturePtr aNewFeature = aFeatureIn->document()->addFeature(aFeatureIn->getKind());
+      FeaturePtr aNewFeature = sketch()->addFeature(aFeatureIn->getKind());
+      aFeatureIn->data()->copyTo(aNewFeature->data());
       aRefListOfMirrored->append(aNewFeature);
       continue;
     }

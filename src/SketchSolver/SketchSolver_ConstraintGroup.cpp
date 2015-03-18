@@ -24,6 +24,7 @@
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
 
 #include <SketchPlugin_Arc.h>
@@ -155,7 +156,19 @@ bool SketchSolver_ConstraintGroup::isInteract(
   std::list<std::shared_ptr<ModelAPI_Attribute>>::const_iterator
       anAttrIter = anAttrList.begin();
   for ( ; anAttrIter != anAttrList.end(); anAttrIter++) {
-    std::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef =
+    AttributeRefListPtr aCAttrRefList = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIter);
+    if (aCAttrRefList) {
+      std::list<ObjectPtr> anObjList = aCAttrRefList->list();
+      std::list<ObjectPtr>::iterator anIt = anObjList.begin();
+      for ( ; anIt != anObjList.end(); anIt++) {
+        FeaturePtr aFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
+        if (aFeature && myEntityFeatMap.find(aFeature) != myEntityFeatMap.end())
+          return true;
+      }
+      continue;
+    }
+    AttributeRefAttrPtr aCAttrRef =
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
     if (!aCAttrRef || !aCAttrRef->isObject()) {
       std::shared_ptr<ModelAPI_Attribute> anAttr = 
@@ -232,8 +245,12 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   if (myWorkplane.h == SLVS_E_UNKNOWN)
     return false;
 
-  if (theConstraint && theConstraint->getKind() == SketchPlugin_ConstraintRigid::ID())
-    return changeRigidConstraint(theConstraint);
+  if (theConstraint) {
+    if (theConstraint->getKind() == SketchPlugin_ConstraintRigid::ID())
+      return changeRigidConstraint(theConstraint);
+    if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID())
+      return changeMirrorConstraint(theConstraint);
+  }
 
   // Search this constraint in the current group to update it
   ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.find(theConstraint);
@@ -579,6 +596,140 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
         myNeedToSolve = true;
     }
   }
+  return true;
+}
+
+// ============================================================================
+//  Function: changeMirrorConstraint
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create/update the "Mirror" constraint in the group
+// ============================================================================
+bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
+    std::shared_ptr<SketchPlugin_Constraint> theConstraint)
+{
+  DataPtr aConstrData = theConstraint->data();
+
+  // Search this constraint in the current group to update it
+  ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.find(theConstraint);
+  std::vector<Slvs_Constraint>::iterator aConstrIter;
+  if (aConstrMapIter != myConstraintMap.end()) {
+    int aConstrPos = Search(aConstrMapIter->second.front(), myConstraints);
+    aConstrIter = myConstraints.begin() + aConstrPos;
+  }
+
+  // Get constraint type and verify the constraint parameters are correct
+  SketchSolver_Constraint aConstraint(theConstraint);
+  int aConstrType = aConstraint.getType();
+  if (aConstrType == SLVS_C_UNKNOWN
+      || (aConstrMapIter != myConstraintMap.end() && aConstrIter->type != aConstrType))
+    return false;
+  const std::vector<std::string>& aConstraintAttributes = aConstraint.getAttributes();
+
+  Slvs_hEntity aMirrorLineEnt = SLVS_E_UNKNOWN;
+  AttributeRefAttrPtr aConstrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+      aConstrData->attribute(aConstraintAttributes[0]));
+  if (!aConstrAttr)
+    return false;
+
+  // Convert the object of the attribute to the feature
+  FeaturePtr aMirrorLineFeat;
+  if (aConstrAttr->isObject() && aConstrAttr->object()) {
+    ResultConstructionPtr aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+        aConstrAttr->object());
+    if (!aRC)
+      return false;
+    std::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+    aMirrorLineFeat = aDoc->feature(aRC);
+  }
+  aMirrorLineEnt = aConstrAttr->isObject() ?
+      changeEntityFeature(aMirrorLineFeat) : changeEntity(aConstrAttr->attr());
+
+  if (aConstrMapIter == myConstraintMap.end()) { // Add new constraint
+    // Append symmetric constraint for each point of mirroring features
+    AttributeRefListPtr aBaseRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        aConstrData->attribute(aConstraintAttributes[1]));
+    AttributeRefListPtr aMirroredRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        aConstrData->attribute(aConstraintAttributes[2]));
+    if (!aBaseRefList || !aMirroredRefList)
+      return false;
+
+    std::list<ObjectPtr> aBaseList = aBaseRefList->list();
+    std::list<ObjectPtr> aMirroredList = aMirroredRefList->list();
+    if (aBaseList.size() != aMirroredList.size())
+      return false;
+
+    myConstraintMap[theConstraint] = std::vector<Slvs_hEntity>();
+
+    FeaturePtr aBaseFeature, aMirrorFeature;
+    ResultConstructionPtr aRC;
+    std::list<ObjectPtr>::iterator aBaseIter = aBaseList.begin();
+    std::list<ObjectPtr>::iterator aMirIter = aMirroredList.begin();
+    for ( ; aBaseIter != aBaseList.end(); aBaseIter++, aMirIter++) {
+      aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aBaseIter);
+      aBaseFeature = aRC ? aRC->document()->feature(aRC) :
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aBaseIter);
+      aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aMirIter);
+      aMirrorFeature = aRC ? aRC->document()->feature(aRC) :
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aMirIter);
+
+      if (!aBaseFeature || !aMirrorFeature || 
+          aBaseFeature->getKind() != aMirrorFeature->getKind())
+        return false;
+      Slvs_hEntity aBaseEnt = changeEntityFeature(aBaseFeature);
+      Slvs_hEntity aMirrorEnt = changeEntityFeature(aMirrorFeature);
+
+      if (aBaseFeature->getKind() == SketchPlugin_Point::ID()) {
+        Slvs_Constraint aConstraint = Slvs_MakeConstraint(++myConstrMaxID, myID, aConstrType,
+            myWorkplane.h, 0.0, aBaseEnt, aMirrorEnt, aMirrorLineEnt, SLVS_E_UNKNOWN);
+        myConstraints.push_back(aConstraint);
+        myConstraintMap[theConstraint].push_back(aConstraint.h);
+      } else {
+        int aBasePos = Search(aBaseEnt, myEntities);
+        int aMirrorPos = Search(aMirrorEnt, myEntities);
+        if (aBaseFeature->getKind() == SketchPlugin_Line::ID()) {
+          for (int ind = 0; ind < 2; ind++) {
+            Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+                ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
+                myEntities[aBasePos].point[ind], myEntities[aMirrorPos].point[ind],
+                aMirrorLineEnt, SLVS_E_UNKNOWN);
+            myConstraints.push_back(aConstraint);
+            myConstraintMap[theConstraint].push_back(aConstraint.h);
+          }
+        } else if (aBaseFeature->getKind() == SketchPlugin_Circle::ID()) {
+          Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+              ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
+              myEntities[aBasePos].point[0], myEntities[aMirrorPos].point[0],
+              aMirrorLineEnt, SLVS_E_UNKNOWN);
+          myConstraints.push_back(aConstraint);
+          myConstraintMap[theConstraint].push_back(aConstraint.h);
+          // Additional constraint for equal radii
+          Slvs_Constraint anEqRadConstr = Slvs_MakeConstraint(
+              ++myConstrMaxID, myID, SLVS_C_EQUAL_RADIUS, myWorkplane.h, 0.0,
+              SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aBaseEnt, aMirrorEnt);
+          myConstraints.push_back(anEqRadConstr);
+          myConstraintMap[theConstraint].push_back(anEqRadConstr.h);
+        } else if (aBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
+          int aBaseArcInd[3] = {0, 1, 2}; // indices of points of arc, center corresponds center, first point corresponds last point
+          int aMirrorArcInd[3] = {0, 2, 1};
+          for (int ind = 0; ind < 2; ind++) {
+            Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+                ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
+                myEntities[aBasePos].point[aBaseArcInd[ind]], myEntities[aMirrorPos].point[aMirrorArcInd[ind]],
+                aMirrorLineEnt, SLVS_E_UNKNOWN);
+            myConstraints.push_back(aConstraint);
+            myConstraintMap[theConstraint].push_back(aConstraint.h);
+          }
+        }
+      }
+    }
+  }
+
+  // Set the mirror line unchanged during constraint recalculation
+  if (aConstrAttr->isObject()) {
+    addTemporaryConstraintWhereDragged(aMirrorLineFeat->attribute(SketchPlugin_Line::START_ID()));
+    addTemporaryConstraintWhereDragged(aMirrorLineFeat->attribute(SketchPlugin_Line::END_ID()));
+  }
+  else addTemporaryConstraintWhereDragged(aConstrAttr->attr());
   return true;
 }
 

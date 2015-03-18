@@ -122,5 +122,37 @@ aRefListB.append(aSketchLine2)
 aMirror.execute()
 aSession.finishOperation()
 #=========================================================================
+# Verify the simmetricity of all mirrored objects
+#=========================================================================
+aRefListC = aMirror.reflist("ConstraintEntityC")
+aListSize = aRefListB.size()
+aLineDirX = aLineEndPoint.x() - aLineStartPoint.x()
+aLineDirY = aLineEndPoint.y() - aLineStartPoint.y()
+
+for ind in range(0, aListSize):
+  aFeatureB = modelAPI_Feature(aRefListB.object(ind))
+  aFeatureC = modelAPI_Feature(aRefListC.object(ind))
+  assert(aFeatureB is not None)
+  assert(aFeatureC is not None)
+  assert(aFeatureB.getKind() == aFeatureC.getKind())
+  anAttributes = {}
+  print aFeatureB.getKind()
+  if (aFeatureB.getKind() == "SketchLine"):
+    anAttributes = {'StartPoint':'StartPoint', 'EndPoint':'EndPoint'}
+  elif (aFeatureB.getKind() == "SketchArc"):
+    anAttributes = {'ArcCenter':'ArcCenter', 'ArcStartPoint':'ArcEndPoint', 'ArcEndPoint':'ArcStartPoint'}
+
+  for key in anAttributes:
+    aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
+    aPointC = geomDataAPI_Point2D(aFeatureC.attribute(anAttributes[key]))
+    aDirX = aPointC.x() - aPointB.x()
+    aDirY = aPointC.y() - aPointB.y()
+    aDot = aLineDirX * aDirX + aLineDirY * aDirY
+    assert(math.fabs(aDot) < 1.e-10)
+    aDirX = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
+    aDirY = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
+    aCross = aLineDirX * aDirY - aLineDirY * aDirX
+    assert(math.fabs(aCross) < 1.e-10)
+#=========================================================================
 # End of test
 #=========================================================================
