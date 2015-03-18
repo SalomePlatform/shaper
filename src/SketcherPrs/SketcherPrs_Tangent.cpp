@@ -78,14 +78,20 @@ void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs, Qu
 
   std::shared_ptr<GeomAPI_Curve> aCurve1 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape1));
   std::shared_ptr<GeomAPI_Curve> aCurve2 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape2));
-  if (aCurve1->isLine()) {
+  if (aCurve1->isCircle() && aCurve2->isLine()) {
+    addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
+    GeomAdaptor_Curve aAdaptor(aCurve1->impl<Handle(Geom_Curve)>(), aCurve1->startParam(), aCurve1->endParam());
+    StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
+  } else if (aCurve1->isLine() && aCurve2->isCircle()) {
     addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
     GeomAdaptor_Curve aAdaptor(aCurve2->impl<Handle(Geom_Curve)>(), aCurve2->startParam(), aCurve2->endParam());
     StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
   } else {
-    addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
-    GeomAdaptor_Curve aAdaptor(aCurve1->impl<Handle(Geom_Curve)>(), aCurve1->startParam(), aCurve1->endParam());
-    StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
+    // Both curves are arcs
+    GeomAdaptor_Curve aAdaptor1(aCurve1->impl<Handle(Geom_Curve)>(), aCurve1->startParam(), aCurve1->endParam());
+    StdPrs_DeflectionCurve::Add(thePrs, aAdaptor1, myDrawer);
+    GeomAdaptor_Curve aAdaptor2(aCurve2->impl<Handle(Geom_Curve)>(), aCurve2->startParam(), aCurve2->endParam());
+    StdPrs_DeflectionCurve::Add(thePrs, aAdaptor2, myDrawer);
   }
 }
 
