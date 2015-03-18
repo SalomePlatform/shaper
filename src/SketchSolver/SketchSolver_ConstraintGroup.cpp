@@ -711,7 +711,7 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
         } else if (aBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
           int aBaseArcInd[3] = {0, 1, 2}; // indices of points of arc, center corresponds center, first point corresponds last point
           int aMirrorArcInd[3] = {0, 2, 1};
-          for (int ind = 0; ind < 2; ind++) {
+          for (int ind = 0; ind < 3; ind++) {
             Slvs_Constraint aConstraint = Slvs_MakeConstraint(
                 ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
                 myEntities[aBasePos].point[aBaseArcInd[ind]], myEntities[aMirrorPos].point[aMirrorArcInd[ind]],
@@ -722,14 +722,20 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
         }
       }
     }
-  }
 
-  // Set the mirror line unchanged during constraint recalculation
-  if (aConstrAttr->isObject()) {
-    addTemporaryConstraintWhereDragged(aMirrorLineFeat->attribute(SketchPlugin_Line::START_ID()));
-    addTemporaryConstraintWhereDragged(aMirrorLineFeat->attribute(SketchPlugin_Line::END_ID()));
+    // Set the mirror line unchanged during constraint recalculation
+    int aMirrorLinePos = Search(aMirrorLineEnt, myEntities);
+    Slvs_Constraint aRigidStart = Slvs_MakeConstraint(
+        ++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, myWorkplane.h, 0,
+        myEntities[aMirrorLinePos].point[0], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+    myConstraints.push_back(aRigidStart);
+    myConstraintMap[theConstraint].push_back(aRigidStart.h);
+    Slvs_Constraint aRigidEnd = Slvs_MakeConstraint(
+        ++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, myWorkplane.h, 0,
+        myEntities[aMirrorLinePos].point[1], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+    myConstraints.push_back(aRigidEnd);
+    myConstraintMap[theConstraint].push_back(aRigidEnd.h);
   }
-  else addTemporaryConstraintWhereDragged(aConstrAttr->attr());
   return true;
 }
 
