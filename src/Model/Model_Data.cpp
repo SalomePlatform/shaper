@@ -67,8 +67,9 @@ void Model_Data::setName(const std::string& theName)
   }
 }
 
-void Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)
+AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)
 {
+  AttributePtr aResult;
   TDF_Label anAttrLab = myLab.FindChild(myAttrs.size() + 1);
   ModelAPI_Attribute* anAttr = 0;
   if (theAttrType == ModelAPI_AttributeDocRef::type()) {
@@ -103,12 +104,14 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
     anAttr = new GeomData_Point2D(anAttrLab);
   }
   if (anAttr) {
-    myAttrs[theID] = std::shared_ptr<ModelAPI_Attribute>(anAttr);
+    aResult = std::shared_ptr<ModelAPI_Attribute>(anAttr);
+    myAttrs[theID] = aResult;
     anAttr->setObject(myObject);
     anAttr->setID(theID);
   } else {
     Events_Error::send("Can not create unknown type of attribute " + theAttrType);
   }
+  return aResult;
 }
 
 // macro for gthe generic returning of the attribute by the ID

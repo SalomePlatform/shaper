@@ -73,7 +73,6 @@ aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
-anExtrusionFt.selectionList("base").setSelectionType(4)
 anExtrusionFt.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
 anExtrusionFt.real("size").setValue(50)

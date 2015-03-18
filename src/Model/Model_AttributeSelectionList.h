@@ -11,7 +11,7 @@
 #include "Model_AttributeSelection.h"
 #include <ModelAPI_AttributeSelectionList.h>
 #include <TDataStd_Integer.hxx>
-#include <TDataStd_Real.hxx>
+#include <TDataStd_Comment.hxx>
 #include <vector>
 
 /**\class Model_AttributeSelectionList
@@ -23,7 +23,7 @@
 class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 {
   Handle(TDataStd_Integer) mySize;  ///< Contains size of this list
-  Handle(TDataStd_Real) mySelectionType;  ///< Contains current index, TODO: make it integer, not real
+  Handle(TDataStd_Comment) mySelectionType;  ///< Contains current type name (same as selection attribute)
 public:
   /// Adds the new reference to the end of the list
   MODEL_EXPORT virtual void append(
@@ -38,11 +38,11 @@ public:
 
   /// The type of all elements selection
   /// \returns the index of the OCCT enumeration of the type of shape
-  MODEL_EXPORT virtual int selectionType();
+  MODEL_EXPORT virtual const std::string selectionType() const;
 
   /// Sets the type of all elements selection
   /// \param theType the index of the OCCT enumeration of the type of shape
-  MODEL_EXPORT virtual void setSelectionType(int theType);
+  MODEL_EXPORT virtual void setSelectionType(const std::string& theType);
 
   /// Returns the attribute selection by the index (zero based)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex);

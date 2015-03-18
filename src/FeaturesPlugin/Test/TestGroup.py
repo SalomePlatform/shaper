@@ -66,8 +66,6 @@ GeomAlgoAPI_SketchBuilder.createFaces(
     origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
 # Create extrusion on them
 anExtrusionFt = aPart.addFeature("Extrusion")
-# selection type FACE=4
-anExtrusionFt.selectionList("base").setSelectionType(4)
 anExtrusionFt.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
 anExtrusionFt.real("size").setValue(50)
@@ -83,8 +81,7 @@ anExtrusionBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
 aSession.startOperation()
 aGroupFeature = aSession.activeDocument().addFeature("Group")
 aSelectionListAttr = aGroupFeature.selectionList("group_list")
-topAbs_EdgeType = 6
-aSelectionListAttr.setSelectionType(topAbs_EdgeType)
+aSelectionListAttr.setSelectionType("edge")
 aSelectionListAttr.append("Extrusion_1/LateralFace_3|Extrusion_1/LateralFace_1")
 aSession.finishOperation()
 #=========================================================================

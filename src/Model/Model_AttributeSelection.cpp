@@ -777,25 +777,33 @@ std::string Model_AttributeSelection::namingName()
 
 TopAbs_ShapeEnum translateType (const std::string& theType)
 {
-  TCollection_AsciiString aStr(theType.c_str());
-  aStr.UpperCase();
-  if(aStr.IsEqual("COMP"))
-	return TopAbs_COMPOUND;
-  else if(aStr.IsEqual("COMS"))
-	return TopAbs_COMPSOLID;
-  else if(aStr.IsEqual("SOLD"))
-	return TopAbs_SOLID;
-  else if(aStr.IsEqual("SHEL"))
-	return TopAbs_SHELL;
-  else if(aStr.IsEqual("FACE"))
-	return TopAbs_FACE;
-  else if(aStr.IsEqual("WIRE"))
-	return TopAbs_WIRE;
-  else if(aStr.IsEqual("EDGE"))
-	return TopAbs_EDGE;
-  else if(aStr.IsEqual("VERT"))
-	return TopAbs_VERTEX;  
-
+  // map from the textual shape types to OCCT enumeration
+  static std::map<std::string, TopAbs_ShapeEnum> MyShapeTypes;
+  if (MyShapeTypes.size() == 0) {
+    MyShapeTypes["face"] = TopAbs_FACE;
+    MyShapeTypes["faces"] = TopAbs_FACE;
+    MyShapeTypes["vertex"] = TopAbs_VERTEX;
+    MyShapeTypes["vertices"] = TopAbs_VERTEX;
+    MyShapeTypes["wire"] = TopAbs_WIRE;
+    MyShapeTypes["edge"] = TopAbs_EDGE;
+    MyShapeTypes["edges"] = TopAbs_EDGE;
+    MyShapeTypes["shell"] = TopAbs_SHELL;
+    MyShapeTypes["solid"] = TopAbs_SOLID;
+    MyShapeTypes["solids"] = TopAbs_SOLID;
+    MyShapeTypes["FACE"] = TopAbs_FACE;
+    MyShapeTypes["FACES"] = TopAbs_FACE;
+    MyShapeTypes["VERTEX"] = TopAbs_VERTEX;
+    MyShapeTypes["VERTICES"] = TopAbs_VERTEX;
+    MyShapeTypes["WIRE"] = TopAbs_WIRE;
+    MyShapeTypes["EDGE"] = TopAbs_EDGE;
+    MyShapeTypes["EDGES"] = TopAbs_EDGE;
+    MyShapeTypes["SHELL"] = TopAbs_SHELL;
+    MyShapeTypes["SOLID"] = TopAbs_SOLID;
+    MyShapeTypes["SOLIDS"] = TopAbs_SOLID;
+  }
+  if (MyShapeTypes.find(theType) != MyShapeTypes.end())
+    return MyShapeTypes[theType];
+  Events_Error::send("Shape type defined in XML is not implemented!");
   return TopAbs_SHAPE;
 }
 

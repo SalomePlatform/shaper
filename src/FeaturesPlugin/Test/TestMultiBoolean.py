@@ -90,8 +90,6 @@ for i in xrange(0, N * N):
   anExtrusionFt = aPart.addFeature("Extrusion")
   assert (anExtrusionFt.getKind() == "Extrusion")
 
-  # selection type FACE=4
-  anExtrusionFt.selectionList("base").setSelectionType(4)
   anExtrusionFt.selectionList("base").append(
       aSketchResult, aSketchFaces[0])
   anExtrusionFt.real("size").setValue(10)
@@ -151,8 +149,6 @@ GeomAlgoAPI_SketchBuilder.createFaces(
     origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
 # Create extrusion on them
 aBox = aPart.addFeature("Extrusion")
-# selection type FACE=4
-aBox.selectionList("base").setSelectionType(4)
 aBox.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
 aBox.real("size").setValue(10)
