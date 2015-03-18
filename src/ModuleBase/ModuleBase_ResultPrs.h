@@ -34,6 +34,9 @@ public:
   /// Returns True if the presentation is in sketch mode
   Standard_EXPORT bool isSketchMode() const { return myIsSketchMode; }
 
+  /// Returns a list of faces
+  Standard_EXPORT const std::list<std::shared_ptr<GeomAPI_Shape> >& facesList() { return myFacesList; }
+
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
   /// Redefinition of virtual function
