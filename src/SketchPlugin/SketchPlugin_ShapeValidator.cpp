@@ -20,9 +20,6 @@ bool SketchPlugin_ShapeValidator::isValid(const AttributePtr& theAttribute,
     return true;
 
   // ask whether the feature of the attribute is external
-  //std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-  //AttributeRefAttrPtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  //                               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
   bool isAttributeExternal = isExternalAttribute(theAttribute);
 
   // ask whether the feature of the attribute by parameter identifier is external
