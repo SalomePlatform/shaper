@@ -136,7 +136,11 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// returns all references by attributes of this data
   /// \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
   virtual void referencesToObjects(
-    std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) = 0;
+    std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) =0;
+
+  /// Copies all atributes content into theTarget data
+  virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget) = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data();
