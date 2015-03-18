@@ -34,7 +34,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
-#include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_ShapeValidator.h>
 
 #include <Config_WidgetAPI.h>
@@ -486,13 +486,13 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
   aData->blockSendAttributeUpdated(true);
   storeAttributeValues(theObj, theShape);
 
-// 3. check the acceptability of the current values
+  // 3. check the acceptability of the current values
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
   bool aValid = true;
   for (; aValidator != aValidators.end() && aValid; aValidator++, aArgs++) {
-    const ModelAPI_RefAttrValidator* aAttrValidator =
-        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+    const ModelAPI_AttributeValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
     if (aAttrValidator) {
       aValid = aAttrValidator->isValid(anAttribute, *aArgs);
     }

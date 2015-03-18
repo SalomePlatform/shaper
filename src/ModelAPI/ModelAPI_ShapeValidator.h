@@ -9,29 +9,21 @@
 
 #include <ModelAPI.h>
 
-#include <ModelAPI_Validator.h>
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Attribute.h>
-
-#include <GeomAPI_Shape.h>
 
 /**
  * Generic validator for any attribute of a feature.
  */
-class ModelAPI_ShapeValidator : public ModelAPI_Validator
+class ModelAPI_ShapeValidator : public ModelAPI_AttributeValidator
 {
 public:
   /// returns True if the attribute is valid. It checks whether the feature of the attribute
   /// does not contain a selection attribute filled with the same shape
-  /// \param theFeature a feature to check
-  /// \param theArguments a filter parameters
-  /// \param theObject an object
   /// \param theAttribute an attribute to check
-  /// \param theShape a shape
-  MODELAPI_EXPORT virtual bool isValid(const FeaturePtr& theFeature,
-                               const std::list<std::string>& theArguments,
-                               const ObjectPtr& theObject, const AttributePtr& theAttribute,
-                               const GeomShapePtr& theShape) const;
+  /// \param theArguments a filter parameters
+  MODELAPI_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
+                                       const std::list<std::string>& theArguments) const;
 };
 
 #endif

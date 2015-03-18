@@ -9,17 +9,19 @@
 #include <ModelAPI_AttributeSelection.h>
 #include "ModelAPI_Object.h"
 
-bool ModelAPI_ShapeValidator::isValid(const FeaturePtr& theFeature,
-                                      const std::list<std::string>& theArguments,
-                                      const ObjectPtr& theObject,
-                                      const AttributePtr& theAttribute,
-                                      const GeomShapePtr& theShape) const
+bool ModelAPI_ShapeValidator::isValid(const AttributePtr& theAttribute,
+                                       const std::list<std::string>& theArguments) const
 {
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeSelectionPtr aSelectionAttribute = 
+                     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  GeomShapePtr aShape = aSelectionAttribute->value();
+
   std::string aCurrentAttributeId = theAttribute->id();
   // get all feature attributes
   std::list<AttributePtr> anAttrs = 
-                   theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
-  if (anAttrs.size() > 0 && theShape.get() != NULL) {
+                   aFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+  if (anAttrs.size() > 0 && aShape.get() != NULL) {
     std::list<AttributePtr>::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {
       AttributePtr anAttribute = *anAttr;
@@ -28,7 +30,7 @@ bool ModelAPI_ShapeValidator::isValid(const FeaturePtr& theFeature,
         AttributeSelectionPtr aSelectionAttribute = 
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttribute);
         // the shape of the attribute should be not the same
-        if (aSelectionAttribute.get() != NULL && theShape->isEqual(aSelectionAttribute->value())) {
+        if (aSelectionAttribute.get() != NULL && aShape->isEqual(aSelectionAttribute->value())) {
           return false;
         }
       }

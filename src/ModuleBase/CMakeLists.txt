@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_FilterNoConsructionSubShapes.h
 	ModuleBase_FilterNoDegeneratedEdge.h
 	ModuleBase_FilterShapeType.h
+	ModuleBase_FilterValidated.h
 	ModuleBase_Tools.h
 	ModuleBase_IModule.h
 	ModuleBase_Operation.h
@@ -62,6 +63,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_FilterNoConsructionSubShapes.cpp
 	ModuleBase_FilterNoDegeneratedEdge.cpp
 	ModuleBase_FilterShapeType.cpp
+	ModuleBase_FilterValidated.cpp
 	ModuleBase_Tools.cpp
 	ModuleBase_IModule.cpp
 	ModuleBase_IWorkshop.cpp
