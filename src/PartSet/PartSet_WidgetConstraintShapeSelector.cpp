@@ -15,7 +15,6 @@
 bool PartSet_WidgetConstraintShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape) const
 {
   ObjectPtr aSelectedObject = theSelectedObject;
-  GeomShapePtr aShape = theShape;
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aSelectedObject);
   if (aFeature) {
@@ -25,11 +24,10 @@ bool PartSet_WidgetConstraintShapeSelector::storeAttributeValues(ObjectPtr theSe
       ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
                                                                   aSelectedObject, mySketch);
       if (aObj) {
-        PartSet_WidgetConstraintShapeSelector* that = (PartSet_WidgetConstraintShapeSelector*) this;
         aSelectedObject = aObj;
       } else 
         return false;
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeAttributeValues(theSelectedObject, theShape);
+  return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, theShape);
 }

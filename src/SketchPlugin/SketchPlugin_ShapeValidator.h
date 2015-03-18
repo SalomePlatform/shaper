@@ -8,8 +8,7 @@
 #define SketchPlugin_ShapeValidator_H
 
 #include <SketchPlugin.h>
-#include <ModelAPI_ShapeValidator.h>
-#include <ModelAPI_Object.h>
+#include <ModelAPI_AttributeValidator.h>
 
 /**\class SketchPlugin_ResultPointValidator
  * \ingroup Validators
@@ -17,20 +16,20 @@
  *
  * Allows to select points only.
  */
-class SketchPlugin_ShapeValidator : public ModelAPI_ShapeValidator
+class SketchPlugin_ShapeValidator : public ModelAPI_AttributeValidator
 {
 public:
-  // returns true if there is an empty or non-external shape on the feature.
-  // in the given shape or in the list of attribute shapes
-  /// \param theFeature a feature to check
-  /// \param theArguments a filter parameters
-  /// \param theObject an object
+  /// returns true if the feature of attribute do not contain external features in the given attribute and
+  /// among attributes listed in the arguments
   /// \param theAttribute an attribute to check
-  /// \param theShape a shape
-  SKETCHPLUGIN_EXPORT virtual bool isValid(const FeaturePtr& theFeature,
-                               const std::list<std::string>& theArguments,
-                               const ObjectPtr& theObject, const AttributePtr& theAttribute,
-                               const GeomShapePtr& theShape) const;
+  /// \param theArguments a filter parameters
+  SKETCHPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
+                                           const std::list<std::string>& theArguments) const;
+
+protected:
+  /// returns true if the feature of the attribute is external
+  /// \param theAttribute an attribute to check
+  bool isExternalAttribute(const AttributePtr& theAttribute) const;
 };
 
 #endif

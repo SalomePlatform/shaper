@@ -13,42 +13,43 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_ResultValidator.h>
 
-bool SketchPlugin_ShapeValidator::isValid(const FeaturePtr& theFeature,
-                                                  const std::list<std::string>& theArguments,
-                                                  const ObjectPtr& theObject,
-                                                  const AttributePtr& theAttribute,
-                                                  const GeomShapePtr& theShape) const
+bool SketchPlugin_ShapeValidator::isValid(const AttributePtr& theAttribute,
+                                          const std::list<std::string>& theArguments) const
 {
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  std::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
-
-  // if the shapes are equal, that means that the given shape is a result.
-  // if the result is selected, the 
-  if (aShape->isEqual(theShape))
+  if (theArguments.size() != 1)
     return true;
 
-  // found a non-external argument on the feature
-  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
-  bool aHasNullParam = false;
-  bool aHasNonExternalParams = false;
-  for (; anIt != aLast; anIt++) {
-    std::string aParamA = *anIt;
-    std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
-          ModelAPI_AttributeRefAttr>(theFeature->data()->attribute(aParamA));
-    if (anAttr) {
-      FeaturePtr anOtherFeature = ModelAPI_Feature::feature(anAttr->object());
-      if (anOtherFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(anOtherFeature);
-        if (aSketchFeature) {
-          aHasNonExternalParams = !aSketchFeature->isExternal();
-        }
+  // ask whether the feature of the attribute is external
+  //std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+  //AttributeRefAttrPtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  //                               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+  bool isAttributeExternal = isExternalAttribute(theAttribute);
+
+  // ask whether the feature of the attribute by parameter identifier is external
+  std::string aFrontArgument = theArguments.front();
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  bool isParameterExternal = isExternalAttribute(aFeature->attribute(aFrontArgument));
+
+  // it is not possible that both features, attribute and attribute in parameter, are external
+  if (isAttributeExternal && isParameterExternal)
+    return false;
+  return true;
+}
+
+bool SketchPlugin_ShapeValidator::isExternalAttribute(const AttributePtr& theAttribute) const
+{
+  bool isExternal = false;
+  AttributeRefAttrPtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+
+  if (anAttribute.get() != NULL) {
+    FeaturePtr anArgumentFeature = ModelAPI_Feature::feature(anAttribute->object());
+    if (anArgumentFeature.get() != NULL) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                    std::dynamic_pointer_cast<SketchPlugin_Feature>(anArgumentFeature);
+      if (aSketchFeature.get() != NULL) {
+        isExternal = aSketchFeature->isExternal();
       }
-      else
-        aHasNullParam = true;
     }
   }
-  if (aHasNullParam || aHasNonExternalParams)
-    return true;
-  return false;
+  return isExternal;
 }
