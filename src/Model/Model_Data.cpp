@@ -31,6 +31,7 @@
 #include <TDataStd_Name.hxx>
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
+#include <TDF_RelocationTable.hxx>
 
 #include <string>
 
@@ -317,7 +318,7 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
 	    aTargetAttr = anAttrIter.Value()->NewEmpty();
       theDestination.AddAttribute(aTargetAttr);
     }
-    Handle(TDF_RelocationTable) aRelocTable; // no relocation, empty map
+    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); // no relocation, empty map
     anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
   }
   // copy the sub-labels content
@@ -331,4 +332,11 @@ void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
 {
   TDF_Label aTargetRoot = std::dynamic_pointer_cast<Model_Data>(theTarget)->label();
   copyAttrs(myLab, aTargetRoot);
+  // make initialized the initialized attributes
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aMyIter = myAttrs.begin();
+  for(; aMyIter != myAttrs.end(); aMyIter++) {
+    if (aMyIter->second->isInitialized()) {
+      theTarget->attribute(aMyIter->first)->setInitialized();
+    }
+  }
 }
