@@ -37,7 +37,7 @@ aPart = aPartResult.partDoc()
 # Create a sketch circle to extrude
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))

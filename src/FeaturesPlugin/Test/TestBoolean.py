@@ -32,7 +32,7 @@ aSession.finishOperation()
 # Create a sketch with circle to extrude
 #=========================================================================
 aSession.startOperation()
-aCircleSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aCircleSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX"))
@@ -51,7 +51,7 @@ aSession.finishOperation()
 # Create a sketch with triangle to extrude
 #=========================================================================
 aSession.startOperation()
-aTriangleSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aTriangleSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aTriangleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirX"))

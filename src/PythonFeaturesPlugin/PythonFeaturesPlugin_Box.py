@@ -5,12 +5,12 @@ import extrusion
 import sketch
 
 
-class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
-
-    "Feature to create a box by drawing a sketch and extruding it"
+class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_CompositeFeature):
+    """Feature to create a box by drawing a sketch and extruding it
+    """
 
     def __init__(self):
-        ModelAPI.ModelAPI_Feature.__init__(self)
+        ModelAPI.ModelAPI_CompositeFeature.__init__(self)
 
     @staticmethod
     def ID():
@@ -57,8 +57,8 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         aSession.validators().registerNotObligatory(self.getKind(), self.LENGTH_REF_ID())
         aSession.validators().registerNotObligatory(self.getKind(), self.HEIGHT_REF_ID())
         aSession.validators().registerConcealment(self.getKind(), self.HEIGHT_REF_ID())
-        self.mySketch = None # not yet initialized
-        self.myExtrusion = None # not yet initialized
+        self.mySketch = None  # not yet initialized
+        self.myExtrusion = None  # not yet initialized
 
     def execute(self):
         aWidth = self.real(self.WIDTH_ID()).value()
@@ -72,8 +72,8 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
             aResult = extrusion.getBody(self.makeBox(aLength, aWidth, aHeight))
         else:
             aHeightProxyResult = ModelAPI.modelAPI_Result(aHeightRefValue)
-            aWidthFeature = ModelAPI.modelAPI_Feature(aWidthRefValue)
-            aLengthFeature = ModelAPI.modelAPI_Feature(aLengthRefValue)
+            aWidthFeature = ModelAPI.objectToFeature(aWidthRefValue)
+            aLengthFeature = ModelAPI.objectToFeature(aLengthRefValue)
             aHeightResult = ModelAPI.modelAPI_ResultBody(aHeightProxyResult)
             aWidthFeature.real("ConstraintValue").setValue(aWidth)
             aLengthFeature.real("ConstraintValue").setValue(aLength)
@@ -84,8 +84,8 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         # create a new result with copied shape from extrusion
         aResultBody = self.document().createBody(self.data())
         if not aResult is None:
-          aResultBody.store(aResult.shape())
-          self.setResult(aResultBody)
+            aResultBody.store(aResult.shape())
+            self.setResult(aResultBody)
         pass
 
     def makeBox(self, aWidth, aLength, aHeight):
@@ -93,7 +93,7 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         aPart = aSession.activeDocument()
         # Starting the Sketch
         aSketch = sketch.addTo(aPart)
-        self.mySketch = sketch
+        self.mySketch = aSketch
         sketch.setXOYPlane(aSketch)
         # Creating the lines
         l1 = sketch.addLine(10, 10, 10, 60, aSketch)
@@ -123,6 +123,28 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         self.reference(self.HEIGHT_REF_ID()).setValue(aHeightFeature.firstResult())
         return aHeightFeature
 
+    def addFeature(self, theID):
+        pass
+
+    def numberOfSubs(self):
+        subsCount = 0
+        if not self.mySketch is None:
+            subsCount += 1
+        if not self.myExtrusion is None:
+            subsCount += 1
+        # extrusion and sketch
+        return subsCount
+
+    def subFeature(self, theIndex):
+        if theIndex == 1: # sketch
+            return ModelAPI.compositeFeatureToFeature(self.mySketch)
+        return self.myExtrusion
+
+    def subFeatureId(self, theIndex):
+        return 0
+
+    def isSub(self, theFeature):
+        return theFeature == self.mySketch or theFeature == self.myExtrusion
 
 # TEST
 """

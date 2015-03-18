@@ -28,7 +28,7 @@ aSession.finishOperation()
 # Create a sketch with triangle and extrude it
 #=========================================================================
 aSession.startOperation()
-aTriangleSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aTriangleSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aTriangleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirX"))

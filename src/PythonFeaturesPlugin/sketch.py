@@ -6,7 +6,7 @@ from GeomDataAPI import *
 # ----------------------------
 
 def addTo(doc):
-    return modelAPI_CompositeFeature(doc.addFeature("Sketch"))
+    return featureToCompositeFeature(doc.addFeature("Sketch"))
 
 
 def setXOYPlane(sketch):

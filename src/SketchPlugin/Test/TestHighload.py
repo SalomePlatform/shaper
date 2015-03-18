@@ -90,7 +90,7 @@ aDocument = aSession.moduleDocument()
 #=========================================================================
 aSession.startOperation()
 aSketchCommonFeature = aDocument.addFeature("Sketch")
-aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
+aSketchFeature = featureToCompositeFeature(aSketchCommonFeature)
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))

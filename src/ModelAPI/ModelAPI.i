@@ -47,15 +47,15 @@
   { 
     return std::dynamic_pointer_cast<T1>(theObject); 
   }
-  
+
 %}
 
 // to avoid error on this
 #define MODELAPI_EXPORT
 
 // standard definitions
-%include "typemaps.i"
 %include "GeomAPI.i"
+%include "typemaps.i"
 %include "std_string.i"
 %include "std_list.i"
 %include "std_shared_ptr.i"
@@ -134,8 +134,9 @@
 
 // std::dynamic_pointer_cast
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
-%template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
-%template(modelAPI_Feature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
+%template(featureToCompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(objectToFeature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
+%template(compositeFeatureToFeature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_CompositeFeature>;
 
 %template(modelAPI_Result) shared_ptr_cast<ModelAPI_Result, ModelAPI_Object>;
 %template(modelAPI_ResultConstruction) shared_ptr_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
