@@ -257,8 +257,8 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
       aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
 
       if (aShape->isEqual(aResult->shape())) {
-        aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        mySelection.append(GeomSelection(aResult, aShape));
+        //aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        mySelection.append(GeomSelection(aResult, NULL));//aShape));
       }
       else
         mySelection.append(GeomSelection(aResult, aShape));
