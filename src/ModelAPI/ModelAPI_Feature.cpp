@@ -97,7 +97,7 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex)
   }
 
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
-  for(int anIndex = 0; anIndex < theSinceIndex; anIndex++)
+  for(int anIndex = 0; anIndex < theSinceIndex && aResIter != myResults.end(); anIndex++)
     aResIter++;
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aNextIter = aResIter;
   for(; aNextIter != myResults.end(); aNextIter++) {

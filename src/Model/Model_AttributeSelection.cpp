@@ -61,6 +61,7 @@ using namespace std;
 static const int kSTART_VERTEX_DELTA = 1000000;
 // identifier that there is simple reference: selection equals to context
 Standard_GUID kSIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb29");
+Standard_GUID kCONSTUCTION_SIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb28");
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -73,19 +74,18 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
   const std::shared_ptr<GeomAPI_Shape>& anOldShape = value();
-  bool isOldShape = 
+  bool isOldContext = theContext == myRef.value();
+  bool isOldShape = isOldContext &&
     (theSubShape == anOldShape || (theSubShape && anOldShape && theSubShape->isEqual(anOldShape)));
   if (isOldShape) return; // shape is the same, so context is also unchanged
   // update the referenced object if needed
-  bool isOldContext = theContext == myRef.value();
-
-
   if (!isOldContext)
     myRef.setValue(theContext);
 
   // do noth use naming if selected shape is result shape itself, but not sub-shape
   TDF_Label aSelLab = selectionLabel();
   aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
+  aSelLab.ForgetAttribute(kCONSTUCTION_SIMPLE_REF_ID);
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
     // do not select the whole shape for body:it is already must be in the data framework
     if (theContext->shape().get() && theContext->shape()->isEqual(theSubShape)) {
@@ -95,7 +95,13 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
       selectBody(theContext, theSubShape);
     }
   } else if (theContext->groupName() == ModelAPI_ResultConstruction::group()) {
-    selectConstruction(theContext, theSubShape);
+    if (!theSubShape.get()) {
+      // to sub, so the whole result is selected
+      aSelLab.ForgetAllAttributes(true);
+      TDataStd_UAttribute::Set(aSelLab, kCONSTUCTION_SIMPLE_REF_ID);
+    } else {
+      selectConstruction(theContext, theSubShape);
+    }
   }
   myIsInitialized = true;
 
@@ -122,6 +128,9 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       if (!aContext.get()) 
         return aResult; // empty result
       return aContext->shape();
+    }
+    if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
+        return aResult; // empty result
     }
 
     Handle(TNaming_NamedShape) aSelection;
@@ -188,6 +197,9 @@ bool Model_AttributeSelection::update()
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
     return aContext->shape() && !aContext->shape()->isNull();
   }
+  if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, not sub-shape
+    return aContext->shape() && !aContext->shape()->isNull();
+  }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
@@ -222,7 +234,7 @@ bool Model_AttributeSelection::update()
         return false;
       }
 
-      if (aShapeType == TopAbs_FACE) {
+      if (aShapeType == TopAbs_FACE) { // compound is for the whole sketch selection
         // If this is a wire with plane defined thin it is a sketch-like object
         std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
         GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
@@ -611,8 +623,11 @@ std::string Model_AttributeSelection::namingName()
   std::shared_ptr<GeomAPI_Shape> aSubSh = value();
   ResultPtr aCont = context();
   aName = "Undefined name";
-  if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
+  if(!aCont.get() || aCont->shape()->isNull()) 
     return aName;
+  if (!aSubSh.get() || aSubSh->isNull()) { // no subshape, so just the whole feature name
+    return aCont->data()->name();
+  }
   TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
   TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
 #ifdef DEB_NAMING

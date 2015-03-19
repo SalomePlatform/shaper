@@ -9,6 +9,7 @@
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Face.h>
 
 #include <string>
 
@@ -37,6 +38,11 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
 
   /// Sets the flag that it must be displayed in history (default is true)
   virtual void setIsInHistory(const bool isInHistory) = 0;
+
+  /// if the construction result may be used as faces, this method returns not zero number of faces
+  virtual int facesNum() = 0;
+  /// if the construction result may be used as faces, this method returns face by zero based index
+  virtual std::shared_ptr<GeomAPI_Face> face(const int theIndex) = 0;
 };
 
 //! Pointer on feature object
