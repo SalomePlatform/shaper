@@ -136,7 +136,7 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_CompositeFeature):
         return subsCount
 
     def subFeature(self, theIndex):
-        if theIndex == 1: # sketch
+        if theIndex == 0: # sketch
             return ModelAPI.compositeFeatureToFeature(self.mySketch)
         return self.myExtrusion
 
@@ -145,6 +145,15 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_CompositeFeature):
 
     def isSub(self, theFeature):
         return theFeature == self.mySketch or theFeature == self.myExtrusion
+
+    def attributeChanged(self, theAttrID):
+        # on update of attributes values, transfer them to sub-features immideately to see good preview
+        # otherwise these features will be executed before execute of "Box" and with old parameters
+        aWidthRefValue = self.reference(self.WIDTH_REF_ID()).value()
+        aLengthRefValue = self.reference(self.LENGTH_REF_ID()).value()
+        aHeightRefValue = self.reference(self.HEIGHT_REF_ID()).value()
+        if all((aWidthRefValue, aLengthRefValue, aHeightRefValue)):
+          self.execute()
 
 # TEST
 """
