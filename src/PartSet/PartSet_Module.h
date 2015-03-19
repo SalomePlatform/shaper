@@ -79,6 +79,10 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
+  /// Realizes some functionality by an operation start
+  /// \param theOperation a started operation
+  virtual ModuleBase_Operation* currentOperation() const;
+
   /// Returns action according to the given ID
   /// \param theId an action identifier, it should be uniqued in the bounds of the module
   QAction* action(const QString& theId) const;

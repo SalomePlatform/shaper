@@ -19,7 +19,6 @@
 
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_FilterValidated.h>
 
 #include <GeomAPI_ICustomPrs.h>
 
@@ -231,8 +230,6 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
-
-  Handle(ModuleBase_FilterValidated) myFilterValidated;
 
   /// A default custom presentation, which is used if the displayed feature is not a custom presentation
   GeomCustomPrsPtr myCustomPrs;

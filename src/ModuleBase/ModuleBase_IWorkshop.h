@@ -9,6 +9,7 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_Definitions.h"
+#include <ModuleBase_FilterValidated.h>
 
 #include <ModelAPI_Object.h>
 #include <GeomAPI_AISObject.h>
@@ -31,9 +32,7 @@ Q_OBJECT
  public:
    /// Constructor
    /// \param theParent parent object
-  ModuleBase_IWorkshop(QObject* theParent)
-      : QObject(theParent)
-  {}
+  ModuleBase_IWorkshop(QObject* theParent);
 
   virtual ~ModuleBase_IWorkshop()
   {}
@@ -53,6 +52,10 @@ Q_OBJECT
 
   //! Returns current viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
+
+  /// A filter to process an attribute validators
+  /// \return a filter
+  Handle(ModuleBase_FilterValidated) validatorFilter();
 
   //! Returns the factory of selection filters : the only one instance per application
   ModuleBase_FilterFactory* selectionFilters() const;
@@ -80,6 +83,9 @@ signals:
   /// Signal which is emited after activation of property panel
   void propertyPanelActivated();
 
+protected:
+  /// A filter to process an attribute validators
+  Handle(ModuleBase_FilterValidated) myValidatorFilter;
 };
 
 #endif

@@ -19,6 +19,7 @@
 class QWidget;
 class ModuleBase_IWorkshop;
 class Config_WidgetAPI;
+class Handle_SelectMgr_EntityOwner;
 
 /**
 * \ingroup GUI
@@ -37,7 +38,27 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
                              const std::string& theParentId);
   virtual ~ModuleBase_WidgetValidated();
 
+  /// Checks all widget validator if the owner is valid
+  /// \param theOwner a selected owner in the view
+  /// \return a boolean value
+  bool isValid(const Handle_SelectMgr_EntityOwner& theOwner);
+
 protected:
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param isBackup a boolean flag, if true, store values from the attribute
+  /// to backup, otherwise set the backed up values to the attribute
+  virtual void backupAttributeValue(const bool isBackup) {}//= 0;
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param theOwner a selected owner
+  virtual void setValue(const Handle_SelectMgr_EntityOwner& theOwner) {}//= 0;
+
+  /// Checks the current attibute in all attribute validators
+  // \return true if all validators return that the attribute is valid
+  bool isValidAttribute() const;
+
   /// Check the selected with validators if installed
   /// \param theObj the object for checking
   /// \param theShape the shape for checking

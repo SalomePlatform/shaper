@@ -69,6 +69,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Realizes some functionality by an operation abort
   virtual void operationAborted(ModuleBase_Operation* theOperation) {}
 
+  /// Realizes some functionality by an operation start
+  /// \param theOperation a started operation
+  virtual ModuleBase_Operation* currentOperation() const = 0;
+
   /// Add menu atems for viewer into the given menu
   /// \param theMenu a popup menu to be shown in the viewer
   virtual void addViewerItems(QMenu* theMenu) const {}

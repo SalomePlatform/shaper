@@ -3,23 +3,67 @@
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_IViewer.h>
-#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
+#include <ModelAPI_AttributeValidator.h>
+
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+#include <SelectMgr_EntityOwner.hxx>
 
 #include <QWidget>
 
 ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
                                                        const Config_WidgetAPI* theData,
                                                        const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId)
+ : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
 }
 
 ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 {
+}
+
+bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& theOwner)
+{
+  backupAttributeValue(true);
+
+  setValue(theOwner);
+  bool aValid = isValidAttribute();
+  backupAttributeValue(false);
+
+  return aValid;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetValidated::isValidAttribute() const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  std::list<ModelAPI_Validator*> aValidators;
+  std::list<std::list<std::string> > anArguments;
+  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+
+  aData->blockSendAttributeUpdated(true);
+
+    // 3. check the acceptability of the current values
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+  bool aValid = true;
+  for (; aValidator != aValidators.end() && aValid; aValidator++, aArgs++) {
+    const ModelAPI_AttributeValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
+    if (aAttrValidator) {
+      aValid = aAttrValidator->isValid(anAttribute, *aArgs);
+    }
+  }
+  aData->blockSendAttributeUpdated(false);
+
+  return aValid;
 }
 
 //********************************************************************
@@ -52,7 +96,13 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
                                                  const bool toActivate) const
 {
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
-
+  /*
+  Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
+  if (toActivate)
+    aViewer->addSelectionFilter(aSelFilter);
+  else
+    aViewer->removeSelectionFilter(aSelFilter);*/
+  
   // apply filters loaded from the XML definition of the widget
   ModuleBase_FilterFactory* aFactory = theWorkshop->selectionFilters();
   SelectMgr_ListOfFilter aFactoryFilters;

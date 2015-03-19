@@ -218,6 +218,13 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
   myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
 
+ModuleBase_Operation* PartSet_Module::currentOperation() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
+  return anOpMgr->currentOperation();
+}
+
 bool PartSet_Module::canUndo() const
 {
   bool aCanUndo = false;
