@@ -33,6 +33,7 @@ int ModuleBase_PagedContainer::addPage(ModuleBase_PageBase* thePage,
 {
   myCaseIds << theCaseId;
   myPages << thePage;
+  storeValueCustom(); // to store the initial state
   return myPages.count();
 }
 
@@ -95,6 +96,7 @@ bool ModuleBase_PagedContainer::storeValueCustom() const
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   QString aWidgetValue = myCaseIds.at(currentPageIndex());
   aStringAttr->setValue(aWidgetValue.toStdString());
+  updateObject(myFeature); // for preview
   return true;
 }
 

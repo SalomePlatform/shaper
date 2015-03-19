@@ -27,6 +27,8 @@ bool GeomAPI_Shape::isNull() const
 
 bool GeomAPI_Shape::isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const
 {
+  if (!theShape.get())
+    return false;
   if (isNull())
     return theShape->isNull();
   if (theShape->isNull())

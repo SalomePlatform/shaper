@@ -137,7 +137,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createPlaneByGeneralEqu
       anAttrC->isInitialized() && anAttrD->isInitialized() ) {
     double aA = anAttrA->value(), aB = anAttrB->value(),
            aC = anAttrC->value(), aD = anAttrD->value();
-    std::shared_ptr<GeomAPI_Pln> aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+    std::shared_ptr<GeomAPI_Pln> aPlane = 
+      std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
     std::string kDefaultPlaneSize = "200";
     double aSize = Config_PropManager::integer("Sketch planes", "planes_size", kDefaultPlaneSize);
     aSize *= 4.;

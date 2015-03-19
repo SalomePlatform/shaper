@@ -399,4 +399,3 @@ void SketchSolver_ConstraintManager::resolveConstraints(const bool theForceUpdat
   if (needToUpdate || theForceUpdate)
     Events_Loop::loop()->flush(anUpdateEvent);
 }
-
