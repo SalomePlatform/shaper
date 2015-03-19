@@ -28,14 +28,12 @@ class ModuleBase_ISelection
  public:
 
   /// Returns a list of viewer selected presentations
-  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const = 0;
+  virtual QList<ModuleBase_ViewerPrs> getSelected() const = 0;
 
   /// Returns a list of viewer highlited presentations
-  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const = 0;
+  virtual QList<ModuleBase_ViewerPrs> getHighlighted() const = 0;
 
   /**
    * Returns list of features currently selected in object browser

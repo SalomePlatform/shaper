@@ -110,6 +110,17 @@ Q_OBJECT
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param isBackup a boolean flag, if true, store values from the attribute
+  /// to backup, otherwise set the backed up values to the attribute
+  virtual void backupAttributeValue(const bool isBackup);
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param theOwner a selected owner
+  virtual void setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+
   /// Computes and updates name of selected object in the widget
   void updateSelectionName();
 
@@ -159,6 +170,18 @@ Q_OBJECT
 
   /// Active/inactive flag
   bool myIsActive;
+
+  /// backup parameters of the model attribute. The class processes three types of attribute:
+  /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter
+  /// values are reserved in the backup
+  /// An attribute object
+  ObjectPtr myObject;
+  /// An attribute shape
+  GeomShapePtr myShape;
+  /// A reference of the attribute
+  AttributePtr myRefAttribute;
+  /// A boolean value whether refAttr uses reference of object
+  bool myIsObject;
 };
 
 #endif

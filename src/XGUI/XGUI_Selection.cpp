@@ -15,8 +15,11 @@
 #include <AIS_InteractiveContext.hxx>
 
 #include <SelectMgr_Selection.hxx>
+#include <SelectMgr_EntityOwner.hxx>
+
 #include <SelectBasics_SensitiveEntity.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
+#include <StdSelect_BRepOwner.hxx>
 
 #include <set>
 
@@ -25,7 +28,7 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 {
 }
 
-QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected() const
 {
   QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
 
@@ -39,25 +42,18 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
   if (aContext->HasOpenedContext()) {
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrs aPrs;
-      Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-      if (aSelectedIds.contains((long)anIO.Access()))
-        continue;
-    
-      aSelectedIds.append((long)anIO.Access());
-      aPrs.setInteractive(anIO);
-
-      ObjectPtr aFeature = aDisplayer->getObject(anIO);
-      // we should not check the appearance of this feature because there can be some selected shapes
-      // for one feature
-      TopoDS_Shape aShape = aContext->SelectedShape();
-      if (!aShape.IsNull() && (aShape.ShapeType() != theShapeTypeToSkip))
-        aPrs.setShape(aShape);
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
-      aPrs.setOwner(anOwner);
-      aPrs.setFeature(aFeature);
+
+      if (aSelectedIds.contains((long)anOwner.Access()))
+        continue;
+      aSelectedIds.append((long)anOwner.Access());
+
+      fillPresentation(aPrs, anOwner);
+
       aPresentations.append(aPrs);
     }
-  } else {
+  }
+  /* else {
     for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent()) {
       ModuleBase_ViewerPrs aPrs;
       Handle(AIS_InteractiveObject) anIO = aContext->Current();
@@ -71,11 +67,36 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
       aPrs.setFeature(aFeature);
       aPresentations.append(aPrs);
     }
-  }
+  }*/
   return aPresentations;
 }
 
-QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
+void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
+                                      const Handle(SelectMgr_EntityOwner)& theOwner) const
+{
+  thePrs.setOwner(theOwner);
+
+  Handle(AIS_InteractiveObject) anIO = 
+                           Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
+  thePrs.setInteractive(anIO);
+
+  // we should not check the appearance of this feature because there can be some selected shapes
+  // for one feature
+  Handle(StdSelect_BRepOwner) aBRO = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
+  if( !aBRO.IsNull() ) {
+    // the located method is called in the context to obtain the shape by the SelectedShape() method,
+    // so the shape is located by the same rules
+    TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
+    if (!aShape.IsNull())
+      thePrs.setShape(aShape);
+  }      
+     
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  ObjectPtr aFeature = aDisplayer->getObject(anIO);
+  thePrs.setFeature(aFeature);
+}
+
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
 {
   QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
   QList<ModuleBase_ViewerPrs> aPresentations;
@@ -97,7 +118,7 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSki
     aPrs.setFeature(aResult);
     if (aContext->HasOpenedContext()) {
       TopoDS_Shape aShape = aContext->DetectedShape();
-      if (!aShape.IsNull() && aShape.ShapeType() != theShapeTypeToSkip)
+      if (!aShape.IsNull())
         aPrs.setShape(aShape);
     }
     aPresentations.push_back(aPrs);

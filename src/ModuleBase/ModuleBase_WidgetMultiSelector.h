@@ -95,6 +95,17 @@ protected slots:
   /// \return True in success
   virtual bool storeValueCustom() const;
 
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param isBackup a boolean flag, if true, store values from the attribute
+  /// to backup, otherwise set the backed up values to the attribute
+  virtual void backupAttributeValue(const bool isBackup);
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param theOwner a selected owner
+  virtual void setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
 

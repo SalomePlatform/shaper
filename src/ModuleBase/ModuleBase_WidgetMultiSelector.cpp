@@ -172,6 +172,18 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
 }
 
 //********************************************************************
+void ModuleBase_WidgetMultiSelector::backupAttributeValue(const bool isBackup)
+{
+
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+{
+
+}
+
+//********************************************************************
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;

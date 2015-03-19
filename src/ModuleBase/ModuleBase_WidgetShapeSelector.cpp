@@ -449,6 +449,41 @@ void ModuleBase_WidgetShapeSelector::activateCustom()
 }
 
 //********************************************************************
+void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
+{
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+
+  if (isBackup) {
+    myObject = getObject(anAttribute);
+    myShape = getShape();
+    myRefAttribute = NULL;
+    myIsObject = false;
+    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+    if (aRefAttr) {
+      myIsObject = aRefAttr->isObject();
+      myRefAttribute = aRefAttr->attr();
+    }
+  }
+  else {
+    storeAttributeValues(myObject, myShape);
+    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+    if (aRefAttr) {
+      if (myIsObject)
+        aRefAttr->setObject(myObject);
+      else
+        aRefAttr->setAttr(myRefAttribute);
+    }
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+{
+
+}
+
+//********************************************************************
 void ModuleBase_WidgetShapeSelector::deactivate()
 {
   activateSelection(false);
@@ -472,19 +507,9 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
   // 1. make a backup of the previous attribute values
-  ObjectPtr aPrevObject = getObject(anAttribute);
-  GeomShapePtr aPrevShape = getShape();
-  AttributePtr aPrevAttribute;
-  bool aPrevIsObject = false;
-  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-  if (aRefAttr) {
-    aPrevIsObject = aRefAttr->isObject();
-    aPrevAttribute = aRefAttr->attr();
-  }
-
+  backupAttributeValue(true);
   // 2. store the current values, disable the model's update
   aData->blockSendAttributeUpdated(true);
-  storeAttributeValues(theObj, theShape);
 
   // 3. check the acceptability of the current values
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
@@ -499,44 +524,9 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
   }
 
   // 4. if the values are not valid, restore the previous values to the attribute
-  storeAttributeValues(aPrevObject, aPrevShape);
-  if (aRefAttr) {
-    if (aPrevIsObject)
-      aRefAttr->setObject(aPrevObject);
-    else
-      aRefAttr->setAttr(aPrevAttribute);
-  }
+  backupAttributeValue(false);
 
   // 5. enable the model's update
   aData->blockSendAttributeUpdated(false);
-  //updateObject(myFeature);
-  //return aValid;
-
-  if (!aValid)
-    return false;
-
-/*  // Check the acceptability of the object as attribute
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
-  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
-    const ModelAPI_RefAttrValidator* aAttrValidator =
-        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
-    if (aAttrValidator) {
-      //if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
-      //  return false;
-      //}
-    }
-    else {
-      const ModelAPI_ShapeValidator* aShapeValidator = 
-                               dynamic_cast<const ModelAPI_ShapeValidator*>(*aValidator);
-      if (aShapeValidator) {
-        DataPtr aData = myFeature->data();
-        AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-        if (!aShapeValidator->isValid(myFeature, *aArgs, theObj, aSelectAttr, theShape)) {
-          return false;
-        }
-      }
-    }
-  }*/
-  return true;
+  return aValid;
 }

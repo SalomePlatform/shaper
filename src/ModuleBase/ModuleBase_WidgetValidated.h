@@ -49,11 +49,11 @@ protected:
   /// parameters of the current attribute
   /// \param isBackup a boolean flag, if true, store values from the attribute
   /// to backup, otherwise set the backed up values to the attribute
-  virtual void backupAttributeValue(const bool isBackup) {}//= 0;
+  virtual void backupAttributeValue(const bool isBackup) = 0;
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
-  virtual void setValue(const Handle_SelectMgr_EntityOwner& theOwner) {}//= 0;
+  virtual void setSelection(const Handle_SelectMgr_EntityOwner& theOwner) = 0;
 
   /// Checks the current attibute in all attribute validators
   // \return true if all validators return that the attribute is valid

@@ -21,6 +21,7 @@
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 
 class XGUI_Workshop;
+class Handle_SelectMgr_EntityOwner;
 
 /**
 * \ingroup GUI
@@ -34,14 +35,17 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   XGUI_Selection(XGUI_Workshop* theWorkshop);
 
   /// Returns a list of viewer selected presentations
-  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
+  virtual QList<ModuleBase_ViewerPrs> getSelected() const;
+
+  /// Fills the viewer presentation parameters by the parameters from the owner
+  /// \param thePrs a container for selection
+  /// \param theOwner a selection owner
+  void fillPresentation(ModuleBase_ViewerPrs& thePrs, const Handle_SelectMgr_EntityOwner& theOwner) const;
 
   /// Returns a list of viewer highlited presentations
-  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
+  virtual QList<ModuleBase_ViewerPrs> getHighlighted() const;
 
   /**
    * Returns list of currently selected objects in object browser

@@ -29,8 +29,9 @@ bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& the
 {
   backupAttributeValue(true);
 
-  setValue(theOwner);
+  setSelection(theOwner);
   bool aValid = isValidAttribute();
+
   backupAttributeValue(false);
 
   return aValid;
@@ -96,13 +97,13 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
                                                  const bool toActivate) const
 {
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
-  /*
+/*
   Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else
-    aViewer->removeSelectionFilter(aSelFilter);*/
-  
+    aViewer->removeSelectionFilter(aSelFilter);
+*/  
   // apply filters loaded from the XML definition of the widget
   ModuleBase_FilterFactory* aFactory = theWorkshop->selectionFilters();
   SelectMgr_ListOfFilter aFactoryFilters;
