@@ -183,6 +183,12 @@
             label="Last object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
       </feature>
+    <!--  SketchConstraintMirror  -->
+      <feature
+        id="SketchConstraintMirror"
+        title="Mirror"
+        tooltip="Create constraint mirroring group of objects"
+        internal="1" />
     </group>
   </workbench>
 </plugin>

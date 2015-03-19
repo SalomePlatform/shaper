@@ -16,6 +16,7 @@
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
@@ -24,6 +25,7 @@
 #include <SketchPlugin_ConstraintVertical.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
@@ -217,8 +219,7 @@ const int& SketchSolver_Constraint::getType(
     return getType();
   }
 
-  if (aConstraintKind.compare(SketchPlugin_ConstraintEqual::ID()) == 0)
-  {
+  if (aConstraintKind.compare(SketchPlugin_ConstraintEqual::ID()) == 0) {
     static const int aConstrType[3] = {
         SLVS_C_EQUAL_RADIUS,
         SLVS_C_EQUAL_LINE_ARC_LEN,
@@ -242,8 +243,7 @@ const int& SketchSolver_Constraint::getType(
     return getType();
   }
 
-  if (aConstraintKind.compare(SketchPlugin_ConstraintTangent::ID()) == 0)
-  {
+  if (aConstraintKind.compare(SketchPlugin_ConstraintTangent::ID()) == 0) {
     static const int anArcPosDefault = 2;
     static const int aLinePosDefault = 3;
     int anArcPos = anArcPosDefault; // arc in tangency constraint should be placed before line
@@ -259,6 +259,30 @@ const int& SketchSolver_Constraint::getType(
     }
     if (anArcPos - anArcPosDefault + aLinePos - aLinePosDefault == 2)
       myType = aLinePos > 3 ? SLVS_C_ARC_LINE_TANGENT : SLVS_C_CURVE_CURVE_TANGENT;
+    return getType();
+  }
+
+  if (aConstraintKind.compare(SketchPlugin_ConstraintMirror::ID()) == 0) {
+    int aNbAttrs = 0;
+    bool hasMirrorLine = false;
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      AttributeRefListPtr anAttrRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr)));
+      if (anAttrRefList) {
+        aNbAttrs++;
+        myAttributesList[aNbAttrs] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+      }
+      else {
+        std::shared_ptr<ModelAPI_Attribute> anAttr = 
+            aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+        if (typeOfAttribute(anAttr) == LINE) {
+          hasMirrorLine = !hasMirrorLine;
+          myAttributesList[0] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+        }
+      }
+    }
+    if (aNbAttrs == 2 && hasMirrorLine)
+      myType = SLVS_C_SYMMETRIC_LINE;
     return getType();
   }
 

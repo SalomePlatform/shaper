@@ -14,7 +14,8 @@
 #include <memory>
 
 // the only created instance of this plugin
-static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE = new InitializationPlugin_Plugin();
+static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE =
+    new InitializationPlugin_Plugin();
 
 InitializationPlugin_Plugin::InitializationPlugin_Plugin()
 {
@@ -27,8 +28,8 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
 {
   const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
   if (theMessage->eventID() == kDocCreatedEvent) {
-    std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage =
-        std::dynamic_pointer_cast<ModelAPI_DocumentCreatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::dynamic_pointer_cast<
+        ModelAPI_DocumentCreatedMessage>(theMessage);
     DocumentPtr aDoc = aMessage->document();
     createPoint(aDoc);
     createPlane(aDoc, 1., 0., 0.);
@@ -38,28 +39,29 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   } else if (theMessage.get()) {
     Events_Error::send(
-      std::string("InitializationPlugin_Plugin::processEvent: unhandled message caught: ") + 
-      theMessage->eventID().eventText());
+        std::string("InitializationPlugin_Plugin::processEvent: unhandled message caught: ")
+            + theMessage->eventID().eventText());
   }
 }
 
-void InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double theA, double theB, double theC)
+void InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double theX, double theY,
+                                              double theZ)
 {
   std::shared_ptr<ModelAPI_Feature> aPlane = theDoc->addFeature("Plane");
   aPlane->string("CreationMethod")->setValue("PlaneByGeneralEquation");
-  aPlane->real("A")->setValue(theA);
-  aPlane->real("B")->setValue(theB);
-  aPlane->real("C")->setValue(theC);
+  aPlane->real("A")->setValue(theX);
+  aPlane->real("B")->setValue(theY);
+  aPlane->real("C")->setValue(theZ);
   aPlane->real("D")->setValue(0.);
 
-  if (theA) {
+  if (theX) {
     aPlane->data()->setName("Y0Z");
-  } else if (theB) {
+  } else if (theY) {
     aPlane->data()->setName("X0Z");
-  } else if (theC) {
+  } else if (theZ) {
     aPlane->data()->setName("X0Y");
   }
-  aPlane->setInHistory(aPlane, false); // don't show automatically created feature in the features history
+  aPlane->setInHistory(aPlane, false);  // don't show automatically created feature in the features history
 }
 
 void InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
@@ -69,5 +71,5 @@ void InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
   aPoint->real("y")->setValue(0.);
   aPoint->real("z")->setValue(0.);
   aPoint->data()->setName("Origin");
-  aPoint->setInHistory(aPoint, false); // don't show automatically created feature in the features history
+  aPoint->setInHistory(aPoint, false);  // don't show automatically created feature in the features history
 }

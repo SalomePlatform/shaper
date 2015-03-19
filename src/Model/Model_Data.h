@@ -176,6 +176,9 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
 
+  /// Copies all atributes content into theTarget data
+  MODEL_EXPORT virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget);
+
 private:
   /// removes all information about back references
   void eraseBackReferences();

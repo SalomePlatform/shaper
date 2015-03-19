@@ -29,6 +29,9 @@
 #include <Events_Error.h>
 
 #include <TDataStd_Name.hxx>
+#include <TDF_AttributeIterator.hxx>
+#include <TDF_ChildIterator.hxx>
+#include <TDF_RelocationTable.hxx>
 
 #include <string>
 
@@ -301,6 +304,39 @@ void Model_Data::referencesToObjects(
     if (!aReferenced.empty()) {
       theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
       aReferenced.clear();
+    }
+  }
+}
+
+/// makes copy of all attributes on the given label and all sub-labels
+static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
+  TDF_AttributeIterator anAttrIter(theSource);
+  for(; anAttrIter.More(); anAttrIter.Next()) {
+    Handle(TDF_Attribute) aTargetAttr;
+    if (!theDestination.FindAttribute(anAttrIter.Value()->ID(), aTargetAttr)) {
+      // create a new attribute if not yet exists in the destination
+	    aTargetAttr = anAttrIter.Value()->NewEmpty();
+      theDestination.AddAttribute(aTargetAttr);
+    }
+    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); // no relocation, empty map
+    anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
+  }
+  // copy the sub-labels content
+  TDF_ChildIterator aSubLabsIter(theSource);
+  for(; aSubLabsIter.More(); aSubLabsIter.Next()) {
+    copyAttrs(aSubLabsIter.Value(), theDestination.FindChild(aSubLabsIter.Value().Tag()));
+  }
+}
+
+void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
+{
+  TDF_Label aTargetRoot = std::dynamic_pointer_cast<Model_Data>(theTarget)->label();
+  copyAttrs(myLab, aTargetRoot);
+  // make initialized the initialized attributes
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aMyIter = myAttrs.begin();
+  for(; aMyIter != myAttrs.end(); aMyIter++) {
+    if (aMyIter->second->isInitialized()) {
+      theTarget->attribute(aMyIter->first)->setInitialized();
     }
   }
 }

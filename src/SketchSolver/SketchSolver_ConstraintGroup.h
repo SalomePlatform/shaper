@@ -67,6 +67,11 @@ class SketchSolver_ConstraintGroup
    *  \return \c true if the constraint added or updated successfully
    */
   bool changeRigidConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  /** \brief Adds or updates a mirror constraint in the group
+   *  \param[in] theConstraint constraint to be changed
+   *  \return \c true if the constraint added or updated successfully
+   */
+  bool changeMirrorConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
