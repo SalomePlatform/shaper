@@ -158,6 +158,9 @@ signals:
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
+  /// Sets default value of widget. Nornaly, widget should fetch this value 
+  /// from the xml. However, some widgets derived widgets could define it
+  void setDefaultValue(const std::string& theValue);
   /// \brief Set the attribute name
   /// \param theAttribute the string value with attribute name
   void setAttributeID(const std::string& theAttribute)
