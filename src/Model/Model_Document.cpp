@@ -928,7 +928,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   static Events_ID aCreateEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
   static Events_ID aToHideEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->activateFlushes(false);
 
