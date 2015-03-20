@@ -354,13 +354,16 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager
     if (aVerified.find(aWP) != aVerified.end())
       continue;
 
-    std::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures = std::dynamic_pointer_cast<
-        ModelAPI_AttributeRefList>(aWP->data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
-    std::list<ObjectPtr> aFeaturesList = aWPFeatures->list();
-    std::list<ObjectPtr>::const_iterator anIter;
-    for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
-      if (*anIter == theFeature)
-        return aWP;  // workplane is found
+    DataPtr aData = aWP->data();
+    if (aData) {
+      std::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures = std::dynamic_pointer_cast<
+          ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+      std::list<ObjectPtr> aFeaturesList = aWPFeatures->list();
+      std::list<ObjectPtr>::const_iterator anIter;
+      for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
+        if (*anIter == theFeature)
+          return aWP;  // workplane is found
+    }
     aVerified.insert(aWP);
   }
 
