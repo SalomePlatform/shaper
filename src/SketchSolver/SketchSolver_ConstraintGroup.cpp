@@ -715,13 +715,42 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
           myConstraints.push_back(anEqRadConstr);
           myConstraintMap[theConstraint].push_back(anEqRadConstr.h);
         } else if (aBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
-          int aBaseArcInd[3] = {0, 1, 2}; // indices of points of arc, center corresponds center, first point corresponds last point
-          int aMirrorArcInd[3] = {0, 2, 1};
+          // Workaround to avoid problems in SolveSpace.
+          // The symmetry of two arcs will be done using symmetry of three points on these arcs:
+          // start point, end point, and any other point on the arc
+          Slvs_hEntity aBaseArcPoints[3] = {
+              myEntities[aBasePos].point[1],
+              myEntities[aBasePos].point[2],
+              SLVS_E_UNKNOWN};
+          Slvs_hEntity aMirrorArcPoints[3] = { // indices of points of arc, center corresponds center, first point corresponds last point
+              myEntities[aMirrorPos].point[2],
+              myEntities[aMirrorPos].point[1],
+              SLVS_E_UNKNOWN};
+          Slvs_hEntity aBothArcs[2] = {aBaseEnt, aMirrorEnt};
+          Slvs_hEntity aBothMiddlePoints[2];
+          for (int i = 0; i < 2; i++) {
+            double x, y;
+            calculateMiddlePoint(aBothArcs[i], x, y);
+            std::vector<Slvs_Param>::iterator aParamIter = myParams.end();
+            Slvs_hParam u = changeParameter(x, aParamIter);
+            Slvs_hParam v = changeParameter(y, aParamIter);
+            Slvs_Entity aPoint = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, u, v);
+            myEntities.push_back(aPoint);
+            aBothMiddlePoints[i] = aPoint.h;
+            // additional constraint point-on-curve
+            Slvs_Constraint aPonCircConstr = Slvs_MakeConstraint(
+                ++myConstrMaxID, myID, SLVS_C_PT_ON_CIRCLE, myWorkplane.h, 0.0,
+                aPoint.h, SLVS_E_UNKNOWN, aBothArcs[i], SLVS_E_UNKNOWN);
+            myConstraints.push_back(aPonCircConstr);
+            myConstraintMap[theConstraint].push_back(aPonCircConstr.h);
+          }
+
+          aBaseArcPoints[2] = aBothMiddlePoints[0];
+          aMirrorArcPoints[2] = aBothMiddlePoints[1];
           for (int ind = 0; ind < 3; ind++) {
             Slvs_Constraint aConstraint = Slvs_MakeConstraint(
                 ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
-                myEntities[aBasePos].point[aBaseArcInd[ind]], myEntities[aMirrorPos].point[aMirrorArcInd[ind]],
-                aMirrorLineEnt, SLVS_E_UNKNOWN);
+                aBaseArcPoints[ind], aMirrorArcPoints[ind], aMirrorLineEnt, SLVS_E_UNKNOWN);
             myConstraints.push_back(aConstraint);
             myConstraintMap[theConstraint].push_back(aConstraint.h);
           }
@@ -881,23 +910,16 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
           Search(myEntities[aPointsPos[1]].param[0], myParams)
         };
       int anIndex = aParamPos[aBaseCoincInd[indEnt]];
-      myParams[anIndex].val =
-          0.5 * (myParams[aParamPos[0]].val + myParams[aParamPos[1]].val);
-      myParams[1 + anIndex].val =
-          0.5 * (myParams[1 + aParamPos[0]].val + myParams[1 + aParamPos[1]].val);
-      if (anIndShift == 1) { // place the changed point on the arc
-        int aCenterPos = Search(myEntities[aFilletObjInd[indEnt]].point[0], myEntities);
-        int aCenterParam = Search(myEntities[aCenterPos].param[0], myParams);
-        double x = myParams[anIndex].val - myParams[aCenterParam].val;
-        double y = myParams[1 + anIndex].val - myParams[1 + aCenterParam].val;
-        double aNorm = sqrt(x*x + y*y);
-        if (aNorm >= tolerance) {
-          double x1 = myParams[aParamPos[1-aBaseCoincInd[indEnt]]].val - myParams[aCenterParam].val;
-          double y1 = myParams[1 + aParamPos[1-aBaseCoincInd[indEnt]]].val - myParams[1 + aCenterParam].val;
-          double aRad = sqrt(x1*x1 + y1*y1);
-          myParams[anIndex].val = myParams[aCenterPos].val + x * aRad / aNorm;
-          myParams[1 + anIndex].val = myParams[1 + aCenterPos].val + y * aRad / aNorm;
-        }
+      if (anIndShift == 0) {
+        myParams[anIndex].val =
+            0.5 * (myParams[aParamPos[0]].val + myParams[aParamPos[1]].val);
+        myParams[1 + anIndex].val =
+            0.5 * (myParams[1 + aParamPos[0]].val + myParams[1 + aParamPos[1]].val);
+      } else { // place the changed point on the arc
+        double x = 0, y = 0;
+        calculateMiddlePoint(aFilletEnt[indEnt], x, y);
+        myParams[anIndex].val = x;
+        myParams[1 + anIndex].val = y;
       }
       anArcPoints[indEnt*2+2] = myParams[anIndex].val;
       anArcPoints[indEnt*2+3] = myParams[1 + anIndex].val;
@@ -2177,6 +2199,59 @@ void SketchSolver_ConstraintGroup::makeMirrorEntity(const Slvs_hEntity& theBase,
   }
 }
 
+// ============================================================================
+//  Function: calculateMiddlePoint
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  calculates middle point on line or arc
+// ============================================================================
+void SketchSolver_ConstraintGroup::calculateMiddlePoint(
+    const Slvs_hEntity& theEntity,
+    double& theX,
+    double& theY) const
+{
+  int anInd = Search(theEntity, myEntities);
+  if (myEntities[anInd].type == SLVS_E_LINE_SEGMENT) {
+    int aLineParams[2];
+    for (int i = 0; i < 2; i++) {
+      int aPtPos = Search(myEntities[anInd].point[i], myEntities);
+      aLineParams[i] = Search(myEntities[aPtPos].param[0], myParams);
+    }
+    theX = 0.5 * (myParams[aLineParams[0]].val + myParams[aLineParams[1]].val);
+    theY = 0.5 * (myParams[1 + aLineParams[0]].val + myParams[1 + aLineParams[1]].val);
+  } else if (myEntities[anInd].type == SLVS_E_ARC_OF_CIRCLE) {
+    double anArcPoint[3][2];
+    for (int i = 0; i < 3; i++) {
+      int aPtPos = Search(myEntities[anInd].point[i], myEntities);
+      int anArcParam = Search(myEntities[aPtPos].param[0], myParams);
+      anArcPoint[i][0] = myParams[anArcParam].val;
+      anArcPoint[i][1] = myParams[1 + anArcParam].val;
+    }
+    // project last point of arc on the arc
+    double x = anArcPoint[1][0] - anArcPoint[0][0];
+    double y = anArcPoint[1][1] - anArcPoint[0][1];
+    double aRad = sqrt(x*x + y*y);
+    x = anArcPoint[2][0] - anArcPoint[0][0];
+    y = anArcPoint[2][1] - anArcPoint[0][1];
+    double aNorm = sqrt(x*x + y*y);
+    if (aNorm >= tolerance) {
+      anArcPoint[2][0] = anArcPoint[0][0] + x * aRad / aNorm;
+      anArcPoint[2][1] = anArcPoint[0][1] + y * aRad / aNorm;
+    }
+
+    x = anArcPoint[1][0] + anArcPoint[2][0] - 2.0 * anArcPoint[0][0];
+    y = anArcPoint[1][1] + anArcPoint[2][1] - 2.0 * anArcPoint[0][1];
+    aNorm = sqrt(x*x + y*y);
+    if (aNorm >= tolerance) {
+      x *= aRad / aNorm;
+      y *= aRad / aNorm;
+    } else { // obtain orthogonal direction
+      x = 0.5 * (anArcPoint[2][1] - anArcPoint[1][1]);
+      y = -0.5 * (anArcPoint[2][0] - anArcPoint[1][0]);
+    }
+    theX = anArcPoint[0][0] + x;
+    theY = anArcPoint[0][1] + y;
+  }
+}
 
 
 // ========================================================
