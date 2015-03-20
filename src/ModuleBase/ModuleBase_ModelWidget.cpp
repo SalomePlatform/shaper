@@ -124,6 +124,11 @@ void ModuleBase_ModelWidget::activate()
   activateCustom();
 }
 
+void ModuleBase_ModelWidget::setDefaultValue(const std::string& theValue)
+{
+  myDefaultValue = theValue;
+}
+
 bool ModuleBase_ModelWidget::storeValue()
 {
   emit beforeValuesChanged();

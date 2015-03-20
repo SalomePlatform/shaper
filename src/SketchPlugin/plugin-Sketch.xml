@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
@@ -189,6 +189,20 @@
         title="Mirror"
         tooltip="Create constraint mirroring group of objects"
         internal="1" />
+    <!--  SketchConstraintFillet  -->
+      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects">
+        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+            label="First object" tooltip="Select line or arc" shape_types="edge">
+        </sketch_constraint_shape_selector>
+
+        <sketch_constraint_shape_selector id="ConstraintEntityB"
+            label="Last object" tooltip="Select line or arc" shape_types="edge">
+        </sketch_constraint_shape_selector>
+
+        <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" default="0" min="0">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
+      </feature>
     </group>
   </workbench>
 </plugin>

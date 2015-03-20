@@ -72,6 +72,11 @@ class SketchSolver_ConstraintGroup
    *  \return \c true if the constraint added or updated successfully
    */
   bool changeMirrorConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  /** \brief Adds or updates a fillet constraint in the group
+   *  \param[in] theConstraint constraint to be changed
+   *  \return \c true if the constraint added or updated successfully
+   */
+  bool changeFilletConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
@@ -186,6 +191,9 @@ protected:
   bool updateAttribute(std::shared_ptr<ModelAPI_Attribute> theAttribute,
                        const Slvs_hEntity& theEntityID);
 
+  /// \brief Update arc of fillet to be less than 180 degree
+  void updateFilletConstraints();
+
   /** \brief Adds a constraint for a point which should not be changed during computations
    *  \param[in] theEntity     the base for the constraint
    *  \param[in] theAllowToFit this flag shows that the entity may be placed into 
@@ -221,6 +229,15 @@ protected:
    *  \param[in,out] theConstraint SolveSpace constraint to be verified
    */
   void checkConstraintConsistence(Slvs_Constraint& theConstraint);
+
+  /** \brief Change entities parameters to make them symmetric relating to the mirror line
+   *  \param[in] theBase        entity to be mirrored
+   *  \param[in] theMirror      a mirrored object
+   *  \param[in] theMirrorLine  a mirror line
+   */
+  void makeMirrorEntity(const Slvs_hEntity& theBase,
+                        const Slvs_hEntity& theMirror,
+                        const Slvs_hEntity& theMirrorLine);
 
  private:
   // SolveSpace entities

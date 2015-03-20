@@ -14,6 +14,7 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMirror.h>
@@ -283,6 +284,26 @@ const int& SketchSolver_Constraint::getType(
     }
     if (aNbAttrs == 2 && hasMirrorLine)
       myType = SLVS_C_SYMMETRIC_LINE;
+    return getType();
+  }
+
+  if (aConstraintKind.compare(SketchPlugin_ConstraintFillet::ID()) == 0) {
+    int aNbAttrs = 0;
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      AttributeRefListPtr anAttrRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr)));
+      if (anAttrRefList)
+        myAttributesList[aNbAttrs++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+      else {
+        std::shared_ptr<ModelAPI_Attribute> anAttr = 
+            aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+        AttrType aType = typeOfAttribute(anAttr);
+        if (aType == LINE || aType == ARC)
+          myAttributesList[aNbAttrs++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+      }
+    }
+    if (aNbAttrs == 3)
+      myType = SLVS_C_FILLET;
     return getType();
   }
 

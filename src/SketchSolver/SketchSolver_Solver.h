@@ -24,6 +24,8 @@ typedef unsigned int UINT32;
 
 // Unknown constraint (for error reporting)
 #define SLVS_C_UNKNOWN 0
+// Fillet constraint identifier
+#define SLVS_C_FILLET 100100
 // Unknown entity
 #define SLVS_E_UNKNOWN 0
 
