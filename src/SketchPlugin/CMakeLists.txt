@@ -27,6 +27,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintEqual.h
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintMirror.h
+    SketchPlugin_ConstraintFillet.h
     SketchPlugin_ShapeValidator.h
     SketchPlugin_Validators.h
     SketchPlugin_ResultValidators.h 
@@ -54,6 +55,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintEqual.cpp
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintMirror.cpp
+    SketchPlugin_ConstraintFillet.cpp
     SketchPlugin_ShapeValidator.cpp
     SketchPlugin_Validators.cpp
     SketchPlugin_ResultValidators.cpp

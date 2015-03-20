@@ -9,6 +9,7 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMirror.h>
@@ -124,6 +125,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintTangent);
   } else if (theFeatureID == SketchPlugin_ConstraintMirror::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
+  } else if (theFeatureID == SketchPlugin_ConstraintFillet::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintFillet);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -173,6 +176,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintEqual::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintTangent::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintFillet::ID(), aHasSketchPlane);
     }
   }
   return aMsg;
