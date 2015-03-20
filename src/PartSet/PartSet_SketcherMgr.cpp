@@ -780,8 +780,10 @@ bool PartSet_SketcherMgr::canSetAuxiliary(bool& theValue) const
     anObjects.append(anOperation->feature());
   }
   else {
-    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-      anOperation->abort();
+    /// The operation should not be aborted here, because the method does not changed
+    /// the auxilliary state, but checks the possibility to perform this
+    ///if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+    ///  anOperation->abort();
     // 2. change auxiliary type of selected sketch entities
     ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
     anObjects = aSelection->selectedPresentations();
@@ -801,7 +803,8 @@ bool PartSet_SketcherMgr::canSetAuxiliary(bool& theValue) const
 
           std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
-          isNotAuxiliaryFound = !anAuxiliaryAttr->value();
+          if (anAuxiliaryAttr)
+            isNotAuxiliaryFound = !anAuxiliaryAttr->value();
         }
       }
     }
@@ -854,7 +857,8 @@ void PartSet_SketcherMgr::setAuxiliary(const bool isChecked)
 
           std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
-          anAuxiliaryAttr->setValue(isChecked);
+          if (anAuxiliaryAttr)
+            anAuxiliaryAttr->setValue(isChecked);
         }
       }
     }
