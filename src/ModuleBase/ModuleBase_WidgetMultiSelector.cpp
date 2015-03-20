@@ -210,12 +210,10 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 }
 
 //********************************************************************
-#include <AIS_ListIteratorOfListOfInteractive.hxx>
-#include <ModuleBase_ResultPrs.h>
 void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  NCollection_List<TopoDS_Shape> aSelectedShapes; //, aFilteredShapes;
+  NCollection_List<TopoDS_Shape> aSelectedShapes;
   std::list<ObjectPtr> aOwnersList;
   aSelection->selectedShapes(aSelectedShapes, aOwnersList);
 
@@ -225,56 +223,29 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   GeomShapePtr aShape;
   for (aIt = aOwnersList.cbegin(); aIt != aOwnersList.cend(); aShpIt.Next(), aIt++) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
-    // this case should be moved to PartSet module after redesign this class
-    /*if (aShpIt.Value().ShapeType() == TopAbs_COMPOUND) {
-      int aValue = 0;
-      AIS_ListOfInteractive aList;
-      aSelection->selectedAISObjects(aList);
-      AIS_ListIteratorOfListOfInteractive aLIt(aList);
-      Handle(AIS_InteractiveObject) anAISIO;
-      for(; aLIt.More(); aLIt.Next()){
-        anAISIO = aLIt.Value();
-        Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(anAISIO);
-        if (!aResultPrs.IsNull()) {
-          const std::list<std::shared_ptr<GeomAPI_Shape> >& aResultFaces = aResultPrs->facesList();
-          std::list<std::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
-          for (aIt = aResultFaces.cbegin(); aIt != aResultFaces.cend(); ++aIt) {
-            TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
-            
-            aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-            aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
-
-            mySelection.append(GeomSelection(aResult, aShape));
-          }
+    if (myFeature) {
+      // We can not select a result of our feature
+      const std::list<ResultPtr>& aResList = myFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      bool isSkipSelf = false;
+      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+        if ((*aIt) == aResult) {
+          isSkipSelf = true;
+          break;
         }
       }
+      if(isSkipSelf)
+        continue;
     }
-    else*/
-    {
-      if (myFeature) {
-        // We can not select a result of our feature
-        const std::list<ResultPtr>& aResList = myFeature->results();
-        std::list<ResultPtr>::const_iterator aIt;
-        bool isSkipSelf = false;
-        for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-          if ((*aIt) == aResult) {
-            isSkipSelf = true;
-            break;
-          }
-        }
-        if(isSkipSelf)
-          continue;
-      }
-      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-      aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
+    aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
 
-      if (aShape->isEqual(aResult->shape())) {
-        //aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        mySelection.append(GeomSelection(aResult, NULL));//aShape));
-      }
-      else
-        mySelection.append(GeomSelection(aResult, aShape));
-    }
+    // if the result has the similar shap as the parameter shape, just the context is set to the
+    // selection list attribute.
+    if (aShape->isEqual(aResult->shape()))
+      mySelection.append(GeomSelection(aResult, NULL));
+    else
+      mySelection.append(GeomSelection(aResult, aShape));
   }
   //updateSelectionList();
   emit valuesChanged();
