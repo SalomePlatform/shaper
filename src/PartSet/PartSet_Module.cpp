@@ -561,11 +561,8 @@ bool PartSet_Module::deleteObjects()
   if (aSelectedObj.count() == 0)
     return false;
 
-  if (isNestedOp)
-    anOperation->abort();
-
   // the active nested sketch operation should be aborted unconditionally
-  if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+  if (isNestedOp)
     anOperation->abort();
 
   std::set<FeaturePtr> aRefFeatures;
