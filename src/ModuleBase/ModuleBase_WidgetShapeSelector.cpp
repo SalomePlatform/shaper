@@ -218,6 +218,14 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     Handle(SelectMgr_EntityOwner) anOwner = aSelected.first().owner();
     if (isValid(anOwner)) {
       setSelection(anOwner);
+      // the updateObject method should be called to flush the updated sigal. The workshop listens it,
+      // calls validators for the feature and, as a result, updates the Apply button state.
+      updateObject(myFeature);
+      //if (theObj) {
+        //  raisePanel();
+      //} 
+      //updateSelectionName();
+      //emit valuesChanged();
       emit focusOutWidget(this);
     }
   }
