@@ -10,6 +10,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_WidgetValidated.h"
 #include "ModuleBase_ViewerFilters.h"
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
@@ -84,7 +85,11 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
+  virtual bool setSelectionPrs(ModuleBase_ViewerPrs theValue);
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param theOwner a selected owner
+  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
@@ -117,10 +122,6 @@ Q_OBJECT
   /// to backup, otherwise set the backed up values to the attribute
   virtual void backupAttributeValue(const bool isBackup);
 
-  /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
-  virtual void setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
-
   /// Computes and updates name of selected object in the widget
   void updateSelectionName();
 
@@ -143,7 +144,7 @@ Q_OBJECT
   /// Check the selected with validators if installed
   /// \param theObj the object for checking
   /// \param theShape the shape for checking
-  virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
+  //virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
 
   /// Clear attribute
   void clearAttribute();

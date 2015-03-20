@@ -37,6 +37,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_IViewer.h
 	ModuleBase_WidgetLineEdit.h
 	ModuleBase_WidgetMultiSelector.h
+	ModuleBase_ValidatorLinearEdge.h
+	ModuleBase_ValidatorLinearEdgeOrVertex.h
 	ModuleBase_ViewerFilters.h
 	ModuleBase_ResultPrs.h
 	ModuleBase_IViewWindow.h
@@ -80,6 +82,8 @@ SET(PROJECT_SOURCES
 	ModuleBase_DoubleSpinBox.cpp
 	ModuleBase_WidgetLineEdit.cpp
 	ModuleBase_WidgetMultiSelector.cpp
+	ModuleBase_ValidatorLinearEdge.cpp
+	ModuleBase_ValidatorLinearEdgeOrVertex.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
 	ModuleBase_WidgetLabel.cpp

@@ -25,7 +25,7 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
     return false;
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  if (aSPFeature.get() != NULL && aShape.get() != NULL && !aShape->isNull()) {
+  if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull()) {
     // Processing of external (non-sketch) object
     ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(aShape->impl<TopoDS_Shape>(),
                                                                 aSelectedObject, mySketch);
@@ -42,9 +42,24 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
       AttributeRefAttrPtr aRefAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
       if (aRefAttr) {
-        TopoDS_Shape aTDSShape = aShape->impl<TopoDS_Shape>();
-        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aSelectedObject, aTDSShape, mySketch);
+        // it is possible that the point feature is selected. It should be used itself
+        // instead of searching an attribute for the shape
+        bool aShapeIsResult = false;
+        /*ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
+        if (aResult.get() != NULL) {
+          GeomShapePtr aShapePtr = aResult->shape();
+          // it is important to call isEqual of the shape of result.
+          // It is a GeomAPI_Vertex shape for the point. The shape of the parameter is 
+          // GeomAPI_Shape. It is important to use the realization of the isEqual method from
+          // GeomAPI_Vertex class
+          aShapeIsResult = aShapePtr.get() != NULL && aShapePtr->isEqual(theShape);
+        }*/
 
+        AttributePtr aPntAttr;
+        if (!aShapeIsResult) {
+          TopoDS_Shape aTDSShape = aShape->impl<TopoDS_Shape>();
+          aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aSelectedObject, aTDSShape, mySketch);
+        }
         // this is an alternative, whether the attribute should be set or object in the attribute
         // the first check is the attribute because the object already exist
         // the object is set only if there is no selected attribute

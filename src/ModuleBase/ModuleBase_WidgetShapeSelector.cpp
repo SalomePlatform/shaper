@@ -215,13 +215,16 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
   //QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
   QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
   if (aSelected.size() > 0) {
-    if (setSelection(aSelected.first()))
+    Handle(SelectMgr_EntityOwner) anOwner = aSelected.first().owner();
+    if (isValid(anOwner)) {
+      setSelection(anOwner);
       emit focusOutWidget(this);
+    }
   }
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
+bool ModuleBase_WidgetShapeSelector::setSelectionPrs(ModuleBase_ViewerPrs theValue)
 {
   ObjectPtr aObject = theValue.object();
   ObjectPtr aCurrentObject = getObject(myFeature->attribute(attributeID()));
@@ -258,43 +261,26 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
     aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(theValue.shape()));
   }
-
   // Check that the selection corresponds to selection type
   if (!acceptSubShape(aShape))
     return false;
-//  if (!acceptObjectShape(aObject))
-//      return false;
 
-  // Check whether the value is valid for the viewer selection filters
-  Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
-  if (!anOwner.IsNull()) {
-    SelectMgr_ListOfFilter aFilters;
-    selectionFilters(myWorkshop, aFilters);
-    SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-    for (; aIt.More(); aIt.Next()) {
-      const Handle(SelectMgr_Filter)& aFilter = aIt.Value();
-      if (!aFilter->IsOk(anOwner))
-        return false;
-    }
-  }
-  if (isValid(aObject, aShape)) {
-    setObject(aObject, aShape);
-    return true;
-  }
-  return false;
+  setObject(aObject, aShape);
+  return true;
 }
 
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  if (storeAttributeValues(theObj, theShape))
-    updateObject(myFeature);
+  //if (
+    storeAttributeValues(theObj, theShape);//)
+  //  updateObject(myFeature);
 
-  if (theObj) {
-    raisePanel();
-  } 
-  updateSelectionName();
-  emit valuesChanged();
+  //if (theObj) {
+  //  raisePanel();
+  //} 
+  //updateSelectionName();
+  //emit valuesChanged();
 }
 
 //********************************************************************
@@ -395,7 +381,17 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
       std::string aName = anObject->data()->name();
       myTextLine->setText(QString::fromStdString(aName));
     } else {
-      if (myIsActive) {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr && aRefAttr->attr().get() != NULL) {
+        //myIsObject = aRefAttr->isObject();
+        AttributePtr anAttr = aRefAttr->attr();
+        if (anAttr.get() != NULL) {
+          std::stringstream aName;
+          aName <<anAttr->owner()->data()->name()<<"/"<<anAttr->id();
+          myTextLine->setText(QString::fromStdString(aName.str()));
+        }
+      }
+      else if (myIsActive) {
         myTextLine->setText("");
       }
     }
@@ -469,18 +465,23 @@ void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
     storeAttributeValues(myObject, myShape);
     AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
     if (aRefAttr) {
-      if (myIsObject)
-        aRefAttr->setObject(myObject);
-      else
+      if (!myIsObject)
         aRefAttr->setAttr(myRefAttribute);
     }
   }
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
 {
-
+  bool isDone = false;
+  //QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
+  //if (aSelected.size() > 0) {
+  ModuleBase_ViewerPrs aPrs;
+  myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+  isDone = setSelectionPrs(aPrs);
+  //}
+  return isDone;
 }
 
 //********************************************************************
@@ -491,7 +492,7 @@ void ModuleBase_WidgetShapeSelector::deactivate()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
+/*bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
   bool isValid = ModuleBase_WidgetValidated::isValid(theObj, theShape);
   if (!isValid)
@@ -529,4 +530,4 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
   // 5. enable the model's update
   aData->blockSendAttributeUpdated(false);
   return aValid;
-}
+}*/

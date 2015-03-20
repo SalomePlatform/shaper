@@ -25,6 +25,21 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 {
 }
 
+bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
+{
+  bool isDone = false;
+
+  Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
+  if (isValid(anOwner)) {
+    //storeAttributeValue(anOwner);
+    setSelection(anOwner);
+    updateObject(myFeature);
+    //isDone = setSelection(anOwner);
+    emit valuesChanged();
+  }
+  return isDone;
+}
+
 bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& theOwner)
 {
   backupAttributeValue(true);
@@ -97,13 +112,13 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
                                                  const bool toActivate) const
 {
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
-/*
+
   Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else
     aViewer->removeSelectionFilter(aSelFilter);
-*/  
+/*
   // apply filters loaded from the XML definition of the widget
   ModuleBase_FilterFactory* aFactory = theWorkshop->selectionFilters();
   SelectMgr_ListOfFilter aFactoryFilters;
@@ -117,7 +132,7 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
       aViewer->addSelectionFilter(aSelFilter);
     else
       aViewer->removeSelectionFilter(aSelFilter);
-  }
+  }*/
 }
 
 void ModuleBase_WidgetValidated::selectionFilters(ModuleBase_IWorkshop* theWorkshop,

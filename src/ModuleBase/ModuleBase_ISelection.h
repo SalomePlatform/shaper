@@ -18,6 +18,8 @@
 
 #include <QList>
 
+class Handle_SelectMgr_EntityOwner;
+
 /**
 * \ingroup GUI
 * A class which provides access to selection.
@@ -34,6 +36,12 @@ class ModuleBase_ISelection
   /// Returns a list of viewer highlited presentations
   /// \return list of presentations
   virtual QList<ModuleBase_ViewerPrs> getHighlighted() const = 0;
+
+  /// Fills the viewer presentation parameters by the parameters from the owner
+  /// \param thePrs a container for selection
+  /// \param theOwner a selection owner
+  virtual void fillPresentation(ModuleBase_ViewerPrs& thePrs,
+                                const Handle_SelectMgr_EntityOwner& theOwner) const = 0;
 
   /**
    * Returns list of features currently selected in object browser

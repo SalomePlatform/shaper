@@ -73,6 +73,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// Fills the attribute with the value of the selected owner
+  /// \param theOwner a selected owner
+  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+
  public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
@@ -101,10 +105,6 @@ protected slots:
   /// \param isBackup a boolean flag, if true, store values from the attribute
   /// to backup, otherwise set the backed up values to the attribute
   virtual void backupAttributeValue(const bool isBackup);
-
-  /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
-  virtual void setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
 
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);

@@ -11,6 +11,8 @@
 
 #include <QGridLayout>
 
+#include <iostream>
+
 ModuleBase_PageWidget::ModuleBase_PageWidget(QWidget* theParent)
 : QFrame(theParent)
 {

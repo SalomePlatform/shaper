@@ -43,6 +43,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// \return a boolean value
   bool isValid(const Handle_SelectMgr_EntityOwner& theOwner);
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
+
 protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -53,7 +58,7 @@ protected:
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
-  virtual void setSelection(const Handle_SelectMgr_EntityOwner& theOwner) = 0;
+  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner) = 0;
 
   /// Checks the current attibute in all attribute validators
   // \return true if all validators return that the attribute is valid

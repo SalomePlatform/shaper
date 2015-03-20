@@ -178,9 +178,9 @@ void ModuleBase_WidgetMultiSelector::backupAttributeValue(const bool isBackup)
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+bool ModuleBase_WidgetMultiSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
 {
-
+  return false;
 }
 
 //********************************************************************

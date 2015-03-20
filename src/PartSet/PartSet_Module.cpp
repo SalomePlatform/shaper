@@ -21,6 +21,9 @@
 #include <ModuleBase_FilterMulti.h>
 #include <ModuleBase_FilterCustom.h>
 #include <ModuleBase_FilterNoConsructionSubShapes.h>
+#include <ModuleBase_ValidatorLinearEdge.h>
+#include <ModuleBase_ValidatorLinearEdgeOrVertex.h>
+
 #include <PartSet_FilterSketchEntity.h>
 
 #include <ModelAPI_Object.h>
@@ -126,6 +129,10 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
   aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
+
+  aFactory->registerValidator("ModuleBase_ValidatorLinearEdge", new ModuleBase_ValidatorLinearEdge);
+  aFactory->registerValidator("ModuleBase_ValidatorLinearEdgeOrVertex",
+                              new ModuleBase_ValidatorLinearEdgeOrVertex);
 }
 
 void PartSet_Module::registerFilters()
