@@ -239,6 +239,14 @@ protected:
                         const Slvs_hEntity& theMirror,
                         const Slvs_hEntity& theMirrorLine);
 
+  /** \brief Calculates middle point on line or arc
+   *  \param[in]  theEntity  identifier of line or arc
+   *  \param[out] theX       X value of middle point
+   *  \param[out] theY       Y value of middle point
+   */
+  void calculateMiddlePoint(const Slvs_hEntity& theEntity,
+                            double& theX, double& theY) const;
+
  private:
   // SolveSpace entities
   Slvs_hGroup myID;            ///< the index of the group
