@@ -1911,19 +1911,26 @@ void SketchSolver_ConstraintGroup::removeConstraint(
         if (anEntToRemove.find(anEntIter->point[i]) != anEntToRemove.end()) {
           anEntToRemove.insert(anEntIter->h);
           for (int j = 0; j < 4; j++)
-            if (anEntIter->param[j] != 0)
+            if (anEntIter->point[j] != 0)
               anEntToRemove.insert(anEntIter->point[j]);
           break;
         }
     }
 
+  // Find entities used by remaining constraints and remove them from the list to delete
   std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
   for (; aConstrIter != myConstraints.end(); aConstrIter++) {
     Slvs_hEntity aEnts[] = { aConstrIter->ptA, aConstrIter->ptB, aConstrIter->entityA, aConstrIter
         ->entityB };
     for (int i = 0; i < 4; i++)
-      if (aEnts[i] != 0 && anEntToRemove.find(aEnts[i]) != anEntToRemove.end())
+      if (aEnts[i] != 0 && anEntToRemove.find(aEnts[i]) != anEntToRemove.end()) {
         anEntToRemove.erase(aEnts[i]);
+        // remove from the list all points of current entity
+        int aEntPos = Search(aEnts[i], myEntities);
+        for (int j = 0; j < 4; j++)
+          if (myEntities[aEntPos].point[j] != 0)
+            anEntToRemove.erase(myEntities[aEntPos].point[j]);
+      }
   }
 
   if (anEntToRemove.empty())
