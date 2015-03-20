@@ -224,66 +224,6 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setSelectionPrs(ModuleBase_ViewerPrs theValue)
-{
-  ObjectPtr aObject = theValue.object();
-  ObjectPtr aCurrentObject = getObject(myFeature->attribute(attributeID()));
-  if ((!aCurrentObject) && (!aObject))
-    return false;
-
-  // Check that the selected object is result (others can not be accepted)
-  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-  if (!aRes)
-    return false;
-
-  if (myFeature) {
-    // We can not select a result of our feature
-    const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
-    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-      if ((*aIt) == aRes)
-        return false;
-    }
-  }
-  // Check that object belongs to active document or PartSet
-  DocumentPtr aDoc = aRes->document();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
-    return false;
-
-  // Check that the result has a shape
-  GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
-  if (!aShape)
-    return false;
-
-  // Get sub-shapes from local selection
-  if (!theValue.shape().IsNull()) {
-    aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-    aShape->setImpl(new TopoDS_Shape(theValue.shape()));
-  }
-  // Check that the selection corresponds to selection type
-  if (!acceptSubShape(aShape))
-    return false;
-
-  setObject(aObject, aShape);
-  return true;
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
-{
-  //if (
-    storeAttributeValues(theObj, theShape);//)
-  //  updateObject(myFeature);
-
-  //if (theObj) {
-  //  raisePanel();
-  //} 
-  //updateSelectionName();
-  //emit valuesChanged();
-}
-
-//********************************************************************
 //bool ModuleBase_WidgetShapeSelector::acceptObjectShape(const ObjectPtr theResult) const
 //{
 //  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theResult);
@@ -475,13 +415,50 @@ void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
 bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
 {
   bool isDone = false;
-  //QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
-  //if (aSelected.size() > 0) {
+
   ModuleBase_ViewerPrs aPrs;
   myWorkshop->selection()->fillPresentation(aPrs, theOwner);
-  isDone = setSelectionPrs(aPrs);
-  //}
-  return isDone;
+  ObjectPtr aObject = aPrs.object();
+  ObjectPtr aCurrentObject = getObject(myFeature->attribute(attributeID()));
+  if ((!aCurrentObject) && (!aObject))
+    return false;
+
+  // Check that the selected object is result (others can not be accepted)
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+  if (!aRes)
+    return false;
+
+  if (myFeature) {
+    // We can not select a result of our feature
+    const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+      if ((*aIt) == aRes)
+        return false;
+    }
+  }
+  // Check that object belongs to active document or PartSet
+  DocumentPtr aDoc = aRes->document();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
+    return false;
+
+  // Check that the result has a shape
+  GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
+  if (!aShape)
+    return false;
+
+  // Get sub-shapes from local selection
+  if (!aPrs.shape().IsNull()) {
+    aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aPrs.shape()));
+  }
+  // Check that the selection corresponds to selection type
+  if (!acceptSubShape(aShape))
+    return false;
+
+  storeAttributeValues(aObject, aShape);
+  return true;
 }
 
 //********************************************************************
@@ -490,44 +467,3 @@ void ModuleBase_WidgetShapeSelector::deactivate()
   activateSelection(false);
   disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 }
-
-//********************************************************************
-/*bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
-{
-  bool isValid = ModuleBase_WidgetValidated::isValid(theObj, theShape);
-  if (!isValid)
-    return false;
-
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::list<ModelAPI_Validator*> aValidators;
-  std::list<std::list<std::string> > anArguments;
-  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
-
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
-
-  // 1. make a backup of the previous attribute values
-  backupAttributeValue(true);
-  // 2. store the current values, disable the model's update
-  aData->blockSendAttributeUpdated(true);
-
-  // 3. check the acceptability of the current values
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
-  bool aValid = true;
-  for (; aValidator != aValidators.end() && aValid; aValidator++, aArgs++) {
-    const ModelAPI_AttributeValidator* aAttrValidator =
-        dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
-    if (aAttrValidator) {
-      aValid = aAttrValidator->isValid(anAttribute, *aArgs);
-    }
-  }
-
-  // 4. if the values are not valid, restore the previous values to the attribute
-  backupAttributeValue(false);
-
-  // 5. enable the model's update
-  aData->blockSendAttributeUpdated(false);
-  return aValid;
-}*/

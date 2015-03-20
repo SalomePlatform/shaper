@@ -82,11 +82,6 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Set the given wrapped value to the current widget
-  /// This value should be processed in the widget according to the needs
-  /// \param theValue the wrapped widget value
-  virtual bool setSelectionPrs(ModuleBase_ViewerPrs theValue);
-
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
   virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
@@ -132,19 +127,9 @@ Q_OBJECT
   /// \param theShape a shape
   virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
 
-  // Set the given object as a value of the widget
-  /// \param theObj an object 
-  /// \param theShape a shape
-  void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
-
   // Get the shape from the attribute it the attribute contain a shape, e.g. selection attribute
   /// \return a shape
   GeomShapePtr getShape() const;
-
-  /// Check the selected with validators if installed
-  /// \param theObj the object for checking
-  /// \param theShape the shape for checking
-  //virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
 
   /// Clear attribute
   void clearAttribute();

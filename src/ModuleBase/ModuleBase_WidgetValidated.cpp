@@ -31,10 +31,8 @@ bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
 
   Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
   if (isValid(anOwner)) {
-    //storeAttributeValue(anOwner);
     setSelection(anOwner);
     updateObject(myFeature);
-    //isDone = setSelection(anOwner);
     emit valuesChanged();
   }
   return isDone;
