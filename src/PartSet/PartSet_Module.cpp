@@ -23,6 +23,7 @@
 #include <ModuleBase_FilterNoConsructionSubShapes.h>
 #include <ModuleBase_ValidatorLinearEdge.h>
 #include <ModuleBase_ValidatorLinearEdgeOrVertex.h>
+#include <ModuleBase_ValidatorFace.h>
 
 #include <PartSet_FilterSketchEntity.h>
 
@@ -133,6 +134,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("ModuleBase_ValidatorLinearEdge", new ModuleBase_ValidatorLinearEdge);
   aFactory->registerValidator("ModuleBase_ValidatorLinearEdgeOrVertex",
                               new ModuleBase_ValidatorLinearEdgeOrVertex);
+  aFactory->registerValidator("ModuleBase_ValidatorFace", new ModuleBase_ValidatorFace);
 }
 
 void PartSet_Module::registerFilters()

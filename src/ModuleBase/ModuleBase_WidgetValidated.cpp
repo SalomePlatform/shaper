@@ -57,7 +57,7 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   std::list<ModelAPI_Validator*> aValidators;
   std::list<std::list<std::string> > anArguments;
-  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+  aFactory->validators(myFeature->getKind(), attributeID(), aValidators, anArguments);
 
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
