@@ -40,6 +40,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_ValidatorFace.h
 	ModuleBase_ValidatorLinearEdge.h
 	ModuleBase_ValidatorLinearEdgeOrVertex.h
+	ModuleBase_ValidatorNoConstructionSubShapes.h
 	ModuleBase_ViewerFilters.h
 	ModuleBase_ResultPrs.h
 	ModuleBase_IViewWindow.h
@@ -86,6 +87,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_ValidatorFace.cpp
 	ModuleBase_ValidatorLinearEdge.cpp
 	ModuleBase_ValidatorLinearEdgeOrVertex.cpp
+	ModuleBase_ValidatorNoConstructionSubShapes.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
 	ModuleBase_WidgetLabel.cpp

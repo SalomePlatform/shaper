@@ -106,17 +106,19 @@ bool ModuleBase_WidgetValidated::isValid(ObjectPtr theObj, GeomShapePtr theShape
   return isValid;
 }
 
+#define VALIDATOR_FILTER
 void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorkshop,
                                                  const bool toActivate) const
 {
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
 
+#ifdef VALIDATOR_FILTER
   Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else
     aViewer->removeSelectionFilter(aSelFilter);
-/*
+#else
   // apply filters loaded from the XML definition of the widget
   ModuleBase_FilterFactory* aFactory = theWorkshop->selectionFilters();
   SelectMgr_ListOfFilter aFactoryFilters;
@@ -130,7 +132,8 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
       aViewer->addSelectionFilter(aSelFilter);
     else
       aViewer->removeSelectionFilter(aSelFilter);
-  }*/
+  }
+#endif
 }
 
 void ModuleBase_WidgetValidated::selectionFilters(ModuleBase_IWorkshop* theWorkshop,
