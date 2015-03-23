@@ -28,7 +28,6 @@
 Config_ValidatorReader::Config_ValidatorReader(const std::string& theXmlFileName)
 : Config_XMLReader(theXmlFileName)
 {
-  std::cout << "Config_ValidatorReader created for: " << theXmlFileName << std::endl;
 }
 
 Config_ValidatorReader::~Config_ValidatorReader()
