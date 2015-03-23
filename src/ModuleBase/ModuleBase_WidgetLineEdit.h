@@ -31,7 +31,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
  public:
   /// Constructor
   /// \param theParent the parent object
-  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theData the widget configuration.
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetLineEdit(QWidget* theParent,
                                 const Config_WidgetAPI* theData,
