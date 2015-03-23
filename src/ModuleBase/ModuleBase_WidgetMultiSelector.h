@@ -131,14 +131,20 @@ protected slots:
   /// Provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
 
-  /// Variable of GeomSelection type
-  QList<GeomSelection> mySelection;
-
   /// An action for pop-up menu in a list control
   QAction* myCopyAction;
 
   /// A filter for the Edges type, which avoid the generated edges selection
   Handle(ModuleBase_FilterNoDegeneratedEdge) myEdgesTypeFilter;
+
+  /// backup parameters of the model attribute. The class processes three types of attribute:
+  /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter
+  /// values are reserved in the backup
+  /// Variable of selection type
+  std::string mySelectionType;
+
+  /// Variable of GeomSelection
+  QList<GeomSelection> mySelection;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

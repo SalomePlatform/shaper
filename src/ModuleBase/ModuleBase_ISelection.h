@@ -60,6 +60,9 @@ class ModuleBase_ISelection
   //! \param theList returning list of selected AIS objects
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const = 0;
 
+  //! Returns list of currently selected QModelIndexes
+  virtual ObjectPtr getSelectableObject(const Handle_SelectMgr_EntityOwner& theOwner) const = 0;
+
   //! Returns list of currently selected shapes and their owners (objects).
   //! Both lists are synchronized
   //! \param theList returning list of selected AIS objects

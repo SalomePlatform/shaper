@@ -139,6 +139,9 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("ModuleBase_ValidatorNoConstructionSubShapes",
                               new ModuleBase_ValidatorNoConstructionSubShapes);
+
+  aFactory->registerValidator("PartSet_SketchEntityValidator",
+                              new PartSet_SketchEntityValidator);
 }
 
 void PartSet_Module::registerFilters()
@@ -147,14 +150,14 @@ void PartSet_Module::registerFilters()
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   ModuleBase_FilterFactory* aFactory = aConnector->selectionFilters();
 
-  aFactory->registerFilter("EdgeFilter", new ModuleBase_FilterLinearEdge);
-  aFactory->registerFilter("FaceFilter", new ModuleBase_FilterFace);
-  aFactory->registerFilter("MultiFilter", new ModuleBase_FilterMulti);
-  Handle(SelectMgr_Filter) aSelectFilter = new ModuleBase_FilterNoConsructionSubShapes(workshop());
-  aFactory->registerFilter("NoConstructionSubShapesFilter",
-            new ModuleBase_FilterCustom(aSelectFilter));
-  aSelectFilter = new PartSet_FilterSketchEntity(workshop());
-  aFactory->registerFilter("SketchEntityFilter", new ModuleBase_FilterCustom(aSelectFilter));
+  //aFactory->registerFilter("EdgeFilter", new ModuleBase_FilterLinearEdge);
+  //aFactory->registerFilter("FaceFilter", new ModuleBase_FilterFace);
+  //aFactory->registerFilter("MultiFilter", new ModuleBase_FilterMulti);
+  //Handle(SelectMgr_Filter) aSelectFilter = new ModuleBase_FilterNoConsructionSubShapes(workshop());
+  //aFactory->registerFilter("NoConstructionSubShapesFilter",
+  //          new ModuleBase_FilterCustom(aSelectFilter));
+  //Handle(SelectMgr_Filter) aSelectFilter = new PartSet_FilterSketchEntity(workshop());
+  //aFactory->registerFilter("SketchEntityFilter", new ModuleBase_FilterCustom(aSelectFilter));
 }
 
 void PartSet_Module::registerProperties()

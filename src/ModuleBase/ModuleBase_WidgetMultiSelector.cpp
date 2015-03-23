@@ -121,28 +121,8 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
 {
-  // A rare case when plugin was not loaded. 
-  if(!myFeature)
-    return false;
-  DataPtr aData = myFeature->data();
-  AttributeSelectionListPtr aSelectionListAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-
-  if (aSelectionListAttr) {
-    aSelectionListAttr->clear();
-    // Store shapes type
-    TopAbs_ShapeEnum aCurrentType =
-          ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
-    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
-    // Store selection in the attribute
-    foreach (GeomSelection aSelec, mySelection) {
-      aSelectionListAttr->append(aSelec.first, aSelec.second);
-    }
-    //updateSelectionList(aSelectionListAttr);
-    updateObject(myFeature);
-    return true;
-  }
-  return false;
+  // the value is stored on the selection changed signal processing 
+  return true;
 }
 
 //********************************************************************
@@ -156,15 +136,9 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
   if (aSelectionListAttr) {
-    mySelection.clear();
     // Restore shape type
     setCurrentShapeType(
       ModuleBase_WidgetShapeSelector::shapeType(aSelectionListAttr->selectionType().c_str()));
-    // Restore selection in the list
-    for (int i = 0; i < aSelectionListAttr->size(); i++) {
-      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
-      mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
-    }
     updateSelectionList(aSelectionListAttr);
     return true;
   }
@@ -174,13 +148,73 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::backupAttributeValue(const bool isBackup)
 {
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+  if (aSelectionListAttr.get() == NULL)
+    return;
 
+  if (isBackup) {
+    mySelectionType = aSelectionListAttr->selectionType();
+    mySelection.clear();
+    for (int i = 0; i < aSelectionListAttr->size(); i++) {
+      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
+      mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
+    }
+  }
+  else {
+    aSelectionListAttr->clear();
+    // Store shapes type
+    aSelectionListAttr->setSelectionType(mySelectionType);
+
+    // Store selection in the attribute
+    foreach (GeomSelection aSelec, mySelection) {
+      aSelectionListAttr->append(aSelec.first, aSelec.second);
+    }
+  }
 }
 
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
 {
-  return false;
+  ModuleBase_ViewerPrs aPrs;
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  aSelection->fillPresentation(aPrs, theOwner);
+
+  const TopoDS_Shape& aTDSShape = aPrs.shape();
+  if (aTDSShape.IsNull())
+    return false;
+  GeomShapePtr aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+  aShape->setImpl(new TopoDS_Shape(aTDSShape));
+
+  ObjectPtr anObject = aSelection->getSelectableObject(theOwner);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if (myFeature) {
+    // We can not select a result of our feature
+    const std::list<ResultPtr>& aResList = myFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    bool isSkipSelf = false;
+    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+      if ((*aIt) == aResult) {
+        isSkipSelf = true;
+        break;
+      }
+    }
+    if(isSkipSelf)
+      return false;
+  }
+
+  // if the result has the similar shap as the parameter shape, just the context is set to the
+  // selection list attribute.
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+  if (aShape->isEqual(aResult->shape()))
+    aSelectionListAttr->append(aResult, NULL);
+  else
+    aSelectionListAttr->append(aResult, aShape);
+
+  return true;
 }
 
 //********************************************************************
@@ -210,73 +244,27 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 }
 
 //********************************************************************
-#include <AIS_ListIteratorOfListOfInteractive.hxx>
-#include <ModuleBase_ResultPrs.h>
 void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
-  ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  NCollection_List<TopoDS_Shape> aSelectedShapes; //, aFilteredShapes;
-  std::list<ObjectPtr> aOwnersList;
-  aSelection->selectedShapes(aSelectedShapes, aOwnersList);
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
 
-  mySelection.clear();
-  std::list<ObjectPtr>::const_iterator aIt;
-  NCollection_List<TopoDS_Shape>::Iterator aShpIt(aSelectedShapes);
-  GeomShapePtr aShape;
-  for (aIt = aOwnersList.cbegin(); aIt != aOwnersList.cend(); aShpIt.Next(), aIt++) {
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
-    // this case should be moved to PartSet module after redesign this class
-    /*if (aShpIt.Value().ShapeType() == TopAbs_COMPOUND) {
-      int aValue = 0;
-      AIS_ListOfInteractive aList;
-      aSelection->selectedAISObjects(aList);
-      AIS_ListIteratorOfListOfInteractive aLIt(aList);
-      Handle(AIS_InteractiveObject) anAISIO;
-      for(; aLIt.More(); aLIt.Next()){
-        anAISIO = aLIt.Value();
-        Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(anAISIO);
-        if (!aResultPrs.IsNull()) {
-          const std::list<std::shared_ptr<GeomAPI_Shape> >& aResultFaces = aResultPrs->facesList();
-          std::list<std::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
-          for (aIt = aResultFaces.cbegin(); aIt != aResultFaces.cend(); ++aIt) {
-            TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
-            
-            aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-            aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-            mySelection.append(GeomSelection(aResult, aShape));
-          }
-        }
+  aSelectionListAttr->clear();
+  if (aSelected.size() > 0) {
+    foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
+      Handle(SelectMgr_EntityOwner) anOwner = aPrs.owner();
+      if (isValid(anOwner)) {
+        setSelection(anOwner);
       }
-    }
-    else*/
-    {
-      if (myFeature) {
-        // We can not select a result of our feature
-        const std::list<ResultPtr>& aResList = myFeature->results();
-        std::list<ResultPtr>::const_iterator aIt;
-        bool isSkipSelf = false;
-        for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-          if ((*aIt) == aResult) {
-            isSkipSelf = true;
-            break;
-          }
-        }
-        if(isSkipSelf)
-          continue;
-      }
-      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-      aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
-
-      if (aShape->isEqual(aResult->shape())) {
-        //aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        mySelection.append(GeomSelection(aResult, NULL));//aShape));
-      }
-      else
-        mySelection.append(GeomSelection(aResult, aShape));
     }
   }
-  //updateSelectionList();
+  // the updateObject method should be called to flush the updated sigal. The workshop listens it,
+  // calls validators for the feature and, as a result, updates the Apply button state.
+  updateObject(myFeature);
+
   emit valuesChanged();
 }
 
