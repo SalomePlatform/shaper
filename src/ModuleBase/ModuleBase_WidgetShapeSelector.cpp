@@ -18,6 +18,7 @@
 #include <Events_Message.h>
 #include <GeomAPI_Interface.h>
 #include <GeomAPI_Shape.h>
+#include <GeomValidators_Tools.h>
 
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Data.h>
@@ -33,7 +34,6 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_ShapeValidator.h>
 
@@ -272,29 +272,6 @@ bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shap
   return false;
 }
 
-ObjectPtr ModuleBase_WidgetShapeSelector::getObject(const AttributePtr& theAttribute)
-{
-  ObjectPtr anObject;
-  std::string anAttrType = theAttribute->attributeType();
-  if (anAttrType == ModelAPI_AttributeRefAttr::type()) {
-    AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-    if (anAttr != NULL && anAttr->isObject())
-      anObject = anAttr->object();
-  }
-  if (anAttrType == ModelAPI_AttributeSelection::type()) {
-    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-    if (anAttr != NULL && anAttr->isInitialized())
-      anObject = anAttr->context();
-  }
-  if (anAttrType == ModelAPI_AttributeReference::type()) {
-    AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
-    if (anAttr.get() != NULL && anAttr->isInitialized())
-      anObject = anAttr->value();
-  }
-  return anObject;
-}
-
-
 //********************************************************************
 GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
 {
@@ -324,7 +301,7 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     isNameUpdated = true;
   }
   if (!isNameUpdated) {
-    ObjectPtr anObject = getObject(myFeature->attribute(attributeID()));
+    ObjectPtr anObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
     if (anObject.get() != NULL) {
       std::string aName = anObject->data()->name();
       myTextLine->setText(QString::fromStdString(aName));
@@ -399,7 +376,7 @@ void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
   if (isBackup) {
-    myObject = getObject(anAttribute);
+    myObject = GeomValidators_Tools::getObject(anAttribute);
     myShape = getShape();
     myRefAttribute = NULL;
     myIsObject = false;
@@ -427,7 +404,7 @@ bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityO
   ModuleBase_ViewerPrs aPrs;
   myWorkshop->selection()->fillPresentation(aPrs, theOwner);
   ObjectPtr aObject = aPrs.object();
-  ObjectPtr aCurrentObject = getObject(myFeature->attribute(attributeID()));
+  ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
   if ((!aCurrentObject) && (!aObject))
     return false;
 

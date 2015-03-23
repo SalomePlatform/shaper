@@ -28,14 +28,12 @@ SET(PROJECT_HEADERS
     ModelAPI_FeatureValidator.h
     ModelAPI_Object.h
     ModelAPI_Plugin.h
-    ModelAPI_RefAttrValidator.h 
     ModelAPI_Result.h
     ModelAPI_ResultBody.h
     ModelAPI_ResultConstruction.h
     ModelAPI_ResultGroup.h
     ModelAPI_ResultParameters.h
     ModelAPI_ResultPart.h
-    ModelAPI_ResultValidator.h
     ModelAPI_Session.h
     ModelAPI_Tools.h
     ModelAPI_ShapeValidator.h

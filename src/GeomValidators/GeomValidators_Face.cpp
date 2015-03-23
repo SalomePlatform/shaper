@@ -1,8 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 
-#include "ModuleBase_ValidatorFace.h"
-#include "ModuleBase_WidgetShapeSelector.h"
+#include "GeomValidators_Face.h"
+#include "GeomValidators_Tools.h"
 
 #include "ModelAPI_AttributeSelection.h"
 
@@ -13,24 +13,24 @@
 #include <QString>
 #include <QMap>
 
-typedef QMap<QString, GeomAbs_SurfaceType> FaceTypes;
+typedef std::map<std::string, GeomAbs_SurfaceType> FaceTypes;
 static FaceTypes MyFaceTypes;
 
-GeomAbs_SurfaceType ModuleBase_ValidatorFace::faceType(const std::string& theType)
+GeomAbs_SurfaceType GeomValidators_Face::faceType(const std::string& theType)
 {
-  if (MyFaceTypes.count() == 0) {
+  if (MyFaceTypes.size() == 0) {
     MyFaceTypes["plane"] = GeomAbs_Plane;
     MyFaceTypes["cylinder"] = GeomAbs_Cylinder;
   }
-  QString aType = QString(theType.c_str()).toLower();
-  if (MyFaceTypes.contains(aType))
+  std::string aType = std::string(theType.c_str());
+  if (MyFaceTypes.find(aType) != MyFaceTypes.end())
     return MyFaceTypes[aType];
   
   Events_Error::send("Face type defined in XML is not implemented!");
   return GeomAbs_Plane;
 }
 
-bool ModuleBase_ValidatorFace::isValid(const AttributePtr& theAttribute,
+bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
                                        const std::list<std::string>& theArguments) const
 {
   bool aValid = false;
@@ -41,7 +41,7 @@ bool ModuleBase_ValidatorFace::isValid(const AttributePtr& theAttribute,
     aFaceType = faceType(anArgument);
   }
 
-  ObjectPtr anObject = ModuleBase_WidgetShapeSelector::getObject(theAttribute);
+  ObjectPtr anObject = GeomValidators_Tools::getObject(theAttribute);
   if (anObject.get() != NULL) {
     AttributeSelectionPtr aSelectionAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
                                                                  (theAttribute);

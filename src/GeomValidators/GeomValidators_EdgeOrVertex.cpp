@@ -1,11 +1,12 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 
-#include "ModuleBase_ValidatorLinearEdgeOrVertex.h"
-#include "ModuleBase_WidgetShapeSelector.h"
-#include "ModuleBase_ValidatorLinearEdge.h"
+#include "GeomValidators_EdgeOrVertex.h"
+#include "GeomValidators_Tools.h"
+#include "GeomValidators_Edge.h"
 
 #include "ModelAPI_AttributeRefAttr.h"
+#include "ModelAPI_Result.h"
 
 #include <ModelAPI_Session.h>
 
@@ -20,8 +21,8 @@
 #include <QMap>
 
 
-bool ModuleBase_ValidatorLinearEdgeOrVertex::isValid(const AttributePtr& theAttribute,
-                                             const std::list<std::string>& theArguments) const
+bool GeomValidators_EdgeOrVertex::isValid(const AttributePtr& theAttribute,
+                                          const std::list<std::string>& theArguments) const
 {
   bool aValid = false;
 
@@ -30,15 +31,15 @@ bool ModuleBase_ValidatorLinearEdgeOrVertex::isValid(const AttributePtr& theAttr
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  const ModuleBase_ValidatorLinearEdge* aLinearEdgeValidator =
-    dynamic_cast<const ModuleBase_ValidatorLinearEdge*>(aFactory->validator("ModuleBase_ValidatorLinearEdge"));
+  const GeomValidators_Edge* aLinearEdgeValidator =
+    dynamic_cast<const GeomValidators_Edge*>(aFactory->validator("GeomValidators_Edge"));
 
   std::list<std::string> anArguments;
   anArguments.push_back("line");
   aValid = aLinearEdgeValidator->isValid(theAttribute, anArguments);
   if (!aValid) {
     //2. check whether the attribute is a vertex
-    ObjectPtr anObject = ModuleBase_WidgetShapeSelector::getObject(theAttribute);
+    ObjectPtr anObject = GeomValidators_Tools::getObject(theAttribute);
     if (anObject.get() != NULL) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
