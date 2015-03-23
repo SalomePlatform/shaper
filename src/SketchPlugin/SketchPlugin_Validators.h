@@ -8,7 +8,7 @@
 #define SketchPlugin_Validators_H
 
 #include "SketchPlugin.h"
-#include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_AttributeValidator.h>
 
 /**\class SketchPlugin_DistanceAttrValidator
  * \ingroup Validators
@@ -16,7 +16,7 @@
  *
  * It just checks that distance is greater than zero.
  */
-class SketchPlugin_DistanceAttrValidator : public ModelAPI_RefAttrValidator
+class SketchPlugin_DistanceAttrValidator : public ModelAPI_AttributeValidator
 {
  public:
   //! returns true if attribute is valid

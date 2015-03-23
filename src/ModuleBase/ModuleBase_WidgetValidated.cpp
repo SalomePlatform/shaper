@@ -6,7 +6,6 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_AttributeValidator.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
@@ -80,74 +79,14 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   return aValid;
 }
 
-//********************************************************************
-bool ModuleBase_WidgetValidated::isValid(ObjectPtr theObj, GeomShapePtr theShape) const
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::list<ModelAPI_Validator*> aValidators;
-  std::list<std::list<std::string> > anArguments;
-  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
-
-  // Check the type of selected object
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  bool isValid = true;
-  for (; aValidator != aValidators.end(); aValidator++) {
-    const ModelAPI_ResultValidator* aResValidator =
-        dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
-    if (aResValidator) {
-      isValid = false;
-      if (aResValidator->isValid(theObj)) {
-        isValid = true;
-        break;
-      }
-    }
-  }
-  return isValid;
-}
-
-#define VALIDATOR_FILTER
 void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorkshop,
                                                  const bool toActivate) const
 {
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
 
-#ifdef VALIDATOR_FILTER
   Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else
     aViewer->removeSelectionFilter(aSelFilter);
-#else
-  // apply filters loaded from the XML definition of the widget
-  ModuleBase_FilterFactory* aFactory = theWorkshop->selectionFilters();
-  SelectMgr_ListOfFilter aFactoryFilters;
-  aFactory->filters(parentID(), attributeID(), aFactoryFilters);
-  SelectMgr_ListIteratorOfListOfFilter aFactoryIt(aFactoryFilters);
-  for (; aFactoryIt.More(); aFactoryIt.Next()) {
-    Handle(SelectMgr_Filter) aSelFilter = aFactoryIt.Value();
-    if (aSelFilter.IsNull())
-      continue;
-    if (toActivate)
-      aViewer->addSelectionFilter(aSelFilter);
-    else
-      aViewer->removeSelectionFilter(aSelFilter);
-  }
-#endif
-}
-
-void ModuleBase_WidgetValidated::selectionFilters(ModuleBase_IWorkshop* theWorkshop,
-                                                  SelectMgr_ListOfFilter& theFilters) const
-{
-  ModuleBase_FilterFactory* aFactory = theWorkshop->selectionFilters();
-  SelectMgr_ListOfFilter aFilters;
-  aFactory->filters(parentID(), attributeID(), aFilters);
-  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-  for (; aIt.More(); aIt.Next()) {
-    Handle(SelectMgr_Filter) aSelFilter = aIt.Value();
-    if (aSelFilter.IsNull())
-      continue;
-
-    theFilters.Append(aSelFilter);
-  }
 }
