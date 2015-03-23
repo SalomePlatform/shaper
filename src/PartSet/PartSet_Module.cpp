@@ -21,10 +21,10 @@
 #include <ModuleBase_FilterMulti.h>
 #include <ModuleBase_FilterCustom.h>
 #include <ModuleBase_FilterNoConsructionSubShapes.h>
-#include <ModuleBase_ValidatorLinearEdge.h>
-#include <ModuleBase_ValidatorLinearEdgeOrVertex.h>
-#include <ModuleBase_ValidatorFace.h>
-#include <ModuleBase_ValidatorNoConstructionSubShapes.h>
+#include <GeomValidators_Edge.h>
+#include <GeomValidators_EdgeOrVertex.h>
+#include <GeomValidators_Face.h>
+#include <GeomValidators_ConstructionComposite.h>
 
 #include <PartSet_FilterSketchEntity.h>
 
@@ -131,13 +131,13 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
 
-  aFactory->registerValidator("ModuleBase_ValidatorLinearEdge", new ModuleBase_ValidatorLinearEdge);
-  aFactory->registerValidator("ModuleBase_ValidatorLinearEdgeOrVertex",
-                              new ModuleBase_ValidatorLinearEdgeOrVertex);
-  aFactory->registerValidator("ModuleBase_ValidatorFace", new ModuleBase_ValidatorFace);
+  aFactory->registerValidator("GeomValidators_Edge", new GeomValidators_Edge);
+  aFactory->registerValidator("GeomValidators_EdgeOrVertex",
+                              new GeomValidators_EdgeOrVertex);
+  aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
 
-  aFactory->registerValidator("ModuleBase_ValidatorNoConstructionSubShapes",
-                              new ModuleBase_ValidatorNoConstructionSubShapes);
+  aFactory->registerValidator("GeomValidators_ConstructionComposite",
+                              new GeomValidators_ConstructionComposite);
 
   aFactory->registerValidator("PartSet_SketchEntityValidator",
                               new PartSet_SketchEntityValidator);

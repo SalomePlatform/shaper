@@ -56,7 +56,7 @@
               tooltip="Select point, line end point, line, center of circle or arc."
               shape_types="edge vertex">
           <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
-          <validator id="ModuleBase_ValidatorLinearEdgeOrVertex"/>
+          <validator id="GeomValidators_EdgeOrVertex"/>
         </sketch_shape_selector>/>
         <sketch_shape_selector 
           id="ConstraintEntityB" 
@@ -66,7 +66,7 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
           <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
-          <validator id="ModuleBase_ValidatorLinearEdgeOrVertex"/>
+          <validator id="GeomValidators_EdgeOrVertex"/>
         </sketch_shape_selector>
         
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
@@ -82,7 +82,7 @@
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" 
             shape_types="edge" >
-        <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+        <validator id="GeomValidators_Edge" parameters="line"/>
     </shape_selector>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
@@ -95,7 +95,7 @@
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
         <shape_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc" 
             shape_types="edge">
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="circle"/>
+            <validator id="GeomValidators_Edge" parameters="circle"/>
         </shape_selector>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed"/>
@@ -105,13 +105,13 @@
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
             <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select a line" 
             shape_types="edge">
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
             <validator id="PartSet_DifferentObjects"/>
             <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityA"/>
         </sketch_constraint_shape_selector>
@@ -124,7 +124,7 @@
             label="First line" tooltip="Select an line" 
             shape_types="edge">
           <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB" 
@@ -132,7 +132,7 @@
             shape_types="edge">
             <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityA"/>
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>
@@ -148,14 +148,14 @@
       <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon=":icons/horisontal.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="Line" tooltip="Select a line" shape_types="edge">
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
       </feature>
     <!--  SketchConstraintVertical  -->
       <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon=":icons/vertical.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="Line" tooltip="Select a line" shape_types="edge">
-            <validator id="ModuleBase_ValidatorLinearEdge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
       </feature>
     <!--  SketchConstraintEqual  -->
