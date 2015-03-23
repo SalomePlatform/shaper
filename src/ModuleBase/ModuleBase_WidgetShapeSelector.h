@@ -89,10 +89,6 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
-  // Get the object from the attribute
-  /// \param theObj an object 
-  static ObjectPtr getObject(const AttributePtr& theAttribute);
-
  public slots:
 
   /// Activate or deactivate selection

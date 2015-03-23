@@ -63,6 +63,7 @@ SET(PROJECT_LIBRARIES
     Config
     GeomAPI
     GeomAlgoAPI
+    GeomValidators
     ModelAPI
     SketcherPrs
     ${CAS_KERNEL}
@@ -84,6 +85,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
+  ../GeomValidators
   ../SketcherPrs
 )
 

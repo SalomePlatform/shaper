@@ -1,38 +1,38 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 
-#include "ModuleBase_ValidatorLinearEdge.h"
-#include "ModuleBase_WidgetShapeSelector.h"
+#include "GeomValidators_Edge.h"
+#include "GeomValidators_Tools.h"
 
 #include <GeomAPI_Curve.h>
-
 #include <Events_Error.h>
+#include <ModelAPI_Result.h>
 
 #include <StdSelect_TypeOfEdge.hxx>
 
-#include <QString>
-#include <QMap>
+#include <string>
+#include <map>
 
 
-typedef QMap<QString, ModuleBase_ValidatorLinearEdge::TypeOfEdge> EdgeTypes;
+typedef std::map<std::string, GeomValidators_Edge::TypeOfEdge> EdgeTypes;
 static EdgeTypes MyEdgeTypes;
 
-ModuleBase_ValidatorLinearEdge::TypeOfEdge ModuleBase_ValidatorLinearEdge::edgeType(const std::string& theType)
+GeomValidators_Edge::TypeOfEdge GeomValidators_Edge::edgeType(const std::string& theType)
 {
-  if (MyEdgeTypes.count() == 0) {
+  if (MyEdgeTypes.size() == 0) {
     MyEdgeTypes["line"] = Line;
     MyEdgeTypes["circle"] = Circle;
   }
-  QString aType = QString(theType.c_str()).toLower();
-  if (MyEdgeTypes.contains(aType))
+  std::string aType = std::string(theType.c_str());
+  if (MyEdgeTypes.find(aType) != MyEdgeTypes.end())
     return MyEdgeTypes[aType];
   
   Events_Error::send("Edge type defined in XML is not implemented!");
   return AnyEdge;
 }
 
-bool ModuleBase_ValidatorLinearEdge::isValid(const AttributePtr& theAttribute,
-                                             const std::list<std::string>& theArguments) const
+bool GeomValidators_Edge::isValid(const AttributePtr& theAttribute,
+                                  const std::list<std::string>& theArguments) const
 {
   bool aValid = false;
 
@@ -42,7 +42,7 @@ bool ModuleBase_ValidatorLinearEdge::isValid(const AttributePtr& theAttribute,
     anEdgeType = edgeType(anArgument);
   }
 
-  ObjectPtr anObject = ModuleBase_WidgetShapeSelector::getObject(theAttribute);
+  ObjectPtr anObject = GeomValidators_Tools::getObject(theAttribute);
   if (anObject.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);

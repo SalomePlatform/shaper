@@ -37,10 +37,6 @@ SET(PROJECT_HEADERS
 	ModuleBase_IViewer.h
 	ModuleBase_WidgetLineEdit.h
 	ModuleBase_WidgetMultiSelector.h
-	ModuleBase_ValidatorFace.h
-	ModuleBase_ValidatorLinearEdge.h
-	ModuleBase_ValidatorLinearEdgeOrVertex.h
-	ModuleBase_ValidatorNoConstructionSubShapes.h
 	ModuleBase_ViewerFilters.h
 	ModuleBase_ResultPrs.h
 	ModuleBase_IViewWindow.h
@@ -84,10 +80,6 @@ SET(PROJECT_SOURCES
 	ModuleBase_DoubleSpinBox.cpp
 	ModuleBase_WidgetLineEdit.cpp
 	ModuleBase_WidgetMultiSelector.cpp
-	ModuleBase_ValidatorFace.cpp
-	ModuleBase_ValidatorLinearEdge.cpp
-	ModuleBase_ValidatorLinearEdgeOrVertex.cpp
-	ModuleBase_ValidatorNoConstructionSubShapes.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
 	ModuleBase_WidgetLabel.cpp
@@ -108,6 +100,7 @@ SET(PROJECT_LIBRARIES
 	ModelAPI
 	GeomAPI
 	GeomAlgoAPI
+	GeomValidators
 	${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
@@ -135,6 +128,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
+    ${CMAKE_SOURCE_DIR}/src/GeomValidators
     ${SUIT_INCLUDE}
 )
 

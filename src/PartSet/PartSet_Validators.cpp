@@ -11,6 +11,7 @@
 #include <BRep_Tool.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <GeomAbs_CurveType.hxx>
+#include <GeomValidators_Tools.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 
@@ -119,7 +120,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 
   // 1. check whether the object of the attribute is not among the feature attributes
   // find the attribute's object
-  ObjectPtr anObject =  ModuleBase_WidgetShapeSelector::getObject(theAttribute);
+  ObjectPtr anObject =  GeomValidators_Tools::getObject(theAttribute);
 
   // check whether the object is not among other feature attributes
   if (anObject.get() != NULL) {
@@ -132,7 +133,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
       // the function parameter attribute should be skipped
       if (anAttr.get() == NULL || anAttr->id() == theAttribute->id())
         continue;
-      ObjectPtr aCurObject =  ModuleBase_WidgetShapeSelector::getObject(anAttr);
+      ObjectPtr aCurObject =  GeomValidators_Tools::getObject(anAttr);
       if (aCurObject  && aCurObject == anObject)
         return false;
     }
