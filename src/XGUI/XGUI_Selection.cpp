@@ -163,6 +163,20 @@ void XGUI_Selection::selectedAISObjects(AIS_ListOfInteractive& theList) const
 }
 
 //**************************************************************
+ObjectPtr XGUI_Selection::getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const
+{
+  ObjectPtr anObject;
+
+  Handle(SelectMgr_EntityOwner) aEO = theOwner;
+  if (!aEO.IsNull()) {
+    Handle(AIS_InteractiveObject) anObj = 
+      Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
+    anObject = myWorkshop->displayer()->getObject(anObj);
+  }
+  return anObject;
+}
+
+//**************************************************************
 void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
                                     std::list<ObjectPtr>& theOwners) const
 {

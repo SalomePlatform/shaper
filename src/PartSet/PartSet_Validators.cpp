@@ -17,6 +17,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Object.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -186,6 +187,30 @@ bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr&
     }
   }
   return true;
+}
+
+bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
+                                            const std::list<std::string>& theArguments) const
+{
+  AttributeSelectionListPtr aSelectionListAttr = 
+                    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+
+  // it filters only selection list attributes
+  if (aSelectionListAttr.get() == NULL)
+    return true;
+
+  std::string aType = aSelectionListAttr->selectionType().c_str();
+
+  // all context objects should be sketch entities
+  bool isSketchEntities = true;
+  int aSize = aSelectionListAttr->size();
+  for (int i = 0; i < aSelectionListAttr->size(); i++) {
+    AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
+    ObjectPtr anObject = aSelectAttr->context();
+    FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+    isSketchEntities = aFeature->getKind() == SketchPlugin_Sketch::ID();
+  }
+  return isSketchEntities;
 }
 
 bool PartSet_SketchValidator::isValid(const ObjectPtr theObject) const

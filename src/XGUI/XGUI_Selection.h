@@ -61,8 +61,17 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const;
 
+  //! Returns list of currently selected QModelIndexes
+  ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner);
+
   //! Returns list of currently selected AIS objects
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const;
+
+  //! Return a selectable object by the entity owner. It founds AIS object in the viewer
+  //! and returns the corresponded object
+  /// \param theOwner an entity owner
+  /// \return a found object or NULL
+  ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   //! Returns list of currently selected shapes
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theShapes, 
