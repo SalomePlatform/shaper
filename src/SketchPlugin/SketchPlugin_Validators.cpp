@@ -8,10 +8,12 @@
 #include "SketchPlugin_ConstraintDistance.h"
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Session.h>
+
+//#include <ModuleBase_ValidatorLinearEdge.h>
+
 #include <GeomDataAPI_Point2D.h>
 
 bool SketchPlugin_DistanceAttrValidator::isValid(
@@ -33,8 +35,23 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   } else {
     // 1. check whether the references object is a linear
     ObjectPtr anObject = aRefAttr->object();
-    const ModelAPI_ResultValidator* anArcValidator =
-        dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
+    /*
+    const ModelAPI_AttributeValidator* aCircleValidator = 
+      dynamic_cast<ModuleBase_ValidatorLinearEdge*>(aFactory->validator("ModuleBase_ValidatorLinearEdge"));
+    std::list<std::string> anArguments;
+    anArguments.push_back("circle");
+    bool anEdgeValid = aCircleValidator->isValid(aRefAttr, anArguments);
+    if (anEdgeValid)
+      return false;
+      
+    anArguments.clear();
+    anArguments.push_back("line");
+    bool anEdgeValid = aCircleValidator->isValid(aRefAttr, anArguments);
+    if (!anEdgeValid)
+      return true;*/
+
+    /*const ModelAPI_ResultValidator* anArcValidator = aFactory->validator("ModuleBase_ValidatorLinearEdge");
+    //dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
     bool anArcValid = anArcValidator->isValid(anObject);
     if (anArcValid)
       return false;
@@ -44,9 +61,9 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
         dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultLine"));
     bool aLineValid = aLineValidator->isValid(anObject);
     if (!aLineValid)
-      return true;
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+      return true;*/
 
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
     // If it is a line then we have to check that first attribute id not a line
     std::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(aFeature->data(), aParamA);
     if (aPoint)

@@ -130,7 +130,6 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
-  aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
 
   aFactory->registerValidator("ModuleBase_ValidatorLinearEdge", new ModuleBase_ValidatorLinearEdge);
   aFactory->registerValidator("ModuleBase_ValidatorLinearEdgeOrVertex",

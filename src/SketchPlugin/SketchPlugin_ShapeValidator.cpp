@@ -11,7 +11,6 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeRefAttr.h>
-#include <ModelAPI_ResultValidator.h>
 
 bool SketchPlugin_ShapeValidator::isValid(const AttributePtr& theAttribute,
                                           const std::list<std::string>& theArguments) const

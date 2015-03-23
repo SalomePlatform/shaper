@@ -11,8 +11,7 @@
 
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_ISelection.h>
-#include <ModelAPI_RefAttrValidator.h>
-#include <ModelAPI_ResultValidator.h>
+#include <ModelAPI_AttributeValidator.h>
 
 /*
  * Selector validators
@@ -70,7 +69,7 @@ class PartSet_RigidValidator : public ModuleBase_SelectionValidator
 * \ingroup Validators
 * A validator which checks that objects selected for feature attributes are different (not the same)
 */
-class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
+class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
 {
  public:
   //! Returns true if the attribute is good for the feature attribute
@@ -95,7 +94,7 @@ protected:
 * \ingroup Validators
 * A validator which checks that objects selected for feature attributes are different (not the same)
 */
-class PartSet_SketchEntityValidator : public ModelAPI_RefAttrValidator
+class PartSet_SketchEntityValidator : public ModelAPI_AttributeValidator
 {
  public:
   //! Returns true if the attribute is good for the feature attribute
@@ -103,18 +102,6 @@ class PartSet_SketchEntityValidator : public ModelAPI_RefAttrValidator
   //! \param theArguments a list of arguments (names of attributes to check)
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments) const;
-};
-
-/**
-* \ingroup Validators
-* A Validator which validates tha selected object is a Sketch
-*/
-class PartSet_SketchValidator : public ModelAPI_ResultValidator
-{
- public:
-   /// Returns True if the given object is a sketch
-   /// \param theObject an object
-  virtual bool isValid(const ObjectPtr theObject) const;
 };
 
 #endif

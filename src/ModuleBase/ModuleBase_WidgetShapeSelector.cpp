@@ -33,7 +33,6 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_ShapeValidator.h>
 

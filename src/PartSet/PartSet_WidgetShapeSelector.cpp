@@ -9,8 +9,6 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_RefAttrValidator.h>
-#include <ModelAPI_ResultValidator.h>
 
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
