@@ -72,7 +72,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
       Events_Loop::loop()->send(aMessage);
     }
   }
-  //Process SOURCE, VALIDATOR nodes.
+  //Process SOURCE nodes.
   Config_XMLReader::processNode(theNode);
 }
 
@@ -110,30 +110,4 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
     aDocKind = restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC);
   }
   outFeatureMessage->setDocumentKind(aDocKind);
-}
-
-void Config_FeatureReader::storeAttribute(xmlNodePtr theNode,
-                                          const char* theNodeAttribute)
-{
-  std::string aKey = getNodeName(theNode) + ":" + std::string(theNodeAttribute);
-  std::string aValue = getProperty(theNode, theNodeAttribute);
-  if(!aValue.empty()) {
-    myParentAttributes[aKey] = aValue;
-  }
-}
-
-std::string Config_FeatureReader::restoreAttribute(xmlNodePtr theNode,
-                                                   const char* theNodeAttribute)
-{
-  return restoreAttribute(getNodeName(theNode).c_str(), theNodeAttribute);
-}
-std::string Config_FeatureReader::restoreAttribute(const char* theNodeName,
-                                                   const char* theNodeAttribute)
-{
-  std::string aKey = std::string(theNodeName) + ":" + std::string(theNodeAttribute);
-  std::string result = "";
-  if(myParentAttributes.find(aKey) != myParentAttributes.end()) {
-    result = myParentAttributes[aKey];
-  }
-  return result;
 }

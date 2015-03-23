@@ -38,6 +38,8 @@ class Config_ModuleReader : public Config_XMLReader
   CONFIG_EXPORT virtual ~Config_ModuleReader();
   /// Returns map that describes which file contains a feature (the feature is key, the file is value)
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
+  /// Returns list of module's xml files
+  CONFIG_EXPORT const std::set<std::string>& modulePluginFiles() const;
   /// Returns module name: an xml attribute from the root of the plugins.xml:
   /// e.g \code <plugins module="PartSet"> \endcode 
   CONFIG_EXPORT std::string getModuleName();
@@ -70,6 +72,7 @@ class Config_ModuleReader : public Config_XMLReader
 
  private:
   std::map<std::string, std::string> myFeaturesInFiles; ///< a feature name is key, a file is value
+  std::set<std::string> myPluginFiles; ///< a feature name is key, a file is value
   static std::map<std::string, PluginType> myPluginTypes; ///< a plugin name is key, a plugin type is value
   static std::set<std::string> myDependencyModules; ///< set of loaded modules
   const char* myEventGenerated; ///< gives ability to send Feature_Messages to various listeners
