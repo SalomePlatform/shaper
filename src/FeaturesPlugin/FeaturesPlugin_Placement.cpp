@@ -9,6 +9,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeBoolean.h>
 
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
@@ -26,6 +27,8 @@ void FeaturesPlugin_Placement::initAttributes()
 {
   data()->addAttribute(FeaturesPlugin_Placement::BASE_FACE_ID(), ModelAPI_AttributeSelection::type());
   data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_FACE_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(FeaturesPlugin_Placement::REVERSE_ID(), ModelAPI_AttributeBoolean::type());
+  data()->addAttribute(FeaturesPlugin_Placement::CENTERING_ID(), ModelAPI_AttributeBoolean::type());
 }
 
 void FeaturesPlugin_Placement::execute()
@@ -87,11 +90,16 @@ void FeaturesPlugin_Placement::execute()
     return;
   }
 
-  std::shared_ptr<GeomAPI_Pln> aBasePlane = aBaseFace1->getPlane();
-  std::shared_ptr<GeomAPI_Pln> aSlavePlane = aSlaveFace1->getPlane();
+  // Flags of the Placement
+  AttributeBooleanPtr aBoolAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+      data()->attribute(FeaturesPlugin_Placement::REVERSE_ID()));
+  bool isReverse = aBoolAttr->value();
+  aBoolAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+      data()->attribute(FeaturesPlugin_Placement::CENTERING_ID()));
+  bool isCentering = aBoolAttr->value();
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  GeomAlgoAPI_Placement aFeature(aSlaveObject, aSlavePlane, aBasePlane);
+  GeomAlgoAPI_Placement aFeature(aSlaveObject, aBaseFaceContext, aSlaveFace1, aBaseFace1, isReverse, isCentering);
   if(!aFeature.isDone()) {
     static const std::string aFeatureError = "Placement algorithm failed";
     setError(aFeatureError);

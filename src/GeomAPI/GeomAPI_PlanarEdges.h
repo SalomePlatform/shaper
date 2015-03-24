@@ -61,7 +61,6 @@ class GeomAPI_PlanarEdges : public GeomAPI_Shape
   /// \param theNorm normal direction of the plane axis
   GEOMAPI_EXPORT void setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                               const std::shared_ptr<GeomAPI_Dir>& theDirY,
                                const std::shared_ptr<GeomAPI_Dir>& theNorm);
 
 private:

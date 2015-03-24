@@ -29,7 +29,8 @@ public:
   /// Returns position of symbol for the given presentation
   /// \param theLine constrained object 
   /// \param thePrs a presentation of constraint
-  gp_Pnt getPosition(ObjectPtr theLine, Handle(SketcherPrs_SymbolPrs) thePrs);
+  /// \param theStep step between symbols
+  gp_Pnt getPosition(ObjectPtr theLine, Handle(SketcherPrs_SymbolPrs) thePrs, double theStep = 20);
 
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation

@@ -28,15 +28,17 @@ public:
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Tangent(SketchPlugin_Constraint* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
   DEFINE_STANDARD_RTTI(SketcherPrs_Tangent)
 protected:
-  /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-    const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   virtual const char* iconName() const { return "tangent.png"; }
 
   virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
+
+  /// Update myPntArray according to presentation positions
+  /// \return true in case of success
+  virtual bool updatePoints(double theStep) const;
 };
 
 #endif

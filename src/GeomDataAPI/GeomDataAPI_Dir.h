@@ -11,6 +11,7 @@
 #include <ModelAPI_Attribute.h>
 
 class GeomAPI_Dir;
+class GeomAPI_XYZ;
 
 /**\class GeomDataAPI_Dir
  * \ingroup DataModel
@@ -33,6 +34,8 @@ class GeomDataAPI_Dir : public ModelAPI_Attribute
   virtual double z() const = 0;
   /// Returns the direction of this attribute
   virtual std::shared_ptr<GeomAPI_Dir> dir() = 0;
+  /// Returns the coordinates of this attribute
+  virtual std::shared_ptr<GeomAPI_XYZ> xyz() = 0;
 
   /// Returns the type of this class of attributes
   static inline std::string type()

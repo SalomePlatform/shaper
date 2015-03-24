@@ -1299,14 +1299,15 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntityFeature(FeaturePtr theEnt
 //  Purpose:  create/update the normal of workplane
 // ============================================================================
 Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
-    std::shared_ptr<ModelAPI_Attribute> theDirX, std::shared_ptr<ModelAPI_Attribute> theDirY,
+    std::shared_ptr<ModelAPI_Attribute> theDirX,
     std::shared_ptr<ModelAPI_Attribute> theNorm)
 {
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theNorm);
   std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirX);
-  std::shared_ptr<GeomDataAPI_Dir> aDirY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirY);
-  if (!aDirX || !aDirY || (fabs(aDirX->x()) + fabs(aDirX->y()) + fabs(aDirX->z()) < tolerance)
-      || (fabs(aDirY->x()) + fabs(aDirY->y()) + fabs(aDirY->z()) < tolerance))
+  if (!aDirX || (fabs(aDirX->x()) + fabs(aDirX->y()) + fabs(aDirX->z()) < tolerance))
     return SLVS_E_UNKNOWN;
+  // calculate Y direction
+  std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aDirX->dir())));
 
   // quaternion parameters of normal vector
   double qw, qx, qy, qz;
@@ -1370,14 +1371,12 @@ bool SketchSolver_ConstraintGroup::updateWorkplane()
   // Get parameters of workplane
   std::shared_ptr<ModelAPI_Attribute> aDirX = mySketch->data()->attribute(
       SketchPlugin_Sketch::DIRX_ID());
-  std::shared_ptr<ModelAPI_Attribute> aDirY = mySketch->data()->attribute(
-      SketchPlugin_Sketch::DIRY_ID());
   std::shared_ptr<ModelAPI_Attribute> aNorm = mySketch->data()->attribute(
       SketchPlugin_Sketch::NORM_ID());
   std::shared_ptr<ModelAPI_Attribute> anOrigin = mySketch->data()->attribute(
       SketchPlugin_Sketch::ORIGIN_ID());
   // Transform them into SolveSpace format
-  Slvs_hEntity aNormalWP = changeNormal(aDirX, aDirY, aNorm);
+  Slvs_hEntity aNormalWP = changeNormal(aDirX, aNorm);
   if (!aNormalWP)
     return false;
   Slvs_hEntity anOriginWP = changeEntity(anOrigin);

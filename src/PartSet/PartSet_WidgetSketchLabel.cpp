@@ -336,9 +336,6 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
   std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
   aDirX->setValue(aXDir);
-  std::shared_ptr<GeomDataAPI_Dir> aDirY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
-  aDirY->setValue(aYDir);
   std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   return aDir;
 }
