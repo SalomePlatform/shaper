@@ -44,12 +44,6 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
     static const std::string MY_DIRX_ID("DirX");
     return MY_DIRX_ID;
   }
-  /// Vector Y inside of the sketch plane
-  inline static const std::string& DIRY_ID()
-  {
-    static const std::string MY_DIRY_ID("DirY");
-    return MY_DIRY_ID;
-  }
   /// Vector Z, normal to the sketch plane
   inline static const std::string& NORM_ID()
   {

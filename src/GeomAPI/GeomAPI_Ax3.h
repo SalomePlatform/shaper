@@ -29,7 +29,6 @@ public:
   /// \param theNorm direction of normal vector
   GeomAPI_Ax3(std::shared_ptr<GeomAPI_Pnt> theOrigin,
               std::shared_ptr<GeomAPI_Dir> theDirX,
-              std::shared_ptr<GeomAPI_Dir> theDirY,
               std::shared_ptr<GeomAPI_Dir> theNorm);
 
   /// Sets origin point

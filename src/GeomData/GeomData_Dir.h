@@ -14,6 +14,7 @@
 #include <memory>
 
 class GeomAPI_Dir;
+class GeomAPI_XYZ;
 
 /**\class GeomData_Dir
  * \ingroup DataModel
@@ -36,6 +37,8 @@ class GeomData_Dir : public GeomDataAPI_Dir
   GEOMDATA_EXPORT virtual double z() const;
   /// Returns the direction of this attribute
   GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_Dir> dir();
+  /// Returns the coordinates of this attribute
+  GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_XYZ> xyz();
 
  protected:
   /// Initializes attributes

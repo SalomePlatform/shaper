@@ -156,12 +156,10 @@ protected:
    *  on the plane transversed to created normal.
    *
    *  \param[in] theDirX first coordinate axis of the plane
-   *  \param[in] theDirY second coordinate axis of the plane
    *  \param[in] theNorm attribute for the normal (used to identify newly created entity)
    *  \return identifier of created or updated normal
    */
   Slvs_hEntity changeNormal(std::shared_ptr<ModelAPI_Attribute> theDirX,
-                            std::shared_ptr<ModelAPI_Attribute> theDirY,
                             std::shared_ptr<ModelAPI_Attribute> theNorm);
 
   /** \brief Adds or updates a parameter in the group
