@@ -13,7 +13,6 @@
 #include <Graphic3d_BndBox4f.hxx>
 
 #include <SelectMgr_Selection.hxx>
-#include <SelectMgr_EntityOwner.hxx>
 #include <Select3D_SensitivePoint.hxx>
 #include <TopLoc_Location.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -317,6 +316,15 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   if (!updatePoints(20))
     return;
 
+  int aNbVertex = myPntArray->VertexNumber();
+  if (myOwner.IsNull()) {
+    myOwner = new SelectMgr_EntityOwner(this);
+    for (int i = 1; i <= aNbVertex; i++) {
+      Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, myPntArray, i);
+      mySPoints.Append(aSP);
+    }
+  }
+
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePresentation);
   aGroup->SetPrimitivesAspect(myAspect);
 
@@ -325,7 +333,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   aBnd.Clear();
   for (int i = 1; i <= myPntArray->ItemNumber(); i++) {
     aVert = myPntArray->Vertice(i);
-    aBnd.Add (Graphic3d_Vec4 (aVert.X(), aVert.Y(), aVert.Z(), 1.0f));
+    aBnd.Add (Graphic3d_Vec4((float)aVert.X(), (float)aVert.Y(), (float)aVert.Z(), 1.0f));
   }
 
   aGroup->UserDraw(this, true);
@@ -338,14 +346,8 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
                                             const Standard_Integer aMode)
 {
   ClearSelected();
-  //if (!updatePoints(20))
-  //  return;
-
-  Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this);
-  for (int i = 1; i <= myPntArray->VertexNumber(); i++) {
-    Handle(Select3D_SensitivePoint) aSP = new Select3D_SensitivePoint(aOwn, myPntArray->Vertice(i));
-    aSelection->Add(aSP);
-  }
+  for (int i = 1; i <= mySPoints.Length(); i++)
+    aSelection->Add(mySPoints.Value(i));
 }
 
 
@@ -406,6 +408,9 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   }
   theWorkspace->EnableTexture (aTextureBack);
   aCtx->BindProgram (NULL);
+
+  // Update selection position
+  GetContext()->RecomputeSelectionOnly(this);
 }
 
 
