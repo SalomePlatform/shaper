@@ -31,7 +31,7 @@ GeomAbs_SurfaceType GeomValidators_Face::faceType(const std::string& theType)
 }
 
 bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
-                                       const std::list<std::string>& theArguments) const
+                                  const std::list<std::string>& theArguments) const
 {
   bool aValid = false;
 
@@ -59,5 +59,7 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
       }
     }
   }
+  else
+    aValid = true; // an empty face selected is valid.
   return aValid;
 }

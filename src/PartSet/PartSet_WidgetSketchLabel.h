@@ -9,14 +9,13 @@
 
 #include "PartSet.h"
 
-#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ViewerFilters.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_AISObject.h>
 
-#include <StdSelect_FaceFilter.hxx>
 #include <TopoDS_Shape.hxx>
 
 class QLabel;
@@ -35,7 +34,7 @@ class XGUI_Workshop;
 * A model widget implementation for a label which provides specific behaviour 
 * for sketcher starting and launching operations
 */
-class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_ModelWidget
+class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_WidgetValidated
 {
 Q_OBJECT
  public:
@@ -80,6 +79,17 @@ signals:
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
 protected:
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param isBackup a boolean flag, if true, store values from the attribute
+  /// to backup, otherwise set the backed up values to the attribute
+  virtual void backupAttributeValue(const bool isBackup);
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param theOwner a selected owner
+  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const
@@ -127,8 +137,6 @@ protected:
   AISObjectPtr myXZPlane;
   AISObjectPtr myXYPlane;
   bool myPreviewDisplayed;
-
-  Handle(StdSelect_FaceFilter) myFaceFilter;
 
   QTimer* mySelectionTimer;
 };

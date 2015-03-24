@@ -10,7 +10,9 @@
         title="Sketch"
         tooltip="Create a new sketch"
         icon=":icons/sketch.png">
-        <sketch-start-label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
+        <sketch-start-label id="External" title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch">
+          <validator id="GeomValidators_Face" parameters="plane"/>
+        </sketch-start-label>
       <!--icon=":pictures/x_point.png"-->
       </feature>
       <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png">
