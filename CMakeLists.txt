@@ -65,6 +65,7 @@ ADD_SUBDIRECTORY (src/GeomApp)
 ADD_SUBDIRECTORY (src/ExchangePlugin)
 ADD_SUBDIRECTORY (src/GeomValidators)
 ADD_SUBDIRECTORY (src/InitializationPlugin)
+ADD_SUBDIRECTORY (src/ParametersPlugin)
 
 IF(${HAVE_SALOME})
     ADD_SUBDIRECTORY (src/NewGeom)
