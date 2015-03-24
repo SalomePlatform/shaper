@@ -8,52 +8,85 @@
 #include <GeomAlgoAPI_DFLoader.h>
 
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Pln.h>
 
 #include <BRepBuilderAPI_Transform.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_Quaternion.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRepCheck_Analyzer.hxx>
+#include <BRepClass3d_SolidClassifier.hxx>
 #include <GProp_GProps.hxx>
 #include <BRepGProp.hxx>
 #include <Precision.hxx>
+
 #define DEB_PLACEMENT 1
 GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
-    std::shared_ptr<GeomAPI_Shape> theAttractiveFace,
-    std::shared_ptr<GeomAPI_Pln> theSourcePlane,
-    std::shared_ptr<GeomAPI_Pln> theDestPlane)
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Shape> theDestShape,
+    std::shared_ptr<GeomAPI_Face> theSourcePlane,
+    std::shared_ptr<GeomAPI_Face> theDestPlane,
+    bool theIsReverse,
+    bool theIsCentering)
   : myDone(false),
     myShape(new GeomAPI_Shape())
 {
-  build(theAttractiveFace, theSourcePlane, theDestPlane);
+  build(theSourceShape, theDestShape, theSourcePlane, theDestPlane, theIsReverse, theIsCentering);
 }
 
 void GeomAlgoAPI_Placement::build(
-    const std::shared_ptr<GeomAPI_Shape>& theAttractiveShape,
-    const std::shared_ptr<GeomAPI_Pln>& theSourcePlane,
-    const std::shared_ptr<GeomAPI_Pln>& theDestPlane)
+    const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
+    const std::shared_ptr<GeomAPI_Shape>& theDestShape,
+    const std::shared_ptr<GeomAPI_Face>& theSourcePlane,
+    const std::shared_ptr<GeomAPI_Face>& theDestPlane,
+    bool theIsReverse,
+    bool theIsCentering)
 {
-  std::shared_ptr<GeomAPI_Dir> aSourceDir = theSourcePlane->direction();
-  std::shared_ptr<GeomAPI_Pnt> aSourceLoc = theSourcePlane->location();
-  std::shared_ptr<GeomAPI_Dir> aDestDir = theDestPlane->direction();
-  std::shared_ptr<GeomAPI_Pnt> aDestLoc = theDestPlane->location();
+  std::shared_ptr<GeomAPI_Pln> aSourcePlane = theSourcePlane->getPlane();
+  std::shared_ptr<GeomAPI_Pln> aDestPlane = theDestPlane->getPlane();
+  std::shared_ptr<GeomAPI_Dir> aSourceDir = aSourcePlane->direction();
+  std::shared_ptr<GeomAPI_Pnt> aSourceLoc = aSourcePlane->location();
+  std::shared_ptr<GeomAPI_Dir> aDestDir = aDestPlane->direction();
+  std::shared_ptr<GeomAPI_Pnt> aDestLoc = aDestPlane->location();
+
+  // Initial shapes
+  const TopoDS_Shape& aSourceShape = theSourceShape->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aDestShape = theDestShape->impl<TopoDS_Shape>();
 
   // Calculate transformation
   gp_Trsf aTrsf;
   gp_Vec aSrcDir(aSourceDir->x(), aSourceDir->y(), aSourceDir->z());
   gp_Vec aDstDir(aDestDir->x(), aDestDir->y(), aDestDir->z());
+  // Check the material of the solids to be on the correct side
+  BRepClass3d_SolidClassifier aClassifier;
+  aClassifier.Load(aSourceShape);
+  static const double aTransStep = 10. * Precision::Confusion();
+  gp_Pnt aPoint(aSourceLoc->x(), aSourceLoc->y(), aSourceLoc->z());
+  aPoint.Translate(aSrcDir * aTransStep);
+  aClassifier.Perform(aPoint, Precision::Confusion());
+  if ((aClassifier.State() == TopAbs_OUT && !theIsReverse) ||
+      (aClassifier.State() == TopAbs_IN && theIsReverse))
+    aSrcDir.Reverse();
+  aClassifier.Load(aDestShape);
+  aPoint.SetCoord(aDestLoc->x(), aDestLoc->y(), aDestLoc->z());
+  aPoint.Translate(aDstDir * aTransStep);
+  aClassifier.Perform(aPoint, Precision::Confusion());
+  if (aClassifier.State() == TopAbs_IN)
+    aDstDir.Reverse();
+  // Calculate rotation
   gp_Quaternion aRot(aSrcDir, aDstDir);
   aTrsf.SetRotation(aRot);
-  gp_Vec aSrcCenter(aSourceLoc->x(), aSourceLoc->y(), aSourceLoc->z());
-  aSrcCenter.Transform(aTrsf);
-  gp_Vec aTrans(aDestLoc->x() - aSrcCenter.X(),
-                aDestLoc->y() - aSrcCenter.Y(),
-                aDestLoc->z() - aSrcCenter.Z());
+  // Calculate translation
+  gp_Vec aSrcLoc(aSourceLoc->x(), aSourceLoc->y(), aSourceLoc->z());
+  gp_Vec aDstLoc(aDestLoc->x(), aDestLoc->y(), aDestLoc->z());
+  if (!theIsCentering)
+    aDstLoc = aSrcLoc + gp_Vec(aDstDir) * (aDstLoc-aSrcLoc).Dot(aDstDir);
+  aSrcLoc.Transform(aTrsf);
+  gp_Vec aTrans = aDstLoc - aSrcLoc;
   aTrsf.SetTransformation(aRot, aTrans);
 
   // Transform the shape with copying it
-  const TopoDS_Shape& aShape = theAttractiveShape->impl<TopoDS_Shape>();
-  BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aShape, aTrsf, true);
+  BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
   if(aBuilder) {
     setImpl(aBuilder);
     myDone = aBuilder->IsDone() == Standard_True;

@@ -43,6 +43,18 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
     static const std::string MY_ATTRACT_FACE_ID("placement_attractable_face");
     return MY_ATTRACT_FACE_ID;
   }
+  /// attribute name of flag of reverse direction
+  inline static const std::string& REVERSE_ID()
+  {
+    static const std::string MY_REVERSE_ID("placement_reverse_direction");
+    return MY_REVERSE_ID;
+  }
+  /// attribute name of flag of centering position
+  inline static const std::string& CENTERING_ID()
+  {
+    static const std::string MY_CENTERING_ID("placement_centering");
+    return MY_CENTERING_ID;
+  }
 
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
