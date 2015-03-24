@@ -122,7 +122,20 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
 {
   // the value is stored on the selection changed signal processing 
-  return true;
+  // A rare case when plugin was not loaded. 
+  if(!myFeature)
+    return false;
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+
+  if (aSelectionListAttr) {
+    // Store shapes type
+     TopAbs_ShapeEnum aCurrentType =
+           ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
+     aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
+  }   
+   return true;
 }
 
 //********************************************************************
@@ -138,7 +151,7 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
   if (aSelectionListAttr) {
     // Restore shape type
     setCurrentShapeType(
-      ModuleBase_WidgetShapeSelector::shapeType(aSelectionListAttr->selectionType().c_str()));
+         ModuleBase_WidgetShapeSelector::shapeType(aSelectionListAttr->selectionType().c_str()));
     updateSelectionList(aSelectionListAttr);
     return true;
   }

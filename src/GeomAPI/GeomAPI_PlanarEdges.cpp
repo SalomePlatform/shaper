@@ -93,8 +93,7 @@ std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const
 
 void GeomAPI_PlanarEdges::setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                    const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                                   const std::shared_ptr<GeomAPI_Dir>& theDirY,
                                    const std::shared_ptr<GeomAPI_Dir>& theNorm)
 {
-  myPlane = std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(theOrigin, theDirX, theDirY, theNorm));
+  myPlane = std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(theOrigin, theDirX, theNorm));
 }

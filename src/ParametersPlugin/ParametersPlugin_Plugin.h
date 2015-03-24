@@ -1,0 +1,24 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+#ifndef PARAMETERSPLUGIN_PLUGIN_H_
+#define PARAMETERSPLUGIN_PLUGIN_H_
+
+#include <ParametersPlugin.h>
+#include <ModelAPI_Plugin.h>
+#include <ModelAPI_Feature.h>
+
+/**\class ParametersPlugin_Plugin
+ * TODO: Add documentation
+ */
+class PARAMETERSPLUGIN_EXPORT ParametersPlugin_Plugin : public ModelAPI_Plugin
+{
+ public:
+  /// Creates the feature object of this plugin by the feature string ID
+  virtual FeaturePtr createFeature(std::string theFeatureID);
+
+ public:
+  ParametersPlugin_Plugin();
+};
+
+#endif
+

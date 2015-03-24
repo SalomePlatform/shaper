@@ -99,8 +99,9 @@ Handle(V3d_View) theView,
 
   std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> anY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_XYZ> anY = aNorm->xyz()->cross(aX->xyz());
 
   gp_Pnt anOriginPnt(anOrigin->x(), anOrigin->y(), anOrigin->z());
   gp_Vec aVec(anOriginPnt, thePoint);
@@ -138,13 +139,14 @@ std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
 
   std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
     std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
 
-  return aPnt2d->to3D(aC->pnt(), aX->dir(), aY->dir());
+  return aPnt2d->to3D(aC->pnt(), aX->dir(), aY);
 }
 
 ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
@@ -417,14 +419,16 @@ std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2
   if (!theSketch || !thePoint2D)
     return aPoint;
 
+  DataPtr aData = theSketch->data();
   std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-      theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+      aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      theSketch->data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      theSketch->data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
+      aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
 
-  return thePoint2D->to3D(aC->pnt(), aX->dir(), aY->dir());
+  return thePoint2D->to3D(aC->pnt(), aX->dir(), aY);
 }
 
 ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShape, 
