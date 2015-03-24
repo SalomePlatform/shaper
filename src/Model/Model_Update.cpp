@@ -112,7 +112,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       for(aFIter = myJustCreatedOrUpdated.begin(); aFIter != myJustCreatedOrUpdated.end(); aFIter++)
       {
         FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
-        if (aF && aF->getKind() == "Extrusion") {
+        if (aF && aF->data() && aF->data()->isValid() && aF->getKind() == "Extrusion") {
           if (aF->selection("extrusion_face")) {
             ResultPtr aSketchRes = aF->selection("extrusion_face")->context();
             if (aSketchRes) {
