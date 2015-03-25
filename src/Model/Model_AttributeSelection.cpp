@@ -86,7 +86,15 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   TDF_Label aSelLab = selectionLabel();
   aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
   aSelLab.ForgetAttribute(kCONSTUCTION_SIMPLE_REF_ID);
-  if (!theContext.get()) {
+
+  bool isDegeneratedEdge = false;
+  // do not use the degenerated edge as a shape, a null context and shape is used in the case
+  if (theSubShape.get() && !theSubShape->isNull() && theSubShape->isEdge()) {
+    const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
+    if (aSubShape.ShapeType() == TopAbs_EDGE)
+      isDegeneratedEdge = BRep_Tool::Degenerated(TopoDS::Edge(aSubShape));
+  }
+  if (!theContext.get() || isDegeneratedEdge) {
     // to keep the reference attribute label
     TDF_Label aRefLab = myRef.myRef->Label();
     aSelLab.ForgetAllAttributes(true);
