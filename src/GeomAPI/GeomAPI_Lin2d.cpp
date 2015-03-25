@@ -6,6 +6,7 @@
 
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Dir2d.h>
 
 #include <gp_Dir2d.hxx>
 #include <gp_Lin2d.hxx>
@@ -34,6 +35,18 @@ GeomAPI_Lin2d::GeomAPI_Lin2d(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
                              const std::shared_ptr<GeomAPI_Pnt2d>& theEnd)
     : GeomAPI_Interface(newLine2d(theStart->x(), theStart->y(), theEnd->x(), theEnd->y()))
 {
+}
+
+std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::location()
+{
+  gp_Pnt2d aLoc = impl<gp_Lin2d>().Location();
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aLoc.X(), aLoc.Y()));
+}
+
+std::shared_ptr<GeomAPI_Dir2d> GeomAPI_Lin2d::direction()
+{
+  const gp_Dir2d& aDir = impl<gp_Lin2d>().Direction();
+  return std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(aDir.X(), aDir.Y()));
 }
 
 double GeomAPI_Lin2d::distance(const std::shared_ptr<GeomAPI_Pnt2d>& theOther) const

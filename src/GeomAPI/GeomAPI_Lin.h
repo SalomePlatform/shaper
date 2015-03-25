@@ -10,6 +10,7 @@
 #include <GeomAPI_Interface.h>
 #include <memory>
 
+class GeomAPI_Dir;
 class GeomAPI_Pnt;
 
 /**\class GeomAPI_Lin
@@ -26,6 +27,12 @@ class GEOMAPI_EXPORT GeomAPI_Lin : public GeomAPI_Interface
   /// Creation of line defined by start and end points
   GeomAPI_Lin(const std::shared_ptr<GeomAPI_Pnt>& theStart,
               const std::shared_ptr<GeomAPI_Pnt>& theEnd);
+
+  /// Returns point on the line (first point)
+  std::shared_ptr<GeomAPI_Pnt> location();
+
+  /// Returns a line direction
+  std::shared_ptr<GeomAPI_Dir> direction();
 
   /// Distance between two points
   double distance(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;

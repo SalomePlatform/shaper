@@ -6,6 +6,7 @@
 
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Dir.h>
 
 #include <gp_Dir.hxx>
 #include <gp_Lin.hxx>
@@ -40,6 +41,18 @@ GeomAPI_Lin::GeomAPI_Lin(const std::shared_ptr<GeomAPI_Pnt>& theStart,
     : GeomAPI_Interface(
         newLine(theStart->x(), theStart->y(), theStart->z(), theEnd->x(), theEnd->y(), theEnd->z()))
 {
+}
+
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::location()
+{
+  gp_Pnt aLoc = impl<gp_Lin>().Location();
+  return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
+}
+
+std::shared_ptr<GeomAPI_Dir> GeomAPI_Lin::direction()
+{
+  const gp_Dir& aDir = impl<gp_Lin>().Direction();
+  return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
 }
 
 double GeomAPI_Lin::distance(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
