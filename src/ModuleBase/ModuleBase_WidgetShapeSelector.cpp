@@ -395,11 +395,11 @@ void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
         aRefAttr->setAttr(myRefAttribute);
     }
     if (myExternalObject.get()) {
-      /*DocumentPtr aDoc = myExternalObject->document();
+      DocumentPtr aDoc = myExternalObject->document();
       FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
       if (aFeature.get() != NULL) {
         aDoc->removeFeature(aFeature);
-      }*/
+      }
     }
   }
 }
