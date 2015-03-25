@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
 	SketcherPrs_HVDirection.h
 	SketcherPrs_Equal.h
 	SketcherPrs_Tangent.h
+	SketcherPrs_SensitivePoint.h
 )
 
 SET(PROJECT_SOURCES
@@ -27,6 +28,7 @@ SET(PROJECT_SOURCES
 	SketcherPrs_HVDirection.cpp
 	SketcherPrs_Equal.cpp
 	SketcherPrs_Tangent.cpp
+	SketcherPrs_SensitivePoint.cpp
 )
 
 SET(PROJECT_LIBRARIES
