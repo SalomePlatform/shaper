@@ -28,3 +28,5 @@ start.bat
 *.orig
 *~
 /.project
+*DFBrowser*
+

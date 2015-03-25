@@ -42,7 +42,7 @@ bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
 bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& theOwner)
 {
   // stores the current values of the widget attribute
-  backupAttributeValue(true);
+  storeAttributeValue();
 
   // saves the owner value to the widget attribute
   setSelection(theOwner);
@@ -51,7 +51,7 @@ bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& the
   bool aValid = isValidAttribute();
 
   // restores the current values of the widget attribute
-  backupAttributeValue(false);
+  restoreAttributeValue(aValid);
 
   return aValid;
 }

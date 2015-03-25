@@ -67,7 +67,7 @@
                 shape_types="edge vertex">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
-          <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
+          <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityA"/>
           <validator id="GeomValidators_EdgeOrVertex"/>
         </sketch_shape_selector>
         

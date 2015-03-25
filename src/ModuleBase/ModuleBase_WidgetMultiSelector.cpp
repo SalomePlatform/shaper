@@ -9,7 +9,6 @@
 
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetShapeSelector.h>
-#include <ModuleBase_FilterNoDegeneratedEdge.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
@@ -159,7 +158,7 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::backupAttributeValue(const bool isBackup)
+void ModuleBase_WidgetMultiSelector::storeAttributeValue()
 {
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
@@ -167,23 +166,32 @@ void ModuleBase_WidgetMultiSelector::backupAttributeValue(const bool isBackup)
   if (aSelectionListAttr.get() == NULL)
     return;
 
-  if (isBackup) {
-    mySelectionType = aSelectionListAttr->selectionType();
-    mySelection.clear();
-    for (int i = 0; i < aSelectionListAttr->size(); i++) {
-      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
-      mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
-    }
+  mySelectionType = aSelectionListAttr->selectionType();
+  mySelection.clear();
+  int aSize = aSelectionListAttr->size();
+  for (int i = 0; i < aSelectionListAttr->size(); i++) {
+    AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
+    mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
   }
-  else {
-    aSelectionListAttr->clear();
-    // Store shapes type
-    aSelectionListAttr->setSelectionType(mySelectionType);
+}
 
-    // Store selection in the attribute
-    foreach (GeomSelection aSelec, mySelection) {
-      aSelectionListAttr->append(aSelec.first, aSelec.second);
-    }
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
+{
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+  if (aSelectionListAttr.get() == NULL)
+    return;
+  aSelectionListAttr->clear();
+
+  // Store shapes type
+  aSelectionListAttr->setSelectionType(mySelectionType);
+
+  // Store selection in the attribute
+  int aSize = mySelection.size();
+  foreach (GeomSelection aSelec, mySelection) {
+    aSelectionListAttr->append(aSelec.first, aSelec.second);
   }
 }
 
@@ -311,20 +319,8 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection()
     QIntList aList;
     aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
     myWorkshop->activateSubShapesSelection(aList);
-
-    // it is necessary to filter the selected edges to be non-degenerated
-    // it is not possible to build naming name for such edges
-    if (aNewType == "Edges") {
-      myEdgesTypeFilter = new ModuleBase_FilterNoDegeneratedEdge();
-      aViewer->addSelectionFilter(myEdgesTypeFilter);
-    }
-    else {
-      aViewer->removeSelectionFilter(myEdgesTypeFilter);
-    }
-
   } else {
     myWorkshop->deactivateSubShapesSelection();
-    aViewer->removeSelectionFilter(myEdgesTypeFilter);
   }
 
   activateFilters(myWorkshop, myIsActive);

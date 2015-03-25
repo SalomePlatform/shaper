@@ -28,9 +28,9 @@ void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::str
 
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  if (myShape != theShape) {
+  if (myShape != theShape && (!theShape.get() || !theShape->isEqual(myShape))) {
     myShape = theShape;
-    if (theShape.get() && (!myShape.get() || !theShape->isEqual(myShape))) {
+    if (theShape.get()) {
       myFacesUpToDate = false;
       myFaces.clear();
     }
