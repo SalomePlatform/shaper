@@ -54,7 +54,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 
 @REM -------------------------
-@REM FREEIMAGE (Used by OCCT)
+@REM FREEIMAGE (Used by OCCT and Graphviz)
 @SET PATH=%PDIR%\freeimage-3.15.4\bin;%PATH%
 @REM -------------------------
 
@@ -118,11 +118,8 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 @SET SOLVESPACE_ROOT_DIR=%PDIR%\solvespace-2.0
 @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
+@SET _NO_DEBUG_HEAP=1
 @REM -------------------------
-
-@SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
-@SET PATH=%ROOT_DIR%\install\plugins;%ROOT_DIR%\install\bin;%PATH%
-@SET PYTHONPATH=%ROOT_DIR%\install\swig;%ROOT_DIR%\install\plugins;%PYTHONPATH%
 
 @REM -------------------------
 @REM PTHREAD
@@ -143,20 +140,24 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
+@REM PNG library (Used by GRAPHVIZ)
+@SET PATH=%PDIR%\libpng-1.5.10\bin;%PATH%
+@REM -------------------------
+
+
+@REM -------------------------
 @REM SUIT
 @SET SUIT_DIR=%PDIR%\suit
 @SET PATH=%SUIT_DIR%\bin;%PATH%
 @REM -------------------------
 
-
 @REM -------------------------
-if "%GUI_ROOT_DIR%" == "" (
-  @SET GUI_ROOT_DIR=%ROOT_DIR%\SALOME\GUI\DEBUG\GUI_INSTALL
-)
-@REM -------------------------
-
-
+@REM OPENPARTS
+@SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
+@SET PATH=%ROOT_DIR%\install\swig;%ROOT_DIR%\install\plugins;%ROOT_DIR%\install\bin;%PATH%
+@SET PYTHONPATH=%ROOT_DIR%\install\swig;%ROOT_DIR%\install\plugins;%PYTHONPATH%
 @SET NewGeomResources=%ROOT_DIR%\install\resources
+@REM -------------------------
 
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)
