@@ -26,25 +26,25 @@
 
 #define DEB_PLACEMENT 1
 GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
-    std::shared_ptr<GeomAPI_Shape> theSourceSolid,
-    std::shared_ptr<GeomAPI_Shape> theDestSolid,
-    std::shared_ptr<GeomAPI_Shape> theSourceShape,
-    std::shared_ptr<GeomAPI_Shape> theDestShape,
-    bool theIsReverse,
-    bool theIsCentering)
+  std::shared_ptr<GeomAPI_Shape> theSourceSolid,
+  std::shared_ptr<GeomAPI_Shape> theDestSolid,
+  std::shared_ptr<GeomAPI_Shape> theSourceShape,
+  std::shared_ptr<GeomAPI_Shape> theDestShape,
+  bool theIsReverse,
+  bool theIsCentering)
   : myDone(false),
-    myShape(new GeomAPI_Shape())
+  myShape(new GeomAPI_Shape())
 {
   build(theSourceSolid, theDestSolid, theSourceShape, theDestShape, theIsReverse, theIsCentering);
 }
 
 void GeomAlgoAPI_Placement::build(
-    const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
-    const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
-    const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
-    const std::shared_ptr<GeomAPI_Shape>& theDestShape,
-    bool theIsReverse,
-    bool theIsCentering)
+  const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
+  const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
+  const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
+  const std::shared_ptr<GeomAPI_Shape>& theDestShape,
+  bool theIsReverse,
+  bool theIsCentering)
 {
   // Filling the parameters of the objects
   static const int aNbObjects = 2;
@@ -94,7 +94,7 @@ void GeomAlgoAPI_Placement::build(
     aPoint.Translate(aSrcDstNormals[0] * aTransStep);
     aClassifier.Perform(aPoint, Precision::Confusion());
     if ((aClassifier.State() == TopAbs_OUT && !theIsReverse) ||
-        (aClassifier.State() == TopAbs_IN && theIsReverse))
+      (aClassifier.State() == TopAbs_IN && theIsReverse))
       aSrcDstNormals[0].Reverse();
   }
   if (hasNormal[1]) {
@@ -114,10 +114,10 @@ void GeomAlgoAPI_Placement::build(
         gp_Vec aVec = aSrcDstNormals[1 - anInd].Crossed(aSrcDstDirections[anInd]);
         if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // normal and direction are collinear
           aVec = aSrcDstNormals[1 - anInd].Crossed(
-              gp_Vec(aSrcDstPoints[1 - anInd], aSrcDstPoints[anInd]));
+            gp_Vec(aSrcDstPoints[1 - anInd], aSrcDstPoints[anInd]));
           if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // normal and points direction are collinear
             if (Abs(aSrcDstNormals[1 - anInd].Y()) >= Precision::Confusion() || 
-                Abs(aSrcDstNormals[1 - anInd].Z()) >= Precision::Confusion())
+              Abs(aSrcDstNormals[1 - anInd].Z()) >= Precision::Confusion())
               aVec = gp::DX();
             else
               aVec = gp::DY();
@@ -135,7 +135,7 @@ void GeomAlgoAPI_Placement::build(
           aVec = aSrcDstDirections[0].Crossed(gp_Vec(aSrcDstPoints[0], aSrcDstPoints[1]));
           if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // lines are equal
             if (Abs(aSrcDstDirections[0].Y()) >= Precision::Confusion() ||
-                Abs(aSrcDstDirections[0].Z()) >= Precision::Confusion())
+              Abs(aSrcDstDirections[0].Z()) >= Precision::Confusion())
               aVec = gp::DX();
             else
               aVec = gp::DY();
@@ -157,7 +157,7 @@ void GeomAlgoAPI_Placement::build(
         aVec.Cross(aSrcDstDirections[anInd]);
         if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // point is on line
           if (Abs(aSrcDstDirections[1 - anInd].Y()) >= Precision::Confusion() || 
-              Abs(aSrcDstDirections[1 - anInd].Z()) >= Precision::Confusion())
+            Abs(aSrcDstDirections[1 - anInd].Z()) >= Precision::Confusion())
             aVec = gp::DX();
           else
             aVec = gp::DY();
@@ -174,8 +174,6 @@ void GeomAlgoAPI_Placement::build(
 
   // Calculate transformation
   gp_Trsf aTrsf;
-  gp_Vec aSrcDir = aSrcDstNormals[0];
-  gp_Vec aDstDir = aSrcDstNormals[1];
   gp_Vec aSrcDir = aSrcDstNormals[0];
   gp_Vec aDstDir = aSrcDstNormals[1];
   // Calculate rotation
@@ -204,8 +202,8 @@ void GeomAlgoAPI_Placement::build(
         myMap.bind(aCurrentShape, aCurrentShape);
       }
 #ifdef DEB_PLACEMENT
-	  int aNum = myMap.size();
-	  cout << "MAP of Oriented shapes =" << aNum <<endl;
+      int aNum = myMap.size();
+      cout << "MAP of Oriented shapes =" << aNum <<endl;
 
 #endif
 
