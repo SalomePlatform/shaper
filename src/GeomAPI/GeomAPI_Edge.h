@@ -11,6 +11,7 @@
 
 class GeomAPI_Pnt;
 class GeomAPI_Circ;
+class GeomAPI_Lin;
 
 /**\class GeomAPI_Edge
 * \ingroup DataModel
@@ -41,8 +42,11 @@ public:
   /// Returns the Last vertex coordinates of the edge 
   std::shared_ptr<GeomAPI_Pnt> lastPoint();
 
-  /// Returns a circle if edge is based on the cirsle curve
+  /// Returns a circle if edge is based on the circle curve
   std::shared_ptr<GeomAPI_Circ> circle();
+
+  /// Returns a line if edge is based on the linear curve
+  std::shared_ptr<GeomAPI_Lin> line();
 
   /// Returns true if the current edge is geometrically equal to the given edge
   bool isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const;

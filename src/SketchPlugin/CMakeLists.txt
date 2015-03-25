@@ -30,7 +30,6 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintFillet.h
     SketchPlugin_ShapeValidator.h
     SketchPlugin_Validators.h
-    SketchPlugin_ResultValidators.h 
 )
 
 SET(PROJECT_SOURCES
@@ -58,13 +57,13 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintFillet.cpp
     SketchPlugin_ShapeValidator.cpp
     SketchPlugin_Validators.cpp
-    SketchPlugin_ResultValidators.cpp
 )
 
 SET(PROJECT_LIBRARIES
     Config
     GeomAPI
     GeomAlgoAPI
+    GeomValidators
     ModelAPI
     SketcherPrs
     ${CAS_KERNEL}
@@ -86,6 +85,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
+  ../GeomValidators
   ../SketcherPrs
 )
 

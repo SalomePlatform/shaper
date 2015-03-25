@@ -20,7 +20,6 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_Validators.h>
-#include <SketchPlugin_ResultValidators.h>
 #include <SketchPlugin_ShapeValidator.h>
 
 #include <Events_Loop.h>
@@ -54,9 +53,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_DistanceAttrValidator);  
   //aFactory->registerValidator("SketchPlugin_DifferentObjects",
   //                            new SketchPlugin_DifferentObjectsValidator);
-  aFactory->registerValidator("SketchPlugin_ResultPoint", new SketchPlugin_ResultPointValidator);
-  aFactory->registerValidator("SketchPlugin_ResultLine", new SketchPlugin_ResultLineValidator);
-  aFactory->registerValidator("SketchPlugin_ResultArc", new SketchPlugin_ResultArcValidator);
+
   aFactory->registerValidator("SketchPlugin_ShapeValidator",
                               new SketchPlugin_ShapeValidator);
 

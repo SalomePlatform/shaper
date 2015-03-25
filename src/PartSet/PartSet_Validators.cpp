@@ -11,6 +11,7 @@
 #include <BRep_Tool.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <GeomAbs_CurveType.hxx>
+#include <GeomValidators_Tools.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 
@@ -119,7 +120,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 
   // 1. check whether the object of the attribute is not among the feature attributes
   // find the attribute's object
-  ObjectPtr anObject =  ModuleBase_WidgetShapeSelector::getObject(theAttribute);
+  ObjectPtr anObject =  GeomValidators_Tools::getObject(theAttribute);
 
   // check whether the object is not among other feature attributes
   if (anObject.get() != NULL) {
@@ -132,7 +133,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
       // the function parameter attribute should be skipped
       if (anAttr.get() == NULL || anAttr->id() == theAttribute->id())
         continue;
-      ObjectPtr aCurObject =  ModuleBase_WidgetShapeSelector::getObject(anAttr);
+      ObjectPtr aCurObject =  GeomValidators_Tools::getObject(anAttr);
       if (aCurObject  && aCurObject == anObject)
         return false;
     }
@@ -192,29 +193,41 @@ bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr&
 bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
                                             const std::list<std::string>& theArguments) const
 {
-  AttributeSelectionListPtr aSelectionListAttr = 
-                    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
-
-  // it filters only selection list attributes
-  if (aSelectionListAttr.get() == NULL)
-    return true;
-
-  std::string aType = aSelectionListAttr->selectionType().c_str();
-
-  // all context objects should be sketch entities
   bool isSketchEntities = true;
-  int aSize = aSelectionListAttr->size();
-  for (int i = 0; i < aSelectionListAttr->size(); i++) {
-    AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
-    ObjectPtr anObject = aSelectAttr->context();
-    FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
-    isSketchEntities = aFeature->getKind() == SketchPlugin_Sketch::ID();
+  std::set<std::string> anEntityKinds;
+  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+  for (; anIt != aLast; anIt++) {
+    anEntityKinds.insert(*anIt);
   }
-  return isSketchEntities;
-}
 
-bool PartSet_SketchValidator::isValid(const ObjectPtr theObject) const
-{
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  return aFeature->getKind() == SketchPlugin_Sketch::ID();
+  std::string anAttributeType = theAttribute->attributeType();
+  if (anAttributeType == ModelAPI_AttributeSelectionList::type()) {
+    AttributeSelectionListPtr aSelectionListAttr = 
+                      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    // it filters only selection list attributes
+    std::string aType = aSelectionListAttr->selectionType().c_str();
+    // all context objects should be sketch entities
+    int aSize = aSelectionListAttr->size();
+    for (int i = 0; i < aSelectionListAttr->size() && isSketchEntities; i++) {
+      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
+      ObjectPtr anObject = aSelectAttr->context();
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+      isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
+    }
+  }
+  if (anAttributeType == ModelAPI_AttributeRefAttr::type()) {
+    std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+                     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    isSketchEntities = false;
+    if (aRef->isObject()) {
+      ObjectPtr anObject = aRef->object();
+      if (anObject.get() != NULL) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        if (aFeature.get() != NULL)
+          isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
+      }
+    }
+  }
+
+  return isSketchEntities;
 }

@@ -1,0 +1,12 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<plugin>
+  <workbench id="Part">
+    <group id="Parameters">
+      <feature id="Parameter" title="New Variable" tooltip="Creates a variable" icon=":pictures/expression.png">
+        <stringvalue id="variable" label="Name"/>
+        <stringvalue id="expression" icon="Value"/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

@@ -16,7 +16,7 @@ class SketchPlugin_Constraint;
 
 #define GET_CONSTRAINT_PRS(NAME) \
   static AISObjectPtr NAME(SketchPlugin_Constraint* theConstraint, \
-                           const std::shared_ptr<GeomAPI_Ax3>& thePlane); \
+                           const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
 
 /**

@@ -44,5 +44,6 @@
      <file>pictures/module.png</file>
      <file>pictures/shading.png</file>
      <file>pictures/wireframe.png</file>
+     <file>pictures/expression.png</file>
  </qresource>
  </RCC>

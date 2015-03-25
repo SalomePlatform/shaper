@@ -45,6 +45,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
+  /// The method is called by the current operation to process the operation preselection.
+  /// It is redefined to check the value validity and if it is, fill the attribute with by value
   /// \param theValue the wrapped widget value
   virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
@@ -64,21 +66,10 @@ protected:
   // \return true if all validators return that the attribute is valid
   bool isValidAttribute() const;
 
-  /// Check the selected with validators if installed
-  /// \param theObj the object for checking
-  /// \param theShape the shape for checking
-  virtual bool isValid(ObjectPtr theObj, GeomShapePtr theShape) const;
-
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param theWorkshop an active workshop
   /// \param toActivate a flag about activation or deactivation the filters
   virtual void activateFilters(ModuleBase_IWorkshop* theWorkshop, const bool toActivate) const;
-
-  /// Fills the given list with all widget filters.
-  /// \param theWorkshop an active workshop
-  /// \param theFilters a list of filters
-  void selectionFilters(ModuleBase_IWorkshop* theWorkshop,
-                        SelectMgr_ListOfFilter& theFilters) const;
 };
 
 #endif /* MODULEBASE_WIDGETVALIDATED_H_ */

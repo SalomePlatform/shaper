@@ -18,9 +18,9 @@ class GeomAPI_Shape;
  * \ingroup Plugins
  * \brief Feature for applying of placement operation: relative movement of Solid.
  *
- * Locates the selected attractable_face of the solid in the middle of the selected
- * placement_base face. Faces must be planar. Orientation of the placed solid is
- * depended on the underlied planes of both faces.
+ * Locates the selected placement_attractable_object (face, edge, vertex) of the solid into 
+ * the selected placement_base_object. Faces must be planar, edges must be linear.
+ * Orientation of the placed solid depends on the underlied planes of both faces.
  */
 class FeaturesPlugin_Placement : public ModelAPI_Feature
 {
@@ -31,17 +31,29 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
     static const std::string MY_PLACEMENT_ID("Placement");
     return MY_PLACEMENT_ID;
   }
-  /// attribute name of referenced face
-  inline static const std::string& BASE_FACE_ID()
+  /// attribute name of referenced object
+  inline static const std::string& BASE_OBJECT_ID()
   {
-    static const std::string MY_BASE_FACE_ID("placement_base_face");
-    return MY_BASE_FACE_ID;
+    static const std::string MY_BASE_OBJECT_ID("placement_base_object");
+    return MY_BASE_OBJECT_ID;
   }
   /// attribute name of attractable face
-  inline static const std::string& ATTRACT_FACE_ID()
+  inline static const std::string& ATTRACT_OBJECT_ID()
   {
-    static const std::string MY_ATTRACT_FACE_ID("placement_attractable_face");
-    return MY_ATTRACT_FACE_ID;
+    static const std::string MY_ATTRACT_OBJECT_ID("placement_attractable_object");
+    return MY_ATTRACT_OBJECT_ID;
+  }
+  /// attribute name of flag of reverse direction
+  inline static const std::string& REVERSE_ID()
+  {
+    static const std::string MY_REVERSE_ID("placement_reverse_direction");
+    return MY_REVERSE_ID;
+  }
+  /// attribute name of flag of centering position
+  inline static const std::string& CENTERING_ID()
+  {
+    static const std::string MY_CENTERING_ID("placement_centering");
+    return MY_CENTERING_ID;
   }
 
   /// Returns the kind of a feature

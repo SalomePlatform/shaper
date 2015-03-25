@@ -8,14 +8,14 @@
         icon=":icons/point.png"
         tooltip="Select a first point"
         shape_types="vertex">
-        <validator id="ModuleBase_ValidatorNoConstructionSubShapes"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
       </shape_selector>
       <shape_selector id="SecondPoint"
         label="Second point"
         icon=":icons/point.png"
         tooltip="Select a second point"
         shape_types="vertex">
-        <validator id="ModuleBase_ValidatorNoConstructionSubShapes"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
         <validator id="PartSet_DifferentShapes"/>
       </shape_selector>
     </box>

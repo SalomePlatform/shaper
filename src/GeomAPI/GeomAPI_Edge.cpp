@@ -8,6 +8,7 @@
 #include<GeomAPI_Pnt.h>
 #include<GeomAPI_Circ.h>
 #include<GeomAPI_Dir.h>
+#include<GeomAPI_Lin.h>
 
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
@@ -105,6 +106,26 @@ std::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle()
     }
   }
   return std::shared_ptr<GeomAPI_Circ>(); // not circle
+}
+
+std::shared_ptr<GeomAPI_Lin> GeomAPI_Edge::line()
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  double aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve) {
+    Handle(Geom_Line) aLine = Handle(Geom_Line)::DownCast(aCurve);
+    if (aLine) {
+      gp_Pnt aStartPnt = aLine->Value(aFirst);
+      std::shared_ptr<GeomAPI_Pnt> aStart(
+          new GeomAPI_Pnt(aStartPnt.X(), aStartPnt.Y(), aStartPnt.Z()));
+      gp_Pnt aEndPnt = aLine->Value(aLast);
+      std::shared_ptr<GeomAPI_Pnt> aEnd(
+          new GeomAPI_Pnt(aEndPnt.X(), aEndPnt.Y(), aEndPnt.Z()));
+      return std::shared_ptr<GeomAPI_Lin>(new GeomAPI_Lin(aStart, aEnd));
+    }
+  }
+  return std::shared_ptr<GeomAPI_Lin>(); // not circle
 }
 
 

@@ -16,6 +16,12 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
   myRef->Append(aData->label().Father());  // store label of the object
+  // do it before the transaction finish to make just created/removed objects know dependencies
+  // and reference from composite feature is removed automatically
+  FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+  if (anOwnerFeature.get()) {
+    aData->addBackReference(anOwnerFeature, id());
+  }
 
   owner()->data()->sendAttributeUpdated(this);
 }

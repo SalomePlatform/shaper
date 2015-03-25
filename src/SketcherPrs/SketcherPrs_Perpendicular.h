@@ -30,16 +30,16 @@ public:
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Perpendicular)
 protected:
-  /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-    const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
-
   virtual const char* iconName() const { return "perpendicular.png"; }
 
   /// Redefine this function in order to add additiona lines of constraint base
   /// \param thePrs a presentation
   /// \param theColor a color of additiona lines
   virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
+
+  /// Update myPntArray according to presentation positions
+  /// \return true in case of success
+  virtual bool updatePoints(double theStep) const;
 };
 
 #endif

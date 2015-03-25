@@ -10,27 +10,33 @@
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Dir.h>
-#include <GeomAPI_Pln.h>
+#include <GeomAPI_Face.h>
 #include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <memory>
 
 /**\class GeomAlgoAPI_Placement
  * \ingroup DataAlgo
- * \brief Creates the copied object which face is placed on the given plane
+ * \brief Creates the copied object which sub-element is placed on the given element
  */
 class GeomAlgoAPI_Placement : public GeomAPI_Interface
 {
 public:
   /** \brief Creates an object which is obtained from current object by transformation calculated
-   *         as a movement of the source plane to be coincident with the destination plane
-   *  \param[in] theAttractiveShape shape to be moved
-   *  \param[in] theSourcePlane     plane on the shape to be made coincident with destination plane
-   *  \param[in] theDestPlane       destination plane
+   *         as a movement of the source object to be coincident with the destination object
+   *  \param[in] theSourceSolid  a shape to be moved
+   *  \param[in] theDestSolid    invariant shape
+   *  \param[in] theSourceShape  a shape on the solid to be made coincident with destination object
+   *  \param[in] theDestShape    destination object
+   *  \param[in] theIsReverse    indicates that the solid materials should be on the same side against the destination plane
+   *  \param[in] theIsCentering  indicates the planes should be centered
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Placement(std::shared_ptr<GeomAPI_Shape> theAttractiveShape,
-                                           std::shared_ptr<GeomAPI_Pln> theSourcePlane,
-                                           std::shared_ptr<GeomAPI_Pln> theDestPlane);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Placement(std::shared_ptr<GeomAPI_Shape> theSourceSolid,
+                                           std::shared_ptr<GeomAPI_Shape> theDestSolid,
+                                           std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                                           std::shared_ptr<GeomAPI_Shape> theDestShape,
+                                           bool theIsReverse = false,
+                                           bool theIsCentering = false);
 
   /// Returns True if algorithm succeed
   GEOMALGOAPI_EXPORT const bool isDone() const
@@ -56,9 +62,12 @@ public:
 
 private:
   /// builds resulting shape
-  void build(const std::shared_ptr<GeomAPI_Shape>& theAttractiveShape,
-             const std::shared_ptr<GeomAPI_Pln>& theSourcePlane,
-             const std::shared_ptr<GeomAPI_Pln>& theDestPlane);
+  void build(const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
+             const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
+             const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
+             const std::shared_ptr<GeomAPI_Shape>& theDestShape,
+             bool theIsReverse,
+             bool theIsCentering);
 
   /// fields
   bool myDone;

@@ -311,9 +311,9 @@ void GeomAPI_AISObject::getColor(int& theR, int& theG, int& theB)
     return;
 
   Quantity_Color aColor = anAIS->Color();
-  theR = aColor.Red()*255.;
-  theG = aColor.Green()*255.;
-  theB = aColor.Blue()*255.;
+  theR = (int)(aColor.Red()*255.);
+  theG = (int)(aColor.Green()*255.);
+  theB = (int)(aColor.Blue()*255.);
 }
 
 bool GeomAPI_AISObject::empty() const

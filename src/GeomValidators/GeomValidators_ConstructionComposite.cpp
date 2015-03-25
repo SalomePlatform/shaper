@@ -1,12 +1,12 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include "ModuleBase_ValidatorNoConstructionSubShapes.h"
+#include "GeomValidators_ConstructionComposite.h"
 
 #include "ModelAPI_AttributeSelection.h"
 #include "ModelAPI_ResultConstruction.h"
 #include "ModelAPI_CompositeFeature.h"
 
-bool ModuleBase_ValidatorNoConstructionSubShapes::isValid(const AttributePtr& theAttribute,
+bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttribute,
                                               const std::list<std::string>& theArguments) const
 {
   bool aValid = false;

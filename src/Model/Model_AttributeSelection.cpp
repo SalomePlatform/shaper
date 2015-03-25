@@ -85,6 +85,13 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   TDF_Label aSelLab = selectionLabel();
   aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
   aSelLab.ForgetAttribute(kCONSTUCTION_SIMPLE_REF_ID);
+  if (!theContext.get()) {
+    // to keep the reference attribute label
+    TDF_Label aRefLab = myRef.myRef->Label();
+    aSelLab.ForgetAllAttributes(true);
+    myRef.myRef = TDF_Reference::Set(aSelLab, aSelLab);
+    return;
+  }
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
     // do not select the whole shape for body:it is already must be in the data framework
     if (theContext->shape().get() && theContext->shape()->isEqual(theSubShape)) {

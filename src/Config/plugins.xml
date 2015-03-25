@@ -9,6 +9,7 @@
   <plugin library="FeaturesPlugin" configuration="plugin-Features.xml"/>
   <plugin library="ExchangePlugin" configuration="plugin-Exchange.xml"/>
   <plugin script="ConnectorPlugin" configuration="plugin-Connector.xml" dependency="Geometry"/>
+  <plugin library="ParametersPlugin" configuration="plugin-Parameters.xml"/>
   <plugin library="SketchSolver"/>
   <plugin library="GeomValidators"/>
   <plugin library="DFBrowser" internal="true"/>

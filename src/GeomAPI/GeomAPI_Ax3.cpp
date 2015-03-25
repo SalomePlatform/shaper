@@ -25,13 +25,11 @@ GeomAPI_Ax3::GeomAPI_Ax3()
 
 GeomAPI_Ax3::GeomAPI_Ax3(std::shared_ptr<GeomAPI_Pnt> theOrigin,
                          std::shared_ptr<GeomAPI_Dir> theDirX,
-                         std::shared_ptr<GeomAPI_Dir> theDirY,
                          std::shared_ptr<GeomAPI_Dir> theNorm)
 : GeomAPI_Interface(new gp_Ax3(theOrigin->impl<gp_Pnt>(), 
                                theNorm->impl<gp_Dir>(), 
                                theDirX->impl<gp_Dir>()))
  {
-   MY_AX3->SetYDirection(theDirY->impl<gp_Dir>());
  }
 
 void GeomAPI_Ax3::setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin)

@@ -12,8 +12,6 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Dir.h>
 
-static const int MyStep = 20;
-
 static SketcherPrs_PositionMgr* MyPosMgr = NULL;
 
 
@@ -50,7 +48,8 @@ int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
 }
 
 gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape, 
-                                            Handle(SketcherPrs_SymbolPrs) thePrs)
+                                            Handle(SketcherPrs_SymbolPrs) thePrs,
+                                            double theStep)
 {
   std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(theShape);
   gp_Pnt aP; // Central point
@@ -91,7 +90,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   }
   gp_Vec aShift = aVec1.Crossed(thePrs->plane()->norm()->impl<gp_Dir>());
   aShift.Normalize();
-  aShift.Multiply(MyStep);
+  aShift.Multiply(theStep);
 
   int aPos = getPositionIndex(theShape, thePrs);
   int aM = 1;
@@ -117,7 +116,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   if (aPos > 1) {
     // Normalize vector along the line
     aVec1.Normalize();
-    aVec1.Multiply(MyStep);
+    aVec1.Multiply(theStep);
     aP.Translate(aVec1.Multiplied(aM));
   }
   return aP;

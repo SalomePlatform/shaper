@@ -7,7 +7,7 @@
                       label="Plane face"
                       tooltip="Select a planar face"
                       shape_types="face">
-        <validator id="ModuleBase_ValidatorFace" parameters="plane"/>
+        <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
       <doublevalue id="distance" 
                    label="Distance" 

@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
 	SketcherPrs_HVDirection.h
 	SketcherPrs_Equal.h
 	SketcherPrs_Tangent.h
+	SketcherPrs_SensitivePoint.h
 )
 
 SET(PROJECT_SOURCES
@@ -27,6 +28,7 @@ SET(PROJECT_SOURCES
 	SketcherPrs_HVDirection.cpp
 	SketcherPrs_Equal.cpp
 	SketcherPrs_Tangent.cpp
+	SketcherPrs_SensitivePoint.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -38,7 +40,15 @@ SET(PROJECT_LIBRARIES
     ${CAS_VIEWER}
     ${CAS_SHAPE}
     ${CAS_TKTopAlgo}
+    ${CAS_TKOpenGl}
 )
+
+IF(WIN32) 
+    SET(PROJECT_LIBRARIES ${PROJECT_LIBRARIES} opengl32)
+ELSE()
+    SET(PROJECT_LIBRARIES ${PROJECT_LIBRARIES} GL)
+ENDIF()
+
 
 SET(PROJECT_PICTURES
     icons/parallel.png
@@ -50,7 +60,7 @@ SET(PROJECT_PICTURES
 	icons/tangent.png
 )
 
-ADD_DEFINITIONS(-DCONSTRAINTS_EXPORTS ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(-DSKETCHERPRS_EXPORTS ${CAS_DEFINITIONS})
 ADD_LIBRARY(SketcherPrs SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 INCLUDE_DIRECTORIES(

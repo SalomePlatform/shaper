@@ -1,20 +1,22 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_ValidatorLinearEdge.h
+// File:        GeomValidators_Edge.h
 // Created:     19 Mar 2015
 // Author:      Natalia ERMOLAEVA
 
-#ifndef ModuleBase_ValidatorLinearEdge_H
-#define ModuleBase_ValidatorLinearEdge_H
+#ifndef GeomValidators_Edge_H
+#define GeomValidators_Edge_H
 
-#include "ModuleBase.h"
+#include "GeomValidators.h"
 #include "ModelAPI_AttributeValidator.h"
+
+#include <string>
 
 /**
 * \ingroup Validators
 * A validator of selection
 */
-class ModuleBase_ValidatorLinearEdge : public ModelAPI_AttributeValidator
+class GeomValidators_Edge : public ModelAPI_AttributeValidator
 {
  public:
   //  the edge type
@@ -26,12 +28,12 @@ class ModuleBase_ValidatorLinearEdge : public ModelAPI_AttributeValidator
   };
 
  public:
-   MODULEBASE_EXPORT ModuleBase_ValidatorLinearEdge() {}
+   GEOMVALIDATORS_EXPORT GeomValidators_Edge() {}
   //! returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
-  MODULEBASE_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
-                                         const std::list<std::string>& theArguments) const;
+  GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
+                                             const std::list<std::string>& theArguments) const;
 protected:
   /// Convert string to TypeOfEdge value
   /// \param theType a string value

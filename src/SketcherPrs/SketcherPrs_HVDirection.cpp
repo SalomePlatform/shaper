@@ -29,24 +29,16 @@ SketcherPrs_HVDirection::SketcherPrs_HVDirection(SketchPlugin_Constraint* theCon
   myPntArray->AddVertex(0., 0., 0.);
 }  
 
-void SketcherPrs_HVDirection::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                   const Handle(Prs3d_Presentation)& thePresentation, 
-                                   const Standard_Integer theMode)
+bool SketcherPrs_HVDirection::updatePoints(double theStep) const 
 {
-  prepareAspect();
-
-  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getShape(aObj1);
-  if (aLine1.get() == NULL)
-    return;
+  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
+    return false;
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this);
-
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
-  aGroup->SetPrimitivesAspect(myAspect);
+  gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
   myPntArray->SetVertice(1, aP1);
-  aGroup->AddPrimitiveArray(myPntArray);
+  return true;
 }
 
 void SketcherPrs_HVDirection::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const

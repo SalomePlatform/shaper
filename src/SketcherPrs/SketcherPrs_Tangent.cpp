@@ -32,32 +32,21 @@ SketcherPrs_Tangent::SketcherPrs_Tangent(SketchPlugin_Constraint* theConstraint,
   myPntArray->AddVertex(0., 0., 0.);
 }  
 
-void SketcherPrs_Tangent::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                   const Handle(Prs3d_Presentation)& thePresentation, 
-                                   const Standard_Integer theMode)
+bool SketcherPrs_Tangent::updatePoints(double theStep) const
 {
-  prepareAspect();
-
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+  if (SketcherPrs_Tools::getShape(aObj1).get() == NULL)
+    return false;
+  if (SketcherPrs_Tools::getShape(aObj2).get() == NULL)
+    return false;
 
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getShape(aObj1);
-  if (aLine1.get() == NULL)
-    return;
-
-  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getShape(aObj2);
-  if (aLine2.get() == NULL)
-    return;
-  
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this);
-  gp_Pnt aP2 = aMgr->getPosition(aObj2, this);
-
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
-  aGroup->SetPrimitivesAspect(myAspect);
+  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
+  gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
   myPntArray->SetVertice(1, aP1);
   myPntArray->SetVertice(2, aP2);
-  aGroup->AddPrimitiveArray(myPntArray);
+  return true;
 }
 
 void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const

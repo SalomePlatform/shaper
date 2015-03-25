@@ -7,16 +7,23 @@
 #ifndef SketcherPrs_SymbolPrs_H
 #define SketcherPrs_SymbolPrs_H
 
+#include "SketcherPrs_SensitivePoint.h"
+
 #include <AIS_InteractiveObject.hxx>
 #include <GeomAPI_Ax3.h>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Image_AlienPixMap.hxx>
+#include <SelectMgr_EntityOwner.hxx>
+#include <Select3D_SensitiveEntitySequence.hxx>
 
 #include <Standard_DefineHandle.hxx>
 #include <map>
 
+#include <OpenGl_Workspace.hxx>
+
 class SketchPlugin_Constraint;
+class OpenGl_Context;
 
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_SymbolPrs, AIS_InteractiveObject)
@@ -52,9 +59,19 @@ public:
 
   Standard_EXPORT SketchPlugin_Constraint* feature() const { return myConstraint; }
 
+
+  Handle(Graphic3d_ArrayOfPoints) pointsArray() const { return myPntArray; }
+
+  void Render(const Handle(OpenGl_Workspace)& theWorkspace) const;
+
+  void Release (OpenGl_Context* theContext);
+
   DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
 
 protected:
+  /// Redefinition of virtual function
+  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+    const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
@@ -80,6 +97,10 @@ protected:
   /// \param theColor a color of additiona lines
   virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const {}
 
+  /// Update myPntArray according to presentation positions
+  /// \return true in case of success
+  virtual bool updatePoints(double theStep) const { return true; }
+
 protected:
   /// Constraint feature
   SketchPlugin_Constraint* myConstraint;
@@ -91,12 +112,17 @@ protected:
   Handle(Graphic3d_AspectMarker3d) myAspect;
 
   /// Array of symbols positions
-  Handle(Graphic3d_ArrayOfPoints) myPntArray;
+  mutable Handle(Graphic3d_ArrayOfPoints) myPntArray;
+
+  Handle(SelectMgr_EntityOwner) myOwner;
 
 private: 
   /// Static map to collect constraints icons {IconName : IconPixMap}
   static std::map<const char*, Handle(Image_AlienPixMap)> myIconsMap;
 
+  mutable Handle(OpenGl_VertexBuffer) myVboAttribs;
+
+  Select3D_SensitiveEntitySequence mySPoints;
 };
 
 #endif
