@@ -67,6 +67,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <BRep_Tool.hxx>
+#include <AIS_Dimension.hxx>
 
 #include <QObject>
 #include <QMouseEvent>
@@ -91,7 +92,7 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   : ModuleBase_IModule(theWshop), 
-  myRestartingMode(RM_None)
+  myRestartingMode(RM_None), myVisualLayerId(0)
 {
   //myWorkshop = dynamic_cast<XGUI_Workshop*>(theWshop);
   mySketchMgr = new PartSet_SketcherMgr(this);
@@ -211,6 +212,8 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
+    Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+    aViewer->AddZLayer(myVisualLayerId);
     mySketchMgr->startSketch(theOperation);
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
@@ -226,6 +229,9 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);
+    Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+    aViewer->RemoveZLayer(myVisualLayerId);
+    myVisualLayerId = 0;
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
@@ -651,3 +657,17 @@ bool PartSet_Module::deleteObjects()
 
   return true;
 }
+
+
+void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) 
+{
+  Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAIS);
+    if (!aDim.IsNull()) {
+      Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
+      aCtx->SetZLayer(aDim, myVisualLayerId);
+    }
+  }
+}
+

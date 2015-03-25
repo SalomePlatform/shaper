@@ -158,8 +158,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       closeLocalContexts(false);
     }
     aContext->Display(anAISIO, false);
-
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
+    emit objectDisplayed(theObject, theAIS);
 
     bool isCustomized = customizeObject(theObject);
     if (isCustomized)
@@ -189,6 +189,7 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
   if (anObject) {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
+      emit beforeObjectErase(theObject, anObject);
       aContext->Remove(anAIS, isUpdateViewer);
     }
   }
@@ -444,14 +445,17 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
-   foreach (AISObjectPtr aAISObj, myResult2AISObjectMap) {
-     // erase an object
-     Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-     if (!anIO.IsNull())
-       aContext->Remove(anIO, false);
-   }
-   if (isUpdateViewer)
-     updateViewer();
+    foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
+      AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+      // erase an object
+      Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+      if (!anIO.IsNull()) {
+        emit beforeObjectErase(aObj, aAISObj);
+        aContext->Remove(anIO, false);
+      }
+    }
+    if (isUpdateViewer)
+      updateViewer();
   }
   myResult2AISObjectMap.clear();
 }

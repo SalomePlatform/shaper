@@ -26,6 +26,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QObject>
 
 class ModelAPI_Feature;
 class XGUI_Workshop;
@@ -34,8 +35,9 @@ class XGUI_Workshop;
  * \ingroup GUI
  * \brief Displayer. Provides mechanizm of display/erase of objects in the viewer
  */
-class XGUI_EXPORT XGUI_Displayer
+class XGUI_EXPORT XGUI_Displayer: public QObject
 {
+  Q_OBJECT
  public:
    /// \enum DisplayMode display mode
    enum DisplayMode { 
@@ -184,6 +186,18 @@ class XGUI_EXPORT XGUI_Displayer
   /// Returns true if the given object can be shown in shaded mode
   /// \param theObject object to check
   bool canBeShaded(ObjectPtr theObject) const;
+
+
+signals:
+  /// Signal on object display
+  /// \param theObject a data object
+  /// \param theAIS a presentation object
+  void objectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS);
+
+  /// Signal on before object erase
+  /// \param theObject a data object
+  /// \param theAIS a presentation object
+  void beforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS);
 
  protected:
   /// Returns currently installed AIS_InteractiveContext

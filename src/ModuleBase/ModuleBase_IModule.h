@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+ // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #ifndef ModuleBase_IModule_H
 #define ModuleBase_IModule_H
@@ -121,6 +121,16 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 public slots:
   /// Called on call of command corresponded to a feature
   void onFeatureTriggered();
+
+  /// Slolt called on object display
+  /// \param theObject a data object
+  /// \param theAIS a presentation object
+  virtual void onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) {}
+
+  /// Slot called on before object erase
+  /// \param theObject a data object
+  /// \param theAIS a presentation object
+  virtual void onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS) {}
 
 protected slots:
   /// Called on selection changed event

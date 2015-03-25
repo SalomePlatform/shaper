@@ -113,6 +113,11 @@ public slots:
   /// \param isChecked a state of toggle if the action is checkable
   void onAction(bool isChecked);
 
+  /// Slolt called on object display
+  /// \param theObject a data object
+  /// \param theAIS a presentation object
+  virtual void onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS);
+
 protected slots:
   /// Called when previous operation is finished
   virtual void onSelectionChanged();
@@ -173,6 +178,8 @@ protected slots:
   PartSet_SketcherMgr* mySketchMgr;
 
   QMap<QString, QAction*> myActions; // the popup menu actions
+
+  int myVisualLayerId;
 };
 
 #endif
