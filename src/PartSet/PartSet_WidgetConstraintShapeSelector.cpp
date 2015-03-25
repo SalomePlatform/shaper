@@ -21,11 +21,10 @@ bool PartSet_WidgetConstraintShapeSelector::storeAttributeValues(ObjectPtr theSe
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if ((!aSPFeature) && (!theShape->isNull())) {
-      ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                                  aSelectedObject, mySketch);
-      if (aObj) {
-        aSelectedObject = aObj;
-        myExternalObject = aObj;
+      createExternal(theSelectedObject, theShape);
+
+      if (myExternalObject) {
+        aSelectedObject = myExternalObject;
       } else 
         return false;
     }

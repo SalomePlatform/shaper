@@ -10,17 +10,17 @@
 
 #include "PartSet.h"
 
-#include <ModuleBase_WidgetShapeSelector.h>
+#include <PartSet_WidgetShapeSelector.h>
 
 #include <ModelAPI_CompositeFeature.h>
 
 
 /**
 * \ingroup Modules
-* Customosation of ModuleBase_WidgetShapeSelector in order to provide 
+* Customosation of PartSet_WidgetShapeSelector in order to provide 
 * working with constraints.
 */
-class PARTSET_EXPORT PartSet_WidgetConstraintShapeSelector: public ModuleBase_WidgetShapeSelector
+class PARTSET_EXPORT PartSet_WidgetConstraintShapeSelector: public PartSet_WidgetShapeSelector
 {
 Q_OBJECT
  public:
@@ -31,16 +31,16 @@ Q_OBJECT
   /// \param theParentId is Id of a parent of the current attribute
   PartSet_WidgetConstraintShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
     const Config_WidgetAPI* theData, const std::string& theParentId)
-    : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId) {}
+    : PartSet_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId) {}
 
   virtual ~PartSet_WidgetConstraintShapeSelector() {}
 
   /// Set sketcher
   /// \param theSketch a sketcher object
-  void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
+  //void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
 
   /// Retrurns installed sketcher
-  CompositeFeaturePtr sketch() const { return mySketch; }
+  //CompositeFeaturePtr sketch() const { return mySketch; }
 
 protected:
   /// Store the values to the model attribute of the widget. It casts this attribute to
@@ -49,9 +49,9 @@ protected:
   /// \param theShape a selected shape, which is used in the selection attribute
   virtual bool storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
-private:
+//private:
   /// Pointer to a sketch 
-  CompositeFeaturePtr mySketch;
+  //CompositeFeaturePtr mySketch;
 };
 
 #endif

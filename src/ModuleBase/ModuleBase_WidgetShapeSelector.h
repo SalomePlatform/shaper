@@ -109,9 +109,13 @@ Q_OBJECT
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
-  /// \param isBackup a boolean flag, if true, store values from the attribute
-  /// to backup, otherwise set the backed up values to the attribute
-  virtual void backupAttributeValue(const bool isBackup);
+  virtual void storeAttributeValue();
+
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param theValid a boolean flag, if restore happens for valid parameters
+  virtual void restoreAttributeValue(const bool theValid);
 
   /// Computes and updates name of selected object in the widget
   void updateSelectionName();
@@ -164,8 +168,6 @@ Q_OBJECT
   AttributePtr myRefAttribute;
   /// A boolean value whether refAttr uses reference of object
   bool myIsObject;
-  /// An external object
-  ObjectPtr myExternalObject;
 };
 
 #endif

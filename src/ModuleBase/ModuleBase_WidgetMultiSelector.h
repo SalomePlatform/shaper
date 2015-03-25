@@ -12,7 +12,6 @@
 
 #include <ModuleBase.h>
 #include <ModuleBase_WidgetValidated.h>
-#include <ModuleBase_FilterNoDegeneratedEdge.h>
 
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_Result.h>
@@ -102,9 +101,13 @@ protected slots:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
-  /// \param isBackup a boolean flag, if true, store values from the attribute
-  /// to backup, otherwise set the backed up values to the attribute
-  virtual void backupAttributeValue(const bool isBackup);
+  virtual void storeAttributeValue();
+
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param theValid a boolean flag, if restore happens for valid parameters
+  virtual void restoreAttributeValue(const bool theValid);
 
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
@@ -133,9 +136,6 @@ protected slots:
 
   /// An action for pop-up menu in a list control
   QAction* myCopyAction;
-
-  /// A filter for the Edges type, which avoid the generated edges selection
-  Handle(ModuleBase_FilterNoDegeneratedEdge) myEdgesTypeFilter;
 
   /// backup parameters of the model attribute. The class processes three types of attribute:
   /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter
