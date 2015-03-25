@@ -13,6 +13,11 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
+#include <ModuleBase_IWorkshop.h>
+#include <XGUI_ModuleConnector.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_Displayer.h>
+
 bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
   ObjectPtr aSelectedObject = theSelectedObject;
@@ -25,13 +30,10 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
   if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull()) {
     // Processing of external (non-sketch) object
-    ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(aShape->impl<TopoDS_Shape>(),
-                                                                aSelectedObject, mySketch);
-    if (aObj) {
-      PartSet_WidgetShapeSelector* that = (PartSet_WidgetShapeSelector*) this;
-      aSelectedObject = aObj;
-      myExternalObject = aObj;
-    } else 
+    createExternal(theSelectedObject, theShape);
+    if (myExternalObject)
+      aSelectedObject = myExternalObject;
+    else
       return false;
   } else {
     // Processing of sketch object
@@ -74,3 +76,51 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
   return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, aShape);
 }
 
+//********************************************************************
+void PartSet_WidgetShapeSelector::storeAttributeValue()
+{
+  /// this is a temporary code, will be removed when master is merged to this branch
+  /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  aWorkshop->displayer()->enableUpdateViewer(false);
+  */
+  ModuleBase_WidgetShapeSelector::storeAttributeValue();
+}
+
+//********************************************************************
+void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
+{
+  ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
+  //if (!theValid)
+  removeExternal();
+  /*
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  aWorkshop->displayer()->enableUpdateViewer(false);//->erase(myExternalObject);
+  aWorkshop->displayer()->enableUpdateViewer(true);*/
+}
+
+//********************************************************************
+void PartSet_WidgetShapeSelector::createExternal(ObjectPtr theSelectedObject,
+                                                 GeomShapePtr theShape)
+{
+  ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
+                                                              theSelectedObject, mySketch);
+  if (aObj != myExternalObject) {
+    removeExternal();
+    myExternalObject = aObj;
+  }
+}
+
+//********************************************************************
+void PartSet_WidgetShapeSelector::removeExternal()
+{
+  if (myExternalObject.get()) {
+    DocumentPtr aDoc = myExternalObject->document();
+    FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
+    if (aFeature.get() != NULL) {
+      aDoc->removeFeature(aFeature);
+    }
+    myExternalObject = NULL;
+  }
+}

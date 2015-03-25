@@ -150,18 +150,20 @@ void PartSet_WidgetSketchLabel::enableFocusProcessing()
   myLabel->installEventFilter(this);
 }
 
-void PartSet_WidgetSketchLabel::backupAttributeValue(const bool isBackup)
+void PartSet_WidgetSketchLabel::storeAttributeValue()
+{
+}
+
+void PartSet_WidgetSketchLabel::restoreAttributeValue(const bool theValid)
 {
   // it is not necessary to save the previous plane value because the plane is chosen once
-  if (!isBackup) {
-    DataPtr aData = feature()->data();
-    AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-    if (aSelAttr) {
-      ResultPtr anEmptyResult;
-      GeomShapePtr anEmptyShape;
-      aSelAttr->setValue(anEmptyResult, anEmptyShape);
-    }
+  DataPtr aData = feature()->data();
+  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+    (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+  if (aSelAttr) {
+    ResultPtr anEmptyResult;
+    GeomShapePtr anEmptyShape;
+    aSelAttr->setValue(anEmptyResult, anEmptyShape);
   }
 }
 

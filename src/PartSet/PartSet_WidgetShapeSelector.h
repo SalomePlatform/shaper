@@ -49,9 +49,31 @@ protected:
   /// \param theShape a selected shape, which is used in the selection attribute
   virtual bool storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
-private:
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  virtual void storeAttributeValue();
+
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param theValid a boolean flag, if restore happens for valid parameters
+  void restoreAttributeValue(const bool theValid);
+
+  // Removes the external presentation from the model
+  /// \param theSelectedObject an object
+  /// \param theShape a selected shape, which is used in the selection attribute
+  void createExternal(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+
+  // Removes the external presentation from the model
+  void removeExternal();
+
+protected:
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;
+
+  /// An external object
+  ObjectPtr myExternalObject;
 };
 
 #endif

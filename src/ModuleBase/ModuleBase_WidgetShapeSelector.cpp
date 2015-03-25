@@ -370,37 +370,33 @@ void ModuleBase_WidgetShapeSelector::activateCustom()
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
+void ModuleBase_WidgetShapeSelector::storeAttributeValue()
 {
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
-  if (isBackup) {
-    myObject = GeomValidators_Tools::getObject(anAttribute);
-    myShape = getShape();
-    myRefAttribute = NULL;
-    myIsObject = false;
-    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    if (aRefAttr) {
-      myIsObject = aRefAttr->isObject();
-      myRefAttribute = aRefAttr->attr();
-    }
-    myExternalObject = NULL;
+  myObject = GeomValidators_Tools::getObject(anAttribute);
+  myShape = getShape();
+  myRefAttribute = NULL;
+  myIsObject = false;
+  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+  if (aRefAttr) {
+    myIsObject = aRefAttr->isObject();
+    myRefAttribute = aRefAttr->attr();
   }
-  else {
-    storeAttributeValues(myObject, myShape);
-    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    if (aRefAttr) {
-      if (!myIsObject)
-        aRefAttr->setAttr(myRefAttribute);
-    }
-    if (myExternalObject.get()) {
-      DocumentPtr aDoc = myExternalObject->document();
-      FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
-      if (aFeature.get() != NULL) {
-        aDoc->removeFeature(aFeature);
-      }
-    }
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
+{
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+
+  storeAttributeValues(myObject, myShape);
+  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+  if (aRefAttr) {
+    if (!myIsObject)
+      aRefAttr->setAttr(myRefAttribute);
   }
 }
 

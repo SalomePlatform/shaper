@@ -13,11 +13,24 @@
 #include <TDF_ChildIterator.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 
+#include <TopoDS.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Edge.hxx>
+#include <BRep_Tool.hxx>
+
 using namespace std;
 
 void Model_AttributeSelectionList::append(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
+  // do not use the degenerated edge as a shape, a list is not incremented in this case
+  if (theSubShape.get() && !theSubShape->isNull() && theSubShape->isEdge()) {
+    const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
+    if (aSubShape.ShapeType() == TopAbs_EDGE && BRep_Tool::Degenerated(TopoDS::Edge(aSubShape))) {
+      return;
+    }
+  }
+
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
 
