@@ -45,6 +45,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
+  /// The method is called by the current operation to process the operation preselection.
+  /// It is redefined to check the value validity and if it is, fill the attribute with by value
   /// \param theValue the wrapped widget value
   virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
