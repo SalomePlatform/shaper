@@ -186,8 +186,10 @@
         title="Mirror"
         tooltip="Create constraint mirroring group of objects"
         internal="1" />
-    <!--  SketchConstraintFillet  -->
-      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects">
+    </group>
+    <group id="Edit">
+      <!--  SketchConstraintFillet  -->
+      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
