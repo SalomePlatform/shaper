@@ -34,5 +34,6 @@
      <file>icons/vertical.png</file>
      <file>icons/equal.png</file>
      <file>icons/tangent.png</file>
+     <file>icons/fillet.png</file>
  </qresource>
  </RCC>
