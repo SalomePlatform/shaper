@@ -15,7 +15,6 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_PlanarEdges.h>
-#include <GeomAlgoAPI_SketchBuilder.h>
 #include <Events_Error.h>
 
 #include <TNaming_Selector.hxx>
@@ -225,10 +224,12 @@ bool Model_AttributeSelection::update()
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
-    std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
-      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext)->shape());
-    if (aWirePtr && aWirePtr->hasPlane()) { // sketch sub-element
+    ResultConstructionPtr aConstructionContext = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    // sketch sub-element
+    if (aConstructionContext && 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContext).get())
+    {
       TDF_Label aLab = myRef.myRef->Label();
       // getting a type of selected shape
       Handle(TDataStd_Integer) aTypeAttr;
@@ -251,15 +252,12 @@ bool Model_AttributeSelection::update()
 
       if (aShapeType == TopAbs_FACE) { // compound is for the whole sketch selection
         // If this is a wire with plane defined thin it is a sketch-like object
-        std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
-        GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-          aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, aFaces);
-        if (aFaces.empty()) // no faces, update can not work correctly
+        if (!aConstructionContext->facesNum()) // no faces, update can not work correctly
           return false;
         // if there is no edges indexes, any face can be used: take the first
         std::shared_ptr<GeomAPI_Shape> aNewSelected;
         if (aNoIndexes) {
-          aNewSelected = *(aFaces.begin());
+          aNewSelected = aConstructionContext->face(0);
         } else { // searching for most looks-like initial face by the indexes
           // prepare edges of the current resut for the fast searching
           TColStd_MapOfTransient allCurves;
@@ -284,12 +282,11 @@ bool Model_AttributeSelection::update()
               }
             }
           }
-          // iterate new result faces and searching for these edges
-          std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFacesIter = aFaces.begin();
           double aBestFound = 0; // best percentage of found edges
-          for(; aFacesIter != aFaces.end(); aFacesIter++) {
+          for(int aFaceIndex = 0; aFaceIndex < aConstructionContext->facesNum(); aFaceIndex++) {
             int aFound = 0, aNotFound = 0;
-            TopExp_Explorer anEdgesExp((*aFacesIter)->impl<TopoDS_Shape>(), TopAbs_EDGE);
+            TopExp_Explorer anEdgesExp(
+              aConstructionContext->face(aFaceIndex)->impl<TopoDS_Shape>(), TopAbs_EDGE);
             for(; anEdgesExp.More(); anEdgesExp.Next()) {
               TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
               if (!anEdge.IsNull()) {
@@ -306,7 +303,7 @@ bool Model_AttributeSelection::update()
               double aPercentage = double(aFound) / double(aFound + aNotFound);
               if (aPercentage > aBestFound) {
                 aBestFound = aPercentage;
-                aNewSelected = *aFacesIter;
+                aNewSelected = aConstructionContext->face(aFaceIndex);
               }
             }
           }

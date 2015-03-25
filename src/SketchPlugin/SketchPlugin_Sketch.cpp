@@ -115,9 +115,6 @@ void SketchPlugin_Sketch::execute()
     aBigWire->addEdge(*aShapeIt);
   }
   aBigWire->setPlane(anOrigin->pnt(), aDirX->dir(), aNorm->dir());
-
-//  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
-//                                         aFeaturesPreview, aLoops, aWires);
   std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
   aConstr->setShape(aBigWire);
   setResult(aConstr);

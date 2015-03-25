@@ -7,8 +7,8 @@
 #include "ModuleBase_ResultPrs.h"
 
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_PlanarEdges.h>
-#include <GeomAlgoAPI_SketchBuilder.h>
 
 #include <BRep_Builder.hxx>
 #include <AIS_Drawer.hxx>
@@ -43,11 +43,15 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   if (!aShapePtr)
     return;
   if (myIsSketchMode) {
-    std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
-      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
     myFacesList.clear();
-    GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-      aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, myFacesList);
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myResult);
+    if (aConstruction.get()) {
+      int aFacesNum = aConstruction->facesNum();
+      for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
+        myFacesList.push_back(aConstruction->face(aFaceIndex));
+      }
+    }
   }
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   if (!myOriginalShape.IsNull()) {

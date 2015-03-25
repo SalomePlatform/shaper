@@ -22,9 +22,9 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
   if(!theObject)
     return;
   if (!myIsInitialized || value() != theObject) {
-      std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
-          theObject->data());
-      TDF_Label anObjLab = aData->label().Father(); // object label
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
+        theObject->data());
+    TDF_Label anObjLab = aData->label().Father(); // object label
 
     if (owner()->document() == theObject->document()) { // same document, use reference attribute
 
@@ -40,6 +40,12 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
       TCollection_AsciiString anEntry;
       TDF_Tool::Entry(anObjLab, anEntry);
       TDataStd_AsciiString::Set(myRef->Label(), anEntry);
+    }
+    // do it before the transaction finish to make just created/removed objects know dependencies
+    // and reference from composite feature is removed automatically
+    FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    if (anOwnerFeature.get()) {
+      aData->addBackReference(anOwnerFeature, id());
     }
 
     owner()->data()->sendAttributeUpdated(this);

@@ -26,25 +26,25 @@
 
 #define DEB_PLACEMENT 1
 GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
-    std::shared_ptr<GeomAPI_Shape> theSourceSolid,
-    std::shared_ptr<GeomAPI_Shape> theDestSolid,
-    std::shared_ptr<GeomAPI_Shape> theSourceShape,
-    std::shared_ptr<GeomAPI_Shape> theDestShape,
-    bool theIsReverse,
-    bool theIsCentering)
+  std::shared_ptr<GeomAPI_Shape> theSourceSolid,
+  std::shared_ptr<GeomAPI_Shape> theDestSolid,
+  std::shared_ptr<GeomAPI_Shape> theSourceShape,
+  std::shared_ptr<GeomAPI_Shape> theDestShape,
+  bool theIsReverse,
+  bool theIsCentering)
   : myDone(false),
-    myShape(new GeomAPI_Shape())
+  myShape(new GeomAPI_Shape())
 {
   build(theSourceSolid, theDestSolid, theSourceShape, theDestShape, theIsReverse, theIsCentering);
 }
 
 void GeomAlgoAPI_Placement::build(
-    const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
-    const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
-    const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
-    const std::shared_ptr<GeomAPI_Shape>& theDestShape,
-    bool theIsReverse,
-    bool theIsCentering)
+  const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
+  const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
+  const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
+  const std::shared_ptr<GeomAPI_Shape>& theDestShape,
+  bool theIsReverse,
+  bool theIsCentering)
 {
   // Filling the parameters of the objects
   static const int aNbObjects = 2;
@@ -82,6 +82,30 @@ void GeomAlgoAPI_Placement::build(
     hasDirection[i] = aSrcDstDirections[i].SquareMagnitude() >= Precision::SquareConfusion();
   }
 
+  // Initial shapes
+  const TopoDS_Shape& aSourceShape = theSourceSolid->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aDestShape = theDestSolid->impl<TopoDS_Shape>();
+  // Check the material of the solids to be on the correct side
+  BRepClass3d_SolidClassifier aClassifier;
+  static const double aTransStep = 10. * Precision::Confusion();
+  if (hasNormal[0]) {
+    aClassifier.Load(aSourceShape);
+    gp_Pnt aPoint = aSrcDstPoints[0];
+    aPoint.Translate(aSrcDstNormals[0] * aTransStep);
+    aClassifier.Perform(aPoint, Precision::Confusion());
+    if ((aClassifier.State() == TopAbs_OUT && !theIsReverse) ||
+      (aClassifier.State() == TopAbs_IN && theIsReverse))
+      aSrcDstNormals[0].Reverse();
+  }
+  if (hasNormal[1]) {
+    aClassifier.Load(aDestShape);
+    gp_Pnt aPoint = aSrcDstPoints[1];
+    aPoint.Translate(aSrcDstNormals[1] * aTransStep);
+    aClassifier.Perform(aPoint, Precision::Confusion());
+    if (aClassifier.State() == TopAbs_IN)
+      aSrcDstNormals[1].Reverse();
+  }
+
   // Calculate directions, which comply the normal, for vertices and edges
   if (!hasNormal[0] || !hasNormal[1]) {
     if (hasNormal[0] || hasNormal[1]) { // plane with line or vertex
@@ -90,10 +114,10 @@ void GeomAlgoAPI_Placement::build(
         gp_Vec aVec = aSrcDstNormals[1 - anInd].Crossed(aSrcDstDirections[anInd]);
         if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // normal and direction are collinear
           aVec = aSrcDstNormals[1 - anInd].Crossed(
-              gp_Vec(aSrcDstPoints[1 - anInd], aSrcDstPoints[anInd]));
+            gp_Vec(aSrcDstPoints[1 - anInd], aSrcDstPoints[anInd]));
           if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // normal and points direction are collinear
             if (Abs(aSrcDstNormals[1 - anInd].Y()) >= Precision::Confusion() || 
-                Abs(aSrcDstNormals[1 - anInd].Z()) >= Precision::Confusion())
+              Abs(aSrcDstNormals[1 - anInd].Z()) >= Precision::Confusion())
               aVec = gp::DX();
             else
               aVec = gp::DY();
@@ -111,7 +135,7 @@ void GeomAlgoAPI_Placement::build(
           aVec = aSrcDstDirections[0].Crossed(gp_Vec(aSrcDstPoints[0], aSrcDstPoints[1]));
           if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // lines are equal
             if (Abs(aSrcDstDirections[0].Y()) >= Precision::Confusion() ||
-                Abs(aSrcDstDirections[0].Z()) >= Precision::Confusion())
+              Abs(aSrcDstDirections[0].Z()) >= Precision::Confusion())
               aVec = gp::DX();
             else
               aVec = gp::DY();
@@ -119,8 +143,10 @@ void GeomAlgoAPI_Placement::build(
         }
         aSrcDstNormals[0] = aSrcDstDirections[0].Crossed(aVec);
         aSrcDstNormals[0].Normalize();
-        aSrcDstNormals[1] = aSrcDstDirections[1].Crossed(aVec).Reversed();
+        aSrcDstNormals[1] = aSrcDstDirections[1].Crossed(aVec);
         aSrcDstNormals[1].Normalize();
+        if (aSrcDstDirections[0].Dot(aSrcDstDirections[1]) < -Precision::Confusion())
+          aSrcDstNormals[1].Reverse();
       } else if (!hasDirection[0] && !hasDirection[1]) { // point - point
         aSrcDstNormals[0] = gp_Vec(aSrcDstPoints[0], aSrcDstPoints[1]);
         aSrcDstNormals[0].Normalize();
@@ -131,7 +157,7 @@ void GeomAlgoAPI_Placement::build(
         aVec.Cross(aSrcDstDirections[anInd]);
         if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // point is on line
           if (Abs(aSrcDstDirections[1 - anInd].Y()) >= Precision::Confusion() || 
-              Abs(aSrcDstDirections[1 - anInd].Z()) >= Precision::Confusion())
+            Abs(aSrcDstDirections[1 - anInd].Z()) >= Precision::Confusion())
             aVec = gp::DX();
           else
             aVec = gp::DY();
@@ -142,35 +168,14 @@ void GeomAlgoAPI_Placement::build(
     }
   }
 
-  // Initial shapes
-  const TopoDS_Shape& aSourceShape = theSourceSolid->impl<TopoDS_Shape>();
-  const TopoDS_Shape& aDestShape = theDestSolid->impl<TopoDS_Shape>();
+  // Reverse the normal if it was not done before
+  if (!hasNormal[0] && theIsReverse)
+    aSrcDstNormals[0].Reverse();
 
   // Calculate transformation
   gp_Trsf aTrsf;
   gp_Vec aSrcDir = aSrcDstNormals[0];
   gp_Vec aDstDir = aSrcDstNormals[1];
-  // Check the material of the solids to be on the correct side
-  BRepClass3d_SolidClassifier aClassifier;
-  static const double aTransStep = 10. * Precision::Confusion();
-  if (hasNormal[0]) {
-    aClassifier.Load(aSourceShape);
-    gp_Pnt aPoint = aSrcDstPoints[0];
-    aPoint.Translate(aSrcDir * aTransStep);
-    aClassifier.Perform(aPoint, Precision::Confusion());
-    if ((aClassifier.State() == TopAbs_OUT && !theIsReverse) ||
-        (aClassifier.State() == TopAbs_IN && theIsReverse))
-      aSrcDir.Reverse();
-  } else if (theIsReverse)
-    aSrcDir.Reverse();
-  if (hasNormal[1]) {
-    aClassifier.Load(aDestShape);
-    gp_Pnt aPoint = aSrcDstPoints[1];
-    aPoint.Translate(aDstDir * aTransStep);
-    aClassifier.Perform(aPoint, Precision::Confusion());
-    if (aClassifier.State() == TopAbs_IN)
-      aDstDir.Reverse();
-  }
   // Calculate rotation
   gp_Quaternion aRot(aSrcDir, aDstDir);
   aTrsf.SetRotation(aRot);
@@ -197,8 +202,8 @@ void GeomAlgoAPI_Placement::build(
         myMap.bind(aCurrentShape, aCurrentShape);
       }
 #ifdef DEB_PLACEMENT
-	  int aNum = myMap.size();
-	  cout << "MAP of Oriented shapes =" << aNum <<endl;
+      int aNum = myMap.size();
+      cout << "MAP of Oriented shapes =" << aNum <<endl;
 
 #endif
 
