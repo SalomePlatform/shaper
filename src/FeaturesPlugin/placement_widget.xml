@@ -1,17 +1,17 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <shape_selector id="placement_base_face" 
-    label="Select a face" 
+  <shape_selector id="placement_base_object" 
+    label="Select an object" 
     icon=":icons/cut_shape.png" 
-    tooltip="Select a destination face"
-    shape_types="face"
+    tooltip="Select a destination element"
+    shape_types="face edge vertex"
   />
-  <shape_selector id="placement_attractable_face" 
-    label="Select a face" 
+  <shape_selector id="placement_attractable_object" 
+    label="Select an object" 
     icon=":icons/cut_shape.png" 
-    tooltip="Select a face of moved object" 
-    shape_types="face" 
+    tooltip="Select an element of moved object" 
+    shape_types="face edge vertex" 
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
   </shape_selector>

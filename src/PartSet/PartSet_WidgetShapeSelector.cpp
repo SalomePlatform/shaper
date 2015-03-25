@@ -13,7 +13,7 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
-bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape) const
+bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
   ObjectPtr aSelectedObject = theSelectedObject;
   GeomShapePtr aShape = theShape;
@@ -30,6 +30,7 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
     if (aObj) {
       PartSet_WidgetShapeSelector* that = (PartSet_WidgetShapeSelector*) this;
       aSelectedObject = aObj;
+      myExternalObject = aObj;
     } else 
       return false;
   } else {

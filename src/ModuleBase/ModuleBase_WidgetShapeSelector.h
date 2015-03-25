@@ -134,7 +134,7 @@ Q_OBJECT
   /// the specific type and set the given values
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
-  virtual bool storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape) const;
+  virtual bool storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
   //----------- Class members -------------
   protected:
@@ -164,6 +164,8 @@ Q_OBJECT
   AttributePtr myRefAttribute;
   /// A boolean value whether refAttr uses reference of object
   bool myIsObject;
+  /// An external object
+  ObjectPtr myExternalObject;
 };
 
 #endif

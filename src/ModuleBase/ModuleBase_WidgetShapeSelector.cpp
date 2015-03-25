@@ -133,7 +133,7 @@ bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject,
-                                                          GeomShapePtr theShape) const
+                                                          GeomShapePtr theShape)
 {
   bool isChanged = false;
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theSelectedObject);
@@ -385,6 +385,7 @@ void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
       myIsObject = aRefAttr->isObject();
       myRefAttribute = aRefAttr->attr();
     }
+    myExternalObject = NULL;
   }
   else {
     storeAttributeValues(myObject, myShape);
@@ -392,6 +393,13 @@ void ModuleBase_WidgetShapeSelector::backupAttributeValue(const bool isBackup)
     if (aRefAttr) {
       if (!myIsObject)
         aRefAttr->setAttr(myRefAttribute);
+    }
+    if (myExternalObject.get()) {
+      /*DocumentPtr aDoc = myExternalObject->document();
+      FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
+      if (aFeature.get() != NULL) {
+        aDoc->removeFeature(aFeature);
+      }*/
     }
   }
 }

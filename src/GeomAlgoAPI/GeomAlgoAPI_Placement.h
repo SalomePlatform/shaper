@@ -17,24 +17,24 @@
 
 /**\class GeomAlgoAPI_Placement
  * \ingroup DataAlgo
- * \brief Creates the copied object which face is placed on the given plane
+ * \brief Creates the copied object which sub-element is placed on the given element
  */
 class GeomAlgoAPI_Placement : public GeomAPI_Interface
 {
 public:
   /** \brief Creates an object which is obtained from current object by transformation calculated
-   *         as a movement of the source plane to be coincident with the destination plane
-   *  \param[in] theSourceShape  shape to be moved
-   *  \param[in] theDestShape    invariabt shape
-   *  \param[in] theSourcePlane  plane on the shape to be made coincident with destination plane
-   *  \param[in] theDestPlane    destination plane
+   *         as a movement of the source object to be coincident with the destination object
+   *  \param[in] theSourceSolid  a shape to be moved
+   *  \param[in] theDestSolid    invariant shape
+   *  \param[in] theSourceShape  a shape on the solid to be made coincident with destination object
+   *  \param[in] theDestShape    destination object
    *  \param[in] theIsReverse    indicates that the solid materials should be on the same side against the destination plane
    *  \param[in] theIsCentering  indicates the planes should be centered
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Placement(std::shared_ptr<GeomAPI_Shape> theSourceShape,
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Placement(std::shared_ptr<GeomAPI_Shape> theSourceSolid,
+                                           std::shared_ptr<GeomAPI_Shape> theDestSolid,
+                                           std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                            std::shared_ptr<GeomAPI_Shape> theDestShape,
-                                           std::shared_ptr<GeomAPI_Face> theSourcePlane,
-                                           std::shared_ptr<GeomAPI_Face> theDestPlane,
                                            bool theIsReverse = false,
                                            bool theIsCentering = false);
 
@@ -62,10 +62,10 @@ public:
 
 private:
   /// builds resulting shape
-  void build(const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
+  void build(const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
+             const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
+             const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
              const std::shared_ptr<GeomAPI_Shape>& theDestShape,
-             const std::shared_ptr<GeomAPI_Face>& theSourcePlane,
-             const std::shared_ptr<GeomAPI_Face>& theDestPlane,
              bool theIsReverse,
              bool theIsCentering);
 

@@ -19,6 +19,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IModule.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Point.h>
@@ -46,7 +47,7 @@
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId),
+    : ModuleBase_WidgetValidated(theParent, theData, theParentId),
       myPreviewDisplayed(false),
       myWorkshop(NULL)
 {
@@ -81,41 +82,43 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onPlaneSelected()
 {
+
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
   if (!aSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = aSelected.first();
-    TopoDS_Shape aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      std::shared_ptr<GeomAPI_Dir> aDir = setSketchPlane(aShape);
-      if (aDir) {
-        erasePreviewPlanes();
+    Handle(SelectMgr_EntityOwner) anOwner = aSelected.first().owner();
+    if (isValid(anOwner)) {
+      setSelection(anOwner);
 
-        if (aPrs.object() && (feature() != aPrs.object())) {
-          DataPtr aData = feature()->data();
-          AttributeSelectionPtr aSelAttr = 
-            std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-            (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-          if (aSelAttr) {
-            ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
-            if (aRes) {
-              GeomShapePtr aShapePtr(new GeomAPI_Shape());
-              aShapePtr->setImpl(new TopoDS_Shape(aShape));
-              aSelAttr->setValue(aRes, aShapePtr);
-            }
+      TopoDS_Shape aShape = aPrs.shape();
+      if (!aShape.IsNull()) {
+        erasePreviewPlanes();
+        DataPtr aData = feature()->data();
+        AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                                  (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+        if (aSelAttr) {
+          GeomShapePtr aShapePtr = aSelAttr->value();
+          if (aShapePtr.get() == NULL || aShapePtr->isNull()) {
+            std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
+            aGShape->setImpl(new TopoDS_Shape(aShape));
+            // get plane parameters
+            std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
+            std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+
+            myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
           }
-        } else
-          myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
+        }
 
         // Clear text in the label
         myLabel->setText("");
         myLabel->setToolTip("");
         disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
                    this, SLOT(onPlaneSelected()));
+        activateFilters(myWorkshop->module()->workshop(), false);
 
         // Clear selection mode and define sketching mode
-        XGUI_Displayer* aDisp = myWorkshop->displayer();
-        aDisp->removeSelectionFilter(myFaceFilter);
+        //XGUI_Displayer* aDisp = myWorkshop->displayer();
         //aDisp->closeLocalContexts();
         emit planeSelected(plane());
         setSketchingMode();
@@ -147,12 +150,61 @@ void PartSet_WidgetSketchLabel::enableFocusProcessing()
   myLabel->installEventFilter(this);
 }
 
+void PartSet_WidgetSketchLabel::backupAttributeValue(const bool isBackup)
+{
+  // it is not necessary to save the previous plane value because the plane is chosen once
+  if (!isBackup) {
+    DataPtr aData = feature()->data();
+    AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+    if (aSelAttr) {
+      ResultPtr anEmptyResult;
+      GeomShapePtr anEmptyShape;
+      aSelAttr->setValue(anEmptyResult, anEmptyShape);
+    }
+  }
+}
+
+bool PartSet_WidgetSketchLabel::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+{
+  bool isOwnerSet = false;
+
+  ModuleBase_ViewerPrs aPrs;
+  myWorkshop->selector()->selection()->fillPresentation(aPrs, theOwner);
+
+  const TopoDS_Shape& aShape = aPrs.shape();
+  std::shared_ptr<GeomAPI_Dir> aDir;
+
+  if (aPrs.object() && (feature() != aPrs.object())) {
+    DataPtr aData = feature()->data();
+    AttributeSelectionPtr aSelAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+    if (aSelAttr) {
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+      if (aRes) {
+        GeomShapePtr aShapePtr(new GeomAPI_Shape());
+        aShapePtr->setImpl(new TopoDS_Shape(aShape));
+        aSelAttr->setValue(aRes, aShapePtr);
+        isOwnerSet = true;
+      }
+    }
+  }
+  else if (!aShape.IsNull()) {
+    aDir = setSketchPlane(aShape);
+    isOwnerSet = aDir;
+  }
+  return isOwnerSet;
+}
+
 void PartSet_WidgetSketchLabel::activateCustom()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane) {
     //setSketchingMode();
     // In order to avoid Opening/Closing of context too often
+    // it can be useful for a delay on the property panel filling
+    // it is possible that it is not necessary anymore, but it requires a check
     mySelectionTimer->start(20);
   } else {
     // We have to select a plane before any operation
@@ -161,9 +213,6 @@ void PartSet_WidgetSketchLabel::activateCustom()
     XGUI_Displayer* aDisp = myWorkshop->displayer();
     //aDisp->openLocalContext();
     //aDisp->activateObjects(QIntList());
-    if (myFaceFilter.IsNull())
-      myFaceFilter = new StdSelect_FaceFilter(StdSelect_Plane);
-    aDisp->addSelectionFilter(myFaceFilter);
     QIntList aModes;
     aModes << TopAbs_FACE;
     aDisp->activateObjects(aModes);
@@ -172,6 +221,8 @@ void PartSet_WidgetSketchLabel::activateCustom()
     myLabel->setToolTip(myTooltip);
 
     connect(myWorkshop->selector(), SIGNAL(selectionChanged()), this, SLOT(onPlaneSelected()));
+    activateFilters(myWorkshop->module()->workshop(), true);
+
     aDisp->updateViewer();
   }
 }
@@ -180,9 +231,7 @@ void PartSet_WidgetSketchLabel::deactivate()
 {
   // Do not set selection mode if the widget was activated for a small moment 
   mySelectionTimer->stop();
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
-  aDisp->removeSelectionFilter(myFaceFilter);
-  //aDisp->removeSelectionFilter(mySketchFilter);
+  //XGUI_Displayer* aDisp = myWorkshop->displayer();
   //aDisp->closeLocalContexts();
   erasePreviewPlanes();
 }
