@@ -7,11 +7,15 @@
 #ifndef SketcherPrs_SymbolPrs_H
 #define SketcherPrs_SymbolPrs_H
 
+#include "SketcherPrs_SensitivePoint.h"
+
 #include <AIS_InteractiveObject.hxx>
 #include <GeomAPI_Ax3.h>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Image_AlienPixMap.hxx>
+#include <SelectMgr_EntityOwner.hxx>
+#include <Select3D_SensitiveEntitySequence.hxx>
 
 #include <Standard_DefineHandle.hxx>
 #include <map>
@@ -110,11 +114,15 @@ protected:
   /// Array of symbols positions
   mutable Handle(Graphic3d_ArrayOfPoints) myPntArray;
 
+  Handle(SelectMgr_EntityOwner) myOwner;
+
 private: 
   /// Static map to collect constraints icons {IconName : IconPixMap}
   static std::map<const char*, Handle(Image_AlienPixMap)> myIconsMap;
 
   mutable Handle(OpenGl_VertexBuffer) myVboAttribs;
+
+  Select3D_SensitiveEntitySequence mySPoints;
 };
 
 #endif
