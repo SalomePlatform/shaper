@@ -1053,6 +1053,12 @@ bool XGUI_Workshop::activateModule()
   myModule = loadModule(moduleName);
   if (!myModule)
     return false;
+
+  connect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
+    myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
+  connect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
+    myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
+
   myModule->createFeatures();
   myActionsMgr->update();
   return true;
