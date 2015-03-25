@@ -796,8 +796,8 @@ TopAbs_ShapeEnum translateType (const std::string& theType)
   return TopAbs_SHAPE;
 }
 
-const TopoDS_Shape getShapeFromCompound(
-  const std::string& theSubShapeName, const TopoDS_Shape& theCompound)
+const TopoDS_Shape getShapeFromNS(
+  const std::string& theSubShapeName, Handle(TNaming_NamedShape) theNS)
 {
   TopoDS_Shape aSelection;
   std::string::size_type n = theSubShapeName.rfind('/');			
@@ -807,13 +807,12 @@ const TopoDS_Shape getShapeFromCompound(
   if (n == std::string::npos) return aSelection;
   aSubString = aSubString.substr(n+1);
   int indx = atoi(aSubString.c_str());
-  TopoDS_Iterator it(theCompound);			
-  for (int i = 1;it.More();it.Next(), i++) {
-    if(i == indx) {			  
-      aSelection = it.Value();			  
-      break;
+
+  TNaming_Iterator anItL(theNS);
+  for(int i = 1; anItL.More(); anItL.Next(), i++) {
+    if (i == indx) {
+      return anItL.NewShape();
     }
-    else continue;			  			
   }
   return aSelection;	
 }
@@ -837,13 +836,7 @@ const TopoDS_Shape findFaceByName(
   if(aLabel.IsNull()) return aFace;
   Handle(TNaming_NamedShape) aNS;
   if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-    const TopoDS_Shape& aShape = aNS->Get();
-    if(!aShape.IsNull()) {
-      if(aShape.ShapeType() == TopAbs_COMPOUND) 
-        aFace = getShapeFromCompound(theSubShapeName, aShape);
-      else 
-        aFace = aShape;	  
-    }
+    aFace = getShapeFromNS(theSubShapeName, aNS);
   }
   return aFace;
 }
@@ -1002,13 +995,7 @@ void Model_AttributeSelection::selectSubShape(
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          const TopoDS_Shape& aShape = aNS->Get();
-          if(!aShape.IsNull()) {
-            if(aShape.ShapeType() == TopAbs_COMPOUND) 
-              aSelection = getShapeFromCompound(theSubShapeName, aShape);
-            else 
-              aSelection = aShape;	  
-          }
+          aSelection = getShapeFromNS(theSubShapeName, aNS);
         }
       }
       if(aSelection.IsNull()) {
@@ -1038,13 +1025,7 @@ void Model_AttributeSelection::selectSubShape(
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          const TopoDS_Shape& aShape = aNS->Get();
-          if(!aShape.IsNull()) {
-            if(aShape.ShapeType() == TopAbs_COMPOUND) 
-              aSelection = getShapeFromCompound(theSubShapeName, aShape);
-            else 
-              aSelection = aShape;	  
-          }
+          aSelection = getShapeFromNS(theSubShapeName, aNS);
         }
       }
       if(aSelection.IsNull()) {
