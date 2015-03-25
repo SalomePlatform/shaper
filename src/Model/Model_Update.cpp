@@ -105,11 +105,14 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       {
         FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
         if (aF && aF->getKind() == "Extrusion") {
-          if (aF->selection("extrusion_face")) {
-            ResultPtr aSketchRes = aF->selection("extrusion_face")->context();
-            if (aSketchRes) {
-              static Events_ID HIDE_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE);
-              ModelAPI_EventCreator::get()->sendUpdated(aSketchRes, HIDE_DISP);
+          AttributeSelectionListPtr aBase = aF->selectionList("base");
+          if (aBase.get()) {
+            for(int a = aBase->size() - 1; a >= 0; a--) {
+              ResultPtr aSketchRes = aBase->value(a)->context();
+              if (aSketchRes) {
+                static Events_ID HIDE_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE);
+                ModelAPI_EventCreator::get()->sendUpdated(aSketchRes, HIDE_DISP);
+              }
             }
           }
         }

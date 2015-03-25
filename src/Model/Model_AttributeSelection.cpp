@@ -218,9 +218,10 @@ bool Model_AttributeSelection::update()
     // take the face that more close by the indexes
     ResultConstructionPtr aConstructionContext = 
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    FeaturePtr aContextFeature = aContext->document()->feature(aContext);
     // sketch sub-element
     if (aConstructionContext && 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContext).get())
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature).get())
     {
       TDF_Label aLab = myRef.myRef->Label();
       // getting a type of selected shape
@@ -235,10 +236,9 @@ bool Model_AttributeSelection::update()
       bool aNoIndexes = 
         !aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), aSubIds) || aSubIds->Extent() == 0;
       // for now working only with composite features
-      FeaturePtr aContextFeature = aContext->document()->feature(aContext);
       CompositeFeaturePtr aComposite = 
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
-      if (!aComposite || aComposite->numberOfSubs() == 0) {
+      if (!aComposite.get() || aComposite->numberOfSubs() == 0) {
         return false;
       }
 
