@@ -30,7 +30,17 @@ bool ModelAPI_Attribute::isInitialized()
 
 void ModelAPI_Attribute::setInitialized()
 {
-  myIsInitialized = true;
+  if (!mySetInitializedBlocked)
+    myIsInitialized = true;
+}
+
+bool ModelAPI_Attribute::blockSetInitialized(const bool theBlock)
+{
+  bool aBlocked = mySetInitializedBlocked;
+  
+  mySetInitializedBlocked = theBlock;
+
+  return aBlocked;
 }
 
 void ModelAPI_Attribute::setIsArgument(const bool theFlag)
@@ -62,6 +72,7 @@ const std::string& ModelAPI_Attribute::id() const
 
 ModelAPI_Attribute::ModelAPI_Attribute()
 {
+  mySetInitializedBlocked = false;
   myIsInitialized = false;
   myIsArgument = true;
   myIsImmutable = false;
