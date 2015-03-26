@@ -91,8 +91,10 @@ void PartSet_WidgetShapeSelector::storeAttributeValue()
 void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
-  //if (!theValid)
-  removeExternal();
+  /// this is a temporary code, will be removed when master is merged to this branch
+  /// after merge, the external edge should be removed always, without flag checking
+  if (!theValid)
+    removeExternal();
   /*
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
