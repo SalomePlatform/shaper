@@ -6,6 +6,10 @@
 
 #include "SketchPlugin_Validators.h"
 #include "SketchPlugin_ConstraintDistance.h"
+#include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_Line.h"
+#include "SketchPlugin_Arc.h"
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -18,11 +22,6 @@
 
 bool SketchPlugin_DistanceAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-//bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
-//                                                 const std::list<std::string>& theArguments,
-//                                                 const ObjectPtr& theObject,
-//                                                 const GeomShapePtr& theShape) const
-// ======= end of todo master
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
@@ -65,84 +64,76 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   }
   return false;
 }
-// TODO(nds) v1.0.2, master
-//  return false;
-//}
 
-//bool SketchPlugin_DistanceAttrValidator::isValid(
-//  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-//{
-//  // any point attribute is acceptable for the distance operation
-//  return true;
-//}
-//
-//bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
-//                                                 const std::list<std::string>& theArguments,
-//                                                 const AttributePtr& theAttribute) const
-//{
-//  return isValid(theAttribute, theArguments);
-//}
 
-// commented in v1.0.2, master:
-//bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
-//                                                 const std::list<std::string>& theArguments,
-//                                                 const ObjectPtr& theObject) const
-//{
-//  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-//    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//  for(; anAttr != anAttrs.end(); anAttr++) {
-//    if (*anAttr) {
-//      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-//        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//      // check the object is already presented
-//      if (aRef->isObject() && aRef->object() == theObject)
-//        return false;
-//    }
-//  }
-//  return true;
-//}
 
-//bool SketchPlugin_DifferentObjectsValidator::isValid(
-//  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-//{
-//  std::shared_ptr<ModelAPI_AttributeRefAttr> anOrigAttr = 
-//    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-//  if (anOrigAttr && anOrigAttr->isObject()) {
-//    const ObjectPtr& anObj = theAttribute->owner();
-//    const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
-//
-//    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-//      aFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//    for(; anAttr != anAttrs.end(); anAttr++) {
-//      if (*anAttr && *anAttr != theAttribute) {
-//        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-//          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//        // check the object is already presented
-//        if (aRef->isObject() && aRef->object() == anOrigAttr->object())
-//          return false;
-//      }
-//    }
-//  }
-//  return true;
-//}
+bool SketchPlugin_TangentAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  // there is a check whether the feature contains a point and a linear edge or two point values
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-//bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
-//  const std::list<std::string>& theArguments, const AttributePtr& theAttribute) const
-//{
-//  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-//    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//  for(; anAttr != anAttrs.end(); anAttr++) {
-//    if (*anAttr) {
-//      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-//        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//      // check the object is already presented
-//      if (!aRef->isObject() && aRef->attr() == theAttribute)
-//        return false;
-//    }
-//  }
-//  return true;
-//}
-// =========== end of todo
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+
+  bool isObject = aRefAttr->isObject();
+  ObjectPtr anObject = aRefAttr->object();
+  if (isObject && anObject) {
+    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+
+    AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
+    ObjectPtr aOtherObject = aOtherAttr->object();
+    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+
+    if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
+      if (aOtherFea->getKind() != SketchPlugin_Arc::ID())
+        return false;
+    } else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
+      if (aOtherFea->getKind() != SketchPlugin_Line::ID())
+        return false;
+    } else
+      return false;
+
+    // check that both have coincidence
+    FeaturePtr aConstrFeature;
+    std::set<FeaturePtr> aCoinList;
+    const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefsList = aRefFea->data()->refsToMe();
+    std::set<std::shared_ptr<ModelAPI_Attribute>>::const_iterator aIt;
+    for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+        AttributeRefAttrPtr aRAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
+        AttributePtr aAR = aRAttr->attr();
+        if (aAR->id() != SketchPlugin_Arc::CENTER_ID()) // ignore constraint to center of arc
+          aCoinList.insert(aConstrFeature);
+      }
+    }
+    // if there is no coincidence then it is not valid
+    if (aCoinList.size() == 0)
+      return false;
+
+    // find that coincedence is the same
+    const std::set<std::shared_ptr<ModelAPI_Attribute>>& aOtherList = aOtherFea->data()->refsToMe();
+    std::set<FeaturePtr>::const_iterator aCoinsIt;
+    for (aIt = aOtherList.cbegin(); aIt != aOtherList.cend(); ++aIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      aCoinsIt = aCoinList.find(aConstrFeature);
+      if (aCoinsIt != aCoinList.end()) {
+        AttributeRefAttrPtr aRAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
+        AttributePtr aAR = aRAttr->attr();
+        if (aAR->id() != SketchPlugin_Arc::CENTER_ID())
+          return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+

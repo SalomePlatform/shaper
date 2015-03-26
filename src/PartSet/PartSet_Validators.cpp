@@ -20,6 +20,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Session.h>
 
 #include <SketchPlugin_Sketch.h>
 
@@ -309,3 +310,32 @@ bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
 
   return isSketchEntities;
 }
+
+
+
+bool PartSet_SameTypeAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  // there is a check whether the feature contains a point and a linear edge or two point values
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+
+  bool isObject = aRefAttr->isObject();
+  ObjectPtr anObject = aRefAttr->object();
+  if (isObject && anObject) {
+    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+
+    AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
+    ObjectPtr aOtherObject = aOtherAttr->object();
+    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+    return aRefFea->getKind() == aOtherFea->getKind();
+  }
+  return false;
+}
+

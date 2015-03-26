@@ -53,6 +53,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_DistanceAttrValidator);  
   aFactory->registerValidator("SketchPlugin_ExternalValidator",
                               new SketchPlugin_ExternalValidator);
+  aFactory->registerValidator("SketchPlugin_TangentAttr",
+                              new SketchPlugin_TangentAttrValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
