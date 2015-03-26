@@ -62,7 +62,9 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(SketchPlugin_Constraint* theFeature,
   else if (anAttr->attr()) {
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
   }
-  return aPointAttr->pnt();
+  if (aPointAttr.get() != NULL)
+    return aPointAttr->pnt();
+  return std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
 

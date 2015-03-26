@@ -35,5 +35,6 @@
      <file>icons/equal.png</file>
      <file>icons/tangent.png</file>
      <file>icons/fillet.png</file>
+     <file>icons/coincedence.png</file>
  </qresource>
  </RCC>

@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
@@ -40,11 +40,6 @@
     </group>
       
     <group id="Constraints">
-      <feature
-        id="SketchConstraintCoincidence"
-        title="Coincident"
-        tooltip="Create constraint for the coincidence of two points"
-        internal="1" />
     <!--  SketchConstraintDistance  -->
       <feature
         id="SketchConstraintDistance"
@@ -79,6 +74,7 @@
         
         <validator id="PartSet_DistanceValidator"/>
       </feature>
+      
     <!--  SketchConstraintLength  -->      
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon=":icons/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
@@ -92,6 +88,7 @@
         </doublevalue_editor>
         <validator id="PartSet_LengthValidator"/>
       </feature>
+      
     <!--  SketchConstraintRadius  -->
       <feature id="SketchConstraintRadius" title="Radius" tooltip="Set fixed radius of a circle or an arc" icon=":icons/radius_constr.png">
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
@@ -103,6 +100,7 @@
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed"/>
         <validator id="PartSet_RadiusValidator"/>
       </feature>
+      
     <!--  SketchConstraintParallel  -->
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
@@ -120,6 +118,7 @@
         
         <validator id="PartSet_ParallelValidator"/>
       </feature>
+      
     <!--  SketchConstraintPerpendicular  -->
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines" icon=":icons/perpendicular.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
@@ -138,7 +137,16 @@
         </sketch_constraint_shape_selector>
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>
-    <!--  SketchConstraintRigid  -->
+
+      <!--  SketchConstraintCoincedence  -->
+      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" icon=":icons/coincedence.png">
+        <sketch_shape_selector id="ConstraintEntityA" label="First point" tooltip="Select a first point" shape_types="vertex"/>
+        <sketch_shape_selector id="ConstraintEntityB" label="Second point" tooltip="Select a second point" shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+        </sketch_shape_selector>
+      </feature>
+
+      <!--  SketchConstraintRigid  -->
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon=":icons/fixed.png">
         <shape_selector id="ConstraintEntityA" label="Object" tooltip="Select an object" 
             shape_types="edge vertex">
@@ -146,6 +154,7 @@
         </shape_selector>
         <validator id="PartSet_RigidValidator"/>
       </feature>
+      
     <!--  SketchConstraintHorizontal  -->
       <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon=":icons/horisontal.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
@@ -153,6 +162,7 @@
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
       </feature>
+      
     <!--  SketchConstraintVertical  -->
       <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon=":icons/vertical.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
@@ -160,6 +170,7 @@
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
       </feature>
+      
     <!--  SketchConstraintEqual  -->
       <feature id="SketchConstraintEqual" title="Equal" tooltip="Create constraint defining equality of two objects" icon=":icons/equal.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
@@ -170,6 +181,7 @@
             label="Last object" tooltip="Select line, circle or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
       </feature>
+      
     <!--  SketchConstraintTangent  -->
       <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects" icon=":icons/tangent.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
@@ -180,6 +192,7 @@
             label="Last object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
       </feature>
+      
     <!--  SketchConstraintMirror  -->
       <feature
         id="SketchConstraintMirror"
@@ -187,6 +200,7 @@
         tooltip="Create constraint mirroring group of objects"
         internal="1" />
     </group>
+    
     <group id="Edit">
       <!--  SketchConstraintFillet  -->
       <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
