@@ -142,6 +142,9 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("PartSet_SketchEntityValidator",
                               new PartSet_SketchEntityValidator);
+
+  aFactory->registerValidator("PartSet_SameTypeAttr",
+                              new PartSet_SameTypeAttrValidator);
 }
 
 void PartSet_Module::registerFilters()
