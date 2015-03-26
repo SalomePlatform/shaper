@@ -9,7 +9,7 @@
 
 std::string ModelAPI_AttributeRefList::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 ModelAPI_AttributeRefList::~ModelAPI_AttributeRefList()

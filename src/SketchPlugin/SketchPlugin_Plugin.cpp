@@ -53,9 +53,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_DistanceAttrValidator);  
   //aFactory->registerValidator("SketchPlugin_DifferentObjects",
   //                            new SketchPlugin_DifferentObjectsValidator);
-
-  aFactory->registerValidator("SketchPlugin_ShapeValidator",
-                              new SketchPlugin_ShapeValidator);
+  aFactory->registerValidator("SketchPlugin_ShapeValidator", new SketchPlugin_ShapeValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

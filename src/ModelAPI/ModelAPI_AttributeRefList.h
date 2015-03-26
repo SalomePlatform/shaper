@@ -20,7 +20,7 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
 {
  public:
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type()
+  MODELAPI_EXPORT static std::string typeId()
   {
     return "RefList";
   }

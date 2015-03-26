@@ -23,7 +23,7 @@ SketchPlugin_ConstraintVertical::SketchPlugin_ConstraintVertical()
 
 void SketchPlugin_ConstraintVertical::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_ConstraintVertical::execute()

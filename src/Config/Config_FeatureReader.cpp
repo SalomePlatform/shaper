@@ -89,7 +89,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
       storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
   }
-  //Process SOURCE, VALIDATOR nodes.
+  //Process SOURCE nodes.
   Config_XMLReader::processNode(theNode);
 }
 
@@ -139,49 +139,3 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   }
   outFeatureMessage->setDocumentKind(aDocKind);
 }
-
-void Config_FeatureReader::storeAttribute(xmlNodePtr theNode,
-                                          const char* theNodeAttribute)
-{
-  std::string aKey = getNodeName(theNode) + ":" + std::string(theNodeAttribute);
-  std::string aValue = getProperty(theNode, theNodeAttribute);
-  if(!aValue.empty()) {
-    myParentAttributes[aKey] = aValue;
-  }
-}
-
-std::string Config_FeatureReader::restoreAttribute(xmlNodePtr theNode,
-                                                   const char* theNodeAttribute)
-{
-  return restoreAttribute(getNodeName(theNode).c_str(), theNodeAttribute);
-}
-std::string Config_FeatureReader::restoreAttribute(const char* theNodeName,
-                                                   const char* theNodeAttribute)
-{
-  std::string aKey = std::string(theNodeName) + ":" + std::string(theNodeAttribute);
-  std::string result = "";
-  if(myParentAttributes.find(aKey) != myParentAttributes.end()) {
-    result = myParentAttributes[aKey];
-  }
-  return result;
-}
-
-bool Config_FeatureReader::cleanupAttribute(xmlNodePtr theNode,
-                                            const char* theNodeAttribute)
-{
-  return cleanupAttribute(getNodeName(theNode).c_str(), theNodeAttribute);
-}
-
-bool Config_FeatureReader::cleanupAttribute(const char* theNodeName,
-                                            const char* theNodeAttribute)
-{
-  std::string aKey = std::string(theNodeName) + ":" + std::string(theNodeAttribute);
-  bool result = false;
-  std::map<std::string, std::string>::iterator anEntry = myParentAttributes.find(aKey);
-  if( anEntry != myParentAttributes.end()) {
-    myParentAttributes.erase(anEntry);
-    result = true;
-  }
-  return result;
-}
-

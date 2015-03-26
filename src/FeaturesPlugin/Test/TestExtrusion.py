@@ -8,9 +8,9 @@
         static const std::string MY_SIZE_ID("extrusion_size");
         static const std::string MY_REVERSE_ID("extrusion_reverse");
           
-        data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::type());
-        data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::type());
-        data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::type());
+        data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
 """
 #=========================================================================
 # Initialization of the test
@@ -37,7 +37,7 @@ aPart = aPartResult.partDoc()
 # Create a sketch circle to extrude
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))

@@ -33,10 +33,10 @@ void SketchPlugin_Arc::initAttributes()
 {
   SketchPlugin_SketchEntity::initAttributes();
 
-  data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 

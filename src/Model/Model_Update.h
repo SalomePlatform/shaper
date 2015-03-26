@@ -23,14 +23,15 @@ class ModelAPI_Feature;
  */
 class Model_Update : public Events_Listener
 {
-  /// initial set of updated features that must be processed
+  /// initial set of updated features that must be processed: caused by external changes, not
+  /// by sequence of update of this class
   std::set<std::shared_ptr<ModelAPI_Object> > myInitial;
   /// already updated and processed features and modificated feature flag
   std::map<std::shared_ptr<ModelAPI_Object>, bool> myUpdated;
   /// to know that all next updates are caused by this execution
-  bool isExecuted;
+  bool myIsExecuted;
   /// to know execute or not automatically all update
-  bool isAutomatic;
+  bool myIsAutomatic;
   /// just created features: they must be updated immideately even in not-automatic mode for 
   /// preview; cleared on commit operations
   std::set<std::shared_ptr<ModelAPI_Object> > myJustCreatedOrUpdated;

@@ -56,6 +56,8 @@ Standard_Boolean ModuleBase_FilterNoConsructionSubShapes::IsOk(const Handle(Sele
           std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
         return aComposite && aComposite->numberOfSubs() > 0;
       }
+      else
+        return Standard_True;
     }
   }
   return Standard_False;

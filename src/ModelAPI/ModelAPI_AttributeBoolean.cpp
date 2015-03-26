@@ -8,7 +8,7 @@
 
 std::string ModelAPI_AttributeBoolean::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 /// To virtually destroy the fields of successors

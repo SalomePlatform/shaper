@@ -8,9 +8,9 @@
         static const std::string MY_SIZE_ID("size");
         static const std::string MY_REVERSE_ID("reverse");
           
-        data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::type());
-        data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::type());
-        data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::type());
+        data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
 """
 
 # Number rows and columns of cylinders that cuts the big box. Number of Boolena operations is N*N
@@ -19,12 +19,13 @@ N = 5
 #=========================================================================
 # Initialization of the test
 #=========================================================================
-from ModelAPI import *
-from GeomDataAPI import *
-from GeomAlgoAPI import *
 from GeomAPI import *
+from GeomAlgoAPI import *
+from GeomDataAPI import *
+from ModelAPI import *
 
-__updated__ = "2015-02-25"
+
+__updated__ = "2015-03-26"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -47,23 +48,23 @@ radius = 95. / N / 2.
 aSession.startOperation()
 aSketchFeatures = []
 for i in xrange(0, N):
-  for j in xrange(0, N):
-    # Create circle
-    aSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
-    origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
-    origin.setValue(0, 0, 0)
-    dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
-    dirx.setValue(1, 0, 0)
-    diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
-    diry.setValue(0, 1, 0)
-    norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
-    norm.setValue(0, 0, 1)
-    aSketchCircle = aSketchFeature.addFeature("SketchCircle")
-    anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
-    aCircleRadius = aSketchCircle.real("CircleRadius")
-    anCircleCentr.setValue(0.5 + step * (0.5 + i), 0.5 + step * (0.5 + j))
-    aCircleRadius.setValue(radius)
-    aSketchFeatures.append(aSketchFeature)
+    for j in xrange(0, N):
+        # Create circle
+        aSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+        origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
+        origin.setValue(0, 0, 0)
+        dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
+        dirx.setValue(1, 0, 0)
+        diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
+        diry.setValue(0, 1, 0)
+        norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
+        norm.setValue(0, 0, 1)
+        aSketchCircle = aSketchFeature.addFeature("SketchCircle")
+        anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
+        aCircleRadius = aSketchCircle.real("CircleRadius")
+        anCircleCentr.setValue(0.5 + step * (0.5 + i), 0.5 + step * (0.5 + j))
+        aCircleRadius.setValue(radius)
+        aSketchFeatures.append(aSketchFeature)
 
 aSession.finishOperation()
 
@@ -77,24 +78,29 @@ aSession.startOperation()
 
 anExtrusions = []
 for i in xrange(0, N * N):
-  aSketchResult = aSketchFeatures[i].firstResult()
-  aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
-  origin = geomDataAPI_Point(aSketchFeatures[i].attribute("Origin")).pnt()
-  dirX = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirX")).dir()
-  dirY = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirY")).dir()
-  norm = geomDataAPI_Dir(aSketchFeatures[i].attribute("Norm")).dir()
-  aSketchFaces = ShapeList()
-  GeomAlgoAPI_SketchBuilder.createFaces(
-      origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
+    aSketchResult = aSketchFeatures[i].firstResult()
+    aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
+    origin = geomDataAPI_Point(aSketchFeatures[i].attribute("Origin")).pnt()
+    dirX = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirX")).dir()
+    dirY = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirY")).dir()
+    norm = geomDataAPI_Dir(aSketchFeatures[i].attribute("Norm")).dir()
+    aSketchFaces = ShapeList()
+    GeomAlgoAPI_SketchBuilder.createFaces(
+        origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
 
-  anExtrusionFt = aPart.addFeature("Extrusion")
-  assert (anExtrusionFt.getKind() == "Extrusion")
+    anExtrusionFt = aPart.addFeature("Extrusion")
+    assert (anExtrusionFt.getKind() == "Extrusion")
 
-  anExtrusionFt.selectionList("base").append(
-      aSketchResult, aSketchFaces[0])
-  anExtrusionFt.real("size").setValue(10)
-  anExtrusionFt.boolean("reverse").setValue(False)
-  anExtrusions.append(anExtrusionFt)
+    anExtrusionFt.selectionList("base").append(
+        aSketchResult, aSketchFaces[0])
+    anExtrusionFt.real("size").setValue(10)
+    anExtrusionFt.boolean("reverse").setValue(False)
+    # v1.0.2 from master
+    # anExtrusionFt.selection("extrusion_face").setValue(
+    #    aSketchResult, aSketchFaces[0])
+    # anExtrusionFt.real("extrusion_size").setValue(10)
+    # anExtrusionFt.boolean("extrusion_reverse").setValue(False)
+    anExtrusions.append(anExtrusionFt)
 
 aSession.finishOperation()
 
@@ -153,23 +159,29 @@ aBox.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
 aBox.real("size").setValue(10)
 aBox.boolean("reverse").setValue(False)
+# v 1.0.2 from master
+# aBox.selection("extrusion_face").setValue(
+#     aSketchResult, aSketchFaces[0])
+# aBox.real("extrusion_size").setValue(10)
+# aBox.boolean("extrusion_reverse").setValue(False)
+
 aSession.finishOperation()
 
 
 #=========================================================================
-# Create a boolean cut of cylinders from the box: 
+# Create a boolean cut of cylinders from the box:
 # result of Boolean is the first argument of the next Boolean
 #=========================================================================
 aCurrentResult = aBox.firstResult()
 aSession.startOperation()
 for i in xrange(0, N * N):
-  aBooleanFt = aPart.addFeature("Boolean")
-  aBooleanFt.reference("main_object").setValue(modelAPI_ResultBody(aCurrentResult))
-  aBooleanFt.reference("tool_object").setValue(modelAPI_ResultBody(anExtrusions[i].firstResult()))
-  kBooleanTypeCut = 0
-  aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
-  aBooleanFt.execute()
-  aCurrentResult = aBooleanFt.firstResult()
+    aBooleanFt = aPart.addFeature("Boolean")
+    aBooleanFt.reference("main_object").setValue(modelAPI_ResultBody(aCurrentResult))
+    aBooleanFt.reference("tool_object").setValue(modelAPI_ResultBody(anExtrusions[i].firstResult()))
+    kBooleanTypeCut = 0
+    aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
+    aBooleanFt.execute()
+    aCurrentResult = aBooleanFt.firstResult()
 aSession.finishOperation()
 
 #=========================================================================

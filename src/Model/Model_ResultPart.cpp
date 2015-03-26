@@ -28,7 +28,7 @@ void Model_ResultPart::setData(std::shared_ptr<ModelAPI_Data> theData)
 {
   ModelAPI_Result::setData(theData);
   if (theData) {
-    data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::type());
+    data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId());
   }
 }
 

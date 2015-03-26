@@ -11,6 +11,10 @@
   #include "GeomAlgoAPI_MakeShape.h"
   #include "GeomAlgoAPI_PointBuilder.h"
   #include "GeomAlgoAPI_SketchBuilder.h"
+
+  #include <memory>
+  #include <string>
+  #include <list>
 %}
 
 // to avoid error on this

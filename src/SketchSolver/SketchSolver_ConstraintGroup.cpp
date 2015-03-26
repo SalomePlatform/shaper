@@ -777,7 +777,7 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
       aBaseFeature = aRC ? aRC->document()->feature(aRC) :
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aBaseIter);
       if (!aBaseFeature) continue;
-      std::list<AttributePtr> aPoints = aBaseFeature->data()->attributes(GeomDataAPI_Point2D::type());
+      std::list<AttributePtr> aPoints = aBaseFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
       std::list<AttributePtr>::iterator anIt = aPoints.begin();
       for ( ; anIt != aPoints.end(); anIt++) {
         // Arcs are fixed by center and start points only (to avoid solving errors in SolveSpace)
@@ -1076,7 +1076,7 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       continue;
     }
     std::list<AttributePtr> anAttributes =
-        aBaseFeature[indAttr]->data()->attributes(GeomDataAPI_Point2D::type());
+        aBaseFeature[indAttr]->data()->attributes(GeomDataAPI_Point2D::typeId());
     std::list<AttributePtr>::iterator anIt = anAttributes.begin();
     for ( ; anIt != anAttributes.end(); anIt++) {
       // Arc should be fixed by center and start points only (to avoid "conflicting constraints" message)

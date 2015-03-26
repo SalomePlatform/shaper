@@ -45,9 +45,9 @@ std::string Config_WidgetReader::featureDescription(const std::string& theFeatur
 void Config_WidgetReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_FEATURE, NULL)) {
-    myCurrentFeature = getProperty(theNode, _ID);
-    myWidgetCache[myCurrentFeature] = dumpNode(theNode);
-    myDescriptionCache[myCurrentFeature] = getProperty(theNode, FEATURE_TEXT);
+    std::string aFeature = getProperty(theNode, _ID);
+    myWidgetCache[aFeature] = dumpNode(theNode);
+    myDescriptionCache[aFeature] = getProperty(theNode, FEATURE_TEXT);
   }
   //Process SOURCE nodes.
   Config_XMLReader::processNode(theNode);

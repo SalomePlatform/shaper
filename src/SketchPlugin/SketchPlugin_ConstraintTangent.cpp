@@ -23,8 +23,8 @@ SketchPlugin_ConstraintTangent::SketchPlugin_ConstraintTangent()
 
 void SketchPlugin_ConstraintTangent::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_ConstraintTangent::execute()

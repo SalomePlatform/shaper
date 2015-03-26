@@ -4,9 +4,9 @@
         
     SketchPlugin_ConstraintMirror
         static const std::string MY_CONSTRAINT_MIRROR_ID("SketchConstraintMirror");
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefListAttr::type());
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefListAttr::type());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefListAttr::typeId());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefListAttr::typeId());
 
 """
 from GeomDataAPI import *

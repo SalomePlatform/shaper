@@ -423,6 +423,15 @@ bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityO
     std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
     for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
       if ((*aIt) == aRes)
+// TODO(nds): v1.0.2 (master)
+//  // Check the acceptability of the object as attribute
+//  aValidator = aValidators.begin();
+//  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+//  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
+//    const ModelAPI_RefAttrValidator* aAttrValidator =
+//        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+//    if (aAttrValidator) {
+//      if (!aAttrValidator->isValid(myFeature, *aArgs, theObj, theShape)) {
         return false;
     }
   }

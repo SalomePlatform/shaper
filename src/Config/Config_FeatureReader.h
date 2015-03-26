@@ -16,7 +16,6 @@
 
 #include <string>
 #include <list>
-#include <map>
 
 class Config_FeatureMessage;
 
@@ -50,21 +49,7 @@ class Config_FeatureReader : public Config_XMLReader
   void fillFeature(xmlNodePtr theRoot, 
                    const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
 
-  /// Stores an attribute in internal map for later use.
-  /// Key is "Node_Name:Node_Attribute" and value is getProperty(theNodeAttribute)
-  void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
-  /// Restores an attribute from internal map.
-  std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
-  /// Restores an attribute from internal map.
-  std::string restoreAttribute(const char* theNodeName, const char* theNodeAttribute);
-
-  bool cleanupAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
-  bool cleanupAttribute(const char* theNodeName, const char* theNodeAttribute);
-
  private:
-  /// A map to store all parent's attributes.
-  /// The key has from "Node_Name:Node_Attribute"
-  std::map<std::string, std::string> myParentAttributes;
   std::string myLibraryName;
 
   std::list<std::string> myFeatures;

@@ -21,6 +21,9 @@
   #include "GeomAPI_Pnt.h"
   #include "GeomAPI_XY.h"
   #include "GeomAPI_XYZ.h"
+
+  #include <memory>
+  #include <string>
 %}
 
 // to avoid error on this

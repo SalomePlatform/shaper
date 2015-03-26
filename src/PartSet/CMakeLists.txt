@@ -47,6 +47,7 @@ SET(PROJECT_LIBRARIES
     Config
     GeomAPI
     GeomValidators
+    GeomDataAPI
     ${QT_LIBRARIES}
     ${CAS_KERNEL}
     ${CAS_SHAPE}

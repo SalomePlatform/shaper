@@ -13,7 +13,7 @@ aDocument = aSession.moduleDocument()
 #=========================================================================
 aSession.startOperation()
 aSketchCommonFeature = aDocument.addFeature("Sketch")
-aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
+aSketchFeature = featureToCompositeFeature(aSketchCommonFeature)
 assert (aSketchFeature.getKind() == "Sketch")
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)

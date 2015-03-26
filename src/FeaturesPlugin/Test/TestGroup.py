@@ -6,7 +6,7 @@
         static const std::string MY_GROUP_ID("Group");
         static const std::string MY_GROUP_LIST_ID("group_list");
         
-        data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::type());
+        data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 """
 #=========================================================================
 # Initialization of the test
@@ -28,7 +28,7 @@ aPart = aSession.activeDocument()
 # Create a sketch with triangle and extrude it
 #=========================================================================
 aSession.startOperation()
-aTriangleSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aTriangleSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aTriangleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirX"))

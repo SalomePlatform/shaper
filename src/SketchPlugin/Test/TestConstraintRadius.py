@@ -12,9 +12,9 @@
         
     SketchPlugin_ConstraintRadius
         static const std::string MY_CONSTRAINT_RADIUS_ID("SketchConstraintRadius");
-        data()->addAttribute(SketchPlugin_Constraint::VALUE(),    ModelAPI_AttributeDouble::type());
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-        data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::type());
+        data()->addAttribute(SketchPlugin_Constraint::VALUE(),    ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+        data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
 
 """
 from GeomDataAPI import *
@@ -33,7 +33,7 @@ aDocument = aSession.moduleDocument()
 #=========================================================================
 aSession.startOperation()
 aSketchCommonFeature = aDocument.addFeature("Sketch")
-aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
+aSketchFeature = featureToCompositeFeature(aSketchCommonFeature)
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
