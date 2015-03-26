@@ -4,7 +4,7 @@
         
     SketchPlugin_ConstraintVertical
         static const std::string MY_CONSTRAINT_VERTICAL_ID("SketchConstraintVertical");
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
 
 """
 from GeomDataAPI import *

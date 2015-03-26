@@ -19,6 +19,7 @@
 #include <Config_AttributeMessage.h>
 #include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
+#include <Config_ValidatorReader.h>
 #include <ModelAPI_ResultPart.h>
 
 #include <TDF_CopyTool.hxx>
@@ -351,8 +352,15 @@ void Model_Session::LoadPluginsInfo()
     return;
 
   // Read plugins information from XML files
-  Config_ModuleReader aXMLReader(Config_FeatureMessage::MODEL_EVENT());
-  aXMLReader.readAll();
+  Config_ModuleReader aModuleReader(Config_FeatureMessage::MODEL_EVENT());
+  aModuleReader.readAll();
+  std::set<std::string> aFiles = aModuleReader.modulePluginFiles();
+  std::set<std::string>::iterator it = aFiles.begin();
+  for ( ; it != aFiles.end(); it++ ) {
+    Config_ValidatorReader aValidatorReader (*it);
+    aValidatorReader.readAll();
+  };
+
 }
 
 void Model_Session::registerPlugin(ModelAPI_Plugin* thePlugin)

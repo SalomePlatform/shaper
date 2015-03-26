@@ -54,7 +54,7 @@ const std::string& ExchangePlugin_ImportFeature::getKind()
  */
 void ExchangePlugin_ImportFeature::initAttributes()
 {
-  data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::type());
+  data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
 }
 
 /*

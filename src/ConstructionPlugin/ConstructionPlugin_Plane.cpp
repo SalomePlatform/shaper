@@ -23,15 +23,15 @@ ConstructionPlugin_Plane::ConstructionPlugin_Plane()
 
 void ConstructionPlugin_Plane::initAttributes()
 {
-  data()->addAttribute(ConstructionPlugin_Plane::METHOD(), ModelAPI_AttributeString::type());
+  data()->addAttribute(ConstructionPlugin_Plane::METHOD(), ModelAPI_AttributeString::typeId());
   // Face & Distance
-  data()->addAttribute(ConstructionPlugin_Plane::FACE(),  ModelAPI_AttributeSelection::type());
-  data()->addAttribute(ConstructionPlugin_Plane::DISTANCE(), ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Plane::FACE(),  ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(ConstructionPlugin_Plane::DISTANCE(), ModelAPI_AttributeDouble::typeId());
   // General equation
-  data()->addAttribute(ConstructionPlugin_Plane::A(),  ModelAPI_AttributeDouble::type());
-  data()->addAttribute(ConstructionPlugin_Plane::B(),  ModelAPI_AttributeDouble::type());
-  data()->addAttribute(ConstructionPlugin_Plane::C(),  ModelAPI_AttributeDouble::type());
-  data()->addAttribute(ConstructionPlugin_Plane::D(),  ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Plane::A(),  ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Plane::B(),  ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Plane::C(),  ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Plane::D(),  ModelAPI_AttributeDouble::typeId());
 }
 
 void ConstructionPlugin_Plane::execute()

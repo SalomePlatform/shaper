@@ -111,6 +111,40 @@ void PartSet_WidgetShapeSelector::createExternal(ObjectPtr theSelectedObject,
   if (aObj != myExternalObject) {
     removeExternal();
     myExternalObject = aObj;
+// TODO(nds) v1.0.2 master
+//  // Check the acceptability of the object and shape as validator attribute
+//  AttributePtr aPntAttr;
+//  DataPtr aData = myFeature->data();
+//  if (theShape.get() != NULL) {
+//    AttributePtr aAttr = aData->attribute(attributeID());
+//    AttributeRefAttrPtr aRefAttr =
+//      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
+//    if (aRefAttr) {
+//      TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+//      aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theObj, aShape, mySketch);
+//    }
+//  }
+//  // Check the acceptability of the object as attribute
+//  aValidator = aValidators.begin();
+//  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+//  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
+//    const ModelAPI_RefAttrValidator* aAttrValidator =
+//        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+//    if (aAttrValidator) {
+//      if (aPntAttr.get() != NULL)
+//      {
+//        if (!aAttrValidator->isValid(myFeature, *aArgs, aPntAttr)) {
+//          return false;
+//        }
+//      }
+//      else
+//      {
+//        if (!aAttrValidator->isValid(myFeature, *aArgs, theObj, theShape)) {
+//          return false;
+//        }
+//      }
+//    }
+// ======= end of todo
   }
 }
 

@@ -24,7 +24,7 @@ class ModelAPI_AttributeDouble : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual double value() = 0;
 
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type()
+  MODELAPI_EXPORT static std::string typeId()
   {
     return "Double";
   }

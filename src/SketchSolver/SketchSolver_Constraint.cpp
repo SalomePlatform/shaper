@@ -341,9 +341,9 @@ AttrType typeOfAttribute(std::shared_ptr<ModelAPI_Attribute> theAttribute)
   } else {
     if (anAttrRef->attr().get() != NULL) {
       const std::string aType = anAttrRef->attr()->attributeType();
-      if (aType == GeomDataAPI_Point2D::type())
+      if (aType == GeomDataAPI_Point2D::typeId())
         return POINT2D;
-      if (aType == GeomDataAPI_Point2D::type())
+      if (aType == GeomDataAPI_Point2D::typeId())
         return POINT2D;
     }
   }

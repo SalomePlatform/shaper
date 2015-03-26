@@ -29,9 +29,9 @@ const std::string& ConstructionPlugin_Point::getKind()
 
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble::type());
-  data()->addAttribute(ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble::type());
-  data()->addAttribute(ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble::typeId());
 }
 
 void ConstructionPlugin_Point::execute()

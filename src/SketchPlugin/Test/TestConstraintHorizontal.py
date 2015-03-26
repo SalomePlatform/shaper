@@ -4,7 +4,7 @@
         
     SketchPlugin_ConstraintHorizontal
         static const std::string MY_CONSTRAINT_HORIZONTAL_ID("SketchConstraintHorizontal");
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
 
 """
 from GeomDataAPI import *

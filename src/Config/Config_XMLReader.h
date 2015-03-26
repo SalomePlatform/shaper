@@ -14,6 +14,7 @@
 
 #include <cstdarg>
 #include <string>
+#include <map>
 
 //>> Forward declaration of xmlNodePtr.
 typedef struct _xmlNode xmlNode;
@@ -84,21 +85,22 @@ class Config_XMLReader
   xmlNodePtr node(void* theNode);
   /// Gets xml node name
   std::string getNodeName(xmlNodePtr theNode);
-  /*!
-   * \brief Retrieves all the necessary info from the validator node.
-   * Sends ValidatorLoaded event
-   */
-  void processValidator(xmlNodePtr theNode);
-  /*!
-   * \brief Retrieves all the necessary info from the SelectionFilter node.
-   * Sends SelectionFilterLoaded event
-   */
-  void processSelectionFilter(xmlNodePtr theNode);
+  /// Stores an attribute in internal map for later use.
+  /// Key is "Node_Name:Node_Attribute" and value is getProperty(theNodeAttribute)
+  void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  /// Restores an attribute from internal map.
+  std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  /// Restores an attribute from internal map.
+  std::string restoreAttribute(const char* theNodeName, const char* theNodeAttribute);
+  bool cleanupAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  bool cleanupAttribute(const char* theNodeName, const char* theNodeAttribute);
 
  protected:
-  std::string myCurrentFeature; ///< Name of currently processed feature
   std::string myDocumentPath; ///< Path to the xml document
   xmlDocPtr myXmlDoc; ///< Root of the xml document
+  /// A map to store all parent's attributes.
+  /// The key has from "Node_Name:Node_Attribute"
+  std::map<std::string, std::string> myCachedAttributes;
 };
 
 #endif /* CONFIG_XMLREADER_H_ */

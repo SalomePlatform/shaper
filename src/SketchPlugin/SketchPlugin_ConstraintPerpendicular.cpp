@@ -28,8 +28,8 @@ SketchPlugin_ConstraintPerpendicular::SketchPlugin_ConstraintPerpendicular()
 
 void SketchPlugin_ConstraintPerpendicular::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_ConstraintPerpendicular::execute()

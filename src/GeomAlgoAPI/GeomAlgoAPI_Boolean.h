@@ -8,9 +8,12 @@
 #define GeomAlgoAPI_Boolean_H_
 
 #include <GeomAlgoAPI.h>
-#include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
+
+#include <GeomAPI_Shape.h>
+#include <GeomAPI_Interface.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
+
 #include <memory>
 
 /**\class GeomAlgoAPI_Boolean

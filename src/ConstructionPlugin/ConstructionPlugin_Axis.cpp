@@ -29,13 +29,13 @@ ConstructionPlugin_Axis::ConstructionPlugin_Axis()
 void ConstructionPlugin_Axis::initAttributes()
 {
   data()->addAttribute(ConstructionPlugin_Axis::METHOD(),
-                       ModelAPI_AttributeString::type());
+                       ModelAPI_AttributeString::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::POINT_FIRST(),
-                       ModelAPI_AttributeSelection::type());
+                       ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::POINT_SECOND(),
-                       ModelAPI_AttributeSelection::type());
+                       ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::CYLINDRICAL_FACE(),
-                       ModelAPI_AttributeSelection::type());
+                       ModelAPI_AttributeSelection::typeId());
 }
 
 void ConstructionPlugin_Axis::createAxisByTwoPoints()

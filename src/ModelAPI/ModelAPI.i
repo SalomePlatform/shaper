@@ -9,8 +9,6 @@
 }
 
 %{
-  #include "GeomAPI_Interface.h"
-  #include "GeomAPI_Shape.h"
   #include "ModelAPI.h"
   #include "ModelAPI_Document.h"
   #include "ModelAPI_Session.h"
@@ -40,20 +38,23 @@
   #include "ModelAPI_ResultParameters.h"
   #include "ModelAPI_ResultGroup.h"
   #include "ModelAPI_Tools.h"
+
+  #include <memory>
+  #include <string>
   
   template<class T1, class T2> 
   std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject)
   { 
     return std::dynamic_pointer_cast<T1>(theObject); 
   }
-  
+
 %}
 
 // to avoid error on this
 #define MODELAPI_EXPORT
-#define GEOMAPI_EXPORT
 
 // standard definitions
+%include "GeomAPI.i"
 %include "typemaps.i"
 %include "std_string.i"
 %include "std_list.i"
@@ -63,11 +64,11 @@
 %feature("director") ModelAPI_Plugin;
 %feature("director") ModelAPI_Object;
 %feature("director") ModelAPI_Feature;
+%feature("director") ModelAPI_CompositeFeature;
+%feature("director") ModelAPI_Data;
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()
-%shared_ptr(GeomAPI_Interface)
-%shared_ptr(GeomAPI_Shape)
 %shared_ptr(ModelAPI_Document)
 %shared_ptr(ModelAPI_Session)
 %shared_ptr(ModelAPI_Plugin)
@@ -97,8 +98,6 @@
 %shared_ptr(ModelAPI_ResultParameters)
 
 // all supported interfaces
-%include "GeomAPI_Interface.h"
-%include "GeomAPI_Shape.h"
 %include "ModelAPI_Document.h"
 %include "ModelAPI_Session.h"
 %include "ModelAPI_Plugin.h"
@@ -135,8 +134,9 @@
 
 // std::dynamic_pointer_cast
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
-%template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
-%template(modelAPI_Feature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
+%template(featureToCompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(objectToFeature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
+%template(compositeFeatureToFeature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_CompositeFeature>;
 
 %template(modelAPI_Result) shared_ptr_cast<ModelAPI_Result, ModelAPI_Object>;
 %template(modelAPI_ResultConstruction) shared_ptr_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;

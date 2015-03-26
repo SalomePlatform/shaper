@@ -6,6 +6,10 @@
   #include "GeomDataAPI_Point.h"
   #include "GeomDataAPI_Dir.h"
   #include "GeomDataAPI_Point2D.h"
+
+  #include <memory>
+  #include <string>
+  #include <list>
   
   template<class T> std::shared_ptr<T> castTo(std::shared_ptr<ModelAPI_Attribute> theObject) 
   { 

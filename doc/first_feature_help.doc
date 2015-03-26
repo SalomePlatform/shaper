@@ -118,13 +118,13 @@ And like a plugin implements a functionality to create 'feature' objects by stri
 \code
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute("DoubleCounterData", ModelAPI_AttributeDouble::type());
+  data()->addAttribute("DoubleCounterData", ModelAPI_AttributeDouble::typeId());
 }
 \endcode
 Python:
 \code
   def initAttributes(self):
-    self.data().addAttribute("DoubleCounterData", ModelAPI.ModelAPI_AttributeDouble.type())
+    self.data().addAttribute("DoubleCounterData", ModelAPI.ModelAPI_AttributeDouble.typeId())
 \endcode
 As you may notice, this method defines that feature has a widget with "DoubleCounterData" id, which has Double type. Therefore, if your feature uses, in example, three widgets, the `initAttributes()` method should 'init' three attributes.
 \n

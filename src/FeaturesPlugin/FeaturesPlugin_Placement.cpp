@@ -26,10 +26,10 @@ FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 
 void FeaturesPlugin_Placement::initAttributes()
 {
-  data()->addAttribute(FeaturesPlugin_Placement::BASE_OBJECT_ID(), ModelAPI_AttributeSelection::type());
-  data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_OBJECT_ID(), ModelAPI_AttributeSelection::type());
-  data()->addAttribute(FeaturesPlugin_Placement::REVERSE_ID(), ModelAPI_AttributeBoolean::type());
-  data()->addAttribute(FeaturesPlugin_Placement::CENTERING_ID(), ModelAPI_AttributeBoolean::type());
+  data()->addAttribute(FeaturesPlugin_Placement::BASE_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Placement::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(FeaturesPlugin_Placement::CENTERING_ID(), ModelAPI_AttributeBoolean::typeId());
 }
 
 void FeaturesPlugin_Placement::execute()

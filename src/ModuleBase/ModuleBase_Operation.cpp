@@ -135,8 +135,17 @@ void ModuleBase_Operation::start()
   }
   ModelAPI_Session::get()->startOperation(anId.toStdString());
 
-  if (!myIsEditing)
-    createFeature();
+  if (!myIsEditing) {
+    FeaturePtr aFeature = createFeature();
+    // if the feature is not created, there is no sense to start the operation
+    if (aFeature.get() == NULL) {
+      // it is necessary to abor the operation in the session and emit the aborted signal
+      // in order to update commands status in the workshop, to be exact the feature action
+      // to be unchecked
+      abort();
+      return;
+    }
+  }
 
   startOperation();
   emit started();

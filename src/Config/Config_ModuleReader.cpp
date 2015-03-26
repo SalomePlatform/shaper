@@ -48,6 +48,11 @@ const std::map<std::string, std::string>& Config_ModuleReader::featuresInFiles()
   return myFeaturesInFiles;
 }
 
+const std::set<std::string>& Config_ModuleReader::modulePluginFiles() const
+{
+  return myPluginFiles;
+}
+
 /*!
  * Get module name from plugins.xml
  * (property "module")
@@ -64,6 +69,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     if (!hasRequiredModules(theNode))
       return;
     std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
+    if (!aPluginConf.empty()) myPluginFiles.insert(aPluginConf);
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
     std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);

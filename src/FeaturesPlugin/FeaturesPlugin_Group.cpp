@@ -22,8 +22,8 @@ FeaturesPlugin_Group::FeaturesPlugin_Group()
 
 void FeaturesPlugin_Group::initAttributes()
 {
-  //data()->addAttribute(FeaturesPlugin_Group::NAME_ID(), ModelAPI_AttributeString::type());
-  data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::type());
+  //data()->addAttribute(FeaturesPlugin_Group::NAME_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
 
 void FeaturesPlugin_Group::execute()

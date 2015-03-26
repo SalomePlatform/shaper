@@ -23,8 +23,8 @@ SketchPlugin_ConstraintEqual::SketchPlugin_ConstraintEqual()
 
 void SketchPlugin_ConstraintEqual::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_ConstraintEqual::execute()

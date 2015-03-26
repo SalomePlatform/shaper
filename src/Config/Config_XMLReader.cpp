@@ -10,8 +10,6 @@
 #include <Config_XMLReader.h>
 #include <Config_Keywords.h>
 #include <Config_Common.h>
-#include <Config_ValidatorMessage.h>
-#include <Config_SelectionFilterMessage.h>
 #include <Config_PropManager.h>
 
 #include <Events_Loop.h>
@@ -77,12 +75,8 @@ void Config_XMLReader::processNode(xmlNodePtr theNode)
     Config_XMLReader aSourceReader = Config_XMLReader(aSourceFile);
     readRecursively(aSourceReader.findRoot());
 #ifdef _DEBUG
-    std::cout << "Config_XMLReader::sourced node: " << aSourceFile << std::endl;
+    //std::cout << "Config_XMLReader::sourced node: " << aSourceFile << std::endl;
 #endif
-  } else if (isNode(theNode, NODE_VALIDATOR, NULL)) {
-    processValidator(theNode);
-  } else if (isNode(theNode, NODE_SELFILTER, NULL)) {
-    processSelectionFilter(theNode);
   }
 }
 
@@ -150,45 +144,43 @@ std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
   return result;
 }
 
-void Config_XMLReader::processValidator(xmlNodePtr theNode)
+void Config_XMLReader::storeAttribute(xmlNodePtr theNode, const char* theAttribute)
 {
-  Events_ID aValidatoEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
-  Events_Loop* aEvLoop = Events_Loop::loop();
-  std::shared_ptr<Config_ValidatorMessage> 
-    aMessage(new Config_ValidatorMessage(aValidatoEvent, this));
-  std::string aValidatorId;
-  std::list<std::string> aParameters;
-  getParametersInfo(theNode, aValidatorId, aParameters);
-  aMessage->setValidatorId(aValidatorId);
-  aMessage->setValidatorParameters(aParameters);
-  xmlNodePtr aFeatureOrWdgNode = theNode->parent;
-  if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
-    aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
-  } else {
-    aMessage->setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
-    aMessage->setFeatureId(myCurrentFeature);
+  std::string aKey = getNodeName(theNode) + ":" + std::string(theAttribute);
+  std::string aValue = getProperty(theNode, theAttribute);
+  if(!aValue.empty()) {
+    myCachedAttributes[aKey] = aValue;
   }
-  aEvLoop->send(aMessage);
 }
 
-void Config_XMLReader::processSelectionFilter(xmlNodePtr theNode)
+std::string Config_XMLReader::restoreAttribute(xmlNodePtr theNode, const char* theAttribute)
 {
-  Events_ID aFilterEvent = Events_Loop::eventByName(EVENT_SELFILTER_LOADED);
-  Events_Loop* aEvLoop = Events_Loop::loop();
-  std::shared_ptr<Config_SelectionFilterMessage> aMessage =
-      std::make_shared<Config_SelectionFilterMessage>(aFilterEvent, this);
-  std::string aSelectionFilterId;
-  std::list<std::string> aParameters;
-  getParametersInfo(theNode, aSelectionFilterId, aParameters);
-  aMessage->setSelectionFilterId(aSelectionFilterId);
-  aMessage->setFilterParameters(aParameters);
+  return restoreAttribute(getNodeName(theNode).c_str(), theAttribute);
+}
 
-  xmlNodePtr aFeatureOrWdgNode = theNode->parent;
-  if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
-    aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
-  } else {
-    aMessage->setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
-    aMessage->setFeatureId(myCurrentFeature);
+std::string Config_XMLReader::restoreAttribute(const char* theNodeName, const char* theAttribute)
+{
+  std::string aKey = std::string(theNodeName) + ":" + std::string(theAttribute);
+  std::string result = "";
+  if(myCachedAttributes.find(aKey) != myCachedAttributes.end()) {
+    result = myCachedAttributes[aKey];
   }
-  aEvLoop->send(aMessage);
+  return result;
+}
+
+bool Config_XMLReader::cleanupAttribute(xmlNodePtr theNode, const char* theNodeAttribute)
+{
+  return cleanupAttribute(getNodeName(theNode).c_str(), theNodeAttribute);
+}
+
+bool Config_XMLReader::cleanupAttribute(const char* theNodeName, const char* theNodeAttribute)
+{
+  std::string aKey = std::string(theNodeName) + ":" + std::string(theNodeAttribute);
+  bool result = false;
+  std::map<std::string, std::string>::iterator anEntry = myCachedAttributes.find(aKey);
+  if( anEntry != myCachedAttributes.end()) {
+    myCachedAttributes.erase(anEntry);
+    result = true;
+  }
+  return result;
 }

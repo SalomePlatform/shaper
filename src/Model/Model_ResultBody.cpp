@@ -46,7 +46,7 @@ void Model_ResultBody::initAttributes()
 {
   // append the color attribute. It is empty, the attribute will be filled by a request
   DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
 }
 
 void Model_ResultBody::colorConfigInfo(std::string& theSection, std::string& theName,

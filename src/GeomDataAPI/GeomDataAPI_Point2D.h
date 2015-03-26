@@ -7,7 +7,7 @@
 #ifndef GeomDataAPI_Point2D_H_
 #define GeomDataAPI_Point2D_H_
 
-#include "GeomDataAPI.h"
+#include <GeomDataAPI.h>
 #include <ModelAPI_Attribute.h>
 
 class GeomAPI_Pnt2d;
@@ -33,29 +33,21 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   virtual std::shared_ptr<GeomAPI_Pnt2d> pnt() = 0;
 
   /// Appends the delta values to point
-  void move(const double theDeltaX, const double theDeltaY)
-  {
-    setValue(x() + theDeltaX, y() + theDeltaY);
-  }
-
+  GEOMDATAAPI_EXPORT void move(const double theDeltaX, const double theDeltaY);
 
   /// Returns the type of this class of attributes
-  static inline std::string type()
+  static std::string typeId()
   {
     return std::string("Point2D");
   }
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType()
-  {
-    return type();
-  }
+  GEOMDATAAPI_EXPORT virtual std::string attributeType();
 
  protected:
   /// Objects are created for features automatically
-  GeomDataAPI_Point2D()
-  {
-  }
+  GEOMDATAAPI_EXPORT GeomDataAPI_Point2D();
+  GEOMDATAAPI_EXPORT virtual ~GeomDataAPI_Point2D();
 };
 
 #endif

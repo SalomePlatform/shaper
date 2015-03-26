@@ -33,7 +33,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   virtual bool update() = 0;
 
   /// Returns the type of this class of attributes
-  static std::string type()
+  static std::string typeId()
   {
     return "Selection";
   }

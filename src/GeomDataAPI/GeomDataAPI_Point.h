@@ -35,22 +35,18 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   virtual std::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
   /// Returns the type of this class of attributes
-  static inline std::string type()
+  static std::string typeId()
   {
     return std::string("Point");
   }
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType()
-  {
-    return type();
-  }
+  GEOMDATAAPI_EXPORT virtual std::string attributeType();
 
  protected:
   /// Objects are created for features automatically
-  GeomDataAPI_Point()
-  {
-  }
+  GEOMDATAAPI_EXPORT GeomDataAPI_Point();
+  GEOMDATAAPI_EXPORT virtual ~GeomDataAPI_Point();
 };
 
 #endif

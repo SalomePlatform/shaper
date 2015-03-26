@@ -66,6 +66,7 @@ SET(PROJECT_LIBRARIES
     GeomValidators
     ModelAPI
     SketcherPrs
+    GeomDataAPI
     ${CAS_KERNEL}
     ${CAS_SHAPE}
 )

@@ -128,6 +128,7 @@ void ModelAPI_Feature::eraseResults()
     // flush it to avoid left presentations after input of invalid arguments (radius=0)
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
     Events_Loop::loop()->flush(anEvent);
+    Events_Loop::loop()->flush(EVENT_DISP);
   }
 }
 

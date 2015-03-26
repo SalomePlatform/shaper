@@ -54,7 +54,7 @@ bool GeomValidators_EdgeOrVertex::isValid(const AttributePtr& theAttribute,
       AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
       if (anAttr.get() != NULL) {
         AttributePtr aRefAttr = anAttr->attr();
-        aValid = aRefAttr.get() != NULL && aRefAttr->attributeType() == GeomDataAPI_Point2D::type();
+        aValid = aRefAttr.get() != NULL && aRefAttr->attributeType() == GeomDataAPI_Point2D::typeId();
       }
     }
   }

@@ -23,7 +23,7 @@ SketchPlugin_ConstraintHorizontal::SketchPlugin_ConstraintHorizontal()
 
 void SketchPlugin_ConstraintHorizontal::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_ConstraintHorizontal::execute()
