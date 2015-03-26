@@ -4,7 +4,7 @@
 // Created:     27 Feb 2015
 // Author:      Natalia ERMOLAEVA
 
-#include "SketchPlugin_ShapeValidator.h"
+#include "SketchPlugin_ExternalValidator.h"
 #include "SketchPlugin_Feature.h"
 
 #include <ModelAPI_Session.h>
@@ -12,7 +12,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeRefAttr.h>
 
-bool SketchPlugin_ShapeValidator::isValid(const AttributePtr& theAttribute,
+bool SketchPlugin_ExternalValidator::isValid(const AttributePtr& theAttribute,
                                           const std::list<std::string>& theArguments) const
 {
   if (theArguments.size() != 1)
@@ -32,7 +32,7 @@ bool SketchPlugin_ShapeValidator::isValid(const AttributePtr& theAttribute,
   return true;
 }
 
-bool SketchPlugin_ShapeValidator::isExternalAttribute(const AttributePtr& theAttribute) const
+bool SketchPlugin_ExternalValidator::isExternalAttribute(const AttributePtr& theAttribute) const
 {
   bool isExternal = false;
   AttributeRefAttrPtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);

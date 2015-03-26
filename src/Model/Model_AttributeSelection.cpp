@@ -117,7 +117,8 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
       selectConstruction(theContext, theSubShape);
     }
   }
-  myIsInitialized = true;
+  //the attribute initialized state should be changed by sendAttributeUpdated only
+  //myIsInitialized = true;
 
   std::string aSelName = namingName();
   if(!aSelName.empty())
