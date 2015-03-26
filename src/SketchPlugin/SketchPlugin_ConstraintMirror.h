@@ -38,6 +38,13 @@ class SketchPlugin_ConstraintMirror : public SketchPlugin_ConstraintBase
     return MY_KIND;
   }
 
+  /// List of objects to be mirrored
+  inline static const std::string& MIRROR_LIST_ID()
+  {
+    static const std::string MY_MIRROR_LIST_ID("ConstraintMirrorList");
+    return MY_MIRROR_LIST_ID;
+  }
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
