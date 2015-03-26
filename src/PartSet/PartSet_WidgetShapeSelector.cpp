@@ -18,7 +18,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
 
-bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape)
+bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
   ObjectPtr aSelectedObject = theSelectedObject;
   GeomShapePtr aShape = theShape;
@@ -73,7 +73,7 @@ bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObje
       }
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, aShape);
+  return ModuleBase_WidgetShapeSelector::setObject(aSelectedObject, aShape);
 }
 
 //********************************************************************

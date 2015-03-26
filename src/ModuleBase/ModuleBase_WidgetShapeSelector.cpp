@@ -132,8 +132,8 @@ bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject,
-                                                          GeomShapePtr theShape)
+bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
+                                               GeomShapePtr theShape)
 {
   bool isChanged = false;
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theSelectedObject);
@@ -392,7 +392,7 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
-  storeAttributeValues(myObject, myShape);
+  setObject(myObject, myShape);
   AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
   if (aRefAttr) {
     if (!myIsObject)
@@ -446,7 +446,7 @@ bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityO
   if (!acceptSubShape(aShape))
     return false;
 
-  storeAttributeValues(aObject, aShape);
+  setObject(aObject, aShape);
   return true;
 }
 

@@ -47,7 +47,7 @@ protected:
   /// the specific type and set the given values
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
-  virtual bool storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+  virtual bool setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different

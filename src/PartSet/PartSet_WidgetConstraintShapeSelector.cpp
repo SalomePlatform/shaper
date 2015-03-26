@@ -12,7 +12,7 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
-bool PartSet_WidgetConstraintShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape)
+bool PartSet_WidgetConstraintShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
   ObjectPtr aSelectedObject = theSelectedObject;
 
@@ -29,5 +29,5 @@ bool PartSet_WidgetConstraintShapeSelector::storeAttributeValues(ObjectPtr theSe
         return false;
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, theShape);
+  return ModuleBase_WidgetShapeSelector::setObject(aSelectedObject, theShape);
 }
