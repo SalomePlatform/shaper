@@ -19,6 +19,7 @@ const static char* NODE_FEATURE = "feature";
 const static char* NODE_SOURCE = "source";
 const static char* NODE_VALIDATOR = "validator";
 const static char* NODE_SELFILTER = "selection_filter";
+const static char* NODE_XMLPARENT = "libxml_parent";
 
 // Widgets
 const static char* WDG_INFO = "label";
