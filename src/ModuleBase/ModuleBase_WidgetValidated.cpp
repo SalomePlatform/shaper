@@ -41,7 +41,12 @@ bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
 //********************************************************************
 bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& theOwner)
 {
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+
   // stores the current values of the widget attribute
+  aData->blockSendAttributeUpdated(true);
+  bool isAttributeBlocked = anAttribute->blockSetInitialized(true);
   storeAttributeValue();
 
   // saves the owner value to the widget attribute
@@ -52,6 +57,8 @@ bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& the
 
   // restores the current values of the widget attribute
   restoreAttributeValue(aValid);
+  aData->blockSendAttributeUpdated(false);
+  anAttribute->blockSetInitialized(isAttributeBlocked);
 
   return aValid;
 }
@@ -68,9 +75,6 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
-  aData->blockSendAttributeUpdated(true);
-
-    // 3. check the acceptability of the current values
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
   bool aValid = true;
@@ -81,8 +85,6 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
       aValid = aAttrValidator->isValid(anAttribute, *aArgs);
     }
   }
-  aData->blockSendAttributeUpdated(false);
-
   return aValid;
 }
 

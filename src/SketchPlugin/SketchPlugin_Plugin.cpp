@@ -20,7 +20,7 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_Validators.h>
-#include <SketchPlugin_ShapeValidator.h>
+#include <SketchPlugin_ExternalValidator.h>
 
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
@@ -51,13 +51,12 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttr",
                               new SketchPlugin_DistanceAttrValidator);  
-  //aFactory->registerValidator("SketchPlugin_DifferentObjects",
-  //                            new SketchPlugin_DifferentObjectsValidator);
-  aFactory->registerValidator("SketchPlugin_ShapeValidator", new SketchPlugin_ShapeValidator);
+  aFactory->registerValidator("SketchPlugin_ExternalValidator",
+                              new SketchPlugin_ExternalValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
-
+  
   Config_PropManager::registerProp("Visualization", "sketch_entity_color", "Sketch enity color",
                                    Config_Prop::Color, SKETCH_ENTITY_COLOR);
 

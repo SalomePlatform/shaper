@@ -25,6 +25,7 @@ class ModelAPI_Attribute
  protected:
   // accessible from the attributes
   bool myIsInitialized; ///< is some value assigned to this attribute
+  bool mySetInitializedBlocked; ///< is initialized blocked
   bool myIsArgument;    ///< is this attribute used as an argument for execution
   bool myIsImmutable;   ///< is this attribute can be changed programmatically (e.g. by constraint)
 
@@ -47,6 +48,11 @@ class ModelAPI_Attribute
 
   /// Makes attribute initialized
   MODELAPI_EXPORT void setInitialized();
+
+  /// Blocks sending "attribute updated" if theBlock is true
+  /// \param theBlock a block value
+  /// \return the previous block value
+  MODELAPI_EXPORT bool blockSetInitialized(const bool theBlock);
 
   /// Set this attribute is argument for result (change of this attribute requires update of result).
   /// By default it is true.
