@@ -4,8 +4,8 @@
 // Created:     27 Feb 2015
 // Author:      Natalia ERMOLAEVA
 
-#ifndef SketchPlugin_ShapeValidator_H
-#define SketchPlugin_ShapeValidator_H
+#ifndef SketchPlugin_ExternalValidator_H
+#define SketchPlugin_ExternalValidator_H
 
 #include <SketchPlugin.h>
 #include <ModelAPI_AttributeValidator.h>
@@ -16,7 +16,7 @@
  *
  * Allows to select points only.
  */
-class SketchPlugin_ShapeValidator : public ModelAPI_AttributeValidator
+class SketchPlugin_ExternalValidator : public ModelAPI_AttributeValidator
 {
 public:
   /// returns true if the feature of attribute do not contain external features in the given attribute and
