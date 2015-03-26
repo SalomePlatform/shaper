@@ -894,6 +894,8 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
     if (!aFilletFeature)
       return false;
     aFilletEnt[indEnt] = changeEntityFeature(aFilletFeature);
+    if (aFilletEnt[indEnt] == SLVS_E_UNKNOWN)
+      return false; // not all attributes are initialized yet
     aFilletObjInd[indEnt] = Search(aFilletEnt[indEnt], myEntities);
   }
   // At first time, for correct result, move floating points of fillet on the middle points of base objects
@@ -934,34 +936,14 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
     }
   }
 
-  // Check the fillet arc which point to be connected to
-  bool isArcInversed = false; // indicates that start and end points of arc should be connected to second and first object respectively
-  Slvs_hEntity hEnt = myEntities[aFilletObjInd[2]].point[1];
-  int aPos = Search(hEnt, myEntities);
-  Slvs_hParam anArcStartPoint = myEntities[aPos].param[0];
-  aPos = Search(anArcStartPoint, myParams);
-  double anArcPtCoord[2] = {myParams[aPos].val, myParams[aPos+1].val};
-  double aSqDistances[2];
-  int aPtInd;
-  for (int indEnt = 0; indEnt < aNbFilletEnt - 1; indEnt++) {
-    aPtInd = aBaseCoincInd[indEnt]+aShift[indEnt];
-    hEnt = myEntities[aFilletObjInd[indEnt]].point[aPtInd];
-    aPos = Search(hEnt, myEntities);
-    Slvs_hParam anObjectPoint = myEntities[aPos].param[0];
-    aPos = Search(anObjectPoint, myParams);
-    double aPtCoord[2] = {myParams[aPos].val, myParams[aPos+1].val};
-    aSqDistances[indEnt] = 
-        (anArcPtCoord[0] - aPtCoord[0]) * (anArcPtCoord[0] - aPtCoord[0]) +
-        (anArcPtCoord[1] - aPtCoord[1]) * (anArcPtCoord[1] - aPtCoord[1]);
-  }
-  if (aSqDistances[1] < aSqDistances[0])
-    isArcInversed = true;
-
   // Create list of constraints to generate fillet
+  int aPtInd;
   std::vector<Slvs_hConstraint> aConstrList;
   bool isExists = myConstraintMap.find(theConstraint) != myConstraintMap.end(); // constraint already exists
   std::vector<Slvs_hConstraint>::iterator aCMapIter =
     isExists ? myConstraintMap[theConstraint].begin() : aConstrList.begin();
+  std::vector<Slvs_hConstraint>::iterator aCMapEnd =
+    isExists ? myConstraintMap[theConstraint].end() : aConstrList.end();
   int aCurConstrPos = isExists ? Search(*aCMapIter, myConstraints) : 0;
   for (int indEnt = 0; indEnt < aNbFilletEnt - 1; indEnt++) {
     // one point of fillet object should be coincident with the point on base, non-coincident with another base object
@@ -973,7 +955,7 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       myConstraints[aCurConstrPos].ptB = aPtFillet;
       aCMapIter++;
       aCurConstrPos = Search(*aCMapIter, myConstraints);
-    } else {
+    } else if (addCoincidentPoints(aPtBase, aPtFillet)) { // the points are not connected by coincidence yet
       Slvs_Constraint aCoincConstr = Slvs_MakeConstraint(
           ++myConstrMaxID, myID, SLVS_C_POINTS_COINCIDENT, myWorkplane.h,
           0, aPtBase, aPtFillet, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
@@ -992,8 +974,9 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
         myConstraints[aCurConstrPos].ptA = aPtBase;
         myConstraints[aCurConstrPos].ptB = aPtFillet;
         aCMapIter++;
-        aCurConstrPos = Search(*aCMapIter, myConstraints);
-      } else {
+        if (aCMapIter != aCMapEnd)
+          aCurConstrPos = Search(*aCMapIter, myConstraints);
+      } else if (addCoincidentPoints(aPtBase, aPtFillet)) { // the points are not connected by coincidence yet
         aPonCurveConstr = Slvs_MakeConstraint(
             ++myConstrMaxID, myID, SLVS_C_POINTS_COINCIDENT, myWorkplane.h,
             0, aPtBase, aPtFillet, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
@@ -1006,7 +989,8 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       if (isExists) {
         myConstraints[aCurConstrPos].ptA = aPtFillet;
         aCMapIter++;
-        aCurConstrPos = Search(*aCMapIter, myConstraints);
+        if (aCMapIter != aCMapEnd)
+          aCurConstrPos = Search(*aCMapIter, myConstraints);
       } else {
         aPonCurveConstr = Slvs_MakeConstraint(
             ++myConstrMaxID, myID, SLVS_C_PT_ON_LINE, myWorkplane.h,
@@ -1018,56 +1002,13 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       myConstraints.push_back(aPonCurveConstr);
       aConstrList.push_back(aPonCurveConstr.h);
     }
-
-    // Bound point of fillet arc should be tangently coincident with a bound point of fillet object
-    aPtInd = 1 + (isArcInversed ? 1-indEnt : indEnt);
-    Slvs_hEntity aPtArc = myEntities[aFilletObjInd[2]].point[aPtInd];
-    if (isExists) {
-      myConstraints[aCurConstrPos].ptA = aPtArc;
-      myConstraints[aCurConstrPos].ptB = aPtFillet;
-      aCMapIter++;
-      aCurConstrPos = Search(*aCMapIter, myConstraints);
-      myConstraints[aCurConstrPos].entityA = aFilletEnt[2];
-      myConstraints[aCurConstrPos].entityB = aFilletEnt[indEnt];
-      myConstraints[aCurConstrPos].other = (isArcInversed ? 1-indEnt : indEnt);
-      aCMapIter++;
-      aCurConstrPos = Search(*aCMapIter, myConstraints);
-    } else {
-      Slvs_Constraint aCoincConstr = Slvs_MakeConstraint(
-          ++myConstrMaxID, myID, SLVS_C_POINTS_COINCIDENT, myWorkplane.h,
-          0, aPtArc, aPtFillet, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-      myConstraints.push_back(aCoincConstr);
-      aConstrList.push_back(aCoincConstr.h);
-      Slvs_Constraint aTangency = Slvs_MakeConstraint(
-          ++myConstrMaxID, myID, aTangentType, myWorkplane.h,
-          0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aFilletEnt[2], aFilletEnt[indEnt]);
-      aTangency.other = (isArcInversed ? 1-indEnt : indEnt);
-      aTangency.other2 = aTangentType == SLVS_C_CURVE_CURVE_TANGENT ? aBaseCoincInd[indEnt] : 0;
-      myConstraints.push_back(aTangency);
-      aConstrList.push_back(aTangency.h);
-    }
   }
 
-  // Additional constraint for fillet diameter
-  double aRadius = 0.0;  // scalar value of the constraint
-  AttributeDoublePtr aDistAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aConstrData->attribute(SketchPlugin_Constraint::VALUE()));
-  aRadius = aDistAttr->value();
-  if (isExists) {
-    myConstraints[aCurConstrPos].entityA = aFilletEnt[2];
-    myConstraints[aCurConstrPos].valA = aRadius * 2.0;
-    aCMapIter++;
-  } else {
-    Slvs_Constraint aDiamConstr = Slvs_MakeConstraint(
-        ++myConstrMaxID, myID, SLVS_C_DIAMETER, myWorkplane.h, aRadius * 2.0,
-        SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aFilletEnt[2], SLVS_E_UNKNOWN);
-    myConstraints.push_back(aDiamConstr);
-    aConstrList.push_back(aDiamConstr.h);
-
+  if (!isExists)
     myConstraintMap[theConstraint] = aConstrList;
-  }
 
   // Additional temporary constraints for base objects to be fixed
+  int aNbArcs = 0;
   for (unsigned int indAttr = 0; indAttr < 2; indAttr++) {
     if (!aBaseFeature[indAttr]) {
       AttributeRefAttrPtr aConstrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
@@ -1075,16 +1016,23 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       addTemporaryConstraintWhereDragged(aConstrAttr->attr());
       continue;
     }
-    std::list<AttributePtr> anAttributes =
-        aBaseFeature[indAttr]->data()->attributes(GeomDataAPI_Point2D::typeId());
-    std::list<AttributePtr>::iterator anIt = anAttributes.begin();
-    for ( ; anIt != anAttributes.end(); anIt++) {
-      // Arc should be fixed by center and start points only (to avoid "conflicting constraints" message)
-      if (aBaseFeature[indAttr]->getKind() == SketchPlugin_Arc::ID() &&
-          (*anIt)->id() == SketchPlugin_Arc::END_ID())
-        continue;
-      addTemporaryConstraintWhereDragged(*anIt);
+    if (aBaseFeature[indAttr]->getKind() == SketchPlugin_Line::ID()) {
+      addTemporaryConstraintWhereDragged(
+          aBaseFeature[indAttr]->attribute(SketchPlugin_Line::START_ID()));
+      addTemporaryConstraintWhereDragged(
+          aBaseFeature[indAttr]->attribute(SketchPlugin_Line::END_ID()));
+    } else if (aBaseFeature[indAttr]->getKind() == SketchPlugin_Arc::ID()) {
+      // Arc should be fixed by its center only (to avoid "conflicting constraints" message)
+      // If the fillet is made on two arc, the shared point should be fixed too
+      aNbArcs++;
+      addTemporaryConstraintWhereDragged(
+          aBaseFeature[indAttr]->attribute(SketchPlugin_Arc::CENTER_ID()));
     }
+  }
+  if (aNbArcs == 2) {
+      addTemporaryConstraintWhereDragged(aBaseCoincInd[0] == 0 ?
+          aBaseFeature[0]->attribute(SketchPlugin_Arc::START_ID()) : 
+          aBaseFeature[0]->attribute(SketchPlugin_Arc::END_ID()));
   }
   return true;
 }
