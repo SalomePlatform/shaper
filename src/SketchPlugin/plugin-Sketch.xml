@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
@@ -200,8 +200,17 @@
       <feature
         id="SketchConstraintMirror"
         title="Mirror"
-        tooltip="Create constraint mirroring group of objects"
-        internal="1" />
+        tooltip="Create constraint, mirroring group of objects">
+        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+            label="Mirror line" tooltip="Select mirror line" shape_types="edge">
+            <validator id="GeomValidators_Edge" parameters="line"/>
+        </sketch_constraint_shape_selector>
+        <multi_selector id="ConstraintMirrorList" 
+            label="List of objects"
+            tooltip="Select list of mirroring objects"
+            type_choice="Edges">
+        </multi_selector>
+      </feature>
     </group>
     
     <group id="Edit">

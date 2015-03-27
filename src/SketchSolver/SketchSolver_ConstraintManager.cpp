@@ -17,6 +17,7 @@
 #include <ModelAPI_Attribute.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -104,10 +105,19 @@ void SketchSolver_ConstraintManager::processEvent(
         }
       }
       // then get anything but not the sketch
+      // at first, add coincidence constraints, because they may be used by other constraints
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (!aFeature)
+        if (!aFeature || aFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
+          continue;
+        changeConstraintOrEntity(aFeature);
+      }
+      // after that, add all features except coincidence
+      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+        std::shared_ptr<SketchPlugin_Feature> aFeature = 
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+        if (!aFeature || aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID())
           continue;
         changeConstraintOrEntity(aFeature);
       }

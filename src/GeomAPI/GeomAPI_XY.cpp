@@ -37,7 +37,16 @@ void GeomAPI_XY::setY(const double theY)
 
 const std::shared_ptr<GeomAPI_XY> GeomAPI_XY::added(const std::shared_ptr<GeomAPI_XY>& theArg)
 {
-  std::shared_ptr<GeomAPI_XY> aResult(new GeomAPI_XY(MY_XY->X() + theArg->x(), MY_XY->Y() + theArg->y()));
+  std::shared_ptr<GeomAPI_XY> aResult(new GeomAPI_XY(
+      MY_XY->X() + theArg->x(), MY_XY->Y() + theArg->y()));
+  return aResult;
+}
+
+const std::shared_ptr<GeomAPI_XY> GeomAPI_XY::decreased(
+    const std::shared_ptr<GeomAPI_XY>& theArg)
+{
+  std::shared_ptr<GeomAPI_XY> aResult(new GeomAPI_XY(
+      MY_XY->X() - theArg->x(), MY_XY->Y() - theArg->y()));
   return aResult;
 }
 

@@ -616,9 +616,11 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
   // Search this constraint in the current group to update it
   ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.find(theConstraint);
   std::vector<Slvs_Constraint>::iterator aConstrIter;
+  bool isExists = false;
   if (aConstrMapIter != myConstraintMap.end()) {
     int aConstrPos = Search(aConstrMapIter->second.front(), myConstraints);
     aConstrIter = myConstraints.begin() + aConstrPos;
+    isExists = true;
   }
 
   // Get constraint type and verify the constraint parameters are correct
@@ -648,128 +650,155 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
   aMirrorLineEnt = aConstrAttr->isObject() ?
       changeEntityFeature(aMirrorLineFeat) : changeEntity(aConstrAttr->attr());
 
-  if (aConstrMapIter == myConstraintMap.end()) { // Add new constraint
-    // Append symmetric constraint for each point of mirroring features
-    AttributeRefListPtr aBaseRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        aConstrData->attribute(aConstraintAttributes[1]));
-    AttributeRefListPtr aMirroredRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        aConstrData->attribute(aConstraintAttributes[2]));
-    if (!aBaseRefList || !aMirroredRefList)
+  // Append symmetric constraint for each point of mirroring features
+  AttributeRefListPtr aBaseRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+    aConstrData->attribute(aConstraintAttributes[1]));
+  AttributeRefListPtr aMirroredRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+    aConstrData->attribute(aConstraintAttributes[2]));
+  if (!aBaseRefList || !aMirroredRefList)
+    return false;
+
+  std::list<ObjectPtr> aBaseList = aBaseRefList->list();
+  std::list<ObjectPtr> aMirroredList = aMirroredRefList->list();
+  if (aBaseList.empty() || aBaseList.size() != aMirroredList.size())
+    return false;
+
+  std::vector<Slvs_hConstraint> aNewConstraints;
+  // Fill the list of already mirrored points
+  std::vector<Slvs_Constraint> anOldConstraints;
+  std::map<Slvs_hEntity, Slvs_hEntity> aMirroredPoints;
+  if (isExists) {
+    std::vector<Slvs_hConstraint>::const_iterator aCIter = aConstrMapIter->second.begin();
+    for (; aCIter != aConstrMapIter->second.end(); aCIter++) {
+      int anInd = Search(*aCIter, myConstraints);
+      if (myConstraints[anInd].type != aConstrType)
+        continue;
+      aMirroredPoints[myConstraints[anInd].ptA] = myConstraints[anInd].ptB;
+      anOldConstraints.push_back(myConstraints[anInd]);
+    }
+  }
+
+  FeaturePtr aBaseFeature, aMirrorFeature;
+  ResultConstructionPtr aRC;
+  std::list<ObjectPtr>::iterator aBaseIter = aBaseList.begin();
+  std::list<ObjectPtr>::iterator aMirIter = aMirroredList.begin();
+  for ( ; aBaseIter != aBaseList.end(); aBaseIter++, aMirIter++) {
+    aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aBaseIter);
+    aBaseFeature = aRC ? aRC->document()->feature(aRC) :
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aBaseIter);
+    aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aMirIter);
+    aMirrorFeature = aRC ? aRC->document()->feature(aRC) :
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aMirIter);
+
+    if (!aBaseFeature || !aMirrorFeature || 
+        aBaseFeature->getKind() != aMirrorFeature->getKind())
       return false;
+    Slvs_hEntity aBaseEnt = changeEntityFeature(aBaseFeature);
+    Slvs_hEntity aMirrorEnt = changeEntityFeature(aMirrorFeature);
+    // Make aMirrorEnt parameters to be symmetric with aBaseEnt
+    makeMirrorEntity(aBaseEnt, aMirrorEnt, aMirrorLineEnt);
 
-    std::list<ObjectPtr> aBaseList = aBaseRefList->list();
-    std::list<ObjectPtr> aMirroredList = aMirroredRefList->list();
-    if (aBaseList.size() != aMirroredList.size())
-      return false;
+    if (aBaseFeature->getKind() == SketchPlugin_Point::ID()) {
+      Slvs_hConstraint anID = changeMirrorPoints(aBaseEnt, aMirrorEnt,
+          aMirrorLineEnt, anOldConstraints, aMirroredPoints);
+      aNewConstraints.push_back(anID);
+    } else {
+      int aBasePos = Search(aBaseEnt, myEntities);
+      int aMirrorPos = Search(aMirrorEnt, myEntities);
+      if (aBaseFeature->getKind() == SketchPlugin_Line::ID()) {
+        for (int ind = 0; ind < 2; ind++) {
+          Slvs_hConstraint anID = changeMirrorPoints(myEntities[aBasePos].point[ind],
+              myEntities[aMirrorPos].point[ind], aMirrorLineEnt, anOldConstraints, aMirroredPoints);
+          aNewConstraints.push_back(anID);
+        }
+      } else if (aBaseFeature->getKind() == SketchPlugin_Circle::ID()) {
+        Slvs_hConstraint anID = changeMirrorPoints(myEntities[aBasePos].point[0],
+            myEntities[aMirrorPos].point[0], aMirrorLineEnt, anOldConstraints, aMirroredPoints);
+        aNewConstraints.push_back(anID);
+        // Additional constraint for equal radii
+        Slvs_Constraint anEqRadConstr = Slvs_MakeConstraint(
+            ++myConstrMaxID, myID, SLVS_C_EQUAL_RADIUS, myWorkplane.h, 0.0,
+            SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aBaseEnt, aMirrorEnt);
+        myConstraints.push_back(anEqRadConstr);
+        myConstraintMap[theConstraint].push_back(anEqRadConstr.h);
+      } else if (aBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
+        // Workaround to avoid problems in SolveSpace.
+        // The symmetry of two arcs will be done using symmetry of three points on these arcs:
+        // start point, end point, and any other point on the arc
+        Slvs_hEntity aBaseArcPoints[3] = {
+            myEntities[aBasePos].point[1],
+            myEntities[aBasePos].point[2],
+            SLVS_E_UNKNOWN};
+        Slvs_hEntity aMirrorArcPoints[3] = { // indices of points of arc, center corresponds center, first point corresponds last point
+            myEntities[aMirrorPos].point[2],
+            myEntities[aMirrorPos].point[1],
+            SLVS_E_UNKNOWN};
+        Slvs_hEntity aBothArcs[2] = {aBaseEnt, aMirrorEnt};
+        Slvs_hEntity aBothMiddlePoints[2];
+        for (int i = 0; i < 2; i++) {
+          double x, y;
+          calculateMiddlePoint(aBothArcs[i], x, y);
+          std::vector<Slvs_Param>::iterator aParamIter = myParams.end();
+          Slvs_hParam u = changeParameter(x, aParamIter);
+          Slvs_hParam v = changeParameter(y, aParamIter);
+          Slvs_Entity aPoint = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, u, v);
+          myEntities.push_back(aPoint);
+          aBothMiddlePoints[i] = aPoint.h;
+          // additional constraint point-on-curve
+          Slvs_Constraint aPonCircConstr = Slvs_MakeConstraint(
+              ++myConstrMaxID, myID, SLVS_C_PT_ON_CIRCLE, myWorkplane.h, 0.0,
+              aPoint.h, SLVS_E_UNKNOWN, aBothArcs[i], SLVS_E_UNKNOWN);
+          myConstraints.push_back(aPonCircConstr);
+          myConstraintMap[theConstraint].push_back(aPonCircConstr.h);
+        }
 
-    myConstraintMap[theConstraint] = std::vector<Slvs_hConstraint>();
-
-    FeaturePtr aBaseFeature, aMirrorFeature;
-    ResultConstructionPtr aRC;
-    std::list<ObjectPtr>::iterator aBaseIter = aBaseList.begin();
-    std::list<ObjectPtr>::iterator aMirIter = aMirroredList.begin();
-    for ( ; aBaseIter != aBaseList.end(); aBaseIter++, aMirIter++) {
-      aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aBaseIter);
-      aBaseFeature = aRC ? aRC->document()->feature(aRC) :
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aBaseIter);
-      aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aMirIter);
-      aMirrorFeature = aRC ? aRC->document()->feature(aRC) :
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aMirIter);
-
-      if (!aBaseFeature || !aMirrorFeature || 
-          aBaseFeature->getKind() != aMirrorFeature->getKind())
-        return false;
-      Slvs_hEntity aBaseEnt = changeEntityFeature(aBaseFeature);
-      Slvs_hEntity aMirrorEnt = changeEntityFeature(aMirrorFeature);
-      // Make aMirrorEnt parameters to be symmetric with aBaseEnt
-      makeMirrorEntity(aBaseEnt, aMirrorEnt, aMirrorLineEnt);
-
-      if (aBaseFeature->getKind() == SketchPlugin_Point::ID()) {
-        Slvs_Constraint aConstraint = Slvs_MakeConstraint(++myConstrMaxID, myID, aConstrType,
-            myWorkplane.h, 0.0, aBaseEnt, aMirrorEnt, aMirrorLineEnt, SLVS_E_UNKNOWN);
-        myConstraints.push_back(aConstraint);
-        myConstraintMap[theConstraint].push_back(aConstraint.h);
-      } else {
-        int aBasePos = Search(aBaseEnt, myEntities);
-        int aMirrorPos = Search(aMirrorEnt, myEntities);
-        if (aBaseFeature->getKind() == SketchPlugin_Line::ID()) {
-          for (int ind = 0; ind < 2; ind++) {
-            Slvs_Constraint aConstraint = Slvs_MakeConstraint(
-                ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
-                myEntities[aBasePos].point[ind], myEntities[aMirrorPos].point[ind],
-                aMirrorLineEnt, SLVS_E_UNKNOWN);
-            myConstraints.push_back(aConstraint);
-            myConstraintMap[theConstraint].push_back(aConstraint.h);
-          }
-        } else if (aBaseFeature->getKind() == SketchPlugin_Circle::ID()) {
-          Slvs_Constraint aConstraint = Slvs_MakeConstraint(
-              ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
-              myEntities[aBasePos].point[0], myEntities[aMirrorPos].point[0],
-              aMirrorLineEnt, SLVS_E_UNKNOWN);
-          myConstraints.push_back(aConstraint);
-          myConstraintMap[theConstraint].push_back(aConstraint.h);
-          // Additional constraint for equal radii
-          Slvs_Constraint anEqRadConstr = Slvs_MakeConstraint(
-              ++myConstrMaxID, myID, SLVS_C_EQUAL_RADIUS, myWorkplane.h, 0.0,
-              SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aBaseEnt, aMirrorEnt);
-          myConstraints.push_back(anEqRadConstr);
-          myConstraintMap[theConstraint].push_back(anEqRadConstr.h);
-        } else if (aBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
-          // Workaround to avoid problems in SolveSpace.
-          // The symmetry of two arcs will be done using symmetry of three points on these arcs:
-          // start point, end point, and any other point on the arc
-          Slvs_hEntity aBaseArcPoints[3] = {
-              myEntities[aBasePos].point[1],
-              myEntities[aBasePos].point[2],
-              SLVS_E_UNKNOWN};
-          Slvs_hEntity aMirrorArcPoints[3] = { // indices of points of arc, center corresponds center, first point corresponds last point
-              myEntities[aMirrorPos].point[2],
-              myEntities[aMirrorPos].point[1],
-              SLVS_E_UNKNOWN};
-          Slvs_hEntity aBothArcs[2] = {aBaseEnt, aMirrorEnt};
-          Slvs_hEntity aBothMiddlePoints[2];
-          for (int i = 0; i < 2; i++) {
-            double x, y;
-            calculateMiddlePoint(aBothArcs[i], x, y);
-            std::vector<Slvs_Param>::iterator aParamIter = myParams.end();
-            Slvs_hParam u = changeParameter(x, aParamIter);
-            Slvs_hParam v = changeParameter(y, aParamIter);
-            Slvs_Entity aPoint = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, u, v);
-            myEntities.push_back(aPoint);
-            aBothMiddlePoints[i] = aPoint.h;
-            // additional constraint point-on-curve
-            Slvs_Constraint aPonCircConstr = Slvs_MakeConstraint(
-                ++myConstrMaxID, myID, SLVS_C_PT_ON_CIRCLE, myWorkplane.h, 0.0,
-                aPoint.h, SLVS_E_UNKNOWN, aBothArcs[i], SLVS_E_UNKNOWN);
-            myConstraints.push_back(aPonCircConstr);
-            myConstraintMap[theConstraint].push_back(aPonCircConstr.h);
-          }
-
-          aBaseArcPoints[2] = aBothMiddlePoints[0];
-          aMirrorArcPoints[2] = aBothMiddlePoints[1];
-          for (int ind = 0; ind < 3; ind++) {
-            Slvs_Constraint aConstraint = Slvs_MakeConstraint(
-                ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
-                aBaseArcPoints[ind], aMirrorArcPoints[ind], aMirrorLineEnt, SLVS_E_UNKNOWN);
-            myConstraints.push_back(aConstraint);
-            myConstraintMap[theConstraint].push_back(aConstraint.h);
-          }
+        aBaseArcPoints[2] = aBothMiddlePoints[0];
+        aMirrorArcPoints[2] = aBothMiddlePoints[1];
+        for (int ind = 0; ind < 3; ind++) {
+          Slvs_hConstraint anID = changeMirrorPoints(aBaseArcPoints[ind], aMirrorArcPoints[ind],
+              aMirrorLineEnt, anOldConstraints, aMirroredPoints);
+          aNewConstraints.push_back(anID);
         }
       }
     }
+  }
 
+  // Remove unused constraints
+  std::vector<Slvs_Constraint>::const_iterator anOldCIter = anOldConstraints.begin();
+  for (; anOldCIter != anOldConstraints.end(); anOldCIter++) {
+    int anInd = Search(anOldCIter->h, myConstraints);
+    myConstraints.erase(myConstraints.begin() + anInd);
+  }
+  myConstraintMap[theConstraint] = aNewConstraints;
+
+  if (!isExists) {
     // Set the mirror line unchanged during constraint recalculation
     int aMirrorLinePos = Search(aMirrorLineEnt, myEntities);
-    Slvs_Constraint aRigidStart = Slvs_MakeConstraint(
-        ++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, myWorkplane.h, 0,
-        myEntities[aMirrorLinePos].point[0], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-    myConstraints.push_back(aRigidStart);
-    myConstraintMap[theConstraint].push_back(aRigidStart.h);
-    Slvs_Constraint aRigidEnd = Slvs_MakeConstraint(
-        ++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, myWorkplane.h, 0,
-        myEntities[aMirrorLinePos].point[1], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-    myConstraints.push_back(aRigidEnd);
-    myConstraintMap[theConstraint].push_back(aRigidEnd.h);
+    // firstly check the line is not fixed yet
+    bool isFixed[2] = {false, false};
+    std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+    for (; aConstrIter != myConstraints.end() && !(isFixed[0] && isFixed[1]); aConstrIter++)
+      if (aConstrIter->type == SLVS_C_WHERE_DRAGGED) {
+        if (aConstrIter->ptA == myEntities[aMirrorLinePos].point[0])
+          isFixed[0] = true;
+        else if (aConstrIter->ptA == myEntities[aMirrorLinePos].point[1])
+          isFixed[1] = true;
+      }
+    // add new rigid constraints
+    if (!isFixed[0]) {
+      Slvs_Constraint aRigidStart = Slvs_MakeConstraint(
+          ++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, myWorkplane.h, 0,
+          myEntities[aMirrorLinePos].point[0], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+      myConstraints.push_back(aRigidStart);
+      myConstraintMap[theConstraint].push_back(aRigidStart.h);
+    }
+    if (!isFixed[1]) {
+      Slvs_Constraint aRigidEnd = Slvs_MakeConstraint(
+          ++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, myWorkplane.h, 0,
+          myEntities[aMirrorLinePos].point[1], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+      myConstraints.push_back(aRigidEnd);
+      myConstraintMap[theConstraint].push_back(aRigidEnd.h);
+    }
 
     // Add temporary constraints for initial objects to be unchanged
     for (aBaseIter = aBaseList.begin(); aBaseIter != aBaseList.end(); aBaseIter++) {
@@ -894,6 +923,8 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
     if (!aFilletFeature)
       return false;
     aFilletEnt[indEnt] = changeEntityFeature(aFilletFeature);
+    if (aFilletEnt[indEnt] == SLVS_E_UNKNOWN)
+      return false; // not all attributes are initialized yet
     aFilletObjInd[indEnt] = Search(aFilletEnt[indEnt], myEntities);
   }
   // At first time, for correct result, move floating points of fillet on the middle points of base objects
@@ -934,34 +965,14 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
     }
   }
 
-  // Check the fillet arc which point to be connected to
-  bool isArcInversed = false; // indicates that start and end points of arc should be connected to second and first object respectively
-  Slvs_hEntity hEnt = myEntities[aFilletObjInd[2]].point[1];
-  int aPos = Search(hEnt, myEntities);
-  Slvs_hParam anArcStartPoint = myEntities[aPos].param[0];
-  aPos = Search(anArcStartPoint, myParams);
-  double anArcPtCoord[2] = {myParams[aPos].val, myParams[aPos+1].val};
-  double aSqDistances[2];
-  int aPtInd;
-  for (int indEnt = 0; indEnt < aNbFilletEnt - 1; indEnt++) {
-    aPtInd = aBaseCoincInd[indEnt]+aShift[indEnt];
-    hEnt = myEntities[aFilletObjInd[indEnt]].point[aPtInd];
-    aPos = Search(hEnt, myEntities);
-    Slvs_hParam anObjectPoint = myEntities[aPos].param[0];
-    aPos = Search(anObjectPoint, myParams);
-    double aPtCoord[2] = {myParams[aPos].val, myParams[aPos+1].val};
-    aSqDistances[indEnt] = 
-        (anArcPtCoord[0] - aPtCoord[0]) * (anArcPtCoord[0] - aPtCoord[0]) +
-        (anArcPtCoord[1] - aPtCoord[1]) * (anArcPtCoord[1] - aPtCoord[1]);
-  }
-  if (aSqDistances[1] < aSqDistances[0])
-    isArcInversed = true;
-
   // Create list of constraints to generate fillet
+  int aPtInd;
   std::vector<Slvs_hConstraint> aConstrList;
   bool isExists = myConstraintMap.find(theConstraint) != myConstraintMap.end(); // constraint already exists
   std::vector<Slvs_hConstraint>::iterator aCMapIter =
     isExists ? myConstraintMap[theConstraint].begin() : aConstrList.begin();
+  std::vector<Slvs_hConstraint>::iterator aCMapEnd =
+    isExists ? myConstraintMap[theConstraint].end() : aConstrList.end();
   int aCurConstrPos = isExists ? Search(*aCMapIter, myConstraints) : 0;
   for (int indEnt = 0; indEnt < aNbFilletEnt - 1; indEnt++) {
     // one point of fillet object should be coincident with the point on base, non-coincident with another base object
@@ -973,7 +984,7 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       myConstraints[aCurConstrPos].ptB = aPtFillet;
       aCMapIter++;
       aCurConstrPos = Search(*aCMapIter, myConstraints);
-    } else {
+    } else if (addCoincidentPoints(aPtBase, aPtFillet)) { // the points are not connected by coincidence yet
       Slvs_Constraint aCoincConstr = Slvs_MakeConstraint(
           ++myConstrMaxID, myID, SLVS_C_POINTS_COINCIDENT, myWorkplane.h,
           0, aPtBase, aPtFillet, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
@@ -992,8 +1003,9 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
         myConstraints[aCurConstrPos].ptA = aPtBase;
         myConstraints[aCurConstrPos].ptB = aPtFillet;
         aCMapIter++;
-        aCurConstrPos = Search(*aCMapIter, myConstraints);
-      } else {
+        if (aCMapIter != aCMapEnd)
+          aCurConstrPos = Search(*aCMapIter, myConstraints);
+      } else if (addCoincidentPoints(aPtBase, aPtFillet)) { // the points are not connected by coincidence yet
         aPonCurveConstr = Slvs_MakeConstraint(
             ++myConstrMaxID, myID, SLVS_C_POINTS_COINCIDENT, myWorkplane.h,
             0, aPtBase, aPtFillet, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
@@ -1006,7 +1018,8 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       if (isExists) {
         myConstraints[aCurConstrPos].ptA = aPtFillet;
         aCMapIter++;
-        aCurConstrPos = Search(*aCMapIter, myConstraints);
+        if (aCMapIter != aCMapEnd)
+          aCurConstrPos = Search(*aCMapIter, myConstraints);
       } else {
         aPonCurveConstr = Slvs_MakeConstraint(
             ++myConstrMaxID, myID, SLVS_C_PT_ON_LINE, myWorkplane.h,
@@ -1018,56 +1031,13 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       myConstraints.push_back(aPonCurveConstr);
       aConstrList.push_back(aPonCurveConstr.h);
     }
-
-    // Bound point of fillet arc should be tangently coincident with a bound point of fillet object
-    aPtInd = 1 + (isArcInversed ? 1-indEnt : indEnt);
-    Slvs_hEntity aPtArc = myEntities[aFilletObjInd[2]].point[aPtInd];
-    if (isExists) {
-      myConstraints[aCurConstrPos].ptA = aPtArc;
-      myConstraints[aCurConstrPos].ptB = aPtFillet;
-      aCMapIter++;
-      aCurConstrPos = Search(*aCMapIter, myConstraints);
-      myConstraints[aCurConstrPos].entityA = aFilletEnt[2];
-      myConstraints[aCurConstrPos].entityB = aFilletEnt[indEnt];
-      myConstraints[aCurConstrPos].other = (isArcInversed ? 1-indEnt : indEnt);
-      aCMapIter++;
-      aCurConstrPos = Search(*aCMapIter, myConstraints);
-    } else {
-      Slvs_Constraint aCoincConstr = Slvs_MakeConstraint(
-          ++myConstrMaxID, myID, SLVS_C_POINTS_COINCIDENT, myWorkplane.h,
-          0, aPtArc, aPtFillet, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-      myConstraints.push_back(aCoincConstr);
-      aConstrList.push_back(aCoincConstr.h);
-      Slvs_Constraint aTangency = Slvs_MakeConstraint(
-          ++myConstrMaxID, myID, aTangentType, myWorkplane.h,
-          0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aFilletEnt[2], aFilletEnt[indEnt]);
-      aTangency.other = (isArcInversed ? 1-indEnt : indEnt);
-      aTangency.other2 = aTangentType == SLVS_C_CURVE_CURVE_TANGENT ? aBaseCoincInd[indEnt] : 0;
-      myConstraints.push_back(aTangency);
-      aConstrList.push_back(aTangency.h);
-    }
   }
 
-  // Additional constraint for fillet diameter
-  double aRadius = 0.0;  // scalar value of the constraint
-  AttributeDoublePtr aDistAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aConstrData->attribute(SketchPlugin_Constraint::VALUE()));
-  aRadius = aDistAttr->value();
-  if (isExists) {
-    myConstraints[aCurConstrPos].entityA = aFilletEnt[2];
-    myConstraints[aCurConstrPos].valA = aRadius * 2.0;
-    aCMapIter++;
-  } else {
-    Slvs_Constraint aDiamConstr = Slvs_MakeConstraint(
-        ++myConstrMaxID, myID, SLVS_C_DIAMETER, myWorkplane.h, aRadius * 2.0,
-        SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aFilletEnt[2], SLVS_E_UNKNOWN);
-    myConstraints.push_back(aDiamConstr);
-    aConstrList.push_back(aDiamConstr.h);
-
+  if (!isExists)
     myConstraintMap[theConstraint] = aConstrList;
-  }
 
   // Additional temporary constraints for base objects to be fixed
+  int aNbArcs = 0;
   for (unsigned int indAttr = 0; indAttr < 2; indAttr++) {
     if (!aBaseFeature[indAttr]) {
       AttributeRefAttrPtr aConstrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
@@ -1075,16 +1045,23 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
       addTemporaryConstraintWhereDragged(aConstrAttr->attr());
       continue;
     }
-    std::list<AttributePtr> anAttributes =
-        aBaseFeature[indAttr]->data()->attributes(GeomDataAPI_Point2D::typeId());
-    std::list<AttributePtr>::iterator anIt = anAttributes.begin();
-    for ( ; anIt != anAttributes.end(); anIt++) {
-      // Arc should be fixed by center and start points only (to avoid "conflicting constraints" message)
-      if (aBaseFeature[indAttr]->getKind() == SketchPlugin_Arc::ID() &&
-          (*anIt)->id() == SketchPlugin_Arc::END_ID())
-        continue;
-      addTemporaryConstraintWhereDragged(*anIt);
+    if (aBaseFeature[indAttr]->getKind() == SketchPlugin_Line::ID()) {
+      addTemporaryConstraintWhereDragged(
+          aBaseFeature[indAttr]->attribute(SketchPlugin_Line::START_ID()));
+      addTemporaryConstraintWhereDragged(
+          aBaseFeature[indAttr]->attribute(SketchPlugin_Line::END_ID()));
+    } else if (aBaseFeature[indAttr]->getKind() == SketchPlugin_Arc::ID()) {
+      // Arc should be fixed by its center only (to avoid "conflicting constraints" message)
+      // If the fillet is made on two arc, the shared point should be fixed too
+      aNbArcs++;
+      addTemporaryConstraintWhereDragged(
+          aBaseFeature[indAttr]->attribute(SketchPlugin_Arc::CENTER_ID()));
     }
+  }
+  if (aNbArcs == 2) {
+      addTemporaryConstraintWhereDragged(aBaseCoincInd[0] == 0 ?
+          aBaseFeature[0]->attribute(SketchPlugin_Arc::START_ID()) : 
+          aBaseFeature[0]->attribute(SketchPlugin_Arc::END_ID()));
   }
   return true;
 }
@@ -2197,6 +2174,44 @@ void SketchSolver_ConstraintGroup::makeMirrorEntity(const Slvs_hEntity& theBase,
     myParams[1+aMirrorParamPos].val = aMirrorPoint->y();
   }
 }
+
+// ============================================================================
+//  Function: changeMirrorPoints
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  creates/updates mirror constraint for two points
+// ============================================================================
+Slvs_hConstraint SketchSolver_ConstraintGroup::changeMirrorPoints(
+    const Slvs_hEntity& theBasePoint,
+    const Slvs_hEntity& theMirrorPoint,
+    const Slvs_hEntity& theMirrorLine,
+    std::vector<Slvs_Constraint>&  thePrevConstr,
+    std::map<Slvs_hEntity, Slvs_hEntity>& thePrevMirror)
+{
+  std::map<Slvs_hEntity, Slvs_hEntity>::iterator aMapIter = thePrevMirror.find(theBasePoint);
+  if (aMapIter != thePrevMirror.end()) {
+    thePrevMirror.erase(aMapIter);
+    std::vector<Slvs_Constraint>::const_iterator anIter = thePrevConstr.begin();
+    for (; anIter != thePrevConstr.end(); anIter++)
+      if (anIter->ptA == theBasePoint) {
+        if (anIter->ptB != theMirrorPoint) {
+          int aConstrInd = Search(anIter->h, myConstraints);
+          myConstraints[aConstrInd].ptB = theMirrorPoint;
+          myConstraints[aConstrInd].entityA = theMirrorLine;
+        }
+        Slvs_hConstraint aResult = anIter->h;
+        thePrevConstr.erase(anIter);
+        return aResult;
+      }
+  }
+
+  // Newly created constraint
+  Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+      ++myConstrMaxID, myID, SLVS_C_SYMMETRIC_LINE, myWorkplane.h, 0.0,
+      theBasePoint, theMirrorPoint, theMirrorLine, SLVS_E_UNKNOWN);
+  myConstraints.push_back(aConstraint);
+  return aConstraint.h;
+}
+
 
 // ============================================================================
 //  Function: calculateMiddlePoint
