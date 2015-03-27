@@ -507,7 +507,9 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
         std::dynamic_pointer_cast<GeomDataAPI_Point>(aConstrAttr->attr());
     std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aConstrAttr->attr());
-    if (aPoint || aPoint2D) {
+    std::shared_ptr<SketchPlugin_Point> aSketchPoint = 
+        std::dynamic_pointer_cast<SketchPlugin_Point>(aFeature);
+    if (aPoint || aPoint2D || aSketchPoint) {
       // Create SolveSpace constraint structure
       Slvs_Constraint aConstraint = Slvs_MakeConstraint(
           ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
