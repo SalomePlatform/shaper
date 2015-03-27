@@ -9,6 +9,8 @@
 
 #include <GeomDataAPI_Point2D.h>
 
+#include <SketcherPrs_Factory.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Result.h>
@@ -110,35 +112,13 @@ bool SketchPlugin_ConstraintLength::getPoints(
 
 AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePrevious)
 {
-  std::shared_ptr<GeomAPI_Pnt> aPoint1, aPoint2;
-  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, anEndPoint;
-  if (!getPoints(aPoint1, aPoint2, aStartPoint, anEndPoint))
-    return thePrevious; // not possible to show length because points are not defined
-
-  AttributePtr aFlyOutAttribute = data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-  if (!aFlyOutAttribute->isInitialized()) {
-    return thePrevious; // not possible to show length because points are not defined
-  }
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
-                                                          GeomDataAPI_Point2D>(aFlyOutAttribute);
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
-  // value calculation
-  // TODO: has to be calculated on definition of reference object
-  double aDistance = aPoint1->distance(aPoint2);
-  std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-  double aValue = aDistance;
-  if (aValueAttr->isInitialized())
-    aValue = aValueAttr->value();
-  else 
-    aValueAttr->setValue(aValue);
-  // End TODO
+  if (!sketch())
+    return thePrevious;
 
   AISObjectPtr anAIS = thePrevious;
-  if (!anAIS)
-    anAIS = AISObjectPtr(new GeomAPI_AISObject);
-  std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
-  anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
+  if (!anAIS) {
+    anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane());
+  }
 
   // Set color from preferences
   std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",

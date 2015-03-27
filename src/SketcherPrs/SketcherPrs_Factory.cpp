@@ -13,6 +13,8 @@
 #include "SketcherPrs_HVDirection.h"
 #include "SketcherPrs_Equal.h"
 #include "SketcherPrs_Tangent.h"
+#include "SketcherPrs_Radius.h"
+#include "SketcherPrs_LengthDimension.h"
 
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
 AISObjectPtr SketcherPrs_Factory::NAME(SketchPlugin_Constraint* theConstraint, \
@@ -30,6 +32,8 @@ CONSTRAINT_PRS_IMPL(perpendicularConstraint, SketcherPrs_Perpendicular);
 CONSTRAINT_PRS_IMPL(rigidConstraint, SketcherPrs_Rigid);
 CONSTRAINT_PRS_IMPL(equalConstraint, SketcherPrs_Equal);
 CONSTRAINT_PRS_IMPL(tangentConstraint, SketcherPrs_Tangent);
+CONSTRAINT_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
+CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
 
 
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(SketchPlugin_Constraint* theConstraint,

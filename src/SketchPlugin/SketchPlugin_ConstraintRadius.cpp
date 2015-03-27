@@ -10,6 +10,8 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Point.h>
 
+#include <SketcherPrs_Factory.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 
@@ -135,42 +137,13 @@ double SketchPlugin_ConstraintRadius::circleRadius(std::shared_ptr<ModelAPI_Feat
 
 AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePrevious)
 {
-  std::shared_ptr<ModelAPI_Feature> aCyrcFeature;
-  double aRadius = circleRadius(aCyrcFeature);
-  if (aRadius < 0)
-    return thePrevious; // can not create a good presentation
+  if (!sketch())
+    return thePrevious;
 
-  // Flyout point
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  if (!aFlyoutAttr->isInitialized())
-    return thePrevious; // can not create a good presentation
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
-
-  // Prepare a circle
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
-  if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
-    aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
-  } else { // arc
-    aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aCyrcFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
-  }
-  std::shared_ptr<GeomAPI_Pnt> aCenter = sketch()->to3D(aCenterAttr->x(), aCenterAttr->y());
-  std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      sketch()->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-  std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  std::shared_ptr<GeomAPI_Circ> aCircle(new GeomAPI_Circ(aCenter, aNormal, aRadius));
-
-  // Value
-  std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-  if (aValueAttr->isInitialized())
-    aRadius = aValueAttr->value();
   AISObjectPtr anAIS = thePrevious;
-  if (!anAIS)
-    anAIS = AISObjectPtr(new GeomAPI_AISObject);
-  anAIS->createRadius(aCircle, aFlyoutPnt, aRadius);
+  if (!anAIS) {
+    anAIS = SketcherPrs_Factory::radiusConstraint(this, sketch()->coordinatePlane());
+  }
 
   // Set color from preferences
   std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",

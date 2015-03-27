@@ -10,6 +10,8 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Arc.h"
 
+#include "SketcherPrs_Tools.h"
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -19,6 +21,7 @@
 #include <GeomValidators_Edge.h>
 
 #include <GeomDataAPI_Point2D.h>
+
 
 bool SketchPlugin_DistanceAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
@@ -58,7 +61,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
 
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
     // If it is a line then we have to check that first attribute id not a line
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(aFeature->data(), aParamA);
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint = SketcherPrs_Tools::getFeaturePoint(aFeature->data(), aParamA);
     if (aPoint)
       return true;
   }
