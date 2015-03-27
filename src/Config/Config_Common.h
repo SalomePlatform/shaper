@@ -43,6 +43,8 @@ CONFIG_EXPORT bool isElementNode(xmlNodePtr theNode);
  */
 CONFIG_EXPORT bool isNode(xmlNodePtr theNode, const char* theNodeName, ...);
 
+//#define isNode(p) _isNode(p, NULL)
+
 /*!
  * Checks if the given node is attribute node.
  * Attribute node represents a widget, that is able to store/restore

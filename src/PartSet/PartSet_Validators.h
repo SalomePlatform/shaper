@@ -99,4 +99,21 @@ class PartSet_SketchEntityValidator : public ModelAPI_AttributeValidator
                        const std::list<std::string>& theArguments) const;
 };
 
+/**\class PartSet_SameTypeAttrValidator
+ * \ingroup Validators
+ * \brief Validator for the tangent constraint input.
+ *
+ * It just checks that distance is greater than zero.
+ */
+class PartSet_SameTypeAttrValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const;
+};
+
+
 #endif

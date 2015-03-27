@@ -46,6 +46,11 @@ class Config_ValidatorReader : public Config_XMLReader
   virtual bool processChildren(xmlNodePtr aNode);
 
   /*!
+   * Cleans the cached information about parent feature or attribute (widget)
+   */
+  virtual void cleanup(xmlNodePtr theNode);
+
+  /*!
    * \brief Retrieves all the necessary info from the validator node.
    * Sends ValidatorLoaded event
    */
@@ -55,6 +60,9 @@ class Config_ValidatorReader : public Config_XMLReader
    * Sends SelectionFilterLoaded event
    */
   void processSelectionFilter(xmlNodePtr theNode);
+
+ private:
+  std::string myCurrentWidget;
 };
 
 #endif /* CONFIG_VALIDATORREADER_H_ */

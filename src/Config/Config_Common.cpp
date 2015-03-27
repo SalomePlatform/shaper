@@ -69,7 +69,7 @@ bool isWidgetNode(xmlNodePtr theNode)
 {
   if(!isElementNode(theNode))
     return false;
-  // it's parent is "feature" or "source"
+  // it's parent is "feature" or "source" or a page ("box", "case")
   if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, 
                          WDG_TOOLBOX_BOX, WDG_SWITCH_CASE, NULL))
     return false;
