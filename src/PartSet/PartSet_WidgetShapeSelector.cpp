@@ -75,10 +75,7 @@ bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
 void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
-  /// this is a temporary code, will be removed when master is merged to this branch
-  /// after merge, the external edge should be removed always, without flag checking
-  if (!theValid)
-    removeExternal();
+  removeExternal();
 }
 
 //********************************************************************
