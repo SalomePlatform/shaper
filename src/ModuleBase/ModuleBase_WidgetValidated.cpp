@@ -11,6 +11,8 @@
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 
+#include <Events_Loop.h>
+
 #include <QWidget>
 
 ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
@@ -45,6 +47,11 @@ bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& the
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
   // stores the current values of the widget attribute
+  Events_Loop* aLoop = Events_Loop::loop();
+  // blocks the flush signals to avoid the temporary objects visualization in the viewer
+  // they should not be shown in order to do not lose highlight by erasing them
+  aLoop->activateFlushes(false);
+
   aData->blockSendAttributeUpdated(true);
   bool isAttributeBlocked = anAttribute->blockSetInitialized(true);
   storeAttributeValue();
@@ -59,6 +66,7 @@ bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& the
   restoreAttributeValue(aValid);
   aData->blockSendAttributeUpdated(false);
   anAttribute->blockSetInitialized(isAttributeBlocked);
+  aLoop->activateFlushes(true);
 
   return aValid;
 }

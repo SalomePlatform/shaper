@@ -137,7 +137,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
   std::shared_ptr<GeomAPI_Shape> aResult;
-  if (myIsInitialized) {
+  if (myRef.isInitialized()) {
     TDF_Label aSelLab = selectionLabel();
     if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
       ResultPtr aContext = context();
