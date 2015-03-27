@@ -118,127 +118,84 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
 
-  // 1. check whether the object of the attribute is not among the feature attributes
-  // find the attribute's object
-  ObjectPtr anObject =  GeomValidators_Tools::getObject(theAttribute);
+  // the type of validated attributes should be equal, attributes with different types are not validated
+  // Check RefAttr attributes
+  std::string anAttrType = theAttribute->attributeType();
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs;
 
-  // check whether the object is not among other feature attributes
-  if (anObject.get() != NULL) {
-    // Check RefAttr attributes
-    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = aFeature->data()->attributes("");
-    //if (anAttrs.size() > 0) {
-    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anIt = anAttrs.begin();
-    for(; anIt != anAttrs.end(); anIt++) {
-      AttributePtr anAttr = *anIt;
-      // the function parameter attribute should be skipped
-      if (anAttr.get() == NULL || anAttr->id() == theAttribute->id())
-        continue;
-      ObjectPtr aCurObject =  GeomValidators_Tools::getObject(anAttr);
-      if (aCurObject  && aCurObject == anObject)
-        return false;
-    }
-  }
-  else {
-    // 2. collect object referenced by theAttribute and ...
-    if (featureHasReferences(theAttribute)) {
-      // 3. check whether the attribute value is not among other feature attributes
-      std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-        aFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+  if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    bool isObject = anAttr->isObject();
+    ObjectPtr anObject = anAttr->object();
+    AttributePtr anAttributeAttr = anAttr->attr();
+
+    anAttrs = aFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+    if (anAttrs.size() > 0) {
       std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
       for(; anAttr != anAttrs.end(); anAttr++) {
-        if (*anAttr) {
-          std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-            std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-          // check the object is already presented
-          if (!aRef->isObject() && aRef->attr() == theAttribute)
-            return false;
+      if ((*anAttr).get() && (*anAttr)->id() != theAttribute->id()) {
+          std::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
+                                      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+          if (aRef->isObject() != isObject)
+            continue;
+          if (isObject) {
+            if (aRef->object() == anObject)
+              return false;
+          }
+          else { // the attribute reference
+            if (aRef->attr() == theAttribute)
+              return false;
+          }
         }
-// TODO(nds) v1.0.2 master
-//bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
-//                                                const std::list<std::string>& theArguments,
-//                                                const ObjectPtr& theObject,
-//                                                const GeomShapePtr& theShape) const
-//{
-//  // Check RefAttr attributes
-//  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
-//    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//  if (anAttrs.size() > 0) {
-//    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//    for(; anAttr != anAttrs.end(); anAttr++) {
-//      if (*anAttr) {
-//        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-//          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//        // check the object is already presented
-//        if (aRef->isObject() && aRef->object() == theObject)
-//          return false;
-//      }
-//    }
-//  }
-//  // Check selection attributes
-//  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
-//  if (anAttrs.size() > 0) {
-//    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//    for(; anAttr != anAttrs.end(); anAttr++) {
-//      if (*anAttr) {
-//        std::shared_ptr<ModelAPI_AttributeSelection> aRef =
-//          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*anAttr);
-//        // check the object is already presented
-//        if (aRef->isInitialized() && aRef->context() == theObject) {
-//          if (theShape.get() != NULL) {
-//            if (aRef->value()->isEqual(theShape))
-//              return false;
-//          } else
-//            return false;
-//        }
-//      }
-//    }
-//  }
-//  // Check selection attributes
-//  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeReference::typeId());
-//  if (anAttrs.size() > 0) {
-//    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//    for(; anAttr != anAttrs.end(); anAttr++) {
-//      if (*anAttr) {
-//        std::shared_ptr<ModelAPI_AttributeReference> aRef =
-//          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*anAttr);
-//        // check the object is already presented
-//        if (aRef->isInitialized() && aRef->value() == theObject)
-//          return false;
-// ======= end of todo
       }
-      return true;
     }
   }
-  return true;
+  else if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    ResultPtr aContext = anAttr->context();
+    GeomShapePtr aShape = anAttr->value();
+
+    // Check selection attributes
+    anAttrs = aFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
+    if (anAttrs.size() > 0) {
+      std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+      for(; anAttr != anAttrs.end(); anAttr++) {
+        if ((*anAttr).get() && (*anAttr)->id() != theAttribute->id()) {
+          std::shared_ptr<ModelAPI_AttributeSelection> aRef =
+                                        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*anAttr);
+          // check the object is already presented
+          if (aRef->context() == aContext) {
+            bool aHasShape = aShape.get() != NULL;
+            if (!aHasShape || aRef->value()->isEqual(aShape))
+              return false;
+          }
+        }
+      }
+    }
+  }
+  else if (anAttrType == ModelAPI_AttributeReference::typeId()) {
+    AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    ObjectPtr anObject = anAttr->value();
+    // Check selection attributes
+    anAttrs = aFeature->data()->attributes(ModelAPI_AttributeReference::typeId());
+    if (anAttrs.size() > 0) {
+      std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+      for(; anAttr != anAttrs.end(); anAttr++) {
+        if ((*anAttr).get() && (*anAttr)->id() != theAttribute->id()) {
+          std::shared_ptr<ModelAPI_AttributeReference> aRef =
+            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*anAttr);
+          // check the object is already presented
+          if (aRef->value() == anObject)
+            return false;
+        }
+        return true;
+      }
+    }
+  }
+  return !featureHasReferences(theAttribute);
 }
 
 bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr& theAttribute) const
-// TODO(nds) v1.0.2 master
-//bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
-//                                                const std::list<std::string>& theArguments,
-//                                                const AttributePtr& theAttribute) const
-//{
-//  if (PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments)) {
-//    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
-//      theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//    for(; anAttr != anAttrs.end(); anAttr++) {
-//      if (*anAttr) {
-//        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-//          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//        // check the object is already presented
-//        if (!aRef->isObject() && aRef->attr() == theAttribute)
-//          return false;
-//      }
-//    }
-//    return true;
-//  }
-//  return false;
-//}
-//
-//bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute,
-//                                                const std::list<std::string>& theArguments) const
-// ======= end of todo
 {
   std::list<std::pair<std::string, std::list<ObjectPtr> > > allRefs;
   if (theAttribute->owner().get() && theAttribute->owner()->data().get())
@@ -251,7 +208,7 @@ bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr&
       anAttrObjs = &(aRefIter->second);
   }
   if (!anAttrObjs || anAttrObjs->empty())
-    return true; // theAttribute does not references to anything
+    return false; // theAttribute does not references to anything
   // check with all others
   for(aRefIter = allRefs.begin(); aRefIter != allRefs.end(); aRefIter++) {
     if (theAttribute->id() == aRefIter->first)
@@ -261,11 +218,11 @@ bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr&
       std::list<ObjectPtr>::iterator aReferencedByMe = anAttrObjs->begin();
       for(; aReferencedByMe != anAttrObjs->end(); aReferencedByMe++) {
         if (*aReferenced == *aReferencedByMe) // found same objects!
-          return false;
+          return true;
       }
     }
   }
-  return true;
+  return false;
 }
 
 bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,

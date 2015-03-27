@@ -18,11 +18,6 @@
 
 bool SketchPlugin_DistanceAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-//bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
-//                                                 const std::list<std::string>& theArguments,
-//                                                 const ObjectPtr& theObject,
-//                                                 const GeomShapePtr& theShape) const
-// ======= end of todo master
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
@@ -65,84 +60,3 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   }
   return false;
 }
-// TODO(nds) v1.0.2, master
-//  return false;
-//}
-
-//bool SketchPlugin_DistanceAttrValidator::isValid(
-//  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-//{
-//  // any point attribute is acceptable for the distance operation
-//  return true;
-//}
-//
-//bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
-//                                                 const std::list<std::string>& theArguments,
-//                                                 const AttributePtr& theAttribute) const
-//{
-//  return isValid(theAttribute, theArguments);
-//}
-
-// commented in v1.0.2, master:
-//bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
-//                                                 const std::list<std::string>& theArguments,
-//                                                 const ObjectPtr& theObject) const
-//{
-//  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-//    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//  for(; anAttr != anAttrs.end(); anAttr++) {
-//    if (*anAttr) {
-//      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-//        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//      // check the object is already presented
-//      if (aRef->isObject() && aRef->object() == theObject)
-//        return false;
-//    }
-//  }
-//  return true;
-//}
-
-//bool SketchPlugin_DifferentObjectsValidator::isValid(
-//  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-//{
-//  std::shared_ptr<ModelAPI_AttributeRefAttr> anOrigAttr = 
-//    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-//  if (anOrigAttr && anOrigAttr->isObject()) {
-//    const ObjectPtr& anObj = theAttribute->owner();
-//    const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
-//
-//    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-//      aFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//    for(; anAttr != anAttrs.end(); anAttr++) {
-//      if (*anAttr && *anAttr != theAttribute) {
-//        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-//          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//        // check the object is already presented
-//        if (aRef->isObject() && aRef->object() == anOrigAttr->object())
-//          return false;
-//      }
-//    }
-//  }
-//  return true;
-//}
-
-//bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
-//  const std::list<std::string>& theArguments, const AttributePtr& theAttribute) const
-//{
-//  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-//    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-//  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-//  for(; anAttr != anAttrs.end(); anAttr++) {
-//    if (*anAttr) {
-//      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-//        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-//      // check the object is already presented
-//      if (!aRef->isObject() && aRef->attr() == theAttribute)
-//        return false;
-//    }
-//  }
-//  return true;
-//}
-// =========== end of todo
