@@ -33,6 +33,8 @@ class GEOMAPI_EXPORT GeomAPI_XY : public GeomAPI_Interface
 
   /// result is sum of coordinates of this and the given argument
   const std::shared_ptr<GeomAPI_XY> added(const std::shared_ptr<GeomAPI_XY>& theArg);
+  /// result is difference between coordinates of this and the given argument
+  const std::shared_ptr<GeomAPI_XY> decreased(const std::shared_ptr<GeomAPI_XY>& theArg);
   /// result is coordinates multiplied by the argument
   const std::shared_ptr<GeomAPI_XY> multiplied(const double theArg);
 

@@ -23,12 +23,12 @@ namespace GeomValidators_Tools {
     }
     if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
       AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-      if (anAttr != NULL && anAttr->isInitialized())
+      if (anAttr != NULL)
         anObject = anAttr->context();
     }
     if (anAttrType == ModelAPI_AttributeReference::typeId()) {
       AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
-      if (anAttr.get() != NULL && anAttr->isInitialized())
+      if (anAttr.get() != NULL)
         anObject = anAttr->value();
     }
     return anObject;

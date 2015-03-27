@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
@@ -65,17 +65,6 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
           <validator id="GeomValidators_EdgeOrVertex"/>
         </sketch_shape_selector>
- <!--
- TODO(nds): v1.0.2, master  
-			    shape_types="edge vertex">
-			<validator id="PartSet_DifferentObjects"/>
-      <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
-      <selection_filter id="MultiFilter" parameters="line,vertex"/>
-    </sketch_shape_selector>
-		
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
- -->
-        
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         
         <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed" min="0">
@@ -125,22 +114,6 @@
             <validator id="PartSet_DifferentObjects"/>
             <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
         </sketch_constraint_shape_selector>
-        
-<!--  
-  TODO(nds): v1.0.2, master  
-		<sketch_constraint_shape_selector id="ConstraintEntityA" 
-			label="First line" tooltip="Select a line" shape_types="edge">
-			<selection_filter id="EdgeFilter" parameters="line"/>
-		</sketch_constraint_shape_selector>
-		
-		<sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select a line" 
-			shape_types="edge">
-			<selection_filter id="EdgeFilter" parameters="line"/>
-			<validator id="PartSet_DifferentObjects"/>
-		</sketch_constraint_shape_selector>
-		
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
--->
         <validator id="PartSet_ParallelValidator"/>
       </feature>
       
@@ -162,21 +135,6 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
-<!--  
-  TODO(nds): v1.0.2, master
-		<sketch_constraint_shape_selector id="ConstraintEntityA" 
-			label="First line" tooltip="Select an line" 
-			shape_types="edge">
-      <selection_filter id="EdgeFilter" parameters="line"/>
-    </sketch_constraint_shape_selector>
-		
-		<sketch_constraint_shape_selector id="ConstraintEntityB" 
-			label="Last line" tooltip="Select an line" 
-			shape_types="edge">
-			<validator id="PartSet_DifferentObjects"/>
-      <selection_filter id="EdgeFilter" parameters="line"/>
-    </sketch_constraint_shape_selector>
--->
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>
 
@@ -242,8 +200,17 @@
       <feature
         id="SketchConstraintMirror"
         title="Mirror"
-        tooltip="Create constraint mirroring group of objects"
-        internal="1" />
+        tooltip="Create constraint, mirroring group of objects">
+        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+            label="Mirror line" tooltip="Select mirror line" shape_types="edge">
+            <validator id="GeomValidators_Edge" parameters="line"/>
+        </sketch_constraint_shape_selector>
+        <multi_selector id="ConstraintMirrorList" 
+            label="List of objects"
+            tooltip="Select list of mirroring objects"
+            type_choice="Edges">
+        </multi_selector>
+      </feature>
     </group>
     
     <group id="Edit">

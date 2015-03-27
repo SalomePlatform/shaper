@@ -42,9 +42,24 @@ void Config_ValidatorReader::processNode(xmlNodePtr theNode)
     processSelectionFilter(theNode);
   } else if (isNode(theNode, NODE_FEATURE, NULL)) {
     storeAttribute(theNode, _ID);
+  } else if (isWidgetNode(theNode)) {
+    storeAttribute(theNode, _ID);
+    // Store widget name to restore it's id on validator/selector processing
+    myCurrentWidget = getNodeName(theNode);
   }
   //Process SOURCE nodes.
   Config_XMLReader::processNode(theNode);
+}
+
+void Config_ValidatorReader::cleanup(xmlNodePtr theNode)
+{
+  if (isNode(theNode, NODE_FEATURE, NULL)) {
+    cleanupAttribute(theNode, _ID);
+  } else if (isWidgetNode(theNode)) {
+    cleanupAttribute(NODE_XMLPARENT, _ID);
+    // Cleanup widget name when leave the widget node.
+    myCurrentWidget = "";
+  }
 }
 
 bool Config_ValidatorReader::processChildren(xmlNodePtr aNode)
@@ -63,14 +78,12 @@ void Config_ValidatorReader::processValidator(xmlNodePtr theNode)
   getParametersInfo(theNode, aValidatorId, aParameters);
   aMessage->setValidatorId(aValidatorId);
   aMessage->setValidatorParameters(aParameters);
-  //TODO(sbh): update feature/attribute id restoring
-  // when "cleanup" technique will be available (v. >= 1.1.0)
-  xmlNodePtr aFeatureOrWdgNode = theNode->parent;
-  if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
-    aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
-  } else {
-    aMessage->setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
-    aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
+  std::string aFeatureId = restoreAttribute(NODE_FEATURE, _ID);
+  aMessage->setFeatureId(aFeatureId);
+  // parent is attribute (widget)
+  if (!myCurrentWidget.empty()) {
+    std::string aParentId = restoreAttribute(myCurrentWidget.c_str(), _ID);
+    aMessage->setAttributeId(aParentId);
   }
   aEvLoop->send(aMessage);
 }
@@ -86,13 +99,12 @@ void Config_ValidatorReader::processSelectionFilter(xmlNodePtr theNode)
   getParametersInfo(theNode, aSelectionFilterId, aParameters);
   aMessage->setSelectionFilterId(aSelectionFilterId);
   aMessage->setFilterParameters(aParameters);
-
-  xmlNodePtr aFeatureOrWdgNode = theNode->parent;
-  if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
-    aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
-  } else {
-    aMessage->setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
-    aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
+  std::string aFeatureId = restoreAttribute(NODE_FEATURE, _ID);
+  aMessage->setFeatureId(aFeatureId);
+  // parent is attribute (widget)
+  if (!myCurrentWidget.empty()) {
+    std::string aParentId = restoreAttribute(myCurrentWidget.c_str(), _ID);
+    aMessage->setAttributeId(aParentId);
   }
   aEvLoop->send(aMessage);
 }

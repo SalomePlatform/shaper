@@ -45,7 +45,7 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
     // and reference from composite feature is removed automatically
     FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     if (anOwnerFeature.get()) {
-      aData->addBackReference(anOwnerFeature, id());
+      aData->addBackReference(anOwnerFeature, id(), false);
     }
 
     owner()->data()->sendAttributeUpdated(this);

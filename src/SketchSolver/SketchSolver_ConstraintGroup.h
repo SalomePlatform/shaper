@@ -237,6 +237,20 @@ protected:
                         const Slvs_hEntity& theMirror,
                         const Slvs_hEntity& theMirrorLine);
 
+  /** \brief Creates/updates mirror constraint for two points
+   *  \param[in]     theBasePoint   ID of initial point
+   *  \param[in]     theMirrorPoint ID of the mirroring point
+   *  \param[in]     theMirrorLine  ID of the mirror line
+   *  \param[in]     thePrevConstr  list of previous constraints (the items will be deleted from the list if they are updated)
+   *  \param[in,out] thePrevMirror  list of previously mirrored points (the items will be deleted from the list if they are updated)
+   *  \return ID of created/updated constraint
+   */
+  Slvs_hConstraint changeMirrorPoints(const Slvs_hEntity& theBasePoint,
+                                      const Slvs_hEntity& theMirrorPoint,
+                                      const Slvs_hEntity& theMirrorLine,
+                                      std::vector<Slvs_Constraint>&  thePrevConstr,
+                                      std::map<Slvs_hEntity, Slvs_hEntity>& thePrevMirror);
+
   /** \brief Calculates middle point on line or arc
    *  \param[in]  theEntity  identifier of line or arc
    *  \param[out] theX       X value of middle point

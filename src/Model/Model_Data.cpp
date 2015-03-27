@@ -259,10 +259,12 @@ void Model_Data::eraseBackReferences()
     aRes->setIsConcealed(false);
 }
 
-void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID)
+void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID, 
+   const bool theApplyConcealment)
 {
   myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
-  if (ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
+  if (theApplyConcealment && 
+      ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
     std::shared_ptr<ModelAPI_Result> aRes = 
       std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
     if (aRes) {

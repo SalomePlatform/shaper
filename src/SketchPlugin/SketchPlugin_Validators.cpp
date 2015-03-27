@@ -67,9 +67,6 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   }
   return false;
 }
-
-
-
 bool SketchPlugin_TangentAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
@@ -137,6 +134,5 @@ bool SketchPlugin_TangentAttrValidator::isValid(
   }
   return false;
 }
-
 
 
