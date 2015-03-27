@@ -13,11 +13,6 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
-#include <ModuleBase_IWorkshop.h>
-#include <XGUI_ModuleConnector.h>
-#include <XGUI_Workshop.h>
-#include <XGUI_Displayer.h>
-
 bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
   ObjectPtr aSelectedObject = theSelectedObject;
@@ -77,17 +72,6 @@ bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
 }
 
 //********************************************************************
-void PartSet_WidgetShapeSelector::storeAttributeValue()
-{
-  /// this is a temporary code, will be removed when master is merged to this branch
-  /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  aWorkshop->displayer()->enableUpdateViewer(false);
-  */
-  ModuleBase_WidgetShapeSelector::storeAttributeValue();
-}
-
-//********************************************************************
 void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
@@ -95,11 +79,6 @@ void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
   /// after merge, the external edge should be removed always, without flag checking
   if (!theValid)
     removeExternal();
-  /*
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  aWorkshop->displayer()->enableUpdateViewer(false);//->erase(myExternalObject);
-  aWorkshop->displayer()->enableUpdateViewer(true);*/
 }
 
 //********************************************************************
