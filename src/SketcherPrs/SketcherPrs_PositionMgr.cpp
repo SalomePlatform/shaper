@@ -90,7 +90,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   }
   gp_Vec aShift = aVec1.Crossed(thePrs->plane()->norm()->impl<gp_Dir>());
   aShift.Normalize();
-  aShift.Multiply(theStep);
+  aShift.Multiply(theStep * 0.8);
 
   int aPos = getPositionIndex(theShape, thePrs);
   int aM = 1;

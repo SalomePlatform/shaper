@@ -36,7 +36,7 @@
 #endif
 
 /// Step between icons
-static const double MyDist = 0.03;
+static const double MyDist = 0.02;
 
 /// Function to convert opengl data type
 GLenum toGlDataType (const Graphic3d_TypeOfData theType, GLint& theNbComp)
