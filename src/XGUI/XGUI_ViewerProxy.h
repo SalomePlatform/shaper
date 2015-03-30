@@ -5,10 +5,9 @@
 
 #include "XGUI.h"
 #include <ModuleBase_IViewer.h>
+#include <AppElements_ViewWindow.h>
 
 class XGUI_Workshop;
-class AppElements_ViewWindow;
-
 /**
  * \ingroup GUI
  * Proxy class which repersents or AppElements_Viewer or Salome Viewer
@@ -100,6 +99,8 @@ private slots:
 
   void onKeyPress(AppElements_ViewWindow*, QKeyEvent*);
   void onKeyRelease(AppElements_ViewWindow*, QKeyEvent*);
+
+  void onViewTransformed(AppElements_ViewWindow::OperationType);
 
  private:
   XGUI_Workshop* myWorkshop;

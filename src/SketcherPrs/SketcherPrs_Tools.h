@@ -38,6 +38,9 @@ namespace SketcherPrs_Tools {
   SKETCHERPRS_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
                                                        const std::string& theAttribute);
 
+  SKETCHERPRS_EXPORT double getArrowSize();
+
+  SKETCHERPRS_EXPORT void setArrowSize(double theSize);
 };
 
 #endif

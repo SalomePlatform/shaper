@@ -133,4 +133,16 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(
   return aLin2d.project(thePoint);
 }
 
+
+static double MyArrowSize = 40.;
+double getArrowSize()
+{
+  return MyArrowSize;
+}
+
+void setArrowSize(double theSize)
+{
+  MyArrowSize = theSize;
+}
+
 };

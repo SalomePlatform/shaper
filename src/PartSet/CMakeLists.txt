@@ -48,6 +48,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomValidators
     GeomDataAPI
+	SketcherPrs
     ${QT_LIBRARIES}
     ${CAS_KERNEL}
     ${CAS_SHAPE}
@@ -78,6 +79,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
+                    ${CMAKE_SOURCE_DIR}/src/SketcherPrs
                     ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomValidators

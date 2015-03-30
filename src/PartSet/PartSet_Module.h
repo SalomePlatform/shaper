@@ -100,6 +100,7 @@ public:
   /// if it is a sketch operation
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
+
   /// Add menu atems for viewer into the given menu
   /// \param theMenu a popup menu to be shown in the viewer
   virtual void addViewerItems(QMenu* theMenu) const;
@@ -148,6 +149,10 @@ protected slots:
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();
+
+   /// Called on transformation in current viewer
+   /// \param theTrsfType type of tranformation
+   void onViewTransformed(int theTrsfType = 2);
 
  private:
   /// Breaks sequense of automatically resterted operations

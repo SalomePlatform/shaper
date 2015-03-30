@@ -183,6 +183,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Returns list of displayed objects
   QObjectPtrList displayedObjects() const { return myResult2AISObjectMap.keys(); }
 
+  /// Returns list of displayed objects
+  QList<AISObjectPtr> displayedPresentations() const { return myResult2AISObjectMap.values(); }
+
   /// Returns true if the given object can be shown in shaded mode
   /// \param theObject object to check
   bool canBeShaded(ObjectPtr theObject) const;
