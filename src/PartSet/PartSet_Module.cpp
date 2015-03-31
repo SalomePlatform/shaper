@@ -275,36 +275,12 @@ bool PartSet_Module::canRedo() const
 
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
-  bool aCanDisplay = false;
-  if (!mySketchMgr->canDisplayObject())
-    return aCanDisplay;
-  CompositeFeaturePtr aSketchFeature = mySketchMgr->activeSketch();
-  if (aSketchFeature.get() != NULL) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  // the display should be possible almost always, with exception of some specific cases
 
-    // MPV: the second and third conditions to avoid crash on exit for application
-    if (aFeature.get() != NULL && aFeature->data().get() && aFeature->data()->isValid()) {
-      if (aFeature == aSketchFeature) {
-        aCanDisplay = false;
-      }
-      else if (aSketchFeature.get() && aSketchFeature->data().get() &&
-               aSketchFeature->data()->isValid()) {
-        for (int i = 0; i < aSketchFeature->numberOfSubs() && !aCanDisplay; i++) {
-          FeaturePtr aSubFeature = aSketchFeature->subFeature(i);
-          std::list<ResultPtr> aResults = aSubFeature->results();
-          std::list<ResultPtr>::const_iterator aIt;
-          for (aIt = aResults.begin(); aIt != aResults.end() && !aCanDisplay; ++aIt) {
-            if (theObject == (*aIt))
-              aCanDisplay = true;
-          }
-          if (aSubFeature == theObject)
-            aCanDisplay = true;
-        }
-      }
-    }
-  }
-  else {
-    aCanDisplay = ModuleBase_IModule::canDisplayObject(theObject);
+  bool aCanDisplay = true;
+
+  if (mySketchMgr->activeSketch()) {
+    aCanDisplay = mySketchMgr->canDisplayObject(theObject);
   }
   return aCanDisplay;
 }

@@ -92,6 +92,25 @@
 #include <dlfcn.h>
 #endif
 
+//#define DEBUG_FEATURE_CREATED
+//#define DEBUG_FEATURE_REDISPLAY
+
+QString objectInfo(ObjectPtr theObj)
+{
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
+  QString aFeatureStr = "feature";
+  if(aRes.get()) {
+    aFeatureStr.append("(Result)");
+    aFeature = ModelAPI_Feature::feature(aRes);
+  }
+  if (aFeature.get()) {
+    aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
+  }
+  return aFeatureStr;
+}
+
+
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
 
@@ -507,9 +526,20 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
+
+#ifdef DEBUG_FEATURE_REDISPLAY
+  QStringList anInfo;
+  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+    anInfo.append(objectInfo((*aIt)));
+  }
+  QString anInfoStr = anInfo.join(", ");
+  qDebug(QString("onFeatureRedisplayMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
 
+    // Hide the object if it is invalid or concealed one
     bool aHide = !aObj->data() || !aObj->data()->isValid();
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -518,7 +548,14 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
     if (aHide)
       myDisplayer->erase(aObj, false);
     else {
-      if (myDisplayer->isVisible(aObj))  {
+      // Redisplay the visible object or the object of the current operation
+      bool isVisibleObject = myDisplayer->isVisible(aObj);
+      #ifdef DEBUG_FEATURE_REDISPLAY
+      QString anObjInfo = objectInfo((aObj));
+      qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+      #endif
+
+      if (isVisibleObject)  { // redisplay visible object
         displayObject(aObj);  // In order to update presentation
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
@@ -526,11 +563,11 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
               aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
             myDisplayer->deactivate(aObj);
         }
-      } else {
-        if (myOperationMgr->hasOperation()) {
+      } else { // display object if the current operation has it
+        ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+        if (aOperation && aOperation->hasObject(aObj)) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (myModule->canDisplayObject(aObj)) {
-            displayObject(aObj);
+          if (displayObject(aObj)) {
             // Deactivate object of current operation from selection
             if (myDisplayer->isActive(aObj))
               myDisplayer->deactivate(aObj);
@@ -546,21 +583,28 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
 void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
-
   std::set<ObjectPtr>::const_iterator aIt;
-  bool aHasPart = false;
+#ifdef DEBUG_FEATURE_CREATED
+  QStringList anInfo;
+  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+    anInfo.append(objectInfo((*aIt)));
+  }
+  QString anInfoStr = anInfo.join(", ");
+  qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
+  //bool aHasPart = false;
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
 
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
-    if (aPart) {
-      aHasPart = true;
+    //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
+    //if (aPart) {
+      //aHasPart = true;
       // If a feature is created from the aplication's python console  
       // it doesn't stored in the operation mgr and doesn't displayed
-    } else if (myModule->canDisplayObject(*aIt)) {
-      displayObject(*aIt);
-      isDisplayed = true;
-    }
+    //} else {
+    isDisplayed = displayObject(*aIt);
+    //}
   }
   if (myObjectBrowser)
     myObjectBrowser->processEvent(theMsg);
@@ -1573,8 +1617,11 @@ void XGUI_Workshop::closeDocument()
 }
 
 //**************************************************************
-void XGUI_Workshop::displayObject(ObjectPtr theObj)
+bool XGUI_Workshop::displayObject(ObjectPtr theObj)
 {
+  if (!myModule->canDisplayObject(theObj))
+    return false;
+
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObj);
   if (aBody.get() != NULL) {
     int aNb = myDisplayer->objectsCount();
@@ -1583,6 +1630,8 @@ void XGUI_Workshop::displayObject(ObjectPtr theObj)
       viewer()->fitAll();
   } else 
     myDisplayer->display(theObj, false);
+
+  return true;
 }
 
 void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot)
