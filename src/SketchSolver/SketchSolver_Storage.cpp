@@ -381,6 +381,17 @@ void SketchSolver_Storage::removeCoincidentPoint(const Slvs_hEntity& thePoint)
     }
 }
 
+bool SketchSolver_Storage::isCoincident(
+    const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const
+{
+  std::vector< std::set<Slvs_hEntity> >::const_iterator aCIter = myCoincidentPoints.begin();
+  for (; aCIter != myCoincidentPoints.end(); aCIter++)
+    if (aCIter->find(thePoint1) != aCIter->end() && aCIter->find(thePoint2) != aCIter->end())
+      return true;
+  return false;
+}
+
+
 
 
 // ========================================================

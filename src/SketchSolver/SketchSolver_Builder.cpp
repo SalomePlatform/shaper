@@ -7,8 +7,10 @@
 #include "SketchSolver_Builder.h"
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_ConstraintDistance.h>
+#include <SketchSolver_ConstraintEqual.h>
 #include <SketchSolver_ConstraintLength.h>
 #include <SketchSolver_ConstraintRigid.h>
+#include <SketchSolver_ConstraintTangent.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomDataAPI_Dir.h>
@@ -61,7 +63,7 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintDistance(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintEqual::ID()) {
-////    return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
+    return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID()) {
 ////    return SolverConstraintPtr(new SketchSolver_ConstraintFillet(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintHorizontal::ID()) {
@@ -75,9 +77,9 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintPerpendicular::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintPerpendicular(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintRadius::ID()) {
-////    return SolverConstraintPtr(new SketchSolver_ConstraintRadius(theConstraint));
+    return SolverConstraintPtr(new SketchSolver_ConstraintRadius(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintTangent::ID()) {
-////    return SolverConstraintPtr(new SketchSolver_ConstraintTangent(theConstraint));
+    return SolverConstraintPtr(new SketchSolver_ConstraintTangent(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintVertical::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintVertical(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintRigid::ID()) {

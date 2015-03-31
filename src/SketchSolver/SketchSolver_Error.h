@@ -41,6 +41,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Incorrect attribute");
     return MY_ERROR_VALUE;
   }
+  /// Tangency constraint has wrong attributes
+  inline static const std::string& INCORRECT_TANGENCY_ATTRIBUTE()
+  {
+    static const std::string MY_ERROR_VALUE("An arc should be an attribute of tangency constraint");
+    return MY_ERROR_VALUE;
+  }
 };
 
 #endif

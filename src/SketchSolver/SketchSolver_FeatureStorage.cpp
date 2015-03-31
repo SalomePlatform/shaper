@@ -313,11 +313,11 @@ bool SketchSolver_FeatureStorage::isConsistent() const
   for (; aFIter != myFeatures.end(); aFIter++)
     if (!aFIter->first->data() || !aFIter->first->data()->isValid())
       return false;
-  // Check the attributes are valid
-  MapAttributeFeature::const_iterator aTIter = myAttributes.begin();
-  for (; aTIter != myAttributes.end(); aTIter++)
-    if (!aTIter->first->isInitialized())
-      return false;
+////  // Check the attributes are valid
+////  MapAttributeFeature::const_iterator aTIter = myAttributes.begin();
+////  for (; aTIter != myAttributes.end(); aTIter++)
+////    if (!aTIter->first->isInitialized())
+////      return false;
   return true;
 }
 
@@ -370,3 +370,21 @@ std::set<ConstraintPtr> SketchSolver_FeatureStorage::getConstraints(AttributePtr
   return aResult;
 }
 
+void SketchSolver_FeatureStorage::blockEvents(bool isBlocked) const
+{
+  std::set<ConstraintPtr>::iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); aCIter++)
+    if ((*aCIter)->data() && (*aCIter)->data()->isValid())
+      (*aCIter)->data()->blockSendAttributeUpdated(isBlocked);
+
+  MapFeatureConstraint::const_iterator aFIter = myFeatures.begin();
+  for (; aFIter != myFeatures.end(); aFIter++)
+    if (aFIter->first->data() && aFIter->first->data()->isValid())
+      aFIter->first->data()->blockSendAttributeUpdated(isBlocked);
+
+  MapAttributeFeature::const_iterator anAtIter = myAttributes.begin();
+  for (; anAtIter != myAttributes.end(); anAtIter++)
+    if (anAtIter->first->owner() && anAtIter->first->owner()->data() &&
+        anAtIter->first->owner()->data()->isValid())
+      anAtIter->first->owner()->data()->blockSendAttributeUpdated(isBlocked);
+}

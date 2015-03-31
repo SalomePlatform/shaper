@@ -64,6 +64,9 @@ public:
   /// \brief Prepares list of constraints, which using specified attribute
   std::set<ConstraintPtr> getConstraints(AttributePtr theAttribute) const;
 
+  /// \brief Block/unblock events of changing attributes of the features
+  void blockEvents(bool isBlocked) const;
+
 private:
   std::set<ConstraintPtr> myConstraints; ///< list of SketchPlugin constraints used in the current group
   MapFeatureConstraint myFeatures; ///< list of features used in the group and corresponding constraints which use the feature

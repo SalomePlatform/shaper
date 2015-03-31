@@ -177,4 +177,27 @@ public:
   { return SLVS_C_VERTICAL; }
 };
 
+
+/** \class   SketchSolver_ConstraintRadius
+ *  \ingroup Plugins
+ *  \brief   Convert Radius constraint to SolveSpace structure
+ */
+class SketchSolver_ConstraintRadius : public SketchSolver_Constraint
+{
+public:
+  SketchSolver_ConstraintRadius(ConstraintPtr theConstraint) :
+      SketchSolver_Constraint(theConstraint)
+  {}
+
+  virtual int getType() const
+  { return SLVS_C_DIAMETER; }
+
+  virtual void adjustConstraint()
+  {
+    Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
+    aConstraint.valA *= 2.0;
+    myStorage->updateConstraint(aConstraint);
+  }
+};
+
 #endif

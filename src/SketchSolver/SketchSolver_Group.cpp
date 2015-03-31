@@ -1397,16 +1397,18 @@ bool SketchSolver_Group::resolveConstraints()
 
     int aResult = myConstrSolver.solve();
     if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
+      myFeatureStorage->blockEvents(true);
       ConstraintConstraintMap::iterator aConstrIter = myConstraints.begin();
       for (; aConstrIter != myConstraints.end(); aConstrIter++)
         aConstrIter->second->refresh();
+      myFeatureStorage->blockEvents(false);
     } else if (!myConstraints.empty())
       Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
 
-    myStorage->setNeedToResolve(false);
     aResolved = true;
   }
   removeTemporaryConstraints();
+  myStorage->setNeedToResolve(false);
   return aResolved;
 }
 

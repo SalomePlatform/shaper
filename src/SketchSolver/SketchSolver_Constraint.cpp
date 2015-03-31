@@ -160,6 +160,8 @@ bool SketchSolver_Constraint::remove(ConstraintPtr theConstraint)
   cleanErrorMsg();
   if (theConstraint && theConstraint != myBaseConstraint)
     return false;
+  if (mySlvsConstraints.empty())
+    return true;
   bool isFullyRemoved = myStorage->removeConstraint(mySlvsConstraints.front());
   if (isFullyRemoved) {
     myFeatureMap.clear();

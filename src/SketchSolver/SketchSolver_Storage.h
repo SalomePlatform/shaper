@@ -109,6 +109,10 @@ private:
   /// \brief Remove point from lists of coincidence
   void removeCoincidentPoint(const Slvs_hEntity& thePoint);
 
+public:
+  /// \brief Check two points are coincident
+  bool isCoincident(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
+
 private:
   Slvs_hParam myParamMaxID; ///< current parameter index (may differs with the number of parameters)
   std::vector<Slvs_Param> myParameters; ///< list of parameters used in the current group of constraints (sorted by the identifier)
