@@ -407,16 +407,17 @@ bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityO
 
   ModuleBase_ViewerPrs aPrs;
   myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+  // It should be checked by corresponded validator
   ObjectPtr aObject = aPrs.object();
-  ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
+  /*ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
   if ((!aCurrentObject) && (!aObject))
-    return false;
+    return false;*/
 
+  // It should be checked by corresponded validator
   // Check that the selected object is result (others can not be accepted)
-  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+  /*ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
   if (!aRes)
     return false;
-
   if (myFeature) {
     // We can not select a result of our feature
     const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
@@ -426,16 +427,21 @@ bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityO
         return false;
     }
   }
+  */
+  // It should be checked by corresponded validator
+  /*
   // Check that object belongs to active document or PartSet
   DocumentPtr aDoc = aRes->document();
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
-    return false;
+    return false;*/
 
+  // It should be checked by corresponded validator
   // Check that the result has a shape
-  GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
+  GeomShapePtr aShape;
+  /*aShape = ModelAPI_Tools::shape(aRes);
   if (!aShape)
-    return false;
+    return false;*/
 
   // Get sub-shapes from local selection
   if (!aPrs.shape().IsNull()) {
