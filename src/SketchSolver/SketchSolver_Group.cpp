@@ -156,41 +156,6 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
   return aCIter->second->getId(theAttribute);
 }
 
-
-////// ============================================================================
-//////  Function: checkConstraintConsistence
-//////  Class:    SketchSolver_Group
-//////  Purpose:  verifies and changes parameters of the constraint
-////// ============================================================================
-////void SketchSolver_Group::checkConstraintConsistence(Slvs_Constraint& theConstraint)
-////{
-////  if (theConstraint.type == SLVS_C_PT_LINE_DISTANCE) {
-////    // Get constraint parameters and check the sign of constraint value
-////
-////    // point coordinates
-////    int aPtPos = Search(theConstraint.ptA, myEntities);
-////    int aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
-////    std::shared_ptr<GeomAPI_XY> aPoint(
-////        new GeomAPI_XY(myParams[aPtParamPos].val, myParams[aPtParamPos + 1].val));
-////
-////    // line coordinates
-////    int aLnPos = Search(theConstraint.entityA, myEntities);
-////    aPtPos = Search(myEntities[aLnPos].point[0], myEntities);
-////    aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
-////    std::shared_ptr<GeomAPI_XY> aStart(
-////        new GeomAPI_XY(-myParams[aPtParamPos].val, -myParams[aPtParamPos + 1].val));
-////    aPtPos = Search(myEntities[aLnPos].point[1], myEntities);
-////    aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
-////    std::shared_ptr<GeomAPI_XY> aEnd(
-////        new GeomAPI_XY(myParams[aPtParamPos].val, myParams[aPtParamPos + 1].val));
-////
-////    aEnd = aEnd->added(aStart);
-////    aPoint = aPoint->added(aStart);
-////    if (aPoint->cross(aEnd) * theConstraint.valA < 0.0)
-////      theConstraint.valA *= -1.0;
-////  }
-////}
-
 // ============================================================================
 //  Function: changeConstraint
 //  Class:    SketchSolver_Group
@@ -453,15 +418,23 @@ bool SketchSolver_Group::changeConstraint(
   return true;
 }
 
-void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+
+bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theFeature);
+  if (aConstraints.empty())
+    return false;
   std::set<ConstraintPtr>::iterator aCIter = aConstraints.begin();
   for (; aCIter != aConstraints.end(); aCIter++) {
     ConstraintConstraintMap::iterator aSolConIter = myConstraints.find(*aCIter);
     aSolConIter->second->update();
   }
+  return true;
+}
 
+void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+{
+  updateFeature(theFeature);
   // Temporary rigid constraint
   SolverConstraintPtr aConstraint =
       SketchSolver_Builder::getInstance()->createRigidConstraint(theFeature);
@@ -1417,46 +1390,24 @@ bool SketchSolver_Group::updateWorkplane()
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
-  if (!myStorage->isNeedToResolve() || isEmpty())
-    return false;
+  bool aResolved = false;
+  if (myStorage->isNeedToResolve() && !isEmpty()) {
+    myConstrSolver.setGroupID(myID);
+    myStorage->initializeSolver(myConstrSolver);
 
-  myConstrSolver.setGroupID(myID);
-  myStorage->initializeSolver(myConstrSolver);
+    int aResult = myConstrSolver.solve();
+    if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
+      ConstraintConstraintMap::iterator aConstrIter = myConstraints.begin();
+      for (; aConstrIter != myConstraints.end(); aConstrIter++)
+        aConstrIter->second->refresh();
+    } else if (!myConstraints.empty())
+      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
 
-////  theSolver.setDraggedParameters(myTempPointWhereDragged);
-////
-  int aResult = myConstrSolver.solve();
-  if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
-    ConstraintConstraintMap::iterator aConstrIter = myConstraints.begin();
-    for (; aConstrIter != myConstraints.end(); aConstrIter++)
-      aConstrIter->second->refresh();
-
-////                                      // Obtain result into the same list of parameters
-////    if (!myConstrSolver.getResult(myParams))
-////      return true;
-////
-////    // We should go through the attributes map, because only attributes have valued parameters
-////    std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntIter =
-////        myEntityAttrMap.begin();
-////    for (; anEntIter != myEntityAttrMap.end(); anEntIter++) {
-////      if (anEntIter->first->owner().get() && anEntIter->first->owner()->data().get())
-////        anEntIter->first->owner()->data()->blockSendAttributeUpdated(true);
-////      if (updateAttribute(anEntIter->first, anEntIter->second))
-////        updateRelatedConstraints(anEntIter->first);
-////    }
-////    updateFilletConstraints();
-////    // unblock all features then
-////    for (anEntIter = myEntityAttrMap.begin(); anEntIter != myEntityAttrMap.end(); anEntIter++) {
-////      if (anEntIter->first->owner().get() && anEntIter->first->owner()->data().get())
-////        anEntIter->first->owner()->data()->blockSendAttributeUpdated(false);
-////    }
-  } else if (!myConstraints.empty())
-    Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
-
+    myStorage->setNeedToResolve(false);
+    aResolved = true;
+  }
   removeTemporaryConstraints();
-////  myNeedToSolve = false;
-  myStorage->setNeedToResolve(false);
-  return true;
+  return aResolved;
 }
 
 // ============================================================================

@@ -30,7 +30,13 @@ void SketchSolver_ConstraintRigid::process()
   bool isEmpty = aConstrIter == mySlvsConstraints.end();
   std::vector<Slvs_hEntity>::const_iterator anEntIter = anEntities.begin();
   for (; anEntIter != anEntities.end(); anEntIter++) {
-    if (isEmpty) { // create new constraint
+    if (*anEntIter == SLVS_E_UNKNOWN)
+      continue;
+    Slvs_hConstraint aConstrID = myStorage->isPointFixed(*anEntIter);
+    bool isForceUpdate = (aConstrID != SLVS_E_UNKNOWN && !myBaseConstraint);
+    if (isEmpty && !isForceUpdate) { // create new constraint
+      if (aConstrID != SLVS_E_UNKNOWN)
+        continue; // the coincident point is already fixed
       aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(), getType(), myGroup->getWorkplaneId(),
           aValue, *anEntIter, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
       aConstraint.h = myStorage->addConstraint(aConstraint);
@@ -38,11 +44,17 @@ void SketchSolver_ConstraintRigid::process()
       if (!myBaseConstraint)
         myStorage->addTemporaryConstraint(aConstraint.h);
     } else { // update already existent constraint
-      aConstraint = myStorage->getConstraint(*aConstrIter);
+      if (aConstrID == SLVS_E_UNKNOWN || myBaseConstraint)
+        aConstrID = *aConstrIter;
+      aConstraint = myStorage->getConstraint(aConstrID);
       aConstraint.ptA = *anEntIter;
       myStorage->addConstraint(aConstraint);
-      aConstrIter++;
-      isEmpty = aConstrIter == mySlvsConstraints.end();
+      if (!myBaseConstraint)
+        myStorage->addTemporaryConstraint(aConstraint.h);
+      if (!isEmpty) {
+        aConstrIter++;
+        isEmpty = aConstrIter == mySlvsConstraints.end();
+      }
     }
   }
 }
@@ -59,7 +71,7 @@ void SketchSolver_ConstraintRigid::getAttributes(
     // Get the attribute of constraint
     AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         myBaseConstraint->attribute(SketchPlugin_ConstraintRigid::ENTITY_A()));
-    if (!aRefAttr) {
+    if (!aRefAttr || !aRefAttr->isInitialized()) {
       myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
       return;
     }

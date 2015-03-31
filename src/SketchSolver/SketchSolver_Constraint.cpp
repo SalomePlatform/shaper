@@ -97,6 +97,7 @@ void SketchSolver_Constraint::process()
     mySlvsConstraints.push_back(anID);
   else
     mySlvsConstraints[0] = anID;
+  adjustConstraint();
 }
 
 void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
@@ -110,13 +111,48 @@ void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
     process();
   }
 
+  // Update all attributes
   int aType;
+  std::map<Slvs_hEntity, Slvs_hEntity> aRelocationMap;
   std::map<FeaturePtr, Slvs_hEntity>::iterator aFeatIter = myFeatureMap.begin();
-  for (; aFeatIter != myFeatureMap.end(); aFeatIter++)
+  for (; aFeatIter != myFeatureMap.end(); aFeatIter++) {
+    Slvs_hEntity aPrevID = aFeatIter->second;
     aFeatIter->second = changeEntity(aFeatIter->first, aType);
+    if (aFeatIter->second != aPrevID)
+      aRelocationMap[aPrevID] = aFeatIter->second;
+  }
   std::map<AttributePtr, Slvs_hEntity>::iterator anAttrIter = myAttributeMap.begin();
-  for (; anAttrIter != myAttributeMap.end(); anAttrIter++)
+  for (; anAttrIter != myAttributeMap.end(); anAttrIter++) {
+    Slvs_hEntity aPrevID = anAttrIter->second;
     anAttrIter->second = changeEntity(anAttrIter->first, aType);
+    if (anAttrIter->second != aPrevID)
+      aRelocationMap[aPrevID] = anAttrIter->second;
+  }
+
+  // Value if exists
+  AttributeDoublePtr aValueAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+    myBaseConstraint->data()->attribute(SketchPlugin_Constraint::VALUE()));
+  double aValue = aValueAttr ? aValueAttr->value() : 0.0;
+
+  // Update constraint
+  std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
+  for (; aCIter != mySlvsConstraints.end(); aCIter++) {
+    Slvs_Constraint aConstraint = myStorage->getConstraint(*aCIter);
+    aConstraint.valA = aValue;
+    Slvs_hEntity* aCoeffs[6] = {
+        &aConstraint.ptA, &aConstraint.ptB,
+        &aConstraint.entityA, &aConstraint.entityB,
+        &aConstraint.entityC, &aConstraint.entityD};
+    for (int i = 0; i < 6; i++) {
+      if (*(aCoeffs[i]) == SLVS_E_UNKNOWN)
+        continue;
+      std::map<Slvs_hEntity, Slvs_hEntity>::iterator aFound = aRelocationMap.find(*(aCoeffs[i]));
+      if (aFound != aRelocationMap.end())
+        *(aCoeffs[i]) = aFound->second;
+    }
+    *aCIter = myStorage->addConstraint(aConstraint);
+  }
+  adjustConstraint();
 }
 
 bool SketchSolver_Constraint::remove(ConstraintPtr theConstraint)
@@ -363,7 +399,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
     int anAttrType;
 
     // Line
-    if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0) {
+    if (aFeatureKind == SketchPlugin_Line::ID()) {
       anAttribute = aFeature->data()->attribute(SketchPlugin_Line::START_ID());
       if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
       Slvs_hEntity aStart = changeEntity(anAttribute, anAttrType);
@@ -381,7 +417,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
       aResult = myStorage->addEntity(aCurrentEntity);
     }
     // Circle
-    else if (aFeatureKind.compare(SketchPlugin_Circle::ID()) == 0) {
+    else if (aFeatureKind == SketchPlugin_Circle::ID()) {
       anAttribute = aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID());
       if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
       Slvs_hEntity aCenter = changeEntity(anAttribute, anAttrType);
@@ -401,7 +437,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
       aResult = myStorage->addEntity(aCurrentEntity);
     }
     // Arc
-    else if (aFeatureKind.compare(SketchPlugin_Arc::ID()) == 0) {
+    else if (aFeatureKind == SketchPlugin_Arc::ID()) {
       anAttribute = aFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID());
       if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
       Slvs_hEntity aCenter = changeEntity(anAttribute, anAttrType);
@@ -426,7 +462,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
       aResult = myStorage->addEntity(aCurrentEntity);
     }
     // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
-    else if (aFeatureKind.compare(SketchPlugin_Point::ID()) == 0) {
+    else if (aFeatureKind == SketchPlugin_Point::ID()) {
       anAttribute = aFeature->data()->attribute(SketchPlugin_Point::COORD_ID());
       if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
       // Both the sketch point and its attribute (coordinates) link to the same SolveSpace point identifier
@@ -435,8 +471,10 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
     }
   }
 
-  myFeatureMap[theEntity] = aResult;
-  theType = aCurrentEntity.type;
+  if (aResult != SLVS_E_UNKNOWN) {
+    myFeatureMap[theEntity] = aResult;
+    theType = aCurrentEntity.type;
+  }
   return aResult;
 }
 

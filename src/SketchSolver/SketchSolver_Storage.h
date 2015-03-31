@@ -60,8 +60,12 @@ public:
   /// \brief Returns the entity by its ID
   const Slvs_Entity& getEntity(const Slvs_hEntity& theEntityID) const;
 
+  /// \brief Verifies the current point or another coincident one is fixed
+  /// \return the ID of the Fixed constraint or SLVS_E_UNKNOWN
+  Slvs_hConstraint isPointFixed(const Slvs_hEntity& thePointID) const;
+
   /** \brief Add new constraint to the current group
-   *  \param[in] theConstraint  SolveSpace constraint
+   *  \param[in] theConstraint   SolveSpace's constraint
    *  \return the ID of added constraint
    */
   Slvs_hConstraint addConstraint(const Slvs_Constraint& theConstraint);
@@ -100,14 +104,21 @@ public:
   void initializeSolver(SketchSolver_Solver& theSolver);
 
 private:
-  Slvs_hParam myParamMaxID; ///< current parameter index (may differs with the number of parameters)
-  std::vector<Slvs_Param> myParameters; ///< list of parameters used in the current group of constraints
-  Slvs_hEntity myEntityMaxID; ///< current entity index (may differs with the number of entities)
-  std::vector<Slvs_Entity> myEntities; ///< list of entities used in the current group of constraints
-  Slvs_hConstraint myConstrMaxID; ///< current constraint index (may differs with the number of constraints)
-  std::vector<Slvs_Constraint> myConstraints; ///< list of constraints used in the current group
+  /// \brief Store coincident points
+  void addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
+  /// \brief Remove point from lists of coincidence
+  void removeCoincidentPoint(const Slvs_hEntity& thePoint);
 
-  std::vector<Slvs_hEntity> myFixedPoints; ///< identifiers of entities which relate to temporary constraints
+private:
+  Slvs_hParam myParamMaxID; ///< current parameter index (may differs with the number of parameters)
+  std::vector<Slvs_Param> myParameters; ///< list of parameters used in the current group of constraints (sorted by the identifier)
+  Slvs_hEntity myEntityMaxID; ///< current entity index (may differs with the number of entities)
+  std::vector<Slvs_Entity> myEntities; ///< list of entities used in the current group of constraints (sorted by the identifier)
+  Slvs_hConstraint myConstrMaxID; ///< current constraint index (may differs with the number of constraints)
+  std::vector<Slvs_Constraint> myConstraints; ///< list of constraints used in the current group (sorted by the identifier)
+
+  std::vector< std::set<Slvs_hEntity> > myCoincidentPoints; ///< lists of coincident points
+  Slvs_hConstraint myFixed; ///< identifier of one of temporary constraints to fix separate point
 
   bool myNeedToResolve; ///< parameters are changed and group needs to be resolved
 

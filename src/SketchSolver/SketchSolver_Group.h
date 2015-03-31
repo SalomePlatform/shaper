@@ -91,6 +91,11 @@ class SketchSolver_Group
 ////   */
 ////  bool changeFilletConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
+  /** \brief Updates the data corresponding the specified feature
+   *  \param[in] theFeature the feature to be updated
+   */
+  bool updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature);
+
   /** \brief Updates the data corresponding the specified feature moved in GUI.
    *         Additional Fixed constraints are created.
    *  \param[in] theFeature the feature to be updated
@@ -239,12 +244,6 @@ private:
 ////   *          \c false if the constraint is the extra one (should not be created in SolveSpace)
 ////   */
 ////  bool addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
-////
-////  /** \brief Verifies and changes parameters of constriant, 
-////   *         e.g. sign of the distance between line and point
-////   *  \param[in,out] theConstraint SolveSpace constraint to be verified
-////   */
-////  void checkConstraintConsistence(Slvs_Constraint& theConstraint);
 ////
 ////  /** \brief Change entities parameters to make them symmetric relating to the mirror line
 ////   *  \param[in] theBase        entity to be mirrored

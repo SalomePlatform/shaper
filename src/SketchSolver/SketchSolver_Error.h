@@ -35,6 +35,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Attribute is not initialized");
     return MY_ERROR_VALUE;
   }
+  /// Constraint has wrong attributes
+  inline static const std::string& INCORRECT_ATTRIBUTE()
+  {
+    static const std::string MY_ERROR_VALUE("Incorrect attribute");
+    return MY_ERROR_VALUE;
+  }
 };
 
 #endif

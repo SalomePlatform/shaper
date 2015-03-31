@@ -6,6 +6,8 @@
 
 #include "SketchSolver_Builder.h"
 #include <SketchSolver_ConstraintCoincidence.h>
+#include <SketchSolver_ConstraintDistance.h>
+#include <SketchSolver_ConstraintLength.h>
 #include <SketchSolver_ConstraintRigid.h>
 
 #include <GeomAPI_Edge.h>
@@ -65,7 +67,7 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintHorizontal::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintHorizontal(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
-////    return SolverConstraintPtr(new SketchSolver_ConstraintLength(theConstraint));
+    return SolverConstraintPtr(new SketchSolver_ConstraintLength(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
 ////    return SolverConstraintPtr(new SketchSolver_ConstraintMirror(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintParallel::ID()) {

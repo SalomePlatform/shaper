@@ -76,6 +76,11 @@ protected:
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes);
 
+  /// \brief This method is used in derived objects to check consistence of constraint.
+  ///        E.g. the distance between line and point may be signed.
+  virtual void adjustConstraint()
+  {}
+
   /// \brief Create or change SlveSpace entity according to the given attribute
   /// \param[in]  theAttribute  reference to the entity to be changed
   /// \param[out] theType       type of created entity
@@ -107,22 +112,6 @@ protected:
 
 typedef std::shared_ptr<SketchSolver_Constraint> SolverConstraintPtr;
 
-
-
-/** \class   SketchSolver_ConstraintDistance
- *  \ingroup Plugins
- *  \brief   Convert distance constraint to SolveSpace structure
- */
-class SketchSolver_ConstraintDistance : public SketchSolver_Constraint
-{
-public:
-  SketchSolver_ConstraintDistance(ConstraintPtr theConstraint) :
-      SketchSolver_Constraint(theConstraint)
-  {}
-
-  virtual int getType() const
-  { return SLVS_C_PT_PT_DISTANCE; }
-};
 
 
 /** \class   SketchSolver_ConstraintParallel

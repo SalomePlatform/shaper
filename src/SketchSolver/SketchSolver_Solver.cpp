@@ -31,6 +31,8 @@ SketchSolver_Solver::SketchSolver_Solver()
 
 SketchSolver_Solver::~SketchSolver_Solver()
 {
+  if (myEquationsSystem.constraint)
+    delete[] myEquationsSystem.constraint;
   if (myEquationsSystem.failed)
     delete[] myEquationsSystem.failed;
 }
@@ -56,8 +58,16 @@ void SketchSolver_Solver::setEntities(Slvs_Entity* theEntities, int theSize)
 
 void SketchSolver_Solver::setConstraints(Slvs_Constraint* theConstraints, int theSize)
 {
-  myEquationsSystem.constraint = theConstraints;
-  myEquationsSystem.constraints = theSize;
+  if (!myEquationsSystem.constraint) {
+    myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+    myEquationsSystem.constraints = theSize;
+  }
+  else if (myEquationsSystem.constraints != theSize) {
+    delete[] myEquationsSystem.constraint;
+    myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+    myEquationsSystem.constraints = theSize;
+  }
+  memcpy(myEquationsSystem.constraint, theConstraints, theSize * sizeof(Slvs_Constraint));
 }
 
 

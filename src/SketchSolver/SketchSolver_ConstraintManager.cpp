@@ -224,7 +224,8 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
     for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
       if ((*aGroupIter)->getId() == aGroupId) {
         // If the group is empty, the feature is not added (the constraint only)
-////        if (!aConstraint && !(*aGroupIter)->isEmpty())
+        if (!aConstraint && !(*aGroupIter)->isEmpty())
+          return (*aGroupIter)->updateFeature(theFeature);
 ////          return (*aGroupIter)->changeEntityFeature(theFeature) != SLVS_E_UNKNOWN;
         return (*aGroupIter)->changeConstraint(aConstraint);
       }
@@ -261,6 +262,7 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
 
     if (aConstraint)
       return (*aFirstGroupIter)->changeConstraint(aConstraint);
+    return (*aFirstGroupIter)->updateFeature(theFeature);
 ////    return (*aFirstGroupIter)->changeEntityFeature(theFeature) != SLVS_E_UNKNOWN;
   }
 
