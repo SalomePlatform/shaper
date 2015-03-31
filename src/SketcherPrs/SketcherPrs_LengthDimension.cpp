@@ -23,16 +23,11 @@
 #include <ModelAPI_Data.h>
 
 
-const int CONSTRAINT_TEXT_HEIGHT = 20;  /// the text height of the constraint
-const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20;  /// the text selection tolerance
-
-
 static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 
-
-
+static const double MyTextHeight = 20;
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
@@ -47,9 +42,11 @@ myConstraint(theConstraint), myPlane(thePlane)
   myAspect->MakeText3d(false);
   myAspect->MakeTextShaded(false);
   myAspect->MakeUnitsDisplayed(false);
+  myAspect->TextAspect()->SetHeight(MyTextHeight);
+  myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
 
+  SetSelToleranceForText2d(MyTextHeight);
   SetDimensionAspect(myAspect);
-  SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
 }
 
 
@@ -90,9 +87,6 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   aFlyout = aDist;
 
   SetFlyout(aFlyout);
-  myAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
-  myAspect->ArrowAspect()->SetLength(CONSTRAINT_TEXT_HEIGHT * 2);
-
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

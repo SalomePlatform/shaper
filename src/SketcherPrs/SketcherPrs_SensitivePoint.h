@@ -15,6 +15,11 @@
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity)
 
+/**
+* \ingroup GUI
+* This sensitive point is done in order to optimize process of the sinzitive area update
+* It referes on point array directly and this lets to avoid procedure of the point synchronisation
+*/
 class SketcherPrs_SensitivePoint : public Select3D_SensitiveEntity
 {
 public: 

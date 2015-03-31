@@ -5,6 +5,7 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "SketcherPrs_Radius.h"
+#include "SketcherPrs_Tools.h"
 
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_Constraint.h>
@@ -17,10 +18,8 @@
 #include <GeomAPI_XYZ.h>
 #include <ModelAPI_AttributeDouble.h>
 
-const int CONSTRAINT_TEXT_HEIGHT = 20;  /// the text height of the constraint
-const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20;  /// the text selection tolerance
-
-static gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
+static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
+static const double MyTextHeight = 20;
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
@@ -34,9 +33,11 @@ SketcherPrs_Radius::SketcherPrs_Radius(SketchPlugin_Constraint* theConstraint,
   myAspect->MakeText3d(false);
   myAspect->MakeTextShaded(false);
   myAspect->MakeUnitsDisplayed(false);
+  myAspect->TextAspect()->SetHeight(MyTextHeight);
+  myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
   
   SetDimensionAspect(myAspect);
-  SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
+  SetSelToleranceForText2d(MyTextHeight);
 }
 
 
@@ -97,7 +98,5 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   SetMeasuredGeometry(aCircle.impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
   SetCustomValue(aRadius);
 
-  myAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
-  myAspect->ArrowAspect()->SetLength(CONSTRAINT_TEXT_HEIGHT * 2.);
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

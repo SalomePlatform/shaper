@@ -98,6 +98,14 @@ class Model_Document : public ModelAPI_Document
   //! \param theLabel base label of the object
   MODEL_EXPORT virtual ObjectPtr object(TDF_Label theLabel);
 
+  //! Returns the first found object in the group by the object name
+  //! \param theGroupID group that contains an object
+  //! \param theName name of the object to search
+  //! \returns null if such object is not found
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Object> objectByName(
+    const std::string& theGroupID, const std::string& theName);
+
+
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 

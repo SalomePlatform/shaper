@@ -118,6 +118,10 @@ signals:
 
   /// Signal emited on selection changed
   void contextMenuRequested(QContextMenuEvent*);
+
+  /// Signal emitted on transformation of view point in view window
+  /// \param theTransformation type of transformation (see AppElements_ViewWindow::OperationType)
+  void viewTransformed(int theTransformation);
 };
 
 #endif

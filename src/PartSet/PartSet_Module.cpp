@@ -57,7 +57,9 @@
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
-//#include <SketchPlugin_ConstraintRigid.h>
+
+#include <SketcherPrs_SymbolPrs.h>
+#include <SketcherPrs_Tools.h>
 
 #include <Events_Loop.h>
 #include <Config_PropManager.h>
@@ -94,7 +96,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   : ModuleBase_IModule(theWshop), 
   myRestartingMode(RM_None), myVisualLayerId(0)
 {
-  //myWorkshop = dynamic_cast<XGUI_Workshop*>(theWshop);
   mySketchMgr = new PartSet_SketcherMgr(this);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
@@ -108,6 +109,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   ModuleBase_IViewer* aViewer = theWshop->viewer();
   connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)),
           this, SLOT(onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
+  connect(aViewer, SIGNAL(viewTransformed(int)),
+          SLOT(onViewTransformed(int)));
 
   createActions();
 }
@@ -642,11 +645,48 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
+    Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
     Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAIS);
     if (!aDim.IsNull()) {
-      Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
       aCtx->SetZLayer(aDim, myVisualLayerId);
+    } else {
+      Handle(SketcherPrs_SymbolPrs) aCons = Handle(SketcherPrs_SymbolPrs)::DownCast(anAIS);
+      if (!aCons.IsNull())
+        aCtx->SetZLayer(aCons, myVisualLayerId);
     }
   }
 }
 
+void PartSet_Module::onViewTransformed(int theTrsfType)
+{
+  // Set length of arrows constant in pixel size
+  // if the operation is panning or rotate or panglobal then do nothing
+  if ((theTrsfType == 1) || (theTrsfType == 3) || (theTrsfType == 4))
+    return;
+
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+  Handle(V3d_View) aView = aViewer->activeView();
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+
+  double aLen = aView->Convert(25);
+
+  SketcherPrs_Tools::setArrowSize(aLen);
+  bool isModified = false;
+  QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
+  foreach (AISObjectPtr aAIS, aPrsList) {
+    Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
+
+    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
+    if (!aDim.IsNull()) {
+      aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
+      aContext->Redisplay(aDim, false);
+      isModified = true;
+    }
+  }
+  if (isModified)
+    aDisplayer->updateViewer();
+}

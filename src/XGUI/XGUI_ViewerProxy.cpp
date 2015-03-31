@@ -107,6 +107,8 @@ void XGUI_ViewerProxy::connectToViewer()
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
     connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
             SIGNAL(contextMenuRequested(QContextMenuEvent*)));
+
+    // TODO: Connect to ViewTransformation signal
   } else {
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
@@ -179,6 +181,9 @@ void XGUI_ViewerProxy::onViewCreated(ModuleBase_IViewWindow* theWnd)
 void XGUI_ViewerProxy::onViewCreated(AppElements_ViewWindow* theWnd)
 {
   theWnd->viewPort()->installEventFilter(this);
+
+  connect(theWnd, SIGNAL(vpTransformationFinished(AppElements_ViewWindow::OperationType)),
+    this, SLOT(onViewTransformed(AppElements_ViewWindow::OperationType)));
 
   emit viewCreated(theWnd);
 }
@@ -293,4 +298,9 @@ bool XGUI_ViewerProxy::canDragByMouse() const
   } else {
     return true;
   }
+}
+
+void XGUI_ViewerProxy::onViewTransformed(AppElements_ViewWindow::OperationType theType)
+{
+  emit viewTransformed((int) theType);
 }
