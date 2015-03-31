@@ -45,6 +45,10 @@ static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 static const char * EVENT_FEATURE_STATE_REQUEST = "FeatureStateRequest";
 static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 
+
+static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
+static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {

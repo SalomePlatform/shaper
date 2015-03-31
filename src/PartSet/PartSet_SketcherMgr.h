@@ -135,7 +135,7 @@ public:
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation
   /// \param theObject a model object
-  bool canDisplayObject() const;
+  bool canDisplayObject(const ObjectPtr& theObject) const;
 
   /// Returns true if the current operation is sketch entity create operation
   /// \param theValue the current auxiliary value

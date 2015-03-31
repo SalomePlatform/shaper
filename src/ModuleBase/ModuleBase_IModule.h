@@ -109,8 +109,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! Returns True if there are available Redos and there is not an active operation
   virtual bool canRedo() const;
 
-  /// Returns whether the object can be displayed at the bounds of the active operation.
-  /// Display only current operation results
+  /// Returns whether the object can be displayed. The default realization returns true.
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 

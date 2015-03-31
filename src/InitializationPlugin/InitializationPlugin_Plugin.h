@@ -32,10 +32,10 @@ class INITIALIZATIONPLUGIN_EXPORT InitializationPlugin_Plugin : public Events_Li
   /// \param theX - determines if X is 0 or not
   /// \param theY - determines if Y is 0 or not
   /// \param theZ - determines if Z is 0 or not
-  void createPlane(DocumentPtr theDoc, double theX, double theY, double theZ);
+  FeaturePtr createPlane(DocumentPtr theDoc, double theX, double theY, double theZ);
   /// Creates the origin point in (0,0,0)
   /// \param theDoc - document to contain a "point" feature
-  void createPoint(DocumentPtr theDoc);
+  FeaturePtr createPoint(DocumentPtr theDoc);
 };
 
 #endif

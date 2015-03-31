@@ -391,7 +391,10 @@ signals:
   void createDockWidgets();
 
   /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
-  void displayObject(ObjectPtr theObj);
+  /// Asks the module whether the object can be displayed
+  /// \param theObj an object
+  /// \return true if the object is displayed
+  bool displayObject(ObjectPtr theObj);
 
   //! Extends undo/redo toolbutton's with history menu
   //! \param theObject - in the OpenParts it is a QToolButton by itself,

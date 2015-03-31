@@ -247,8 +247,16 @@ bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
     for (int i = 0; i < aSelectionListAttr->size() && isSketchEntities; i++) {
       AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
       ObjectPtr anObject = aSelectAttr->context();
-      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
-      isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
+      // a context of the selection attribute is a feature result. It can be a case when the result
+      // of the feature is null, e.g. the feature is modified and has not been executed yet.
+      // The validator returns an invalid result here. The case is an extrusion built on a sketch
+      // feature. A new sketch element creation leads to an empty result.
+      if (!anObject.get())
+        isSketchEntities = false;
+      else {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
+      }
     }
   }
   if (anAttributeType == ModelAPI_AttributeRefAttr::typeId()) {

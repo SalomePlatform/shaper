@@ -113,8 +113,7 @@ void ModuleBase_IModule::actionCreated(QAction* theFeature)
 
 bool ModuleBase_IModule::canDisplayObject(const ObjectPtr& theObject) const
 {
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  return anOperation && anOperation->hasObject(theObject);
+  return true;
 }
 
 bool ModuleBase_IModule::canUndo() const
