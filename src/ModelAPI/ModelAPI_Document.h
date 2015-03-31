@@ -71,6 +71,13 @@ public:
                                                     const int theIndex,
                                                     const bool theHidden = false) = 0;
 
+  //! Returns the first found object in the group by the object name
+  //! \param theGroupID group that contains an object
+  //! \param theName name of the object to search
+  //! \returns null if such object is not found
+  virtual std::shared_ptr<ModelAPI_Object> objectByName(const std::string& theGroupID,
+                                                    const std::string& theName) = 0;
+
   //! Returns the number of objects in the group of objects
   //! If theHidden is true, it counts also the features that are not in tree
   virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;

@@ -821,6 +821,37 @@ ObjectPtr Model_Document::object(const std::string& theGroupID, const int theInd
   return ObjectPtr();
 }
 
+std::shared_ptr<ModelAPI_Object> Model_Document::objectByName(
+    const std::string& theGroupID, const std::string& theName)
+{
+  if (theGroupID == ModelAPI_Feature::group()) {
+    int anIndex = 0;
+    TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+    for (; aLabIter.More(); aLabIter.Next()) {
+      TDF_Label aFLabel = aLabIter.Value()->Label();
+      FeaturePtr aFeature = feature(aFLabel);
+      if (aFeature && aFeature->name() == theName)
+        return aFeature;
+    }
+  } else {
+    // comment must be in any feature: it is kind
+    int anIndex = 0;
+    TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+    for (; aLabIter.More(); aLabIter.Next()) {
+      TDF_Label aFLabel = aLabIter.Value()->Label();
+      FeaturePtr aFeature = feature(aFLabel);
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for (; aRIter != aResults.cend(); aRIter++) {
+        if ((*aRIter)->groupName() == theGroupID && (*aRIter)->data()->name() == theName)
+          return *aRIter;
+      }
+    }
+  }
+  // not found
+  return ObjectPtr();
+}
+
 int Model_Document::size(const std::string& theGroupID, const bool theHidden)
 {
   int aResult = 0;
