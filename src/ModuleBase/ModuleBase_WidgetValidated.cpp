@@ -33,7 +33,7 @@ bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
 
   Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
   if (isValid(anOwner)) {
-    setSelection(anOwner);
+    isDone = setSelection(anOwner);
     updateObject(myFeature);
     emit valuesChanged();
   }
