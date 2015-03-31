@@ -225,6 +225,9 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
 
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
+
   registerValidators();
 
   // Calling of  loadCustomProps before activating module is required
@@ -472,6 +475,12 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
                                aMsg->parameters());
       }
     }
+  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)) {
+    // the viewer's update context will not happens until viewer updated is emitted
+    myDisplayer->enableUpdateViewer(false);
+  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)) {
+    // the viewer's update context is unblocked, the viewer's update works
+    myDisplayer->enableUpdateViewer(true);
   } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);

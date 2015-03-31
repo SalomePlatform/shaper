@@ -34,6 +34,12 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     DocumentPtr aDoc = aMessage->document();
     std::list<FeaturePtr> aFeatures;
 
+    // the viewer update should be blocked in order to avoid the features blinking before they are
+    // hidden
+    std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+    Events_Loop::loop()->send(aMsg);
+
     aFeatures.push_back(createPoint(aDoc));
     aFeatures.push_back(createPlane(aDoc, 1., 0., 0.));
     aFeatures.push_back(createPlane(aDoc, 0., 1., 0.));
@@ -54,6 +60,13 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
       }
     }
     Events_Loop::loop()->flush(HIDE_DISP);
+
+    // the viewer update should be unblocked in order to avoid the features blinking before they are
+    // hidden
+    aMsg = std::shared_ptr<Events_Message>(
+                  new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+
+    Events_Loop::loop()->send(aMsg);
 
   } else if (theMessage.get()) {
     Events_Error::send(
