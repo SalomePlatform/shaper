@@ -22,6 +22,7 @@ class QLabel;
 class QTimer;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
+class QCheckBox;
 
 /// the plane edge width
 #define SKETCH_WIDTH        "4"
@@ -43,7 +44,7 @@ Q_OBJECT
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   PartSet_WidgetSketchLabel(QWidget* theParent, const Config_WidgetAPI* theData,
-                            const std::string& theParentId);
+                            const std::string& theParentId, bool toShowConstraints);
 
   virtual ~PartSet_WidgetSketchLabel();
 
@@ -74,9 +75,13 @@ Q_OBJECT
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
+  void showConstraints(bool theOn);
+
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
+
+  void showConstraintToggled(bool);
 
 protected:
   /// Creates a backup of the current values of the attribute
@@ -143,6 +148,8 @@ protected:
   bool myPreviewDisplayed;
 
   QTimer* mySelectionTimer;
+
+  QCheckBox* myShowConstraints;
 };
 
 #endif

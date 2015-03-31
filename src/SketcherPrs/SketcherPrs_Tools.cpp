@@ -134,7 +134,7 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(
 }
 
 
-static double MyArrowSize = 40.;
+static double MyArrowSize = 30.;
 double getArrowSize()
 {
   return MyArrowSize;

@@ -467,10 +467,13 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
-    PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi, theParentId);
+    PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, 
+      theWidgetApi, theParentId, mySketchMgr->isConstraintsShown());
     aLabelWgt->setWorkshop(aWorkshop);
     connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
+    connect(aLabelWgt, SIGNAL(showConstraintToggled(bool)),
+      mySketchMgr, SLOT(onShowConstraintsToggle(bool)));
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
     PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, theWidgetApi, theParentId);
@@ -672,7 +675,7 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
 
-  double aLen = aView->Convert(25);
+  double aLen = aView->Convert(15);
 
   SketcherPrs_Tools::setArrowSize(aLen);
   bool isModified = false;

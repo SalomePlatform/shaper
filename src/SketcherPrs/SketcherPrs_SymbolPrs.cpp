@@ -6,6 +6,7 @@
 
 #include "SketcherPrs_SymbolPrs.h"
 #include "SketcherPrs_Tools.h"
+#include "SketcherPrs_PositionMgr.h"
 
 #include <GeomAPI_Edge.h>
 
@@ -224,6 +225,13 @@ SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(SketchPlugin_Constraint* theConstra
 {
   SetAutoHilight(Standard_False);
 }
+
+SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
+{
+  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+  aMgr->deleteConstraint(this);
+}
+
 
 
 Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()

@@ -19,6 +19,7 @@
 class ModuleBase_IModule;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
+class ModuleBase_IPropertyPanel;
 class ModuleBase_Operation;
 class ModuleBase_FilterFactory;
 
@@ -52,6 +53,9 @@ Q_OBJECT
 
   //! Returns current viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
+
+  //! Returns property panel
+  virtual ModuleBase_IPropertyPanel* propertyPanel() const = 0;
 
   /// A filter to process an attribute validators
   /// \return a filter

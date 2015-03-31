@@ -146,6 +146,16 @@ public:
   /// \param isChecked if true, the feature is a construction
   void setAuxiliary(const bool isChecked);
 
+
+  bool isConstraintsShown() const { return myIsConstraintsShown; }
+
+
+  /// Returns list of strings which contains id's of sketch operations
+  static const QStringList& sketchOperationIdList();
+
+  /// Returns list of strings which contains id's of constraints operations
+  static const QStringList& constraintsIdList();
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
@@ -174,12 +184,11 @@ private slots:
   void onBeforeContextMenu();
   void onAfterContextMenu();
 
+  void onShowConstraintsToggle(bool);
+
 private:
   /// Launches the operation from current highlighting
   void launchEditing();
-
-  /// Returns list of strings which contains id's of sketch operations
-  static QStringList sketchOperationIdList();
 
   /// Converts mouse position to 2d coordinates. 
   /// Member myCurrentSketch has to be correctly defined
@@ -263,6 +272,8 @@ private:
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
   FeatureToSelectionMap myCurrentSelection;
   bool myPreviousUpdateViewerEnabled;
+
+  bool myIsConstraintsShown;
 };
 
 

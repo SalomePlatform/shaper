@@ -28,27 +28,27 @@ SketcherPrs_PositionMgr::SketcherPrs_PositionMgr()
 
 
 int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine, 
-                                              Handle(SketcherPrs_SymbolPrs) thePrs)
+                                              const SketcherPrs_SymbolPrs* thePrs)
 {
   if (myShapes.count(theLine) == 1) {
     PositionsMap& aPosMap = myShapes[theLine];
-    if (aPosMap.count(thePrs.Access()) == 1) {
-      return aPosMap[thePrs.Access()];
+    if (aPosMap.count(thePrs) == 1) {
+      return aPosMap[thePrs];
     } else {
       int aInd = aPosMap.size();
-      aPosMap[thePrs.Access()] = aInd;
+      aPosMap[thePrs] = aInd;
       return aInd;
     }
   } else {
     PositionsMap aPosMap;
-    aPosMap[thePrs.Access()] = 0;
+    aPosMap[thePrs] = 0;
     myShapes[theLine] = aPosMap;
     return 0;
   }
 }
 
 gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape, 
-                                            Handle(SketcherPrs_SymbolPrs) thePrs,
+                                            const SketcherPrs_SymbolPrs* thePrs,
                                             double theStep)
 {
   std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(theShape);
@@ -122,18 +122,20 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   return aP;
 }
 
-void SketcherPrs_PositionMgr::deleteConstraint(Handle(SketcherPrs_SymbolPrs) thePrs)
+void SketcherPrs_PositionMgr::deleteConstraint(const SketcherPrs_SymbolPrs* thePrs)
 {
   std::map<ObjectPtr, PositionsMap>::iterator aIt;
+  std::list<ObjectPtr> aToDel;
   for (aIt = myShapes.begin(); aIt != myShapes.end(); ++aIt) {
     PositionsMap& aPosMap = aIt->second;
-    if (aPosMap.count(thePrs.Access()) > 0) 
-      aPosMap.erase(aPosMap.find(thePrs.Access()));
-  }
-  for (aIt = myShapes.begin(); aIt != myShapes.end(); ++aIt) {
-    if (aIt->second.size() == 0) {
-      myShapes.erase(aIt);
-      aIt = myShapes.begin();
+    if (aPosMap.count(thePrs) > 0) {
+      aPosMap.erase(aPosMap.find(thePrs));
+      if (aPosMap.size() == 0)
+        aToDel.push_back(aIt->first);
     }
+  }
+  std::list<ObjectPtr>::const_iterator aListIt;
+  for (aListIt = aToDel.cbegin(); aListIt != aToDel.cend(); ++aListIt) {
+    myShapes.erase(*aListIt);
   }
 }

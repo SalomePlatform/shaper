@@ -30,11 +30,11 @@ public:
   /// \param theLine constrained object 
   /// \param thePrs a presentation of constraint
   /// \param theStep step between symbols
-  gp_Pnt getPosition(ObjectPtr theLine, Handle(SketcherPrs_SymbolPrs) thePrs, double theStep = 20);
+  gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs, double theStep = 20);
 
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation
-  void deleteConstraint(Handle(SketcherPrs_SymbolPrs) thePrs);
+  void deleteConstraint(const SketcherPrs_SymbolPrs* thePrs);
 
 private:
   /// Constructor
@@ -43,10 +43,10 @@ private:
   /// Returns position index of the given constraint
   /// \param theLine constrained object 
   /// \param thePrs a presentation of constraint
-  int getPositionIndex(ObjectPtr theLine, Handle(SketcherPrs_SymbolPrs) thePrs);
+  int getPositionIndex(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs);
 
 private:
-  typedef std::map<void*, int> PositionsMap;
+  typedef std::map<const SketcherPrs_SymbolPrs*, int> PositionsMap;
 
   /// The map which contains position of presentation
   PositionsMap myIndexes;

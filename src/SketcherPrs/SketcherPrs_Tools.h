@@ -17,6 +17,8 @@ class SketchPlugin_Constraint;
 class SketchPlugin_Line;
 class GeomDataAPI_Point2D;
 
+#define MyTextHeight 20
+
 namespace SketcherPrs_Tools {
 
   SKETCHERPRS_EXPORT ObjectPtr getResult(SketchPlugin_Constraint* theFeature,

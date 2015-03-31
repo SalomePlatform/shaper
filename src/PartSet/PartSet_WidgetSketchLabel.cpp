@@ -42,11 +42,13 @@
 #include <QTimer>
 #include <QApplication>
 #include <QVBoxLayout>
+#include <QCheckBox>
 
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId)
+                                                     const std::string& theParentId,
+                                                     bool toShowConstraints)
     : ModuleBase_WidgetValidated(theParent, theData, theParentId),
       myPreviewDisplayed(false),
       myWorkshop(NULL)
@@ -65,7 +67,13 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->addWidget(myLabel);
+
+  myShowConstraints = new QCheckBox(tr("Show constraints"), this);
+  aLayout->addWidget(myShowConstraints);
+
   setLayout(aLayout);
+  connect(myShowConstraints, SIGNAL(toggled(bool)), this, SIGNAL(showConstraintToggled(bool)));
+  myShowConstraints->setChecked(toShowConstraints);
 }
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
@@ -358,4 +366,10 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
 
   aDisp->activateObjects(aModes);
+}
+
+void PartSet_WidgetSketchLabel::showConstraints(bool theOn)
+{
+  myShowConstraints->setChecked(theOn);
+  emit showConstraintToggled(theOn);
 }

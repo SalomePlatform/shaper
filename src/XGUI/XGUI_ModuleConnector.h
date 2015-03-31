@@ -46,6 +46,9 @@ Q_OBJECT
   //! Returns current viewer
   virtual ModuleBase_IViewer* viewer() const;
 
+  //! Returns property panel
+  virtual ModuleBase_IPropertyPanel* propertyPanel() const;
+
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const;
 

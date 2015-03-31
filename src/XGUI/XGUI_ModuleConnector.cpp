@@ -11,6 +11,7 @@
 #include "XGUI_Selection.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_PropertyPanel.h"
 
 #include <AIS_Shape.hxx>
 
@@ -45,6 +46,11 @@ ModuleBase_IModule* XGUI_ModuleConnector::module() const
 ModuleBase_IViewer* XGUI_ModuleConnector::viewer() const
 {
   return myWorkshop->viewer();
+}
+
+ModuleBase_IPropertyPanel* XGUI_ModuleConnector::propertyPanel() const
+{
+  return myWorkshop->propertyPanel();
 }
 
 ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const
@@ -102,3 +108,4 @@ bool XGUI_ModuleConnector::canStartOperation(QString theId)
 {
   return myWorkshop->operationMgr()->canStartOperation(theId);
 }
+

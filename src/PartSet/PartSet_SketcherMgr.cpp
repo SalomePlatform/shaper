@@ -9,6 +9,7 @@
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
+#include "PartSet_WidgetSketchLabel.h"
 
 #include <ModuleBase_WidgetEditor.h>
 
@@ -53,6 +54,8 @@
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_ConstraintMirror.h>
 
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
@@ -122,7 +125,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
     myIsPropertyPanelValueChanged(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false)
+    myIsPopupMenuActive(false), myIsConstraintsShown(true)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -572,7 +575,7 @@ void PartSet_SketcherMgr::launchEditing()
 }
 
 
-QStringList PartSet_SketcherMgr::sketchOperationIdList()
+const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
 {
   static QStringList aIds;
   if (aIds.size() == 0) {
@@ -591,9 +594,32 @@ QStringList PartSet_SketcherMgr::sketchOperationIdList()
     aIds << SketchPlugin_ConstraintEqual::ID().c_str();
     aIds << SketchPlugin_ConstraintTangent::ID().c_str();
     aIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
+    aIds << SketchPlugin_ConstraintFillet::ID().c_str();
+    aIds << SketchPlugin_ConstraintMirror::ID().c_str();
   }
   return aIds;
 }
+
+const QStringList& PartSet_SketcherMgr::constraintsIdList()
+{
+  static QStringList aIds;
+  if (aIds.size() == 0) {
+    aIds << SketchPlugin_ConstraintLength::ID().c_str();
+    aIds << SketchPlugin_ConstraintDistance::ID().c_str();
+    aIds << SketchPlugin_ConstraintRigid::ID().c_str();
+    aIds << SketchPlugin_ConstraintRadius::ID().c_str();
+    aIds << SketchPlugin_ConstraintPerpendicular::ID().c_str();
+    aIds << SketchPlugin_ConstraintParallel::ID().c_str();
+    aIds << SketchPlugin_ConstraintHorizontal::ID().c_str();
+    aIds << SketchPlugin_ConstraintVertical::ID().c_str();
+    aIds << SketchPlugin_ConstraintEqual::ID().c_str();
+    aIds << SketchPlugin_ConstraintTangent::ID().c_str();
+    aIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
+    aIds << SketchPlugin_ConstraintMirror::ID().c_str();
+  }
+  return aIds;
+}
+
 
 bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)
 {
@@ -719,7 +745,7 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* )
   connectToPropertyPanel(true);
 }
 
-void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
+void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
@@ -730,6 +756,11 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
 {
   if (isNestedCreateOperation(theOperation))
     visualizeFeature(theOperation, true);
+
+  if (constraintsIdList().contains(theOperation->id())) {
+    // Show constraints if a constraint was created
+    onShowConstraintsToggle(true);
+  }
 }
 
 bool PartSet_SketcherMgr::canUndo() const
@@ -1126,4 +1157,30 @@ void PartSet_SketcherMgr::restoreSelection()
                         anOwnersToSelect);
     aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
   }
+}
+
+void PartSet_SketcherMgr::onShowConstraintsToggle(bool theOn)
+{
+  if (myIsConstraintsShown == theOn)
+    return;
+  if (myCurrentSketch.get() == NULL)
+    return;
+
+  myIsConstraintsShown = theOn;
+
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+  const QStringList& aConstrIds = constraintsIdList();
+  for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+    FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
+    if (aConstrIds.contains(QString(aSubFeature->getKind().c_str()))) {
+      if (myIsConstraintsShown) 
+        aDisplayer->display(aSubFeature, false);
+      else
+        aDisplayer->erase(aSubFeature, false);
+    }
+  }
+  aDisplayer->updateViewer();
 }
