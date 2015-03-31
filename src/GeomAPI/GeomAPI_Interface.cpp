@@ -18,8 +18,10 @@ GeomAPI_Interface::GeomAPI_Interface(void* theImpl)
 
 GeomAPI_Interface::~GeomAPI_Interface()
 {
-  if (myImpl)
+  if (myImpl) {
     delete myImpl;
+    myImpl = 0;
+  }
 }
 
 void GeomAPI_Interface::setImpl(void* theImpl)

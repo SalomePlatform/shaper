@@ -28,6 +28,8 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   /// \brief Creation of empty AIS object
   GeomAPI_AISObject();
 
+  ~GeomAPI_AISObject();
+
   /// \brief Creates AIS_Shape object using specified shape
   void createShape(std::shared_ptr<GeomAPI_Shape> theShape);
 
