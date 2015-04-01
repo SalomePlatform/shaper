@@ -117,7 +117,7 @@ void SketchSolver_ConstraintManager::processEvent(
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (!aFeature || aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+        if (!aFeature /*|| aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()*/)
           continue;
         changeConstraintOrEntity(aFeature);
       }
