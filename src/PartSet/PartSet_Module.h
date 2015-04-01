@@ -103,7 +103,9 @@ public:
 
   /// Add menu atems for viewer into the given menu
   /// \param theMenu a popup menu to be shown in the viewer
-  virtual void addViewerItems(QMenu* theMenu) const;
+  /// \param theStdActions a map of standard actions
+  /// \return true if items are added and there is no necessity to provide standard menu
+  virtual bool addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
 
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel

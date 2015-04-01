@@ -47,6 +47,7 @@ protected:
 private:
   SketchPlugin_Constraint* myConstraint;
   std::shared_ptr<GeomAPI_Ax3> myPlane;
+  gp_Pnt myPoint;
 };
 
 

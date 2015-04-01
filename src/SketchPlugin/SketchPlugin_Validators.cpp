@@ -7,8 +7,10 @@
 #include "SketchPlugin_Validators.h"
 #include "SketchPlugin_ConstraintDistance.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_Circle.h"
 
 #include "SketcherPrs_Tools.h"
 
@@ -93,7 +95,8 @@ bool SketchPlugin_TangentAttrValidator::isValid(
       if (aOtherFea->getKind() != SketchPlugin_Arc::ID())
         return false;
     } else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Line::ID())
+      if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
+          aOtherFea->getKind() != SketchPlugin_Arc::ID())
         return false;
     } else
       return false;
@@ -135,4 +138,76 @@ bool SketchPlugin_TangentAttrValidator::isValid(
   return false;
 }
 
+bool SketchPlugin_NotFixedValidator::isValid(
+    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
+{
+  std::shared_ptr<SketchPlugin_Feature> aFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+  if (!aFeature)
+    return true;
+
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+
+  SketchPlugin_Sketch* aSketch = aFeature->sketch();
+  int aNbFeatures = aSketch->numberOfSubs();
+  for (int anInd = 0; anInd < aNbFeatures; anInd++) {
+    FeaturePtr aSubFeature = aSketch->subFeature(anInd);
+    if (aSubFeature->getKind() != SketchPlugin_ConstraintRigid::ID() || aSubFeature == aFeature)
+      continue;
+    AttributeRefAttrPtr aRAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aSubFeature->attribute(SketchPlugin_ConstraintRigid::ENTITY_A()));
+    if (aRefAttr->isObject()) {
+      if (aRefAttr->object() == aRAttr->object())
+        return false;
+    } else if (aRefAttr->attr() == aRAttr->attr())
+      return false;
+  }
+  return true;
+}
+
+bool SketchPlugin_EqualAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  std::string aParamA = theArguments.front();
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr[2];
+  aRefAttr[0] = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+  aRefAttr[1] = aFeature->data()->refattr(aParamA);
+
+  if (!aRefAttr[0]->isObject() || !aRefAttr[1]->isObject())
+    return false;
+
+  int aType[2] = {0, 0}; // types of attributes: 0 - incorrect, 1 - line, 2 - circle, 3 - arc
+  std::list<std::string> anArguments;
+  for (int i = 0; i < 2; i++) {
+    ObjectPtr anObject = aRefAttr[i]->object();
+    aFeature = ModelAPI_Feature::feature(anObject);
+    if (!aFeature)
+      return false;
+
+    if (aFeature->getKind() == SketchPlugin_Line::ID()) {
+      aType[i] = 1;
+      continue;
+    }
+    if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
+      aType[i] = 2;
+      continue;
+    }
+    if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+      aType[i] = 3;
+      continue;
+    }
+    // wrong type of attribute
+    return false;
+  }
+
+  if ((aType[0] == 1 && aType[1] == 2) ||
+      (aType[0] == 2 && aType[1] == 1))
+    return false;
+  return true;
+}
 

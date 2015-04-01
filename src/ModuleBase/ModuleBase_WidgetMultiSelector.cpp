@@ -231,7 +231,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(const Handle_SelectMgr_EntityO
   AttributeSelectionListPtr aSelectionListAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
   if (aShape->isEqual(aResult->shape()))
-    aSelectionListAttr->append(aResult, NULL);
+    aSelectionListAttr->append(aResult, GeomShapePtr());
   else
     aSelectionListAttr->append(aResult, aShape);
 

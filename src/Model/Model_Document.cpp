@@ -84,10 +84,15 @@ static TCollection_ExtendedString DocFileName(const char* theFileName, const std
   return aPath;
 }
 
+bool Model_Document::isRoot() const
+{
+  return this == Model_Session::get()->moduleDocument().get();
+}
+
 bool Model_Document::load(const char* theFileName)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
-  if (this == Model_Session::get()->moduleDocument().get()) {
+  if (isRoot()) {
     anApp->setLoadPath(theFileName);
   }
   TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
@@ -161,7 +166,7 @@ bool Model_Document::load(const char* theFileName)
       std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
     aSession->setActiveDocument(anApp->getDocument(myID), false);
     aSession->setCheckTransactions(false);
-    synchronizeFeatures(false, true);
+    synchronizeFeatures(false, true, true);
     aSession->setCheckTransactions(true);
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
     aSession->setActiveDocument(anApp->getDocument(myID), true);
@@ -173,7 +178,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
 {
   // create a directory in the root document if it is not yet exist
   Handle(Model_Application) anApp = Model_Application::getApplication();
-  if (this == Model_Session::get()->moduleDocument().get()) {
+  if (isRoot()) {
 #ifdef WIN32
     CreateDirectory(theFileName, NULL);
 #else
@@ -241,9 +246,9 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
 void Model_Document::close(const bool theForever)
 {
   std::shared_ptr<ModelAPI_Session> aPM = Model_Session::get();
-  if (this != aPM->moduleDocument().get() && this == aPM->activeDocument().get()) {
+  if (!isRoot() && this == aPM->activeDocument().get()) {
     aPM->setActiveDocument(aPM->moduleDocument());
-  } else if (this == aPM->moduleDocument().get()) {
+  } else if (isRoot()) {
     // erase the active document if root is closed
     aPM->setActiveDocument(DocumentPtr());
   }
@@ -341,7 +346,7 @@ bool Model_Document::finishOperation()
   // this must be here just after everything is finished but before real transaction stop
   // to avoid messages about modifications outside of the transaction
   // and to rebuild everything after all updates and creates
-  if (Model_Session::get()->moduleDocument().get() == this) { // once for root document
+  if (isRoot()) { // once for root document
     Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     static std::shared_ptr<Events_Message> aFinishMsg
       (new Events_Message(Events_Loop::eventByName("FinishOperation")));
@@ -371,7 +376,7 @@ bool Model_Document::finishOperation()
   if (!aResult && !myTransactions.empty() /* it can be for just created part document */)
     aResult = myTransactions.rbegin()->myOCAFNum != 0;
 
-  if (!aResult && Model_Session::get()->moduleDocument().get() == this) {
+  if (!aResult && isRoot()) {
     // nothing inside in all documents, so remove this transaction from the transactions list
     undoInternal(true, false);
     myDoc->ClearRedos();
@@ -398,7 +403,8 @@ void Model_Document::abortOperation()
       myDoc->Undo();
     myDoc->ClearRedos();
   }
-  synchronizeFeatures(true, false); // references were not changed since transaction start
+  // references were not changed since transaction start
+  synchronizeFeatures(true, false, isRoot());
   // abort for all subs
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
@@ -446,8 +452,6 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
   for(int a = 0; a < aNumTransactions; a++)
     myDoc->Undo();
 
-  if (theSynchronize)
-    synchronizeFeatures(true, true);
   if (theWithSubs) {
     // undo for all subs
     const std::set<std::string> aSubs = subDocuments(true);
@@ -455,6 +459,9 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
     for (; aSubIter != aSubs.end(); aSubIter++)
       subDoc(*aSubIter)->undoInternal(theWithSubs, theSynchronize);
   }
+  // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
+  if (theSynchronize)
+    synchronizeFeatures(true, true, isRoot());
 }
 
 void Model_Document::undo()
@@ -485,12 +492,14 @@ void Model_Document::redo()
   for(int a = 0; a < aNumRedos; a++)
     myDoc->Redo();
 
-  synchronizeFeatures(true, true);
   // redo for all subs
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->redo();
+
+  // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
+  synchronizeFeatures(true, true, isRoot());
 }
 
 std::list<std::string> Model_Document::undoList() const
@@ -949,7 +958,8 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theT
   theObj->initAttributes();
 }
 
-void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences)
+void Model_Document::synchronizeFeatures(
+  const bool theMarkUpdated, const bool theUpdateReferences, const bool theFlush)
 {
   std::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
@@ -1040,11 +1050,13 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   myExecuteFeatures = false;
   aLoop->activateFlushes(true);
 
-  aLoop->flush(aCreateEvent);
-  aLoop->flush(aDeleteEvent);
-  aLoop->flush(anUpdateEvent);
-  aLoop->flush(aRedispEvent);
-  aLoop->flush(aToHideEvent);
+  if (theFlush) {
+    aLoop->flush(aCreateEvent);
+    aLoop->flush(aDeleteEvent);
+    aLoop->flush(anUpdateEvent);
+    aLoop->flush(aRedispEvent);
+    aLoop->flush(aToHideEvent);
+  }
   myExecuteFeatures = true;
 }
 

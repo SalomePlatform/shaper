@@ -10,6 +10,7 @@
 
 #include <QString>
 #include <QObject>
+#include <QMap>
 
 #include <string>
 #include <map>
@@ -75,7 +76,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Add menu atems for viewer into the given menu
   /// \param theMenu a popup menu to be shown in the viewer
-  virtual void addViewerItems(QMenu* theMenu) const {}
+  /// \param theStdActions a map of standard actions
+  /// \return true if items are added and there is no necessity to provide standard menu
+  virtual bool addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const { return false; }
 
   /// Add menu atems for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser

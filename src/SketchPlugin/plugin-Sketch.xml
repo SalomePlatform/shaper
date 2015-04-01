@@ -151,6 +151,7 @@
         <shape_selector id="ConstraintEntityA" label="Object" tooltip="Select an object" 
             shape_types="edge vertex">
           <validator id="PartSet_SketchEntityValidator" parameters="SketchPoint,SketchLine,SketchCircle,SketchArc"/>
+          <validator id="SketchPlugin_NotFixed"/>
         </shape_selector>
         <validator id="PartSet_RigidValidator"/>
       </feature>
@@ -179,7 +180,7 @@
         
         <sketch_constraint_shape_selector id="ConstraintEntityB"
             label="Last object" tooltip="Select line, circle or arc" shape_types="edge">
-          <validator id="PartSet_SameTypeAttr" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
           <validator id="PartSet_DifferentObjects"/>
         </sketch_constraint_shape_selector>
       </feature>

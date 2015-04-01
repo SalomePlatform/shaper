@@ -136,6 +136,6 @@ void PartSet_WidgetShapeSelector::removeExternal()
       anIgnoredFeatures.insert(sketch());
       XGUI_Workshop::deleteFeatures(anObjects, anIgnoredFeatures);
     }
-    myExternalObject = NULL;
+    myExternalObject = ObjectPtr();
   }
 }

@@ -79,8 +79,7 @@ void SketchPlugin_ConstraintMirror::execute()
         ResultConstructionPtr aRC =
             std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aMirrorIter);
         DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
-        FeaturePtr aFeature =  aDoc ? std::dynamic_pointer_cast<SketchPlugin_Feature>(
-              aDoc->feature(aRC)) : FeaturePtr();
+        FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
         if (aFeature)
           aDoc->removeFeature(aFeature);
       }
