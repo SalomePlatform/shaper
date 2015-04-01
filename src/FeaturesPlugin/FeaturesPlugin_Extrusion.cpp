@@ -72,8 +72,12 @@ void FeaturesPlugin_Extrusion::execute()
 
     for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      std::shared_ptr<GeomAPI_Shape> aFace = 
-        aFacesNum == -1 ? aValueFace : aConstruction->face(aFaceIndex);
+      std::shared_ptr<GeomAPI_Shape> aFace;
+      if (aFacesNum == -1) {
+        aFace = aValueFace;
+      } else {
+        aFace = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+      }
       GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
       if(!aFeature.isDone()) {
         static const std::string aFeatureError = "Extrusion algorithm failed";  

@@ -13,7 +13,7 @@
 #include <ModelAPI_AttributeString.h>
 
 #include <QWidget>
-#include <Qlist>
+#include <QList>
 #include <QVBoxLayout>
 
 

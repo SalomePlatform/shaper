@@ -687,10 +687,10 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
   for ( ; aBaseIter != aBaseList.end(); aBaseIter++, aMirIter++) {
     aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aBaseIter);
     aBaseFeature = aRC ? aRC->document()->feature(aRC) :
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aBaseIter);
+        std::dynamic_pointer_cast<ModelAPI_Feature>(*aBaseIter);
     aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aMirIter);
     aMirrorFeature = aRC ? aRC->document()->feature(aRC) :
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aMirIter);
+        std::dynamic_pointer_cast<ModelAPI_Feature>(*aMirIter);
 
     if (!aBaseFeature || !aMirrorFeature || 
         aBaseFeature->getKind() != aMirrorFeature->getKind())
@@ -806,7 +806,7 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
     for (aBaseIter = aBaseList.begin(); aBaseIter != aBaseList.end(); aBaseIter++) {
       aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aBaseIter);
       aBaseFeature = aRC ? aRC->document()->feature(aRC) :
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aBaseIter);
+          std::dynamic_pointer_cast<ModelAPI_Feature>(*aBaseIter);
       if (!aBaseFeature) continue;
       std::list<AttributePtr> aPoints = aBaseFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
       std::list<AttributePtr>::iterator anIt = aPoints.begin();
@@ -921,7 +921,7 @@ bool SketchSolver_ConstraintGroup::changeFilletConstraint(
   for (int indEnt = 0; aFilIter != aFilletList.end(); aFilIter++, indEnt++) {
     aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aFilIter);
     aFilletFeature = aRC ? aRC->document()->feature(aRC) :
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFilIter);
+        std::dynamic_pointer_cast<ModelAPI_Feature>(*aFilIter);
     if (!aFilletFeature)
       return false;
     aFilletEnt[indEnt] = changeEntityFeature(aFilletFeature);
@@ -1080,7 +1080,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
       myEntityAttrMap.find(theEntity);
   int aEntPos;
-  std::vector<Slvs_Param>::const_iterator aParamIter;  // looks at first parameter of already existent entity or at the end of vector otherwise
+  std::vector<Slvs_Param>::iterator aParamIter;  // looks at first parameter of already existent entity or at the end of vector otherwise
   if (aEntIter == myEntityAttrMap.end())  // no such entity => should be created
     aParamIter = myParams.end();
   else {  // the entity already exists
@@ -1297,7 +1297,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
   // Try to find existent normal
   std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
       myEntityAttrMap.find(theNorm);
-  std::vector<Slvs_Param>::const_iterator aParamIter;  // looks to the first parameter of already existent entity or to the end of vector otherwise
+  std::vector<Slvs_Param>::iterator aParamIter;  // looks to the first parameter of already existent entity or to the end of vector otherwise
   if (aEntIter == myEntityAttrMap.end())  // no such entity => should be created
     aParamIter = myParams.end();
   else {  // the entity already exists, update it
@@ -1378,7 +1378,7 @@ bool SketchSolver_ConstraintGroup::updateWorkplane()
 //  Purpose:  create/update value of parameter
 // ============================================================================
 Slvs_hParam SketchSolver_ConstraintGroup::changeParameter(
-    const double& theParam, std::vector<Slvs_Param>::const_iterator& thePrmIter)
+    double theParam, std::vector<Slvs_Param>::iterator& thePrmIter)
 {
   if (thePrmIter != myParams.end()) {  // Parameter should be updated
     int aParamPos = thePrmIter - myParams.begin();
@@ -2192,7 +2192,7 @@ Slvs_hConstraint SketchSolver_ConstraintGroup::changeMirrorPoints(
   std::map<Slvs_hEntity, Slvs_hEntity>::iterator aMapIter = thePrevMirror.find(theBasePoint);
   if (aMapIter != thePrevMirror.end()) {
     thePrevMirror.erase(aMapIter);
-    std::vector<Slvs_Constraint>::const_iterator anIter = thePrevConstr.begin();
+    std::vector<Slvs_Constraint>::iterator anIter = thePrevConstr.begin();
     for (; anIter != thePrevConstr.end(); anIter++)
       if (anIter->ptA == theBasePoint) {
         if (anIter->ptB != theMirrorPoint) {
