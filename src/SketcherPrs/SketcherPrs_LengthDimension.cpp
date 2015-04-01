@@ -126,19 +126,19 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) co
       aPnt_A = aPoint_A->pnt();
       aPnt_B = aPoint_B->pnt();
     } else if (!aPoint_A && aPoint_B) {
-      std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
-          aData, SketchPlugin_Constraint::ENTITY_A());
-      if (aLine) {
-        aPnt_B = aPoint_B->pnt();
-        aPnt_A = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_B);
-      }
+//      std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
+//          aData, SketchPlugin_Constraint::ENTITY_A());
+//      if (aLine) {
+//        aPnt_B = aPoint_B->pnt();
+//        aPnt_A = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_B);
+//      }
     } else if (aPoint_A && !aPoint_B) {
-      std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
-          aData, SketchPlugin_Constraint::ENTITY_B());
-      if (aLine) {
-        aPnt_A = aPoint_A->pnt();
-        aPnt_B = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_A);
-      }
+//      std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
+//          aData, SketchPlugin_Constraint::ENTITY_B());
+//      if (aLine) {
+//        aPnt_A = aPoint_A->pnt();
+//        aPnt_B = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_A);
+//      }
     }
     if (!aPnt_A || !aPnt_B)
       return false;

@@ -100,38 +100,38 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
 }
 
 //*************************************************************************************
-std::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData,
-                                                  const std::string& theAttribute)
-{
-  std::shared_ptr<SketchPlugin_Line> aLine;
-  if (!theData)
-    return aLine;
-
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
-  if (anAttr) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
-    if (aFeature && aFeature->getKind() == SketchPlugin_Line::ID()) {
-      aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aFeature);
-    }
-  }
-  return aLine;
-}
+//std::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData,
+//                                                  const std::string& theAttribute)
+//{
+//  std::shared_ptr<SketchPlugin_Line> aLine;
+//  if (!theData)
+//    return aLine;
+//
+//  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
+//      ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
+//  if (anAttr) {
+//    FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
+//    if (aFeature && aFeature->getKind() == SketchPlugin_Line::ID()) {
+//      aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aFeature);
+//    }
+//  }
+//  return aLine;
+//}
 
 //*************************************************************************************
-std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(
-    const std::shared_ptr<SketchPlugin_Line>& theLine,
-    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
-{
-  std::shared_ptr<ModelAPI_Data> aData = theLine->data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Line::END_ID()));
-
-  GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
-  return aLin2d.project(thePoint);
-}
+//std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(
+//    const std::shared_ptr<SketchPlugin_Line>& theLine,
+//    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+//{
+//  std::shared_ptr<ModelAPI_Data> aData = theLine->data();
+//  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+//      aData->attribute(SketchPlugin_Line::START_ID()));
+//  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+//      aData->attribute(SketchPlugin_Line::END_ID()));
+//
+//  GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
+//  return aLin2d.project(thePoint);
+//}
 
 
 static double MyArrowSize = 30.;
