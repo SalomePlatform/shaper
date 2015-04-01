@@ -25,6 +25,9 @@
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_Root.hxx>
+#include <SelectMgr_EntityOwner.hxx>
+#include <SelectMgr_Selection.hxx>
+#include <Select3D_SensitivePoint.hxx>
 
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Coincident, AIS_InteractiveObject);
@@ -34,6 +37,7 @@ SketcherPrs_Coincident::SketcherPrs_Coincident(SketchPlugin_Constraint* theConst
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane)
 {
+  
 }  
 
 
@@ -48,11 +52,15 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
     return;
 
   std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y());
+  myPoint = aPoint->impl<gp_Pnt>();
 
-  static Handle(Graphic3d_AspectMarker3d) aPtA = new Graphic3d_AspectMarker3d ();
-  aPtA->SetType(Aspect_TOM_RING1);
-  aPtA->SetScale(2.);
-  aPtA->SetColor(myOwnColor);
+  static Handle(Graphic3d_AspectMarker3d) aPtA;
+  if (aPtA.IsNull()) {
+    aPtA = new Graphic3d_AspectMarker3d ();
+    aPtA->SetType(Aspect_TOM_RING1);
+    aPtA->SetScale(2.);
+    aPtA->SetColor(myOwnColor);
+  }
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
   Handle(Graphic3d_ArrayOfPoints) aPntArray = new Graphic3d_ArrayOfPoints(1);
@@ -64,6 +72,9 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
 void SketcherPrs_Coincident::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
+  Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this, 10);
+  Handle(Select3D_SensitivePoint) aSp = new Select3D_SensitivePoint(aOwn, myPoint);
+  aSelection->Add(aSp);
 }
 
 void SketcherPrs_Coincident::SetColor(const Quantity_NameOfColor aCol)

@@ -288,12 +288,12 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
   return aCanDisplay;
 }
 
-void PartSet_Module::addViewerItems(QMenu* theMenu) const
+bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
       !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    return;
+    return false;
 
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   QObjectPtrList aObjects = aSelection->selectedPresentations();
@@ -307,10 +307,7 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
       }
     }
     if (hasFeature) {
-      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-      XGUI_Workshop* aWorkshop = aConnector->workshop();
-      QAction* anAction = aWorkshop->contextMenuMgr()->action("DELETE_CMD");
-      theMenu->addAction(anAction);
+      theMenu->addAction(theStdActions["DELETE_CMD"]);
     }
   }
   bool isAuxiliary;
@@ -319,6 +316,7 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
     theMenu->addAction(anAction);
     anAction->setChecked(isAuxiliary);
   }
+  return true;
 }
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
