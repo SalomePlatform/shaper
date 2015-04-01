@@ -259,9 +259,28 @@ void Model_Data::eraseBackReferences()
     aRes->setIsConcealed(false);
 }
 
+void Model_Data::removeBackReference(FeaturePtr theFeature, std::string theAttrID)
+{
+  AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
+  if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
+    return;
+
+  myRefsToMe.erase(anAttribute);
+  // TODO: check whether the concealed should be thrown down to the false value
+  std::shared_ptr<ModelAPI_Result> aRes = 
+    std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+  if (aRes)
+    aRes->setIsConcealed(false);
+}
+
 void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID, 
    const bool theApplyConcealment)
 {
+  // do not add the same attribute twice
+  AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
+  if (myRefsToMe.find(anAttribute) != myRefsToMe.end())
+    return;
+
   myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
   if (theApplyConcealment && 
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {

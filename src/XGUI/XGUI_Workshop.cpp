@@ -562,8 +562,8 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
       // Redisplay the visible object or the object of the current operation
       bool isVisibleObject = myDisplayer->isVisible(aObj);
       #ifdef DEBUG_FEATURE_REDISPLAY
-      QString anObjInfo = objectInfo((aObj));
-      qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+      //QString anObjInfo = objectInfo((aObj));
+      //qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
       #endif
 
       if (isVisibleObject)  { // redisplay visible object
@@ -607,7 +607,11 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
   //bool aHasPart = false;
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-
+    ObjectPtr anObject = *aIt;
+    // the validity of the data should be checked here in order to avoid display of the objects,
+    // which were created, then deleted, but flush for the creation event happens after that
+    if (!anObject->data() || !anObject->data()->isValid())
+      continue;
     //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     //if (aPart) {
       //aHasPart = true;
@@ -1454,6 +1458,9 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
         aDoc->removeFeature(aFeature);
     }
   }
+  // the update signal should be emitted obligatory in order to have a redisplay
+  // signal and hide the removed presentations in the viewer
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   return true;
 }
 

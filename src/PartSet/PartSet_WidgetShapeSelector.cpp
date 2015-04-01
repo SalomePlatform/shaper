@@ -15,6 +15,8 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
+#include <SketchPlugin_ConstraintRigid.h>
+
 #include <XGUI_Workshop.h>
 
 PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
@@ -109,6 +111,24 @@ void PartSet_WidgetShapeSelector::removeExternal()
     DocumentPtr aDoc = myExternalObject->document();
     FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
     if (aFeature.get() != NULL) {
+      // 1. check whether the external object can be deleted
+      // It should not be deleted if there are references to the object from other features,
+      // which are not the sketch or a rigid constraints.
+      std::set<FeaturePtr> aRefFeatures;
+      aFeature->document()->refsToFeature(aFeature, aRefFeatures, false);
+      std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+      bool aReferenceExist = false;
+      CompositeFeaturePtr aSketch = sketch();
+      for (; anIt != aLast && !aReferenceExist; anIt++) {
+        FeaturePtr aFeature = (*anIt);
+        aReferenceExist = aFeature != aSketch &&
+                          aFeature->getKind() != SketchPlugin_ConstraintRigid::ID();
+      }
+      if (aReferenceExist)
+        return;
+
+      // 2. delete external object
       QObjectPtrList anObjects;
       anObjects.append(aFeature);
       // the external feature should be removed with all references, sketch feature should be ignored

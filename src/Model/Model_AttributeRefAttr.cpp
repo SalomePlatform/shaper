@@ -41,11 +41,29 @@ std::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
 
 void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
 {
+  // the back reference from the previous object to the attribute should be removed
+  ObjectPtr anObject = object();
+  if (anObject.get() && anObject != theObject) {
+    FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    if (anOwnerFeature.get()) {
+      std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
+                                          anObject->data());
+      aData->removeBackReference(anOwnerFeature, id());
+    }
+  }
+
   if (theObject && (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject)) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
         theObject->data());
     myRef->Set(aData->label().Father());
     myID->Set("");  // feature is identified by the empty ID
+
+    // do it before the transaction finish to make just created/removed objects know dependencies
+    // and reference from composite feature is removed automatically
+    FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    if (anOwnerFeature.get()) {
+      aData->addBackReference(anOwnerFeature, id(), false);
+    }
     owner()->data()->sendAttributeUpdated(this);
   } else if (theObject.get() == NULL) {
     myRef->Set(myRef->Label()); // reference to itself means that object is null

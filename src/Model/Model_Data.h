@@ -185,6 +185,10 @@ private:
   /// Adds a back reference (with identifier which attribute references to this object
   /// \param theFeature feature referenced to this
   /// \param theAttrID identifier of the attribute that is references from theFeature to this
+  void removeBackReference(FeaturePtr theFeature, std::string theAttrID);
+  /// Adds a back reference (with identifier which attribute references to this object
+  /// \param theFeature feature referenced to this
+  /// \param theAttrID identifier of the attribute that is references from theFeature to this
   /// \param theApplyConcealment applies consealment flag changes
   void addBackReference(FeaturePtr theFeature, std::string theAttrID, 
     const bool theApplyConcealment = true);
