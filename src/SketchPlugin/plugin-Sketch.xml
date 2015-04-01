@@ -180,7 +180,7 @@
         
         <sketch_constraint_shape_selector id="ConstraintEntityB"
             label="Last object" tooltip="Select line, circle or arc" shape_types="edge">
-          <validator id="PartSet_SameTypeAttr" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
           <validator id="PartSet_DifferentObjects"/>
         </sketch_constraint_shape_selector>
       </feature>

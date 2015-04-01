@@ -57,6 +57,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_TangentAttrValidator);
   aFactory->registerValidator("SketchPlugin_NotFixed",
                               new SketchPlugin_NotFixedValidator);
+  aFactory->registerValidator("SketchPlugin_EqualAttr",
+                              new SketchPlugin_EqualAttrValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

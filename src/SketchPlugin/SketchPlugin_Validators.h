@@ -60,5 +60,21 @@ class SketchPlugin_NotFixedValidator : public ModelAPI_AttributeValidator
                        const std::list<std::string>& theArguments) const;
 };
 
+/**\class SketchPlugin_EqualAttrValidator
+ * \ingroup Validators
+ * \brief Validator for the equal constraint input.
+ *
+ * It checks that attributes of the Equal constraint are correct.
+ */
+class SketchPlugin_EqualAttrValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const;
+};
+
 
 #endif
