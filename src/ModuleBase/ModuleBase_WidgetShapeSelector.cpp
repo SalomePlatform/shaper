@@ -377,7 +377,7 @@ void ModuleBase_WidgetShapeSelector::storeAttributeValue()
 
   myObject = GeomValidators_Tools::getObject(anAttribute);
   myShape = getShape();
-  myRefAttribute = NULL;
+  myRefAttribute = AttributePtr();
   myIsObject = false;
   AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
   if (aRefAttr) {

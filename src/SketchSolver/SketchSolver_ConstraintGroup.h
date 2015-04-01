@@ -168,8 +168,8 @@ protected:
    *                        (the iterator will be increased if it does not reach the end of the list)
    *  \return identifier of changed parameter; when the parameter cannot be created, returned ID is 0
    */
-  Slvs_hParam changeParameter(const double& theParam,
-                              std::vector<Slvs_Param>::const_iterator& thePrmIter);
+  Slvs_hParam changeParameter(double theParam,
+                              std::vector<Slvs_Param>::iterator& thePrmIter);
 
   /** \brief Removes specified entities and their parameters
    *  \param[in] theEntities  list of IDs of the entities to be removed

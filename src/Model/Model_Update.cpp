@@ -50,7 +50,7 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kOpStartEvent);
 
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
-                                   Config_Prop::Bool, "false");
+                                   Config_Prop::Boolean, "false");
   myIsAutomatic =
     Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
 }

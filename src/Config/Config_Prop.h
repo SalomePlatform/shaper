@@ -4,8 +4,8 @@
 // Created:     12 Aug 2014
 // Author:      Vitaly SMETANNIKOV
 
-#ifndef Config_Prop_H
-#define Config_Prop_H
+#ifndef CONFIG_PROP_H
+#define CONFIG_PROP_H
 
 #include "Config_def.h"
 
@@ -26,7 +26,7 @@ class Config_Prop
   {
     Disabled,
     Space,
-    Bool,
+    Boolean,
     Color,
     String,
     Selector,

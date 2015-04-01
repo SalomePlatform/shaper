@@ -13,7 +13,7 @@
 #include <SketchPlugin_Arc.h>
 
 #include <GeomDataAPI_Point2D.h>
-#include <GeomAPI_Pnt2D.h>
+#include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_XYZ.h>
 #include <ModelAPI_AttributeDouble.h>
