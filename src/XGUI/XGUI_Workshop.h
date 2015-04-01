@@ -164,7 +164,7 @@ Q_OBJECT
   void activatePart(std::shared_ptr<ModelAPI_ResultPart> theFeature);
 
   //! Delete features
-  void deleteObjects(const QObjectPtrList& theList);
+  void deleteObjects();
 
   //! Returns true if there is at least one selected body/construction/group result
   //! \return boolean value
@@ -212,6 +212,19 @@ Q_OBJECT
    * - there is no active operation
    */
   bool isActiveOperationAborted();
+
+  //! Delete features. Delete the referenced features. There can be a question with a list of referenced
+  //! objects.
+  //! \param theList an objects to be deleted
+  //! \param theIgnoredFeatures a list of features to be ignored during delete
+  //! \param theParent a parent widget for the question message box
+  //! \param theAskAboutDeleteReferences if true, the message box with a list of references to the
+  //! objects features appear. If the user chose do not continue, the deletion is not performed
+  //! \return the success of the delete 
+  static bool deleteFeatures(const QObjectPtrList& theList,
+                             std::set<FeaturePtr> theIgnoredFeatures = std::set<FeaturePtr>(),
+                             QWidget* theParent = 0,
+                             const bool theAskAboutDeleteReferences = false);
 
 signals:
   /// Emitted when selection happens in Salome viewer

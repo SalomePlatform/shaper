@@ -537,23 +537,20 @@ void PartSet_Module::onAction(bool isChecked)
 
 bool PartSet_Module::deleteObjects()
 {
+  // 1. check whether the delete should be processed in the module
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
        isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
   if (!isSketchOp && !isNestedOp)
     return false;
 
-  // sketch feature should be skipped, only sub-features can be removed
-  // when sketch operation is active
-  CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
-
+  // 2. find selected presentations
   // selected objects should be collected before the current operation abort because
   // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   ModuleBase_ISelection* aSel = aConnector->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
-
   // if there are no selected objects in the viewer, that means that the selection in another
   // place cased this method. It is necessary to return the false value to understande in above
   // method that delete is not processed
@@ -564,80 +561,20 @@ bool PartSet_Module::deleteObjects()
   if (isNestedOp)
     anOperation->abort();
 
-  std::set<FeaturePtr> aRefFeatures;
-  foreach (ObjectPtr aObj, aSelectedObj)
-  {
-    //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-    //if (aPart) {
-      // TODO: check for what there is this condition. It is placed here historicaly because
-      // ther is this condition during remove features.
-    //} else {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    if (aFeature.get() != NULL) {
-      aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
-    }
-    //}
-  }
-
+  // 3. start operation
   QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-  /**
-  // according to #355 feature, it is not necessary to inform about dependencies during
-  // sketch delete operation
-  // 
-  if (!aRefFeatures.empty()) {
-    QStringList aRefNames;
-    std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                         aLast = aRefFeatures.end();
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt);
-      if (aFeature == aSketch)
-        continue;
-      aRefNames.append((*anIt)->name().c_str());
-    }
-    if (!aRefNames.empty()) {
-      QString aNames = aRefNames.join(", ");
-      aDescription += aNames.prepend(" ");
-
-      QMainWindow* aDesktop = aWorkshop->desktop();
-      QMessageBox::StandardButton aRes = QMessageBox::warning(
-          aDesktop, tr("Delete features"),
-          QString(tr("Selected features are used in the following features: %1.\
-  These features will be deleted also. Would you like to continue?")).arg(aNames),
-          QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-      if (aRes != QMessageBox::Yes)
-        return;
-    }
-  }*/
-
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(aDescription.toStdString());
-  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                       aLast = aRefFeatures.end();
-  for (; anIt != aLast; anIt++) {
-    FeaturePtr aRefFeature = (*anIt);
-    if (aRefFeature == aSketch)
-      continue;
-    aRefFeature->document()->removeFeature(aRefFeature);
-  }
 
-  foreach (ObjectPtr aObj, aSelectedObj)
-  {
-    DocumentPtr aDoc = aObj->document();
-    //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-    //if (aPart) {
-    //  if (aDoc == aMgr->activeDocument()) {
-    //    aDoc->close();
-    //  }
-    //} else {
-      //FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    if (aFeature.get() != NULL) {
-      aDoc->removeFeature(aFeature);
-    }
-    //}
-  }
+  // 4. delete features
+  // sketch feature should be skipped, only sub-features can be removed
+  // when sketch operation is active
+  std::set<FeaturePtr> anIgnoredFeatures;
+  anIgnoredFeatures.insert(mySketchMgr->activeSketch());
+  aWorkshop->deleteFeatures(aSelectedObj, anIgnoredFeatures);
+  
+  // 5. stop operation
   aWorkshop->displayer()->updateViewer();
-  //myDisplayer->updateViewer();
   aMgr->finishOperation();
 
   return true;

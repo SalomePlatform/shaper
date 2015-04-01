@@ -106,6 +106,8 @@ QString objectInfo(ObjectPtr theObj)
   }
   if (aFeature.get()) {
     aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
+    if (aFeature->data().get() && aFeature->data()->isValid())
+      aFeatureStr.append(QString("(name=%1)").arg(aFeature->data()->name().c_str()).toStdString().c_str());
   }
   return aFeatureStr;
 }
@@ -1303,7 +1305,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   } else if (theId == "DEACTIVATE_PART_CMD")
     activatePart(ResultPartPtr());
   else if (theId == "DELETE_CMD")
-    deleteObjects(aObjects);
+    deleteObjects();
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
   else if (theId == "SHOW_CMD")
@@ -1353,90 +1355,106 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 //}
 
 //**************************************************************
-void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)
+void XGUI_Workshop::deleteObjects()
 {
   ModuleBase_IModule* aModule = module();
+  // 1. allow the module to delete objects, do nothing if it has succeed
   if (aModule->deleteObjects())
     return;
 
   if (!isActiveOperationAborted())
     return;
-
-  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
-  std::set<FeaturePtr> aRefFeatures;
-  foreach (ObjectPtr aObj, theList)
-  {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-    if (aPart) {
-      // TODO: check for what there is this condition. It is placed here historicaly because
-      // ther is this condition during remove features.
-    } else {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      if (aFeature.get() != NULL) {
-        aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
-      }
-    }
-  }
-
-  if (!aRefFeatures.empty()) {
-    QStringList aRefNames;
-    std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                         aLast = aRefFeatures.end();
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt);
-      std::string aFName = aFeature->data()->name().c_str();
-      std::string aName = (*anIt)->name().c_str();
-      aRefNames.append((*anIt)->name().c_str());
-    }
-    QString aNames = aRefNames.join(", ");
-
-    QMessageBox::StandardButton aRes = QMessageBox::warning(
-        aDesktop, tr("Delete features"),
-        QString(tr("Selected features are used in the following features: %1.\
-These features will be deleted also. Would you like to continue?")).arg(aNames),
-        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-    if (aRes != QMessageBox::Yes)
-      return;
-  }
-
-  QString aDescription = tr("Delete %1");
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  // 1. start operation
+  QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+  aDescription += tr(" %1");
   QStringList aObjectNames;
-  foreach (ObjectPtr aObj, theList) {
+  foreach (ObjectPtr aObj, anObjects) {
     if (!aObj->data().get())
       continue;
     aObjectNames << QString::fromStdString(aObj->data()->name());
   }
   aDescription = aDescription.arg(aObjectNames.join(", "));
+
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(aDescription.toStdString());
-  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                       aLast = aRefFeatures.end();
-  for (; anIt != aLast; anIt++) {
-    FeaturePtr aRefFeature = (*anIt);
-    DocumentPtr aDoc = aRefFeature->document();
-    aDoc->removeFeature(aRefFeature);
-   }
-
-
-  foreach (ObjectPtr aObj, theList)
+  // 2. close the documents of the removed parts if the result part is in a list of selected objects
+  foreach (ObjectPtr aObj, anObjects)
   {
-    DocumentPtr aDoc = aObj->document();
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
     if (aPart) {
+      DocumentPtr aDoc = aObj->document();
       if (aDoc == aMgr->activeDocument()) {
         aDoc->close();
       }
-    } else {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      if (aFeature) {
-        aDoc->removeFeature(aFeature);
-      }
     }
   }
+  // 3. delete objects
+  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+  std::set<FeaturePtr> anIgnoredFeatures;
+  if (deleteFeatures(anObjects, anIgnoredFeatures, aDesktop, true)) {
+    myDisplayer->updateViewer();
+    aMgr->finishOperation();
+    updateCommandStatus();
+  }
+  else {
+    aMgr->abortOperation();
+  }
+}
 
-  myDisplayer->updateViewer();
-  aMgr->finishOperation();
-  updateCommandStatus();
+//**************************************************************
+bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
+                                   std::set<FeaturePtr> theIgnoredFeatures,
+                                   QWidget* theParent,
+                                   const bool theAskAboutDeleteReferences)
+{
+  // 1. find all referenced features
+  std::set<FeaturePtr> aRefFeatures;
+  foreach (ObjectPtr aObj, theList) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    if (aFeature.get() != NULL) {
+      aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
+    }
+  }
+  // 2. warn about the references remove, break the delete operation if the user chose it
+  if (theAskAboutDeleteReferences && !aRefFeatures.empty()) {
+    QStringList aRefNames;
+    std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                         aLast = aRefFeatures.end();
+    for (; anIt != aLast; anIt++) {
+      aRefNames.append((*anIt)->name().c_str());
+    }
+    QString aNames = aRefNames.join(", ");
+
+    QMessageBox::StandardButton aRes = QMessageBox::warning(
+        theParent, tr("Delete features"),
+        QString(tr("Selected features are used in the following features: %1.\
+These features will be deleted also. Would you like to continue?")).arg(aNames),
+        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+    if (aRes != QMessageBox::Yes)
+      return false;
+  }
+
+  // 3. remove referenced features
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = (*anIt);
+    DocumentPtr aDoc = aFeature->document();
+    if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end())
+      aDoc->removeFeature(aFeature);
+  }
+
+  // 4. remove the parameter features
+  foreach (ObjectPtr aObj, theList) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    if (aFeature) {
+      DocumentPtr aDoc = aObj->document();
+      if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end())
+        aDoc->removeFeature(aFeature);
+    }
+  }
+  return true;
 }
 
 bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes)

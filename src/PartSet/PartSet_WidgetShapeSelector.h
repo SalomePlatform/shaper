@@ -30,8 +30,7 @@ Q_OBJECT
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   PartSet_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-    const Config_WidgetAPI* theData, const std::string& theParentId)
-    : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId) {}
+    const Config_WidgetAPI* theData, const std::string& theParentId);
 
   virtual ~PartSet_WidgetShapeSelector() {}
 

@@ -10,8 +10,20 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <ModuleBase_Definitions.h>
+
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
+
+#include <XGUI_Workshop.h>
+
+PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
+                                                         ModuleBase_IWorkshop* theWorkshop,
+                                                         const Config_WidgetAPI* theData,
+                                                         const std::string& theParentId)
+: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId)
+{
+}
 
 bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
@@ -97,7 +109,12 @@ void PartSet_WidgetShapeSelector::removeExternal()
     DocumentPtr aDoc = myExternalObject->document();
     FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
     if (aFeature.get() != NULL) {
-      aDoc->removeFeature(aFeature);
+      QObjectPtrList anObjects;
+      anObjects.append(aFeature);
+      // the external feature should be removed with all references, sketch feature should be ignored
+      std::set<FeaturePtr> anIgnoredFeatures;
+      anIgnoredFeatures.insert(sketch());
+      XGUI_Workshop::deleteFeatures(anObjects, anIgnoredFeatures);
     }
     myExternalObject = NULL;
   }
