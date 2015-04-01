@@ -7,6 +7,7 @@
 #include "SketchPlugin_Validators.h"
 #include "SketchPlugin_ConstraintDistance.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Arc.h"
 
@@ -135,4 +136,32 @@ bool SketchPlugin_TangentAttrValidator::isValid(
   return false;
 }
 
+bool SketchPlugin_NotFixedValidator::isValid(
+    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
+{
+  std::shared_ptr<SketchPlugin_Feature> aFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+  if (!aFeature)
+    return true;
+
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+
+  SketchPlugin_Sketch* aSketch = aFeature->sketch();
+  int aNbFeatures = aSketch->numberOfSubs();
+  for (int anInd = 0; anInd < aNbFeatures; anInd++) {
+    FeaturePtr aSubFeature = aSketch->subFeature(anInd);
+    if (aSubFeature->getKind() != SketchPlugin_ConstraintRigid::ID() || aSubFeature == aFeature)
+      continue;
+    AttributeRefAttrPtr aRAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aSubFeature->attribute(SketchPlugin_ConstraintRigid::ENTITY_A()));
+    if (aRefAttr->isObject()) {
+      if (aRefAttr->object() == aRAttr->object())
+        return false;
+    } else if (aRefAttr->attr() == aRAttr->attr())
+      return false;
+  }
+  return true;
+}
 
