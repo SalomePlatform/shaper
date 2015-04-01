@@ -95,7 +95,8 @@ bool SketchPlugin_TangentAttrValidator::isValid(
       if (aOtherFea->getKind() != SketchPlugin_Arc::ID())
         return false;
     } else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Line::ID())
+      if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
+          aOtherFea->getKind() != SketchPlugin_Arc::ID())
         return false;
     } else
       return false;
