@@ -110,7 +110,7 @@ const int& SketchSolver_Constraint::getType(
     }
     // The constrained points should be in first and second positions,
     // so the expected value of aPt2d or aPt3d is 3
-    if ((aPt2d == 3 && aPt3d == 0) || (aPt2d == 0 && aPt3d == 3))
+    if (aPt2d + aPt3d == 3)
       myType = SLVS_C_POINTS_COINCIDENT;
     // Constraint parameters are wrong
     return getType();
