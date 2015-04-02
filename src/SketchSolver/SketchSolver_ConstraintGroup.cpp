@@ -662,6 +662,22 @@ bool SketchSolver_ConstraintGroup::changeMirrorConstraint(
 
   std::list<ObjectPtr> aBaseList = aBaseRefList->list();
   std::list<ObjectPtr> aMirroredList = aMirroredRefList->list();
+  // remove all empty items
+  std::list<ObjectPtr>::iterator anIt = aBaseList.begin();
+  std::list<ObjectPtr>::iterator aTmpIt;
+  while (anIt != aBaseList.end()) {
+    aTmpIt = anIt;
+    anIt++;
+    if (!(*aTmpIt))
+      aBaseList.erase(aTmpIt);
+  }
+  anIt = aMirroredList.begin();
+  while (anIt != aMirroredList.end()) {
+    aTmpIt = anIt;
+    anIt++;
+    if (!(*aTmpIt))
+      aMirroredList.erase(aTmpIt);
+  }
   if (aBaseList.empty() || aBaseList.size() != aMirroredList.size())
     return false;
 
