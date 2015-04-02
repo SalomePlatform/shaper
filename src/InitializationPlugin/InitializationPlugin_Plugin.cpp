@@ -32,6 +32,12 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::dynamic_pointer_cast<
         ModelAPI_DocumentCreatedMessage>(theMessage);
     DocumentPtr aDoc = aMessage->document();
+
+    /// Issue 431: for the current moment create planes only in the module document,
+    /// Later if it is needed we may create special initial planes in Parts (may be different)
+    if (aDoc != ModelAPI_Session::get()->moduleDocument())
+      return;
+
     std::list<FeaturePtr> aFeatures;
 
     // the viewer update should be blocked in order to avoid the features blinking before they are
