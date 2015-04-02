@@ -33,10 +33,15 @@ ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
 {
   QFormLayout* aMainLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
-  QString aTitle = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
+  QLabel* aLabel = new QLabel(aLabelText, this);
+  if (!aLabelIcon.isEmpty())
+    aLabel->setPixmap(QPixmap(aLabelIcon));
+
   myLineEdit = new QLineEdit(this);
   myLineEdit->setMinimumHeight(20);
-  aMainLay->addRow(aTitle, myLineEdit);
+  aMainLay->addRow(aLabel, myLineEdit);
   this->setLayout(aMainLay);
 
   connect(myLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged()));

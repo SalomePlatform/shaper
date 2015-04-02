@@ -31,6 +31,7 @@ const static char* WDG_SHAPE_SELECTOR = "shape_selector";
 const static char* WDG_CHOICE = "choice";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 const static char* WDG_FILE_SELECTOR= "file_selector";
+const static char* WDG_EXPR_EDITOR = "expr_editor";
 // Containers
 const static char* WDG_GROUP = "groupbox";
 const static char* WDG_CHECK_GROUP = "check_groupbox";

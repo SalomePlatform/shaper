@@ -11,14 +11,11 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
-//#include <ModuleBase_WidgetFeatureOrAttribute.h>
-//#include <ModuleBase_WidgetFeature.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
-//#include <ModuleBase_WidgetPoint2dDistance.h>
 #include <ModuleBase_WidgetFileSelector.h>
 #include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_IWorkshop.h>
@@ -31,6 +28,7 @@
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageGroupBox.h>
 #include <ModuleBase_PageWidget.h>
+#include <ModuleBase_WidgetExprEditor.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -115,53 +113,45 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   thePage->alignToTop();
 }
 
-ModuleBase_ModelWidget* ModuleBase_WidgetFactory
-::createWidgetByType(const std::string& theType, QWidget* theParent)
+ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
+                                                                     QWidget* theParent)
 {
   ModuleBase_ModelWidget* result = NULL;
 
   if (theType == WDG_INFO) {
     result = new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_DOUBLEVALUE) {
     result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_SHAPE_SELECTOR) {
-    result =  new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
-
+    result = new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   } else if (theType == WDG_BOOLVALUE) {
     result = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_FILE_SELECTOR) {
     result = new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_CHOICE) {
-    result = new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
-
+    result = new ModuleBase_WidgetChoice(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_STRINGVALUE) {
-    result = new ModuleBase_WidgetLineEdit(theParent, myWidgetApi,myParentId);
-
+    result = new ModuleBase_WidgetLineEdit(theParent, myWidgetApi, myParentId);
+  } else if (theType == WDG_EXPR_EDITOR) {
+    result = new ModuleBase_WidgetExprEditor(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_MULTISELECTOR) {
-    result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi,myParentId);
-
+    result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   } else if (theType == WDG_TOOLBOX) {
     result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_SWITCH) {
     result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi, myParentId);
-
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
     // Do nothing for "box" and "case"
     result = NULL;
   } else {
-    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi,
-                                                      myParentId);
-#ifdef _DEBUG
-    if (!result) {qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");}
-#endif
+    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myParentId);
+    #ifdef _DEBUG
+    if (!result) {
+      qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");
+    }
+    #endif
   }
   if (result) {
     myModelWidgets.append(result);

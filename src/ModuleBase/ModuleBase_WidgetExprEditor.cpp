@@ -1,0 +1,207 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+/*
+ * ModuleBase_WidgetExprEditor.cpp
+ *
+ *  Created on: Aug 28, 2014
+ *      Author: sbh
+ */
+
+#include <ModuleBase_WidgetExprEditor.h>
+#include <ModuleBase_Tools.h>
+
+#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Object.h>
+#include <ModelAPI_Validator.h>
+
+#include <Config_WidgetAPI.h>
+
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QObject>
+#include <QString>
+#include <QStringListModel>
+#include <QCompleter>
+#include <QSize>
+#include <QShortcut>
+#include <QScrollBar>
+
+#include <memory>
+#include <string>
+
+ExpressionEditor::ExpressionEditor(QWidget* theParent)
+: QPlainTextEdit(theParent)
+{
+  myCompleter = new QCompleter(this);
+  myCompleter->setWidget(this);
+  myCompleter->setCompletionMode(QCompleter::PopupCompletion);
+
+  myCompleterModel = new QStringListModel(this);
+  myCompleter->setModel(myCompleterModel);
+  // Use sorted model to accelerate completion (QCompleter will use binary search)
+  myCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+  myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+
+  connect(myCompleter, SIGNAL(activated(const QString&)),
+          this,        SLOT(insertCompletion(const QString&)));
+  (void) new QShortcut(QKeySequence(tr("Ctrl+Space", "Complete")),
+                       this, SLOT(performCompletion()));
+}
+
+ExpressionEditor::~ExpressionEditor()
+{
+
+}
+
+void ExpressionEditor::setCompletionList(QStringList& theList)
+{
+  theList.sort();
+  theList.removeDuplicates();
+  myCompleterModel->setStringList(theList);
+}
+
+void ExpressionEditor::insertCompletion(const QString& theCompletion, bool isSingleWord)
+{
+  QTextCursor aCursor = textCursor();
+  int numberOfCharsToComplete = theCompletion.length() -
+      myCompleter->completionPrefix().length();
+  int insertionPosition = aCursor.position();
+  aCursor.insertText(theCompletion.right(numberOfCharsToComplete));
+  if (isSingleWord) {
+    aCursor.setPosition(insertionPosition);
+    aCursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+    myCompletedAndSelected = true;
+  }
+  setTextCursor(aCursor);
+}
+
+void ExpressionEditor::performCompletion()
+{
+  QTextCursor aCursor = textCursor();
+  aCursor.select(QTextCursor::WordUnderCursor);
+  const QString aPrefix = aCursor.selectedText();
+  if (!aPrefix.isEmpty() && aPrefix.at(aPrefix.length() - 1).isLetter()) {
+    performCompletion(aPrefix);
+  }
+}
+
+void ExpressionEditor::performCompletion(const QString& theCompletionPrefix)
+{
+  //populate model?
+  if (theCompletionPrefix != myCompleter->completionPrefix()) {
+    myCompleter->setCompletionPrefix(theCompletionPrefix);
+    myCompleter->popup()->setCurrentIndex(myCompleter->completionModel()->index(0, 0));
+  }
+  if (myCompleter->completionCount() == 1) {
+    insertCompletion(myCompleter->currentCompletion(), true);
+  } else {
+    QRect aRect = cursorRect();
+    aRect.setWidth(myCompleter->popup()->sizeHintForColumn(0)
+                  + myCompleter->popup()->verticalScrollBar()->sizeHint().width());
+    myCompleter->complete(aRect);
+  }
+}
+
+void ExpressionEditor::keyPressEvent(QKeyEvent* theEvent)
+{
+  if (myCompletedAndSelected && handledCompletedAndSelected(theEvent))
+    return;
+  myCompletedAndSelected = false;
+  if (myCompleter->popup()->isVisible()) {
+    switch (theEvent->key()) {
+      case Qt::Key_Up:
+      case Qt::Key_Down:
+      case Qt::Key_Enter:
+      case Qt::Key_Return:
+      case Qt::Key_Escape:
+        theEvent->ignore();
+        return;
+      default:
+        myCompleter->popup()->hide();
+        break;
+    }
+  }
+  QPlainTextEdit::keyPressEvent(theEvent);
+}
+
+bool ExpressionEditor::handledCompletedAndSelected(QKeyEvent* theEvent)
+{
+  myCompletedAndSelected = false;
+  QTextCursor aCursor = textCursor();
+  switch (theEvent->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return: aCursor.clearSelection(); break;
+    case Qt::Key_Escape: aCursor.removeSelectedText(); break;
+    default: return false;
+  }
+  setTextCursor(aCursor);
+  theEvent->accept();
+  return true;
+}
+
+ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor(QWidget* theParent,
+                                                     const Config_WidgetAPI* theData,
+                                                     const std::string& theParentId)
+    : ModuleBase_ModelWidget(theParent, theData, theParentId)
+{
+  QVBoxLayout* aMainLay = new QVBoxLayout(this);
+  ModuleBase_Tools::adjustMargins(aMainLay);
+
+  myEditor = new ExpressionEditor(this);
+  myEditor->setMinimumHeight(20);
+  aMainLay->addWidget(myEditor);
+  this->setLayout(aMainLay);
+
+  connect(myEditor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+}
+
+ModuleBase_WidgetExprEditor::~ModuleBase_WidgetExprEditor()
+{
+}
+
+bool ModuleBase_WidgetExprEditor::storeValueCustom() const
+{
+  // A rare case when plugin was not loaded. 
+  if(!myFeature)
+    return false;
+  DataPtr aData = myFeature->data();
+  AttributeStringPtr aStringAttr = aData->string(attributeID());
+  QString aWidgetValue = myEditor->toPlainText();
+  aStringAttr->setValue(aWidgetValue.toStdString());
+  updateObject(myFeature);
+  return true;
+}
+
+bool ModuleBase_WidgetExprEditor::restoreValue()
+{
+  // A rare case when plugin was not loaded. 
+  if(!myFeature)
+    return false;
+  DataPtr aData = myFeature->data();
+  AttributeStringPtr aStringAttr = aData->string(attributeID());
+
+  bool isBlocked = myEditor->blockSignals(true);
+  QTextCursor aCursor = myEditor->textCursor();
+  int pos = aCursor.position();
+  std::string aRestoredStr = aStringAttr->value();
+  myEditor->setPlainText(QString::fromStdString(aRestoredStr));
+  aCursor.setPosition(pos);
+  myEditor->setTextCursor(aCursor);
+  myEditor->blockSignals(isBlocked);
+
+  return true;
+}
+
+QList<QWidget*> ModuleBase_WidgetExprEditor::getControls() const
+{
+  QList<QWidget*> result;
+  result << myEditor;
+  return result;
+}
+
+void ModuleBase_WidgetExprEditor::onTextChanged()
+{
+  storeValue();
+}
