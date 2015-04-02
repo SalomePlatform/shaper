@@ -280,14 +280,8 @@ bool PartSet_Module::canRedo() const
 
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
-  // the display should be possible almost always, with exception of some specific cases
-
-  bool aCanDisplay = true;
-
-  if (mySketchMgr->activeSketch()) {
-    aCanDisplay = mySketchMgr->canDisplayObject(theObject);
-  }
-  return aCanDisplay;
+  // the sketch manager put the restriction to the objects display
+  return mySketchMgr->canDisplayObject(theObject);
 }
 
 bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const

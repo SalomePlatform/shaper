@@ -776,42 +776,45 @@ bool PartSet_SketcherMgr::canRedo() const
 bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = true;
-  // 1. the sketch feature should not be displayed during the sketch active operation
-  // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch 
-  // nested features can be visualized
-  CompositeFeaturePtr aSketchFeature = activeSketch();
-  if (aSketchFeature.get() != NULL) {
+
+  bool aHasActiveSketch = activeSketch().get() != NULL;
+  if (aHasActiveSketch) {
+    // 1. the sketch feature should not be displayed during the sketch active operation
+    // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch 
+    // nested features can be visualized
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL && aFeature == aSketchFeature)
+    if (aFeature.get() != NULL && aFeature == activeSketch())
       aCanDisplay = false;
   }
-  // 2. For created nested feature operation do not display the created feature if
+  else { // there are no an active sketch
+    // 2. sketch sub-features should not visualized if the sketch operatio is not active
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      if (aSketchFeature.get() == NULL)
+        aCanDisplay = false;
+    }
+  }
+
+  // 3. For created nested feature operation do not display the created feature if
   // the mouse curstor leaves the OCC window.
   // The correction cases, which ignores this condition:
   // a. the property panel values modification
   // b. the popup menu activated
   // c. widget editor control
-  if (aCanDisplay) {
-    if (!isNestedCreateOperation(getCurrentOperation()))
-      return aCanDisplay;
-
+  if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
     ModuleBase_Operation* aOperation = getCurrentOperation();
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWdg = aPanel ? aPanel->activeWidget() : 0;
+    ModuleBase_WidgetEditor* anEditorWdg = anActiveWdg ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWdg) : 0;
     // the active widget editor should not influence here. The presentation should be visible always
     // when this widget is active.
-    if (anActiveWdg) {
-      ModuleBase_WidgetEditor* anEditorWdg = dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWdg);
-      if (anEditorWdg) {
-        return aCanDisplay;
-      }
+    if (!anEditorWdg && !myIsPopupMenuActive) {
+      // during a nested create operation, the feature is redisplayed only if the mouse over view
+      // of there was a value modified in the property panel after the mouse left the view
+      aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
     }
-    if (myIsPopupMenuActive)
-      return aCanDisplay;
-
-    // during a nested create operation, the feature is redisplayed only if the mouse over view
-    // of there was a value modified in the property panel after the mouse left the view
-    aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
   }
   return aCanDisplay;
 }
