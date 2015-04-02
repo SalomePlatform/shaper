@@ -35,6 +35,10 @@ protected:
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
+  /// Redefinition of virtual function
+  Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+    const Standard_Integer aMode);
+
 private:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;

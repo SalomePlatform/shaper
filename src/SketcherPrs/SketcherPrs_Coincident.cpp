@@ -70,9 +70,11 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
 void SketcherPrs_Coincident::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
-  Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this, 10);
-  Handle(Select3D_SensitivePoint) aSp = new Select3D_SensitivePoint(aOwn, myPoint);
-  aSelection->Add(aSp);
+  if ((aMode == 0) || (aMode == SketcherPrs_Tools::Sel_Constraint)) {
+    Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this, 10);
+    Handle(Select3D_SensitivePoint) aSp = new Select3D_SensitivePoint(aOwn, myPoint);
+    aSelection->Add(aSp);
+  }
 }
 
 void SketcherPrs_Coincident::SetColor(const Quantity_NameOfColor aCol)

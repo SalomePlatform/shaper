@@ -353,9 +353,11 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
 void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
-  ClearSelected();
-  for (int i = 1; i <= mySPoints.Length(); i++)
-    aSelection->Add(mySPoints.Value(i));
+  //ClearSelected();
+  if ((aMode == 0) || (aMode == SketcherPrs_Tools::Sel_Constraint)) {
+    for (int i = 1; i <= mySPoints.Length(); i++)
+      aSelection->Add(mySPoints.Value(i));
+  }
 }
 
 

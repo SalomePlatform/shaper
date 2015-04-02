@@ -20,8 +20,26 @@ class GeomDataAPI_Point2D;
 
 namespace SketcherPrs_Tools {
 
+/// Enumeration with modes for activation of selection custom presentations
+enum SelectionModes {
+  /// Start of enumeration
+  Sel_Mode_First = 100, 
+  
+  /// Selection mode for all constraints exclude dimensions
+  Sel_Constraint,
+  
+  /// Selection mode for whole dimension
+  Sel_Dimension_All,
+  
+  /// Selection mode for line of dimension
+  Sel_Dimension_Line,
+
+  /// Selection mode foe text of dimension
+  Sel_Dimension_Text
+};
+
   SKETCHERPRS_EXPORT ObjectPtr getResult(ModelAPI_Feature* theFeature,
-                      const std::string& theAttrName);
+                                         const std::string& theAttrName);
 
   SKETCHERPRS_EXPORT std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject);
 

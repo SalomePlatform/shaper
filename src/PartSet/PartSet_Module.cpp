@@ -547,7 +547,7 @@ bool PartSet_Module::deleteObjects()
   // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
-  ModuleBase_ISelection* aSel = aConnector->selection();
+  ModuleBase_ISelection* aSel = workshop()->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
   // if there are no selected objects in the viewer, that means that the selection in another
   // place cased this method. It is necessary to return the false value to understande in above

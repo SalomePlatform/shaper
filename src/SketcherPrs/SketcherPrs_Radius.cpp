@@ -99,3 +99,23 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
+
+void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+                                                   const Standard_Integer theMode)
+{
+  Standard_Integer aMode;
+  switch (theMode) {
+  case SketcherPrs_Tools::Sel_Dimension_All:
+    aMode = 0;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Line:
+    aMode = 1;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Text:
+    aMode = 2;
+    break;
+  default:
+    aMode = theMode;
+  }
+  AIS_RadiusDimension::ComputeSelection(aSelection, aMode);
+}

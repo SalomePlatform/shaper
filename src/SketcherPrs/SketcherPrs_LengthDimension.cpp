@@ -151,3 +151,25 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) co
   }
   return false;
 }
+
+
+
+void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+                                                   const Standard_Integer theMode)
+{
+  Standard_Integer aMode;
+  switch (theMode) {
+  case SketcherPrs_Tools::Sel_Dimension_All:
+    aMode = 0;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Line:
+    aMode = 1;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Text:
+    aMode = 2;
+    break;
+  default:
+    aMode = theMode;
+  }
+  AIS_LengthDimension::ComputeSelection(aSelection, aMode);
+}

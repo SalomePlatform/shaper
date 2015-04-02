@@ -68,7 +68,10 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
   // Convert shape types to selection types
   QIntList aModes;
   foreach(int aType, theTypes) {
-    aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
+    if (aType > TopAbs_SHAPE) 
+      aModes.append(aType);
+    else
+      aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
   }
   aDisp->activateObjects(aModes);
   //TODO: We have to open Local context because at neutral point filters don't work (bug 25340)

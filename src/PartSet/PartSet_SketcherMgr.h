@@ -146,7 +146,7 @@ public:
   /// \param isChecked if true, the feature is a construction
   void setAuxiliary(const bool isChecked);
 
-
+  /// Returns state of constraints showing flag 
   bool isConstraintsShown() const { return myIsConstraintsShown; }
 
 
