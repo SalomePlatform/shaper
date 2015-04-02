@@ -403,6 +403,8 @@ int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities)
 {
   int aResIndex = theEntityID <= theEntities.size() ? theEntityID - 1 : 0;
   int aVecSize = theEntities.size();
+  if (theEntities.empty())
+    return 1;
   while (aResIndex >= 0 && theEntities[aResIndex].h > theEntityID)
     aResIndex--;
   while (aResIndex < aVecSize && aResIndex >= 0 && theEntities[aResIndex].h < theEntityID)

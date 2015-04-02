@@ -47,6 +47,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("An arc should be an attribute of tangency constraint");
     return MY_ERROR_VALUE;
   }
+  /// Mirror constraint has wrong attributes
+  inline static const std::string& INCORRECT_MIRROR_ATTRIBUTE()
+  {
+    static const std::string MY_ERROR_VALUE("Mirror constraint has wrong attributes");
+    return MY_ERROR_VALUE;
+  }
 };
 
 #endif

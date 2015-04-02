@@ -17,6 +17,9 @@
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_ConstraintTangent.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -104,19 +107,27 @@ void SketchSolver_ConstraintManager::processEvent(
         }
       }
       // then get anything but not the sketch
-      // at first, add coincidence constraints, because they may be used by other constraints
+      std::set<ObjectPtr> aComplexConstraints;
+      // fillet and mirror an tangency constraints will be processed later
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (!aFeature || aFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
+        if (!aFeature)
           continue;
+        if (aFeature->getKind() == SketchPlugin_ConstraintFillet::ID() ||
+            aFeature->getKind() == SketchPlugin_ConstraintMirror::ID() ||
+            aFeature->getKind() == SketchPlugin_ConstraintTangent::ID()) {
+          aComplexConstraints.insert(aFeature);
+          continue;
+        }
         changeConstraintOrEntity(aFeature);
       }
-      // after that, add all features except coincidence
-      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+      // processing remain constraints
+      aFeatIter = aComplexConstraints.begin();
+      for (; aFeatIter != aComplexConstraints.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (!aFeature /*|| aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()*/)
+        if (!aFeature)
           continue;
         changeConstraintOrEntity(aFeature);
       }
@@ -226,7 +237,6 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
         // If the group is empty, the feature is not added (the constraint only)
         if (!aConstraint && !(*aGroupIter)->isEmpty())
           return (*aGroupIter)->updateFeature(theFeature);
-////          return (*aGroupIter)->changeEntityFeature(theFeature) != SLVS_E_UNKNOWN;
         return (*aGroupIter)->changeConstraint(aConstraint);
       }
   } else if (aGroups.size() > 1) {  // Several groups applicable for this feature => need to merge them
@@ -263,7 +273,6 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
     if (aConstraint)
       return (*aFirstGroupIter)->changeConstraint(aConstraint);
     return (*aFirstGroupIter)->updateFeature(theFeature);
-////    return (*aFirstGroupIter)->changeEntityFeature(theFeature) != SLVS_E_UNKNOWN;
   }
 
   // Something goes wrong
@@ -282,48 +291,6 @@ void SketchSolver_ConstraintManager::moveEntity(
   for (; aGroupIt != myGroups.end(); aGroupIt++)
     if (!(*aGroupIt)->isEmpty() && (*aGroupIt)->isInteract(theFeature))
       (*aGroupIt)->moveFeature(theFeature);
-
-////  // Create list of attributes depending on type of the feature
-////  std::vector<std::string> anAttrList;
-////  const std::string& aFeatureKind = theFeature->getKind();
-////  // Point
-////  if (aFeatureKind.compare(SketchPlugin_Point::ID()) == 0)
-////    anAttrList.push_back(SketchPlugin_Point::COORD_ID());
-////  // Line
-////  else if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0) {
-////    anAttrList.push_back(SketchPlugin_Line::START_ID());
-////    anAttrList.push_back(SketchPlugin_Line::END_ID());
-////  }
-////  // Circle
-////  else if (aFeatureKind.compare(SketchPlugin_Circle::ID()) == 0) {
-////    anAttrList.push_back(SketchPlugin_Circle::CENTER_ID());
-////    anAttrList.push_back(SketchPlugin_Circle::RADIUS_ID());
-////  }
-////  // Arc
-////  else if (aFeatureKind.compare(SketchPlugin_Arc::ID()) == 0) {
-////    anAttrList.push_back(SketchPlugin_Arc::CENTER_ID());
-////    anAttrList.push_back(SketchPlugin_Arc::START_ID());
-////    anAttrList.push_back(SketchPlugin_Arc::END_ID());
-////  }
-////  /// \todo Other types of features should be implemented
-////
-////  // Check changing of feature's attributes (go through the groups and search usage of the attributes)
-////  std::vector<std::string>::const_iterator anAttrIter;
-////  for (anAttrIter = anAttrList.begin(); anAttrIter != anAttrList.end(); anAttrIter++) {
-////    std::vector<SketchSolver_Group*>::iterator aGroupIter;
-////    for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++) {
-////      if ((*aGroupIter)->isEmpty())
-////        continue;
-////      std::shared_ptr<ModelAPI_Attribute> anAttribute = std::dynamic_pointer_cast<
-////          ModelAPI_Attribute>(theFeature->data()->attribute(*anAttrIter));
-////      (*aGroupIter)->updateEntityIfPossible(anAttribute);
-////    }
-////  }
-////
-////  std::vector<SketchSolver_Group*>::iterator aGroupIter;
-////  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
-////    if (!(*aGroupIter)->isEmpty())
-////      (*aGroupIter)->updateRelatedConstraintsFeature(theFeature);
 }
 
 // ============================================================================

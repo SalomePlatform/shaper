@@ -44,6 +44,16 @@ protected:
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes);
 
+  /// \brief This method is used in derived objects to check consistence of constraint.
+  ///        E.g. the distance between line and point may be signed.
+  virtual void adjustConstraint();
+
+private:
+  /// \brief The arc is fixed differently to avoid SolveSpace problems (overconstraint)
+  ///
+  /// There will be fixed start and end points and the radius of the arc.
+  void fixArc(const Slvs_Entity& theArc);
+
 protected:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
 };

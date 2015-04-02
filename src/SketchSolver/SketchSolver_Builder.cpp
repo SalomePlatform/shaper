@@ -8,7 +8,9 @@
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>
+#include <SketchSolver_ConstraintFillet.h>
 #include <SketchSolver_ConstraintLength.h>
+#include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_ConstraintRigid.h>
 #include <SketchSolver_ConstraintTangent.h>
 
@@ -65,13 +67,13 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintEqual::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID()) {
-////    return SolverConstraintPtr(new SketchSolver_ConstraintFillet(theConstraint));
+    return SolverConstraintPtr(new SketchSolver_ConstraintFillet(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintHorizontal::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintHorizontal(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintLength(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
-////    return SolverConstraintPtr(new SketchSolver_ConstraintMirror(theConstraint));
+    return SolverConstraintPtr(new SketchSolver_ConstraintMirror(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintParallel::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintParallel(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintPerpendicular::ID()) {

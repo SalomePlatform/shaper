@@ -11,7 +11,9 @@ SET(PROJECT_HEADERS
     SketchSolver_ConstraintCoincidence.h
     SketchSolver_ConstraintDistance.h
     SketchSolver_ConstraintEqual.h
+    SketchSolver_ConstraintFillet.h
     SketchSolver_ConstraintLength.h
+    SketchSolver_ConstraintMirror.h
     SketchSolver_ConstraintRigid.h
     SketchSolver_ConstraintTangent.h
     SketchSolver_Builder.h
@@ -27,7 +29,9 @@ SET(PROJECT_SOURCES
     SketchSolver_ConstraintCoincidence.cpp
     SketchSolver_ConstraintDistance.cpp
     SketchSolver_ConstraintEqual.cpp
+    SketchSolver_ConstraintFillet.cpp
     SketchSolver_ConstraintLength.cpp
+    SketchSolver_ConstraintMirror.cpp
     SketchSolver_ConstraintRigid.cpp
     SketchSolver_ConstraintTangent.cpp
     SketchSolver_Builder.cpp

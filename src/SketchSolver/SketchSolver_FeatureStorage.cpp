@@ -313,11 +313,6 @@ bool SketchSolver_FeatureStorage::isConsistent() const
   for (; aFIter != myFeatures.end(); aFIter++)
     if (!aFIter->first->data() || !aFIter->first->data()->isValid())
       return false;
-////  // Check the attributes are valid
-////  MapAttributeFeature::const_iterator aTIter = myAttributes.begin();
-////  for (; aTIter != myAttributes.end(); aTIter++)
-////    if (!aTIter->first->isInitialized())
-////      return false;
   return true;
 }
 

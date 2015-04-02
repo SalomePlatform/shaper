@@ -91,12 +91,24 @@ protected:
   /// \brief Create or change SlveSpace entity according to the given feature
   Slvs_hEntity changeEntity(FeaturePtr theFeature, int& theType);
 
+  /// \brief Calculate middle point on the specified entity
+  /// \param[in]  theEntity  arc or line
+  /// \param[in]  theCoeff   is a value in [0.0, 1.0] which shows the position of the point on the entity (0.0 - start point, 1.0 - end point)
+  /// \param[out] theX       X coordinate of middle point
+  /// \param[out] theY       Y coordinate of middle point
+  void calculateMiddlePoint(const Slvs_Entity& theEntity, double theCoeff,
+                            double& theX, double& theY) const;
+
   /// \brief Removes the links to unused entities
   void cleanRemovedEntities();
 
   /// \brief Removes last error
   void cleanErrorMsg()
   { myErrorMsg.clear(); }
+
+private:
+  /// \brief Sets error, if the attribute is not initialized
+  bool isInitialized(AttributePtr theAttribute);
 
 protected:
   SketchSolver_Group* myGroup; ///< the group which contains current constraint
