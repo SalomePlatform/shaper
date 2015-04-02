@@ -52,6 +52,7 @@ void SketchPlugin_ConstraintFillet::initAttributes()
 void SketchPlugin_ConstraintFillet::execute()
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
+  ResultConstructionPtr aRC;
   // Check the base objects are initialized
   double aFilletRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aData->attribute(SketchPlugin_Constraint::VALUE()))->value();
@@ -65,12 +66,37 @@ void SketchPlugin_ConstraintFillet::execute()
   // Check the fillet shapes is not initialized yet
   AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_C()));
-  if (aRefListOfFillet->size() > 0)
+  if (aRefListOfFillet->size() > 0) {
+    // update the Radius constraint
+    ObjectPtr aFilletArcObj = aRefListOfFillet->list().back();
+    aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFilletArcObj);
+    FeaturePtr aFilletArcFeature = aRC ? aRC->document()->feature(aRC) : 
+      std::dynamic_pointer_cast<ModelAPI_Feature>(aFilletArcObj);
+
+    int aNbSubs = sketch()->numberOfSubs();
+    FeaturePtr aSubFeature;
+    for (int aSub = 0; aSub < aNbSubs; aSub++) {
+      aSubFeature = sketch()->subFeature(aSub);
+      if (aSubFeature->getKind() != SketchPlugin_ConstraintRadius::ID())
+        continue;
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aSubFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      if (!aRefAttr || !aRefAttr->isObject())
+        continue;
+      aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aRefAttr->object());
+      FeaturePtr aFeature = aRC ? aRC->document()->feature(aRC) : 
+        std::dynamic_pointer_cast<ModelAPI_Feature>(aRefAttr->object());
+      if (aFeature == aFilletArcFeature) {
+        AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+            aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
+        aRadius->setValue(aFilletRadius);
+      }
+    }
     return;
+  }
   // Obtain features for the base objects
   FeaturePtr aFeatureA, aFeatureB;
-  ResultConstructionPtr aRC =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseA->object());
+  aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseA->object());
   if (aRC) aFeatureA = aRC->document()->feature(aRC);
   aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseB->object());
   if (aRC) aFeatureB = aRC->document()->feature(aRC);
@@ -246,19 +272,18 @@ void SketchPlugin_ConstraintFillet::execute()
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
   }
 
-  // send events
-  ModelAPI_EventCreator::get()->sendUpdated(FeaturePtr(this), anUpdateEvent);
-  if (isUpdateFlushed)
-    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
-  Events_Loop::loop()->flush(anUpdateEvent);
-
   // make base features auxiliary
   static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
   aFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
   ModelAPI_EventCreator::get()->sendUpdated(aFeatureA, aRedisplayEvent);
   ModelAPI_EventCreator::get()->sendUpdated(aFeatureB, aRedisplayEvent);
-  Events_Loop::loop()->flush(aRedisplayEvent);
+////  Events_Loop::loop()->flush(aRedisplayEvent);
+
+  // send events
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
+  Events_Loop::loop()->flush(anUpdateEvent);
 }
 
 AISObjectPtr SketchPlugin_ConstraintFillet::getAISObject(AISObjectPtr thePrevious)
