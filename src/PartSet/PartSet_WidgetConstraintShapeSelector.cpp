@@ -14,7 +14,11 @@
 
 bool PartSet_WidgetConstraintShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
 {
-  ObjectPtr aSelectedObject = theSelectedObject;
+  // initially the method is wrote to create an external object. Since the parent widget creates it,
+  // the redefinition is not necessary anymore.
+  // TODO: remove the widget and use the parent one insted of it
+  return PartSet_WidgetShapeSelector::setObject(theSelectedObject, theShape);
+  /*ObjectPtr aSelectedObject = theSelectedObject;
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aSelectedObject);
   if (aFeature) {
@@ -29,5 +33,5 @@ bool PartSet_WidgetConstraintShapeSelector::setObject(ObjectPtr theSelectedObjec
         return false;
     }
   }
-  return ModuleBase_WidgetShapeSelector::setObject(aSelectedObject, theShape);
+  return ModuleBase_WidgetShapeSelector::setObject(aSelectedObject, theShape);*/
 }

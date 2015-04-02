@@ -145,6 +145,15 @@ class PARTSET_EXPORT PartSet_Tools
   static std::shared_ptr<GeomAPI_Pnt> point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
                                                 CompositeFeaturePtr theSketch);
 
+  /// Finds a line (arc or circle) by given edge
+  /// \param theShape an edge
+  /// \param theObject a selected result object
+  /// \param theSketch a sketch feature
+  /// \return result of found feature or NULL
+  static ResultPtr findFixedObjectByExternal(const TopoDS_Shape& theShape, 
+                                             const ObjectPtr& theObject, 
+                                             CompositeFeaturePtr theSketch);
+
   /// Creates a line (arc or circle) by given edge
   /// Created line will have fixed constraint
   /// \param theShape an edge

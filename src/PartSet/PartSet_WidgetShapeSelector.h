@@ -55,11 +55,6 @@ protected:
   void restoreAttributeValue(const bool theValid);
 
   // Removes the external presentation from the model
-  /// \param theSelectedObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  void createExternal(ObjectPtr theSelectedObject, GeomShapePtr theShape);
-
-  // Removes the external presentation from the model
   void removeExternal();
 
 protected:

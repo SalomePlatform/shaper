@@ -431,19 +431,30 @@ std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2
   return thePoint2D->to3D(aC->pnt(), aX->dir(), aY);
 }
 
+ResultPtr PartSet_Tools::findFixedObjectByExternal(const TopoDS_Shape& theShape,
+                                                   const ObjectPtr& theObject,
+                                                   CompositeFeaturePtr theSketch)
+{
+  ResultPtr aResult;
+  if (theShape.ShapeType() == TopAbs_EDGE) {
+    // Check that we already have such external edge
+    std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
+    aInEdge->setImpl(new TopoDS_Shape(theShape));
+    aResult = findExternalEdge(theSketch, aInEdge);
+  }
+  if (theShape.ShapeType() == TopAbs_VERTEX) {
+    std::shared_ptr<GeomAPI_Vertex> aInVert = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex());
+    aInVert->setImpl(new TopoDS_Shape(theShape));
+    aResult = findExternalVertex(theSketch, aInVert);
+  }
+  return aResult;
+}
+
 ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShape, 
                                                  const ObjectPtr& theObject, 
                                                  CompositeFeaturePtr theSketch)
 {
   if (theShape.ShapeType() == TopAbs_EDGE) {
-    // Check that we already have such external edge
-    std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
-    aInEdge->setImpl(new TopoDS_Shape(theShape));
-    ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
-    if (aResult)
-      return aResult;
-
-    // If not found then we have to create new
     Standard_Real aStart, aEnd;
     Handle(V3d_View) aNullView;
     FeaturePtr aMyFeature;
@@ -487,12 +498,6 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
     }
   }
   if (theShape.ShapeType() == TopAbs_VERTEX) {
-    std::shared_ptr<GeomAPI_Vertex> aInVert = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex());
-    aInVert->setImpl(new TopoDS_Shape(theShape));
-    ResultPtr aResult = findExternalVertex(theSketch, aInVert);
-    if (aResult)
-      return aResult;
-
     FeaturePtr aMyFeature = theSketch->addFeature(SketchPlugin_Point::ID());
 
     if (aMyFeature) {

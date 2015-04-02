@@ -38,12 +38,15 @@ bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
   if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull()) {
-    // Processing of external (non-sketch) object
-    createExternal(theSelectedObject, theShape);
-    if (myExternalObject)
-      aSelectedObject = myExternalObject;
-    else
-      return false;
+    aSelectedObject = PartSet_Tools::findFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
+                                                  theSelectedObject, mySketch);
+    if (!aSelectedObject.get()) {
+      // Processing of external (non-sketch) object
+      aSelectedObject = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
+                                                  theSelectedObject, mySketch);
+      if (aSelectedObject.get())
+        myExternalObject = aSelectedObject;
+    }
   } else {
     // Processing of sketch object
     DataPtr aData = myFeature->data();
@@ -93,42 +96,12 @@ void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 }
 
 //********************************************************************
-void PartSet_WidgetShapeSelector::createExternal(ObjectPtr theSelectedObject,
-                                                 GeomShapePtr theShape)
-{
-  ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                              theSelectedObject, mySketch);
-  if (aObj != myExternalObject) {
-    removeExternal();
-    myExternalObject = aObj;
-  }
-}
-
-//********************************************************************
 void PartSet_WidgetShapeSelector::removeExternal()
 {
   if (myExternalObject.get()) {
     DocumentPtr aDoc = myExternalObject->document();
     FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
     if (aFeature.get() != NULL) {
-      // 1. check whether the external object can be deleted
-      // It should not be deleted if there are references to the object from other features,
-      // which are not the sketch or a rigid constraints.
-      std::set<FeaturePtr> aRefFeatures;
-      aFeature->document()->refsToFeature(aFeature, aRefFeatures, false);
-      std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                       aLast = aRefFeatures.end();
-      bool aReferenceExist = false;
-      CompositeFeaturePtr aSketch = sketch();
-      for (; anIt != aLast && !aReferenceExist; anIt++) {
-        FeaturePtr aFeature = (*anIt);
-        aReferenceExist = aFeature != aSketch &&
-                          aFeature->getKind() != SketchPlugin_ConstraintRigid::ID();
-      }
-      if (aReferenceExist)
-        return;
-
-      // 2. delete external object
       QObjectPtrList anObjects;
       anObjects.append(aFeature);
       // the external feature should be removed with all references, sketch feature should be ignored
