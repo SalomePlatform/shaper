@@ -792,7 +792,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     if (aFeature.get() != NULL) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      if (aSketchFeature.get() == NULL)
+      if (aSketchFeature.get())
         aCanDisplay = false;
     }
   }
