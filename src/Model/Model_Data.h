@@ -183,6 +183,7 @@ private:
   /// Removes all information about back references
   void eraseBackReferences();
   /// Adds a back reference (with identifier which attribute references to this object
+  /// It does not change the consealment flag of the data object result
   /// \param theFeature feature referenced to this
   /// \param theAttrID identifier of the attribute that is references from theFeature to this
   void removeBackReference(FeaturePtr theFeature, std::string theAttrID);

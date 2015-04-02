@@ -1458,9 +1458,6 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
         aDoc->removeFeature(aFeature);
     }
   }
-  // the update signal should be emitted obligatory in order to have a redisplay
-  // signal and hide the removed presentations in the viewer
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   return true;
 }
 
