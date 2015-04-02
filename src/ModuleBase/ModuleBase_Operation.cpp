@@ -220,6 +220,7 @@ void ModuleBase_Operation::activateByPreselection()
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
   QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
   bool isSet = false;
+  // 1. apply the selection to controls
   for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
        (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
        ++aWIt) {
@@ -237,7 +238,15 @@ void ModuleBase_Operation::activateByPreselection()
       aFilledWgt = aWgt;
     }
   }
+  // 2. ignore not obligatory widgets
+  for (; aWIt != aWidgets.constEnd(); ++aWIt) {
+    aWgt = (*aWIt);
+    if (aWgt && aWgt->isObligatory())
+      continue;
+    aFilledWgt = aWgt;
+  }
 
+  // 3. activate the next obligatory widget
   myPropertyPanel->activateNextWidget(aFilledWgt);
   if (aFilledWgt)
     emit activatedByPreselection();
