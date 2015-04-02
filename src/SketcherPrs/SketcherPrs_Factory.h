@@ -9,13 +9,13 @@
 
 #include "SketcherPrs.h"
 
+#include <ModelAPI_Feature.h>
+
 #include <GeomAPI_Ax3.h>
 #include <GeomAPI_AISObject.h>
 
-class SketchPlugin_Constraint;
-
 #define GET_CONSTRAINT_PRS(NAME) \
-  static AISObjectPtr NAME(SketchPlugin_Constraint* theConstraint, \
+  static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
                            const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
 

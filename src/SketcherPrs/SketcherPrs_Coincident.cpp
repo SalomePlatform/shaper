@@ -16,8 +16,6 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Pnt2d.h>
 
-#include <SketchPlugin_Point.h>
-#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Constraint.h>
 
 #include <AIS_Drawer.hxx>
@@ -30,7 +28,7 @@
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Coincident, AIS_InteractiveObject);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 
-SketcherPrs_Coincident::SketcherPrs_Coincident(SketchPlugin_Constraint* theConstraint, 
+SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane)
 {

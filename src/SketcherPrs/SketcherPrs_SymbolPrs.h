@@ -8,6 +8,7 @@
 #define SketcherPrs_SymbolPrs_H
 
 #include "SketcherPrs_SensitivePoint.h"
+#include <ModelAPI_Feature.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <GeomAPI_Ax3.h>
@@ -22,7 +23,6 @@
 
 #include <OpenGl_Workspace.hxx>
 
-class SketchPlugin_Constraint;
 class OpenGl_Context;
 
 
@@ -38,7 +38,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_SymbolPrs(SketchPlugin_Constraint* theConstraint, 
+  Standard_EXPORT SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
   
   virtual ~SketcherPrs_SymbolPrs();
@@ -59,7 +59,7 @@ public:
 
   Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return myPlane; }
 
-  Standard_EXPORT SketchPlugin_Constraint* feature() const { return myConstraint; }
+  Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }
 
 
   Handle(Graphic3d_ArrayOfPoints) pointsArray() const { return myPntArray; }
@@ -105,7 +105,7 @@ protected:
 
 protected:
   /// Constraint feature
-  SketchPlugin_Constraint* myConstraint;
+  ModelAPI_Feature* myConstraint;
 
   /// Plane of the current sketcher
   std::shared_ptr<GeomAPI_Ax3> myPlane;

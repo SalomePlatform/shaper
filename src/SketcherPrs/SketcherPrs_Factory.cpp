@@ -17,7 +17,7 @@
 #include "SketcherPrs_LengthDimension.h"
 
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
-AISObjectPtr SketcherPrs_Factory::NAME(SketchPlugin_Constraint* theConstraint, \
+AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane) \
 { \
   std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); \
@@ -36,7 +36,7 @@ CONSTRAINT_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
 CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
 
 
-AISObjectPtr SketcherPrs_Factory::horisontalConstraint(SketchPlugin_Constraint* theConstraint,
+AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 { 
   std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); 
@@ -45,7 +45,7 @@ AISObjectPtr SketcherPrs_Factory::horisontalConstraint(SketchPlugin_Constraint* 
   return aAISObj; 
 }
 
-AISObjectPtr SketcherPrs_Factory::verticalConstraint(SketchPlugin_Constraint* theConstraint,
+AISObjectPtr SketcherPrs_Factory::verticalConstraint(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 { 
   std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); 
