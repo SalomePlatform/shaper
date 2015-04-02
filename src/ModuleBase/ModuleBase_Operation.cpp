@@ -239,12 +239,12 @@ void ModuleBase_Operation::activateByPreselection()
     }
   }
   // 2. ignore not obligatory widgets
-  for (; aWIt != aWidgets.constEnd(); ++aWIt) {
+  /*for (; aWIt != aWidgets.constEnd(); ++aWIt) {
     aWgt = (*aWIt);
     if (aWgt && aWgt->isObligatory())
       continue;
     aFilledWgt = aWgt;
-  }
+  }*/
 
   // 3. activate the next obligatory widget
   myPropertyPanel->activateNextWidget(aFilledWgt);

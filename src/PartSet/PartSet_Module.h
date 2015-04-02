@@ -107,6 +107,10 @@ public:
   /// \return true if items are added and there is no necessity to provide standard menu
   virtual bool addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
 
+  /// Returns whether the mouse enter the viewer's window
+  /// \return true if items are added and there is no necessity to provide standard menu
+  bool isMouseOverWindow();
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

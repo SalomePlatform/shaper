@@ -8,6 +8,7 @@
 #include <PartSet_WidgetPoint2dDistance.h>
 #include <PartSet_WidgetShapeSelector.h>
 #include <PartSet_WidgetConstraintShapeSelector.h>
+#include <PartSet_WidgetEditor.h>
 #include <PartSet_SketcherMgr.h>
 
 #include <ModuleBase_Operation.h>
@@ -63,6 +64,7 @@
 
 #include <Events_Loop.h>
 #include <Config_PropManager.h>
+#include <Config_Keywords.h>
 
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -319,6 +321,11 @@ bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*
   return true;
 }
 
+bool PartSet_Module::isMouseOverWindow()
+{
+  return mySketchMgr->isMouseOverWindow();
+}
+
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
   ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
@@ -494,7 +501,9 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
       new PartSet_WidgetConstraintShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
     aConstraintShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aConstraintShapeSelectorWgt;
-  }
+  } if (theType == WDG_DOUBLEVALUE_EDITOR) {
+    aWgt = new PartSet_WidgetEditor(theParent, workshop(), theWidgetApi, theParentId);
+  } 
   return aWgt;
 }
 

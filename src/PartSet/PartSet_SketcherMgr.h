@@ -102,6 +102,8 @@ public:
   /// \return a boolean value
   static bool isDistanceOperation(ModuleBase_Operation* theOperation);
 
+  bool isMouseOverWindow() { return myIsMouseOverWindow; }
+
   /// Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
   CompositeFeaturePtr activeSketch() const { return myCurrentSketch; }
 
