@@ -9,9 +9,7 @@
 
 #include "SketcherPrs_SymbolPrs.h"
 #include <ModelAPI_Object.h>
-
-class SketchPlugin_Constraint;
-class SketchPlugin_Sketch;
+#include <ModelAPI_Feature.h>
 
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_Rigid, SketcherPrs_SymbolPrs)
@@ -27,7 +25,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_Rigid(SketchPlugin_Constraint* theConstraint, 
+  Standard_EXPORT SketcherPrs_Rigid(ModelAPI_Feature* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
 

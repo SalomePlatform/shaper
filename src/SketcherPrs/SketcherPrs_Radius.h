@@ -9,11 +9,10 @@
 #define SketcherPrs_Radius_H
 
 #include <GeomAPI_Ax3.h>
+#include <ModelAPI_Feature.h>
 
 #include <AIS_RadiusDimension.hxx>
 #include <Standard_DefineHandle.hxx>
-
-class SketchPlugin_Constraint;
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension)
 
@@ -27,7 +26,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_Radius(SketchPlugin_Constraint* theConstraint, 
+  Standard_EXPORT SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Radius)
@@ -38,7 +37,7 @@ protected:
 
 private:
   /// Constraint feature
-  SketchPlugin_Constraint* myConstraint;
+  ModelAPI_Feature* myConstraint;
 
   /// Plane of the current sketcher
   std::shared_ptr<GeomAPI_Ax3> myPlane;
