@@ -23,7 +23,7 @@ static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
-SketcherPrs_Radius::SketcherPrs_Radius(SketchPlugin_Constraint* theConstraint, 
+SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), myPlane(thePlane)
 {
@@ -98,4 +98,24 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   SetCustomValue(aRadius);
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
+}
+
+void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+                                                   const Standard_Integer theMode)
+{
+  Standard_Integer aMode;
+  switch (theMode) {
+  case SketcherPrs_Tools::Sel_Dimension_All:
+    aMode = 0;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Line:
+    aMode = 1;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Text:
+    aMode = 2;
+    break;
+  default:
+    aMode = theMode;
+  }
+  AIS_RadiusDimension::ComputeSelection(aSelection, aMode);
 }

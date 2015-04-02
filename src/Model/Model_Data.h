@@ -195,4 +195,28 @@ private:
     const bool theApplyConcealment = true);
 };
 
+/// Generic method to register back reference, used in referencing attributes.
+/// Without concealment change, it will be done later, on synchronization.
+#define ADD_BACK_REF(TARGET) \
+  if (TARGET.get() != NULL) { \
+    FeaturePtr anAttributeOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner()); \
+    if (anAttributeOwnerFeature.get()) { \
+      std::shared_ptr<Model_Data> aTargetData = std::dynamic_pointer_cast<Model_Data>( \
+        (TARGET)->data()); \
+      aTargetData->addBackReference(anAttributeOwnerFeature, id(), false); \
+    } \
+  }
+
+/// Generic method to unregister back reference, used in referencing attributes.
+/// Without concealment change, it will be done later, on synchronization.
+#define REMOVE_BACK_REF(TARGET) \
+  if (TARGET.get() != NULL) { \
+    FeaturePtr anAttOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner()); \
+    if (anAttOwnerFeature.get()) { \
+      std::shared_ptr<Model_Data> aTargetData = std::dynamic_pointer_cast<Model_Data>( \
+        (TARGET)->data()); \
+      aTargetData->removeBackReference(anAttOwnerFeature, id()); \
+    } \
+  }
+
 #endif

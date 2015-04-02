@@ -30,7 +30,7 @@ static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
 
-SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(SketchPlugin_Constraint* theConstraint, 
+SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln), 
 myConstraint(theConstraint), myPlane(thePlane)
@@ -126,14 +126,14 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) co
       aPnt_A = aPoint_A->pnt();
       aPnt_B = aPoint_B->pnt();
     } else if (!aPoint_A && aPoint_B) {
-      std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
+      FeaturePtr aLine = SketcherPrs_Tools::getFeatureLine(
           aData, SketchPlugin_Constraint::ENTITY_A());
       if (aLine) {
         aPnt_B = aPoint_B->pnt();
         aPnt_A = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_B);
       }
     } else if (aPoint_A && !aPoint_B) {
-      std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
+      FeaturePtr aLine = SketcherPrs_Tools::getFeatureLine(
           aData, SketchPlugin_Constraint::ENTITY_B());
       if (aLine) {
         aPnt_A = aPoint_A->pnt();
@@ -150,4 +150,26 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) co
     return true;
   }
   return false;
+}
+
+
+
+void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+                                                   const Standard_Integer theMode)
+{
+  Standard_Integer aMode;
+  switch (theMode) {
+  case SketcherPrs_Tools::Sel_Dimension_All:
+    aMode = 0;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Line:
+    aMode = 1;
+    break;
+  case SketcherPrs_Tools::Sel_Dimension_Text:
+    aMode = 2;
+    break;
+  default:
+    aMode = theMode;
+  }
+  AIS_LengthDimension::ComputeSelection(aSelection, aMode);
 }

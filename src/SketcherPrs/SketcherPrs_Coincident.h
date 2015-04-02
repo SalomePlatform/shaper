@@ -8,11 +8,10 @@
 #define SketcherPrs_Coincident_H
 
 #include <GeomAPI_Ax3.h>
+#include <ModelAPI_Feature.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <Standard_DefineHandle.hxx>
-
-class SketchPlugin_Constraint;
 
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_Coincident, AIS_InteractiveObject)
@@ -27,7 +26,7 @@ class SketcherPrs_Coincident: public AIS_InteractiveObject
 public:
   /// Constructor
   /// \param theResult a result object
-  Standard_EXPORT SketcherPrs_Coincident(SketchPlugin_Constraint* theConstraint, 
+  Standard_EXPORT SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   Standard_EXPORT virtual void SetColor(const Quantity_Color& aColor);
@@ -45,7 +44,7 @@ protected:
     const Standard_Integer aMode) ;
 
 private:
-  SketchPlugin_Constraint* myConstraint;
+  ModelAPI_Feature* myConstraint;
   std::shared_ptr<GeomAPI_Ax3> myPlane;
   gp_Pnt myPoint;
 };

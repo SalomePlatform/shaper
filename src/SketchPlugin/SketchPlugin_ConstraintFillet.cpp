@@ -30,6 +30,8 @@
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 
+static const std::string PREVIOUS_VALUE("FilletPreviousRadius");
+
 /// \brief Attract specified point on theNewArc to the attribute of theFeature
 static void recalculateAttributes(FeaturePtr theNewArc, const std::string& theNewArcAttribute,
   FeaturePtr theFeature, const std::string& theFeatureAttribute);
@@ -45,8 +47,11 @@ void SketchPlugin_ConstraintFillet::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(PREVIOUS_VALUE, ModelAPI_AttributeDouble::typeId());
   // initialize attribute not applicable for user
   data()->attribute(SketchPlugin_Constraint::ENTITY_C())->setInitialized();
+  data()->attribute(PREVIOUS_VALUE)->setInitialized();
+  std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(PREVIOUS_VALUE))->setValue(0.0);
 }
 
 void SketchPlugin_ConstraintFillet::execute()
@@ -87,9 +92,17 @@ void SketchPlugin_ConstraintFillet::execute()
       FeaturePtr aFeature = aRC ? aRC->document()->feature(aRC) : 
         std::dynamic_pointer_cast<ModelAPI_Feature>(aRefAttr->object());
       if (aFeature == aFilletArcFeature) {
-        AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-            aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
-        aRadius->setValue(aFilletRadius);
+        // Update radius constraint only if the value is changed in fillet's attribute
+        double aPrevRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+            aData->attribute(PREVIOUS_VALUE))->value();
+        if (aFilletRadius != aPrevRadius) {
+          AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+              aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
+          aRadius->setValue(aFilletRadius);
+          std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+              aData->attribute(PREVIOUS_VALUE))->setValue(aFilletRadius);
+        }
+        break;
       }
     }
     return;

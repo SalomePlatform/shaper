@@ -27,6 +27,7 @@
 #include <GeomAPI_XYZ.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <SketcherPrs_Tools.h>
 
 #include <Precision.hxx>
 #include <gp_Pln.hxx>
@@ -360,8 +361,9 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
 
   // Get default selection modes
   QIntList aModes;
-  aModes.append(AIS_DSM_Text);
-  aModes.append(AIS_DSM_Line);
+  aModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
+  aModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
+  aModes.append(SketcherPrs_Tools::Sel_Constraint);
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
 
