@@ -100,6 +100,12 @@ double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& 
   return aDelta;
 }
 
+const std::string& SketchPlugin_Line::getKind()
+{
+  static std::string MY_KIND = SketchPlugin_Line::ID();
+  return MY_KIND;
+}
+
 bool SketchPlugin_Line::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }
