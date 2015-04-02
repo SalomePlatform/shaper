@@ -92,7 +92,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   if (theSubShape.get() && !theSubShape->isNull() && theSubShape->isEdge()) {
     const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
     if (aSubShape.ShapeType() == TopAbs_EDGE)
-      isDegeneratedEdge = BRep_Tool::Degenerated(TopoDS::Edge(aSubShape));
+      isDegeneratedEdge = BRep_Tool::Degenerated(TopoDS::Edge(aSubShape)) == Standard_True;
   }
   if (!theContext.get() || isDegeneratedEdge) {
     // to keep the reference attribute label
