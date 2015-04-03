@@ -23,6 +23,7 @@ void SketchSolver_ConstraintEqual::process()
   int aNbLines = 0;
   int aNbArcs = 0;
   int aNbCircs = 0;
+  bool isArcFirst = false; // in line-arc equivalence, the line should be first
   std::vector<Slvs_hEntity>::iterator anEntIter = anEntities.begin();
   for (; anEntIter != anEntities.end(); anEntIter++) {
     Slvs_Entity anEnt = myStorage->getEntity(*anEntIter);
@@ -30,8 +31,10 @@ void SketchSolver_ConstraintEqual::process()
       aNbLines++;
     else if (anEnt.type == SLVS_E_CIRCLE)
       aNbCircs++;
-    else if (anEnt.type == SLVS_E_ARC_OF_CIRCLE)
+    else if (anEnt.type == SLVS_E_ARC_OF_CIRCLE) {
       aNbArcs++;
+      isArcFirst = (aNbLines == 0);
+    }
   }
 
   if (aNbLines + aNbArcs + aNbCircs != 2 ||
@@ -46,6 +49,11 @@ void SketchSolver_ConstraintEqual::process()
     break;
   case 1:
     myType = SLVS_C_EQUAL_LINE_ARC_LEN;
+    if (isArcFirst) { // change the order of arc and line
+      Slvs_hEntity aTmp = anEntities[2];
+      anEntities[2] = anEntities[3];
+      anEntities[3] = aTmp;
+    }
     break;
   default:
     myType = SLVS_C_EQUAL_LENGTH_LINES;
