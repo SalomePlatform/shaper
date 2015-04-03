@@ -10,6 +10,7 @@
 #include "SketchSolver.h"
 #include <SketchSolver_Solver.h>
 
+#include <list>
 #include <memory>
 #include <set>
 #include <vector>
@@ -83,6 +84,8 @@ public:
   bool removeConstraint(const Slvs_hConstraint& theConstraintID);
   /// \brief Returns the constraint by its ID
   const Slvs_Constraint& getConstraint(const Slvs_hConstraint& theConstraintID) const;
+  /// \brief Returns list of constraints of specified type
+  std::list<Slvs_Constraint> getConstraintsByType(int theConstraintType) const;
 
   /// \brief Attach temporary constraint to this storage. It need to make precise calculations
   void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);

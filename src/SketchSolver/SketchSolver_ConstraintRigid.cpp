@@ -113,6 +113,8 @@ void SketchSolver_ConstraintRigid::getAttributes(
     anEntityID = myGroup->getFeatureId(myBaseFeature);
     if (anEntityID == SLVS_E_UNKNOWN)
       anEntityID = changeEntity(myBaseFeature, aType);
+    else
+      myFeatureMap[myBaseFeature] = anEntityID;
   }
 
   // Check the entity is complex
@@ -223,11 +225,19 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
   }
 
   // Fix radius of the arc
-  aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER, myGroup->getWorkplaneId(),
-    aRadius * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, myFeatureMap.begin()->second, SLVS_E_UNKNOWN);
-  aConstraint.h = myStorage->addConstraint(aConstraint);
-  mySlvsConstraints.push_back(aConstraint.h);
-  if (!myBaseConstraint)
-    myStorage->addTemporaryConstraint(aConstraint.h);
+  bool isExists = false;
+  std::list<Slvs_Constraint> aDiamConstraints = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
+  std::list<Slvs_Constraint>::iterator anIt = aDiamConstraints.begin();
+  for (; anIt != aDiamConstraints.end() && !isExists; anIt)
+    if (anIt->entityA == myFeatureMap.begin()->second)
+      isExists = true;
+  if (!isExists) {
+    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER, myGroup->getWorkplaneId(),
+      aRadius * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, myFeatureMap.begin()->second, SLVS_E_UNKNOWN);
+    aConstraint.h = myStorage->addConstraint(aConstraint);
+    mySlvsConstraints.push_back(aConstraint.h);
+    if (!myBaseConstraint)
+      myStorage->addTemporaryConstraint(aConstraint.h);
+  }
 }
 

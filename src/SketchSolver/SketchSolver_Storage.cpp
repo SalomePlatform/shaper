@@ -226,6 +226,20 @@ Slvs_hConstraint SketchSolver_Storage::addConstraint(const Slvs_Constraint& theC
   }
 
   Slvs_Constraint aConstraint = theConstraint;
+
+  // Find a constraint with same type uses same arguments
+  std::vector<Slvs_Constraint>::iterator aCIt = myConstraints.begin();
+  for (; aCIt != myConstraints.end(); aCIt++) {
+    if (aConstraint.type != aCIt->type)
+      continue;
+    if (aConstraint.ptA == aCIt->ptA && aConstraint.ptB == aCIt->ptB &&
+        aConstraint.entityA == aCIt->entityA && aConstraint.entityB == aCIt->entityB &&
+        aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD) {
+      aConstraint.h = aCIt->h;
+      return updateConstraint(aConstraint);
+    }
+  }
+
   if (aConstraint.h > myConstrMaxID)
     myConstrMaxID = aConstraint.h;
   else
@@ -292,6 +306,17 @@ const Slvs_Constraint& SketchSolver_Storage::getConstraint(const Slvs_hConstrain
   aDummy.h = 0;
   return aDummy;
 }
+
+std::list<Slvs_Constraint> SketchSolver_Storage::getConstraintsByType(int theConstraintType) const
+{
+  std::list<Slvs_Constraint> aResult;
+  std::vector<Slvs_Constraint>::const_iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); aCIter++)
+    if (aCIter->type == theConstraintType)
+      aResult.push_back(*aCIter);
+  return aResult;
+}
+
 
 void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theConstraintID)
 {

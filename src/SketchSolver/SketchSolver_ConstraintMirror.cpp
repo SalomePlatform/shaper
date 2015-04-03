@@ -137,8 +137,8 @@ void SketchSolver_ConstraintMirror::process()
           aBaseIter->point[2],
           SLVS_E_UNKNOWN};
       Slvs_hEntity aMirrorArcPoints[3] = { // indices of points of arc, center corresponds center, first point corresponds last point
-          aBaseIter->point[2],
-          aBaseIter->point[1],
+          aMirrorIter->point[2],
+          aMirrorIter->point[1],
           SLVS_E_UNKNOWN};
 
       Slvs_Entity aBothArcs[2] = {*aBaseIter, *aMirrorIter};
@@ -234,6 +234,10 @@ void SketchSolver_ConstraintMirror::makeMirrorEntity(
     aMirrorPoint[2] = aMirrorPoint[1];
     aMirrorPoint[1] = aTmp;
   }
+  if (theBase.type == SLVS_E_POINT_IN_2D || theBase.type == SLVS_E_POINT_IN_3D) {
+    aBasePoint[0] = theBase.h;
+    aMirrorPoint[0] = theMirror.h;
+  }
 
   // Mirror line parameters
   std::shared_ptr<GeomAPI_XY> aLinePoints[2];
@@ -267,3 +271,63 @@ void SketchSolver_ConstraintMirror::makeMirrorEntity(
   }
 }
 
+void SketchSolver_ConstraintMirror::adjustConstraint()
+{
+  // Search mirror between middle points on the arcs and recompute their coordinates
+  std::list<Slvs_Constraint> aPonCirc = myStorage->getConstraintsByType(SLVS_C_PT_ON_CIRCLE);
+  if (aPonCirc.empty())
+    return;
+
+  AttributeRefAttrPtr aMirLineAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+      myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  if (!aMirLineAttr || !aMirLineAttr->isInitialized() || !aMirLineAttr->isObject()) {
+    myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
+    return;
+  }
+  ResultConstructionPtr aRC =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aMirLineAttr->object());
+  FeaturePtr aFeature = aRC ? aRC->document()->feature(aRC) :
+    std::dynamic_pointer_cast<ModelAPI_Feature>(aMirLineAttr->object());
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aMirLineIter = myFeatureMap.find(aFeature);
+  if (aMirLineIter == myFeatureMap.end())
+    return;
+  Slvs_Entity aMirrorLine = myStorage->getEntity(aMirLineIter->second);
+
+  double aStartEnd[4];
+  for (int i = 0; i < 2; i++) {
+    Slvs_Entity aPoint = myStorage->getEntity(aMirrorLine.point[i]);
+    for (int j = 0; j < 2; j++)
+      aStartEnd[2*i+j] = myStorage->getParameter(aPoint.param[j]).val;
+  }
+
+  Slvs_Constraint aMirror;
+  std::vector<Slvs_hConstraint>::iterator aConstrIter = mySlvsConstraints.begin();
+  for (; aConstrIter != mySlvsConstraints.end(); aConstrIter++) {
+    aMirror = myStorage->getConstraint(*aConstrIter);
+    if (aMirror.type != SLVS_C_SYMMETRIC_LINE)
+      continue;
+    Slvs_Constraint aPonCircA, aPonCircB;
+    aPonCircA.h = SLVS_E_UNKNOWN;
+    aPonCircB.h = SLVS_E_UNKNOWN;
+    std::list<Slvs_Constraint>::iterator aPtIter = aPonCirc.begin();
+    for (; aPtIter != aPonCirc.end(); aPtIter++) {
+      if (aMirror.ptA == aPtIter->ptA)
+        aPonCircA = *aPtIter;
+      if (aMirror.ptB == aPtIter->ptA)
+        aPonCircB = *aPtIter;
+    }
+    if (aPonCircA.h == SLVS_E_UNKNOWN || aPonCircB.h == SLVS_E_UNKNOWN)
+      continue;
+
+    // Calculate middle point for base arc and mirrored point on mirror arc
+    Slvs_Entity aBaseArc = myStorage->getEntity(aPonCircA.entityA);
+    Slvs_Entity aBasePoint = myStorage->getEntity(aPonCircA.ptA);
+    Slvs_Param aParamX = myStorage->getParameter(aBasePoint.param[0]);
+    Slvs_Param aParamY = myStorage->getParameter(aBasePoint.param[1]);
+    calculateMiddlePoint(aBaseArc, 0.5, aParamX.val, aParamY.val);
+    myStorage->updateParameter(aParamX);
+    myStorage->updateParameter(aParamY);
+    Slvs_Entity aMirrorPoint = myStorage->getEntity(aPonCircB.ptA);
+    makeMirrorEntity(aBasePoint, aMirrorPoint, aStartEnd);
+  }
+}

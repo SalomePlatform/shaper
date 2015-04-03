@@ -50,6 +50,10 @@ protected:
                      std::vector<Slvs_Entity>& theBaseEntities,
                      std::vector<Slvs_Entity>& theMirrorEntities);
 
+  /// \brief This method is used in derived objects to check consistence of constraint.
+  ///        E.g. the distance between line and point may be signed.
+  virtual void adjustConstraint();
+
 private:
   /// \brief Change parameters of entities to be symmetric relative a line,
   ///        given by array of parameters (coordinates of first and last points)
