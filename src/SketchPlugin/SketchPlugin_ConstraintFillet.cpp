@@ -214,10 +214,10 @@ void SketchPlugin_ConstraintFillet::execute()
       aCenter->x(), aCenter->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::START_ID()))->setValue(
-      aCenter->x() - aStep->y(), aCenter->y() + aStep->x());
+      aSharedPoint->x() - 1.e-5 * aStep->y(), aSharedPoint->y() + 1.e-5 * aStep->x());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(
-      aCenter->x() + aStep->y(), aCenter->y() - aStep->x());
+      aSharedPoint->x() + 1.e-5 * aStep->y(), aSharedPoint->y() - 1.e-5 * aStep->x());
   aNewArc->execute();
   // attach new arc to the list
   aRefListOfFillet->append(aNewArc->lastResult());
