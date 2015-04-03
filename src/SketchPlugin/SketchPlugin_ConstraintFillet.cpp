@@ -121,16 +121,14 @@ void SketchPlugin_ConstraintFillet::execute()
   FeaturePtr aNewFeatureA = sketch()->addFeature(aFeatureA->getKind());
   aFeatureA->data()->copyTo(aNewFeatureA->data());
   aNewFeatureA->execute();
-  aRefListOfFillet->append(aNewFeatureA);
+  aRefListOfFillet->append(aNewFeatureA->firstResult());
   // copy aFeatureB
   FeaturePtr aNewFeatureB = sketch()->addFeature(aFeatureB->getKind());
   aFeatureB->data()->copyTo(aNewFeatureB->data());
   aNewFeatureB->execute();
-  aRefListOfFillet->append(aNewFeatureB);
-  // create filleting arc
+  aRefListOfFillet->append(aNewFeatureB->firstResult());
+  // create filleting arc (it will be attached to the list later)
   FeaturePtr aNewArc = sketch()->addFeature(SketchPlugin_Arc::ID());
-  aRefListOfFillet->append(aNewArc);
-  aRefListOfFillet->setInitialized();
 
   // Wait all constraints being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -221,6 +219,9 @@ void SketchPlugin_ConstraintFillet::execute()
       aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(
       aCenter->x() + aStep->y(), aCenter->y() - aStep->x());
   aNewArc->execute();
+  // attach new arc to the list
+  aRefListOfFillet->append(aNewArc->lastResult());
+  aRefListOfFillet->setInitialized();
 
   // Create list of additional constraints:
   // 1. Coincidence of boundary points of features and fillet arc

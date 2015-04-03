@@ -13,11 +13,13 @@
 #include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_ConstraintRigid.h>
 #include <SketchSolver_ConstraintTangent.h>
+#include <SketchSolver_Error.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
+#include <Events_Error.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -60,6 +62,35 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
   DataPtr aData = theConstraint->data();
   if (!aData || !aData->isValid())
     return aResult;
+
+#ifdef _DEBUG
+  // Verify attributes of constraint and generate errors
+  std::list<AttributePtr> anAttrList = aData->attributes(std::string());
+  std::list<AttributePtr>::iterator anIter = anAttrList.begin();
+  for (; anIter != anAttrList.end(); anIter++) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
+    if (aRefAttr) {
+      if (aRefAttr->isObject() && aRefAttr->object()) {
+        ResultConstructionPtr aRC =
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aRefAttr->object());
+        if (!aRC)
+          Events_Error::send(SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this);
+      }
+      continue;
+    }
+    AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIter);
+    if (aRefList) {
+      std::list<ObjectPtr> aList = aRefList->list();
+      std::list<ObjectPtr>::iterator aListIter = aList.begin();
+      for (; aListIter != aList.end(); aListIter++) {
+        ResultConstructionPtr aRC =
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aListIter);
+        if (*aListIter && !aRC)
+          Events_Error::send(SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this);
+      }
+    }
+  }
+#endif
 
   if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintCoincidence(theConstraint));

@@ -23,6 +23,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Conflicting constraints");
     return MY_ERROR_VALUE;
   }
+  /// Constraints should use objects instead of features as attributes
+  inline static const std::string& NEED_OBJECT_NOT_FEATURE()
+  {
+    static const std::string MY_ERROR_VALUE("Constraint should be based on object instead of feature");
+    return MY_ERROR_VALUE;
+  }
   /// The entities need to have shared point, but they have not
   inline static const std::string& NO_COINCIDENT_POINTS()
   {
