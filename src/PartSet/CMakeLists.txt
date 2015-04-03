@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
 	PartSet_Filters.h
 	PartSet_FilterSketchEntity.h
 	PartSet_SketcherMgr.h
+	PartSet_MenuMgr.h
 )
 
 SET(PROJECT_SOURCES
@@ -34,6 +35,7 @@ SET(PROJECT_SOURCES
 	PartSet_Filters.cpp
 	PartSet_FilterSketchEntity.cpp
 	PartSet_SketcherMgr.cpp
+	PartSet_MenuMgr.cpp
 )
 
 SET(PROJECT_RESOURCES 

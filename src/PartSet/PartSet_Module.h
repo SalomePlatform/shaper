@@ -5,7 +5,6 @@
 
 #include "PartSet.h"
 #include "PartSet_Filters.h"
-#include "PartSet_SketcherMgr.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -26,6 +25,8 @@
 
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
+class PartSet_MenuMgr;
+class PartSet_SketcherMgr;
 
 class QAction;
 
@@ -83,10 +84,6 @@ public:
   /// \param theOperation a started operation
   virtual ModuleBase_Operation* currentOperation() const;
 
-  /// Returns action according to the given ID
-  /// \param theId an action identifier, it should be uniqued in the bounds of the module
-  QAction* action(const QString& theId) const;
-
   /// Returns True if there are available Undos and the sketch manager allows undo
   /// \return the boolean result
   virtual bool canUndo() const;
@@ -111,14 +108,12 @@ public:
   /// \return true if items are added and there is no necessity to provide standard menu
   bool isMouseOverWindow();
 
+  PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
   void onNoMoreWidgets();
-
-  /// Processes the context menu action click
-  /// \param isChecked a state of toggle if the action is checkable
-  void onAction(bool isChecked);
 
   /// Slolt called on object display
   /// \param theObject a data object
@@ -164,15 +159,6 @@ protected slots:
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
 
-  /// Create all actions for context menus. It is called on creation of module
-  /// Put the created actions into an internal map
-  void createActions();
-
-  /// Add action to the internal map
-  /// \param theId - string ID of the item
-  /// \param theAction - action to add
-  void addAction(const QString& theId, QAction* theAction);
-
   //! Delete features
   virtual bool deleteObjects();
 
@@ -188,7 +174,7 @@ protected slots:
 
   PartSet_SketcherMgr* mySketchMgr;
 
-  QMap<QString, QAction*> myActions; // the popup menu actions
+  PartSet_MenuMgr* myMenuMgr;
 
   int myVisualLayerId;
 };

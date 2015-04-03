@@ -793,3 +793,18 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   }
   return aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
 }
+
+
+QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject, const QColor& theColor, bool toUpdate)
+{
+  if (!isVisible(theObject))
+    return Qt::black;
+
+  AISObjectPtr anAISObj = getAISObject(theObject);
+  int aR, aG, aB;
+  anAISObj->getColor(aR, aG, aB);
+  anAISObj->setColor(theColor.red(), theColor.green(), theColor.blue());
+  if (toUpdate)
+    updateViewer();
+  return QColor(aR, aG, aB);
+}

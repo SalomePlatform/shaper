@@ -9,7 +9,8 @@
 #include <PartSet_WidgetShapeSelector.h>
 #include <PartSet_WidgetConstraintShapeSelector.h>
 #include <PartSet_WidgetEditor.h>
-#include <PartSet_SketcherMgr.h>
+#include "PartSet_SketcherMgr.h"
+#include "PartSet_MenuMgr.h"
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IViewer.h>
@@ -51,8 +52,9 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
-//#include <SketchPlugin_Arc.h>
-//#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -114,7 +116,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   connect(aViewer, SIGNAL(viewTransformed(int)),
           SLOT(onViewTransformed(int)));
 
-  createActions();
+  myMenuMgr = new PartSet_MenuMgr(this);
 }
 
 PartSet_Module::~PartSet_Module()
@@ -284,35 +286,10 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
   return mySketchMgr->canDisplayObject(theObject);
 }
 
+
 bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
-      !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    return false;
-
-  ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  QObjectPtrList aObjects = aSelection->selectedPresentations();
-  if (aObjects.size() > 0) {
-    bool hasFeature = false;
-    foreach(ObjectPtr aObject, aObjects)
-    {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-      if (aFeature.get() != NULL) {
-        hasFeature = true;
-      }
-    }
-    if (hasFeature) {
-      theMenu->addAction(theStdActions["DELETE_CMD"]);
-    }
-  }
-  bool isAuxiliary;
-  if (mySketchMgr->canSetAuxiliary(isAuxiliary)) {
-    QAction* anAction = action("AUXILIARY_CMD");
-    theMenu->addAction(anAction);
-    anAction->setChecked(isAuxiliary);
-  }
-  return true;
+  return myMenuMgr->addViewerItems(theMenu, theStdActions);
 }
 
 bool PartSet_Module::isMouseOverWindow()
@@ -501,40 +478,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   return aWgt;
 }
 
-void PartSet_Module::createActions()
-{
-  QAction* anAction;
-
-  anAction = new QAction(tr("Auxiliary"), this);
-  anAction->setCheckable(true);
-  addAction("AUXILIARY_CMD", anAction);
-}
-
-QAction* PartSet_Module::action(const QString& theId) const
-{
-  if (myActions.contains(theId))
-    return myActions[theId];
-  return 0;
-}
-
-void PartSet_Module::addAction(const QString& theId, QAction* theAction)
-{
-  if (myActions.contains(theId))
-    qCritical("A command with Id = '%s' already defined!", qPrintable(theId));
-  theAction->setData(theId);
-  connect(theAction, SIGNAL(triggered(bool)), this, SLOT(onAction(bool)));
-  myActions[theId] = theAction;
-}
-
-void PartSet_Module::onAction(bool isChecked)
-{
-  QAction* aAction = static_cast<QAction*>(sender());
-  QString anId = aAction->data().toString();
-
-  if (anId == "AUXILIARY_CMD") {
-    mySketchMgr->setAuxiliary(isChecked);
-  }
-}
 
 bool PartSet_Module::deleteObjects()
 {
