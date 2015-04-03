@@ -159,6 +159,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     }
     aContext->Display(anAISIO, false);
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
+    if (isShading)
+      anAISIO->Attributes()->SetFaceBoundaryDraw( Standard_True );
     emit objectDisplayed(theObject, theAIS);
 
     bool isCustomized = customizeObject(theObject);
