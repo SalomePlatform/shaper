@@ -42,6 +42,7 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 
+#include <math.h>
 
 // Initialization of constraint builder self pointer
 SketchSolver_Builder* SketchSolver_Builder::mySelf = 0;

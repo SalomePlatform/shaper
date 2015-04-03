@@ -31,6 +31,7 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_Feature.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -110,7 +111,7 @@ bool SketchSolver_Group::isInteract(
   ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
   if (aConstraint)
     return myFeatureStorage->isInteract(aConstraint);
-  return myFeatureStorage->isInteract(theFeature);
+  return myFeatureStorage->isInteract(std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature));
 }
 
 // ============================================================================
@@ -244,7 +245,8 @@ bool SketchSolver_Group::changeConstraint(
 
 bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
-  std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theFeature);
+  std::set<ConstraintPtr> aConstraints =
+      myFeatureStorage->getConstraints(std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature));
   if (aConstraints.empty())
     return false;
   std::set<ConstraintPtr>::iterator aCIter = aConstraints.begin();

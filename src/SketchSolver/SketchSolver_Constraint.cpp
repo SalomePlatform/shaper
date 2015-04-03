@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <math.h>
 
 SketchSolver_Constraint::SketchSolver_Constraint(
     ConstraintPtr  theConstraint)

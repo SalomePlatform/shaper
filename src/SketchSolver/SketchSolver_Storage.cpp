@@ -6,6 +6,8 @@
 
 #include <SketchSolver_Storage.h>
 
+#include <math.h>
+
 /** \brief Search the entity/parameter with specified ID in the list of elements
  *  \param[in] theEntityID unique ID of the element
  *  \param[in] theEntities list of elements
