@@ -11,6 +11,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultParameter.h>
 
 #include <TDocStd_Document.hxx>
 #include <NCollection_DataMap.hxx>
@@ -140,6 +141,9 @@ class Model_Document : public ModelAPI_Document
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a group results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 
   //! Returns a feature by result (owner of result)

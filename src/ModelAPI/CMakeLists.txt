@@ -32,7 +32,7 @@ SET(PROJECT_HEADERS
     ModelAPI_ResultBody.h
     ModelAPI_ResultConstruction.h
     ModelAPI_ResultGroup.h
-    ModelAPI_ResultParameters.h
+    ModelAPI_ResultParameter.h
     ModelAPI_ResultPart.h
     ModelAPI_Session.h
     ModelAPI_Tools.h
