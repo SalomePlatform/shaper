@@ -131,8 +131,10 @@ void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
   }
 
   // Value if exists
+  DataPtr aData = myBaseConstraint->data();
+  if (!aData) return;
   AttributeDoublePtr aValueAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-    myBaseConstraint->data()->attribute(SketchPlugin_Constraint::VALUE()));
+    myBaseConstraint->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aValueAttr ? aValueAttr->value() : 0.0;
 
   // Update constraint
@@ -295,6 +297,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributePtr theEntity, int& 
     if (aResult != SLVS_E_UNKNOWN) {
       Slvs_Entity anEnt = myStorage->getEntity(aResult);
       theType = anEnt.type;
+      myAttributeMap[theEntity] = aResult;
       return aResult;
     }
   }
@@ -388,6 +391,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
     if (aResult != SLVS_E_UNKNOWN) {
       Slvs_Entity anEnt = myStorage->getEntity(aResult);
       theType = anEnt.type;
+      myFeatureMap[theEntity] = aResult;
       return aResult;
     }
   }

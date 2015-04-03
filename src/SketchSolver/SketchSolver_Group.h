@@ -16,7 +16,7 @@
 #include <SketchPlugin_Constraint.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
-
+#include <ModelAPI_AttributeRefList.h>
 
 #include <memory>
 #include <list>
@@ -147,6 +147,9 @@ private:
    *  \return \c true if success, \c false if workplane parameters are not consistent
    */
   bool addWorkplane(CompositeFeaturePtr theSketch);
+
+  /// \brief Apply temporary rigid constraints for the list of features
+  void fixFeaturesList(AttributeRefListPtr theList);
 
 private:
   Slvs_hGroup myID; ///< Index of the group

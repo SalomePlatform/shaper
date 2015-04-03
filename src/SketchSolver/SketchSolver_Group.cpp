@@ -20,7 +20,6 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -234,6 +233,12 @@ bool SketchSolver_Group::changeConstraint(
       myTempConstraints.insert(aConstraint);
     }
   }
+  // Fix base features for mirror
+  if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
+    AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        theConstraint->attribute(SketchPlugin_ConstraintMirror::ENTITY_B()));
+    fixFeaturesList(aRefList);
+  }
 
   if (!myFeatureStorage)
     myFeatureStorage = FeatureStoragePtr(new SketchSolver_FeatureStorage);
@@ -268,6 +273,29 @@ void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFe
   aConstraint->setGroup(this);
   aConstraint->setStorage(myStorage);
   myTempConstraints.insert(aConstraint);
+}
+
+// ============================================================================
+//  Function: fixFeaturesList
+//  Class:    SketchSolver_Group
+//  Purpose:  Apply temporary rigid constraints for the list of features
+// ============================================================================
+void SketchSolver_Group::fixFeaturesList(AttributeRefListPtr theList)
+{
+  std::list<ObjectPtr> aList = theList->list();
+  std::list<ObjectPtr>::iterator anIt = aList.begin();
+  for (; anIt != aList.end(); anIt++) {
+    if (!(*anIt))
+      continue;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    SolverConstraintPtr aConstraint =
+        SketchSolver_Builder::getInstance()->createRigidConstraint(aFeature);
+    if (!aConstraint)
+      continue;
+    aConstraint->setGroup(this);
+    aConstraint->setStorage(myStorage);
+    myTempConstraints.insert(aConstraint);
+  }
 }
 
 // ============================================================================
