@@ -14,6 +14,7 @@
 #include <Graphic3d_BndBox4f.hxx>
 
 #include <SelectMgr_Selection.hxx>
+#include <SelectMgr_SelectionManager.hxx>
 #include <Select3D_SensitivePoint.hxx>
 #include <TopLoc_Location.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -419,8 +420,10 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   theWorkspace->EnableTexture (aTextureBack);
   aCtx->BindProgram (NULL);
 
-  // Update selection position
-  GetContext()->RecomputeSelectionOnly(this);
+  // Update selection position only if there is no selected object
+  // because it can corrupt selection of other objects
+  if ((GetContext()->NbCurrents() == 0) && (GetContext()->NbSelected() == 0))
+    GetContext()->RecomputeSelectionOnly(this);
 }
 
 
