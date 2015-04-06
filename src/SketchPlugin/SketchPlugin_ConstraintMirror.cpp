@@ -11,6 +11,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -90,6 +91,8 @@ void SketchPlugin_ConstraintMirror::execute()
       aMirrorIter++;
   }
 
+  static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
   // Check consistency of initial list and mirrored list
   anInitialList =  aRefListOfShapes->list();
   anInitIter = anInitialList.begin();
@@ -131,6 +134,7 @@ void SketchPlugin_ConstraintMirror::execute()
       FeaturePtr aNewFeature = sketch()->addFeature(aFeatureIn->getKind());
       aFeatureIn->data()->copyTo(aNewFeature->data());
       aNewFeature->execute();
+      ModelAPI_EventCreator::get()->sendUpdated(aNewFeature, aRedisplayEvent);
 
       std::shared_ptr<GeomAPI_Shape> aShapeIn = aRCIn->shape();
       const std::list<ResultPtr>& aResults = aNewFeature->results();

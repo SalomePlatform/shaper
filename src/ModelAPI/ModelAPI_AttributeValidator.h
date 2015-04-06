@@ -7,6 +7,7 @@
 #ifndef ModelAPI_AttributeValidator_H
 #define ModelAPI_AttributeValidator_H
 
+#include <ModelAPI.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Validator.h>
 
@@ -21,6 +22,8 @@ public:
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments) const = 0;
+
+  MODELAPI_EXPORT ~ModelAPI_AttributeValidator();
 };
 
 #endif

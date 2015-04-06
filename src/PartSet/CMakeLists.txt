@@ -13,11 +13,13 @@ SET(PROJECT_HEADERS
 	PartSet_Validators.h
 	PartSet_WidgetPoint2d.h
 	PartSet_WidgetConstraintShapeSelector.h
+    PartSet_WidgetEditor.h
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_Filters.h
 	PartSet_FilterSketchEntity.h
 	PartSet_SketcherMgr.h
+	PartSet_MenuMgr.h
 )
 
 SET(PROJECT_SOURCES
@@ -26,12 +28,14 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp
 	PartSet_WidgetConstraintShapeSelector.cpp
+    PartSet_WidgetEditor.cpp
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
 	PartSet_Filters.cpp
 	PartSet_FilterSketchEntity.cpp
 	PartSet_SketcherMgr.cpp
+	PartSet_MenuMgr.cpp
 )
 
 SET(PROJECT_RESOURCES 

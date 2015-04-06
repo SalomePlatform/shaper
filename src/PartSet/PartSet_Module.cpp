@@ -8,7 +8,9 @@
 #include <PartSet_WidgetPoint2dDistance.h>
 #include <PartSet_WidgetShapeSelector.h>
 #include <PartSet_WidgetConstraintShapeSelector.h>
-#include <PartSet_SketcherMgr.h>
+#include <PartSet_WidgetEditor.h>
+#include "PartSet_SketcherMgr.h"
+#include "PartSet_MenuMgr.h"
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IViewer.h>
@@ -50,8 +52,9 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
-//#include <SketchPlugin_Arc.h>
-//#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -63,6 +66,7 @@
 
 #include <Events_Loop.h>
 #include <Config_PropManager.h>
+#include <Config_Keywords.h>
 
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -112,7 +116,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   connect(aViewer, SIGNAL(viewTransformed(int)),
           SLOT(onViewTransformed(int)));
 
-  createActions();
+  myMenuMgr = new PartSet_MenuMgr(this);
 }
 
 PartSet_Module::~PartSet_Module()
@@ -278,45 +282,19 @@ bool PartSet_Module::canRedo() const
 
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
-  // the display should be possible almost always, with exception of some specific cases
-
-  bool aCanDisplay = true;
-
-  if (mySketchMgr->activeSketch()) {
-    aCanDisplay = mySketchMgr->canDisplayObject(theObject);
-  }
-  return aCanDisplay;
+  // the sketch manager put the restriction to the objects display
+  return mySketchMgr->canDisplayObject(theObject);
 }
+
 
 bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
-      !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    return false;
+  return myMenuMgr->addViewerItems(theMenu, theStdActions);
+}
 
-  ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  QObjectPtrList aObjects = aSelection->selectedPresentations();
-  if (aObjects.size() > 0) {
-    bool hasFeature = false;
-    foreach(ObjectPtr aObject, aObjects)
-    {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-      if (aFeature.get() != NULL) {
-        hasFeature = true;
-      }
-    }
-    if (hasFeature) {
-      theMenu->addAction(theStdActions["DELETE_CMD"]);
-    }
-  }
-  bool isAuxiliary;
-  if (mySketchMgr->canSetAuxiliary(isAuxiliary)) {
-    QAction* anAction = action("AUXILIARY_CMD");
-    theMenu->addAction(anAction);
-    anAction->setChecked(isAuxiliary);
-  }
-  return true;
+bool PartSet_Module::isMouseOverWindow()
+{
+  return mySketchMgr->isMouseOverWindow();
 }
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
@@ -494,44 +472,12 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
       new PartSet_WidgetConstraintShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
     aConstraintShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aConstraintShapeSelectorWgt;
-  }
+  } if (theType == WDG_DOUBLEVALUE_EDITOR) {
+    aWgt = new PartSet_WidgetEditor(theParent, workshop(), theWidgetApi, theParentId);
+  } 
   return aWgt;
 }
 
-void PartSet_Module::createActions()
-{
-  QAction* anAction;
-
-  anAction = new QAction(tr("Auxiliary"), this);
-  anAction->setCheckable(true);
-  addAction("AUXILIARY_CMD", anAction);
-}
-
-QAction* PartSet_Module::action(const QString& theId) const
-{
-  if (myActions.contains(theId))
-    return myActions[theId];
-  return 0;
-}
-
-void PartSet_Module::addAction(const QString& theId, QAction* theAction)
-{
-  if (myActions.contains(theId))
-    qCritical("A command with Id = '%s' already defined!", qPrintable(theId));
-  theAction->setData(theId);
-  connect(theAction, SIGNAL(triggered(bool)), this, SLOT(onAction(bool)));
-  myActions[theId] = theAction;
-}
-
-void PartSet_Module::onAction(bool isChecked)
-{
-  QAction* aAction = static_cast<QAction*>(sender());
-  QString anId = aAction->data().toString();
-
-  if (anId == "AUXILIARY_CMD") {
-    mySketchMgr->setAuxiliary(isChecked);
-  }
-}
 
 bool PartSet_Module::deleteObjects()
 {
@@ -547,7 +493,7 @@ bool PartSet_Module::deleteObjects()
   // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
-  ModuleBase_ISelection* aSel = aConnector->selection();
+  ModuleBase_ISelection* aSel = workshop()->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
   // if there are no selected objects in the viewer, that means that the selection in another
   // place cased this method. It is necessary to return the false value to understande in above

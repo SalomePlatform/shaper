@@ -30,6 +30,8 @@
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 
+static const std::string PREVIOUS_VALUE("FilletPreviousRadius");
+
 /// \brief Attract specified point on theNewArc to the attribute of theFeature
 static void recalculateAttributes(FeaturePtr theNewArc, const std::string& theNewArcAttribute,
   FeaturePtr theFeature, const std::string& theFeatureAttribute);
@@ -45,8 +47,11 @@ void SketchPlugin_ConstraintFillet::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(PREVIOUS_VALUE, ModelAPI_AttributeDouble::typeId());
   // initialize attribute not applicable for user
   data()->attribute(SketchPlugin_Constraint::ENTITY_C())->setInitialized();
+  data()->attribute(PREVIOUS_VALUE)->setInitialized();
+  std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(PREVIOUS_VALUE))->setValue(0.0);
 }
 
 void SketchPlugin_ConstraintFillet::execute()
@@ -87,9 +92,17 @@ void SketchPlugin_ConstraintFillet::execute()
       FeaturePtr aFeature = aRC ? aRC->document()->feature(aRC) : 
         std::dynamic_pointer_cast<ModelAPI_Feature>(aRefAttr->object());
       if (aFeature == aFilletArcFeature) {
-        AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-            aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
-        aRadius->setValue(aFilletRadius);
+        // Update radius constraint only if the value is changed in fillet's attribute
+        double aPrevRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+            aData->attribute(PREVIOUS_VALUE))->value();
+        if (aFilletRadius != aPrevRadius) {
+          AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+              aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
+          aRadius->setValue(aFilletRadius);
+          std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+              aData->attribute(PREVIOUS_VALUE))->setValue(aFilletRadius);
+        }
+        break;
       }
     }
     return;
@@ -108,16 +121,14 @@ void SketchPlugin_ConstraintFillet::execute()
   FeaturePtr aNewFeatureA = sketch()->addFeature(aFeatureA->getKind());
   aFeatureA->data()->copyTo(aNewFeatureA->data());
   aNewFeatureA->execute();
-  aRefListOfFillet->append(aNewFeatureA);
+  aRefListOfFillet->append(aNewFeatureA->firstResult());
   // copy aFeatureB
   FeaturePtr aNewFeatureB = sketch()->addFeature(aFeatureB->getKind());
   aFeatureB->data()->copyTo(aNewFeatureB->data());
   aNewFeatureB->execute();
-  aRefListOfFillet->append(aNewFeatureB);
-  // create filleting arc
+  aRefListOfFillet->append(aNewFeatureB->firstResult());
+  // create filleting arc (it will be attached to the list later)
   FeaturePtr aNewArc = sketch()->addFeature(SketchPlugin_Arc::ID());
-  aRefListOfFillet->append(aNewArc);
-  aRefListOfFillet->setInitialized();
 
   // Wait all constraints being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -203,11 +214,14 @@ void SketchPlugin_ConstraintFillet::execute()
       aCenter->x(), aCenter->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::START_ID()))->setValue(
-      aCenter->x() - aStep->y(), aCenter->y() + aStep->x());
+      aSharedPoint->x() - 1.e-5 * aStep->y(), aSharedPoint->y() + 1.e-5 * aStep->x());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(
-      aCenter->x() + aStep->y(), aCenter->y() - aStep->x());
+      aSharedPoint->x() + 1.e-5 * aStep->y(), aSharedPoint->y() - 1.e-5 * aStep->x());
   aNewArc->execute();
+  // attach new arc to the list
+  aRefListOfFillet->append(aNewArc->lastResult());
+  aRefListOfFillet->setInitialized();
 
   // Create list of additional constraints:
   // 1. Coincidence of boundary points of features and fillet arc

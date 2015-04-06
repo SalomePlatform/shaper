@@ -28,6 +28,8 @@ typedef unsigned int UINT32;
 #define SLVS_C_FILLET 100100
 // Unknown entity
 #define SLVS_E_UNKNOWN 0
+// Unknown group
+#define SLVS_G_UNKNOWN 0
 
 /**
  * The main class that performs the high-level operations for connection to the SolveSpace.
@@ -46,25 +48,28 @@ class SketchSolver_Solver
   }
 
   /** \brief Change array of parameters
-   *  \param[in] theParameters vector of parameters
+   *  \param[in] theParameters pointer to the array of parameters
+   *  \param[in] theSize       size of this array
    */
-  void setParameters(const std::vector<Slvs_Param>& theParameters);
+  void setParameters(Slvs_Param* theParameters, int theSize);
 
   /** \brief Change array of entities
-   *  \param[in] theEntities vector of entities
+   *  \param[in] theEntities pointer to the array of entities
+   *  \param[in] theSize     size of this array
    */
-  void setEntities(const std::vector<Slvs_Entity>& theEntities);
+  void setEntities(Slvs_Entity* theEntities, int theSize);
 
   /** \brief Change array of constraints
-   *  \param[in] theConstraints vector of constraints
+   *  \param[in] theConstraints pointer to the array of constraints
+   *  \param[in] theSize        size of this array
    */
-  void setConstraints(const std::vector<Slvs_Constraint>& theConstraints);
+  void setConstraints(Slvs_Constraint* theConstraints, int theSize);
 
   /** \brief Store the parameters of the point which was moved by user.
    *         The solver will watch this items to be constant
    *  \param[in] theDragged list of parameters (not more than 4) which should not be changed during solving
    */
-  void setDraggedParameters(const std::vector<Slvs_hParam>& theDragged);
+  void setDraggedParameters(const Slvs_hParam* theDragged);
 
   /** \brief Solve the set of equations
    *  \return identifier whether solution succeeded

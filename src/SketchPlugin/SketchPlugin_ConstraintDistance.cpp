@@ -82,19 +82,19 @@ bool SketchPlugin_ConstraintDistance::compute(const std::string& theAttributeId)
     aPnt_A = aPoint_A->pnt();
     aPnt_B = aPoint_B->pnt();
   } else if (!aPoint_A && aPoint_B) {
-    std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
-        aData, SketchPlugin_Constraint::ENTITY_A());
-    if (aLine) {
-      aPnt_B = aPoint_B->pnt();
-      aPnt_A = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_B);
-    }
+    //std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
+    //    aData, SketchPlugin_Constraint::ENTITY_A());
+    //if (aLine) {
+    //  aPnt_B = aPoint_B->pnt();
+    //  aPnt_A = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_B);
+    //}
   } else if (aPoint_A && !aPoint_B) {
-    std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
-        aData, SketchPlugin_Constraint::ENTITY_B());
-    if (aLine) {
-      aPnt_A = aPoint_A->pnt();
-      aPnt_B = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_A);
-    }
+    //std::shared_ptr<SketchPlugin_Line> aLine = SketcherPrs_Tools::getFeatureLine(
+    //    aData, SketchPlugin_Constraint::ENTITY_B());
+    //if (aLine) {
+    //  aPnt_A = aPoint_A->pnt();
+    //  aPnt_B = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_A);
+    //}
   }
   if (!aPnt_A || !aPnt_B)
     return false;
@@ -159,19 +159,19 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
   if (aPointA && aPointB) {  // both points
     aDistance = aPointA->pnt()->distance(aPointB->pnt());
   } else {
-    if (!aPointA && aPointB) {  //Line and point
-      std::shared_ptr<SketchPlugin_Line> aLine =
-          SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-      if (aLine) {
-        aDistance = aLine->distanceToPoint(aPointB->pnt());
-      }
-    } else if (aPointA && !aPointB) {  // Point and line
-      std::shared_ptr<SketchPlugin_Line> aLine =
-          SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
-      if (aLine) {
-        aDistance = aLine->distanceToPoint(aPointA->pnt());
-      }
-    }
+//    if (!aPointA && aPointB) {  //Line and point
+//      std::shared_ptr<SketchPlugin_Line> aLine =
+//          SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+//      if (aLine) {
+//        aDistance = aLine->distanceToPoint(aPointB->pnt());
+//      }
+//    } else if (aPointA && !aPointB) {  // Point and line
+//      std::shared_ptr<SketchPlugin_Line> aLine =
+//          SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+//      if (aLine) {
+//        aDistance = aLine->distanceToPoint(aPointA->pnt());
+//      }
+//    }
   }
   return aDistance;
 }

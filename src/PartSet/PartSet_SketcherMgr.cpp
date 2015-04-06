@@ -776,152 +776,49 @@ bool PartSet_SketcherMgr::canRedo() const
 bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = true;
-  // 1. the sketch feature should not be displayed during the sketch active operation
-  // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch 
-  // nested features can be visualized
-  CompositeFeaturePtr aSketchFeature = activeSketch();
-  if (aSketchFeature.get() != NULL) {
+
+  bool aHasActiveSketch = activeSketch().get() != NULL;
+  if (aHasActiveSketch) {
+    // 1. the sketch feature should not be displayed during the sketch active operation
+    // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch 
+    // nested features can be visualized
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL && aFeature == aSketchFeature)
+    if (aFeature.get() != NULL && aFeature == activeSketch())
       aCanDisplay = false;
   }
-  // 2. For created nested feature operation do not display the created feature if
+  else { // there are no an active sketch
+    // 2. sketch sub-features should not visualized if the sketch operatio is not active
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      if (aSketchFeature.get())
+        aCanDisplay = false;
+    }
+  }
+
+  // 3. For created nested feature operation do not display the created feature if
   // the mouse curstor leaves the OCC window.
   // The correction cases, which ignores this condition:
   // a. the property panel values modification
   // b. the popup menu activated
   // c. widget editor control
-  if (aCanDisplay) {
-    if (!isNestedCreateOperation(getCurrentOperation()))
-      return aCanDisplay;
-
+  if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
     ModuleBase_Operation* aOperation = getCurrentOperation();
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWdg = aPanel ? aPanel->activeWidget() : 0;
+    ModuleBase_WidgetEditor* anEditorWdg = anActiveWdg ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWdg) : 0;
     // the active widget editor should not influence here. The presentation should be visible always
     // when this widget is active.
-    if (anActiveWdg) {
-      ModuleBase_WidgetEditor* anEditorWdg = dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWdg);
-      if (anEditorWdg) {
-        return aCanDisplay;
-      }
+    if (!anEditorWdg && !myIsPopupMenuActive) {
+      // during a nested create operation, the feature is redisplayed only if the mouse over view
+      // of there was a value modified in the property panel after the mouse left the view
+      aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
     }
-    if (myIsPopupMenuActive)
-      return aCanDisplay;
-
-    // during a nested create operation, the feature is redisplayed only if the mouse over view
-    // of there was a value modified in the property panel after the mouse left the view
-    aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
   }
   return aCanDisplay;
 }
 
-bool PartSet_SketcherMgr::canSetAuxiliary(bool& theValue) const
-{
-  bool anEnabled = false;
-  ModuleBase_Operation* anOperation = getCurrentOperation();
-
-  bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
-  if (!isActiveSketch)
-    return anEnabled;
-
-  QObjectPtrList anObjects;
-  // 1. change auxiliary type of a created feature
-  if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
-      PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
-    anObjects.append(anOperation->feature());
-  }
-  else {
-    /// The operation should not be aborted here, because the method does not changed
-    /// the auxilliary state, but checks the possibility to perform this
-    ///if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    ///  anOperation->abort();
-    // 2. change auxiliary type of selected sketch entities
-    ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
-    anObjects = aSelection->selectedPresentations();
-  }
-  anEnabled = anObjects.size() > 0;
-
-  bool isNotAuxiliaryFound = false;
-  if (anObjects.size() > 0) {
-    QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
-    for (; anIt != aLast && !isNotAuxiliaryFound; anIt++) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-      if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-                            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSketchFeature.get() != NULL) {
-          std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
-
-          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
-            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
-          if (anAuxiliaryAttr)
-            isNotAuxiliaryFound = !anAuxiliaryAttr->value();
-        }
-      }
-    }
-  }
-  theValue = anObjects.size() && !isNotAuxiliaryFound;
-  return anEnabled;
-}
-  
-void PartSet_SketcherMgr::setAuxiliary(const bool isChecked)
-{
-  ModuleBase_Operation* anOperation = getCurrentOperation();
-
-  bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
-  if (!isActiveSketch)
-    return;
-
-  QObjectPtrList anObjects;
-  bool isUseTransaction = false;
-  // 1. change auxiliary type of a created feature
-  if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
-      PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
-    anObjects.append(anOperation->feature());
-  }
-  else {
-    isUseTransaction = true;
-    // 2. change auxiliary type of selected sketch entities
-    ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
-    anObjects = aSelection->selectedPresentations();
-  }
-
-  QAction* anAction = myModule->action("AUXILIARY_CMD");
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (isUseTransaction) {
-    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-      anOperation->abort();
-    aMgr->startOperation(anAction->text().toStdString());
-  }
-  storeSelection();
-
-  if (anObjects.size() > 0) {
-    QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-      if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-                            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSketchFeature.get() != NULL) {
-          std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
-
-          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
-            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
-          if (anAuxiliaryAttr)
-            anAuxiliaryAttr->setValue(isChecked);
-        }
-      }
-    }
-  }
-  if (isUseTransaction) {
-    aMgr->finishOperation();
-  }
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  restoreSelection();
-}
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {

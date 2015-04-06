@@ -998,6 +998,12 @@ void XGUI_Workshop::onUndo(int theTimes)
 //******************************************************
 void XGUI_Workshop::onRedo(int theTimes)
 {
+  // the viewer update should be blocked in order to avoid the features blinking. For the created
+  // feature a results are created, the flush of the created signal caused the viewer redisplay for
+  // each created result. After a redisplay signal is flushed. So, the viewer update is blocked until
+  // redo of all possible objects happens
+  bool isUpdateEnabled = myDisplayer->enableUpdateViewer(false);
+
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
@@ -1006,6 +1012,10 @@ void XGUI_Workshop::onRedo(int theTimes)
     aMgr->redo();
   }
   updateCommandStatus();
+
+  // unblock the viewer update functionality and make update on purpose
+  myDisplayer->enableUpdateViewer(isUpdateEnabled);
+  myDisplayer->updateViewer();
 }
 
 //******************************************************

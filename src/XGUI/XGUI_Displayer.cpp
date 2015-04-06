@@ -103,7 +103,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
     if (aPrs.get() != NULL) {
-      anAIS = aPrs->getAISObject(AISObjectPtr());
+      anAIS = aPrs->getAISObject(anAIS);
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult.get() != NULL) {
@@ -159,6 +159,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     }
     aContext->Display(anAISIO, false);
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
+    if (isShading)
+      anAISIO->Attributes()->SetFaceBoundaryDraw( Standard_True );
     emit objectDisplayed(theObject, theAIS);
 
     bool isCustomized = customizeObject(theObject);
@@ -790,4 +792,19 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
     aCustomPrs = myCustomPrs;
   }
   return aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+}
+
+
+QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject, const QColor& theColor, bool toUpdate)
+{
+  if (!isVisible(theObject))
+    return Qt::black;
+
+  AISObjectPtr anAISObj = getAISObject(theObject);
+  int aR, aG, aB;
+  anAISObj->getColor(aR, aG, aB);
+  anAISObj->setColor(theColor.red(), theColor.green(), theColor.blue());
+  if (toUpdate)
+    updateViewer();
+  return QColor(aR, aG, aB);
 }

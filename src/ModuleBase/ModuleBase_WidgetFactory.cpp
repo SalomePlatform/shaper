@@ -126,8 +126,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   } else if (theType == WDG_BOOLVALUE) {
     result = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
-  } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
-    result = new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
+  //} else if (theType == WDG_DOUBLEVALUE_EDITOR) {
+  //  result = new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_FILE_SELECTOR) {
     result = new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_CHOICE) {

@@ -19,7 +19,7 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Equal, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;
 
-SketcherPrs_Equal::SketcherPrs_Equal(SketchPlugin_Constraint* theConstraint, 
+SketcherPrs_Equal::SketcherPrs_Equal(ModelAPI_Feature* theConstraint, 
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {

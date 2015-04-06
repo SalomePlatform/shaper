@@ -18,10 +18,7 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
   myRef->Append(aData->label().Father());  // store label of the object
   // do it before the transaction finish to make just created/removed objects know dependencies
   // and reference from composite feature is removed automatically
-  FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-  if (anOwnerFeature.get()) {
-    aData->addBackReference(anOwnerFeature, id());
-  }
+  ADD_BACK_REF(theObject);
 
   owner()->data()->sendAttributeUpdated(this);
 }
@@ -42,6 +39,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
         ObjectPtr anObj = aDoc->object(aLIter.Value());
         if (anObj.get() == NULL) {
           myRef->Remove(aLIter.Value());
+          REMOVE_BACK_REF(theObject);
           break;
         }
       }

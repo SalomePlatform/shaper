@@ -17,4 +17,7 @@
 #endif
 #endif
 
+/// Tolerance for value of parameters
+const double tolerance = 1.e-10;
+
 #endif

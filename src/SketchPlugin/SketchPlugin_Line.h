@@ -39,11 +39,7 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
   }
 
   /// Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
-  {
-    static std::string MY_KIND = SketchPlugin_Line::ID();
-    return MY_KIND;
-  }
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind();
 
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed();

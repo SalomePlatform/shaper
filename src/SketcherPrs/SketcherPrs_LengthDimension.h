@@ -9,11 +9,10 @@
 #define SketcherPrs_LinearDimension_H
 
 #include <GeomAPI_Ax3.h>
+#include <ModelAPI_Feature.h>
 #include <AIS_LengthDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
-
-class SketchPlugin_Constraint;
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension)
 
@@ -28,7 +27,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_LengthDimension(SketchPlugin_Constraint* theConstraint, 
+  Standard_EXPORT SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   std::string constraintType() const;
@@ -39,11 +38,15 @@ protected:
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
+  /// Redefinition of virtual function
+  Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+    const Standard_Integer aMode);
+
 private:
   bool getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) const;
 
   /// Constraint feature
-  SketchPlugin_Constraint* myConstraint;
+  ModelAPI_Feature* myConstraint;
 
   /// Plane of the current sketcher
   std::shared_ptr<GeomAPI_Ax3> myPlane;

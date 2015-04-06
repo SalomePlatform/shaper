@@ -36,7 +36,9 @@ AISObjectPtr SketchPlugin_ConstraintCoincidence::getAISObject(AISObjectPtr thePr
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS) {
     anAIS = SketcherPrs_Factory::coincidentConstraint(this, sketch()->coordinatePlane());
-    anAIS->setColor(0, 0, 255);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_constraint_color",
+                                                    SKETCH_DIMENSION_COLOR);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   }
   return anAIS;
 }

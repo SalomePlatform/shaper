@@ -27,6 +27,7 @@
 #include <QString>
 #include <QMap>
 #include <QObject>
+#include <QColor>
 
 class ModelAPI_Feature;
 class XGUI_Workshop;
@@ -190,6 +191,12 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theObject object to check
   bool canBeShaded(ObjectPtr theObject) const;
 
+  /// Set color on presentation of an object if it is displayed
+  /// \param theObject an object 
+  /// \param theColor a color which has to be set
+  /// \param theUpdate update viewer flag
+  /// \return previously defined color on the object
+  QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool toUpdate = true);
 
 signals:
   /// Signal on object display

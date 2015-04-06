@@ -227,7 +227,7 @@
             label="Last object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
 
-        <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" default="1" min="0" obligatory="0">
+        <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
       </feature>

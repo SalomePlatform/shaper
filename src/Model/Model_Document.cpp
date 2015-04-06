@@ -404,8 +404,8 @@ void Model_Document::abortOperation()
       myDoc->Undo();
     myDoc->ClearRedos();
   }
-  // references were not changed since transaction start
-  synchronizeFeatures(true, false, isRoot());
+  // references may be changed because they are set in attributes on the fly
+  synchronizeFeatures(true, true, isRoot());
   // abort for all subs
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();

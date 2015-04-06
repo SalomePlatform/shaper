@@ -84,4 +84,6 @@ class SketchPlugin_Constraint : public SketchPlugin_Feature
   }
 };
 
+typedef std::shared_ptr<SketchPlugin_Constraint> ConstraintPtr;
+
 #endif

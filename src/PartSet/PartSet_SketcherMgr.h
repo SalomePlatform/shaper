@@ -102,6 +102,8 @@ public:
   /// \return a boolean value
   static bool isDistanceOperation(ModuleBase_Operation* theOperation);
 
+  bool isMouseOverWindow() { return myIsMouseOverWindow; }
+
   /// Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
   CompositeFeaturePtr activeSketch() const { return myCurrentSketch; }
 
@@ -137,18 +139,14 @@ public:
   /// \param theObject a model object
   bool canDisplayObject(const ObjectPtr& theObject) const;
 
-  /// Returns true if the current operation is sketch entity create operation
-  /// \param theValue the current auxiliary value
-  /// \return the boolean result
-  bool canSetAuxiliary(bool& theValue) const;
-  
-  /// Changes the sketcher entity construction argument value
-  /// \param isChecked if true, the feature is a construction
-  void setAuxiliary(const bool isChecked);
-
-
+  /// Returns state of constraints showing flag 
   bool isConstraintsShown() const { return myIsConstraintsShown; }
 
+  /// Saves the current selection in the viewer into an internal container
+  /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
+  /// \param theHighlightedUse a boolean flag
+  void storeSelection(const bool theHighlightedOnly = false);
+  void restoreSelection();
 
   /// Returns list of strings which contains id's of sketch operations
   static const QStringList& sketchOperationIdList();
@@ -247,12 +245,6 @@ private:
   /// \param theOperation an operation which feature is to be displayed, it is nested create operation
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay);
-
-  /// Saves the current selection in the viewer into an internal container
-  /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
-  /// \param theHighlightedUse a boolean flag
-  void storeSelection(const bool theHighlightedOnly = false);
-  void restoreSelection();
 
 private:
   PartSet_Module* myModule;

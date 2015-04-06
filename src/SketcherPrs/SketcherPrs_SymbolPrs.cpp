@@ -14,6 +14,7 @@
 #include <Graphic3d_BndBox4f.hxx>
 
 #include <SelectMgr_Selection.hxx>
+#include <SelectMgr_SelectionManager.hxx>
 #include <Select3D_SensitivePoint.hxx>
 #include <TopLoc_Location.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -219,7 +220,7 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_SymbolPrs, AIS_InteractiveObject);
 std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsMap;
 
 
-SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(SketchPlugin_Constraint* theConstraint, 
+SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint, 
                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
  : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane)
 {
@@ -354,8 +355,10 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
                                             const Standard_Integer aMode)
 {
   ClearSelected();
-  for (int i = 1; i <= mySPoints.Length(); i++)
-    aSelection->Add(mySPoints.Value(i));
+  if ((aMode == 0) || (aMode == SketcherPrs_Tools::Sel_Constraint)) {
+    for (int i = 1; i <= mySPoints.Length(); i++)
+      aSelection->Add(mySPoints.Value(i));
+  }
 }
 
 
@@ -417,8 +420,10 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   theWorkspace->EnableTexture (aTextureBack);
   aCtx->BindProgram (NULL);
 
-  // Update selection position
-  GetContext()->RecomputeSelectionOnly(this);
+  // Update selection position only if there is no selected object
+  // because it can corrupt selection of other objects
+  if ((GetContext()->NbCurrents() == 0) && (GetContext()->NbSelected() == 0))
+    GetContext()->RecomputeSelectionOnly(this);
 }
 
 

@@ -31,82 +31,45 @@ SketchSolver_Solver::SketchSolver_Solver()
 
 SketchSolver_Solver::~SketchSolver_Solver()
 {
-  if (myEquationsSystem.param)
-    delete[] myEquationsSystem.param;
-  if (myEquationsSystem.entity)
-    delete[] myEquationsSystem.entity;
   if (myEquationsSystem.constraint)
     delete[] myEquationsSystem.constraint;
   if (myEquationsSystem.failed)
     delete[] myEquationsSystem.failed;
 }
 
-void SketchSolver_Solver::setParameters(const std::vector<Slvs_Param>& theParameters)
+void SketchSolver_Solver::setParameters(Slvs_Param* theParameters, int theSize)
 {
-  if (theParameters.size() != myEquationsSystem.params)  // number of parameters was changed => reallocate the memory
-      {
-    if (myEquationsSystem.param)
-      delete[] myEquationsSystem.param;
-    myEquationsSystem.params = theParameters.size();
-    myEquationsSystem.param = new Slvs_Param[theParameters.size()];
-  }
-
-  // Copy data
-  std::vector<Slvs_Param>::const_iterator aParamIter = theParameters.begin();
-  for (int i = 0; i < myEquationsSystem.params; i++, aParamIter++)
-    myEquationsSystem.param[i] = *aParamIter;
+  myEquationsSystem.param = theParameters;
+  myEquationsSystem.params = theSize;
 }
 
-void SketchSolver_Solver::setDraggedParameters(const std::vector<Slvs_hParam>& theDragged)
+
+void SketchSolver_Solver::setDraggedParameters(const Slvs_hParam* theDragged)
 {
-  if (theDragged.size() == 0) {
-    myEquationsSystem.dragged[0] = 0;
-    myEquationsSystem.dragged[1] = 0;
-    myEquationsSystem.dragged[2] = 0;
-    myEquationsSystem.dragged[3] = 0;
-    return;
-  }
-  for (unsigned int i = 0; i < theDragged.size(); i++)
+  for (unsigned int i = 0; i < 4; i++)
     myEquationsSystem.dragged[i] = theDragged[i];
 }
 
-void SketchSolver_Solver::setEntities(const std::vector<Slvs_Entity>& theEntities)
+void SketchSolver_Solver::setEntities(Slvs_Entity* theEntities, int theSize)
 {
-  if (theEntities.size() != myEquationsSystem.entities)  // number of entities was changed => reallocate the memory
-      {
-    if (myEquationsSystem.entity)
-      delete[] myEquationsSystem.entity;
-    myEquationsSystem.entities = theEntities.size();
-    myEquationsSystem.entity = new Slvs_Entity[theEntities.size()];
-  }
-
-  // Copy data
-  std::vector<Slvs_Entity>::const_iterator aEntIter = theEntities.begin();
-  for (int i = 0; i < myEquationsSystem.entities; i++, aEntIter++)
-    myEquationsSystem.entity[i] = *aEntIter;
+  myEquationsSystem.entity = theEntities;
+  myEquationsSystem.entities = theSize;
 }
 
-void SketchSolver_Solver::setConstraints(const std::vector<Slvs_Constraint>& theConstraints)
+void SketchSolver_Solver::setConstraints(Slvs_Constraint* theConstraints, int theSize)
 {
-  if (theConstraints.size() != myEquationsSystem.constraints)  // number of constraints was changed => reallocate the memory
-      {
-    if (myEquationsSystem.constraint)
-      delete[] myEquationsSystem.constraint;
-    myEquationsSystem.constraints = theConstraints.size();
-    myEquationsSystem.constraint = new Slvs_Constraint[theConstraints.size()];
-
-    // Assign the memory for the failed constraints
-    if (myEquationsSystem.failed)
-      delete[] myEquationsSystem.failed;
-    myEquationsSystem.failed = new Slvs_hConstraint[theConstraints.size()];
-    myEquationsSystem.faileds = theConstraints.size();
+  if (!myEquationsSystem.constraint) {
+    myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+    myEquationsSystem.constraints = theSize;
   }
-
-  // Copy data
-  std::vector<Slvs_Constraint>::const_iterator aConstrIter = theConstraints.begin();
-  for (int i = 0; i < myEquationsSystem.constraints; i++, aConstrIter++)
-    myEquationsSystem.constraint[i] = *aConstrIter;
+  else if (myEquationsSystem.constraints != theSize) {
+    delete[] myEquationsSystem.constraint;
+    myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+    myEquationsSystem.constraints = theSize;
+  }
+  memcpy(myEquationsSystem.constraint, theConstraints, theSize * sizeof(Slvs_Constraint));
 }
+
 
 int SketchSolver_Solver::solve()
 {
