@@ -6,6 +6,7 @@
 
 #include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_ConstraintParallel.h"
+#include "SketchPlugin_Feature.h"
 
 #include <SketcherPrs_Factory.h>
 
@@ -34,8 +35,18 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
     return thePrevious;
 
   AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    anAIS = SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane());
+  if (anAIS.get() == NULL) {
+    std::shared_ptr<ModelAPI_Data> aData = data();
+    std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    ObjectPtr aObj = anAttr->object();
+    if (aObj.get() != NULL) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+      std::shared_ptr<SketchPlugin_Feature> aSkFea = 
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      if (!aSkFea->isExternal()) 
+        anAIS = SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane());
+    }
   }
 
   return anAIS;

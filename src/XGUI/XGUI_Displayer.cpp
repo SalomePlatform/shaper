@@ -103,7 +103,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
     if (aPrs.get() != NULL) {
-      anAIS = aPrs->getAISObject(AISObjectPtr());
+      anAIS = aPrs->getAISObject(anAIS);
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult.get() != NULL) {
