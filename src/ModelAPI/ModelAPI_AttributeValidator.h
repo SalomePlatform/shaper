@@ -21,6 +21,8 @@ public:
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments) const = 0;
+
+  ~ModelAPI_AttributeValidator();
 };
 
 #endif
