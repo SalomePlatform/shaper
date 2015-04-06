@@ -49,7 +49,7 @@ private:
   void addConstraint(ConstraintPtr theConstraint);
 
 private:
-  std::map<ConstraintPtr, Slvs_hConstraint> myExtraCoincidence; ///< multiple coincidence of points
+  std::map<Slvs_hConstraint, ConstraintPtr> myExtraCoincidence; ///< multiple coincidence of points
 };
 
 #endif

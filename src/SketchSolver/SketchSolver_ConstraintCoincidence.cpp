@@ -8,9 +8,9 @@ bool SketchSolver_ConstraintCoincidence::hasConstraint(ConstraintPtr theConstrai
 {
   if (myBaseConstraint == theConstraint)
     return true;
-  std::map<ConstraintPtr, Slvs_hConstraint>::const_iterator anIt = myExtraCoincidence.begin();
+  std::map<Slvs_hConstraint, ConstraintPtr>::const_iterator anIt = myExtraCoincidence.begin();
   for (; anIt != myExtraCoincidence.end(); anIt++)
-    if (anIt->first == theConstraint)
+    if (anIt->second == theConstraint)
       return true;
   return false;
 }
@@ -19,9 +19,9 @@ std::list<ConstraintPtr> SketchSolver_ConstraintCoincidence::constraints() const
 {
   std::list<ConstraintPtr> aConstraints;
   aConstraints.push_back(myBaseConstraint);
-  std::map<ConstraintPtr, Slvs_hConstraint>::const_iterator anIt = myExtraCoincidence.begin();
+  std::map<Slvs_hConstraint, ConstraintPtr>::const_iterator anIt = myExtraCoincidence.begin();
   for (; anIt != myExtraCoincidence.end(); anIt++)
-    aConstraints.push_back(anIt->first);
+    aConstraints.push_back(anIt->second);
   return aConstraints;
 }
 
@@ -59,10 +59,10 @@ void SketchSolver_ConstraintCoincidence::attach(
 
   // Copy data.
   addConstraint(theConstraint->myBaseConstraint);
-  std::map<ConstraintPtr, Slvs_hConstraint>::iterator aConstrIter =
+  std::map<Slvs_hConstraint, ConstraintPtr>::iterator aConstrIter =
       theConstraint->myExtraCoincidence.begin();
   for (; aConstrIter != theConstraint->myExtraCoincidence.end(); aConstrIter++)
-    addConstraint(aConstrIter->first);
+    addConstraint(aConstrIter->second);
   // Clear the lists to not remove the entities on destruction
   theConstraint->mySlvsConstraints.clear();
   theConstraint->myFeatureMap.clear();
@@ -103,38 +103,105 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
   std::vector<Slvs_hEntity>::iterator anEntIter = anEntities.begin();
   for (; anEntIter != anEntities.end(); anEntIter++)
     aNewConstr = addConstraint(aBaseCoincidence.ptA, *anEntIter);
-  myExtraCoincidence[theConstraint] = aNewConstr;
+  myExtraCoincidence[aNewConstr] = theConstraint;
 }
 
 bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
 {
   cleanErrorMsg();
+  if (mySlvsConstraints.empty())
+    return true;
   ConstraintPtr aConstraint = theConstraint ? theConstraint : myBaseConstraint;
   int aPos = -1; // position of constraint in the list (-1 for base constraint)
+  std::map<Slvs_hConstraint, ConstraintPtr>::iterator anExtraIt;
   if (aConstraint != myBaseConstraint) {
-    std::map<ConstraintPtr, Slvs_hConstraint>::const_iterator anIt = myExtraCoincidence.begin();
-    for (aPos = 0; anIt != myExtraCoincidence.end(); anIt++, aPos++)
-      if (anIt->first == aConstraint)
+    anExtraIt = myExtraCoincidence.begin();
+    for (aPos = 0; anExtraIt != myExtraCoincidence.end(); anExtraIt++, aPos++)
+      if (anExtraIt->second == aConstraint)
         break;
     if (aPos >= (int)myExtraCoincidence.size())
       return false; // there is no constraint, which is specified to remove
+    else {
+      bool isEmpty = anExtraIt->first == SLVS_E_UNKNOWN;
+      myExtraCoincidence.erase(anExtraIt);
+      if (isEmpty)
+        return false;
+    }
   }
 
   bool isFullyRemoved = myStorage->removeConstraint(mySlvsConstraints[aPos+1]);
   mySlvsConstraints.erase(mySlvsConstraints.begin() + (1+aPos));
-  cleanRemovedEntities();
   if (aPos < 0 && !myExtraCoincidence.empty()) {
-    // Need to specify another base coincidence constraint
-    myBaseConstraint = myExtraCoincidence.begin()->first;
-    myExtraCoincidence.erase(myExtraCoincidence.begin());
-    std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
-    Slvs_Constraint aBase = myStorage->getConstraint(*aCIter);
-    for (++aCIter; aCIter != mySlvsConstraints.end(); aCIter++) {
-      Slvs_Constraint aConstr = myStorage->getConstraint(*aCIter);
-      aConstr.ptA = aBase.ptA;
-      myStorage->updateConstraint(aConstr);
+    anExtraIt = myExtraCoincidence.begin();
+    // Remove invalid constraints
+    while (anExtraIt != myExtraCoincidence.end()) {
+      if (!anExtraIt->second->data() || !anExtraIt->second->data()->isValid()) {
+        std::map<Slvs_hConstraint, ConstraintPtr>::iterator aTempIt = anExtraIt++;
+        if (aTempIt->first != SLVS_E_UNKNOWN) {
+          myStorage->removeConstraint(aTempIt->first);
+          std::vector<Slvs_hConstraint>::iterator anIt = mySlvsConstraints.begin();
+          for (; anIt != mySlvsConstraints.end(); anIt++)
+            if (*anIt == aTempIt->first) {
+              mySlvsConstraints.erase(anIt);
+              break;
+            }
+        }
+        myExtraCoincidence.erase(aTempIt);
+        continue;
+      }
+      anExtraIt++;
+    }
+    // Find first non-extra conststraint
+    while (anExtraIt != myExtraCoincidence.end() && anExtraIt->first == SLVS_E_UNKNOWN)
+      anExtraIt++;
+    if (anExtraIt != myExtraCoincidence.end()) {
+      // Need to specify another base coincidence constraint
+      myBaseConstraint = anExtraIt->second;
+      myExtraCoincidence.erase(anExtraIt);
+      std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
+      Slvs_Constraint aBase = myStorage->getConstraint(*aCIter);
+      for (++aCIter; aCIter != mySlvsConstraints.end(); aCIter++) {
+        Slvs_Constraint aConstr = myStorage->getConstraint(*aCIter);
+        aConstr.ptA = aBase.ptA;
+        myStorage->updateConstraint(aConstr);
+      }
     }
   }
-  return true;
+  // Clear removed attributes
+  std::set<Slvs_hParam> aParamRemoved;
+  std::set<Slvs_hEntity> anEntRemoved;
+  std::set<Slvs_hConstraint> aConstrRemoved;
+  myStorage->getRemoved(aParamRemoved, anEntRemoved, aConstrRemoved);
+  std::map<AttributePtr, Slvs_hEntity>::iterator anAttrIter = myAttributeMap.begin();
+  while (anAttrIter != myAttributeMap.end()) {
+    if (anEntRemoved.find(anAttrIter->second) != anEntRemoved.end()) {
+      std::map<AttributePtr, Slvs_hEntity>::iterator aTempIt = anAttrIter++;
+      myAttributeMap.erase(aTempIt);
+      continue;
+    }
+    anAttrIter++;
+  }
+
+  // Go through remaining extra coincidence and try to add or remove them
+  anExtraIt = myExtraCoincidence.begin();
+  while (anExtraIt != myExtraCoincidence.end()) {
+    if (anExtraIt->first == SLVS_E_UNKNOWN) {
+      if (!anExtraIt->second->data() || !anExtraIt->second->data()->isValid()) {
+        std::map<Slvs_hConstraint, ConstraintPtr>::iterator aTempIt = anExtraIt++;
+        myExtraCoincidence.erase(aTempIt);
+        continue;
+      }
+      if (mySlvsConstraints.empty()) {
+        myBaseConstraint = anExtraIt->second;
+        std::map<Slvs_hConstraint, ConstraintPtr>::iterator aTempIt = anExtraIt++;
+        myExtraCoincidence.erase(aTempIt);
+        process();
+        continue;
+      } else
+        addConstraint(anExtraIt->second);
+    }
+    anExtraIt++;
+  }
+  return isFullyRemoved;
 }
 
