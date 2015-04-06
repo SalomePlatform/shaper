@@ -37,6 +37,9 @@ class ModelAPI_ResultParameter : public ModelAPI_Result
     static const std::string MY_VALUE_ID("Value");
     return MY_VALUE_ID;
   }
+
+  MODELAPI_EXPORT virtual void initAttributes();
+
 };
 
 //! Pointer on feature object

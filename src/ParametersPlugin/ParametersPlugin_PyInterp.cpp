@@ -84,6 +84,11 @@ void ParametersPlugin_PyInterp::_extendLocalContext(const std::list<std::string>
 {
   if (theParameters.empty())
     return;
+  std::list<std::string>::const_iterator it = theParameters.begin();
+  for ( ; it != theParameters.cend(); it++) {
+    std::string aParamValue = *it;
+    simpleRun(aParamValue.c_str(), false);
+  }
 }
 
 
@@ -107,9 +112,10 @@ double ParametersPlugin_PyInterp::_evaluate(const std::string& theExpression, st
 
   PyObject* anEvalStrObj = PyObject_Str(anEvalResult);
   std::string anEvalStr(PyString_AsString(anEvalStrObj));
-  double result = std::stod(anEvalStr);
-
-  return result;
+  Py_XDECREF(anExprCode);
+  Py_XDECREF(anEvalResult);
+  Py_XDECREF(anEvalStrObj);
+  return std::stod(anEvalStr);
 }
 
 std::string ParametersPlugin_PyInterp::errorMessage()
