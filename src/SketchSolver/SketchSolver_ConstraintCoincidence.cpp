@@ -121,8 +121,12 @@ bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
         break;
     if (aPos >= (int)myExtraCoincidence.size())
       return false; // there is no constraint, which is specified to remove
-    else
+    else {
+      bool isEmpty = anExtraIt->first == SLVS_E_UNKNOWN;
       myExtraCoincidence.erase(anExtraIt);
+      if (isEmpty)
+        return false;
+    }
   }
 
   bool isFullyRemoved = myStorage->removeConstraint(mySlvsConstraints[aPos+1]);
