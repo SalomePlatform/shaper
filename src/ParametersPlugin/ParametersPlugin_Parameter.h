@@ -10,9 +10,13 @@
 #include "ParametersPlugin.h"
 #include <ModelAPI_Feature.h>
 
+class ParametersPlugin_PyInterp;
+
 class ParametersPlugin_Parameter : public ModelAPI_Feature
 {
  public:
+  virtual ~ParametersPlugin_Parameter();
+
   /// Extrusion kind
   inline static const std::string& ID()
   {
@@ -49,6 +53,12 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   ParametersPlugin_Parameter();
+
+ protected:
+  double evaluate(std::string);
+
+ private:
+  ParametersPlugin_PyInterp* myInterp;
 };
 
 #endif

@@ -4,7 +4,7 @@ INCLUDE(Common)
 INCLUDE(XMLProcessing)
 
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Events
-                     ${PYTHON_INCLUDE_DIRS}) 
+                     ${PYTHON_INCLUDE_DIR}) 
 
 SET(PROJECT_HEADERS
   Config_def.h
