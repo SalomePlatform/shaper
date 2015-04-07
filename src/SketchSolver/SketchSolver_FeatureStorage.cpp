@@ -91,14 +91,10 @@ void SketchSolver_FeatureStorage::removeConstraint(ConstraintPtr theConstraint)
     while (aFeatIter != myFeatures.end()) {
       aCIter = aFeatIter->second.find(theConstraint);
       if (aCIter != aFeatIter->second.end()) {
-        aFeatIter->second.erase(aCIter);
-        if (aFeatIter->second.empty()) {
-          MapFeatureConstraint::iterator aTmpIter = aFeatIter; // stores iterator for the next element, while the current is deleting
-          aTmpIter++;
-          myFeatures.erase(aFeatIter);
-          aFeatIter = aTmpIter;
-          continue;
-        }
+        FeaturePtr aFeature = aFeatIter->first;
+        aFeatIter++;
+        removeFeature(aFeature, theConstraint);
+        continue;
       }
       aFeatIter++;
     }
@@ -200,7 +196,7 @@ void SketchSolver_FeatureStorage::changeFeature(FeaturePtr theFeature, Constrain
 void SketchSolver_FeatureStorage::removeFeature(FeaturePtr theFeature)
 {
   MapFeatureConstraint::iterator aFeatIter = myFeatures.find(theFeature);
-  if (aFeatIter != myFeatures.end())
+  if (aFeatIter == myFeatures.end())
     return; // no such feature
 
   std::set<ConstraintPtr> aConstraints = aFeatIter->second;
@@ -212,7 +208,7 @@ void SketchSolver_FeatureStorage::removeFeature(FeaturePtr theFeature)
 void SketchSolver_FeatureStorage::removeFeature(FeaturePtr theFeature, ConstraintPtr theConstraint)
 {
   MapFeatureConstraint::iterator aFeatIter = myFeatures.find(theFeature);
-  if (aFeatIter != myFeatures.end())
+  if (aFeatIter == myFeatures.end())
     return; // no such feature
 
   std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
@@ -287,7 +283,7 @@ void SketchSolver_FeatureStorage::removeAttribute(AttributePtr theAttribute)
 void SketchSolver_FeatureStorage::removeAttribute(AttributePtr theAttribute, FeaturePtr theFeature)
 {
   MapAttributeFeature::iterator anAttrIter = myAttributes.find(theAttribute);
-  if (anAttrIter != myAttributes.end())
+  if (anAttrIter == myAttributes.end())
     return; // no such attribute
 
   anAttrIter->second.erase(theFeature);
