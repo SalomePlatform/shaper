@@ -404,13 +404,13 @@ void Model_Document::abortOperation()
       myDoc->Undo();
     myDoc->ClearRedos();
   }
-  // references may be changed because they are set in attributes on the fly
-  synchronizeFeatures(true, true, isRoot());
-  // abort for all subs
+  // abort for all subs, flushes will be later, in the end of root abort
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->abortOperation();
+  // references may be changed because they are set in attributes on the fly
+  synchronizeFeatures(true, true, isRoot());
 }
 
 bool Model_Document::isOperation() const
