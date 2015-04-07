@@ -9,6 +9,8 @@
 #include "SketcherPrs_PositionMgr.h"
 
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Vertex.h>
+#include <GeomAPI_Curve.h>
 
 #include <Graphic3d_ArrayOfSegments.hxx>
 #include <Graphic3d_BndBox4f.hxx>
@@ -20,6 +22,11 @@
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_Viewer.hxx>
 #include <Prs3d_Root.hxx>
+#include <Geom_CartesianPoint.hxx>
+#include <GeomAdaptor_Curve.hxx>
+#include <StdPrs_DeflectionCurve.hxx>
+#include <StdPrs_Point.hxx>
+#include <StdPrs_Curve.hxx>
 
 #include <OpenGl_Element.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -437,3 +444,24 @@ void SketcherPrs_SymbolPrs::Release (OpenGl_Context* theContext)
   }
 }
 
+void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape, 
+                                      const Handle(Prs3d_Presentation)& thePrs) const
+{
+  if (theShape->isEdge()) {
+    std::shared_ptr<GeomAPI_Curve> aCurve = 
+      std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(theShape));
+    if (aCurve->isLine()) {
+      GeomAdaptor_Curve aCurv(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
+      StdPrs_Curve::Add(thePrs, aCurv, myDrawer);
+    } else {
+      GeomAdaptor_Curve aAdaptor(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
+      StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
+    }
+  } else if (theShape->isVertex()) {
+    std::shared_ptr<GeomAPI_Vertex> aVertex = 
+      std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(theShape));
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+    Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
+    StdPrs_Point::Add(thePrs, aPoint, myDrawer);
+  }
+}

@@ -63,31 +63,31 @@ int shapesNbLines(const ModuleBase_ISelection* theSelection)
   return aCount;
 }
 
-bool PartSet_DistanceValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
   return (aCount > 0) && (aCount < 3);
 }
 
-bool PartSet_LengthValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 2);
+  return (aCount == 1);
 }
 
-bool PartSet_PerpendicularValidator::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
-
-bool PartSet_ParallelValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbLines(theSelection);
   return (aCount > 0) && (aCount < 3);
 }
 
-bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbLines(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
+bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
   ModuleBase_ViewerPrs aPrs;
@@ -105,14 +105,62 @@ bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection)
       }
     }
   }
-  return (aCount > 0) && (aCount < 2);
+  return (aCount == 1);
 }
 
-bool PartSet_RigidValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();  
+  return (aList.count() == 1);
+}
+
+
+bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbPoints(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
+bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 2);
+  return (aCount == 1);
 }
+
+bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
+  ModuleBase_ViewerPrs aPrs;
+  if (aList.size() != 2)
+    return false;
+
+  ModuleBase_ViewerPrs aPrs1 = aList.first();
+  ModuleBase_ViewerPrs aPrs2 = aList.last();
+
+  const TopoDS_Shape& aShape1 = aPrs1.shape();
+  const TopoDS_Shape& aShape2 = aPrs2.shape();
+  if (aShape1.IsNull() || aShape2.IsNull())
+    return false;
+
+  if ((aShape1.ShapeType() != TopAbs_EDGE) || (aShape2.ShapeType() != TopAbs_EDGE))
+    return false;
+
+  TopoDS_Edge aEdge1 = TopoDS::Edge(aShape1);
+  TopoDS_Edge aEdge2 = TopoDS::Edge(aShape2);
+
+  Standard_Real aStart, aEnd;
+  Handle(Geom_Curve) aCurve1 = BRep_Tool::Curve(aEdge1, aStart, aEnd);
+  Handle(Geom_Curve) aCurve2 = BRep_Tool::Curve(aEdge2, aStart, aEnd);
+
+  GeomAdaptor_Curve aAdaptor1(aCurve1);
+  GeomAdaptor_Curve aAdaptor2(aCurve2);
+  if (aAdaptor1.GetType() == GeomAbs_Circle)
+    return aAdaptor2.GetType() == GeomAbs_Line;
+  else if (aAdaptor2.GetType() == GeomAbs_Circle)
+    return aAdaptor1.GetType() == GeomAbs_Line;
+  return false;
+}
+
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments) const

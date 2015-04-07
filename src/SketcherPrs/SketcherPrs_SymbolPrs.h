@@ -103,6 +103,10 @@ protected:
   /// \return true in case of success
   virtual bool updatePoints(double theStep) const { return true; }
 
+  void drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape, 
+    const Handle(Prs3d_Presentation)& thePrs) const;
+
+
 protected:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;

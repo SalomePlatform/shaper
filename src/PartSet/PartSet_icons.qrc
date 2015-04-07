@@ -36,5 +36,6 @@
      <file>icons/tangent.png</file>
      <file>icons/fillet.png</file>
      <file>icons/coincedence.png</file>
+     <file>icons/mirror.png</file>
  </qresource>
  </RCC>

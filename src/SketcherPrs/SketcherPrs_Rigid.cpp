@@ -66,25 +66,11 @@ void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quan
     return;
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-  if (aShape->isEdge()) {
-    Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-    aGroup->SetPrimitivesAspect(aLineAspect);
-    std::shared_ptr<GeomAPI_Curve> aCurve = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
-    if (aCurve->isLine()) {
-      addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
-    } else {
-      GeomAdaptor_Curve aAdaptor(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
-      StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
-    }
-  } else {
-    // This is a point
-    Handle(Prs3d_PointAspect) aPntAspect = new Prs3d_PointAspect(Aspect_TOM_PLUS, theColor, 1);
-    myDrawer->SetPointAspect(aPntAspect);
+  Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+  aGroup->SetPrimitivesAspect(aLineAspect);
 
-    std::shared_ptr<GeomAPI_Vertex> aVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
-    std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
-    Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
-    StdPrs_Point::Add(thePrs, aPoint, myDrawer);
-  }
+  Handle(Prs3d_PointAspect) aPntAspect = new Prs3d_PointAspect(Aspect_TOM_PLUS, theColor, 1);
+  myDrawer->SetPointAspect(aPntAspect);
+  drawShape(aShape, thePrs);
 }
 

@@ -71,7 +71,7 @@
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
         
-        <validator id="PartSet_DistanceValidator"/>
+        <validator id="PartSet_DistanceSelection"/>
       </feature>
       
     <!--  SketchConstraintLength  -->      
@@ -85,7 +85,7 @@
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
-        <validator id="PartSet_LengthValidator"/>
+        <validator id="PartSet_LengthSelection"/>
       </feature>
       
     <!--  SketchConstraintRadius  -->
@@ -97,7 +97,7 @@
         </shape_selector>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed"/>
-        <validator id="PartSet_RadiusValidator"/>
+        <validator id="PartSet_RadiusSelection"/>
       </feature>
       
     <!--  SketchConstraintParallel  -->
@@ -114,7 +114,7 @@
             <validator id="PartSet_DifferentObjects"/>
             <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
         </sketch_constraint_shape_selector>
-        <validator id="PartSet_ParallelValidator"/>
+        <validator id="PartSet_ParallelSelection"/>
       </feature>
       
     <!--  SketchConstraintPerpendicular  -->
@@ -135,7 +135,7 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
-        <validator id="PartSet_PerpendicularValidator"/>
+        <validator id="PartSet_PerpendicularSelection"/>
       </feature>
 
       <!--  SketchConstraintCoincedence  -->
@@ -144,6 +144,7 @@
         <sketch_shape_selector id="ConstraintEntityB" label="Second point" tooltip="Select a second point" shape_types="vertex">
           <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
+        <validator id="PartSet_CoincidentSelection"/>
       </feature>
 
       <!--  SketchConstraintRigid  -->
@@ -153,7 +154,7 @@
           <validator id="PartSet_SketchEntityValidator" parameters="SketchPoint,SketchLine,SketchCircle,SketchArc"/>
           <validator id="SketchPlugin_NotFixed"/>
         </shape_selector>
-        <validator id="PartSet_RigidValidator"/>
+        <validator id="PartSet_RigidSelection"/>
       </feature>
       
     <!--  SketchConstraintHorizontal  -->
@@ -162,6 +163,7 @@
             label="Line" tooltip="Select a line" shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
+        <validator id="PartSet_HVDirSelection"/>
       </feature>
       
     <!--  SketchConstraintVertical  -->
@@ -170,6 +172,7 @@
             label="Line" tooltip="Select a line" shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
+        <validator id="PartSet_HVDirSelection"/>
       </feature>
       
     <!--  SketchConstraintEqual  -->
@@ -197,12 +200,13 @@
             label="Last object" tooltip="Select line or arc" shape_types="edge">
         <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityA"/>
         </sketch_constraint_shape_selector>
+        <validator id="PartSet_TangentSelection"/>
       </feature>
       
     <!--  SketchConstraintMirror  -->
       <feature
         id="SketchConstraintMirror"
-        title="Mirror"
+        title="Mirror" icon=":icons/mirror.png"
         tooltip="Create constraint, mirroring group of objects">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
