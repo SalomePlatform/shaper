@@ -15,6 +15,7 @@
 #include <Model_ResultGroup.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
+
 #include <Events_Loop.h>
 #include <Events_Error.h>
 
@@ -403,13 +404,13 @@ void Model_Document::abortOperation()
       myDoc->Undo();
     myDoc->ClearRedos();
   }
-  // references may be changed because they are set in attributes on the fly
-  synchronizeFeatures(true, true, isRoot());
-  // abort for all subs
+  // abort for all subs, flushes will be later, in the end of root abort
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->abortOperation();
+  // references may be changed because they are set in attributes on the fly
+  synchronizeFeatures(true, true, isRoot());
 }
 
 bool Model_Document::isOperation() const
@@ -1217,6 +1218,23 @@ std::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
   }
   if (!aResult) {
     aResult = std::shared_ptr<ModelAPI_ResultGroup>(new Model_ResultGroup(theFeatureData));
+    storeResult(theFeatureData, aResult, theIndex);
+  }
+  return aResult;
+}
+
+std::shared_ptr<ModelAPI_ResultParameter> Model_Document::createParameter(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultParameter::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
+  std::shared_ptr<ModelAPI_ResultParameter> aResult;
+  if (anOldObject) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = std::shared_ptr<ModelAPI_ResultParameter>(new ModelAPI_ResultParameter);
     storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;

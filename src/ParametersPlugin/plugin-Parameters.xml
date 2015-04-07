@@ -4,8 +4,8 @@
   <workbench id="Part">
     <group id="Parameters">
       <feature id="Parameter" title="New Variable" tooltip="Creates a variable" icon=":pictures/expression.png">
-        <stringvalue id="variable" label="Name"/>
-        <stringvalue id="expression" icon="Value"/>
+        <stringvalue id="variable" label="Name" icon=":pictures/expression.png"/>
+        <expr_editor id="expression"/>
       </feature>
     </group>
   </workbench>

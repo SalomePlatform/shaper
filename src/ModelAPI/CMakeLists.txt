@@ -32,7 +32,7 @@ SET(PROJECT_HEADERS
     ModelAPI_ResultBody.h
     ModelAPI_ResultConstruction.h
     ModelAPI_ResultGroup.h
-    ModelAPI_ResultParameters.h
+    ModelAPI_ResultParameter.h
     ModelAPI_ResultPart.h
     ModelAPI_Session.h
     ModelAPI_Tools.h
@@ -68,6 +68,7 @@ SET(PROJECT_SOURCES
     ModelAPI_Session.cpp
     ModelAPI_ShapeValidator.cpp
     ModelAPI_Tools.cpp
+    ModelAPI_ResultParameter.cpp
     ModelAPI_AttributeValidator.cpp
 )
 
@@ -81,11 +82,10 @@ ADD_LIBRARY(ModelAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 SET_TARGET_PROPERTIES(ModelAPI PROPERTIES LINKER_LANGUAGE CXX)
 TARGET_LINK_LIBRARIES(ModelAPI ${PROJECT_LIBRARIES})
 
-INCLUDE_DIRECTORIES(
-  ../Config 
-  ../Events
-  ../GeomAPI
-  ../GeomAlgoAPI
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Config 
+                    ${PROJECT_SOURCE_DIR}/src/Events
+                    ${PROJECT_SOURCE_DIR}/src/GeomAPI
+                    ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
 )
 
 

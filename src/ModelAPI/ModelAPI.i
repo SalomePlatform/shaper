@@ -35,7 +35,7 @@
   #include "ModelAPI_ResultConstruction.h"
   #include "ModelAPI_ResultBody.h"
   #include "ModelAPI_ResultPart.h"
-  #include "ModelAPI_ResultParameters.h"
+  #include "ModelAPI_ResultParameter.h"
   #include "ModelAPI_ResultGroup.h"
   #include "ModelAPI_Tools.h"
 
@@ -95,7 +95,7 @@
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
 %shared_ptr(ModelAPI_ResultGroup)
-%shared_ptr(ModelAPI_ResultParameters)
+%shared_ptr(ModelAPI_ResultParameter)
 
 // all supported interfaces
 %include "ModelAPI_Document.h"
@@ -124,7 +124,7 @@
 %include "ModelAPI_ResultBody.h"
 %include "ModelAPI_ResultPart.h"
 %include "ModelAPI_ResultGroup.h"
-%include "ModelAPI_ResultParameters.h"
+%include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
 
 // std::list -> [] 

@@ -21,6 +21,7 @@ class ModelAPI_ResultConstruction;
 class ModelAPI_ResultBody;
 class ModelAPI_ResultPart;
 class ModelAPI_ResultGroup;
+class ModelAPI_ResultParameter;
 class ModelAPI_Data;
 
 /**\class ModelAPI_Document
@@ -96,6 +97,9 @@ public:
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a group results
   virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+
+  virtual std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
   //! Returns a feature by result (owner of result)
