@@ -14,6 +14,7 @@
 #include <ModuleBase_ModelWidget.h>
 
 #include <QList>
+#include <QLabel>
 #include <QString>
 #include <QStringList>
 #include <QPlainTextEdit>
@@ -79,6 +80,7 @@ protected:
 
 private:
    /// A line edit control
+  QLabel* myResultLabel;
   ExpressionEditor* myEditor;
 };
 

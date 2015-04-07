@@ -38,7 +38,13 @@ class ModelAPI_ResultParameter : public ModelAPI_Result
     return MY_VALUE_ID;
   }
 
-  MODELAPI_EXPORT virtual void initAttributes();
+  inline static const std::string& STATE()
+  {
+    static const std::string MY_VALUE_ID("State");
+    return MY_VALUE_ID;
+  }
+
+  virtual void initAttributes() = 0;
 
 };
 

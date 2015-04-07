@@ -14,6 +14,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultParameter.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -149,6 +150,9 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor(QWidget* theParent,
   QVBoxLayout* aMainLay = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
+  myResultLabel = new QLabel(this);
+  myResultLabel->setWordWrap(true);
+  aMainLay->addWidget(myResultLabel);
   myEditor = new ExpressionEditor(this);
   myEditor->setMinimumHeight(20);
   aMainLay->addWidget(myEditor);
@@ -171,6 +175,14 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
   QString aWidgetValue = myEditor->toPlainText();
   aStringAttr->setValue(aWidgetValue.toStdString());
   updateObject(myFeature);
+
+  if(!myFeature->firstResult().get())
+    return true;
+  
+  ResultParameterPtr aResult =
+      std::dynamic_pointer_cast<ModelAPI_ResultParameter>(myFeature->firstResult());
+  AttributeStringPtr aErrorAttr = aResult->data()->string(ModelAPI_ResultParameter::STATE());
+  myResultLabel->setText(QString::fromStdString(aErrorAttr->value()));
   return true;
 }
 

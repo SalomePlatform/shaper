@@ -22,6 +22,7 @@ ParametersPlugin_Parameter::ParametersPlugin_Parameter()
 
 ParametersPlugin_Parameter::~ParametersPlugin_Parameter()
 {
+  myInterp->destroy();
   delete myInterp;
 }
 
@@ -33,28 +34,49 @@ void ParametersPlugin_Parameter::initAttributes()
                        ModelAPI_AttributeString::typeId());
 }
 
+bool ParametersPlugin_Parameter::isInHistory()
+{
+  return false;
+}
+
 void ParametersPlugin_Parameter::execute()
 {
-  std::string anExpression = string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
-  if(anExpression.empty())
-    return;
+  ResultParameterPtr aParam = document()->createParameter(data());
 
-  ResultParameterPtr aParameterResult = document()->createParameter(data());
+  std::string anExpression = string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
+  if(anExpression.empty()) {
+    // clear error/result if the expression is empty
+    aParam->data()->string(ModelAPI_ResultParameter::STATE())->setValue("");
+    return;
+  }
   // Value
-  AttributeDoublePtr aValueAttribute = aParameterResult->data()->real(ModelAPI_ResultParameter::VALUE());
-  double aValue = evaluate(anExpression);
+  std::string outErrorMessage;
+  double aValue = evaluate(anExpression, outErrorMessage);
+  AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
   aValueAttribute->setValue(aValue);
-  setResult(aParameterResult);
+  setResult(aParam);
   // Name
   std::string aName = string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
   std::ostringstream sstream;
   sstream << aValue;
   std::string aParamValue = sstream.str();
   data()->setName(aName + " ("+ aParamValue + ")");
-  aParameterResult->data()->setName(aName);
+  aParam->data()->setName(aName);
+  // Error
+  AttributeStringPtr aErrorAttr = aParam->data()->string(ModelAPI_ResultParameter::STATE());
+  std::string aStateMsg;
+  if (outErrorMessage.empty()) {
+    aStateMsg = "Result: " + aParamValue;
+  } else {
+    aStateMsg = "Error:\n" + outErrorMessage;
+  }
+  aErrorAttr->setValue(aStateMsg);
+  //if(!outErrorMessage.empty()) {
+  //  data()->execState(ModelAPI_StateExecFailed);
+  //}
 }
 
-double ParametersPlugin_Parameter::evaluate(std::string theExpression)
+double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
 {
   std::list<std::string> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
@@ -72,7 +94,5 @@ double ParametersPlugin_Parameter::evaluate(std::string theExpression)
     aContext.push_back(aParamName + "=" + aParamValue);
   }
   myInterp->extendLocalContext(aContext);
-  std::string outError;
-  return myInterp->evaluate(theExpression, outError);
-
+  return myInterp->evaluate(theExpression, theError);
 }

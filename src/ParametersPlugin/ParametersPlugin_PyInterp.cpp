@@ -20,32 +20,7 @@ ParametersPlugin_PyInterp::~ParametersPlugin_PyInterp()
 
 std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& theExpression)
 {
-  PyGILState_STATE aGilState = PyGILState_Ensure();
-  std::list<std::string>  res = this->_compile(theExpression);
-  PyGILState_Release(aGilState);
-  return res;
-}
-
-void ParametersPlugin_PyInterp::extendLocalContext(const std::list<std::string>& theParameters)
-{
-  PyGILState_STATE aGilState = PyGILState_Ensure();
-  this->_extendLocalContext(theParameters);
-  PyGILState_Release(aGilState);
-}
-
-double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression,
-                                           std::string& theError)
-{
-  PyGILState_STATE aGilState = PyGILState_Ensure();
-  double res = this->_evaluate(theExpression, theError);
-  PyGILState_Release(aGilState);
-  return res;
-}
-
-
-std::list<std::string> ParametersPlugin_PyInterp::_compile(const std::string& theExpression)
-{
-
+  PyLockWrapper lck; // Acquire GIL until the end of the method
   std::list<std::string> aResult;
   PyObject *aCodeopModule = PyImport_AddModule("codeop");
   if(!aCodeopModule) { // Fatal error. No way to go on.
@@ -62,6 +37,7 @@ std::list<std::string> ParametersPlugin_PyInterp::_compile(const std::string& th
   }
 
   PyCodeObject* aCodeObj = (PyCodeObject*) aCodePyObj;
+  std::string aCodeName(PyString_AsString(aCodeObj->co_code));
   // co_names should be tuple, but can be changed in modern versions of python (>2.7.3)
   if(!PyTuple_Check(aCodeObj->co_names))
     return aResult;
@@ -80,8 +56,9 @@ std::list<std::string> ParametersPlugin_PyInterp::_compile(const std::string& th
   return aResult;
 }
 
-void ParametersPlugin_PyInterp::_extendLocalContext(const std::list<std::string>& theParameters)
+void ParametersPlugin_PyInterp::extendLocalContext(const std::list<std::string>& theParameters)
 {
+  PyLockWrapper lck; // Acquire GIL until the end of the method
   if (theParameters.empty())
     return;
   std::list<std::string>::const_iterator it = theParameters.begin();
@@ -92,8 +69,9 @@ void ParametersPlugin_PyInterp::_extendLocalContext(const std::list<std::string>
 }
 
 
-double ParametersPlugin_PyInterp::_evaluate(const std::string& theExpression, std::string& theError)
+double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression, std::string& theError)
 {
+  PyLockWrapper lck; // Acquire GIL until the end of the method
   PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileString(theExpression.c_str(),
                                                                "<string>", Py_eval_input);
   if(!anExprCode) {
@@ -115,7 +93,14 @@ double ParametersPlugin_PyInterp::_evaluate(const std::string& theExpression, st
   Py_XDECREF(anExprCode);
   Py_XDECREF(anEvalResult);
   Py_XDECREF(anEvalStrObj);
-  return std::stod(anEvalStr);
+  double result = 0.;
+  try {
+    result = std::stod(anEvalStr);
+  } catch (const std::invalid_argument&) {
+    theError = "Unable to eval " + anEvalStr;
+  }
+  
+  return result;
 }
 
 std::string ParametersPlugin_PyInterp::errorMessage()
@@ -133,4 +118,18 @@ std::string ParametersPlugin_PyInterp::errorMessage()
     Py_XDECREF(ptraceback);
   }
   return aPyError;
+}
+
+bool ParametersPlugin_PyInterp::initContext()
+{
+  PyObject *m = PyImport_AddModule("__main__");  // interpreter main module (module context)
+  if(!m){
+    PyErr_Print();
+    return false;
+  }
+  _global_context = PyModule_GetDict(m);          // get interpreter global variable context
+  Py_INCREF(_global_context);
+  _local_context = _global_context;
+
+  return PyRun_SimpleString("from math import *") == 0;
 }

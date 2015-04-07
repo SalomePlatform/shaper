@@ -51,11 +51,14 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   /// Request for initialization of data model of the feature: adding all attributes
   PARAMETERSPLUGIN_EXPORT virtual void initAttributes();
 
+  PARAMETERSPLUGIN_EXPORT virtual bool isInHistory(); //false
+  //bool isI
+
   /// Use plugin manager for features creation
   ParametersPlugin_Parameter();
 
  protected:
-  double evaluate(std::string);
+  double evaluate(const std::string& theExpression, std::string& theError);
 
  private:
   ParametersPlugin_PyInterp* myInterp;

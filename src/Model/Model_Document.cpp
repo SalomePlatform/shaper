@@ -13,6 +13,7 @@
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
 #include <Model_ResultGroup.h>
+#include <Model_ResultParameter.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
 
@@ -1234,7 +1235,7 @@ std::shared_ptr<ModelAPI_ResultParameter> Model_Document::createParameter(
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(anOldObject);
   }
   if (!aResult) {
-    aResult = std::shared_ptr<ModelAPI_ResultParameter>(new ModelAPI_ResultParameter);
+    aResult = std::shared_ptr<ModelAPI_ResultParameter>(new Model_ResultParameter);
     storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;

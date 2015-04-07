@@ -68,7 +68,6 @@ SET(PROJECT_SOURCES
     ModelAPI_Session.cpp
     ModelAPI_ShapeValidator.cpp
     ModelAPI_Tools.cpp
-    ModelAPI_ResultParameter.cpp
     ModelAPI_AttributeValidator.cpp
 )
 
