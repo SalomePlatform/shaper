@@ -282,7 +282,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributeRefAttrPtr theAttrib
 Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributePtr theEntity, int& theType)
 {
   Slvs_hEntity aResult = SLVS_E_UNKNOWN;
-  if (!isInitialized(theEntity))
+  if (!theEntity || !isInitialized(theEntity))
     return SLVS_E_UNKNOWN;
 
   // If the entity is already in the group, try to find it
@@ -378,7 +378,7 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributePtr theEntity, int& 
 Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& theType)
 {
   Slvs_hEntity aResult = SLVS_E_UNKNOWN;
-  if (!theEntity->data() || !theEntity->data()->isValid())
+  if (!theEntity || !theEntity->data() || !theEntity->data()->isValid())
     return SLVS_E_UNKNOWN;
   // If the entity is already in the group, try to find it
   std::map<FeaturePtr, Slvs_hEntity>::const_iterator anEntIter = myFeatureMap.find(theEntity);
