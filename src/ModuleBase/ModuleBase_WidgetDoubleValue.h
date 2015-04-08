@@ -10,7 +10,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
 
-class ModuleBase_DoubleSpinBox;
+class ModuleBase_ParamSpinBox;
 class Config_WidgetAPI;
 class QWidget;
 class QLabel;
@@ -63,7 +63,7 @@ protected:
   QLabel* myLabel;
 
   /// Input value control
-  ModuleBase_DoubleSpinBox* mySpinBox;
+  ModuleBase_ParamSpinBox* mySpinBox;
 };
 
 #endif

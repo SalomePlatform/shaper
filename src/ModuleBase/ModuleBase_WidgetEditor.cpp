@@ -5,7 +5,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <ModuleBase_WidgetEditor.h>
-#include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>

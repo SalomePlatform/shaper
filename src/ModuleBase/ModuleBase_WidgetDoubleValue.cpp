@@ -5,10 +5,11 @@
 // Author:      Vitaly Smetannikov
 
 #include <ModuleBase_WidgetDoubleValue.h>
-#include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 
 #include <Config_Keywords.h>
@@ -46,7 +47,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
 
-  mySpinBox = new ModuleBase_DoubleSpinBox(this);
+  mySpinBox = new ModuleBase_ParamSpinBox(this);
   QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
@@ -113,6 +114,11 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
   aReal->setValue(mySpinBox->value());
+  std::string aTextRepr;
+  if (mySpinBox->hasVariables()) {
+    aTextRepr = mySpinBox->text().toStdString();
+  }
+  aReal->setText(aTextRepr);
   updateObject(myFeature);
   return true;
 }
@@ -121,9 +127,12 @@ bool ModuleBase_WidgetDoubleValue::restoreValue()
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aRef = aData->real(attributeID());
-
-  ModuleBase_Tools::setSpinValue(mySpinBox, aRef->value());
-
+  std::string aTextRepr = aRef->text();
+  if (!aTextRepr.empty()) {
+    mySpinBox->setText(QString::fromStdString(aTextRepr));
+  } else {
+    ModuleBase_Tools::setSpinValue(mySpinBox, aRef->value());
+  }
   return true;
 }
 

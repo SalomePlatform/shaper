@@ -8,6 +8,9 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 
+#include <TCollection_AsciiString.hxx>
+#include <TCollection_ExtendedString.hxx>
+
 using namespace std;
 
 void Model_AttributeDouble::setValue(const double theValue)
@@ -30,5 +33,20 @@ Model_AttributeDouble::Model_AttributeDouble(TDF_Label& theLabel)
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just zero
     myReal = TDataStd_Real::Set(theLabel, 0.);
+    myText = TDataStd_Name::Set(theLabel, TCollection_ExtendedString());
   }
+}
+
+void Model_AttributeDouble::setText(const std::string& theValue)
+{
+  TCollection_ExtendedString aValue(theValue.c_str());
+  if (myText->Get() != aValue) {
+    myText->Set(aValue);
+    //owner()->data()->sendAttributeUpdated(this); ?
+  }
+}
+
+string Model_AttributeDouble::text()
+{
+  return TCollection_AsciiString(myText->Get()).ToCString();
 }
