@@ -13,6 +13,9 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_IPresentable.h>
 #include <GeomAPI_Ax3.h>
+#include <GeomAPI_XYZ.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Dir.h>
 #include <list>
 
 #define YZ_PLANE_COLOR "#ff0000"
@@ -85,7 +88,37 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   }
 
   /// Converts a 2D sketch space point into point in 3D space
-  SKETCHPLUGIN_EXPORT std::shared_ptr<GeomAPI_Pnt> to3D(const double theX, const double theY);
+  /// \param theX an X coordinate
+  /// \param theY an Y coordinate
+  std::shared_ptr<GeomAPI_Pnt> to3D(const double theX, const double theY) const
+  {
+    std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        data()->attribute(ORIGIN_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(NORM_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(DIRX_ID()));
+    std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+
+    std::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(aX->dir()->xyz()->multiplied(theX))
+        ->added(aY->xyz()->multiplied(theY));
+
+    return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
+  }
+  
+  /// Returns the point projected into the sketch plane
+  /// \param thePnt a source 3d point
+  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePnt) const
+  {
+    std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        data()->attribute(ORIGIN_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(NORM_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(DIRX_ID()));
+    std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+    return thePnt->to2D(aC->pnt(), aX->dir(), aY);
+  }
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory()
@@ -97,11 +130,43 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   SketchPlugin_Sketch();
 
   /// Returns the basis plane for the sketch
-  std::shared_ptr<GeomAPI_Pln> plane();
+  std::shared_ptr<GeomAPI_Pln> plane() const
+  {
+    std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        data()->attribute(ORIGIN_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(NORM_ID()));
 
-  SKETCHPLUGIN_EXPORT std::shared_ptr<GeomAPI_Ax3> coordinatePlane() const;
+    if (!anOrigin || !aNorm)
+      return std::shared_ptr<GeomAPI_Pln>();
 
-  //virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+    return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
+  }
+
+  /// Returns currently defined plane as an object of Ax3
+  std::shared_ptr<GeomAPI_Ax3> coordinatePlane() const
+  {
+    DataPtr aData = data();
+    std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      aData->attribute(ORIGIN_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(DIRX_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(NORM_ID()));
+
+    return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(aC->pnt(), aX->dir(), aNorm->dir()));
+  }
+
+  /// Checks whether the plane is set in the sketch.
+  /// \returns the boolean state
+  bool isPlaneSet() const
+  {
+    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(NORM_ID()));
+
+    return aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
+  }
+
 
   /// removes also all sub-sketch elements
   SKETCHPLUGIN_EXPORT virtual void erase();
@@ -128,14 +193,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 
-  /// Returns the point projected into the sketch plane
-  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePnt);
-
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
-protected:
-  /// Checks whether the plane is set in the sketch.
-  /// \returns the boolean state
-  bool isPlaneSet();
 };
 
 #endif
