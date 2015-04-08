@@ -699,6 +699,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverWindow = false;
+  myIsConstraintsShown = true;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
@@ -742,8 +743,12 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   aDisplayer->updateViewer();
 }
 
-void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* )
+void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
+  if (constraintsIdList().contains(theOperation->id())) {
+    // Show constraints if a constraint was created
+    onShowConstraintsToggle(true);
+  }
   connectToPropertyPanel(true);
 }
 
@@ -759,10 +764,6 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
   if (isNestedCreateOperation(theOperation))
     visualizeFeature(theOperation, true);
 
-  if (constraintsIdList().contains(theOperation->id())) {
-    // Show constraints if a constraint was created
-    onShowConstraintsToggle(true);
-  }
 }
 
 bool PartSet_SketcherMgr::canUndo() const
