@@ -90,6 +90,14 @@ class PartSet_TangentSelection : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Validators
+//! A class to validate a selection for Fillet constraints operation
+class PartSet_FilletSelection : public ModuleBase_SelectionValidator
+{
+ public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+};
+
 ////////////// Attribute validators ////////////////
 
 

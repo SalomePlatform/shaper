@@ -23,6 +23,7 @@
 #include <ModelAPI_Session.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <GeomAPI_Edge.h>
 
 #include <list>
 #ifdef _DEBUG
@@ -127,37 +128,53 @@ bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection) 
   return (aCount == 1);
 }
 
+bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbLines(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
 bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
-  ModuleBase_ViewerPrs aPrs;
-  if (aList.size() != 2)
+  if ((aList.size() == 0) || (aList.size() > 2))
     return false;
 
-  ModuleBase_ViewerPrs aPrs1 = aList.first();
-  ModuleBase_ViewerPrs aPrs2 = aList.last();
-
-  const TopoDS_Shape& aShape1 = aPrs1.shape();
-  const TopoDS_Shape& aShape2 = aPrs2.shape();
-  if (aShape1.IsNull() || aShape2.IsNull())
+  ModuleBase_ViewerPrs aPrs = aList.first();
+  const TopoDS_Shape& aShape = aPrs.shape();
+  if (aShape.IsNull())
     return false;
 
-  if ((aShape1.ShapeType() != TopAbs_EDGE) || (aShape2.ShapeType() != TopAbs_EDGE))
+  if (aShape.ShapeType() != TopAbs_EDGE)
     return false;
 
-  TopoDS_Edge aEdge1 = TopoDS::Edge(aShape1);
-  TopoDS_Edge aEdge2 = TopoDS::Edge(aShape2);
+  std::shared_ptr<GeomAPI_Shape> aShapePtr(new GeomAPI_Shape);
+  aShapePtr->setImpl(new TopoDS_Shape(aShape));
+  GeomAPI_Edge aEdge1(aShapePtr);
 
-  Standard_Real aStart, aEnd;
-  Handle(Geom_Curve) aCurve1 = BRep_Tool::Curve(aEdge1, aStart, aEnd);
-  Handle(Geom_Curve) aCurve2 = BRep_Tool::Curve(aEdge2, aStart, aEnd);
+  if (aEdge1.isLine() || aEdge1.isArc()) {
+    if (aList.size() == 2) {
+      // Check second selection
+      aPrs = aList.last();
+      const TopoDS_Shape& aShape2 = aPrs.shape();
+      if (aShape2.IsNull())
+        return false;
 
-  GeomAdaptor_Curve aAdaptor1(aCurve1);
-  GeomAdaptor_Curve aAdaptor2(aCurve2);
-  if (aAdaptor1.GetType() == GeomAbs_Circle)
-    return aAdaptor2.GetType() == GeomAbs_Line;
-  else if (aAdaptor2.GetType() == GeomAbs_Circle)
-    return aAdaptor1.GetType() == GeomAbs_Line;
+      if (aShape2.ShapeType() != TopAbs_EDGE)
+        return false;
+
+      std::shared_ptr<GeomAPI_Shape> aShapePtr2(new GeomAPI_Shape);
+      aShapePtr2->setImpl(new TopoDS_Shape(aShape2));
+      GeomAPI_Edge aEdge2(aShapePtr2);
+      if (aEdge1.isLine() && aEdge2.isArc())
+        return true;
+      else if (aEdge1.isArc() && aEdge2.isLine())
+        return true;
+      else
+        return false;
+    } else
+      return true;
+  }
   return false;
 }
 

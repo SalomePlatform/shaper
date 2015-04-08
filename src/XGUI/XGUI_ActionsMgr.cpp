@@ -131,35 +131,41 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   if (!myOperationMgr->hasOperation())
     return;
 
-  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
-  FeaturePtr anActiveFeature = anOperation->feature();
-  if(!anActiveFeature.get())
+  QStringList aIdList = myOperationMgr->operationList();
+  //ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+  //FeaturePtr anActiveFeature = anOperation->feature();
+  //if(!anActiveFeature.get())
+  if (aIdList.isEmpty())
     return;
 
-  QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
+  //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   if (aSelection->getSelected().size() == 0) {
-    foreach(QString aId, nestedCommands(aFeatureId)) {
-      setActionEnabled(aId, true);
+    foreach(QString aFeatureId, aIdList) {
+      foreach(QString aId, nestedCommands(aFeatureId)) {
+        setActionEnabled(aId, true);
+      }
     }
   } else { 
     SessionPtr aMgr = ModelAPI_Session::get();
     ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-    foreach(QString aId, nestedCommands(aFeatureId)) {
-      std::list<ModelAPI_Validator*> aValidators;
-      std::list<std::list<std::string> > anArguments;
-      aFactory->validators(aId.toStdString(), aValidators, anArguments);
-      std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-      std::list<std::list<std::string> >::iterator aValidatorArgs = anArguments.begin();
-      for (; aValidator != aValidators.end(); aValidator++, aValidatorArgs++) {
-        if (!(*aValidator))
-          continue;
-        const ModuleBase_SelectionValidator* aSelValidator =
-            dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
-        if (!aSelValidator)
-          continue;
-        setActionEnabled(aId, aSelValidator->isValid(aSelection, *aValidatorArgs));
+    foreach(QString aFeatureId, aIdList) {
+      foreach(QString aId, nestedCommands(aFeatureId)) {
+        std::list<ModelAPI_Validator*> aValidators;
+        std::list<std::list<std::string> > anArguments;
+        aFactory->validators(aId.toStdString(), aValidators, anArguments);
+        std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+        std::list<std::list<std::string> >::iterator aValidatorArgs = anArguments.begin();
+        for (; aValidator != aValidators.end(); aValidator++, aValidatorArgs++) {
+          if (!(*aValidator))
+            continue;
+          const ModuleBase_SelectionValidator* aSelValidator =
+              dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
+          if (!aSelValidator)
+            continue;
+          setActionEnabled(aId, aSelValidator->isValid(aSelection, *aValidatorArgs));
 
+        }
       }
     }
   }

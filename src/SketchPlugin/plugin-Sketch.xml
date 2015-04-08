@@ -204,21 +204,6 @@
         <validator id="PartSet_TangentSelection"/>
       </feature>
       
-    <!--  SketchConstraintMirror  -->
-      <feature
-        id="SketchConstraintMirror"
-        title="Mirror" icon=":icons/mirror.png"
-        tooltip="Create constraint, mirroring group of objects">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
-            label="Mirror line" tooltip="Select mirror line" shape_types="edge">
-            <validator id="GeomValidators_Edge" parameters="line"/>
-        </sketch_constraint_shape_selector>
-        <multi_selector id="ConstraintMirrorList" 
-            label="List of objects"
-            tooltip="Select list of mirroring objects"
-            type_choice="Edges">
-        </multi_selector>
-      </feature>
     </group>
     
     <group id="Edit">
@@ -235,6 +220,23 @@
         <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
+        <validator id="PartSet_FilletSelection"/>
+      </feature>
+      
+      <!--  SketchConstraintMirror  -->
+      <feature
+        id="SketchConstraintMirror"
+        title="Mirror" icon=":icons/mirror.png"
+        tooltip="Create constraint, mirroring group of objects">
+        <sketch_constraint_shape_selector id="ConstraintEntityA"
+            label="Mirror line" tooltip="Select mirror line" shape_types="edge">
+          <validator id="GeomValidators_Edge" parameters="line"/>
+        </sketch_constraint_shape_selector>
+        <multi_selector id="ConstraintMirrorList"
+            label="List of objects"
+            tooltip="Select list of mirroring objects"
+            type_choice="Edges">
+        </multi_selector>
       </feature>
     </group>
   </workbench>

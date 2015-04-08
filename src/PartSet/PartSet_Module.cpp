@@ -139,6 +139,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_CoincidentSelection", new PartSet_CoincidentSelection);
   aFactory->registerValidator("PartSet_HVDirSelection", new PartSet_HVDirSelection);
   aFactory->registerValidator("PartSet_TangentSelection", new PartSet_TangentSelection);
+  aFactory->registerValidator("PartSet_FilletSelection", new PartSet_FilletSelection);
 
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
