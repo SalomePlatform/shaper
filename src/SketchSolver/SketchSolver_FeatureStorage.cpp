@@ -211,16 +211,32 @@ void SketchSolver_FeatureStorage::removeFeature(FeaturePtr theFeature, Constrain
   if (aFeatIter == myFeatures.end())
     return; // no such feature
 
-  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
-  std::list<AttributePtr>::iterator anIter = anAttributes.begin();
-  for (; anIter != anAttributes.end(); anIter++) {
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
-    if (aRefAttr) {
-      if (!aRefAttr->isObject())
-        removeAttribute(aRefAttr->attr(), theFeature);
-      continue;
+  if (theFeature->data()) {
+    std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
+    std::list<AttributePtr>::iterator anIter = anAttributes.begin();
+    for (; anIter != anAttributes.end(); anIter++) {
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
+      if (aRefAttr) {
+        if (!aRefAttr->isObject())
+          removeAttribute(aRefAttr->attr(), theFeature);
+        continue;
+      }
+      removeAttribute(*anIter, theFeature);
     }
-    removeAttribute(*anIter, theFeature);
+  } else {
+    // iterate on attributes to find items refered to theFeature
+    MapAttributeFeature::iterator anIter = myAttributes.begin();
+    while (anIter != myAttributes.end()) {
+      if (anIter->second.find(theFeature) != anIter->second.end()) {
+        anIter->second.erase(theFeature);
+        if (anIter->second.empty()) {
+          MapAttributeFeature::iterator aDeadIter = anIter++;
+          myAttributes.erase(aDeadIter);
+          continue;
+        }
+      }
+      anIter++;
+    }
   }
 
   aFeatIter->second.erase(theConstraint);
