@@ -52,7 +52,16 @@ void SketcherPrs_Equal::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quan
   Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
+  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aObj);
+  if (aLine.get() == NULL)
+    return;
+  drawShape(aLine, thePrs);
+
+  aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+  aLine = SketcherPrs_Tools::getShape(aObj);
+  if (aLine.get() == NULL)
+    return;
+  drawShape(aLine, thePrs);
 }
 

@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
 	SketcherPrs_SensitivePoint.h
 	SketcherPrs_Radius.h
 	SketcherPrs_LengthDimension.h
+	SketcherPrs_Mirror.h
 )
 
 SET(PROJECT_SOURCES
@@ -33,6 +34,7 @@ SET(PROJECT_SOURCES
 	SketcherPrs_SensitivePoint.cpp
 	SketcherPrs_Radius.cpp
 	SketcherPrs_LengthDimension.cpp
+	SketcherPrs_Mirror.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -62,6 +64,7 @@ SET(PROJECT_PICTURES
 	icons/vertical.png
 	icons/equal.png
 	icons/tangent.png
+	icons/mirror.png
 )
 
 ADD_DEFINITIONS(-DSKETCHERPRS_EXPORTS ${CAS_DEFINITIONS})

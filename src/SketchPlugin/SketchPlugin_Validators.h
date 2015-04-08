@@ -76,5 +76,21 @@ class SketchPlugin_EqualAttrValidator : public ModelAPI_AttributeValidator
                        const std::list<std::string>& theArguments) const;
 };
 
+/**\class SketchPlugin_MirrorAttrValidator
+ * \ingroup Validators
+ * \brief Validator for the mirror constraint input.
+ *
+ * It checks that attributes of the Mirror constraint are correct.
+ */
+class SketchPlugin_MirrorAttrValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute (not used)
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const;
+};
+
 
 #endif

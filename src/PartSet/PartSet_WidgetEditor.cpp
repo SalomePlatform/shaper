@@ -24,8 +24,8 @@ bool PartSet_WidgetEditor::focusTo()
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule->isMouseOverWindow())
-    return ModuleBase_WidgetDoubleValue::focusTo();
+    return ModuleBase_WidgetEditor::focusTo();
   else {
-    ModuleBase_WidgetEditor::focusTo();
+    return ModuleBase_WidgetDoubleValue::focusTo();
   }
 }

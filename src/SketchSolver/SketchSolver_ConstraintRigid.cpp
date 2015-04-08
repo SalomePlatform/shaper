@@ -117,6 +117,11 @@ void SketchSolver_ConstraintRigid::getAttributes(
       myFeatureMap[myBaseFeature] = anEntityID;
   }
 
+  if (anEntityID == SLVS_E_UNKNOWN) {
+    myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
+    return;
+  }
+
   // Check the entity is complex
   Slvs_Entity anEntity = myStorage->getEntity(anEntityID);
   if (anEntity.point[0] != SLVS_E_UNKNOWN) {

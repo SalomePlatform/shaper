@@ -157,27 +157,29 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 
 void PartSet_SketcherMgr::onEnterViewPort()
 {
-  if (!isNestedCreateOperation(getCurrentOperation()))
-    return;
   // 1. if the mouse over window, update the next flag. Do not perform update visibility of
   // created feature because it should be done in onMouseMove(). Some widgets watch
   // the mouse move and use the cursor position to update own values. If the presentaion is
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
   myIsPropertyPanelValueChanged = false;
+
+  if (!isNestedCreateOperation(getCurrentOperation()))
+    return;
 }
 
 void PartSet_SketcherMgr::onLeaveViewPort()
 {
+  myIsMouseOverViewProcessed = false;
+  myIsMouseOverWindow = false;
+  myIsPropertyPanelValueChanged = false;
+
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
   // the method should be performed if the popup menu is called,
   // the reset of the current widget should not happen
   if (myIsPopupMenuActive)
     return;
-
-  myIsMouseOverViewProcessed = false;
-  myIsMouseOverWindow = false;
 
   // 2. if the mouse IS NOT over window, reset the active widget value and hide the presentation
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
@@ -195,7 +197,7 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
 
   // hides the presentation of the current operation feature
-  myIsPropertyPanelValueChanged = false;
+  //myIsPropertyPanelValueChanged = false;
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
   FeaturePtr aFeature = getCurrentOperation()->feature();
@@ -697,6 +699,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverWindow = false;
+  myIsConstraintsShown = true;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
@@ -740,8 +743,12 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   aDisplayer->updateViewer();
 }
 
-void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* )
+void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
+  if (constraintsIdList().contains(theOperation->id())) {
+    // Show constraints if a constraint was created
+    onShowConstraintsToggle(true);
+  }
   connectToPropertyPanel(true);
 }
 
@@ -757,10 +764,6 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
   if (isNestedCreateOperation(theOperation))
     visualizeFeature(theOperation, true);
 
-  if (constraintsIdList().contains(theOperation->id())) {
-    // Show constraints if a constraint was created
-    onShowConstraintsToggle(true);
-  }
 }
 
 bool PartSet_SketcherMgr::canUndo() const

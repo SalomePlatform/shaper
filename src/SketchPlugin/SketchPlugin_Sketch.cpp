@@ -12,10 +12,7 @@
 #include <GeomAPI_AISObject.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_PlanarEdges.h>
-#include <GeomAPI_XYZ.h>
 
-#include <GeomDataAPI_Dir.h>
-#include <GeomDataAPI_Point.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <ModelAPI_AttributeRefList.h>
@@ -188,69 +185,6 @@ bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
   return false;
 }
 
-std::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
-{
-  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-      data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
-
-  std::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(aX->dir()->xyz()->multiplied(theX))
-      ->added(aY->xyz()->multiplied(theY));
-
-  return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
-}
-
-std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Sketch::to2D(
-  const std::shared_ptr<GeomAPI_Pnt>& thePnt)
-{
-  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-      data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
-  return thePnt->to2D(aC->pnt(), aX->dir(), aY);
-}
-
-
-bool SketchPlugin_Sketch::isPlaneSet()
-{
-  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-
-  return aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
-}
-
-std::shared_ptr<GeomAPI_Pln> SketchPlugin_Sketch::plane()
-{
-  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-      data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-
-  if (!anOrigin || !aNorm)
-    return std::shared_ptr<GeomAPI_Pln>();
-
-  return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
-}
-
-std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::coordinatePlane() const
-{
-  DataPtr aData = data();
-  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-    aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-    aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-    aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-
-  return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(aC->pnt(), aX->dir(), aNorm->dir()));
-}
 
 void SketchPlugin_Sketch::erase()
 {

@@ -706,7 +706,9 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
-  GetFilter()->Remove(theFilter);
+  Handle(SelectMgr_AndFilter) aCompositeFilter = GetFilter();
+  if (aCompositeFilter->IsIn(theFilter))
+    aCompositeFilter->Remove(theFilter);
 }
 
 void XGUI_Displayer::removeFilters()

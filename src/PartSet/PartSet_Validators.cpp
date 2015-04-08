@@ -23,6 +23,7 @@
 #include <ModelAPI_Session.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <GeomAPI_Edge.h>
 
 #include <list>
 #ifdef _DEBUG
@@ -63,31 +64,31 @@ int shapesNbLines(const ModuleBase_ISelection* theSelection)
   return aCount;
 }
 
-bool PartSet_DistanceValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
   return (aCount > 0) && (aCount < 3);
 }
 
-bool PartSet_LengthValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 2);
+  return (aCount == 1);
 }
 
-bool PartSet_PerpendicularValidator::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
-
-bool PartSet_ParallelValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbLines(theSelection);
   return (aCount > 0) && (aCount < 3);
 }
 
-bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbLines(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
+bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
   ModuleBase_ViewerPrs aPrs;
@@ -105,14 +106,78 @@ bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection)
       }
     }
   }
-  return (aCount > 0) && (aCount < 2);
+  return (aCount == 1);
 }
 
-bool PartSet_RigidValidator::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();  
+  return (aList.count() == 1);
+}
+
+
+bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbPoints(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
+bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
   int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 2);
+  return (aCount == 1);
 }
+
+bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbLines(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
+bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
+  if ((aList.size() == 0) || (aList.size() > 2))
+    return false;
+
+  ModuleBase_ViewerPrs aPrs = aList.first();
+  const TopoDS_Shape& aShape = aPrs.shape();
+  if (aShape.IsNull())
+    return false;
+
+  if (aShape.ShapeType() != TopAbs_EDGE)
+    return false;
+
+  std::shared_ptr<GeomAPI_Shape> aShapePtr(new GeomAPI_Shape);
+  aShapePtr->setImpl(new TopoDS_Shape(aShape));
+  GeomAPI_Edge aEdge1(aShapePtr);
+
+  if (aEdge1.isLine() || aEdge1.isArc()) {
+    if (aList.size() == 2) {
+      // Check second selection
+      aPrs = aList.last();
+      const TopoDS_Shape& aShape2 = aPrs.shape();
+      if (aShape2.IsNull())
+        return false;
+
+      if (aShape2.ShapeType() != TopAbs_EDGE)
+        return false;
+
+      std::shared_ptr<GeomAPI_Shape> aShapePtr2(new GeomAPI_Shape);
+      aShapePtr2->setImpl(new TopoDS_Shape(aShape2));
+      GeomAPI_Edge aEdge2(aShapePtr2);
+      if (aEdge1.isLine() && aEdge2.isArc())
+        return true;
+      else if (aEdge1.isArc() && aEdge2.isLine())
+        return true;
+      else
+        return false;
+    } else
+      return true;
+  }
+  return false;
+}
+
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments) const

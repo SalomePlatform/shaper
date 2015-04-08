@@ -23,9 +23,7 @@ namespace SketcherPrs_Tools {
 ObjectPtr getResult(ModelAPI_Feature* theFeature, const std::string& theAttrName)
 {
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(theAttrName));
-
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(theAttrName);
   return anAttr->object();
 }
 

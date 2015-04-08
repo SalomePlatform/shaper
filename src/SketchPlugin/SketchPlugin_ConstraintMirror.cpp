@@ -187,7 +187,9 @@ AISObjectPtr SketchPlugin_ConstraintMirror::getAISObject(AISObjectPtr thePreviou
     return thePrevious;
 
   AISObjectPtr anAIS = thePrevious;
-  /// TODO: Equal constraint presentation should be put here
+  if (!anAIS) {
+    anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch()->coordinatePlane());
+  }
   return anAIS;
 }
 

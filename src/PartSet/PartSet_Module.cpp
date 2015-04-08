@@ -130,12 +130,17 @@ void PartSet_Module::registerValidators()
   //Registering of validators
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);
-  aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
-  aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
-  aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
-  aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
-  aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
+  aFactory->registerValidator("PartSet_DistanceSelection", new PartSet_DistanceSelection);
+  aFactory->registerValidator("PartSet_LengthSelection", new PartSet_LengthSelection);
+  aFactory->registerValidator("PartSet_PerpendicularSelection", new PartSet_PerpendicularSelection);
+  aFactory->registerValidator("PartSet_ParallelSelection", new PartSet_ParallelSelection);
+  aFactory->registerValidator("PartSet_RadiusSelection", new PartSet_RadiusSelection);
+  aFactory->registerValidator("PartSet_RigidSelection", new PartSet_RigidSelection);
+  aFactory->registerValidator("PartSet_CoincidentSelection", new PartSet_CoincidentSelection);
+  aFactory->registerValidator("PartSet_HVDirSelection", new PartSet_HVDirSelection);
+  aFactory->registerValidator("PartSet_TangentSelection", new PartSet_TangentSelection);
+  aFactory->registerValidator("PartSet_FilletSelection", new PartSet_FilletSelection);
+
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
 

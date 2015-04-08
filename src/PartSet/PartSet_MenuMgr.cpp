@@ -7,6 +7,7 @@
 #include "PartSet_MenuMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_SketcherMgr.h"
+#include "PartSet_Tools.h"
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
@@ -15,6 +16,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Sketch.h>
 
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_Operation.h>
@@ -29,6 +31,9 @@
 
 #include <QAction>
 #include <QMenu>
+
+#include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
 
 PartSet_MenuMgr::PartSet_MenuMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myPrevId(-1)
@@ -117,7 +122,7 @@ void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList, std::
   if (!theList.contains(aObj)) {
     std::shared_ptr<GeomAPI_Pnt2d> aOrig = getPoint(theStartCoin, theAttr);
     theList.append(aObj);
-    const std::set<AttributePtr> aRefsList = aObj->data()->refsToMe();
+    const std::set<AttributePtr>& aRefsList = aObj->data()->refsToMe();
     std::set<AttributePtr>::const_iterator aIt;
     for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
       std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
@@ -143,43 +148,76 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
 
   myCoinsideLines.clear();
   ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
-  QObjectPtrList aObjects = aSelection->selectedPresentations();
-  if (aObjects.size() > 0) {
+
+  NCollection_List<TopoDS_Shape> aShapeList;
+  std::list<ObjectPtr> aObjectsList;
+  aSelection->selectedShapes(aShapeList, aObjectsList);
+  bool aIsDetach = false;
+
+  if (aShapeList.Extent() == 1) {
+    TopoDS_Shape aShape = aShapeList.First();
+    if (aShape.ShapeType() == TopAbs_VERTEX) {
+      // Find 2d coordinates
+      FeaturePtr aSketchFea = myModule->sketchMgr()->activeSketch();
+      std::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        std::dynamic_pointer_cast<SketchPlugin_Sketch>(aSketchFea);
+      gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+      std::shared_ptr<GeomAPI_Pnt> aPnt3d(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+      std::shared_ptr<GeomAPI_Pnt2d> aSelPnt = aSketch->to2D(aPnt3d);
+
+      // Find coincident in these coordinates
+      ObjectPtr aObj = aObjectsList.front();
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+      const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aIt;
+      FeaturePtr aCoincident;
+      for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+        std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+        FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+        if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+          std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+          if (aSelPnt->isEqual(a2dPnt)) {
+            aCoincident = aConstrFeature;
+            break;
+          }
+        }
+      }
+      // If we have coincidence then add Detach menu
+      if (aCoincident.get() != NULL) {
+        mySelectedFeature = aCoincident;
+        findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+        findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_B());
+        if (myCoinsideLines.size() > 0) {
+          aIsDetach = true;
+          QMenu* aSubMenu = theMenu->addMenu(tr("Detach"));
+          QAction* aAction;
+          int i = 0;
+          foreach (FeaturePtr aCoins, myCoinsideLines) {
+            aAction = aSubMenu->addAction(aCoins->data()->name().c_str());
+            aAction->setData(QVariant(i));
+            i++;
+          }
+          connect(aSubMenu, SIGNAL(hovered(QAction*)), SLOT(onLineHighlighted(QAction*)));
+          connect(aSubMenu, SIGNAL(aboutToHide()), SLOT(onDetachMenuHide()));
+          connect(aSubMenu, SIGNAL(triggered(QAction*)), SLOT(onLineDetach(QAction*)));
+        } 
+      }
+    }
+  }
+  if ((!aIsDetach) && (aObjectsList.size() > 0)) {
     bool hasFeature = false;
     FeaturePtr aFeature;
-    foreach(ObjectPtr aObject, aObjects) {
+    std::list<ObjectPtr>::const_iterator aIt;
+    ObjectPtr aObject;
+    for (aIt = aObjectsList.cbegin(); aIt != aObjectsList.cend(); ++aIt) {
+      aObject = (*aIt);
       aFeature = ModelAPI_Feature::feature(aObject);
       if (aFeature.get() != NULL) {
         hasFeature = true;
       }
     }
-    if (hasFeature) {
-      bool aIsDetach = false;
-      if (aObjects.size() == 1) {
-        if (aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-          /// If the feature is coincident then we use Detach command instead Delete
-          mySelectedFeature = aFeature;
-          findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_A());
-          findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_B());
-          if (myCoinsideLines.size() > 0) {
-            aIsDetach = true;
-            QMenu* aSubMenu = theMenu->addMenu(tr("Detach"));
-            QAction* aAction;
-            int i = 0;
-            foreach (FeaturePtr aCoins, myCoinsideLines) {
-              aAction = aSubMenu->addAction(aCoins->data()->name().c_str());
-              aAction->setData(QVariant(i));
-              i++;
-            }
-            connect(aSubMenu, SIGNAL(hovered(QAction*)), SLOT(onLineHighlighted(QAction*)));
-            connect(aSubMenu, SIGNAL(aboutToHide()), SLOT(onDetachMenuHide()));
-            connect(aSubMenu, SIGNAL(triggered(QAction*)), SLOT(onLineDetach(QAction*)));
-          } 
-        }
-      } 
-      if (!aIsDetach)
+    if (hasFeature)
         theMenu->addAction(theStdActions["DELETE_CMD"]);
-    }
   }
   bool isAuxiliary;
   if (canSetAuxiliary(isAuxiliary)) {
