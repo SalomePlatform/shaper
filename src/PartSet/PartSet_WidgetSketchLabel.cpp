@@ -245,6 +245,7 @@ void PartSet_WidgetSketchLabel::deactivate()
   //XGUI_Displayer* aDisp = myWorkshop->displayer();
   //aDisp->closeLocalContexts();
   erasePreviewPlanes();
+  activateFilters(myWorkshop->module()->workshop(), false);
 }
 
 void PartSet_WidgetSketchLabel::erasePreviewPlanes()

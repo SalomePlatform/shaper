@@ -465,12 +465,15 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
       // Create line
       aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
     } else if (aAdaptor.GetType() == GeomAbs_Circle) {
-      if (aAdaptor.IsClosed()) {
-        // Create circle
-        aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
-      } else {
+      std::shared_ptr<GeomAPI_Edge> anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge);
+      anEdge->setImpl(new TopoDS_Shape(theShape));
+      if (anEdge->isArc()) {
         // Create arc
         aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+      }
+      else {
+        // Create circle
+        aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
       }
     }
     if (aMyFeature) {

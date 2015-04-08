@@ -265,10 +265,10 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
         theMenu->addAction(action("SHOW_CMD"));
       //theMenu->addAction(action("DELETE_CMD"));
     }
-    if (myWorkshop->canChangeColor())
-      theMenu->addAction(action("COLOR_CMD"));
     if (myWorkshop->displayer()->objectsCount() > 0)
       theMenu->addAction(action("HIDEALL_CMD"));
+    if (myWorkshop->canChangeColor())
+      theMenu->addAction(action("COLOR_CMD"));
   }
   if (!myWorkshop->isSalomeMode()) {
     theMenu->addSeparator();

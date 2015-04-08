@@ -18,8 +18,10 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
 Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
-  ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+  if (!anOperation)
+    return true;
 
+  ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
   ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
   ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                           (anActiveWidget);
