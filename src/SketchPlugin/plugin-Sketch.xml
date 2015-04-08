@@ -196,6 +196,7 @@
         <sketch_constraint_shape_selector id="ConstraintEntityB"
             label="Last object" tooltip="Select line or arc" shape_types="edge">
         <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityA"/>
+        <validator id="PartSet_DifferentObjects"/>
         </sketch_constraint_shape_selector>
       </feature>
       
