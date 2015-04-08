@@ -77,7 +77,7 @@ class ModelAPI_Attribute
   MODELAPI_EXPORT ModelAPI_Attribute();
 
   /// Sets the ID of the attribute in Data (called from Data)
-  MODELAPI_EXPORT void setID(const std::string theID);
+  MODELAPI_EXPORT virtual void setID(const std::string theID);
 
   friend class Model_Data;
 };

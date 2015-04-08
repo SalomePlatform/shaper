@@ -202,6 +202,6 @@ bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
     }
     anExtraIt++;
   }
-  return isFullyRemoved;
+  return mySlvsConstraints.empty();
 }
 

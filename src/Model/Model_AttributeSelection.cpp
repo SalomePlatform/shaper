@@ -171,6 +171,12 @@ Model_AttributeSelection::Model_AttributeSelection(TDF_Label& theLabel)
   myIsInitialized = myRef.isInitialized();
 }
 
+void Model_AttributeSelection::setID(const std::string theID)
+{
+  myRef.setID(theID);
+  ModelAPI_AttributeSelection::setID(theID);
+}
+
 ResultPtr Model_AttributeSelection::context() {
   return std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
 }

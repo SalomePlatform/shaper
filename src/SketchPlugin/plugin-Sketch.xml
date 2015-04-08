@@ -217,6 +217,7 @@
             label="List of objects"
             tooltip="Select list of mirroring objects"
             type_choice="Edges">
+            <validator id="SketchPlugin_MirrorAttr" />
         </multi_selector>
       </feature>
     </group>

@@ -71,6 +71,9 @@ protected:
   /// Returns the prepared map of valid labels for naming selection solving (creates if not exists)
   TDF_LabelMap& scope();
 
+  /// Sets the ID of the attribute in Data (called from Data): here it is used for myRef ID setting
+  MODELAPI_EXPORT virtual void setID(const std::string theID);
+
   friend class Model_Data;
   friend class Model_AttributeSelectionList;
 };
