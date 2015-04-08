@@ -29,6 +29,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
   if (theObject.get() != NULL) {
     aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
     myRef->Remove(aData->label().Father());
+    REMOVE_BACK_REF(theObject);
   }
   else { // in case of empty object remove, the first empty object is removed from the list
     std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(

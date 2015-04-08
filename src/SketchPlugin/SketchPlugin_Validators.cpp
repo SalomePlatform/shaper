@@ -18,6 +18,8 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Session.h>
 
 #include <GeomValidators_Edge.h>
@@ -208,6 +210,29 @@ bool SketchPlugin_EqualAttrValidator::isValid(
   if ((aType[0] == 1 && aType[1] == 2) ||
       (aType[0] == 2 && aType[1] == 1))
     return false;
+  return true;
+}
+
+bool SketchPlugin_MirrorAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeSelectionListPtr aSelAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelAttr)
+    return false;
+
+  AttributeRefListPtr aRefListOfMirrored = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      aFeature->attribute(SketchPlugin_Constraint::ENTITY_C()));
+  std::list<ObjectPtr> aMirroredObjects = aRefListOfMirrored->list();
+
+  for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aSelAttr->value(anInd);
+    std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
+    for (; aMirIter != aMirroredObjects.end(); aMirIter++)
+      if (aSelect->context() == *aMirIter)
+        return false;
+  }
   return true;
 }
 

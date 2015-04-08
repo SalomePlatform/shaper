@@ -39,6 +39,7 @@ void Model_AttributeSelectionList::append(
   if (owner()) {
     aNewAttr->setObject(owner());
   }
+  aNewAttr->setID(id());
   mySize->Set(aNewTag);
   aNewAttr->setValue(theContext, theSubShape);
   owner()->data()->sendAttributeUpdated(this);

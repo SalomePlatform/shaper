@@ -204,6 +204,7 @@
         <validator id="PartSet_TangentSelection"/>
       </feature>
       
+         
     </group>
     
     <group id="Edit">
@@ -230,12 +231,13 @@
         tooltip="Create constraint, mirroring group of objects">
         <sketch_constraint_shape_selector id="ConstraintEntityA"
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
-          <validator id="GeomValidators_Edge" parameters="line"/>
+            <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_constraint_shape_selector>
         <multi_selector id="ConstraintMirrorList"
             label="List of objects"
             tooltip="Select list of mirroring objects"
             type_choice="Edges">
+            <validator id="SketchPlugin_MirrorAttr" />
         </multi_selector>
       </feature>
     </group>
