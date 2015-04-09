@@ -159,6 +159,20 @@ void SketchSolver_ConstraintMirror::process()
             0.0, aBothMiddlePoints[i], SLVS_E_UNKNOWN, aBothArcs[i].h, SLVS_E_UNKNOWN);
         aPonCircConstr.h = myStorage->addConstraint(aPonCircConstr);
         mySlvsConstraints.push_back(aPonCircConstr.h);
+        if (i == 0) {
+          // additional constraint for the point to be in the middle of a base arc
+          Slvs_Entity aLine1 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
+              myGroup->getWorkplaneId(), aBothArcs[i].point[1], aBothMiddlePoints[i]);
+          aLine1.h = myStorage->addEntity(aLine1);
+          Slvs_Entity aLine2 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
+              myGroup->getWorkplaneId(), aBothArcs[i].point[2], aBothMiddlePoints[i]);
+          aLine2.h = myStorage->addEntity(aLine2);
+          Slvs_Constraint aMiddleConstr = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
+              SLVS_C_EQUAL_LENGTH_LINES, myGroup->getWorkplaneId(),
+              0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aLine1.h, aLine2.h);
+          aMiddleConstr.h = myStorage->addConstraint(aMiddleConstr);
+          mySlvsConstraints.push_back(aMiddleConstr.h);
+        }
       }
 
       aBaseArcPoints[2] = aBothMiddlePoints[0];
@@ -319,6 +333,7 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     if (aPonCircA.h == SLVS_E_UNKNOWN || aPonCircB.h == SLVS_E_UNKNOWN)
       continue;
 
+    bool aNeedToResolve = myStorage->isNeedToResolve();
     // Calculate middle point for base arc and mirrored point on mirror arc
     Slvs_Entity aBaseArc = myStorage->getEntity(aPonCircA.entityA);
     Slvs_Entity aBasePoint = myStorage->getEntity(aPonCircA.ptA);
@@ -327,7 +342,14 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     calculateMiddlePoint(aBaseArc, 0.5, aParamX.val, aParamY.val);
     myStorage->updateParameter(aParamX);
     myStorage->updateParameter(aParamY);
+    Slvs_Entity aMirrorArc = myStorage->getEntity(aPonCircB.entityA);
     Slvs_Entity aMirrorPoint = myStorage->getEntity(aPonCircB.ptA);
-    makeMirrorEntity(aBasePoint, aMirrorPoint, aStartEnd);
+    aParamX = myStorage->getParameter(aMirrorPoint.param[0]);
+    aParamY = myStorage->getParameter(aMirrorPoint.param[1]);
+    calculateMiddlePoint(aMirrorArc, 0.5, aParamX.val, aParamY.val);
+    myStorage->updateParameter(aParamX);
+    myStorage->updateParameter(aParamY);
+    // To avoid looped recalculations of sketch
+    myStorage->setNeedToResolve(aNeedToResolve);
   }
 }

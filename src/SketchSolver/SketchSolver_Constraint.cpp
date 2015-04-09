@@ -618,18 +618,24 @@ void SketchSolver_Constraint::calculateMiddlePoint(
 
     double xStart = anArcPoint[1][0] / aRad, xEnd = anArcPoint[2][0] / aRad;
     double yStart = anArcPoint[1][1] / aRad, yEnd = anArcPoint[2][1] / aRad;
+    double aTanStart = abs(xStart) < tolerance ? yStart : yStart / xStart;
+    double aTanEnd   = abs(xEnd) < tolerance   ? yEnd   : yEnd / xEnd;
+    double aCotStart = abs(yStart) < tolerance ? xStart : xStart / yStart;
+    double aCotEnd   = abs(yEnd) < tolerance   ? xEnd   : xEnd / yEnd;
     if (anArcPoint[1][0] * anArcPoint[2][0] < 0.0) {
       if (anArcPoint[1][0] > 0.0)
         yEnd = 2.0 - yEnd;
       else
         yStart = -2.0 - yStart;
     } else {
-      if (yStart > yEnd) {
-        yStart = 2.0 - yStart;
-        yEnd = -2.0 - yEnd;
-      } else {
-        yStart = -2.0 - yStart;
-        yEnd = 2.0 - yEnd;
+      if (aTanStart > aTanEnd) {
+        if (yStart > yEnd) {
+          yStart = 2.0 - yStart;
+          yEnd = -2.0 - yEnd;
+        } else {
+          yStart = -2.0 - yStart;
+          yEnd = 2.0 - yEnd;
+        }
       }
     }
     if (anArcPoint[1][1] * anArcPoint[2][1] < 0.0) {
@@ -638,12 +644,14 @@ void SketchSolver_Constraint::calculateMiddlePoint(
       else
         xStart = -2.0 - xStart;
     } else {
-      if (xStart > xEnd) {
-        xStart = 2.0 - xStart;
-        xEnd = -2.0 - xEnd;
-      } else {
-        xStart = -2.0 - xStart;
-        xEnd = 2.0 - xEnd;
+      if (aCotStart < aCotEnd) {
+        if (xStart > xEnd) {
+          xStart = 2.0 - xStart;
+          xEnd = -2.0 - xEnd;
+        } else {
+          xStart = -2.0 - xStart;
+          xEnd = 2.0 - xEnd;
+        }
       }
     }
     x = (1.0 - theCoeff) * xStart + theCoeff * xEnd;
