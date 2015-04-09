@@ -27,6 +27,10 @@ public:
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
+
+  /// \brief This method is used in derived objects to check consistence of constraint.
+  ///        E.g. the distance between line and point may be signed.
+  virtual void adjustConstraint();
 };
 
 #endif

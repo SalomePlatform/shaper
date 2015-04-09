@@ -9,6 +9,8 @@
 
 #include "ModuleBase.h"
 
+#include <ModelAPI_Feature.h>
+
 #include <QPixmap>
 
 class QWidget;
@@ -56,6 +58,11 @@ MODULEBASE_EXPORT QPixmap lighter(const QString& theIcon, const int theLighterVa
 /// \param theSpin an X or Y coordinate widget
 /// \param theValue a new value
 MODULEBASE_EXPORT void setSpinValue(QDoubleSpinBox* theSpin, double theValue);
+
+/// Converts the object to the feature or a result and generate information string
+/// \param theObj an object
+/// \return a string
+MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj);
 
 }
 

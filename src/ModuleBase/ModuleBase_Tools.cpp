@@ -5,6 +5,10 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_Tools.h"
+
+#include <ModelAPI_Result.h>
+#include <ModelAPI_Data.h>
+
 #include <QWidget>
 #include <QLayout>
 #include <QPainter>
@@ -103,6 +107,23 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
   theSpin->blockSignals(isBlocked);
+}
+
+QString objectInfo(const ObjectPtr& theObj)
+{
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+  FeaturePtr aFeature;// = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
+  QString aFeatureStr = "feature";
+  if(aRes.get()) {
+    aFeatureStr.append("(Result)");
+    //aFeature = ModelAPI_Feature::feature(aRes);
+  }
+  if (aFeature.get()) {
+    aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
+    if (aFeature->data().get() && aFeature->data()->isValid())
+      aFeatureStr.append(QString("(name=%1)").arg(aFeature->data()->name().c_str()).toStdString().c_str());
+  }
+  return aFeatureStr;
 }
 
 }

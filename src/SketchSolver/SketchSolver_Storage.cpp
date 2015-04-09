@@ -151,19 +151,13 @@ bool SketchSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
       if (anEntIter->distance == theEntityID)
         return false;
     }
-    std::set<Slvs_hEntity> anEntAndSubs;
-    anEntAndSubs.insert(theEntityID);
-    for (int i = 0; i < 4; i++)
-      if (myEntities[aPos].point[i] != SLVS_E_UNKNOWN)
-        anEntAndSubs.insert(myEntities[aPos].point[i]);
-
     std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
     for (; aConstrIter != myConstraints.end(); aConstrIter++) {
       Slvs_hEntity anEntIDs[6] = {aConstrIter->ptA, aConstrIter->ptB,
           aConstrIter->entityA, aConstrIter->entityB,
           aConstrIter->entityC, aConstrIter->entityD};
       for (int i = 0; i < 6; i++)
-        if (anEntAndSubs.find(anEntIDs[i]) != anEntAndSubs.end())
+        if (anEntIDs[i] == theEntityID)
           return false;
     }
     // The entity is not used, remove it and its parameters
@@ -324,7 +318,7 @@ std::list<Slvs_Constraint> SketchSolver_Storage::getConstraintsByType(int theCon
 }
 
 
-void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theConstraintID)
+void SketchSolver_Storage::addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID)
 {
   if (myFixed != SLVS_E_UNKNOWN)
     return; // the point is already fixed
@@ -332,6 +326,22 @@ void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theCon
   if (aPos >= 0 && aPos < (int)myConstraints.size())
     myFixed = theConstraintID;
 }
+
+void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theConstraintID)
+{
+  myTemporaryConstraints.insert(theConstraintID);
+}
+
+void SketchSolver_Storage::removeTemporaryConstraints()
+{
+  myTemporaryConstraints.clear();
+}
+
+bool SketchSolver_Storage::isTemporary(const Slvs_hConstraint& theConstraintID) const
+{
+  return myTemporaryConstraints.find(theConstraintID) != myTemporaryConstraints.end();
+}
+
 
 void SketchSolver_Storage::getRemoved(
     std::set<Slvs_hParam>& theParameters,

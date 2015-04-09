@@ -70,6 +70,9 @@ class SketchSolver_Group
     return mySketch->data() && mySketch->data()->isValid();
   }
 
+  /// \brief Verifies the constraint is complex, i.e. it needs another constraints to be created before
+  static bool isComplexConstraint(FeaturePtr theConstraint);
+
   /** \brief Adds or updates a constraint in the group
    *  \param[in] theConstraint constraint to be changed
    *  \return \c true if the constraint added or updated successfully
@@ -150,6 +153,9 @@ private:
 
   /// \brief Apply temporary rigid constraints for the list of features
   void fixFeaturesList(AttributeRefListPtr theList);
+
+  /// \brief Append given constraint to th group of temporary constraints
+  void setTemporary(SolverConstraintPtr theConstraint);
 
 private:
   Slvs_hGroup myID; ///< Index of the group

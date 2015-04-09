@@ -40,7 +40,7 @@
 #include <Config_PropManager.h>
 
 #include <QLabel>
-#include <QTimer>
+//#include <QTimer>
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QCheckBox>
@@ -61,9 +61,9 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myLabel->setToolTip("");
   myLabel->setIndent(5);
 
-  mySelectionTimer = new QTimer(this);
-  connect(mySelectionTimer, SIGNAL(timeout()), SLOT(setSketchingMode()));
-  mySelectionTimer->setSingleShot(true);
+  //mySelectionTimer = new QTimer(this);
+  //connect(mySelectionTimer, SIGNAL(timeout()), SLOT(setSketchingMode()));
+  //mySelectionTimer->setSingleShot(true);
 
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -130,7 +130,7 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
         //XGUI_Displayer* aDisp = myWorkshop->displayer();
         //aDisp->closeLocalContexts();
         emit planeSelected(plane());
-        setSketchingMode();
+        //setSketchingMode();
 
         // Update sketcher actions
         XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
@@ -216,7 +216,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
     // In order to avoid Opening/Closing of context too often
     // it can be useful for a delay on the property panel filling
     // it is possible that it is not necessary anymore, but it requires a check
-    mySelectionTimer->start(20);
+    //mySelectionTimer->start(20);
   } else {
     // We have to select a plane before any operation
     showPreviewPlanes();
@@ -241,7 +241,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
 void PartSet_WidgetSketchLabel::deactivate()
 {
   // Do not set selection mode if the widget was activated for a small moment 
-  mySelectionTimer->stop();
+  //mySelectionTimer->stop();
   //XGUI_Displayer* aDisp = myWorkshop->displayer();
   //aDisp->closeLocalContexts();
   erasePreviewPlanes();
@@ -353,7 +353,7 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
 }
 
 
-void PartSet_WidgetSketchLabel::setSketchingMode()
+/*void PartSet_WidgetSketchLabel::setSketchingMode()
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   // Clear standard selection modes if they are defined
@@ -361,6 +361,7 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   //aDisp->openLocalContext();
 
   // Get default selection modes
+  
   QIntList aModes;
   aModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
   aModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
@@ -369,7 +370,7 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
 
   aDisp->activateObjects(aModes);
-}
+}*/
 
 void PartSet_WidgetSketchLabel::showConstraints(bool theOn)
 {

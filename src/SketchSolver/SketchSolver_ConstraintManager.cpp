@@ -114,9 +114,7 @@ void SketchSolver_ConstraintManager::processEvent(
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
         if (!aFeature)
           continue;
-        if (aFeature->getKind() == SketchPlugin_ConstraintFillet::ID() ||
-            aFeature->getKind() == SketchPlugin_ConstraintMirror::ID() ||
-            aFeature->getKind() == SketchPlugin_ConstraintTangent::ID()) {
+        if (SketchSolver_Group::isComplexConstraint(aFeature)) {
           aComplexConstraints.insert(aFeature);
           continue;
         }

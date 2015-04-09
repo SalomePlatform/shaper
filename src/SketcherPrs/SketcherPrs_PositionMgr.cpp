@@ -107,7 +107,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     // Odd position
     aP.Translate(-aShift);
     if (aPos > 1) {
-      if (aPos % 4 == 0) 
+      if ((aPos - 1) % 4 == 0) 
         aM = (aPos - 1) / 4;
       else
         aM = -(aPos + 1) / 4;
