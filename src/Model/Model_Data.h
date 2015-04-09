@@ -163,7 +163,10 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual ModelAPI_ExecState execState();
 
   /// Registers error during the execution, causes the ExecutionFailed state
-  MODEL_EXPORT virtual void setError(const std::string& theError);
+  MODEL_EXPORT virtual void setError(const std::string& theError, bool theSend = true);
+
+  /// Registers error during the execution, causes the ExecutionFailed state
+  MODEL_EXPORT virtual std::string error() const;
 
   /// Returns the identifier of feature-owner, unique in this document
   MODEL_EXPORT virtual int featureId() const;

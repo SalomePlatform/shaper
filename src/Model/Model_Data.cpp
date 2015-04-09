@@ -29,6 +29,7 @@
 #include <Events_Error.h>
 
 #include <TDataStd_Name.hxx>
+#include <TDataStd_AsciiString.hxx>
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
@@ -239,10 +240,22 @@ ModelAPI_ExecState Model_Data::execState()
   return ModelAPI_StateMustBeUpdated; // default value
 }
 
-void Model_Data::setError(const std::string& theError)
+void Model_Data::setError(const std::string& theError, bool theSend)
 {
   execState(ModelAPI_StateExecFailed);
-  Events_Error::send(theError);
+  if (theSend) {
+    Events_Error::send(theError);
+  }
+  TDataStd_AsciiString::Set(myLab, theError.c_str());
+}
+
+std::string Model_Data::error() const
+{
+  Handle(TDataStd_AsciiString) anErrorAttr;
+  if (myLab.FindAttribute(TDataStd_AsciiString::GetID(), anErrorAttr)) {
+    return std::string(anErrorAttr->Get().ToCString());
+  }
+  return std::string();
 }
 
 int Model_Data::featureId() const

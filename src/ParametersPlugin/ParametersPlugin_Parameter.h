@@ -52,7 +52,8 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   PARAMETERSPLUGIN_EXPORT virtual void initAttributes();
 
   PARAMETERSPLUGIN_EXPORT virtual bool isInHistory(); //false
-  //bool isI
+
+  PARAMETERSPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Use plugin manager for features creation
   ParametersPlugin_Parameter();

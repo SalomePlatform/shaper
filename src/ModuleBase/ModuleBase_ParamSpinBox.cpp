@@ -156,8 +156,7 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
   // either a string starting with a letter, or a string starting with
   // an underscore followed by at least one alphanumeric character
   if (isAcceptVariables()) {
-    QRegExp varNameMask("(([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|_)*)|"
-                        "(_([a-z]|[A-Z]|[0-9])+([a-z]|[A-Z]|[0-9]|_)*)");
+    QRegExp varNameMask("[_a-zA-Z][a-zA-Z0-9_]*");
     if (varNameMask.exactMatch(str))
       res = QValidator::Acceptable;
 

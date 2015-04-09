@@ -10,11 +10,12 @@
 #include <ModuleBase_WidgetExprEditor.h>
 #include <ModuleBase_Tools.h>
 
-#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -176,13 +177,24 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
   aStringAttr->setValue(aWidgetValue.toStdString());
   updateObject(myFeature);
 
-  if(!myFeature->firstResult().get())
-    return true;
-  
-  ResultParameterPtr aResult =
+  // Try to get the value
+  QString aStateMsg;
+  std::string anErrorMessage = myFeature->error();
+  if (anErrorMessage.empty()) {
+    ResultParameterPtr aParam =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(myFeature->firstResult());
-  AttributeStringPtr aErrorAttr = aResult->data()->string(ModelAPI_ResultParameter::STATE());
-  myResultLabel->setText(QString::fromStdString(aErrorAttr->value()));
+    if(aParam.get()) {
+      AttributeDoublePtr aValueAttr =
+        aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+      if (aValueAttr.get()) {
+        double aValue = aValueAttr->value();
+        aStateMsg = "Result: " + QString::number(aValue);
+      }
+    }
+  } else {
+    aStateMsg = QString::fromStdString(anErrorMessage);
+  }
+  myResultLabel->setText(aStateMsg);
   return true;
 }
 

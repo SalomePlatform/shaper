@@ -58,8 +58,13 @@ class ModelAPI_Feature : public ModelAPI_Object
   virtual bool compute(const std::string& theAttributeId) { return false; };
 
   /// Registers error during the execution, causes the ExecutionFailed state
-  virtual void setError(const std::string& theError) {
-    data()->setError(theError);
+  virtual void setError(const std::string& theError, bool isSend = true) {
+    data()->setError(theError, isSend);
+  }
+
+  /// Returns error, arose during the execution
+  virtual std::string error() const {
+    return data()->error();
   }
 
   /// returns the current results of the feature

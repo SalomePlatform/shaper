@@ -17,10 +17,7 @@ void Model_ResultParameter::initAttributes()
 {
   data()->addAttribute(ModelAPI_ResultParameter::VALUE(),
                        ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(ModelAPI_ResultParameter::STATE(),
-                       ModelAPI_AttributeString::typeId());
 }
-
 
 Model_ResultParameter::Model_ResultParameter()
 {

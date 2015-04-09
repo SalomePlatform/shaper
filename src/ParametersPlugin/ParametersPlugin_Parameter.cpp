@@ -39,22 +39,18 @@ bool ParametersPlugin_Parameter::isInHistory()
   return false;
 }
 
-void ParametersPlugin_Parameter::execute()
+void ParametersPlugin_Parameter::attributeChanged(const std::string&)
 {
   ResultParameterPtr aParam = document()->createParameter(data());
 
   std::string anExpression = string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
   if(anExpression.empty()) {
     // clear error/result if the expression is empty
-    aParam->data()->string(ModelAPI_ResultParameter::STATE())->setValue("");
+    setError("", false);
     return;
   }
-  // Value
   std::string outErrorMessage;
   double aValue = evaluate(anExpression, outErrorMessage);
-  AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-  aValueAttribute->setValue(aValue);
-  setResult(aParam);
   // Name
   std::string aName = string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
   std::ostringstream sstream;
@@ -63,17 +59,20 @@ void ParametersPlugin_Parameter::execute()
   data()->setName(aName + " ("+ aParamValue + ")");
   aParam->data()->setName(aName);
   // Error
-  AttributeStringPtr aErrorAttr = aParam->data()->string(ModelAPI_ResultParameter::STATE());
   std::string aStateMsg;
-  if (outErrorMessage.empty()) {
-    aStateMsg = "Result: " + aParamValue;
-  } else {
-    aStateMsg = "Error:\n" + outErrorMessage;
-  }
-  aErrorAttr->setValue(aStateMsg);
-  //if(!outErrorMessage.empty()) {
-  //  data()->execState(ModelAPI_StateExecFailed);
-  //}
+  if (!outErrorMessage.empty()) {
+    aStateMsg = "Error: " + outErrorMessage;
+    data()->execState(ModelAPI_StateExecFailed);
+  } 
+  setError(aStateMsg, false);
+  // Value
+  AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+  aValueAttribute->setValue(aValue);
+  setResult(aParam);
+}
+
+void ParametersPlugin_Parameter::execute()
+{
 }
 
 double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
