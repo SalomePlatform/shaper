@@ -154,6 +154,9 @@ private:
   /// \brief Apply temporary rigid constraints for the list of features
   void fixFeaturesList(AttributeRefListPtr theList);
 
+  /// \brief Append given constraint to th group of temporary constraints
+  void setTemporary(SolverConstraintPtr theConstraint);
+
 private:
   Slvs_hGroup myID; ///< Index of the group
   Slvs_hEntity myWorkplaneID; ///< Index of workplane, the group is based on

@@ -51,6 +51,9 @@ public:
   /// \brief Returns the type of constraint
   virtual int getType() const = 0;
 
+  /// \brief The constraint is made temoparary
+  void makeTemporary() const;
+
   /// \brief Checks the constraint is used by current object
   virtual bool hasConstraint(ConstraintPtr theConstraint) const
   { return theConstraint == myBaseConstraint; }

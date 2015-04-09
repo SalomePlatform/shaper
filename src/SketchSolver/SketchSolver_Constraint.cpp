@@ -674,3 +674,10 @@ void SketchSolver_Constraint::calculateMiddlePoint(
   }
 }
 
+void SketchSolver_Constraint::makeTemporary() const
+{
+  std::vector<Slvs_hConstraint>::const_iterator anIt = mySlvsConstraints.begin();
+  for (; anIt != mySlvsConstraints.end(); anIt++)
+    myStorage->addTemporaryConstraint(*anIt);
+}
+

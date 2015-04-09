@@ -231,7 +231,7 @@ bool SketchSolver_Group::changeConstraint(
         continue;
       aConstraint->setGroup(this);
       aConstraint->setStorage(myStorage);
-      myTempConstraints.insert(aConstraint);
+      setTemporary(aConstraint);
     }
   }
   // Fix base features for mirror
@@ -273,7 +273,7 @@ void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFe
     return;
   aConstraint->setGroup(this);
   aConstraint->setStorage(myStorage);
-  myTempConstraints.insert(aConstraint);
+  setTemporary(aConstraint);
 }
 
 // ============================================================================
@@ -295,7 +295,7 @@ void SketchSolver_Group::fixFeaturesList(AttributeRefListPtr theList)
       continue;
     aConstraint->setGroup(this);
     aConstraint->setStorage(myStorage);
-    myTempConstraints.insert(aConstraint);
+    setTemporary(aConstraint);
   }
 }
 
@@ -523,6 +523,7 @@ bool SketchSolver_Group::isConsistent()
 void SketchSolver_Group::removeTemporaryConstraints()
 {
   myTempConstraints.clear();
+  myStorage->removeTemporaryConstraints();
   // Clean lists of removed entities in the storage
   std::set<Slvs_hParam> aRemPar;
   std::set<Slvs_hEntity> aRemEnt;
@@ -560,5 +561,16 @@ bool SketchSolver_Group::isComplexConstraint(FeaturePtr theConstraint)
   return theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID() ||
          theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID() ||
          theConstraint->getKind() == SketchPlugin_ConstraintTangent::ID();
+}
+
+// ============================================================================
+//  Function: setTemporary
+//  Class:    SketchSolver_Group
+//  Purpose:  append given constraint to th group of temporary constraints
+// ============================================================================
+void SketchSolver_Group::setTemporary(SolverConstraintPtr theConstraint)
+{
+  theConstraint->makeTemporary();
+  myTempConstraints.insert(theConstraint);
 }
 

@@ -52,7 +52,8 @@ void SketchSolver_ConstraintRigid::process()
     if (*anEntIter == SLVS_E_UNKNOWN)
       continue;
     Slvs_hConstraint aConstrID = myStorage->isPointFixed(*anEntIter);
-    bool isForceUpdate = (aConstrID != SLVS_E_UNKNOWN && !myBaseConstraint);
+    bool isForceUpdate = (aConstrID != SLVS_E_UNKNOWN && !myBaseConstraint &&
+                          myStorage->isTemporary(aConstrID));
     if (isEmpty && !isForceUpdate) { // create new constraint
       if (aConstrID != SLVS_E_UNKNOWN)
         continue; // the coincident point is already fixed
@@ -61,7 +62,7 @@ void SketchSolver_ConstraintRigid::process()
       aConstraint.h = myStorage->addConstraint(aConstraint);
       mySlvsConstraints.push_back(aConstraint.h);
       if (!myBaseConstraint)
-        myStorage->addTemporaryConstraint(aConstraint.h);
+        myStorage->addConstraintWhereDragged(aConstraint.h);
     } else { // update already existent constraint
       if (aConstrID == SLVS_E_UNKNOWN || myBaseConstraint)
         aConstrID = *aConstrIter;
@@ -69,7 +70,7 @@ void SketchSolver_ConstraintRigid::process()
       aConstraint.ptA = *anEntIter;
       myStorage->addConstraint(aConstraint);
       if (!myBaseConstraint)
-        myStorage->addTemporaryConstraint(aConstraint.h);
+        myStorage->addConstraintWhereDragged(aConstraint.h);
       if (!isEmpty) {
         aConstrIter++;
         isEmpty = aConstrIter == mySlvsConstraints.end();
@@ -86,7 +87,7 @@ void SketchSolver_ConstraintRigid::process()
     aConstraint.h = myStorage->addConstraint(aConstraint);
     mySlvsConstraints.push_back(aConstraint.h);
     if (!myBaseConstraint)
-      myStorage->addTemporaryConstraint(aConstraint.h);
+      myStorage->addConstraintWhereDragged(aConstraint.h);
   }
 }
 
@@ -226,7 +227,7 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
     aConstraint.h = myStorage->addConstraint(aConstraint);
     mySlvsConstraints.push_back(aConstraint.h);
     if (!myBaseConstraint)
-      myStorage->addTemporaryConstraint(aConstraint.h);
+      myStorage->addConstraintWhereDragged(aConstraint.h);
   }
 
   // Fix radius of the arc
@@ -242,7 +243,7 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
     aConstraint.h = myStorage->addConstraint(aConstraint);
     mySlvsConstraints.push_back(aConstraint.h);
     if (!myBaseConstraint)
-      myStorage->addTemporaryConstraint(aConstraint.h);
+      myStorage->addConstraintWhereDragged(aConstraint.h);
   }
 }
 
