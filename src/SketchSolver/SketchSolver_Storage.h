@@ -87,8 +87,15 @@ public:
   /// \brief Returns list of constraints of specified type
   std::list<Slvs_Constraint> getConstraintsByType(int theConstraintType) const;
 
-  /// \brief Attach temporary constraint to this storage. It need to make precise calculations
+  /// \brief Attach constraint SLVS_C_WHERE_DRAGGED to this storage. It need to make precise calculations
+  void addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID);
+
+  /// \brief Add transient constraint
   void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);
+  /// \brief Remove all transient constraints
+  void removeTemporaryConstraints();
+  /// \brief Checks the constraint is temporary
+  bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
 
   /// \brief Shows the sketch should be resolved
   bool isNeedToResolve() const
@@ -129,6 +136,7 @@ private:
 
   bool myNeedToResolve; ///< parameters are changed and group needs to be resolved
 
+  std::set<Slvs_hConstraint> myTemporaryConstraints; ///< list of transient constraints
   std::set<Slvs_hParam> myRemovedParameters; ///< list of just removed parameters (cleared when returning to applicant)
   std::set<Slvs_hEntity> myRemovedEntities; ///< list of just removed entities (cleared when returning to applicant)
   std::set<Slvs_hConstraint> myRemovedConstraints; ///< list of just removed constraints (cleared when returning to applicant)

@@ -318,7 +318,7 @@ std::list<Slvs_Constraint> SketchSolver_Storage::getConstraintsByType(int theCon
 }
 
 
-void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theConstraintID)
+void SketchSolver_Storage::addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID)
 {
   if (myFixed != SLVS_E_UNKNOWN)
     return; // the point is already fixed
@@ -326,6 +326,22 @@ void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theCon
   if (aPos >= 0 && aPos < (int)myConstraints.size())
     myFixed = theConstraintID;
 }
+
+void SketchSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theConstraintID)
+{
+  myTemporaryConstraints.insert(theConstraintID);
+}
+
+void SketchSolver_Storage::removeTemporaryConstraints()
+{
+  myTemporaryConstraints.clear();
+}
+
+bool SketchSolver_Storage::isTemporary(const Slvs_hConstraint& theConstraintID) const
+{
+  return myTemporaryConstraints.find(theConstraintID) != myTemporaryConstraints.end();
+}
+
 
 void SketchSolver_Storage::getRemoved(
     std::set<Slvs_hParam>& theParameters,
