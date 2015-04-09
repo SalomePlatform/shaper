@@ -13,6 +13,7 @@
 #include <ModelAPI_Session.h>
 
 #include <GeomAPI_Circ2d.h>
+#include <GeomAPI_Circ.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
@@ -209,14 +210,28 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-  if (!aCenterAttr->isInitialized())
-    return;
   std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(START_ID()));
-  if (!aStartAttr->isInitialized())
-    return;
   std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(END_ID()));
+  if (theID == EXTERNAL_ID()) {
+    std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
+    // update arguments due to the selection value
+    if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
+      std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
+      std::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
+      if (aCirc.get()) {
+        aStartAttr->setValue(sketch()->to2D(anEdge->firstPoint()));
+        anEndAttr->setValue(sketch()->to2D(anEdge->lastPoint()));
+        aCenterAttr->setValue(sketch()->to2D(aCirc->center()));
+      }
+    }
+    return;
+  }
+  if (!aCenterAttr->isInitialized())
+    return;
+  if (!aStartAttr->isInitialized())
+    return;
   if (!anEndAttr->isInitialized())
     return;
 
