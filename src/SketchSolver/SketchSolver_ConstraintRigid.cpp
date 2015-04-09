@@ -234,7 +234,7 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
   bool isExists = false;
   std::list<Slvs_Constraint> aDiamConstraints = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
   std::list<Slvs_Constraint>::iterator anIt = aDiamConstraints.begin();
-  for (; anIt != aDiamConstraints.end() && !isExists; anIt)
+  for (; anIt != aDiamConstraints.end() && !isExists; anIt++)
     if (anIt->entityA == myFeatureMap.begin()->second)
       isExists = true;
   if (!isExists) {
