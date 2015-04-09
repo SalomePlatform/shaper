@@ -57,7 +57,7 @@
         </sketch_shape_selector>/>
         <sketch_shape_selector 
           id="ConstraintEntityB" 
-          label="Last object" 
+          label="Second object" 
           tooltip="Select point, line end point, line, center of circle or arc." 
           shape_types="edge vertex">
           <validator id="PartSet_DifferentObjects"/>
@@ -108,7 +108,7 @@
             <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_constraint_shape_selector>
         
-        <sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select a line" 
+        <sketch_constraint_shape_selector id="ConstraintEntityB" label="Second line" tooltip="Select a line" 
             shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
             <validator id="PartSet_DifferentObjects"/>
@@ -129,7 +129,7 @@
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB" 
-            label="Last line" tooltip="Select an line" 
+            label="Second line" tooltip="Select an line" 
             shape_types="edge">
             <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
@@ -184,7 +184,7 @@
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB"
-            label="Last object" tooltip="Select line, circle or arc" shape_types="edge">
+            label="Second object" tooltip="Select line, circle or arc" shape_types="edge">
           <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
           <validator id="PartSet_DifferentObjects"/>
         </sketch_constraint_shape_selector>
@@ -197,7 +197,7 @@
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB"
-            label="Last object" tooltip="Select line or arc" shape_types="edge">
+            label="Second object" tooltip="Select line or arc" shape_types="edge">
         <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityA"/>
         <validator id="PartSet_DifferentObjects"/>
         </sketch_constraint_shape_selector>
@@ -215,7 +215,7 @@
         </sketch_constraint_shape_selector>
 
         <sketch_constraint_shape_selector id="ConstraintEntityB"
-            label="Last object" tooltip="Select line or arc" shape_types="edge">
+            label="Second object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
 
         <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
