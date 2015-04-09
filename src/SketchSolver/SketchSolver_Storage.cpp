@@ -151,19 +151,13 @@ bool SketchSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
       if (anEntIter->distance == theEntityID)
         return false;
     }
-    std::set<Slvs_hEntity> anEntAndSubs;
-    anEntAndSubs.insert(theEntityID);
-    for (int i = 0; i < 4; i++)
-      if (myEntities[aPos].point[i] != SLVS_E_UNKNOWN)
-        anEntAndSubs.insert(myEntities[aPos].point[i]);
-
     std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
     for (; aConstrIter != myConstraints.end(); aConstrIter++) {
       Slvs_hEntity anEntIDs[6] = {aConstrIter->ptA, aConstrIter->ptB,
           aConstrIter->entityA, aConstrIter->entityB,
           aConstrIter->entityC, aConstrIter->entityD};
       for (int i = 0; i < 6; i++)
-        if (anEntAndSubs.find(anEntIDs[i]) != anEntAndSubs.end())
+        if (anEntIDs[i] == theEntityID)
           return false;
     }
     // The entity is not used, remove it and its parameters
