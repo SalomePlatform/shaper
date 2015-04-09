@@ -753,8 +753,30 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   if (aContext.IsNull() || theIO.IsNull())
     return;
 
-  aContext->Load(theIO, -1, true);
-  aContext->Deactivate(theIO);
+  // deactivate object in all modes, which are not in the list of activation
+  TColStd_ListOfInteger aTColModes;
+  aContext->ActivatedModes(theIO, aTColModes);
+  TColStd_ListIteratorOfListOfInteger itr( aTColModes );
+  QIntList aModesActivatedForIO;
+  for (; itr.More(); itr.Next() ) {
+    Standard_Integer aMode = itr.Value();
+    if (!theModes.contains(aMode)) {
+#ifdef DEBUG_ACTIVATE
+      qDebug(QString("deactivate: %1").arg(aMode).toStdString().c_str());
+#endif
+      aContext->Deactivate(theIO, aMode);
+    }
+    else {
+      aModesActivatedForIO.append(aMode);
+#ifdef DEBUG_ACTIVATE
+      qDebug(QString("  active: %1").arg(aMode).toStdString().c_str());
+#endif
+    }
+  }
+  // loading the interactive object allowing the decomposition
+  if (aTColModes.IsEmpty())
+    aContext->Load(theIO, -1, true);
+
   Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
   //Deactivate trihedron which can be activated in local selector
   if (aTrihedron.IsNull()) {
@@ -763,10 +785,18 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     if (theModes.size() == 0) {
       //aContext->Load(anAISIO, 0, true);
       aContext->Activate(theIO);
+#ifdef DEBUG_ACTIVATE
+      qDebug("activate in all modes");
+#endif
     } else {
       foreach(int aMode, theModes) {
         //aContext->Load(anAISIO, aMode, true);
-        aContext->Activate(theIO, aMode);
+        if (!aModesActivatedForIO.contains(aMode)) {
+          aContext->Activate(theIO, aMode);
+#ifdef DEBUG_ACTIVATE
+          qDebug(QString("activate: %1").arg(aMode).toStdString().c_str());
+#endif
+        }
       }
     }
   }

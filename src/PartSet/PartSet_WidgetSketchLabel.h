@@ -19,7 +19,7 @@
 #include <TopoDS_Shape.hxx>
 
 class QLabel;
-class QTimer;
+//class QTimer;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 class QCheckBox;
@@ -114,7 +114,7 @@ protected:
   void onPlaneSelected();
 
   /// Set sketch specific mode of selection
-  void setSketchingMode();
+  //void setSketchingMode();
 
  private:
    /// Create preview of planes for sketch plane selection
@@ -147,7 +147,7 @@ protected:
   AISObjectPtr myXYPlane;
   bool myPreviewDisplayed;
 
-  QTimer* mySelectionTimer;
+  //QTimer* mySelectionTimer;
 
   QCheckBox* myShowConstraints;
 };

@@ -54,8 +54,9 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
-#include<ModuleBase_FilterFactory.h>
+#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_PageBase.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -94,24 +95,6 @@
 
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
-
-QString objectInfo(ObjectPtr theObj)
-{
-  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
-  QString aFeatureStr = "feature";
-  if(aRes.get()) {
-    aFeatureStr.append("(Result)");
-    aFeature = ModelAPI_Feature::feature(aRes);
-  }
-  if (aFeature.get()) {
-    aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
-    if (aFeature->data().get() && aFeature->data()->isValid())
-      aFeatureStr.append(QString("(name=%1)").arg(aFeature->data()->name().c_str()).toStdString().c_str());
-  }
-  return aFeatureStr;
-}
-
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
@@ -541,7 +524,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
 #ifdef DEBUG_FEATURE_REDISPLAY
   QStringList anInfo;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-    anInfo.append(objectInfo((*aIt)));
+    anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(", ");
   qDebug(QString("onFeatureRedisplayMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
@@ -562,7 +545,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
       // Redisplay the visible object or the object of the current operation
       bool isVisibleObject = myDisplayer->isVisible(aObj);
       #ifdef DEBUG_FEATURE_REDISPLAY
-      //QString anObjInfo = objectInfo((aObj));
+      //QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
       //qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
       #endif
 
@@ -598,7 +581,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
 #ifdef DEBUG_FEATURE_CREATED
   QStringList anInfo;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-    anInfo.append(objectInfo((*aIt)));
+    anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(", ");
   qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
@@ -679,8 +662,10 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 
   // Activate objects created by current operation 
   // in order to clean selection modes
-  QIntList aModes;
-  myDisplayer->activateObjects(aModes);
+  // the deactivation should be pefromed in the same place, where the mode is activated,
+  // e.g. activation in the current widget activation, deactivation - in the widget's deactivation
+  //QIntList aModes;
+  //myDisplayer->activateObjects(aModes);
   myModule->operationStopped(theOperation);
 }
 

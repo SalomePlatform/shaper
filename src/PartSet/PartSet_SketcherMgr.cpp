@@ -57,11 +57,13 @@
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintMirror.h>
 
+#include <SketcherPrs_Tools.h>
+
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
 //#include <AIS_DimensionSelectionMode.hxx>
-//#include <AIS_Shape.hxx>
+#include <AIS_Shape.hxx>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
@@ -552,18 +554,9 @@ void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent
 
 void PartSet_SketcherMgr::launchEditing()
 {
-  // there should be activate the vertex selection mode because the edit can happens by the selected
-  // point
-  QIntList aModes;
-  aModes << TopAbs_VERTEX << TopAbs_EDGE;
-  // TODO: #391 - to be uncommented
-  /*aModes.append(AIS_DSM_Text);
-  aModes.append(AIS_DSM_Line);
-  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
-  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));*/
-
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  aConnector->activateSubShapesSelection(aModes);
+  // there should be activate the sketch selection mode because the edit can happens
+  // by any sketch entity or consttant selected
+  activateObjectsInSketchMode(true);
 
   if (!myCurrentSelection.empty()) {
     FeaturePtr aFeature = myCurrentSelection.begin().key();
@@ -700,6 +693,9 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverWindow = false;
   myIsConstraintsShown = true;
+  // the objects activated in the sketch should be deactivated in order to do not have the specific
+  // sketch selection mode activated on objects in neutral point of the application(no started operation)
+  activateObjectsInSketchMode(false);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
@@ -757,6 +753,10 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
   myIsMouseOverViewProcessed = true;
+
+  // the sketch objects selection should be activated in order to select any sketch
+  // object
+  activateObjectsInSketchMode(true);
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -826,6 +826,11 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
   myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
+
+  // after the plane is selected in the sketch, the sketch selection should be activated
+  // it can not be performed in the sketch label widget because, we don't need to switch off
+  // the selection by any label deactivation, but need to switch it off by stop the sketch
+  activateObjectsInSketchMode(true);
 }
 
 void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
@@ -1013,6 +1018,23 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
     }
   }
   aDisplayer->updateViewer();
+}
+
+void PartSet_SketcherMgr::activateObjectsInSketchMode(const bool isActive)
+{
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+  QIntList aModes;
+  if (isActive) {
+    aModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
+    aModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
+    aModes.append(SketcherPrs_Tools::Sel_Constraint);
+    aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
+    aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
+  }
+  aDisplayer->activateObjects(aModes);
 }
 
 void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
