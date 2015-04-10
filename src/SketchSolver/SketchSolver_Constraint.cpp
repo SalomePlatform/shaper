@@ -62,6 +62,12 @@ void SketchSolver_Constraint::setGroup(SketchSolver_Group* theGroup)
   process();
 }
 
+void SketchSolver_Constraint::addFeature(FeaturePtr theFeature)
+{
+  int aType;
+  changeEntity(theFeature, aType);
+}
+
 
 void SketchSolver_Constraint::process()
 {
@@ -527,7 +533,7 @@ void SketchSolver_Constraint::refresh()
         }
         if (fabs(aPoint2D->x() - aXY[0]) > tolerance ||
             fabs(aPoint2D->y() - aXY[1]) > tolerance)
-        aPoint2D->setValue(aXY[0], aXY[1]);
+          aPoint2D->setValue(aXY[0], aXY[1]);
       } else {
         // Scalar value (used for the distance entities)
         AttributeDoublePtr aScalar =

@@ -258,6 +258,10 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
   std::set<ConstraintPtr>::iterator aCIter = aConstraints.begin();
   for (; aCIter != aConstraints.end(); aCIter++) {
     ConstraintConstraintMap::iterator aSolConIter = myConstraints.find(*aCIter);
+    if (aSolConIter == myConstraints.end())
+      continue;
+    myFeatureStorage->changeFeature(theFeature, aSolConIter->first);
+    aSolConIter->second->addFeature(theFeature);
     aSolConIter->second->update();
   }
   return true;
