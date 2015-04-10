@@ -116,12 +116,53 @@ void SketchSolver_Constraint::process()
 void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
 {
   cleanErrorMsg();
-  if (theConstraint && theConstraint != myBaseConstraint) {
-    if (theConstraint->getKind() != myBaseConstraint->getKind())
+  bool needToRebuild = (theConstraint && theConstraint != myBaseConstraint);
+  if (!needToRebuild) {
+    // Check the attrbutes of constraint are changed
+    ConstraintPtr aConstraint = theConstraint ? theConstraint : myBaseConstraint;
+    std::list<AttributePtr> anAttrList = aConstraint->data()->attributes(std::string());
+    std::list<AttributePtr>::iterator anAttrIter = anAttrList.begin();
+    for (; anAttrIter != anAttrList.end(); anAttrIter++) {
+      AttributeRefAttrPtr aRefAttr =
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
+      if (aRefAttr) {
+        if (aRefAttr->isObject()) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+          if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end()) {
+            needToRebuild = true;
+            break;
+          }
+        } else if (aRefAttr->attr() &&
+                    myAttributeMap.find(aRefAttr->attr()) == myAttributeMap.end()) {
+          needToRebuild = true;
+          break;
+        }
+      }
+      AttributeRefListPtr aRefList =
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIter);
+      if (aRefList) {
+        std::list<ObjectPtr> anItems = aRefList->list();
+        std::list<ObjectPtr>::iterator anIt = anItems.begin();
+        for (; anIt != anItems.end(); anIt++) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+          if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end()) {
+            needToRebuild = true;
+            break;
+          }
+        }
+        if (needToRebuild)
+          break;
+      }
+    }
+  }
+  if (needToRebuild) {
+    if (theConstraint && theConstraint->getKind() != myBaseConstraint->getKind())
       return;
     remove(myBaseConstraint);
-    myBaseConstraint = theConstraint;
+    if (theConstraint)
+      myBaseConstraint = theConstraint;
     process();
+    return;
   }
 
   // Update all attributes
@@ -564,7 +605,15 @@ Slvs_hEntity SketchSolver_Constraint::getId(FeaturePtr theFeature) const
   std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFIter = myFeatureMap.find(theFeature);
   if (aFIter == myFeatureMap.end())
     return SLVS_E_UNKNOWN;
-  return aFIter->second;
+  // check the Feature is really in the storage
+  Slvs_Entity anEntity = myStorage->getEntity(aFIter->second);
+  if (anEntity.h == SLVS_E_UNKNOWN) {
+    // rebuild feature
+    int aType;
+    anEntity.h = const_cast<SketchSolver_Constraint*>(this)->changeEntity(aFIter->first, aType);
+    const_cast<SketchSolver_Constraint*>(this)->myFeatureMap[theFeature] = anEntity.h;
+  }
+  return anEntity.h;
 }
 
 Slvs_hEntity SketchSolver_Constraint::getId(AttributePtr theAttribute) const
