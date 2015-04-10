@@ -46,7 +46,7 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 //#define DEBUG_DISPLAY
 //#define DEBUG_ACTIVATE
 //#define DEBUG_FEATURE_REDISPLAY
-#define DEBUG_SELECTION_FILTERS
+//#define DEBUG_SELECTION_FILTERS
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -707,7 +707,13 @@ void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
     if (theFilter.Access() == aIt.Value().Access())
       return;
   }
-  GetFilter()->Add(theFilter);
+  Handle(SelectMgr_CompositionFilter) aCompFilter = GetFilter();
+  const SelectMgr_ListOfFilter& aStoredFilters = aCompFilter->StoredFilters();
+  for (aIt.Initialize(aStoredFilters); aIt.More(); aIt.Next()) {
+    if (theFilter.Access() == aIt.Value().Access())
+      return;
+  }
+  aCompFilter->Add(theFilter);
 #ifdef DEBUG_SELECTION_FILTERS
   int aCount = GetFilter()->StoredFilters().Extent();
   qDebug(QString("addSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
