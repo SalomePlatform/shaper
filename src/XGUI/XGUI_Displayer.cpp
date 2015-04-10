@@ -45,6 +45,8 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 
 //#define DEBUG_DISPLAY
 //#define DEBUG_ACTIVATE
+//#define DEBUG_FEATURE_REDISPLAY
+#define DEBUG_SELECTION_FILTERS
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -248,8 +250,15 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     }
     // Customization of presentation
     bool isCustomized = customizeObject(theObject);
+    #ifdef DEBUG_FEATURE_REDISPLAY
+      qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
+        arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
+    #endif
     if (!isEqualShapes || isCustomized) {
       aContext->Redisplay(aAISIO, false);
+      #ifdef DEBUG_FEATURE_REDISPLAY
+      //qDebug("  Redisplay happens");
+      #endif
       if (isUpdateViewer)
         updateViewer();
     }
@@ -699,6 +708,10 @@ void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
       return;
   }
   GetFilter()->Add(theFilter);
+#ifdef DEBUG_SELECTION_FILTERS
+  int aCount = GetFilter()->StoredFilters().Extent();
+  qDebug(QString("addSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
+#endif
 }
 
 void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
@@ -709,6 +722,10 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
   Handle(SelectMgr_AndFilter) aCompositeFilter = GetFilter();
   if (aCompositeFilter->IsIn(theFilter))
     aCompositeFilter->Remove(theFilter);
+#ifdef DEBUG_SELECTION_FILTERS
+  int aCount = GetFilter()->StoredFilters().Extent();
+  qDebug(QString("removeSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
+#endif
 }
 
 void XGUI_Displayer::removeFilters()
