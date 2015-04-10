@@ -50,6 +50,7 @@ private:
 
 private:
   std::map<Slvs_hConstraint, ConstraintPtr> myExtraCoincidence; ///< multiple coincidence of points
+  std::set<AttributePtr> myCoincidentPoints; ///< list of points under the Coincidence constraint
 };
 
 #endif

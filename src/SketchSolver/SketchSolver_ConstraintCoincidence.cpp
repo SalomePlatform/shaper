@@ -28,13 +28,9 @@ std::list<ConstraintPtr> SketchSolver_ConstraintCoincidence::constraints() const
 bool SketchSolver_ConstraintCoincidence::isCoincide(
     std::shared_ptr<SketchSolver_ConstraintCoincidence> theConstraint) const
 {
-  std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFeatIter = myFeatureMap.begin();
-  for (; aFeatIter != myFeatureMap.end(); aFeatIter++)
-    if (theConstraint->myFeatureMap.find(aFeatIter->first) != theConstraint->myFeatureMap.end())
-      return true;
-  std::map<AttributePtr, Slvs_hEntity>::const_iterator anAttrIter = myAttributeMap.begin();
-  for (; anAttrIter != myAttributeMap.end(); anAttrIter++)
-    if (theConstraint->myAttributeMap.find(anAttrIter->first) != theConstraint->myAttributeMap.end())
+  std::set<AttributePtr>::const_iterator anAttrIter = theConstraint->myCoincidentPoints.begin();
+  for (; anAttrIter != theConstraint->myCoincidentPoints.end(); anAttrIter++)
+    if (myCoincidentPoints.find(*anAttrIter) != myCoincidentPoints.end())
       return true;
   return false;
 }
@@ -96,6 +92,7 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
     if (anEntityID == SLVS_E_UNKNOWN)
       anEntityID = changeEntity(aRefAttr->attr(), aType);
     anEntities.push_back(anEntityID);
+    myCoincidentPoints.insert(aRefAttr->attr());
   }
 
   Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
@@ -176,6 +173,7 @@ bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
   while (anAttrIter != myAttributeMap.end()) {
     if (anEntRemoved.find(anAttrIter->second) != anEntRemoved.end()) {
       std::map<AttributePtr, Slvs_hEntity>::iterator aTempIt = anAttrIter++;
+      myCoincidentPoints.erase(aTempIt->first);
       myAttributeMap.erase(aTempIt);
       continue;
     }
