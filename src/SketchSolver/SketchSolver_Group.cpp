@@ -25,6 +25,7 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -289,12 +290,27 @@ void SketchSolver_Group::fixFeaturesList(AttributeRefListPtr theList)
 {
   std::list<ObjectPtr> aList = theList->list();
   std::list<ObjectPtr>::iterator anIt = aList.begin();
+  std::list<FeaturePtr> aFeatures;
+  // Sort features, at begining there are features used by Equal constraint
   for (; anIt != aList.end(); anIt++) {
     if (!(*anIt))
       continue;
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(aFeature);
+    std::set<ConstraintPtr>::iterator aCIter = aConstraints.begin();
+    for (; aCIter != aConstraints.end(); aCIter++)
+      if ((*aCIter)->getKind() == SketchPlugin_ConstraintEqual::ID())
+        break;
+    if (aCIter != aConstraints.end())
+      aFeatures.push_front(aFeature);
+    else
+      aFeatures.push_back(aFeature);
+  }
+
+  std::list<FeaturePtr>::iterator aFeatIter = aFeatures.begin();
+  for (; aFeatIter != aFeatures.end(); aFeatIter++) {
     SolverConstraintPtr aConstraint =
-        SketchSolver_Builder::getInstance()->createRigidConstraint(aFeature);
+        SketchSolver_Builder::getInstance()->createRigidConstraint(*aFeatIter);
     if (!aConstraint)
       continue;
     aConstraint->setGroup(this);

@@ -66,8 +66,18 @@ public:
   void copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo);
 
   /// \brief Verifies the current point or another coincident one is fixed
-  /// \return the ID of the Fixed constraint or SLVS_E_UNKNOWN
-  Slvs_hConstraint isPointFixed(const Slvs_hEntity& thePointID) const;
+  /// \param[in]  thePointID  entity to be checked fixed
+  /// \param[out] theFixed    ID of constraint
+  /// \param[in]  theAccurate if \c true, the calculation will be made for all type of constraints,
+  ///                         if \c false, only the point is verified
+  /// \return \c true if the point is fixed
+  bool isPointFixed(const Slvs_hEntity& thePointID, Slvs_hConstraint& theFixed, bool theAccurate = false) const;
+  /// \brief Verifies the current entity is fully fixed (may not be changed by constraints)
+  /// \param[in] theEntityID entity to be checked fixed
+  /// \param[in] theAccurate if \c true, the calculation will be made for all type of constraints,
+  ///                        if \c false, only points are verified
+  /// \return \c true if the entity is fixed
+  bool isEntityFixed(const Slvs_hEntity& theEntityID, bool theAccurate = false) const;
 
   /** \brief Add new constraint to the current group
    *  \param[in] theConstraint   SolveSpace's constraint
