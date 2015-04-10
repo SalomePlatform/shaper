@@ -142,13 +142,19 @@ bool SketchSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
   bool aResult = true;
   int aPos = Search(theEntityID, myEntities);
   if (aPos >= 0 && aPos < (int)myEntities.size()) {
-    // Firstly, check the entity is not used elsewhere
+    // Firstly, check the entity and its attributes is not used elsewhere
+    std::set<Slvs_hEntity> anEntAndSubs;
+    anEntAndSubs.insert(theEntityID);
+    for (int i = 0; i < 4; i++)
+      if (myEntities[aPos].point[i] != SLVS_E_UNKNOWN)
+        anEntAndSubs.insert(myEntities[aPos].point[i]);
+
     std::vector<Slvs_Entity>::const_iterator anEntIter = myEntities.begin();
     for (; anEntIter != myEntities.end(); anEntIter++) {
       for (int i = 0; i < 4; i++)
-        if (anEntIter->point[i] == theEntityID)
+        if (anEntAndSubs.find(anEntIter->point[i]) != anEntAndSubs.end())
           return false;
-      if (anEntIter->distance == theEntityID)
+      if (anEntAndSubs.find(anEntIter->distance) != anEntAndSubs.end())
         return false;
     }
     std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
@@ -157,7 +163,7 @@ bool SketchSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
           aConstrIter->entityA, aConstrIter->entityB,
           aConstrIter->entityC, aConstrIter->entityD};
       for (int i = 0; i < 6; i++)
-        if (anEntIDs[i] == theEntityID)
+        if (anEntAndSubs.find(anEntIDs[i]) != anEntAndSubs.end())
           return false;
     }
     // The entity is not used, remove it and its parameters
@@ -188,7 +194,7 @@ const Slvs_Entity& SketchSolver_Storage::getEntity(const Slvs_hEntity& theEntity
 
   // Entity is not found, return empty object
   static Slvs_Entity aDummy;
-  aDummy.h = 0;
+  aDummy.h = SLVS_E_UNKNOWN;
   return aDummy;
 }
 
@@ -639,7 +645,7 @@ int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities)
     aResIndex--;
   while (aResIndex < aVecSize && aResIndex >= 0 && theEntities[aResIndex].h < theEntityID)
     aResIndex++;
-  if (aResIndex == -1)
+  if (aResIndex == -1 || (aResIndex < aVecSize && theEntities[aResIndex].h != theEntityID))
     aResIndex = aVecSize;
   return aResIndex;
 }
