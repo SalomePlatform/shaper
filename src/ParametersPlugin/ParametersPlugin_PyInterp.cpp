@@ -8,6 +8,7 @@
 #include <ParametersPlugin_PyInterp.h>
 
 #include <string>
+#include <stdexcept>
 
 ParametersPlugin_PyInterp::ParametersPlugin_PyInterp()
 : PyInterp_Interp()

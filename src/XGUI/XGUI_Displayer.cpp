@@ -45,6 +45,8 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 
 //#define DEBUG_DISPLAY
 //#define DEBUG_ACTIVATE
+//#define DEBUG_FEATURE_REDISPLAY
+//#define DEBUG_SELECTION_FILTERS
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -248,8 +250,15 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     }
     // Customization of presentation
     bool isCustomized = customizeObject(theObject);
+    #ifdef DEBUG_FEATURE_REDISPLAY
+      qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
+        arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
+    #endif
     if (!isEqualShapes || isCustomized) {
       aContext->Redisplay(aAISIO, false);
+      #ifdef DEBUG_FEATURE_REDISPLAY
+      //qDebug("  Redisplay happens");
+      #endif
       if (isUpdateViewer)
         updateViewer();
     }
@@ -698,7 +707,17 @@ void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
     if (theFilter.Access() == aIt.Value().Access())
       return;
   }
-  GetFilter()->Add(theFilter);
+  Handle(SelectMgr_CompositionFilter) aCompFilter = GetFilter();
+  const SelectMgr_ListOfFilter& aStoredFilters = aCompFilter->StoredFilters();
+  for (aIt.Initialize(aStoredFilters); aIt.More(); aIt.Next()) {
+    if (theFilter.Access() == aIt.Value().Access())
+      return;
+  }
+  aCompFilter->Add(theFilter);
+#ifdef DEBUG_SELECTION_FILTERS
+  int aCount = GetFilter()->StoredFilters().Extent();
+  qDebug(QString("addSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
+#endif
 }
 
 void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
@@ -709,6 +728,10 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
   Handle(SelectMgr_AndFilter) aCompositeFilter = GetFilter();
   if (aCompositeFilter->IsIn(theFilter))
     aCompositeFilter->Remove(theFilter);
+#ifdef DEBUG_SELECTION_FILTERS
+  int aCount = GetFilter()->StoredFilters().Extent();
+  qDebug(QString("removeSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
+#endif
 }
 
 void XGUI_Displayer::removeFilters()
@@ -754,6 +777,14 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     return;
 
   // deactivate object in all modes, which are not in the list of activation
+  // It seems that after the IO deactivation the selected state of the IO's owners
+  // is modified in OCC(version: 6.8.0) and the selection of the object later is lost.
+  // By this reason, the number of the IO deactivate is decreased and the object is deactivated
+  // only if there is a difference in the current modes and the parameters modes.
+  // If the selection problem happens again, it is possible to write a test scenario and create
+  // a bug. The bug steps are the following:
+  // Create two IO, activate them in 5 modes, select the first IO, deactivate 3 modes for both,
+  // with clicked SHIFT select the second object. The result is the selection of the first IO is lost.
   TColStd_ListOfInteger aTColModes;
   aContext->ActivatedModes(theIO, aTColModes);
   TColStd_ListIteratorOfListOfInteger itr( aTColModes );

@@ -248,6 +248,8 @@ bool SketchSolver_FeatureStorage::isInteract(FeaturePtr theFeature) const
 {
   if (myFeatures.find(theFeature) != myFeatures.end())
     return true;
+  if (!theFeature->data() || !theFeature->data()->isValid())
+    return false;
 
   std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
   std::list<AttributePtr>::iterator anIter = anAttributes.begin();

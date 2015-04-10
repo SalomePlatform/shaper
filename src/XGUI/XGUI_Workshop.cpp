@@ -550,7 +550,11 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
       #endif
 
       if (isVisibleObject)  { // redisplay visible object
-        displayObject(aObj);  // In order to update presentation
+        //displayObject(aObj);  // In order to update presentation
+        // in order to avoid the check whether the object can be redisplayed, the exact method
+        // of redisplay is called. This modification is made in order to have the line is updated
+        // by creation of a horizontal constraint on the line by preselection
+        myDisplayer->redisplay(aObj, false);
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           if (!aOperation->isEditOperation() &&

@@ -72,6 +72,12 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param isUpdate the parameter whether the viewer should be update immediatelly
   void displayAIS(AISObjectPtr theAIS, bool isUpdate = true);
 
+  /** Redisplay the shape if it was displayed
+   * \param theObject an object instance
+   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+   */
+  void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
+
   /**
    * Add presentations which corresponds to the given features to current selection
    * \param theFeatures a list of features to be selected
@@ -226,12 +232,7 @@ signals:
   void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
                bool isUpdateViewer = true);
 
-  /** Redisplay the shape if it was displayed
-   * \param theObject an object instance
-   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-   */
-  void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
-
+private:
   /// Activates the interactive object in the local context.
   /// \param theIO an interactive object
   /// \param theModes - modes on which it has to be activated (can be empty)

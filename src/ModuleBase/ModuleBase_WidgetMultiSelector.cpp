@@ -282,11 +282,10 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
       }
     }
   }
+  emit valuesChanged();
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.
   updateObject(myFeature);
-
-  emit valuesChanged();
 }
 
 //********************************************************************
@@ -334,6 +333,8 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList(AttributeSelectionListP
     AttributeSelectionPtr aAttr = theList->value(i);
     myListControl->addItem(aAttr->namingName().c_str());
   }
+  // We have to call repaint because sometimes the List control is not updated
+  myListControl->repaint();
 }
 
 //********************************************************************
