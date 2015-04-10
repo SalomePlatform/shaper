@@ -7,7 +7,6 @@
 #include <PartSet_WidgetPoint2d.h>
 #include <PartSet_WidgetPoint2dDistance.h>
 #include <PartSet_WidgetShapeSelector.h>
-#include <PartSet_WidgetConstraintShapeSelector.h>
 #include <PartSet_WidgetEditor.h>
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
@@ -472,11 +471,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
       new PartSet_WidgetShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
-  } if (theType == "sketch_constraint_shape_selector") {
-    PartSet_WidgetConstraintShapeSelector* aConstraintShapeSelectorWgt =
-      new PartSet_WidgetConstraintShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
-    aConstraintShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
-    aWgt = aConstraintShapeSelectorWgt;
   } if (theType == WDG_DOUBLEVALUE_EDITOR) {
     aWgt = new PartSet_WidgetEditor(theParent, workshop(), theWidgetApi, theParentId);
   } 

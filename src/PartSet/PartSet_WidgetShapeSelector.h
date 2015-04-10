@@ -63,6 +63,8 @@ protected:
 
   /// An external object
   ObjectPtr myExternalObject;
+
+  bool myUseExternal;
 };
 
 #endif

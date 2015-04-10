@@ -11,6 +11,7 @@
 #include <ModelAPI_Validator.h>
 
 #include <ModuleBase_Definitions.h>
+#include <Config_WidgetAPI.h>
 
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
@@ -23,8 +24,13 @@ PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
                                                          const Config_WidgetAPI* theData,
                                                          const std::string& theParentId)
-: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId)
+: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId), myUseExternal(true)
 {
+  QString aIsExternal(theData->getProperty("use_external").c_str());
+  if (!aIsExternal.isEmpty()) {
+    QString aStr = aIsExternal.toUpper();
+    myUseExternal = (aStr == "TRUE") || (aStr == "YES"); 
+  }
 }
 
 bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
@@ -35,9 +41,15 @@ bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aSelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
     return false;
+  // Do check using of external feature
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull()) {
+
+  // Do check that we can use external feature
+  if ((aSPFeature.get() != NULL) && aSPFeature->isExternal() && (!myUseExternal))
+    return false;
+
+  if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull() && myUseExternal) {
     aSelectedObject = PartSet_Tools::findFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
                                                   theSelectedObject, mySketch);
     if (!aSelectedObject.get()) {
