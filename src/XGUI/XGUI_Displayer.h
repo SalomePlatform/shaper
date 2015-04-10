@@ -225,13 +225,14 @@ signals:
   /// \return true if the object is succesfully displayed
   void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
                bool isUpdateViewer = true);
-
+public:
   /** Redisplay the shape if it was displayed
    * \param theObject an object instance
    * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
 
+private:
   /// Activates the interactive object in the local context.
   /// \param theIO an interactive object
   /// \param theModes - modes on which it has to be activated (can be empty)
