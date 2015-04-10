@@ -115,7 +115,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
   AttributeDoublePtr aReal = aData->real(attributeID());
   aReal->setValue(mySpinBox->value());
   std::string aTextRepr;
-  if (mySpinBox->hasVariables()) {
+  if (mySpinBox->hasVariable()) {
     aTextRepr = mySpinBox->text().toStdString();
   }
   aReal->setText(aTextRepr);

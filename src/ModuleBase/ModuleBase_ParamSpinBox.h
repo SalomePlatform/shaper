@@ -21,11 +21,8 @@ public:
   virtual void stepBy(int);
 
   virtual double valueFromText(const QString&) const;
-  virtual QString textFromValue(double) const;
 
   virtual QValidator::State validate(QString&, int&) const;
-
-  virtual void setDefaultValue(const double);
 
   virtual void setValue(double);
 
@@ -33,15 +30,15 @@ public:
 
   void setAcceptVariables(const bool);
   bool isAcceptVariables() const;
-  bool hasVariables() const;
+  bool hasVariable() const;
 
 signals:
   void textChanged(const QString&);
 
  protected:
+  bool hasVariable(const QString& theText) const;
   State isValid(const QString&, double&) const;
 
-  double defaultValue() const;
   bool checkRange(const double) const;
 
   bool findVariable(const QString&, double&) const;
@@ -58,13 +55,10 @@ signals:
   void connectSignalsAndSlots();
 
  private:
-  double myDefaultValue;
-
   QString myCorrectValue;
   QString myTextValue;
 
   bool myAcceptVariables;
-  bool myHasVariables;
 };
 
 #endif

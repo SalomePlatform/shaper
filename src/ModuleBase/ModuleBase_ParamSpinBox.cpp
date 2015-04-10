@@ -27,9 +27,7 @@
  */
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
     : ModuleBase_DoubleSpinBox(theParent, thePrecision),
-      myAcceptVariables(true),
-      myHasVariables(false),
-      myDefaultValue(0.)
+      myAcceptVariables(true)
 {
   connectSignalsAndSlots();
 }
@@ -52,17 +50,7 @@ ModuleBase_ParamSpinBox::~ModuleBase_ParamSpinBox()
  */
 void ModuleBase_ParamSpinBox::stepBy(int steps)
 {
-  QString str = text();
-  QString pref = prefix();
-  QString suff = suffix();
-
-  if (pref.length() && str.startsWith(pref))
-    str = str.right(str.length() - pref.length());
-  if (suff.length() && str.endsWith(suff))
-    str = str.left(str.length() - suff.length());
-
-  QRegExp varNameMask("([a-z]|[A-Z]|_).*");
-  if (varNameMask.exactMatch(str))
+  if (hasVariable())
     return;
 
   ModuleBase_DoubleSpinBox::stepBy(steps);
@@ -107,9 +95,6 @@ void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
   double value = 0;
   if (isValid(text, value) == Acceptable) {
     myCorrectValue = text;
-    myHasVariables = true;
-  } else {
-    myHasVariables = false;
   }
 }
 
@@ -121,24 +106,12 @@ void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
  */
 double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
 {
+  if (!hasVariable(theText))
+    return ModuleBase_DoubleSpinBox::valueFromText(theText);
+
   double aValue = 0;
-  if (isValid(theText, aValue) == Acceptable)
-    return aValue;
-
-  return defaultValue();
-}
-
-/*!
- \brief This function is used by the spin box whenever it needs to display
- the given value.
-
- \param val spin box value
- \return text representation of the value
- \sa valueFromText()
- */
-QString ModuleBase_ParamSpinBox::textFromValue(double val) const
-{
-  return ModuleBase_DoubleSpinBox::textFromValue(val);
+  findVariable(theText, aValue);
+  return aValue;
 }
 
 /*!
@@ -149,6 +122,10 @@ QString ModuleBase_ParamSpinBox::textFromValue(double val) const
  */
 QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) const
 {
+  // Trying to interpret the current input text as a numeric value
+  if (!hasVariable(str))
+    return ModuleBase_DoubleSpinBox::validate(str, pos);
+
   QValidator::State res = QValidator::Invalid;
 
   // Considering the input text as a variable name
@@ -166,21 +143,7 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
         res = QValidator::Intermediate;
     }
   }
-
-  // Trying to interpret the current input text as a numeric value
-  if (res == QValidator::Invalid)
-    res = ModuleBase_DoubleSpinBox::validate(str, pos);
-
   return res;
-}
-
-/*!
- \brief This function is used to set a default value for this spinbox.
- \param value default value
- */
-void ModuleBase_ParamSpinBox::setDefaultValue(const double value)
-{
-  myDefaultValue = value;
 }
 
 /*!
@@ -222,9 +185,15 @@ bool ModuleBase_ParamSpinBox::isAcceptVariables() const
   return myAcceptVariables;
 }
 
-bool ModuleBase_ParamSpinBox::hasVariables() const
+bool ModuleBase_ParamSpinBox::hasVariable() const
 {
-  return myHasVariables;
+  return hasVariable(text());
+}
+
+bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
+{
+  QRegExp varNameMask("([a-z]|[A-Z]|_).*");
+  return varNameMask.exactMatch(theText);
 }
 
 /*!
@@ -234,7 +203,7 @@ bool ModuleBase_ParamSpinBox::hasVariables() const
 ModuleBase_ParamSpinBox::State ModuleBase_ParamSpinBox::isValid(const QString& theText,
                                                                 double& theValue) const
 {
-  if (!findVariable(theText, theValue)) {
+  if (hasVariable() && !findVariable(theText, theValue)) {
     bool ok = false;
     theValue = locale().toDouble(theText, &ok);
     if (!ok) {
@@ -246,18 +215,6 @@ ModuleBase_ParamSpinBox::State ModuleBase_ParamSpinBox::isValid(const QString& t
   }
 
   return Acceptable;
-}
-
-/*!
- \brief This function return a default acceptable value (commonly, 0.0).
- \return default acceptable value
- */
-double ModuleBase_ParamSpinBox::defaultValue() const
-{
-  if (minimum() > myDefaultValue || maximum() < myDefaultValue)
-    return minimum();
-
-  return myDefaultValue;
 }
 
 /*!
@@ -304,7 +261,8 @@ void ModuleBase_ParamSpinBox::keyPressEvent(QKeyEvent* e)
 /*!
  \brief This function is called when the spinbox recieves show event.
  */
-void ModuleBase_ParamSpinBox::showEvent(QShowEvent*)
+void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
 {
-  setText(myTextValue);
+  ModuleBase_DoubleSpinBox::showEvent(theEvent);
+  //setText(myTextValue);
 }
