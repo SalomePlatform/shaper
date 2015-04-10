@@ -754,6 +754,14 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     return;
 
   // deactivate object in all modes, which are not in the list of activation
+  // It seems that after the IO deactivation the selected state of the IO's owners
+  // is modified in OCC(version: 6.8.0) and the selection of the object later is lost.
+  // By this reason, the number of the IO deactivate is decreased and the object is deactivated
+  // only if there is a difference in the current modes and the parameters modes.
+  // If the selection problem happens again, it is possible to write a test scenario and create
+  // a bug. The bug steps are the following:
+  // Create two IO, activate them in 5 modes, select the first IO, deactivate 3 modes for both,
+  // with clicked SHIFT select the second object. The result is the selection of the first IO is lost.
   TColStd_ListOfInteger aTColModes;
   aContext->ActivatedModes(theIO, aTColModes);
   TColStd_ListIteratorOfListOfInteger itr( aTColModes );

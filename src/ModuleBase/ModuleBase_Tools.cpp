@@ -112,11 +112,11 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 QString objectInfo(const ObjectPtr& theObj)
 {
   ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
-  FeaturePtr aFeature;// = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   QString aFeatureStr = "feature";
   if(aRes.get()) {
     aFeatureStr.append("(Result)");
-    //aFeature = ModelAPI_Feature::feature(aRes);
+    aFeature = ModelAPI_Feature::feature(aRes);
   }
   if (aFeature.get()) {
     aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
