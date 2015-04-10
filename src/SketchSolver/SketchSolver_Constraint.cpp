@@ -33,10 +33,16 @@ SketchSolver_Constraint::~SketchSolver_Constraint()
     myStorage->removeEntity(anIt2->second);
   myAttributeMap.clear();
 
-  std::map<FeaturePtr, Slvs_hEntity>::const_iterator anIt3 =  myFeatureMap.begin();
-  for (; anIt3 != myFeatureMap.end(); anIt3++)
-    myStorage->removeEntity(anIt3->second);
-  myFeatureMap.clear();
+  std::map<FeaturePtr, Slvs_hEntity>::iterator anIt3 =  myFeatureMap.begin();
+  while (!myFeatureMap.empty()) {
+    std::shared_ptr<SketchPlugin_Feature> aFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(anIt3->first);
+    Slvs_hEntity anEnt = anIt3->second;
+    std::map<FeaturePtr, Slvs_hEntity>::iterator aRemIt = anIt3++;
+    myFeatureMap.erase(aRemIt);
+    if (!myGroup->isInteract(aFeature))
+      myStorage->removeEntity(anEnt);
+  }
 
   std::vector<Slvs_hConstraint>::const_iterator anIt4 = mySlvsConstraints.begin();
   for (; anIt4 != mySlvsConstraints.end(); anIt4++)

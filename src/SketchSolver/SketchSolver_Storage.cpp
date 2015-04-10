@@ -192,6 +192,60 @@ const Slvs_Entity& SketchSolver_Storage::getEntity(const Slvs_hEntity& theEntity
   return aDummy;
 }
 
+Slvs_hEntity SketchSolver_Storage::copyEntity(const Slvs_hEntity& theCopied)
+{
+  int aPos = Search(theCopied, myEntities);
+  if (aPos < 0 || aPos >= (int)myEntities.size())
+    return SLVS_E_UNKNOWN;
+
+  Slvs_Entity aCopy = myEntities[aPos];
+  aCopy.h = SLVS_E_UNKNOWN;
+  int i = 0;
+  while (aCopy.point[i] != SLVS_E_UNKNOWN) {
+    aCopy.point[i] = copyEntity(aCopy.point[i]);
+    i++;
+  }
+  if (aCopy.param[0] != SLVS_E_UNKNOWN) {
+    aPos = Search(aCopy.param[0], myParameters);
+    i = 0;
+    while (aCopy.param[i] != SLVS_E_UNKNOWN) {
+      Slvs_Param aNewParam = myParameters[aPos];
+      aNewParam.h = SLVS_E_UNKNOWN;
+      aCopy.param[i] = addParameter(aNewParam);
+      i++;
+      aPos++;
+    }
+  }
+  return addEntity(aCopy);
+}
+
+void SketchSolver_Storage::copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo)
+{
+  int aPosFrom = Search(theFrom, myEntities);
+  int aPosTo = Search(theTo, myEntities);
+  if (aPosFrom < 0 || aPosFrom >= (int)myEntities.size() || 
+      aPosTo < 0 || aPosTo >= (int)myEntities.size())
+    return;
+
+  Slvs_Entity aEntFrom = myEntities[aPosFrom];
+  Slvs_Entity aEntTo = myEntities[aPosTo];
+  int i = 0;
+  while (aEntFrom.point[i] != SLVS_E_UNKNOWN) {
+    copyEntity(aEntFrom.point[i], aEntTo.point[i]);
+    i++;
+  }
+  if (aEntFrom.param[0] != SLVS_E_UNKNOWN) {
+    aPosFrom = Search(aEntFrom.param[0], myParameters);
+    aPosTo = Search(aEntTo.param[0], myParameters);
+    i = 0;
+    while (aEntFrom.param[i] != SLVS_E_UNKNOWN) {
+      myParameters[aPosTo++].val = myParameters[aPosFrom++].val;
+      i++;
+    }
+  }
+}
+
+
 Slvs_hConstraint SketchSolver_Storage::isPointFixed(const Slvs_hEntity& thePointID) const
 {
   // Search the set of coincident points

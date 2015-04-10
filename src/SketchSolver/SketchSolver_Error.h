@@ -59,6 +59,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Mirror constraint has wrong attributes");
     return MY_ERROR_VALUE;
   }
+  /// Crash in SolveSpace
+  inline static const std::string& SOLVESPACE_CRASH()
+  {
+    static const std::string MY_ERROR_VALUE("Caution: SolveSpace crash! Constraints are wrong");
+    return MY_ERROR_VALUE;
+  }
 };
 
 #endif

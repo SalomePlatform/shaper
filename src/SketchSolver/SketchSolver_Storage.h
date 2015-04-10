@@ -60,6 +60,10 @@ public:
   bool removeEntity(const Slvs_hEntity& theEntityID);
   /// \brief Returns the entity by its ID
   const Slvs_Entity& getEntity(const Slvs_hEntity& theEntityID) const;
+  /// \brief Makes a full copy of the given entity
+  Slvs_hEntity copyEntity(const Slvs_hEntity& theCopied);
+  /// \brief Copy one entity to another
+  void copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo);
 
   /// \brief Verifies the current point or another coincident one is fixed
   /// \return the ID of the Fixed constraint or SLVS_E_UNKNOWN

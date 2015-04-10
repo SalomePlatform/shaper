@@ -207,6 +207,7 @@ void SketchSolver_ConstraintMirror::update(ConstraintPtr theConstraint)
     if (aMirroredRefList->size() != myNumberOfObjects) {
       remove(myBaseConstraint);
       process();
+      return;
     }
   }
   SketchSolver_Constraint::update();

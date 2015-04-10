@@ -5,6 +5,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_Line.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
@@ -31,63 +32,20 @@ void SketchSolver_ConstraintRigid::process()
   double aValue;
   std::vector<Slvs_hEntity> anEntities;
   getAttributes(aValue, anEntities);
-  if (!myErrorMsg.empty())
+  if (!myErrorMsg.empty() || myFeatureMap.empty())
     return;
 
-  Slvs_Constraint aConstraint;
-  std::vector<Slvs_hConstraint>::iterator aConstrIter = mySlvsConstraints.begin();
-  bool isEmpty = aConstrIter == mySlvsConstraints.end();
-
-  // Check the fixed entity is an arc
-  if (isEmpty) {
-    if (!myFeatureMap.empty() && myFeatureMap.begin()->first->getKind() == SketchPlugin_Arc::ID()) {
-      Slvs_Entity anArc = myStorage->getEntity(myFeatureMap.begin()->second);
-      fixArc(anArc);
-      return;
-    }
+  if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Line::ID()) {
+    Slvs_Entity aLine = myStorage->getEntity(myFeatureMap.begin()->second);
+    fixLine(aLine);
   }
-
-  std::vector<Slvs_hEntity>::const_iterator anEntIter = anEntities.begin();
-  for (; anEntIter != anEntities.end(); anEntIter++) {
-    if (*anEntIter == SLVS_E_UNKNOWN)
-      continue;
-    Slvs_hConstraint aConstrID = myStorage->isPointFixed(*anEntIter);
-    bool isForceUpdate = (aConstrID != SLVS_E_UNKNOWN && !myBaseConstraint &&
-                          myStorage->isTemporary(aConstrID));
-    if (isEmpty && !isForceUpdate) { // create new constraint
-      if (aConstrID != SLVS_E_UNKNOWN)
-        continue; // the coincident point is already fixed
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), getType(), myGroup->getWorkplaneId(),
-          aValue, *anEntIter, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-      aConstraint.h = myStorage->addConstraint(aConstraint);
-      mySlvsConstraints.push_back(aConstraint.h);
-      if (!myBaseConstraint)
-        myStorage->addConstraintWhereDragged(aConstraint.h);
-    } else { // update already existent constraint
-      if (aConstrID == SLVS_E_UNKNOWN || myBaseConstraint)
-        aConstrID = *aConstrIter;
-      aConstraint = myStorage->getConstraint(aConstrID);
-      aConstraint.ptA = *anEntIter;
-      myStorage->addConstraint(aConstraint);
-      if (!myBaseConstraint)
-        myStorage->addConstraintWhereDragged(aConstraint.h);
-      if (!isEmpty) {
-        aConstrIter++;
-        isEmpty = aConstrIter == mySlvsConstraints.end();
-      }
-    }
+  else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Arc::ID()) {
+    Slvs_Entity anArc = myStorage->getEntity(myFeatureMap.begin()->second);
+    fixArc(anArc);
   }
-
-  if (!myFeatureMap.empty() && myFeatureMap.begin()->first->getKind() == SketchPlugin_Circle::ID()) {
-    // Fix radius of a circle
-    AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-        myFeatureMap.begin()->first->attribute(SketchPlugin_Circle::RADIUS_ID()));
-    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER, myGroup->getWorkplaneId(),
-      aRadiusAttr->value() * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, myFeatureMap.begin()->second, SLVS_E_UNKNOWN);
-    aConstraint.h = myStorage->addConstraint(aConstraint);
-    mySlvsConstraints.push_back(aConstraint.h);
-    if (!myBaseConstraint)
-      myStorage->addConstraintWhereDragged(aConstraint.h);
+  else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Circle::ID()) {
+    Slvs_Entity aCirc = myStorage->getEntity(myFeatureMap.begin()->second);
+    fixArc(aCirc);
   }
 }
 
@@ -184,14 +142,131 @@ bool SketchSolver_ConstraintRigid::remove(ConstraintPtr theConstraint)
   return true;
 }
 
+void SketchSolver_ConstraintRigid::fixPoint(const Slvs_hEntity& thePointID)
+{
+  if (thePointID == SLVS_E_UNKNOWN)
+    return;
+
+  Slvs_Constraint aConstraint;
+  Slvs_hConstraint aConstrID = myStorage->isPointFixed(thePointID);
+  bool isForceUpdate = (aConstrID != SLVS_E_UNKNOWN && !myBaseConstraint &&
+                        myStorage->isTemporary(aConstrID));
+  if (!isForceUpdate) { // create new constraint
+    if (aConstrID != SLVS_E_UNKNOWN)
+      return; // the coincident point is already fixed
+    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), getType(), myGroup->getWorkplaneId(),
+        0.0, thePointID, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+    aConstraint.h = myStorage->addConstraint(aConstraint);
+    mySlvsConstraints.push_back(aConstraint.h);
+    if (!myBaseConstraint)
+      myStorage->addConstraintWhereDragged(aConstraint.h);
+  } else { // update already existent constraint
+    if (aConstrID == SLVS_E_UNKNOWN || myBaseConstraint)
+      return;
+    aConstraint = myStorage->getConstraint(aConstrID);
+    aConstraint.ptA = thePointID;
+    myStorage->addConstraint(aConstraint);
+    if (!myBaseConstraint)
+      myStorage->addConstraintWhereDragged(aConstraint.h);
+  }
+}
+
+void SketchSolver_ConstraintRigid::fixLine(const Slvs_Entity& theLine)
+{
+  Slvs_Constraint anEqual;
+  if (isUsedInEqual(theLine, anEqual)) {
+    // Check another entity of Equal is already fixed
+    Slvs_hEntity anOtherEntID = anEqual.entityA == theLine.h ? anEqual.entityB : anEqual.entityA;
+    Slvs_Entity anOtherEntity = myStorage->getEntity(anOtherEntID);
+    if (isFixed(anOtherEntity)) {
+      // Fix start point of the line (if end point is not fixed yet) ...
+      Slvs_hConstraint anEndFixedID = myStorage->isPointFixed(theLine.point[1]);
+      if (anEndFixedID == SLVS_E_UNKNOWN)
+        fixPoint(theLine.point[0]);
+      // ...  and create fixed point lying on this line
+      Slvs_hEntity aPointToCopy = anEndFixedID == SLVS_E_UNKNOWN ? theLine.point[1] : theLine.point[0];
+      // Firstly, search already fixed point on line
+      bool isPonLineFixed = false;
+      Slvs_hEntity aFixedPoint;
+      std::list<Slvs_Constraint> aPonLineList = myStorage->getConstraintsByType(SLVS_C_PT_ON_LINE);
+      std::list<Slvs_Constraint>::const_iterator aPLIter = aPonLineList.begin();
+      for (; aPLIter != aPonLineList.end() && !isPonLineFixed; aPLIter++)
+        if (aPLIter->entityA == theLine.h) {
+          isPonLineFixed = (myStorage->isPointFixed(aPLIter->ptA) != SLVS_E_UNKNOWN);
+          aFixedPoint = aPLIter->ptA;
+        }
+
+      if (isPonLineFixed) { // update existent constraint
+        myStorage->copyEntity(aPointToCopy, aFixedPoint);
+      } else { // create new constraint
+        Slvs_hEntity aCopied = myStorage->copyEntity(aPointToCopy);
+        Slvs_Constraint aPonLine = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_PT_ON_LINE,
+            myGroup->getWorkplaneId(), 0.0, aCopied, SLVS_E_UNKNOWN, theLine.h, SLVS_E_UNKNOWN);
+        aPonLine.h = myStorage->addConstraint(aPonLine);
+        mySlvsConstraints.push_back(aPonLine.h);
+        fixPoint(aCopied);
+      }
+      return;
+    }
+  }
+
+  for (int i = 0; i < 2; i++)
+    fixPoint(theLine.point[i]);
+}
+
+void SketchSolver_ConstraintRigid::fixCircle(const Slvs_Entity& theCircle)
+{
+  bool isFixRadius = true;
+  // Verify the arc is under Equal constraint
+  Slvs_Constraint anEqual;
+  if (isUsedInEqual(theCircle, anEqual)) {
+    // Check another entity of Equal is already fixed
+    Slvs_hEntity anOtherEntID = anEqual.entityA == theCircle.h ? anEqual.entityB : anEqual.entityA;
+    Slvs_Entity anOtherEntity = myStorage->getEntity(anOtherEntID);
+    if (isFixed(anOtherEntity))
+      isFixRadius = false;
+  }
+
+  fixPoint(theCircle.point[0]);
+
+  if (isFixRadius) {
+    // Fix radius of a circle
+    AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        myFeatureMap.begin()->first->attribute(SketchPlugin_Circle::RADIUS_ID()));
+    Slvs_Constraint aFixedR = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER,
+        myGroup->getWorkplaneId(), aRadiusAttr->value() * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
+        myFeatureMap.begin()->second, SLVS_E_UNKNOWN);
+    aFixedR.h = myStorage->addConstraint(aFixedR);
+    mySlvsConstraints.push_back(aFixedR.h);
+  }
+}
 
 void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
 {
-  Slvs_Constraint aConstraint;
+  bool isFixRadius = true;
+  std::list<Slvs_hEntity> aPointsToFix;
+  aPointsToFix.push_back(theArc.point[1]);
+  aPointsToFix.push_back(theArc.point[2]);
+
+  // Verify the arc is under Equal constraint
+  Slvs_Constraint anEqual;
+  if (isUsedInEqual(theArc, anEqual)) {
+    // Check another entity of Equal is already fixed
+    Slvs_hEntity anOtherEntID = anEqual.entityA == theArc.h ? anEqual.entityB : anEqual.entityA;
+    Slvs_Entity anOtherEntity = myStorage->getEntity(anOtherEntID);
+    if (isFixed(anOtherEntity)) {
+      isFixRadius = false;
+      if (anOtherEntity.type == SLVS_E_LINE_SEGMENT) {
+        aPointsToFix.pop_back();
+        aPointsToFix.push_back(theArc.point[0]);
+      }
+    }
+  }
+
   Slvs_hConstraint aConstrID = myStorage->isPointFixed(theArc.point[0]);
-  int aPointsToFix = 2; // number of fixed points for the arc
+  int aNbPointsToFix = 2; // number of fixed points for the arc
   if (aConstrID != SLVS_E_UNKNOWN)
-    aPointsToFix--;
+    aNbPointsToFix--;
 
   // Radius of the arc
   FeaturePtr aFeature = myFeatureMap.begin()->first;
@@ -218,32 +293,69 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
     myStorage->updateParameter(aParam);
   }
 
-  for (int i = 1; aPointsToFix > 0; i++, aPointsToFix--) {
-    aConstrID = myStorage->isPointFixed(theArc.point[i]);
-    if (aConstrID != SLVS_E_UNKNOWN)
-      continue; // the coincident point is already fixed
-    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), getType(), myGroup->getWorkplaneId(),
-        0.0, theArc.point[i], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-    aConstraint.h = myStorage->addConstraint(aConstraint);
-    mySlvsConstraints.push_back(aConstraint.h);
-    if (!myBaseConstraint)
-      myStorage->addConstraintWhereDragged(aConstraint.h);
+  std::list<Slvs_hEntity>::iterator aPtIt = aPointsToFix.begin();
+  for (; aNbPointsToFix > 0; aPtIt++, aNbPointsToFix--)
+    fixPoint(*aPtIt);
+
+  if (isFixRadius) {
+    // Fix radius of the arc
+    bool isExists = false;
+    std::list<Slvs_Constraint> aDiamConstraints = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
+    std::list<Slvs_Constraint>::iterator anIt = aDiamConstraints.begin();
+    for (; anIt != aDiamConstraints.end() && !isExists; anIt++)
+      if (anIt->entityA == myFeatureMap.begin()->second)
+        isExists = true;
+    if (!isExists) {
+      Slvs_Constraint aFixedR = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER,
+          myGroup->getWorkplaneId(), aRadius * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
+          myFeatureMap.begin()->second, SLVS_E_UNKNOWN);
+      aFixedR.h = myStorage->addConstraint(aFixedR);
+      mySlvsConstraints.push_back(aFixedR.h);
+      if (!myBaseConstraint)
+        myStorage->addConstraintWhereDragged(aFixedR.h);
+    }
+  }
+}
+
+bool SketchSolver_ConstraintRigid::isUsedInEqual(
+    const Slvs_Entity& theEntity, Slvs_Constraint& theEqual) const
+{
+  // Check the entity is used in Equal constraint
+  std::list<Slvs_Constraint> anEqualConstr = myStorage->getConstraintsByType(SLVS_C_EQUAL_LENGTH_LINES);
+  std::list<Slvs_Constraint> anAddList = myStorage->getConstraintsByType(SLVS_C_EQUAL_LINE_ARC_LEN);
+  anEqualConstr.insert(anEqualConstr.end(), anAddList.begin(), anAddList.end());
+  anAddList = myStorage->getConstraintsByType(SLVS_C_EQUAL_RADIUS);
+  anEqualConstr.insert(anEqualConstr.end(), anAddList.begin(), anAddList.end());
+
+  std::list<Slvs_Constraint>::const_iterator anEqIter = anEqualConstr.begin();
+  for (; anEqIter != anEqualConstr.end(); anEqIter++)
+    if (anEqIter->entityA == theEntity.h || anEqIter->entityB == theEntity.h) {
+      theEqual = *anEqIter;
+      return true;
+    }
+  return false;
+}
+
+bool SketchSolver_ConstraintRigid::isFixed(const Slvs_Entity& theEntity) const
+{
+  if (theEntity.type == SLVS_E_POINT_IN_2D)
+    return myStorage->isPointFixed(theEntity.h) != SLVS_E_UNKNOWN;
+
+  // Check all the points of entity are fixed
+  int aNbFixed = 0;
+  for (int i = 0; i < 4; i++) {
+    if (theEntity.point[i] != SLVS_E_UNKNOWN &&
+        myStorage->isPointFixed(theEntity.point[i]) != SLVS_E_UNKNOWN)
+      aNbFixed++;
   }
 
-  // Fix radius of the arc
-  bool isExists = false;
-  std::list<Slvs_Constraint> aDiamConstraints = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
-  std::list<Slvs_Constraint>::iterator anIt = aDiamConstraints.begin();
-  for (; anIt != aDiamConstraints.end() && !isExists; anIt++)
-    if (anIt->entityA == myFeatureMap.begin()->second)
-      isExists = true;
-  if (!isExists) {
-    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER, myGroup->getWorkplaneId(),
-      aRadius * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, myFeatureMap.begin()->second, SLVS_E_UNKNOWN);
-    aConstraint.h = myStorage->addConstraint(aConstraint);
-    mySlvsConstraints.push_back(aConstraint.h);
-    if (!myBaseConstraint)
-      myStorage->addConstraintWhereDragged(aConstraint.h);
+  switch (theEntity.type) {
+  case SLVS_E_LINE_SEGMENT:
+  case SLVS_E_ARC_OF_CIRCLE:
+    if (aNbFixed == 2) return true;
+  case SLVS_E_CIRCLE:
+    if (aNbFixed == 1) return true;
   }
+  return false;
 }
 

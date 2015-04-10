@@ -384,7 +384,13 @@ bool SketchSolver_Group::resolveConstraints()
     myConstrSolver.setGroupID(myID);
     myStorage->initializeSolver(myConstrSolver);
 
-    int aResult = myConstrSolver.solve();
+    int aResult = SLVS_RESULT_OKAY;
+    try {
+      aResult = myConstrSolver.solve();
+    } catch (...) {
+      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
+      return false;
+    }
     if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
       myFeatureStorage->blockEvents(true);
       ConstraintConstraintMap::iterator aConstrIter = myConstraints.begin();

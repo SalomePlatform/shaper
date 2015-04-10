@@ -49,10 +49,26 @@ protected:
   virtual void adjustConstraint();
 
 private:
+  /// \brief Fixing line position (start and end points)
+  void fixLine(const Slvs_Entity& theLine);
+  /// \brief Fixing circle (center and radius)
+  void fixCircle(const Slvs_Entity& theCircle);
   /// \brief The arc is fixed differently to avoid SolveSpace problems (overconstraint)
   ///
   /// There will be fixed start and end points and the radius of the arc.
   void fixArc(const Slvs_Entity& theArc);
+
+  /// \brief Fix given point
+  void fixPoint(const Slvs_hEntity& thePointID);
+
+  /// \brief Verifies the entity is used in any equal constraint
+  /// \param[in]  theEntity entity to be found
+  /// \param[out] theEqual  constraint, which uses the entity
+  /// \return \c true, if the Equal constrait is found
+  bool isUsedInEqual(const Slvs_Entity& theEntity, Slvs_Constraint& theEqual) const;
+
+  /// \brief Verifies the entity is already fixed
+  bool isFixed(const Slvs_Entity& theEntity) const;
 
 protected:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
