@@ -102,18 +102,18 @@
       
     <!--  SketchConstraintParallel  -->
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
             <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         
-        <sketch_constraint_shape_selector id="ConstraintEntityB" label="Second line" tooltip="Select a line" 
+        <sketch_shape_selector id="ConstraintEntityB" label="Second line" tooltip="Select a line" 
             shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
             <validator id="PartSet_DifferentObjects"/>
             <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         <validator id="PartSet_ParallelSelection"/>
       </feature>
       
@@ -121,20 +121,20 @@
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" 
         tooltip="Create constraint defining two perpendicular lines" 
         icon=":icons/perpendicular.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select an line" 
             shape_types="edge">
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
             <validator id="GeomValidators_Edge" parameters="line"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         
-        <sketch_constraint_shape_selector id="ConstraintEntityB" 
+        <sketch_shape_selector id="ConstraintEntityB" 
             label="Second line" tooltip="Select an line" 
             shape_types="edge">
             <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
             <validator id="GeomValidators_Edge" parameters="line"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         <validator id="PartSet_PerpendicularSelection"/>
       </feature>
 
@@ -159,19 +159,19 @@
       
     <!--  SketchConstraintHorizontal  -->
       <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon=":icons/horisontal.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
-            label="Line" tooltip="Select a line" shape_types="edge">
+        <sketch_shape_selector id="ConstraintEntityA" 
+            label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
             <validator id="GeomValidators_Edge" parameters="line"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         <validator id="PartSet_HVDirSelection"/>
       </feature>
       
     <!--  SketchConstraintVertical  -->
       <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon=":icons/vertical.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
-            label="Line" tooltip="Select a line" shape_types="edge">
+        <sketch_shape_selector id="ConstraintEntityA" 
+            label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
             <validator id="GeomValidators_Edge" parameters="line"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         <validator id="PartSet_HVDirSelection"/>
       </feature>
       
@@ -179,28 +179,28 @@
       <feature id="SketchConstraintEqual" title="Equal"
         tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle"
         icon=":icons/equal.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         
-        <sketch_constraint_shape_selector id="ConstraintEntityB"
+        <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line, circle or arc" shape_types="edge">
           <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
           <validator id="PartSet_DifferentObjects"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
       </feature>
       
     <!--  SketchConstraintTangent  -->
       <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects" icon=":icons/tangent.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         
-        <sketch_constraint_shape_selector id="ConstraintEntityB"
+        <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line or arc" shape_types="edge">
         <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityA"/>
         <validator id="PartSet_DifferentObjects"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         <validator id="PartSet_TangentSelection"/>
       </feature>
       
@@ -210,13 +210,13 @@
     <group id="Edit">
       <!--  SketchConstraintFillet  -->
       <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
-        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
 
-        <sketch_constraint_shape_selector id="ConstraintEntityB"
+        <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line or arc" shape_types="edge">
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
 
         <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
           <validator id="GeomValidators_Positive"/>
@@ -229,10 +229,10 @@
         id="SketchConstraintMirror"
         title="Mirror" icon=":icons/mirror.png"
         tooltip="Create constraint, mirroring group of objects">
-        <sketch_constraint_shape_selector id="ConstraintEntityA"
+        <sketch_shape_selector id="ConstraintEntityA"
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
-        </sketch_constraint_shape_selector>
+        </sketch_shape_selector>
         <multi_selector id="ConstraintMirrorList"
             label="List of objects"
             tooltip="Select list of mirroring objects"
