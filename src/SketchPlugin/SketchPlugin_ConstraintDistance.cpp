@@ -105,7 +105,7 @@ bool SketchPlugin_ConstraintDistance::compute(const std::string& theAttributeId)
   std::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPnt_A->x(), aPnt_A->y());
   std::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPnt_B->x(), aPnt_B->y());
   // it is not possible to create lin2d on the points with equal position
-  if (aPoint1->distance(aPoint1) < tolerance)
+  if (aPoint1->distance(aPoint2) < tolerance)
     return false;
 
   std::shared_ptr<GeomAPI_Lin2d> aLine = std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPnt_A, aPnt_B));
