@@ -246,29 +246,162 @@ void SketchSolver_Storage::copyEntity(const Slvs_hEntity& theFrom, const Slvs_hE
 }
 
 
-Slvs_hConstraint SketchSolver_Storage::isPointFixed(const Slvs_hEntity& thePointID) const
+bool SketchSolver_Storage::isPointFixed(
+    const Slvs_hEntity& thePointID, Slvs_hConstraint& theFixed, bool theAccurate) const
 {
   // Search the set of coincident points
+  std::set<Slvs_hEntity> aCoincident;
+  aCoincident.insert(thePointID);
   std::vector< std::set<Slvs_hEntity> >::const_iterator aCPIter = myCoincidentPoints.begin();
   for (; aCPIter != myCoincidentPoints.end(); aCPIter++)
-    if (aCPIter->find(thePointID) != aCPIter->end())
+    if (aCPIter->find(thePointID) != aCPIter->end()) {
+      aCoincident = *aCPIter;
       break;
-  if (aCPIter == myCoincidentPoints.end()) {
-    std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
-    for (; aConstrIter != myConstraints.end(); aConstrIter++)
-      if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
-          aConstrIter->ptA == thePointID)
-        return aConstrIter->h;
-    return SLVS_E_UNKNOWN;
-  }
+    }
 
   // Search the Rigid constraint
   std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
   for (; aConstrIter != myConstraints.end(); aConstrIter++)
     if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
-        aCPIter->find(aConstrIter->ptA) != aCPIter->end())
-      return aConstrIter->h;
+        aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
+      theFixed = aConstrIter->h;
+      return true;
+    }
+
+  if (theAccurate) {
+    // Try to find the fixed entity which uses such point or its coincidence
+    std::vector<Slvs_Entity>::const_iterator anEntIter = myEntities.begin();
+    for (; anEntIter != myEntities.end(); anEntIter++) {
+      for (int i = 0; i < 4; i++) {
+        Slvs_hEntity aPt = anEntIter->point[i];
+        if (aPt != SLVS_E_UNKNOWN &&
+            (aPt == thePointID || aCoincident.find(aPt) != aCoincident.end())) {
+          if (isEntityFixed(anEntIter->h, true))
+            return true;
+        }
+      }
+    }
+  }
   return SLVS_E_UNKNOWN;
+}
+
+bool SketchSolver_Storage::isEntityFixed(const Slvs_hEntity& theEntityID, bool theAccurate) const
+{
+  int aPos = Search(theEntityID, myEntities);
+  if (aPos < 0 || aPos >= (int)myEntities.size())
+    return false;
+
+  // Firstly, find how many points are under Rigid constraint
+  int aNbFixed = 0;
+  for (int i = 0; i < 4; i++) {
+    Slvs_hEntity aPoint = myEntities[aPos].point[i];
+    if (aPoint == SLVS_E_UNKNOWN)
+      continue;
+
+    std::set<Slvs_hEntity> aCoincident;
+    aCoincident.insert(aPoint);
+    std::vector< std::set<Slvs_hEntity> >::const_iterator aCPIter = myCoincidentPoints.begin();
+    for (; aCPIter != myCoincidentPoints.end(); aCPIter++)
+      if (aCPIter->find(aPoint) != aCPIter->end()) {
+        aCoincident = *aCPIter;
+        break;
+      }
+
+    // Search the Rigid constraint
+    std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+    for (; aConstrIter != myConstraints.end(); aConstrIter++)
+      if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
+          aCoincident.find(aConstrIter->ptA) != aCoincident.end())
+        aNbFixed++;
+  }
+
+  std::list<Slvs_Constraint> aList;
+  std::list<Slvs_Constraint>::iterator anIt;
+  Slvs_hConstraint aTempID; // used in isPointFixed() method
+
+  if (myEntities[aPos].type == SLVS_E_LINE_SEGMENT) {
+    if (aNbFixed == 2)
+      return true;
+    else if (aNbFixed == 0 || !theAccurate)
+      return false;
+    // Additional check (the line may be fixed if it is used by different constraints):
+    // 1. The line is used in Equal constraint, another entity is fixed and there is a fixed point on line
+    aList = getConstraintsByType(SLVS_C_PT_ON_LINE);
+    for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+      if (anIt->entityA == theEntityID && isPointFixed(anIt->ptA, aTempID))
+        break;
+    if (anIt != aList.end()) {
+      aList = getConstraintsByType(SLVS_C_EQUAL_LENGTH_LINES);
+      aList.splice(aList.end(), getConstraintsByType(SLVS_C_EQUAL_LINE_ARC_LEN));
+      for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+        if (anIt->entityA == theEntityID || anIt->entityB == theEntityID) {
+          Slvs_hEntity anOther = anIt->entityA == theEntityID ? anIt->entityB : anIt->entityA;
+          if (isEntityFixed(anOther, false))
+            return true;
+        }
+    }
+    // 2. The line is used in Parallel/Perpendicular and Length constraints
+    aList = getConstraintsByType(SLVS_C_PARALLEL);
+    aList.splice(aList.end(), getConstraintsByType(SLVS_C_PERPENDICULAR));
+    for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+      if (anIt->entityA == theEntityID || anIt->entityB == theEntityID) {
+        Slvs_hEntity anOther = anIt->entityA == theEntityID ? anIt->entityB : anIt->entityA;
+        if (isEntityFixed(anOther, false))
+          break;
+      }
+    if (anIt != aList.end()) {
+      aList = getConstraintsByType(SLVS_C_PT_PT_DISTANCE);
+      for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+        if ((anIt->ptA == myEntities[aPos].point[0] && anIt->ptB == myEntities[aPos].point[1]) ||
+            (anIt->ptA == myEntities[aPos].point[1] && anIt->ptB == myEntities[aPos].point[0]))
+          return true;
+    }
+    // 3. Another verifiers ...
+  } else if (myEntities[aPos].type == SLVS_E_CIRCLE) {
+    if (aNbFixed == 0)
+      return false;
+    // Search for Diameter constraint
+    aList = getConstraintsByType(SLVS_C_DIAMETER);
+    for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+      if (anIt->entityA == theEntityID)
+        return true;
+    if (!theAccurate)
+      return false;
+    // Additional check (the circle may be fixed if it is used by different constraints):
+    // 1. The circle is used in Equal constraint and another entity is fixed
+    aList = getConstraintsByType(SLVS_C_EQUAL_RADIUS);
+    for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+      if (anIt->entityA == theEntityID || anIt->entityB == theEntityID) {
+        Slvs_hEntity anOther = anIt->entityA == theEntityID ? anIt->entityB : anIt->entityA;
+        if (isEntityFixed(anOther, false))
+          return true;
+      }
+    // 2. Another verifiers ...
+  } else if (myEntities[aPos].type == SLVS_E_ARC_OF_CIRCLE) {
+    if (aNbFixed > 2)
+      return true;
+    else if (aNbFixed <= 1)
+      return false;
+    // Search for Diameter constraint
+    aList = getConstraintsByType(SLVS_C_DIAMETER);
+    for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+      if (anIt->entityA == theEntityID)
+        return true;
+    if (!theAccurate)
+      return false;
+    // Additional check (the arc may be fixed if it is used by different constraints):
+    // 1. The arc is used in Equal constraint and another entity is fixed
+    aList = getConstraintsByType(SLVS_C_EQUAL_RADIUS);
+    aList.splice(aList.end(), getConstraintsByType(SLVS_C_EQUAL_LINE_ARC_LEN));
+    for (anIt = aList.begin(); anIt != aList.end(); anIt++)
+      if (anIt->entityA == theEntityID || anIt->entityB == theEntityID) {
+        Slvs_hEntity anOther = anIt->entityA == theEntityID ? anIt->entityB : anIt->entityA;
+        if (isEntityFixed(anOther, false))
+          return true;
+      }
+    // 2. Another verifiers ...
+  }
+  return false;
 }
 
 

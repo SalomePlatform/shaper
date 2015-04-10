@@ -67,9 +67,6 @@ private:
   /// \return \c true, if the Equal constrait is found
   bool isUsedInEqual(const Slvs_Entity& theEntity, Slvs_Constraint& theEqual) const;
 
-  /// \brief Verifies the entity is already fixed
-  bool isFixed(const Slvs_Entity& theEntity) const;
-
 protected:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
 };
