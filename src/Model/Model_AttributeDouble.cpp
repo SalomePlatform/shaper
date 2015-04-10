@@ -33,6 +33,8 @@ Model_AttributeDouble::Model_AttributeDouble(TDF_Label& theLabel)
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just zero
     myReal = TDataStd_Real::Set(theLabel, 0.);
+  }
+  if (!theLabel.FindAttribute(TDataStd_Name::GetID(), myText)) {
     myText = TDataStd_Name::Set(theLabel, TCollection_ExtendedString());
   }
 }
