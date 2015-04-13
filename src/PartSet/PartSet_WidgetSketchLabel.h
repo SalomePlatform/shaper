@@ -97,7 +97,7 @@ protected:
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
-  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -110,8 +110,8 @@ protected:
   virtual void activateCustom();
 
  private slots:
-   /// Slot on plane selection
-  void onPlaneSelected();
+   /// Slot on change selection
+  void onSelectionChanged();
 
   /// Set sketch specific mode of selection
   //void setSketchingMode();

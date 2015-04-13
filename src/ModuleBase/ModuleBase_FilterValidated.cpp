@@ -9,8 +9,10 @@
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelection.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_WidgetValidated.h>
+#include <ModuleBase_ViewerPrs.h>
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterValidated, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
@@ -25,6 +27,9 @@ Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityO
   ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
   ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                           (anActiveWidget);
-  return !aWidgetValidated || aWidgetValidated->isValid(theOwner);
+  ModuleBase_ViewerPrs aPrs;
+  myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+
+  return !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
 }
 

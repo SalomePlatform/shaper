@@ -93,8 +93,8 @@
 #include <dlfcn.h>
 #endif
 
-//#define DEBUG_FEATURE_CREATED
-//#define DEBUG_FEATURE_REDISPLAY
+#define DEBUG_FEATURE_CREATED
+#define DEBUG_FEATURE_REDISPLAY
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
@@ -565,6 +565,10 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
         ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
         if (aOperation && aOperation->hasObject(aObj)) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+          #ifdef DEBUG_FEATURE_REDISPLAY
+            QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
+            qDebug(QString("  display object = %1").arg(anObjInfo).toStdString().c_str());
+          #endif
           if (displayObject(aObj)) {
             // Deactivate object of current operation from selection
             if (myDisplayer->isActive(aObj))

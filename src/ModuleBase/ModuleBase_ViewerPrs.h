@@ -47,7 +47,7 @@ class ModuleBase_ViewerPrs
 
   /// Sets the object.
   /// \param theResult an object instance
-  void setFeature(ObjectPtr theResult)
+  void setObject(ObjectPtr theResult)
   {
     myResult = theResult;
   }
@@ -98,6 +98,14 @@ class ModuleBase_ViewerPrs
   Handle(AIS_InteractiveObject) interactive() const
   {
     return myInteractive;
+  }
+
+  /// Returns true if all presentation fields are empty
+  /// \return boolean value
+  bool isEmpty() const
+  {
+    return myShape.IsNull() &&
+           myOwner.IsNull() && !myResult.get();
   }
 
   /// Returns True if the current object is equal to the given one

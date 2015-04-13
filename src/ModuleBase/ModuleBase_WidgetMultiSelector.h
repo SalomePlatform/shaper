@@ -74,7 +74,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
-  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
  public slots:
   /// Slot is called on selection type changed
