@@ -14,23 +14,5 @@
                    tooltip="Distance from selected face to plane" 
                default="0" />
     </case>
-    <case id="PlaneByGeneralEquation" title="By palne equation parameters">
-      <doublevalue id="A" 
-                   label="A:" 
-                   tooltip="The A parameter from general plane equation (Ax+By+Cz+D=0)" 
-                   default="0" />
-      <doublevalue id="B" 
-                   label="B:" 
-                   tooltip="The B parameter from general plane equation (Ax+By+Cz+D=0)" 
-                   default="0" />
-      <doublevalue id="C" 
-                   label="C:" 
-                   tooltip="The C parameter from general plane equation (Ax+By+Cz+D=0)" 
-                   default="0" />
-      <doublevalue id="D" 
-                   label="D:" 
-                   tooltip="The D parameter from general plane equation (Ax+By+Cz+D=0)" 
-                   default="0" />
-    </case>
   </switch>
 </source>
