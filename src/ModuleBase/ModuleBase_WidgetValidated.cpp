@@ -31,9 +31,8 @@ bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
 {
   bool isDone = false;
 
-  Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
-  if (isValid(anOwner)) {
-    isDone = setSelection(anOwner);
+  if (isValidSelection(theValue)) {
+    isDone = setSelectionCustom(theValue);
     updateObject(myFeature);
     emit valuesChanged();
   }
@@ -41,7 +40,7 @@ bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& theOwner)
+bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& theValue)
 {
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
@@ -57,7 +56,7 @@ bool ModuleBase_WidgetValidated::isValid(const Handle_SelectMgr_EntityOwner& the
   storeAttributeValue();
 
   // saves the owner value to the widget attribute
-  bool aValid = setSelection(theOwner);
+  bool aValid = setSelectionCustom(theValue);
 
   if (aValid)
     // checks the attribute validity

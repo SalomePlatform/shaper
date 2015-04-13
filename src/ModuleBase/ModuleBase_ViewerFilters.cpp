@@ -92,32 +92,3 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
   }
   return Standard_False;
 }
-
-
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_ObjectTypesFilter, SelectMgr_Filter);
-IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ObjectTypesFilter, SelectMgr_Filter);
-
-
-//TODO (VSV): Check bug in OCCT: Filter result is ignored (bug25340)
-Standard_Boolean ModuleBase_ObjectTypesFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
-{
-  Standard_Boolean isOk = ModuleBase_ShapeDocumentFilter::IsOk(theOwner);
-  if (isOk && theOwner->HasSelectable()) {
-    Handle(AIS_InteractiveObject) aAisObj = 
-      Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-    if (!aAisObj.IsNull()) {
-      std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
-      ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
-
-      foreach (QString aType, myTypes) {
-        if (aType.toLower() == "construction") {
-          ResultConstructionPtr aConstr = 
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
-          return (aConstr != NULL);
-        } // ToDo: Process other types of objects
-      }
-    }
-  }
-  return Standard_False;
-}

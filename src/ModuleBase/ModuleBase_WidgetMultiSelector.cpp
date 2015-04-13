@@ -196,19 +196,15 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  ModuleBase_ViewerPrs aPrs;
-  ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  aSelection->fillPresentation(aPrs, theOwner);
-
-  const TopoDS_Shape& aTDSShape = aPrs.shape();
+  const TopoDS_Shape& aTDSShape = thePrs.shape();
   if (aTDSShape.IsNull())
     return false;
   GeomShapePtr aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aTDSShape));
 
-  ObjectPtr anObject = aSelection->getSelectableObject(theOwner);
+  ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   if (myFeature) {
     // We can not select a result of our feature
@@ -276,9 +272,8 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   aSelectionListAttr->clear();
   if (aSelected.size() > 0) {
     foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
-      Handle(SelectMgr_EntityOwner) anOwner = aPrs.owner();
-      if (isValid(anOwner)) {
-        setSelection(anOwner);
+      if (isValidSelection(aPrs)) {
+        setSelectionCustom(aPrs);
       }
     }
   }

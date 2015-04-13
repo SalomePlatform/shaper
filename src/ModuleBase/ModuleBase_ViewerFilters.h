@@ -75,33 +75,4 @@ private:
   gp_Pln myPlane;
 };
 
-
-/**
-* \class ModuleBase_ObjectTypesFilter
-* \ingroup GUI
-* A filter which provides filtering of selection in 3d viewer.
-* Installing of this filter lets to select only object of requested type
-* Accepts following objects types:
-* - "construction" - to select ModelAPI_ResultConstruction objects
-*/
-DEFINE_STANDARD_HANDLE(ModuleBase_ObjectTypesFilter, SelectMgr_Filter);
-class ModuleBase_ObjectTypesFilter: public ModuleBase_ShapeDocumentFilter
-{
-public:
-  /// Constructor
-  /// \param theWorkshop instance of workshop interface
-  /// \param theTypes list of object types
-  Standard_EXPORT ModuleBase_ObjectTypesFilter(ModuleBase_IWorkshop* theWorkshop, const QStringList& theTypes): 
-      ModuleBase_ShapeDocumentFilter(theWorkshop), myTypes(theTypes) {}
-
-  /// Returns True if the given owner is acceptable for selection
-  /// \param theOwner the selected owner
-  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
-
-  DEFINE_STANDARD_RTTI(ModuleBase_ObjectTypesFilter)
-private:
-  /// List of object types
-  QStringList myTypes;
-};
-
 #endif

@@ -93,7 +93,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
      
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   ObjectPtr aFeature = aDisplayer->getObject(anIO);
-  thePrs.setFeature(aFeature);
+  thePrs.setObject(aFeature);
 }
 
 QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
@@ -115,7 +115,7 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
     ObjectPtr aResult = aDisplayer->getObject(anIO);
     // we should not check the appearance of this feature because there can be some selected shapes
     // for one feature
-    aPrs.setFeature(aResult);
+    aPrs.setObject(aResult);
     if (aContext->HasOpenedContext()) {
       TopoDS_Shape aShape = aContext->DetectedShape();
       if (!aShape.IsNull())

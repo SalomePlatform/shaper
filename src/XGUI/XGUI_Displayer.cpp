@@ -243,7 +243,6 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
           const TopoDS_Shape& aShape = aShapePrs->Shape();
           std::shared_ptr<GeomAPI_Shape> anAISShapePtr(new GeomAPI_Shape());
           anAISShapePtr->setImpl(new TopoDS_Shape(aShape));
-
           isEqualShapes = aShapePtr->isEqual(anAISShapePtr);
         }
       }
@@ -251,8 +250,8 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     // Customization of presentation
     bool isCustomized = customizeObject(theObject);
     #ifdef DEBUG_FEATURE_REDISPLAY
-      qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
-        arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
+      //qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
+      //  arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
     #endif
     if (!isEqualShapes || isCustomized) {
       aContext->Redisplay(aAISIO, false);

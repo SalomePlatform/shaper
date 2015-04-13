@@ -84,7 +84,7 @@ Q_OBJECT
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
-  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner);
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();

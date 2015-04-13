@@ -21,6 +21,9 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IModule.h>
 
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Tools.h>
+
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -89,55 +92,70 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
   return aResult;
 }
 
-void PartSet_WidgetSketchLabel::onPlaneSelected()
+void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
-
+  ModuleBase_ViewerPrs aPrs;
+  // 1. find selected presentation either in the viewer or in OB
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+  // the selection in OCC viewer - the selection of a face in the viewer
+  // it can be th main plane's face of a face on a visualized body
   if (!aSelected.empty()) {
-    ModuleBase_ViewerPrs aPrs = aSelected.first();
-    Handle(SelectMgr_EntityOwner) anOwner = aSelected.first().owner();
-    if (isValid(anOwner)) {
-      setSelection(anOwner);
+    aPrs = aSelected.first();
+  }
+  else {
+    // the selection in Object Browser: the plane object can be used as sketch plane
+    QObjectPtrList anObjects = aSelection->selectedObjects();
+    if (!anObjects.empty()) {
+      aPrs.setObject(anObjects.first());
+    }
+  }
+  if (aPrs.isEmpty())
+    return;
 
-      TopoDS_Shape aShape = aPrs.shape();
-      if (!aShape.IsNull()) {
-        erasePreviewPlanes();
-        DataPtr aData = feature()->data();
-        AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                                  (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-        if (aSelAttr) {
-          GeomShapePtr aShapePtr = aSelAttr->value();
-          if (aShapePtr.get() == NULL || aShapePtr->isNull()) {
-            std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
-            aGShape->setImpl(new TopoDS_Shape(aShape));
-            // get plane parameters
-            std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
-            std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  if (isValidSelection(aPrs)) {
+    // 2. set the selection to sketch
+    setSelectionCustom(aPrs);
+    // 3. hide main planes if they have been displayed
+    erasePreviewPlanes();
+    // 4. if the planes were displayed, change the view projection
+    TopoDS_Shape aShape = aPrs.shape();
+    if (!aShape.IsNull()) {
+      DataPtr aData = feature()->data();
+      AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                                (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+      if (aSelAttr) {
+        GeomShapePtr aShapePtr = aSelAttr->value();
+        if (aShapePtr.get() == NULL || aShapePtr->isNull()) {
+          //TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+          std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
+          aGShape->setImpl(new TopoDS_Shape(aShape));
+          // get plane parameters
+          std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
+          std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
 
-            myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
-          }
+          myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
         }
-
-        // Clear text in the label
-        myLabel->setText("");
-        myLabel->setToolTip("");
-        disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
-                   this, SLOT(onPlaneSelected()));
-        activateFilters(myWorkshop->module()->workshop(), false);
-
-        // Clear selection mode and define sketching mode
-        //XGUI_Displayer* aDisp = myWorkshop->displayer();
-        //aDisp->closeLocalContexts();
-        emit planeSelected(plane());
-        //setSketchingMode();
-
-        // Update sketcher actions
-        XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
-        anActMgr->update();
-        myWorkshop->viewer()->update();
       }
     }
+    // 5. Clear text in the label
+    myLabel->setText("");
+    myLabel->setToolTip("");
+    disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
+               this, SLOT(onSelectionChanged()));
+    // 6. deactivate face selection filter
+    activateFilters(myWorkshop->module()->workshop(), false);
+
+    // 7. Clear selection mode and define sketching mode
+    //XGUI_Displayer* aDisp = myWorkshop->displayer();
+    //aDisp->closeLocalContexts();
+    emit planeSelected(plane());
+    //setSketchingMode();
+
+    // 8. Update sketcher actions
+    XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
+    anActMgr->update();
+    myWorkshop->viewer()->update();
   }
 }
 
@@ -176,26 +194,28 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const bool theValid)
   }
 }
 
-bool PartSet_WidgetSketchLabel::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   bool isOwnerSet = false;
 
-  ModuleBase_ViewerPrs aPrs;
-  myWorkshop->selector()->selection()->fillPresentation(aPrs, theOwner);
-
-  const TopoDS_Shape& aShape = aPrs.shape();
+  const TopoDS_Shape& aShape = thePrs.shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
 
-  if (aPrs.object() && (feature() != aPrs.object())) {
+  if (thePrs.object() && (feature() != thePrs.object())) {
     DataPtr aData = feature()->data();
     AttributeSelectionPtr aSelAttr = 
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
     if (aSelAttr) {
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
       if (aRes) {
         GeomShapePtr aShapePtr(new GeomAPI_Shape());
-        aShapePtr->setImpl(new TopoDS_Shape(aShape));
+        if (aShape.IsNull()) {
+          aShapePtr = ModelAPI_Tools::shape(aRes);
+        }
+        else {
+          aShapePtr->setImpl(new TopoDS_Shape(aShape));
+        }
         aSelAttr->setValue(aRes, aShapePtr);
         isOwnerSet = true;
       }
@@ -211,31 +231,40 @@ bool PartSet_WidgetSketchLabel::setSelection(const Handle_SelectMgr_EntityOwner&
 void PartSet_WidgetSketchLabel::activateCustom()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
-  if (aPlane) {
+  bool aBodyIsVisualized = false;
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  QObjectPtrList aDisplayed = aDisp->displayedObjects();
+  foreach (ObjectPtr anObj, aDisplayed) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      aBodyIsVisualized = aResult->groupName() == ModelAPI_ResultBody::group();
+      if (aBodyIsVisualized)
+        break;
+    }
+  }
+
+  if (aPlane || aBodyIsVisualized) {
     //setSketchingMode();
     // In order to avoid Opening/Closing of context too often
     // it can be useful for a delay on the property panel filling
     // it is possible that it is not necessary anymore, but it requires a check
     //mySelectionTimer->start(20);
+    //setSketchingMode();
   } else {
     // We have to select a plane before any operation
     showPreviewPlanes();
-
-    XGUI_Displayer* aDisp = myWorkshop->displayer();
-    //aDisp->openLocalContext();
-    //aDisp->activateObjects(QIntList());
-    QIntList aModes;
-    aModes << TopAbs_FACE;
-    aDisp->activateObjects(aModes);
-
-    myLabel->setText(myText);
-    myLabel->setToolTip(myTooltip);
-
-    connect(myWorkshop->selector(), SIGNAL(selectionChanged()), this, SLOT(onPlaneSelected()));
-    activateFilters(myWorkshop->module()->workshop(), true);
-
-    aDisp->updateViewer();
   }
+  QIntList aModes;
+  aModes << TopAbs_FACE;
+  aDisp->activateObjects(aModes);
+
+  myLabel->setText(myText);
+  myLabel->setToolTip(myTooltip);
+
+  connect(myWorkshop->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  activateFilters(myWorkshop->module()->workshop(), true);
+
+  aDisp->updateViewer();
 }
 
 void PartSet_WidgetSketchLabel::deactivate()

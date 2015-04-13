@@ -215,9 +215,8 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
   //QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
   QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
   if (aSelected.size() > 0) {
-    Handle(SelectMgr_EntityOwner) anOwner = aSelected.first().owner();
-    if (isValid(anOwner)) {
-      setSelection(anOwner);
+    if (isValidSelection(aSelected.first())) {
+      setSelectionCustom(aSelected.first());
       // the updateObject method should be called to flush the updated sigal. The workshop listens it,
       // calls validators for the feature and, as a result, updates the Apply button state.
       updateObject(myFeature);
@@ -401,14 +400,12 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityOwner& theOwner)
+bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   bool isDone = false;
 
-  ModuleBase_ViewerPrs aPrs;
-  myWorkshop->selection()->fillPresentation(aPrs, theOwner);
   // It should be checked by corresponded validator
-  ObjectPtr aObject = aPrs.object();
+  ObjectPtr aObject = thePrs.object();
   ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
   /*
   if ((!aCurrentObject) && (!aObject))
@@ -444,9 +441,9 @@ bool ModuleBase_WidgetShapeSelector::setSelection(const Handle_SelectMgr_EntityO
     return false;
 
   // Get sub-shapes from local selection
-  if (!aPrs.shape().IsNull()) {
+  if (!thePrs.shape().IsNull()) {
     aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-    aShape->setImpl(new TopoDS_Shape(aPrs.shape()));
+    aShape->setImpl(new TopoDS_Shape(thePrs.shape()));
   }
   // Check that the selection corresponds to selection type
   if (!acceptSubShape(aShape))

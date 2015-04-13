@@ -71,6 +71,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 
+//#define DEBUG_DO_NOT_BY_ENTER
 
 /// Returns list of unique objects by sum of objects from List1 and List2
 /*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
@@ -166,8 +167,11 @@ void PartSet_SketcherMgr::onEnterViewPort()
   myIsMouseOverWindow = true;
   myIsPropertyPanelValueChanged = false;
 
-  if (!isNestedCreateOperation(getCurrentOperation()))
-    return;
+  #ifdef DEBUG_DO_NOT_BY_ENTER
+  return;
+  #endif
+  //if (!isNestedCreateOperation(getCurrentOperation()))
+  //  return;
 }
 
 void PartSet_SketcherMgr::onLeaveViewPort()
@@ -175,6 +179,10 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
   myIsPropertyPanelValueChanged = false;
+
+  #ifdef DEBUG_DO_NOT_BY_ENTER
+  return;
+  #endif
 
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
@@ -790,7 +798,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       aCanDisplay = false;
   }
   else { // there are no an active sketch
-    // 2. sketch sub-features should not visualized if the sketch operatio is not active
+    // 2. sketch sub-features should not visualized if the sketch operation is not active
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature.get() != NULL) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
@@ -806,6 +814,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   // a. the property panel values modification
   // b. the popup menu activated
   // c. widget editor control
+  #ifndef DEBUG_DO_NOT_BY_ENTER
   if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
     ModuleBase_Operation* aOperation = getCurrentOperation();
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
@@ -819,6 +828,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
     }
   }
+  #endif
   return aCanDisplay;
 }
 
@@ -991,6 +1001,10 @@ ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
                                            const bool isToDisplay)
 {
+  #ifdef DEBUG_DO_NOT_BY_ENTER
+  return;
+  #endif
+
   if (!theOperation || theOperation->isEditOperation())
     return;
 

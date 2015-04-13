@@ -41,7 +41,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// Checks all widget validator if the owner is valid
   /// \param theOwner a selected owner in the view
   /// \return a boolean value
-  bool isValid(const Handle_SelectMgr_EntityOwner& theOwner);
+  bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
@@ -64,7 +64,7 @@ protected:
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
-  virtual bool setSelection(const Handle_SelectMgr_EntityOwner& theOwner) = 0;
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs) = 0;
 
   virtual void removePresentations() {};
 
