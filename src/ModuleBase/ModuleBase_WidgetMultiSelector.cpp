@@ -198,14 +198,9 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  const TopoDS_Shape& aTDSShape = thePrs.shape();
-  if (aTDSShape.IsNull())
-    return false;
-  GeomShapePtr aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-  aShape->setImpl(new TopoDS_Shape(aTDSShape));
-
   ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+
   if (myFeature) {
     // We can not select a result of our feature
     const std::list<ResultPtr>& aResList = myFeature->results();
@@ -226,11 +221,17 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-  if (aShape->isEqual(aResult->shape()))
-    aSelectionListAttr->append(aResult, GeomShapePtr());
-  else
-    aSelectionListAttr->append(aResult, aShape);
 
+  const TopoDS_Shape& aTDSShape = thePrs.shape();
+  // if only result is selected, an empty shape is set to the model
+  if (aTDSShape.IsNull()) {
+    aSelectionListAttr->append(aResult, GeomShapePtr());
+  }
+  else {
+    GeomShapePtr aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aTDSShape));
+    aSelectionListAttr->append(aResult, aShape);
+  }
   return true;
 }
 
@@ -263,7 +264,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
+  QList<ModuleBase_ViewerPrs> aSelected = getSelectedEntitiesOrObjects(myWorkshop->selection());
 
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
