@@ -154,6 +154,28 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
   aSelection->selectedShapes(aShapeList, aObjectsList);
   bool aIsDetach = false;
 
+  // Check that selected shape is not attribute
+  // if at least a one shape is attribute then we can not add auxiliary item
+  bool hasAttribute = false;
+  if (aShapeList.Extent() > 0) {
+    NCollection_List<TopoDS_Shape>::Iterator aIt(aShapeList);
+    std::list<ObjectPtr>::const_iterator aItObj;
+    TopoDS_Shape aShape;
+    ObjectPtr aObj;
+    ResultPtr aResult;
+    for (aItObj = aObjectsList.cbegin(); aIt.More(); aIt.Next(), aItObj++) {
+      aShape = aIt.Value(); 
+      aObj = (*aItObj);
+      aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aResult.get() != NULL) {
+        if (!aShape.IsEqual(aResult->shape()->impl<TopoDS_Shape>())) {
+          hasAttribute = true;
+          break;
+        }
+      }
+    }
+  }
+
   if (aShapeList.Extent() == 1) {
     TopoDS_Shape aShape = aShapeList.First();
     if (aShape.ShapeType() == TopAbs_VERTEX) {
@@ -204,21 +226,21 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
       }
     }
   }
-  if ((!aIsDetach) && (aObjectsList.size() > 0)) {
+  QObjectPtrList aObjects = aSelection->selectedPresentations();
+  if ((!aIsDetach) && (aObjects.size() > 0)) {
     bool hasFeature = false;
     FeaturePtr aFeature;
-    std::list<ObjectPtr>::const_iterator aIt;
-    ObjectPtr aObject;
-    for (aIt = aObjectsList.cbegin(); aIt != aObjectsList.cend(); ++aIt) {
-      aObject = (*aIt);
+    foreach (ObjectPtr aObject, aObjects) {
       aFeature = ModelAPI_Feature::feature(aObject);
       if (aFeature.get() != NULL) {
         hasFeature = true;
       }
     }
-    if (hasFeature)
+    if (hasFeature && (!hasAttribute))
         theMenu->addAction(theStdActions["DELETE_CMD"]);
   }
+  if (hasAttribute)
+    return true;
   bool isAuxiliary;
   if (canSetAuxiliary(isAuxiliary)) {
     QAction* anAction = action("AUXILIARY_CMD");
@@ -330,7 +352,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
   bool isUseTransaction = false;
   // 1. change auxiliary type of a created feature
   if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
-      PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
+    PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
     anObjects.append(anOperation->feature());
   }
   else {
@@ -387,7 +409,7 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
   QObjectPtrList anObjects;
   // 1. change auxiliary type of a created feature
   if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
-      PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
+    PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
     anObjects.append(anOperation->feature());
   }
   else {
@@ -399,14 +421,14 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
     ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
     anObjects = aSelection->selectedPresentations();
   }
-  anEnabled = anObjects.size() > 0;
 
   bool isNotAuxiliaryFound = false;
   if (anObjects.size() > 0) {
     QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
     for (; anIt != aLast && !isNotAuxiliaryFound; anIt++) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-      if (aFeature.get() != NULL) {
+      if ((aFeature.get() != NULL) && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+        anEnabled = true;
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature.get() != NULL) {

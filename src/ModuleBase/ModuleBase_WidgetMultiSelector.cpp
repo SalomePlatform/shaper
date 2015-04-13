@@ -198,8 +198,15 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  ResultPtr aResult;
+  if (!thePrs.owner().IsNull()) {
+    ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  }
+  else {
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+  }
+
 
   if (myFeature) {
     // We can not select a result of our feature
@@ -230,7 +237,11 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
   else {
     GeomShapePtr aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(aTDSShape));
-    aSelectionListAttr->append(aResult, aShape);
+    // We can not select a result of our feature
+    if (aShape->isEqual(aResult->shape()))
+      aSelectionListAttr->append(aResult, GeomShapePtr());
+    else
+      aSelectionListAttr->append(aResult, aShape);
   }
   return true;
 }

@@ -640,14 +640,12 @@ bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOpera
   return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
 }
 
-bool PartSet_SketcherMgr::isEntityOperation(ModuleBase_Operation* theOperation)
+bool PartSet_SketcherMgr::isEntity(const std::string& theId)
 {
-  std::string aId = theOperation ? theOperation->id().toStdString() : "";
-
-  return (aId == SketchPlugin_Line::ID()) ||
-         (aId == SketchPlugin_Point::ID()) ||
-         (aId == SketchPlugin_Arc::ID()) ||
-         (aId == SketchPlugin_Circle::ID());
+  return (theId == SketchPlugin_Line::ID()) ||
+         (theId == SketchPlugin_Point::ID()) ||
+         (theId == SketchPlugin_Arc::ID()) ||
+         (theId == SketchPlugin_Circle::ID());
 }
 
 bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)

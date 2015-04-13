@@ -95,7 +95,7 @@ public:
   /// Returns whether the current operation is a sketch entity - line, point, arc or circle
   /// \param the operation
   /// \return a boolean value
-  static bool isEntityOperation(ModuleBase_Operation* theOperation);
+  static bool isEntity(const std::string& theId);
 
   /// Returns whether the current operation is a sketch distance - lenght, distance or radius
   /// \param the operation
