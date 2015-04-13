@@ -13,7 +13,6 @@
 
 #include <ModelAPI_AttributeValidator.h>
 
-#include <regex>
 #include <memory>
 
 class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
@@ -28,8 +27,9 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments) const;
 
- private:
-  std::regex myPyVariableRegex;
+ protected:
+  PARAMETERSPLUGIN_EXPORT bool isVariable(const std::string& theString) const;
+
 };
 
 class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator

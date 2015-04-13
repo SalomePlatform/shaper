@@ -13,7 +13,6 @@
 
 ParametersPlugin_VariableValidator::ParametersPlugin_VariableValidator()
 {
-  myPyVariableRegex = std::regex("[_a-zA-Z][a-zA-Z0-9_]*");
 }
 
 ParametersPlugin_VariableValidator::~ParametersPlugin_VariableValidator()
@@ -24,8 +23,22 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments) const
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
-  bool result = std::regex_match(aStrAttr->value(), myPyVariableRegex);
+  bool result = isVariable(aStrAttr->value());
   return result;
+}
+
+bool ParametersPlugin_VariableValidator::isVariable(const std::string& theString) const
+{
+  std::string::const_iterator it = theString.begin();
+  if (!(isalpha(*it) || (*it) == '_') || it == theString.end())
+    return false;
+  it++;
+  for ( ; it != theString.end(); ++it ) {
+    if(!(isalnum(*it) || (*it) == '_')) {
+      return false;
+    }
+  }
+  return true;
 }
 
 ParametersPlugin_ExpressionValidator::ParametersPlugin_ExpressionValidator()
