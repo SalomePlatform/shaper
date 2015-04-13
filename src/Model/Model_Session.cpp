@@ -131,10 +131,10 @@ std::list<std::string> Model_Session::redoList()
   return ROOT_DOC->redoList();
 }
 
-FeaturePtr Model_Session::createFeature(string theFeatureID)
+FeaturePtr Model_Session::createFeature(string theFeatureID, Model_Document* theDocOwner)
 {
   if (this != myImpl) {
-    return myImpl->createFeature(theFeatureID);
+    return myImpl->createFeature(theFeatureID, theDocOwner);
   }
 
   // load all information about plugins, features and attributes
@@ -142,7 +142,7 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
 
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
-    if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
+    if (!aPlugin.second.empty() && aPlugin.second != theDocOwner->kind()) {
       Events_Error::send(
           string("Feature '") + theFeatureID + "' can be created only in document '"
               + aPlugin.second + "' by the XML definition");
