@@ -11,7 +11,7 @@
 #include <ModelAPI_AttributeString.h>
 
 #include <TDF_Label.hxx>
-#include <Handle_TDataStd_Name.hxx>
+#include <TDataStd_Name.hxx>
 
 #include <string>
 
