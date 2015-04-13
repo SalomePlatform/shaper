@@ -138,25 +138,25 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
         }
       }
     }
-    // 5. Clear text in the label
-    myLabel->setText("");
-    myLabel->setToolTip("");
-    disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
-               this, SLOT(onSelectionChanged()));
-    // 6. deactivate face selection filter
-    activateFilters(myWorkshop->module()->workshop(), false);
-
-    // 7. Clear selection mode and define sketching mode
-    //XGUI_Displayer* aDisp = myWorkshop->displayer();
-    //aDisp->closeLocalContexts();
-    emit planeSelected(plane());
-    //setSketchingMode();
-
-    // 8. Update sketcher actions
-    XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
-    anActMgr->update();
-    myWorkshop->viewer()->update();
   }
+  // 5. Clear text in the label
+  myLabel->setText("");
+  myLabel->setToolTip("");
+  disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
+              this, SLOT(onSelectionChanged()));
+  // 6. deactivate face selection filter
+  activateFilters(myWorkshop->module()->workshop(), false);
+
+  // 7. Clear selection mode and define sketching mode
+  //XGUI_Displayer* aDisp = myWorkshop->displayer();
+  //aDisp->closeLocalContexts();
+  emit planeSelected(plane());
+  //setSketchingMode();
+
+  // 8. Update sketcher actions
+  XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
+  anActMgr->update();
+  myWorkshop->viewer()->update();
 }
 
 std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
