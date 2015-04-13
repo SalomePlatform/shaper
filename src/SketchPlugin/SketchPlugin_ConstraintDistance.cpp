@@ -156,21 +156,21 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
   std::shared_ptr<GeomDataAPI_Point2D> aPointB =
       SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B());
 
-  if (aPointA && aPointB) {  // both points
+  if (aPointA.get() && aPointB.get()) {  // both points
     aDistance = aPointA->pnt()->distance(aPointB->pnt());
   } else {
-    if (!aPointA && aPointB) {  //Line and point
-      FeaturePtr aLineFeature =
-          SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-      std::shared_ptr<SketchPlugin_Line> aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aLineFeature);
-      if (aLine) {
+    FeaturePtr aLineFeature;
+    std::shared_ptr<SketchPlugin_Line> aLine;
+    if (!aPointA.get() && aPointB.get()) {  //Line and point
+      aLineFeature = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+      aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aLineFeature);
+      if (aLine.get()) {
         aDistance = aLine->distanceToPoint(aPointB->pnt());
       }
-    } else if (aPointA && !aPointB) {  // Point and line
-      FeaturePtr aLineFeasture =
-          SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
-      std::shared_ptr<SketchPlugin_Line> aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aLineFeasture);
-      if (aLine) {
+    } else if (aPointA.get() && !aPointB.get()) {  // Point and line
+      aLineFeature = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+      aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aLineFeature);
+      if (aLine.get()) {
         aDistance = aLine->distanceToPoint(aPointA->pnt());
       }
     }
@@ -178,7 +178,8 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
   return aDistance;
 }
 
-void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID) {
+void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
+{
   if (theID == SketchPlugin_Constraint::ENTITY_A() || 
       theID == SketchPlugin_Constraint::ENTITY_B()) 
   {
