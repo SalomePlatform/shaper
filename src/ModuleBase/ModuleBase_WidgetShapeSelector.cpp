@@ -212,22 +212,26 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
   // In order to make reselection possible
   // TODO: check with MPV clearAttribute();
 
-  //QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
-  if (aSelected.size() > 0) {
-    if (isValidSelection(aSelected.first())) {
-      setSelectionCustom(aSelected.first());
-      // the updateObject method should be called to flush the updated sigal. The workshop listens it,
-      // calls validators for the feature and, as a result, updates the Apply button state.
-      updateObject(myFeature);
-      //if (theObj) {
-        //  raisePanel();
-      //} 
-      //updateSelectionName();
-      //emit valuesChanged();
-      emit focusOutWidget(this);
-    }
+  QList<ModuleBase_ViewerPrs> aSelectedPrs = getSelectedEntitiesOrObjects(myWorkshop->selection());
+  if (aSelectedPrs.empty())
+    return;
+  ModuleBase_ViewerPrs aPrs = aSelectedPrs.first();
+  if (aPrs.isEmpty() || !isValidSelection(aPrs))
+    return;
+
+  if (!aPrs.isEmpty() && isValidSelection(aPrs)) {
+    setSelectionCustom(aPrs);
+    // the updateObject method should be called to flush the updated sigal. The workshop listens it,
+    // calls validators for the feature and, as a result, updates the Apply button state.
+    updateObject(myFeature);
+    //if (theObj) {
+      //  raisePanel();
+    //} 
+    //updateSelectionName();
+    //emit valuesChanged();
+    emit focusOutWidget(this);
   }
+
 }
 
 //********************************************************************

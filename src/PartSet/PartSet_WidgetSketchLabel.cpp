@@ -94,26 +94,12 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
-  ModuleBase_ViewerPrs aPrs;
-  // 1. find selected presentation either in the viewer or in OB
-  XGUI_Selection* aSelection = myWorkshop->selector()->selection();
-  QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-  // the selection in OCC viewer - the selection of a face in the viewer
-  // it can be th main plane's face of a face on a visualized body
-  if (!aSelected.empty()) {
-    aPrs = aSelected.first();
-  }
-  else {
-    // the selection in Object Browser: the plane object can be used as sketch plane
-    QObjectPtrList anObjects = aSelection->selectedObjects();
-    if (!anObjects.empty()) {
-      aPrs.setObject(anObjects.first());
-    }
-  }
-  if (aPrs.isEmpty())
+  QList<ModuleBase_ViewerPrs> aSelectedPrs = getSelectedEntitiesOrObjects(
+                                             myWorkshop->selector()->selection());
+  if (aSelectedPrs.empty())
     return;
-
-  if (!isValidSelection(aPrs))
+  ModuleBase_ViewerPrs aPrs = aSelectedPrs.first();
+  if (aPrs.isEmpty() || !isValidSelection(aPrs))
     return;
 
   // 2. set the selection to sketch
