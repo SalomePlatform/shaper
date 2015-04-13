@@ -113,50 +113,54 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   if (aPrs.isEmpty())
     return;
 
-  if (isValidSelection(aPrs)) {
-    // 2. set the selection to sketch
-    setSelectionCustom(aPrs);
-    // 3. hide main planes if they have been displayed
-    erasePreviewPlanes();
-    // 4. if the planes were displayed, change the view projection
-    TopoDS_Shape aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      DataPtr aData = feature()->data();
-      AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                                (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-      if (aSelAttr) {
-        GeomShapePtr aShapePtr = aSelAttr->value();
-        if (aShapePtr.get() == NULL || aShapePtr->isNull()) {
-          //TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-          std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
-          aGShape->setImpl(new TopoDS_Shape(aShape));
-          // get plane parameters
-          std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
-          std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  if (!isValidSelection(aPrs))
+    return;
 
-          myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
-        }
-      }
-    }
-    // 5. Clear text in the label
-    myLabel->setText("");
-    myLabel->setToolTip("");
-    disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
-               this, SLOT(onSelectionChanged()));
-    // 6. deactivate face selection filter
-    activateFilters(myWorkshop->module()->workshop(), false);
-
-    // 7. Clear selection mode and define sketching mode
-    //XGUI_Displayer* aDisp = myWorkshop->displayer();
-    //aDisp->closeLocalContexts();
-    emit planeSelected(plane());
-    //setSketchingMode();
-
-    // 8. Update sketcher actions
-    XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
-    anActMgr->update();
-    myWorkshop->viewer()->update();
+  // 2. set the selection to sketch
+  setSelectionCustom(aPrs);
+  // 3. hide main planes if they have been displayed
+  erasePreviewPlanes();
+  // 4. if the planes were displayed, change the view projection
+  TopoDS_Shape aShape = aPrs.shape();
+  std::shared_ptr<GeomAPI_Shape> aGShape;
+  // selection happens in OCC viewer
+  if (!aShape.IsNull()) {
+    aGShape =  std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
+    aGShape->setImpl(new TopoDS_Shape(aShape));
   }
+  else { // selection happens in OCC viewer(on body) of in the OB browser
+    DataPtr aData = feature()->data();
+    AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                              (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+    if (aSelAttr) {
+      aGShape = aSelAttr->value();
+    }
+  }
+  if (aGShape.get() != NULL) {
+    // get plane parameters
+    std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
+    std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+
+    myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
+  }
+  // 5. Clear text in the label
+  myLabel->setText("");
+  myLabel->setToolTip("");
+  disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
+              this, SLOT(onSelectionChanged()));
+  // 6. deactivate face selection filter
+  activateFilters(myWorkshop->module()->workshop(), false);
+
+  // 7. Clear selection mode and define sketching mode
+  //XGUI_Displayer* aDisp = myWorkshop->displayer();
+  //aDisp->closeLocalContexts();
+  emit planeSelected(plane());
+  //setSketchingMode();
+
+  // 8. Update sketcher actions
+  XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
+  anActMgr->update();
+  myWorkshop->viewer()->update();
 }
 
 std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
@@ -210,14 +214,16 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
       if (aRes) {
         GeomShapePtr aShapePtr(new GeomAPI_Shape());
-        if (aShape.IsNull()) {
+        if (aShape.IsNull()) {  // selection happens in the OCC viewer
           aShapePtr = ModelAPI_Tools::shape(aRes);
         }
-        else {
+        else { // selection happens in OB browser
           aShapePtr->setImpl(new TopoDS_Shape(aShape));
         }
-        aSelAttr->setValue(aRes, aShapePtr);
-        isOwnerSet = true;
+        if (aShapePtr.get() != NULL) {
+          aSelAttr->setValue(aRes, aShapePtr);
+          isOwnerSet = true;
+        }
       }
     }
   }

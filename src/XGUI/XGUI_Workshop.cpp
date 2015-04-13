@@ -93,8 +93,8 @@
 #include <dlfcn.h>
 #endif
 
-#define DEBUG_FEATURE_CREATED
-#define DEBUG_FEATURE_REDISPLAY
+//#define DEBUG_FEATURE_CREATED
+//#define DEBUG_FEATURE_REDISPLAY
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 

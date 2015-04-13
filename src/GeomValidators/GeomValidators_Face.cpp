@@ -46,16 +46,21 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
     AttributeSelectionPtr aSelectionAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
                                                                  (theAttribute);
     std::shared_ptr<GeomAPI_Shape> aGeomShape = aSelectionAttr->value();
-    std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face(aGeomShape));
-    if (aGeomFace.get() != NULL) {
-      switch(aFaceType) {
-          case GeomAbs_Plane:
-            aValid = aGeomFace->isPlanar();
-            break;
-          case GeomAbs_Cylinder:
-            break;
-          default:
-            break;
+    // it is necessary to check whether the shape is face in order to set in selection a value
+    // with any type and check the type in this validator
+    // It is realized to select any object in OB and filter it in this validator (sketch plane)
+    if (aGeomShape->isFace()) {
+      std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face(aGeomShape));
+      if (aGeomFace.get() != NULL) {
+        switch(aFaceType) {
+            case GeomAbs_Plane:
+              aValid = aGeomFace->isPlanar();
+              break;
+            case GeomAbs_Cylinder:
+              break;
+            default:
+              break;
+        }
       }
     }
   }
