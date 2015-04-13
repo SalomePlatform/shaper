@@ -158,9 +158,9 @@ bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
       }
     } else {
       AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-      if (aSelectAttr && aBody && (theShape.get() != NULL)) {
-        aSelectAttr->setValue(aBody, theShape);
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
+      if (aSelectAttr) {
+        aSelectAttr->setValue(aResult, theShape);
         isChanged = true;
       }
     }
