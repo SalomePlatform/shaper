@@ -159,48 +159,48 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
     if (aShape.ShapeType() == TopAbs_VERTEX) {
       // Find 2d coordinates
       FeaturePtr aSketchFea = myModule->sketchMgr()->activeSketch();
-      std::shared_ptr<SketchPlugin_Sketch> aSketch = 
-        std::dynamic_pointer_cast<SketchPlugin_Sketch>(aSketchFea);
-      gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-      std::shared_ptr<GeomAPI_Pnt> aPnt3d(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
-      std::shared_ptr<GeomAPI_Pnt2d> aSelPnt = aSketch->to2D(aPnt3d);
+      if (aSketchFea->getKind() == SketchPlugin_Sketch::ID()) {
+        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+        std::shared_ptr<GeomAPI_Pnt> aPnt3d(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+        std::shared_ptr<GeomAPI_Pnt2d> aSelPnt = PartSet_Tools::convertTo2D(aSketchFea, aPnt3d);
 
-      // Find coincident in these coordinates
-      ObjectPtr aObj = aObjectsList.front();
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-      const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
-      std::set<AttributePtr>::const_iterator aIt;
-      FeaturePtr aCoincident;
-      for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-        std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-        FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-        if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
-          std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
-          if (aSelPnt->isEqual(a2dPnt)) {
-            aCoincident = aConstrFeature;
-            break;
+        // Find coincident in these coordinates
+        ObjectPtr aObj = aObjectsList.front();
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+        const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
+        std::set<AttributePtr>::const_iterator aIt;
+        FeaturePtr aCoincident;
+        for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+          std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+          FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+          if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+            std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+            if (aSelPnt->isEqual(a2dPnt)) { 
+              aCoincident = aConstrFeature;
+              break;
+            } 
           }
         }
-      }
-      // If we have coincidence then add Detach menu
-      if (aCoincident.get() != NULL) {
-        mySelectedFeature = aCoincident;
-        findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_A());
-        findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_B());
-        if (myCoinsideLines.size() > 0) {
-          aIsDetach = true;
-          QMenu* aSubMenu = theMenu->addMenu(tr("Detach"));
-          QAction* aAction;
-          int i = 0;
-          foreach (FeaturePtr aCoins, myCoinsideLines) {
-            aAction = aSubMenu->addAction(aCoins->data()->name().c_str());
-            aAction->setData(QVariant(i));
-            i++;
-          }
-          connect(aSubMenu, SIGNAL(hovered(QAction*)), SLOT(onLineHighlighted(QAction*)));
-          connect(aSubMenu, SIGNAL(aboutToHide()), SLOT(onDetachMenuHide()));
-          connect(aSubMenu, SIGNAL(triggered(QAction*)), SLOT(onLineDetach(QAction*)));
-        } 
+        // If we have coincidence then add Detach menu
+        if (aCoincident.get() != NULL) {
+          mySelectedFeature = aCoincident;
+          findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+          findCoincidences(mySelectedFeature, myCoinsideLines, SketchPlugin_ConstraintCoincidence::ENTITY_B());
+          if (myCoinsideLines.size() > 0) {
+            aIsDetach = true;
+            QMenu* aSubMenu = theMenu->addMenu(tr("Detach"));
+            QAction* aAction;
+            int i = 0;
+            foreach (FeaturePtr aCoins, myCoinsideLines) {
+              aAction = aSubMenu->addAction(aCoins->data()->name().c_str());
+              aAction->setData(QVariant(i));
+              i++;
+            }
+            connect(aSubMenu, SIGNAL(hovered(QAction*)), SLOT(onLineHighlighted(QAction*)));
+            connect(aSubMenu, SIGNAL(aboutToHide()), SLOT(onDetachMenuHide()));
+            connect(aSubMenu, SIGNAL(triggered(QAction*)), SLOT(onLineDetach(QAction*)));
+          } 
+        }
       }
     }
   }

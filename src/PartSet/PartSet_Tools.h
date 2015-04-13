@@ -55,6 +55,12 @@ class PARTSET_EXPORT PartSet_Tools
                           Handle(V3d_View) theView,
                           double& theX, double& theY);
 
+  /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
+  /// \param theSketch the sketch feature
+  /// \param thePnt the 3D point in the viewer
+  /// \returns the converted point object
+  static std::shared_ptr<GeomAPI_Pnt2d> convertTo2D(FeaturePtr theSketch, const std::shared_ptr<GeomAPI_Pnt>& thePnt);
+
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
