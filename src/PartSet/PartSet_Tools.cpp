@@ -131,6 +131,23 @@ Handle(V3d_View) theView,
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }
 
+std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::convertTo2D(FeaturePtr theSketch, 
+                                                    const std::shared_ptr<GeomAPI_Pnt>& thePnt)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aRes;
+  if (theSketch->getKind() != SketchPlugin_Sketch::ID())
+    return aRes;
+  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      theSketch->data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+  return thePnt->to2D(aC->pnt(), aX->dir(), aY);
+}
+
+
 std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr theSketch)
 {
   std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
