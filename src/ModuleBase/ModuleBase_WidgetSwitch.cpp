@@ -47,7 +47,7 @@ int ModuleBase_WidgetSwitch::addPage(ModuleBase_PageBase* thePage, const QString
   int aSuperCount = ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId);
   myCombo->addItem(theName);
   int aResultCount = myCombo->count();
-  if (aResultCount == 1)
+  if (aResultCount == 2)
     myCombo->show();
   QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
   aFrame->setFrameShape(QFrame::Box);

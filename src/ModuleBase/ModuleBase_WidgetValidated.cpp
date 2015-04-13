@@ -3,6 +3,7 @@
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_IViewer.h>
+#include <ModuleBase_ISelection.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -106,4 +107,26 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
     aViewer->addSelectionFilter(aSelFilter);
   else
     aViewer->removeSelectionFilter(aSelFilter);
+}
+
+QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getSelectedEntitiesOrObjects(
+                                                  ModuleBase_ISelection* theSelection) const
+{
+  QList<ModuleBase_ViewerPrs> aSelectedPrs;
+
+  // find selected presentation either in the viewer or in OB
+  // the selection in OCC viewer - the selection of a sub-shapes in the viewer
+  aSelectedPrs = theSelection->getSelected();
+  if (aSelectedPrs.empty()) {
+    // the selection in Object Browser
+    QObjectPtrList anObjects = theSelection->selectedObjects();
+    QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
+    for (; anIt != aLast; anIt++) {
+      ObjectPtr anObject = *anIt;
+      if (anObject.get() != NULL) {
+        aSelectedPrs.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
+      }
+    }
+  }
+  return aSelectedPrs;
 }

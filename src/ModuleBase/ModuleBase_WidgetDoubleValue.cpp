@@ -104,8 +104,12 @@ void ModuleBase_WidgetDoubleValue::reset()
   else {
     bool isOk;
     double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
-    ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
-    storeValueCustom();
+    // reset the value just if there is a default value definition in the XML definition
+    // if the double value can not be found by the default value, do nothing
+    if (isOk) {
+      ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
+      storeValueCustom();
+    }
   }
 }
 
@@ -114,7 +118,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
   aReal->setValue(mySpinBox->value());
-  std::string aTextRepr;
+  std::string aTextRepr = aReal->text();
   if (mySpinBox->hasVariable()) {
     aTextRepr = mySpinBox->text().toStdString();
   }
