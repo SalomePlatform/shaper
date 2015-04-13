@@ -13,8 +13,6 @@
 #include <Standard_TypeDef.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
-#include <TDataStd_Integer.hxx>
-#include <TDataStd_Name.hxx>
 
 #include <string>
 
@@ -35,7 +33,7 @@ std::string Model_AttributeString::value()
 Model_AttributeString::Model_AttributeString(TDF_Label& theLabel)
 {
   // check the attribute could be already presented in this doc (after load document)
-  myIsInitialized = theLabel.FindAttribute(TDataStd_Integer::GetID(), myString) == Standard_True;
+  myIsInitialized = theLabel.FindAttribute(TDataStd_Name::GetID(), myString) == Standard_True;
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just empty string
     myString = TDataStd_Name::Set(theLabel, TCollection_ExtendedString());
