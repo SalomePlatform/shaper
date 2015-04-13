@@ -106,12 +106,8 @@ class MODELAPI_EXPORT ModelAPI_Session
   }
 
  protected:
-  /// Creates the feature object using plugins functionality
-  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
   /// Sets the session interface implementation (once per application launch)
   static void setSession(std::shared_ptr<ModelAPI_Session> theManager);
-
-  friend class Model_Document;
 };
 
 typedef std::shared_ptr<ModelAPI_Session> SessionPtr;

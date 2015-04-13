@@ -557,7 +557,8 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 {
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
-  FeaturePtr aFeature = ModelAPI_Session::get()->createFeature(theID);
+  FeaturePtr aFeature = 
+    std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get())->createFeature(theID, this);
   if (!aFeature)
     return aFeature;
   Model_Document* aDocToAdd;
@@ -985,9 +986,9 @@ void Model_Document::synchronizeFeatures(
     FeaturePtr aFeature;
     if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
-      aFeature = ModelAPI_Session::get()->createFeature(
+      aFeature = std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get())->createFeature(
         TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
-        .ToCString());
+        .ToCString(), this);
       if (!aFeature) {  // somethig is wrong, most probably, the opened document has invalid structure
         Events_Error::send("Invalid type of object in the document");
         aLabIter.Value()->Label().ForgetAllAttributes();

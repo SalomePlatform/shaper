@@ -119,7 +119,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   void LoadPluginsInfo();
 
   /// Creates the feature object using plugins functionality
-  virtual FeaturePtr createFeature(std::string theFeatureID);
+  FeaturePtr createFeature(std::string theFeatureID, Model_Document* theDocOwner);
+
+  friend class Model_Document;
 };
 
 #endif
