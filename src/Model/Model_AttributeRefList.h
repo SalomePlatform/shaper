@@ -37,6 +37,8 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   /// Returns the list of features
   MODEL_EXPORT virtual ObjectPtr object(const int theIndex) const;
 
+  /// Returns true if attribute was  initialized by some value
+  MODEL_EXPORT virtual bool isInitialized();
  protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefList(TDF_Label& theLabel);

@@ -44,7 +44,7 @@ class ModelAPI_Attribute
   MODELAPI_EXPORT const std::shared_ptr<ModelAPI_Object>& owner() const;
 
   /// Returns true if attribute was  initialized by some value
-  MODELAPI_EXPORT bool isInitialized();
+  MODELAPI_EXPORT virtual bool isInitialized();
 
   /// Makes attribute initialized
   MODELAPI_EXPORT void setInitialized();
