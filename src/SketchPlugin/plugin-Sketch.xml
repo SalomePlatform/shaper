@@ -219,9 +219,9 @@
             label="Second object" tooltip="Select line or arc" shape_types="edge">
         </sketch_shape_selector>
 
-        <doublevalue_editor label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
+        <doublevalue label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue_editor>
+        </doublevalue>
         <validator id="PartSet_FilletSelection"/>
       </feature>
       
