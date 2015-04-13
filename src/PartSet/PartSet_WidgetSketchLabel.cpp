@@ -237,6 +237,9 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
 void PartSet_WidgetSketchLabel::activateCustom()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  if (aPlane.get())
+    return;
+
   bool aBodyIsVisualized = false;
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   QObjectPtrList aDisplayed = aDisp->displayedObjects();
@@ -249,14 +252,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
     }
   }
 
-  if (aPlane || aBodyIsVisualized) {
-    //setSketchingMode();
-    // In order to avoid Opening/Closing of context too often
-    // it can be useful for a delay on the property panel filling
-    // it is possible that it is not necessary anymore, but it requires a check
-    //mySelectionTimer->start(20);
-    //setSketchingMode();
-  } else {
+  if (!aBodyIsVisualized) {
     // We have to select a plane before any operation
     showPreviewPlanes();
   }
