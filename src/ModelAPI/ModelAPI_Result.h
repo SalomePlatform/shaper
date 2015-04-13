@@ -43,7 +43,8 @@ class ModelAPI_Result : public ModelAPI_Object
   }
 
   // Retuns the parameters of color definition in the resources config manager
-  virtual void colorConfigInfo(std::string& theSection, std::string& theName, std::string& theDefault) {}
+  virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+    std::string& theDefault) {}
 
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes() {};

@@ -50,6 +50,9 @@ public:
   /// Returns all attributes
   MODEL_EXPORT virtual void clear();
 
+  /// Returns true if attribute was  initialized by some value
+  MODEL_EXPORT virtual bool isInitialized();
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);

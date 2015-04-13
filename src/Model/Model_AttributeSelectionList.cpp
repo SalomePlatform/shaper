@@ -102,6 +102,14 @@ void Model_AttributeSelectionList::clear()
   }
 }
 
+bool Model_AttributeSelectionList::isInitialized()
+{
+  if (size() == 0) { // empty list is not initialized list: sketch will be not valid after add/undo
+    return false;
+  }
+  return ModelAPI_AttributeSelectionList::isInitialized();
+}
+
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
 {
   myIsInitialized = theLabel.FindAttribute(TDataStd_Integer::GetID(), mySize) == Standard_True;

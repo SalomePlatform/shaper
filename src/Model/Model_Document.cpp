@@ -557,13 +557,18 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 {
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
-  FeaturePtr aFeature = 
-    std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get())->createFeature(theID, this);
+  std::shared_ptr<Model_Session> aSession = 
+    std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
+  FeaturePtr aFeature = aSession->createFeature(theID, this);
   if (!aFeature)
     return aFeature;
   Model_Document* aDocToAdd;
-  if (aFeature->documentToAdd().get()) { // use the customized document to add
-    aDocToAdd = std::dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd()).get();
+  if (!aFeature->documentToAdd().empty()) { // use the customized document to add
+    if (aFeature->documentToAdd() != kind()) { // the root document by default
+      aDocToAdd = std::dynamic_pointer_cast<Model_Document>(aSession->moduleDocument()).get();
+    } else {
+      aDocToAdd = this;
+    }
   } else { // if customized is not presented, add to "this" document
     aDocToAdd = this;
   }

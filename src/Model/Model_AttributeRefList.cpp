@@ -54,6 +54,14 @@ int Model_AttributeRefList::size() const
   return myRef->Extent();
 }
 
+bool Model_AttributeRefList::isInitialized()
+{
+  if (size() == 0) { // empty list is not initialized list: sketch will be not valid after add/undo
+    return false;
+  }
+  return ModelAPI_AttributeRefList::isInitialized();
+}
+
 list<ObjectPtr> Model_AttributeRefList::list()
 {
   std::list<ObjectPtr> aResult;
