@@ -31,7 +31,8 @@ void PartSetPlugin_Part::execute()
   }
 }
 
-std::shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd()
+const std::string& PartSetPlugin_Part::documentToAdd()
 {
-  return ModelAPI_Session::get()->moduleDocument();
+  // part must be added only to the module document
+  return ModelAPI_Session::get()->moduleDocument()->kind();
 }

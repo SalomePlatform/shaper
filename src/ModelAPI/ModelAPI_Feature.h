@@ -99,8 +99,8 @@ class ModelAPI_Feature : public ModelAPI_Object
   }
 
   /// Must return document where the new feature must be added to
-  /// By default it is null document: it is added to the document this method is called to
-  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> documentToAdd();
+  /// By default it is empty: it is added to the document this method is called to
+  MODELAPI_EXPORT virtual const std::string& documentToAdd();
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Feature();

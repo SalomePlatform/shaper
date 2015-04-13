@@ -132,10 +132,11 @@ void ModelAPI_Feature::eraseResults()
   }
 }
 
-std::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
+const std::string& ModelAPI_Feature::documentToAdd()
 {
-  // null pointer t ouse the current document
-  return std::shared_ptr<ModelAPI_Document>();
+  // empty to use the current document
+  static const std::string anEmpty;
+  return anEmpty;
 }
 
 void ModelAPI_Feature::erase()
