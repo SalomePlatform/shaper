@@ -7,7 +7,8 @@
 #ifndef MODELAPI_RESULTPARAMETER_H_
 #define MODELAPI_RESULTPARAMETER_H_
 
-#include "ModelAPI_Result.h"
+#include <ModelAPI.h>
+#include <ModelAPI_Result.h>
 
 /**\class ModelAPI_ResultParameter
  * \ingroup DataModel
@@ -45,6 +46,8 @@ class ModelAPI_ResultParameter : public ModelAPI_Result
   }
 
   virtual void initAttributes() = 0;
+
+  MODELAPI_EXPORT ~ModelAPI_ResultParameter();
 
 };
 
