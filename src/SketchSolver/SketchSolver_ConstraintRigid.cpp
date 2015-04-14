@@ -35,17 +35,23 @@ void SketchSolver_ConstraintRigid::process()
   if (!myErrorMsg.empty() || myFeatureMap.empty())
     return;
 
+  Slvs_hEntity anEntID = myFeatureMap.begin()->second;
+  if (myStorage->isEntityFixed(anEntID, true)) {
+    myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
+    return;
+  }
+
   if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Line::ID()) {
-    Slvs_Entity aLine = myStorage->getEntity(myFeatureMap.begin()->second);
+    Slvs_Entity aLine = myStorage->getEntity(anEntID);
     fixLine(aLine);
   }
   else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Arc::ID()) {
-    Slvs_Entity anArc = myStorage->getEntity(myFeatureMap.begin()->second);
+    Slvs_Entity anArc = myStorage->getEntity(anEntID);
     fixArc(anArc);
   }
   else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Circle::ID()) {
-    Slvs_Entity aCirc = myStorage->getEntity(myFeatureMap.begin()->second);
-    fixArc(aCirc);
+    Slvs_Entity aCirc = myStorage->getEntity(anEntID);
+    fixCircle(aCirc);
   }
 }
 

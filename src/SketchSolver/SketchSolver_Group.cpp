@@ -278,7 +278,8 @@ void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFe
     return;
   aConstraint->setGroup(this);
   aConstraint->setStorage(myStorage);
-  setTemporary(aConstraint);
+  if (aConstraint->error().empty())
+    setTemporary(aConstraint);
 }
 
 // ============================================================================
