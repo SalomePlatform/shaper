@@ -142,4 +142,11 @@ void setArrowSize(double theSize)
   MyArrowSize = theSize;
 }
 
+double getFlyoutDistance(const ModelAPI_Feature* theConstraint, 
+                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  return 50;
+}
+
+
 };

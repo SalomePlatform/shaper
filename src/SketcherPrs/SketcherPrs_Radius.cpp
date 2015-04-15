@@ -83,7 +83,6 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   std::shared_ptr<GeomAPI_Dir> aNormal = myPlane->norm();
 
   GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
-  //gp_Circ aCircle(gp_Ax2(aCenter->impl<gp_Pnt>(), aNormal->impl<gp_Dir>()), aRadius);
     
   std::shared_ptr<GeomAPI_Pnt> anAnchor = aCircle.project(aFlyoutPnt);
   std::shared_ptr<GeomAPI_XYZ> anAnchorXYZ = anAnchor->xyz();
