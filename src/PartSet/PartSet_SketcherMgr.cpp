@@ -851,6 +851,20 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   return aCanDisplay;
 }
 
+bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
+{
+  bool isFoundObject = false;
+
+  FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObject);
+  if (anObjectFeature.get()) {
+    int aSize = myCurrentSketch->numberOfSubs();
+    for (int i = 0; i < myCurrentSketch->numberOfSubs() && !isFoundObject; i++) {
+      FeaturePtr aCurrentFeature = myCurrentSketch->subFeature(i);
+      isFoundObject = myCurrentSketch->subFeature(i) == anObjectFeature;
+    }
+  }
+  return isFoundObject;
+}
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
