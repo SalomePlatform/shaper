@@ -22,6 +22,7 @@
 class ModuleBase_SelectionValidator : public ModelAPI_Validator
 {
  public:
+  virtual ~ModuleBase_SelectionValidator();
    /// Returns True if selection is valid
    /// \param theSelection selection instance
   virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
@@ -30,10 +31,8 @@ class ModuleBase_SelectionValidator : public ModelAPI_Validator
    /// \param theSelection selection instance
    /// \param theArguments list of arguments
   virtual bool isValid(const ModuleBase_ISelection* theSelection,
-                       const std::list<std::string>& theArguments) const
-  {
-    return isValid(theSelection);
-  }
+                       const std::list<std::string>& theArguments) const;
+
 };
 
 #endif
