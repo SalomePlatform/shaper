@@ -10,6 +10,7 @@
 #include "SketcherPrs.h"
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Ax3.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Feature.h>
 #include <string>
@@ -60,6 +61,9 @@ enum SelectionModes {
   SKETCHERPRS_EXPORT double getArrowSize();
 
   SKETCHERPRS_EXPORT void setArrowSize(double theSize);
+
+  SKETCHERPRS_EXPORT double getFlyoutDistance(const ModelAPI_Feature* theConstraint, 
+                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 };
 
 #endif
