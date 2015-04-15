@@ -41,14 +41,15 @@ PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
 {
 }
 
-void PartSet_WidgetPoint2dDistance::reset()
-{
-  bool isOk;
-  double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
-
-  ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
-  storeValueCustom();
-}
+// It is not clear a necesity of this method also it contradicts to scenario defined in parent class
+//void PartSet_WidgetPoint2dDistance::reset()
+//{
+//  bool isOk;
+//  double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+//
+//  ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
+//  storeValueCustom();
+//}
 
 void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePnt)

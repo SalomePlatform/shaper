@@ -19,6 +19,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_ResultParameter.h>
 
 #include <ModuleBase_IModule.h>
 
@@ -142,15 +143,17 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     bool hasResult = false;
     bool hasFeature = false;
+    bool hasParameter = false;
     foreach(ObjectPtr aObj, aObjects)
     {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      if (aResult)
-        hasResult = true;
-      if (aFeature)
-        hasFeature = true;
-      if (hasFeature && hasResult) // && hasGroup)
+      ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
+
+      hasResult = (aResult.get() != NULL);
+      hasFeature = (aFeature.get() != NULL);
+      hasParameter = (aConstruction.get() != NULL);
+      if (hasFeature && hasResult  && hasParameter)
         break;
     }
     //Process Feature
@@ -175,17 +178,20 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
             }
             aMenu->addSeparator();
             aMenu->addAction(action("HIDE_CMD"));
-          } else {
+          } else if (!hasParameter) {
             aMenu->addAction(action("SHOW_CMD"));
           }
-          aMenu->addAction(action("SHOW_ONLY_CMD"));
+          if (hasParameter)
+            aMenu->addAction(action("EDIT_CMD"));
+          else
+            aMenu->addAction(action("SHOW_ONLY_CMD"));
         }
       } else {  // If feature is 0 the it means that selected root object (document)
         if (aMgr->activeDocument() != aMgr->moduleDocument())
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
     } else {
-      if (hasResult) {
+      if (hasResult && (!hasParameter)) {
         aMenu->addAction(action("SHOW_CMD"));
         aMenu->addAction(action("HIDE_CMD"));
         aMenu->addAction(action("SHOW_ONLY_CMD"));
@@ -194,7 +200,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         aMenu->addAction(action("WIREFRAME_CMD"));
       }
     }
-    if (hasFeature)
+    if (hasFeature || hasParameter)
       aMenu->addAction(action("DELETE_CMD"));
   }
   if (myWorkshop->canChangeColor())
