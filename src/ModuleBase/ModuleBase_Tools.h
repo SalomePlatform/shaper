@@ -61,8 +61,9 @@ MODULEBASE_EXPORT void setSpinValue(QDoubleSpinBox* theSpin, double theValue);
 
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object
+/// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
-MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj);
+MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo = false);
 
 }
 

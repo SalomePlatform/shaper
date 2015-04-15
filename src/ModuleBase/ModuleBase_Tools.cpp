@@ -8,6 +8,10 @@
 
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeRefAttr.h>
+
+#include <GeomDataAPI_Point2D.h>
 
 #include <QWidget>
 #include <QLayout>
@@ -109,7 +113,7 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
   theSpin->blockSignals(isBlocked);
 }
 
-QString objectInfo(const ObjectPtr& theObj)
+QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
   ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
@@ -121,8 +125,32 @@ QString objectInfo(const ObjectPtr& theObj)
   if (aFeature.get()) {
     aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
     if (aFeature->data().get() && aFeature->data()->isValid())
-      aFeatureStr.append(QString("(name=%1)").arg(aFeature->data()->name().c_str()).toStdString().c_str());
+      aFeatureStr.append(QString(", name=%1").arg(aFeature->data()->name().c_str()).toStdString()
+                                                                                       .c_str());
+    if (isUseAttributesInfo) {
+      std::list<AttributePtr> anAttrs = aFeature->data()->attributes("");
+      std::list<AttributePtr>::const_iterator anIt = anAttrs.begin(), aLast = anAttrs.end();
+      QStringList aValues;
+      for(; anIt != aLast; anIt++) {
+        AttributePtr anAttr = *anIt;
+        QString aValue = "not defined";
+        std::string aType = anAttr->attributeType();
+        if (aType == GeomDataAPI_Point2D::typeId()) {
+          std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                                                         anAttr);
+          if (aPoint.get())
+            aValue = QString("(%1, %2)").arg(aPoint->x()).arg(aPoint->y());
+        }
+        else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
+        }
+
+        aValues.push_back(QString("%1: %2").arg(anAttr->id().c_str()).arg(aValue).toStdString().c_str());
+      }
+      if (!aValues.empty())
+        aFeatureStr.append(QString(", attributes: %1").arg(aValues.join(", ").toStdString().c_str()));
+    }
   }
+
   return aFeatureStr;
 }
 

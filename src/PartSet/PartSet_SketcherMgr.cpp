@@ -796,7 +796,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       aCanDisplay = false;
   }
   else { // there are no an active sketch
-    // 2. sketch sub-features should not visualized if the sketch operation is not active
+    // 2. sketch sub-features should not be visualized if the sketch operation is not active
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature.get() != NULL) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
@@ -806,7 +806,28 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     }
   }
 
-  // 3. For created nested feature operation do not display the created feature if
+  // 3. the method should not filter the objects, which are not related to the current operation.
+  // The object is filtered just if it is a current operation feature or this feature result
+  bool isObjectFound = false;
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+  if (anOperation) {
+    FeaturePtr aFeature = anOperation->feature();
+    if (aFeature.get()) {
+      std::list<ResultPtr> aResults = aFeature->results();
+      if (theObject == aFeature)
+        isObjectFound = true;
+      else {
+        std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
+        for (; anIt != aLast; anIt++) {
+          isObjectFound = *anIt == theObject;
+        }
+      }
+    }
+  }
+  if (!isObjectFound)
+    return aCanDisplay;
+
+  // 4. For created nested feature operation do not display the created feature if
   // the mouse curstor leaves the OCC window.
   // The correction cases, which ignores this condition:
   // a. the property panel values modification
