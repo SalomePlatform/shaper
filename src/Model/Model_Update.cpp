@@ -221,8 +221,8 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
     CompositeFeaturePtr aComposite = 
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
     if (aComposite) {
-      int aSubsNum = aComposite->numberOfSubs();
-      for(int a = 0; a < aSubsNum; a++) {
+      // number of subs can be changed in execution: like fillet
+      for(int a = 0; a < aComposite->numberOfSubs(); a++) {
         if (updateFeature(aComposite->subFeature(a)))
           aMustbeUpdated = true;
       }
@@ -290,8 +290,8 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
               // for sketch after update of plane (by update of selection attribute)
               // but before execute, all sub-elements also must be updated (due to the plane changes)
               if (aComposite) {
-                int aSubsNum = aComposite->numberOfSubs();
-                for(int a = 0; a < aSubsNum; a++) {
+                // number of subs can be changed in execution: like fillet
+                for(int a = 0; a < aComposite->numberOfSubs(); a++) {
                   FeaturePtr aSub = aComposite->subFeature(a);
                   bool aWasModified = myUpdated[aSub];
                   myUpdated.erase(myUpdated.find(aSub)); // erase to update for sure (plane may be changed)
@@ -301,7 +301,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                 }
                 // re-execute after update: solver may update the previous values, so, shapes must be
                 // updated
-                for(int a = 0; a < aSubsNum; a++) {
+                for(int a = 0; a < aComposite->numberOfSubs(); a++) {
                   if (aComposite->subFeature(a) && aFactory->validate(aComposite->subFeature(a)))
                     aComposite->subFeature(a)->execute();
                 }

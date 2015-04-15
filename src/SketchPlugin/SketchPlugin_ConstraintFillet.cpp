@@ -17,6 +17,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Line.h>
@@ -49,13 +50,19 @@ void SketchPlugin_ConstraintFillet::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(PREVIOUS_VALUE, ModelAPI_AttributeDouble::typeId());
   // initialize attribute not applicable for user
-  data()->attribute(SketchPlugin_Constraint::ENTITY_C())->setInitialized();
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_C());
   data()->attribute(PREVIOUS_VALUE)->setInitialized();
   std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(PREVIOUS_VALUE))->setValue(0.0);
 }
 
 void SketchPlugin_ConstraintFillet::execute()
 {
+  // the viewer update should be blocked in order to avoid the temporaty fillet sub-features visualization
+  // before they are processed by the solver
+  //std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+  //    new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+  //Events_Loop::loop()->send(aMsg);
+
   std::shared_ptr<ModelAPI_Data> aData = data();
   ResultConstructionPtr aRC;
   // Check the base objects are initialized
@@ -221,7 +228,6 @@ void SketchPlugin_ConstraintFillet::execute()
   aNewArc->execute();
   // attach new arc to the list
   aRefListOfFillet->append(aNewArc->lastResult());
-  aRefListOfFillet->setInitialized();
 
   // Create list of additional constraints:
   // 1. Coincidence of boundary points of features and fillet arc
@@ -251,15 +257,6 @@ void SketchPlugin_ConstraintFillet::execute()
   recalculateAttributes(aNewArc, SketchPlugin_Arc::END_ID(), aFeature[aFeatInd], aFeatAttributes[anAttrInd]);
   aConstraint->execute();
   ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
-  // recalculate center of fillet arc
-  std::shared_ptr<GeomAPI_Pnt2d> aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::START_ID()))->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::END_ID()))->pnt();
-  aCenter = aStartPoint->xy()->added(aEndPoint->xy())->multiplied(0.5);
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(
-      aCenter->x(), aCenter->y());
   // 2. Fillet arc radius
   aConstraint = sketch()->addFeature(SketchPlugin_ConstraintRadius::ID());
   aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
@@ -285,19 +282,19 @@ void SketchPlugin_ConstraintFillet::execute()
     aConstraint->execute();
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
   }
-
   // make base features auxiliary
-  static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
   aFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
-  ModelAPI_EventCreator::get()->sendUpdated(aFeatureA, aRedisplayEvent);
-  ModelAPI_EventCreator::get()->sendUpdated(aFeatureB, aRedisplayEvent);
-////  Events_Loop::loop()->flush(aRedisplayEvent);
 
-  // send events
+  // send events to update the sub-features by the solver
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
-  Events_Loop::loop()->flush(anUpdateEvent);
+
+  // the viewer update should be unblocked in order after the fillet features
+  // are processed by the solver
+  //aMsg = std::shared_ptr<Events_Message>(
+  //              new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+  //Events_Loop::loop()->send(aMsg);
 }
 
 AISObjectPtr SketchPlugin_ConstraintFillet::getAISObject(AISObjectPtr thePrevious)

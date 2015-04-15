@@ -95,6 +95,9 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
   if (theEvent->button() != Qt::LeftButton)
     return;
 
+  if (mySpinBox->hasVariable())
+    return;
+
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
   double aX, aY;
@@ -107,6 +110,9 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
 
 void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (mySpinBox->hasVariable())
+    return;
+
   myWorkshop->operationMgr()->setLockValidating(true);
   myWorkshop->operationMgr()->setApplyEnabled(false);
 
