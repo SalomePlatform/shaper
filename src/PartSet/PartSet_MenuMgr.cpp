@@ -149,35 +149,26 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
   myCoinsideLines.clear();
   ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
 
-  NCollection_List<TopoDS_Shape> aShapeList;
-  std::list<ObjectPtr> aObjectsList;
-  aSelection->selectedShapes(aShapeList, aObjectsList);
   bool aIsDetach = false;
-
-  // Check that selected shape is not attribute
-  // if at least a one shape is attribute then we can not add auxiliary item
   bool hasAttribute = false;
-  if (aShapeList.Extent() > 0) {
-    NCollection_List<TopoDS_Shape>::Iterator aIt(aShapeList);
-    std::list<ObjectPtr>::const_iterator aItObj;
-    TopoDS_Shape aShape;
-    ObjectPtr aObj;
-    ResultPtr aResult;
-    for (aItObj = aObjectsList.cbegin(); aIt.More(); aIt.Next(), aItObj++) {
-      aShape = aIt.Value(); 
-      aObj = (*aItObj);
-      aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      if (aResult.get() != NULL) {
-        if (!aShape.IsEqual(aResult->shape()->impl<TopoDS_Shape>())) {
-          hasAttribute = true;
-          break;
-        }
-      }
+  bool hasFeature = false;
+
+  QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected();
+  TopoDS_Shape aShape;
+  ResultPtr aResult;
+  foreach(ModuleBase_ViewerPrs aPrs, aPrsList) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+    if (aResult.get() != NULL) {
+      aShape = aPrs.shape();
+      if (aShape.IsEqual(aResult->shape()->impl<TopoDS_Shape>()))
+        hasFeature = true;
+      else
+        hasAttribute = true;
     }
   }
 
-  if (aShapeList.Extent() == 1) {
-    TopoDS_Shape aShape = aShapeList.First();
+  if (aPrsList.size() == 1) {
+    TopoDS_Shape aShape = aPrsList.first().shape();
     if (aShape.ShapeType() == TopAbs_VERTEX) {
       // Find 2d coordinates
       FeaturePtr aSketchFea = myModule->sketchMgr()->activeSketch();
@@ -187,7 +178,7 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
         std::shared_ptr<GeomAPI_Pnt2d> aSelPnt = PartSet_Tools::convertTo2D(aSketchFea, aPnt3d);
 
         // Find coincident in these coordinates
-        ObjectPtr aObj = aObjectsList.front();
+        ObjectPtr aObj = aPrsList.first().object();
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
         const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
         std::set<AttributePtr>::const_iterator aIt;
@@ -226,18 +217,8 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
       }
     }
   }
-  QObjectPtrList aObjects = aSelection->selectedPresentations();
-  if ((!aIsDetach) && (aObjects.size() > 0)) {
-    bool hasFeature = false;
-    FeaturePtr aFeature;
-    foreach (ObjectPtr aObject, aObjects) {
-      aFeature = ModelAPI_Feature::feature(aObject);
-      if (aFeature.get() != NULL) {
-        hasFeature = true;
-      }
-    }
-    if (hasFeature && (!hasAttribute))
-        theMenu->addAction(theStdActions["DELETE_CMD"]);
+  if ((!aIsDetach) && hasFeature) {
+    theMenu->addAction(theStdActions["DELETE_CMD"]);
   }
   if (hasAttribute)
     return true;
