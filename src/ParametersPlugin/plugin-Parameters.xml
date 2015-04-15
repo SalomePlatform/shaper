@@ -3,7 +3,7 @@
 <plugin>
   <workbench id="Part">
     <group id="Parameters">
-      <feature id="Parameter" title="Parameter" tooltip="Creates a parameter" icon=":pictures/expression.png">
+      <feature id="Parameter" title="Parameter" tooltip="Create a parameter" icon=":pictures/expression.png">
         <stringvalue id="variable" label="Name" icon=":pictures/expression.png">
           <validator id="Parameters_VariableValidator"/>
         </stringvalue>
