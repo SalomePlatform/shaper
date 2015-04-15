@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:      ModuleBase_DoubleSpinBox.h
-// Author:    Sergey TELKOV
+// Author:    Sergey BELASH
 //
 #ifndef MODULEBASE_DOUBLESPINBOX_H_
 #define MODULEBASE_DOUBLESPINBOX_H_

@@ -10,6 +10,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Tools.h>
 
 #include <string>
 #include <sstream>
@@ -17,12 +18,10 @@
 ParametersPlugin_Parameter::ParametersPlugin_Parameter()
 {
   myInterp = new ParametersPlugin_PyInterp();
-  myInterp->initialize();
 }
 
 ParametersPlugin_Parameter::~ParametersPlugin_Parameter()
 {
-  myInterp->destroy();
   delete myInterp;
 }
 
@@ -77,21 +76,22 @@ void ParametersPlugin_Parameter::execute()
 
 double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
 {
+  myInterp->initialize();
   std::list<std::string> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
   std::list<std::string> aContext;
   std::list<std::string>::iterator it = anExprParams.begin();
   for ( ; it != anExprParams.end(); it++) {
-    std::string aParamName = *it;
-    ObjectPtr aParamObj = document()->objectByName(ModelAPI_ResultParameter::group(), aParamName);
-    ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
-    if(!aParam.get()) continue;
-    AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+    double aValue;
+    if (!ModelAPI_Tools::findVariable(*it, aValue)) continue;
+
     std::ostringstream sstream;
-    sstream << aValueAttribute->value();
+    sstream << aValue;
     std::string aParamValue = sstream.str();
-    aContext.push_back(aParamName + "=" + aParamValue);
+    aContext.push_back(*it + "=" + aParamValue);
   }
   myInterp->extendLocalContext(aContext);
-  return myInterp->evaluate(theExpression, theError);
+  double result = myInterp->evaluate(theExpression, theError);
+  myInterp->destroy();
+  return result;
 }

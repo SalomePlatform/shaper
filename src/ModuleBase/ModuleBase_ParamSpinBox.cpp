@@ -4,6 +4,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Tools.h>
 
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -234,16 +235,7 @@ bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
                                            double& outValue) const
 {
 
-  SessionPtr aSession = ModelAPI_Session::get();
-  DocumentPtr aDocument = aSession->activeDocument();
-  ObjectPtr aParamObj = aDocument->objectByName(ModelAPI_ResultParameter::group(),
-                                                theName.toStdString());
-  ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
-  if(!aParam.get())
-    return false;
-  AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-  outValue = aValueAttribute->value();
-  return true;
+  return ModelAPI_Tools::findVariable(theName.toStdString(), outValue);
 }
 
 /*!
