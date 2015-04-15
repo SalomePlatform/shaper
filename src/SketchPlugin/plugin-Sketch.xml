@@ -213,10 +213,12 @@
       <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
+          <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line or arc" shape_types="edge">
+          <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
 
         <doublevalue label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0">
