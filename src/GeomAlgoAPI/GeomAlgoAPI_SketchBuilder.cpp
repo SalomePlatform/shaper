@@ -82,8 +82,9 @@ static void removeWasteEdges(std::list<TopoDS_Vertex>::iterator& theStartVertex,
 
 
 void GeomAlgoAPI_SketchBuilder::createFaces(
-    const std::shared_ptr<GeomAPI_Pnt>& theOrigin, const std::shared_ptr<GeomAPI_Dir>& theDirX,
-    const std::shared_ptr<GeomAPI_Dir>& theDirY, const std::shared_ptr<GeomAPI_Dir>& theNorm,
+    const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+    const std::shared_ptr<GeomAPI_Dir>& theDirX,
+    const std::shared_ptr<GeomAPI_Dir>& theNorm,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theFeatures,
     std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces,
     std::list<std::shared_ptr<GeomAPI_Shape> >& theResultWires)
@@ -132,8 +133,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     return;
 
   gp_Dir aDirX = theDirX->impl<gp_Dir>();
-  gp_Dir aDirY = theDirY->impl<gp_Dir>();
   gp_Dir aNorm = theNorm->impl<gp_Dir>();
+  gp_Dir aDirY = aNorm.Crossed(aDirX);
 
   gp_Pln aPlane(theOrigin->impl<gp_Pnt>(), aNorm);
 
@@ -375,7 +376,6 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
 void GeomAlgoAPI_SketchBuilder::createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                             const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                                            const std::shared_ptr<GeomAPI_Dir>& theDirY,
                                             const std::shared_ptr<GeomAPI_Dir>& theNorm,
                                             const std::shared_ptr<GeomAPI_Shape>& theWire,
                                             std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
@@ -385,7 +385,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(const std::shared_ptr<GeomAPI_Pnt>& 
     return;
   // Filter wires, return only faces.
   std::list<std::shared_ptr<GeomAPI_Shape> > aFilteredWires;
-  createFaces(theOrigin, theDirX, theDirY, theNorm,
+  createFaces(theOrigin, theDirX, theNorm,
               aWire->getEdges(), theResultFaces, aFilteredWires);
 }
 

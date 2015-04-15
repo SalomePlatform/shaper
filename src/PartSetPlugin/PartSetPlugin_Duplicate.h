@@ -26,6 +26,9 @@ class PartSetPlugin_Duplicate : public PartSetPlugin_Part
   /// Makes a new part, copy of active
   PartSetPlugin_Duplicate();
 
+  /// Part must be added only to PartSet
+  PARTSETPLUGIN_EXPORT virtual const std::string& documentToAdd();
+
   /// Request for initialization of data model of the feature: adding all attributes
   PARTSETPLUGIN_EXPORT virtual void initAttributes();
 

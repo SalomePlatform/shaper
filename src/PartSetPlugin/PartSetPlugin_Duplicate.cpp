@@ -46,3 +46,9 @@ void PartSetPlugin_Duplicate::execute()
   if (!data()->name().empty())
     PartSetPlugin_Part::execute();
 }
+
+const std::string& PartSetPlugin_Duplicate::documentToAdd()
+{
+  // part must be added only to the module document
+  return ModelAPI_Session::get()->moduleDocument()->kind();
+}

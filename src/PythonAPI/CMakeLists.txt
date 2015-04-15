@@ -1,0 +1,6 @@
+## Copyright (C) 2014-20xx  OPEN CASCADE
+
+
+SET(CMAKE_AUTOMOC ON)
+
+INSTALL(DIRECTORY extension geom modeler DESTINATION pythonAPI)
