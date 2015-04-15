@@ -22,17 +22,16 @@
 class ModuleBase_SelectionValidator : public ModelAPI_Validator
 {
  public:
-  virtual ~ModuleBase_SelectionValidator();
-   /// Returns True if selection is valid
-   /// \param theSelection selection instance
-  virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
-
    /// Returns True if selection is valid
    /// \param theSelection selection instance
    /// \param theArguments list of arguments
-  virtual bool isValid(const ModuleBase_ISelection* theSelection,
+  virtual MODULEBASE_EXPORT bool isValid(const ModuleBase_ISelection* theSelection,
                        const std::list<std::string>& theArguments) const;
 
+ protected:
+   /// Returns True if selection is valid
+   /// \param theSelection selection instance
+  virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
 };
 
 #endif

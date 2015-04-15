@@ -6,10 +6,6 @@
 
 #include <ModuleBase_SelectionValidator.h>
 
-ModuleBase_SelectionValidator::~ModuleBase_SelectionValidator()
-{
-}
-
 bool ModuleBase_SelectionValidator::isValid(const ModuleBase_ISelection* theSelection,
                                             const std::list<std::string>& theArguments) const
 {
