@@ -267,9 +267,10 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateShapeSelection();
   QObjectPtrList anEmptyList;
+  // This method will call Selection changed event which will call onSelectionChanged
+  // To clear mySelection, myListControl and storeValue()
+  // So, we don't need to call it
   myWorkshop->setSelected(anEmptyList);
-  // Clear mySelection, myListControl and storeValue()
-  onSelectionChanged();
 }
 
 //********************************************************************

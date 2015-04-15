@@ -111,34 +111,15 @@ void XGUI_SelectionMgr::onViewerSelection()
 }
 
 //**************************************************************
-/*QFeatureList XGUI_SelectionMgr::selectedFeatures() const 
- { 
- return myWorkshop->objectBrowser()->selectedFeatures(); 
- }
+void XGUI_SelectionMgr::clearSelection()
+{
+  QObjectPtrList aFeatures;
+  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
+  myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
+  myWorkshop->objectBrowser()->blockSignals(aBlocked);
 
- //**************************************************************
- QModelIndexList XGUI_SelectionMgr::selectedIndexes() const 
- { 
- return myWorkshop->objectBrowser()->selectedIndexes();
- }
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->setSelected(aFeatures);
 
- //**************************************************************
- void XGUI_SelectionMgr::selectedAISObjects(AIS_ListOfInteractive& theList) const
- {
- Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
- theList.Clear();
- for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
- theList.Append(aContext->SelectedInteractive());
- }
-
- //**************************************************************
- void XGUI_SelectionMgr::selectedShapes(NCollection_List<TopoDS_Shape>& theList) const
- {
- theList.Clear();
- Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
- for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
- TopoDS_Shape aShape = aContext->SelectedShape();
- if (!aShape.IsNull())
- theList.Append(aShape);
- }
- }*/
+  emit selectionChanged();
+}
