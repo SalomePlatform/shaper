@@ -65,6 +65,7 @@ SET(PROJECT_SOURCES
     ModelAPI_ResultConstruction.cpp
     ModelAPI_ResultGroup.cpp
     ModelAPI_ResultPart.cpp
+    ModelAPI_ResultParameter.cpp
     ModelAPI_Session.cpp
     ModelAPI_ShapeValidator.cpp
     ModelAPI_Tools.cpp

@@ -29,6 +29,7 @@
 #include <QSize>
 #include <QShortcut>
 #include <QScrollBar>
+#include <QFontMetrics>
 
 #include <memory>
 #include <string>
@@ -153,6 +154,9 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor(QWidget* theParent,
 
   myResultLabel = new QLabel(this);
   myResultLabel->setWordWrap(true);
+  QFontMetrics fm(myResultLabel->font());
+  myResultLabel->setMinimumHeight(fm.height() * 2); // set 2 line height as minimum
+  myResultLabel->setAlignment(Qt::AlignLeft|Qt::AlignBottom);
   aMainLay->addWidget(myResultLabel);
   myEditor = new ExpressionEditor(this);
   myEditor->setMinimumHeight(20);
