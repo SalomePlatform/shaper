@@ -14,7 +14,7 @@
 #include <XGUI_Selection.h>
 #include <XGUI_OperationMgr.h>
 
-#include <ModuleBase_ParamSpinBox.h>
+#include <ModuleBase_DoubleSpinBox.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewWindow.h>
 
@@ -70,7 +70,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aLabel->setPixmap(QPixmap(":pictures/x_point.png"));
     aGroupLay->addWidget(aLabel, 0, 0);
 
-    myXSpin = new ModuleBase_ParamSpinBox(myGroupBox);
+    myXSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
     myXSpin->setMinimum(-DBL_MAX);
     myXSpin->setMaximum(DBL_MAX);
     myXSpin->setToolTip(tr("X"));
@@ -84,7 +84,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aLabel->setPixmap(QPixmap(":pictures/y_point.png"));
     aGroupLay->addWidget(aLabel, 1, 0);
 
-    myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
+    myYSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
     myYSpin->setMinimum(-DBL_MAX);
     myYSpin->setMaximum(DBL_MAX);
     myYSpin->setToolTip(tr("Y"));
