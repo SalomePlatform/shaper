@@ -23,7 +23,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
-#include <QTimer>
+//#include <QTimer>
 #include <QDialog>
 #include <QLayout>
 #include <QApplication>
@@ -64,16 +64,27 @@ double editedValue(double theValue, bool& isDone)
 
 bool ModuleBase_WidgetEditor::focusTo()
 {
+  // nds: it seems, that the timer is not necessary anymore
+
   // We can not launch here modal process for value editing because 
   // it can be called on other focusOutWidget event and will block it
-  QTimer::singleShot(1, this, SLOT(showPopupEditor()));
+  //QTimer::singleShot(1, this, SLOT(showPopupEditor()));
+
+  showPopupEditor();
+
   return true;
 }
 
 void ModuleBase_WidgetEditor::showPopupEditor()
 {
+  // we need to emit the focus in event manually in order to save the widget as an active
+  // in the property panel before the mouse leave event happens in the viewer. The module
+  // ask an active widget and change the feature visualization if the widget is not the current one.
+  emit focusInWidget(this);
+
+  // nds: it seems, that the envents processing is not necessary anymore
   // White while all events will be processed
-  QApplication::processEvents();
+  //QApplication::processEvents();
   double aValue = mySpinBox->value();
   bool isDone;
   aValue = editedValue(aValue, isDone);
