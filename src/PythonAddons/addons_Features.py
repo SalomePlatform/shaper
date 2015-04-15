@@ -1,8 +1,9 @@
-"""
+"""Registration of all user-defined Python features
 """
 
 import ModelAPI
-from PythonFeaturesPlugin_Box import PythonFeaturesPlugin_Box
+from macros.box.feature      import BoxFeature
+from macros.cylinder.feature import CylinderFeature
 
 
 class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
@@ -15,11 +16,16 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
 
     def createFeature(self, theFeatureID):
         aFeature = None
-        if theFeatureID == PythonFeaturesPlugin_Box.ID():
-            aCompositeFeature = PythonFeaturesPlugin_Box().__disown__()
-            aFeature = ModelAPI.compositeFeatureToFeature(aCompositeFeature)
+
+        if theFeatureID == BoxFeature.ID():
+            aFeature = BoxFeature().__disown__()
+
+        elif theFeatureID == CylinderFeature.ID():
+            aFeature = CylinderFeature().__disown__()
+
         else:
             raise StandardError("No such feature %s" % theFeatureID)
+
         return aFeature
 
 

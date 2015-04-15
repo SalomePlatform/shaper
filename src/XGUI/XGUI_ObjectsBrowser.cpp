@@ -18,6 +18,31 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QAction>
+#include <QStyledItemDelegate>
+
+class XGUI_TreeViewItemDelegate: public QStyledItemDelegate
+{
+public:
+  XGUI_TreeViewItemDelegate(XGUI_DataTree* theParent):QStyledItemDelegate(theParent), myTreedView(theParent) {}
+
+  virtual void	setEditorData ( QWidget* editor, const QModelIndex& index ) const
+  {
+    QLineEdit* aEditor = dynamic_cast<QLineEdit*>(editor);
+    if (aEditor) {
+      XGUI_DocumentDataModel* aModel = myTreedView->dataModel();
+      ObjectPtr aObj = aModel->object(index);
+      if (aObj.get() != NULL) {
+        aEditor->setText(aObj->data()->name().c_str());
+        return;
+      }
+    }
+    QStyledItemDelegate::setEditorData(editor, index);
+  }
+
+private:
+  XGUI_DataTree* myTreedView;
+};
+
 
 XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
@@ -27,6 +52,8 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+  setItemDelegateForColumn(0, new XGUI_TreeViewItemDelegate(this));
 
   connect(selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));

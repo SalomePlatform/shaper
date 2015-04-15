@@ -61,7 +61,7 @@ int Model_ResultConstruction::facesNum()
       std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(myShape);
     std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
     GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-      aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, aFaces);
+      aWirePtr->norm(), aWirePtr, aFaces);
     std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
     for(; aFIter != aFaces.end(); aFIter++) {
       std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));

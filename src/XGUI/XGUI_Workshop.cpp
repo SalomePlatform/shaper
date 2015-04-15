@@ -40,6 +40,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_ResultParameter.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -1329,7 +1330,14 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     myDisplayer->eraseAll();
   else if (theId == "EDIT_CMD") {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
-    if (aFeature)
+    if (aFeature == NULL) {
+      ResultParameterPtr aParam = 
+        std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObjects.first());
+      if (aParam.get() != NULL) {
+        aFeature = ModelAPI_Feature::feature(aParam);
+      }
+    }
+    if (aFeature.get() != NULL)
       myModule->editFeature(aFeature);
   }
 }

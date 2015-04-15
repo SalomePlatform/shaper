@@ -15,6 +15,7 @@
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <QIcon>
 #include <QBrush>
@@ -47,8 +48,13 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         case ParamObject: {
           DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultParameter::group(), theIndex.row());
-          if (aObject)
-            return aObject->data()->name().c_str();
+          if (aObject) {
+            ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObject);
+            AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+            QString aVal = QString::number(aValueAttribute->value());
+            QString aTitle = QString(aObject->data()->name().c_str());
+            return aTitle + "=" + aVal;
+          }
         }
           break;
         case ConstructFolder:
@@ -274,8 +280,13 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
         case ParamObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_ResultParameter::group(),
                                                      theIndex.row());
-          if (aObject)
-            return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
+          if (aObject) {
+            ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObject);
+            AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+            QString aVal = QString::number(aValueAttribute->value());
+            QString aTitle = QString(aObject->data()->name().c_str());
+            return aTitle + "=" + aVal;
+          }
         }
           break;
         case ConstructObject: {

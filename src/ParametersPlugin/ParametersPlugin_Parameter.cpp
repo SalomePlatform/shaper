@@ -56,7 +56,7 @@ void ParametersPlugin_Parameter::attributeChanged(const std::string&)
   std::ostringstream sstream;
   sstream << aValue;
   std::string aParamValue = sstream.str();
-  data()->setName(aName + " ("+ aParamValue + ")");
+  data()->setName(aName);
   aParam->data()->setName(aName);
   // Error
   std::string aStateMsg;

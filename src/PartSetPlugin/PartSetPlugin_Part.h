@@ -43,6 +43,7 @@ class PartSetPlugin_Part : public ModelAPI_Feature
   /// Request for initialization of data model of the feature: adding all attributes
   PARTSETPLUGIN_EXPORT virtual void initAttributes();
 
+  /// Part must be added only to PartSet
   PARTSETPLUGIN_EXPORT virtual const std::string& documentToAdd();
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
