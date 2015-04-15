@@ -70,6 +70,9 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
+
+private:
+  bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
 };
 
 #endif

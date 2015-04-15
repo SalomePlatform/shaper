@@ -70,6 +70,9 @@ private:
     std::shared_ptr<GeomAPI_Pnt>& thePoint1, std::shared_ptr<GeomAPI_Pnt>& thePoint2,
     std::shared_ptr<GeomDataAPI_Point2D>& theStartPoint,
     std::shared_ptr<GeomDataAPI_Point2D>& theEndPoint);
+
+private:
+  bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
 };
 
 #endif

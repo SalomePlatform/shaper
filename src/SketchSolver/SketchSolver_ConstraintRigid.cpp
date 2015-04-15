@@ -6,6 +6,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
@@ -52,6 +53,9 @@ void SketchSolver_ConstraintRigid::process()
   else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Circle::ID()) {
     Slvs_Entity aCirc = myStorage->getEntity(anEntID);
     fixCircle(aCirc);
+  }
+  else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Point::ID()) {
+    fixPoint(anEntID);
   }
 }
 
