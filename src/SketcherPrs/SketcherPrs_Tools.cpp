@@ -145,7 +145,11 @@ void setArrowSize(double theSize)
 double getFlyoutDistance(const ModelAPI_Feature* theConstraint, 
                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
-  return 50;
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutPoint =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      const_cast<ModelAPI_Feature*>(theConstraint)->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+
+  return aFlyoutPoint->y();
 }
 
 
