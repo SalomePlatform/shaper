@@ -119,6 +119,11 @@ void PartSet_WidgetShapeSelector::removeExternal()
       // the external feature should be removed with all references, sketch feature should be ignored
       std::set<FeaturePtr> anIgnoredFeatures;
       anIgnoredFeatures.insert(sketch());
+      // the current feature should be ignored, because it can use the external feature in the
+      // attributes and, therefore have a references to it. So, the delete functionality tries
+      // to delete this feature. Test case is creation of a constraint on external point,
+      // use in this control after an external point, the point of the sketch.
+      anIgnoredFeatures.insert(myFeature);
       XGUI_Workshop::deleteFeatures(anObjects, anIgnoredFeatures);
     }
     myExternalObject = ObjectPtr();
