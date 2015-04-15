@@ -89,6 +89,7 @@ SET(PROJECT_LIBRARIES
 	Events
 	ModelAPI
 	GeomAPI
+	GeomDataAPI
 	GeomAlgoAPI
 	GeomValidators
 	${QT_LIBRARIES}

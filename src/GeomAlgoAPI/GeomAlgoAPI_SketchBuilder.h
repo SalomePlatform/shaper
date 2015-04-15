@@ -38,7 +38,6 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_SketchBuilder
    */
   static void createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                           const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                          const std::shared_ptr<GeomAPI_Dir>& theDirY,
                           const std::shared_ptr<GeomAPI_Dir>& theNorm,
                           const std::list<std::shared_ptr<GeomAPI_Shape> >& theFeatures,
                           std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces,
@@ -58,7 +57,6 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_SketchBuilder
    */
   static void createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                           const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                          const std::shared_ptr<GeomAPI_Dir>& theDirY,
                           const std::shared_ptr<GeomAPI_Dir>& theNorm,
                           const std::shared_ptr<GeomAPI_Shape>& theWire,
                           std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces);

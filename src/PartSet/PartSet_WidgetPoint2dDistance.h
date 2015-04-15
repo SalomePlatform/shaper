@@ -48,7 +48,7 @@ Q_OBJECT
   virtual ~PartSet_WidgetPoint2dDistance();
 
   /// Fills the widget with default values
-  virtual void reset();
+  //virtual void reset();
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();

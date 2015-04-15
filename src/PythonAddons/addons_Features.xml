@@ -1,0 +1,4 @@
+<plugin>
+  <source path="../addons/macros/box/widget.xml"/>
+  <source path="../addons/macros/cylinder/widget.xml"/>
+</plugin>

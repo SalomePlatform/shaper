@@ -1,0 +1,16 @@
+<source>
+  <workbench id="Macros" document="Part">
+    <group id="Samples">
+
+      <feature id="Cylinder" title="Cylinder" tooltip="Creates a cylinder on the Z axis by extruding a circle" icon=":pictures/part_ico.png">
+        <doublevalue id="radius" label="Radius: " min="0" step="1.0" default="10" tooltip="Sets the cylinder radius">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue>
+        <doublevalue id="length" label="Length: " min="0" step="1.0" default="50" tooltip="Sets the cylinder length">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue>
+      </feature>
+
+    </group>
+  </workbench>  
+</source>
