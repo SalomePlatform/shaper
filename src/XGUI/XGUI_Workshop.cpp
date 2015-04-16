@@ -145,7 +145,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myObjectBrowser(0),
       myDisplayer(0),
       myUpdatePrefs(false),
-      myPartActivating(false)
+      myPartActivating(false),
+      myIsLoadingData(false)
 {
   myMainWindow = mySalomeConnector ? 0 : new AppElements_MainWindow();
 
@@ -917,10 +918,12 @@ void XGUI_Workshop::onOpen()
     return;
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
+  myIsLoadingData = true;
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
   displayAllResults();
   updateCommandStatus();
+  myIsLoadingData = false;
   QApplication::restoreOverrideCursor();
 }
 
@@ -1670,7 +1673,7 @@ bool XGUI_Workshop::displayObject(ObjectPtr theObj)
     myDisplayer->display(theObj, false);
     if (aNb == 0)
       viewer()->fitAll();
-  } else 
+  } else if (!(myIsLoadingData || myPartActivating))
     myDisplayer->display(theObj, false);
 
   return true;
