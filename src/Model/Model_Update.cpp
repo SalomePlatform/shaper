@@ -20,6 +20,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
 #include <Events_Error.h>
@@ -217,6 +218,28 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
     if (theFeature->data()->execState() != ModelAPI_StateDone)
       aMustbeUpdated = true;
 
+    ModelAPI_ExecState aState = ModelAPI_StateDone;
+
+    // check the parameters: values can be changed
+    std::list<AttributePtr> aDoubles = 
+      theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId()); 
+    std::list<AttributePtr>::iterator aDoubleIter = aDoubles.begin();
+    for(; aDoubleIter != aDoubles.end(); aDoubleIter++) {
+      AttributeDoublePtr aDouble = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
+      if (aDouble.get() && !aDouble->text().empty()) {
+        double aNewVal;
+        if (ModelAPI_Tools::findVariable(aDouble->text(), aNewVal)) {
+          if (aNewVal != aDouble->value()) {
+            aDouble->setValue(aNewVal);
+            aMustbeUpdated = true;
+          }
+        } else {
+          aState = ModelAPI_StateInvalidArgument;
+        }
+      }
+    }
+
     // composite feature must be executed after sub-features execution
     CompositeFeaturePtr aComposite = 
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
@@ -227,7 +250,6 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           aMustbeUpdated = true;
       }
     }
-    ModelAPI_ExecState aState = ModelAPI_StateDone;
     // check all references: if referenced objects are updated, this object also must be updated
     // also check state of referenced objects: if they are not ready, inherit corresponding state
     std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
