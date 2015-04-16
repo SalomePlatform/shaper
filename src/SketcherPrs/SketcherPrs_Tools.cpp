@@ -179,6 +179,7 @@ std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstrain
   double aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aConstraint->attribute(SketchPlugin_Constraint::VALUE()))->value();
   double aLen = aFlyoutPnt->distance(anOrigin);
+  aRadius *= 1.001; // a gap to make point much closer to the circle, but not lying on it
   aFlyoutPnt->setX(aCenter->x() + aFlyoutPnt->x() * aRadius / aLen);
   aFlyoutPnt->setY(aCenter->y() + aFlyoutPnt->y() * aRadius / aLen);
   return thePlane->to3D(aFlyoutPnt->x(), aFlyoutPnt->y());
