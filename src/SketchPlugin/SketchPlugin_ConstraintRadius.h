@@ -65,6 +65,9 @@ private:
   /// Checks and gets the radius of referenced circle (or arc) otherwise returns -1.
   /// \param theCircData the found referenced circle returned by this method
   double circleRadius(std::shared_ptr<ModelAPI_Feature>& theCirc);
+
+private:
+  bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
 };
 
 #endif
