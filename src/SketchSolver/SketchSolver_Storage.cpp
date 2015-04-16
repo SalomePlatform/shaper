@@ -29,7 +29,8 @@ SketchSolver_Storage::SketchSolver_Storage()
     myEntityMaxID(SLVS_E_UNKNOWN),
     myConstrMaxID(SLVS_C_UNKNOWN),
     myFixed(SLVS_E_UNKNOWN),
-    myNeedToResolve(false)
+    myNeedToResolve(false),
+    myDuplicatedConstraint(false)
 {
 }
 
@@ -420,17 +421,15 @@ Slvs_hConstraint SketchSolver_Storage::addConstraint(const Slvs_Constraint& theC
 
   Slvs_Constraint aConstraint = theConstraint;
 
-  // Find a constraint with same type uses same arguments
+  // Find a constraint with same type uses same arguments to show user overconstraint situation
   std::vector<Slvs_Constraint>::iterator aCIt = myConstraints.begin();
   for (; aCIt != myConstraints.end(); aCIt++) {
     if (aConstraint.type != aCIt->type)
       continue;
     if (aConstraint.ptA == aCIt->ptA && aConstraint.ptB == aCIt->ptB &&
         aConstraint.entityA == aCIt->entityA && aConstraint.entityB == aCIt->entityB &&
-        aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD) {
-      aConstraint.h = aCIt->h;
-      return updateConstraint(aConstraint);
-    }
+        aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD)
+      myDuplicatedConstraint = true;
   }
 
   if (aConstraint.h > myConstrMaxID)
@@ -484,6 +483,21 @@ bool SketchSolver_Storage::removeConstraint(const Slvs_hConstraint& theConstrain
     // remove temporary fixed point, if available
     if (myFixed == theConstraintID)
       myFixed = SLVS_E_UNKNOWN;
+    if (myDuplicatedConstraint) {
+      // Check the duplicated constraints are still available
+      myDuplicatedConstraint = false;
+      std::vector<Slvs_Constraint>::const_iterator anIt1 = myConstraints.begin();
+      std::vector<Slvs_Constraint>::const_iterator anIt2 = myConstraints.begin();
+      for (; anIt1 != myConstraints.end() && !myDuplicatedConstraint; anIt1++)
+        for (anIt2 = anIt1+1; anIt2 != myConstraints.end() && !myDuplicatedConstraint; anIt2++) {
+          if (anIt1->type != anIt2->type)
+            continue;
+          if (anIt1->ptA == anIt2->ptA && anIt1->ptB == anIt2->ptB &&
+              anIt1->entityA == anIt2->entityA && anIt1->entityB == anIt2->entityB &&
+              anIt1->entityC == anIt2->entityC && anIt1->entityD == anIt2->entityD)
+            myDuplicatedConstraint = true;
+        }
+    }
   }
   return aResult;
 }

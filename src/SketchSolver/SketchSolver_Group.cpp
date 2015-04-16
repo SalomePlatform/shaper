@@ -408,7 +408,10 @@ bool SketchSolver_Group::resolveConstraints()
 
     int aResult = SLVS_RESULT_OKAY;
     try {
-      aResult = myConstrSolver.solve();
+      if (myStorage->hasDuplicatedConstraint())
+        aResult = SLVS_RESULT_INCONSISTENT;
+      else
+        aResult = myConstrSolver.solve();
     } catch (...) {
       Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       return false;

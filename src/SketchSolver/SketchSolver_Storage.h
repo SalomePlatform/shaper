@@ -115,6 +115,10 @@ public:
   bool isNeedToResolve() const
   { return myNeedToResolve; }
 
+  /// \brief Shows the storage has the same constraint twice
+  bool hasDuplicatedConstraint() const
+  { return myDuplicatedConstraint; }
+
   /// \brief Changes the flag of group to be resolved
   void setNeedToResolve(bool theFlag)
   { myNeedToResolve = theFlag; }
@@ -149,6 +153,7 @@ private:
   Slvs_hConstraint myFixed; ///< identifier of one of temporary constraints to fix separate point
 
   bool myNeedToResolve; ///< parameters are changed and group needs to be resolved
+  bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
 
   std::set<Slvs_hConstraint> myTemporaryConstraints; ///< list of transient constraints
   std::set<Slvs_hParam> myRemovedParameters; ///< list of just removed parameters (cleared when returning to applicant)
