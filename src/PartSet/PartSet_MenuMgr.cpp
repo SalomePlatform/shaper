@@ -156,6 +156,7 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
   QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected();
   TopoDS_Shape aShape;
   ResultPtr aResult;
+  FeaturePtr aFeature;
   foreach(ModuleBase_ViewerPrs aPrs, aPrsList) {
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
     if (aResult.get() != NULL) {
@@ -164,12 +165,15 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
         hasFeature = true;
       else
         hasAttribute = true;
+    } else {
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aPrs.object());
+      hasFeature = (aFeature.get() != NULL);
     }
   }
 
   if (aPrsList.size() == 1) {
     TopoDS_Shape aShape = aPrsList.first().shape();
-    if (aShape.ShapeType() == TopAbs_VERTEX) {
+    if ((!aShape.IsNull()) && aShape.ShapeType() == TopAbs_VERTEX) {
       // Find 2d coordinates
       FeaturePtr aSketchFea = myModule->sketchMgr()->activeSketch();
       if (aSketchFea->getKind() == SketchPlugin_Sketch::ID()) {
