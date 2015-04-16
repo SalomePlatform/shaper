@@ -347,9 +347,11 @@ bool SketchSolver_Storage::isEntityFixed(const Slvs_hEntity& theEntityID, bool t
             return true;
         }
     }
-    // 2. The line is used in Parallel/Perpendicular and Length constraints
+    // 2. The line is used in Parallel/Perpendicular/Vertical/Horizontal and Length constraints
     aList = getConstraintsByType(SLVS_C_PARALLEL);
     aList.splice(aList.end(), getConstraintsByType(SLVS_C_PERPENDICULAR));
+    aList.splice(aList.end(), getConstraintsByType(SLVS_C_VERTICAL));
+    aList.splice(aList.end(), getConstraintsByType(SLVS_C_HORIZONTAL));
     for (anIt = aList.begin(); anIt != aList.end(); anIt++)
       if (anIt->entityA == theEntityID || anIt->entityB == theEntityID) {
         Slvs_hEntity anOther = anIt->entityA == theEntityID ? anIt->entityB : anIt->entityA;

@@ -180,7 +180,8 @@ bool SketchSolver_Group::changeConstraint(
   if (!theConstraint)
     return false;
 
-  if (myConstraints.find(theConstraint) == myConstraints.end()) {
+  bool isNewConstraint = myConstraints.find(theConstraint) == myConstraints.end();
+  if (isNewConstraint) {
     // Add constraint to the current group
     SolverConstraintPtr aConstraint =
         SketchSolver_Builder::getInstance()->createConstraint(theConstraint);
@@ -216,7 +217,7 @@ bool SketchSolver_Group::changeConstraint(
     myConstraints[theConstraint]->update();
 
   // Fix base features for fillet
-  if (theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID()) {
+  if (isNewConstraint && theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID()) {
     std::list<AttributePtr> anAttrList =
         theConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
     std::list<AttributePtr>::iterator anAttrIter = anAttrList.begin();
