@@ -16,7 +16,7 @@
     <group id="Collections">
       <feature id="Group"
         title="Group"
-        tooltip="Create a new named collection of geometry entities"
+        tooltip="Create named collection of geometry entities"
         icon=":icons/shape_group.png">
         <source path="group_widget.xml"/>
       </feature>
