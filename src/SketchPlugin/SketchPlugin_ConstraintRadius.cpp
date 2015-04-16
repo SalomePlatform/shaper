@@ -30,6 +30,7 @@ const double tolerance = 1.e-7;
 
 SketchPlugin_ConstraintRadius::SketchPlugin_ConstraintRadius()
 {
+  myFlyoutUpdate = false;
 }
 
 void SketchPlugin_ConstraintRadius::initAttributes()
@@ -161,27 +162,10 @@ void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  // The flyout point is calculated in local coordinates of the shape,
-  // so the center should be coincident with origin
-  std::shared_ptr<GeomAPI_Pnt2d> aCenter(new GeomAPI_Pnt2d(0.0, 0.0));
-
-  // The specified delta applied on the circle curve, 
-  // so it will be scaled due to distance between flyout and center points
+  myFlyoutUpdate = true;
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  std::shared_ptr<GeomAPI_Pnt2d> aFlyout = aFlyoutAttr->pnt();
-
-  std::shared_ptr<ModelAPI_AttributeDouble> aRadius = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
-  double aScale = aFlyout->distance(aCenter) / aRadius->value();
-
-  std::shared_ptr<GeomAPI_Circ2d> aCircle(new GeomAPI_Circ2d(aCenter, aFlyout));
-  aFlyout->setX(aFlyout->x() + aScale * theDeltaX);
-  aFlyout->setY(aFlyout->y() + aScale * theDeltaY);
-  aFlyout = aCircle->project(aFlyout);
-
-  myFlyoutUpdate = true;
-  aFlyoutAttr->setValue(aFlyout->x(), aFlyout->y());
+  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
   myFlyoutUpdate = false;
 }
 

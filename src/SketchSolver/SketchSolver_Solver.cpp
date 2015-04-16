@@ -63,8 +63,10 @@ void SketchSolver_Solver::setConstraints(Slvs_Constraint* theConstraints, int th
     myEquationsSystem.constraints = theSize;
   }
   else if (myEquationsSystem.constraints != theSize) {
-    delete[] myEquationsSystem.constraint;
-    myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+    if (theSize > myEquationsSystem.constraints) {
+      delete[] myEquationsSystem.constraint;
+      myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+    }
     myEquationsSystem.constraints = theSize;
   }
   memcpy(myEquationsSystem.constraint, theConstraints, theSize * sizeof(Slvs_Constraint));

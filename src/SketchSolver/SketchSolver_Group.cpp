@@ -180,7 +180,8 @@ bool SketchSolver_Group::changeConstraint(
   if (!theConstraint)
     return false;
 
-  if (myConstraints.find(theConstraint) == myConstraints.end()) {
+  bool isNewConstraint = myConstraints.find(theConstraint) == myConstraints.end();
+  if (isNewConstraint) {
     // Add constraint to the current group
     SolverConstraintPtr aConstraint =
         SketchSolver_Builder::getInstance()->createConstraint(theConstraint);
@@ -216,7 +217,7 @@ bool SketchSolver_Group::changeConstraint(
     myConstraints[theConstraint]->update();
 
   // Fix base features for fillet
-  if (theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID()) {
+  if (isNewConstraint && theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID()) {
     std::list<AttributePtr> anAttrList =
         theConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
     std::list<AttributePtr>::iterator anAttrIter = anAttrList.begin();
@@ -410,8 +411,18 @@ bool SketchSolver_Group::resolveConstraints()
     try {
       if (myStorage->hasDuplicatedConstraint())
         aResult = SLVS_RESULT_INCONSISTENT;
-      else
-        aResult = myConstrSolver.solve();
+      else {
+        // To avoid overconstraint situation, we will remove temporary constraints one-by-one
+        // and try to find the case without overconstraint
+        int aNbTemp = (int)myTempConstraints.size();
+        while (true) {
+          aResult = myConstrSolver.solve();
+          if (aResult == SLVS_RESULT_OKAY || aNbTemp <= 0)
+            break;
+          aNbTemp = myStorage->removeFirstTemporaryConstraint();
+          myStorage->initializeSolver(myConstrSolver);
+        }
+      }
     } catch (...) {
       Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       return false;

@@ -108,6 +108,9 @@ public:
   void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);
   /// \brief Remove all transient constraints
   void removeTemporaryConstraints();
+  /// \brief Remove first temporary constraint
+  /// \return Number of remaining temporary constraints
+  int removeFirstTemporaryConstraint();
   /// \brief Checks the constraint is temporary
   bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
 

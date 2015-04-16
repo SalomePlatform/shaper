@@ -67,6 +67,9 @@ private:
   /// \return \c true, if the Equal constrait is found
   bool isUsedInEqual(const Slvs_Entity& theEntity, Slvs_Constraint& theEqual) const;
 
+  /// \brief Check the entity is horizontal of vertical
+  bool isAxisParallel(const Slvs_Entity& theEntity) const;
+
 protected:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
 };
