@@ -78,6 +78,7 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
 
  protected:
   void createAxisByTwoPoints();
+  void createAxisByCylindricalFace();
 };
 
 
