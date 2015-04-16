@@ -14,6 +14,7 @@
 #include <Config_WidgetAPI.h>
 
 #include <PartSet_Tools.h>
+#include <PartSet_ExternalObjectsMgr.h>
 #include <SketchPlugin_Feature.h>
 
 #include <SketchPlugin_ConstraintRigid.h>
@@ -24,13 +25,14 @@ PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
                                                          const Config_WidgetAPI* theData,
                                                          const std::string& theParentId)
-: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId), myUseExternal(true)
+: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId)
 {
-  QString aIsExternal(theData->getProperty("use_external").c_str());
-  if (!aIsExternal.isEmpty()) {
-    QString aStr = aIsExternal.toUpper();
-    myUseExternal = (aStr == "TRUE") || (aStr == "YES"); 
-  }
+  myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), true);
+}
+
+PartSet_WidgetShapeSelector::~PartSet_WidgetShapeSelector()
+{
+  delete myExternalObjectMgr;
 }
 
 bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
@@ -46,19 +48,11 @@ bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
 
   // Do check that we can use external feature
-  if ((aSPFeature.get() != NULL) && aSPFeature->isExternal() && (!myUseExternal))
+  if ((aSPFeature.get() != NULL) && aSPFeature->isExternal() && (!myExternalObjectMgr->useExternal()))
     return false;
 
-  if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull() && myUseExternal) {
-    aSelectedObject = PartSet_Tools::findFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                  theSelectedObject, mySketch);
-    if (!aSelectedObject.get()) {
-      // Processing of external (non-sketch) object
-      aSelectedObject = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                  theSelectedObject, mySketch);
-      if (aSelectedObject.get())
-        myExternalObject = aSelectedObject;
-    }
+  if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull() && myExternalObjectMgr->useExternal()) {
+    aSelectedObject = myExternalObjectMgr->externalObject(theSelectedObject, theShape, sketch());
   } else {
     // Processing of sketch object
     DataPtr aData = myFeature->data();
@@ -104,28 +98,5 @@ bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
 void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
-  removeExternal();
-}
-
-//********************************************************************
-void PartSet_WidgetShapeSelector::removeExternal()
-{
-  if (myExternalObject.get()) {
-    DocumentPtr aDoc = myExternalObject->document();
-    FeaturePtr aFeature = ModelAPI_Feature::feature(myExternalObject);
-    if (aFeature.get() != NULL) {
-      QObjectPtrList anObjects;
-      anObjects.append(aFeature);
-      // the external feature should be removed with all references, sketch feature should be ignored
-      std::set<FeaturePtr> anIgnoredFeatures;
-      anIgnoredFeatures.insert(sketch());
-      // the current feature should be ignored, because it can use the external feature in the
-      // attributes and, therefore have a references to it. So, the delete functionality tries
-      // to delete this feature. Test case is creation of a constraint on external point,
-      // use in this control after an external point, the point of the sketch.
-      anIgnoredFeatures.insert(myFeature);
-      XGUI_Workshop::deleteFeatures(anObjects, anIgnoredFeatures);
-    }
-    myExternalObject = ObjectPtr();
-  }
+  myExternalObjectMgr->removeExternal(sketch(), myFeature);
 }

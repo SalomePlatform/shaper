@@ -1,12 +1,12 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        PartSet_WidgetShapeSelector.h
-// Created:     27 Nov 2014
-// Author:      Vitaly Smetannikov
+// File:        PartSet_WidgetMultiSelector.h
+// Created:     15 Apr 2015
+// Author:      Natalia Ermolaeva
 
 
-#ifndef PartSet_WidgetShapeSelector_H
-#define PartSet_WidgetShapeSelector_H
+#ifndef PartSet_WidgetMultiSelector_H
+#define PartSet_WidgetMultiSelector_H
 
 #include "PartSet.h"
 
@@ -21,7 +21,7 @@ class PartSet_ExternalObjectsMgr;
 * Customosation of ModuleBase_WidgetShapeSelector in order to provide 
 * working with sketch specific objects.
 */
-class PARTSET_EXPORT PartSet_WidgetShapeSelector: public ModuleBase_WidgetShapeSelector
+class PARTSET_EXPORT PartSet_WidgetMultiSelector: public ModuleBase_WidgetShapeSelector
 {
 Q_OBJECT
  public:
@@ -30,10 +30,10 @@ Q_OBJECT
   /// \param theWorkshop instance of workshop interface
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  PartSet_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+  PartSet_WidgetMultiSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
     const Config_WidgetAPI* theData, const std::string& theParentId);
 
-  virtual ~PartSet_WidgetShapeSelector();
+  virtual ~PartSet_WidgetMultiSelector();
 
   /// Set sketcher
   /// \param theSketch a sketcher object
@@ -43,12 +43,6 @@ Q_OBJECT
   CompositeFeaturePtr sketch() const { return mySketch; }
 
 protected:
-  /// Store the values to the model attribute of the widget. It casts this attribute to
-  /// the specific type and set the given values
-  /// \param theSelectedObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  virtual bool setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
-
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
