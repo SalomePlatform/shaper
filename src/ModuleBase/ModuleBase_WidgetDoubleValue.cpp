@@ -96,12 +96,11 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 
 void ModuleBase_WidgetDoubleValue::reset()
 {
-  if (isComputedDefault()) {
+  if (isComputedDefault() || mySpinBox->hasVariable()) {
     return;
     //if (myFeature->compute(myAttributeID))
     //  restoreValue();
-  }
-  else {
+  } else {
     bool isOk;
     double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
     // reset the value just if there is a default value definition in the XML definition
@@ -121,6 +120,8 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
   std::string aTextRepr = aReal->text();
   if (mySpinBox->hasVariable()) {
     aTextRepr = mySpinBox->text().toStdString();
+  } else {
+    aTextRepr = "";
   }
   aReal->setText(aTextRepr);
   updateObject(myFeature);

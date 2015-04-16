@@ -131,7 +131,7 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
   if (aSelectionListAttr) {
     // Store shapes type
      TopAbs_ShapeEnum aCurrentType =
-           ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
+           ModuleBase_Tools::shapeType(myTypeCombo->currentText());
      aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
   }   
    return true;
@@ -149,8 +149,7 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
 
   if (aSelectionListAttr) {
     // Restore shape type
-    setCurrentShapeType(
-         ModuleBase_WidgetShapeSelector::shapeType(aSelectionListAttr->selectionType().c_str()));
+    setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionListAttr->selectionType().c_str()));
     updateSelectionList(aSelectionListAttr);
     return true;
   }
@@ -198,6 +197,12 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
+  TopoDS_Shape aShape = thePrs.shape();
+  if ((myTypeCombo->count() > 1) && (!aShape.IsNull())) {
+    TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->currentText());
+    if (aShape.ShapeType() != aType)
+      return false;
+  }
   ResultPtr aResult;
   if (!thePrs.owner().IsNull()) {
     ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
@@ -235,7 +240,7 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
     aSelectionListAttr->append(aResult, GeomShapePtr());
   }
   else {
-    GeomShapePtr aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    GeomShapePtr aShape(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(aTDSShape));
     // We can not select a result of our feature
     if (aShape->isEqual(aResult->shape()))
@@ -303,7 +308,7 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
   
   for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
     aShapeTypeName = myTypeCombo->itemText(idx);
-    TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
+    TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
       myIsActive = false;
       activateShapeSelection();
@@ -324,7 +329,7 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection()
   if (myIsActive) {
     QString aNewType = myTypeCombo->currentText();
     QIntList aList;
-    aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
+    aList.append(ModuleBase_Tools::shapeType(aNewType));
     myWorkshop->activateSubShapesSelection(aList);
   } else {
     myWorkshop->deactivateSubShapesSelection();

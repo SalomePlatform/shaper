@@ -8,30 +8,30 @@
         nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror"
         when_nested="accept abort"
         title="Sketch"
-        tooltip="Create a new sketch"
+        tooltip="Create sketch"
         icon=":icons/sketch.png">
         <sketch-start-label id="External" title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch">
           <validator id="GeomValidators_Face" parameters="plane"/>
         </sketch-start-label>
       <!--icon=":pictures/x_point.png"-->
       </feature>
-      <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png">
+      <feature id="SketchPoint" title="Point" tooltip="Create point" icon=":icons/point.png">
         <sketch-2dpoint_selector id="PointCoordindates" title="Point" tooltip="Point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
-      <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
+      <feature id="SketchLine" title="Line" tooltip="Create line" icon=":icons/line.png">
         <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
         <sketch-2dpoint_selector id="EndPoint" title="End point" tooltip="End point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
-      <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon=":icons/circle.png">
+      <feature id="SketchCircle" title="Circle" tooltip="Create circle" icon=":icons/circle.png">
         <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center coordinates"/>
         <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
           <validator id="GeomValidators_Positive"/>
         </point2ddistance>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
-      <feature id="SketchArc" title="Arc" tooltip="Create a new arc" icon=":icons/arc.png">
+      <feature id="SketchArc" title="Arc" tooltip="Create arc" icon=":icons/arc.png">
         <sketch-2dpoint_selector id="ArcCenter" title="Center" tooltip="Center of a circle"/>
         <sketch-2dpoint_selector id="ArcStartPoint" title="Start point" tooltip="Start point"/>
         <sketch-2dpoint_selector id="ArcEndPoint" title="End point" tooltip="End point"/>

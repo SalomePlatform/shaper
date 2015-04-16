@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <Events_Error.h>
 
 #include <QWidget>
 #include <QLayout>
@@ -153,6 +154,31 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 
   return aFeatureStr;
 }
+
+typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
+static ShapeTypes MyShapeTypes;
+
+TopAbs_ShapeEnum shapeType(const QString& theType)
+{
+  if (MyShapeTypes.count() == 0) {
+    MyShapeTypes["face"] = TopAbs_FACE;
+    MyShapeTypes["faces"] = TopAbs_FACE;
+    MyShapeTypes["vertex"] = TopAbs_VERTEX;
+    MyShapeTypes["vertices"] = TopAbs_VERTEX;
+    MyShapeTypes["wire"] = TopAbs_WIRE;
+    MyShapeTypes["edge"] = TopAbs_EDGE;
+    MyShapeTypes["edges"] = TopAbs_EDGE;
+    MyShapeTypes["shell"] = TopAbs_SHELL;
+    MyShapeTypes["solid"] = TopAbs_SOLID;
+    MyShapeTypes["solids"] = TopAbs_SOLID;
+  }
+  QString aType = theType.toLower();
+  if (MyShapeTypes.contains(aType))
+    return MyShapeTypes[aType];
+  Events_Error::send("Shape type defined in XML is not implemented!");
+  return TopAbs_SHAPE;
+}
+
 
 }
 

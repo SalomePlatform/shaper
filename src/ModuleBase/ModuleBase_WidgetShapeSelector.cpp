@@ -65,29 +65,6 @@
 #include <list>
 #include <string>
 
-typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
-static ShapeTypes MyShapeTypes;
-
-TopAbs_ShapeEnum ModuleBase_WidgetShapeSelector::shapeType(const QString& theType)
-{
-  if (MyShapeTypes.count() == 0) {
-    MyShapeTypes["face"] = TopAbs_FACE;
-    MyShapeTypes["faces"] = TopAbs_FACE;
-    MyShapeTypes["vertex"] = TopAbs_VERTEX;
-    MyShapeTypes["vertices"] = TopAbs_VERTEX;
-    MyShapeTypes["wire"] = TopAbs_WIRE;
-    MyShapeTypes["edge"] = TopAbs_EDGE;
-    MyShapeTypes["edges"] = TopAbs_EDGE;
-    MyShapeTypes["shell"] = TopAbs_SHELL;
-    MyShapeTypes["solid"] = TopAbs_SOLID;
-    MyShapeTypes["solids"] = TopAbs_SOLID;
-  }
-  QString aType = theType.toLower();
-  if (MyShapeTypes.contains(aType))
-    return MyShapeTypes[aType];
-  Events_Error::send("Shape type defined in XML is not implemented!");
-  return TopAbs_SHAPE;
-}
 
 ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
@@ -269,7 +246,7 @@ bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shap
 {
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   foreach (QString aType, myShapeTypes) {
-    if (aShape.ShapeType() == shapeType(aType))
+    if (aShape.ShapeType() == ModuleBase_Tools::shapeType(aType))
       return true;
   }
   return false;
@@ -338,7 +315,7 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
   if (myIsActive) {
     QIntList aList;
     foreach (QString aType, myShapeTypes) {
-      aList.append(shapeType(aType));
+      aList.append(ModuleBase_Tools::shapeType(aType));
     }
     myWorkshop->activateSubShapesSelection(aList);
   } else {

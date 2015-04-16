@@ -69,6 +69,12 @@ void ParametersPlugin_PyInterp::extendLocalContext(const std::list<std::string>&
   }
 }
 
+void ParametersPlugin_PyInterp::clearLocalContext()
+{
+  PyLockWrapper lck;
+  PyDict_Clear(_local_context);
+}
+
 
 double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression, std::string& theError)
 {

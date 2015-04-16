@@ -58,11 +58,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_Widge
 Q_OBJECT
  public:
 
-   /// Converts string value (name of shape type) to shape enum value
-   /// \param theType - string with shape type name
-   /// \return TopAbs_ShapeEnum value
-  static TopAbs_ShapeEnum shapeType(const QString& theType);
-
   /// Constructor
   /// \param theParent the parent object
   /// \param theWorkshop instance of workshop interface
