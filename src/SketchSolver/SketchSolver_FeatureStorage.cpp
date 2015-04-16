@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <GeomDataAPI_Point2D.h>
 
 void SketchSolver_FeatureStorage::changeConstraint(ConstraintPtr theConstraint)
 {
@@ -305,6 +306,24 @@ void SketchSolver_FeatureStorage::removeAttribute(AttributePtr theAttribute, Fea
     return; // no such attribute
 
   anAttrIter->second.erase(theFeature);
+  if (!anAttrIter->second.empty())
+    return;
+
+  // Check there is no features containing such attribute
+  MapFeatureConstraint::iterator aFeatIter = myFeatures.begin();
+  for (; aFeatIter != myFeatures.end(); aFeatIter++) {
+    DataPtr aData = aFeatIter->first->data();
+    if (!aData || !aData->isValid())
+      continue;
+    std::list<AttributePtr> anAttrList = aData->attributes(GeomDataAPI_Point2D::typeId());
+    std::list<AttributePtr>::iterator anAtIt = anAttrList.begin();
+    for (; anAtIt != anAttrList.end(); anAtIt++) {
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anAtIt);
+      if (aPoint == theAttribute)
+        anAttrIter->second.insert(aFeatIter->first);
+    }
+  }
   if (anAttrIter->second.empty())
     myAttributes.erase(anAttrIter);
 }

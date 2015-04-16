@@ -82,6 +82,9 @@ void SketchSolver_ConstraintManager::processEvent(
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
+    // Shows the message has at least one feature applicable for solver
+    bool hasProperFeature = false;
+
     bool isMovedEvt = theMessage->eventID()
         == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
     if (isMovedEvt) {
@@ -89,8 +92,10 @@ void SketchSolver_ConstraintManager::processEvent(
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aSFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (aSFeature)
+        if (aSFeature) {
           moveEntity(aSFeature);
+          hasProperFeature = true;
+        }
       }
     } else {
       std::set<ObjectPtr>::iterator aFeatIter;
@@ -103,7 +108,7 @@ void SketchSolver_ConstraintManager::processEvent(
         if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0) {
           std::shared_ptr<ModelAPI_CompositeFeature> aSketch = std::dynamic_pointer_cast<
               ModelAPI_CompositeFeature>(aFeature);
-          changeWorkplane(aSketch);
+          hasProperFeature = changeWorkplane(aSketch) || hasProperFeature;
         }
       }
       // then get anything but not the sketch
@@ -118,7 +123,7 @@ void SketchSolver_ConstraintManager::processEvent(
           aComplexConstraints.insert(aFeature);
           continue;
         }
-        changeConstraintOrEntity(aFeature);
+        hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
       }
       // processing remain constraints
       aFeatIter = aComplexConstraints.begin();
@@ -127,12 +132,13 @@ void SketchSolver_ConstraintManager::processEvent(
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
         if (!aFeature)
           continue;
-        changeConstraintOrEntity(aFeature);
+        hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
       }
     }
 
     // Solve the set of constraints
-    resolveConstraints(isMovedEvt); // send update for movement in any case
+    if (hasProperFeature)
+      resolveConstraints(isMovedEvt); // send update for movement in any case
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
