@@ -7,12 +7,14 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
+	PartSet_ExternalObjectsMgr.h
 	PartSet_Module.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
 	PartSet_WidgetPoint2d.h
-    PartSet_WidgetEditor.h
+	PartSet_WidgetEditor.h
+	PartSet_WidgetMultiSelector.h
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_Filters.h
@@ -21,11 +23,13 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+	PartSet_ExternalObjectsMgr.cpp
 	PartSet_Module.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp
-    PartSet_WidgetEditor.cpp
+	PartSet_WidgetEditor.cpp
+	PartSet_WidgetMultiSelector.cpp
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
