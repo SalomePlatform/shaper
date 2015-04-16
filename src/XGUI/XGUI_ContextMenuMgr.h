@@ -33,6 +33,8 @@ Q_OBJECT
   /// \param theId an id of an action
   QAction* action(const QString& theId) const;
 
+  QAction* actionByName(const QString& theName) const;
+
   /// Returns list of registered actions Ids
   QStringList actionIds() const;
 

@@ -97,6 +97,16 @@ QAction* XGUI_ContextMenuMgr::action(const QString& theId) const
   return 0;
 }
 
+QAction* XGUI_ContextMenuMgr::actionByName(const QString& theName) const
+{
+  foreach(QAction* eachAction, myActions) {
+    if (eachAction->text() == theName) {
+      return eachAction;
+    }
+  }
+  return NULL;
+}
+
 QStringList XGUI_ContextMenuMgr::actionIds() const
 {
   return myActions.keys();

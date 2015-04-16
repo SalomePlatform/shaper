@@ -1377,8 +1377,10 @@ void XGUI_Workshop::deleteObjects()
 {
   ModuleBase_IModule* aModule = module();
   // 1. allow the module to delete objects, do nothing if it has succeed
-  if (aModule->deleteObjects())
+  if (aModule->deleteObjects()) {
+    updateCommandStatus();
     return;
+  }
 
   if (!isActiveOperationAborted())
     return;
@@ -1705,7 +1707,13 @@ QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>
     if (isEditing) {
       anId.chop(ModuleBase_Operation::EditSuffix().size());
     }
-    ActionInfo anInfo = myActionsMgr->actionInfoById(anId);
+    ActionInfo anInfo;
+    QAction* aContextMenuAct = myContextMenuMgr->actionByName(anId);
+    if (aContextMenuAct) {
+      anInfo.initFrom(aContextMenuAct);
+    } else {
+      anInfo = myActionsMgr->actionInfoById(anId);
+    }
     if (isEditing) {
       anInfo.text = anInfo.text.prepend("Modify ");
     }

@@ -376,7 +376,11 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
   }
   if (isUseTransaction) {
     aMgr->finishOperation();
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+    aWorkshop->updateCommandStatus();
   }
+
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   myModule->sketchMgr()->restoreSelection();
 }
