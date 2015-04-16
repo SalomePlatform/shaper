@@ -10,9 +10,11 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Arc.h>
 
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Lin2d.h>
@@ -142,8 +144,7 @@ void setArrowSize(double theSize)
   MyArrowSize = theSize;
 }
 
-double getFlyoutDistance(const ModelAPI_Feature* theConstraint, 
-                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+double getFlyoutDistance(const ModelAPI_Feature* theConstraint)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -152,5 +153,36 @@ double getFlyoutDistance(const ModelAPI_Feature* theConstraint,
   return aFlyoutPoint->y();
 }
 
+std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstraint,
+                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  ModelAPI_Feature* aConstraint = const_cast<ModelAPI_Feature*>(theConstraint);
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  if (!aRefAttr || !aRefAttr->isObject() || !aRefAttr->object())
+    return std::shared_ptr<GeomAPI_Pnt>();
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter;
+  if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+    aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
+  } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
+    aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->pnt();
+  } else
+    return std::shared_ptr<GeomAPI_Pnt>();
+
+  std::shared_ptr<GeomAPI_Pnt2d> anOrigin(new GeomAPI_Pnt2d(0.0, 0.0));
+  std::shared_ptr<GeomAPI_Pnt2d> aFlyoutPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))->pnt();
+  double aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+      aConstraint->attribute(SketchPlugin_Constraint::VALUE()))->value();
+  double aLen = aFlyoutPnt->distance(anOrigin);
+  aRadius *= 1.001; // a gap to make point much closer to the circle, but not lying on it
+  aFlyoutPnt->setX(aCenter->x() + aFlyoutPnt->x() * aRadius / aLen);
+  aFlyoutPnt->setY(aCenter->y() + aFlyoutPnt->y() * aRadius / aLen);
+  return thePlane->to3D(aFlyoutPnt->x(), aFlyoutPnt->y());
+}
 
 };

@@ -55,7 +55,7 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   }
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   if (!myOriginalShape.IsNull()) {
-    Set(aShapePtr->impl<TopoDS_Shape>());
+    Set(myOriginalShape);
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }
 }

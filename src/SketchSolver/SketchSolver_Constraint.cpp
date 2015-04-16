@@ -194,7 +194,8 @@ void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
   std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
   for (; aCIter != mySlvsConstraints.end(); aCIter++) {
     Slvs_Constraint aConstraint = myStorage->getConstraint(*aCIter);
-    aConstraint.valA = aValue;
+    if (aValueAttr)
+      aConstraint.valA = aValue;
     Slvs_hEntity* aCoeffs[6] = {
         &aConstraint.ptA, &aConstraint.ptB,
         &aConstraint.entityA, &aConstraint.entityB,

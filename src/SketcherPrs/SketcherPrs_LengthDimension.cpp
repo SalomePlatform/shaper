@@ -85,7 +85,7 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   //aFlyout = aDist;
 
   //SetFlyout(aFlyout);
-  SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint, myPlane));
+  SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

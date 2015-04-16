@@ -13,6 +13,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
 
+#include <math.h>
+
 SketchSolver_ConstraintRigid::SketchSolver_ConstraintRigid(FeaturePtr theFeature)
   : SketchSolver_Constraint(),
     myBaseFeature(theFeature)
@@ -184,7 +186,34 @@ void SketchSolver_ConstraintRigid::fixPoint(const Slvs_hEntity& thePointID)
 void SketchSolver_ConstraintRigid::fixLine(const Slvs_Entity& theLine)
 {
   Slvs_Constraint anEqual;
-  if (isUsedInEqual(theLine, anEqual)) {
+  if (isAxisParallel(theLine)) {
+    // Fix one point and a line length
+    Slvs_hConstraint aFixed;
+    if (!myStorage->isPointFixed(theLine.point[0], aFixed, true) &&
+        !myStorage->isPointFixed(theLine.point[1], aFixed, true))
+      fixPoint(theLine.point[0]);
+    if (!isUsedInEqual(theLine, anEqual)) {
+      // Calculate distance between points on the line
+      double aCoords[4];
+      for (int i = 0; i < 2; i++) {
+        Slvs_Entity aPnt = myStorage->getEntity(theLine.point[i]);
+        for (int j = 0; j < 2; j++) {
+          Slvs_Param aParam = myStorage->getParameter(aPnt.param[j]);
+          aCoords[2*i+j] = aParam.val;
+        }
+      }
+      double aLength = sqrt((aCoords[2] - aCoords[0]) * (aCoords[2] - aCoords[0]) + 
+                            (aCoords[3] - aCoords[1]) * (aCoords[3] - aCoords[1]));
+      // fix line length
+      Slvs_Constraint aDistance = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
+          SLVS_C_PT_PT_DISTANCE, myGroup->getWorkplaneId(), aLength,
+          theLine.point[0], theLine.point[1], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+      aDistance.h = myStorage->addConstraint(aDistance);
+      mySlvsConstraints.push_back(aDistance.h);
+    }
+    return;
+  }
+  else if (isUsedInEqual(theLine, anEqual)) {
     // Check another entity of Equal is already fixed
     Slvs_hEntity anOtherEntID = anEqual.entityA == theLine.h ? anEqual.entityB : anEqual.entityA;
     if (myStorage->isEntityFixed(anOtherEntID, true)) {
@@ -239,6 +268,13 @@ void SketchSolver_ConstraintRigid::fixCircle(const Slvs_Entity& theCircle)
   fixPoint(theCircle.point[0]);
 
   if (isFixRadius) {
+    // Search the radius is already fixed
+    std::list<Slvs_Constraint> aDiamConstr = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
+    std::list<Slvs_Constraint>::const_iterator aDiamIter = aDiamConstr.begin();
+    for (; aDiamIter != aDiamConstr.end(); aDiamIter++)
+      if (aDiamIter->entityA == theCircle.h)
+        return;
+
     // Fix radius of a circle
     AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
         myFeatureMap.begin()->first->attribute(SketchPlugin_Circle::RADIUS_ID()));
@@ -312,7 +348,7 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
     std::list<Slvs_Constraint> aDiamConstraints = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
     std::list<Slvs_Constraint>::iterator anIt = aDiamConstraints.begin();
     for (; anIt != aDiamConstraints.end() && !isExists; anIt++)
-      if (anIt->entityA == myFeatureMap.begin()->second)
+      if (anIt->entityA == theArc.h)
         isExists = true;
     if (!isExists) {
       Slvs_Constraint aFixedR = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER,
@@ -345,3 +381,15 @@ bool SketchSolver_ConstraintRigid::isUsedInEqual(
   return false;
 }
 
+bool SketchSolver_ConstraintRigid::isAxisParallel(const Slvs_Entity& theEntity) const
+{
+  std::list<Slvs_Constraint> aConstr = myStorage->getConstraintsByType(SLVS_C_HORIZONTAL);
+  std::list<Slvs_Constraint> aVert = myStorage->getConstraintsByType(SLVS_C_VERTICAL);
+  aConstr.insert(aConstr.end(), aVert.begin(), aVert.end());
+
+  std::list<Slvs_Constraint>::const_iterator anIter = aConstr.begin();
+  for (; anIter != aConstr.end(); anIter++)
+    if (anIter->entityA == theEntity.h)
+      return true;
+  return false;
+}

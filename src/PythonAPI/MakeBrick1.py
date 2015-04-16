@@ -70,5 +70,5 @@ modeler.end()
 
 modeler.begin()
 mybase.setValue( mylength, 100 )
-mybox.setSize( 20 )
+mybox.setSize( 80 )
 modeler.end()

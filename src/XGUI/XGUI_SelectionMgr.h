@@ -50,6 +50,9 @@ Q_OBJECT
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void updateSelectedOwners(bool isUpdateViewer);
 
+  //! Clears selection in Viewer and object Browser
+  void clearSelection();
+
 signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();

@@ -19,14 +19,18 @@
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_XY.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 
 #include <Config_PropManager.h>
 
+const double tolerance = 1.e-7;
+
 SketchPlugin_ConstraintRadius::SketchPlugin_ConstraintRadius()
 {
+  myFlyoutUpdate = false;
 }
 
 void SketchPlugin_ConstraintRadius::initAttributes()
@@ -158,36 +162,11 @@ void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
-      ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
-  if (!aFeature)
-    return;
-  std::string aCenterAttrName;
-  if (aFeature->getKind() == SketchPlugin_Circle::ID())
-    aCenterAttrName = SketchPlugin_Circle::CENTER_ID();
-  else if (aFeature->getKind() == SketchPlugin_Arc::ID())
-    aCenterAttrName = SketchPlugin_Arc::CENTER_ID();
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(aFeature->data()->attribute(aCenterAttrName));
-  std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCenterAttr->pnt();
-
-  // The specified delta applied on the circle curve, 
-  // so it will be scaled due to distance between flyout and center points
+  myFlyoutUpdate = true;
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  std::shared_ptr<GeomAPI_Pnt2d> aFlyout = aFlyoutAttr->pnt();
-
-  std::shared_ptr<ModelAPI_AttributeDouble> aRadius = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
-  double aScale = aFlyout->distance(aCenter) / aRadius->value();
-
-  std::shared_ptr<GeomAPI_Circ2d> aCircle(new GeomAPI_Circ2d(aCenter, aFlyout));
-  aFlyout->setX(aFlyout->x() + aScale * theDeltaX);
-  aFlyout->setY(aFlyout->y() + aScale * theDeltaY);
-  aFlyout = aCircle->project(aFlyout);
-
-  aFlyoutAttr->setValue(aFlyout->x(), aFlyout->y());
+  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
+  myFlyoutUpdate = false;
 }
 
 void SketchPlugin_ConstraintRadius::attributeChanged(const std::string& theID) {
@@ -201,5 +180,41 @@ void SketchPlugin_ConstraintRadius::attributeChanged(const std::string& theID) {
         aValueAttr->setValue(aRadius);
       }
     }
+  } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
+    // Recalculate flyout point in local coordinates of the circle (or arc):
+    // coordinates are calculated according to center of the shape
+    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        attribute(SketchPlugin_Constraint::ENTITY_A()));
+    if (!aRefAttr || !aRefAttr->isObject())
+      return;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+    if (!aFeature || (aFeature->getKind() != SketchPlugin_Arc::ID() &&
+        aFeature->getKind() != SketchPlugin_Circle::ID()))
+      return;
+
+    std::string aCenterAttrName;
+    if (aFeature->getKind() == SketchPlugin_Circle::ID())
+      aCenterAttrName = SketchPlugin_Circle::CENTER_ID();
+    else if (aFeature->getKind() == SketchPlugin_Arc::ID())
+      aCenterAttrName = SketchPlugin_Arc::CENTER_ID();
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(aFeature->data()->attribute(aCenterAttrName));
+    std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCenterAttr->pnt();
+    std::shared_ptr<ModelAPI_AttributeDouble> aRadius = std::dynamic_pointer_cast<
+        ModelAPI_AttributeDouble>(attribute(SketchPlugin_Constraint::VALUE()));
+
+    std::shared_ptr<GeomAPI_Pnt2d> aFlyoutPnt = aFlyoutAttr->pnt();
+    double aDist = aFlyoutPnt->distance(aCenter);
+    if (aDist < tolerance)
+      return;
+
+    myFlyoutUpdate = true;
+    std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutPnt->xy()->decreased(aCenter->xy());
+    aFlyoutAttr->setValue(aFlyoutDir->x(), aFlyoutDir->y());
+    myFlyoutUpdate = false;
   }
 }

@@ -53,11 +53,8 @@ void SketchSolver_ConstraintDistance::process()
       getType(), myGroup->getWorkplaneId(), aValue, aPoint[0], aPoint[1], aLine, SLVS_E_UNKNOWN);
   aConstraint.h = myStorage->addConstraint(aConstraint);
   mySlvsConstraints.push_back(aConstraint.h);
-  adjustConstraint();
-}
 
-void SketchSolver_ConstraintDistance::adjustConstraint()
-{
+  // Adjust point-line distance
   if (getType() != SLVS_C_PT_LINE_DISTANCE)
     return;
 
@@ -84,4 +81,3 @@ void SketchSolver_ConstraintDistance::adjustConstraint()
     }
   }
 }
-

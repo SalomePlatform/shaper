@@ -62,7 +62,10 @@ enum SelectionModes {
 
   SKETCHERPRS_EXPORT void setArrowSize(double theSize);
 
-  SKETCHERPRS_EXPORT double getFlyoutDistance(const ModelAPI_Feature* theConstraint, 
+  SKETCHERPRS_EXPORT double getFlyoutDistance(const ModelAPI_Feature* theConstraint);
+
+  SKETCHERPRS_EXPORT std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(
+                                              const ModelAPI_Feature* theConstraint,
                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 };
 

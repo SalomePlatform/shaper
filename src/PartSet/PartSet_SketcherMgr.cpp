@@ -324,6 +324,17 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
       launchEditing();
+      // Init flyout point for radius rotation
+      FeaturePtr aFeature = myCurrentSelection.begin().key();
+      std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+                std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      if (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID()) {
+        DataPtr aData = aSPFeature->data();
+        AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+        std::shared_ptr<GeomDataAPI_Point2D> aFPAttr = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
+        aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
+      }
 
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
@@ -851,6 +862,20 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   return aCanDisplay;
 }
 
+bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
+{
+  bool isFoundObject = false;
+
+  FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObject);
+  if (anObjectFeature.get()) {
+    int aSize = myCurrentSketch->numberOfSubs();
+    for (int i = 0; i < myCurrentSketch->numberOfSubs() && !isFoundObject; i++) {
+      FeaturePtr aCurrentFeature = myCurrentSketch->subFeature(i);
+      isFoundObject = myCurrentSketch->subFeature(i) == anObjectFeature;
+    }
+  }
+  return isFoundObject;
+}
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {

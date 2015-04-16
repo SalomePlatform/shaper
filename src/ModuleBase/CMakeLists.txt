@@ -82,6 +82,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetValidated.cpp
 	ModuleBase_WidgetExprEditor.cpp
 	ModuleBase_ParamSpinBox.cpp
+	ModuleBase_SelectionValidator.cpp
 )
 
 SET(PROJECT_LIBRARIES

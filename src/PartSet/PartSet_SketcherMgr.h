@@ -142,6 +142,11 @@ public:
   /// Returns state of constraints showing flag 
   bool isConstraintsShown() const { return myIsConstraintsShown; }
 
+  /// Returns true if the object is a current sketch sub feature of a result of the feature
+  /// \param theObject an object
+  /// \return boolean value
+  bool isObjectOfSketch(const ObjectPtr& theObject) const;
+
   /// Saves the current selection in the viewer into an internal container
   /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
   /// \param theHighlightedUse a boolean flag

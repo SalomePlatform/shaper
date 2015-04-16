@@ -485,6 +485,20 @@ bool PartSet_Module::deleteObjects()
   if (aSelectedObj.count() == 0)
     return false;
 
+  // avoid delete of the objects, which are not belong to the current sketch
+  // in order to do not delete results of other sketches
+  QObjectPtrList aSketchObjects;
+  QObjectPtrList::const_iterator anIt = aSelectedObj.begin(), aLast = aSelectedObj.end();
+  for ( ; anIt != aLast; anIt++) {
+    ObjectPtr anObject = *anIt;
+    if (mySketchMgr->isObjectOfSketch(anObject))
+      aSketchObjects.append(anObject);
+  }
+  // if the selection contains only local selected presentations from other sketches,
+  // the Delete operation should not be done at all
+  if (aSketchObjects.size() == 0)
+    return true;
+
   // the active nested sketch operation should be aborted unconditionally
   if (isNestedOp)
     anOperation->abort();
@@ -499,7 +513,7 @@ bool PartSet_Module::deleteObjects()
   // when sketch operation is active
   std::set<FeaturePtr> anIgnoredFeatures;
   anIgnoredFeatures.insert(mySketchMgr->activeSketch());
-  aWorkshop->deleteFeatures(aSelectedObj, anIgnoredFeatures);
+  aWorkshop->deleteFeatures(aSketchObjects, anIgnoredFeatures);
   
   // 5. stop operation
   aWorkshop->displayer()->updateViewer();

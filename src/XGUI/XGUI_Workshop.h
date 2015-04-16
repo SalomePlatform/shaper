@@ -441,6 +441,9 @@ private:
 
   // Flag to check that part document is in process of activating
   bool myPartActivating;
+
+  /// The flag is true when we loading a document
+  bool myIsLoadingData;
 };
 
 #endif

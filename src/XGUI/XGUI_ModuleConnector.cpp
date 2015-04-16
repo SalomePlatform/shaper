@@ -104,7 +104,11 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
 void XGUI_ModuleConnector::setSelected(const QObjectPtrList& theFeatures)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
-  aDisp->setSelected(theFeatures);
+  if (theFeatures.isEmpty()) {
+    myWorkshop->selector()->clearSelection();
+  } else {
+    aDisp->setSelected(theFeatures);
+  }    
 }
 
 bool XGUI_ModuleConnector::canStartOperation(QString theId)

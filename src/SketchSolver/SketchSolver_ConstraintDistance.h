@@ -28,9 +28,6 @@ protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
 
-  /// \brief Verifies the sign of the distance between line and point and change it if necessary
-  virtual void adjustConstraint();
-
 private:
   int myType; ///< type of constraint (applicable: SLVS_C_PT_PT_DISTANCE, SLVS_C_PT_LINE_DISTANCE)
 };
