@@ -381,9 +381,11 @@ bool Model_Document::finishOperation()
   if (!aResult && isRoot()) {
     // nothing inside in all documents, so remove this transaction from the transactions list
     undoInternal(true, false);
-    myDoc->ClearRedos();
-    myRedos.clear();
   }
+  // on finish clear redos in any case (issue 446)
+  myDoc->ClearRedos();
+  myRedos.clear();
+
   return aResult;
 }
 
