@@ -380,13 +380,24 @@ void GeomAlgoAPI_SketchBuilder::createFaces(const std::shared_ptr<GeomAPI_Pnt>& 
                                             const std::shared_ptr<GeomAPI_Shape>& theWire,
                                             std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
 {
-  std::shared_ptr<GeomAPI_PlanarEdges> aWire = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
-  if(!aWire)
-    return;
-  // Filter wires, return only faces.
   std::list<std::shared_ptr<GeomAPI_Shape> > aFilteredWires;
-  createFaces(theOrigin, theDirX, theNorm,
-              aWire->getEdges(), theResultFaces, aFilteredWires);
+  std::shared_ptr<GeomAPI_PlanarEdges> aWire = 
+    std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
+  if(aWire) {
+    // Filter wires, return only faces.
+    createFaces(theOrigin, theDirX, theNorm,
+                aWire->getEdges(), theResultFaces, aFilteredWires);
+
+    return;
+  } else { // it may be only one circle
+    std::shared_ptr<GeomAPI_Edge> anEdge = std::dynamic_pointer_cast<GeomAPI_Edge>(theWire);
+    if (anEdge) {
+      std::list<std::shared_ptr<GeomAPI_Shape> > aList;
+      aList.push_back(anEdge);
+      createFaces(theOrigin, theDirX, theNorm,
+                  aList, theResultFaces, aFilteredWires);
+    }
+  }
 }
 
 
