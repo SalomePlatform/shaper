@@ -256,5 +256,7 @@ void ModuleBase_ParamSpinBox::keyPressEvent(QKeyEvent* e)
 void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
 {
   ModuleBase_DoubleSpinBox::showEvent(theEvent);
-  //setText(myTextValue);
+  if (hasVariable(myTextValue)) {
+    setText(myTextValue);
+  }
 }
