@@ -411,8 +411,18 @@ bool SketchSolver_Group::resolveConstraints()
     try {
       if (myStorage->hasDuplicatedConstraint())
         aResult = SLVS_RESULT_INCONSISTENT;
-      else
-        aResult = myConstrSolver.solve();
+      else {
+        // To avoid overconstraint situation, we will remove temporary constraints one-by-one
+        // and try to find the case without overconstraint
+        int aNbTemp = (int)myTempConstraints.size();
+        while (true) {
+          aResult = myConstrSolver.solve();
+          if (aResult == SLVS_RESULT_OKAY || aNbTemp <= 0)
+            break;
+          aNbTemp = myStorage->removeFirstTemporaryConstraint();
+          myStorage->initializeSolver(myConstrSolver);
+        }
+      }
     } catch (...) {
       Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       return false;

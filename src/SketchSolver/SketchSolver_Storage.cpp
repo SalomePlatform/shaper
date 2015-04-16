@@ -546,6 +546,15 @@ void SketchSolver_Storage::removeTemporaryConstraints()
   myTemporaryConstraints.clear();
 }
 
+int SketchSolver_Storage::removeFirstTemporaryConstraint()
+{
+  if (myTemporaryConstraints.empty())
+    return 0;
+  removeConstraint(*myTemporaryConstraints.begin());
+  myTemporaryConstraints.erase(myTemporaryConstraints.begin());
+  return (int)myTemporaryConstraints.size();
+}
+
 bool SketchSolver_Storage::isTemporary(const Slvs_hConstraint& theConstraintID) const
 {
   return myTemporaryConstraints.find(theConstraintID) != myTemporaryConstraints.end();
