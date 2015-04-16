@@ -53,6 +53,7 @@
               tooltip="Select point, line end point, line, center of circle or arc."
               shape_types="edge vertex">
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+          <validator id="PartSet_DifferentObjects"/>
           <validator id="GeomValidators_EdgeOrVertex"/>
         </sketch_shape_selector>/>
         <sketch_shape_selector 
@@ -125,6 +126,7 @@
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select an line" 
             shape_types="edge">
+          <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_shape_selector>
@@ -142,6 +144,7 @@
       <!--  SketchConstraintCoincedence  -->
       <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" icon=":icons/coincedence.png">
         <sketch_shape_selector id="ConstraintEntityA" label="First point" tooltip="Select a first point" shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
         <sketch_shape_selector id="ConstraintEntityB" label="Second point" tooltip="Select a second point" shape_types="vertex">
@@ -185,6 +188,7 @@
         icon=":icons/equal.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
+          <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
         
@@ -200,6 +204,7 @@
       <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects" icon=":icons/tangent.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
+          <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
         
         <sketch_shape_selector id="ConstraintEntityB"
