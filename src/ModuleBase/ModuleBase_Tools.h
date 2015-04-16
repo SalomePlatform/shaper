@@ -10,6 +10,7 @@
 #include "ModuleBase.h"
 
 #include <ModelAPI_Feature.h>
+#include <TopAbs_ShapeEnum.hxx>
 
 #include <QPixmap>
 
@@ -64,6 +65,11 @@ MODULEBASE_EXPORT void setSpinValue(QDoubleSpinBox* theSpin, double theValue);
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
 MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo = false);
+
+/// Converts string value (name of shape type) to shape enum value
+/// \param theType - string with shape type name
+/// \return TopAbs_ShapeEnum value
+MODULEBASE_EXPORT TopAbs_ShapeEnum shapeType(const QString& theType);
 
 }
 
