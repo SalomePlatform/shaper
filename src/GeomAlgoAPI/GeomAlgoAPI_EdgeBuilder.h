@@ -23,7 +23,10 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
  public:
   /// Creates linear edge by two points
   static std::shared_ptr<GeomAPI_Edge> line(std::shared_ptr<GeomAPI_Pnt> theStart,
-                                              std::shared_ptr<GeomAPI_Pnt> theEnd);
+                                            std::shared_ptr<GeomAPI_Pnt> theEnd);
+  /// Creates edge - axis of the given cylindrical face
+  static std::shared_ptr<GeomAPI_Edge> cylinderAxis(
+    std::shared_ptr<GeomAPI_Shape> theCylindricalFace);
 
   /// Creates linear edge in a form of a circle by a point and a circle radius
   static std::shared_ptr<GeomAPI_Edge> lineCircle(std::shared_ptr<GeomAPI_Pnt> theCenter,

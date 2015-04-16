@@ -1300,6 +1300,9 @@ void Model_Document::updateResults(FeaturePtr theFeature)
           break;
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
+        } else if (aGroup->Get() == ModelAPI_ResultParameter::group().c_str()) {
+          theFeature->attributeChanged("expression"); // just produce a value
+          break;
         } else {
           Events_Error::send(std::string("Unknown type of result is found in the document:") +
             TCollection_AsciiString(aGroup->Get()).ToCString());

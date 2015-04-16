@@ -18,6 +18,7 @@
 ParametersPlugin_Parameter::ParametersPlugin_Parameter()
 {
   myInterp = new ParametersPlugin_PyInterp();
+  myInterp->initialize();
 }
 
 ParametersPlugin_Parameter::~ParametersPlugin_Parameter()
@@ -76,7 +77,7 @@ void ParametersPlugin_Parameter::execute()
 
 double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
 {
-  myInterp->initialize();
+
   std::list<std::string> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
   std::list<std::string> aContext;
@@ -92,6 +93,6 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
   }
   myInterp->extendLocalContext(aContext);
   double result = myInterp->evaluate(theExpression, theError);
-  myInterp->destroy();
+  myInterp->clearLocalContext();
   return result;
 }

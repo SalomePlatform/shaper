@@ -59,6 +59,19 @@ void ConstructionPlugin_Axis::createAxisByTwoPoints()
   }
 }
 
+void ConstructionPlugin_Axis::createAxisByCylindricalFace()
+{
+    std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(CYLINDRICAL_FACE())->value();
+     // update arguments due to the selection value
+    if (aSelection && !aSelection->isNull() && aSelection->isFace()) {
+      std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::cylinderAxis(aSelection);
+
+      ResultConstructionPtr aConstr = document()->createConstruction(data());
+      aConstr->setShape(anEdge);
+      setResult(aConstr);
+    }
+}
+
 void ConstructionPlugin_Axis::execute()
 {
   AttributeStringPtr aMethodTypeAttr = string(ConstructionPlugin_Axis::METHOD());
@@ -66,14 +79,12 @@ void ConstructionPlugin_Axis::execute()
   if (aMethodType == "AxisByPointsCase") {
     createAxisByTwoPoints();
   } else if (aMethodType == "AxisByCylindricalFaceCase") {
-    #ifdef _DEBUG
-    std::cout << "ConstructionPlugin_Axis::execute: " << "AxisByCylindricalFaceCase is not supported yet." << std::endl;
-    #endif
+    createAxisByCylindricalFace();
   }
 }
 
 bool ConstructionPlugin_Axis::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                                    std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+  std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
 {
   bool isCustomized = theDefaultPrs.get() != NULL &&
                       theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);

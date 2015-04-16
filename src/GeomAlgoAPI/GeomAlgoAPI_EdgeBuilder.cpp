@@ -8,9 +8,11 @@
 #include <gp_Pln.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <TopoDS_Edge.hxx>
+#include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
+#include <Geom_CylindricalSurface.hxx>
 
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
@@ -25,6 +27,36 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     return std::shared_ptr<GeomAPI_Edge>();
   if (Abs(aStart.SquareDistance(anEnd)) > 1.e+100)
     return std::shared_ptr<GeomAPI_Edge>();
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
+  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
+
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
+    std::shared_ptr<GeomAPI_Shape> theCylindricalFace)
+{
+  std::shared_ptr<GeomAPI_Edge> aResult;
+  const TopoDS_Shape& aShape = theCylindricalFace->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return aResult;
+  TopoDS_Face aFace = TopoDS::Face(aShape);
+  if (aFace.IsNull())
+    return aResult;
+  TopLoc_Location aLoc;
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace, aLoc);
+  if (aSurf.IsNull())
+    return aResult;
+  Handle(Geom_CylindricalSurface) aCyl = Handle(Geom_CylindricalSurface)::DownCast(aSurf);
+  if (aCyl.IsNull())
+    return aResult;
+  gp_Ax1 anAxis = aCyl->Axis();
+  gp_Pnt aStart(anAxis.Location().Transformed(aLoc.Transformation()));
+  // edge length is 100, "-" because cylinder of extrusion has negative direction with the cylinder
+  gp_Pnt anEnd(anAxis.Location().XYZ() - anAxis.Direction().XYZ() * 100.);
+  anEnd.Transform(aLoc.Transformation());
+  
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();

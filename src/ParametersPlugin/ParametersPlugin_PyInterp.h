@@ -22,6 +22,7 @@ class PARAMETERSPLUGIN_EXPORT ParametersPlugin_PyInterp : public PyInterp_Interp
 
   std::list<std::string> compile(const std::string&);
   void extendLocalContext(const std::list<std::string>&);
+  void clearLocalContext();
   double evaluate(const std::string&, std::string&);
 
  protected:
