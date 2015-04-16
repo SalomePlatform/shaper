@@ -3,7 +3,6 @@
 
 import ModelAPI
 from macros.box.feature      import BoxFeature
-from macros.cylinder.feature import CylinderFeature
 
 
 class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
@@ -19,9 +18,6 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
 
         if theFeatureID == BoxFeature.ID():
             aFeature = BoxFeature().__disown__()
-
-        elif theFeatureID == CylinderFeature.ID():
-            aFeature = CylinderFeature().__disown__()
 
         else:
             raise StandardError("No such feature %s" % theFeatureID)
