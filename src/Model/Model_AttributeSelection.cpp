@@ -121,6 +121,8 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   //the attribute initialized state should be changed by sendAttributeUpdated only
   //myIsInitialized = true;
 
+  owner()->data()->sendAttributeUpdated(this);
+
   std::string aSelName = namingName();
   if(!aSelName.empty())
     TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
@@ -131,7 +133,6 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   //selectSubShape("EDGE", "Extrusion_1/TopFace|Extrusion_1/LateralFace_1");
   //selectSubShape("EDGE", "Sketch_1/Edge_6");
 #endif
-  owner()->data()->sendAttributeUpdated(this);
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
