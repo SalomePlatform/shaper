@@ -8,6 +8,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeValidator.h>
+#include <ModelAPI_Events.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
@@ -68,6 +69,16 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   aData->blockSendAttributeUpdated(false);
   anAttribute->blockSetInitialized(isAttributeBlocked);
   aLoop->activateFlushes(true);
+
+  // In particular case the results are deleted and called as redisplayed inside of this
+  // highlight-selection, to they must be flushed as soon as possible.
+  // Example: selection of group-vertices subshapes with shift pressend on body. Without
+  //  these 4 lines below the application crashes because of left presentations on
+  //  removed results still in the viewer.
+  static Events_ID aDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+  static Events_ID aRedispEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  aLoop->flush(aDeletedEvent);
+  aLoop->flush(aRedispEvent);
 
   return aValid;
 }
