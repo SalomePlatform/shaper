@@ -134,7 +134,9 @@ bool ModuleBase_WidgetDoubleValue::restoreValue()
   AttributeDoublePtr aRef = aData->real(attributeID());
   std::string aTextRepr = aRef->text();
   if (!aTextRepr.empty()) {
+    bool isBlocked = mySpinBox->blockSignals(true);
     mySpinBox->setText(QString::fromStdString(aTextRepr));
+    mySpinBox->blockSignals(isBlocked);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox, aRef->value());
   }
