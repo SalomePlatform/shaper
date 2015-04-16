@@ -239,6 +239,13 @@ void SketchSolver_ConstraintRigid::fixCircle(const Slvs_Entity& theCircle)
   fixPoint(theCircle.point[0]);
 
   if (isFixRadius) {
+    // Search the radius is already fixed
+    std::list<Slvs_Constraint> aDiamConstr = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
+    std::list<Slvs_Constraint>::const_iterator aDiamIter = aDiamConstr.begin();
+    for (; aDiamIter != aDiamConstr.end(); aDiamIter++)
+      if (aDiamIter->entityA == theCircle.h)
+        return;
+
     // Fix radius of a circle
     AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
         myFeatureMap.begin()->first->attribute(SketchPlugin_Circle::RADIUS_ID()));
@@ -312,7 +319,7 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
     std::list<Slvs_Constraint> aDiamConstraints = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
     std::list<Slvs_Constraint>::iterator anIt = aDiamConstraints.begin();
     for (; anIt != aDiamConstraints.end() && !isExists; anIt++)
-      if (anIt->entityA == myFeatureMap.begin()->second)
+      if (anIt->entityA == theArc.h)
         isExists = true;
     if (!isExists) {
       Slvs_Constraint aFixedR = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_DIAMETER,
