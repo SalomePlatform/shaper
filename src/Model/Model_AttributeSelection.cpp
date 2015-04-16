@@ -402,28 +402,29 @@ void Model_AttributeSelection::selectBody(
 {
   // perform the selection
   TNaming_Selector aSel(selectionLabel());
-  TopoDS_Shape aNewShape = theSubShape ? theSubShape->impl<TopoDS_Shape>() : TopoDS_Shape();
   TopoDS_Shape aContext;
 
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myRef.value());
   if (aBody) {
     aContext = aBody->shape()->impl<TopoDS_Shape>();
   } else {
-    ResultConstructionPtr aConstr = 
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myRef.value());
-    if (aConstr) {
-      aContext = aConstr->shape()->impl<TopoDS_Shape>();
+    ResultPtr aResult = 
+      std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
+    if (aResult) {
+      aContext = aResult->shape()->impl<TopoDS_Shape>();
     } else {
       Events_Error::send("A result with shape is expected");
       return;
     }
   }
+  TopoDS_Shape aNewShape = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
   /// fix for issue 411: result modified shapes must not participate in this selection mechanism
   FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   if (aFeatureOwner.get())
     aFeatureOwner->eraseResults();
-
-  aSel.Select(aNewShape, aContext); 
+  if (!aContext.IsNull()) {
+    aSel.Select(aNewShape, aContext); 
+  }
 }
 
 /// registers the name of the shape in the label (theID == 0) of sub label (theID is a tag)
