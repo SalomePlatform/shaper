@@ -677,6 +677,12 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   //QIntList aModes;
   //myDisplayer->activateObjects(aModes);
   myModule->operationStopped(theOperation);
+
+  if (myOperationMgr->operationsCount() == 0) {
+    // Activate selection mode for all objects
+    QIntList aModes;
+    myDisplayer->activateObjects(aModes);
+  }
 }
 
 
