@@ -105,6 +105,7 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   connect(theOperation, SIGNAL(committed()), SLOT(onOperationCommitted()));
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
+  connect(theOperation, SIGNAL(triggered(bool)), SLOT(onOperationTriggered(bool)));
   connect(theOperation, SIGNAL(activatedByPreselection()),
           SIGNAL(operationActivatedByPreselection()));
 
@@ -287,6 +288,26 @@ void XGUI_OperationMgr::onOperationStopped()
   if (aResultOp) {
     resumeOperation(aResultOp);
     onValidateOperation();
+  }
+}
+
+void XGUI_OperationMgr::onOperationTriggered(bool theState)
+{
+  ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  if (aSenderOperation && !theState) {
+    ModuleBase_Operation* aCurrentOperation = currentOperation();
+    if (aSenderOperation == aCurrentOperation)
+      aCurrentOperation->abort();
+    else {
+      // it is possible to trigger upper operation(e.g. sketch, current is sketch line)
+      // all operation from the current to triggered should also be aborted
+      while(hasOperation()) {
+        ModuleBase_Operation* aCurrentOperation = currentOperation();
+        aCurrentOperation->abort();
+        if(aSenderOperation == aCurrentOperation)
+          break;
+      }
+    }
   }
 }
 

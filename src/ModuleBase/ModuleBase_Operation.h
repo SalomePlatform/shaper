@@ -148,6 +148,10 @@ signals:
   /// The operation is postponed
   void postponed();  
 
+  /// The operation is triggered
+  /// \param theState a new triggered state
+  void triggered(bool theState);
+
   /// The operation is filled with existing preselection
   void activatedByPreselection(); 
 

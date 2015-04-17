@@ -199,9 +199,7 @@ bool ModuleBase_Operation::commit()
 
 void ModuleBase_Operation::setRunning(bool theState)
 {
-  if (!theState) {
-    abort();
-  }
+  emit triggered(theState);
 }
 
 void ModuleBase_Operation::activateByPreselection()

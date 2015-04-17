@@ -165,6 +165,9 @@ signals:
   /// Slot called on operation resume
   void onOperationResumed();
 
+  /// Slot called on operation triggered
+  void onOperationTriggered(bool theState);
+
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
   Operations myOperations;  ///< a stack of started operations. The active operation is on top,
