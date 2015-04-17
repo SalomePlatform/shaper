@@ -382,9 +382,13 @@ bool Model_Document::finishOperation()
     // nothing inside in all documents, so remove this transaction from the transactions list
     undoInternal(true, false);
   }
-  // on finish clear redos in any case (issue 446)
+  // on finish clear redos in any case (issue 446) and for all subs (issue 408)
   myDoc->ClearRedos();
   myRedos.clear();
+  for (aSubIter = aSubs.begin(); aSubIter != aSubs.end(); aSubIter++) {
+    subDoc(*aSubIter)->myDoc->ClearRedos();
+    subDoc(*aSubIter)->myRedos.clear();
+  }
 
   return aResult;
 }
