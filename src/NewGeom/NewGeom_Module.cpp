@@ -341,7 +341,8 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& 
                     theInfo.text,
                     theInfo.toolTip,
                     theInfo.icon,
-                    theInfo.shortcut);
+                    theInfo.shortcut,
+                    theInfo.checkable);
 }
 
 //******************************************************
