@@ -80,8 +80,7 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
-  /// Realizes some functionality by an operation start
-  /// \param theOperation a started operation
+  /// Returns current operation
   virtual ModuleBase_Operation* currentOperation() const;
 
   /// Returns True if there are available Undos and the sketch manager allows undo
@@ -146,6 +145,10 @@ protected slots:
 
   /// Register properties of this module
   virtual void registerProperties();
+
+  /// Sends the operation for launching
+  /// \param theOperation the operation
+  virtual void sendOperation(ModuleBase_Operation* theOperation);
 
  private slots:
    /// Processing of vertex selected

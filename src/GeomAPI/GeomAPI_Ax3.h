@@ -25,7 +25,6 @@ public:
   /// Ñonstructor
   /// \param theOrigin point of origin
   /// \param theDirX direction of X axis
-  /// \param theDirY direction of Y axis
   /// \param theNorm direction of normal vector
   GeomAPI_Ax3(std::shared_ptr<GeomAPI_Pnt> theOrigin,
               std::shared_ptr<GeomAPI_Dir> theDirX,

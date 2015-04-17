@@ -20,11 +20,20 @@
 #include <QAction>
 #include <QStyledItemDelegate>
 
+/**
+* \ingroup GUI
+* Tree item delegate for definition of data in column items editor
+*/
 class XGUI_TreeViewItemDelegate: public QStyledItemDelegate
 {
 public:
+  /// Constructor
+  /// \param theParent a parent of the delegate
   XGUI_TreeViewItemDelegate(XGUI_DataTree* theParent):QStyledItemDelegate(theParent), myTreedView(theParent) {}
 
+  /// Set data for item editor (name of the item)
+  /// \param editor a widget of editor
+  /// \param index the tree item index
   virtual void	setEditorData ( QWidget* editor, const QModelIndex& index ) const
   {
     QLineEdit* aEditor = dynamic_cast<QLineEdit*>(editor);

@@ -26,8 +26,8 @@ aSession = ModelAPI_Session.get()
 # Create a part for extrusions & boolean
 aSession.startOperation()
 aPartFeature = aSession.moduleDocument().addFeature("Part")
-aPart = aSession.activeDocument()
 aSession.finishOperation()
+aPart = aSession.activeDocument()
 #=========================================================================
 # Create a sketch with circle to extrude
 #=========================================================================
@@ -37,8 +37,6 @@ origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirY"))
-diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSketchCircle = aCircleSketchFeature.addFeature("SketchCircle")
@@ -56,8 +54,6 @@ origin = geomDataAPI_Point(aTriangleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirY"))
-diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aTriangleSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSketchLineA = aTriangleSketchFeature.addFeature("SketchLine")
@@ -88,11 +84,10 @@ for eachSketchFeature in [aCircleSketchFeature, aTriangleSketchFeature]:
     aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
     origin = geomDataAPI_Point(eachSketchFeature.attribute("Origin")).pnt()
     dirX = geomDataAPI_Dir(eachSketchFeature.attribute("DirX")).dir()
-    dirY = geomDataAPI_Dir(eachSketchFeature.attribute("DirY")).dir()
     norm = geomDataAPI_Dir(eachSketchFeature.attribute("Norm")).dir()
     aSketchFaces = ShapeList()
     GeomAlgoAPI_SketchBuilder.createFaces(
-        origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
+        origin, dirX, norm, aSketchEdges, aSketchFaces)
     # Create extrusion on them
     anExtrusionFt = aPart.addFeature("Extrusion")
     anExtrusionFt.selectionList("base").append(

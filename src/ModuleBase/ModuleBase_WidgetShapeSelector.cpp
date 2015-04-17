@@ -136,7 +136,7 @@ bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
     } else {
       AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-      if (aSelectAttr) {
+      if (aSelectAttr.get() != NULL) {
         aSelectAttr->setValue(aResult, theShape);
         isChanged = true;
       }

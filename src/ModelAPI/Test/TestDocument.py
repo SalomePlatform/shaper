@@ -62,7 +62,7 @@ assert(aPart.size("Features") == 1)
 # Duplicate the document
 assert(aSession.moduleDocument().size("Parts") == 1)
 aSession.startOperation()
-aSession.moduleDocument().addFeature("Duplicate")
+aPart.addFeature("Duplicate")
 aSession.finishOperation()
 assert(aSession.moduleDocument().size("Parts") == 2)
 aCopyOfPart = aSession.activeDocument()
@@ -75,7 +75,7 @@ assert(aCopyOfPart != aPart)
 #=========================================================================
 assert(aSession.moduleDocument().size("Parts") == 2)
 aSession.startOperation()
-aSession.moduleDocument().addFeature("Remove")
+aPart.addFeature("Remove")
 aSession.finishOperation()
 assert(aSession.moduleDocument().size("Parts") == 1)
 assert(aSession.activeDocument().id() == aSession.moduleDocument().id())
@@ -83,23 +83,7 @@ assert(aSession.activeDocument().id() == aSession.moduleDocument().id())
 aSession.startOperation()
 aDoc1 = aSession.document("Part_1")
 aSession.setActiveDocument(aDoc1, False)
-aSession.moduleDocument().addFeature("Remove")
+aDoc1.addFeature("Remove")
 aSession.finishOperation()
 assert(aSession.moduleDocument().size("Parts") == 0)
 assert(aSession.activeDocument())
-#=========================================================================
-# Trying to duplicate/remove the root
-#=========================================================================
-aSession.startOperation()
-aSession.moduleDocument().addFeature("Duplicate")
-aSession.finishOperation()
-assert(aSession.activeDocument().id() == aSession.moduleDocument().id())
-assert(aSession.moduleDocument().size("Parts") == 0)
-aSession.startOperation()
-aSession.moduleDocument().addFeature("Remove")
-aSession.finishOperation()
-assert(aSession.activeDocument().id() == aSession.moduleDocument().id())
-assert(aSession.moduleDocument().size("Parts") == 0)
-#=========================================================================
-# End of test
-#=========================================================================

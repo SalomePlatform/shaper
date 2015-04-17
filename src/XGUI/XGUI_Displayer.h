@@ -200,7 +200,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Set color on presentation of an object if it is displayed
   /// \param theObject an object 
   /// \param theColor a color which has to be set
-  /// \param theUpdate update viewer flag
+  /// \param toUpdate update viewer flag
   /// \return previously defined color on the object
   QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool toUpdate = true);
 

@@ -57,15 +57,21 @@ public:
   Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
                                                      const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
 
+  /// Returns sketcher plane
   Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return myPlane; }
 
+  /// Returns feature object
   Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }
 
-
+  /// Return array of points where symbols will be placed
   Handle(Graphic3d_ArrayOfPoints) pointsArray() const { return myPntArray; }
 
+  /// Render of the presentation
+  /// \param theWorkspace is OpenGl workspace
   void Render(const Handle(OpenGl_Workspace)& theWorkspace) const;
 
+  /// Release used OpenGl resources
+  /// \param theContext is an OpenGL context
   void Release (OpenGl_Context* theContext);
 
   DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
@@ -103,6 +109,9 @@ protected:
   /// \return true in case of success
   virtual bool updatePoints(double theStep) const { return true; }
 
+  /// Draw a shape into the given presentation scene
+  /// \param theShape the shape to draw
+  /// \param thePrs the presentation scene
   void drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape, 
     const Handle(Prs3d_Presentation)& thePrs) const;
 
@@ -120,6 +129,7 @@ protected:
   /// Array of symbols positions
   mutable Handle(Graphic3d_ArrayOfPoints) myPntArray;
 
+  /// An owner object of the presentation
   Handle(SelectMgr_EntityOwner) myOwner;
 
 private: 

@@ -33,6 +33,8 @@ Q_OBJECT
   /// \param theId an id of an action
   QAction* action(const QString& theId) const;
 
+  /// Returns action object by its Id (name)
+  /// \param theName is an Id of the action
   QAction* actionByName(const QString& theName) const;
 
   /// Returns list of registered actions Ids
@@ -57,7 +59,10 @@ signals:
   /// \param isChecked is checked flag
   void actionTriggered(const QString& theId, bool isChecked);
 
+  /// A signal which is sent before context menu show
   void beforeContextMenu();
+
+  /// A signal which is sent after context menu show
   void afterContextMenu();
 
  private slots:
