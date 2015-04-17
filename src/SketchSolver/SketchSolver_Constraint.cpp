@@ -113,48 +113,45 @@ void SketchSolver_Constraint::process()
   adjustConstraint();
 }
 
+bool SketchSolver_Constraint::checkAttributesChanged(ConstraintPtr theConstraint)
+{
+  // Check the attrbutes of constraint are changed
+  ConstraintPtr aConstraint = theConstraint ? theConstraint : myBaseConstraint;
+  std::list<AttributePtr> anAttrList = aConstraint->data()->attributes(std::string());
+  std::list<AttributePtr>::iterator anAttrIter = anAttrList.begin();
+  for (; anAttrIter != anAttrList.end(); anAttrIter++) {
+    AttributeRefAttrPtr aRefAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
+    if (aRefAttr) {
+      if (aRefAttr->isObject()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+        if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
+          return true;
+      } else if (aRefAttr->attr() &&
+                 myAttributeMap.find(aRefAttr->attr()) == myAttributeMap.end())
+        return true;
+    }
+    AttributeRefListPtr aRefList =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIter);
+    if (aRefList) {
+      std::list<ObjectPtr> anItems = aRefList->list();
+      std::list<ObjectPtr>::iterator anIt = anItems.begin();
+      for (; anIt != anItems.end(); anIt++) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+        if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
+          return true;
+      }
+    }
+  }
+  return false;
+}
+
 void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
 {
   cleanErrorMsg();
   bool needToRebuild = (theConstraint && theConstraint != myBaseConstraint);
-  if (!needToRebuild) {
-    // Check the attrbutes of constraint are changed
-    ConstraintPtr aConstraint = theConstraint ? theConstraint : myBaseConstraint;
-    std::list<AttributePtr> anAttrList = aConstraint->data()->attributes(std::string());
-    std::list<AttributePtr>::iterator anAttrIter = anAttrList.begin();
-    for (; anAttrIter != anAttrList.end(); anAttrIter++) {
-      AttributeRefAttrPtr aRefAttr =
-          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
-      if (aRefAttr) {
-        if (aRefAttr->isObject()) {
-          FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-          if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end()) {
-            needToRebuild = true;
-            break;
-          }
-        } else if (aRefAttr->attr() &&
-                    myAttributeMap.find(aRefAttr->attr()) == myAttributeMap.end()) {
-          needToRebuild = true;
-          break;
-        }
-      }
-      AttributeRefListPtr aRefList =
-          std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIter);
-      if (aRefList) {
-        std::list<ObjectPtr> anItems = aRefList->list();
-        std::list<ObjectPtr>::iterator anIt = anItems.begin();
-        for (; anIt != anItems.end(); anIt++) {
-          FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-          if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end()) {
-            needToRebuild = true;
-            break;
-          }
-        }
-        if (needToRebuild)
-          break;
-      }
-    }
-  }
+  if (!needToRebuild)
+    needToRebuild = checkAttributesChanged(theConstraint);
   if (needToRebuild) {
     if (theConstraint && theConstraint->getKind() != myBaseConstraint->getKind())
       return;

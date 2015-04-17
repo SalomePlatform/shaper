@@ -82,6 +82,11 @@ protected:
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes);
 
+  /// \brief Verify the attributes of constraint are changed (and constraint need to rebuild)
+  /// \param[in] theConstraint constraint, which attributes should be checked (if NULL, the myBaseConstraint is used)
+  /// \return \c true if some attributes are changed
+  virtual bool checkAttributesChanged(ConstraintPtr theConstraint);
+
   /// \brief This method is used in derived objects to check consistence of constraint.
   ///        E.g. the distance between line and point may be signed.
   virtual void adjustConstraint()
