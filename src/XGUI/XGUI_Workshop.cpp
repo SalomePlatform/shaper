@@ -762,8 +762,29 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
   QStringList aNestedFeatures =
       QString::fromStdString(theMessage->nestedFeatures()).split(" ", QString::SkipEmptyParts);
   QString aDocKind = QString::fromStdString(theMessage->documentKind());
+  QList<QAction*> aNestedActList;
+  bool isColumnButton = !aNestedFeatures.isEmpty();
+  if (isColumnButton) {
+    QString aNestedActions = QString::fromStdString(theMessage->actionsWhenNested());
+    if (aNestedActions.contains("accept")) {
+      QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+      connect(anAction, SIGNAL(triggered()), myOperationMgr, SLOT(commitAllOperations()));
+      aNestedActList << anAction;
+    }
+    if (aNestedActions.contains("abort")) {
+      QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, NULL);
+      connect(anAction, SIGNAL(triggered()), myOperationMgr, SLOT(abortAllOperations()));
+      aNestedActList << anAction;
+    }
+  }
+
   if (isSalomeMode()) {
-    QAction* aAction = salomeConnector()->addFeature(aWchName, aFeatureInfo);
+    QAction* aAction;
+    if (isColumnButton) {
+      aAction = salomeConnector()->addNestedFeature(aWchName, aFeatureInfo, aNestedActList);
+    } else {
+      aAction = salomeConnector()->addFeature(aWchName, aFeatureInfo);
+    }
     salomeConnector()->setNestedActions(aFeatureInfo.id, aNestedFeatures);
     salomeConnector()->setDocumentKind(aFeatureInfo.id, aDocKind);
 
@@ -794,19 +815,7 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     // Enrich created button with accept/abort buttons if necessary
     AppElements_Button* aButton = aCommand->button();
     if (aButton->isColumnButton()) {
-      QString aNestedActions = QString::fromStdString(theMessage->actionsWhenNested());
-      QList<QAction*> anActList;
-      if (aNestedActions.contains("accept")) {
-        QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, aButton);
-        connect(anAction, SIGNAL(triggered()), myOperationMgr, SLOT(commitAllOperations()));
-        anActList << anAction;
-      }
-      if (aNestedActions.contains("abort")) {
-        QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, aButton);
-        connect(anAction, SIGNAL(triggered()), myOperationMgr, SLOT(abortAllOperations()));
-        anActList << anAction;
-      }
-      aButton->setAdditionalButtons(anActList);
+      aButton->setAdditionalButtons(aNestedActList);
     }
     myActionsMgr->addCommand(aCommand);
     myModule->actionCreated(aCommand);

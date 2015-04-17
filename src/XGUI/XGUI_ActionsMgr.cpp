@@ -299,6 +299,7 @@ void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
     return;
   FeaturePtr aFeature = theOperation->feature();
   QString aFeatureId = QString::fromStdString(aFeature->getKind());
+  setActionEnabled(aFeatureId, true);
   setNestedCommandsEnabled(true, aFeatureId);
 
   setNestedStackEnabled(myOperationMgr->previousOperation(theOperation));
