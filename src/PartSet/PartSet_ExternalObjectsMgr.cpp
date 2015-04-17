@@ -112,7 +112,7 @@ void PartSet_ExternalObjectsMgr::removeExternalValidated(const CompositeFeatureP
 {
   // TODO(nds): unite with removeExternal(), remove parameters
   removeExternalObject(myExternalObjectValidated, theSketch, theFeature);
-  myExternalObjectValidated = NULL;
+  myExternalObjectValidated = ObjectPtr();
 }
 
 void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject,
