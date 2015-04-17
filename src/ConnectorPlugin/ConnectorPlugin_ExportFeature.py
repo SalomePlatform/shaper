@@ -84,9 +84,11 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         for anIndex in range(0, aFeaturesNum):
             aFeature = self.Part.object("Features", anIndex)
             aSelectionList = aFeature.data().selectionList("group_list")
-            aName = aFeature.data().name()
             # if a group has been found
             if aSelectionList:
+                aFeature = ModelAPI.objectToFeature(aFeature)
+                if aFeature.firstResult() is not None:
+                  aName = aFeature.firstResult().data().name()
                 groupIndex = groupIndex + 1
                 self.createGroupFromList(aSelectionList, aName)
                      
