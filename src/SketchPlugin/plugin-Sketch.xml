@@ -246,12 +246,13 @@
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
             <validator id="GeomValidators_Edge" parameters="line"/>
         </sketch_shape_selector>
-        <multi_selector id="ConstraintMirrorList"
+        <sketch_multi_selector id="ConstraintMirrorList"
             label="List of objects"
             tooltip="Select list of mirroring objects"
-            type_choice="Edges">
+            type_choice="Edges"
+            use_external="true">
             <validator id="SketchPlugin_MirrorAttr" />
-        </multi_selector>
+        </sketch_multi_selector>
       </feature>
     </group>
   </workbench>
