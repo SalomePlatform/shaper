@@ -35,6 +35,9 @@
 #include <Config_PropManager.h>
 #include <Config_ModuleReader.h>
 
+#include <AIS_ListOfInteractive.hxx>
+#include <AIS_ListIteratorOfListOfInteractive.hxx>
+
 #include <QDockWidget>
 #include <QAction>
 #include <QTimer>
@@ -180,6 +183,33 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
   // switch off in this module
   aResMgr->setValue("Study", "store_positions", false);
 
+  // Synchronize displayed objects
+  if (mySelector && mySelector->viewer()) {
+    Handle(AIS_InteractiveContext) aContext = mySelector->viewer()->getAISContext();
+    XGUI_Displayer* aDisp = myWorkshop->displayer();
+    QObjectPtrList aObjList = aDisp->displayedObjects();
+
+    AIS_ListOfInteractive aList;
+    aContext->DisplayedObjects(aList);
+    AIS_ListIteratorOfListOfInteractive aLIt;
+    Handle(AIS_InteractiveObject) anAISIO;
+    foreach (ObjectPtr aObj, aObjList) {
+      AISObjectPtr aPrs = aDisp->getAISObject(aObj);
+      Handle(AIS_InteractiveObject) aAIS = aPrs->impl<Handle(AIS_InteractiveObject)>();
+      bool aFound = false;
+      for (aLIt.Initialize(aList); aLIt.More(); aLIt.Next()) {
+        anAISIO = aLIt.Value();
+        if (anAISIO.Access() == aAIS.Access()) {
+          aFound = true;
+          break;
+        }
+      }
+      if (!aFound) {
+        aDisp->erase(aObj, false);
+      }
+    }
+  }
+
   return isDone;
 }
 
@@ -311,7 +341,8 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& 
                     theInfo.text,
                     theInfo.toolTip,
                     theInfo.icon,
-                    theInfo.shortcut);
+                    theInfo.shortcut,
+                    theInfo.checkable);
 }
 
 //******************************************************
