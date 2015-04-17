@@ -12,6 +12,7 @@
 #include <QRegExp>
 
 #include <string>
+#include <iostream>
 
 /*!
  \class ModuleBase_ParamSpinBox
@@ -62,9 +63,6 @@ void ModuleBase_ParamSpinBox::stepBy(int steps)
  */
 void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
 {
-  connect(this, SIGNAL(editingFinished()),
-          this, SLOT(onEditingFinished()));
-
   connect(this, SIGNAL(valueChanged(const QString&)),
           this, SLOT(onTextChanged(const QString&)));
 
@@ -73,17 +71,6 @@ void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
 
   //connect(lineEdit(), SIGNAL(textChanged(const QString&)),
   //        this,       SIGNAL(textChanged(const QString&)));
-}
-
-/*!
- \brief This function is called when editing is finished.
- */
-void ModuleBase_ParamSpinBox::onEditingFinished()
-{
-  if (myTextValue.isNull())
-    myTextValue = text();
-
-  setText(myTextValue);
 }
 
 /*!

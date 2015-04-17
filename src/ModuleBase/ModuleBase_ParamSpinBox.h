@@ -48,7 +48,6 @@ signals:
   virtual void showEvent(QShowEvent*);
 
  protected slots:
-  void onEditingFinished();
   void onTextChanged(const QString&);
 
  private:
