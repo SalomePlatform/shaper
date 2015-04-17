@@ -13,6 +13,8 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <GeomAPI_Pnt2d.h>
@@ -32,6 +34,11 @@ void ConstructionPlugin_Plane::initAttributes()
   data()->addAttribute(ConstructionPlugin_Plane::B(),  ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ConstructionPlugin_Plane::C(),  ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ConstructionPlugin_Plane::D(),  ModelAPI_AttributeDouble::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ConstructionPlugin_Plane::A());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ConstructionPlugin_Plane::B());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ConstructionPlugin_Plane::C());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ConstructionPlugin_Plane::D());
 }
 
 void ConstructionPlugin_Plane::execute()

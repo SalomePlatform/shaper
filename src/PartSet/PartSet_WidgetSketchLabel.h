@@ -48,6 +48,13 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetSketchLabel();
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// The method is called by the current operation to process the operation preselection.
+  /// It is redefined to do nothing if the plane of the sketch has been already set.
+  /// \param theValue the wrapped widget value
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
+
   virtual bool restoreValue()
   {
     return true;

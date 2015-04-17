@@ -57,6 +57,10 @@ Q_OBJECT
   virtual QAction* addFeature(const QString& theWBName,
                               const ActionInfo& theInfo);
 
+  virtual QAction* addNestedFeature(const QString& theWBName,
+                                    const ActionInfo& theInfo,
+                                    const QList<QAction*>& theNestedActions);
+
   virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
                                      const QString& theTip, const QIcon& theIcon,
                                      const QKeySequence& theKeys, bool isCheckable,

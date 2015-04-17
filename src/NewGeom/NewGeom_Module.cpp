@@ -4,6 +4,7 @@
 #include "NewGeom_Module.h"
 #include "NewGeom_DataModel.h"
 #include "NewGeom_OCCSelector.h"
+#include <NewGeom_NestedButton.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_PropertyPanel.h>
@@ -14,6 +15,7 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
+#include <ModuleBase_ActionInfo.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -332,6 +334,16 @@ CAM_DataModel* NewGeom_Module::createDataModel()
   return aDataModel;
 }
 
+QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& theInfo)
+{
+  return addFeature(theWBName,
+                    theInfo.id,
+                    theInfo.text,
+                    theInfo.toolTip,
+                    theInfo.icon,
+                    theInfo.shortcut);
+}
+
 //******************************************************
 QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& theId,
                                     const QString& theTitle, const QString& theTip,
@@ -352,17 +364,37 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
   aAction->setData(theId);
   int aItemId = createMenu(aId, aMenu, -1, 10);
   int aToolId = createTool(aId, aTool);
+
   return aAction;
 }
 
-QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& theInfo)
+
+QAction* NewGeom_Module::addNestedFeature(const QString& theWBName,
+                                          const ActionInfo& theInfo,
+                                          const QList<QAction*>& theNestedActions)
 {
-  return addFeature(theWBName,
-                    theInfo.id,
-                    theInfo.text,
-                    theInfo.toolTip,
-                    theInfo.icon,
-                    theInfo.shortcut);
+  int aMenu = createMenu(theWBName, -1, -1, 50);
+  int aTool = createTool(theWBName);
+
+  int aId = myActionsList.size();
+  myActionsList.append(theInfo.id);
+  SUIT_Desktop* aDesk = application()->desktop();
+  NewGeom_NestedButton* anAction = new NewGeom_NestedButton(aDesk, theNestedActions);
+  anAction->setData(theInfo.id);
+  anAction->setCheckable(theInfo.checkable);
+  anAction->setChecked(theInfo.checked);
+  anAction->setEnabled(theInfo.enabled);
+  anAction->setVisible(theInfo.visible);
+  anAction->setIcon(theInfo.icon);
+  anAction->setText(theInfo.text);
+  anAction->setToolTip(theInfo.toolTip);
+  anAction->setShortcut(theInfo.shortcut);
+  anAction->setFont(theInfo.font);
+
+  //int aItemId = createMenu(aId, aMenu, -1, 10);
+  int aToolId = createTool(anAction, aTool, aId);
+
+  return anAction;
 }
 
 
