@@ -93,15 +93,16 @@ public:
   static bool isNestedCreateOperation(ModuleBase_Operation* theOperation);
 
   /// Returns whether the current operation is a sketch entity - line, point, arc or circle
-  /// \param the operation
+  /// \param theId is an id of object
   /// \return a boolean value
   static bool isEntity(const std::string& theId);
 
   /// Returns whether the current operation is a sketch distance - lenght, distance or radius
-  /// \param the operation
+  /// \param theOperation the operation
   /// \return a boolean value
   static bool isDistanceOperation(ModuleBase_Operation* theOperation);
 
+  /// Returns true if a mouse cursor is over viewer window
   bool isMouseOverWindow() { return myIsMouseOverWindow; }
 
   /// Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
@@ -151,6 +152,8 @@ public:
   /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
   /// \param theHighlightedUse a boolean flag
   void storeSelection(const bool theHighlightedOnly = false);
+
+  /// Restores previously saved selection state
   void restoreSelection();
 
   /// Returns list of strings which contains id's of sketch operations

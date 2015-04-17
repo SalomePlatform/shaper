@@ -36,6 +36,8 @@ public:
   //! the point area in the selection process.
   Standard_EXPORT   void Areas (SelectBasics_ListOfBox2d& aresult) ;
   
+  //! Update location of the point
+  //! \param aLocation a new location
   Standard_EXPORT   Handle(Select3D_SensitiveEntity) GetConnected (const TopLoc_Location& aLocation) ;
   
   //! Checks whether the sensitive entity matches the picking
@@ -43,6 +45,12 @@ public:
   //! For details please refer to base class declaration.
   Standard_EXPORT   Standard_Boolean Matches (const SelectBasics_PickArgs& thePickArgs, Standard_Real& theMatchDMin, Standard_Real& theMatchDepth) ;
   
+  /// Returns true if the current point is matches with given rectangle
+  /// \param XMin an X min coordinate
+  /// \param YMin an Y min coordinate
+  /// \param XMax an X max coordinate
+  /// \param YMax an Y max coordinate
+  /// \param aTol a tolerance
   Standard_EXPORT   Standard_Boolean Matches (const Standard_Real XMin, const Standard_Real YMin, const Standard_Real XMax, const Standard_Real YMax, const Standard_Real aTol) ;
   
   Standard_EXPORT virtual   Standard_Boolean Matches (const TColgp_Array1OfPnt2d& Polyline, const Bnd_Box2d& aBox, const Standard_Real aTol) ;
