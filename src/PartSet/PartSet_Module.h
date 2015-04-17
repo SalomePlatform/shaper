@@ -146,6 +146,10 @@ protected slots:
   /// Register properties of this module
   virtual void registerProperties();
 
+  /// Sends the operation for launching
+  /// \param theOperation the operation
+  virtual void sendOperation(ModuleBase_Operation* theOperation);
+
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();

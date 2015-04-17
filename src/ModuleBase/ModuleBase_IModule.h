@@ -141,7 +141,7 @@ protected slots:
  protected:
   /// Sends the operation for launching
   /// \param theOperation the operation
-  void sendOperation(ModuleBase_Operation* theOperation);
+  virtual void sendOperation(ModuleBase_Operation* theOperation);
 
   /// Creates a new operation
   /// \param theCmdId the operation name
