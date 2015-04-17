@@ -116,7 +116,7 @@ public:
 
   /// \brief Shows the sketch should be resolved
   bool isNeedToResolve() const
-  { return myNeedToResolve; }
+  { return myNeedToResolve && !myConstraints.empty(); }
 
   /// \brief Shows the storage has the same constraint twice
   bool hasDuplicatedConstraint() const
