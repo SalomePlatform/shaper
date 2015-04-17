@@ -61,6 +61,10 @@ void Model_Application::deleteDocument(string theDocID)
 
 void Model_Application::deleteAllDocuments()
 {
+  std::map<std::string, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
+  for(; aDoc != myDocs.end(); aDoc++) {
+    aDoc->second->close();
+  }
   myDocs.clear();
   myLoadedByDemand.clear();
 }

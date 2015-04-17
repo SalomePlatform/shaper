@@ -1391,6 +1391,13 @@ void XGUI_Workshop::deleteObjects()
   if (!isActiveOperationAborted())
     return;
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  bool hasResult = false;
+  bool hasFeature = false;
+  bool hasParameter = false;
+  XGUI_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter);
+  if (!(hasFeature || hasParameter))
+    return;
+
   // 1. start operation
   QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
   aDescription += tr(" %1");

@@ -68,10 +68,16 @@ void SketchSolver_ConstraintCoincidence::attach(
 Slvs_hConstraint SketchSolver_ConstraintCoincidence::addConstraint(
     Slvs_hEntity thePoint1, Slvs_hEntity thePoint2)
 {
+  bool hasDuplicated = myStorage->hasDuplicatedConstraint();
   Slvs_Constraint aNewConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
       SLVS_C_POINTS_COINCIDENT, myGroup->getWorkplaneId(), 0.0, thePoint1, thePoint2, 
       SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
   Slvs_hConstraint aNewID = myStorage->addConstraint(aNewConstraint);
+  if (!hasDuplicated && myStorage->hasDuplicatedConstraint()) {
+    // the duplicated constraint appears
+    myStorage->removeConstraint(aNewID);
+    return SLVS_E_UNKNOWN;
+  }
   mySlvsConstraints.push_back(aNewID);
   return aNewID;
 }
@@ -101,6 +107,22 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
   for (; anEntIter != anEntities.end(); anEntIter++)
     aNewConstr = addConstraint(aBaseCoincidence.ptA, *anEntIter);
   myExtraCoincidence[aNewConstr] = theConstraint;
+}
+
+void SketchSolver_ConstraintCoincidence::process()
+{
+  SketchSolver_Constraint::process();
+
+  // Fill the list of coincident points
+  std::list<AttributePtr> anAttrList =
+      myBaseConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+  std::list<AttributePtr>::iterator anIt = anAttrList.begin();
+  for (; anIt != anAttrList.end(); anIt++) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
+    if (!aRefAttr || aRefAttr->isObject())
+      continue;
+    myCoincidentPoints.insert(aRefAttr->attr());
+  }
 }
 
 bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)

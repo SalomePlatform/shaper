@@ -53,7 +53,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
             AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
             QString aVal = QString::number(aValueAttribute->value());
             QString aTitle = QString(aObject->data()->name().c_str());
-            return aTitle + "=" + aVal;
+            return aTitle + " = " + aVal;
           }
         }
           break;
@@ -285,7 +285,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
             AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
             QString aVal = QString::number(aValueAttribute->value());
             QString aTitle = QString(aObject->data()->name().c_str());
-            return aTitle + "=" + aVal;
+            return aTitle + " = " + aVal;
           }
         }
           break;

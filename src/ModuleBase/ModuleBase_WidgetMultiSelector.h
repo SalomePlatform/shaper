@@ -81,7 +81,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   void onSelectionTypeChanged();
 
   /// Slot is called on selection changed
-  void onSelectionChanged();
+  virtual void onSelectionChanged();
 
 protected slots:
   /// Slot for copy command in a list pop-up menu
@@ -115,7 +115,7 @@ protected slots:
   /// Start shape selection
   void activateShapeSelection();
 
- private:
+ protected:
    /// Update selection list
    void updateSelectionList(AttributeSelectionListPtr);
 

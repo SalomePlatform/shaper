@@ -41,6 +41,10 @@ public:
   /// \brief Append all data of coincidence constaint to the current
   void attach(std::shared_ptr<SketchSolver_ConstraintCoincidence> theConstraint);
 
+protected:
+  /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
+  virtual void process();
+
 private:
   /// \brief Creates new coincidence constraint
   Slvs_hConstraint addConstraint(Slvs_hEntity thePoint1, Slvs_hEntity thePoint2);
