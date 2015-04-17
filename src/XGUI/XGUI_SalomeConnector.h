@@ -40,6 +40,13 @@ class XGUI_EXPORT XGUI_SalomeConnector
   virtual QAction* addFeature(const QString& theWBName,
                               const ActionInfo& theInfo) = 0;
 
+  //! Creates a feature (command) in SALOME desktop
+  //! \param theWBName - name of toolbar (workbench)
+  //! \param theInfo - information about action (icon, text, etc)
+  virtual QAction* addNestedFeature(const QString& theWBName,
+                                    const ActionInfo& theInfo,
+                                    const QList<QAction*>& theNestedActions) = 0;
+
   //! Creates a command in Edit menu of SALOME desktop
   //! \param theId - an id of the feature
   //! \param theTitle - a menu item string

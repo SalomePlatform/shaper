@@ -235,9 +235,10 @@ void XGUI_OperationMgr::onAbortOperation()
 void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  if (myOperations.count() == 1) {
-    emit nestedStateChanged(false);
-  }
+  
+  bool isNestedOk = (myOperations.count() >= 1) && 
+                     myOperations.at(0)->isValid();
+  emit nestedStateChanged(isNestedOk);
   emit operationStarted(aSenderOperation);
 }
 
@@ -250,7 +251,7 @@ void XGUI_OperationMgr::onOperationAborted()
 void XGUI_OperationMgr::onOperationCommitted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  emit nestedStateChanged(true);
+  emit nestedStateChanged(myOperations.count() >= 1);
   emit operationCommitted(aSenderOperation);
 }
 

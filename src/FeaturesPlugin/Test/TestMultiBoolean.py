@@ -50,13 +50,11 @@ aSketchFeatures = []
 for i in xrange(0, N):
     for j in xrange(0, N):
         # Create circle
-        aSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+        aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
         origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
         origin.setValue(0, 0, 0)
         dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
         dirx.setValue(1, 0, 0)
-        diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
-        diry.setValue(0, 1, 0)
         norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
         norm.setValue(0, 0, 1)
         aSketchCircle = aSketchFeature.addFeature("SketchCircle")
@@ -82,11 +80,10 @@ for i in xrange(0, N * N):
     aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
     origin = geomDataAPI_Point(aSketchFeatures[i].attribute("Origin")).pnt()
     dirX = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirX")).dir()
-    dirY = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirY")).dir()
     norm = geomDataAPI_Dir(aSketchFeatures[i].attribute("Norm")).dir()
     aSketchFaces = ShapeList()
     GeomAlgoAPI_SketchBuilder.createFaces(
-        origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
+        origin, dirX, norm, aSketchEdges, aSketchFaces)
 
     anExtrusionFt = aPart.addFeature("Extrusion")
     assert (anExtrusionFt.getKind() == "Extrusion")
@@ -108,13 +105,11 @@ aSession.finishOperation()
 # Make rectangle sketch: base for the box, size 100x100
 #=========================================================================
 aSession.startOperation()
-aQuadrangleSketchFeature = modelAPI_CompositeFeature(aPart.addFeature("Sketch"))
+aQuadrangleSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
 origin = geomDataAPI_Point(aQuadrangleSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("DirY"))
-diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSketchLineA = aQuadrangleSketchFeature.addFeature("SketchLine")
@@ -148,11 +143,10 @@ aSketchResult = aQuadrangleSketchFeature.firstResult()
 aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
 origin = geomDataAPI_Point(aQuadrangleSketchFeature.attribute("Origin")).pnt()
 dirX = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("DirX")).dir()
-dirY = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("DirY")).dir()
 norm = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("Norm")).dir()
 aSketchFaces = ShapeList()
 GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
+    origin, dirX, norm, aSketchEdges, aSketchFaces)
 # Create extrusion on them
 aBox = aPart.addFeature("Extrusion")
 aBox.selectionList("base").append(
