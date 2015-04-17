@@ -670,6 +670,8 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     closeLocalContexts(false);
   }
   aContext->SetDisplayMode(aAISIO, theMode, false);
+  // Redisplay in order to update new mode because it could be not computed before
+  aContext->Redisplay(aAISIO, false);
   if (aCanBeShaded) {
     openLocalContext();
     activateObjects(myActiveSelectionModes);
