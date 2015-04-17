@@ -233,6 +233,39 @@ bool SketchSolver_ConstraintMirror::remove(ConstraintPtr theConstraint)
   return true;
 }
 
+bool SketchSolver_ConstraintMirror::checkAttributesChanged(ConstraintPtr theConstraint)
+{
+  // First of all, check the mirror line is changed.
+  // It may be changed to one of mirrored lines, which is already in this constraint
+  // (this case is not marked as attribute changing)
+  ConstraintPtr aConstraint = theConstraint ? theConstraint : myBaseConstraint;
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  if (!aRefAttr || !aRefAttr->isObject() || !aRefAttr->object())
+    return true;
+  FeaturePtr aMirrorLine = ModelAPI_Feature::feature(aRefAttr->object());
+  if (!aMirrorLine)
+    return true;
+
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aMirrorIter = myFeatureMap.find(aMirrorLine);
+  if (aMirrorIter == myFeatureMap.end())
+    return true;
+
+  // Check the entity is not used as mirror line
+  std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
+  for (; aCIter != mySlvsConstraints.end(); aCIter++) {
+    Slvs_Constraint aMirrorConstr = myStorage->getConstraint(*aCIter);
+    if (aMirrorConstr.type != SLVS_C_SYMMETRIC_LINE)
+      continue;
+    if (aMirrorConstr.entityA != aMirrorIter->second)
+      return true;
+    else break; // check just one symmetric constraint
+  }
+
+  // Base verification
+  return SketchSolver_Constraint::checkAttributesChanged(theConstraint);
+}
+
 void SketchSolver_ConstraintMirror::makeMirrorEntity(
     const Slvs_Entity& theBase,
     const Slvs_Entity& theMirror,

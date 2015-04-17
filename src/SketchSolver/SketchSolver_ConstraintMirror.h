@@ -42,6 +42,11 @@ protected:
   virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes)
   { /* do nothing here */ }
 
+  /// \brief Verify the attributes of constraint are changed (and constraint need to rebuild)
+  /// \param[in] theConstraint constraint, which attributes should be checked (if NULL, the myBaseConstraint is used)
+  /// \return \c true if some attributes are changed
+  virtual bool checkAttributesChanged(ConstraintPtr theConstraint);
+
   /// \brief Generate list of entities of mirror constraint
   /// \param[out] theMirrorLine     entity corresponding to mirror line
   /// \param[out] theBaseEntities   list of entities to mirror
