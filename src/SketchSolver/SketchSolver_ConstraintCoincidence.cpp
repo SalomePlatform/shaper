@@ -103,6 +103,22 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
   myExtraCoincidence[aNewConstr] = theConstraint;
 }
 
+void SketchSolver_ConstraintCoincidence::process()
+{
+  SketchSolver_Constraint::process();
+
+  // Fill the list of coincident points
+  std::list<AttributePtr> anAttrList =
+      myBaseConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+  std::list<AttributePtr>::iterator anIt = anAttrList.begin();
+  for (; anIt != anAttrList.end(); anIt++) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
+    if (!aRefAttr || aRefAttr->isObject())
+      continue;
+    myCoincidentPoints.insert(aRefAttr->attr());
+  }
+}
+
 bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
 {
   cleanErrorMsg();
