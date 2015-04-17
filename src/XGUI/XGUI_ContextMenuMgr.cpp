@@ -8,6 +8,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Selection.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_Tools.h"
 
 #include <AppElements_MainWindow.h>
 
@@ -154,18 +155,8 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
-    foreach(ObjectPtr aObj, aObjects)
-    {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
+    XGUI_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
 
-      hasResult = (aResult.get() != NULL);
-      hasFeature = (aFeature.get() != NULL);
-      hasParameter = (aConstruction.get() != NULL);
-      if (hasFeature && hasResult  && hasParameter)
-        break;
-    }
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();

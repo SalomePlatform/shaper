@@ -546,12 +546,37 @@ void SketchSolver_Storage::removeTemporaryConstraints()
   myTemporaryConstraints.clear();
 }
 
-int SketchSolver_Storage::removeFirstTemporaryConstraint()
+int SketchSolver_Storage::deleteTemporaryConstraint()
 {
   if (myTemporaryConstraints.empty())
     return 0;
-  removeConstraint(*myTemporaryConstraints.begin());
-  myTemporaryConstraints.erase(myTemporaryConstraints.begin());
+  // Search the point-on-line or a non-rigid constraint
+  std::set<Slvs_hConstraint>::iterator aCIt = myTemporaryConstraints.begin();
+  for (; aCIt != myTemporaryConstraints.end(); aCIt++) {
+    int aPos = Search(*aCIt, myConstraints);
+    if (myConstraints[aPos].type != SLVS_C_WHERE_DRAGGED)
+      break;
+    std::vector<Slvs_Constraint>::iterator anIt = myConstraints.begin();
+    for (; anIt != myConstraints.end(); anIt++)
+      if (anIt->type == SLVS_C_PT_ON_LINE && anIt->ptA == myConstraints[aPos].ptA)
+        break;
+    if (anIt != myConstraints.end())
+      break;
+  }
+  if (aCIt == myTemporaryConstraints.end())
+    aCIt = myTemporaryConstraints.begin();
+  bool aNewFixed = (*aCIt == myFixed);
+  removeConstraint(*aCIt);
+  myTemporaryConstraints.erase(aCIt);
+  if (aNewFixed) {
+    for (aCIt = myTemporaryConstraints.begin(); aCIt != myTemporaryConstraints.end(); aCIt++) {
+      int aPos = Search(*aCIt, myConstraints);
+      if (myConstraints[aPos].type == SLVS_C_WHERE_DRAGGED) {
+        myFixed = *aCIt;
+        break;
+      }
+    }
+  }
   return (int)myTemporaryConstraints.size();
 }
 

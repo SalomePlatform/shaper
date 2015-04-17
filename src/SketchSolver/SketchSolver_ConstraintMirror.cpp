@@ -189,6 +189,8 @@ void SketchSolver_ConstraintMirror::process()
 
   // Set the mirror line unchanged during constraint recalculation
   for (int i = 0; i < 2; i++) {
+    if (myStorage->isPointFixed(aMirrorLine.point[i], aConstraint.h, true))
+      continue;
     aConstraint = Slvs_MakeConstraint(
         SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_WHERE_DRAGGED, myGroup->getWorkplaneId(), 0.0,
         aMirrorLine.point[i], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);

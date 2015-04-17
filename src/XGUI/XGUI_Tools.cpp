@@ -4,6 +4,9 @@
 
 #include <TopoDS_Shape.hxx>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Result.h>
+#include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
 
 #include <QDir>
@@ -70,5 +73,25 @@ std::string featureInfo(FeaturePtr theFeature)
  return aObject->featureRef();
  }
  }*/
+
+
+void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter)
+{
+  hasResult = false;
+  hasFeature = false;
+  hasParameter = false;
+  foreach(ObjectPtr aObj, theObjects) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
+
+    hasResult = (aResult.get() != NULL);
+    hasFeature = (aFeature.get() != NULL);
+    hasParameter = (aConstruction.get() != NULL);
+    if (hasFeature && hasResult  && hasParameter)
+      break;
+  }
+}
+
 
 }

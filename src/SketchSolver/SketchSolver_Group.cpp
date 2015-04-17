@@ -419,7 +419,7 @@ bool SketchSolver_Group::resolveConstraints()
           aResult = myConstrSolver.solve();
           if (aResult == SLVS_RESULT_OKAY || aNbTemp <= 0)
             break;
-          aNbTemp = myStorage->removeFirstTemporaryConstraint();
+          aNbTemp = myStorage->deleteTemporaryConstraint();
           myStorage->initializeSolver(myConstrSolver);
         }
       }
