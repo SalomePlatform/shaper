@@ -4,9 +4,9 @@
       
       class FeaturesPlugin_Extrusion : public ModelAPI_Feature
         static const std::string MY_EXTRUSION_ID("Extrusion");
-        static const std::string MY_FACE_ID("extrusion_face");
-        static const std::string MY_SIZE_ID("extrusion_size");
-        static const std::string MY_REVERSE_ID("extrusion_reverse");
+        static const std::string MY_FACE_ID("base");
+        static const std::string MY_SIZE_ID("size");
+        static const std::string MY_REVERSE_ID("reverse");
           
         data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::typeId());
         data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::typeId());
@@ -42,8 +42,6 @@ origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
-diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 # Create circle
@@ -61,11 +59,10 @@ aSketchResult = aSketchFeature.firstResult()
 aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin")).pnt()
 dirX = geomDataAPI_Dir(aSketchFeature.attribute("DirX")).dir()
-dirY = geomDataAPI_Dir(aSketchFeature.attribute("DirY")).dir()
 norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm")).dir()
 aSketchFaces = ShapeList()
 GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
+    origin, dirX, norm, aSketchEdges, aSketchFaces)
 assert (len(aSketchFaces) > 0)
 assert (aSketchFaces[0] is not None)
 # Create extrusion
