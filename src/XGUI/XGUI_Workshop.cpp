@@ -1044,6 +1044,7 @@ void XGUI_Workshop::onRebuild()
   if (!aWasOperation) {
     aMgr->finishOperation();
   }
+  updateCommandStatus();
 }
 
 //******************************************************
