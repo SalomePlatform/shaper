@@ -57,7 +57,13 @@ void SketchSolver_ConstraintMirror::getAttributes(
         continue;
 
       anEntity = changeEntity(aFeature, aType);
-      aList->push_back(myStorage->getEntity(anEntity));
+      // Sort entities by their type
+      std::vector<Slvs_Entity>::iterator anIt = aList->begin();
+      for (; anIt != aList->end(); anIt++)
+        if (aType < anIt->type)
+          break;
+//      aList->push_back(myStorage->getEntity(anEntity));
+      aList->insert(anIt, myStorage->getEntity(anEntity));
     }
   }
 
@@ -225,6 +231,10 @@ bool SketchSolver_ConstraintMirror::remove(ConstraintPtr theConstraint)
   for (; aCIter != mySlvsConstraints.end(); aCIter++)
    isFullyRemoved = myStorage->removeConstraint(*aCIter) && isFullyRemoved;
   mySlvsConstraints.clear();
+
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aFeatIt = myFeatureMap.begin();
+  for (; aFeatIt != myFeatureMap.end(); aFeatIt++)
+    myStorage->removeEntity(aFeatIt->second);
 
   if (isFullyRemoved) {
     myFeatureMap.clear();

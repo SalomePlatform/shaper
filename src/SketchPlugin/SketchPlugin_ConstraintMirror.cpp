@@ -44,6 +44,12 @@ void SketchPlugin_ConstraintMirror::execute()
   AttributeSelectionListPtr aMirrorObjectRefs =
       selectionList(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID());
 
+  // Wait all objects being created, then send update events
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+
   std::shared_ptr<ModelAPI_Data> aData = data();
   AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
@@ -177,6 +183,10 @@ void SketchPlugin_ConstraintMirror::execute()
       aRefListOfMirrored->append(aNewFeature);
     }
   }
+
+  // send events to update the sub-features by the solver
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
 }
 
 AISObjectPtr SketchPlugin_ConstraintMirror::getAISObject(AISObjectPtr thePrevious)
