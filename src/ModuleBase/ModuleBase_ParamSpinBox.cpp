@@ -65,12 +65,6 @@ void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
 {
   connect(this, SIGNAL(valueChanged(const QString&)),
           this, SLOT(onTextChanged(const QString&)));
-
-  //connect(lineEdit(), SIGNAL(textChanged(const QString&)),
-  //        this,       SLOT(onTextChanged(const QString&)));
-
-  //connect(lineEdit(), SIGNAL(textChanged(const QString&)),
-  //        this,       SIGNAL(textChanged(const QString&)));
 }
 
 /*!
@@ -79,11 +73,6 @@ void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
 void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
 {
   myTextValue = text;
-
-  double value = 0;
-  if (isValid(text, value) == Acceptable) {
-    myCorrectValue = text;
-  }
 }
 
 /*!
@@ -100,6 +89,14 @@ double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
   double aValue = 0;
   findVariable(theText, aValue);
   return aValue;
+}
+
+QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
+{
+  if (hasVariable(myTextValue)){
+    return myTextValue;
+  }
+  return ModuleBase_DoubleSpinBox::textFromValue(theValue);
 }
 
 /*!
@@ -142,8 +139,7 @@ void ModuleBase_ParamSpinBox::setValue(const double value)
 {
   ModuleBase_DoubleSpinBox::setValue(value);
 
-  myCorrectValue = ModuleBase_DoubleSpinBox::textFromValue(value);
-  myTextValue = myCorrectValue;
+  myTextValue = ModuleBase_DoubleSpinBox::textFromValue(value);
 }
 
 /*!
@@ -175,7 +171,7 @@ bool ModuleBase_ParamSpinBox::isAcceptVariables() const
 
 bool ModuleBase_ParamSpinBox::hasVariable() const
 {
-  return hasVariable(text());
+  return hasVariable(myTextValue);
 }
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const

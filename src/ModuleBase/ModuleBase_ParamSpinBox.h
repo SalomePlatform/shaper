@@ -21,6 +21,7 @@ public:
   virtual void stepBy(int);
 
   virtual double valueFromText(const QString&) const;
+  virtual QString textFromValue (double value) const;
 
   virtual QValidator::State validate(QString&, int&) const;
 
@@ -54,7 +55,6 @@ signals:
   void connectSignalsAndSlots();
 
  private:
-  QString myCorrectValue;
   QString myTextValue;
 
   bool myAcceptVariables;
