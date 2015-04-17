@@ -115,7 +115,7 @@ protected slots:
   /// Start shape selection
   void activateShapeSelection();
 
- private:
+ protected:
    /// Update selection list
    void updateSelectionList(AttributeSelectionListPtr);
 
