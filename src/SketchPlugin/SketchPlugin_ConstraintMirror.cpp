@@ -43,8 +43,6 @@ void SketchPlugin_ConstraintMirror::execute()
 {
   AttributeSelectionListPtr aMirrorObjectRefs =
       selectionList(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID());
-  if (!aMirrorObjectRefs->isInitialized())
-    return;
 
   std::shared_ptr<ModelAPI_Data> aData = data();
   AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(

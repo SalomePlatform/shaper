@@ -47,7 +47,16 @@ Q_OBJECT
   /// \param theOwner a selected owner
   virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
+public slots:
+  /// Slot is called on selection changed
+  virtual void onSelectionChanged();
+
 protected:
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  virtual void storeAttributeValue();
+
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
@@ -65,6 +74,8 @@ protected:
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;
+
+  bool myIsInVaildate;
 };
 
 #endif

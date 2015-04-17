@@ -44,15 +44,34 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   ObjectPtr externalObject(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
                            const CompositeFeaturePtr& theSketch);
 
+  ObjectPtr externalObjectValidated(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
+                           const CompositeFeaturePtr& theSketch);
+
+
   // Removes the external presentation from the model
   /// \param theSketch a current sketch
   /// \param theFeature a current feature
   void removeExternal(const CompositeFeaturePtr& theSketch,
                       const FeaturePtr& theFeature);
 
+  void removeExternalValidated(const CompositeFeaturePtr& theSketch,
+                               const FeaturePtr& theFeature);
+
+  void removeUnusedExternalObjects(const QObjectPtrList& theIgnoreObjects,
+                            const CompositeFeaturePtr& theSketch,
+                            const FeaturePtr& theFeature);
+
+protected:
+  void removeExternalObject(const ObjectPtr& theObject,
+                            const CompositeFeaturePtr& theSketch,
+                            const FeaturePtr& theFeature);
+
 protected:
   /// An external object
   QObjectPtrList myExternalObjects;
+
+  /// An external object
+  ObjectPtr myExternalObjectValidated;
 
   /// Boolean value about the neccessity of the external object use
   bool myUseExternal;

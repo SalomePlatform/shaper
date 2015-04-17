@@ -42,10 +42,40 @@ PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
 }
 
 //********************************************************************
+void PartSet_WidgetMultiSelector::onSelectionChanged()
+{
+  ModuleBase_WidgetMultiSelector::onSelectionChanged();
+  // TODO(nds): unite with externalObject(), remove parameters
+  //myFeature->execute();
+
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+
+  QObjectPtrList aListOfAttributeObjects;
+  for (int i = 0; i < aSelectionListAttr->size(); i++) {
+    AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
+    aListOfAttributeObjects.append(anAttr->context());
+  }
+
+  myExternalObjectMgr->removeUnusedExternalObjects(aListOfAttributeObjects, sketch(), myFeature);
+}
+
+//********************************************************************
+void PartSet_WidgetMultiSelector::storeAttributeValue()
+{
+  myIsInVaildate = true;
+  ModuleBase_WidgetMultiSelector::storeAttributeValue();
+
+}
+
+//********************************************************************
 void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
 {
+  myIsInVaildate = false;
   ModuleBase_WidgetMultiSelector::restoreAttributeValue(theValid);
-  myExternalObjectMgr->removeExternal(sketch(), myFeature);
+
+  myExternalObjectMgr->removeExternalValidated(sketch(), myFeature);
 }
 
 //********************************************************************
@@ -126,7 +156,10 @@ bool PartSet_WidgetMultiSelector::setObject(const ObjectPtr& theSelectedObject,
     return false;
 
   if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull() && myExternalObjectMgr->useExternal()) {
-    aSelectedObject = myExternalObjectMgr->externalObject(theSelectedObject, theShape, sketch());
+    if (myIsInVaildate)
+      aSelectedObject = myExternalObjectMgr->externalObjectValidated(theSelectedObject, theShape, sketch());
+    else
+      aSelectedObject = myExternalObjectMgr->externalObject(theSelectedObject, theShape, sketch());
   }
 
 
