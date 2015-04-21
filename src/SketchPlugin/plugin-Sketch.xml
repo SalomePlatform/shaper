@@ -142,14 +142,15 @@
       </feature>
 
       <!--  SketchConstraintCoincedence  -->
-      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" icon=":icons/coincedence.png">
-        <sketch_shape_selector id="ConstraintEntityA" label="First point" tooltip="Select a first point" shape_types="vertex">
+      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points or point on line or circle" icon=":icons/coincedence.png">
+        <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
-        <sketch_shape_selector id="ConstraintEntityB" label="Second point" tooltip="Select a second point" shape_types="vertex">
+        <sketch_shape_selector id="ConstraintEntityB" label="Second object" tooltip="Select a second object" shape_types="vertex edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_CoincidenceAttr" parameters="ConstraintEntityA"/>
         </sketch_shape_selector>
         <validator id="PartSet_CoincidentSelection"/>
       </feature>

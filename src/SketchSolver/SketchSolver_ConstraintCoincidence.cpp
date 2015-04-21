@@ -4,6 +4,30 @@
 
 #include <map>
 
+void SketchSolver_ConstraintCoincidence::getAttributes(
+    double& theValue,
+    std::vector<Slvs_hEntity>& theAttributes)
+{
+  SketchSolver_Constraint::getAttributes(theValue, theAttributes);
+  if (!myErrorMsg.empty() || theAttributes[0] == SLVS_E_UNKNOWN)
+    return;
+
+  if (theAttributes[1] != SLVS_E_UNKNOWN)
+    myType = SLVS_C_POINTS_COINCIDENT;
+  else if (theAttributes[2] != SLVS_E_UNKNOWN) {
+    // check the type of entity (line or circle)
+    Slvs_Entity anEnt = myStorage->getEntity(theAttributes[2]);
+    if (anEnt.type == SLVS_E_LINE_SEGMENT)
+      myType = SLVS_C_PT_ON_LINE;
+    else if (anEnt.type == SLVS_E_CIRCLE || anEnt.type == SLVS_E_ARC_OF_CIRCLE)
+      myType = SLVS_C_PT_ON_CIRCLE;
+    else
+      myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+  } else
+    myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+}
+
+
 bool SketchSolver_ConstraintCoincidence::hasConstraint(ConstraintPtr theConstraint) const
 {
   if (myBaseConstraint == theConstraint)
@@ -28,6 +52,10 @@ std::list<ConstraintPtr> SketchSolver_ConstraintCoincidence::constraints() const
 bool SketchSolver_ConstraintCoincidence::isCoincide(
     std::shared_ptr<SketchSolver_ConstraintCoincidence> theConstraint) const
 {
+  // Multi-coincidence allowed for two points only
+  if (getType() != theConstraint->getType() || getType() != SLVS_C_POINTS_COINCIDENT)
+    return false;
+
   std::set<AttributePtr>::const_iterator anAttrIter = theConstraint->myCoincidentPoints.begin();
   for (; anAttrIter != theConstraint->myCoincidentPoints.end(); anAttrIter++)
     if (myCoincidentPoints.find(*anAttrIter) != myCoincidentPoints.end())

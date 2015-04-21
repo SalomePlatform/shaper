@@ -85,6 +85,8 @@ void SketchSolver_Constraint::process()
   getAttributes(aValue, anAttributes);
   if (!myErrorMsg.empty())
     return;
+  if (aConstrType == SLVS_C_UNKNOWN)
+    aConstrType = getType();
 
   Slvs_hGroup aGroupID = myGroup->getId();
   Slvs_hEntity aWorkplaneID = myGroup->getWorkplaneId();

@@ -61,6 +61,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_EqualAttrValidator);
   aFactory->registerValidator("SketchPlugin_MirrorAttr",
                               new SketchPlugin_MirrorAttrValidator);
+  aFactory->registerValidator("SketchPlugin_CoincidenceAttr",
+                              new SketchPlugin_CoincidenceAttrValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

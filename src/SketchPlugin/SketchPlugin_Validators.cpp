@@ -11,6 +11,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Arc.h"
 #include "SketchPlugin_Circle.h"
+#include "SketchPlugin_Point.h"
 
 #include "SketcherPrs_Tools.h"
 
@@ -234,5 +235,48 @@ bool SketchPlugin_MirrorAttrValidator::isValid(
         return false;
   }
   return true;
+}
+
+
+bool SketchPlugin_CoincidenceAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  // there is a check whether the feature contains a point and a linear edge or two point values
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr aConstraint = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttrA = aConstraint->data()->refattr(aParamA);
+  if (!aRefAttrA)
+    return false;
+
+  AttributeRefAttrPtr aRefAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttrB)
+    return false;
+
+  // first attribute is a point, it may coincide with any object
+  if (!aRefAttrA->isObject())
+    return true;
+  else {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrA->object());
+    if (!aFeature)
+      return false;
+    if (aFeature->getKind() == SketchPlugin_Point::ID())
+      return true;
+  }
+
+  // second attribute is a point, it may coincide with any object
+  if (!aRefAttrB->isObject())
+    return true;
+  else {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrB->object());
+    if (!aFeature)
+      return false;
+    if (aFeature->getKind() == SketchPlugin_Point::ID())
+      return true;
+  }
+
+  return false;
 }
 

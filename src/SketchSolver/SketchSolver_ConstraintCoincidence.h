@@ -19,11 +19,12 @@ class SketchSolver_ConstraintCoincidence : public SketchSolver_Constraint
 {
 public:
   SketchSolver_ConstraintCoincidence(ConstraintPtr theConstraint) :
-      SketchSolver_Constraint(theConstraint)
+      SketchSolver_Constraint(theConstraint),
+      myType(SLVS_C_UNKNOWN)
   {}
 
   virtual int getType() const
-  { return SLVS_C_POINTS_COINCIDENT; }
+  { return myType; }
 
   /// \brief Tries to remove constraint
   /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
@@ -45,6 +46,11 @@ protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
 
+  /// \brief Generate list of attributes of constraint in order useful for SolveSpace constraints
+  /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
+  /// \param[out] theAttributes list of attributes to be filled
+  virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes);
+
 private:
   /// \brief Creates new coincidence constraint
   Slvs_hConstraint addConstraint(Slvs_hEntity thePoint1, Slvs_hEntity thePoint2);
@@ -53,6 +59,7 @@ private:
   void addConstraint(ConstraintPtr theConstraint);
 
 private:
+  int myType; ///< type of constraint (applicable SLVS_C_POINTS_COINCIDENT or SLVS_C_PT_ON_LINE or SLVS_C_PT_ON_CIRCLE)
   std::map<Slvs_hConstraint, ConstraintPtr> myExtraCoincidence; ///< multiple coincidence of points
   std::set<AttributePtr> myCoincidentPoints; ///< list of points under the Coincidence constraint
 };
