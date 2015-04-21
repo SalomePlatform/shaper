@@ -3,7 +3,6 @@
 #include "NewGeom_SalomeViewer.h"
 #include "NewGeom_OCCSelector.h"
 
-#include <OCCViewer_ViewWindow.h>
 #include <OCCViewer_ViewPort3d.h>
 #include <OCCViewer_ViewFrame.h>
 
@@ -231,12 +230,21 @@ void NewGeom_SalomeViewer::onDeleteView(SUIT_ViewWindow*)
 void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
 {
   myView->setCurrentView(theView);
+
+  OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(theView);
+
+  OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
+  if (aWnd)
+    connect(aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
+      this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+
   emit viewCreated(myView);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onActivated(SUIT_ViewWindow*)
+void NewGeom_SalomeViewer::onActivated(SUIT_ViewWindow* theView)
 {
+  myView->setCurrentView(theView);
   emit activated(myView);
 }
 
@@ -337,4 +345,10 @@ void NewGeom_SalomeViewer::update()
   if (!aContext.IsNull()) {
     aContext->UpdateCurrentViewer();
   }
+}
+
+//***************************************
+void NewGeom_SalomeViewer::onViewTransformed(OCCViewer_ViewWindow::OperationType theType)
+{
+  emit viewTransformed((int) theType);
 }

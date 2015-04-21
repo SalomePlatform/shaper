@@ -9,6 +9,8 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 
+#include <OCCViewer_ViewWindow.h>
+
 #include <V3d_View.hxx>
 
 class SUIT_ViewWindow;
@@ -138,6 +140,7 @@ Q_OBJECT
   void onActivated(SUIT_ViewWindow*);
 
   void onSelectionChanged();
+  void onViewTransformed(OCCViewer_ViewWindow::OperationType);
 
  private:
   NewGeom_OCCSelector* mySelector;

@@ -105,10 +105,11 @@ void XGUI_ViewerProxy::connectToViewer()
       this, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
+    
+    connect(aViewer, SIGNAL(viewTransformed(int)), this, SIGNAL(viewTransformed(int)));
+
     connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
             SIGNAL(contextMenuRequested(QContextMenuEvent*)));
-
-    // TODO: Connect to ViewTransformation signal
   } else {
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
@@ -300,7 +301,9 @@ bool XGUI_ViewerProxy::canDragByMouse() const
   }
 }
 
+//***************************************
 void XGUI_ViewerProxy::onViewTransformed(AppElements_ViewWindow::OperationType theType)
 {
   emit viewTransformed((int) theType);
 }
+
