@@ -58,10 +58,6 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
 
-  else if (aFeature && aFeature->getKind() == SketchPlugin_Circle::ID())
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
-
   else if (anAttr->attr()) {
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
   }
@@ -88,10 +84,6 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
   if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
-
-  else if (aFeature && aFeature->getKind() == SketchPlugin_Circle::ID())
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
 
   else if (anAttr->attr()) {
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());

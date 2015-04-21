@@ -99,10 +99,6 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(std::shared_ptr<ModelAPI_Feature>& theFe
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
 
-  else if (aFeature &&  aFeature->getKind() == SketchPlugin_Circle::ID())
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
-
   else if (anAttr->attr()) {
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
   }
@@ -121,6 +117,8 @@ void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList, std::
   FeaturePtr aObj = ModelAPI_Feature::feature(aPnt->object());
   if (!theList.contains(aObj)) {
     std::shared_ptr<GeomAPI_Pnt2d> aOrig = getPoint(theStartCoin, theAttr);
+    if (aOrig.get() == NULL)
+      return;
     theList.append(aObj);
     const std::set<AttributePtr>& aRefsList = aObj->data()->refsToMe();
     std::set<AttributePtr>::const_iterator aIt;
@@ -129,7 +127,7 @@ void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList, std::
       FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
       if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
         std::shared_ptr<GeomAPI_Pnt2d> aPnt = getPoint(aConstrFeature, theAttr);
-        if (aOrig->isEqual(aPnt)) {
+        if (aPnt.get() && aOrig->isEqual(aPnt)) {
           findCoincidences(aConstrFeature, theList, SketchPlugin_ConstraintCoincidence::ENTITY_A());
           findCoincidences(aConstrFeature, theList, SketchPlugin_ConstraintCoincidence::ENTITY_B());
         }
@@ -191,11 +189,18 @@ bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction
           std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
           FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
           if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
-            std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
-            if (aSelPnt->isEqual(a2dPnt)) { 
+            std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = 
+              getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+            if (a2dPnt.get() && aSelPnt->isEqual(a2dPnt)) { 
               aCoincident = aConstrFeature;
               break;
-            } 
+            } else {
+              a2dPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B());
+              if (a2dPnt.get() && aSelPnt->isEqual(a2dPnt)) { 
+                aCoincident = aConstrFeature;
+                break;
+              }
+            }
           }
         }
         // If we have coincidence then add Detach menu
@@ -269,6 +274,9 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
   int aId = theAction->data().toInt();
   FeaturePtr aLine = myCoinsideLines.at(aId);
   std::shared_ptr<GeomAPI_Pnt2d> aOrig = getPoint(mySelectedFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+  if (aOrig.get() == NULL)
+    aOrig = getPoint(mySelectedFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B());
+  
   gp_Pnt aOr = aOrig->impl<gp_Pnt>();
   const std::set<AttributePtr>& aRefsList = aLine->data()->refsToMe();
 
@@ -280,6 +288,10 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
     if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
       std::shared_ptr<GeomAPI_Pnt2d> aPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+      if (aPnt.get() == NULL)
+        aPnt = getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B());
+      if (aPnt.get() == NULL)
+        return;
       gp_Pnt aP = aPnt->impl<gp_Pnt>();
       if (aOrig->isEqual(aPnt)) {
         aToDelFeatures.append(aConstrFeature);
