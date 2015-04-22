@@ -64,6 +64,10 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
+  if (aMode > TopAbs_SHAPE)
+    // In order to avoid using custom selection modes
+    return;
+
   if (myIsSketchMode) {
     if (aMode == TopAbs_FACE) {
       BRep_Builder aBuilder;
