@@ -54,14 +54,28 @@ void SketchSolver_ConstraintDistance::process()
   aConstraint.h = myStorage->addConstraint(aConstraint);
   mySlvsConstraints.push_back(aConstraint.h);
 
+  myPrevValue = 0.0;
+  adjustConstraint();
+}
+
+void SketchSolver_ConstraintDistance::adjustConstraint()
+{
   // Adjust point-line distance
   if (getType() != SLVS_C_PT_LINE_DISTANCE)
     return;
 
+  // Check the sign of distance is changed
+  Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
+  if (fabs(myPrevValue) == fabs(aConstraint.valA)) {
+    aConstraint.valA = myPrevValue;
+    myStorage->updateConstraint(aConstraint);
+    return;
+  }
+
   // Get constraint parameters and check the sign of constraint value
   std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
   for (; aCIter != mySlvsConstraints.end(); aCIter++) {
-    Slvs_Constraint aConstraint = myStorage->getConstraint(*aCIter);
+    aConstraint = myStorage->getConstraint(*aCIter);
     Slvs_Entity aLine = myStorage->getEntity(aConstraint.entityA);
     // Obtain point and line coordinates
     Slvs_hEntity aPointID[3] = {aConstraint.ptA, aLine.point[0], aLine.point[1]};
@@ -80,4 +94,11 @@ void SketchSolver_ConstraintDistance::process()
       myStorage->updateConstraint(aConstraint);
     }
   }
+}
+
+void SketchSolver_ConstraintDistance::update(ConstraintPtr theConstraint)
+{
+  Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
+  myPrevValue = aConstraint.valA;
+  SketchSolver_Constraint::update(theConstraint);
 }
