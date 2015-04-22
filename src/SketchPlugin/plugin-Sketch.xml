@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchMultiRotation SketchMultiTranslation"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -254,6 +254,61 @@
             use_external="true">
             <validator id="SketchPlugin_MirrorAttr" />
         </sketch_multi_selector>
+      </feature>
+      <!--  SketchMultiTranslation  -->
+      <feature
+        id="SketchMultiTranslation"
+        title="Translation" 
+        tooltip="Make a number of shifted copies of a group of objects">
+        <sketch_multi_selector id="MultiTranslationList"
+            label="List of objects"
+            tooltip="Select list of translating objects"
+            type_choice="Edges"
+            use_external="true">
+          <validator id="SketchPlugin_CopyValidator" />
+        </sketch_multi_selector>
+        <groupbox title="Direction">
+          <sketch-2dpoint_selector
+              id="MultiTranslationStartPoint"
+              title="Start point"
+              tooltip="Start point of translation"/>
+          <sketch-2dpoint_selector
+              id="MultiTranslationEndPoint"
+              title="End point"
+              tooltip="Final point of translation"/>
+        </groupbox>
+        <doublevalue_editor id="MultiTranslationCopies"
+            label="Number of copies"
+            tooltip="Number of copies" 
+            default="1" min="1">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
+      </feature>
+      <!--  SketchMultiRotation  -->
+      <feature
+        id="SketchMultiRotation"
+        title="Rotation" 
+        tooltip="Make a number of rotated copies of a group of objects">
+        <sketch_multi_selector id="MultiRotationList"
+            label="List of objects"
+            tooltip="Select list of rotating objects"
+            type_choice="Edges"
+            use_external="true">
+          <validator id="SketchPlugin_CopyValidator" />
+        </sketch_multi_selector>
+        <sketch-2dpoint_selector
+            id="MultiRotationCenter"
+            title="Center of rotation"
+            tooltip="Center of rotation"/>
+        <doublevalue_editor id="MultiRotationAngle"
+            label="Angle"
+            tooltip="Rotation angle"/>
+        <doublevalue_editor id="MultiRotationCopies"
+            label="Number of copies"
+            tooltip="Number of copies" 
+            default="1" min="1">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
       </feature>
     </group>
   </workbench>

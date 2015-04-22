@@ -109,4 +109,22 @@ class SketchPlugin_CoincidenceAttrValidator : public ModelAPI_AttributeValidator
                        const std::list<std::string>& theArguments) const;
 };
 
+
+/**\class SketchPlugin_CopyValidator
+ * \ingroup Validators
+ * \brief Validator for the constraints which create features.
+ *
+ * Applicable only for features, which creates another features. It verifies the produced
+ * features of current constraint don't become into the list of initial features
+ */
+class SketchPlugin_CopyValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute (not used)
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const;
+};
+
 #endif

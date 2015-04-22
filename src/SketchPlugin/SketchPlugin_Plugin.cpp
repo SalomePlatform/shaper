@@ -19,6 +19,8 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_MultiRotation.h>
+#include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ExternalValidator.h>
 
@@ -63,6 +65,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_MirrorAttrValidator);
   aFactory->registerValidator("SketchPlugin_CoincidenceAttr",
                               new SketchPlugin_CoincidenceAttrValidator);
+  aFactory->registerValidator("SketchPlugin_CopyValidator",
+                              new SketchPlugin_CopyValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -131,6 +135,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
   } else if (theFeatureID == SketchPlugin_ConstraintFillet::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintFillet);
+  } else if (theFeatureID == SketchPlugin_MultiTranslation::ID()) {
+    return FeaturePtr(new SketchPlugin_MultiTranslation);
+  } else if (theFeatureID == SketchPlugin_MultiRotation::ID()) {
+    return FeaturePtr(new SketchPlugin_MultiRotation);
   }
   // feature of such kind is not found
   return FeaturePtr();

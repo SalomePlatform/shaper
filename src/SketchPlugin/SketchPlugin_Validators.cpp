@@ -280,3 +280,37 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(
   return false;
 }
 
+
+bool SketchPlugin_CopyValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeSelectionListPtr aSelAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelAttr)
+    return false;
+
+  AttributeRefListPtr aRefListOfInitial = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  AttributeRefListPtr aRefListOfCopied = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      aFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  std::list<ObjectPtr> anInitialObjects = aRefListOfInitial->list();
+  std::list<ObjectPtr> aCopiedObjects = aRefListOfCopied->list();
+
+  std::list<ObjectPtr>::iterator anObjIter;
+  for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aSelAttr->value(anInd);
+    anObjIter = anInitialObjects.begin();
+    for (; anObjIter != anInitialObjects.end(); anObjIter++)
+      if (aSelect->context() == *anObjIter)
+        break;
+    if (anObjIter != anInitialObjects.end())
+      continue;
+    anObjIter = aCopiedObjects.begin();
+    for (; anObjIter != aCopiedObjects.end(); anObjIter++)
+      if (aSelect->context() == *anObjIter)
+        return false;
+  }
+  return true;
+}
+
