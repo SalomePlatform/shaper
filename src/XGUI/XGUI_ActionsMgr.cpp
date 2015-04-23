@@ -141,11 +141,15 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   if (aSelection->getSelected().size() == 0) {
-    foreach(QString aFeatureId, aIdList) {
+    // it seems that this code is not nesessary anymore. It leads to incorrect case:
+    // sketch operation start, click in any place in the viewer. The result is all nested
+    // entities are enabled(but the sketch plane is not selected yet). Any sketch operation
+    // can be started but will be incorrect on preview build before it uses the sketch unset plane.
+    /*foreach(QString aFeatureId, aIdList) {
       foreach(QString aId, nestedCommands(aFeatureId)) {
         setActionEnabled(aId, true);
       }
-    }
+    }*/
   } else { 
     SessionPtr aMgr = ModelAPI_Session::get();
     ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
