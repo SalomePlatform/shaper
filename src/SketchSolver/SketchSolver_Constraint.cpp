@@ -333,8 +333,10 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributeRefAttrPtr theAttrib
 Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributePtr theEntity, int& theType)
 {
   Slvs_hEntity aResult = SLVS_E_UNKNOWN;
-  if (!theEntity || !isInitialized(theEntity))
+  if (!theEntity || !isInitialized(theEntity)) {
+    myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
     return SLVS_E_UNKNOWN;
+  }
 
   // If the entity is already in the group, try to find it
   std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator anEntIter =
