@@ -80,7 +80,6 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
 
 private:
   ObjectPtr copyFeature(ObjectPtr theObject);
-  void shiftFeature(ObjectPtr theInitial, ObjectPtr theTarget, double theDeltaX, double theDeltaY);
 };
 
 #endif

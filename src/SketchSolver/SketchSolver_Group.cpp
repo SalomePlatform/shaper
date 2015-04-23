@@ -33,6 +33,7 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_MultiTranslation.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -272,8 +273,7 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
 
 void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
-  updateFeature(theFeature);
-  // Temporary rigid constraint
+  // Firstly, create temporary rigid constraint
   SolverConstraintPtr aConstraint =
       SketchSolver_Builder::getInstance()->createRigidConstraint(theFeature);
   if (!aConstraint)
@@ -282,6 +282,8 @@ void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFe
   aConstraint->setStorage(myStorage);
   if (aConstraint->error().empty())
     setTemporary(aConstraint);
+  // Secondly, update the feature
+  updateFeature(theFeature);
 }
 
 // ============================================================================

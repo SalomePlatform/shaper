@@ -25,7 +25,11 @@ typedef unsigned int UINT32;
 // Unknown constraint (for error reporting)
 #define SLVS_C_UNKNOWN 0
 // Fillet constraint identifier
-#define SLVS_C_FILLET 100100
+#define SLVS_C_FILLET            100100
+// Multi-rotation constraint identifier
+#define SLVS_C_MULTI_ROTATION    100101
+// Multi-translation constraint identifier
+#define SLVS_C_MULTI_TRANSLATION 100102
 // Unknown entity
 #define SLVS_E_UNKNOWN 0
 // Unknown group

@@ -161,16 +161,6 @@ void SketchPlugin_MultiTranslation::execute()
     }
   }
 
-  // Recalculate positions of features
-  aTargetList = aRefListOfTranslated->list();
-  aTargetIter = aTargetList.begin();
-  while (aTargetIter != aTargetList.end()) {
-    ObjectPtr anInitialObject = *aTargetIter++;
-    for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
-      shiftFeature(anInitialObject, *aTargetIter,
-          aShiftVec->x() * (i + 1), aShiftVec->y() * (i + 1));
-  }
-
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
@@ -216,31 +206,4 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
       return aRC;
   }
   return ObjectPtr();
-}
-
-void SketchPlugin_MultiTranslation::shiftFeature(
-    ObjectPtr theInitial, ObjectPtr theTarget, double theDeltaX, double theDeltaY)
-{
-  FeaturePtr anInitialFeature = ModelAPI_Feature::feature(theInitial);
-  FeaturePtr aTargetFeature = ModelAPI_Feature::feature(theTarget);
-
-  // block feature update
-  aTargetFeature->data()->blockSendAttributeUpdated(true);
-
-  std::list<AttributePtr> anInitAttrList =
-      anInitialFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<AttributePtr> aTargetAttrList =
-      aTargetFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<AttributePtr>::iterator anInitIt = anInitAttrList.begin();
-  std::list<AttributePtr>::iterator aTargetIt = aTargetAttrList.begin();
-  for (; anInitIt != anInitAttrList.end(); anInitIt++, aTargetIt++) {
-    std::shared_ptr<GeomDataAPI_Point2D> aPointFrom =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anInitIt);
-    std::shared_ptr<GeomDataAPI_Point2D> aPointTo =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aTargetIt);
-    aPointTo->setValue(aPointFrom->x() + theDeltaX, aPointFrom->y() + theDeltaY);
-  }
-
-  // unblock feature update
-  aTargetFeature->data()->blockSendAttributeUpdated(false);
 }
