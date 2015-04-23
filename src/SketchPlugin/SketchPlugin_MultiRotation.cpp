@@ -133,9 +133,10 @@ void SketchPlugin_MultiRotation::execute()
             aTargetList.insert(aTargetIter, anObject);
           } else {
             // remove object
-            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter;
-            ObjectPtr anObject = *(--aRemoveIt);
+            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter++;
+            ObjectPtr anObject = *aRemoveIt;
             aTargetList.erase(aRemoveIt);
+            aRefListOfRotated->remove(anObject);
             // remove the corresponding feature from the sketch
             ResultConstructionPtr aRC =
                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anObject);
@@ -166,16 +167,16 @@ void SketchPlugin_MultiRotation::execute()
     }
   }
 
-  if (fabs(anAngle) > 1.e-12) {
-    // Recalculate positions of features
-    aTargetList = aRefListOfRotated->list();
-    aTargetIter = aTargetList.begin();
-    while (aTargetIter != aTargetList.end()) {
-      ObjectPtr anInitialObject = *aTargetIter++;
-      for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
-        rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
-    }
-  }
+////  if (fabs(anAngle) > 1.e-12) {
+////    // Recalculate positions of features
+////    aTargetList = aRefListOfRotated->list();
+////    aTargetIter = aTargetList.begin();
+////    while (aTargetIter != aTargetList.end()) {
+////      ObjectPtr anInitialObject = *aTargetIter++;
+////      for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
+////        rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
+////    }
+////  }
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)

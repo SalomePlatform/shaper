@@ -33,7 +33,6 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_Feature.h>
-#include <SketchPlugin_MultiTranslation.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>

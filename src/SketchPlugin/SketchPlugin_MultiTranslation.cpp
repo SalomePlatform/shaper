@@ -128,9 +128,10 @@ void SketchPlugin_MultiTranslation::execute()
             aTargetList.insert(aTargetIter, anObject);
           } else {
             // remove object
-            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter;
-            ObjectPtr anObject = *(--aRemoveIt);
+            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter++;
+            ObjectPtr anObject = *aRemoveIt;
             aTargetList.erase(aRemoveIt);
+            aRefListOfTranslated->remove(anObject);
             // remove the corresponding feature from the sketch
             ResultConstructionPtr aRC =
                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anObject);

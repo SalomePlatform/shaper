@@ -13,6 +13,7 @@
 #include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_ConstraintRigid.h>
 #include <SketchSolver_ConstraintTangent.h>
+#include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_ConstraintMultiTranslation.h>
 #include <SketchSolver_Error.h>
 
@@ -44,6 +45,7 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
 #include <math.h>
@@ -122,6 +124,8 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintRigid(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintMultiTranslation(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintMultiRotation(theConstraint));
   }
   return aResult;
 }
