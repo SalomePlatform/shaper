@@ -46,3 +46,7 @@ double GeomAPI_Dir2d::cross(const std::shared_ptr<GeomAPI_Dir2d>& theArg) const
   return MY_DIR->XY().Crossed(theArg->impl<gp_Dir2d>().XY());
 }
 
+double GeomAPI_Dir2d::angle(const std::shared_ptr<GeomAPI_Dir2d>& theArg) const
+{
+  return MY_DIR->Angle(theArg->impl<gp_Dir2d>());
+}

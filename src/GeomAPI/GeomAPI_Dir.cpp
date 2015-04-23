@@ -53,3 +53,8 @@ const std::shared_ptr<GeomAPI_XYZ> GeomAPI_Dir::cross(
   return std::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(aResult.X(), aResult.Y(), aResult.Z()));
 }
 
+double GeomAPI_Dir::angle(const std::shared_ptr<GeomAPI_Dir>& theArg) const
+{
+  return MY_DIR->Angle(theArg->impl<gp_Dir>());
+}
+

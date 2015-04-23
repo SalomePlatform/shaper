@@ -39,6 +39,9 @@ class GEOMAPI_EXPORT GeomAPI_Dir : public GeomAPI_Interface
   double dot(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
   /// result is a cross product of two directions
   const std::shared_ptr<GeomAPI_XYZ> cross(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
+
+  /// calculates angle between two directions
+  double angle(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
 };
 
 #endif
