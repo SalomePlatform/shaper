@@ -185,7 +185,10 @@ void SketchSolver_ConstraintMultiRotation::update(ConstraintPtr theConstraint)
   if (!theConstraint || theConstraint == myBaseConstraint) {
     AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    if (anInitialRefList->size() != myNumberOfObjects) {
+    AttributeDoublePtr aNbCopies = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        myBaseConstraint->attribute(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID()));
+    if (anInitialRefList->size() != myNumberOfObjects ||
+        (size_t)aNbCopies->value() != myNumberOfCopies) {
       remove(myBaseConstraint);
       process();
       return;
