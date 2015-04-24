@@ -141,11 +141,11 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   if (aSelection->getSelected().size() == 0) {
-    foreach(QString aFeatureId, aIdList) {
+    /*foreach(QString aFeatureId, aIdList) {
       foreach(QString aId, nestedCommands(aFeatureId)) {
         setActionEnabled(aId, true);
       }
-    }
+    }*/
   } else { 
     SessionPtr aMgr = ModelAPI_Session::get();
     ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
