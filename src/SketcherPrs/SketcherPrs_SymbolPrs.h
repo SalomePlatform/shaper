@@ -9,6 +9,7 @@
 
 #include "SketcherPrs_SensitivePoint.h"
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_AttributeRefList.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <GeomAPI_Ax3.h>
@@ -115,6 +116,11 @@ protected:
   void drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape, 
     const Handle(Prs3d_Presentation)& thePrs) const;
 
+  /// Draw a list of shapes stored in a RefListAttribute
+  /// \param theListAttr the attribute of reference3s list
+  /// \param thePrs the presentation scene
+  void drawListOfShapes(const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr, 
+                        const Handle(Prs3d_Presentation)& thePrs) const;
 
 protected:
   /// Constraint feature

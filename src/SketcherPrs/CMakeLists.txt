@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
 	SketcherPrs_Radius.h
 	SketcherPrs_LengthDimension.h
 	SketcherPrs_Mirror.h
+	SketcherPrs_Transformation.h
 )
 
 SET(PROJECT_SOURCES
@@ -35,6 +36,7 @@ SET(PROJECT_SOURCES
 	SketcherPrs_Radius.cpp
 	SketcherPrs_LengthDimension.cpp
 	SketcherPrs_Mirror.cpp
+	SketcherPrs_Transformation.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -65,6 +67,8 @@ SET(PROJECT_PICTURES
 	icons/equal.png
 	icons/tangent.png
 	icons/mirror.png
+	icons/rotate.png
+	icons/translate.png
 )
 
 ADD_DEFINITIONS(-DSKETCHERPRS_EXPORTS ${CAS_DEFINITIONS})

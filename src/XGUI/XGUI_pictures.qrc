@@ -46,5 +46,6 @@
      <file>pictures/shading.png</file>
      <file>pictures/wireframe.png</file>
      <file>pictures/expression.png</file>
+     <file>pictures/arrow.png</file>
  </qresource>
  </RCC>

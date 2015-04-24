@@ -43,5 +43,7 @@
      <file>icons/fillet.png</file>
      <file>icons/coincedence.png</file>
      <file>icons/mirror.png</file>
+     <file>icons/translate.png</file>
+     <file>icons/rotate.png</file>
  </qresource>
  </RCC>
