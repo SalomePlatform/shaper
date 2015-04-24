@@ -21,12 +21,13 @@
 
 #include <GeomDataAPI_Point2D.h>
 
-#include <QWidget>
-#include <QLineEdit>
-//#include <QTimer>
-#include <QDialog>
-#include <QLayout>
 #include <QApplication>
+#include <QLineEdit>
+#include <QMenu>
+#include <QWidget>
+#include <QWidgetAction>
+#include <QRegExp>
+#include <QRegExpValidator>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,
@@ -39,27 +40,31 @@ ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
 }
 
-double editedValue(double theValue, bool& isDone)
+void editedValue(double& outValue, QString& outText)
 {
-  QDialog aDlg;
-  aDlg.setWindowFlags(Qt::FramelessWindowHint);
-  QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
-  ModuleBase_Tools::zeroMargins(aLay);
+  QMenu* aPopup = new QMenu();
 
-  QLineEdit* aEditor = new QLineEdit(QString::number(theValue), &aDlg);
+  QLineEdit* aEditor = new QLineEdit(QString::number(outValue), aPopup);
+  QWidgetAction* aLineEditAction = new QWidgetAction(aPopup);
+  aLineEditAction->setDefaultWidget(aEditor);
+  aPopup->addAction(aLineEditAction);
+
+  aEditor->setFocus();
   aEditor->selectAll();
-  aEditor->setValidator(new QDoubleValidator(aEditor));
-  QObject::connect(aEditor, SIGNAL(returnPressed()), &aDlg, SLOT(accept()));
-  aLay->addWidget(aEditor);
+  QString anExpression("([0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)|([_a-zA-Z][a-zA-Z0-9_]*)");
+  aEditor->setValidator(new QRegExpValidator(QRegExp(anExpression), aEditor));
+  QObject::connect(aEditor, SIGNAL(returnPressed()), aLineEditAction, SIGNAL(triggered()));
+  QObject::connect(aLineEditAction, SIGNAL(triggered()), aPopup, SLOT(hide()));
 
-  QPoint aPoint = QCursor::pos();
-  aDlg.move(aPoint);
-
-  isDone = aDlg.exec() == QDialog::Accepted;
-  double aValue = theValue;
-  if (isDone)
-    aValue = aEditor->text().toDouble();
-  return aValue;
+  QAction* aResult = aPopup->exec(QCursor::pos());
+  outText = aEditor->text();
+  bool isDouble;
+  double aValue = outText.toDouble(&isDouble);
+  if (isDouble) {
+    outValue = aValue;
+    outText = ""; // return empty string, if it's can be converted to a double
+  }
+  aPopup->deleteLater();
 }
 
 bool ModuleBase_WidgetEditor::focusTo()
@@ -86,25 +91,13 @@ void ModuleBase_WidgetEditor::showPopupEditor()
   // White while all events will be processed
   //QApplication::processEvents();
   double aValue = mySpinBox->value();
-  bool isDone;
-  aValue = editedValue(aValue, isDone);
-
-  if (isDone) {
+  QString aText;
+  editedValue(aValue, aText);
+  if (aText.isEmpty()) {
     ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
+  } else {
+    ModuleBase_Tools::setSpinText(mySpinBox, aText);
   }
   emit valuesChanged();
   emit focusOutWidget(this);
-}
-
-void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature,
-                                               const std::string theAttribute)
-{
-  DataPtr aData = theFeature->data();
-  AttributeDoublePtr aRef = aData->real(theAttribute);
-  double aValue = aRef->value();
-
-  bool isDone;
-  aValue = editedValue(aValue, isDone);
-  if (isDone)
-    aRef->setValue(aValue);
 }

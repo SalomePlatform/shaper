@@ -17,6 +17,7 @@
 class QWidget;
 class QLayout;
 class QDoubleSpinBox;
+class ModuleBase_ParamSpinBox;
 
 namespace ModuleBase_Tools {
 
@@ -59,6 +60,11 @@ MODULEBASE_EXPORT QPixmap lighter(const QString& theIcon, const int theLighterVa
 /// \param theSpin an X or Y coordinate widget
 /// \param theValue a new value
 MODULEBASE_EXPORT void setSpinValue(QDoubleSpinBox* theSpin, double theValue);
+
+/// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
+/// \param theSpin an ModuleBase_ParamSpinBox that accepts text
+/// \param theText a new value
+MODULEBASE_EXPORT void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText);
 
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object
