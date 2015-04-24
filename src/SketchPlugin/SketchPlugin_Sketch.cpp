@@ -15,6 +15,9 @@
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 
+#include <GeomDataAPI_Point2D.h>
+#include <GeomAlgoAPI_PointBuilder.h>
+
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -241,4 +244,26 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
       }
     }
   }
+}
+
+void SketchPlugin_Sketch::createPoint2DResult(ModelAPI_Feature* theFeature,
+                                              SketchPlugin_Sketch* theSketch,
+                                              const std::string& theAttributeID, const int theIndex)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theFeature->attribute(theAttributeID));
+
+  if (!aPoint || !aPoint->isInitialized())
+    return;
+
+  std::shared_ptr<GeomAPI_Pnt> aCenter(theSketch->to3D(aPoint->x(), aPoint->y()));
+  //std::cout<<"Execute circle "<<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
+  // make a visible point
+  std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+  std::shared_ptr<ModelAPI_ResultConstruction> aResult = theFeature->document()->createConstruction(
+                     theFeature->data(), theIndex);
+  aResult->setShape(aCenterPointShape);
+  aResult->setIsInHistory(false);
+
+  theFeature->setResult(aResult, theIndex);
 }
