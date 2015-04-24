@@ -258,7 +258,7 @@
       <!--  SketchMultiTranslation  -->
       <feature
         id="SketchMultiTranslation"
-        title="Translation" 
+        title="Translation" icon=":icons/translate.png"
         tooltip="Make a number of shifted copies of a group of objects">
         <sketch_multi_selector id="MultiTranslationList"
             label="List of objects"
@@ -287,7 +287,7 @@
       <!--  SketchMultiRotation  -->
       <feature
         id="SketchMultiRotation"
-        title="Rotation" 
+        title="Rotation" icon=":icons/rotate.png"
         tooltip="Make a number of rotated copies of a group of objects">
         <sketch_multi_selector id="MultiRotationList"
             label="List of objects"
