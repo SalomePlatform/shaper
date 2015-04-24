@@ -10,8 +10,6 @@
 
 #include <SketchPlugin_Constraint.h>
 
-#include <ModelAPI_AttributeRefList.h>
-
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
 
@@ -76,7 +74,6 @@ void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs, Qua
   if (anAttrC.get() == NULL)
     return;
 
-  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   int aNb = anAttrB->size();
   if (aNb != anAttrC->size())
     return;
@@ -90,20 +87,9 @@ void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs, Qua
   addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
 
   // Draw source objects
-  int i;
-  ObjectPtr aObj;
-  for (i = 0; i < aNb; i++) {
-    aObj = anAttrB->object(i);
-    std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
-    if (aShape.get() != NULL)
-      drawShape(aShape, thePrs);
-  }
+  drawListOfShapes(anAttrB, thePrs);
+
   // draw mirrored objects
-  for (i = 0; i < aNb; i++) {
-    aObj = anAttrC->object(i);
-    std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
-    if (aShape.get() != NULL)
-      drawShape(aShape, thePrs);
-  }
+  drawListOfShapes(anAttrC, thePrs);
 }
 

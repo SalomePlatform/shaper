@@ -20,4 +20,6 @@
 /// Tolerance for value of parameters
 const double tolerance = 1.e-10;
 
+#define PI 3.1415926535897932
+
 #endif

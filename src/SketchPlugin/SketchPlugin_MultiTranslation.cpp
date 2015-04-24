@@ -18,6 +18,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <SketcherPrs_Factory.h>
+
 SketchPlugin_MultiTranslation::SketchPlugin_MultiTranslation()
 {
 }
@@ -26,7 +28,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
 {
   data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeDouble::typeId()/*ModelAPI_AttributeInteger::typeId()*/);
+  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   AttributeSelectionListPtr aSelection = 
@@ -40,8 +42,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
 void SketchPlugin_MultiTranslation::execute()
 {
   AttributeSelectionListPtr aTranslationObjectRefs = selectionList(TRANSLATION_LIST_ID());
-  int aNbCopies = (int)(std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      attribute(NUMBER_OF_COPIES_ID()))->value());
+  int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
   // Calculate shift vector
   std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -128,9 +129,10 @@ void SketchPlugin_MultiTranslation::execute()
             aTargetList.insert(aTargetIter, anObject);
           } else {
             // remove object
-            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter;
-            ObjectPtr anObject = *(--aRemoveIt);
+            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter++;
+            ObjectPtr anObject = *aRemoveIt;
             aTargetList.erase(aRemoveIt);
+            aRefListOfTranslated->remove(anObject);
             // remove the corresponding feature from the sketch
             ResultConstructionPtr aRC =
                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anObject);
@@ -161,16 +163,6 @@ void SketchPlugin_MultiTranslation::execute()
     }
   }
 
-  // Recalculate positions of features
-  aTargetList = aRefListOfTranslated->list();
-  aTargetIter = aTargetList.begin();
-  while (aTargetIter != aTargetList.end()) {
-    ObjectPtr anInitialObject = *aTargetIter++;
-    for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
-      shiftFeature(anInitialObject, *aTargetIter,
-          aShiftVec->x() * (i + 1), aShiftVec->y() * (i + 1));
-  }
-
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
@@ -183,8 +175,7 @@ AISObjectPtr SketchPlugin_MultiTranslation::getAISObject(AISObjectPtr thePreviou
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS) {
-// TODO:
-//    anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch()->coordinatePlane());
+    anAIS = SketcherPrs_Factory::translateConstraint(this, sketch()->coordinatePlane());
   }
   return anAIS;
 }
@@ -216,31 +207,4 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
       return aRC;
   }
   return ObjectPtr();
-}
-
-void SketchPlugin_MultiTranslation::shiftFeature(
-    ObjectPtr theInitial, ObjectPtr theTarget, double theDeltaX, double theDeltaY)
-{
-  FeaturePtr anInitialFeature = ModelAPI_Feature::feature(theInitial);
-  FeaturePtr aTargetFeature = ModelAPI_Feature::feature(theTarget);
-
-  // block feature update
-  aTargetFeature->data()->blockSendAttributeUpdated(true);
-
-  std::list<AttributePtr> anInitAttrList =
-      anInitialFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<AttributePtr> aTargetAttrList =
-      aTargetFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<AttributePtr>::iterator anInitIt = anInitAttrList.begin();
-  std::list<AttributePtr>::iterator aTargetIt = aTargetAttrList.begin();
-  for (; anInitIt != anInitAttrList.end(); anInitIt++, aTargetIt++) {
-    std::shared_ptr<GeomDataAPI_Point2D> aPointFrom =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anInitIt);
-    std::shared_ptr<GeomDataAPI_Point2D> aPointTo =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aTargetIt);
-    aPointTo->setValue(aPointFrom->x() + theDeltaX, aPointFrom->y() + theDeltaY);
-  }
-
-  // unblock feature update
-  aTargetFeature->data()->blockSendAttributeUpdated(false);
 }

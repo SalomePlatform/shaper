@@ -66,6 +66,9 @@ private:
                         const Slvs_Entity& theMirror,
                         const double theMirrorLine[]) const;
 
+  /// \brief Precisely update last point to be on arc
+  void adjustArcPoints(const Slvs_Entity& theArc) const;
+
 private:
   size_t myNumberOfObjects; ///< number of previously mirrored objects
 };

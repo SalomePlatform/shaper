@@ -16,6 +16,7 @@
 #include "SketcherPrs_Radius.h"
 #include "SketcherPrs_LengthDimension.h"
 #include "SketcherPrs_Mirror.h"
+#include "SketcherPrs_Transformation.h"
 
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
 AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
@@ -52,6 +53,24 @@ AISObjectPtr SketcherPrs_Factory::verticalConstraint(ModelAPI_Feature* theConstr
 { 
   std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); 
   Handle(SketcherPrs_HVDirection) aPrs = new SketcherPrs_HVDirection(theConstraint, thePlane, false); 
+  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); 
+  return aAISObj; 
+}
+
+AISObjectPtr SketcherPrs_Factory::translateConstraint(ModelAPI_Feature* theConstraint,
+                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{ 
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); 
+  Handle(SketcherPrs_Transformation) aPrs = new SketcherPrs_Transformation(theConstraint, thePlane, true); 
+  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); 
+  return aAISObj; 
+}
+
+AISObjectPtr SketcherPrs_Factory::rotateConstraint(ModelAPI_Feature* theConstraint,
+                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{ 
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); 
+  Handle(SketcherPrs_Transformation) aPrs = new SketcherPrs_Transformation(theConstraint, thePlane, false); 
   aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); 
   return aAISObj; 
 }

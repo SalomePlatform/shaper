@@ -46,6 +46,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetValidated.h
 	ModuleBase_WidgetExprEditor.h
 	ModuleBase_ParamSpinBox.h
+	ModuleBase_WidgetIntValue.h
 )
 
 SET(PROJECT_SOURCES
@@ -83,6 +84,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetExprEditor.cpp
 	ModuleBase_ParamSpinBox.cpp
 	ModuleBase_SelectionValidator.cpp
+	ModuleBase_WidgetIntValue.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -20,6 +20,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 
+#include <SketcherPrs_Factory.h>
+
 #define PI 3.1415926535897932
 
 SketchPlugin_MultiRotation::SketchPlugin_MultiRotation()
@@ -30,7 +32,7 @@ void SketchPlugin_MultiRotation::initAttributes()
 {
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeDouble::typeId()/*ModelAPI_AttributeInteger::typeId()*/);
+  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   AttributeSelectionListPtr aSelection = 
@@ -44,8 +46,7 @@ void SketchPlugin_MultiRotation::initAttributes()
 void SketchPlugin_MultiRotation::execute()
 {
   AttributeSelectionListPtr aRotationObjectRefs = selectionList(ROTATION_LIST_ID());
-  int aNbCopies = (int)(std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      attribute(NUMBER_OF_COPIES_ID()))->value());
+  int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
   // Obtain center and angle of rotation
   std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -133,9 +134,10 @@ void SketchPlugin_MultiRotation::execute()
             aTargetList.insert(aTargetIter, anObject);
           } else {
             // remove object
-            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter;
-            ObjectPtr anObject = *(--aRemoveIt);
+            std::list<ObjectPtr>::iterator aRemoveIt = aTargetIter++;
+            ObjectPtr anObject = *aRemoveIt;
             aTargetList.erase(aRemoveIt);
+            aRefListOfRotated->remove(anObject);
             // remove the corresponding feature from the sketch
             ResultConstructionPtr aRC =
                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anObject);
@@ -166,16 +168,16 @@ void SketchPlugin_MultiRotation::execute()
     }
   }
 
-  if (fabs(anAngle) > 1.e-12) {
-    // Recalculate positions of features
-    aTargetList = aRefListOfRotated->list();
-    aTargetIter = aTargetList.begin();
-    while (aTargetIter != aTargetList.end()) {
-      ObjectPtr anInitialObject = *aTargetIter++;
-      for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
-        rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
-    }
-  }
+////  if (fabs(anAngle) > 1.e-12) {
+////    // Recalculate positions of features
+////    aTargetList = aRefListOfRotated->list();
+////    aTargetIter = aTargetList.begin();
+////    while (aTargetIter != aTargetList.end()) {
+////      ObjectPtr anInitialObject = *aTargetIter++;
+////      for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
+////        rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
+////    }
+////  }
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
@@ -189,8 +191,7 @@ AISObjectPtr SketchPlugin_MultiRotation::getAISObject(AISObjectPtr thePrevious)
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS) {
-// TODO:
-//    anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch()->coordinatePlane());
+    anAIS = SketcherPrs_Factory::rotateConstraint(this, sketch()->coordinatePlane());
   }
   return anAIS;
 }
