@@ -6,9 +6,11 @@
 #include <SketchPlugin_MultiTranslation.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Data.h>
 
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_XY.h>
@@ -44,8 +46,7 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
   AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   myNumberOfObjects = anInitialRefList->size();
-  myNumberOfCopies = (size_t)std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aData->attribute(SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID()))->value();
+  myNumberOfCopies = (size_t) aData->integer(SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID())->value();
   AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
   if (!aRefList) {
@@ -183,8 +184,7 @@ void SketchSolver_ConstraintMultiTranslation::update(ConstraintPtr theConstraint
   if (!theConstraint || theConstraint == myBaseConstraint) {
     AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    AttributeDoublePtr aNbCopies = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-        myBaseConstraint->attribute(SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID()));
+    AttributeIntegerPtr aNbCopies = myBaseConstraint->integer(SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID());
     if (anInitialRefList->size() != myNumberOfObjects ||
         (size_t)aNbCopies->value() != myNumberOfCopies) {
       remove(myBaseConstraint);

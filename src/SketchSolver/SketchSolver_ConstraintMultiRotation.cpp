@@ -6,6 +6,7 @@
 #include <SketchPlugin_MultiRotation.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -39,8 +40,7 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   myNumberOfObjects = anInitialRefList->size();
-  myNumberOfCopies = (size_t)std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aData->attribute(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID()))->value();
+  myNumberOfCopies = (size_t) aData->integer(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID())->value();
   AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
   if (!aRefList) {
@@ -183,10 +183,8 @@ void SketchSolver_ConstraintMultiRotation::update(ConstraintPtr theConstraint)
   if (!theConstraint || theConstraint == myBaseConstraint) {
     AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    AttributeDoublePtr aNbCopies = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-        myBaseConstraint->attribute(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID()));
-    if (anInitialRefList->size() != myNumberOfObjects ||
-        (size_t)aNbCopies->value() != myNumberOfCopies) {
+    AttributeIntegerPtr aNbCopies = myBaseConstraint->integer(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID());
+    if (anInitialRefList->size() != myNumberOfObjects || aNbCopies->value() != myNumberOfCopies) {
       remove(myBaseConstraint);
       process();
       return;

@@ -56,6 +56,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_MultiRotation.h>
+#include <SketchPlugin_MultiTranslation.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -598,19 +600,8 @@ const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
     aIds << SketchPlugin_Point::ID().c_str();
     aIds << SketchPlugin_Arc::ID().c_str();
     aIds << SketchPlugin_Circle::ID().c_str();
-    aIds << SketchPlugin_ConstraintLength::ID().c_str();
-    aIds << SketchPlugin_ConstraintDistance::ID().c_str();
-    aIds << SketchPlugin_ConstraintRigid::ID().c_str();
-    aIds << SketchPlugin_ConstraintRadius::ID().c_str();
-    aIds << SketchPlugin_ConstraintPerpendicular::ID().c_str();
-    aIds << SketchPlugin_ConstraintParallel::ID().c_str();
-    aIds << SketchPlugin_ConstraintHorizontal::ID().c_str();
-    aIds << SketchPlugin_ConstraintVertical::ID().c_str();
-    aIds << SketchPlugin_ConstraintEqual::ID().c_str();
-    aIds << SketchPlugin_ConstraintTangent::ID().c_str();
-    aIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
     aIds << SketchPlugin_ConstraintFillet::ID().c_str();
-    aIds << SketchPlugin_ConstraintMirror::ID().c_str();
+    aIds.append(constraintsIdList());
   }
   return aIds;
 }
@@ -631,6 +622,8 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
     aIds << SketchPlugin_ConstraintTangent::ID().c_str();
     aIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
     aIds << SketchPlugin_ConstraintMirror::ID().c_str();
+    aIds << SketchPlugin_MultiRotation::ID().c_str();
+    aIds << SketchPlugin_MultiTranslation::ID().c_str();
   }
   return aIds;
 }

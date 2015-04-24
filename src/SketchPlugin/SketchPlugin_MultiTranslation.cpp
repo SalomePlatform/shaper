@@ -28,7 +28,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
 {
   data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeDouble::typeId()/*ModelAPI_AttributeInteger::typeId()*/);
+  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   AttributeSelectionListPtr aSelection = 
@@ -42,8 +42,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
 void SketchPlugin_MultiTranslation::execute()
 {
   AttributeSelectionListPtr aTranslationObjectRefs = selectionList(TRANSLATION_LIST_ID());
-  int aNbCopies = (int)(std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      attribute(NUMBER_OF_COPIES_ID()))->value());
+  int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
   // Calculate shift vector
   std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

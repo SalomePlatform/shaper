@@ -277,12 +277,12 @@
               title="End point"
               tooltip="Final point of translation"/>
         </groupbox>
-        <doublevalue_editor id="MultiTranslationCopies"
+        <integervalue id="MultiTranslationCopies"
             label="Number of copies"
             tooltip="Number of copies" 
             default="1" min="1">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue_editor>
+        </integervalue>
       </feature>
       <!--  SketchMultiRotation  -->
       <feature
@@ -300,15 +300,15 @@
             id="MultiRotationCenter"
             title="Center of rotation"
             tooltip="Center of rotation"/>
-        <doublevalue_editor id="MultiRotationAngle"
+        <doublevalue id="MultiRotationAngle"
             label="Angle"
             tooltip="Rotation angle"/>
-        <doublevalue_editor id="MultiRotationCopies"
+        <integervalue id="MultiRotationCopies"
             label="Number of copies"
             tooltip="Number of copies" 
             default="1" min="1">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue_editor>
+        </integervalue>
       </feature>
     </group>
   </workbench>

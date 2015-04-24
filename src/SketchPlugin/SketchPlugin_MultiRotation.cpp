@@ -32,7 +32,7 @@ void SketchPlugin_MultiRotation::initAttributes()
 {
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeDouble::typeId()/*ModelAPI_AttributeInteger::typeId()*/);
+  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   AttributeSelectionListPtr aSelection = 
@@ -46,8 +46,7 @@ void SketchPlugin_MultiRotation::initAttributes()
 void SketchPlugin_MultiRotation::execute()
 {
   AttributeSelectionListPtr aRotationObjectRefs = selectionList(ROTATION_LIST_ID());
-  int aNbCopies = (int)(std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      attribute(NUMBER_OF_COPIES_ID()))->value());
+  int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
   // Obtain center and angle of rotation
   std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

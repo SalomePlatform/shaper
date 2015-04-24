@@ -6,6 +6,7 @@
 
 #include "GeomValidators_Positive.h"
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -23,7 +24,11 @@ GeomValidators_Positive::GeomValidators_Positive()
 bool GeomValidators_Positive::isValid(
     const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
 {
-  std::shared_ptr<ModelAPI_AttributeDouble> aDouble = 
+  AttributeDoublePtr aDouble = 
     std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-  return aDouble->isInitialized() && aDouble->value() > 1.e-5;
+  if (aDouble.get())
+    return aDouble->isInitialized() && aDouble->value() > 1.e-5;
+  AttributeIntegerPtr aInteger = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttribute);
+  return aInteger->isInitialized() && aInteger->value() > 0;
 }

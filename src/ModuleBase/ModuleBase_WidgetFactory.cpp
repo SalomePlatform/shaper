@@ -15,6 +15,7 @@
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
+#include <ModuleBase_WidgetIntValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
 #include <ModuleBase_WidgetFileSelector.h>
 #include <ModuleBase_WidgetChoice.h>
@@ -122,6 +123,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_DOUBLEVALUE) {
     result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
+  } else if (theType == WDG_INTEGERVALUE) {
+    result = new ModuleBase_WidgetIntValue(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_SHAPE_SELECTOR) {
     result = new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   } else if (theType == WDG_BOOLVALUE) {
