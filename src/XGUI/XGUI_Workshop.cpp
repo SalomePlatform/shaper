@@ -1529,6 +1529,9 @@ bool XGUI_Workshop::canChangeColor() const
 }
 
 //**************************************************************
+#include <QButtonGroup>
+#include <QRadioButton>
+#include <QLabel>
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
   std::vector<int> aColor;
@@ -1545,19 +1548,33 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 
   // 2. show the dialog to change the value
   QDialog* aDlg = new QDialog();
-  QVBoxLayout* aLay = new QVBoxLayout(aDlg);
+  aDlg->setWindowTitle("Color");
+  QGridLayout* aLay = new QGridLayout(aDlg);
+
+  QRadioButton* aRandomChoiceBtn = new QRadioButton(aDlg);
+  QRadioButton* aColorChoiceBtn = new QRadioButton(aDlg);
+  aColorChoiceBtn->setChecked(true);
+  QButtonGroup* aGroup = new QButtonGroup(aDlg);
+  aGroup->setExclusive(true);
+  aGroup->addButton(aColorChoiceBtn);
+  aGroup->addButton(aRandomChoiceBtn);
+
+  aLay->addWidget(aColorChoiceBtn, 0, 0);
+  aLay->addWidget(aRandomChoiceBtn, 1, 0);
 
   QtxColorButton* aColorBtn = new QtxColorButton(aDlg);
   aColorBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-  aLay->addWidget(aColorBtn);
+  aLay->addWidget(aColorBtn, 0, 1);
   aColorBtn->setColor(QColor(aColor[0], aColor[1], aColor[2]));
+
+  QLabel* aRandomLabel = new QLabel("Random", aDlg);
+  aLay->addWidget(aRandomLabel, 1, 1);
 
   QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                                     Qt::Horizontal, aDlg);
   connect(aButtons, SIGNAL(accepted()), aDlg, SLOT(accept()));
   connect(aButtons, SIGNAL(rejected()), aDlg, SLOT(reject()));
-  aLay->addWidget(aButtons);
+  aLay->addWidget(aButtons, 2, 0, 1, 2);
 
   aDlg->move(QCursor::pos());
   bool isDone = aDlg->exec() == QDialog::Accepted;
