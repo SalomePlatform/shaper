@@ -43,11 +43,6 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
-  /// Creates an editor for the real value and set the new value to the feature
-  /// \param theFeature the model feature
-  /// \param theAttribute the feature attribute
-  static void editFeatureValue(FeaturePtr theFeature, const std::string theAttribute);
-
  private slots:
    /// Shous popup window under cursor for data editing
    void showPopupEditor();

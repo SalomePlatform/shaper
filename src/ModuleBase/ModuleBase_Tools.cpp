@@ -5,6 +5,7 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_Tools.h"
+#include <ModuleBase_ParamSpinBox.h>
 
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Data.h>
@@ -105,6 +106,13 @@ QPixmap lighter(const QString& theIcon, const int theLighterValue)
     }
   }
   return QPixmap::fromImage(aResult);
+}
+
+void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText)
+{
+  bool isBlocked = theSpin->blockSignals(true);
+  theSpin->setText(theText);
+  theSpin->blockSignals(isBlocked);
 }
 
 void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
