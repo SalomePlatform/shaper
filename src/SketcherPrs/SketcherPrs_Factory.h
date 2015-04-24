@@ -30,7 +30,7 @@ public:
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(coincidentConstraint)
 
-  /// Creates coincedent parallel presentation
+  /// Creates parallel constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(parallelConstraint)
@@ -40,45 +40,55 @@ public:
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(perpendicularConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates rigid constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(rigidConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates horizontal constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(horisontalConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates vertical constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(verticalConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates equal constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(equalConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates tangent constraiont presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(tangentConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates radius dimension presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(radiusConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates length dimension presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(lengthDimensionConstraint)
 
-  /// Creates coincedent perpendicular presentation
+  /// Creates mirror constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(mirrorConstraint)
+
+  /// Creates translate constraint presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  GET_CONSTRAINT_PRS(translateConstraint)
+
+  /// Creates rotate constraint presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  GET_CONSTRAINT_PRS(rotateConstraint)
 };
 
 #endif

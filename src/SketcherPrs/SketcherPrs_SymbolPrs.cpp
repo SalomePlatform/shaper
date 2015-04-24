@@ -335,10 +335,12 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   int aNbVertex = myPntArray->VertexNumber();
   if (myOwner.IsNull()) {
     myOwner = new SelectMgr_EntityOwner(this);
-    for (int i = 1; i <= aNbVertex; i++) {
-      Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, myPntArray, i);
-      mySPoints.Append(aSP);
-    }
+  }
+
+  mySPoints.Clear();
+  for (int i = 1; i <= aNbVertex; i++) {
+    Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, myPntArray, i);
+    mySPoints.Append(aSP);
   }
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePresentation);
@@ -465,3 +467,20 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
     StdPrs_Point::Add(thePrs, aPoint, myDrawer);
   }
 }
+
+void SketcherPrs_SymbolPrs::drawListOfShapes(const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr, 
+                                             const Handle(Prs3d_Presentation)& thePrs) const
+{
+  int aNb = theListAttr->size();
+  if (aNb == 0)
+    return;
+  int i;
+  ObjectPtr aObj;
+  for (i = 0; i < aNb; i++) {
+    aObj = theListAttr->object(i);
+    std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
+    if (aShape.get() != NULL)
+      drawShape(aShape, thePrs);
+  }
+}
+

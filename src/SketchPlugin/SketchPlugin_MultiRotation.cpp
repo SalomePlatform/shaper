@@ -20,6 +20,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 
+#include <SketcherPrs_Factory.h>
+
 #define PI 3.1415926535897932
 
 SketchPlugin_MultiRotation::SketchPlugin_MultiRotation()
@@ -190,8 +192,7 @@ AISObjectPtr SketchPlugin_MultiRotation::getAISObject(AISObjectPtr thePrevious)
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS) {
-// TODO:
-//    anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch()->coordinatePlane());
+    anAIS = SketcherPrs_Factory::rotateConstraint(this, sketch()->coordinatePlane());
   }
   return anAIS;
 }

@@ -18,6 +18,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <SketcherPrs_Factory.h>
+
 SketchPlugin_MultiTranslation::SketchPlugin_MultiTranslation()
 {
 }
@@ -174,8 +176,7 @@ AISObjectPtr SketchPlugin_MultiTranslation::getAISObject(AISObjectPtr thePreviou
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS) {
-// TODO:
-//    anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch()->coordinatePlane());
+    anAIS = SketcherPrs_Factory::translateConstraint(this, sketch()->coordinatePlane());
   }
   return anAIS;
 }
