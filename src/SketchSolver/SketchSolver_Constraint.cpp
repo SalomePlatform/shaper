@@ -7,6 +7,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 
+#include <GeomAPI_Dir2d.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -677,61 +678,16 @@ void SketchSolver_Constraint::calculateMiddlePoint(
       return;
     }
 
-    double xStart = anArcPoint[1][0] / aRad, xEnd = anArcPoint[2][0] / aRad;
-    double yStart = anArcPoint[1][1] / aRad, yEnd = anArcPoint[2][1] / aRad;
-    double aTanStart = abs(xStart) < tolerance ? yStart : yStart / xStart;
-    double aTanEnd   = abs(xEnd) < tolerance   ? yEnd   : yEnd / xEnd;
-    double aCotStart = abs(yStart) < tolerance ? xStart : xStart / yStart;
-    double aCotEnd   = abs(yEnd) < tolerance   ? xEnd   : xEnd / yEnd;
-    if (anArcPoint[1][0] * anArcPoint[2][0] < 0.0) {
-      if (anArcPoint[1][0] > 0.0)
-        yEnd = 2.0 - yEnd;
-      else
-        yStart = -2.0 - yStart;
-    } else {
-      if (aTanStart > aTanEnd) {
-        if (yStart > yEnd) {
-          yStart = 2.0 - yStart;
-          yEnd = -2.0 - yEnd;
-        } else {
-          yStart = -2.0 - yStart;
-          yEnd = 2.0 - yEnd;
-        }
-      }
-    }
-    if (anArcPoint[1][1] * anArcPoint[2][1] < 0.0) {
-      if (anArcPoint[1][1] > 0.0)
-        xEnd = 2.0 - xEnd;
-      else
-        xStart = -2.0 - xStart;
-    } else {
-      if (aCotStart < aCotEnd) {
-        if (xStart > xEnd) {
-          xStart = 2.0 - xStart;
-          xEnd = -2.0 - xEnd;
-        } else {
-          xStart = -2.0 - xStart;
-          xEnd = 2.0 - xEnd;
-        }
-      }
-    }
-    x = (1.0 - theCoeff) * xStart + theCoeff * xEnd;
-    y = (1.0 - theCoeff) * yStart + theCoeff * yEnd;
-    if (x > 1.0) x = 2.0 - x;
-    if (x < -1.0) x = -2.0 - x;
-    if (y > 1.0) y = 2.0 - y;
-    if (y < -1.0) y = -2.0 - y;
-
-    aNorm = sqrt(x*x + y*y);
-    if (aNorm >= tolerance) {
-      x *= aRad / aNorm;
-      y *= aRad / aNorm;
-    } else {
-      x = -0.5 * (anArcPoint[2][1] + anArcPoint[1][1]);
-      y = -0.5 * (anArcPoint[2][0] + anArcPoint[1][0]);
-    }
-    theX = anArcPoint[0][0] + x;
-    theY = anArcPoint[0][1] + y;
+    std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
+    std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
+    double anAngle = aStartDir->angle(aEndDir);
+    if (anAngle < 0)
+      anAngle += 2.0 * PI;
+    anAngle *= theCoeff;
+    double aCos = cos(anAngle);
+    double aSin = sin(anAngle);
+    theX = anArcPoint[0][0] + anArcPoint[1][0] * aCos - anArcPoint[1][1] * aSin;
+    theY = anArcPoint[0][1] + anArcPoint[1][0] * aSin + anArcPoint[1][1] * aCos;
   }
 }
 

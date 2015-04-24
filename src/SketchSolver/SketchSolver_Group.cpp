@@ -236,12 +236,21 @@ bool SketchSolver_Group::changeConstraint(
       setTemporary(aConstraint);
     }
   }
-  //// Fix base features for mirror
-  //if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
-  //  AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-  //      theConstraint->attribute(SketchPlugin_ConstraintMirror::ENTITY_B()));
-  //  fixFeaturesList(aRefList);
-  //}
+  // Fix mirror line
+  if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        theConstraint->attribute(SketchPlugin_ConstraintMirror::ENTITY_A()));
+    if (aRefAttr && aRefAttr->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+      SolverConstraintPtr aConstraint =
+          SketchSolver_Builder::getInstance()->createRigidConstraint(aFeature);
+      if (aConstraint) {
+        aConstraint->setGroup(this);
+        aConstraint->setStorage(myStorage);
+        setTemporary(aConstraint);
+      }
+    }
+  }
 
   if (!myFeatureStorage)
     myFeatureStorage = FeatureStoragePtr(new SketchSolver_FeatureStorage);

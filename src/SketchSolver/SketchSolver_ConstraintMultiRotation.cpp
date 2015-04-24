@@ -15,8 +15,6 @@
 
 #include <math.h>
 
-#define PI 3.1415926535897932
-
 void SketchSolver_ConstraintMultiRotation::getAttributes(
     Slvs_hEntity& theCenter, double& theAngle,
     std::vector<std::vector<Slvs_hEntity> >& thePoints,

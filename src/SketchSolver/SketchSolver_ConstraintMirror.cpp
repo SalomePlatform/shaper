@@ -192,17 +192,6 @@ void SketchSolver_ConstraintMirror::process()
       }
     }
   }
-
-  // Set the mirror line unchanged during constraint recalculation
-  for (int i = 0; i < 2; i++) {
-    if (myStorage->isPointFixed(aMirrorLine.point[i], aConstraint.h, true))
-      continue;
-    aConstraint = Slvs_MakeConstraint(
-        SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_WHERE_DRAGGED, myGroup->getWorkplaneId(), 0.0,
-        aMirrorLine.point[i], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-    aConstraint.h = myStorage->addConstraint(aConstraint);
-    mySlvsConstraints.push_back(aConstraint.h);
-  }
 }
 
 
@@ -293,6 +282,7 @@ void SketchSolver_ConstraintMirror::makeMirrorEntity(
     Slvs_hEntity aTmp = aMirrorPoint[2];
     aMirrorPoint[2] = aMirrorPoint[1];
     aMirrorPoint[1] = aTmp;
+    adjustArcPoints(theBase);
   }
   if (theBase.type == SLVS_E_POINT_IN_2D || theBase.type == SLVS_E_POINT_IN_3D) {
     aBasePoint[0] = theBase.h;
@@ -310,9 +300,14 @@ void SketchSolver_ConstraintMirror::makeMirrorEntity(
   // orthogonal direction
   aDir = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(aDir->y(), -aDir->x()));
 
+  Slvs_hConstraint aFixed; // transient variable
   for (int i = 0; i < 4; i++) {
     if (aBasePoint[i] == SLVS_E_UNKNOWN || aMirrorPoint[i] == SLVS_E_UNKNOWN)
       continue;
+    // check the mirror point is not fixed
+    if (myStorage->isPointFixed(aMirrorPoint[i], aFixed, true))
+      continue;
+
     Slvs_Entity aPointEnt = myStorage->getEntity(aBasePoint[i]);
     double aBaseX = myStorage->getParameter(aPointEnt.param[0]).val;
     double aBaseY = myStorage->getParameter(aPointEnt.param[1]).val;
@@ -331,13 +326,41 @@ void SketchSolver_ConstraintMirror::makeMirrorEntity(
   }
 }
 
+void SketchSolver_ConstraintMirror::adjustArcPoints(const Slvs_Entity& theArc) const
+{
+  Slvs_Param aParam;
+  Slvs_Entity aPoint;
+  double anArcParams[3][2];
+  for (int i = 0; i < 3; i++) {
+    aPoint = myStorage->getEntity(theArc.point[i]);
+    for (int j = 0; j < 2; j++) {
+      aParam = myStorage->getParameter(aPoint.param[j]);
+      anArcParams[i][j] = aParam.val;
+      if (i > 0)
+        anArcParams[i][j] -= anArcParams[0][j];
+    }
+  }
+  double aRad2 = anArcParams[1][0] * anArcParams[1][0] + anArcParams[1][1] * anArcParams[1][1];
+  double aDist2 = anArcParams[2][0] * anArcParams[2][0] + anArcParams[2][1] * anArcParams[2][1];
+  if (fabs(aRad2 - aDist2) < tolerance)
+    return; // nothing to update (last point already on the arc)
+  if (aDist2 < tolerance)
+    return; // unable to update
+  double aCoeff = sqrt(aRad2 / aDist2);
+  anArcParams[2][0] *= aCoeff;
+  anArcParams[2][1] *= aCoeff;
+
+  // Update last point
+  aPoint = myStorage->getEntity(theArc.point[2]);
+  for (int i = 0; i < 2; i++) {
+    aParam = Slvs_MakeParam(aPoint.param[i], myGroup->getId(),
+        anArcParams[0][i] + anArcParams[2][i]);
+    myStorage->updateParameter(aParam);
+  }
+}
+
 void SketchSolver_ConstraintMirror::adjustConstraint()
 {
-  // Search mirror between middle points on the arcs and recompute their coordinates
-  std::list<Slvs_Constraint> aPonCirc = myStorage->getConstraintsByType(SLVS_C_PT_ON_CIRCLE);
-  if (aPonCirc.empty())
-    return;
-
   AttributeRefAttrPtr aMirLineAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!aMirLineAttr || !aMirLineAttr->isInitialized() || !aMirLineAttr->isObject()) {
@@ -353,6 +376,7 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     return;
   Slvs_Entity aMirrorLine = myStorage->getEntity(aMirLineIter->second);
 
+  Slvs_Constraint aMirror;
   double aStartEnd[4];
   for (int i = 0; i < 2; i++) {
     Slvs_Entity aPoint = myStorage->getEntity(aMirrorLine.point[i]);
@@ -360,7 +384,10 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
       aStartEnd[2*i+j] = myStorage->getParameter(aPoint.param[j]).val;
   }
 
-  Slvs_Constraint aMirror;
+  // Search mirror between middle points on the arcs and recompute their coordinates
+  std::map<Slvs_hEntity, Slvs_hEntity> aPointsOnCircles;
+  std::list<Slvs_Constraint> aMirrorPonCirc;
+  std::list<Slvs_Constraint> aPonCirc = myStorage->getConstraintsByType(SLVS_C_PT_ON_CIRCLE);
   std::vector<Slvs_hConstraint>::iterator aConstrIter = mySlvsConstraints.begin();
   for (; aConstrIter != mySlvsConstraints.end(); aConstrIter++) {
     aMirror = myStorage->getConstraint(*aConstrIter);
@@ -378,24 +405,45 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     }
     if (aPonCircA.h == SLVS_E_UNKNOWN || aPonCircB.h == SLVS_E_UNKNOWN)
       continue;
+    aMirrorPonCirc.push_back(aMirror);
+    // Store point IDs to avoid their recalculation twice
+    aPointsOnCircles[aPonCircA.ptA] = aPonCircA.entityA;
+    aPointsOnCircles[aPonCircB.ptA] = aPonCircB.entityA;
+  }
 
-    bool aNeedToResolve = myStorage->isNeedToResolve();
+  // Recalculate positions of mirroring points
+  std::list<Slvs_Constraint> aMirrorList = myStorage->getConstraintsByType(SLVS_C_SYMMETRIC_LINE);
+  std::list<Slvs_Constraint>::iterator aMirIter = aMirrorList.begin();
+  for (; aMirIter != aMirrorList.end(); aMirIter++) {
+    if (aPointsOnCircles.find(aMirIter->ptA) != aPointsOnCircles.end())
+      continue; // Avoid mirroring points on circles
+    Slvs_Entity aBase = myStorage->getEntity(aMirIter->ptA);
+    Slvs_Entity aMirror = myStorage->getEntity(aMirIter->ptB);
+    makeMirrorEntity(aBase, aMirror, aStartEnd);
+  }
+
+  bool aNeedToResolve = myStorage->isNeedToResolve();
+  for (aMirIter = aMirrorPonCirc.begin(); aMirIter != aMirrorPonCirc.end(); aMirIter++) {
     // Calculate middle point for base arc and mirrored point on mirror arc
-    Slvs_Entity aBaseArc = myStorage->getEntity(aPonCircA.entityA);
-    Slvs_Entity aBasePoint = myStorage->getEntity(aPonCircA.ptA);
+    Slvs_Entity aBaseArc = myStorage->getEntity(aPointsOnCircles[aMirIter->ptA]);
+    Slvs_Entity aBasePoint = myStorage->getEntity(aMirIter->ptA);
     Slvs_Param aParamX = myStorage->getParameter(aBasePoint.param[0]);
     Slvs_Param aParamY = myStorage->getParameter(aBasePoint.param[1]);
     calculateMiddlePoint(aBaseArc, 0.5, aParamX.val, aParamY.val);
     myStorage->updateParameter(aParamX);
     myStorage->updateParameter(aParamY);
-    Slvs_Entity aMirrorArc = myStorage->getEntity(aPonCircB.entityA);
-    Slvs_Entity aMirrorPoint = myStorage->getEntity(aPonCircB.ptA);
+    Slvs_Entity aMirrorArc = myStorage->getEntity(aPointsOnCircles[aMirIter->ptB]);
+    Slvs_Entity aMirrorPoint = myStorage->getEntity(aMirIter->ptB);
     aParamX = myStorage->getParameter(aMirrorPoint.param[0]);
     aParamY = myStorage->getParameter(aMirrorPoint.param[1]);
     calculateMiddlePoint(aMirrorArc, 0.5, aParamX.val, aParamY.val);
     myStorage->updateParameter(aParamX);
     myStorage->updateParameter(aParamY);
-    // To avoid looped recalculations of sketch
-    myStorage->setNeedToResolve(aNeedToResolve);
+    // make centers of arcs symmetric
+    aBasePoint = myStorage->getEntity(aBaseArc.point[0]);
+    aMirrorPoint = myStorage->getEntity(aMirrorArc.point[0]);
+    makeMirrorEntity(aBasePoint, aMirrorPoint, aStartEnd);
   }
+  // Restore previous value to avoid looped recalculations of sketch
+  myStorage->setNeedToResolve(aNeedToResolve);
 }
