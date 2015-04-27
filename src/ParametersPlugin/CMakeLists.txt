@@ -1,5 +1,6 @@
 INCLUDE(Common)
 INCLUDE(FindPython)
+INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     ParametersPlugin.h
@@ -45,3 +46,6 @@ TARGET_LINK_LIBRARIES(ParametersPlugin ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS ParametersPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
+
+ADD_UNIT_TESTS(TestParameterCreation.py
+              )
