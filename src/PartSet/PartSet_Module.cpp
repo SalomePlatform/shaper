@@ -560,14 +560,29 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     return;
 
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-  Handle(V3d_View) aView = aViewer->activeView();
+  //Handle(V3d_View) aView = aViewer->activeView();
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
 
-  double aLen = aView->Convert(15);
+  Handle(V3d_Viewer) aV3dViewer = aContext->CurrentViewer();
+  Handle(V3d_View) aView;
+  double aScale = 0;
+  for (aV3dViewer->InitDefinedViews(); 
+       aV3dViewer->MoreDefinedViews(); 
+       aV3dViewer->NextDefinedViews()) {
+    Handle(V3d_View) aV = aV3dViewer->DefinedView();
+    double aS = aV->Scale();
+    if (aS > aScale) {
+      aScale = aS;
+      aView = aV;
+    }
+  }
+  if (aView.IsNull())
+    return;
+  double aLen = aView->Convert(20);
 
   SketcherPrs_Tools::setArrowSize(aLen);
   bool isModified = false;

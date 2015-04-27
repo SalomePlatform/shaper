@@ -280,8 +280,7 @@
         <integervalue id="MultiTranslationCopies"
             label="Number of copies"
             tooltip="Number of copies" 
-            default="1" min="1"
-            obligatory="0">
+            default="1" min="1">
           <validator id="GeomValidators_Positive"/>
         </integervalue>
       </feature>
@@ -307,8 +306,7 @@
         <integervalue id="MultiRotationCopies"
             label="Number of copies"
             tooltip="Number of copies" 
-            default="1" min="1"
-            obligatory="0">
+            default="1" min="1">
           <validator id="GeomValidators_Positive"/>
         </integervalue>
       </feature>
