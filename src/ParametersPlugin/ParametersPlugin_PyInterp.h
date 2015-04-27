@@ -29,6 +29,7 @@ class PARAMETERSPLUGIN_EXPORT ParametersPlugin_PyInterp : public PyInterp_Interp
   std::string errorMessage();
   // Overrides PyInterp_Interp
   virtual bool initContext();
+  virtual void closeContext();
 };
 
 #endif /* PARAMETERSPLUGIN_PYINTERP_H_ */

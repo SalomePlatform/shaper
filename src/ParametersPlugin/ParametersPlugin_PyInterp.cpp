@@ -136,7 +136,14 @@ bool ParametersPlugin_PyInterp::initContext()
   }
   _global_context = PyModule_GetDict(m);          // get interpreter global variable context
   Py_INCREF(_global_context);
-  _local_context = _global_context;
+  _local_context = PyDict_New();
+  Py_INCREF(_local_context);
 
   return PyRun_SimpleString("from math import *") == 0;
+}
+
+void ParametersPlugin_PyInterp::closeContext()
+{
+  Py_XDECREF(_local_context);
+  PyInterp_Interp::closeContext();
 }

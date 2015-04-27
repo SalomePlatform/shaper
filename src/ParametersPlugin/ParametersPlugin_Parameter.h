@@ -20,8 +20,8 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   /// Extrusion kind
   inline static const std::string& ID()
   {
-    static const std::string MY_EXTRUSION_ID("Parameter");
-    return MY_EXTRUSION_ID;
+    static const std::string MY_PARAMETER_ID("Parameter");
+    return MY_PARAMETER_ID;
   }
   /// attribute name of references sketch entities list, it should contain a sketch result or
   /// a pair a sketch result to sketch face
