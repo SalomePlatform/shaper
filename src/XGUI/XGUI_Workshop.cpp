@@ -11,6 +11,7 @@
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
+#include "XGUI_ColorDialog.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ContextMenuMgr.h"
@@ -78,10 +79,6 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QAction>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QHBoxLayout>
-#include <QtxColorButton.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -1525,21 +1522,64 @@ bool XGUI_Workshop::canChangeColor() const
   aTypes.insert(ModelAPI_ResultGroup::group());
   aTypes.insert(ModelAPI_ResultConstruction::group());
   aTypes.insert(ModelAPI_ResultBody::group());
+  aTypes.insert(ModelAPI_ResultPart::group());
+
   return hasResults(aObjects, aTypes);
 }
 
+void setColor(ResultPtr theResult, std::vector<int>& theColor)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+  if (aColorAttr.get() != NULL) {
+    if (!aColorAttr->size()) {
+      aColorAttr->setSize(3);
+    }
+    aColorAttr->setValue(0, theColor[0]);
+    aColorAttr->setValue(1, theColor[1]);
+    aColorAttr->setValue(2, theColor[2]);
+  }
+}
+
 //**************************************************************
-#include <QButtonGroup>
-#include <QRadioButton>
-#include <QLabel>
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
+  AttributeIntArrayPtr aColorAttr;
+  // 1. find the current color of the object. This is a color of AIS presentation
+  // The objects are iterated until a first valid color is found 
   std::vector<int> aColor;
   foreach(ObjectPtr anObject, theObjects) {
-
-    AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
-    aColor.resize(3);
-    anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+    if (anObject->groupName() == ModelAPI_ResultPart::group()) {
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anObject);
+      DocumentPtr aPartDoc = aPart->partDoc();
+      // the document should be checked on null, because in opened document if the part
+      // has not been activated yet, the part document is empty
+      if (!aPartDoc.get()) {
+        emit errorOccurred(QString::fromLatin1("Color can not be changed on a part with an empty document"));
+      }
+      else {
+        if (aPartDoc->size(ModelAPI_ResultBody::group()) > 0) {
+          ObjectPtr aObject = aPartDoc->object(ModelAPI_ResultBody::group(), 0);
+          ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
+          if (aBody.get()) {
+            std::string aSection, aName, aDefault;
+            aBody->colorConfigInfo(aSection, aName, aDefault);
+            if (!aSection.empty() && !aName.empty()) {
+              aColor = Config_PropManager::color(aSection, aName, aDefault);
+            }
+          }
+        }
+      }
+    }
+    else {
+      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+      if (anAISObj.get()) {
+        aColor.resize(3);
+        anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+      }
+    }
     if (!aColor.empty())
       break;
   }
@@ -1547,69 +1587,44 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     return;
 
   // 2. show the dialog to change the value
-  QDialog* aDlg = new QDialog();
-  aDlg->setWindowTitle("Color");
-  QGridLayout* aLay = new QGridLayout(aDlg);
-
-  QRadioButton* aRandomChoiceBtn = new QRadioButton(aDlg);
-  QRadioButton* aColorChoiceBtn = new QRadioButton(aDlg);
-  aColorChoiceBtn->setChecked(true);
-  QButtonGroup* aGroup = new QButtonGroup(aDlg);
-  aGroup->setExclusive(true);
-  aGroup->addButton(aColorChoiceBtn);
-  aGroup->addButton(aRandomChoiceBtn);
-
-  aLay->addWidget(aColorChoiceBtn, 0, 0);
-  aLay->addWidget(aRandomChoiceBtn, 1, 0);
-
-  QtxColorButton* aColorBtn = new QtxColorButton(aDlg);
-  aColorBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  aLay->addWidget(aColorBtn, 0, 1);
-  aColorBtn->setColor(QColor(aColor[0], aColor[1], aColor[2]));
-
-  QLabel* aRandomLabel = new QLabel("Random", aDlg);
-  aLay->addWidget(aRandomLabel, 1, 1);
-
-  QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                                                    Qt::Horizontal, aDlg);
-  connect(aButtons, SIGNAL(accepted()), aDlg, SLOT(accept()));
-  connect(aButtons, SIGNAL(rejected()), aDlg, SLOT(reject()));
-  aLay->addWidget(aButtons, 2, 0, 1, 2);
-
+  XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(mainWindow());
+  aDlg->setColor(aColor);
   aDlg->move(QCursor::pos());
   bool isDone = aDlg->exec() == QDialog::Accepted;
   if (!isDone)
     return;
 
-  QColor aColorResult = aColorBtn->color();
-  int aRedResult = aColorResult.red(),
-      aGreenResult = aColorResult.green(),
-      aBlueResult = aColorResult.blue();
-
-  if (aRedResult == aColor[0] && aGreenResult == aColor[1] && aBlueResult == aColor[2])
-    return;
+  bool isRandomColor = aDlg->isRandomColor();
 
   // 3. abort the previous operation and start a new one
   SessionPtr aMgr = ModelAPI_Session::get();
   bool aWasOperation = aMgr->isOperation(); // keep this value
   if (!aWasOperation) {
-    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+    QString aDescription = contextMenuMgr()->action("COLOR_CMD")->text();
     aMgr->startOperation(aDescription.toStdString());
   }
 
   // 4. set the value to all results
-  AttributeIntArrayPtr aColorAttr;
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
-      if (aColorAttr.get() != NULL) {
-        if (!aColorAttr->size()) {
-          aColorAttr->setSize(3);
+      if (aResult->groupName() == ModelAPI_ResultPart::group()) {
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aResult);
+        DocumentPtr aPartDoc = aPart->partDoc();
+        // the document should be checked on null, because in opened document if the part
+        // has not been activated yet, the part document is empty
+        if (aPartDoc.get()) {
+          for (int i = 0; i < aPartDoc->size(ModelAPI_ResultBody::group()); i++) {
+            ObjectPtr aObject = aPartDoc->object(ModelAPI_ResultBody::group(), i);
+            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
+            std::vector<int> aColorResult = aDlg->getColor();
+            setColor(aBody, aColorResult);
+          }
         }
-        aColorAttr->setValue(0, aRedResult);
-        aColorAttr->setValue(1, aGreenResult);
-        aColorAttr->setValue(2, aBlueResult);
+      }
+      else {
+        std::vector<int> aColorResult = aDlg->getColor();
+        setColor(aResult, aColorResult);
       }
     }
   }

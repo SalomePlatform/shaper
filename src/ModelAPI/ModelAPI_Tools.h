@@ -11,6 +11,8 @@
 #include <ModelAPI_Result.h>
 #include <GeomAPI_Shape.h>
 
+#include <vector>
+
 namespace ModelAPI_Tools {
 /// Returns shape from the given Result object
 MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult);
@@ -21,6 +23,12 @@ MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
  * and returns true.
  */
 MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue);
+
+/*!
+ * Returns the values of the next random color. The values are in range [0, 255]
+ * \param theValues a container of component of RGB value: red, green, blue
+ */
+MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues);
 
 }
 

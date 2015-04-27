@@ -12,6 +12,7 @@
 #include <ModelAPI_ResultParameter.h>
 
 #include <list>
+#include <map>
 
 namespace ModelAPI_Tools {
 
@@ -55,6 +56,41 @@ bool findVariable(const std::string& theName, double& outValue)
     return true;
   }
   return false;
+}
+
+static std::map<int, std::vector<int> > myColorMap;
+
+std::vector<int> vectorOfValues(const int theRed, const int theGreen, const int theBlue)
+{
+  std::vector<int> aValues;
+  aValues.push_back(theRed);
+  aValues.push_back(theGreen);
+  aValues.push_back(theBlue);
+
+  return aValues;
+}
+
+void fillColorMap()
+{
+  if (!myColorMap.empty())
+    return;
+  myColorMap[0] = vectorOfValues(127, 51, 0);
+  myColorMap[1] = vectorOfValues(0, 38, 225);
+  myColorMap[2] = vectorOfValues(255, 0, 0);
+}
+
+void findRandomColor(std::vector<int>& theValues)
+{
+  theValues.clear();
+  if (myColorMap.empty()) {
+    fillColorMap();
+  }
+
+  int aSize = myColorMap.size();
+  int anIndex = rand() % aSize;
+  if (myColorMap.find(anIndex) != myColorMap.end()) {
+    theValues = myColorMap.at(anIndex);
+  }
 }
 
 } // namespace ModelAPI_Tools

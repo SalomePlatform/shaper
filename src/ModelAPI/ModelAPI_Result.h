@@ -23,7 +23,9 @@ class ModelAPI_Result : public ModelAPI_Object
   bool myIsConcealed; ///< the result is concealed from the data tree (referenced by other objects)
  public:
 
-  /// Reference to the color of the result
+  /// Reference to the color of the result.
+  /// The integer array is used. It contains tree values for red green and blue values. The values are in
+  /// [0, 255] range
   inline static const std::string& COLOR_ID()
   {
     static const std::string MY_COLOR_ID("Color");
