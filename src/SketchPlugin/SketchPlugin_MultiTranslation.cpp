@@ -51,6 +51,11 @@ void SketchPlugin_MultiTranslation::execute()
       attribute(END_POINT_ID()));
   if (!aStart || !aEnd || !aStart->isInitialized() || !aEnd->isInitialized())
     return;
+
+  // make a visible points
+  SketchPlugin_Sketch::createPoint2DResult(this, sketch(), START_POINT_ID(), 0);
+  SketchPlugin_Sketch::createPoint2DResult(this, sketch(), END_POINT_ID(), 1);
+
   std::shared_ptr<GeomAPI_XY> aShiftVec(new GeomAPI_XY(aEnd->x() - aStart->x(), aEnd->y() - aStart->y()));
 
   // Wait all objects being created, then send update events
@@ -208,3 +213,4 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
   }
   return ObjectPtr();
 }
+

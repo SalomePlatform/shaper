@@ -194,6 +194,13 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
+  /// \brief Create a result for the point in the attribute if the attribute is initialized
+  /// \param theAttributeID an attribute string
+  /// \param theIndex an index of the result
+  static void createPoint2DResult(ModelAPI_Feature* theFeature,
+                                  SketchPlugin_Sketch* theSketch,
+                                  const std::string& theAttributeID, const int theIndex);
 };
 
 #endif

@@ -6,6 +6,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	XGUI.h
 	XGUI_ActionsMgr.h
+	XGUI_ColorDialog.h
 	XGUI_ContextMenuMgr.h
 	XGUI_CustomPrs.h
 	XGUI_DataTreeModel.h
@@ -33,6 +34,7 @@ SET(PROJECT_AUTOMOC
 
 SET(PROJECT_SOURCES
 	XGUI_ActionsMgr.cpp
+	XGUI_ColorDialog.cpp
 	XGUI_ContextMenuMgr.cpp
 	XGUI_CustomPrs.cpp
 	XGUI_Displayer.cpp

@@ -53,6 +53,9 @@ void SketchPlugin_MultiRotation::execute()
       attribute(CENTER_ID()));
   if (!aCenter || !aCenter->isInitialized())
     return;
+  // make a visible points
+  SketchPlugin_Sketch::createPoint2DResult(this, sketch(), CENTER_ID(), 0);
+
   double anAngle = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       attribute(ANGLE_ID()))->value();
   // Convert angle to radians

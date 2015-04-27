@@ -38,18 +38,46 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
     return MY_GROUP_LIST_ID;
   }
 
-  /// attribute name of extrusion size
-  inline static const std::string& SIZE_ID()
+  /// attribute name of an object to which the extrusion grows
+  inline static const std::string& AXIS_OBJECT_ID()
   {
-    static const std::string MY_SIZE_ID("size");
-    return MY_SIZE_ID;
+    static const std::string MY_TO_OBJECT_ID("axis_object");
+    return MY_TO_OBJECT_ID;
+  }
+
+  /// attribute name of extrusion size
+  inline static const std::string& TO_SIZE_ID()
+  {
+    static const std::string MY_TO_SIZE_ID("to_size");
+    return MY_TO_SIZE_ID;
+  }
+
+  /// attribute name of extrusion size
+  inline static const std::string& FROM_SIZE_ID()
+  {
+    static const std::string MY_FROM_SIZE_ID("from_size");
+    return MY_FROM_SIZE_ID;
+  }
+
+  /// attribute name of an object to which the extrusion grows
+  inline static const std::string& TO_OBJECT_ID()
+  {
+    static const std::string MY_TO_OBJECT_ID("to_object");
+    return MY_TO_OBJECT_ID;
+  }
+
+  /// attribute name of tool object
+  inline static const std::string& FROM_OBJECT_ID()
+  {
+    static const std::string MY_FROM_OBJECT_ID("from_object");
+    return MY_FROM_OBJECT_ID;
   }
   /// attribute name of reverse direction
-  inline static const std::string& REVERSE_ID()
-  {
-    static const std::string MY_REVERSE_ID("reverse");
-    return MY_REVERSE_ID;
-  }
+ inline static const std::string& REVERSE_ID()
+ {
+   static const std::string MY_REVERSE_ID("reverse");
+   return MY_REVERSE_ID;
+ }
 
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()

@@ -51,12 +51,7 @@ void SketchPlugin_Circle::execute()
       std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
       //std::cout<<"Execute circle "<<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
       // make a visible point
-      std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-      std::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = document()->createConstruction(
-          data(), 0);
-      aConstr1->setShape(aCenterPointShape);
-      aConstr1->setIsInHistory(false);
-      setResult(aConstr1, 0);
+      SketchPlugin_Sketch::createPoint2DResult(this, sketch(), CENTER_ID(), 0);
 
       // make a visible circle
       std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(

@@ -14,6 +14,8 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeReference.h>
 #include <GeomAlgoAPI_Extrusion.h>
 
 using namespace std;
@@ -33,8 +35,15 @@ void FeaturesPlugin_Extrusion::initAttributes()
     FeaturesPlugin_Extrusion::LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // extrusion works with faces always
   aSelection->setSelectionType("FACE");
-  data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+
   data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+  //data()->addAttribute(FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+
+  //data()->addAttribute(FeaturesPlugin_Extrusion::AXIS_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
+
+  //data()->addAttribute(FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
+  //data()->addAttribute(FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
 }
 
 void FeaturesPlugin_Extrusion::execute()
@@ -52,7 +61,7 @@ void FeaturesPlugin_Extrusion::execute()
       setError(aContextError);
       break;
     }
-    double aSize = real(FeaturesPlugin_Extrusion::SIZE_ID())->value();
+    double aSize = real(FeaturesPlugin_Extrusion::TO_SIZE_ID())->value();
     if (boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
       aSize = -aSize;
 
