@@ -4,6 +4,8 @@
 
 #include <GeomAPI_XY.h>
 
+#include <math.h>
+
 
 void SketchSolver_ConstraintDistance::process()
 {
