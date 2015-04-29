@@ -18,8 +18,7 @@
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_FilterFactory.h>
-#include <GeomValidators_Edge.h>
-#include <GeomValidators_EdgeOrVertex.h>
+#include <GeomValidators_ShapeType.h>
 #include <GeomValidators_Face.h>
 #include <GeomValidators_ConstructionComposite.h>
 
@@ -138,9 +137,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
 
-  aFactory->registerValidator("GeomValidators_Edge", new GeomValidators_Edge);
-  aFactory->registerValidator("GeomValidators_EdgeOrVertex",
-                              new GeomValidators_EdgeOrVertex);
+  aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
 
   aFactory->registerValidator("GeomValidators_ConstructionComposite",
