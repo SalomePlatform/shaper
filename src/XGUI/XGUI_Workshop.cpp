@@ -675,11 +675,20 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   //myDisplayer->activateObjects(aModes);
   myModule->operationStopped(theOperation);
 
-  if (myOperationMgr->operationsCount() == 0) {
+  // if the operation is nested, do not deactivate objects
+  //if (myOperationMgr->operationsCount() == 0) {
     // Activate selection mode for all objects
-    QIntList aModes;
-    myDisplayer->activateObjects(aModes);
-  }
+  QIntList aModes;
+  // TODO: check on OCC_6.9.0
+  // the module current active modes should not be deactivated in order to save the objects selected
+  // the deactivate object in the mode of selection leads to the object is deselected in the viewer.
+  // But, in OCC_6.8.0 this deselection does not happened automatically. It is necessary to call
+  // ClearOutdatedSelection, but this method has an error in the realization, which should be fixed in
+  // the OCC_6.9.0 release. Moreother, it is possible that ClearOutdatedSelection will be called inside
+  // Deactivate method of AIS_InteractiveContext. In this case, we need not call it.
+  module()->activeSelectionModes(aModes);
+  myDisplayer->activateObjects(aModes);
+  //}
 }
 
 

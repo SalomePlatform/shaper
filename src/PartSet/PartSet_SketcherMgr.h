@@ -162,6 +162,10 @@ public:
   /// Returns list of strings which contains id's of constraints operations
   static const QStringList& constraintsIdList();
 
+  /// Returns a list of modes, where the AIS objects should be activated
+  /// \param theModes a list of modes
+  static void sketchSelectionModes(QIntList& theModes);
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);

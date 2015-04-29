@@ -285,6 +285,13 @@ bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*
   return myMenuMgr->addViewerItems(theMenu, theStdActions);
 }
 
+void PartSet_Module::activeSelectionModes(QIntList& theModes)
+{
+  theModes.clear();
+  if (mySketchMgr->activeSketch().get())
+    PartSet_SketcherMgr::sketchSelectionModes(theModes);
+}
+
 bool PartSet_Module::isMouseOverWindow()
 {
   return mySketchMgr->isMouseOverWindow();
