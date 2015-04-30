@@ -120,6 +120,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };
 
+  /// Returns a list of modes, where the AIS objects should be activated
+  /// \param theModes a list of modes
+  virtual void activeSelectionModes(QIntList& theModes) {};
+
 public slots:
   /// Called on call of command corresponded to a feature
   void onFeatureTriggered();

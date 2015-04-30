@@ -23,7 +23,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Session.h>
 
-#include <GeomValidators_Edge.h>
+#include <GeomValidators_ShapeType.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -48,20 +48,20 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
     // 1. check whether the references object is a linear
     ObjectPtr anObject = aRefAttr->object();
 
-    const ModelAPI_AttributeValidator* anEdgeValidator = 
-      dynamic_cast<const GeomValidators_Edge*>(aFactory->validator("GeomValidators_Edge"));
+    const ModelAPI_AttributeValidator* aShapeValidator = 
+      dynamic_cast<const GeomValidators_ShapeType*>(aFactory->validator("GeomValidators_ShapeType"));
     std::list<std::string> anArguments;
     anArguments.push_back("circle");
-    bool anEdgeValid = anEdgeValidator->isValid(aRefAttr, anArguments);
+    bool aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments);
     // the circle line is not a valid case
-    if (anEdgeValid)
+    if (aShapeValid)
       return false;
       
     anArguments.clear();
     anArguments.push_back("line");
-    anEdgeValid = anEdgeValidator->isValid(aRefAttr, anArguments);
+    aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments);
     // if the attribute value is not a line, that means it is a vertex. A vertex is always valid
-    if (!anEdgeValid)
+    if (!aShapeValid)
       return true;
 
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());

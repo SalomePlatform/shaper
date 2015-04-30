@@ -35,28 +35,38 @@ void SketchSolver_ConstraintRigid::process()
   double aValue;
   std::vector<Slvs_hEntity> anEntities;
   getAttributes(aValue, anEntities);
-  if (!myErrorMsg.empty() || myFeatureMap.empty())
+  if (!myErrorMsg.empty() || (myFeatureMap.empty() && myAttributeMap.empty()))
     return;
 
-  Slvs_hEntity anEntID = myFeatureMap.begin()->second;
+  Slvs_hEntity anEntID; 
+  if (!myFeatureMap.empty())
+    anEntID = myFeatureMap.begin()->second;
+  else
+    anEntID = myAttributeMap.begin()->second;
   if (myStorage->isEntityFixed(anEntID, true)) {
     myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
     return;
   }
 
-  if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Line::ID()) {
+  std::string aKind;
+  if (!myFeatureMap.empty())
+    aKind = myFeatureMap.begin()->first->getKind();
+  else
+    aKind = myAttributeMap.begin()->first->attributeType();
+
+  if (aKind == SketchPlugin_Line::ID()) {
     Slvs_Entity aLine = myStorage->getEntity(anEntID);
     fixLine(aLine);
   }
-  else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Arc::ID()) {
+  else if (aKind == SketchPlugin_Arc::ID()) {
     Slvs_Entity anArc = myStorage->getEntity(anEntID);
     fixArc(anArc);
   }
-  else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Circle::ID()) {
+  else if (aKind == SketchPlugin_Circle::ID()) {
     Slvs_Entity aCirc = myStorage->getEntity(anEntID);
     fixCircle(aCirc);
   }
-  else if (myFeatureMap.begin()->first->getKind() == SketchPlugin_Point::ID()) {
+  else if (aKind == SketchPlugin_Point::ID() || aKind == GeomDataAPI_Point2D::typeId()) {
     fixPoint(anEntID);
   }
 }

@@ -31,7 +31,10 @@ void ModuleBase_PageGroupBox::placeModelWidget(ModuleBase_ModelWidget* theWidget
 {
   const int kCol = 0;
   const int kRow = myMainLayout->count();
-  myMainLayout->addWidget(theWidget, kRow, kCol, Qt::AlignTop | Qt::AlignLeft);
+  // it seems, that the align on left is not necessary here, but leads to widgets, which are
+  // not extended on full width of the parent page. The case is grouped widgets in
+  // the sketch translation operation
+  myMainLayout->addWidget(theWidget, kRow, kCol, Qt::AlignTop);// | Qt::AlignLeft);
   myMainLayout->setRowStretch(kRow, 0);
 
 }

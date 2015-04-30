@@ -47,6 +47,7 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 //#define DEBUG_ACTIVATE
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
+//#define DEBUG_USE_CLEAR_OUTDATED_SELECTION
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -272,6 +273,10 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
     aContext->Deactivate(anAIS);
+#ifdef DEBUG_USE_CLEAR_OUTDATED_SELECTION
+    aContext->LocalContext()->ClearOutdatedSelection(anAIS, true);
+    updateViewer();
+#endif
   }
 }
 
@@ -388,6 +393,10 @@ void XGUI_Displayer::deactivateObjects()
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
     aContext->Deactivate(anAISIO);
+#ifdef DEBUG_USE_CLEAR_OUTDATED_SELECTION
+    aContext->LocalContext()->ClearOutdatedSelection(anAISIO, true);
+    updateViewer();
+#endif
   }
 }
 
@@ -588,7 +597,7 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
   return aWasEnabled;
 }
 
-void XGUI_Displayer::updateViewer()
+void XGUI_Displayer::updateViewer() const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull() && myEnableUpdateViewer)
@@ -788,6 +797,7 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   aContext->ActivatedModes(theIO, aTColModes);
   TColStd_ListIteratorOfListOfInteger itr( aTColModes );
   QIntList aModesActivatedForIO;
+  //bool isDeactivated = false;
   for (; itr.More(); itr.Next() ) {
     Standard_Integer aMode = itr.Value();
     if (!theModes.contains(aMode)) {
@@ -795,6 +805,7 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
       qDebug(QString("deactivate: %1").arg(aMode).toStdString().c_str());
 #endif
       aContext->Deactivate(theIO, aMode);
+      //isDeactivated = true;
     }
     else {
       aModesActivatedForIO.append(aMode);
@@ -803,6 +814,12 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
 #endif
     }
   }
+#ifdef DEBUG_USE_CLEAR_OUTDATED_SELECTION
+  if (isDeactivated) {
+    aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
+    updateViewer();
+  }
+#endif
   // loading the interactive object allowing the decomposition
   if (aTColModes.IsEmpty())
     aContext->Load(theIO, -1, true);

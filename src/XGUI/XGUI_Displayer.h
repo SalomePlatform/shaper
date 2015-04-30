@@ -126,7 +126,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   bool enableUpdateViewer(const bool isEnabled);
 
   /// Updates the viewer
-  void updateViewer();
+  void updateViewer() const;
 
   /// Searches the interactive object by feature
   /// \param theObject the object or presentable feature
