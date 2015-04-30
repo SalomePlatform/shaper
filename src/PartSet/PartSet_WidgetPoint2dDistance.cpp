@@ -60,14 +60,20 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   if (!aPoint)
     return;
 
-  double aRadius = thePnt->distance(aPoint->pnt());
+  double aValue = computeValue(aPoint->pnt(), thePnt);
   AttributeDoublePtr aReal = aData->real(attributeID());
-  if (aReal && (aReal->value() != aRadius)) {
-    aReal->setValue(aRadius);
+  if (aReal && (aReal->value() != aValue)) {
+    aReal->setValue(aValue);
     
-    ModuleBase_Tools::setSpinValue(mySpinBox, aRadius);
+    ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
     storeValue();
   }
+}
+
+double PartSet_WidgetPoint2dDistance::computeValue(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
+                                                   const std::shared_ptr<GeomAPI_Pnt2d>& theCurrentPnt)
+{
+  return theCurrentPnt->distance(theFirstPnt);
 }
 
 void PartSet_WidgetPoint2dDistance::activateCustom()

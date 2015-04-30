@@ -301,9 +301,12 @@
             id="MultiRotationCenter"
             title="Center of rotation"
             tooltip="Center of rotation"/>
-        <doublevalue id="MultiRotationAngle"
-            label="Angle"
-            tooltip="Rotation angle"/>
+        <point2dangle id="MultiRotationAngle"
+                         first_point="MultiRotationCenter"
+                         label="Angle"
+                         icon=":icons/angle.png"
+                         tooltip="Rotation angle"
+                         default="90"/>
         <integervalue id="MultiRotationCopies"
             label="Number of copies"
             tooltip="Number of copies" 

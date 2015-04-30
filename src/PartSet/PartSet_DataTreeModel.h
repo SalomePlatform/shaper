@@ -1,9 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-#ifndef XGUI_DataTreeModel_H
-#define XGUI_DataTreeModel_H
+#ifndef PartSet_DataTreeModel_H
+#define PartSet_DataTreeModel_H
 
-#include "XGUI.h"
+#include "PartSet.h"
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
@@ -12,16 +12,16 @@
 #include <QAbstractItemModel>
 #include <QColor>
 
-/**\class XGUI_FeaturesModel
+/**\class PartSet_FeaturesModel
  * \ingroup GUI
  * \brief Abstaract class of model object which operates with features data.
  */
-class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
+class PARTSET_EXPORT PartSet_FeaturesModel : public QAbstractItemModel
 {
  public:
    /// Constructor
    /// \param theParent a parent object
-  XGUI_FeaturesModel(QObject* theParent)
+  PartSet_FeaturesModel(QObject* theParent)
       : QAbstractItemModel(theParent),
         myItemsColor(Qt::black)
   {
@@ -60,17 +60,17 @@ class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
   QColor myItemsColor;
 };
 
-/**\class XGUI_PartModel
+/**\class PartSet_PartModel
  * \ingroup GUI
  * \brief Abstaract class of model object which operates with parts data.
  */
-class XGUI_PartModel : public XGUI_FeaturesModel
+class PartSet_PartModel : public PartSet_FeaturesModel
 {
  public:
    /// Constructor
    /// \param theParent a parent object
-  XGUI_PartModel(QObject* theParent)
-      : XGUI_FeaturesModel(theParent)
+  PartSet_PartModel(QObject* theParent)
+      : PartSet_FeaturesModel(theParent)
   {
   }
 

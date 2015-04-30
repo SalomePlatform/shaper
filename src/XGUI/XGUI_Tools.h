@@ -8,7 +8,6 @@
 #include <QRect>
 
 #include <ModelAPI_Feature.h>
-#include <ModuleBase_Definitions.h>
 
 #include <memory>
 
@@ -65,15 +64,6 @@ bool XGUI_EXPORT isModelObject(FeaturePtr theFeature);
  */
 std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
 
-
-/*!
-Check types of objects which are in the given list
-\param theObjects the list of objects
-\param hasResult will be set to true if list contains Result objects
-\param hasFeature will be set to true if list contains Feature objects
-\param hasParameter will be set to true if list contains Parameter objects
-*/
-void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter);
 
 };
 

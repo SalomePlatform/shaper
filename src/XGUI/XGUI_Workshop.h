@@ -156,13 +156,6 @@ Q_OBJECT
   /// \return a desktop instance
   QMainWindow* desktop() const;
 
-  //! Returns icon name according to feature
-  static QIcon featureIcon(const FeaturePtr& theFeature);
-
-  //! Activates or deactivates a part
-  //! If PartPtr is Null pointer then PartSet will be activated
-  void activatePart(std::shared_ptr<ModelAPI_ResultPart> theFeature);
-
   //! Delete features
   void deleteObjects();
 
@@ -293,12 +286,6 @@ signals:
   /// Reaction on command call
   void onFeatureTriggered();
 
-  /// Change active document
-  /// \param theObj a part object. If it is NULL then active document is a main document
-  void changeCurrentDocument(ObjectPtr theObj);
-
-  //void activateLastPart();
-
   /// Close document
   void closeDocument();
 
@@ -332,9 +319,6 @@ signals:
 
   /// Process feature redisplay message
   void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
-
-  /// Process feature delete message
-  void onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& );
 
   /// Display all results
   void displayAllResults();
@@ -435,7 +419,6 @@ private:
   XGUI_ModuleConnector* myModuleConnector;
 
   QString myCurrentDir;
-  static QMap<QString, QString> myIcons;
 
   bool myUpdatePrefs;
 

@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
 	PartSet_WidgetPoint2d.h
+	PartSet_WidgetPoint2dAngle.h
 	PartSet_WidgetEditor.h
 	PartSet_WidgetMultiSelector.h
 	PartSet_WidgetPoint2dDistance.h
@@ -20,6 +21,9 @@ SET(PROJECT_HEADERS
 	PartSet_Filters.h
 	PartSet_SketcherMgr.h
 	PartSet_MenuMgr.h
+    PartSet_DocumentDataModel.h
+    PartSet_PartDataModel.h
+    PartSet_DataTreeModel.h
 )
 
 SET(PROJECT_SOURCES
@@ -31,11 +35,14 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetEditor.cpp
 	PartSet_WidgetMultiSelector.cpp
 	PartSet_WidgetPoint2d.cpp
+	PartSet_WidgetPoint2dAngle.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
 	PartSet_Filters.cpp
 	PartSet_SketcherMgr.cpp
 	PartSet_MenuMgr.cpp
+    PartSet_DocumentDataModel.cpp
+    PartSet_PartDataModel.cpp
 )
 
 SET(PROJECT_RESOURCES 
@@ -85,6 +92,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
                     ${CMAKE_SOURCE_DIR}/src/SketcherPrs
                     ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
+                    ${CMAKE_SOURCE_DIR}/src/PartSetPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomValidators
                     ${CMAKE_SOURCE_DIR}/src/AppElements

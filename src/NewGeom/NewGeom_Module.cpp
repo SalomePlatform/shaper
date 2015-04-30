@@ -506,7 +506,7 @@ void NewGeom_Module::selectionChanged()
 //******************************************************
 void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle)
 {
-  myWorkshop->contextMenuMgr()->addViewerItems(theMenu);
+  myWorkshop->contextMenuMgr()->addViewerMenu(theMenu);
   LightApp_Module::contextMenuPopup(theClient, theMenu, theTitle);
 }
 

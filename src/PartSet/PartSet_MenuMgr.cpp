@@ -28,6 +28,8 @@
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultParameter.h>
 
 #include <QAction>
 #include <QMenu>
@@ -60,11 +62,28 @@ void PartSet_MenuMgr::addAction(const QString& theId, QAction* theAction)
 
 void PartSet_MenuMgr::createActions()
 {
-  QAction* anAction;
+  QAction* aAction;
 
-  anAction = new QAction(tr("Auxiliary"), this);
-  anAction->setCheckable(true);
-  addAction("AUXILIARY_CMD", anAction);
+  aAction = new QAction(tr("Auxiliary"), this);
+  aAction->setCheckable(true);
+  addAction("AUXILIARY_CMD", aAction);
+
+  aAction = new QAction(QIcon(":icons/activate.png"), tr("Activate"), this);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePart(bool)));
+  myActions["ACTIVATE_PART_CMD"] = aAction;
+
+  aAction = new QAction(QIcon(":icons/deactivate.png"), tr("Deactivate"), this);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePartSet(bool)));
+  myActions["DEACTIVATE_PART_CMD"] = aAction;
+
+  // Activate PartSet
+  aAction = new QAction(QIcon(":icons/activate.png"), tr("Activate"), this);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePartSet(bool)));
+  myActions["ACTIVATE_PARTSET_CMD"] = aAction;
+
+  aAction = new QAction(QIcon(":icons/edit.png"), tr("Edit..."), this);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onEdit(bool)));
+  myActions["EDIT_CMD"] = aAction;
 }
 
 
@@ -137,7 +156,7 @@ void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList, std::
 }
 
 
-bool PartSet_MenuMgr::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
+bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {
   ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
   if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
@@ -445,4 +464,36 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
   }
   theValue = anObjects.size() && !isNotAuxiliaryFound;
   return anEnabled;
+}
+
+void PartSet_MenuMgr::onActivatePart(bool)
+{
+  QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
+  if (aObjects.size() > 0) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
+    if (aPart) {
+      aPart->activate();
+    }
+  }
+}
+
+void PartSet_MenuMgr::onActivatePartSet(bool)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->setActiveDocument(aMgr->moduleDocument());
+}
+
+void PartSet_MenuMgr::onEdit(bool)
+{
+  QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
+  if (aFeature == NULL) {
+    ResultParameterPtr aParam = 
+      std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObjects.first());
+    if (aParam.get() != NULL) {
+      aFeature = ModelAPI_Feature::feature(aParam);
+    }
+  }
+  if (aFeature.get() != NULL)
+    myModule->editFeature(aFeature);
 }
