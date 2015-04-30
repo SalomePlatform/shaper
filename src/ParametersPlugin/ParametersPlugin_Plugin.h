@@ -4,6 +4,8 @@
 #define PARAMETERSPLUGIN_PLUGIN_H_
 
 #include <ParametersPlugin.h>
+#include <ParametersPlugin_EvalListener.h>
+
 #include <ModelAPI_Plugin.h>
 #include <ModelAPI_Feature.h>
 
@@ -18,6 +20,8 @@ class PARAMETERSPLUGIN_EXPORT ParametersPlugin_Plugin : public ModelAPI_Plugin
 
  public:
   ParametersPlugin_Plugin();
+
+  std::shared_ptr<ParametersPlugin_EvalListener> myEvalListener;
 };
 
 #endif

@@ -83,12 +83,11 @@ void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
  */
 double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
 {
-  if (!hasVariable(theText))
+  if (!hasVariable(theText)) {
     return ModuleBase_DoubleSpinBox::valueFromText(theText);
-
-  double aValue = 0;
-  findVariable(theText, aValue);
-  return aValue;
+  }
+  // small hack: return length of the string to iniiate valuesChanged signal
+  return theText.length();
 }
 
 QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
@@ -112,21 +111,8 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
     return ModuleBase_DoubleSpinBox::validate(str, pos);
 
   QValidator::State res = QValidator::Invalid;
-
-  // Considering the input text as a variable name
-  // Applying Python identifier syntax:
-  // either a string starting with a letter, or a string starting with
-  // an underscore followed by at least one alphanumeric character
   if (isAcceptVariables()) {
-    QRegExp varNameMask("[_a-zA-Z][a-zA-Z0-9_]*");
-    if (varNameMask.exactMatch(str))
-      res = QValidator::Acceptable;
-
-    if (res == QValidator::Invalid) {
-      varNameMask.setPattern("_");
-      if (varNameMask.exactMatch(str))
-        res = QValidator::Intermediate;
-    }
+    res = QValidator::Acceptable;
   }
   return res;
 }
@@ -176,8 +162,8 @@ bool ModuleBase_ParamSpinBox::hasVariable() const
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  QRegExp varNameMask("([a-z]|[A-Z]|_).*");
-  return varNameMask.exactMatch(theText);
+  QRegExp varNameMask("[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
+  return !varNameMask.exactMatch(theText);
 }
 
 /*!

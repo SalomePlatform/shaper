@@ -10,6 +10,8 @@
 #include "ParametersPlugin.h"
 #include <ModelAPI_Feature.h>
 
+#include <memory>
+
 class ParametersPlugin_PyInterp;
 
 class ParametersPlugin_Parameter : public ModelAPI_Feature
@@ -62,7 +64,7 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   double evaluate(const std::string& theExpression, std::string& theError);
 
  private:
-  ParametersPlugin_PyInterp* myInterp;
+  std::shared_ptr<ParametersPlugin_PyInterp> myInterp;
 };
 
 #endif

@@ -85,7 +85,8 @@ std::list<std::string> ModelAPI_FeatureStateMessage::features() const
 }
 
 
-ModelAPI_DocumentCreatedMessage::ModelAPI_DocumentCreatedMessage(const Events_ID theID, const void* theSender)
+ModelAPI_DocumentCreatedMessage::ModelAPI_DocumentCreatedMessage(const Events_ID theID,
+                                                                 const void* theSender)
 : Events_Message(theID, theSender)
 {
 
@@ -104,4 +105,26 @@ DocumentPtr ModelAPI_DocumentCreatedMessage::document() const
 void ModelAPI_DocumentCreatedMessage::setDocument(DocumentPtr theDocument)
 {
   myDocument = theDocument;
+}
+
+ModelAPI_AttributeEvalMessage::ModelAPI_AttributeEvalMessage(const Events_ID theID,
+                                                                         const void* theSender)
+: Events_Message(theID, theSender)
+{
+
+}
+
+ModelAPI_AttributeEvalMessage::~ModelAPI_AttributeEvalMessage()
+{
+
+}
+
+AttributePtr ModelAPI_AttributeEvalMessage::attribute() const
+{
+  return myAttribute;
+}
+
+void ModelAPI_AttributeEvalMessage::setAttribute(AttributePtr theDocument)
+{
+  myAttribute = theDocument;
 }

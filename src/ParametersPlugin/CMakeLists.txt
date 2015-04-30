@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
     ParametersPlugin_Parameter.h
     ParametersPlugin_PyInterp.h
     ParametersPlugin_Validators.h
+    ParametersPlugin_EvalListener.h
 )
  
 SET(PROJECT_SOURCES
@@ -15,6 +16,7 @@ SET(PROJECT_SOURCES
     ParametersPlugin_Parameter.cpp
     ParametersPlugin_PyInterp.cpp
     ParametersPlugin_Validators.cpp
+    ParametersPlugin_EvalListener.cpp
 )
 
 SET(XML_RESOURCES

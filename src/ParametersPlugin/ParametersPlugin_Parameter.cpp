@@ -17,13 +17,12 @@
 
 ParametersPlugin_Parameter::ParametersPlugin_Parameter()
 {
-  myInterp = new ParametersPlugin_PyInterp();
+  myInterp = std::shared_ptr<ParametersPlugin_PyInterp>(new ParametersPlugin_PyInterp());
   myInterp->initialize();
 }
 
 ParametersPlugin_Parameter::~ParametersPlugin_Parameter()
 {
-  delete myInterp;
 }
 
 void ParametersPlugin_Parameter::initAttributes()

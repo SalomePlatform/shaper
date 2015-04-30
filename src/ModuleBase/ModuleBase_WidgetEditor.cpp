@@ -62,7 +62,7 @@ void editedValue(double& outValue, QString& outText)
   double aValue = outText.toDouble(&isDouble);
   if (isDouble) {
     outValue = aValue;
-    outText = ""; // return empty string, if it's can be converted to a double
+  //  outText = ""; // return empty string, if it's can be converted to a double
   }
   aPopup->deleteLater();
 }

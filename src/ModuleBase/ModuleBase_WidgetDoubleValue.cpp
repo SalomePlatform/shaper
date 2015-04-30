@@ -4,27 +4,27 @@
 // Created:     04 June 2014
 // Author:      Vitaly Smetannikov
 
-#include <ModuleBase_WidgetDoubleValue.h>
-#include <ModuleBase_ParamSpinBox.h>
-#include <ModuleBase_Tools.h>
-
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeString.h>
-#include <ModelAPI_Data.h>
-
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
-#include <Events_Loop.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 
-#include <QWidget>
+#include <ModuleBase_ParamSpinBox.h>
+#include <ModuleBase_Tools.h>
+#include <ModuleBase_WidgetDoubleValue.h>
+
 #include <QFormLayout>
 #include <QLabel>
-#include <QEvent>
-#include <QTimer>
+#include <QList>
+#include <QObject>
+#include <QPixmap>
+#include <QString>
 
-#include <math.h>
+#include <cfloat>
+#include <xstring>
 
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623158e+308 
@@ -87,7 +87,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   mySpinBox->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
-  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesChanged()));
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
@@ -116,14 +116,19 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
-  aReal->setValue(mySpinBox->value());
-  std::string aTextRepr = aReal->text();
-  if (mySpinBox->hasVariable()) {
-    aTextRepr = mySpinBox->text().toStdString();
+  if (!mySpinBox->hasVariable()) {
+    aReal->setValue(mySpinBox->value());
   } else {
-    aTextRepr = "";
+    // Here is a text of a real value or an expression.
+    std::string aText = mySpinBox->text().toStdString();
+    aReal->setText(aText);
+    // Send it to evaluator to convert into the double and store in the attribute
+    static Events_ID anId = ModelAPI_AttributeEvalMessage::eventId();
+    std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
+      std::shared_ptr<ModelAPI_AttributeEvalMessage>(new ModelAPI_AttributeEvalMessage(anId, this));
+    aMessage->setAttribute(aData->attribute(attributeID()));
+    Events_Loop::loop()->send(aMessage);
   }
-  aReal->setText(aTextRepr);
   updateObject(myFeature);
   return true;
 }
