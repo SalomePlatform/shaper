@@ -111,6 +111,10 @@ public:
   /// \return true if items are added and there is no necessity to provide standard menu
   virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
 
+  /// Returns a list of modes, where the AIS objects should be activated
+  /// \param theModes a list of modes
+  virtual void activeSelectionModes(QIntList& theModes);
+
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
   bool isMouseOverWindow();

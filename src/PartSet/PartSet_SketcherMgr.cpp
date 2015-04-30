@@ -628,6 +628,16 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
   return aIds;
 }
 
+void PartSet_SketcherMgr::sketchSelectionModes(QIntList& theModes)
+{
+  theModes.clear();
+
+  theModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
+  theModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
+  theModes.append(SketcherPrs_Tools::Sel_Constraint);
+  theModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
+  theModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
+}
 
 bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)
 {
@@ -1079,13 +1089,8 @@ void PartSet_SketcherMgr::activateObjectsInSketchMode(const bool isActive)
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   QIntList aModes;
-  if (isActive) {
-    aModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
-    aModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
-    aModes.append(SketcherPrs_Tools::Sel_Constraint);
-    aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
-    aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
-  }
+  if (isActive)
+    sketchSelectionModes(aModes);
   aDisplayer->activateObjects(aModes);
 }
 

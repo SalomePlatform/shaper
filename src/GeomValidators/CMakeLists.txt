@@ -5,19 +5,17 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
     GeomValidators.h
     GeomValidators_ConstructionComposite.h
-    GeomValidators_Edge.h
-    GeomValidators_EdgeOrVertex.h
     GeomValidators_Face.h
     GeomValidators_Positive.h
+    GeomValidators_ShapeType.h
     GeomValidators_Tools.h
 )
 
 SET(PROJECT_SOURCES
     GeomValidators_ConstructionComposite.cpp
-    GeomValidators_Edge.cpp
-    GeomValidators_EdgeOrVertex.cpp
     GeomValidators_Face.cpp
     GeomValidators_Positive.cpp
+    GeomValidators_ShapeType.cpp
     GeomValidators_Tools.cpp
 )
 

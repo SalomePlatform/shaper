@@ -13,6 +13,8 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_PropertyPanel.h"
 
+#include <ModuleBase_IModule.h>
+
 #include <AIS_Shape.hxx>
 
 
@@ -83,6 +85,14 @@ void XGUI_ModuleConnector::deactivateSubShapesSelection()
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   // Clear selection modes
   QIntList aModes;
+  // TODO: check on OCC6.9.0
+  // the module current active modes should not be deactivated in order to save the objects selected
+  // the deactivate object in the mode of selection leads to the object is deselected in the viewer.
+  // But, in OCC6.8.0 this deselection does not happened automatically. It is necessary to call
+  // ClearOutdatedSelection, but this method has an error in the realization, which should be fixed in
+  // the OCC6.9.0 release. Moreother, it is possible that ClearOutdatedSelection will be called inside
+  // Deactivate method of AIS_InteractiveContext. In this case, we need not call it.
+  module()->activeSelectionModes(aModes);
   aDisp->activateObjects(aModes);
   // The document limitation selection has to be only during operation
   //aDisp->removeSelectionFilter(myDocumentShapeFilter);

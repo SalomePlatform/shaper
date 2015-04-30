@@ -23,9 +23,8 @@
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Tools.h>
+#include <GeomValidators_ShapeType.h>
 
-#include <GeomValidators_Edge.h>
-#include <GeomValidators_EdgeOrVertex.h>
 #include <GeomValidators_Face.h>
 #include <GeomValidators_ConstructionComposite.h>
 
@@ -152,9 +151,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
 
-  aFactory->registerValidator("GeomValidators_Edge", new GeomValidators_Edge);
-  aFactory->registerValidator("GeomValidators_EdgeOrVertex",
-                              new GeomValidators_EdgeOrVertex);
+  aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
 
   aFactory->registerValidator("GeomValidators_ConstructionComposite",
@@ -300,6 +297,13 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 bool PartSet_Module::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {
   return myMenuMgr->addViewerMenu(theMenu, theStdActions);
+}
+
+void PartSet_Module::activeSelectionModes(QIntList& theModes)
+{
+  theModes.clear();
+  if (mySketchMgr->activeSketch().get())
+    PartSet_SketcherMgr::sketchSelectionModes(theModes);
 }
 
 bool PartSet_Module::isMouseOverWindow()

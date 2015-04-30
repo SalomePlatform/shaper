@@ -19,7 +19,7 @@ class PartSet_ExternalObjectsMgr;
 /**
 * \ingroup Modules
 * Customosation of ModuleBase_WidgetShapeSelector in order to provide 
-* working with sketch specific objects.
+* working with sketch specific objects and external objects.
 */
 class PARTSET_EXPORT PartSet_WidgetShapeSelector: public ModuleBase_WidgetShapeSelector
 {
@@ -54,6 +54,12 @@ protected:
   /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
   void restoreAttributeValue(const bool theValid);
+
+  /// Found the sketch point attribute by the shape and set it in the feature attribute
+  /// otherwise set the selected object
+  /// \param theSelectedObject an object
+  /// \param theShape a selected shape, which is used in the selection attribute
+  void setPointAttribute(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
 protected:
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;
