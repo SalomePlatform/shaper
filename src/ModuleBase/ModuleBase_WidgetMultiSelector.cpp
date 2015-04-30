@@ -13,6 +13,7 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_Definitions.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -107,6 +108,23 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 
   myIsActive = true;
   activateShapeSelection();
+
+  QObjectPtrList anObjects;
+  // Restore selection in the viewer by the attribute selection list
+  if(myFeature) {
+    DataPtr aData = myFeature->data();
+    AttributeSelectionListPtr aListAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+    if (aListAttr) {
+      for (int i = 0; i < aListAttr->size(); i++) {
+        AttributeSelectionPtr anAttr = aListAttr->value(i);
+        ResultPtr anObject = anAttr->context();
+        if (anObject.get())
+          anObjects.append(anObject);
+      }
+    }
+  }
+  myWorkshop->setSelected(anObjects);
 }
 
 //********************************************************************

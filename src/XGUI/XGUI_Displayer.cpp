@@ -428,8 +428,13 @@ void XGUI_Displayer::setSelected(const QObjectPtrList& theResults, const bool is
       if (isVisible(aResult)) {
         AISObjectPtr anObj = myResult2AISObjectMap[aResult];
         Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-        if (!anAIS.IsNull())
-          aContext->SetSelected(anAIS, false);
+        if (!anAIS.IsNull()) {
+          // The methods are replaced in order to provide multi-selection, e.g. restore selection
+          // by activating multi selector widget. It also gives an advantage that the multi
+          // selection in OB gives multi-selection in the viewer
+          //aContext->SetSelected(anAIS, false);
+          aContext->AddOrRemoveSelected(anAIS, false);
+        }
       }
     }
   } else {

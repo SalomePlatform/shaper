@@ -36,6 +36,9 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetMultiSelector();
 
+  /// Defines if it is supposed that the widget should interact with the viewer.
+  virtual bool isViewerSelector() { return true; }
+
   /// Set sketcher
   /// \param theSketch a sketcher object
   void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
