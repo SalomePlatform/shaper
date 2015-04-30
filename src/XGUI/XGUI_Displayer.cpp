@@ -433,6 +433,7 @@ void XGUI_Displayer::setSelected(const QObjectPtrList& theResults, const bool is
           // by activating multi selector widget. It also gives an advantage that the multi
           // selection in OB gives multi-selection in the viewer
           //aContext->SetSelected(anAIS, false);
+          // The selection in the context was cleared, so the method sets the objects are selected
           aContext->AddOrRemoveSelected(anAIS, false);
         }
       }
