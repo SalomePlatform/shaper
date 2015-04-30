@@ -216,19 +216,15 @@ void ModuleBase_Operation::activateByPreselection()
   
   ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-  QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
   bool isSet = false;
   // 1. apply the selection to controls
-  for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
-       (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
-       ++aWIt) {
+  int aCurrentPosition = 0;
+  for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
     aWgt = (*aWIt);
-    ModuleBase_ViewerPrs aValue = (*aPIt);
     if (!aWgt->canSetValue())
       continue;
 
-    ++aPIt;
-    if (!aWgt->setSelection(aValue)) {
+    if (!aWgt->setSelection(myPreSelection, aCurrentPosition/*aValue*/)) {
       isSet = false;
       break;
     } else {

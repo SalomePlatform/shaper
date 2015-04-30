@@ -73,8 +73,9 @@ Q_OBJECT
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
-  /// \param theValue the wrapped widget value
-  virtual bool setSelection(ModuleBase_ViewerPrs theValue)
+  /// \param theValues the wrapped selection values
+  /// \param thePosition an index in the list of values, the values should be get from the index
+  virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
   {
     return false;
   }

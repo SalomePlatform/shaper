@@ -195,6 +195,35 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 }
 
 //********************************************************************
+bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerPrs>& theValues,
+                                                  int& thePosition)
+{
+  if (thePosition < 0)
+    return false;
+
+  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  bool isDone = false;
+  for (int i = thePosition; i < theValues.size(); i++) {
+    ModuleBase_ViewerPrs aValue = theValues[i];
+    thePosition++;
+    bool aProcessed = false;
+    if (isValidSelection(aValue)) {
+      aProcessed = setSelectionCustom(aValue);
+    }
+    // if there is at least one set, the result is true
+    isDone = isDone || aProcessed;
+    // when an object, which do not satisfy the validating process, stop set selection
+    if (!aProcessed)
+      break;
+  }
+  if (isDone) {
+    updateObject(myFeature);
+    emit valuesChanged();
+  }
+  return isDone;
+}
+
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   TopoDS_Shape aShape = thePrs.shape();

@@ -29,12 +29,17 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::setSelection(ModuleBase_ViewerPrs theValue)
+bool ModuleBase_WidgetValidated::setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
 {
+  if (thePosition < 0 || thePosition >= theValues.size())
+    return false;
+  ModuleBase_ViewerPrs aValue = theValues[thePosition];
+  thePosition++;
+
   bool isDone = false;
 
-  if (isValidSelection(theValue)) {
-    isDone = setSelectionCustom(theValue);
+  if (isValidSelection(aValue)) {
+    isDone = setSelectionCustom(aValue);
     updateObject(myFeature);
     emit valuesChanged();
   }

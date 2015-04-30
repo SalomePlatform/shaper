@@ -48,8 +48,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// This value should be processed in the widget according to the needs
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to check the value validity and if it is, fill the attribute with by value
-  /// \param theValue the wrapped widget value
-  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
+  /// \param theValues the wrapped selection values
+  /// \param thePosition an index in the list of values, the values should be get from the index
+  virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition);
 
 protected:
   /// Creates a backup of the current values of the attribute

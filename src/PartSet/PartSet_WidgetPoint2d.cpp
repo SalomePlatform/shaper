@@ -120,11 +120,16 @@ PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
 }
 
-bool PartSet_WidgetPoint2D::setSelection(ModuleBase_ViewerPrs theValue)
+bool PartSet_WidgetPoint2D::setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
 {
+  if (thePosition < 0 || thePosition >= theValues.size())
+    return false;
+  ModuleBase_ViewerPrs aValue = theValues[thePosition];
+  thePosition++;
+
   Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
   bool isDone = false;
-  TopoDS_Shape aShape = theValue.shape();
+  TopoDS_Shape aShape = aValue.shape();
   double aX, aY;
   if (getPoint2d(aView, aShape, aX, aY)) {
     isDone = setPoint(aX, aY);

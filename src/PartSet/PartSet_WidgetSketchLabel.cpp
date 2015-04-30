@@ -85,7 +85,7 @@ PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
   erasePreviewPlanes();
 }
 
-bool PartSet_WidgetSketchLabel::setSelection(ModuleBase_ViewerPrs theValue)
+bool PartSet_WidgetSketchLabel::setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
 {
   // do not use the given selection if the plane of the sketch has been already set.
   // If this check is absent, a selected plane in the viewer can be set in the sketch
@@ -93,7 +93,7 @@ bool PartSet_WidgetSketchLabel::setSelection(ModuleBase_ViewerPrs theValue)
   if (plane().get())
     return true;
 
-  return ModuleBase_WidgetValidated::setSelection(theValue);
+  return ModuleBase_WidgetValidated::setSelection(theValues, thePosition);
 }
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
