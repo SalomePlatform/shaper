@@ -12,6 +12,8 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 
+#include <Events_Listener.h>
+
 //#include <StdSelect_FaceFilter.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -27,6 +29,7 @@ class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
 class PartSet_MenuMgr;
 class PartSet_SketcherMgr;
+class PartSet_DocumentDataModel;
 
 class QAction;
 
@@ -34,7 +37,7 @@ class QAction;
 * \ingroup Modules
 * Implementation of Partset module
 */
-class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
+class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule, public Events_Listener
 {
 Q_OBJECT
 
@@ -47,6 +50,7 @@ enum RestartingMode {
 };
 
 public:
+
   /// Constructor
   /// \param theWshop a pointer to a workshop
   PartSet_Module(ModuleBase_IWorkshop* theWshop);
@@ -97,17 +101,28 @@ public:
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Add menu atems for object browser into the given menu
+  /// \param theMenu a popup menu to be shown in the object browser
+  virtual void addObjectBrowserMenu(QMenu* theMenu) const;
+
   /// Add menu atems for viewer into the given menu
   /// \param theMenu a popup menu to be shown in the viewer
   /// \param theStdActions a map of standard actions
   /// \return true if items are added and there is no necessity to provide standard menu
-  virtual bool addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
+  virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
 
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
   bool isMouseOverWindow();
 
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
+
+  /// Returns data model object for representation of data tree in Object browser
+  virtual ModuleBase_IDocumentDataModel* dataModel() const;
+
+  /// Event Listener method
+  /// \param theMessage an event message
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
@@ -150,6 +165,10 @@ protected slots:
   /// \param theOperation the operation
   virtual void sendOperation(ModuleBase_Operation* theOperation);
 
+  //! Activates or deactivates a part
+  //! If PartPtr is Null pointer then PartSet will be activated
+  //void activatePart(std::shared_ptr<ModelAPI_ResultPart> theFeature);
+
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();
@@ -180,6 +199,8 @@ protected slots:
   PartSet_MenuMgr* myMenuMgr;
 
   int myVisualLayerId;
+
+  PartSet_DocumentDataModel* myDataModel;
 };
 
 #endif

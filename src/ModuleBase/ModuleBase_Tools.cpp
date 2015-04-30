@@ -11,6 +11,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_ResultParameter.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Error.h>
@@ -185,6 +186,24 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
     return MyShapeTypes[aType];
   Events_Error::send("Shape type defined in XML is not implemented!");
   return TopAbs_SHAPE;
+}
+
+void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter)
+{
+  hasResult = false;
+  hasFeature = false;
+  hasParameter = false;
+  foreach(ObjectPtr aObj, theObjects) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
+
+    hasResult = (aResult.get() != NULL);
+    hasFeature = (aFeature.get() != NULL);
+    hasParameter = (aConstruction.get() != NULL);
+    if (hasFeature && hasResult  && hasParameter)
+      break;
+  }
 }
 
 

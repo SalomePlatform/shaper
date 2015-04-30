@@ -47,6 +47,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetExprEditor.h
 	ModuleBase_ParamSpinBox.h
 	ModuleBase_WidgetIntValue.h
+    ModuleBase_IDocumentDataModel.h
 )
 
 SET(PROJECT_SOURCES

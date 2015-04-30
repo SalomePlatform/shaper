@@ -8,7 +8,6 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Selection.h"
 #include "XGUI_SalomeConnector.h"
-#include "XGUI_Tools.h"
 
 #include <AppElements_MainWindow.h>
 
@@ -17,12 +16,12 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
 
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_Tools.h>
 
 #include <QAction>
 #include <QContextMenuEvent>
@@ -41,16 +40,7 @@ XGUI_ContextMenuMgr::~XGUI_ContextMenuMgr()
 
 void XGUI_ContextMenuMgr::createActions()
 {
-  QAction* aAction = new QAction(QIcon(":pictures/edit.png"), tr("Edit..."), this);
-  addAction("EDIT_CMD", aAction);
-
-  aAction = new QAction(QIcon(":pictures/activate.png"), tr("Activate"), this);
-  addAction("ACTIVATE_PART_CMD", aAction);
-
-  aAction = new QAction(QIcon(":pictures/assembly.png"), tr("Deactivate"), this);
-  addAction("DEACTIVATE_PART_CMD", aAction);
-
-  aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
   QMainWindow* aDesktop = myWorkshop->mainWindow();
   if (!aDesktop)
     aDesktop = myWorkshop->salomeConnector()->desktop();
@@ -155,21 +145,13 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
-    XGUI_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
+    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
 
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-        if (aPart) {
-          if (aMgr->activeDocument() == aPart->partDoc())
-            aMenu->addAction(action("DEACTIVATE_PART_CMD"));
-          else
-            aMenu->addAction(action("ACTIVATE_PART_CMD"));
-        } else if (hasFeature && aObject->document() == aMgr->activeDocument()) {
-          aMenu->addAction(action("EDIT_CMD"));
-        } else {
+        if (!hasFeature) {
           if (aDisplayer->isVisible(aObject)) {
             if (aDisplayer->canBeShaded(aObject)) {
               if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
@@ -179,18 +161,13 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
             }
             aMenu->addSeparator();
             aMenu->addAction(action("HIDE_CMD"));
-          } else if (!hasParameter) {
+          } else if (hasResult && (!hasParameter)) {
             aMenu->addAction(action("SHOW_CMD"));
           }
-          if (hasParameter)
-            aMenu->addAction(action("EDIT_CMD"));
-          else
+          if (!(hasParameter || hasFeature))
             aMenu->addAction(action("SHOW_ONLY_CMD"));
         }
-      } else {  // If feature is 0 the it means that selected root object (document)
-        if (aMgr->activeDocument() != aMgr->moduleDocument())
-          aMenu->addAction(action("ACTIVATE_PART_CMD"));
-      }
+      } 
     } else {
       if (hasResult && (!hasParameter)) {
         aMenu->addAction(action("SHOW_CMD"));
@@ -208,11 +185,13 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     aMenu->addAction(action("COLOR_CMD"));
 
   aMenu->addSeparator();
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule) {
+    aModule->addObjectBrowserMenu(aMenu);
+    aMenu->addSeparator();
+  }
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
 
-  ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule)
-    aModule->addObjectBrowserItems(aMenu);
 
   if (aMenu->actions().size() > 0) {
     return aMenu;
@@ -224,7 +203,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 QMenu* XGUI_ContextMenuMgr::viewerMenu() const
 {
   QMenu* aMenu = new QMenu();
-  addViewerItems(aMenu);
+  addViewerMenu(aMenu);
   if (aMenu->actions().size() > 0) {
     return aMenu;
   }
@@ -232,19 +211,17 @@ QMenu* XGUI_ContextMenuMgr::viewerMenu() const
   return 0;
 }
 
-void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
+void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 {
   bool aIsDone = false;
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule) 
-    aIsDone = aModule->addViewerItems(theMenu, myActions);
+    aIsDone = aModule->addViewerMenu(theMenu, myActions);
 
   if (!aIsDone) {
     XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
     QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
     if (aObjects.size() > 0) {
-      //if (aObjects.size() == 1)
-      //  theMenu->addAction(action("EDIT_CMD"));
       bool isVisible = false;
       bool isShading = false;
       bool canBeShaded = false;
@@ -270,7 +247,6 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
         theMenu->addAction(action("HIDE_CMD"));
       } else
         theMenu->addAction(action("SHOW_CMD"));
-      //theMenu->addAction(action("DELETE_CMD"));
     }
     if (myWorkshop->displayer()->objectsCount() > 0)
       theMenu->addAction(action("HIDEALL_CMD"));

@@ -1,15 +1,14 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 #include "XGUI_ObjectsBrowser.h"
-#include "XGUI_DocumentDataModel.h"
 #include "XGUI_Tools.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
-#include <ModelAPI_Object.h>
 
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IDocumentDataModel.h>
 
 #include <QLayout>
 #include <QLabel>
@@ -19,6 +18,11 @@
 #include <QMouseEvent>
 #include <QAction>
 #include <QStyledItemDelegate>
+
+
+/// Width of second column (minimum acceptable = 27)
+#define SECOND_COL_WIDTH 30
+
 
 /**
 * \ingroup GUI
@@ -38,7 +42,7 @@ public:
   {
     QLineEdit* aEditor = dynamic_cast<QLineEdit*>(editor);
     if (aEditor) {
-      XGUI_DocumentDataModel* aModel = myTreedView->dataModel();
+      ModuleBase_IDocumentDataModel* aModel = myTreedView->dataModel();
       ObjectPtr aObj = aModel->object(index);
       if (aObj.get() != NULL) {
         aEditor->setText(aObj->data()->name().c_str());
@@ -57,53 +61,20 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
 {
   setHeaderHidden(true);
-  setModel(new XGUI_DocumentDataModel(this));
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   setItemDelegateForColumn(0, new XGUI_TreeViewItemDelegate(this));
-
-  connect(selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-          this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
 XGUI_DataTree::~XGUI_DataTree()
 {
 }
 
-XGUI_DocumentDataModel* XGUI_DataTree::dataModel() const
+ModuleBase_IDocumentDataModel* XGUI_DataTree::dataModel() const
 {
-  return static_cast<XGUI_DocumentDataModel*>(model());
-}
-
-void XGUI_DataTree::onSelectionChanged(const QItemSelection& theSelected,
-                                       const QItemSelection& theDeselected)
-{
-  mySelectedData.clear();
-  QModelIndexList aIndexes = selectionModel()->selectedIndexes();
-  XGUI_DocumentDataModel* aModel = dataModel();
-  QModelIndexList::const_iterator aIt;
-  for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
-    ObjectPtr aObject = aModel->object(*aIt);
-    if (aObject)
-      mySelectedData.append(aObject);
-  }
-  emit selectionChanged();
-}
-
-void XGUI_DataTree::mouseDoubleClickEvent(QMouseEvent* theEvent)
-{
-  if (theEvent->button() == Qt::LeftButton) {
-    QModelIndex aIndex = currentIndex();
-    XGUI_DocumentDataModel* aModel = dataModel();
-    ObjectPtr aObject = aModel->object(aIndex);
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-    if (aPart) {
-      aPart->activate();
-    }
-  } else
-    QTreeView::mouseDoubleClickEvent(theEvent);
+  return static_cast<ModuleBase_IDocumentDataModel*>(model());
 }
 
 void XGUI_DataTree::contextMenuEvent(QContextMenuEvent* theEvent)
@@ -116,27 +87,38 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   QLineEdit* aEditor = dynamic_cast<QLineEdit*>(theEditor);
   if (aEditor) {
     QString aRes = aEditor->text();
-    ObjectPtr aFeature = mySelectedData.first();
+    QModelIndexList aIndexList = selectionModel()->selectedIndexes();
+    ModuleBase_IDocumentDataModel* aModel = dataModel();
+    ObjectPtr aObj = aModel->object(aIndexList.first());
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->startOperation("Rename");
-    aFeature->data()->setName(qPrintable(aRes));
+    aObj->data()->setName(qPrintable(aRes));
     aMgr->finishOperation();
   }
 }
 
 void XGUI_DataTree::clear() 
 {
-  mySelectedData.clear();
-  XGUI_DocumentDataModel* aModel = dataModel();
+  ModuleBase_IDocumentDataModel* aModel = dataModel();
   aModel->clear();
   reset();
 }
+
+void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
+{
+  QSize aSize = theEvent->size();
+  if (aSize.isValid()) {
+    setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH);
+    setColumnWidth(1, SECOND_COL_WIDTH);
+  }
+}
+
 
 //********************************************************************
 //********************************************************************
 //********************************************************************
 XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
-    : QWidget(theParent)
+    : QWidget(theParent), myDocModel(0)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -179,23 +161,13 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   myTreeView = new XGUI_DataTree(this);
   aLayout->addWidget(myTreeView);
 
-  myDocModel = myTreeView->dataModel();
-
   aLabelWgt->setFrameShape(myTreeView->frameShape());
   aLabelWgt->setFrameShadow(myTreeView->frameShadow());
-
-  connect(myTreeView, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  connect(myTreeView, SIGNAL(activePartChanged(ObjectPtr)), this,
-          SLOT(onActivePartChanged(ObjectPtr)));
-  connect(myTreeView, SIGNAL(activePartChanged(ObjectPtr)), this,
-          SIGNAL(activePartChanged(ObjectPtr)));
 
   connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
           SLOT(onLabelContextMenuRequested(const QPoint&)));
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SLOT(onContextMenuRequested(QContextMenuEvent*)));
-
-  onActivePartChanged(ObjectPtr());
 
   // Create internal actions
   QAction* aAction = new QAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this);
@@ -210,31 +182,10 @@ XGUI_ObjectsBrowser::~XGUI_ObjectsBrowser()
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::onActivePartChanged(ObjectPtr thePart)
-{
-  QPalette aPalet = myActiveDocLbl->palette();
-  if (thePart) {
-    aPalet.setColor(QPalette::Text, Qt::black);
-  } else {
-    aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
-  }
-  myActiveDocLbl->setPalette(aPalet);
-}
-
-//***************************************************
 bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
 {
   if (obj == myActiveDocLbl) {
-    if (myActiveDocLbl->isReadOnly()) {
-      if (theEvent->type() == QEvent::MouseButtonDblClick) {
-        if (myDocModel->activePartIndex().isValid()) {
-          myTreeView->setExpanded(myDocModel->activePartIndex(), false);
-        }
-        myDocModel->deactivatePart();
-        onActivePartChanged(ObjectPtr());
-        emit activePartChanged(ObjectPtr());
-      }
-    } else {
+    if (!myActiveDocLbl->isReadOnly()) {
       // End of editing by mouse click
       if (theEvent->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* aEvent = (QMouseEvent*) theEvent;
@@ -276,39 +227,9 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::activatePart(const ResultPartPtr& thePart)
-{
-  if (thePart) {
-    QModelIndex aIndex = myDocModel->partIndex(thePart);
-
-    if ((myDocModel->activePartIndex() != aIndex) && myDocModel->activePartIndex().isValid()) {
-      myTreeView->setExpanded(myDocModel->activePartIndex(), false);
-    }
-    bool isChanged = myDocModel->activatedIndex(aIndex);
-    if (isChanged) {
-      if (myDocModel->activePartIndex().isValid()) {
-        myTreeView->setExpanded(aIndex.parent(), true);
-        myTreeView->setExpanded(aIndex, true);
-        onActivePartChanged(myDocModel->object(aIndex));
-      } else {
-        onActivePartChanged(ObjectPtr());
-      }
-    }
-  } else {
-    QModelIndex aIndex = myDocModel->activePartIndex();
-    if (aIndex.isValid()) {
-      myDocModel->activatedIndex(aIndex);
-      myTreeView->setExpanded(aIndex, false);
-      onActivePartChanged(ObjectPtr());
-    }
-  }
-}
-
-//***************************************************
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 {
-  myObjectsList = myTreeView->selectedObjects();
-  bool toEnable = myObjectsList.size() == 1;
+  bool toEnable = mySelectedData.size() == 1;
   foreach(QAction* aCmd, actions())
   {
     aCmd->setEnabled(toEnable);
@@ -319,9 +240,9 @@ void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 //***************************************************
 void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
 {
-  myObjectsList.clear();
+  mySelectedData.clear();
   //Empty feature pointer means that selected root document
-  myObjectsList.append(ObjectPtr());
+  mySelectedData.append(ObjectPtr());
 
   foreach(QAction* aCmd, actions())
   {
@@ -334,8 +255,8 @@ void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
 //***************************************************
 void XGUI_ObjectsBrowser::onEditItem()
 {
-  if (myObjectsList.size() > 0) {
-    ObjectPtr aFeature = myObjectsList.first();
+  if (mySelectedData.size() > 0) {
+    ObjectPtr aFeature = mySelectedData.first();
     if (aFeature) {  // Selection happens in TreeView
       // Find index which corresponds the feature
       QModelIndex aIndex;
@@ -362,13 +283,6 @@ void XGUI_ObjectsBrowser::onEditItem()
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::onSelectionChanged()
-{
-  myObjectsList = myTreeView->selectedObjects();
-  emit selectionChanged();
-}
-
-//***************************************************
 void XGUI_ObjectsBrowser::rebuildDataTree()
 {
   myDocModel->rebuildDataTree();
@@ -392,15 +306,34 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QObjectPtrList& theObjects)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::processEvent(const std::shared_ptr<Events_Message>& theMessage)
-{ 
-  myDocModel->processEvent(theMessage); 
-}
-
-
-//***************************************************
 void XGUI_ObjectsBrowser::clearContent()  
 { 
-  myObjectsList.clear();
+  mySelectedData.clear();
   myTreeView->clear(); 
+}
+
+void XGUI_ObjectsBrowser::setDataModel(ModuleBase_IDocumentDataModel* theModel)
+{
+  myDocModel = theModel;
+  myTreeView->setModel(myDocModel);
+  QItemSelectionModel* aSelMod = myTreeView->selectionModel();
+  connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+          this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
+}
+
+void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
+                                       const QItemSelection& theDeselected)
+{
+  mySelectedData.clear();
+  QModelIndexList aIndexes = myTreeView->selectionModel()->selectedIndexes();
+  ModuleBase_IDocumentDataModel* aModel = dataModel();
+  QModelIndexList::const_iterator aIt;
+  for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
+    if ((*aIt).column() == 0) {
+      ObjectPtr aObject = aModel->object(*aIt);
+      if (aObject)
+        mySelectedData.append(aObject);
+    }
+  }
+  emit selectionChanged();
 }

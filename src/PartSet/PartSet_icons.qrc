@@ -45,5 +45,10 @@
      <file>icons/mirror.png</file>
      <file>icons/translate.png</file>
      <file>icons/rotate.png</file>
+     <file>icons/exec_state_failed.png</file>
+     <file>icons/exec_state_invalid_parameters.png</file>
+     <file>icons/activate.png</file>
+     <file>icons/deactivate.png</file>
+     <file>icons/edit.png</file>
  </qresource>
  </RCC>

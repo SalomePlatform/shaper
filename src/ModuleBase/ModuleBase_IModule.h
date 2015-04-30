@@ -23,6 +23,7 @@ class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
+class ModuleBase_IDocumentDataModel;
 
 /**
  * \ingroup GUI
@@ -78,11 +79,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theMenu a popup menu to be shown in the viewer
   /// \param theStdActions a map of standard actions
   /// \return true if items are added and there is no necessity to provide standard menu
-  virtual bool addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const { return false; }
+  virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const { return false; }
 
   /// Add menu atems for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser
-  virtual void addObjectBrowserItems(QMenu* theMenu) const {};
+  virtual void addObjectBrowserMenu(QMenu* theMenu) const {};
 
   /// Called when it is necessary to update a command state (enable or disable it)
   //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
@@ -119,6 +120,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Reacts to the delete action in module
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };
+
+  /// Returns data model object for representation of data tree in Object browser
+  virtual ModuleBase_IDocumentDataModel* dataModel() const = 0;
 
 public slots:
   /// Called on call of command corresponded to a feature

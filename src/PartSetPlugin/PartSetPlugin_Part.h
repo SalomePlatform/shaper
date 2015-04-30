@@ -46,12 +46,6 @@ class PartSetPlugin_Part : public ModelAPI_Feature
   /// Part must be added only to PartSet
   PARTSETPLUGIN_EXPORT virtual const std::string& documentToAdd();
 
-  /// Returns true if this feature must be displayed in the history (top level of Part tree)
-  PARTSETPLUGIN_EXPORT virtual bool isInHistory()
-  {
-    return false;
-  }
-
   /// Use plugin manager for features creation
   PartSetPlugin_Part();
 };

@@ -12,7 +12,7 @@
 #include <QWidget>
 #include <QTreeView>
 
-class XGUI_DocumentDataModel;
+class ModuleBase_IDocumentDataModel;
 class QLineEdit;
 
 /**
@@ -26,24 +26,13 @@ Q_OBJECT
    /// Constructor
    /// \param theParent a parent widget
   XGUI_DataTree(QWidget* theParent);
+
   virtual ~XGUI_DataTree();
 
-  //! Returns list of currently selected objects
-  QObjectPtrList selectedObjects() const
-  {
-    return mySelectedData;
-  }
-
   /// Returns current data model
-  XGUI_DocumentDataModel* dataModel() const;
+  ModuleBase_IDocumentDataModel* dataModel() const;
 
 signals:
-  //! Emited when selection is changed
-  void selectionChanged();
-
-  //! Emited when active part changed
-  void activePartChanged(ObjectPtr thePart);
-
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
@@ -52,23 +41,16 @@ public slots:
   virtual void clear();
 
  protected slots:
-   /// Commit modified data (used for renaming of objects)
+  /// Commit modified data (used for renaming of objects)
   virtual void commitData(QWidget* theEditor);
 
  protected:
    /// Redefinition of virtual method
-  virtual void mouseDoubleClickEvent(QMouseEvent* theEvent);
-
-   /// Redefinition of virtual method
   virtual void contextMenuEvent(QContextMenuEvent* theEvent);
 
- private slots:
-  //! Called when selection in Data Tree is changed
-  void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
+   /// Redefinition of virtual method
+  virtual void resizeEvent(QResizeEvent* theEvent);
 
- private:
-  //! List of currently selected data
-  QObjectPtrList mySelectedData;
 };
 
 /**\class XGUI_ObjectsBrowser
@@ -85,7 +67,7 @@ Q_OBJECT
   virtual ~XGUI_ObjectsBrowser();
 
   //! Returns Model which provides access to data objects
-  XGUI_DocumentDataModel* dataModel() const
+  ModuleBase_IDocumentDataModel* dataModel() const
   {
     return myDocModel;
   }
@@ -93,7 +75,7 @@ Q_OBJECT
   //! Returns list of currently selected objects
   QObjectPtrList selectedObjects() const
   {
-    return myObjectsList;
+    return mySelectedData;
   }
 
   /// Set selected list of objects
@@ -112,25 +94,21 @@ Q_OBJECT
     return myTreeView;
   }
 
-  //! Activates currently selected part. Signal activePartChanged will not be sent
-  void activatePart(const ResultPartPtr& thePart);
+  /// Returns active doc label object
+  QLineEdit* activeDocLabel() const { return myActiveDocLbl; }
 
   /// Rebuild data tree
   void rebuildDataTree();
 
-  /// Process application event
-  /// \param theMessage an event message
-  void processEvent(const std::shared_ptr<Events_Message>& theMessage);
-
   /// Resets the object browser into initial state
   void clearContent();
+
+  /// Set Data Model for the Object Browser
+  void setDataModel(ModuleBase_IDocumentDataModel* theModel);
 
 signals:
   //! Emited when selection is changed
   void selectionChanged();
-
-  //! Emited when current active document is changed
-  void activePartChanged(ObjectPtr thePart);
 
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
@@ -140,10 +118,6 @@ signals:
   virtual bool eventFilter(QObject* obj, QEvent* theEvent);
 
  private slots:
-   /// Activate part
-   /// \param thePart a part to activate
-  void onActivePartChanged(ObjectPtr thePart);
-
   /// Show context menu
   /// \param theEvent a context menu event
   void onContextMenuRequested(QContextMenuEvent* theEvent);
@@ -155,19 +129,19 @@ signals:
   //! Called on Edit command request
   void onEditItem();
 
-  /// Process selection changed event
-  void onSelectionChanged();
+  //! Called when selection in Data Tree is changed
+  void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
  private:
   void closeDocNameEditing(bool toSave);
 
   //! Internal model
-  XGUI_DocumentDataModel* myDocModel;
+  ModuleBase_IDocumentDataModel* myDocModel;
 
   QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 
-  QObjectPtrList myObjectsList;
+  QObjectPtrList mySelectedData;
 };
 
 #endif

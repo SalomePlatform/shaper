@@ -1,16 +1,20 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include "PartSet_Module.h"
-#include <PartSet_WidgetSketchLabel.h>
-#include <PartSet_Validators.h>
-#include <PartSet_Tools.h>
-#include <PartSet_WidgetPoint2d.h>
-#include <PartSet_WidgetPoint2dDistance.h>
-#include <PartSet_WidgetShapeSelector.h>
-#include <PartSet_WidgetMultiSelector.h>
-#include <PartSet_WidgetEditor.h>
+#include "PartSet_WidgetSketchLabel.h"
+#include "PartSet_Validators.h"
+#include "PartSet_Tools.h"
+#include "PartSet_WidgetPoint2d.h"
+#include "PartSet_WidgetPoint2dDistance.h"
+#include "PartSet_WidgetShapeSelector.h"
+#include "PartSet_WidgetMultiSelector.h"
+#include "PartSet_WidgetEditor.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
+#include "PartSet_DocumentDataModel.h"
+
+#include <PartSetPlugin_Remove.h>
+#include <PartSetPlugin_Part.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IViewer.h>
@@ -18,6 +22,8 @@
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_FilterFactory.h>
+#include <ModuleBase_Tools.h>
+
 #include <GeomValidators_Edge.h>
 #include <GeomValidators_EdgeOrVertex.h>
 #include <GeomValidators_Face.h>
@@ -42,6 +48,7 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Tools.h>
+#include <XGUI_ObjectsBrowser.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -76,6 +83,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QMainWindow>
+#include <QLineEdit>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Dir.h>
@@ -84,6 +92,8 @@
 #include <QDebug>
 #endif
 
+
+
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop* theWshop)
 {
@@ -91,10 +101,11 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 }
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
-  : ModuleBase_IModule(theWshop), 
+  : ModuleBase_IModule(theWshop),
   myRestartingMode(RM_None), myVisualLayerId(0)
 {
   mySketchMgr = new PartSet_SketcherMgr(this);
+  myDataModel = new PartSet_DocumentDataModel(this);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -111,6 +122,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           SLOT(onViewTransformed(int)));
 
   myMenuMgr = new PartSet_MenuMgr(this);
+
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -283,9 +297,9 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 }
 
 
-bool PartSet_Module::addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
+bool PartSet_Module::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {
-  return myMenuMgr->addViewerItems(theMenu, theStdActions);
+  return myMenuMgr->addViewerMenu(theMenu, theStdActions);
 }
 
 bool PartSet_Module::isMouseOverWindow()
@@ -478,60 +492,73 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
 
 bool PartSet_Module::deleteObjects()
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
   // 1. check whether the delete should be processed in the module
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
        isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
-  if (!isSketchOp && !isNestedOp)
-    return false;
+  if (isSketchOp && isNestedOp) {
+    // 2. find selected presentations
+    // selected objects should be collected before the current operation abort because
+    // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+    ModuleBase_ISelection* aSel = workshop()->selection();
+    QObjectPtrList aSelectedObj = aSel->selectedPresentations();
+    // if there are no selected objects in the viewer, that means that the selection in another
+    // place cased this method. It is necessary to return the false value to understande in above
+    // method that delete is not processed
+    if (aSelectedObj.count() == 0)
+      return false;
 
-  // 2. find selected presentations
-  // selected objects should be collected before the current operation abort because
-  // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  ModuleBase_ISelection* aSel = workshop()->selection();
-  QObjectPtrList aSelectedObj = aSel->selectedPresentations();
-  // if there are no selected objects in the viewer, that means that the selection in another
-  // place cased this method. It is necessary to return the false value to understande in above
-  // method that delete is not processed
-  if (aSelectedObj.count() == 0)
-    return false;
+    // avoid delete of the objects, which are not belong to the current sketch
+    // in order to do not delete results of other sketches
+    QObjectPtrList aSketchObjects;
+    QObjectPtrList::const_iterator anIt = aSelectedObj.begin(), aLast = aSelectedObj.end();
+    for ( ; anIt != aLast; anIt++) {
+      ObjectPtr anObject = *anIt;
+      if (mySketchMgr->isObjectOfSketch(anObject))
+        aSketchObjects.append(anObject);
+    }
+    // if the selection contains only local selected presentations from other sketches,
+    // the Delete operation should not be done at all
+    if (aSketchObjects.size() == 0)
+      return true;
 
-  // avoid delete of the objects, which are not belong to the current sketch
-  // in order to do not delete results of other sketches
-  QObjectPtrList aSketchObjects;
-  QObjectPtrList::const_iterator anIt = aSelectedObj.begin(), aLast = aSelectedObj.end();
-  for ( ; anIt != aLast; anIt++) {
-    ObjectPtr anObject = *anIt;
-    if (mySketchMgr->isObjectOfSketch(anObject))
-      aSketchObjects.append(anObject);
-  }
-  // if the selection contains only local selected presentations from other sketches,
-  // the Delete operation should not be done at all
-  if (aSketchObjects.size() == 0)
-    return true;
+    // the active nested sketch operation should be aborted unconditionally
+    if (isNestedOp)
+      anOperation->abort();
 
-  // the active nested sketch operation should be aborted unconditionally
-  if (isNestedOp)
-    anOperation->abort();
+    // 3. start operation
+    QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
+    aMgr->startOperation(aDescription.toStdString());
 
-  // 3. start operation
-  QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->startOperation(aDescription.toStdString());
-
-  // 4. delete features
-  // sketch feature should be skipped, only sub-features can be removed
-  // when sketch operation is active
-  std::set<FeaturePtr> anIgnoredFeatures;
-  anIgnoredFeatures.insert(mySketchMgr->activeSketch());
-  aWorkshop->deleteFeatures(aSketchObjects, anIgnoredFeatures);
+    // 4. delete features
+    // sketch feature should be skipped, only sub-features can be removed
+    // when sketch operation is active
+    std::set<FeaturePtr> anIgnoredFeatures;
+    anIgnoredFeatures.insert(mySketchMgr->activeSketch());
+    aWorkshop->deleteFeatures(aSketchObjects, anIgnoredFeatures);
   
-  // 5. stop operation
-  aWorkshop->displayer()->updateViewer();
-  aMgr->finishOperation();
-
+    // 5. stop operation
+    aWorkshop->displayer()->updateViewer();
+    aMgr->finishOperation();
+  } else {
+    // Delete part with help of PartSet plugin
+    // TODO: the deleted objects has to be processed by multiselection
+    QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
+    if (aObjects.size() == 1) {
+      ObjectPtr aObj = aObjects.first();
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      if (aFeature.get() && (aFeature->getKind() == PartSetPlugin_Part::ID())) {
+        std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+        aMgr->startOperation(PartSetPlugin_Remove::ID());
+        FeaturePtr aFeature = aDoc->addFeature(PartSetPlugin_Remove::ID());
+        aFeature->execute();
+        aMgr->finishOperation();
+      }
+    }
+  }
   return true;
 }
 
@@ -599,4 +626,80 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   }
   if (isModified)
     aDisplayer->updateViewer();
+}
+
+ModuleBase_IDocumentDataModel* PartSet_Module::dataModel() const
+{
+  return myDataModel;
+}
+
+
+void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
+{
+  QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
+  int aSelected = aObjects.size();
+  if (aSelected == 1) {
+    bool hasResult = false;
+    bool hasFeature = false;
+    bool hasParameter = false;
+    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
+
+    SessionPtr aMgr = ModelAPI_Session::get();
+    ObjectPtr aObject = aObjects.first();
+    if (aObject) {
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+      if (aPart) {
+        if (aMgr->activeDocument() == aPart->partDoc())
+          theMenu->addAction(myMenuMgr->action("DEACTIVATE_PART_CMD"));
+        else
+          theMenu->addAction(myMenuMgr->action("ACTIVATE_PART_CMD"));
+      } else if (aObject->document() == aMgr->activeDocument()) {
+        if (hasParameter || hasFeature)
+          theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
+      }
+    } else {  // If feature is 0 the it means that selected root object (document)
+      if (aMgr->activeDocument() != aMgr->moduleDocument())
+        theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
+    }
+  }
+}
+
+void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+    XGUI_DataTree* aTreeView = aWorkshop->objectBrowser()->treeView();
+    QLineEdit* aLabel = aWorkshop->objectBrowser()->activeDocLabel();
+    QPalette aPalet = aLabel->palette();
+
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aActiveDoc = aMgr->activeDocument();
+    DocumentPtr aDoc = aMgr->moduleDocument();
+    QModelIndex aOldIndex = myDataModel->activePartIndex();
+    if (aActiveDoc == aDoc) {
+      if (aOldIndex.isValid())
+        aTreeView->setExpanded(aOldIndex, false);
+      myDataModel->deactivatePart();
+      aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
+    } else {
+      std::string aGrpName = ModelAPI_ResultPart::group();
+      for (int i = 0; i < aDoc->size(aGrpName); i++) {
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
+        if (aPart->partDoc() == aActiveDoc) {
+          QModelIndex aIndex = myDataModel->partIndex(aPart);
+          if ((aOldIndex != aIndex) && aOldIndex.isValid()) {
+            aTreeView->setExpanded(aOldIndex, false);
+          }
+          if (myDataModel->activatePart(aIndex)) {
+            aTreeView->setExpanded(aIndex.parent(), true);
+            aTreeView->setExpanded(aIndex, true);
+            aPalet.setColor(QPalette::Text, Qt::black);
+          }
+          break;
+        }
+      }
+    }
+    aLabel->setPalette(aPalet);
+  }
 }
