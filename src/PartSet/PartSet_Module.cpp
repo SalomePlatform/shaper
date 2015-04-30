@@ -6,6 +6,7 @@
 #include <PartSet_Tools.h>
 #include <PartSet_WidgetPoint2d.h>
 #include <PartSet_WidgetPoint2dDistance.h>
+#include <PartSet_WidgetPoint2dAngle.h>
 #include <PartSet_WidgetShapeSelector.h>
 #include <PartSet_WidgetMultiSelector.h>
 #include <PartSet_WidgetEditor.h>
@@ -462,7 +463,13 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aDistanceWgt->setWorkshop(aWorkshop);
     aDistanceWgt->setSketch(mySketchMgr->activeSketch());
     aWgt = aDistanceWgt;
-  } if (theType == "sketch_shape_selector") {
+  } if(theType == "point2dangle") {
+    PartSet_WidgetPoint2dAngle* anAngleWgt = new PartSet_WidgetPoint2dAngle(theParent, theWidgetApi, theParentId);
+    anAngleWgt->setWorkshop(aWorkshop);
+    anAngleWgt->setSketch(mySketchMgr->activeSketch());
+    aWgt = anAngleWgt;
+  }
+  if (theType == "sketch_shape_selector") {
     PartSet_WidgetShapeSelector* aShapeSelectorWgt =
       new PartSet_WidgetShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
