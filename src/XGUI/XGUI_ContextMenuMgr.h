@@ -51,7 +51,7 @@ Q_OBJECT
 
   /// Add menu atems for viewer into the given menu (used in SALOME mode)
   /// \param theMenu a popup menu to be shown in the viewer
-  void addViewerItems(QMenu* theMenu) const;
+  void addViewerMenu(QMenu* theMenu) const;
 
 signals:
   /// Signal aabout triggered action

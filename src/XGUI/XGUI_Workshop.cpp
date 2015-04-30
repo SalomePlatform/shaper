@@ -94,44 +94,6 @@
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
 
-QMap<QString, QString> XGUI_Workshop::myIcons;
-
-
-QIcon XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
-{
-  QIcon anIcon;
-
-  std::string aKind = theFeature->getKind();
-  QString aId(aKind.c_str());
-  if (!myIcons.contains(aId))
-    return anIcon;
-
-  QString anIconString = myIcons[aId];
-
-  ModelAPI_ExecState aState = theFeature->data()->execState();
-  switch(aState) {
-    case ModelAPI_StateDone:
-    case ModelAPI_StateNothing: {
-      anIcon = QIcon(anIconString);
-    }
-    break;
-    case ModelAPI_StateMustBeUpdated: {
-      anIcon = ModuleBase_Tools::lighter(anIconString);
-    }
-    break;
-    case ModelAPI_StateExecFailed: {
-      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_failed.png", anIconString);
-    }
-    break;
-    case ModelAPI_StateInvalidArgument: {
-      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_invalid_parameters.png",
-                                           anIconString);
-    }
-    break;
-    default: break;  
-  }
-  return anIcon;  
-}
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
@@ -201,10 +163,8 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOSHOW));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
@@ -382,10 +342,6 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
-  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-    onObjectDeletedMsg(aDelMsg);
   } else if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed()) {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -425,30 +381,7 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
           updateCommandStatus();
       }
     }
-  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
-    myActionsMgr->update();
-    // Find and Activate active part
-    if (myPartActivating)
-      return;
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aActiveDoc = aMgr->activeDocument();
-    DocumentPtr aDoc = aMgr->moduleDocument();
-    if (aActiveDoc == aDoc) {
-      activatePart(ResultPartPtr()); 
-      return;
-    }
-    std::string aGrpName = ModelAPI_ResultPart::group();
-    for (int i = 0; i < aDoc->size(aGrpName); i++) {
-      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
-      if (aPart->partDoc() == aActiveDoc) {
-        activatePart(aPart); // Activate a part which corresponds to active Doc
-        return;
-      }
-    }
-    // If not found then activate global document
-    activatePart(ResultPartPtr()); 
-
-  }
+  } 
   else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SELFILTER_LOADED)) {
     std::shared_ptr<Config_SelectionFilterMessage> aMsg = 
       std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);
@@ -510,8 +443,8 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
     }
   }
   myOperationMgr->onValidateOperation();
-  if (myObjectBrowser)
-    myObjectBrowser->processEvent(theMsg);
+  //if (myObjectBrowser)
+  //  myObjectBrowser->processEvent(theMsg);
 }
 
 //******************************************************
@@ -611,21 +544,13 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
     isDisplayed = displayObject(*aIt);
     //}
   }
-  if (myObjectBrowser)
-    myObjectBrowser->processEvent(theMsg);
+  //if (myObjectBrowser)
+  //  myObjectBrowser->processEvent(theMsg);
   if (isDisplayed)
     myDisplayer->updateViewer();
   //if (aHasPart) { // TODO: Avoid activate last part on loading of document
   //  activateLastPart();
   //}
-}
-
-//******************************************************
-void XGUI_Workshop::onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg)
-{
-  if (myObjectBrowser)
-    myObjectBrowser->processEvent(theMsg);
-  //std::set<ObjectPtr> aFeatures = theMsg->objects();
 }
 
 //******************************************************
@@ -761,8 +686,6 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
   }
   ActionInfo aFeatureInfo;
   aFeatureInfo.initFrom(theMessage);
-  // Remember features icons
-  myIcons[QString::fromStdString(theMessage->id())] = aFeatureInfo.iconFile;
 
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QStringList aNestedFeatures =
@@ -1215,8 +1138,9 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
-  connect(myObjectBrowser, SIGNAL(activePartChanged(ObjectPtr)), this,
-          SLOT(changeCurrentDocument(ObjectPtr)));
+  myObjectBrowser->setDataModel(myModule->dataModel());
+  //connect(myObjectBrowser, SIGNAL(activePartChanged(ObjectPtr)), this,
+  //        SLOT(changeCurrentDocument(ObjectPtr)));
   aObjDock->setWidget(myObjectBrowser);
 
   myContextMenuMgr->connectObjectBrowser();
@@ -1300,23 +1224,6 @@ void XGUI_Workshop::onFeatureTriggered()
 }
 
 //******************************************************
-void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (theObj) {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theObj);
-    if (aPart) {
-      DocumentPtr aPartDoc = aPart->partDoc();
-      if (aPartDoc) {
-        aMgr->setActiveDocument(aPartDoc);
-        return;
-      }
-    }
-  }
-  aMgr->setActiveDocument(aMgr->moduleDocument());
-}
-
-//******************************************************
 void XGUI_Workshop::salomeViewerSelectionChanged()
 {
   emit salomeViewerSelection();
@@ -1332,12 +1239,7 @@ ModuleBase_IViewer* XGUI_Workshop::salomeViewer() const
 void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
-  if ((theId == "ACTIVATE_PART_CMD") && (aObjects.size() > 0)) {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
-    activatePart(aPart);
-  } else if (theId == "DEACTIVATE_PART_CMD")
-    activatePart(ResultPartPtr());
-  else if (theId == "DELETE_CMD")
+  if (theId == "DELETE_CMD")
     deleteObjects();
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
@@ -1353,46 +1255,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
   else if (theId == "HIDEALL_CMD")
     myDisplayer->eraseAll();
-  else if (theId == "EDIT_CMD") {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
-    if (aFeature == NULL) {
-      ResultParameterPtr aParam = 
-        std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObjects.first());
-      if (aParam.get() != NULL) {
-        aFeature = ModelAPI_Feature::feature(aParam);
-      }
-    }
-    if (aFeature.get() != NULL)
-      myModule->editFeature(aFeature);
-  }
 }
-
-//**************************************************************
-void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
-{
-  if (!myPartActivating) {
-    myPartActivating = true;
-    if (theFeature)
-      theFeature->activate();
-    changeCurrentDocument(theFeature);
-    myObjectBrowser->activatePart(theFeature);
-    myPartActivating = false;
-  }
-  updateCommandStatus();
-}
-
-//**************************************************************
-//void XGUI_Workshop::activateLastPart()
-//{
-//  SessionPtr aMgr = ModelAPI_Session::get();
-//  DocumentPtr aDoc = aMgr->moduleDocument();
-//  std::string aGrpName = ModelAPI_ResultPart::group();
-//  ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
-//  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
-//  if (aPart) {
-//    activatePart(aPart);
-//  }
-//}
 
 //**************************************************************
 void XGUI_Workshop::deleteObjects()
@@ -1410,7 +1273,7 @@ void XGUI_Workshop::deleteObjects()
   bool hasResult = false;
   bool hasFeature = false;
   bool hasParameter = false;
-  XGUI_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter);
+  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter);
   if (!(hasFeature || hasParameter))
     return;
 

@@ -1,7 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-#include "XGUI_PartDataModel.h"
-#include "XGUI_Workshop.h"
+#include "PartSet_PartDataModel.h"
+#include "PartSet_Module.h"
+#include "PartSet_DocumentDataModel.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
@@ -20,24 +21,17 @@
 #include <QIcon>
 #include <QBrush>
 
-//ObjectPtr featureObj(const ObjectPtr& theFeature)
-//{
-//  ObjectPtr aObject = std::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
-//  if (aObject)
-//    return aObject->featureRef();
-//  return theFeature;
-//}
 
-XGUI_TopDataModel::XGUI_TopDataModel(QObject* theParent)
-    : XGUI_FeaturesModel(theParent)
+PartSet_TopDataModel::PartSet_TopDataModel(QObject* theParent)
+    : PartSet_FeaturesModel(theParent)
 {
 }
 
-XGUI_TopDataModel::~XGUI_TopDataModel()
+PartSet_TopDataModel::~PartSet_TopDataModel()
 {
 }
 
-QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
+QVariant PartSet_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
 {
   switch (theRole) {
     case Qt::DisplayRole:
@@ -106,12 +100,12 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
   return QVariant();
 }
 
-QVariant XGUI_TopDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant PartSet_TopDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   return QVariant();
 }
 
-int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
+int PartSet_TopDataModel::rowCount(const QModelIndex& theParent) const
 {
   if (!theParent.isValid())
     return 2;  // In case of groups using it has to be +1
@@ -129,12 +123,12 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
   return 0;
 }
 
-int XGUI_TopDataModel::columnCount(const QModelIndex &parent) const
+int PartSet_TopDataModel::columnCount(const QModelIndex &parent) const
 {
   return 1;
 }
 
-QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelIndex& theParent) const
+QModelIndex PartSet_TopDataModel::index(int theRow, int theColumn, const QModelIndex& theParent) const
 {
   if (!theParent.isValid()) {
     switch (theRow) {
@@ -158,7 +152,7 @@ QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelInde
   return QModelIndex();
 }
 
-QModelIndex XGUI_TopDataModel::parent(const QModelIndex& theIndex) const
+QModelIndex PartSet_TopDataModel::parent(const QModelIndex& theIndex) const
 {
   int aId = (int) theIndex.internalId();
   switch (aId) {
@@ -176,12 +170,12 @@ QModelIndex XGUI_TopDataModel::parent(const QModelIndex& theIndex) const
   return QModelIndex();
 }
 
-bool XGUI_TopDataModel::hasChildren(const QModelIndex& theParent) const
+bool PartSet_TopDataModel::hasChildren(const QModelIndex& theParent) const
 {
   return rowCount(theParent) > 0;
 }
 
-ObjectPtr XGUI_TopDataModel::object(const QModelIndex& theIndex) const
+ObjectPtr PartSet_TopDataModel::object(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
     case ParamsFolder:
@@ -203,12 +197,12 @@ ObjectPtr XGUI_TopDataModel::object(const QModelIndex& theIndex) const
   return ObjectPtr();
 }
 
-QModelIndex XGUI_TopDataModel::findParent(const ObjectPtr& theObject) const
+QModelIndex PartSet_TopDataModel::findParent(const ObjectPtr& theObject) const
 {
   return findGroup(theObject->groupName().c_str());
 }
 
-QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
+QModelIndex PartSet_TopDataModel::findGroup(const std::string& theGroup) const
 {
   if (theGroup == ModelAPI_ResultParameter::group())
     return createIndex(0, 0, (qint32) ParamsFolder);
@@ -219,7 +213,7 @@ QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
   return QModelIndex();
 }
 
-QModelIndex XGUI_TopDataModel::objectIndex(const ObjectPtr& theObject) const
+QModelIndex PartSet_TopDataModel::objectIndex(const ObjectPtr& theObject) const
 {
   QModelIndex aIndex;
   if (theObject) {
@@ -248,16 +242,16 @@ QModelIndex XGUI_TopDataModel::objectIndex(const ObjectPtr& theObject) const
 //******************************************************************
 //******************************************************************
 //******************************************************************
-XGUI_PartDataModel::XGUI_PartDataModel(QObject* theParent)
-    : XGUI_PartModel(theParent)
+PartSet_PartDataModel::PartSet_PartDataModel(QObject* theParent)
+    : PartSet_PartModel(theParent)
 {
 }
 
-XGUI_PartDataModel::~XGUI_PartDataModel()
+PartSet_PartDataModel::~PartSet_PartDataModel()
 {
 }
 
-QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) const
+QVariant PartSet_PartDataModel::data(const QModelIndex& theIndex, int theRole) const
 {
   switch (theRole) {
     case Qt::DisplayRole:
@@ -342,7 +336,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - getRowsNumber());
           FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
           if (aFeature)
-            return XGUI_Workshop::featureIcon(aFeature);
+            return PartSet_DocumentDataModel::featureIcon(aFeature);
         }
       }
       break;
@@ -356,12 +350,12 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
   return QVariant();
 }
 
-QVariant XGUI_PartDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant PartSet_PartDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   return QVariant();
 }
 
-int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
+int PartSet_PartDataModel::rowCount(const QModelIndex& parent) const
 {
   if (!parent.isValid()) {
     DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
@@ -391,12 +385,12 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
   return 0;
 }
 
-int XGUI_PartDataModel::columnCount(const QModelIndex &parent) const
+int PartSet_PartDataModel::columnCount(const QModelIndex &parent) const
 {
   return 1;
 }
 
-QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelIndex &theParent) const
+QModelIndex PartSet_PartDataModel::index(int theRow, int theColumn, const QModelIndex &theParent) const
 {
   if (!theParent.isValid())
     return createIndex(theRow, 0, (qint32) MyRoot);
@@ -434,7 +428,7 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
   return QModelIndex();
 }
 
-QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
+QModelIndex PartSet_PartDataModel::parent(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
     case MyRoot:
@@ -458,12 +452,12 @@ QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
   return QModelIndex();
 }
 
-bool XGUI_PartDataModel::hasChildren(const QModelIndex& theParent) const
+bool PartSet_PartDataModel::hasChildren(const QModelIndex& theParent) const
 {
   return rowCount(theParent) > 0;
 }
 
-DocumentPtr XGUI_PartDataModel::partDocument() const
+DocumentPtr PartSet_PartDataModel::partDocument() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
@@ -473,7 +467,7 @@ DocumentPtr XGUI_PartDataModel::partDocument() const
   return DocumentPtr(); // null if not found
 }
 
-ObjectPtr XGUI_PartDataModel::object(const QModelIndex& theIndex) const
+ObjectPtr PartSet_PartDataModel::object(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
     case MyRoot: {
@@ -500,17 +494,17 @@ ObjectPtr XGUI_PartDataModel::object(const QModelIndex& theIndex) const
   return ObjectPtr();
 }
 
-bool XGUI_PartDataModel::hasDocument(const DocumentPtr& theDoc) const
+bool PartSet_PartDataModel::hasDocument(const DocumentPtr& theDoc) const
 {
   return (partDocument() == theDoc);
 }
 
-QModelIndex XGUI_PartDataModel::findParent(const ObjectPtr& theObject) const
+QModelIndex PartSet_PartDataModel::findParent(const ObjectPtr& theObject) const
 {
   return findGroup(theObject->groupName().c_str());
 }
 
-QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
+QModelIndex PartSet_PartDataModel::findGroup(const std::string& theGroup) const
 {
   if (theGroup == ModelAPI_ResultParameter::group())
     return createIndex(0, 0, (qint32) ParamsFolder);
@@ -523,14 +517,14 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
   return QModelIndex();
 }
 
-ResultPartPtr XGUI_PartDataModel::part() const
+ResultPartPtr PartSet_PartDataModel::part() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObj = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
   return std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
 }
 
-QModelIndex XGUI_PartDataModel::objectIndex(const ObjectPtr& theObject) const
+QModelIndex PartSet_PartDataModel::objectIndex(const ObjectPtr& theObject) const
 {
   QModelIndex aIndex;
   if (theObject) {
@@ -564,7 +558,7 @@ QModelIndex XGUI_PartDataModel::objectIndex(const ObjectPtr& theObject) const
 }
 
 
-int XGUI_PartDataModel::getRowsNumber() const
+int PartSet_PartDataModel::getRowsNumber() const
 {
   int aSize = partDocument()->size(ModelAPI_ResultGroup::group());
   if (aSize == 0) // If there are no groups then do not show group folder

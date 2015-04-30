@@ -8,6 +8,7 @@
 #define ModuleBase_Tools_H
 
 #include "ModuleBase.h"
+#include "ModuleBase_Definitions.h"
 
 #include <ModelAPI_Feature.h>
 #include <TopAbs_ShapeEnum.hxx>
@@ -77,6 +78,14 @@ MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, const bool isUseAt
 /// \return TopAbs_ShapeEnum value
 MODULEBASE_EXPORT TopAbs_ShapeEnum shapeType(const QString& theType);
 
+/*!
+Check types of objects which are in the given list
+\param theObjects the list of objects
+\param hasResult will be set to true if list contains Result objects
+\param hasFeature will be set to true if list contains Feature objects
+\param hasParameter will be set to true if list contains Parameter objects
+*/
+MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter);
 }
 
 #endif

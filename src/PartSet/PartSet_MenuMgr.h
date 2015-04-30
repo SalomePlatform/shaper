@@ -40,7 +40,7 @@ public:
   /// \param theMenu a popup menu to be shown in the viewer
   /// \param theStdActions a map of standard actions
   /// \return true if items are added and there is no necessity to provide standard menu
-  bool addViewerItems(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
+  bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
 
 public slots:
   /// Processes the context menu action click
@@ -59,6 +59,15 @@ private slots:
   /// A slot which is called on selection an Item in Detach menu
   /// \param theAction an action of the selected item
   void onLineDetach(QAction* theAction);
+
+  /// A slot called on Part activation command
+  void onActivatePart(bool);
+
+  /// A slot called on PartSet activation command
+  void onActivatePartSet(bool);
+
+  /// A slot called on edit of feature
+  void onEdit(bool);
 
 private:
   /// Returns true if the current operation is sketch entity create operation

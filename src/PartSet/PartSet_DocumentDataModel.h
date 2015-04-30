@@ -1,34 +1,34 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-#ifndef XGUI_DocumentDataModel_H
-#define XGUI_DocumentDataModel_H
+#ifndef PartSet_DocumentDataModel_H
+#define PartSet_DocumentDataModel_H
 
-#include "XGUI.h"
+#include "PartSet.h"
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Feature.h>
+#include <ModuleBase_IDocumentDataModel.h>
 
 #include <Events_Listener.h>
-
-#include <QAbstractItemModel>
 #include <QList>
 
 class ModelAPI_Document;
-class XGUI_PartModel;
-class XGUI_TopDataModel;
+class PartSet_PartModel;
+class PartSet_TopDataModel;
 
-/**\class XGUI_DocumentDataModel
+/**\class PartSet_DocumentDataModel
  * \ingroup GUI
  * \brief This is a proxy data model for Object Browser (QTreeView).
  * It contains several sub-models for generation of each sub-part of data tree.
  */
-class XGUI_EXPORT XGUI_DocumentDataModel : public QAbstractItemModel, public Events_Listener
+class PARTSET_EXPORT PartSet_DocumentDataModel : public ModuleBase_IDocumentDataModel, public Events_Listener
 {
 Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent object
-  XGUI_DocumentDataModel(QObject* theParent);
-  virtual ~XGUI_DocumentDataModel();
+  PartSet_DocumentDataModel(QObject* theParent);
+  virtual ~PartSet_DocumentDataModel();
 
   /// Event Listener method
   /// \param theMessage an event message
@@ -87,15 +87,15 @@ Q_OBJECT
 
   /// Returns the item flags for the given index.
   /// \param theIndex a model index
-  Qt::ItemFlags flags(const QModelIndex& theIndex) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& theIndex) const;
 
   //! Returns an object by the given Model index.
   //! Returns 0 if the given index is not index of an object
-  ObjectPtr object(const QModelIndex& theIndex) const;
+  virtual ObjectPtr object(const QModelIndex& theIndex) const;
 
   //! Returns index of the object
   //! \param theObject object to find
-  QModelIndex objectIndex(const ObjectPtr theObject) const;
+  virtual QModelIndex objectIndex(const ObjectPtr theObject) const;
 
   //! Returns QModelIndex which corresponds to the given part
   //! If the object is not found then index is not valid
@@ -105,7 +105,7 @@ Q_OBJECT
   //! Activates a part data model if the index is a Part node index. 
   //! Returns true if active part changed.
   //! \param theIndex a model index
-  bool activatedIndex(const QModelIndex& theIndex);
+  bool activatePart(const QModelIndex& theIndex);
 
   //! Retrurns active part
   ResultPartPtr activePart() const;
@@ -120,11 +120,19 @@ Q_OBJECT
   void deactivatePart();
 
   //! Rebuild data tree
-  void rebuildDataTree();
+  virtual void rebuildDataTree();
 
   //! Clear internal data
-  void clear();
+  virtual void clear();
 
+  //! Set an Index which will be considered as a last history index
+  //! \param theIndex a last index for history
+  void setLastHistoryItem(const QModelIndex& theIndex);
+
+  QModelIndex lastHistoryItem() const;
+
+  //! Returns icon name according to feature
+  static QIcon featureIcon(const FeaturePtr& theFeature);
 
  private:
 
@@ -159,24 +167,30 @@ Q_OBJECT
   bool isPartSubModel(const QAbstractItemModel* theModel) const;
 
   //! Returns Parts Folder node
-  QModelIndex partFolderNode() const;
+  //! \param theColumn an Id of column
+  QModelIndex partFolderNode(int theColumn) const;
+
+  int lastHistoryRow() const;
 
   int historyOffset() const;
 
   //! Data model of top part of data tree (not parts object)
-  XGUI_TopDataModel* myModel;
+  PartSet_TopDataModel* myModel;
 
   //! Data models for Parts data tree representation (one data model per a one part)
-  QList<XGUI_PartModel*> myPartModels;
+  QList<PartSet_PartModel*> myPartModels;
 
   //! Active part in part editing mode
-  XGUI_PartModel* myActivePart;
+  PartSet_PartModel* myActivePart;
 
   QModelIndex myActivePartIndex;
 
   //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;
 
+  int myHistoryBackOffset;
+
+  static QMap<QString, QString> myIcons;
 };
 
 #endif

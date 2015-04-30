@@ -1,24 +1,24 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-#ifndef XGUI_PartDataModel_H
-#define XGUI_PartDataModel_H
+#ifndef PartSet_PartDataModel_H
+#define PartSet_PartDataModel_H
 
-#include "XGUI.h"
-#include "XGUI_DataTreeModel.h"
+#include "PartSet.h"
+#include "PartSet_DataTreeModel.h"
 
-/**\class XGUI_TopDataModel
+/**\class PartSet_TopDataModel
  * \ingroup GUI
  * \brief This is a data model for Object Browser (QTreeView).
  * It represents only upper part of data tree (non-parts tree items)
  */
-class XGUI_EXPORT XGUI_TopDataModel : public XGUI_FeaturesModel
+class PARTSET_EXPORT PartSet_TopDataModel : public PartSet_FeaturesModel
 {
 Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent object
-  XGUI_TopDataModel(QObject* theParent);
-  virtual ~XGUI_TopDataModel();
+  PartSet_TopDataModel(QObject* theParent);
+  virtual ~PartSet_TopDataModel();
 
   // Reimpl from QAbstractItemModel
 
@@ -89,19 +89,19 @@ Q_OBJECT
 
 };
 
-/**\class XGUI_PartDataModel
+/**\class PartSet_PartDataModel
  * \ingroup GUI
  * \brief This is a data model for Object Browser (QTreeView).
  * It represents data tree only of a one part
  */
-class XGUI_PartDataModel : public XGUI_PartModel
+class PartSet_PartDataModel : public PartSet_PartModel
 {
 Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent object
-  XGUI_PartDataModel(QObject* theParent);
-  virtual ~XGUI_PartDataModel();
+  PartSet_PartDataModel(QObject* theParent);
+  virtual ~PartSet_PartDataModel();
 
   // Reimpl from QAbstractItemModel
 

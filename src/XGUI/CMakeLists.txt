@@ -9,14 +9,11 @@ SET(PROJECT_HEADERS
 	XGUI_ColorDialog.h
 	XGUI_ContextMenuMgr.h
 	XGUI_CustomPrs.h
-	XGUI_DataTreeModel.h
 	XGUI_Displayer.h
-	XGUI_DocumentDataModel.h
 	XGUI_ErrorDialog.h
 	XGUI_ModuleConnector.h
 	XGUI_ObjectsBrowser.h
 	XGUI_OperationMgr.h
-	XGUI_PartDataModel.h
 	XGUI_PropertyPanel.h
 	XGUI_QtEvents.h
 	XGUI_SalomeConnector.h
@@ -38,12 +35,10 @@ SET(PROJECT_SOURCES
 	XGUI_ContextMenuMgr.cpp
 	XGUI_CustomPrs.cpp
 	XGUI_Displayer.cpp
-	XGUI_DocumentDataModel.cpp
 	XGUI_ErrorDialog.cpp
 	XGUI_ModuleConnector.cpp
 	XGUI_ObjectsBrowser.cpp
 	XGUI_OperationMgr.cpp
-	XGUI_PartDataModel.cpp
 	XGUI_PropertyPanel.cpp
 	XGUI_QtEvents.cpp
 	XGUI_Selection.cpp
