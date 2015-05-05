@@ -106,6 +106,10 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Object> objectByName(
     const std::string& theGroupID, const std::string& theName);
 
+  //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
+  //! \param theObject object of this document
+  //! \returns index started from zero, or -1 if object is invisible or belongs to another document
+  MODEL_EXPORT virtual const int index(std::shared_ptr<ModelAPI_Object> theObject);
 
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);

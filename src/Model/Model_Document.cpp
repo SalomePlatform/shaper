@@ -877,6 +877,45 @@ std::shared_ptr<ModelAPI_Object> Model_Document::objectByName(
   return ObjectPtr();
 }
 
+const int Model_Document::index(std::shared_ptr<ModelAPI_Object> theObject)
+{
+  const std::string aGroupName = theObject->groupName();
+  if (aGroupName == ModelAPI_Feature::group()) {
+    int anIndex = 0;
+    TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+    for (; aLabIter.More(); aLabIter.Next()) {
+      TDF_Label aFLabel = aLabIter.Value()->Label();
+      FeaturePtr aFeature = feature(aFLabel);
+      if (aFeature == theObject)
+        return anIndex;
+      if (aFeature->isInHistory())
+        anIndex++;
+    }
+  } else {
+    // comment must be in any feature: it is kind
+    int anIndex = 0;
+    TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+    for (; aLabIter.More(); aLabIter.Next()) {
+      TDF_Label aFLabel = aLabIter.Value()->Label();
+      FeaturePtr aFeature = feature(aFLabel);
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for (; aRIter != aResults.cend(); aRIter++) {
+        if (*aRIter == theObject)
+          return anIndex;
+        if ((*aRIter)->groupName() == aGroupName) {
+          bool isIn = (*aRIter)->isInHistory() && !(*aRIter)->isConcealed();
+          if (isIn) {
+            anIndex++;
+          }
+        }
+      }
+    }
+  }
+  // not found
+  return -1;
+}
+
 int Model_Document::size(const std::string& theGroupID, const bool theHidden)
 {
   int aResult = 0;

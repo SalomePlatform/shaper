@@ -79,6 +79,11 @@ public:
   virtual std::shared_ptr<ModelAPI_Object> objectByName(const std::string& theGroupID,
                                                     const std::string& theName) = 0;
 
+  //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
+  //! \param theObject object of this document
+  //! \returns index started from zero, or -1 if object is invisible or belongs to another document
+  virtual const int index(std::shared_ptr<ModelAPI_Object> theObject) = 0;
+
   //! Returns the number of objects in the group of objects
   //! If theHidden is true, it counts also the features that are not in tree
   virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;
