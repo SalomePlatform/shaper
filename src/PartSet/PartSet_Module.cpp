@@ -12,7 +12,6 @@
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
-#include "PartSet_DocumentDataModel.h"
 
 #include <PartSetPlugin_Remove.h>
 #include <PartSetPlugin_Part.h>
@@ -567,8 +566,10 @@ bool PartSet_Module::deleteObjects()
         FeaturePtr aFeature = aDoc->addFeature(PartSetPlugin_Remove::ID());
         aFeature->execute();
         aMgr->finishOperation();
-      }
-    }
+      } else
+        return false;
+    } else
+      return false;
   }
   return true;
 }
@@ -639,23 +640,18 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
-ModuleBase_IDocumentDataModel* PartSet_Module::dataModel() const
-{
-  return myDataModel;
-}
-
 
 void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
 {
   QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
   int aSelected = aObjects.size();
+  SessionPtr aMgr = ModelAPI_Session::get();
   if (aSelected == 1) {
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
 
-    SessionPtr aMgr = ModelAPI_Session::get();
     ObjectPtr aObject = aObjects.first();
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
@@ -672,6 +668,10 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       if (aMgr->activeDocument() != aMgr->moduleDocument())
         theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
     }
+  } else if (aSelected == 0) {
+    // if there is no selection then it means that upper label is selected
+    if (aMgr->activeDocument() != aMgr->moduleDocument())
+      theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
   }
 }
 
@@ -687,7 +687,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
     DocumentPtr aDoc = aMgr->moduleDocument();
-    QModelIndex aOldIndex = myDataModel->activePartIndex();
+    QModelIndex aOldIndex = myDataModel->activePartTree();
     if (aActiveDoc == aDoc) {
       if (aOldIndex.isValid())
         aTreeView->setExpanded(aOldIndex, false);
@@ -699,12 +699,9 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
         if (aPart->partDoc() == aActiveDoc) {
           QModelIndex aIndex = myDataModel->partIndex(aPart);
-          if ((aOldIndex != aIndex) && aOldIndex.isValid()) {
-            aTreeView->setExpanded(aOldIndex, false);
-          }
           if (myDataModel->activatePart(aIndex)) {
-            aTreeView->setExpanded(aIndex.parent(), true);
-            aTreeView->setExpanded(aIndex, true);
+            aTreeView->setExpanded(aOldIndex, false);
+            aTreeView->setExpanded(myDataModel->activePartTree(), true);
             aPalet.setColor(QPalette::Text, Qt::black);
           }
           break;

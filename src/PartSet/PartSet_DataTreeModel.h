@@ -70,7 +70,7 @@ class PartSet_PartModel : public PartSet_FeaturesModel
    /// Constructor
    /// \param theParent a parent object
   PartSet_PartModel(QObject* theParent)
-      : PartSet_FeaturesModel(theParent)
+      : PartSet_FeaturesModel(theParent), myId(-1)
   {
   }
 
@@ -80,6 +80,9 @@ class PartSet_PartModel : public PartSet_FeaturesModel
   {
     myId = theId;
   }
+
+  /// Returns Id of the part
+  int partId() const { return myId; }
 
   //! Returns true if the given document is a sub-document of this tree
   //! \param theDoc a document to check

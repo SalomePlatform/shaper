@@ -5,6 +5,7 @@
 
 #include "PartSet.h"
 #include "PartSet_Filters.h"
+#include "PartSet_DocumentDataModel.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -29,7 +30,6 @@ class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
 class PartSet_MenuMgr;
 class PartSet_SketcherMgr;
-class PartSet_DocumentDataModel;
 
 class QAction;
 
@@ -122,7 +122,7 @@ public:
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
 
   /// Returns data model object for representation of data tree in Object browser
-  virtual ModuleBase_IDocumentDataModel* dataModel() const;
+  virtual ModuleBase_IDocumentDataModel* dataModel() const { return myDataModel; }
 
   /// Event Listener method
   /// \param theMessage an event message

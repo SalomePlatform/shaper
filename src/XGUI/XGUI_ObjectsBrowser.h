@@ -73,10 +73,7 @@ Q_OBJECT
   }
 
   //! Returns list of currently selected objects
-  QObjectPtrList selectedObjects() const
-  {
-    return mySelectedData;
-  }
+  QObjectPtrList selectedObjects() const;
 
   /// Set selected list of objects
   /// \param theObjects list of objects to select
@@ -140,8 +137,6 @@ signals:
 
   QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
-
-  QObjectPtrList mySelectedData;
 };
 
 #endif

@@ -174,7 +174,7 @@ Q_OBJECT
   //! Types of QModelIndexes
   enum DataIds
   {
-    MyRoot,
+    //MyRoot,
     ParamsFolder,
     ParamObject,
     ConstructFolder,

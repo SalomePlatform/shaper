@@ -229,9 +229,9 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
 //***************************************************
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 {
-  bool toEnable = mySelectedData.size() == 1;
-  foreach(QAction* aCmd, actions())
-  {
+  QObjectPtrList aSelectedData = selectedObjects();
+  bool toEnable = aSelectedData.size() == 1;
+  foreach(QAction* aCmd, actions()) {
     aCmd->setEnabled(toEnable);
   }
   emit contextMenuRequested(theEvent);
@@ -240,12 +240,9 @@ void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 //***************************************************
 void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
 {
-  mySelectedData.clear();
+  myTreeView->selectionModel()->clearSelection();
   //Empty feature pointer means that selected root document
-  mySelectedData.append(ObjectPtr());
-
-  foreach(QAction* aCmd, actions())
-  {
+  foreach(QAction* aCmd, actions()) {
     aCmd->setEnabled(true);
   }
   QContextMenuEvent aEvent(QContextMenuEvent::Mouse, thePnt, myActiveDocLbl->mapToGlobal(thePnt));
@@ -255,13 +252,13 @@ void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
 //***************************************************
 void XGUI_ObjectsBrowser::onEditItem()
 {
-  if (mySelectedData.size() > 0) {
-    ObjectPtr aFeature = mySelectedData.first();
+  QObjectPtrList aSelectedData = selectedObjects();
+  if (aSelectedData.size() > 0) {
+    ObjectPtr aFeature = aSelectedData.first();
     if (aFeature) {  // Selection happens in TreeView
       // Find index which corresponds the feature
       QModelIndex aIndex;
-      foreach(QModelIndex aIdx, selectedIndexes())
-      {
+      foreach(QModelIndex aIdx, selectedIndexes()) {
         ObjectPtr aFea = dataModel()->object(aIdx);
         if (dataModel()->object(aIdx)->isSame(aFeature)) {
           aIndex = aIdx;
@@ -272,14 +269,15 @@ void XGUI_ObjectsBrowser::onEditItem()
         myTreeView->setCurrentIndex(aIndex);
         myTreeView->edit(aIndex);
       }
-    } else {  //Selection happens in Upper label
-      myActiveDocLbl->setReadOnly(false);
-      myActiveDocLbl->setFocus();
-      myActiveDocLbl->selectAll();
-      myActiveDocLbl->grabMouse();
-      myActiveDocLbl->setProperty("OldText", myActiveDocLbl->text());
+      return;
     }
   }
+  //Selection happens in Upper label
+  myActiveDocLbl->setReadOnly(false);
+  myActiveDocLbl->setFocus();
+  myActiveDocLbl->selectAll();
+  myActiveDocLbl->grabMouse();
+  myActiveDocLbl->setProperty("OldText", myActiveDocLbl->text());
 }
 
 //***************************************************
@@ -308,7 +306,6 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QObjectPtrList& theObjects)
 //***************************************************
 void XGUI_ObjectsBrowser::clearContent()  
 { 
-  mySelectedData.clear();
   myTreeView->clear(); 
 }
 
@@ -324,16 +321,21 @@ void XGUI_ObjectsBrowser::setDataModel(ModuleBase_IDocumentDataModel* theModel)
 void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
                                        const QItemSelection& theDeselected)
 {
-  mySelectedData.clear();
-  QModelIndexList aIndexes = myTreeView->selectionModel()->selectedIndexes();
+  emit selectionChanged();
+}
+
+QObjectPtrList XGUI_ObjectsBrowser::selectedObjects() const
+{
+  QObjectPtrList aList;
+  QModelIndexList aIndexes = selectedIndexes();
   ModuleBase_IDocumentDataModel* aModel = dataModel();
   QModelIndexList::const_iterator aIt;
   for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
     if ((*aIt).column() == 0) {
       ObjectPtr aObject = aModel->object(*aIt);
       if (aObject)
-        mySelectedData.append(aObject);
+        aList.append(aObject);
     }
   }
-  emit selectionChanged();
+  return aList;
 }

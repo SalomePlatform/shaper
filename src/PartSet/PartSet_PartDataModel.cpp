@@ -257,12 +257,12 @@ QVariant PartSet_PartDataModel::data(const QModelIndex& theIndex, int theRole) c
     case Qt::DisplayRole:
       // return a name
       switch (theIndex.internalId()) {
-        case MyRoot: {
-          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-          ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-          if (aObject)
-            return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
-        }
+        //case MyRoot: {
+        //  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+        //  ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
+        //  if (aObject)
+        //    return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
+        //}
         case ParamsFolder:
           return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
         case ConstructFolder:
@@ -311,8 +311,8 @@ QVariant PartSet_PartDataModel::data(const QModelIndex& theIndex, int theRole) c
     case Qt::DecorationRole:
       // return an Icon
       switch (theIndex.internalId()) {
-        case MyRoot:
-          return QIcon(":pictures/part_ico.png");
+        //case MyRoot:
+        //  return QIcon(":pictures/part_ico.png");
         case ParamsFolder:
           return QIcon(":pictures/params_folder.png");
         case ConstructFolder:
@@ -358,21 +358,26 @@ QVariant PartSet_PartDataModel::headerData(int section, Qt::Orientation orientat
 int PartSet_PartDataModel::rowCount(const QModelIndex& parent) const
 {
   if (!parent.isValid()) {
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-    if (aRootDoc->object(ModelAPI_ResultPart::group(), myId))
-      return 1;
-    else
+    //DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    //if (aRootDoc->object(ModelAPI_ResultPart::group(), myId))
+    //  return 1;
+    //else
+    //  return 0;
+    DocumentPtr aDoc = partDocument();
+    if (aDoc.get()) {
+      return getRowsNumber() + aDoc->size(ModelAPI_Feature::group());
+    } else 
       return 0;
   }
   switch (parent.internalId()) {
-    case MyRoot:
-      {
-        DocumentPtr aDoc = partDocument();
-        if (aDoc) {
-          return getRowsNumber() + aDoc->size(ModelAPI_Feature::group());
-        } else 
-          return 0;
-      }
+    //case MyRoot:
+    //  {
+    //    DocumentPtr aDoc = partDocument();
+    //    if (aDoc) {
+    //      return getRowsNumber() + aDoc->size(ModelAPI_Feature::group());
+    //    } else 
+    //      return 0;
+    //  }
     case ParamsFolder:
       return partDocument()->size(ModelAPI_ResultParameter::group());
     case ConstructFolder:
@@ -392,38 +397,57 @@ int PartSet_PartDataModel::columnCount(const QModelIndex &parent) const
 
 QModelIndex PartSet_PartDataModel::index(int theRow, int theColumn, const QModelIndex &theParent) const
 {
-  if (!theParent.isValid())
-    return createIndex(theRow, 0, (qint32) MyRoot);
-
-  int aId = (int) theParent.internalId();
-  switch (aId) {
-    case MyRoot:
-      switch (theRow) {
-        case 0:
-          return createIndex(theRow, 0, (qint32) ParamsFolder);
-        case 1:
-          return createIndex(theRow, 0, (qint32) ConstructFolder);
-        case 2:
-          return createIndex(theRow, 0, (qint32) BodiesFolder);
-        case 3:
-          {
-          int aSize = partDocument()->size(ModelAPI_ResultGroup::group());
-          if (aSize > 0)
-            return createIndex(theRow, 0, (qint32) GroupsFolder);
-          else
-            return createIndex(theRow, theColumn, (qint32) HistoryObject);
-          }
-        default:
+  if (!theParent.isValid()) {
+  //  return createIndex(theRow, 0, (qint32) MyRoot);
+    switch (theRow) {
+      case 0:
+        return createIndex(theRow, theColumn, (qint32) ParamsFolder);
+      case 1:
+        return createIndex(theRow, theColumn, (qint32) ConstructFolder);
+      case 2:
+        return createIndex(theRow, theColumn, (qint32) BodiesFolder);
+      case 3:
+        {
+        int aSize = partDocument()->size(ModelAPI_ResultGroup::group());
+        if (aSize > 0)
+          return createIndex(theRow, theColumn, (qint32) GroupsFolder);
+        else
           return createIndex(theRow, theColumn, (qint32) HistoryObject);
-      }
-    case ParamsFolder:
-      return createIndex(theRow, 0, (qint32) ParamObject);
-    case ConstructFolder:
-      return createIndex(theRow, 0, (qint32) ConstructObject);
-    case BodiesFolder:
-      return createIndex(theRow, 0, (qint32) BodiesObject);
-    case GroupsFolder:
-      return createIndex(theRow, 0, (qint32) GroupObject);
+        }
+      default:
+        return createIndex(theRow, theColumn, (qint32) HistoryObject);
+    }
+  } else {
+    int aId = (int) theParent.internalId();
+    switch (aId) {
+      //case MyRoot:
+      //  switch (theRow) {
+      //    case 0:
+      //      return createIndex(theRow, 0, (qint32) ParamsFolder);
+      //    case 1:
+      //      return createIndex(theRow, 0, (qint32) ConstructFolder);
+      //    case 2:
+      //      return createIndex(theRow, 0, (qint32) BodiesFolder);
+      //    case 3:
+      //      {
+      //      int aSize = partDocument()->size(ModelAPI_ResultGroup::group());
+      //      if (aSize > 0)
+      //        return createIndex(theRow, 0, (qint32) GroupsFolder);
+      //      else
+      //        return createIndex(theRow, theColumn, (qint32) HistoryObject);
+      //      }
+      //    default:
+      //      return createIndex(theRow, theColumn, (qint32) HistoryObject);
+      //  }
+      case ParamsFolder:
+        return createIndex(theRow, theColumn, (qint32) ParamObject);
+      case ConstructFolder:
+        return createIndex(theRow, theColumn, (qint32) ConstructObject);
+      case BodiesFolder:
+        return createIndex(theRow, theColumn, (qint32) BodiesObject);
+      case GroupsFolder:
+        return createIndex(theRow, theColumn, (qint32) GroupObject);
+    }
   }
   return QModelIndex();
 }
@@ -431,23 +455,24 @@ QModelIndex PartSet_PartDataModel::index(int theRow, int theColumn, const QModel
 QModelIndex PartSet_PartDataModel::parent(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
-    case MyRoot:
-      return QModelIndex();
+    //case MyRoot:
+    //  return QModelIndex();
     case ParamsFolder:
     case ConstructFolder:
     case BodiesFolder:
     case GroupsFolder:
     case HistoryObject:
-      return createIndex(0, 0, (qint32) MyRoot);
+      return QModelIndex();
+      //return createIndex(0, 0, (qint32) MyRoot);
 
     case ParamObject:
-      return createIndex(0, 0, (qint32) ParamsFolder);
+      return createIndex(0, theIndex.column(), (qint32) ParamsFolder);
     case ConstructObject:
-      return createIndex(1, 0, (qint32) ConstructFolder);
+      return createIndex(1, theIndex.column(), (qint32) ConstructFolder);
     case BodiesObject:
-      return createIndex(2, 0, (qint32) BodiesFolder);
+      return createIndex(2, theIndex.column(), (qint32) BodiesFolder);
     case GroupObject:
-      return createIndex(3, 0, (qint32) GroupsFolder);
+      return createIndex(3, theIndex.column(), (qint32) GroupsFolder);
   }
   return QModelIndex();
 }
@@ -460,20 +485,21 @@ bool PartSet_PartDataModel::hasChildren(const QModelIndex& theParent) const
 DocumentPtr PartSet_PartDataModel::partDocument() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-  if (aPart)
-    return aPart->partDoc();
-  return DocumentPtr(); // null if not found
+  //ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
+  ObjectPtr aObject = aRootDoc->object(ModelAPI_Feature::group(), myId);
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFeature->firstResult()); 
+  //std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+  return aPart->partDoc();
 }
 
 ObjectPtr PartSet_PartDataModel::object(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
-    case MyRoot: {
-      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-      return aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-    }
+    //case MyRoot: {
+    //  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    //  return aRootDoc->object(ModelAPI_ResultPart::group(), myId);
+    //}
     case ParamsFolder:
     case ConstructFolder:
     case BodiesFolder:

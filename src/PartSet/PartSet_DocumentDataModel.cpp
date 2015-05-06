@@ -19,6 +19,8 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ActionInfo.h>
 
+#include <PartSetPlugin_Part.h>
+
 #include <QIcon>
 #include <QString>
 #include <QBrush>
@@ -33,7 +35,7 @@ QMap<QString, QString> PartSet_DocumentDataModel::myIcons;
 
 PartSet_DocumentDataModel::PartSet_DocumentDataModel(QObject* theParent)
     : ModuleBase_IDocumentDataModel(theParent),
-      myActivePart(0), myHistoryBackOffset(0)
+      myActivePartId(-1), myHistoryBackOffset(0)
 {
   // Create a top part of data tree model
   myModel = new PartSet_TopDataModel(this);
@@ -73,11 +75,16 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
       if (aDoc == aRootDoc) {  // If root objects
         if (aObject->groupName() == ModelAPI_ResultPart::group()) {  // Update only Parts group
             // Add a new part
-          int aStart = myPartModels.size();
-          PartSet_PartDataModel* aModel = new PartSet_PartDataModel(this);
-          aModel->setPartId(myPartModels.count());
-          myPartModels.append(aModel);
-          insertRow(aStart, partFolderNode(0));
+          int aStart = aRootDoc->size(ModelAPI_ResultPart::group());
+          if (aStart > 0) {
+            FeaturePtr aPartFeature = ModelAPI_Feature::feature(aObject);
+            PartSet_PartDataModel* aModel = new PartSet_PartDataModel(this);
+            int anId = aRootDoc->index(aPartFeature);
+            aModel->setPartId(anId);
+            //aModel->setPartId(aRootDoc->index(aObject));
+            myPartModels[anId] = aModel;
+            insertRow(aStart, partFolderNode(0));
+          }
         } else {  // Update top groups (other except parts
           QModelIndex aIndex = myModel->findParent(aObject);
           int aStart = myModel->rowCount(aIndex) - 1;
@@ -115,15 +122,26 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
         if (aGroup == ModelAPI_ResultPart::group()) {  // Update only Parts group
-          int aStart = myPartModels.size() - 1;
-          if (aStart >= 0) {// MPV: this could be reproduced on close
-            removeSubModel(aStart);
-            removeRow(aStart, partFolderNode(0));
-            if (myActivePart && (!isPartSubModel(myActivePart))) {
-              myActivePart = 0;
-              myActivePartIndex = QModelIndex();
-              myModel->setItemsColor(ACTIVE_COLOR);
+          ObjectPtr aObj;
+          FeaturePtr aFeature;
+          int aDelId = -1;
+          foreach (int aId, myPartModels.keys()) {
+            aObj = aDoc->object(ModelAPI_Feature::group(), aId);
+            if (aObj.get()) {
+              aFeature = ModelAPI_Feature::feature(aObj);
+              if (aFeature.get()) {
+                if (aFeature->getKind() == PartSetPlugin_Part::ID())
+                  continue;
+              }
             }
+            aDelId = aId;
+            break;
+          }
+          if (aDelId != -1) {
+            deactivatePart();
+            int aStart = myPartModels.size() - 1;
+            removeSubModel(aDelId);
+            removeRow(aStart, partFolderNode(0));
           }
         } else {  // Update top groups (other except parts
           QModelIndex aIndex = myModel->findGroup(aGroup);
@@ -180,17 +198,17 @@ void PartSet_DocumentDataModel::rebuildDataTree()
   clearModelIndexes();
 
   int aNbParts = aRootDoc->size(ModelAPI_ResultPart::group());
-  if (myPartModels.size() != aNbParts) {  // resize internal models
-    while (myPartModels.size() > aNbParts) {
-      delete myPartModels.last();
-      myPartModels.removeLast();
-    }
-    while (myPartModels.size() < aNbParts) {
-      myPartModels.append(new PartSet_PartDataModel(this));
-    }
-    for (int i = 0; i < myPartModels.size(); i++)
-      myPartModels.at(i)->setPartId(i);
-  }
+  //if (myPartModels.size() != aNbParts) {  // resize internal models
+  //  while (myPartModels.size() > aNbParts) {
+  //    delete myPartModels.last();
+  //    myPartModels.removeLast();
+  //  }
+  //  while (myPartModels.size() < aNbParts) {
+  //    myPartModels.append(new PartSet_PartDataModel(this));
+  //  }
+  //  for (int i = 0; i < myPartModels.size(); i++)
+  //    myPartModels.at(i)->setPartId(i);
+  //}
   endResetModel();
 }
 
@@ -198,19 +216,19 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
 {
   if (!theIndex.isValid())
     return QVariant();
-  QModelIndex aParent = theIndex.parent();
 
-  if ((theIndex.column() == 1) ) {
-    if ((theIndex.internalId() == HistoryNode) && (!aParent.isValid())) {
-      switch (theRole) {
-      case Qt::DecorationRole:
-        if (theIndex.row() == lastHistoryRow())
-          return QIcon(":pictures/arrow.png");
-      }
-    }
-    return QVariant();
-  }
+  //if ((theIndex.column() == 1) ) {
+  //  if ((theIndex.internalId() == HistoryNode) && (!aParent.isValid())) {
+  //    switch (theRole) {
+  //    case Qt::DecorationRole:
+  //      if (theIndex.row() == lastHistoryRow())
+  //        return QIcon(":pictures/arrow.png");
+  //    }
+  //  }
+  //  return QVariant();
+  //}
 
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   switch (theIndex.internalId()) {
     case PartsFolder:
       switch (theRole) {
@@ -221,7 +239,7 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
         case Qt::ToolTipRole:
           return tr("Parts folder");
         case Qt::ForegroundRole:
-          if (myActivePart)
+          if (myActivePartIndex.isValid())
               return QBrush(PASSIVE_COLOR);
             else
               return QBrush(ACTIVE_COLOR);
@@ -232,7 +250,6 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
     case HistoryNode:
       {
         int aOffset = historyOffset();
-        DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
         ObjectPtr aObj = aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
         FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
         if (!aFeature)
@@ -251,7 +268,7 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
             if (theIndex.row() > lastHistoryRow())
               return QBrush(Qt::lightGray);
             else {
-              if (myActivePart)
+              if (myActivePartIndex.isValid())
                 return QBrush(PASSIVE_COLOR);
               else
                 return QBrush(ACTIVE_COLOR);
@@ -261,9 +278,34 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
         }
       }
       break;
+    case PartResult:
+      {
+        ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), theIndex.row());
+        if (aObject) {
+          switch (theRole) {
+            case Qt::DisplayRole:
+              return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
+            case Qt::DecorationRole:
+              return QIcon(":pictures/part_ico.png");
+            case Qt::ForegroundRole:
+              {
+                if (theIndex == myActivePartIndex)
+                  return QBrush(ACTIVE_COLOR);
+                else
+                  return QBrush(PASSIVE_COLOR);
+              }
+            default:
+              return QVariant();
+          }
+        }
+      }
+      break;
   }
-  if (aParent.isValid() && (aParent.internalId() == PartsFolder)) {
-    return myPartModels.at(theIndex.row())->data(QModelIndex(), theRole);
+  QModelIndex aParent = theIndex.parent();
+  if (aParent.internalId() == HistoryNode) {
+    int aId = aParent.row() - historyOffset();
+    QModelIndex* aIndex = toSourceModelIndex(theIndex);
+    return myPartModels[aId]->data(*aIndex, theRole);
   }
   return toSourceModelIndex(theIndex)->data(theRole);
 }
@@ -276,8 +318,8 @@ QVariant PartSet_DocumentDataModel::headerData(int theSection, Qt::Orientation t
 
 int PartSet_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 {
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   if (!theParent.isValid()) {
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     // Size of external models
     int aVal = historyOffset();
     // Plus history size
@@ -285,12 +327,19 @@ int PartSet_DocumentDataModel::rowCount(const QModelIndex& theParent) const
     return aVal;
   }
   if (theParent.internalId() == PartsFolder) {
-    int aSize = myPartModels.size();
-    return myPartModels.size();
+    return aRootDoc->size(ModelAPI_ResultPart::group());
+    //int aSize = myPartModels.size();
+    //return myPartModels.size();
   }
   if (theParent.internalId() == HistoryNode) {
+    int aId = theParent.row() - historyOffset();
+    if (myPartModels.contains(aId))
+      return myPartModels[aId]->rowCount(QModelIndex());
     return 0;
   }
+  if (theParent.internalId() == PartResult)
+    return 0;
+ 
   QModelIndex* aParent = toSourceModelIndex(theParent);
   const QAbstractItemModel* aModel = aParent->model();
   if (!isSubModel(aModel))
@@ -320,18 +369,28 @@ QModelIndex PartSet_DocumentDataModel::index(int theRow, int theColumn,
     } else {
       if (theRow == aOffs)  // Create Parts node
         aIndex = partFolderNode(theColumn);
-      else
-        // create history node
+      else {
+        // create history node or a part sub-tree
+        int aId = theRow - historyOffset();
         aIndex = createIndex(theRow, theColumn, HistoryNode);
+        //if (myPartModels.contains(aId)) {
+        //  aIndex = myPartModels[aId]->index(theRow, theColumn, QModelIndex());
+        //} 
+      }
     }
   } else {
     if (theParent.internalId() == PartsFolder) {
-      aIndex = myPartModels.at(theRow)->index(0, theColumn, QModelIndex());
-    } else {
-      QModelIndex* aParent = (QModelIndex*) theParent.internalPointer();
-      aIndex = aParent->model()->index(theRow, theColumn, (*aParent));
+       aIndex = createIndex(theRow, theColumn, PartResult);
+    } else { 
+      if (theParent.internalId() == HistoryNode) {
+        int aId = theParent.row() - historyOffset();
+        aIndex = myPartModels[aId]->index(theRow, theColumn, QModelIndex());
+      } else {
+        QModelIndex* aParent = (QModelIndex*) theParent.internalPointer();
+        aIndex = aParent->model()->index(theRow, theColumn, (*aParent));
+      }
+      aIndex = createIndex(theRow, theColumn, (void*) getModelIndex(aIndex));
     }
-    aIndex = createIndex(theRow, theColumn, (void*) getModelIndex(aIndex));
   }
   return aIndex;
 }
@@ -341,18 +400,21 @@ QModelIndex PartSet_DocumentDataModel::parent(const QModelIndex& theIndex) const
   if ((theIndex.internalId() == PartsFolder) || (theIndex.internalId() == HistoryNode))
     return QModelIndex();
 
+  if (theIndex.internalId() == PartResult)
+    return partFolderNode(theIndex.column());
+
   QModelIndex* aIndex = toSourceModelIndex(theIndex);
   const QAbstractItemModel* aModel = aIndex->model();
   if (!isSubModel(aModel))
     return QModelIndex();
 
-  if (isPartSubModel(aModel)) {
-    if (!aModel->parent(*aIndex).isValid()) {
-      return partFolderNode(theIndex.column());
-    }
+  QModelIndex aIndex1 = aModel->parent(*aIndex);
+  if (isPartSubModel(aModel) && (!aIndex1.isValid())) {
+    int aId = myPartModels.key((PartSet_PartModel*) aModel);
+    int aRow = aId + historyOffset();
+    return createIndex(aRow, theIndex.column(), (qint32) HistoryNode);
   }
 
-  QModelIndex aIndex1 = aModel->parent(*aIndex);
   if (aIndex1.isValid())
     return createIndex(aIndex1.row(), aIndex1.column(), (void*) getModelIndex(aIndex1));
   return aIndex1;
@@ -411,10 +473,13 @@ ObjectPtr PartSet_DocumentDataModel::object(const QModelIndex& theIndex) const
 {
   if (theIndex.internalId() == PartsFolder)
     return ObjectPtr();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   if (theIndex.internalId() == HistoryNode) {
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     int aOffset = historyOffset();
     return aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
+  }
+  if (theIndex.internalId() == PartResult) {
+    return aRootDoc->object(ModelAPI_ResultPart::group(), theIndex.row());
   }
   QModelIndex* aIndex = toSourceModelIndex(theIndex);
   if (!isSubModel(aIndex->model()))
@@ -447,7 +512,7 @@ bool PartSet_DocumentDataModel::removeRows(int theRow, int theCount, const QMode
 
 void PartSet_DocumentDataModel::removeSubModel(int theModelId)
 {
-  PartSet_PartModel* aModel = myPartModels.at(theModelId);
+  PartSet_PartModel* aModel = myPartModels[theModelId];
   QIntList aToRemove;
   for (int i = 0; i < myIndexes.size(); i++) {
     if (myIndexes.at(i)->model() == aModel)
@@ -461,7 +526,7 @@ void PartSet_DocumentDataModel::removeSubModel(int theModelId)
     aToRemove.removeLast();
   }
   delete aModel;
-  myPartModels.removeAt(theModelId);
+  myPartModels.remove(theModelId);
 }
 
 bool PartSet_DocumentDataModel::isSubModel(const QAbstractItemModel* theModel) const
@@ -473,7 +538,7 @@ bool PartSet_DocumentDataModel::isSubModel(const QAbstractItemModel* theModel) c
 
 bool PartSet_DocumentDataModel::isPartSubModel(const QAbstractItemModel* theModel) const
 {
-  return myPartModels.contains((PartSet_PartModel*) theModel);
+  return myPartModels.key((PartSet_PartModel*) theModel, -1) != -1;
 }
 
 QModelIndex PartSet_DocumentDataModel::partFolderNode(int theColumn) const
@@ -493,52 +558,78 @@ bool PartSet_DocumentDataModel::activatePart(const QModelIndex& theIndex)
   if ((theIndex.internalId() == PartsFolder) || (theIndex.internalId() == HistoryNode))
     return false;
 
-  QModelIndex* aIndex = toSourceModelIndex(theIndex);
-  if (!aIndex)
-    return false;
+  if (theIndex.isValid() && (theIndex.internalId() == PartResult)) {
+    myActivePartIndex = theIndex;
+    myModel->setItemsColor(PASSIVE_COLOR);
+    if (myActivePartId != -1) 
+      myPartModels[myActivePartId]->setItemsColor(PASSIVE_COLOR);
+    
+    // Find activated part feature by its ID
+    ResultPartPtr aPartRes = activePart();
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aPartRes);
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    myActivePartId = aRootDoc->index(aFeature);
+    myPartModels[myActivePartId]->setItemsColor(ACTIVE_COLOR);
+  } 
+  //QModelIndex* aIndex = toSourceModelIndex(theIndex);
+  //if (!aIndex)
+  //  return false;
 
-  const QAbstractItemModel* aModel = aIndex->model();
+  //const QAbstractItemModel* aModel = aIndex->model();
 
-  if (isPartSubModel(aModel)) {
-    // if this is root node (Part item index)
-    if (!aIndex->parent().isValid()) {
-      if (myActivePart)
-        myActivePart->setItemsColor(PASSIVE_COLOR);
+  //if (isPartSubModel(aModel)) {
+  //  // if this is root node (Part item index)
+  //  if (!aIndex->parent().isValid()) {
+  //    if (myActivePart)
+  //      myActivePart->setItemsColor(PASSIVE_COLOR);
 
-        if (myActivePart == aModel) {
-          myActivePart = 0;
-          myActivePartIndex = QModelIndex();
-        } else {
-          myActivePart = (PartSet_PartModel*)aModel;
-          myActivePartIndex = theIndex;
-        }
+  //      if (myActivePart == aModel) {
+  //        myActivePart = 0;
+  //        myActivePartIndex = QModelIndex();
+  //      } else {
+  //        myActivePart = (PartSet_PartModel*)aModel;
+  //        myActivePartIndex = theIndex;
+  //      }
 
-        if (myActivePart) {
-          myActivePart->setItemsColor(ACTIVE_COLOR);
-          myModel->setItemsColor(PASSIVE_COLOR);
-        } else
-          myModel->setItemsColor(ACTIVE_COLOR);
-        return true;
-      }
-    }
-  return false;
+  //      if (myActivePart) {
+  //        myActivePart->setItemsColor(ACTIVE_COLOR);
+  //        myModel->setItemsColor(PASSIVE_COLOR);
+  //      } else
+  //        myModel->setItemsColor(ACTIVE_COLOR);
+  //      return true;
+  //    }
+  //  }
+  return true;
 }
 
 ResultPartPtr PartSet_DocumentDataModel::activePart() const
 {
-  if (myActivePart)
-    return myActivePart->part();
+  if (myActivePartIndex.isValid()) {
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    ObjectPtr aObj = aRootDoc->object(ModelAPI_ResultPart::group(), myActivePartIndex.row());
+    return std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+  }
   return ResultPartPtr();
+}
+
+QModelIndex PartSet_DocumentDataModel::activePartTree() const
+{
+  if (myActivePartId != -1) {
+    return createIndex(myActivePartId + historyOffset(), 0, HistoryNode);
+  }
+  return QModelIndex();
 }
 
 void PartSet_DocumentDataModel::deactivatePart()
 {
-  if (myActivePart)
-    myActivePart->setItemsColor(PASSIVE_COLOR);
-    myActivePart = 0;
+  if (myActivePartIndex.isValid()) {
+    if (myActivePartId != -1) 
+      myPartModels[myActivePartId]->setItemsColor(PASSIVE_COLOR);
+    myActivePartId = -1;
     myActivePartIndex = QModelIndex();
     myModel->setItemsColor(ACTIVE_COLOR);
   }
+}
 
 Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) const
 {
@@ -556,18 +647,24 @@ Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) cons
 
 QModelIndex PartSet_DocumentDataModel::partIndex(const ResultPartPtr& theObject) const
 {
-  int aRow = -1;
-  PartSet_PartModel* aModel = 0;
-  foreach (PartSet_PartModel* aPartModel, myPartModels)
-  {
-    aRow++;
-    if (aPartModel->part() == theObject) {
-      aModel = aPartModel;
-      break;
-    }
-  }
-  if (aModel) {
-    return createIndex(aRow, 0, (void*) getModelIndex(aModel->index(0, 0, QModelIndex())));
+  //int aRow = -1;
+  //PartSet_PartModel* aModel = 0;
+  //foreach (PartSet_PartModel* aPartModel, myPartModels)
+  //{
+  //  aRow++;
+  //  if (aPartModel->part() == theObject) {
+  //    aModel = aPartModel;
+  //    break;
+  //  }
+  //}
+  //if (aModel) {
+  //  return createIndex(aRow, 0, (void*) getModelIndex(aModel->index(0, 0, QModelIndex())));
+  //}
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  int aNb = aRootDoc->size(ModelAPI_ResultPart::group());
+  for (int aId = 0; aId < aNb; aId++) {
+    if (theObject == aRootDoc->object(ModelAPI_ResultPart::group(), aId))
+      return createIndex(aId, 0, PartResult);
   }
   return QModelIndex();
 }
@@ -598,8 +695,7 @@ QModelIndex PartSet_DocumentDataModel::objectIndex(const ObjectPtr theObject) co
     }
   } else {
     PartSet_PartModel* aPartModel = 0;
-    foreach(PartSet_PartModel* aModel, myPartModels)
-    {
+    foreach(PartSet_PartModel* aModel, myPartModels) {
       if (aModel->hasDocument(aDoc)) {
         aPartModel = aModel;
         break;
@@ -607,8 +703,7 @@ QModelIndex PartSet_DocumentDataModel::objectIndex(const ObjectPtr theObject) co
     }
     if (aPartModel) {
       QModelIndex aIndex = aPartModel->objectIndex(theObject);
-      return
-          aIndex.isValid() ?
+      return aIndex.isValid() ?
               createIndex(aIndex.row(), aIndex.column(), (void*) getModelIndex(aIndex)) :
               QModelIndex();
     }
@@ -621,7 +716,7 @@ void PartSet_DocumentDataModel::clear()
 {
   clearModelIndexes();
   clearSubModels();
-  myActivePart = 0;
+  //myActivePart = 0;
   myActivePartIndex = QModelIndex();
   myModel->setItemsColor(ACTIVE_COLOR);
 }

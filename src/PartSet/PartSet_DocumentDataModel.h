@@ -11,6 +11,7 @@
 
 #include <Events_Listener.h>
 #include <QList>
+#include <QMap>
 
 class ModelAPI_Document;
 class PartSet_PartModel;
@@ -116,6 +117,9 @@ Q_OBJECT
     return myActivePartIndex;
   }
 
+  //! Returns parent index of active part tree (index of Part feature) 
+  QModelIndex activePartTree() const;
+
   //! Deactivates a Part
   void deactivatePart();
 
@@ -138,8 +142,9 @@ Q_OBJECT
 
   enum
   {
-    PartsFolder,
-    HistoryNode
+    PartsFolder = -100,
+    HistoryNode,
+    PartResult
   };
 
   //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
@@ -178,10 +183,10 @@ Q_OBJECT
   PartSet_TopDataModel* myModel;
 
   //! Data models for Parts data tree representation (one data model per a one part)
-  QList<PartSet_PartModel*> myPartModels;
+  QMap<int, PartSet_PartModel*> myPartModels;
 
   //! Active part in part editing mode
-  PartSet_PartModel* myActivePart;
+  int myActivePartId;
 
   QModelIndex myActivePartIndex;
 
