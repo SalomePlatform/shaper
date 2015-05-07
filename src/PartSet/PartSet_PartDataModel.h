@@ -171,6 +171,8 @@ Q_OBJECT
   //! Returns defult number of rows
   int getRowsNumber() const;
 
+  int lastHistoryRow() const;
+
   //! Types of QModelIndexes
   enum DataIds
   {
@@ -186,6 +188,7 @@ Q_OBJECT
     HistoryObject
   };
 
+  int myHistoryBackOffset;
 };
 
 #endif

@@ -58,6 +58,7 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
 
+
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
@@ -81,7 +82,6 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
             PartSet_PartDataModel* aModel = new PartSet_PartDataModel(this);
             int anId = aRootDoc->index(aPartFeature);
             aModel->setPartId(anId);
-            //aModel->setPartId(aRootDoc->index(aObject));
             myPartModels[anId] = aModel;
             insertRow(aStart, partFolderNode(0));
           }
@@ -197,18 +197,38 @@ void PartSet_DocumentDataModel::rebuildDataTree()
   beginResetModel();
   clearModelIndexes();
 
-  int aNbParts = aRootDoc->size(ModelAPI_ResultPart::group());
-  //if (myPartModels.size() != aNbParts) {  // resize internal models
-  //  while (myPartModels.size() > aNbParts) {
-  //    delete myPartModels.last();
-  //    myPartModels.removeLast();
-  //  }
-  //  while (myPartModels.size() < aNbParts) {
-  //    myPartModels.append(new PartSet_PartDataModel(this));
-  //  }
-  //  for (int i = 0; i < myPartModels.size(); i++)
-  //    myPartModels.at(i)->setPartId(i);
-  //}
+  // Delete extra models
+  ObjectPtr aObj;
+  FeaturePtr aFeature;
+  QIntList aDelList;
+  foreach (int aId, myPartModels.keys()) {
+    aObj = aRootDoc->object(ModelAPI_Feature::group(), aId);
+    if (aObj.get()) {
+      aFeature = ModelAPI_Feature::feature(aObj);
+      if (aFeature.get()) {
+        if (aFeature->getKind() == PartSetPlugin_Part::ID())
+          continue;
+      }
+    }
+    aDelList.append(aId);
+    break;
+  }
+  foreach (int aId, aDelList) {
+    removeSubModel(aId);
+  }
+  // Add non existing models
+  int aHistNb = aRootDoc->size(ModelAPI_Feature::group());
+  for (int i = 0; i < aHistNb; i++) {
+    aObj = aRootDoc->object(ModelAPI_Feature::group(), i);
+    aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
+      if (!myPartModels.contains(i)) {
+        PartSet_PartDataModel* aModel = new PartSet_PartDataModel(this);
+        aModel->setPartId(i);
+        myPartModels[i] = aModel;
+      }
+    }
+  }
   endResetModel();
 }
 
@@ -217,18 +237,29 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
   if (!theIndex.isValid())
     return QVariant();
 
-  //if ((theIndex.column() == 1) ) {
-  //  if ((theIndex.internalId() == HistoryNode) && (!aParent.isValid())) {
-  //    switch (theRole) {
-  //    case Qt::DecorationRole:
-  //      if (theIndex.row() == lastHistoryRow())
-  //        return QIcon(":pictures/arrow.png");
-  //    }
-  //  }
-  //  return QVariant();
-  //}
-
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  QModelIndex aParent = theIndex.parent();
+  if ((theIndex.column() == 1) ) {
+    if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
+      if (ModelAPI_Session::get()->activeDocument() == aRootDoc) {
+        if ((theIndex.internalId() == HistoryNode) && (!aParent.isValid())) {
+          switch (theRole) {
+          case Qt::DecorationRole:
+            if (theIndex.row() == lastHistoryRow())
+              return QIcon(":pictures/arrow.png");
+          }
+        }
+      }
+    } else {
+      QModelIndex* aIndex = toSourceModelIndex(theIndex);
+      const QAbstractItemModel* aModel = aIndex->model();
+      if (isPartSubModel(aModel)) {
+        return aModel->data(*aIndex, theRole);
+      }
+    }
+    return QVariant();
+  }
+
   switch (theIndex.internalId()) {
     case PartsFolder:
       switch (theRole) {
@@ -301,7 +332,6 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
       }
       break;
   }
-  QModelIndex aParent = theIndex.parent();
   if (aParent.internalId() == HistoryNode) {
     int aId = aParent.row() - historyOffset();
     QModelIndex* aIndex = toSourceModelIndex(theIndex);
@@ -354,7 +384,7 @@ int PartSet_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 
 int PartSet_DocumentDataModel::columnCount(const QModelIndex& theParent) const
 {
-  return 1;
+  return 2;
 }
 
 QModelIndex PartSet_DocumentDataModel::index(int theRow, int theColumn,
@@ -370,12 +400,8 @@ QModelIndex PartSet_DocumentDataModel::index(int theRow, int theColumn,
       if (theRow == aOffs)  // Create Parts node
         aIndex = partFolderNode(theColumn);
       else {
-        // create history node or a part sub-tree
-        int aId = theRow - historyOffset();
+        // create history node
         aIndex = createIndex(theRow, theColumn, HistoryNode);
-        //if (myPartModels.contains(aId)) {
-        //  aIndex = myPartModels[aId]->index(theRow, theColumn, QModelIndex());
-        //} 
       }
     }
   } else {
@@ -401,7 +427,7 @@ QModelIndex PartSet_DocumentDataModel::parent(const QModelIndex& theIndex) const
     return QModelIndex();
 
   if (theIndex.internalId() == PartResult)
-    return partFolderNode(theIndex.column());
+    return partFolderNode(0);
 
   QModelIndex* aIndex = toSourceModelIndex(theIndex);
   const QAbstractItemModel* aModel = aIndex->model();
@@ -412,11 +438,11 @@ QModelIndex PartSet_DocumentDataModel::parent(const QModelIndex& theIndex) const
   if (isPartSubModel(aModel) && (!aIndex1.isValid())) {
     int aId = myPartModels.key((PartSet_PartModel*) aModel);
     int aRow = aId + historyOffset();
-    return createIndex(aRow, theIndex.column(), (qint32) HistoryNode);
+    return createIndex(aRow, 0, (qint32) HistoryNode);
   }
 
   if (aIndex1.isValid())
-    return createIndex(aIndex1.row(), aIndex1.column(), (void*) getModelIndex(aIndex1));
+    return createIndex(aIndex1.row(), 0, (void*) getModelIndex(aIndex1));
   return aIndex1;
 }
 
@@ -633,7 +659,7 @@ void PartSet_DocumentDataModel::deactivatePart()
 
 Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) const
 {
-  Qt::ItemFlags aFlags = QAbstractItemModel::flags(theIndex); //Qt::ItemIsSelectable; 
+  Qt::ItemFlags aFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled; //QAbstractItemModel::flags(theIndex); 
   if (object(theIndex)) {
     aFlags |= Qt::ItemIsEditable;
   }
@@ -690,7 +716,7 @@ QModelIndex PartSet_DocumentDataModel::objectIndex(const ObjectPtr theObject) co
       QModelIndex aIndex = myModel->objectIndex(theObject);
       return
           aIndex.isValid() ?
-              createIndex(aIndex.row(), aIndex.column(), (void*) getModelIndex(aIndex)) :
+              createIndex(aIndex.row(), 0, (void*) getModelIndex(aIndex)) :
               QModelIndex();
     }
   } else {
@@ -704,7 +730,7 @@ QModelIndex PartSet_DocumentDataModel::objectIndex(const ObjectPtr theObject) co
     if (aPartModel) {
       QModelIndex aIndex = aPartModel->objectIndex(theObject);
       return aIndex.isValid() ?
-              createIndex(aIndex.row(), aIndex.column(), (void*) getModelIndex(aIndex)) :
+              createIndex(aIndex.row(), 0, (void*) getModelIndex(aIndex)) :
               QModelIndex();
     }
   }
