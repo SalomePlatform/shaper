@@ -171,3 +171,9 @@ FeaturePtr ModelAPI_Feature::feature(ObjectPtr theObject)
   }
   return aFeature;
 }
+
+
+bool ModelAPI_Feature::isMacro() const
+{
+  return false;
+}

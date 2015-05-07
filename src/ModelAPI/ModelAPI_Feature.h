@@ -98,6 +98,10 @@ class ModelAPI_Feature : public ModelAPI_Object
     return false;
   }
 
+  /// Returns true if this feature is used as macro: creates other features and then removed.
+  /// \returns false by default
+  MODELAPI_EXPORT virtual bool isMacro() const;
+
   /// Must return document where the new feature must be added to
   /// By default it is empty: it is added to the document this method is called to
   MODELAPI_EXPORT virtual const std::string& documentToAdd();

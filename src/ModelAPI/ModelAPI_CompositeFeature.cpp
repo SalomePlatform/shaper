@@ -10,4 +10,3 @@ ModelAPI_CompositeFeature::~ModelAPI_CompositeFeature()
 {
 
 }
-
