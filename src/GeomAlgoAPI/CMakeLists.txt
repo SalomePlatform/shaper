@@ -21,6 +21,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Placement.h
     GeomAlgoAPI_BREPImport.h
     GeomAlgoAPI_STEPImport.h
+    GeomAlgoAPI_IGESImport.h
 )
 
 SET(PROJECT_SOURCES
@@ -38,6 +39,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Placement.cpp
     GeomAlgoAPI_BREPImport.cpp
     GeomAlgoAPI_STEPImport.cpp
+    GeomAlgoAPI_IGESImport.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -54,6 +56,7 @@ SET(PROJECT_LIBRARIES
     ${CAS_TKPrim}
     ${CAS_TKSTEP}
     ${CAS_TKSTEPBase}
+    ${CAS_TKIGES}
     ${CAS_TKTopAlgo}
     ${CAS_TKXSBase} 
 )

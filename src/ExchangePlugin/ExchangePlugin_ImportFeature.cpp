@@ -10,6 +10,7 @@
 #include <ExchangePlugin_ImportFeature.h>
 #include <GeomAlgoAPI_BREPImport.h>
 #include <GeomAlgoAPI_STEPImport.h>
+#include <GeomAlgoAPI_IGESImport.h>
 
 #include <GeomAPI_Shape.h>
 #include <Config_Common.h>
@@ -89,6 +90,8 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
     aShape = BREPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
   } else if (aFormatName == "STEP" || aFormatName == "STP") {
     aShape = STEPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
+  } else if (aFormatName == "IGES") {
+    aShape = IGESImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
   }
    // Check if shape is valid
   if ( aShape.IsNull() ) {
