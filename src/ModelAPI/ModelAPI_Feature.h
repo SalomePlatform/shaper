@@ -26,6 +26,8 @@ class ModelAPI_Feature : public ModelAPI_Object
 {
   ///< list of current results of this feature
   std::list<std::shared_ptr<ModelAPI_Result> > myResults;
+  ///< is feature disabled or not
+  bool myIsDisabled;
  public:
   /// Returns the unique kind of a feature (like "Point")
   virtual const std::string& getKind() = 0;
@@ -98,9 +100,21 @@ class ModelAPI_Feature : public ModelAPI_Object
     return false;
   }
 
+  /// Returns true if this feature is used as macro: creates other features and then removed.
+  /// \returns false by default
+  MODELAPI_EXPORT virtual bool isMacro() const;
+
   /// Must return document where the new feature must be added to
   /// By default it is empty: it is added to the document this method is called to
   MODELAPI_EXPORT virtual const std::string& documentToAdd();
+
+  /// Enables/disables the feature. The disabled feature has no results and does not participate in
+  /// any calculation.
+  /// \returns true if state is really changed
+  MODELAPI_EXPORT virtual bool setDisabled(const bool theFlag);
+
+  /// Returns the feature is disabled or not.
+  MODELAPI_EXPORT virtual bool isDisabled() const;
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Feature();

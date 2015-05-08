@@ -88,6 +88,15 @@ public:
   //! If theHidden is true, it counts also the features that are not in tree
   virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;
 
+  //! Returns the feature that is currently edited in this document, normally
+  //! this is the latest created feature
+  //! \returns null if next created feature must be the first
+  virtual std::shared_ptr<ModelAPI_Feature> currentFeature() = 0;
+
+  //! Sets the current feature: all features below will be disabled, new features
+  //! will be appended after this one.
+  virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent) = 0;
+
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
 

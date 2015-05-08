@@ -171,3 +171,25 @@ FeaturePtr ModelAPI_Feature::feature(ObjectPtr theObject)
   }
   return aFeature;
 }
+
+
+bool ModelAPI_Feature::isMacro() const
+{
+  return false;
+}
+
+bool ModelAPI_Feature::setDisabled(const bool theFlag)
+{
+  if (myIsDisabled != theFlag) {
+    myIsDisabled = theFlag;
+    if (myIsDisabled)
+      eraseResults();
+    return true;
+  }
+  return false;
+}
+
+bool ModelAPI_Feature::isDisabled() const
+{
+  return myIsDisabled;
+}

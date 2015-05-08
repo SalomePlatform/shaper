@@ -26,10 +26,13 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_SketchEntity.h>
+
+#include <Events_Loop.h>
 
 #include <memory>
 
@@ -242,6 +245,14 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
         aDirX->setValue(aXDir);
         std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
       }
+    }
+  } else if (theID == SketchPlugin_Sketch::NORM_ID() || theID == SketchPlugin_Sketch::DIRX_ID()) {
+    // send all sub-elements are also updated: all entities become created on different plane
+    static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+    std::list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
+    std::list<ObjectPtr>::iterator aSub = aSubs.begin();
+    for(; aSub != aSubs.end(); aSub++) {
+      ModelAPI_EventCreator::get()->sendUpdated(*aSub, anUpdateEvent);
     }
   }
 }

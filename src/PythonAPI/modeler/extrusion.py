@@ -18,7 +18,7 @@ class Extrusion():
     else:
 	  self.my.data().boolean("reverse").setValue(False)
 
-    self.my.data().real("size").setValue(size)
+    self.my.data().real("to_size").setValue(size)
 
     if ModelAPI_Session.get().validators().validate(self.my):
       self.my.execute()
@@ -34,7 +34,7 @@ class Extrusion():
     else:
       self.my.data().boolean("reverse").setValue(False)
 
-    self.my.data().real("size").setValue(size)
+    self.my.data().real("to_size").setValue(size)
     self.my.execute()
 
   def result (self):

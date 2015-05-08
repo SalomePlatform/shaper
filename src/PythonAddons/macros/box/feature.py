@@ -82,8 +82,9 @@ class BoxFeature(modeler.Feature):
     self.base.setValue( self.length, length )
     self.box.setSize( height )
 
-    # Publishing the result
-    self.addResult( self.box.result() )
-
-	
-
+    # Publishing the result: not needed for Macro feature
+    #self.addResult( self.box.result() )
+  
+  def isMacro(self):
+    # Box feature is macro: removes itself on the creation transaction finish
+    return True
