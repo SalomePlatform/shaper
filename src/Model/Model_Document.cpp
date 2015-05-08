@@ -969,7 +969,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature()
   static TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   Handle(TDF_Reference) aRef;
   if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
-    return feature(aRef->Get());
+    TDF_Label aLab = aRef->Get();
+    return feature(aLab);
   }
   return std::shared_ptr<ModelAPI_Feature>(); // null feature means the higher than first
 }
