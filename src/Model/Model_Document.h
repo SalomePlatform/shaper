@@ -134,6 +134,15 @@ class Model_Document : public ModelAPI_Document
   //! If theHidden is true, it counts also the features that are not in tree
   MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theHidden = false);
 
+  //! Returns the feature that is currently edited in this document, normally
+  //! this is the latest created feature
+  //! \returns null if next created feature must be the first
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> currentFeature();
+
+  //! Sets the current feature: all features below will be disabled, new features
+  //! will be appended after this one.
+  MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent);
+
   /// Creates a construction cresults
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
@@ -170,6 +179,8 @@ class Model_Document : public ModelAPI_Document
 
   //! Returns (creates if needed) the features label
   TDF_Label featuresLabel() const;
+  //! Returns (creates if needed) the general label
+  TDF_Label generalLabel() const;
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index

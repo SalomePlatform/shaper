@@ -49,6 +49,9 @@ static const int TAG_GENERAL = 1;  // general properties tag
 static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
 static const int TAG_HISTORY = 3;  // tag of the history sub-tree (python dump)
 
+// general sub-labels
+static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
+
 // feature sub-labels
 static const int TAG_FEATURE_ARGUMENTS = 1;  ///< where the arguments are located
 static const int TAG_FEATURE_RESULTS = 2;  ///< where the results are located
@@ -596,6 +599,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
       // event: feature is added
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+      setCurrentFeature(aFeature); // after all this feature stays in the document, so make it current
     } else { // feature must be executed
        // no creation event => updater not working, problem with remove part
       aFeature->execute();
@@ -695,6 +699,14 @@ void Model_Document::removeFeature(FeaturePtr theFeature/*, const bool theCheck*
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aRefIter);
       if (aComposite.get()) {
         aComposite->removeFeature(theFeature);
+      }
+    }
+    // if this feature is current, make the current the previous feature
+    if (theFeature == currentFeature()) {
+      int aCurrentIndex = index(theFeature);
+      if (aCurrentIndex != -1) {
+        setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(
+          object(ModelAPI_Feature::group(), aCurrentIndex - 1)));
       }
     }
 
@@ -952,9 +964,58 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
   return aResult;
 }
 
+std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature()
+{
+  static TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
+  Handle(TDF_Reference) aRef;
+  if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+    return feature(aRef->Get());
+  }
+  return std::shared_ptr<ModelAPI_Feature>(); // null feature means the higher than first
+}
+
+void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent)
+{
+  static TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
+  if (theCurrent.get()) {
+    std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
+    if (aData.get()) {
+      TDF_Label aFeatureLabel = aData->label().Father();
+      Handle(TDF_Reference) aRef;
+      if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+        aRef->Set(aFeatureLabel);
+      } else {
+        aRef = TDF_Reference::Set(aRefLab, aFeatureLabel);
+      }
+    }
+  } else { // remove reference for the null feature
+    aRefLab.ForgetAttribute(TDF_Reference::GetID());
+  }
+  // make all features after this feature disabled in reversed order (to remove results without deps)
+  bool aPassed = false; // flag that the current object is already passed in cycle
+  int aSize = size(ModelAPI_Feature::group(), true);
+  for(int a = aSize - 1; a >= 0; a--) {
+    FeaturePtr aFeature = 
+      std::dynamic_pointer_cast<ModelAPI_Feature>(object(ModelAPI_Feature::group(), a, true));
+    if (aFeature->setDisabled(!aPassed)) {
+      // state of feature is changed => so feature become updated
+      static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
+
+    }
+    // check this only after passed become enabled: the current feature is enabled!
+    if (aFeature == theCurrent) aPassed = true;
+  }
+}
+
 TDF_Label Model_Document::featuresLabel() const
 {
   return myDoc->Main().FindChild(TAG_OBJECTS);
+}
+
+TDF_Label Model_Document::generalLabel() const
+{
+  return myDoc->Main().FindChild(TAG_GENERAL);
 }
 
 void Model_Document::setUniqueName(FeaturePtr theFeature)
