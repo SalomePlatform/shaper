@@ -8,7 +8,7 @@
           id="import_file_selector"
           title="Import file"
           path="">
-          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP:STEPImport" />
+          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP|STP:STEPImport" />
         </file_selector>
       </feature>
     </group>

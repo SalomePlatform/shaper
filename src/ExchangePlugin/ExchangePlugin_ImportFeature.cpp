@@ -87,7 +87,7 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   TopoDS_Shape aShape;
   if (aFormatName == "BREP") {
     aShape = BREPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
-  } else if (aFormatName == "STEP") {
+  } else if (aFormatName == "STEP" || aFormatName == "STP") {
     aShape = STEPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
   }
    // Check if shape is valid

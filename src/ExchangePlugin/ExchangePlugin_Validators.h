@@ -26,7 +26,7 @@ class ExchangePlugin_ImportFormatValidator : public ModelAPI_AttributeValidator
    * and list of corresponding plugins: "BREPImport", "STEPImport"
    */
   static bool parseFormats(const std::list<std::string>& theArguments,
-                             std::list<std::string>& outFormats);
+                           std::list<std::string>& outFormats);
 public:
   /**
    * Returns true is the file-name attribute correctly corresponds to the set of

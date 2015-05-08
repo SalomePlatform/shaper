@@ -17,14 +17,15 @@
 
 #include <Config_WidgetAPI.h>
 
-#include <QGridLayout>
 #include <QFileDialog>
+#include <QGridLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QList>
 #include <QObject>
 #include <QPushButton>
+#include <QRegExp>
 #include <QString>
-#include <QLabel>
 
 #include <memory>
 #include <string>
@@ -131,7 +132,9 @@ QString ModuleBase_WidgetFileSelector::formatsString() const
   QStringList aValidatorFormats = getValidatorFormats();
 
   foreach(QString eachFormat, aValidatorFormats)  {
-    aResult << QString("%1 files (*.%1)").arg(eachFormat);
+    QStringList aFormatList = eachFormat.split("|");
+    aResult << QString("%1 files (%2)").arg(aFormatList.value(0))
+        .arg(QStringList(aFormatList).replaceInStrings(QRegExp("^(.*)$"), "*.\\1").join(" "));
   }
   aResult << QString("All files (*.*)");
   return aResult.join(";;");

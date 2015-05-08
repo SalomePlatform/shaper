@@ -12,6 +12,7 @@
 
 #include <list>
 #include <string>
+#include <sstream>
 #include <algorithm>
 
 bool ExchangePlugin_ImportFormatValidator::parseFormats(const std::list<std::string>& theArguments,
@@ -26,9 +27,12 @@ bool ExchangePlugin_ImportFormatValidator::parseFormats(const std::list<std::str
       result = false;
       continue;
     }
-    std::string aFormat = anArg.substr(0, aSepPos);
-    std::transform(aFormat.begin(), aFormat.end(), aFormat.begin(), toupper);
-    outFormats.push_back(aFormat);
+    std::string aFormatList = anArg.substr(0, aSepPos);
+    std::transform(aFormatList.begin(), aFormatList.end(), aFormatList.begin(), toupper);
+    std::istringstream aStream(aFormatList);
+    std::string aFormat;
+    while (std::getline(aStream, aFormat, '|'))
+      outFormats.push_back(aFormat);
   }
   return result;
 }
