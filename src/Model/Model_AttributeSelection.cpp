@@ -98,7 +98,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
     // to keep the reference attribute label
     TDF_Label aRefLab = myRef.myRef->Label();
     aSelLab.ForgetAllAttributes(true);
-    myRef.myRef = TDF_Reference::Set(aSelLab, aSelLab);
+    myRef.myRef = TDF_Reference::Set(aSelLab.Father(), aSelLab.Father());
     return;
   }
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
