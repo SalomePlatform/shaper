@@ -22,6 +22,8 @@
 
 #include <SketcherPrs_Factory.h>
 
+#include <cmath>
+
 #define PI 3.1415926535897932
 
 SketchPlugin_MultiRotation::SketchPlugin_MultiRotation()
@@ -234,8 +236,8 @@ void SketchPlugin_MultiRotation::rotateFeature(
     double theCenterX, double theCenterY, double theAngle)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aCenter(new GeomAPI_Pnt2d(theCenterX, theCenterY));
-  double cosA = cos(theAngle);
-  double sinA = sin(theAngle);
+  double cosA = std::cos(theAngle);
+  double sinA = std::sin(theAngle);
 
   FeaturePtr anInitialFeature = ModelAPI_Feature::feature(theInitial);
   FeaturePtr aTargetFeature = ModelAPI_Feature::feature(theTarget);

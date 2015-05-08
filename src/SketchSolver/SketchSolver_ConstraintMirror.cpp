@@ -10,6 +10,7 @@
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_XY.h>
 
+#include <cmath>
 
 void SketchSolver_ConstraintMirror::getAttributes(
     Slvs_Entity& theMirrorLine,
@@ -342,11 +343,11 @@ void SketchSolver_ConstraintMirror::adjustArcPoints(const Slvs_Entity& theArc) c
   }
   double aRad2 = anArcParams[1][0] * anArcParams[1][0] + anArcParams[1][1] * anArcParams[1][1];
   double aDist2 = anArcParams[2][0] * anArcParams[2][0] + anArcParams[2][1] * anArcParams[2][1];
-  if (fabs(aRad2 - aDist2) < tolerance)
+  if (std::fabs(aRad2 - aDist2) < tolerance)
     return; // nothing to update (last point already on the arc)
   if (aDist2 < tolerance)
     return; // unable to update
-  double aCoeff = sqrt(aRad2 / aDist2);
+  double aCoeff = std::sqrt(aRad2 / aDist2);
   anArcParams[2][0] *= aCoeff;
   anArcParams[2][1] *= aCoeff;
 
