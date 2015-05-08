@@ -24,6 +24,7 @@
 #include <QIcon>
 #include <QString>
 #include <QBrush>
+#include <QTreeView>
 
 #include <set>
 
@@ -659,33 +660,28 @@ void PartSet_DocumentDataModel::deactivatePart()
 
 Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) const
 {
-  Qt::ItemFlags aFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled; //QAbstractItemModel::flags(theIndex); 
-  if (object(theIndex)) {
-    aFlags |= Qt::ItemIsEditable;
+  if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
+    Qt::ItemFlags aFlags = Qt::ItemIsSelectable;
+    if (object(theIndex)) {
+      aFlags |= Qt::ItemIsEditable;
+    }
+    // Disable items which are below of last history row
+    // Do not disable second column
+    if (theIndex.internalId() == HistoryNode) {
+      if (theIndex.row() <= lastHistoryRow() || (theIndex.column() == 1))
+        aFlags |= Qt::ItemIsEnabled;
+    } else
+      aFlags |= Qt::ItemIsEnabled;
+    return aFlags;
+  } else {
+    QModelIndex* aIndex = toSourceModelIndex(theIndex);
+    const QAbstractItemModel* aModel = aIndex->model();
+    return aModel->flags(*aIndex);
   }
-  // Disable items which are below of last history row
-  // Do not disable second column
-  //if (theIndex.row() <= lastHistoryRow() || theIndex.column() == 1) {
-  //  aFlags |= Qt::ItemIsEnabled;
-  //}
-  return aFlags;
 }
 
 QModelIndex PartSet_DocumentDataModel::partIndex(const ResultPartPtr& theObject) const
 {
-  //int aRow = -1;
-  //PartSet_PartModel* aModel = 0;
-  //foreach (PartSet_PartModel* aPartModel, myPartModels)
-  //{
-  //  aRow++;
-  //  if (aPartModel->part() == theObject) {
-  //    aModel = aPartModel;
-  //    break;
-  //  }
-  //}
-  //if (aModel) {
-  //  return createIndex(aRow, 0, (void*) getModelIndex(aModel->index(0, 0, QModelIndex())));
-  //}
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   int aNb = aRootDoc->size(ModelAPI_ResultPart::group());
   for (int aId = 0; aId < aNb; aId++) {
@@ -754,9 +750,7 @@ int PartSet_DocumentDataModel::lastHistoryRow() const
 
 void PartSet_DocumentDataModel::setLastHistoryItem(const QModelIndex& theIndex)
 {
-  if (theIndex.internalId() == HistoryNode) {
-    myHistoryBackOffset = rowCount() - 1 - theIndex.row();
-  }
+  myHistoryBackOffset = rowCount() - 1 - theIndex.row();
 }
 
 QModelIndex PartSet_DocumentDataModel::lastHistoryItem() const
@@ -801,3 +795,38 @@ QIcon PartSet_DocumentDataModel::featureIcon(const FeaturePtr& theFeature)
   return anIcon;  
 }
 
+void PartSet_DocumentDataModel::onMouseDoubleClick(const QModelIndex& theIndex)
+{
+  QTreeView* aTreeView = dynamic_cast<QTreeView*>(sender());
+  if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
+    if ((theIndex.column() == 1) && (theIndex.internalId() == HistoryNode)) {
+      int aOldId = lastHistoryRow();
+      setLastHistoryItem(theIndex);
+      int aStartRow = std::min(aOldId, theIndex.row());
+      int aEndRow = std::max(aOldId, theIndex.row());
+      for (int i = aStartRow; i <= aEndRow; i++) {
+        aTreeView->update(createIndex(i, 0, HistoryNode));
+        aTreeView->update(createIndex(i, 1, HistoryNode));
+      }
+    }
+  } else {
+    QModelIndex* aIndex = toSourceModelIndex(theIndex);
+    const QAbstractItemModel* aModel = aIndex->model();
+    if (isPartSubModel(aModel)) {
+      PartSet_PartDataModel* aPartModel = (PartSet_PartDataModel*)aModel;
+      QModelIndex aOldItem = aPartModel->lastHistoryItem();
+      aPartModel->setLastHistoryItem(*aIndex);
+      QModelIndex aOldIndex = createIndex(aOldItem.row(), aOldItem.column(), (void*) getModelIndex(aOldItem));
+      int aStartRow = std::min(aOldItem.row(), aIndex->row());
+      int aEndRow = std::max(aOldItem.row(), aIndex->row());
+      for (int i = aStartRow; i <= aEndRow; i++) {
+        QModelIndex aInd1 = aPartModel->index(i, 0);
+        QModelIndex aInd2 = createIndex(i, 0, (void*) getModelIndex(aInd1));
+        aTreeView->update(aInd2);
+        aInd1 = aPartModel->index(i, 1);
+        aInd2 = createIndex(i, 1, (void*) getModelIndex(aInd1));
+        aTreeView->update(aInd2);
+      }
+    }
+  }
+} 

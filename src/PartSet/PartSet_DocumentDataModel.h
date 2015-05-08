@@ -133,10 +133,14 @@ Q_OBJECT
   //! \param theIndex a last index for history
   void setLastHistoryItem(const QModelIndex& theIndex);
 
+  //! Returns last history item
   QModelIndex lastHistoryItem() const;
 
   //! Returns icon name according to feature
   static QIcon featureIcon(const FeaturePtr& theFeature);
+
+ public slots:
+   void onMouseDoubleClick(const QModelIndex& theIndex);
 
  private:
 

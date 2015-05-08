@@ -641,6 +641,20 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
 }
 
 
+void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
+{
+  XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
+  if (aOB) {
+    QLineEdit* aLabel = aOB->activeDocLabel();
+    QPalette aPalet = aLabel->palette();
+    aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
+    aLabel->setPalette(aPalet);
+    connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
+      myDataModel, SLOT(onMouseDoubleClick(const QModelIndex&)));
+  }
+}
+
+
 void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
 {
   QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
