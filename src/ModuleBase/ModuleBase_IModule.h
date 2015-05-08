@@ -126,7 +126,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Returns a list of modes, where the AIS objects should be activated
   /// \param theModes a list of modes
-  virtual void activeSelectionModes(QIntList& theModes) {};
+  virtual void activeSelectionModes(QIntList& theModes) {}
+
+  /// This method is called on object browser creation for customisation of module specific features
+  /// \param theObjectBrowser a pinter on Object Browser widget
+  virtual void customizeObjectBrowser(QWidget* theObjectBrowser) {}
 
 public slots:
   /// Called on call of command corresponded to a feature

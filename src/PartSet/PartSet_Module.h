@@ -128,6 +128,10 @@ public:
   /// \param theMessage an event message
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  /// This method is called on object browser creation for customisation of module specific features
+  /// \param theObjectBrowser a pinter on Object Browser widget
+  virtual void customizeObjectBrowser(QWidget* theObjectBrowser);
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

@@ -1139,6 +1139,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
       "::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
   myObjectBrowser->setDataModel(myModule->dataModel());
+  myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
 
   myContextMenuMgr->connectObjectBrowser();

@@ -361,8 +361,11 @@ QVariant PartSet_PartDataModel::data(const QModelIndex& theIndex, int theRole) c
       // return Tooltip
       break;
     case Qt::ForegroundRole:
+      if (theIndex.internalId() == HistoryObject) {
+        if (theIndex.row() > lastHistoryRow())
+          return QBrush(Qt::lightGray);
+      }
       return QBrush(myItemsColor);
-      break;
   }
   return QVariant();
 }
@@ -570,4 +573,30 @@ int PartSet_PartDataModel::getRowsNumber() const
 int PartSet_PartDataModel::lastHistoryRow() const
 {
   return rowCount() - 1 - myHistoryBackOffset;
+}
+
+void PartSet_PartDataModel::setLastHistoryItem(const QModelIndex& theIndex)
+{
+  if (theIndex.internalId() == HistoryObject) {
+    myHistoryBackOffset = rowCount() - 1 - theIndex.row();
+  }
+}
+
+QModelIndex PartSet_PartDataModel::lastHistoryItem() const
+{
+  return index(lastHistoryRow(), 1);
+}
+
+Qt::ItemFlags PartSet_PartDataModel::flags(const QModelIndex& theIndex) const
+{
+  Qt::ItemFlags aFlags = Qt::ItemIsSelectable;
+  if (object(theIndex)) {
+    aFlags |= Qt::ItemIsEditable;
+  }
+  if (theIndex.internalId() == HistoryObject) {
+    if (theIndex.row() <= lastHistoryRow() || (theIndex.column() == 1))
+      aFlags |= Qt::ItemIsEnabled;
+  } else
+    aFlags |= Qt::ItemIsEnabled;
+  return aFlags;
 }

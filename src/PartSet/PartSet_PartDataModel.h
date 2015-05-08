@@ -127,6 +127,10 @@ Q_OBJECT
   /// \param theParent a parent model index
   virtual int columnCount(const QModelIndex &theParent = QModelIndex()) const;
 
+  /// Returns the item flags for the given index.
+  /// \param theIndex a model index
+  virtual Qt::ItemFlags flags(const QModelIndex& theIndex) const;
+
   /// Returns the index of the item in the model specified by the given row, column and parent index.
   /// \param theRow a row
   /// \param theColumn a column
@@ -162,6 +166,13 @@ Q_OBJECT
 
   //! Return a Part object
   virtual ResultPartPtr part() const;
+
+  //! Set an Index which will be considered as a last history index
+  //! \param theIndex a last index for history
+  void setLastHistoryItem(const QModelIndex& theIndex);
+
+  //! Returns last history item
+  QModelIndex lastHistoryItem() const;
 
  private:
 
