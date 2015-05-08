@@ -8,12 +8,12 @@
     type_choice="Faces">
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
-  <!--<groupbox title="From">
+  <groupbox title="From">
     <shape_selector id="from_object"
                     icon=":icons/plane.png"
                     label="Plane face"
                     tooltip="Select a planar face"
-                    shape_types="face" obligatory="false">
+                    shape_types="face">
       <validator id="GeomValidators_Face" parameters="plane"/>
     </shape_selector>
     <doublevalue
@@ -23,20 +23,18 @@
       step="1.0"
       default="0"
       icon=":icons/dimension_down.png"
-      tooltip="Height"
-      obligatory="false">
+      tooltip="Height">
       <validator id="GeomValidators_Positive"/>
     </doublevalue>
-  </groupbox>-->
+  </groupbox>
   <groupbox title="To">
-  <!--  <shape_selector id="to_object"
+    <shape_selector id="to_object"
                     icon=":icons/plane_inverted.png"
                     label="Plane face"
                     tooltip="Select a planar face"
-                    shape_types="face"
-                    obligatory="false">
+                    shape_types="face">
       <validator id="GeomValidators_Face" parameters="plane"/>
-    </shape_selector>-->
+    </shape_selector>
     <doublevalue
       id="to_size"
       label="Size"
@@ -47,8 +45,7 @@
       tooltip="Height">
       <validator id="GeomValidators_Positive"/>
     </doublevalue>
-    <boolvalue id="reverse" label="Reverse" default="false" tooltip="Reverse default direction"/>
-  </groupbox>-->
+  </groupbox>
 <!--XML definition of the revolution:-->
 <!--  <multi_selector id="base"
     label="Select a sketch face"

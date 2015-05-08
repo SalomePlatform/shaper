@@ -11,6 +11,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAlgoAPI_Extrusion.h>
+#include <GeomAlgoAPI_Prism.h>
 #include <GeomAPI_Shape.h>
 
 /**\class FeaturesPlugin_Extrusion
@@ -18,8 +19,9 @@
  * \brief Feature for creation of extrusion from the planar face.
  *
  * Extrusion creates the lateral faces based on edges of the base face and
- * the top face equal to the base face. Direction of extrusion is taken from the face
- * plane, but can be corrected by the "reverse" flag.
+ * the top and bottom faces equal to the base face or this faces can be projection on the
+ * bounding planes if they were set. Direction of extrusion is taken from the face
+ * plane or if the bounding faces were set then it will be from the bottom to the top plane.
  */
 class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 {
@@ -72,12 +74,6 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
     static const std::string MY_FROM_OBJECT_ID("from_object");
     return MY_FROM_OBJECT_ID;
   }
-  /// attribute name of reverse direction
- inline static const std::string& REVERSE_ID()
- {
-   static const std::string MY_REVERSE_ID("reverse");
-   return MY_REVERSE_ID;
- }
 
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
@@ -96,9 +92,9 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
   FeaturesPlugin_Extrusion();
 private:
   /// Load Naming data structure of the feature to the document
-  void LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-	                std::shared_ptr<GeomAPI_Shape> theBasis,
-	                std::shared_ptr<GeomAPI_Shape> theContext);
+  void LoadNamingDS(GeomAlgoAPI_Prism& theFeature, std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    std::shared_ptr<GeomAPI_Shape> theBasis,
+                    std::shared_ptr<GeomAPI_Shape> theContext);
 
   /// Set an empty shape to the result of extrusion
   void clearResult();

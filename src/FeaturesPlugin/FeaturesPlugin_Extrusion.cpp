@@ -6,6 +6,7 @@
 
 #include "FeaturesPlugin_Extrusion.h"
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -16,7 +17,11 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeReference.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_XYZ.h>
 #include <GeomAlgoAPI_Extrusion.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
+#include <GeomAlgoAPI_Prism.h>
 
 using namespace std;
 #define _LATERAL_TAG 1
@@ -36,19 +41,38 @@ void FeaturesPlugin_Extrusion::initAttributes()
   // extrusion works with faces always
   aSelection->setSelectionType("FACE");
 
-  data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
-  //data()->addAttribute(FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
 
   //data()->addAttribute(FeaturesPlugin_Extrusion::AXIS_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
 
-  //data()->addAttribute(FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
-  //data()->addAttribute(FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
+  data()->addAttribute(FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_Extrusion::TO_OBJECT_ID());
 }
 
 void FeaturesPlugin_Extrusion::execute()
 {
   AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Extrusion::LIST_ID());
+
+  std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape);
+  std::shared_ptr<GeomAPI_Shape> aToShape(new GeomAPI_Shape);
+
+  // Getting bounding planes.
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
+  if (anObjRef) {
+    aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+  }
+  anObjRef = selection(FeaturesPlugin_Extrusion::TO_OBJECT_ID());
+  if (anObjRef) {
+    aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+  }
+
+  // Getting sizes.
+  double aFromSize = real(FeaturesPlugin_Extrusion::FROM_SIZE_ID())->value();
+  double aToSize = real(FeaturesPlugin_Extrusion::TO_SIZE_ID())->value();
 
   // for each selected face generate a result
   int anIndex = 0, aResultIndex = 0;
@@ -61,9 +85,6 @@ void FeaturesPlugin_Extrusion::execute()
       setError(aContextError);
       break;
     }
-    double aSize = real(FeaturesPlugin_Extrusion::TO_SIZE_ID())->value();
-    if (boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
-      aSize = -aSize;
 
     std::shared_ptr<GeomAPI_Shape> aValueFace = aFaceRef->value();
     int aFacesNum = -1; // this mean that "aFace" is used
@@ -81,32 +102,66 @@ void FeaturesPlugin_Extrusion::execute()
 
     for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      std::shared_ptr<GeomAPI_Shape> aFace;
+      std::shared_ptr<GeomAPI_Shape> aBaseShape;
       if (aFacesNum == -1) {
-        aFace = aValueFace;
+        aBaseShape = aValueFace;
       } else {
-        aFace = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+        aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
       }
-      GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
+
+      // If bounding faces was not set creating them.
+      std::shared_ptr<GeomAPI_Face> aBaseFace(new GeomAPI_Face(aBaseShape));
+      std::shared_ptr<GeomAPI_Pln> aBasePlane = aBaseFace->getPlane();
+      std::shared_ptr<GeomAPI_Dir> aBaseDir = aBasePlane->direction();
+      std::shared_ptr<GeomAPI_Pnt> aBaseLoc = aBasePlane->location();
+
+      if(!aFromShape) {
+        aFromShape = GeomAlgoAPI_FaceBuilder::plane(aBaseLoc, aBaseDir);
+      }
+      if(!aToShape) {
+        aToShape = GeomAlgoAPI_FaceBuilder::plane(aBaseLoc, aBaseDir);
+      }
+
+      // Moving bounding faces according to "from" and "to" sizes.
+      std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aFromShape));
+      std::shared_ptr<GeomAPI_Pln> aFromPlane = aFromFace->getPlane();
+      std::shared_ptr<GeomAPI_Pnt> aFromLoc = aFromPlane->location();
+      std::shared_ptr<GeomAPI_Dir> aFromDir = aFromPlane->direction();
+
+      std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aToShape));
+      std::shared_ptr<GeomAPI_Pln> aToPlane = aToFace->getPlane();
+      std::shared_ptr<GeomAPI_Pnt> aToLoc = aToPlane->location();
+      std::shared_ptr<GeomAPI_Dir> aToDir = aToPlane->direction();
+
+      bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
+
+      std::shared_ptr<GeomAPI_Pnt> aFromPnt(new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(aSign ? aFromSize : -aFromSize))));
+      aFromShape = GeomAlgoAPI_FaceBuilder::plane(aFromPnt, aFromDir);
+
+      std::shared_ptr<GeomAPI_Pnt> aToPnt(new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(aSign ? -aToSize : aToSize))));
+      aToShape = GeomAlgoAPI_FaceBuilder::plane(aToPnt, aToDir);
+
+      //GeomAlgoAPI_Extrusion aFeature(aFace, aFromSize);
+      GeomAlgoAPI_Prism aFeature(aBaseShape, aFromShape, aToShape);
       if(!aFeature.isDone()) {
-        static const std::string aFeatureError = "Extrusion algorithm failed";  
+        static const std::string aFeatureError = "Extrusion algorithm failed";
         setError(aFeatureError);
         break;
       }
 
       // Check if shape is valid
-      if (aFeature.shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";     
+      if(aFeature.shape()->isNull()) {
+        static const std::string aShapeError = "Resulting shape is Null";
         setError(aShapeError);
         break;
       }
       if(!aFeature.isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";  
+        std::string aFeatureError = "Warning: resulting shape is not valid";
         setError(aFeatureError);
         break;
-      }  
+      }
       //LoadNamingDS
-      LoadNamingDS(aFeature, aResultBody, aFace, aContext);
+      LoadNamingDS(aFeature, aResultBody, aBaseShape, aContext);
 
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
@@ -120,18 +175,16 @@ void FeaturesPlugin_Extrusion::execute()
 }
 
 //============================================================================
-void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, 
-  std::shared_ptr<ModelAPI_ResultBody> theResultBody, 
-  std::shared_ptr<GeomAPI_Shape> theBasis,
-  std::shared_ptr<GeomAPI_Shape> theContext)
-{  
-
-
+void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
+                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                            std::shared_ptr<GeomAPI_Shape> theBasis,
+                                            std::shared_ptr<GeomAPI_Shape> theContext)
+{
   //load result
   if(theBasis->isEqual(theContext))
     theResultBody->store(theFeature.shape());
   else
-    theResultBody->storeGenerated(theContext, theFeature.shape()); 
+    theResultBody->storeGenerated(theContext, theFeature.shape());
 
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
@@ -142,26 +195,23 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
 
   //Insert bottom face
   std::string aBotName = "BottomFace";
-  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  
-  if (!aBottomFace->isNull()) {
-	if (aSubShapes->isBound(aBottomFace)) {	 
-		aBottomFace = aSubShapes->find(aBottomFace);		
-    }     
+  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();
+  if(!aBottomFace->isNull()) {
+    if(aSubShapes->isBound(aBottomFace)) {
+      aBottomFace = aSubShapes->find(aBottomFace);
+    }
     theResultBody->generated(aBottomFace, aBotName, _FIRST_TAG);
   }
-
-
 
   //Insert top face
   std::string aTopName = "TopFace";
   std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
   if (!aTopFace->isNull()) {
-    if (aSubShapes->isBound(aTopFace)) {	 
-      aTopFace = aSubShapes->find(aTopFace);	
+    if (aSubShapes->isBound(aTopFace)) {
+      aTopFace = aSubShapes->find(aTopFace);
     }
     theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
   }
-  
 }
 
 //============================================================================

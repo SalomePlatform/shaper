@@ -65,8 +65,8 @@ GeomAlgoAPI_SketchBuilder.createFaces(
 anExtrusionFt = aPart.addFeature("Extrusion")
 anExtrusionFt.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
-anExtrusionFt.real("size").setValue(50)
-anExtrusionFt.boolean("reverse").setValue(False)
+anExtrusionFt.real("from_size").setValue(50)
+anExtrusionFt.real("to_size").setValue(50)
 anExtrusionFt.execute()
 aSession.finishOperation()
 anExtrusionBody = modelAPI_ResultBody(anExtrusionFt.firstResult())

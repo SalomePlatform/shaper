@@ -92,8 +92,8 @@ for eachSketchFeature in [aCircleSketchFeature, aTriangleSketchFeature]:
     anExtrusionFt = aPart.addFeature("Extrusion")
     anExtrusionFt.selectionList("base").append(
         aSketchResult, aSketchFaces[0])
-    anExtrusionFt.real("size").setValue(50)
-    anExtrusionFt.boolean("reverse").setValue(False)
+    anExtrusionFt.real("from_size").setValue(0)
+    anExtrusionFt.real("to_size").setValue(50)
     anExtrusionFt.execute()
     extrudedObjects.append(modelAPI_ResultBody(anExtrusionFt.firstResult()))
 aSession.finishOperation()

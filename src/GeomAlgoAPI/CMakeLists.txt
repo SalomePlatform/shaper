@@ -13,8 +13,10 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_PointBuilder.h
     GeomAlgoAPI_SketchBuilder.h
     GeomAlgoAPI_Extrusion.h
+    GeomAlgoAPI_Prism.h
     GeomAlgoAPI_Boolean.h
     GeomAlgoAPI_MakeShape.h
+    GeomAlgoAPI_ShapeProps.h
     GeomAlgoAPI_DFLoader.h
     GeomAlgoAPI_Placement.h
     GeomAlgoAPI_BREPImport.h
@@ -28,8 +30,10 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_PointBuilder.cpp
     GeomAlgoAPI_SketchBuilder.cpp
     GeomAlgoAPI_Extrusion.cpp
+    GeomAlgoAPI_Prism.cpp
     GeomAlgoAPI_Boolean.cpp
     GeomAlgoAPI_MakeShape.cpp
+    GeomAlgoAPI_ShapeProps.cpp
     GeomAlgoAPI_DFLoader.cpp
     GeomAlgoAPI_Placement.cpp
     GeomAlgoAPI_BREPImport.cpp

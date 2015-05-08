@@ -10,6 +10,8 @@
   #include "GeomAlgoAPI_FaceBuilder.h"
   #include "GeomAlgoAPI_MakeShape.h"
   #include "GeomAlgoAPI_PointBuilder.h"
+  #include "GeomAlgoAPI_Prism.h"
+  #include "GeomAlgoAPI_ShapeProps.h"
   #include "GeomAlgoAPI_SketchBuilder.h"
 
   #include <memory>
@@ -35,6 +37,8 @@
 %include "GeomAlgoAPI_FaceBuilder.h"
 %include "GeomAlgoAPI_MakeShape.h"
 %include "GeomAlgoAPI_PointBuilder.h"
+%include "GeomAlgoAPI_Prism.h"
+%include "GeomAlgoAPI_ShapeProps.h"
 %include "GeomAlgoAPI_SketchBuilder.h"
 
 %template(ShapeList) std::list<std::shared_ptr<GeomAPI_Shape> >;

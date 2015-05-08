@@ -90,8 +90,8 @@ for i in xrange(0, N * N):
 
     anExtrusionFt.selectionList("base").append(
         aSketchResult, aSketchFaces[0])
-    anExtrusionFt.real("size").setValue(10)
-    anExtrusionFt.boolean("reverse").setValue(False)
+    anExtrusionFt.real("from_size").setValue(0)
+    anExtrusionFt.real("to_size").setValue(10)
     # v1.0.2 from master
     # anExtrusionFt.selection("extrusion_face").setValue(
     #    aSketchResult, aSketchFaces[0])
@@ -151,8 +151,8 @@ GeomAlgoAPI_SketchBuilder.createFaces(
 aBox = aPart.addFeature("Extrusion")
 aBox.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
-aBox.real("size").setValue(10)
-aBox.boolean("reverse").setValue(False)
+aBox.real("from_size").setValue(0)
+aBox.real("to_size").setValue(10)
 # v 1.0.2 from master
 # aBox.selection("extrusion_face").setValue(
 #     aSketchResult, aSketchFaces[0])

@@ -152,7 +152,7 @@ SET(CAS_KERNEL ${CAS_TKernel} ${CAS_TKMath})
 SET(CAS_OCAF ${CAS_TKernel} ${CAS_TKMath} ${CAS_TKCDF} ${CAS_TKLCAF})
 SET(CAS_VIEWER ${CAS_TKService} ${CAS_TKV3d} ${CAS_TKG3d} ${CAS_TKGeomBase} ${CAS_TKBRep})
 SET(CAS_OCAFVIS ${CAS_TKCAF} ${CAS_TKBRep} ${CAS_TKG2d})
-SET(CAS_MODELER ${CAS_TKG3d} ${CAS_TKGeomBase} ${CAS_TKGeomAlgo} ${CAS_TKBRep} ${CAS_TKTopAlgo} ${CAS_TKG2d})
+SET(CAS_MODELER ${CAS_TKG3d} ${CAS_TKGeomBase} ${CAS_TKGeomAlgo} ${CAS_TKBRep} ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKFeat})
 # TODO(mpv, vsv) Give a proper name for the following variable
 SET(CAS_SHAPE ${CAS_TKShHealing} ${CAS_TKMesh} ${CAS_TKHLR})
 
