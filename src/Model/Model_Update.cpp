@@ -191,7 +191,9 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
       for (; aRIter != aResults.cend(); aRIter++) {
         ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
         if (aPart.get()) {
-          updateInDoc(aPart->partDoc());
+          if (aPart->isActivated()) {
+            updateInDoc(aPart->partDoc());
+          }
         }
       }
     }
