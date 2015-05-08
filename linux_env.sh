@@ -1,7 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "${INST_ROOT}" = "" ] ; then
-    source /dn48/newgeom/common/SALOME/env_products.sh
+#    source /dn48/newgeom/common/SALOME/env_products.sh
+  echo "Error: INST_ROOT is not defined."
+  exit 1
 else
     source ${INST_ROOT}/env_products.sh
 fi
@@ -35,7 +37,10 @@ export PATH=${CASROOT}:${PATH}
 ##
 
 #------ NewGEOM ------
-export NEWGEOM_ROOT_DIR=${ROOT_DIR}/install
+INSTALL_DIR=install
+if [ $1 ]; then INSTALL_DIR=${INSTALL_DIR}-$1; fi
+
+export NEWGEOM_ROOT_DIR=${ROOT_DIR}/${INSTALL_DIR}
 export PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/plugins:${PATH}
 export PYTHONPATH=${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${NEWGEOM_ROOT_DIR}/addons:${NEWGEOM_ROOT_DIR}/pythonAPI:${PYTHONPATH}
 export LD_LIBRARY_PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}

@@ -6,12 +6,21 @@ export ROOT_DIR=`cd "${ROOT_DIR}";pwd`
 
 SRC_DIR=${ROOT_DIR}/sources
 
-source ${SRC_DIR}/linux_env.sh
-mkdir -p ${ROOT_DIR}/build
-cd ${ROOT_DIR}/build
+BUILD_DIR=build
+INSTALL_DIR=install
+if [ $1 ]
+then
+  BUILD_DIR=${BUILD_DIR}-$1
+  INSTALL_DIR=${INSTALL_DIR}-$1
+fi
+
+source ${SRC_DIR}/salome_env.sh
+source ${SRC_DIR}/linux_env.sh $1
+mkdir -p ${ROOT_DIR}/${BUILD_DIR}
+cd ${ROOT_DIR}/${BUILD_DIR}
 
 CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release"
-CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=${ROOT_DIR}/install"
+CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=${ROOT_DIR}/${INSTALL_DIR}"
 CMAKE_ARGS="${CMAKE_ARGS} ${SRC_DIR}"
 
 cmake -G "Unix Makefiles" ${CMAKE_ARGS}
