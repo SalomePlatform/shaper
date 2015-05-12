@@ -6,6 +6,7 @@
 
 #include <ExchangePlugin_Plugin.h>
 #include <ExchangePlugin_ImportFeature.h>
+#include <ExchangePlugin_ExportFeature.h>
 #include <ExchangePlugin_Validators.h>
 
 #include <Config_PropManager.h>
@@ -38,6 +39,9 @@ FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == ExchangePlugin_ImportFeature::ID()) {
     return FeaturePtr(new ExchangePlugin_ImportFeature);
+  } else
+  if (theFeatureID == ExchangePlugin_ExportFeature::ID()) {
+    return FeaturePtr(new ExchangePlugin_ExportFeature);
   }
   // feature of such kind is not found
   return FeaturePtr();

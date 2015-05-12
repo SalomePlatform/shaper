@@ -4,11 +4,13 @@
   <workbench id="Features" document="Part">
     <group id="Exchange">
       <feature id="Import" title="Import" tooltip="Import a file" icon=":icons/import.png">
-        <file_selector
-          id="import_file_selector"
-          title="Import file"
-          path="">
+        <file_selector id="import_file_selector" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP|STP:STEPImport,IGES:IGESImport" />
+        </file_selector>
+      </feature>
+      <feature id="Export" title="Export" tooltip="Export to file" icon=":icons/export.png">
+        <file_selector id="export_file_selector" title="Export file" path="">
+          <validator id="ExchangePlugin_ExportFormat" parameters="BREgi tP:BREPExport,STEP|STP:STEPExport,IGES:IGESExport" />
         </file_selector>
       </feature>
     </group>

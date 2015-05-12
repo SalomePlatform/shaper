@@ -14,12 +14,14 @@ SET(PROJECT_HEADERS
     ExchangePlugin.h
     ExchangePlugin_Plugin.h
     ExchangePlugin_ImportFeature.h
+    ExchangePlugin_ExportFeature.h
     ExchangePlugin_Validators.h
 )
  
 SET(PROJECT_SOURCES
     ExchangePlugin_Plugin.cpp
     ExchangePlugin_ImportFeature.cpp
+    ExchangePlugin_ExportFeature.cpp
     ExchangePlugin_Validators.cpp
 )
 

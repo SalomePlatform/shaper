@@ -56,7 +56,7 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 private:
   /// Loads Naming data structure to the document
   void loadNamingDS(std::shared_ptr<GeomAPI_Shape> theGeomShape, 
-					std::shared_ptr<ModelAPI_ResultBody> theResultBody);
+                    std::shared_ptr<ModelAPI_ResultBody> theResultBody);
 };
 
 #endif /* IMPORT_IMPORTFEATURE_H_ */
