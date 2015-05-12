@@ -966,7 +966,7 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature()
 {
-  static TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
+  TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   Handle(TDF_Reference) aRef;
   if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
     TDF_Label aLab = aRef->Get();
@@ -977,7 +977,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature()
 
 void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent)
 {
-  static TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
+  TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (aData.get()) {
