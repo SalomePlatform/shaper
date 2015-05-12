@@ -31,6 +31,7 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <QGroupBox>
 #include <QGridLayout>
@@ -212,8 +213,7 @@ void PartSet_WidgetPoint2D::activateCustom()
 
   QIntList aModes;
   aModes << TopAbs_VERTEX;
-  if (isEditingMode())
-    aModes << TopAbs_EDGE;
+  aModes << TopAbs_EDGE;
   myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
 }
 
@@ -278,6 +278,25 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
       setPoint(aX, aY);
 
       PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
+      emit vertexSelected();
+      emit focusOutWidget(this);
+      return;
+    } else if (aShape.ShapeType() == TopAbs_EDGE) {
+      // Create point-edge coincedence
+      FeaturePtr aFeature = mySketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+      std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = std::dynamic_pointer_cast<
+          ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
+      std::shared_ptr<GeomDataAPI_Point2D> aThisPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
+      aRef1->setAttr(aThisPoint);
+
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = std::dynamic_pointer_cast<
+          ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      aRef2->setObject(aObject);
+      aFeature->execute();
       emit vertexSelected();
       emit focusOutWidget(this);
       return;
