@@ -9,6 +9,8 @@
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_Tools.h"
 
+#include <PartSetPlugin_Part.h>
+
 #include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
 
@@ -470,10 +472,16 @@ void PartSet_MenuMgr::onActivatePart(bool)
 {
   QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
   if (aObjects.size() > 0) {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
-    if (aPart) {
-      aPart->activate();
+    ObjectPtr aObj = aObjects.first();
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    if (!aPart.get()) {
+      FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      if (aPartFeature.get() && (aPartFeature->getKind() == PartSetPlugin_Part::ID())) {
+        aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
+      }
     }
+    if (aPart.get())
+      aPart->activate();
   }
 }
 

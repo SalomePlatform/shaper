@@ -246,7 +246,7 @@ QModelIndex PartSet_TopDataModel::objectIndex(const ObjectPtr& theObject) const
 //******************************************************************
 //******************************************************************
 PartSet_PartDataModel::PartSet_PartDataModel(QObject* theParent)
-    : PartSet_PartModel(theParent), myHistoryBackOffset(0)
+    : PartSet_PartModel(theParent)
 {
 }
 
@@ -572,13 +572,20 @@ int PartSet_PartDataModel::getRowsNumber() const
 
 int PartSet_PartDataModel::lastHistoryRow() const
 {
-  return rowCount() - 1 - myHistoryBackOffset;
+  DocumentPtr aDoc = partDocument();
+  FeaturePtr aFeature = aDoc->currentFeature();
+  return getRowsNumber() + aDoc->index(aFeature);
 }
 
 void PartSet_PartDataModel::setLastHistoryItem(const QModelIndex& theIndex)
 {
   if (theIndex.internalId() == HistoryObject) {
-    myHistoryBackOffset = rowCount() - 1 - theIndex.row();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    ObjectPtr aObject = object(theIndex);
+    DocumentPtr aDoc = partDocument();
+    aMgr->startOperation(tr("History change").toStdString());
+    aDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject));
+    aMgr->finishOperation();
   }
 }
 

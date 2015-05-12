@@ -198,8 +198,6 @@ Q_OBJECT
     GroupObject,
     HistoryObject
   };
-
-  int myHistoryBackOffset;
 };
 
 #endif

@@ -669,8 +669,16 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     ObjectPtr aObject = aObjects.first();
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-      if (aPart) {
-        if (aMgr->activeDocument() == aPart->partDoc())
+      FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      bool isPart = aPart.get() || 
+        (aPartFeature.get() && (aPartFeature->getKind() == PartSetPlugin_Part::ID()));
+      if (isPart) {
+        DocumentPtr aPartDoc;
+        if (!aPart.get()) {
+          aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
+        }
+        aPartDoc = aPart->partDoc();
+        if (aMgr->activeDocument() == aPartDoc)
           theMenu->addAction(myMenuMgr->action("DEACTIVATE_PART_CMD"));
         else
           theMenu->addAction(myMenuMgr->action("ACTIVATE_PART_CMD"));
@@ -684,8 +692,10 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     }
   } else if (aSelected == 0) {
     // if there is no selection then it means that upper label is selected
-    if (aMgr->activeDocument() != aMgr->moduleDocument())
-      theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
+    QModelIndexList aIndexes = myWorkshop->selection()->selectedIndexes();
+    if (aIndexes.size() == 0) // it means that selection happens in top label outside of tree view
+      if (aMgr->activeDocument() != aMgr->moduleDocument())
+        theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
   }
 }
 

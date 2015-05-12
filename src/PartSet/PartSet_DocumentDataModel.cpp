@@ -36,7 +36,7 @@ QMap<QString, QString> PartSet_DocumentDataModel::myIcons;
 
 PartSet_DocumentDataModel::PartSet_DocumentDataModel(QObject* theParent)
     : ModuleBase_IDocumentDataModel(theParent),
-      myActivePartId(-1), myHistoryBackOffset(0)
+      myActivePartId(-1)
 {
   // Create a top part of data tree model
   myModel = new PartSet_TopDataModel(this);
@@ -598,34 +598,6 @@ bool PartSet_DocumentDataModel::activatePart(const QModelIndex& theIndex)
     myActivePartId = aRootDoc->index(aFeature);
     myPartModels[myActivePartId]->setItemsColor(ACTIVE_COLOR);
   } 
-  //QModelIndex* aIndex = toSourceModelIndex(theIndex);
-  //if (!aIndex)
-  //  return false;
-
-  //const QAbstractItemModel* aModel = aIndex->model();
-
-  //if (isPartSubModel(aModel)) {
-  //  // if this is root node (Part item index)
-  //  if (!aIndex->parent().isValid()) {
-  //    if (myActivePart)
-  //      myActivePart->setItemsColor(PASSIVE_COLOR);
-
-  //      if (myActivePart == aModel) {
-  //        myActivePart = 0;
-  //        myActivePartIndex = QModelIndex();
-  //      } else {
-  //        myActivePart = (PartSet_PartModel*)aModel;
-  //        myActivePartIndex = theIndex;
-  //      }
-
-  //      if (myActivePart) {
-  //        myActivePart->setItemsColor(ACTIVE_COLOR);
-  //        myModel->setItemsColor(PASSIVE_COLOR);
-  //      } else
-  //        myModel->setItemsColor(ACTIVE_COLOR);
-  //      return true;
-  //    }
-  //  }
   return true;
 }
 
@@ -745,12 +717,21 @@ void PartSet_DocumentDataModel::clear()
 
 int PartSet_DocumentDataModel::lastHistoryRow() const
 {
-  return rowCount() - 1 - myHistoryBackOffset;
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  FeaturePtr aFeature = aRootDoc->currentFeature();
+  return historyOffset() + aRootDoc->index(aFeature);
 }
 
 void PartSet_DocumentDataModel::setLastHistoryItem(const QModelIndex& theIndex)
 {
-  myHistoryBackOffset = rowCount() - 1 - theIndex.row();
+  if (theIndex.internalId() == HistoryNode) {
+    ObjectPtr aObject = object(theIndex);
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aRootDoc = aMgr->moduleDocument();
+    aMgr->startOperation(tr("History change").toStdString());
+    aRootDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject));
+    aMgr->finishOperation();
+  }
 }
 
 QModelIndex PartSet_DocumentDataModel::lastHistoryItem() const

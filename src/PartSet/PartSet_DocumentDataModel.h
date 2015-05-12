@@ -197,8 +197,6 @@ Q_OBJECT
   //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;
 
-  int myHistoryBackOffset;
-
   static QMap<QString, QString> myIcons;
 };
 
