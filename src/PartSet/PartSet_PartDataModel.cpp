@@ -261,7 +261,7 @@ QVariant PartSet_PartDataModel::data(const QModelIndex& theIndex, int theRole) c
     DocumentPtr aActiveDoc = ModelAPI_Session::get()->activeDocument();
     QModelIndex aParent = theIndex.parent();
     if (aActiveDoc == aPartDoc) {
-      if ((theIndex.internalId() == HistoryObject) && (!aParent.isValid())) {
+      if (!aParent.isValid()) {
         switch (theRole) {
         case Qt::DecorationRole:
           if (theIndex.row() == lastHistoryRow())
@@ -574,17 +574,25 @@ int PartSet_PartDataModel::lastHistoryRow() const
 {
   DocumentPtr aDoc = partDocument();
   FeaturePtr aFeature = aDoc->currentFeature();
-  return getRowsNumber() + aDoc->index(aFeature);
+  if (aFeature.get())
+    return getRowsNumber() + aDoc->index(aFeature);
+  else
+    return getRowsNumber() - 1;
 }
 
 void PartSet_PartDataModel::setLastHistoryItem(const QModelIndex& theIndex)
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = partDocument();
+  std::string aOpName = tr("History change").toStdString();
   if (theIndex.internalId() == HistoryObject) {
-    SessionPtr aMgr = ModelAPI_Session::get();
     ObjectPtr aObject = object(theIndex);
-    DocumentPtr aDoc = partDocument();
-    aMgr->startOperation(tr("History change").toStdString());
+    aMgr->startOperation(aOpName);
     aDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject));
+    aMgr->finishOperation();
+  } else {
+    aMgr->startOperation(aOpName);
+    aDoc->setCurrentFeature(FeaturePtr());
     aMgr->finishOperation();
   }
 }

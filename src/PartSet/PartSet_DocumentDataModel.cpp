@@ -243,7 +243,7 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
   if ((theIndex.column() == 1) ) {
     if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
       if (ModelAPI_Session::get()->activeDocument() == aRootDoc) {
-        if ((theIndex.internalId() == HistoryNode) && (!aParent.isValid())) {
+        if (!aParent.isValid()) {
           switch (theRole) {
           case Qt::DecorationRole:
             if (theIndex.row() == lastHistoryRow())
@@ -719,17 +719,25 @@ int PartSet_DocumentDataModel::lastHistoryRow() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   FeaturePtr aFeature = aRootDoc->currentFeature();
-  return historyOffset() + aRootDoc->index(aFeature);
+  if (aFeature.get())
+    return historyOffset() + aRootDoc->index(aFeature);
+  else 
+    return historyOffset() - 1;
 }
 
 void PartSet_DocumentDataModel::setLastHistoryItem(const QModelIndex& theIndex)
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aRootDoc = aMgr->moduleDocument();
+  std::string aOpName = tr("History change").toStdString();
   if (theIndex.internalId() == HistoryNode) {
     ObjectPtr aObject = object(theIndex);
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aRootDoc = aMgr->moduleDocument();
-    aMgr->startOperation(tr("History change").toStdString());
+    aMgr->startOperation(aOpName);
     aRootDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject));
+    aMgr->finishOperation();
+  } else {
+    aMgr->startOperation(aOpName);
+    aRootDoc->setCurrentFeature(FeaturePtr());
     aMgr->finishOperation();
   }
 }
@@ -778,18 +786,22 @@ QIcon PartSet_DocumentDataModel::featureIcon(const FeaturePtr& theFeature)
 
 void PartSet_DocumentDataModel::onMouseDoubleClick(const QModelIndex& theIndex)
 {
+  if (theIndex.column() != 1)
+    return;
   QTreeView* aTreeView = dynamic_cast<QTreeView*>(sender());
   if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
-    if ((theIndex.column() == 1) && (theIndex.internalId() == HistoryNode)) {
-      int aOldId = lastHistoryRow();
-      setLastHistoryItem(theIndex);
-      int aStartRow = std::min(aOldId, theIndex.row());
-      int aEndRow = std::max(aOldId, theIndex.row());
-      for (int i = aStartRow; i <= aEndRow; i++) {
-        aTreeView->update(createIndex(i, 0, HistoryNode));
-        aTreeView->update(createIndex(i, 1, HistoryNode));
-      }
+    QModelIndex aNewIndex;
+    if (theIndex.internalId() == HistoryNode) 
+      aNewIndex = theIndex;
+    int aOldId = lastHistoryRow();
+    setLastHistoryItem(theIndex);
+    int aStartRow = std::min(aOldId, theIndex.row());
+    int aEndRow = std::max(aOldId, theIndex.row());
+    for (int i = aStartRow; i <= aEndRow; i++) {
+      aTreeView->update(createIndex(i, 0, HistoryNode));
+      aTreeView->update(createIndex(i, 1, HistoryNode));
     }
+    
   } else {
     QModelIndex* aIndex = toSourceModelIndex(theIndex);
     const QAbstractItemModel* aModel = aIndex->model();
