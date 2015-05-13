@@ -90,12 +90,16 @@ public:
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
+  //! \param theVisible use visible features only: flag is true for Object Browser functionality
   //! \returns null if next created feature must be the first
-  virtual std::shared_ptr<ModelAPI_Feature> currentFeature() = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> currentFeature(const bool theVisible) = 0;
 
   //! Sets the current feature: all features below will be disabled, new features
   //! will be appended after this one.
-  virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent) = 0;
+  //! \param theCurrent the selected feature as current: blow it everythin become disabled
+  //! \param theVisible use visible features only: flag is true for Object Browser functionality
+  virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
+    const bool theVisible) = 0;
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();

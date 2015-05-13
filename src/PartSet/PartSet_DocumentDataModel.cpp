@@ -718,7 +718,7 @@ void PartSet_DocumentDataModel::clear()
 int PartSet_DocumentDataModel::lastHistoryRow() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  FeaturePtr aFeature = aRootDoc->currentFeature();
+  FeaturePtr aFeature = aRootDoc->currentFeature(true);
   if (aFeature.get())
     return historyOffset() + aRootDoc->index(aFeature);
   else 
@@ -733,11 +733,11 @@ void PartSet_DocumentDataModel::setLastHistoryItem(const QModelIndex& theIndex)
   if (theIndex.internalId() == HistoryNode) {
     ObjectPtr aObject = object(theIndex);
     aMgr->startOperation(aOpName);
-    aRootDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject));
+    aRootDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject), true);
     aMgr->finishOperation();
   } else {
     aMgr->startOperation(aOpName);
-    aRootDoc->setCurrentFeature(FeaturePtr());
+    aRootDoc->setCurrentFeature(FeaturePtr(), true);
     aMgr->finishOperation();
   }
 }

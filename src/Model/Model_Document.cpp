@@ -600,7 +600,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
       aFeature->setDisabled(false); // by default created feature is enabled
-      setCurrentFeature(aFeature); // after all this feature stays in the document, so make it current
+      setCurrentFeature(aFeature, false); // after all this feature stays in the document, so make it current
     } else { // feature must be executed
        // no creation event => updater not working, problem with remove part
       aFeature->execute();
@@ -703,11 +703,11 @@ void Model_Document::removeFeature(FeaturePtr theFeature/*, const bool theCheck*
       }
     }
     // if this feature is current, make the current the previous feature
-    if (theFeature == currentFeature()) {
+    if (theFeature == currentFeature(false)) {
       int aCurrentIndex = index(theFeature);
       if (aCurrentIndex != -1) {
         setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(
-          object(ModelAPI_Feature::group(), aCurrentIndex - 1)));
+          object(ModelAPI_Feature::group(), aCurrentIndex - 1)), false);
       }
     }
 
@@ -965,24 +965,57 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
   return aResult;
 }
 
-std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature()
+std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theVisible)
 {
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   Handle(TDF_Reference) aRef;
   if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
     TDF_Label aLab = aRef->Get();
-    return feature(aLab);
+    FeaturePtr aResult = feature(aLab);
+    if (theVisible) { // get nearest visible (in history) going up
+      int aTag = aLab.Tag();
+      while(aTag > 1 && (!aResult.get() || !aResult->isInHistory())) {
+        aTag--;
+        aLab = aLab.Father().FindChild(aTag);
+        aResult = feature(aLab);
+      }
+      if (aTag <= 1)
+        aResult.reset();
+    }
+    return aResult;
   }
   return std::shared_ptr<ModelAPI_Feature>(); // null feature means the higher than first
 }
 
-void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent)
+void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
+  const bool theVisible)
 {
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (aData.get()) {
       TDF_Label aFeatureLabel = aData->label().Father();
+      if (theVisible) { // make features below which are not in history also enabled: sketch subs
+        int aTag = aFeatureLabel.Tag();
+        FeaturePtr aNextFeature;
+        TDF_Label aNextLabel;
+        for(aTag++; true; aTag++) {
+          TDF_Label aLabel = aFeatureLabel.Father().FindChild(aTag, 0);
+          if (aLabel.IsNull())
+            break;
+          FeaturePtr aFeature = feature(aLabel);
+          if (aFeature.get()) {
+            if (aFeature->isInHistory())
+              break;
+            aNextFeature = aFeature;
+            aNextLabel = aLabel;
+          }
+        }
+        if (aNextFeature.get()) {
+          theCurrent = aNextFeature;
+          aFeatureLabel = aNextLabel;
+        }
+      }
       Handle(TDF_Reference) aRef;
       if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
         aRef->Set(aFeatureLabel);

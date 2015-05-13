@@ -136,12 +136,16 @@ class Model_Document : public ModelAPI_Document
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
+  //! \param theVisible use visible features only: flag is true for Object Browser functionality
   //! \returns null if next created feature must be the first
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> currentFeature();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> currentFeature(const bool theVisible);
 
   //! Sets the current feature: all features below will be disabled, new features
   //! will be appended after this one.
-  MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent);
+  //! \param theCurrent the selected feature as current: blow it everythin become disabled
+  //! \param theVisible use visible features only: flag is true for Object Browser functionality
+  MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
+    const bool theVisible);
 
   /// Creates a construction cresults
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(

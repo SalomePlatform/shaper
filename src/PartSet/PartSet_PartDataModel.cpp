@@ -573,7 +573,7 @@ int PartSet_PartDataModel::getRowsNumber() const
 int PartSet_PartDataModel::lastHistoryRow() const
 {
   DocumentPtr aDoc = partDocument();
-  FeaturePtr aFeature = aDoc->currentFeature();
+  FeaturePtr aFeature = aDoc->currentFeature(true);
   if (aFeature.get())
     return getRowsNumber() + aDoc->index(aFeature);
   else
@@ -588,11 +588,11 @@ void PartSet_PartDataModel::setLastHistoryItem(const QModelIndex& theIndex)
   if (theIndex.internalId() == HistoryObject) {
     ObjectPtr aObject = object(theIndex);
     aMgr->startOperation(aOpName);
-    aDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject));
+    aDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObject), true);
     aMgr->finishOperation();
   } else {
     aMgr->startOperation(aOpName);
-    aDoc->setCurrentFeature(FeaturePtr());
+    aDoc->setCurrentFeature(FeaturePtr(), true);
     aMgr->finishOperation();
   }
 }
