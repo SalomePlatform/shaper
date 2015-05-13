@@ -10,6 +10,7 @@
 #include <memory>
 #include <GeomAPI_Interface.h>
 
+class GeomAPI_Ax3;
 class GeomAPI_Pnt;
 class GeomAPI_Dir;
 
@@ -21,6 +22,9 @@ class GeomAPI_Dir;
 class GEOMAPI_EXPORT GeomAPI_Pln : public GeomAPI_Interface
 {
  public:
+  /// Creation of plane by the axis placement
+  GeomAPI_Pln(const std::shared_ptr<GeomAPI_Ax3>& theAxis);
+
   /// Creation of plane by the point and normal
   GeomAPI_Pln(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
               const std::shared_ptr<GeomAPI_Dir>& theNormal);

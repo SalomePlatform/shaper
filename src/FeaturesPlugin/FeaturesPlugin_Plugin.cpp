@@ -6,6 +6,7 @@
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_Group.h>
 #include <FeaturesPlugin_Placement.h>
+#include <FeaturesPlugin_Revolution.h>
 
 #include <ModelAPI_Session.h>
 
@@ -28,6 +29,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == FeaturesPlugin_Extrusion::ID()) {
     return FeaturePtr(new FeaturesPlugin_Extrusion);
+  } else if (theFeatureID == FeaturesPlugin_Revolution::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Revolution);
   } else if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
     return FeaturePtr(new FeaturesPlugin_Boolean);
   } else if (theFeatureID == FeaturesPlugin_Group::ID()) {

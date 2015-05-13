@@ -66,7 +66,7 @@ bool GeomAPI_Face::isPlanar() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
   GeomLib_IsPlanarSurface isPlanar(aSurf);
-  return isPlanar.IsPlanar();
+  return isPlanar.IsPlanar() == Standard_True;
 }
 
 std::shared_ptr<GeomAPI_Pln> GeomAPI_Face::getPlane() const

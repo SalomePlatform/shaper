@@ -174,8 +174,7 @@ bool Model_AttributeSelection::isInitialized()
       TDF_Label aSelLab = selectionLabel();
       if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
         ResultPtr aContext = context();
-        if (!aContext.get()) 
-          return false;
+        return aContext.get();
       }
       if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
           return true;

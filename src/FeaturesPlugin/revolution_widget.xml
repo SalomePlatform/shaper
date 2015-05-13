@@ -8,6 +8,14 @@
     type_choice="Faces">
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
+  <shape_selector id="axis_object"
+                  icon=":icons/axis.png"
+                  label="Axis"
+                  tooltip="Select an edge for axis"
+                  shape_types="edge"
+                  default="">
+    <validator id="GeomValidators_ShapeType" parameters="line"/>
+  </shape_selector>
   <groupbox title="From">
     <shape_selector id="from_object"
                     icon=":icons/plane.png"
@@ -18,13 +26,13 @@
       <validator id="GeomValidators_Face" parameters="plane"/>
     </shape_selector>
     <doublevalue
-      id="from_size"
-      label="Size"
+      id="from_angle"
+      label="Angle"
       min="0"
       step="1.0"
       default="0"
-      icon=":icons/dimension_down.png"
-      tooltip="Height">
+      icon=":icons/angle_down.png"
+      tooltip="Angle">
       <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
@@ -38,15 +46,15 @@
       <validator id="GeomValidators_Face" parameters="plane"/>
     </shape_selector>
     <doublevalue
-      id="to_size"
-      label="Size"
+      id="to_angle"
+      label="Angle"
       min="0"
       step="1.0"
       default="10"
-      icon=":icons/dimension_up.png"
-      tooltip="Height">
+      icon=":icons/angle_up.png"
+      tooltip="Angle">
       <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
-  <validator id="GeomValidators_ZeroOffset" parameters="from_object,to_object,from_size,to_size"/>
+  <validator id="GeomValidators_ZeroOffset" parameters="from_object,to_object,from_angle,to_angle"/>
 </source>

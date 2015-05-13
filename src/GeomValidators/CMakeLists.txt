@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
     GeomValidators_Positive.h
     GeomValidators_ShapeType.h
     GeomValidators_Tools.h
+    GeomValidators_ZeroOffset.h
 )
 
 SET(PROJECT_SOURCES
@@ -17,6 +18,7 @@ SET(PROJECT_SOURCES
     GeomValidators_Positive.cpp
     GeomValidators_ShapeType.cpp
     GeomValidators_Tools.cpp
+    GeomValidators_ZeroOffset.cpp
 )
 
 SET(PROJECT_LIBRARIES

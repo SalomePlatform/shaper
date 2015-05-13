@@ -28,6 +28,7 @@
 
 #include <GeomValidators_Face.h>
 #include <GeomValidators_ConstructionComposite.h>
+#include <GeomValidators_ZeroOffset.h>
 
 
 #include <ModelAPI_Object.h>
@@ -157,6 +158,9 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("GeomValidators_ConstructionComposite",
                               new GeomValidators_ConstructionComposite);
+
+  aFactory->registerValidator("GeomValidators_ZeroOffset",
+                              new GeomValidators_ZeroOffset);
 
   aFactory->registerValidator("PartSet_SketchEntityValidator",
                               new PartSet_SketchEntityValidator);

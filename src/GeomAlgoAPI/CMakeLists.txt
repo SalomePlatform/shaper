@@ -15,7 +15,9 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_SketchBuilder.h
     GeomAlgoAPI_Extrusion.h
     GeomAlgoAPI_Prism.h
+    GeomAlgoAPI_Revolution.h
     GeomAlgoAPI_Boolean.h
+    GeomAlgoAPI_Rotation.h
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_ShapeProps.h
     GeomAlgoAPI_DFLoader.h
@@ -37,7 +39,9 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_SketchBuilder.cpp
     GeomAlgoAPI_Extrusion.cpp
     GeomAlgoAPI_Prism.cpp
+    GeomAlgoAPI_Revolution.cpp
     GeomAlgoAPI_Boolean.cpp
+    GeomAlgoAPI_Rotation.cpp
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_ShapeProps.cpp
     GeomAlgoAPI_DFLoader.cpp

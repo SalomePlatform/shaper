@@ -5,12 +5,18 @@
 // Author:      Mikhail PONIKAROV
 
 #include<GeomAPI_Pln.h>
+#include <GeomAPI_Ax3.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
 
 #include<gp_Pln.hxx>
 
 using namespace std;
+
+GeomAPI_Pln::GeomAPI_Pln(const std::shared_ptr<GeomAPI_Ax3>& theAxis)
+: GeomAPI_Interface(new gp_Ax3(theAxis->impl<gp_Ax3>()))
+{
+}
 
 GeomAPI_Pln::GeomAPI_Pln(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                          const std::shared_ptr<GeomAPI_Dir>& theNormal)

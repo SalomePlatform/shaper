@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomAlgoAPI_Prism.h
+// File:        GeomAlgoAPI_Prism.cpp
 // Created:     5 May 2015
 // Author:      Dmitry Bobylev
 
@@ -12,33 +12,35 @@
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepFeat_MakePrism.hxx>
 #include <BRepGProp.hxx>
-#include <Geom_CylindricalSurface.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_RectangularTrimmedSurface.hxx>
-#include <gp_Cylinder.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
-#include <LocOpe_FindEdgesInFace.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
+//=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
                                      std::shared_ptr<GeomAPI_Shape> theFromShape,
                                      std::shared_ptr<GeomAPI_Shape> theToShape)
 : myFromShape(theFromShape),
   myToShape(theToShape),
+  myDone(false),
   myShape(new GeomAPI_Shape()),
   myFirst(new GeomAPI_Shape()),myLast(new GeomAPI_Shape())
 {
   build(theBasis);
 }
 
-//============================================================================
+//=================================================================================================
 void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
 {
+  if(!theBasis || !myFromShape || !myToShape ||
+    (myFromShape && myToShape && myFromShape->isEqual(myToShape))) {
+    return;
+  }
+
   TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());
-  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(
-    BRep_Tool::Surface(aBasis));
+  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aBasis));
   if(aPlane.IsNull()) { // non-planar shapes is not supported for extrusion yet
     return;
   }
@@ -50,19 +52,16 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
     setImpl(aBuilder);
     TopoDS_Shape aFromShape = myFromShape->impl<TopoDS_Shape>();
     TopoDS_Shape aToShape   = myToShape->impl<TopoDS_Shape>();
-    aBuilder->Perform(myFromShape->impl<TopoDS_Shape>(), myToShape->impl<TopoDS_Shape>());
-    myDone = aBuilder->IsDone();
-    if (myDone) {
-      TopoDS_Shape aResult;
-      if(aBuilder->Shape().ShapeType() == TopAbs_COMPOUND) {
-        aResult = GeomAlgoAPI_DFLoader::refineResult(aBuilder->Shape());
-      }
-      else {
-        aResult = aBuilder->Shape();
-      }
+    aBuilder->Perform(aFromShape, aToShape);
+    myDone = aBuilder->IsDone() == Standard_True;
+    if(myDone){
+      TopoDS_Shape aResult = aBuilder->Shape();
       TopExp_Explorer anExp(aResult, TopAbs_SOLID);
       if(!anExp.More()) {
         return;
+      }
+      if(aResult.ShapeType() == TopAbs_COMPOUND) {
+        aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
       }
       // fill data map to keep correct orientation of sub-shapes
       for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
@@ -78,20 +77,20 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
   }
 }
 
-//============================================================================
+//=================================================================================================
 const bool GeomAlgoAPI_Prism::isDone() const
 {
   return myDone;
 }
 
-//============================================================================
+//=================================================================================================
 const bool GeomAlgoAPI_Prism::isValid() const
 {
   BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
   return (aChecker.IsValid() == Standard_True);
 }
 
-//============================================================================
+//=================================================================================================
 const bool GeomAlgoAPI_Prism::hasVolume() const
 {
   bool hasVolume(false);
@@ -105,37 +104,37 @@ const bool GeomAlgoAPI_Prism::hasVolume() const
   return hasVolume;
 }
 
-//============================================================================
+//=================================================================================================
 const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Prism::shape () const
 {
   return myShape;
 }
 
-//============================================================================
+//=================================================================================================
 const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Prism::firstShape()
 {
   return myFirst;
 }
 
-//============================================================================
+//=================================================================================================
 const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Prism::lastShape()
 {
   return myLast;
 }
 
-//============================================================================
+//=================================================================================================
 void GeomAlgoAPI_Prism::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const
 {
   theMap = myMap;
 }
 
-//============================================================================
+//=================================================================================================
 GeomAlgoAPI_MakeShape* GeomAlgoAPI_Prism::makeShape() const
 {
   return myMkShape;
 }
 
-//============================================================================
+//=================================================================================================
 GeomAlgoAPI_Prism::~GeomAlgoAPI_Prism()
 {
   if (myImpl) {

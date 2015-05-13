@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin.h
     FeaturesPlugin_Plugin.h
     FeaturesPlugin_Extrusion.h
+    FeaturesPlugin_Revolution.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_Group.h
     FeaturesPlugin_Placement.h
@@ -15,6 +16,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
     FeaturesPlugin_Plugin.cpp
     FeaturesPlugin_Extrusion.cpp
+    FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
     FeaturesPlugin_Placement.cpp
@@ -23,6 +25,7 @@ SET(PROJECT_SOURCES
 SET(XML_RESOURCES
   plugin-Features.xml
   extrusion_widget.xml
+  revolution_widget.xml
   boolean_widget.xml
   group_widget.xml
   placement_widget.xml
