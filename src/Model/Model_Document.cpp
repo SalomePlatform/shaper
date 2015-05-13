@@ -599,6 +599,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
       // event: feature is added
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+      aFeature->setDisabled(false); // by default created feature is enabled
       setCurrentFeature(aFeature); // after all this feature stays in the document, so make it current
     } else { // feature must be executed
        // no creation event => updater not working, problem with remove part
@@ -998,14 +999,16 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   for(int a = aSize - 1; a >= 0; a--) {
     FeaturePtr aFeature = 
       std::dynamic_pointer_cast<ModelAPI_Feature>(object(ModelAPI_Feature::group(), a, true));
+
+    // check this before passed become enabled: the current feature is enabled!
+    if (aFeature == theCurrent) aPassed = true;
+
     if (aFeature->setDisabled(!aPassed)) {
       // state of feature is changed => so feature become updated
       static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
 
     }
-    // check this only after passed become enabled: the current feature is enabled!
-    if (aFeature == theCurrent) aPassed = true;
   }
 }
 

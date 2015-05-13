@@ -234,6 +234,8 @@ ModelAPI_ExecState stateByReference(ObjectPtr theTarget, const ModelAPI_ExecStat
 void Model_Update::updateArguments(FeaturePtr theFeature) {
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
+  if (theFeature->isDisabled()) // nothing to do with disabled feature
+    return;
   bool aJustUpdated = false;
   ModelAPI_ExecState aState = ModelAPI_StateDone;
   // check the parameters: values can be changed
@@ -299,6 +301,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
 {
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+
+  if (theFeature->isDisabled()) // nothing to do with disabled feature
+    return;
   bool aJustUpdated = false;
 
   if (theFeature) {
