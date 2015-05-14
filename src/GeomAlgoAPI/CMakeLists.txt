@@ -23,6 +23,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_STEPImport.h
     GeomAlgoAPI_IGESImport.h
     GeomAlgoAPI_BREPExport.h
+    GeomAlgoAPI_STEPExport.h
     GeomAlgoAPI_IGESExport.h
 )
 
@@ -43,6 +44,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_STEPImport.cpp
     GeomAlgoAPI_IGESImport.cpp
     GeomAlgoAPI_BREPExport.cpp
+    GeomAlgoAPI_STEPExport.cpp
     GeomAlgoAPI_IGESExport.cpp
 )
 

@@ -9,7 +9,7 @@
 
 #include <ExchangePlugin_ExportFeature.h>
 #include <GeomAlgoAPI_BREPExport.h>
-//#include <GeomAlgoAPI_STEPExport.h>
+#include <GeomAlgoAPI_STEPExport.h>
 #include <GeomAlgoAPI_IGESExport.h>
 
 #include <Config_Common.h>
@@ -109,7 +109,7 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   if (aFormatName == "BREP") {
     aResult = BREPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
   } else if (aFormatName == "STEP" || aFormatName == "STP") {
-//    aShape = STEPExport::Export(aFileName, aFormatName, anError, anUnknownLabel);
+    aResult = STEPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
   } else if (aFormatName == "IGES") {
     aResult = IGESExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
   }

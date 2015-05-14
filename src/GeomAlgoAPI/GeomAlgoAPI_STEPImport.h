@@ -7,6 +7,9 @@
  *      Author: sbh
  */
 
+#ifndef GEOMALGOAPI_STEPIMPORT_H_
+#define GEOMALGOAPI_STEPIMPORT_H_
+
 #include <GeomAlgoAPI.h>
 
 #include <TCollection_AsciiString.hxx>
@@ -28,3 +31,5 @@ TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
                     const TCollection_AsciiString& theFormatName, TCollection_AsciiString& theError,
                     const TDF_Label& theShapeLabel);
 }
+
+#endif /* GEOMALGOAPI_STEPIMPORT_H_ */
