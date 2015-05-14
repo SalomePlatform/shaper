@@ -50,7 +50,7 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
   }
 
  protected:
-  /// POerforms the import of the file
+  /// Performs the import of the file
   EXCHANGEPLUGIN_EXPORT bool importFile(const std::string& theFileName);
 
 private:

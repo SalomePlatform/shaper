@@ -74,7 +74,7 @@ void ExchangePlugin_ImportFeature::execute()
 bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 {
   // retrieve the file and plugin library names
-  TCollection_AsciiString aFileName (theFileName.c_str());
+  TCollection_AsciiString aFileName(theFileName.c_str());
   OSD_Path aPath(aFileName);
   TCollection_AsciiString aFormatName = aPath.Extension();
   // ".brep" -> "BREP", TCollection_AsciiString are numbered from 1
@@ -118,12 +118,12 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 
 //============================================================================
 void ExchangePlugin_ImportFeature::loadNamingDS(
-	                            std::shared_ptr<GeomAPI_Shape> theGeomShape, 
-					     std::shared_ptr<ModelAPI_ResultBody> theResultBody)
-{  
+    std::shared_ptr<GeomAPI_Shape> theGeomShape,
+    std::shared_ptr<ModelAPI_ResultBody> theResultBody)
+{
   //load result
   theResultBody->store(theGeomShape);
- 
+
   int aTag(1);
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS, aTag);

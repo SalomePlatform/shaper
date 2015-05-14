@@ -36,6 +36,7 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myTitle = QString::fromStdString(theData->getProperty("title"));
+  myType = (theData->getProperty("type") == "save") ? WFS_SAVE : WFS_OPEN;
   myDefaultPath = QString::fromStdString(theData->getProperty("path"));
 
   QGridLayout* aMainLay = new QGridLayout(this);
@@ -68,7 +69,7 @@ ModuleBase_WidgetFileSelector::~ModuleBase_WidgetFileSelector()
 bool ModuleBase_WidgetFileSelector::storeValueCustom() const
 {
   // A rare case when plugin was not loaded. 
-  if(!myFeature)
+  if (!myFeature)
     return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
@@ -81,7 +82,7 @@ bool ModuleBase_WidgetFileSelector::storeValueCustom() const
 bool ModuleBase_WidgetFileSelector::restoreValue()
 {
   // A rare case when plugin was not loaded. 
-  if(!myFeature)
+  if (!myFeature)
     return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
@@ -104,15 +105,16 @@ QList<QWidget*> ModuleBase_WidgetFileSelector::getControls() const
 
 bool ModuleBase_WidgetFileSelector::isCurrentPathValid()
 {
-  QFileInfo aFile (myPathField->text());
+  QFileInfo aFile(myPathField->text());
   return aFile.exists();
 }
 
-
 void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 {
-  QString aFilter = formatsString();
-  QString aFileName = QFileDialog::getOpenFileName(this, myTitle, myDefaultPath, aFilter);
+  QString aFilter = filterString();
+  QString aFileName = (myType == WFS_SAVE)
+      ? QFileDialog::getSaveFileName(this, myTitle, myDefaultPath, aFilter)
+      : QFileDialog::getOpenFileName(this, myTitle, myDefaultPath, aFilter);
   if (!aFileName.isEmpty()) {
     myPathField->setText(aFileName);
   }
@@ -120,13 +122,13 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 
 void ModuleBase_WidgetFileSelector::onPathChanged()
 {
-  if(!isCurrentPathValid())
+  if (myType == WFS_OPEN && !isCurrentPathValid())
     return;
   storeValue();
   emit valuesChanged();
 }
 
-QString ModuleBase_WidgetFileSelector::formatsString() const
+QString ModuleBase_WidgetFileSelector::filterString() const
 {
   QStringList aResult;
   QStringList aValidatorFormats = getValidatorFormats();
@@ -147,21 +149,22 @@ QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
   std::list<ModelAPI_Validator*> allValidators;
   std::list<std::list<std::string> > allArguments;
   aFactory->validators(myFeature->getKind(), myAttributeID, allValidators, allArguments);
-  //TODO(sbh): extract as separate method
-  if(allArguments.empty())
-    return QStringList();
+  QStringList aResult;
   std::list<std::string> anArgumentList = allArguments.front();
   std::list<std::string>::const_iterator it = anArgumentList.begin();
-  QStringList aResult;
   for (; it != anArgumentList.end(); ++it) {
-    std::string anArg = *it;
-    int aSepPos = anArg.find(":");
-    if (aSepPos == std::string::npos) {
-      continue;
-    }
-    QString aFormat = QString::fromStdString(anArg.substr(0, aSepPos));
-    aFormat = aFormat.toUpper();
-    aResult.append(aFormat);
+    QString aFormat = getFormat(*it);
+    if (!aFormat.isNull())
+      aResult << aFormat;
   }
   return aResult;
 }
+
+QString ModuleBase_WidgetFileSelector::getFormat( const std::string& theArgument ) const
+{
+  QString anArgument = QString::fromStdString(theArgument);
+  if (!anArgument.contains(":"))
+    return QString();
+  return anArgument.section(":", 0, 0).toUpper();
+}
+

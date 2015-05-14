@@ -10,13 +10,17 @@
 #include <ExchangePlugin_ExportFeature.h>
 //#include <GeomAlgoAPI_BREPExport.h>
 //#include <GeomAlgoAPI_STEPExport.h>
-//#include <GeomAlgoAPI_IGESExport.h>
+#include <GeomAlgoAPI_IGESExport.h>
 
-#include <GeomAPI_Shape.h>
 #include <Config_Common.h>
 #include <Config_PropManager.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
+
+#include <GeomAPI_Shape.h>
+
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
@@ -56,6 +60,7 @@ const std::string& ExchangePlugin_ExportFeature::getKind()
 void ExchangePlugin_ExportFeature::initAttributes()
 {
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
 
 /*
@@ -66,15 +71,29 @@ void ExchangePlugin_ExportFeature::execute()
   AttributeStringPtr aFilePathAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
       data()->attribute(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
   std::string aFilePath = aFilePathAttr->value();
-  if(aFilePath.empty())
+  if (aFilePath.empty())
     return;
-  exportFile(aFilePath);
+
+  AttributeSelectionListPtr aSelectionListAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(
+          data()->attribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
+
+  std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
+  for ( int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i ) {
+    std::shared_ptr<ModelAPI_AttributeSelection> anSelectionAttr = aSelectionListAttr->value(i);
+    aShapes.push_back(anSelectionAttr->value());
+  }
+  std::shared_ptr<GeomAPI_Shape> aShape =
+      GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+
+  exportFile(aFilePath, aShape);
 }
 
-bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName)
+bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
+                                              std::shared_ptr<GeomAPI_Shape> theShape)
 {
   // retrieve the file and plugin library names
-  TCollection_AsciiString aFileName (theFileName.c_str());
+  TCollection_AsciiString aFileName(theFileName.c_str());
   OSD_Path aPath(aFileName);
   TCollection_AsciiString aFormatName = aPath.Extension();
   // ".brep" -> "BREP", TCollection_AsciiString are numbered from 1
@@ -85,50 +104,22 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName)
   TCollection_AsciiString anError;
   TDF_Label anUnknownLabel = TDF_Label();
 
-  TopoDS_Shape aShape;
-//  if (aFormatName == "BREP") {
+  TopoDS_Shape aShape(theShape->impl<TopoDS_Shape>());
+  bool aResult = true;
+  if (aFormatName == "BREP") {
 //    aShape = BREPExport::Export(aFileName, aFormatName, anError, anUnknownLabel);
-//  } else if (aFormatName == "STEP" || aFormatName == "STP") {
+  } else if (aFormatName == "STEP" || aFormatName == "STP") {
 //    aShape = STEPExport::Export(aFileName, aFormatName, anError, anUnknownLabel);
-//  } else if (aFormatName == "IGES") {
-//    aShape = IGESExport::Export(aFileName, aFormatName, anError, anUnknownLabel);
-//  }
-//   // Check if shape is valid
-//  if ( aShape.IsNull() ) {
-//     const static std::string aShapeError =
-//       "An error occurred while exporting " + theFileName + ": " + anError.ToCString();
-//     setError(aShapeError);
-//     return false;
-//   }
-//
-//  // Pass the results into the model
-//  std::string anObjectName = aPath.Name().ToCString();
-//  data()->setName(anObjectName);
-//  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-//  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-//  aGeomShape->setImpl(new TopoDS_Shape(aShape));
-//
-//  //LoadNamingDS of the exported shape
-//  loadNamingDS(aGeomShape, aResultBody);
-//
-//  setResult(aResultBody);
+  } else if (aFormatName == "IGES") {
+    aResult = IGESExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
+  }
+
+  if ( !aResult ) {
+    const static std::string aShapeError =
+        "An error occurred while exporting " + theFileName + ": " + anError.ToCString();
+    setError(aShapeError);
+    return false;
+  }
 
   return true;
-}
-
-//============================================================================
-void ExchangePlugin_ExportFeature::loadNamingDS(
-    std::shared_ptr<GeomAPI_Shape> theGeomShape,
-    std::shared_ptr<ModelAPI_ResultBody> theResultBody)
-{
-  //load result
-  theResultBody->store(theGeomShape);
-
-  int aTag(1);
-  std::string aNameMS = "Shape";
-  theResultBody->loadFirstLevel(theGeomShape, aNameMS, aTag);
-  //std::string aNameDE = "DiscEdges";
-  //theResultBody->loadDisconnectedEdges(theGeomShape, aNameDE, aTag);
-  //std::string aNameDV = "DiscVertexes";
-  //theResultBody->loadDisconnectedVertexes(theGeomShape, aNameDV, aTag); 
 }

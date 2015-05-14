@@ -9,9 +9,10 @@
         </file_selector>
       </feature>
       <feature id="Export" title="Export" tooltip="Export to file" icon=":icons/export.png">
-        <file_selector id="export_file_selector" title="Export file" path="">
-          <validator id="ExchangePlugin_ExportFormat" parameters="BREgi tP:BREPExport,STEP|STP:STEPExport,IGES:IGESExport" />
+        <file_selector id="export_file_selector" type="save" title="Export file" path="">
+          <validator id="ExchangePlugin_ExportFormat" parameters="BREP:BREPExport,STEP|STP:STEPExport,IGES:IGESExport" />
         </file_selector>
+        <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="Vertices Edges Faces Solids" /> 
       </feature>
     </group>
   </workbench>

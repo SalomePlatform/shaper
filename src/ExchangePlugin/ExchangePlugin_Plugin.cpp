@@ -29,6 +29,8 @@ ExchangePlugin_Plugin::ExchangePlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aSession->validators();
   aFactory->registerValidator("ExchangePlugin_ImportFormat",
                               new ExchangePlugin_ImportFormatValidator);
+  aFactory->registerValidator("ExchangePlugin_ExportFormat",
+                              new ExchangePlugin_ExportFormatValidator);
 
   // register construction properties
   //Config_PropManager::registerProp("Visualization", "import_feature_color", "Imported feature color",

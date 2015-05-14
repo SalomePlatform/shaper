@@ -18,17 +18,22 @@
 class ExchangePlugin_ExportFeature : public ModelAPI_Feature
 {
  public:
-  /// Extrusion kind
   inline static const std::string& ID()
   {
     static const std::string MY_EXPORT_ID("Export");
     return MY_EXPORT_ID;
   }
-  /// attribute name of referenced face
+  /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
     static const std::string MY_FILE_PATH_ID("export_file_selector");
     return MY_FILE_PATH_ID;
+  }
+  /// attribute name of selection list
+  inline static const std::string& SELECTION_LIST_ID()
+  {
+    static const std::string MY_SELECTION_LIST_ID("selection_list");
+    return MY_SELECTION_LIST_ID;
   }
   /// default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ExportFeature();
@@ -51,12 +56,8 @@ class ExchangePlugin_ExportFeature : public ModelAPI_Feature
 
  protected:
   /// Performs the export of the file
-  EXCHANGEPLUGIN_EXPORT bool exportFile(const std::string& theFileName);
-
-private:
-  /// Loads Naming data structure to the document
-  void loadNamingDS(std::shared_ptr<GeomAPI_Shape> theGeomShape, 
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody);
+  EXCHANGEPLUGIN_EXPORT bool exportFile(const std::string& theFileName,
+                                        std::shared_ptr<GeomAPI_Shape> theShape);
 };
 
 #endif /* EXPORT_EXPORTFEATURE_H_ */

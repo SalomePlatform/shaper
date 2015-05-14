@@ -3,8 +3,8 @@
 /*
  * GEOMALGOAPI_IGESImport.h
  *
- *  Created on: Dec 24, 2014
- *      Author: sbh
+ *  Created on: May 14, 2015
+ *      Author: spo
  */
 
 #ifndef GEOMALGOAPI_IGESIMPORT_H_
