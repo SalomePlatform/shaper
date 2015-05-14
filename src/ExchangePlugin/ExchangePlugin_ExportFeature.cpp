@@ -3,12 +3,12 @@
 /*
  * ExchangePlugin_ExportFeature.cpp
  *
- *  Created on: Aug 28, 2014
- *      Author: sbh
+ *  Created on: May 14, 2015
+ *      Author: spo
  */
 
 #include <ExchangePlugin_ExportFeature.h>
-//#include <GeomAlgoAPI_BREPExport.h>
+#include <GeomAlgoAPI_BREPExport.h>
 //#include <GeomAlgoAPI_STEPExport.h>
 #include <GeomAlgoAPI_IGESExport.h>
 
@@ -107,7 +107,7 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   TopoDS_Shape aShape(theShape->impl<TopoDS_Shape>());
   bool aResult = true;
   if (aFormatName == "BREP") {
-//    aShape = BREPExport::Export(aFileName, aFormatName, anError, anUnknownLabel);
+    aResult = BREPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
   } else if (aFormatName == "STEP" || aFormatName == "STP") {
 //    aShape = STEPExport::Export(aFileName, aFormatName, anError, anUnknownLabel);
   } else if (aFormatName == "IGES") {

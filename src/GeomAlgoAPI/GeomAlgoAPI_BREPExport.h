@@ -1,14 +1,14 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 /*
- * GEOMALGOAPI_IGESExport.h
+ * GEOMALGOAPI_BREPExport.h
  *
- *  Created on: Dec 24, 2014
- *      Author: sbh
+ *  Created on: May 14, 2015
+ *      Author: spo
  */
 
-#ifndef GEOMALGOAPI_IGESEXPORT_H_
-#define GEOMALGOAPI_IGESEXPORT_H_
+#ifndef GEOMALGOAPI_BREPEXPORT_H_
+#define GEOMALGOAPI_BREPEXPORT_H_
 
 #include <GeomAlgoAPI.h>
 
@@ -16,9 +16,9 @@
 #include <TopoDS_Shape.hxx>
 #include <TDF_Label.hxx>
 
-namespace IGESExport {
+namespace BREPExport {
 
-/// Implementation of the export IGES files algorithms
+/// Implementation of the export BREP files algorithms
 GEOMALGOAPI_EXPORT
 bool Export(const TCollection_AsciiString& theFileName,
             const TCollection_AsciiString& theFormatName,
@@ -27,4 +27,4 @@ bool Export(const TCollection_AsciiString& theFileName,
 
 }
 
-#endif /* GEOMALGOAPI_IGESEXPORT_H_ */
+#endif /* GEOMALGOAPI_BREPEXPORT_H_ */
