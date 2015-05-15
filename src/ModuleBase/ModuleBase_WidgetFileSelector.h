@@ -67,22 +67,25 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom() const;
 
- protected:
-   /// Returns string containing formats
-  QString filterString() const;
+protected:
+  /// Converts format to filter string
+  static QString formatToFilter( const QString & theFormat );
 
   /// Returns list of validator formats
   QStringList getValidatorFormats() const;
 
-  /// Returns a format received from theArgument
-  QString getFormat( const std::string& theArgument ) const;
+  /// Returns string containing formats
+  QString filterString() const;
 
- private:
+protected:
    /// A control for path input
   QLineEdit* myPathField;
 
   /// A title of open file dialog box
   QString myTitle;
+
+  /// A current format
+  QString mySelectedFilter;
 
   /// A title of open file dialog box
   enum { WFS_OPEN, WFS_SAVE } myType;

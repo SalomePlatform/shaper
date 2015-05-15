@@ -5,6 +5,9 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include <ExchangePlugin_Validators.h>
+
+#include <ExchangePlugin_Tools.h>
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Session.h>
@@ -12,7 +15,6 @@
 
 #include <list>
 #include <string>
-#include <sstream>
 #include <algorithm>
 
 bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& theArguments,
@@ -27,12 +29,10 @@ bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& 
       result = false;
       continue;
     }
-    std::string aFormatList = anArg.substr(0, aSepPos);
-    std::transform(aFormatList.begin(), aFormatList.end(), aFormatList.begin(), toupper);
-    std::istringstream aStream(aFormatList);
-    std::string aFormat;
-    while (std::getline(aStream, aFormat, '|'))
-      outFormats.push_back(aFormat);
+    std::string aFormats = anArg.substr(0, aSepPos);
+    std::transform(aFormats.begin(), aFormats.end(), aFormats.begin(), toupper);
+    std::list<std::string> aFormatList = ExchangePlugin_Tools::split(aFormats, '|');
+    outFormats.insert(outFormats.end(), aFormatList.begin(), aFormatList.end());
   }
   return result;
 }

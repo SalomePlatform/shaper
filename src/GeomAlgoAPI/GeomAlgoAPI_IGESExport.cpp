@@ -77,15 +77,21 @@ int KindOfBRep (const TopoDS_Shape& theShape)
 
 //=============================================================================
 //extern "C" {
+
 namespace IGESExport {
 
 bool Export(const TCollection_AsciiString& theFileName,
-            const TCollection_AsciiString&,
+            const TCollection_AsciiString& theFormatName,
             const TopoDS_Shape& theShape,
             TCollection_AsciiString& theError, const TDF_Label&)
 {
-  //TODO(spo): pass version as argument of the function
-  TCollection_AsciiString aVersion = "5.3";
+  // theFormatName expected "IGES-5.1", "IGES-5.3"...
+  TCollection_AsciiString aVersion = theFormatName.Token("-", 2);
+  #ifdef _DEBUG
+  if (!aVersion.IsEqual("5.1") || !aVersion.IsEqual("5.3"))
+    std::cout << "Warning: unrecognized version " << aVersion.ToCString()
+              << ". Default version: 5.1." << std::endl;
+  #endif
   // define, whether to write only faces (5.1 IGES format)
   // or shells and solids also (5.3 IGES format)
   int aBrepMode = 0;
@@ -124,7 +130,7 @@ bool Export(const TCollection_AsciiString& theFileName,
   // perform shape writing
   if( ICW.AddShape( theShape ) ) {
     ICW.ComputeModel();
-    return (bool)ICW.Write( theFileName.ToCString() );
+    return ICW.Write( theFileName.ToCString() );
   }
   return false;
 }

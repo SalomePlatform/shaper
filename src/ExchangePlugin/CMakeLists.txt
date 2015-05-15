@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
     ExchangePlugin_ImportFeature.h
     ExchangePlugin_ExportFeature.h
     ExchangePlugin_Validators.h
+    ExchangePlugin_Tools.h
 )
 
 SET(PROJECT_SOURCES
@@ -23,6 +24,7 @@ SET(PROJECT_SOURCES
     ExchangePlugin_ImportFeature.cpp
     ExchangePlugin_ExportFeature.cpp
     ExchangePlugin_Validators.cpp
+    ExchangePlugin_Tools.cpp
 )
 
 SET(XML_RESOURCES

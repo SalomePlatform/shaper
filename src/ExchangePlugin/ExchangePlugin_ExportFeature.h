@@ -23,6 +23,12 @@ class ExchangePlugin_ExportFeature : public ModelAPI_Feature
     static const std::string MY_EXPORT_ID("Export");
     return MY_EXPORT_ID;
   }
+  /// attribute name of file format
+  inline static const std::string& FILE_FORMAT_ID()
+  {
+    static const std::string MY_FILE_FORMAT_ID("export_file_format");
+    return MY_FILE_FORMAT_ID;
+  }
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
@@ -54,9 +60,10 @@ class ExchangePlugin_ExportFeature : public ModelAPI_Feature
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   MODELAPI_EXPORT virtual bool isPreviewNeeded() const { return false; }
 
- protected:
+protected:
   /// Performs the export of the file
   EXCHANGEPLUGIN_EXPORT bool exportFile(const std::string& theFileName,
+                                        const std::string& theFormat,
                                         std::shared_ptr<GeomAPI_Shape> theShape);
 };
 

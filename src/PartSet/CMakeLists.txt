@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetMultiSelector.h
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
+	PartSet_WidgetFileSelector.h
 	PartSet_Filters.h
 	PartSet_SketcherMgr.h
 	PartSet_MenuMgr.h
@@ -38,6 +39,7 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetPoint2dAngle.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
+	PartSet_WidgetFileSelector.cpp
 	PartSet_Filters.cpp
 	PartSet_SketcherMgr.cpp
 	PartSet_MenuMgr.cpp

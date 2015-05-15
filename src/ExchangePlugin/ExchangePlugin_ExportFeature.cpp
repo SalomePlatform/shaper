@@ -8,6 +8,9 @@
  */
 
 #include <ExchangePlugin_ExportFeature.h>
+
+#include <ExchangePlugin_Tools.h>
+
 #include <GeomAlgoAPI_BREPExport.h>
 #include <GeomAlgoAPI_STEPExport.h>
 #include <GeomAlgoAPI_IGESExport.h>
@@ -19,18 +22,20 @@
 
 #include <GeomAPI_Shape.h>
 
-#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
+
 #include <TCollection_AsciiString.hxx>
 #include <TDF_Label.hxx>
 #include <TopoDS_Shape.hxx>
 #include <OSD_Path.hxx>
 
 #include <algorithm>
+#include <iterator>
 #include <string>
 #ifdef _DEBUG
 #include <iostream>
@@ -59,6 +64,7 @@ const std::string& ExchangePlugin_ExportFeature::getKind()
  */
 void ExchangePlugin_ExportFeature::initAttributes()
 {
+  data()->addAttribute(ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
@@ -68,54 +74,65 @@ void ExchangePlugin_ExportFeature::initAttributes()
  */
 void ExchangePlugin_ExportFeature::execute()
 {
-  AttributeStringPtr aFilePathAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
-      data()->attribute(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
+  AttributeStringPtr aFormatAttr =
+      this->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID());
+  std::string aFormat = aFormatAttr->value();
+  if (aFormat.empty())
+    return;
+
+  AttributeStringPtr aFilePathAttr =
+      this->string(ExchangePlugin_ExportFeature::FILE_PATH_ID());
   std::string aFilePath = aFilePathAttr->value();
   if (aFilePath.empty())
     return;
 
   AttributeSelectionListPtr aSelectionListAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(
-          data()->attribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
-
+      this->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
   for ( int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i ) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anSelectionAttr = aSelectionListAttr->value(i);
-    aShapes.push_back(anSelectionAttr->value());
+    aShapes.push_back(aSelectionListAttr->value(i)->value());
   }
   std::shared_ptr<GeomAPI_Shape> aShape =
       GeomAlgoAPI_CompoundBuilder::compound(aShapes);
 
-  exportFile(aFilePath, aShape);
+  exportFile(aFilePath, aFormat, aShape);
+}
+
+std::list<std::string> ExchangePlugin_ExportFeature::getFormats() const
+{
+  // This value is a copy of string_list attribute of format_choice in plugin-Exchange.xml
+  // XPath:plugin-Exchange.xml:string(//*[@id="format_choice"]/@string_list)
+  std::string aFormats = "BREP STEP IGES-5.1 IGES-5.3";
+  return ExchangePlugin_Tools::split(aFormats, ' ');
 }
 
 bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
+                                              const std::string& theFormat,
                                               std::shared_ptr<GeomAPI_Shape> theShape)
 {
   // retrieve the file and plugin library names
   TCollection_AsciiString aFileName(theFileName.c_str());
   OSD_Path aPath(aFileName);
-  TCollection_AsciiString aFormatName = aPath.Extension();
-  // ".brep" -> "BREP", TCollection_AsciiString are numbered from 1
-  aFormatName = aFormatName.SubString(2, aFormatName.Length());
-  aFormatName.UpperCase();
+  TCollection_AsciiString aFormatName(theFormat.c_str());
 
   // Perform the export
   TCollection_AsciiString anError;
   TDF_Label anUnknownLabel = TDF_Label();
 
   TopoDS_Shape aShape(theShape->impl<TopoDS_Shape>());
-  bool aResult = true;
+  bool aResult = false;
   if (aFormatName == "BREP") {
     aResult = BREPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
-  } else if (aFormatName == "STEP" || aFormatName == "STP") {
+  } else if (aFormatName == "STEP") {
     aResult = STEPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
-  } else if (aFormatName == "IGES") {
+  } else if (aFormatName.SubString(1, 4) == "IGES") {
     aResult = IGESExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
+  } else {
+    anError = TCollection_AsciiString("Unsupported format ") + aFormatName;
   }
 
-  if ( !aResult ) {
-    const static std::string aShapeError =
+  if (!aResult) {
+    std::string aShapeError =
         "An error occurred while exporting " + theFileName + ": " + anError.ToCString();
     setError(aShapeError);
     return false;

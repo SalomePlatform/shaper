@@ -111,11 +111,13 @@ bool ModuleBase_WidgetFileSelector::isCurrentPathValid()
 
 void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 {
-  QString aDefaultPath = myPathField->text().isEmpty() ? myDefaultPath : myPathField->text();
+  QString aDefaultPath = myPathField->text().isEmpty()
+      ? myDefaultPath
+      : QFileInfo(myPathField->text()).absolutePath();
   QString aFilter = filterString();
   QString aFileName = (myType == WFS_SAVE)
-      ? QFileDialog::getSaveFileName(this, myTitle, aDefaultPath, aFilter)
-      : QFileDialog::getOpenFileName(this, myTitle, aDefaultPath, aFilter);
+      ? QFileDialog::getSaveFileName(this, myTitle, aDefaultPath, aFilter, &mySelectedFilter)
+      : QFileDialog::getOpenFileName(this, myTitle, aDefaultPath, aFilter, &mySelectedFilter);
   if (!aFileName.isEmpty()) {
     myPathField->setText(aFileName);
   }
@@ -129,18 +131,15 @@ void ModuleBase_WidgetFileSelector::onPathChanged()
   emit valuesChanged();
 }
 
-QString ModuleBase_WidgetFileSelector::filterString() const
+QString ModuleBase_WidgetFileSelector::formatToFilter( const QString & theFormat )
 {
-  QStringList aResult;
-  QStringList aValidatorFormats = getValidatorFormats();
+  if (theFormat.isEmpty() && !theFormat.contains(":"))
+    return QString();
 
-  foreach(QString eachFormat, aValidatorFormats)  {
-    QStringList aFormatList = eachFormat.split("|");
-    aResult << QString("%1 files (%2)").arg(aFormatList.value(0))
-        .arg(QStringList(aFormatList).replaceInStrings(QRegExp("^(.*)$"), "*.\\1").join(" "));
-  }
-  aResult << QString("All files (*.*)");
-  return aResult.join(";;");
+  QStringList aExtesionList = theFormat.section(':', 0, 0).split("|");
+  QString aFormat = theFormat.section(':', 1, 1);
+  return QString("%1 files (%2)").arg(aFormat)
+      .arg(QStringList(aExtesionList).replaceInStrings(QRegExp("^(.*)$"), "*.\\1").join(" "));
 }
 
 QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
@@ -154,18 +153,22 @@ QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
   std::list<std::string> anArgumentList = allArguments.front();
   std::list<std::string>::const_iterator it = anArgumentList.begin();
   for (; it != anArgumentList.end(); ++it) {
-    QString aFormat = getFormat(*it);
-    if (!aFormat.isNull())
+    QString aFormat = QString::fromStdString(*it);
+    if (!aFormat.isEmpty())
       aResult << aFormat;
   }
   return aResult;
 }
 
-QString ModuleBase_WidgetFileSelector::getFormat( const std::string& theArgument ) const
+QString ModuleBase_WidgetFileSelector::filterString() const
 {
-  QString anArgument = QString::fromStdString(theArgument);
-  if (!anArgument.contains(":"))
-    return QString();
-  return anArgument.section(":", 0, 0).toUpper();
-}
+  QStringList aResult;
+  QStringList aValidatorFormats = getValidatorFormats();
 
+  foreach(const QString & eachFormat, aValidatorFormats) {
+    aResult << formatToFilter(eachFormat);
+  }
+  if (myType == WFS_OPEN)
+    aResult << QString("All files (*.*)");
+  return aResult.join(";;");
+}
