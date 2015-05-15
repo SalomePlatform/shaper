@@ -167,7 +167,8 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
 
   if (aSelectionListAttr) {
     // Restore shape type
-    setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionListAttr->selectionType().c_str()));
+    if (!aSelectionListAttr->selectionType().empty())
+      setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionListAttr->selectionType().c_str()));
     updateSelectionList(aSelectionListAttr);
     return true;
   }
