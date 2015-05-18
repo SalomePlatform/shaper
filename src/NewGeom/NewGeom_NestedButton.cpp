@@ -46,6 +46,9 @@ QWidget * NewGeom_NestedButton::createWidget(QWidget * theParent)
   QHBoxLayout* aBoxLay = new QHBoxLayout(myButtonFrame);
   aBoxLay->setContentsMargins(2, 0, 0, 0);
   aBoxLay->setSpacing(1);
+  QSizePolicy aSizePolicy;
+  aSizePolicy.setControlType(QSizePolicy::ToolButton);
+  myButtonFrame->setSizePolicy(aSizePolicy);
 
   myThisButton = new QToolButton(myButtonFrame);
   myThisButton->setDefaultAction(this);
