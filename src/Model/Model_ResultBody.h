@@ -39,9 +39,14 @@ public:
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
 
-  // Retuns the parameters of color definition in the resources config manager
+  /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
                                             std::string& theDefault);
+
+  /// Disables the result body: keeps the resulting shape as selection, but erases the underlaying
+  /// naming data structure if theFlag if false. Or restores everything on theFlag is true.
+  MODEL_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
+    const bool theFlag);
 
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
@@ -130,7 +135,7 @@ private:
   /// builds name for the shape kept at the specified tag 
   void buildName(const int theTag, const std::string& theName);
 
-  friend class Model_Document;
+  friend class Model_Objects;
 };
 
 #endif

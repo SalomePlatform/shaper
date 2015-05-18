@@ -67,10 +67,8 @@ public:
   //! Returns the object in the group by the index (started from zero)
   //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
-  //! \param theHidden if it is true, it counts also the features that are not in tree
   virtual std::shared_ptr<ModelAPI_Object> object(const std::string& theGroupID,
-                                                    const int theIndex,
-                                                    const bool theHidden = false) = 0;
+                                                    const int theIndex) = 0;
 
   //! Returns the first found object in the group by the object name
   //! \param theGroupID group that contains an object
@@ -85,8 +83,7 @@ public:
   virtual const int index(std::shared_ptr<ModelAPI_Object> theObject) = 0;
 
   //! Returns the number of objects in the group of objects
-  //! If theHidden is true, it counts also the features that are not in tree
-  virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;
+  virtual int size(const std::string& theGroupID) = 0;
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
@@ -129,9 +126,12 @@ protected:
   MODELAPI_EXPORT ModelAPI_Document();
 
   /// Internally makes document know that feature was removed or added in history after creation
-  MODELAPI_EXPORT virtual void addToHistory(const std::shared_ptr<ModelAPI_Object> theObject) = 0;
+  MODELAPI_EXPORT virtual void updateHistory(const std::shared_ptr<ModelAPI_Object> theObject) = 0;
+  /// Internally makes document know that feature was removed or added in history after creation
+  MODELAPI_EXPORT virtual void updateHistory(const std::string theGroup) = 0;
 
   friend class ModelAPI_Object; // to add or remove from the history
+  friend class ModelAPI_Result; // to add or remove from the history
 };
 
 //! Pointer on document object

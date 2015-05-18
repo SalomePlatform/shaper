@@ -17,7 +17,7 @@ void ModelAPI_Object::setInHistory(
 {
   if (myInHistory != theFlag) {
     myInHistory = theFlag;
-    myDoc->addToHistory(theObject);
+    myDoc->updateHistory(theObject);
   }
 }
 

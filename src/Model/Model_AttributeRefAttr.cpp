@@ -7,6 +7,7 @@
 #include "Model_AttributeRefAttr.h"
 #include "Model_Application.h"
 #include "Model_Data.h"
+#include "Model_Objects.h"
 #include <ModelAPI_Feature.h>
 
 using namespace std;
@@ -76,7 +77,7 @@ ObjectPtr Model_AttributeRefAttr::object()
         owner()->document());
     if (aDoc) {
       TDF_Label aRefLab = myRef->Get();
-      return aDoc->object(aRefLab);
+      return aDoc->objects()->object(aRefLab);
     }
   }
   // not initialized

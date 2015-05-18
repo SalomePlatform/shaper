@@ -14,16 +14,11 @@
 #include <ModelAPI_ResultParameter.h>
 
 #include <TDocStd_Document.hxx>
-#include <NCollection_DataMap.hxx>
-#include <TDF_Label.hxx>
 #include <map>
 #include <set>
 
 class Handle_Model_Document;
-
-// for TDF_Label map usage
-static Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper);
-static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2);
+class Model_Objects;
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -91,14 +86,6 @@ class Model_Document : public ModelAPI_Document
   //! \param theFeature a removed feature
   MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 
-  //! Returns the existing feature by the label
-  //! \param theLabel base label of the feature
-  MODEL_EXPORT virtual FeaturePtr feature(TDF_Label& theLabel) const;
-
-  //! Returns the existing object: result or feature
-  //! \param theLabel base label of the object
-  MODEL_EXPORT virtual ObjectPtr object(TDF_Label theLabel);
-
   //! Returns the first found object in the group by the object name
   //! \param theGroupID group that contains an object
   //! \param theName name of the object to search
@@ -126,13 +113,10 @@ class Model_Document : public ModelAPI_Document
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
-  //! \param theHidden if it is true, it counts also the features that are not in tree
-  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex,
-                                        const bool theHidden = false);
+  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex);
 
   //! Returns the number of features in the group
-  //! If theHidden is true, it counts also the features that are not in tree
-  MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theHidden = false);
+  MODEL_EXPORT virtual int size(const std::string& theGroupID);
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
@@ -169,7 +153,7 @@ class Model_Document : public ModelAPI_Document
 
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
-  bool executeFeatures() {return myExecuteFeatures;}
+  bool& executeFeatures() {return myExecuteFeatures;}
 
   //! Registers the name of the shape for the topological naming needs
   void addNamingName(const TDF_Label theLabel, std::string theName);
@@ -180,24 +164,8 @@ class Model_Document : public ModelAPI_Document
   ResultPtr findByName(const std::string theName);
 
  protected:
-
-  //! Returns (creates if needed) the features label
-  TDF_Label featuresLabel() const;
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;
-
-  //! Initializes feature with a unique name in this group (unique name is generated as 
-  //! feature type + "_" + index
-  void setUniqueName(FeaturePtr theFeature);
-
-  //! Synchronizes myFeatures list with the updated document
-  //! \param theMarkUpdated causes the "update" event for all features
-  //! \param theUpdateReferences causes the update of back-references
-  //! \param theFlush makes flush all events in the end of all modifications of this method
-  void synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences,
-    const bool theFlush);
-  //! Synchronizes the BackReferences list in Data of Features and Results
-  void synchronizeBackRefs();
 
   //! Creates new document with binary file format
   Model_Document(const std::string theID, const std::string theKind);
@@ -211,20 +179,6 @@ class Model_Document : public ModelAPI_Document
   //! performs compactification of all nested operations into one
   //! \returns true if resulting transaction is not empty and can be undoed
   void compactNested();
-
-  //! Initializes the data fields of the feature
-  void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
-
-  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
-  MODEL_EXPORT virtual void storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
-                                        std::shared_ptr<ModelAPI_Result> theResult,
-                                        const int theResultIndex = 0);
-
-  //! returns the label of result by index; creates this label if it was not created before
-  TDF_Label resultLabel(const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex);
-
-  //! Updates the results list of the feature basing on the current data tree
-  void updateResults(FeaturePtr theFeature);
 
   //! Returns all sub documents
   const std::set<std::string> subDocuments(const bool theActivatedOnly) const;
@@ -242,21 +196,33 @@ class Model_Document : public ModelAPI_Document
   std::list<std::string> redoList() const;
 
   /// Internally makes document know that feature was removed or added in history after creation
-  MODEL_EXPORT virtual void addToHistory(const std::shared_ptr<ModelAPI_Object> theObject);
+  virtual void updateHistory(const std::shared_ptr<ModelAPI_Object> theObject);
+  /// Internally makes document know that feature was removed or added in history after creation
+  virtual void updateHistory(const std::string theGroup);
 
   /// Returns true if the document is root module document
   bool isRoot() const;
+
+  /// Sets shared pointer to this
+  void setThis(DocumentPtr theDoc);
+
+  /// Returns the objects manager
+  Model_Objects* objects() {return myObjs;}
 
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;
   friend class Model_AttributeReference;
+  friend class Model_AttributeRefAttr;
+  friend class Model_AttributeRefList;
   friend class DFBrowser;
 
  private:
   std::string myID;  ///< identifier of the document in the application
   std::string myKind;  ///< kind of the document in the application
   Handle_TDocStd_Document myDoc;  ///< OCAF document
+
+  Model_Objects *myObjs; ///< data manager of this document
 
   /// counter value of transaction on the last "save" call, used for "IsModified" method
   int myTransactionSave;
@@ -277,9 +243,7 @@ class Model_Document : public ModelAPI_Document
   std::list<Transaction> myTransactions;
   /// list of info about transactions undone (first is oldest undone)
   std::list<Transaction> myRedos;
-  /// All features managed by this document (not only in history of OB)
-  /// For optimization mapped by labels
-  NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
+
   /// Optimization for finding the shape-label by topological naming names
   std::map<std::string, TDF_Label> myNamingNames;
   /// If it is true, features are not executed on update (on abort, undo, redo)

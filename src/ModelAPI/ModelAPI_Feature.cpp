@@ -29,22 +29,24 @@ std::shared_ptr<ModelAPI_Result> ModelAPI_Feature::lastResult()
 
 void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
-  if (firstResult() == theResult) {  // just updated
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
-    return;
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID EVENT_UPD = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+
+  if (firstResult() == theResult) {
+    // nothing to change
+  } else if (!myResults.empty()) {  // all except first become disabled
+    std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+    *aResIter = theResult;
+    aECreator->sendUpdated(theResult, EVENT_UPD);
+    for(aResIter++; aResIter != myResults.end(); aResIter++) {
+      (*aResIter)->setDisabled((*aResIter), true);
+    }
+  } else {
+    myResults.push_back(theResult);
   }
-  // created
-  while (!myResults.empty()) {  // remove one by one with messages
-    std::shared_ptr<ModelAPI_Result> aRes = *(myResults.begin());
-    myResults.erase(myResults.begin());
-    ModelAPI_EventCreator::get()->sendDeleted(aRes->document(), aRes->groupName());
-  }
-  myResults.push_back(theResult);
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-  ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
-  // Create event for first Feature 
-  Events_Loop::loop()->flush(anEvent);
+  // in any case result decomes enabled
+  theResult->setDisabled(theResult, false);
 }
 
 void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResult,
@@ -56,80 +58,31 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
   }
   if (aResIter == myResults.end()) {  // append
     myResults.push_back(theResult);
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
-    // Create event for first Feature, send it to make "created" earlier than "updated"
-    // VSV: Commenting out of this statement causes problems with circle operation for example
-    Events_Loop::loop()->flush(anEvent);
   } else {  // update
     *aResIter = theResult;
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
   }
+  theResult->setDisabled(theResult, false);
 }
 
 void ModelAPI_Feature::removeResult(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
-  std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
-  for(; aResIter != myResults.end(); aResIter++) {
-    ResultPtr aRes = *aResIter;
-    if (aRes == theResult) {
-      std::string aGroup = aRes->groupName();
-      aRes->data()->erase();
-      myResults.erase(aResIter);
-
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
-      static Events_Loop* aLoop = Events_Loop::loop();
-      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-      ModelAPI_EventCreator::get()->sendDeleted(document(), aGroup);
-      aECreator->sendUpdated(aRes, EVENT_DISP);
-      break;
-    }
-  }
+  theResult->setDisabled(theResult, true);
 }
 
 void ModelAPI_Feature::removeResults(const int theSinceIndex)
 {
-  if (theSinceIndex == 0) {
-    eraseResults();
-    return;
-  }
-
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
   for(int anIndex = 0; anIndex < theSinceIndex && aResIter != myResults.end(); anIndex++)
     aResIter++;
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aNextIter = aResIter;
   for(; aNextIter != myResults.end(); aNextIter++) {
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
-    static Events_Loop* aLoop = Events_Loop::loop();
-    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-    ModelAPI_EventCreator::get()->sendDeleted(document(), (*aNextIter)->groupName());
-    aECreator->sendUpdated(*aNextIter, EVENT_DISP);
+    (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
   }
-  myResults.erase(aResIter, myResults.end());
 }
 
 void ModelAPI_Feature::eraseResults()
 {
-  if (!myResults.empty()) {
-    static Events_Loop* aLoop = Events_Loop::loop();
-    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-
-    std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
-    for(; aResIter != myResults.end(); aResIter++) {
-      (*aResIter)->data()->erase();
-      ModelAPI_EventCreator::get()->sendDeleted(document(), (*aResIter)->groupName());
-      aECreator->sendUpdated(*aResIter, EVENT_DISP);
-    }
-    myResults.clear();
-    // flush it to avoid left presentations after input of invalid arguments (radius=0)
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
-    Events_Loop::loop()->flush(anEvent);
-    Events_Loop::loop()->flush(EVENT_DISP);
-  }
+  removeResults(0);
 }
 
 const std::string& ModelAPI_Feature::documentToAdd()

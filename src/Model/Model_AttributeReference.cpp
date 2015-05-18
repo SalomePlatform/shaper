@@ -8,6 +8,7 @@
 #include "Model_Application.h"
 #include "Model_Events.h"
 #include "Model_Data.h"
+#include "Model_Objects.h"
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Session.h>
 
@@ -64,9 +65,9 @@ ObjectPtr Model_AttributeReference::value()
         if (myRef->Label().FindAttribute(TDataStd_AsciiString::GetID(), anEntry)) {
           std::shared_ptr<Model_Document> aDR = std::dynamic_pointer_cast<Model_Document>(aRefDoc);
           TDF_Label aRefLab;
-          TDF_Tool::Label(aDR->featuresLabel().Data(), anEntry->Get().ToCString(), aRefLab);
+          TDF_Tool::Label(aDR->objects()->featuresLabel().Data(), anEntry->Get().ToCString(), aRefLab);
           if (!aRefLab.IsNull()) {
-            return aDR->object(aRefLab);
+            return aDR->objects()->object(aRefLab);
           }
         }
       }
@@ -76,7 +77,7 @@ ObjectPtr Model_AttributeReference::value()
       if (aDoc) {
         TDF_Label aRefLab = myRef->Get();
         if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
-          return aDoc->object(aRefLab);
+          return aDoc->objects()->object(aRefLab);
         }
       }
     }

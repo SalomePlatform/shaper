@@ -33,6 +33,7 @@ const std::shared_ptr<Model_Document>& Model_Application::getDocument(string the
   bool isRoot = theDocID == "root"; // the document is root
   std::shared_ptr<Model_Document> aNew(
     new Model_Document(theDocID, isRoot ? thePartSetKind : thePartKind));
+  aNew->setThis(aNew);
   myDocs[theDocID] = aNew;
 
   // load it if it must be loaded by demand

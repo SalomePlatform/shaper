@@ -7,6 +7,7 @@
 #include <Model_Update.h>
 #include <Model_Document.h>
 #include <Model_Data.h>
+#include <Model_Objects.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -166,15 +167,16 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
 {
   std::set<FeaturePtr> alreadyProcessed; // features that are processed before others
   // all features one by one
-  for (int aFIndex = 0; aFIndex < theDoc->size(ModelAPI_Feature::group(), true); aFIndex++) {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
-      theDoc->object(ModelAPI_Feature::group(), aFIndex, true));
-    if (aFeature && alreadyProcessed.find(aFeature) == alreadyProcessed.end()) {
+  Model_Objects* anObjs = std::dynamic_pointer_cast<Model_Document>(theDoc)->objects();
+  if (!anObjs) return;
+  FeaturePtr aFeatureIter = anObjs->firstFeature();
+  for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
+    if (aFeatureIter && alreadyProcessed.find(aFeatureIter) == alreadyProcessed.end()) {
       // update selection and parameters attributes first, before sub-features analysis (sketch plane)
-      updateArguments(aFeature);
+      updateArguments(aFeatureIter);
       // composite feature must be executed after sub-features execution
       CompositeFeaturePtr aComposite = 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeatureIter);
       if (aComposite) {
         // number of subs can be changed in execution: like fillet
         for(int a = 0; a < aComposite->numberOfSubs(); a++) {
@@ -184,14 +186,14 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
         }
       }
 
-      updateFeature(aFeature);
+      updateFeature(aFeatureIter);
       // update the document results recursively
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeatureIter->results();
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
         ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
         if (aPart.get()) {
-          if (aPart->isActivated()) {
+          if (!aPart->isDisabled() && aPart->isActivated()) {
             updateInDoc(aPart->partDoc());
           }
         }

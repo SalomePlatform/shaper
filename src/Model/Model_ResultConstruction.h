@@ -63,7 +63,7 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   /// Makes a body on the given feature
   Model_ResultConstruction();
 
-  friend class Model_Document;
+  friend class Model_Objects;
 };
 
 #endif

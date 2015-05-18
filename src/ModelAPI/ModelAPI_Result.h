@@ -21,6 +21,7 @@ class ModelAPI_Feature;
 class ModelAPI_Result : public ModelAPI_Object
 {
   bool myIsConcealed; ///< the result is concealed from the data tree (referenced by other objects)
+  bool myIsDisabled; ///< the result is disabled: removed for the user, but keeps the general info
  public:
 
   /// Reference to the color of the result.
@@ -39,10 +40,19 @@ class ModelAPI_Result : public ModelAPI_Object
   }
 
   /// Returns true if the result is concealed from the data tree (referenced by other objects)
-  inline void setIsConcealed(const bool theValue)
-  {
-    myIsConcealed = theValue;
-  }
+  MODELAPI_EXPORT void setIsConcealed(const bool theValue);
+
+  /// Enables/disables the result. The disabled result does not participate in any calculation
+  /// and visualization: like it was removed. But it keeps the general parameters: colors, 
+  /// visibility, etc.
+  /// \param theThis pointer to this object, needed to generate all events if it is neccessary
+  /// \param theFlag makes disabled if it is true
+  /// \returns true if state is really changed
+  MODELAPI_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
+    const bool theFlag);
+
+  /// Returns the result is disabled or not.
+  MODELAPI_EXPORT virtual bool isDisabled() const;
 
   // Retuns the parameters of color definition in the resources config manager
   virtual void colorConfigInfo(std::string& theSection, std::string& theName,

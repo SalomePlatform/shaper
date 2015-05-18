@@ -62,6 +62,7 @@ class Model_Data : public ModelAPI_Data
   }
 
   friend class Model_Document;
+  friend class Model_Objects;
   friend class Model_Update;
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;

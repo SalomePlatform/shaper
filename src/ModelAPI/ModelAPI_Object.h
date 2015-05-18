@@ -74,7 +74,7 @@ class ModelAPI_Object
   /// removes all fields from this feature
   MODELAPI_EXPORT virtual void erase();
 
-  friend class Model_Document;
+  friend class Model_Objects;
 
 };
 

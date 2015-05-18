@@ -122,6 +122,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   FeaturePtr createFeature(std::string theFeatureID, Model_Document* theDocOwner);
 
   friend class Model_Document;
+  friend class Model_Objects;
 };
 
 #endif

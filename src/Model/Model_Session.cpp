@@ -9,6 +9,7 @@
 #include <ModelAPI_Plugin.h>
 #include <Model_Data.h>
 #include <Model_Document.h>
+#include <Model_Objects.h>
 #include <Model_Application.h>
 #include <Model_Events.h>
 #include <Model_Validator.h>
@@ -216,7 +217,7 @@ void Model_Session::setActiveDocument(
       if (aDoc.get()) {
         bool aWasChecked = myCheckTransactions;
         setCheckTransactions(false);
-        aDoc->synchronizeFeatures(false, true, true);
+        aDoc->objects()->synchronizeFeatures(false, true, true);
         if (aWasChecked)
             setCheckTransactions(true);
       }
@@ -266,7 +267,7 @@ std::shared_ptr<ModelAPI_Document> Model_Session::copy(
   aRT->SetRelocation(aSourceRoot, aTargetRoot);
   TDF_CopyTool::Copy(aDS, aRT);
 
-  aNew->synchronizeFeatures(false, true, true);
+  aNew->objects()->synchronizeFeatures(false, true, true);
   return aNew;
 }
 

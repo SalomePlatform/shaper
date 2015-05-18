@@ -38,7 +38,7 @@ protected:
   /// Returns true if document is activated (loaded into the memory)
   virtual bool isActivated();
 
-  friend class Model_Document;
+  friend class Model_Objects;
 };
 
 #endif

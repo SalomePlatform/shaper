@@ -43,7 +43,7 @@ protected:
   /// Makes a body on the given feature data
   Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData);
 
-  friend class Model_Document;
+  friend class Model_Objects;
 };
 
 #endif

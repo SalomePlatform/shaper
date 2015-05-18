@@ -26,7 +26,7 @@ class Model_ResultParameter : public ModelAPI_ResultParameter
  protected:
   Model_ResultParameter();
 
-  friend class Model_Document;
+  friend class Model_Objects;
 };
 
 #endif

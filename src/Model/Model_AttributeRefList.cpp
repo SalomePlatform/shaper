@@ -7,6 +7,7 @@
 #include "Model_AttributeRefList.h"
 #include "Model_Application.h"
 #include "Model_Data.h"
+#include "Model_Objects.h"
 #include <ModelAPI_Feature.h>
 #include <TDF_ListIteratorOfLabelList.hxx>
 
@@ -37,7 +38,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
     if (aDoc) {
       const TDF_LabelList& aList = myRef->List();
       for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-        ObjectPtr anObj = aDoc->object(aLIter.Value());
+        ObjectPtr anObj = aDoc->objects()->object(aLIter.Value());
         if (anObj.get() == NULL) {
           myRef->Remove(aLIter.Value());
           REMOVE_BACK_REF(theObject);
@@ -70,7 +71,7 @@ list<ObjectPtr> Model_AttributeRefList::list()
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
     for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-      ObjectPtr anObj = aDoc->object(aLIter.Value());
+      ObjectPtr anObj = aDoc->objects()->object(aLIter.Value());
       aResult.push_back(anObj);
     }
   }
@@ -86,7 +87,7 @@ ObjectPtr Model_AttributeRefList::object(const int theIndex) const
     int anIndex = 0;
     for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next(), anIndex++) {
       if (anIndex == theIndex)
-        return aDoc->object(aLIter.Value());
+        return aDoc->objects()->object(aLIter.Value());
     }
   }
   return ObjectPtr();
