@@ -33,6 +33,8 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
+#include <Standard_GUID.hxx>
+#include <TDataStd_UAttribute.hxx>
 
 #include <string>
 
@@ -367,5 +369,21 @@ void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
     if (aMyIter->second->isInitialized()) {
       theTarget->attribute(aMyIter->first)->setInitialized();
     }
+  }
+}
+
+const Standard_GUID kIsInHistory("9275e461-4aca-46c7-ad84-1efb569d8144");
+
+bool Model_Data::isInHistory()
+{
+  return !myLab.IsAttribute(kIsInHistory);
+}
+
+void Model_Data::setIsInHistory(const bool theFlag)
+{
+  if (theFlag) { // is in histiry true: default behavior, so, remove GUID
+    myLab.ForgetAttribute(kIsInHistory);
+  } else { // not standard behavior is defined by special GUID attribute
+    TDataStd_UAttribute::Set(myLab, kIsInHistory);
   }
 }

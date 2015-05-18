@@ -43,8 +43,14 @@ static const int TAG_FEATURE_RESULTS = 2;  ///< where the results are located
 
 Model_Objects::Model_Objects(TDF_Label theMainLab) : myMain(theMainLab)
 {
+}
+
+void Model_Objects::setOwner(DocumentPtr theDoc)
+{
+  myDoc = theDoc;
   // update all fields and recreate features and result objects if needed
   synchronizeFeatures(false, true, true);
+  myHistory.clear();
 }
 
 Model_Objects::~Model_Objects()
@@ -360,6 +366,29 @@ int Model_Objects::size(const std::string& theGroupID)
   createHistory(theGroupID);
   return myHistory[theGroupID].size();
 }
+
+void Model_Objects::allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults)
+{
+  // iterate the array of references and get feature by feature from the array
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
+      FeaturePtr aFeature = feature(aRefs->Value(a));
+      if (aFeature.get()) {
+        const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+        for (; aRIter != aResults.cend(); aRIter++) {
+          ResultPtr aRes = *aRIter;
+          if (aRes->groupName() != theGroupID) break; // feature have only same group results
+          if (aRes->isInHistory() && !aRes->isConcealed()) {
+            theResults.push_back(*aRIter);
+          }
+        }
+      }
+    }
+  }
+}
+
 
 TDF_Label Model_Objects::featuresLabel() const
 {
@@ -732,7 +761,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
     aResIter++;
   }
   // it may be on undo
-  if (!theFeature->data() || !theFeature->data()->isValid())
+  if (!theFeature->data() || !theFeature->data()->isValid() || theFeature->isDisabled())
     return;
   // check that results are presented on all labels
   int aResSize = theFeature->results().size();

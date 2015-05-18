@@ -9,14 +9,19 @@
 
 bool ModelAPI_Object::isInHistory()
 {
-  return myInHistory;
+  if (myData.get() && myData->isValid()) {
+    return myData->isInHistory();
+  }
+  return true; // default value
 }
 
 void ModelAPI_Object::setInHistory(
   const std::shared_ptr<ModelAPI_Object> theObject, const bool theFlag)
 {
-  if (myInHistory != theFlag) {
-    myInHistory = theFlag;
+  if (isInHistory() != theFlag) {
+    if (myData.get() && myData->isValid()) {
+      myData->setIsInHistory(theFlag);
+    }
     myDoc->updateHistory(theObject);
   }
 }
@@ -40,7 +45,7 @@ void ModelAPI_Object::attributeChanged(const std::string& theID)
 {
 }
 
-ModelAPI_Object::ModelAPI_Object() : myInHistory(true)
+ModelAPI_Object::ModelAPI_Object()
 {
 }
 

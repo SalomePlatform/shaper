@@ -37,7 +37,7 @@ static Model_Session* myImpl = new Model_Session();
 
 bool Model_Session::load(const char* theFileName)
 {
-  bool aRes = ROOT_DOC->load(theFileName);
+  bool aRes = ROOT_DOC->load(theFileName, ROOT_DOC);
   return aRes;
 }
 

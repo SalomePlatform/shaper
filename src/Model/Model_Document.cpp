@@ -86,7 +86,7 @@ bool Model_Document::isRoot() const
   return this == Model_Session::get()->moduleDocument().get();
 }
 
-bool Model_Document::load(const char* theFileName)
+bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
@@ -163,10 +163,12 @@ bool Model_Document::load(const char* theFileName)
       std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
     aSession->setActiveDocument(anApp->getDocument(myID), false);
     aSession->setCheckTransactions(false);
-    DocumentPtr aThis = myObjs->owner();
-    delete myObjs;
+    if (myObjs)
+      delete myObjs;
     myObjs = new Model_Objects(myDoc->Main()); // synchronisation is inside
-    myObjs->setOwner(aThis);
+    myObjs->setOwner(theThis);
+    // update the current features status
+    setCurrentFeature(currentFeature(false), false);
     aSession->setCheckTransactions(true);
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
     aSession->setActiveDocument(anApp->getDocument(myID), true);
@@ -447,8 +449,11 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
       subDoc(*aSubIter)->undoInternal(theWithSubs, theSynchronize);
   }
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
-  if (theSynchronize)
+  if (theSynchronize) {
+    // update the current features status
+    setCurrentFeature(currentFeature(false), false);
     myObjs->synchronizeFeatures(true, true, isRoot());
+  }
 }
 
 void Model_Document::undo()
@@ -485,6 +490,8 @@ void Model_Document::redo()
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->redo();
 
+  // update the current features status
+  setCurrentFeature(currentFeature(false), false);
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
   myObjs->synchronizeFeatures(true, true, isRoot());
 }
@@ -587,10 +594,11 @@ std::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string theDo
 const std::set<std::string> Model_Document::subDocuments(const bool theActivatedOnly) const
 {
   std::set<std::string> aResult;
-  int aNum = myObjs->size(ModelAPI_ResultPart::group());
-  for(int a = 0; a < aNum; a++) {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
-      myObjs->object(ModelAPI_ResultPart::group(), a));
+  std::list<ResultPtr> aPartResults;
+  myObjs->allResults(ModelAPI_ResultPart::group(), aPartResults);
+  std::list<ResultPtr>::iterator aPartRes = aPartResults.begin();
+  for(; aPartRes != aPartResults.end(); aPartRes++) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
     if (aPart && (!theActivatedOnly || aPart->isActivated()))
       aResult.insert(aPart->data()->name());
   }
