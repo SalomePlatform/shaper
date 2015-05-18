@@ -33,14 +33,14 @@ const std::shared_ptr<Model_Document>& Model_Application::getDocument(string the
   bool isRoot = theDocID == "root"; // the document is root
   std::shared_ptr<Model_Document> aNew(
     new Model_Document(theDocID, isRoot ? thePartSetKind : thePartKind));
-  aNew->setThis(aNew);
   myDocs[theDocID] = aNew;
 
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
-    aNew->load(myPath.c_str());
+    aNew->load(myPath.c_str(), aNew);
     myLoadedByDemand.erase(theDocID);  // done, don't do it anymore
   } else {
+    aNew->setThis(aNew);
     static Events_ID anId = ModelAPI_DocumentCreatedMessage::eventId();
     std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::shared_ptr
       <ModelAPI_DocumentCreatedMessage>(new ModelAPI_DocumentCreatedMessage(anId, this));

@@ -36,8 +36,9 @@ class Model_Document : public ModelAPI_Document
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
+  //! \param theThis the common shared pointer to the document to manage with it later
   //! \returns true if file was loaded successfully
-  MODEL_EXPORT virtual bool load(const char* theFileName);
+  MODEL_EXPORT virtual bool load(const char* theFileName, DocumentPtr theThis);
 
   //! Saves the OCAF document to the file.
   //! \param theFileName full name of the file to store

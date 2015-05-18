@@ -472,7 +472,9 @@ DocumentPtr PartSet_PartDataModel::partDocument() const
   ObjectPtr aObject = aRootDoc->object(ModelAPI_Feature::group(), myId);
   FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
   ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFeature->firstResult()); 
-  return aPart->partDoc();
+  if (aPart.get()) // this may be null is Part feature is disabled
+    return aPart->partDoc();
+  return DocumentPtr();
 }
 
 ObjectPtr PartSet_PartDataModel::object(const QModelIndex& theIndex) const

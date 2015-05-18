@@ -28,7 +28,6 @@ class ModelAPI_Object
 {
   std::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
-  bool myInHistory; ///< keep the information about the presense of the object in the history tree
  public:
   /// By default object is displayed in the object browser.
   MODELAPI_EXPORT virtual bool isInHistory();

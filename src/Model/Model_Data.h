@@ -183,6 +183,13 @@ class Model_Data : public ModelAPI_Data
   /// Copies all atributes content into theTarget data
   MODEL_EXPORT virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget);
 
+protected:
+  /// Returns true if "is in history" custom behaviors is defined for the feature
+  MODEL_EXPORT virtual bool isInHistory();
+
+  /// Defines the custom "is in history" behavior
+  MODEL_EXPORT virtual void setIsInHistory(const bool theFlag);
+
 private:
   /// Removes all information about back references
   void eraseBackReferences();

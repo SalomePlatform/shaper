@@ -83,6 +83,9 @@ class Model_Objects
   //! Returns the number of features in the group
   int size(const std::string& theGroupID);
 
+  ///! Returns all (and disabled) results of the given type. Not fast method (iterates all features).
+  void allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults);
+
   /// Creates a construction cresults
   std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
@@ -104,7 +107,7 @@ class Model_Objects
     feature(const std::shared_ptr<ModelAPI_Result>& theResult);
 
   //! Sets the owner of this manager
-  void setOwner(DocumentPtr theDoc) {myDoc = theDoc;}
+  void setOwner(DocumentPtr theDoc);
 
   //! Returns the owner of this manager
   DocumentPtr owner() {return myDoc;}
