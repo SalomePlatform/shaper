@@ -790,6 +790,9 @@ void PartSet_DocumentDataModel::onMouseDoubleClick(const QModelIndex& theIndex)
     return;
   QTreeView* aTreeView = dynamic_cast<QTreeView*>(sender());
   if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
+    if (myActivePartId != -1)
+      // It means that the root document is not active
+      return;
     QModelIndex aNewIndex;
     if (theIndex.internalId() == HistoryNode) 
       aNewIndex = theIndex;
