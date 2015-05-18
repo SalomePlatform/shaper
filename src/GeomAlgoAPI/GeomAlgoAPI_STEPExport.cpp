@@ -12,8 +12,7 @@ namespace STEPExport {
 bool Export(const TCollection_AsciiString& theFileName,
             const TCollection_AsciiString& theFormatName,
             const TopoDS_Shape& theShape,
-            TCollection_AsciiString& theError,
-            const TDF_Label& theShapeLabel)
+            TCollection_AsciiString& theError)
 {
   #ifdef _DEBUG
   std::cout << "Export STEP into file " << theFileName.ToCString() << std::endl;

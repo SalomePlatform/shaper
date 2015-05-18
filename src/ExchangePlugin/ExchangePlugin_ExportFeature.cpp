@@ -89,7 +89,7 @@ void ExchangePlugin_ExportFeature::execute()
   AttributeSelectionListPtr aSelectionListAttr =
       this->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
-  for ( int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i ) {
+  for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
     aShapes.push_back(aSelectionListAttr->value(i)->value());
   }
   std::shared_ptr<GeomAPI_Shape> aShape =
@@ -98,35 +98,24 @@ void ExchangePlugin_ExportFeature::execute()
   exportFile(aFilePath, aFormat, aShape);
 }
 
-std::list<std::string> ExchangePlugin_ExportFeature::getFormats() const
-{
-  // This value is a copy of string_list attribute of format_choice in plugin-Exchange.xml
-  // XPath:plugin-Exchange.xml:string(//*[@id="format_choice"]/@string_list)
-  std::string aFormats = "BREP STEP IGES-5.1 IGES-5.3";
-  return ExchangePlugin_Tools::split(aFormats, ' ');
-}
-
 bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
                                               const std::string& theFormat,
                                               std::shared_ptr<GeomAPI_Shape> theShape)
 {
   // retrieve the file and plugin library names
   TCollection_AsciiString aFileName(theFileName.c_str());
-  OSD_Path aPath(aFileName);
   TCollection_AsciiString aFormatName(theFormat.c_str());
 
   // Perform the export
   TCollection_AsciiString anError;
-  TDF_Label anUnknownLabel = TDF_Label();
-
   TopoDS_Shape aShape(theShape->impl<TopoDS_Shape>());
   bool aResult = false;
   if (aFormatName == "BREP") {
-    aResult = BREPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
+    aResult = BREPExport::Export(aFileName, aFormatName, aShape, anError);
   } else if (aFormatName == "STEP") {
-    aResult = STEPExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
+    aResult = STEPExport::Export(aFileName, aFormatName, aShape, anError);
   } else if (aFormatName.SubString(1, 4) == "IGES") {
-    aResult = IGESExport::Export(aFileName, aFormatName, aShape, anError, anUnknownLabel);
+    aResult = IGESExport::Export(aFileName, aFormatName, aShape, anError);
   } else {
     anError = TCollection_AsciiString("Unsupported format ") + aFormatName;
   }

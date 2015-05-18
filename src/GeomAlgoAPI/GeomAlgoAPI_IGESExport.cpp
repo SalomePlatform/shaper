@@ -83,7 +83,7 @@ namespace IGESExport {
 bool Export(const TCollection_AsciiString& theFileName,
             const TCollection_AsciiString& theFormatName,
             const TopoDS_Shape& theShape,
-            TCollection_AsciiString& theError, const TDF_Label&)
+            TCollection_AsciiString& theError)
 {
   // theFormatName expected "IGES-5.1", "IGES-5.3"...
   TCollection_AsciiString aVersion = theFormatName.Token("-", 2);

@@ -22,7 +22,7 @@ namespace BREPImport {
 GEOMALGOAPI_EXPORT
 TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
                     const TCollection_AsciiString& theFormatName,
-                    TCollection_AsciiString& theError, const TDF_Label&);
+                    TCollection_AsciiString& theError);
 
 }
 

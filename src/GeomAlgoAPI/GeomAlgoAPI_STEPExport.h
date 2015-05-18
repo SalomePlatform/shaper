@@ -30,8 +30,7 @@ GEOMALGOAPI_EXPORT
 bool Export(const TCollection_AsciiString& theFileName,
             const TCollection_AsciiString& theFormatName,
             const TopoDS_Shape& theShape,
-            TCollection_AsciiString& theError,
-            const TDF_Label& theShapeLabel);
+            TCollection_AsciiString& theError);
 }
 
 #endif /* GEOMALGOAPI_STEPEXPORT_H_ */

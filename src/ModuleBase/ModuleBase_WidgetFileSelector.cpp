@@ -146,9 +146,11 @@ QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
   std::list<ModelAPI_Validator*> allValidators;
   std::list<std::list<std::string> > allArguments;
   aFactory->validators(myFeature->getKind(), myAttributeID, allValidators, allArguments);
+
   QStringList aResult;
   std::list<std::string> anArgumentList = allArguments.front();
   std::list<std::string>::const_iterator it = anArgumentList.begin();

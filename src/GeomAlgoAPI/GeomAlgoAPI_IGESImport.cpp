@@ -15,7 +15,7 @@
 namespace IGESImport {
 TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
                     const TCollection_AsciiString&,
-                    TCollection_AsciiString& theError, const TDF_Label&)
+                    TCollection_AsciiString& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import IGES from file " << theFileName << std::endl;

@@ -15,7 +15,7 @@ namespace BREPExport {
 bool Export(const TCollection_AsciiString& theFileName,
             const TCollection_AsciiString&,
             const TopoDS_Shape& theShape,
-            TCollection_AsciiString& theError, const TDF_Label&)
+            TCollection_AsciiString& theError)
 {
   #ifdef _DEBUG
   std::cout << "Export BREP into file " << theFileName << std::endl;

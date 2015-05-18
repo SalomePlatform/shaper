@@ -63,11 +63,12 @@ void ExchangePlugin_ImportFeature::initAttributes()
  */
 void ExchangePlugin_ImportFeature::execute()
 {
-  AttributeStringPtr aFilePathAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
-      data()->attribute(ExchangePlugin_ImportFeature::FILE_PATH_ID()));
+  AttributeStringPtr aFilePathAttr =
+      this->string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
   std::string aFilePath = aFilePathAttr->value();
-  if(aFilePath.empty())
+  if (aFilePath.empty())
     return;
+
   importFile(aFilePath);
 }
 
@@ -76,26 +77,25 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   // retrieve the file and plugin library names
   TCollection_AsciiString aFileName(theFileName.c_str());
   OSD_Path aPath(aFileName);
-  TCollection_AsciiString aFormatName = aPath.Extension();
+  TCollection_AsciiString anExtension = aPath.Extension();
   // ".brep" -> "BREP", TCollection_AsciiString are numbered from 1
-  aFormatName = aFormatName.SubString(2, aFormatName.Length());
-  aFormatName.UpperCase();
+  anExtension = anExtension.SubString(2, anExtension.Length());
+  anExtension.UpperCase();
 
   // Perform the import
   TCollection_AsciiString anError;
-  TDF_Label anUnknownLabel = TDF_Label();
 
   TopoDS_Shape aShape;
-  if (aFormatName == "BREP") {
-    aShape = BREPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
-  } else if (aFormatName == "STEP" || aFormatName == "STP") {
-    aShape = STEPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
-  } else if (aFormatName == "IGES") {
-    aShape = IGESImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
+  if (anExtension == "BREP") {
+    aShape = BREPImport::Import(aFileName, anExtension, anError);
+  } else if (anExtension == "STEP" || anExtension == "STP") {
+    aShape = STEPImport::Import(aFileName, anExtension, anError);
+  } else if (anExtension == "IGES") {
+    aShape = IGESImport::Import(aFileName, anExtension, anError);
   }
    // Check if shape is valid
   if ( aShape.IsNull() ) {
-     const static std::string aShapeError = 
+     const static std::string aShapeError =
        "An error occurred while importing " + theFileName + ": " + anError.ToCString();
      setError(aShapeError);
      return false;
@@ -127,8 +127,4 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
   int aTag(1);
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS, aTag);
-  //std::string aNameDE = "DiscEdges";
-  //theResultBody->loadDisconnectedEdges(theGeomShape, aNameDE, aTag);
-  //std::string aNameDV = "DiscVertexes";
-  //theResultBody->loadDisconnectedVertexes(theGeomShape, aNameDV, aTag); 
 }

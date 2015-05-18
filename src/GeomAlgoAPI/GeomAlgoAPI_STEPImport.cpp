@@ -366,8 +366,7 @@ Handle(TCollection_HAsciiString) GetValue (const TCollection_AsciiString& theFil
 
 TopoDS_Shape Import (const TCollection_AsciiString& theFileName,
                      const TCollection_AsciiString& theFormatName,
-                     TCollection_AsciiString&       theError,
-                     const TDF_Label&               theShapeLabel)
+                     TCollection_AsciiString&       theError)
 {
   TopoDS_Shape aResShape;
 
