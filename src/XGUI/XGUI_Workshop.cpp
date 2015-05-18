@@ -466,7 +466,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
     ObjectPtr aObj = (*aIt);
 
     // Hide the object if it is invalid or concealed one
-    bool aHide = !aObj->data() || !aObj->data()->isValid();
+    bool aHide = !aObj->data() || !aObj->data()->isValid() || aObj->isDisabled();
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();

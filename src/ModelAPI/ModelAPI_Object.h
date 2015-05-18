@@ -54,6 +54,9 @@ class ModelAPI_Object
   /// Request for initialization of data model of the object: adding all attributes
   virtual void initAttributes() = 0;
 
+  /// Returns the feature is disabled or not.
+  virtual bool isDisabled() const = 0;
+
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
