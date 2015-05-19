@@ -169,6 +169,9 @@ Q_OBJECT
   //! Removes sub-model on removing a part object. Also it removes QModelIndex-es which refer to this model
   void removeSubModel(int theModelId);
 
+  //! Removes sub-model on removing a part object. Also it removes QModelIndex-es which refer to this model
+  void removeSubModel(PartSet_PartModel* theModel);
+
   //! Returns true if the given model is a one of sub-models (of both types)
   bool isSubModel(const QAbstractItemModel* theModel) const;
 
@@ -183,14 +186,18 @@ Q_OBJECT
 
   int historyOffset() const;
 
+  PartSet_PartModel* findPartModel(FeaturePtr thePart) const;
+
+  PartSet_PartModel* findPartModel(int thePosition) const;
+
   //! Data model of top part of data tree (not parts object)
   PartSet_TopDataModel* myModel;
 
   //! Data models for Parts data tree representation (one data model per a one part)
-  QMap<int, PartSet_PartModel*> myPartModels;
+  QList<PartSet_PartModel*> myPartModels;
 
   //! Active part in part editing mode
-  int myActivePartId;
+  PartSet_PartModel* myActivePartModel;
 
   QModelIndex myActivePartIndex;
 

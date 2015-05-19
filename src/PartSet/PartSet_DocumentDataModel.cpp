@@ -36,7 +36,7 @@ QMap<QString, QString> PartSet_DocumentDataModel::myIcons;
 
 PartSet_DocumentDataModel::PartSet_DocumentDataModel(QObject* theParent)
     : ModuleBase_IDocumentDataModel(theParent),
-      myActivePartId(-1)
+      myActivePartModel(0)
 {
   // Create a top part of data tree model
   myModel = new PartSet_TopDataModel(this);
@@ -82,8 +82,8 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
             FeaturePtr aPartFeature = ModelAPI_Feature::feature(aObject);
             PartSet_PartDataModel* aModel = new PartSet_PartDataModel(this);
             int anId = aRootDoc->index(aPartFeature);
-            aModel->setPartId(anId);
-            myPartModels[anId] = aModel;
+            aModel->setPart(aPartFeature);
+            myPartModels.append(aModel);
             insertRow(aStart, partFolderNode(0));
           }
         } else {  // Update top groups (other except parts
@@ -123,25 +123,17 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
         if (aGroup == ModelAPI_ResultPart::group()) {  // Update only Parts group
-          ObjectPtr aObj;
-          FeaturePtr aFeature;
-          int aDelId = -1;
-          foreach (int aId, myPartModels.keys()) {
-            aObj = aDoc->object(ModelAPI_Feature::group(), aId);
-            if (aObj.get()) {
-              aFeature = ModelAPI_Feature::feature(aObj);
-              if (aFeature.get()) {
-                if (aFeature->getKind() == PartSetPlugin_Part::ID())
-                  continue;
-              }
+          PartSet_PartModel* aDelPartModel = 0;
+          foreach (PartSet_PartModel* aPartModel, myPartModels) {
+            if (aPartModel->position() == -1) {
+              aDelPartModel = aPartModel;
+              break;
             }
-            aDelId = aId;
-            break;
           }
-          if (aDelId != -1) {
+          if (aDelPartModel) {
             deactivatePart();
             int aStart = myPartModels.size() - 1;
-            removeSubModel(aDelId);
+            removeSubModel(aDelPartModel);
             removeRow(aStart, partFolderNode(0));
           }
         } else {  // Update top groups (other except parts
@@ -201,21 +193,13 @@ void PartSet_DocumentDataModel::rebuildDataTree()
   // Delete extra models
   ObjectPtr aObj;
   FeaturePtr aFeature;
-  QIntList aDelList;
-  foreach (int aId, myPartModels.keys()) {
-    aObj = aRootDoc->object(ModelAPI_Feature::group(), aId);
-    if (aObj.get()) {
-      aFeature = ModelAPI_Feature::feature(aObj);
-      if (aFeature.get()) {
-        if (aFeature->getKind() == PartSetPlugin_Part::ID())
-          continue;
-      }
-    }
-    aDelList.append(aId);
-    break;
+  QList<PartSet_PartModel*> aDelList;
+  foreach (PartSet_PartModel* aPartModel, myPartModels) {
+    if (aPartModel->position() == -1) 
+      aDelList.append(aPartModel);
   }
-  foreach (int aId, aDelList) {
-    removeSubModel(aId);
+  foreach (PartSet_PartModel* aPartModel, aDelList) {
+    removeSubModel(aPartModel);
   }
   // Add non existing models
   int aHistNb = aRootDoc->size(ModelAPI_Feature::group());
@@ -223,10 +207,10 @@ void PartSet_DocumentDataModel::rebuildDataTree()
     aObj = aRootDoc->object(ModelAPI_Feature::group(), i);
     aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
-      if (!myPartModels.contains(i)) {
+      if (!findPartModel(aFeature)) {
         PartSet_PartDataModel* aModel = new PartSet_PartDataModel(this);
-        aModel->setPartId(i);
-        myPartModels[i] = aModel;
+        aModel->setPart(aFeature);
+        myPartModels.append(aModel);
       }
     }
   }
@@ -336,7 +320,7 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
   if (aParent.internalId() == HistoryNode) {
     int aId = aParent.row() - historyOffset();
     QModelIndex* aIndex = toSourceModelIndex(theIndex);
-    return myPartModels[aId]->data(*aIndex, theRole);
+    return findPartModel(aId)->data(*aIndex, theRole);
   }
   return toSourceModelIndex(theIndex)->data(theRole);
 }
@@ -364,8 +348,9 @@ int PartSet_DocumentDataModel::rowCount(const QModelIndex& theParent) const
   }
   if (theParent.internalId() == HistoryNode) {
     int aId = theParent.row() - historyOffset();
-    if (myPartModels.contains(aId))
-      return myPartModels[aId]->rowCount(QModelIndex());
+    PartSet_PartModel* aModel = findPartModel(aId);
+    if (aModel)
+      return aModel->rowCount(QModelIndex());
     return 0;
   }
   if (theParent.internalId() == PartResult)
@@ -411,7 +396,7 @@ QModelIndex PartSet_DocumentDataModel::index(int theRow, int theColumn,
     } else { 
       if (theParent.internalId() == HistoryNode) {
         int aId = theParent.row() - historyOffset();
-        aIndex = myPartModels[aId]->index(theRow, theColumn, QModelIndex());
+        aIndex = findPartModel(aId)->index(theRow, theColumn, QModelIndex());
       } else {
         QModelIndex* aParent = (QModelIndex*) theParent.internalPointer();
         aIndex = aParent->model()->index(theRow, theColumn, (*aParent));
@@ -436,8 +421,9 @@ QModelIndex PartSet_DocumentDataModel::parent(const QModelIndex& theIndex) const
     return QModelIndex();
 
   QModelIndex aIndex1 = aModel->parent(*aIndex);
-  if (isPartSubModel(aModel) && (!aIndex1.isValid())) {
-    int aId = myPartModels.key((PartSet_PartModel*) aModel);
+  const PartSet_PartModel* aPartModel = dynamic_cast<const PartSet_PartModel*>(aModel);
+  if (aPartModel && (!aIndex1.isValid())) {
+    int aId = aPartModel->position();
     int aRow = aId + historyOffset();
     return createIndex(aRow, 0, (qint32) HistoryNode);
   }
@@ -539,10 +525,15 @@ bool PartSet_DocumentDataModel::removeRows(int theRow, int theCount, const QMode
 
 void PartSet_DocumentDataModel::removeSubModel(int theModelId)
 {
-  PartSet_PartModel* aModel = myPartModels[theModelId];
+  PartSet_PartModel* aModel = myPartModels.at(theModelId);
+  removeSubModel(aModel);
+}
+
+void PartSet_DocumentDataModel::removeSubModel(PartSet_PartModel* theModel)
+{
   QIntList aToRemove;
   for (int i = 0; i < myIndexes.size(); i++) {
-    if (myIndexes.at(i)->model() == aModel)
+    if (myIndexes.at(i)->model() == theModel)
       aToRemove.append(i);
   }
   int aId;
@@ -552,9 +543,10 @@ void PartSet_DocumentDataModel::removeSubModel(int theModelId)
     myIndexes.removeAt(aId);
     aToRemove.removeLast();
   }
-  delete aModel;
-  myPartModels.remove(theModelId);
+  delete theModel;
+  myPartModels.removeAll(theModel);
 }
+
 
 bool PartSet_DocumentDataModel::isSubModel(const QAbstractItemModel* theModel) const
 {
@@ -565,7 +557,7 @@ bool PartSet_DocumentDataModel::isSubModel(const QAbstractItemModel* theModel) c
 
 bool PartSet_DocumentDataModel::isPartSubModel(const QAbstractItemModel* theModel) const
 {
-  return myPartModels.key((PartSet_PartModel*) theModel, -1) != -1;
+  return myPartModels.contains((PartSet_PartModel*) theModel);
 }
 
 QModelIndex PartSet_DocumentDataModel::partFolderNode(int theColumn) const
@@ -588,15 +580,16 @@ bool PartSet_DocumentDataModel::activatePart(const QModelIndex& theIndex)
   if (theIndex.isValid() && (theIndex.internalId() == PartResult)) {
     myActivePartIndex = theIndex;
     myModel->setItemsColor(PASSIVE_COLOR);
-    if (myActivePartId != -1) 
-      myPartModels[myActivePartId]->setItemsColor(PASSIVE_COLOR);
+    if (myActivePartModel) 
+      myActivePartModel->setItemsColor(PASSIVE_COLOR);
     
     // Find activated part feature by its ID
     ResultPartPtr aPartRes = activePart();
     FeaturePtr aFeature = ModelAPI_Feature::feature(aPartRes);
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-    myActivePartId = aRootDoc->index(aFeature);
-    myPartModels[myActivePartId]->setItemsColor(ACTIVE_COLOR);
+    if (aFeature.get()) {
+      myActivePartModel = findPartModel(aFeature);
+      myActivePartModel->setItemsColor(ACTIVE_COLOR);
+    }
   } 
   return true;
 }
@@ -613,8 +606,8 @@ ResultPartPtr PartSet_DocumentDataModel::activePart() const
 
 QModelIndex PartSet_DocumentDataModel::activePartTree() const
 {
-  if (myActivePartId != -1) {
-    return createIndex(myActivePartId + historyOffset(), 0, HistoryNode);
+  if (myActivePartModel) {
+    return createIndex(myActivePartModel->position() + historyOffset(), 0, HistoryNode);
   }
   return QModelIndex();
 }
@@ -622,9 +615,9 @@ QModelIndex PartSet_DocumentDataModel::activePartTree() const
 void PartSet_DocumentDataModel::deactivatePart()
 {
   if (myActivePartIndex.isValid()) {
-    if (myActivePartId != -1) 
-      myPartModels[myActivePartId]->setItemsColor(PASSIVE_COLOR);
-    myActivePartId = -1;
+    if (myActivePartModel) 
+      myActivePartModel->setItemsColor(PASSIVE_COLOR);
+    myActivePartModel = 0;
     myActivePartIndex = QModelIndex();
     myModel->setItemsColor(ACTIVE_COLOR);
   }
@@ -790,7 +783,7 @@ void PartSet_DocumentDataModel::onMouseDoubleClick(const QModelIndex& theIndex)
     return;
   QTreeView* aTreeView = dynamic_cast<QTreeView*>(sender());
   if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
-    if (myActivePartId != -1)
+    if (myActivePartModel)
       // It means that the root document is not active
       return;
     QModelIndex aNewIndex;
@@ -826,3 +819,22 @@ void PartSet_DocumentDataModel::onMouseDoubleClick(const QModelIndex& theIndex)
     }
   }
 } 
+
+
+PartSet_PartModel* PartSet_DocumentDataModel::findPartModel(FeaturePtr thePart) const
+{
+  foreach (PartSet_PartModel* aModel, myPartModels) {
+    if (aModel->part() == thePart)
+      return aModel;
+  }
+  return 0;
+}
+
+PartSet_PartModel* PartSet_DocumentDataModel::findPartModel(int thePosition) const
+{
+  foreach (PartSet_PartModel* aModel, myPartModels) {
+    if (aModel->position() == thePosition)
+      return aModel;
+  }
+  return 0;
+}

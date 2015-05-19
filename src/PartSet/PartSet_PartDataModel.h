@@ -164,9 +164,6 @@ Q_OBJECT
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const;
 
-  //! Return a Part object
-  virtual ResultPartPtr part() const;
-
   //! Set an Index which will be considered as a last history index
   //! \param theIndex a last index for history
   void setLastHistoryItem(const QModelIndex& theIndex);

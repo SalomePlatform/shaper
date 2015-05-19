@@ -678,7 +678,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
           aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
         }
         if (aPart.get()) // this may be null is Part feature is disabled
-          aPartDoc;
+          aPartDoc = aPart->partDoc();
         if (aMgr->activeDocument() == aPartDoc)
           theMenu->addAction(myMenuMgr->action("DEACTIVATE_PART_CMD"));
         else

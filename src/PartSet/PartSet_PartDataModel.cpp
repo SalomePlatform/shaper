@@ -468,10 +468,7 @@ bool PartSet_PartDataModel::hasChildren(const QModelIndex& theParent) const
 
 DocumentPtr PartSet_PartDataModel::partDocument() const
 {
-  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  ObjectPtr aObject = aRootDoc->object(ModelAPI_Feature::group(), myId);
-  FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFeature->firstResult()); 
+  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(myPart->firstResult()); 
   if (aPart.get()) // this may be null is Part feature is disabled
     return aPart->partDoc();
   return DocumentPtr();
@@ -521,13 +518,6 @@ QModelIndex PartSet_PartDataModel::findGroup(const std::string& theGroup) const
   if (theGroup == ModelAPI_ResultGroup::group())
     return createIndex(3, 0, (qint32) GroupsFolder);
   return QModelIndex();
-}
-
-ResultPartPtr PartSet_PartDataModel::part() const
-{
-  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  ObjectPtr aObj = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-  return std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
 }
 
 QModelIndex PartSet_PartDataModel::objectIndex(const ObjectPtr& theObject) const

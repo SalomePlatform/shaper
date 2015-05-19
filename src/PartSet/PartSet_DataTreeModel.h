@@ -8,6 +8,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Session.h>
 
 #include <QAbstractItemModel>
 #include <QColor>
@@ -70,30 +71,34 @@ class PartSet_PartModel : public PartSet_FeaturesModel
    /// Constructor
    /// \param theParent a parent object
   PartSet_PartModel(QObject* theParent)
-      : PartSet_FeaturesModel(theParent), myId(-1)
+      : PartSet_FeaturesModel(theParent)
   {
   }
 
   /// Set part id
   /// \param theId a new id
-  void setPartId(int theId)
+  void setPart(FeaturePtr thePart)
   {
-    myId = theId;
+    myPart = thePart;
   }
 
   /// Returns Id of the part
-  int partId() const { return myId; }
+  FeaturePtr part() const { return myPart; }
 
   //! Returns true if the given document is a sub-document of this tree
   //! \param theDoc a document to check
   virtual bool hasDocument(const DocumentPtr& theDoc) const = 0;
 
-  //! Return a Part object
-  virtual ResultPartPtr part() const = 0;
+  /// Returns position of the part in history 
+  int position() const 
+  {
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    return aRootDoc->index(myPart);
+  }
 
  protected:
   //! Id of the current part object in the document
-  int myId;
+  FeaturePtr myPart;
 };
 
 #endif
