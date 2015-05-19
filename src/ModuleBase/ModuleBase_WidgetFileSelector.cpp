@@ -111,10 +111,11 @@ bool ModuleBase_WidgetFileSelector::isCurrentPathValid()
 
 void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 {
+  QString aDefaultPath = myPathField->text().isEmpty() ? myDefaultPath : myPathField->text();
   QString aFilter = filterString();
   QString aFileName = (myType == WFS_SAVE)
-      ? QFileDialog::getSaveFileName(this, myTitle, myDefaultPath, aFilter)
-      : QFileDialog::getOpenFileName(this, myTitle, myDefaultPath, aFilter);
+      ? QFileDialog::getSaveFileName(this, myTitle, aDefaultPath, aFilter)
+      : QFileDialog::getOpenFileName(this, myTitle, aDefaultPath, aFilter);
   if (!aFileName.isEmpty()) {
     myPathField->setText(aFileName);
   }
