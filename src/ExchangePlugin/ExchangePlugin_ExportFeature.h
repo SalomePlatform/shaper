@@ -57,8 +57,9 @@ public:
 
   /// Reimplemented from ModelAPI_Feature::isMacro(). Returns true.
   EXCHANGEPLUGIN_EXPORT virtual bool isMacro() const { return true; }
+
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
-  MODELAPI_EXPORT virtual bool isPreviewNeeded() const { return false; }
+  EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
 
 protected:
   /// Performs the export of the file
