@@ -111,8 +111,19 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     for(; aCreatedIter != myJustCreated.end(); aCreatedIter++) {
       FeaturePtr aFeature = 
         std::dynamic_pointer_cast<ModelAPI_Feature>(*aCreatedIter);
-      if (aFeature.get() && aFeature->isMacro()) {
-        aFeature->document()->removeFeature(aFeature);
+      if (aFeature.get()) {
+        // execute not-previewed feature on "apply"
+        if (!aFeature->isPreviewNeeded() && (myJustCreated.find(aFeature) != myJustCreated.end() ||
+          myJustUpdated.find(aFeature) != myJustUpdated.end())) {
+          static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+          if (aFactory->validate(aFeature)) {
+            executeFeature(aFeature);
+          }
+        }
+        // remove macro on apply
+        if (aFeature->isMacro()) {
+          aFeature->document()->removeFeature(aFeature);
+        }
       }
     }
     myJustCreated.clear();
@@ -346,33 +357,16 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     //std::cout<<"Update feature "<<theFeature->getKind()<<" must be updated = "<<aMustbeUpdated<<std::endl;
     // execute feature if it must be updated
     if (aJustUpdated) {
-      if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
-          !theFeature->isPersistentResult()) {
+      if ((std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
+          !theFeature->isPersistentResult()) && theFeature->isPreviewNeeded()) {
         if (aFactory->validate(theFeature)) {
           if (myIsAutomatic || 
               (myJustCreated.find(theFeature) != myJustCreated.end() ||
               !theFeature->isPersistentResult() /* execute quick, not persistent results */))
           {
-            // execute in try-catch to avoid internal problems of the feature
             if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
-              theFeature->data()->execState(ModelAPI_StateDone);
-              try {
-                theFeature->execute();
-                if (theFeature->data()->execState() != ModelAPI_StateDone) {
-                  aState = ModelAPI_StateExecFailed;
-                } else {
-                  aState = ModelAPI_StateDone;
-                }
-              } catch(...) {
-                aState = ModelAPI_StateExecFailed;
-                Events_Error::send(
-                  "Feature " + theFeature->getKind() + " has failed during the execution");
-              }
+              executeFeature(theFeature);
             }
-            if (aState != ModelAPI_StateDone) {
-              theFeature->eraseResults();
-            }
-            redisplayWithResults(theFeature, aState);
           } else { // must be updatet, but not updated yet
             theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
             const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
@@ -392,3 +386,27 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     }
   }
 }
+
+void Model_Update::executeFeature(FeaturePtr theFeature)
+{
+  // execute in try-catch to avoid internal problems of the feature
+  ModelAPI_ExecState aState = ModelAPI_StateDone;
+  theFeature->data()->execState(ModelAPI_StateDone);
+  try {
+    theFeature->execute();
+    if (theFeature->data()->execState() != ModelAPI_StateDone) {
+      aState = ModelAPI_StateExecFailed;
+    } else {
+      aState = ModelAPI_StateDone;
+    }
+  } catch(...) {
+    aState = ModelAPI_StateExecFailed;
+    Events_Error::send(
+      "Feature " + theFeature->getKind() + " has failed during the execution");
+  }
+  if (aState != ModelAPI_StateDone) {
+    theFeature->eraseResults();
+  }
+  redisplayWithResults(theFeature, aState);
+}
+

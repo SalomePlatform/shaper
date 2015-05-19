@@ -53,7 +53,7 @@ class Model_Objects
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
-  FeaturePtr feature(TDF_Label& theLabel) const;
+  FeaturePtr feature(TDF_Label theLabel) const;
 
   //! Returns the existing object: result or feature
   //! \param theLabel base label of the object

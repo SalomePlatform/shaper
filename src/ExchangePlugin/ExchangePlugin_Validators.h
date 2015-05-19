@@ -18,11 +18,11 @@
  * about which formats are supported and the extension of the associated files.
  * This validator filters out files that are out of this description.
  */
-class ExchangePlugin_ImportFormatValidator : public ModelAPI_AttributeValidator
+class ExchangePlugin_FormatValidator : public ModelAPI_AttributeValidator
 {
   /**
-   * Parses input arguments "BREP:BREPImport", "STEP:STEPImport"
-   * into list of file formats "BREP","STEP"
+   * Parses input arguments "BREP:BREPImport", "STEP|STP:STEPImport"
+   * into list of file formats "BREP","STEP","STP"
    * and list of corresponding plugins: "BREPImport", "STEPImport"
    */
   static bool parseFormats(const std::list<std::string>& theArguments,
@@ -34,8 +34,15 @@ public:
    */
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments) const;
+};
 
+class ExchangePlugin_ImportFormatValidator : public ExchangePlugin_FormatValidator
+{
 
+};
+
+class ExchangePlugin_ExportFormatValidator : public ExchangePlugin_FormatValidator
+{
 
 };
 

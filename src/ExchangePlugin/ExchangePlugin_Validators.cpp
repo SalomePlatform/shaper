@@ -5,6 +5,9 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include <ExchangePlugin_Validators.h>
+
+#include <ExchangePlugin_Tools.h>
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Session.h>
@@ -12,11 +15,10 @@
 
 #include <list>
 #include <string>
-#include <sstream>
 #include <algorithm>
 
-bool ExchangePlugin_ImportFormatValidator::parseFormats(const std::list<std::string>& theArguments,
-                                                        std::list<std::string>& outFormats)
+bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& theArguments,
+                                                  std::list<std::string>& outFormats)
 {
   std::list<std::string>::const_iterator it = theArguments.begin();
   bool result = true;
@@ -27,42 +29,40 @@ bool ExchangePlugin_ImportFormatValidator::parseFormats(const std::list<std::str
       result = false;
       continue;
     }
-    std::string aFormatList = anArg.substr(0, aSepPos);
-    std::transform(aFormatList.begin(), aFormatList.end(), aFormatList.begin(), toupper);
-    std::istringstream aStream(aFormatList);
-    std::string aFormat;
-    while (std::getline(aStream, aFormat, '|'))
-      outFormats.push_back(aFormat);
+    std::string aFormats = anArg.substr(0, aSepPos);
+    std::transform(aFormats.begin(), aFormats.end(), aFormats.begin(), toupper);
+    std::list<std::string> aFormatList = ExchangePlugin_Tools::split(aFormats, '|');
+    outFormats.insert(outFormats.end(), aFormatList.begin(), aFormatList.end());
   }
   return result;
 }
 
-bool ExchangePlugin_ImportFormatValidator::isValid(const AttributePtr& theAttribute,
-                                                   const std::list<std::string>& theArguments) const
+bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
+                                             const std::list<std::string>& theArguments) const
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  if (theAttribute->isInitialized()) {
-    const AttributeStringPtr aStrAttr =
-        std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
-    if(!aStrAttr)
-      return false;
-    std::string aFileName = aStrAttr->value();
-    if (!aFileName.empty()) {
-      std::list<std::string> aFormats;
-      ExchangePlugin_ImportFormatValidator::parseFormats(theArguments, aFormats);
-      std::list<std::string>::const_iterator itFormats = aFormats.begin();
-      size_t aFileNameLen = aFileName.length();
-      std::transform(aFileName.begin(), aFileName.end(), aFileName.begin(), toupper);
-      // Is file name ends with the format
-      for (; itFormats != aFormats.end(); ++itFormats) {
-        size_t aFormatBeginPos = aFileNameLen - (*itFormats).length();
-        if (aFileName.compare(aFormatBeginPos, std::string::npos, *itFormats) == 0) {
-          return true;
-        }
-      }
+  if (!theAttribute->isInitialized())
+    return false;
+
+  const AttributeStringPtr aStrAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
+  if (!aStrAttr)
+    return false;
+
+  std::string aFileName = aStrAttr->value();
+  if (aFileName.empty())
+    return false;
+
+  std::list<std::string> aFormats;
+  ExchangePlugin_FormatValidator::parseFormats(theArguments, aFormats);
+  std::list<std::string>::const_iterator itFormats = aFormats.begin();
+  size_t aFileNameLen = aFileName.length();
+  std::transform(aFileName.begin(), aFileName.end(), aFileName.begin(), toupper);
+  // Is file name ends with the format
+  for (; itFormats != aFormats.end(); ++itFormats) {
+    size_t aFormatBeginPos = aFileNameLen - (*itFormats).length();
+    if (aFileName.compare(aFormatBeginPos, std::string::npos, *itFormats) == 0) {
+      return true;
     }
   }
   return false;
 }
-

@@ -27,6 +27,7 @@ class QLineEdit;
 *  \code
 *      <file_selector
 *          id="import_file_selector"
+*          type="open"
 *          title="Import file"
 *          path="">
 *          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP:STEPImport" />
@@ -66,19 +67,28 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom() const;
 
- protected:
-   /// Returns string containing formats
-  QString formatsString() const;
+protected:
+  /// Converts format to filter string
+  static QString formatToFilter( const QString & theFormat );
 
-  /// Return list of validator formats
+  /// Returns list of validator formats
   QStringList getValidatorFormats() const;
 
- private:
+  /// Returns string containing formats
+  QString filterString() const;
+
+protected:
    /// A control for path input
   QLineEdit* myPathField;
 
   /// A title of open file dialog box
   QString myTitle;
+
+  /// A current format
+  QString mySelectedFilter;
+
+  /// A title of open file dialog box
+  enum { WFS_OPEN, WFS_SAVE } myType;
 
   /// Default path
   QString myDefaultPath;

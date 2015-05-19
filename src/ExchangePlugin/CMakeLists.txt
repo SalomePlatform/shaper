@@ -8,19 +8,23 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
                     ${CAS_INCLUDE_DIRS}
-) 
+)
 
 SET(PROJECT_HEADERS
     ExchangePlugin.h
     ExchangePlugin_Plugin.h
     ExchangePlugin_ImportFeature.h
+    ExchangePlugin_ExportFeature.h
     ExchangePlugin_Validators.h
+    ExchangePlugin_Tools.h
 )
- 
+
 SET(PROJECT_SOURCES
     ExchangePlugin_Plugin.cpp
     ExchangePlugin_ImportFeature.cpp
+    ExchangePlugin_ExportFeature.cpp
     ExchangePlugin_Validators.cpp
+    ExchangePlugin_Tools.cpp
 )
 
 SET(XML_RESOURCES

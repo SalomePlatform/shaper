@@ -7,6 +7,9 @@
  *      Author: sbh
  */
 
+#ifndef GEOMALGOAPI_STEPIMPORT_H_
+#define GEOMALGOAPI_STEPIMPORT_H_
+
 #include <GeomAlgoAPI.h>
 
 #include <TCollection_AsciiString.hxx>
@@ -25,6 +28,8 @@ Handle(TCollection_HAsciiString) GetValue(const TCollection_AsciiString& theFile
 /// Implementation of the import STEP files algorithms
 GEOMALGOAPI_EXPORT
 TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
-                    const TCollection_AsciiString& theFormatName, TCollection_AsciiString& theError,
-                    const TDF_Label& theShapeLabel);
+                    const TCollection_AsciiString& theFormatName,
+                    TCollection_AsciiString& theError);
 }
+
+#endif /* GEOMALGOAPI_STEPIMPORT_H_ */

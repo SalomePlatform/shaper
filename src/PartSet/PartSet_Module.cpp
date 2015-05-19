@@ -10,6 +10,7 @@
 #include "PartSet_WidgetPoint2dAngle.h"
 #include "PartSet_WidgetMultiSelector.h"
 #include "PartSet_WidgetEditor.h"
+#include "PartSet_WidgetFileSelector.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
 
@@ -471,30 +472,30 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
     aWgt = aPointWgt;
-  } if (theType == "point2ddistance") {
+  } else if (theType == "point2ddistance") {
     PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent, theWidgetApi, theParentId);
     aDistanceWgt->setWorkshop(aWorkshop);
     aDistanceWgt->setSketch(mySketchMgr->activeSketch());
     aWgt = aDistanceWgt;
-  } if(theType == "point2dangle") {
+  } else if(theType == "point2dangle") {
     PartSet_WidgetPoint2dAngle* anAngleWgt = new PartSet_WidgetPoint2dAngle(theParent, theWidgetApi, theParentId);
     anAngleWgt->setWorkshop(aWorkshop);
     anAngleWgt->setSketch(mySketchMgr->activeSketch());
     aWgt = anAngleWgt;
-  }
-  if (theType == "sketch_shape_selector") {
+  } else if (theType == "sketch_shape_selector") {
     PartSet_WidgetShapeSelector* aShapeSelectorWgt =
       new PartSet_WidgetShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
-  } if (theType == "sketch_multi_selector") {
+  } else if (theType == "sketch_multi_selector") {
     PartSet_WidgetMultiSelector* aShapeSelectorWgt =
       new PartSet_WidgetMultiSelector(theParent, workshop(), theWidgetApi, theParentId);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
-  }
-  if (theType == WDG_DOUBLEVALUE_EDITOR) {
+  } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     aWgt = new PartSet_WidgetEditor(theParent, workshop(), theWidgetApi, theParentId);
+  } else if (theType == "export_file_selector") {
+    aWgt = new PartSet_WidgetFileSelector(theParent, workshop(), theWidgetApi, theParentId);
   } 
   return aWgt;
 }

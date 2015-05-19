@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(PROJECT_HEADERS
     GeomAlgoAPI.h
+    GeomAlgoAPI_Tools.h
     GeomAlgoAPI_CompoundBuilder.h
     GeomAlgoAPI_FaceBuilder.h
     GeomAlgoAPI_EdgeBuilder.h
@@ -22,9 +23,13 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_BREPImport.h
     GeomAlgoAPI_STEPImport.h
     GeomAlgoAPI_IGESImport.h
+    GeomAlgoAPI_BREPExport.h
+    GeomAlgoAPI_STEPExport.h
+    GeomAlgoAPI_IGESExport.h
 )
 
 SET(PROJECT_SOURCES
+    GeomAlgoAPI_Tools.cpp
     GeomAlgoAPI_CompoundBuilder.cpp
     GeomAlgoAPI_FaceBuilder.cpp
     GeomAlgoAPI_EdgeBuilder.cpp
@@ -40,6 +45,9 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_BREPImport.cpp
     GeomAlgoAPI_STEPImport.cpp
     GeomAlgoAPI_IGESImport.cpp
+    GeomAlgoAPI_BREPExport.cpp
+    GeomAlgoAPI_STEPExport.cpp
+    GeomAlgoAPI_IGESExport.cpp
 )
 
 SET(PROJECT_LIBRARIES

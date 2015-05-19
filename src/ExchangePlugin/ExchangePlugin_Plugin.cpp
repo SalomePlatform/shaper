@@ -6,6 +6,7 @@
 
 #include <ExchangePlugin_Plugin.h>
 #include <ExchangePlugin_ImportFeature.h>
+#include <ExchangePlugin_ExportFeature.h>
 #include <ExchangePlugin_Validators.h>
 
 #include <Config_PropManager.h>
@@ -28,6 +29,8 @@ ExchangePlugin_Plugin::ExchangePlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aSession->validators();
   aFactory->registerValidator("ExchangePlugin_ImportFormat",
                               new ExchangePlugin_ImportFormatValidator);
+  aFactory->registerValidator("ExchangePlugin_ExportFormat",
+                              new ExchangePlugin_ExportFormatValidator);
 
   // register construction properties
   //Config_PropManager::registerProp("Visualization", "import_feature_color", "Imported feature color",
@@ -38,6 +41,9 @@ FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == ExchangePlugin_ImportFeature::ID()) {
     return FeaturePtr(new ExchangePlugin_ImportFeature);
+  } else
+  if (theFeatureID == ExchangePlugin_ExportFeature::ID()) {
+    return FeaturePtr(new ExchangePlugin_ExportFeature);
   }
   // feature of such kind is not found
   return FeaturePtr();

@@ -299,7 +299,7 @@ void Model_Objects::updateHistory(const std::string theGroup)
     myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
 }
 
-FeaturePtr Model_Objects::feature(TDF_Label& theLabel) const
+FeaturePtr Model_Objects::feature(TDF_Label theLabel) const
 {
   if (myFeatures.IsBound(theLabel))
     return myFeatures.Find(theLabel);

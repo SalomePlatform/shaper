@@ -3,8 +3,8 @@
 /*
  * GEOMALGOAPI_IGESImport.h
  *
- *  Created on: Dec 24, 2014
- *      Author: sbh
+ *  Created on: May 14, 2015
+ *      Author: spo
  */
 
 #ifndef GEOMALGOAPI_IGESIMPORT_H_
@@ -22,7 +22,7 @@ namespace IGESImport {
 GEOMALGOAPI_EXPORT
 TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
                     const TCollection_AsciiString& theFormatName,
-                    TCollection_AsciiString& theError, const TDF_Label&);
+                    TCollection_AsciiString& theError);
 
 }
 
