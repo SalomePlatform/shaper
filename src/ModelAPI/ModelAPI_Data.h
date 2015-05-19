@@ -143,6 +143,7 @@ class MODELAPI_EXPORT ModelAPI_Data
 
   /// Copies all atributes content into theTarget data
   virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget) = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data();
@@ -152,6 +153,15 @@ class MODELAPI_EXPORT ModelAPI_Data
 
   /// Defines the custom "is in history" behavior
   virtual void setIsInHistory(const bool theFlag) = 0;
+
+  /// Returns true if object must be displayed in the viewer: flag is stored in the
+  /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
+  /// the original state i nthe current transaction.
+  virtual bool isDisplayed() = 0;
+
+  /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"
+  /// signal.
+  virtual void setDisplayed(const bool theDisplay) = 0;
 
   friend class ModelAPI_Object;
 };

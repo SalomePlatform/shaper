@@ -33,14 +33,17 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
-#include <Standard_GUID.hxx>
-#include <TDataStd_UAttribute.hxx>
 
 #include <string>
 
 // myLab contains:
 // TDataStd_Name - name of the object
 // TDataStd_Integer - state of the object execution
+// TDataStd_BooleanArray - array of flags of this data:
+//                             0 - is in history or not
+static const int kFlagInHistory = 0;
+//                             1 - is displayed or not
+static const int kFlagDisplayed = 1;
 
 Model_Data::Model_Data() : mySendAttributeUpdated(true)
 {
@@ -49,6 +52,13 @@ Model_Data::Model_Data() : mySendAttributeUpdated(true)
 void Model_Data::setLabel(TDF_Label theLab)
 {
   myLab = theLab;
+  // set or get the default flags
+  if (!myLab.FindAttribute(TDataStd_BooleanArray::GetID(), myFlags)) {
+    // set default values if not found
+    Handle(TDataStd_BooleanArray) myFlags = TDataStd_BooleanArray::Set(myLab, 0, 1);
+    myFlags->SetValue(kFlagInHistory, Standard_True); // is in history by default is true
+    myFlags->SetValue(kFlagDisplayed, Standard_True); // is displayed by default is true
+  }
 }
 
 std::string Model_Data::name()
@@ -372,18 +382,28 @@ void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
   }
 }
 
-const Standard_GUID kIsInHistory("9275e461-4aca-46c7-ad84-1efb569d8144");
-
 bool Model_Data::isInHistory()
 {
-  return !myLab.IsAttribute(kIsInHistory);
+  return myFlags->Value(kFlagInHistory) == Standard_True;
 }
 
 void Model_Data::setIsInHistory(const bool theFlag)
 {
-  if (theFlag) { // is in histiry true: default behavior, so, remove GUID
-    myLab.ForgetAttribute(kIsInHistory);
-  } else { // not standard behavior is defined by special GUID attribute
-    TDataStd_UAttribute::Set(myLab, kIsInHistory);
+  return myFlags->SetValue(kFlagInHistory, theFlag);
+}
+
+bool Model_Data::isDisplayed()
+{
+  return myFlags->Value(kFlagDisplayed) == Standard_True;
+}
+
+void Model_Data::setDisplayed(const bool theDisplay)
+{
+  if (theDisplay != isDisplayed()) {
+    myFlags->SetValue(kFlagDisplayed, theDisplay);
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+    aECreator->sendUpdated(myObject, EVENT_DISP);
   }
 }

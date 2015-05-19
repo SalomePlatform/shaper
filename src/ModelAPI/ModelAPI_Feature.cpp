@@ -75,8 +75,14 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex)
   for(int anIndex = 0; anIndex < theSinceIndex && aResIter != myResults.end(); anIndex++)
     aResIter++;
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aNextIter = aResIter;
-  for(; aNextIter != myResults.end(); aNextIter++) {
-    (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
+  while( aNextIter != myResults.end()) {
+    // remove previously erased results: to enable later if needed only actual (of history change)
+    if (theSinceIndex == 0 && (*aNextIter)->isDisabled()) {
+      aNextIter = myResults.erase(aNextIter);
+    } else {
+      (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
+      aNextIter++;
+    }
   }
 }
 
@@ -135,8 +141,15 @@ bool ModelAPI_Feature::setDisabled(const bool theFlag)
 {
   if (myIsDisabled != theFlag) {
     myIsDisabled = theFlag;
-    if (myIsDisabled)
+    if (myIsDisabled) {
       eraseResults();
+    } else {
+      // enable all disabled previously results
+      std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+      for(; aResIter != myResults.end(); aResIter++) {
+        (*aResIter)->setDisabled(*aResIter, false); // just enable results
+      }
+    }
     return true;
   }
   return false;

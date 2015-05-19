@@ -6,6 +6,9 @@
 
 #include "ModelAPI_Object.h"
 #include "ModelAPI_Document.h"
+#include "ModelAPI_Data.h"
+#include "ModelAPI_Events.h"
+#include <Events_Loop.h>
 
 bool ModelAPI_Object::isInHistory()
 {
@@ -67,4 +70,14 @@ void ModelAPI_Object::erase()
 {
   if (myData) myData->erase();
   setData(DataPtr());
+}
+
+bool ModelAPI_Object::isDisplayed()
+{
+  return myData->isDisplayed();
+}
+
+void ModelAPI_Object::setDisplayed(const bool theDisplay)
+{
+  myData->setDisplayed(theDisplay);
 }

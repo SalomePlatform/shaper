@@ -23,6 +23,7 @@
 #include <ModelAPI_Object.h>
 
 #include <TDF_Label.hxx>
+#include <TDataStd_BooleanArray.hxx>
 
 #include <memory>
 
@@ -44,6 +45,8 @@ class Model_Data : public ModelAPI_Data
   TDF_Label myLab;  ///< label of the feature in the document
   /// All attributes of the object identified by the attribute ID
   std::map<std::string, std::shared_ptr<ModelAPI_Attribute> > myAttrs;
+  /// Array of flags of this data
+  Handle(TDataStd_BooleanArray) myFlags;
 
   /// needed here to emit signal that object changed on change of the attribute
   ObjectPtr myObject;
@@ -204,6 +207,15 @@ private:
   /// \param theApplyConcealment applies consealment flag changes
   void addBackReference(FeaturePtr theFeature, std::string theAttrID, 
     const bool theApplyConcealment = true);
+
+  /// Returns true if object must be displayed in the viewer: flag is stored in the
+  /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
+  /// the original state i nthe current transaction.
+  MODEL_EXPORT virtual bool isDisplayed();
+
+  /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"
+  /// signal.
+  MODEL_EXPORT virtual void setDisplayed(const bool theDisplay);
 };
 
 /// Generic method to register back reference, used in referencing attributes.

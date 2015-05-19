@@ -76,6 +76,15 @@ class ModelAPI_Object
   /// removes all fields from this feature
   MODELAPI_EXPORT virtual void erase();
 
+  /// Returns true if object must be displayed in the viewer: flag is stored in the
+  /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
+  /// the original state i nthe current transaction.
+  MODELAPI_EXPORT virtual bool isDisplayed();
+
+  /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"
+  /// signal.
+  MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
+
   friend class Model_Objects;
 
 };
