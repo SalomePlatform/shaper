@@ -56,6 +56,10 @@ protected:
   /// On operation start/end/abort the "Just" fileds must be cleared and processed in the right way
   /// \param theTotalUpdate force to updates everything that has been changed in this operation
   void processOperation(const bool theTotalUpdate);
+
+  /// Performs the feature execution
+  /// \returns the status of execution
+  void executeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 };
 
 #endif

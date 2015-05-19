@@ -104,6 +104,11 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// \returns false by default
   MODELAPI_EXPORT virtual bool isMacro() const;
 
+  /// Returns true if preview update during the edition needed. Otherwise the update-mechanism
+  /// calls the \a execute function only on "apply" of the operation
+  /// \returns true by default
+  MODELAPI_EXPORT virtual bool isPreviewNeeded() const;
+
   /// Must return document where the new feature must be added to
   /// By default it is empty: it is added to the document this method is called to
   MODELAPI_EXPORT virtual const std::string& documentToAdd();

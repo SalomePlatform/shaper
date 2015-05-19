@@ -146,3 +146,8 @@ bool ModelAPI_Feature::isDisabled() const
 {
   return myIsDisabled;
 }
+
+bool ModelAPI_Feature::isPreviewNeeded() const
+{
+  return true;
+}
