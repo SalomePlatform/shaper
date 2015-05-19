@@ -55,7 +55,7 @@ void Model_Data::setLabel(TDF_Label theLab)
   // set or get the default flags
   if (!myLab.FindAttribute(TDataStd_BooleanArray::GetID(), myFlags)) {
     // set default values if not found
-    Handle(TDataStd_BooleanArray) myFlags = TDataStd_BooleanArray::Set(myLab, 0, 1);
+    myFlags = TDataStd_BooleanArray::Set(myLab, 0, 1);
     myFlags->SetValue(kFlagInHistory, Standard_True); // is in history by default is true
     myFlags->SetValue(kFlagDisplayed, Standard_True); // is displayed by default is true
   }
