@@ -67,7 +67,7 @@ class Model_Objects
     const std::string& theGroupID, const std::string& theName);
 
   //! Returns the result by the result name
-  ResultPtr Model_Objects::findByName(const std::string theName);
+  ResultPtr findByName(const std::string theName);
 
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
