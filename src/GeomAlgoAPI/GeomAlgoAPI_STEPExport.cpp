@@ -2,6 +2,8 @@
 
 #include <GeomAlgoAPI_STEPExport.h>
 
+#include "GeomAlgoAPI_Tools.h"
+
 // OOCT includes
 #include <IFSelect_ReturnStatus.hxx>
 #include <STEPControl_Writer.hxx>
@@ -20,8 +22,8 @@ bool Export(const TCollection_AsciiString& theFileName,
 
   try
   {
-//    // Set "C" numeric locale to save numbers correctly
-//    Kernel_Utils::Localizer loc;
+    // Set "C" numeric locale to save numbers correctly
+    GeomAlgoAPI_Tools::Localizer loc;
 
     IFSelect_ReturnStatus status ;
     //VRV: OCC 4.0 migration

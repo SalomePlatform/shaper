@@ -2,9 +2,7 @@
 
 #include <GeomAlgoAPI_IGESExport.h>
 
-//// KERNEL includes
-//#include <utilities.h>
-//#include <Basics_Utils.hxx>
+#include "GeomAlgoAPI_Tools.h"
 
 // OOCT includes
 #include <IGESControl_Controller.hxx>
@@ -115,8 +113,8 @@ bool Export(const TCollection_AsciiString& theFileName,
       aBrepMode = aKind;
   }
 
-//  // Set "C" numeric locale to save numbers correctly
-//  Kernel_Utils::Localizer loc;
+  // Set "C" numeric locale to save numbers correctly
+  GeomAlgoAPI_Tools::Localizer loc;
 
   // initialize writer
   IGESControl_Controller::Init();

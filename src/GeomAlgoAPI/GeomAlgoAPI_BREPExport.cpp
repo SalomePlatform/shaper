@@ -2,6 +2,8 @@
 
 #include <GeomAlgoAPI_BREPExport.h>
 
+#include "GeomAlgoAPI_Tools.h"
+
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
 
@@ -20,6 +22,10 @@ bool Export(const TCollection_AsciiString& theFileName,
   #ifdef _DEBUG
   std::cout << "Export BREP into file " << theFileName << std::endl;
   #endif
+
+  // Set "C" numeric locale to save numbers correctly
+  GeomAlgoAPI_Tools::Localizer loc;
+
   if ( !BRepTools::Write( theShape, theFileName.ToCString() ) ) {
     theError = "BREP Export failed";
     return false;
