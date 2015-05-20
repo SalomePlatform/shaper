@@ -708,6 +708,9 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     myPlaneFilter->setPlane(aPln->impl<gp_Pln>());
   }
   aDisplayer->updateViewer();
+  // all sketch objects should be activated in the sketch selection modes by edit operation start
+  if (theOperation->isEditOperation())
+    activateObjectsInSketchMode(true);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
