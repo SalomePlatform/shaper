@@ -71,7 +71,13 @@ bool ModuleBase_Operation::isValid() const
   //Get validators for the Id
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  return aFactory->validate(myFeature);
+  bool aValid = aFactory->validate(myFeature);
+
+  // the feature exec state should be checked in order to do not apply features, which result can not
+  // be built. E.g. extrusion on sketch, where the "to" is a perpendicular plane to the sketch
+  bool isDone = myFeature->data()->execState() == ModelAPI_StateDone;
+
+  return aValid && isDone;
 }
 
 
