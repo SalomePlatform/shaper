@@ -191,21 +191,26 @@ void ModuleBase_Operation::abort()
 bool ModuleBase_Operation::commit()
 {
   if (canBeCommitted()) {
+    SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
     if (myIsEditing) {
-      SessionPtr aMgr = ModelAPI_Session::get();
       DocumentPtr aDoc = aMgr->activeDocument();
+      bool aIsOp = aMgr->isOperation();
+      if (!aIsOp)
+        aMgr->startOperation();
       aDoc->setCurrentFeature(myCurrentFeature, true);
+      if (!aIsOp)
+        aMgr->finishOperation();
       myCurrentFeature = FeaturePtr();
     }
     commitOperation();
     // check whether there are modifications performed during the current operation
     // in the model
     // in case if there are no modifications, do not increase the undo/redo stack
-    if (ModelAPI_Session::get()->isModified())
-      ModelAPI_Session::get()->finishOperation();
+    if (aMgr->isModified())
+      aMgr->finishOperation();
     else
-      ModelAPI_Session::get()->abortOperation();
+      aMgr->abortOperation();
 
     stopOperation();
     emit stopped();
