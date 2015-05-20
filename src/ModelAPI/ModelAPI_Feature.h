@@ -83,7 +83,9 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// removes the result from the feature
   MODELAPI_EXPORT void removeResult(const std::shared_ptr<ModelAPI_Result>& theResult);
   /// removes all results starting from the gived index (zero-based)
-  MODELAPI_EXPORT void removeResults(const int theSinceIndex);
+  /// \param theSinceIndex - index of the deleted result and all after also will be deleted
+  /// \param theFlush - if it is false, REDISPLAY message is not flushed
+  MODELAPI_EXPORT void removeResults(const int theSinceIndex, const bool theFlush = true);
   /// removes all results from the feature
   MODELAPI_EXPORT void eraseResults();
   /// removes all fields from this feature: results, data, etc
