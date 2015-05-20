@@ -264,6 +264,8 @@ signals:
   /// before operation feature creating
   CompositeFeaturePtr myParentFeature;  
 
+  /// Last current feature before editing operation
+  FeaturePtr myCurrentFeature;
 };
 
 #endif

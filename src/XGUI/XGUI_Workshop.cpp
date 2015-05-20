@@ -466,7 +466,8 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
     ObjectPtr aObj = (*aIt);
 
     // Hide the object if it is invalid or concealed one
-    bool aHide = !aObj->data() || !aObj->data()->isValid() || aObj->isDisabled();
+    bool aHide = !aObj->data() || !aObj->data()->isValid() || 
+      aObj->isDisabled() || (!aObj->isDisplayed());
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();
@@ -494,14 +495,14 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
             myDisplayer->deactivate(aObj);
         }
       } else { // display object if the current operation has it
-        ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-        if (aOperation && aOperation->hasObject(aObj)) {
+        if (displayObject(aObj)) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          #ifdef DEBUG_FEATURE_REDISPLAY
-            QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-            qDebug(QString("  display object = %1").arg(anObjInfo).toStdString().c_str());
-          #endif
-          if (displayObject(aObj)) {
+          if (aOperation && aOperation->hasObject(aObj)) {
+            ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+            #ifdef DEBUG_FEATURE_REDISPLAY
+              QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
+              qDebug(QString("  display object = %1").arg(anObjInfo).toStdString().c_str());
+            #endif
             // Deactivate object of current operation from selection
             if (myDisplayer->isActive(aObj))
               myDisplayer->deactivate(aObj);
@@ -1507,15 +1508,17 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 //**************************************************************
 void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
-  foreach (ObjectPtr aObj, theList)
-  {
+  foreach (ObjectPtr aObj, theList) {
     if (isVisible) {
-      displayObject(aObj);
+      aObj->setDisplayed(true);
+      //displayObject(aObj);
     } else {
-      myDisplayer->erase(aObj, false);
+      aObj->setDisplayed(false);
+      //myDisplayer->erase(aObj, false);
     }
   }
-  myDisplayer->updateViewer();
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  //myDisplayer->updateViewer();
 }
 
 //**************************************************************
@@ -1558,8 +1561,10 @@ void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
 //**************************************************************
 void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup)
 {
-  for (int i = 0; i < theDoc->size(theGroup); i++)
-    displayObject(theDoc->object(theGroup, i));
+  for (int i = 0; i < theDoc->size(theGroup); i++) 
+    theDoc->object(theGroup, i)->setDisplayed(true);
+    //displayObject(theDoc->object(theGroup, i));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 //**************************************************************

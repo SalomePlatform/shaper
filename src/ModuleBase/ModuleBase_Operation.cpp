@@ -131,7 +131,7 @@ void ModuleBase_Operation::start()
 {
   QString anId = getDescription()->operationId();
   if (myIsEditing) {
-      anId = anId.append(EditSuffix());
+    anId = anId.append(EditSuffix());
   }
   ModelAPI_Session::get()->startOperation(anId.toStdString());
 
@@ -145,6 +145,13 @@ void ModuleBase_Operation::start()
       abort();
       return;
     }
+  }
+  /// Set current feature and remeber old current feature
+  if (myIsEditing) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->activeDocument();
+    myCurrentFeature = aDoc->currentFeature(true);
+    aDoc->setCurrentFeature(feature(), false);
   }
 
   startOperation();
@@ -166,6 +173,12 @@ void ModuleBase_Operation::resume()
 
 void ModuleBase_Operation::abort()
 {
+  if (myIsEditing) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->activeDocument();
+    aDoc->setCurrentFeature(myCurrentFeature, true);
+    myCurrentFeature = FeaturePtr();
+  }
   abortOperation();
   emit aborted();
 
@@ -178,6 +191,13 @@ void ModuleBase_Operation::abort()
 bool ModuleBase_Operation::commit()
 {
   if (canBeCommitted()) {
+    /// Set current feature and remeber old current feature
+    if (myIsEditing) {
+      SessionPtr aMgr = ModelAPI_Session::get();
+      DocumentPtr aDoc = aMgr->activeDocument();
+      aDoc->setCurrentFeature(myCurrentFeature, true);
+      myCurrentFeature = FeaturePtr();
+    }
     commitOperation();
     // check whether there are modifications performed during the current operation
     // in the model
