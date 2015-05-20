@@ -527,7 +527,7 @@ void Model_Document::operationId(const std::string& theId)
   myTransactions.rbegin()->myId = theId;
 }
 
-FeaturePtr Model_Document::addFeature(std::string theID)
+FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurrent)
 {
   std::shared_ptr<Model_Session> aSession = 
     std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
@@ -547,7 +547,8 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   if (aFeature) {
     aDocToAdd->myObjs->addFeature(aFeature, currentFeature(false));
     if (!aFeature->isAction()) {  // do not add action to the data model
-      setCurrentFeature(aFeature, false); // after all this feature stays in the document, so make it current
+      if (theMakeCurrent)  // after all this feature stays in the document, so make it current
+        setCurrentFeature(aFeature, false);
     } else { // feature must be executed
        // no creation event => updater not working, problem with remove part
       aFeature->execute();

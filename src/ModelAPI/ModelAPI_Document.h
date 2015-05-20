@@ -44,7 +44,9 @@ public:
 
   //! Adds to the document the new feature of the given feature id
   //! \param theID creates feature and puts it in the document (if it is not action)
-  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
+  //! \param theMakeCurrent to make current this new feature in this document
+  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID, 
+    const bool theMakeCurrent = true) = 0;
 
   //! Return a list of features, which refers to the feature
   //! \param theFeature a feature
