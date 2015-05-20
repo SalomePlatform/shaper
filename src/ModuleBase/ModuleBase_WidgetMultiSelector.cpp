@@ -39,7 +39,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                const Config_WidgetAPI* theData,
                                                                const std::string& theParentId)
     : ModuleBase_WidgetValidated(theParent, theData, theParentId),
-      myWorkshop(theWorkshop), myIsActive(false)
+      myWorkshop(theWorkshop)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -94,8 +94,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 {
-  myIsActive = false;
-  activateShapeSelection();
+  activateShapeSelection(false);
 }
 
 //********************************************************************
@@ -106,8 +105,7 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
           this,       SLOT(onSelectionChanged()), 
           Qt::UniqueConnection);
 
-  myIsActive = true;
-  activateShapeSelection();
+  activateShapeSelection(true);
 
   QObjectPtrList anObjects;
   // Restore selection in the viewer by the attribute selection list
@@ -131,8 +129,7 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 void ModuleBase_WidgetMultiSelector::deactivate()
 {
   disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  myIsActive = false;
-  activateShapeSelection();
+  activateShapeSelection(false);
 }
 
 //********************************************************************
@@ -318,7 +315,7 @@ bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEve
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
-  activateShapeSelection();
+  activateShapeSelection(true);
   QObjectPtrList anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
   // To clear mySelection, myListControl and storeValue()
@@ -358,23 +355,21 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      myIsActive = false;
-      activateShapeSelection();
+      activateShapeSelection(false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
-      myIsActive = true;
       myTypeCombo->blockSignals(isBlocked);
-      activateShapeSelection();
+      activateShapeSelection(true);
       break;
     }
   }
 }
 
-void ModuleBase_WidgetMultiSelector::activateShapeSelection()
+void ModuleBase_WidgetMultiSelector::activateShapeSelection(const bool isActivated)
 {
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
-  if (myIsActive) {
+  if (isActivated) {
     QString aNewType = myTypeCombo->currentText();
     QIntList aList;
     aList.append(ModuleBase_Tools::shapeType(aNewType));
@@ -383,7 +378,7 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection()
     myWorkshop->deactivateSubShapesSelection();
   }
 
-  activateFilters(myWorkshop, myIsActive);
+  activateFilters(myWorkshop, isActivated);
 }
 
 //********************************************************************

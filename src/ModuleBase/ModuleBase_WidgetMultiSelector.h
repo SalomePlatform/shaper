@@ -119,7 +119,8 @@ protected slots:
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
 
   /// Start shape selection
-  void activateShapeSelection();
+  /// \param isActivated a state whether the shape is activated or deactivated in selection
+  void activateShapeSelection(const bool isActivated);
 
  protected:
    /// Update selection list
@@ -133,9 +134,6 @@ protected slots:
 
   //TODO: Move into the base of selectors
   ModuleBase_IWorkshop* myWorkshop;
-
-  /// If true then local selector has to be activated in context
-  bool myIsActive;
 
   /// Provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
