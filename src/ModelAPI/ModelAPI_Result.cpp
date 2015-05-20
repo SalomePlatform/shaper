@@ -27,10 +27,10 @@ bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, cons
       aECreator->sendDeleted(document(), groupName());
     } else { // un-disabled equals to created
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-      aECreator->sendUpdated(theThis, anEvent, false); // do not group: creation must be immediate
+      aECreator->sendUpdated(theThis, anEvent /*, false*/); // flush is in setCurrentFeature
     }
     static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    aECreator->sendUpdated(theThis, EVENT_DISP, false);
+    aECreator->sendUpdated(theThis, EVENT_DISP/*, false*/); // flush is in setCurrentFeature
     return true;
   }
   return false;

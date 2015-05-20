@@ -45,8 +45,11 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
   } else {
     myResults.push_back(theResult);
   }
-  // in any case result decomes enabled
+  // in any case result becomes enabled
   theResult->setDisabled(theResult, false);
+  // flush vidualisation changes
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  aLoop->flush(aRedispEvent);
 }
 
 void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResult,
@@ -62,14 +65,22 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
     *aResIter = theResult;
   }
   theResult->setDisabled(theResult, false);
+  // flush visualisation changes
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  aLoop->flush(aRedispEvent);
 }
 
 void ModelAPI_Feature::removeResult(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   theResult->setDisabled(theResult, true);
+  // flush visualisation changes
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  aLoop->flush(aRedispEvent);
 }
 
-void ModelAPI_Feature::removeResults(const int theSinceIndex)
+void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlush)
 {
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
   for(int anIndex = 0; anIndex < theSinceIndex && aResIter != myResults.end(); anIndex++)
@@ -83,6 +94,12 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex)
       (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
       aNextIter++;
     }
+  }
+  if (theFlush) {
+    // flush visualisation changes
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    aLoop->flush(aRedispEvent);
   }
 }
 
@@ -131,7 +148,6 @@ FeaturePtr ModelAPI_Feature::feature(ObjectPtr theObject)
   return aFeature;
 }
 
-
 bool ModelAPI_Feature::isMacro() const
 {
   return false;
@@ -142,12 +158,12 @@ bool ModelAPI_Feature::setDisabled(const bool theFlag)
   if (myIsDisabled != theFlag) {
     myIsDisabled = theFlag;
     if (myIsDisabled) {
-      eraseResults();
+      removeResults(0, false); // flush will be in setCurrentFeature
     } else {
       // enable all disabled previously results
       std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
       for(; aResIter != myResults.end(); aResIter++) {
-        (*aResIter)->setDisabled(*aResIter, false); // just enable results
+        (*aResIter)->setDisabled(*aResIter, false);
       }
     }
     return true;

@@ -655,6 +655,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
 {
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   if (theCurrent.get()) {
+    /*
     if (theVisible) { // make features below which are not in history also enabled: sketch subs
       FeaturePtr aNext = myObjs->nextFeature(theCurrent);
       for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent)) {
@@ -664,7 +665,18 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
           theCurrent = aNext;
         }
       }
+    }*/
+    // if feature nests into compisite feature, make the composite feature as current
+    const std::set<AttributePtr>& aRefsToMe = theCurrent->data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aRefToMe = aRefsToMe.begin();
+    for(; aRefToMe != aRefsToMe.end(); aRefToMe++) {
+      CompositeFeaturePtr aComposite = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*aRefToMe)->owner());
+      if (aComposite.get() && aComposite->isSub(theCurrent)) {
+        theCurrent = aComposite;
+      }
     }
+
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (!aData.get()) return; // unknown case
     TDF_Label aFeatureLabel = aData->label().Father();
@@ -679,19 +691,31 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     aRefLab.ForgetAttribute(TDF_Reference::GetID());
   }
   // make all features after this feature disabled in reversed order (to remove results without deps)
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
+  // if the current feature is composite features, all sub-features also must be enabled
+  CompositeFeaturePtr aCurComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theCurrent);
+
+
   bool aPassed = false; // flag that the current object is already passed in cycle
   FeaturePtr anIter = myObjs->lastFeature();
   for(; anIter.get(); anIter = myObjs->nextFeature(anIter, true)) {
     // check this before passed become enabled: the current feature is enabled!
     if (anIter == theCurrent) aPassed = true;
 
-    if (anIter->setDisabled(!aPassed)) {
+    bool aDisabledFlag = !aPassed;
+    if (aCurComp.get() && aCurComp->isSub(anIter))
+      aDisabledFlag = false;
+    if (anIter->setDisabled(aDisabledFlag)) {
       // state of feature is changed => so feature become updated
-      static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
       ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
-
+      // flush is in the end of this method
+      ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
     }
   }
+  aLoop->flush(aRedispEvent);
 }
 
 TDF_Label Model_Document::generalLabel() const
