@@ -508,7 +508,7 @@ bool PartSet_Module::deleteObjects()
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
        isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
-  if (isSketchOp && isNestedOp) {
+  if (isSketchOp || isNestedOp) {
     // 2. find selected presentations
     // selected objects should be collected before the current operation abort because
     // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
