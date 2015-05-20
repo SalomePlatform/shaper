@@ -35,6 +35,9 @@ public:
   /// Returns all property panel's widget created by WidgetFactory
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;
 
+  /// Removes all widgets in the widget area of the property panel
+  virtual void cleanContent() = 0;
+
   /// Editing mode depends on mode of current operation. This value is defined by it.
   /// \param isEditing state of editing mode flag
   virtual void setEditingMode(bool isEditing) { myIsEditing = isEditing; }

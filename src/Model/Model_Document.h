@@ -73,7 +73,8 @@ class Model_Document : public ModelAPI_Document
 
   //! Adds to the document the new feature of the given feature id
   //! \param theID creates feature and puts it in the document
-  MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID);
+  //! \param theMakeCurrent to make current this new feature in this document
+  MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID, const bool theMakeCurrent = true);
 
   //! Return a list of features, which refers to the feature
   //! \param theFeature a feature

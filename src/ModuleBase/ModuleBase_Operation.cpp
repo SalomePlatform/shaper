@@ -189,6 +189,9 @@ void ModuleBase_Operation::abort()
   emit aborted();
 
   stopOperation();
+  // is is necessary to deactivate current widgets before the model operation is aborted
+  // because abort removes the feature and activated filters should not check it
+  propertyPanel()->cleanContent();
 
   ModelAPI_Session::get()->abortOperation();
   emit stopped();

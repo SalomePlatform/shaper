@@ -125,11 +125,13 @@ void SketchPlugin_Sketch::execute()
 
 std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string theID)
 {
-  std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID);
+  std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID, false);
   if (aNew) {
     std::dynamic_pointer_cast<SketchPlugin_Feature>(aNew)->setSketch(this);
     data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(aNew);
   }
+   // set as current also after it becomes sub to set correctly enabled for other sketch subs
+  document()->setCurrentFeature(aNew, false);
   return aNew;
 }
 
