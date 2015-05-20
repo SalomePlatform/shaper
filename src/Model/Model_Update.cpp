@@ -362,6 +362,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
         if (aFactory->validate(theFeature)) {
           if (myIsAutomatic || 
               (myJustCreated.find(theFeature) != myJustCreated.end() ||
+              (myJustUpdated.find(theFeature) != myJustUpdated.end() && 
+               theFeature == theFeature->document()->currentFeature(false)) || // currently edited
               !theFeature->isPersistentResult() /* execute quick, not persistent results */))
           {
             if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {

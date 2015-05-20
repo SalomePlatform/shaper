@@ -58,6 +58,45 @@ void Model_ResultBody::colorConfigInfo(std::string& theSection, std::string& the
   theDefault = DEFAULT_COLOR();
 }
 
+// Converts evolution of naming shape to selection evelution and back to avoid
+// naming support on the disabled results. Deeply in the labels tree, recursively.
+static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
+  std::list<std::pair<TopoDS_Shape, TopoDS_Shape> > aShapePairs; // to store old and new shapes
+  Handle(TNaming_NamedShape) aName;
+  int anEvolution = -1;
+  if (theLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
+    anEvolution = (int)(aName->Evolution());
+    for(TNaming_Iterator anIter(aName); anIter.More(); anIter.Next()) {
+      aShapePairs.push_back(std::pair<TopoDS_Shape, TopoDS_Shape>
+        (anIter.OldShape(), anIter.NewShape()));
+    }
+  }
+  // remove old
+  theLab.ForgetAttribute(TNaming_NamedShape::GetID());
+  // create new
+  TNaming_Builder aBuilder(theLab);
+  TNaming_Evolution anEvol = (TNaming_Evolution)(anEvolution);
+  std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter = aShapePairs.begin();
+  for(; aPairsIter != aShapePairs.end(); aPairsIter++) {
+    if (theFlag) { // disabled => make selection
+      aBuilder.Select(aPairsIter->first, aPairsIter->second);
+    } else if (anEvol == TNaming_GENERATED) {
+      aBuilder.Generated(aPairsIter->first, aPairsIter->second);
+    } else if (anEvol == TNaming_MODIFY) {
+      aBuilder.Modify(aPairsIter->first, aPairsIter->second);
+    } else if (anEvol == TNaming_DELETE) {
+      aBuilder.Delete(aPairsIter->first);
+    } else if (anEvol == TNaming_PRIMITIVE) {
+      aBuilder.Generated(aPairsIter->first, aPairsIter->second);
+    }
+  }
+  // recursive call for all sub-labels
+  TDF_ChildIterator anIter(theLab, Standard_False);
+  for(; anIter.More(); anIter.Next()) {
+    EvolutionToSelection(anIter.Value(), theFlag);
+  }
+}
+
 bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)
 {
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
@@ -66,32 +105,7 @@ bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, con
     if (!aData) // unknown case
       return aChanged;
     TDF_Label& aShapeLab = aData->shapeLab();
-
-    std::list<std::pair<TopoDS_Shape, TopoDS_Shape> > aShapePairs; // to store old and new shapes
-    Handle(TNaming_NamedShape) aName;
-    int anEvolution = -1;
-    if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
-      anEvolution = (int)(aName->Evolution());
-      for(TNaming_Iterator anIter(aName); anIter.More(); anIter.Next()) {
-        aShapePairs.push_back(std::pair<TopoDS_Shape, TopoDS_Shape>
-          (anIter.OldShape(), anIter.NewShape()));
-      }
-    }
-    // remove old
-    aShapeLab.ForgetAttribute(TNaming_NamedShape::GetID());
-    // create new
-    TNaming_Builder aBuilder(aShapeLab);
-    TNaming_Evolution anEvol = (TNaming_Evolution)(anEvolution);
-    std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter = aShapePairs.begin();
-    for(; aPairsIter != aShapePairs.end(); aPairsIter++) {
-      if (theFlag) { // disabled => make selection
-        aBuilder.Select(aPairsIter->first, aPairsIter->second);
-      } else if (anEvol == TNaming_GENERATED) {
-        aBuilder.Generated(aPairsIter->first, aPairsIter->second);
-      } else if (anEvol == TNaming_MODIFY) {
-        aBuilder.Modify(aPairsIter->first, aPairsIter->second);
-      }
-    }
+    EvolutionToSelection(aShapeLab, theFlag);
   }
   return aChanged;
 }
