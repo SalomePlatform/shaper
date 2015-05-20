@@ -99,18 +99,18 @@ std::vector<int> HSVtoRGB(int theH, int theS, int theV)
   double aVdec = theV - anA;
 
   double aPercentToValue = 255./100;
-  aV    *= aPercentToValue;
-  aVinc *= aPercentToValue;
-  aVmin *= aPercentToValue;
-  aVdec *= aPercentToValue;
+  int aV_int    = (int)(aV*aPercentToValue);
+  int aVinc_int = (int)(aVinc*aPercentToValue);
+  int aVmin_int = (int)(aVmin*aPercentToValue);
+  int aVdec_int = (int)(aVdec*aPercentToValue);
 
   switch(aHi) {
-    case 0: appendValues(aRGB, aV,    aVinc, aVmin); break;
-    case 1: appendValues(aRGB, aVdec, aV,    aVmin); break;
-    case 2: appendValues(aRGB, aVmin, aV,    aVinc); break;
-    case 3: appendValues(aRGB, aVmin, aVdec, aV); break;
-    case 4: appendValues(aRGB, aVinc, aVmin, aV); break;
-    case 5: appendValues(aRGB, aV,    aVmin, aVdec); break;
+    case 0: appendValues(aRGB, aV_int,    aVinc_int, aVmin_int); break;
+    case 1: appendValues(aRGB, aVdec_int, aV_int,    aVmin_int); break;
+    case 2: appendValues(aRGB, aVmin_int, aV_int,    aVinc_int); break;
+    case 3: appendValues(aRGB, aVmin_int, aVdec_int, aV_int); break;
+    case 4: appendValues(aRGB, aVinc_int, aVmin_int, aV_int); break;
+    case 5: appendValues(aRGB, aV_int,    aVmin_int, aVdec_int); break;
     default: break;
   }
   return aRGB;
