@@ -62,7 +62,7 @@ Q_OBJECT
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
 
   /// Removes all widgets in the widget area of the property panel
-  void cleanContent();
+  virtual void cleanContent();
 
   /// Returns currently active widget
   virtual ModuleBase_ModelWidget* activeWidget() const { return myActiveWidget; }
