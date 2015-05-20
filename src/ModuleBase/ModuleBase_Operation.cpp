@@ -64,7 +64,7 @@ FeaturePtr ModuleBase_Operation::feature() const
 
 bool ModuleBase_Operation::isValid() const
 {
-  if (!myFeature)
+  if (!myFeature || !myFeature->data().get())
     return true; // rename operation
   if (myFeature->isAction())
     return true;
