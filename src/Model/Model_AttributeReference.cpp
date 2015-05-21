@@ -96,7 +96,8 @@ ObjectPtr Model_AttributeReference::value()
 
 bool Model_AttributeReference::isInitialized()
 {
-  if (myRef->Label() == myRef->Get()) { // empty reference is not initialized
+  if (myRef->Label() == myRef->Get() && !myRef->Label().IsAttribute(TDataStd_Comment::GetID())) {
+    // empty reference is not initialized
     return false;
   }
   return ModelAPI_AttributeReference::isInitialized();
