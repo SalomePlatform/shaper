@@ -27,7 +27,11 @@ void PartSetPlugin_Part::execute()
   if (!aResult) {
     aResult = document()->createPart(data());
     setResult(aResult);
-    aResult->activate();
+    // do not activate part by simple execution if it is not loaded yet: it must be explicitly
+    // activated for this
+    if (!ModelAPI_Session::get()->isLoadByDemand(aResult->data()->name())) {
+      aResult->activate();
+    }
   }
 }
 
