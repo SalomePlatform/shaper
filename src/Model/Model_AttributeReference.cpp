@@ -20,21 +20,29 @@ using namespace std;
 
 void Model_AttributeReference::setValue(ObjectPtr theObject)
 {
-  if(!theObject)
-    return;
+  // now allow to deselect in this attribute: extrusion from/to
+  //if(!theObject)
+  //  return;
   ObjectPtr aValue = value();
   if (!myIsInitialized || aValue != theObject) {
     REMOVE_BACK_REF(aValue);
 
-    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
-      theObject->data());
-    TDF_Label anObjLab = aData->label().Father(); // object label
-
-    if (owner()->document() == theObject->document()) { // same document, use reference attribute
+    TDF_Label anObjLab;
+    if (theObject.get() && theObject->data().get() && theObject->data()->isValid()) {
+      std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
+        theObject->data());
+      anObjLab = aData->label().Father(); // object label
+    }
+    // same document, use reference attribute
+    if (anObjLab.IsNull() || owner()->document() == theObject->document()) {
 
       std::shared_ptr<Model_Document> aDoc =
         std::dynamic_pointer_cast<Model_Document>(owner()->document());
-      myRef->Set(anObjLab);  // references to the object label
+      if (anObjLab.IsNull()) {
+        myRef->Set(myRef->Label());
+      } else {
+        myRef->Set(anObjLab);  // references to the object label
+      }
        // remove external link attributes (if any)
       myRef->Label().ForgetAttribute(TDataStd_Comment::GetID());
       myRef->Label().ForgetAttribute(TDataStd_AsciiString::GetID());
@@ -55,7 +63,7 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
 
 ObjectPtr Model_AttributeReference::value()
 {
-  if (myIsInitialized) {
+  if (isInitialized()) {
     Handle(TDataStd_Comment) aDocID;
     if (myRef->Label().FindAttribute(TDataStd_Comment::GetID(), aDocID)) { // external ref
       DocumentPtr aRefDoc =
@@ -84,6 +92,14 @@ ObjectPtr Model_AttributeReference::value()
   }
   // not initialized
   return FeaturePtr();
+}
+
+bool Model_AttributeReference::isInitialized()
+{
+  if (myRef->Label() == myRef->Get()) { // empty reference is not initialized
+    return false;
+  }
+  return ModelAPI_AttributeReference::isInitialized();
 }
 
 Model_AttributeReference::Model_AttributeReference(TDF_Label& theLabel)

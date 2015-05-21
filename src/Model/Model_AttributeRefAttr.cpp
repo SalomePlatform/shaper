@@ -46,7 +46,7 @@ void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
 {
   // the back reference from the previous object to the attribute should be removed
   ObjectPtr anObject = object();
-  if (theObject && (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject)) {
+  if (theObject.get() && (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject)) {
     REMOVE_BACK_REF(anObject);
 
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
@@ -82,6 +82,14 @@ ObjectPtr Model_AttributeRefAttr::object()
   }
   // not initialized
   return ObjectPtr();
+}
+
+bool Model_AttributeRefAttr::isInitialized()
+{
+  if (myRef->Get() == myRef->Label()) { // empty is not initialized: sketch parallelity
+    return false;
+  }
+  return ModelAPI_AttributeRefAttr::isInitialized();
 }
 
 Model_AttributeRefAttr::Model_AttributeRefAttr(TDF_Label& theLabel)
