@@ -95,6 +95,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 {
   activateShapeSelection(false);
+  activateFilters(myWorkshop, false);
 }
 
 //********************************************************************
@@ -106,8 +107,7 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
           Qt::UniqueConnection);
 
   activateShapeSelection(true);
-
-  QObjectPtrList anObjects;
+  QList<ModuleBase_ViewerPrs> aSelected;
   // Restore selection in the viewer by the attribute selection list
   if(myFeature) {
     DataPtr aData = myFeature->data();
@@ -117,12 +117,20 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
       for (int i = 0; i < aListAttr->size(); i++) {
         AttributeSelectionPtr anAttr = aListAttr->value(i);
         ResultPtr anObject = anAttr->context();
-        if (anObject.get())
-          anObjects.append(anObject);
+        if (anObject.get()) {
+          TopoDS_Shape aShape;
+          std::shared_ptr<GeomAPI_Shape> aShapePtr = anAttr->value();
+          if (aShapePtr.get()) {
+            aShape = aShapePtr->impl<TopoDS_Shape>();
+          }
+          aSelected.append(ModuleBase_ViewerPrs(anObject, aShape, NULL));
+        }
       }
     }
   }
-  myWorkshop->setSelected(anObjects);
+  myWorkshop->setSelected(aSelected);
+
+  activateFilters(myWorkshop, true);
 }
 
 //********************************************************************
@@ -130,6 +138,7 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 {
   disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateShapeSelection(false);
+  activateFilters(myWorkshop, false);
 }
 
 //********************************************************************
@@ -316,7 +325,8 @@ bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEve
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateShapeSelection(true);
-  QObjectPtrList anEmptyList;
+  activateFilters(myWorkshop, true);
+  QList<ModuleBase_ViewerPrs> anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
   // To clear mySelection, myListControl and storeValue()
   // So, we don't need to call it
@@ -356,10 +366,13 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
       activateShapeSelection(false);
+      activateFilters(myWorkshop, false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
+
       activateShapeSelection(true);
+      activateFilters(myWorkshop, true);
       break;
     }
   }
@@ -377,8 +390,6 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection(const bool isActivat
   } else {
     myWorkshop->deactivateSubShapesSelection();
   }
-
-  activateFilters(myWorkshop, isActivated);
 }
 
 //********************************************************************

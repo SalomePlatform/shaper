@@ -85,6 +85,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
    */
   void setSelected(const QObjectPtrList& theFeatures, bool isUpdateViewer = true);
 
+  void setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool isUpdateViewer = true);
+
 
   /// Unselect all objects
   void clearSelected();

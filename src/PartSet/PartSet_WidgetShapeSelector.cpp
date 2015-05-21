@@ -102,7 +102,7 @@ void PartSet_WidgetShapeSelector::setPointAttribute(ObjectPtr theSelectedObject,
     // test case is - preselection for distance operation, which contains two points selected on lines
     if (aPntAttr)
       aRefAttr->setAttr(aPntAttr);
-    else if (theSelectedObject)
+    else
       aRefAttr->setObject(theSelectedObject);
   }
 }

@@ -63,7 +63,7 @@ Q_OBJECT
 
   //! Select features clearing previous selection. 
   //! If the list is empty then selection will be cleared
-  virtual void setSelected(const QObjectPtrList& theFeatures);
+  virtual void setSelected(const QList<ModuleBase_ViewerPrs>& theValues);
 
   //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }

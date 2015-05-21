@@ -454,6 +454,57 @@ void XGUI_Displayer::setSelected(const QObjectPtrList& theResults, const bool is
     updateViewer();
 }
 
+void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  if (aContext->HasOpenedContext()) {
+    aContext->UnhilightSelected();
+    aContext->ClearSelected();
+    //if (aSelected.size() > 0) {
+    foreach (ModuleBase_ViewerPrs aPrs, theValues) {
+    //    if (isValidSelection(aPrs)) {
+    //foreach(ObjectPtr aResult, theResults) {
+      ObjectPtr anObject = aPrs.object();
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      if (aResult.get() && isVisible(aResult)) {
+        AISObjectPtr anObj = myResult2AISObjectMap[aResult];
+        Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+        if (!anAIS.IsNull()) {
+          const TopoDS_Shape& aShape = aPrs.shape();
+          if (!aShape.IsNull()) {
+            aContext->AddOrRemoveSelected(aShape, false);
+          }
+          else {
+            // The methods are replaced in order to provide multi-selection, e.g. restore selection
+            // by activating multi selector widget. It also gives an advantage that the multi
+            // selection in OB gives multi-selection in the viewer
+            //aContext->SetSelected(anAIS, false);
+            // The selection in the context was cleared, so the method sets the objects are selected
+            aContext->AddOrRemoveSelected(anAIS, false);
+          }
+        }
+      }
+    }
+  } else {
+    aContext->UnhilightCurrents();
+    aContext->ClearCurrents();
+    //foreach(ObjectPtr aResult, theResults) {
+    foreach (ModuleBase_ViewerPrs aPrs, theValues) {
+      ObjectPtr anObject = aPrs.object();
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      if (aResult.get() && isVisible(aResult)) {
+        AISObjectPtr anObj = myResult2AISObjectMap[aResult];
+        Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+        if (!anAIS.IsNull())
+          aContext->SetCurrentObject(anAIS, false);
+      }
+    }
+  }
+  if (isUpdateViewer)
+    updateViewer();
+}
 
 void XGUI_Displayer::clearSelected()
 {

@@ -10,6 +10,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_Definitions.h"
 #include <ModuleBase_FilterValidated.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Object.h>
 #include <GeomAPI_AISObject.h>
@@ -78,7 +79,7 @@ Q_OBJECT
 
   //! Select features clearing previous selection. 
   //! If the list is empty then selection will be cleared
-  virtual void setSelected(const QObjectPtrList& theFeatures) = 0;
+  virtual void setSelected(const QList<ModuleBase_ViewerPrs>& theValues) = 0;
 
 signals:
   /// Signal selection chaged.

@@ -150,9 +150,6 @@ Q_OBJECT
   /// List of accepting shapes types
   QStringList myShapeTypes;
 
-  /// Active/inactive flag
-  bool myIsActive;
-
   /// backup parameters of the model attribute. The class processes three types of attribute:
   /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter
   /// values are reserved in the backup
