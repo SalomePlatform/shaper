@@ -109,7 +109,7 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
   activateShapeSelection(true);
 
   // Restore selection in the viewer by the attribute selection list
-  myWorkshop->setSelected(getCurrentSelection());
+  myWorkshop->setSelected(getAttributeSelection());
 
   activateFilters(myWorkshop, true);
 }
@@ -224,6 +224,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerP
   }
   if (isDone) {
     updateObject(myFeature);
+    // this emit is necessary to call store/restore method an restore type of selection
     emit valuesChanged();
   }
   return isDone;
@@ -373,7 +374,7 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection(const bool isActivat
   }
 }
 
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetMultiSelector::getCurrentSelection() const
+QList<ModuleBase_ViewerPrs> ModuleBase_WidgetMultiSelector::getAttributeSelection() const
 {
   QList<ModuleBase_ViewerPrs> aSelected;
   // Restore selection in the viewer by the attribute selection list

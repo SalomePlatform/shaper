@@ -125,7 +125,7 @@ protected slots:
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-  QList<ModuleBase_ViewerPrs> getCurrentSelection() const;
+  QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
  protected:
    /// Update selection list

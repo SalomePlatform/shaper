@@ -147,7 +147,7 @@ bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
 }
 
 //********************************************************************
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getCurrentSelection() const
+QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelection() const
 {
   QList<ModuleBase_ViewerPrs> aSelected;
   if(myFeature) {
@@ -330,7 +330,7 @@ void ModuleBase_WidgetShapeSelector::activateCustom()
   activateSelection(true);
 
   // Restore selection in the viewer by the attribute selection list
-  myWorkshop->setSelected(getCurrentSelection());
+  myWorkshop->setSelected(getAttributeSelection());
 
   activateFilters(myWorkshop, true);
 }
