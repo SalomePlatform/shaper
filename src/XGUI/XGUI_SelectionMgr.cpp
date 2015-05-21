@@ -87,8 +87,10 @@ void XGUI_SelectionMgr::updateSelectedOwners(bool isUpdateViewer)
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
   QObjectPtrList aObjects = myWorkshop->objectBrowser()->selectedObjects();
+  QList<ModuleBase_ViewerPrs> aSelectedPrs = ModuleBase_ISelection::getViewerPrs(aObjects);
+
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->setSelected(aObjects);
+  aDisplayer->setSelected(aSelectedPrs);
   emit selectionChanged();
 }
 
@@ -117,9 +119,10 @@ void XGUI_SelectionMgr::clearSelection()
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
   myWorkshop->objectBrowser()->blockSignals(aBlocked);
+  QList<ModuleBase_ViewerPrs> aSelectedPrs = ModuleBase_ISelection::getViewerPrs(aFeatures);
 
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->setSelected(aFeatures);
+  aDisplayer->setSelected(aSelectedPrs);
 
   emit selectionChanged();
 }

@@ -79,12 +79,12 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
 
   /**
-   * Add presentations which corresponds to the given features to current selection
-   * \param theFeatures a list of features to be selected
+   * Add presentations to current selection. It unhighlight and deselect the current selection.
+   * The shape and result components are processed in the values. If the presentation shape is not
+   * empty, select it, otherwise select the result.
+   * \param theValues a list of presentation to be selected
    * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
-  void setSelected(const QObjectPtrList& theFeatures, bool isUpdateViewer = true);
-
   void setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool isUpdateViewer = true);
 
 
