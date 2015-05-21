@@ -32,6 +32,10 @@ class Model_AttributeReference : public ModelAPI_AttributeReference
 
   MODEL_EXPORT virtual void setObject(const std::shared_ptr<ModelAPI_Object>& theObject);
 
+  /// Returns true if attribute was  initialized by some value
+  MODEL_EXPORT virtual bool isInitialized();
+
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeReference(TDF_Label& theLabel);
