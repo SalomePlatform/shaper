@@ -12,6 +12,8 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Curve.h>
 
+#include <Events_Error.h>
+
 #include <Graphic3d_ArrayOfSegments.hxx>
 #include <Graphic3d_BndBox4f.hxx>
 
@@ -247,13 +249,21 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   if (myIconsMap.count(iconName()) == 1) {
     return myIconsMap[iconName()];
   }
-  TCollection_AsciiString aFile(getenv("NewGeomResources"));
-  aFile += FSEP;
-  aFile += iconName();
-  Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
-  if (aPixMap->Load(aFile)) {
-    myIconsMap[iconName()] = aPixMap;
-    return aPixMap;
+  char* aEnv = getenv("NewGeomResources");
+  if (aEnv != NULL) {
+    TCollection_AsciiString aFile(aEnv);
+    aFile += FSEP;
+    aFile += iconName();
+    Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
+    if (aPixMap->Load(aFile)) {
+      myIconsMap[iconName()] = aPixMap;
+      return aPixMap;
+    }
+  } else {
+    static const char aMsg[] = "Error! NewGeomResources environment variable is not defined: constraint images are not found";
+    cout<<aMsg<<endl;
+    Events_Error::send(aMsg);
+    myIconsMap[iconName()] = Handle(Image_AlienPixMap)();
   }
   return Handle(Image_AlienPixMap)();
 }
@@ -269,7 +279,11 @@ void SketcherPrs_SymbolPrs::ClearSelected()
 void SketcherPrs_SymbolPrs::prepareAspect()
 {
   if (myAspect.IsNull()) {
-    myAspect = new Graphic3d_AspectMarker3d(icon());
+    Handle(Image_AlienPixMap) aIcon = icon();
+    if (aIcon.IsNull()) 
+      myAspect = new Graphic3d_AspectMarker3d();
+    else
+      myAspect = new Graphic3d_AspectMarker3d(aIcon);
   }
 }
 
