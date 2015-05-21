@@ -486,6 +486,7 @@ void Model_Objects::synchronizeFeatures(
       aNewFeatures.insert(aFeature);
       initData(aFeature, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
       updateHistory(aFeature);
+      aFeature->setDisabled(false); // by default created feature is enabled (this allows to recreate the results before "setCurrent" is called)
 
       // event: model is updated
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, aCreateEvent);
@@ -600,6 +601,15 @@ void Model_Objects::synchronizeBackRefs()
             std::shared_ptr<Model_Data> aRefData = 
               std::dynamic_pointer_cast<Model_Data>((*aRefTo)->data());
             aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
+            // update enable/disable status: the nested status must be equal to the composite
+            CompositeFeaturePtr aComp = 
+              std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+            if (aComp.get()) {
+              FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(*aRefTo);
+              if (aReferenced.get()) {
+                aReferenced->setDisabled(aComp->isDisabled());
+              }
+            }
           }
         }
       }
@@ -777,7 +787,9 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
         if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
-          aNewBody = createPart(theFeature->data(), aResIndex);
+          //aNewBody = createPart(theFeature->data(), aResIndex); 
+          theFeature->execute(); // create the part result
+          break;
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
           theFeature->execute(); // construction shapes are needed for sketch solver
           break;

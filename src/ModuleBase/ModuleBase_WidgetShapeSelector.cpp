@@ -263,7 +263,7 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
   bool isNameUpdated = false;
   AttributeSelectionPtr aSelect = aData->selection(attributeID());
   if (aSelect) {
-    myTextLine->setText(QString::fromStdString(aSelect->namingName()));
+    myTextLine->setText(QString::fromStdString(aSelect->namingName(getDefaultValue())));
     isNameUpdated = true;
   }
   if (!isNameUpdated) {
@@ -283,7 +283,7 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
         }
       }
       else {
-        myTextLine->setText("");
+        myTextLine->setText(getDefaultValue().c_str());
       }
     }
   }

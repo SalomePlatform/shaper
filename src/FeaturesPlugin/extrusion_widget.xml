@@ -13,7 +13,8 @@
                     icon=":icons/plane.png"
                     label="Plane face"
                     tooltip="Select a planar face"
-                    shape_types="face">
+                    shape_types="face"
+                    default="&lt;sketch&gt;">
       <validator id="GeomValidators_Face" parameters="plane"/>
     </shape_selector>
     <doublevalue
@@ -32,7 +33,8 @@
                     icon=":icons/plane_inverted.png"
                     label="Plane face"
                     tooltip="Select a planar face"
-                    shape_types="face">
+                    shape_types="face"
+                    default="&lt;sketch&gt;">
       <validator id="GeomValidators_Face" parameters="plane"/>
     </shape_selector>
     <doublevalue

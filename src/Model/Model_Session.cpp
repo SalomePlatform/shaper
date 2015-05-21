@@ -250,6 +250,11 @@ std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments
   return aResult;
 }
 
+bool Model_Session::isLoadByDemand(const std::string theDocID)
+{
+  return Model_Application::getApplication()->isLoadByDemand(theDocID);
+}
+
 std::shared_ptr<ModelAPI_Document> Model_Session::copy(
     std::shared_ptr<ModelAPI_Document> theSource, std::string theID)
 {

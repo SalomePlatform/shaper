@@ -93,6 +93,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns all the opened documents of the session (without postponed)
   virtual std::list<std::shared_ptr<ModelAPI_Document> > allOpenedDocuments() = 0;
 
+  /// Returns true if document is not loaded yet
+  virtual bool isLoadByDemand(const std::string theDocID) = 0;
+
   /// Copies the document to the new one with the given id
   virtual std::shared_ptr<ModelAPI_Document> copy(std::shared_ptr<ModelAPI_Document> theSource,
                                                     std::string theID) = 0;
