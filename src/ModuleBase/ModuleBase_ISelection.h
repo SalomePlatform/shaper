@@ -70,6 +70,11 @@ class ModuleBase_ISelection
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
     std::list<ObjectPtr>& theOwners) const = 0;
 
+  //! Wraps the object list into the viewer prs list
+  //! \param theObjects a list of objects
+  //! \return a list of prs, where only object is not empty
+  static MODULEBASE_EXPORT QList<ModuleBase_ViewerPrs> getViewerPrs(
+                                                       const QObjectPtrList& theObjects);
 };
 
 #endif

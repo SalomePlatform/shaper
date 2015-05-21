@@ -136,13 +136,7 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getSelectedEntitiesOrObj
   if (aSelectedPrs.empty()) {
     // the selection in Object Browser
     QObjectPtrList anObjects = theSelection->selectedObjects();
-    QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
-    for (; anIt != aLast; anIt++) {
-      ObjectPtr anObject = *anIt;
-      if (anObject.get() != NULL) {
-        aSelectedPrs.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
-      }
-    }
+    aSelectedPrs = ModuleBase_ISelection::getViewerPrs(anObjects);
   }
   return aSelectedPrs;
 }
