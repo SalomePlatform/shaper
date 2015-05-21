@@ -570,8 +570,10 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   if (theFeature == currentFeature(false)) {
     int aCurrentIndex = index(theFeature);
     if (aCurrentIndex != -1) {
-      setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(
-        object(ModelAPI_Feature::group(), aCurrentIndex - 1)), false);
+      ObjectPtr aPrevObj;
+      if (aCurrentIndex != 0)
+        aPrevObj = object(ModelAPI_Feature::group(), aCurrentIndex - 1);
+      setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aPrevObj), false);
     }
   }
   myObjs->removeFeature(theFeature);
@@ -655,6 +657,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   const bool theVisible)
 {
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
+  CompositeFeaturePtr aMain; // main feature that may nest the new current
   if (theCurrent.get()) {
     /*
     if (theVisible) { // make features below which are not in history also enabled: sketch subs
@@ -674,7 +677,8 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
       CompositeFeaturePtr aComposite = 
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*aRefToMe)->owner());
       if (aComposite.get() && aComposite->isSub(theCurrent)) {
-        theCurrent = aComposite;
+        aMain = aComposite;
+        break;
       }
     }
 
@@ -695,10 +699,6 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
-  // if the current feature is composite features, all sub-features also must be enabled
-  CompositeFeaturePtr aCurComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theCurrent);
-
-
   bool aPassed = false; // flag that the current object is already passed in cycle
   FeaturePtr anIter = myObjs->lastFeature();
   for(; anIter.get(); anIter = myObjs->nextFeature(anIter, true)) {
@@ -706,7 +706,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     if (anIter == theCurrent) aPassed = true;
 
     bool aDisabledFlag = !aPassed;
-    if (aCurComp.get() && aCurComp->isSub(anIter))
+    if (aMain.get() && aMain->isSub(anIter))
       aDisabledFlag = false;
     if (anIter->setDisabled(aDisabledFlag)) {
       // state of feature is changed => so feature become updated

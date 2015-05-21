@@ -600,6 +600,15 @@ void Model_Objects::synchronizeBackRefs()
             std::shared_ptr<Model_Data> aRefData = 
               std::dynamic_pointer_cast<Model_Data>((*aRefTo)->data());
             aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
+            // update enable/disable status: the nested status must be equal to the composite
+            CompositeFeaturePtr aComp = 
+              std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+            if (aComp.get()) {
+              FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(*aRefTo);
+              if (aReferenced.get()) {
+                aReferenced->setDisabled(aComp->isDisabled());
+              }
+            }
           }
         }
       }
