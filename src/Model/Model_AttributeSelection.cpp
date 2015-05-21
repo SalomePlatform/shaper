@@ -649,10 +649,11 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
   if(aNumber > 1) return false;
   return true;
 }
-std::string Model_AttributeSelection::namingName()
+std::string Model_AttributeSelection::namingName(const std::string& theDefaultName)
 {
   std::string aName("");
-  if(!this->isInitialized()) return aName;
+  if(!this->isInitialized())
+    return !theDefaultName.empty() ? theDefaultName : aName;
   Handle(TDataStd_Name) anAtt;
   if(selectionLabel().FindAttribute(TDataStd_Name::GetID(), anAtt)) {
     aName = TCollection_AsciiString(anAtt->Get()).ToCString();
@@ -663,7 +664,7 @@ std::string Model_AttributeSelection::namingName()
   ResultPtr aCont = context();
   aName = "Undefined name";
   if(!aCont.get() || aCont->shape()->isNull()) 
-    return aName;
+    return !theDefaultName.empty() ? theDefaultName : aName;
   if (!aSubSh.get() || aSubSh->isNull()) { // no subshape, so just the whole feature name
     return aCont->data()->name();
   }

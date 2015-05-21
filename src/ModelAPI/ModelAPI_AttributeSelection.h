@@ -42,7 +42,8 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual std::string attributeType();
 
   /// Returns a textual string of the selection
-  virtual std::string namingName() = 0;
+  /// \param theDefaultValue a value, which is used if the naming name can not be obtained
+  virtual std::string namingName(const std::string& theDefaultValue = "") = 0;
   
   /// Returns an id of the selection
   virtual int Id() = 0;

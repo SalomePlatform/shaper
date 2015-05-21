@@ -40,7 +40,8 @@ public:
   MODEL_EXPORT virtual bool update();
 
   /// Returns a textual string of the selection
-  MODEL_EXPORT virtual std::string namingName();
+  /// \param theDefaultValue a name, which is returned if the naming name can not be obtained
+  MODEL_EXPORT virtual std::string namingName(const std::string& theDefaultValue = "");
   
   /// Returns an Id of the selection
   /// NOTE: This method has been added for temporary export of groups towards old GEOM
