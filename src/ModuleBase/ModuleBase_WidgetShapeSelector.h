@@ -122,10 +122,6 @@ Q_OBJECT
   /// \param theShape a shape
   virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
 
-  // Get the shape from the attribute it the attribute contain a shape, e.g. selection attribute
-  /// \return a shape
-  GeomShapePtr getShape() const;
-
   /// Clear attribute
   void clearAttribute();
 
@@ -135,6 +131,10 @@ Q_OBJECT
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
   virtual bool setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+
+  /// Get the shape from the attribute if the attribute contains a shape, e.g. selection attribute
+  /// \return a shape
+  virtual GeomShapePtr getShape() const;
 
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
