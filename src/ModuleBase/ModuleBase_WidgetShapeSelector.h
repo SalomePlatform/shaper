@@ -136,6 +136,11 @@ Q_OBJECT
   /// \return true if it is succeed
   virtual bool setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
+  /// Return the attribute values wrapped in a list of viewer presentations
+  /// \return a list of viewer presentations, which contains an attribute result and
+  /// a shape. If the attribute do not uses the shape, it is empty
+  QList<ModuleBase_ViewerPrs> getCurrentSelection() const;
+
   //----------- Class members -------------
   protected:
   /// Label of the widget

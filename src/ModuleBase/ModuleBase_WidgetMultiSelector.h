@@ -122,6 +122,11 @@ protected slots:
   /// \param isActivated a state whether the shape is activated or deactivated in selection
   void activateShapeSelection(const bool isActivated);
 
+  /// Return the attribute values wrapped in a list of viewer presentations
+  /// \return a list of viewer presentations, which contains an attribute result and
+  /// a shape. If the attribute do not uses the shape, it is empty
+  QList<ModuleBase_ViewerPrs> getCurrentSelection() const;
+
  protected:
    /// Update selection list
    void updateSelectionList(AttributeSelectionListPtr);

@@ -147,6 +147,26 @@ bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
 }
 
 //********************************************************************
+QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getCurrentSelection() const
+{
+  QList<ModuleBase_ViewerPrs> aSelected;
+  if(myFeature) {
+    DataPtr aData = myFeature->data();
+    AttributePtr anAttribute = myFeature->attribute(attributeID());
+
+    ObjectPtr anObject = GeomValidators_Tools::getObject(anAttribute);
+    TopoDS_Shape aShape;
+    std::shared_ptr<GeomAPI_Shape> aShapePtr = getShape();
+    if (aShapePtr.get()) {
+      aShape = aShapePtr->impl<TopoDS_Shape>();
+    }
+    ModuleBase_ViewerPrs aPrs(anObject, aShape, NULL);
+    aSelected.append(aPrs);
+  }
+  return aSelected;
+}
+
+//********************************************************************
 void ModuleBase_WidgetShapeSelector::clearAttribute()
 {
   DataPtr aData = myFeature->data();
@@ -308,22 +328,9 @@ void ModuleBase_WidgetShapeSelector::activateCustom()
 {
   connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateSelection(true);
-  // Restore selection in the viewer by the attribute selection list
-  QList<ModuleBase_ViewerPrs> aSelected;
-  if(myFeature) {
-    DataPtr aData = myFeature->data();
-    AttributePtr anAttribute = myFeature->attribute(attributeID());
 
-    ObjectPtr anObject = GeomValidators_Tools::getObject(anAttribute);
-    TopoDS_Shape aShape;
-    std::shared_ptr<GeomAPI_Shape> aShapePtr = getShape();
-    if (aShapePtr.get()) {
-      aShape = aShapePtr->impl<TopoDS_Shape>();
-    }
-    ModuleBase_ViewerPrs aPrs(anObject, aShape, NULL);
-    aSelected.append(aPrs);
-  }
-  myWorkshop->setSelected(aSelected);
+  // Restore selection in the viewer by the attribute selection list
+  myWorkshop->setSelected(getCurrentSelection());
 
   activateFilters(myWorkshop, true);
 }
