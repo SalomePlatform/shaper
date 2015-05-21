@@ -669,15 +669,18 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
         }
       }
     }*/
-    // if feature nests into compisite feature, make the composite feature as current
-    const std::set<AttributePtr>& aRefsToMe = theCurrent->data()->refsToMe();
-    std::set<AttributePtr>::const_iterator aRefToMe = aRefsToMe.begin();
-    for(; aRefToMe != aRefsToMe.end(); aRefToMe++) {
-      CompositeFeaturePtr aComposite = 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*aRefToMe)->owner());
-      if (aComposite.get() && aComposite->isSub(theCurrent)) {
-        aMain = aComposite;
-        break;
+    aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theCurrent);
+    if (!aMain.get()) {
+      // if feature nests into compisite feature, make the composite feature as current
+      const std::set<AttributePtr>& aRefsToMe = theCurrent->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aRefToMe = aRefsToMe.begin();
+      for(; aRefToMe != aRefsToMe.end(); aRefToMe++) {
+        CompositeFeaturePtr aComposite = 
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*aRefToMe)->owner());
+        if (aComposite.get() && aComposite->isSub(theCurrent)) {
+          aMain = aComposite;
+          break;
+        }
       }
     }
 
