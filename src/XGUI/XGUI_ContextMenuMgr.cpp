@@ -152,7 +152,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
         if (!hasFeature) {
-          if (aDisplayer->isVisible(aObject)) {
+          if (aObject->isDisplayed()) {
             if (aDisplayer->canBeShaded(aObject)) {
               if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
                 aMenu->addAction(action("WIREFRAME_CMD"));
@@ -228,7 +228,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
       foreach(ObjectPtr aObject, aObjects)
       {
         ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-        if (aRes && myWorkshop->displayer()->isVisible(aRes)) {
+        if (aRes && aRes->isDisplayed()) {
           isVisible = true;
           canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
           isShading = (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);      

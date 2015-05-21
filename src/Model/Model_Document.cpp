@@ -324,7 +324,6 @@ bool Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   // this must be here just after everything is finished but before real transaction stop
   // to avoid messages about modifications outside of the transaction

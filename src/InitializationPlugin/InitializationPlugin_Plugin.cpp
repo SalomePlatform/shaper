@@ -55,17 +55,16 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
 
     // hides the created features, the precondition is that the feature's results have been
     // already built, so the createPlane/Points method calls the execute function for the planes
-    static Events_ID HIDE_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE);
     std::list<FeaturePtr >::const_iterator aFIter = aFeatures.begin();
     for (; aFIter != aFeatures.cend(); aFIter++) {
       FeaturePtr aPlane = *aFIter;
       const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aPlane->results();
       std::list<ResultPtr >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
-        ModelAPI_EventCreator::get()->sendUpdated(*aRIter, HIDE_DISP);
+        (*aRIter)->setDisplayed(false);
       }
     }
-    Events_Loop::loop()->flush(HIDE_DISP);
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
     // the viewer update should be unblocked in order to avoid the features blinking before they are
     // hidden

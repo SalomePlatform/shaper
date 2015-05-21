@@ -165,8 +165,6 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOSHOW));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
 
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
@@ -348,24 +346,6 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     } else {
       QApplication::restoreOverrideCursor();
     }
-  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW)) {
-    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
-    QObjectPtrList aList;
-    std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
-      aList.append(*aIt);
-    showObjects(aList, true);
-  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE)) {
-    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
-    QObjectPtrList aList;
-    std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
-      aList.append(*aIt);
-    showObjects(aList, false);
   }
   //An operation passed by message. Start it, process and commit.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
@@ -1253,8 +1233,12 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(aObjects, XGUI_Displayer::Shading);
   else if (theId == "WIREFRAME_CMD")
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
-  else if (theId == "HIDEALL_CMD")
-    myDisplayer->eraseAll();
+  else if (theId == "HIDEALL_CMD") {
+    QObjectPtrList aList = myDisplayer->displayedObjects();
+    foreach (ObjectPtr aObj, aList)
+      aObj->setDisplayed(false);
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
 }
 
 //**************************************************************
@@ -1524,7 +1508,13 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 //**************************************************************
 void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 {
-  myDisplayer->showOnly(theList);
+  QObjectPtrList aList = myDisplayer->displayedObjects();
+  foreach (ObjectPtr aObj, aList)
+    aObj->setDisplayed(false);
+  foreach (ObjectPtr aObj, theList)
+    aObj->setDisplayed(true);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
 }
 
 

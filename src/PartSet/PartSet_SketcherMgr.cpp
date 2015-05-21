@@ -677,15 +677,14 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   // Display all sketcher sub-Objects
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theOperation->feature());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   // Hide sketcher result
   std::list<ResultPtr> aResults = myCurrentSketch->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    aDisplayer->erase((*aIt), false);
+    (*aIt)->setDisplayed(false);
   }
-  aDisplayer->erase(myCurrentSketch, false);
+  myCurrentSketch->setDisplayed(false);
 
   // Display sketcher objects
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
@@ -693,9 +692,9 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     std::list<ResultPtr> aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      aDisplayer->display((*aIt), false);
+      (*aIt)->setDisplayed(true);
     }
-    aDisplayer->display(aFeature, false);
+    aFeature->setDisplayed(true);
   }
 
   if (myPlaneFilter.IsNull()) 
@@ -707,7 +706,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     std::shared_ptr<GeomAPI_Pln> aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
     myPlaneFilter->setPlane(aPln->impl<gp_Pln>());
   }
-  aDisplayer->updateViewer();
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   // all sketch objects should be activated in the sketch selection modes by edit operation start
   if (theOperation->isEditOperation())
     activateObjectsInSketchMode(true);
@@ -722,10 +721,10 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   activateObjectsInSketchMode(false);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   DataPtr aData = myCurrentSketch->data();
   if ((!aData) || (!aData->isValid())) {
+    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
@@ -736,7 +735,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     foreach (ObjectPtr aObj, aObjects) {
       DataPtr aObjData = aObj->data();
       if ((!aObjData) || (!aObjData->isValid()))
-        aDisplayer->erase(aObj);
+        aObj->setDisplayed(false);
     }
     return; 
   }
@@ -746,21 +745,21 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     std::list<ResultPtr> aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      aDisplayer->erase((*aIt), false);
+      (*aIt)->setDisplayed(false);
     }
-    aDisplayer->erase(aFeature, false);
+    aFeature->setDisplayed(false);
   }
   // Display sketcher result
   std::list<ResultPtr> aResults = myCurrentSketch->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    aDisplayer->display((*aIt), false);
+    (*aIt)->setDisplayed(true);
   }
-  aDisplayer->display(myCurrentSketch);
+  myCurrentSketch->setDisplayed(true);
     
   myCurrentSketch = CompositeFeaturePtr();
   myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
-  aDisplayer->updateViewer();
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
@@ -810,8 +809,9 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch 
     // nested features can be visualized
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL && aFeature == activeSketch())
+    if (aFeature.get() != NULL && aFeature == activeSketch()) {
       aCanDisplay = false;
+    }
   }
   else { // there are no an active sketch
     // 2. sketch sub-features should not be visualized if the sketch operation is not active
@@ -819,8 +819,9 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     if (aFeature.get() != NULL) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      if (aSketchFeature.get())
+      if (aSketchFeature.get()) {
         aCanDisplay = false;
+      }
     }
   }
 
@@ -842,8 +843,10 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       }
     }
   }
-  if (!isObjectFound)
+  if (!isObjectFound) {
+    theObject->setDisplayed(aCanDisplay); // If it be set into True - set to False
     return aCanDisplay;
+  }
 
   // 4. For created nested feature operation do not display the created feature if
   // the mouse curstor leaves the OCC window.
@@ -866,6 +869,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     }
   }
   #endif
+  theObject->setDisplayed(aCanDisplay); // If it be set into True - set to False
   return aCanDisplay;
 }
 
@@ -1061,28 +1065,27 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   // 1. change visibility of the object itself, here the presentable object is processed,
   // e.g. constraints features
   FeaturePtr aFeature = theOperation->feature();
   std::list<ResultPtr> aResults = aFeature->results();
   if (isToDisplay)
-    aDisplayer->display(aFeature, false);
+    aFeature->setDisplayed(true);
   else
-    aDisplayer->erase(aFeature, false);
+    aFeature->setDisplayed(false);
 
   // change visibility of the object results, e.g. non-constraint features
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
     if (isToDisplay) {
-      aDisplayer->display(*aIt, false);
+      (*aIt)->setDisplayed(true);
     }
     else {
-      aDisplayer->erase(*aIt, false);
+      (*aIt)->setDisplayed(false);
     }
   }
-  aDisplayer->updateViewer();
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 void PartSet_SketcherMgr::activateObjectsInSketchMode(const bool isActive)
@@ -1152,17 +1155,16 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(bool theOn)
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   const QStringList& aConstrIds = constraintsIdList();
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
     if (aConstrIds.contains(QString(aSubFeature->getKind().c_str()))) {
       if (myIsConstraintsShown) 
-        aDisplayer->display(aSubFeature, false);
+        aSubFeature->setDisplayed(true);
       else
-        aDisplayer->erase(aSubFeature, false);
+        aSubFeature->setDisplayed(false);
     }
   }
-  aDisplayer->updateViewer();
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }

@@ -144,8 +144,7 @@ void Model_Update::processOperation(const bool theTotalUpdate)
         for(int a = aBase->size() - 1; a >= 0; a--) {
           ResultPtr aSketchRes = aBase->value(a)->context();
           if (aSketchRes) {
-            static Events_ID HIDE_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE);
-            ModelAPI_EventCreator::get()->sendUpdated(aSketchRes, HIDE_DISP);
+            aSketchRes->setDisplayed(false);
           }
         }
       }
