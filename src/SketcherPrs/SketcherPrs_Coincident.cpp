@@ -57,14 +57,26 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   static Handle(Graphic3d_AspectMarker3d) aPtA;
   if (aPtA.IsNull()) {
     aPtA = new Graphic3d_AspectMarker3d ();
-    aPtA->SetType(Aspect_TOM_RING1);
-    aPtA->SetScale(2.);
-    aPtA->SetColor(myOwnColor);
   }
+  aPtA->SetType(Aspect_TOM_RING3);
+  aPtA->SetScale(2.);
+  aPtA->SetColor(Quantity_NOC_YELLOW);
+
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
   Handle(Graphic3d_ArrayOfPoints) aPntArray = new Graphic3d_ArrayOfPoints(1);
   aPntArray->AddVertex (aPoint->x(), aPoint->y(), aPoint->z());
+  aGroup->AddPrimitiveArray (aPntArray);
+
+  aPtA->SetType(Aspect_TOM_RING1);
+  aPtA->SetScale(1.);
+  aPtA->SetColor(Quantity_NOC_BLACK);
+  aGroup->SetPrimitivesAspect(aPtA);
+  aGroup->AddPrimitiveArray (aPntArray);
+
+  aPtA->SetType(Aspect_TOM_POINT);
+  aPtA->SetScale(5.);
+  aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 }
 
