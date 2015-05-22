@@ -42,18 +42,6 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
   return aRes;
 }
 
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::plane(std::shared_ptr<GeomAPI_Pnt> theCenter,
-                                                              std::shared_ptr<GeomAPI_Dir> theNormal)
-{
-  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
-  const gp_Dir& aDir = theNormal->impl<gp_Dir>();
-  gp_Pln aPlane(aCenter, aDir);
-  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane);
-  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
-  return aRes;
-}
-
 std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
     std::shared_ptr<GeomAPI_Shape> theFace)
 {
@@ -80,6 +68,23 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   aPln.Coefficients(aA, aB, aC, aD);
   aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
+}
+
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Ax1> theAxis)
+{
+  return planarFace(theAxis->origin(), theAxis->dir());
+}
+
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                                   std::shared_ptr<GeomAPI_Dir> theNormal)
+{
+  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
+  const gp_Dir& aDir = theNormal->impl<gp_Dir>();
+  gp_Pln aPlane(aCenter, aDir);
+  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane);
+  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
+  return aRes;
 }
 
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Pln> thePlane,

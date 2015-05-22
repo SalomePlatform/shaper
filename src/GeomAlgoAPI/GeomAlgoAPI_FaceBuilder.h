@@ -8,6 +8,7 @@
 #define GeomAlgoAPI_FaceBuilder_H_
 
 #include <GeomAlgoAPI.h>
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
@@ -32,12 +33,15 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_FaceBuilder
   static std::shared_ptr<GeomAPI_Shape> square(std::shared_ptr<GeomAPI_Pln> thePlane,
                                                const double theSize);
 
-  /// Creates the plane by given point of the center and normal to the plane.
-  static std::shared_ptr<GeomAPI_Shape> plane(std::shared_ptr<GeomAPI_Pnt> theCenter,
-                                            std::shared_ptr<GeomAPI_Dir> theNormal);
-
   /// Returns the plane of the planar face. If it is not planar, returns empty ptr.
   static std::shared_ptr<GeomAPI_Pln> plane(std::shared_ptr<GeomAPI_Shape> theFace);
+
+  /// Creates the planar face by given axis.
+  static std::shared_ptr<GeomAPI_Shape> planarFace(std::shared_ptr<GeomAPI_Ax1> theAxis);
+
+  /// Creates the planar face by given point of the center and normal to the plane.
+  static std::shared_ptr<GeomAPI_Shape> planarFace(std::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                   std::shared_ptr<GeomAPI_Dir> theNormal);
 
   /// Creates a planar face by given plane, left lower point and size.
   static std::shared_ptr<GeomAPI_Shape> planarFace(std::shared_ptr<GeomAPI_Pln> thePlane,
