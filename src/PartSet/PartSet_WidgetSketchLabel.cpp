@@ -226,7 +226,7 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
   }
   else if (!aShape.IsNull()) {
     aDir = setSketchPlane(aShape);
-    isOwnerSet = aDir;
+    isOwnerSet = aDir.get();
   }
   return isOwnerSet;
 }
