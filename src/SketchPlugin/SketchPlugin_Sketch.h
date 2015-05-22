@@ -12,21 +12,23 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_IPresentable.h>
+#include <GeomAPI_ICustomPrs.h>
+
 #include <GeomAPI_Ax3.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 #include <list>
 
-#define YZ_PLANE_COLOR "#ff0000"
-#define XZ_PLANE_COLOR "#00ff00"
-#define XY_PLANE_COLOR "#0000ff"
+#define YZ_PLANE_COLOR "225,0,0"
+#define XZ_PLANE_COLOR "0,225,0"
+#define XY_PLANE_COLOR "0,0,225"
 
 /**\class SketchPlugin_Sketch
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_IPresentable
+class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICustomPrs//, public GeomAPI_IPresentable
 {
  public:
   /// Sketch feature kind
@@ -201,6 +203,20 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   static void createPoint2DResult(ModelAPI_Feature* theFeature,
                                   SketchPlugin_Sketch* theSketch,
                                   const std::string& theAttributeID, const int theIndex);
+  /// Customize presentation of the feature
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+  {
+    bool isCustomized = false;
+    // apply the color of the result to the presentation
+    if (theDefaultPrs.get())
+      isCustomized = theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+    // set the sketch presentation bold    
+    isCustomized = thePrs->setWidth(2) || isCustomized;
+  
+    return isCustomized;
+  }
+
 };
 
 #endif

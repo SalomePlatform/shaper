@@ -20,9 +20,9 @@
 
 #include <Config_PropManager.h>
 
-#define SKETCH_ENTITY_COLOR "#ff0000"
-#define SKETCH_EXTERNAL_COLOR "#00ff00"
-#define SKETCH_AUXILIARY_COLOR "#000000"
+#define SKETCH_ENTITY_COLOR "225,0,0"
+#define SKETCH_EXTERNAL_COLOR "170,0,225"
+#define SKETCH_AUXILIARY_COLOR "0,85,0"
 
 /**\class SketchPlugin_SketchEntity
  * \ingroup Plugins

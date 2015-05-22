@@ -29,7 +29,7 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   /// default color for a result construction
   inline static const std::string& DEFAULT_COLOR()
   {
-    static const std::string RESULT_CONSTRUCTION_COLOR("#000000");
+    static const std::string RESULT_CONSTRUCTION_COLOR("120,120,120");
     return RESULT_CONSTRUCTION_COLOR;
   }
 

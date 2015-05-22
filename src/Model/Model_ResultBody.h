@@ -32,7 +32,7 @@ public:
   /// default color for a result body
   inline static const std::string& DEFAULT_COLOR()
   {
-    static const std::string RESULT_BODY_COLOR("#E0A01B");
+    static const std::string RESULT_BODY_COLOR("150,150,180");
     return RESULT_BODY_COLOR;
   }
 
