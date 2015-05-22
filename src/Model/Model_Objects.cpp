@@ -227,9 +227,7 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
     // erase all attributes under the label of feature
     aFeatureLabel.ForgetAllAttributes();
     // remove it from the references array
-    if (theFeature->isInHistory()) {
-      RemoveFromRefArray(featuresLabel(), aFeatureLabel);
-    }
+    RemoveFromRefArray(featuresLabel(), aFeatureLabel);
     // event: feature is deleted
     ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
     // the redisplay signal should be flushed in order to erase the feature presentation in the viewer

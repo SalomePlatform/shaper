@@ -449,9 +449,9 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
   }
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
   if (theSynchronize) {
+    myObjs->synchronizeFeatures(true, true, isRoot());
     // update the current features status
     setCurrentFeature(currentFeature(false), false);
-    myObjs->synchronizeFeatures(true, true, isRoot());
   }
 }
 
@@ -489,10 +489,10 @@ void Model_Document::redo()
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->redo();
 
-  // update the current features status
-  setCurrentFeature(currentFeature(false), false);
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
   myObjs->synchronizeFeatures(true, true, isRoot());
+  // update the current features status
+  setCurrentFeature(currentFeature(false), false);
 }
 
 std::list<std::string> Model_Document::undoList() const
@@ -567,13 +567,8 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
 {
   // if this feature is current, make the current the previous feature
   if (theFeature == currentFeature(false)) {
-    int aCurrentIndex = index(theFeature);
-    if (aCurrentIndex != -1) {
-      ObjectPtr aPrevObj;
-      if (aCurrentIndex != 0)
-        aPrevObj = object(ModelAPI_Feature::group(), aCurrentIndex - 1);
-      setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aPrevObj), false);
-    }
+    FeaturePtr aPrev = myObjs->nextFeature(theFeature, true);
+    setCurrentFeature(aPrev, false);
   }
   myObjs->removeFeature(theFeature);
 }
