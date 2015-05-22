@@ -828,7 +828,6 @@ void XGUI_Workshop::onOpen()
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
-    aSession->closeAll();
     myCurrentDir = "";
   }
 
@@ -844,6 +843,7 @@ void XGUI_Workshop::onOpen()
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
   myIsLoadingData = true;
+  aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
   displayAllResults();

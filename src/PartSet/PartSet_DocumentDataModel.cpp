@@ -333,7 +333,10 @@ QVariant PartSet_DocumentDataModel::headerData(int theSection, Qt::Orientation t
 
 int PartSet_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 {
-  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  SessionPtr aSession = ModelAPI_Session::get();
+  if (!aSession->hasModuleDocument())
+    return 0;
+  DocumentPtr aRootDoc = aSession->moduleDocument();
   if (!theParent.isValid()) {
     // Size of external models
     int aVal = historyOffset();
