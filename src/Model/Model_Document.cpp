@@ -544,10 +544,10 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
     aDocToAdd = this;
   }
   if (aFeature) {
-    aDocToAdd->myObjs->addFeature(aFeature, currentFeature(false));
+    aDocToAdd->myObjs->addFeature(aFeature, aDocToAdd->currentFeature(false));
     if (!aFeature->isAction()) {  // do not add action to the data model
       if (theMakeCurrent)  // after all this feature stays in the document, so make it current
-        setCurrentFeature(aFeature, false);
+        aDocToAdd->setCurrentFeature(aFeature, false);
     } else { // feature must be executed
        // no creation event => updater not working, problem with remove part
       aFeature->execute();
