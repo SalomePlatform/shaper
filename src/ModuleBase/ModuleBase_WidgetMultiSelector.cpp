@@ -336,6 +336,11 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.
   updateObject(myFeature);
+
+  // Set focus to List control in order to make possible 
+  // to use Tab key for transfer the focus to next widgets
+  myListControl->setCurrentRow(myListControl->model()->rowCount() - 1);
+  myListControl->setFocus();
 }
 
 //********************************************************************
