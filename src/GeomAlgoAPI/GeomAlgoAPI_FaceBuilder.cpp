@@ -70,11 +70,6 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   return aResult;
 }
 
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Ax1> theAxis)
-{
-  return planarFace(theAxis->origin(), theAxis->dir());
-}
-
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Pnt> theCenter,
                                                                    std::shared_ptr<GeomAPI_Dir> theNormal)
 {
