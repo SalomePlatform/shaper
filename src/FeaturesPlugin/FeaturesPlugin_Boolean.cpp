@@ -15,6 +15,7 @@
 #include <GeomAlgoAPI_Boolean.h>
 using namespace std;
 
+// to use multi-selection, please comment the next define and uncomment multi_selector in boolean_widget.xml
 #define DEBUG_ONE_OBJECT
 
 #define FACE 4
