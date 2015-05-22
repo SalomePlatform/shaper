@@ -52,6 +52,9 @@ public:
   /// Selects (i.e. creates Naming data structure) of sub-shape specifed by textual name
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName);
 
+  /// Returns true if attribute was  initialized by some value
+  MODEL_EXPORT virtual bool isInitialized();
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);

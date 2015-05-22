@@ -55,7 +55,7 @@ protected:
 
   /// On operation start/end/abort the "Just" fileds must be cleared and processed in the right way
   /// \param theTotalUpdate force to updates everything that has been changed in this operation
-  void processOperation(const bool theTotalUpdate);
+  void processOperation(const bool theTotalUpdate, const bool theFinish = false);
 
   /// Performs the feature execution
   /// \returns the status of execution
