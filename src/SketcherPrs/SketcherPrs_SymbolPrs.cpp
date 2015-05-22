@@ -249,9 +249,11 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   if (myIconsMap.count(iconName()) == 1) {
     return myIconsMap[iconName()];
   }
-  char* aEnv = getenv("NewGeomResources");
+  char* aEnv = getenv("NEWGEOM_ROOT_DIR");
   if (aEnv != NULL) {
     TCollection_AsciiString aFile(aEnv);
+    aFile+=FSEP;
+    aFile+="resources";
     aFile += FSEP;
     aFile += iconName();
     Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
@@ -259,12 +261,11 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
       myIconsMap[iconName()] = aPixMap;
       return aPixMap;
     }
-  } else {
-    static const char aMsg[] = "Error! NewGeomResources environment variable is not defined: constraint images are not found";
-    cout<<aMsg<<endl;
-    Events_Error::send(aMsg);
-    myIconsMap[iconName()] = Handle(Image_AlienPixMap)();
   }
+  static const char aMsg[] = "Error! constraint images are not found";
+  cout<<aMsg<<endl;
+  Events_Error::send(aMsg);
+  myIconsMap[iconName()] = Handle(Image_AlienPixMap)();
   return Handle(Image_AlienPixMap)();
 }
 
