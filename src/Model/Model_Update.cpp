@@ -102,7 +102,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)
     isOperationChanged = true;
   } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
-    processOperation(true);
+    processOperation(true, theMessage->eventID() == kOpFinishEvent);
     isOperationChanged = true;
   }
   if (isOperationChanged) {
@@ -131,20 +131,22 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   }
 }
 
-void Model_Update::processOperation(const bool theTotalUpdate)
+void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
 {
-  // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
-  std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
-  for(aFIter = myJustCreated.begin(); aFIter != myJustCreated.end(); aFIter++)
-  {
-    FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
-    if (aF && aF->data().get() && aF->getKind() == "Extrusion") {
-      AttributeSelectionListPtr aBase = aF->selectionList("base");
-      if (aBase.get()) {
-        for(int a = aBase->size() - 1; a >= 0; a--) {
-          ResultPtr aSketchRes = aBase->value(a)->context();
-          if (aSketchRes) {
-            aSketchRes->setDisplayed(false);
+  if (theFinish) {
+    // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
+    std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
+    for(aFIter = myJustCreated.begin(); aFIter != myJustCreated.end(); aFIter++)
+    {
+      FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
+      if (aF && aF->data().get() && aF->getKind() == "Extrusion") {
+        AttributeSelectionListPtr aBase = aF->selectionList("base");
+        if (aBase.get()) {
+          for(int a = aBase->size() - 1; a >= 0; a--) {
+            ResultPtr aSketchRes = aBase->value(a)->context();
+            if (aSketchRes) {
+              aSketchRes->setDisplayed(false);
+            }
           }
         }
       }

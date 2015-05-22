@@ -166,6 +166,36 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
   return aResult;
 }
 
+bool Model_AttributeSelection::isInitialized()
+{
+  if (ModelAPI_AttributeSelection::isInitialized()) { // additional checkings if it is initialized
+    std::shared_ptr<GeomAPI_Shape> aResult;
+    if (myRef.isInitialized()) {
+      TDF_Label aSelLab = selectionLabel();
+      if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
+        ResultPtr aContext = context();
+        if (!aContext.get()) 
+          return false;
+      }
+      if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
+          return false;
+      }
+
+      Handle(TNaming_NamedShape) aSelection;
+      if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
+        return !aSelection->Get().IsNull();
+      } else { // for simple construction element: just shape of this construction element
+        ResultConstructionPtr aConstr = 
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(context());
+        if (aConstr.get()) {
+          return aConstr->shape().get();
+        }
+      }
+    }
+  }
+  return false;
+}
+
 Model_AttributeSelection::Model_AttributeSelection(TDF_Label& theLabel)
   : myRef(theLabel)
 {

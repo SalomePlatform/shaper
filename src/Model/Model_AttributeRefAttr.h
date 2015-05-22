@@ -43,7 +43,6 @@ class Model_AttributeRefAttr : public ModelAPI_AttributeRefAttr
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
 
-
  protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefAttr(TDF_Label& theLabel);
