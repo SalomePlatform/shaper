@@ -1,14 +1,7 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <!--<shape_selector id="main_object" 
-    label="Main object" 
-    icon=":icons/cut_shape.png" 
-    tooltip="Select an object solid"
-    shape_types="solid shell"
-    concealment="true"
-  />-->
-  <multi_selector id="main_objects" 
+  <!--<multi_selector id="main_objects" 
     label="Main object" 
     icon=":icons/cut_shape.png" 
     tooltip="Select an object solid"
@@ -22,15 +15,22 @@
     type_choice="Solids"
     concealment="true" >
 	<validator id="PartSet_DifferentObjects"/>
-  </multi_selector>
-  <!--<shape_selector id="tool_object" 
+  </multi_selector>-->
+  <shape_selector id="main_object"
+    label="Main object"
+    icon=":icons/cut_shape.png"
+    tooltip="Select an object solid"
+    shape_types="solid shell"
+    concealment="true"
+  />
+  <shape_selector id="tool_object" 
     label="Tool object" 
     icon=":icons/cut_tool.png" 
     tooltip="Select a tool solid"
     shape_types="solid"
     concealment="true" >
 	<validator id="PartSet_DifferentObjects"/>
-  </shape_selector>-->
+  </shape_selector>
   <choice id="bool_type" 
     label="Type" 
     tooltip="Type of boolean operation"

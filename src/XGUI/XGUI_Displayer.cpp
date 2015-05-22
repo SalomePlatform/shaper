@@ -20,6 +20,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
@@ -93,14 +94,6 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   if (isVisible(theObject)) {
     redisplay(theObject, isUpdateViewer);
   } else {
-#ifdef DEBUG_DISPLAY
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL) {
-      qDebug(QString("display feature: %1, displayed: %2").
-        arg(aFeature->data()->name().c_str()).
-        arg(displayedObjects().size()).toStdString().c_str());
-    }
-#endif
     AISObjectPtr anAIS;
 
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
@@ -152,7 +145,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
 
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
-    myResult2AISObjectMap[theObject] = theAIS;
+    appendResultObject(theObject, theAIS);
+
     bool aCanBeShaded = ::canBeShaded(anAISIO);
     // In order to avoid extra closing/opening context
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
@@ -217,7 +211,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
       return;
     }
     if (aAIS_Obj != aAISObj) {
-      myResult2AISObjectMap[theObject] = aAIS_Obj;
+      appendResultObject(theObject, aAIS_Obj);
     }
     aAISIO = aAIS_Obj->impl<Handle(AIS_InteractiveObject)>();
   }
@@ -901,4 +895,32 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject, const QColor& theColo
   if (toUpdate)
     updateViewer();
   return QColor(aR, aG, aB);
+}
+
+void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS)
+{
+  myResult2AISObjectMap[theObject] = theAIS;
+
+#ifdef DEBUG_DISPLAY
+  std::ostringstream aPtrStr;
+  aPtrStr << theObject.get();
+  qDebug(QString("display object: %1").arg(aPtrStr.str().c_str()).toStdString().c_str());
+  qDebug(getResult2AISObjectMapInfo().c_str());
+#endif
+}
+
+std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
+{
+  QStringList aContent;
+  foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
+    AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+    std::ostringstream aPtrStr;
+    aPtrStr << "aObj = " << aObj.get() << ":";
+    aPtrStr << "anAIS = " << aAISObj.get() << ":";
+    aPtrStr << "[" << ModuleBase_Tools::objectInfo(aObj).toStdString().c_str() << "]";
+    
+    aContent.append(aPtrStr.str().c_str());
+  }
+  return QString("myResult2AISObjectMap: size = %1\n%2").arg(myResult2AISObjectMap.size()).
+                                            arg(aContent.join("\n")).toStdString().c_str();
 }

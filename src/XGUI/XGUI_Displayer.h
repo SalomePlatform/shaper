@@ -251,6 +251,15 @@ private:
    */
   bool customizeObject(ObjectPtr theObject);
 
+  /// Append the objects in the internal map. Checks whether the map already contains the object
+  /// \param theObject an object to display
+  /// \param theAIS AIOS object to display
+  void appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS);
+
+  /// Returns an information about alredy displayed objects
+  /// \return a string representation
+  std::string getResult2AISObjectMapInfo() const;
+
  protected:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;

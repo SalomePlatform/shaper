@@ -514,7 +514,8 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
     ObjectPtr anObject = *aIt;
     // the validity of the data should be checked here in order to avoid display of the objects,
     // which were created, then deleted, but flush for the creation event happens after that
-    if (!anObject->data() || !anObject->data()->isValid())
+    // we should not display disabled objects
+    if (!anObject->data() || !anObject->data()->isValid() || anObject->isDisabled())
       continue;
     //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     //if (aPart) {

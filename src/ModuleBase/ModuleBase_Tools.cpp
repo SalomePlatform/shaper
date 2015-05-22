@@ -22,6 +22,8 @@
 #include <QBitmap>
 #include <QDoubleSpinBox>
 
+#include <sstream>
+
 namespace ModuleBase_Tools {
 
 //******************************************************************
@@ -125,18 +127,33 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
+  QString aFeatureStr = "feature";
+  if (!theObj.get())
+    return aFeatureStr;
+
+  std::ostringstream aPtrStr;
+  aPtrStr << "[" << theObj.get() << "]";
+
   ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
-  QString aFeatureStr = "feature";
   if(aRes.get()) {
-    aFeatureStr.append("(Result)");
+    aFeatureStr.append(QString("(result%1)").arg(aPtrStr.str().c_str()).toStdString() .c_str());
+    if (aRes->isDisabled())
+      aFeatureStr.append("[disabled]");
+    if (aRes->isConcealed())
+      aFeatureStr.append("[concealed]");
+
     aFeature = ModelAPI_Feature::feature(aRes);
   }
+  else
+    aFeatureStr.append(aPtrStr.str().c_str());
+
   if (aFeature.get()) {
     aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
-    if (aFeature->data().get() && aFeature->data()->isValid())
+    if (aFeature->data().get() && aFeature->data()->isValid()) {
       aFeatureStr.append(QString(", name=%1").arg(aFeature->data()->name().c_str()).toStdString()
                                                                                        .c_str());
+    }
     if (isUseAttributesInfo) {
       std::list<AttributePtr> anAttrs = aFeature->data()->attributes("");
       std::list<AttributePtr>::const_iterator anIt = anAttrs.begin(), aLast = anAttrs.end();

@@ -15,7 +15,7 @@
 #include <GeomAlgoAPI_Boolean.h>
 using namespace std;
 
-//#define DEBUG_ONE_OBJECT
+#define DEBUG_ONE_OBJECT
 
 #define FACE 4
 #define _MODIFY_TAG 1
