@@ -7,12 +7,12 @@
 #ifndef FeaturesPlugin_Extrusion_H_
 #define FeaturesPlugin_Extrusion_H_
 
-#include "FeaturesPlugin.h"
+#include <FeaturesPlugin.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_ResultBody.h>
-#include <GeomAlgoAPI_Extrusion.h>
 #include <GeomAlgoAPI_Prism.h>
-#include <GeomAPI_Shape.h>
+
+class GeomAPI_Shape;
+class ModelAPI_ResultBody;
 
 /**\class FeaturesPlugin_Extrusion
  * \ingroup Plugins
@@ -95,9 +95,6 @@ private:
   void LoadNamingDS(GeomAlgoAPI_Prism& theFeature, std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBasis,
                     std::shared_ptr<GeomAPI_Shape> theContext);
-
-  /// Set an empty shape to the result of extrusion
-  void clearResult();
 };
 
 #endif

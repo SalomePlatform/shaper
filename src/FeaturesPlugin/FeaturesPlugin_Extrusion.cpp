@@ -57,8 +57,8 @@ void FeaturesPlugin_Extrusion::execute()
 {
   AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Extrusion::LIST_ID());
 
-  std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape);
-  std::shared_ptr<GeomAPI_Shape> aToShape(new GeomAPI_Shape);
+  std::shared_ptr<GeomAPI_Shape> aFromShape;
+  std::shared_ptr<GeomAPI_Shape> aToShape;
 
   // Getting bounding planes.
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
@@ -110,39 +110,36 @@ void FeaturesPlugin_Extrusion::execute()
       }
 
       // If bounding faces was not set creating them.
-      std::shared_ptr<GeomAPI_Face> aBaseFace(new GeomAPI_Face(aBaseShape));
-      std::shared_ptr<GeomAPI_Pln> aBasePlane = aBaseFace->getPlane();
-      std::shared_ptr<GeomAPI_Dir> aBaseDir = aBasePlane->direction();
-      std::shared_ptr<GeomAPI_Pnt> aBaseLoc = aBasePlane->location();
+      std::shared_ptr<GeomAPI_Face>  aBaseFace(new GeomAPI_Face(aBaseShape));
+      std::shared_ptr<GeomAPI_Pln>   aBasePln = aBaseFace->getPlane();
+      std::shared_ptr<GeomAPI_Dir>   aBaseDir = aBasePln->direction();
+      std::shared_ptr<GeomAPI_Pnt>   aBaseLoc = aBasePln->location();
+      std::shared_ptr<GeomAPI_Shape> aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
 
-      if(!aFromShape) {
-        aFromShape = GeomAlgoAPI_FaceBuilder::plane(aBaseLoc, aBaseDir);
-      }
-      if(!aToShape) {
-        aToShape = GeomAlgoAPI_FaceBuilder::plane(aBaseLoc, aBaseDir);
-      }
+      std::shared_ptr<GeomAPI_Shape> aBoundingFromShape = aFromShape ? aFromShape : aBasePlane;
+      std::shared_ptr<GeomAPI_Shape> aBoundingToShape   = aToShape   ? aToShape   : aBasePlane;
 
       // Moving bounding faces according to "from" and "to" sizes.
-      std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aFromShape));
-      std::shared_ptr<GeomAPI_Pln> aFromPlane = aFromFace->getPlane();
-      std::shared_ptr<GeomAPI_Pnt> aFromLoc = aFromPlane->location();
-      std::shared_ptr<GeomAPI_Dir> aFromDir = aFromPlane->direction();
+      std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aBoundingFromShape));
+      std::shared_ptr<GeomAPI_Pln>  aFromPln = aFromFace->getPlane();
+      std::shared_ptr<GeomAPI_Pnt>  aFromLoc = aFromPln->location();
+      std::shared_ptr<GeomAPI_Dir>  aFromDir = aFromPln->direction();
 
-      std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aToShape));
-      std::shared_ptr<GeomAPI_Pln> aToPlane = aToFace->getPlane();
-      std::shared_ptr<GeomAPI_Pnt> aToLoc = aToPlane->location();
-      std::shared_ptr<GeomAPI_Dir> aToDir = aToPlane->direction();
+      std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aBoundingToShape));
+      std::shared_ptr<GeomAPI_Pln>  aToPln = aToFace->getPlane();
+      std::shared_ptr<GeomAPI_Pnt>  aToLoc = aToPln->location();
+      std::shared_ptr<GeomAPI_Dir>  aToDir = aToPln->direction();
 
       bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
 
       std::shared_ptr<GeomAPI_Pnt> aFromPnt(new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(aSign ? aFromSize : -aFromSize))));
-      aFromShape = GeomAlgoAPI_FaceBuilder::plane(aFromPnt, aFromDir);
+      aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
 
       std::shared_ptr<GeomAPI_Pnt> aToPnt(new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(aSign ? -aToSize : aToSize))));
-      aToShape = GeomAlgoAPI_FaceBuilder::plane(aToPnt, aToDir);
+      aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
       //GeomAlgoAPI_Extrusion aFeature(aFace, aFromSize);
-      GeomAlgoAPI_Prism aFeature(aBaseShape, aFromShape, aToShape);
+      GeomAlgoAPI_Prism aFeature(aBaseShape, aBoundingFromShape, aBoundingToShape);
       if(!aFeature.isDone()) {
         static const std::string aFeatureError = "Extrusion algorithm failed";
         setError(aFeatureError);
@@ -212,13 +209,4 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
     }
     theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
   }
-}
-
-//============================================================================
-void FeaturesPlugin_Extrusion::clearResult()
-{
-  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  std::shared_ptr<GeomAPI_Shape> anEmptyShape(new GeomAPI_Shape);
-  aResultBody->store(anEmptyShape);
-  setResult(aResultBody);
 }
