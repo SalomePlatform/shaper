@@ -735,5 +735,6 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       }
     }
     aLabel->setPalette(aPalet);
+    aWorkshop->updateCommandStatus();
   }
 }
