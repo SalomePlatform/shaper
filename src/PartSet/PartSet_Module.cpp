@@ -736,5 +736,12 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     }
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
+
+    // Update displayed objects in order to update active color
+    XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+    QObjectPtrList aObjects = aDisplayer->displayedObjects();
+    foreach(ObjectPtr aObj, aObjects)
+      aDisplayer->redisplay(aObj, false);
+    aDisplayer->updateViewer();
   }
 }

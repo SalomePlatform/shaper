@@ -7,11 +7,13 @@
 #include <XGUI_CustomPrs.h>
 
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_Session.h>
 #include <Config_PropManager.h>
 
 #include <Events_Error.h>
 
 #include <vector>
+#include <QColor>
 
 
 void getColor(ResultPtr theResult, std::vector<int>& theColor)
@@ -56,5 +58,13 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
   if (aColor.empty())
     getDefaultColor(theResult, thePrs, aColor);
 
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->activeDocument() != theResult->document()) {
+    QColor aQColor(aColor[0], aColor[1], aColor[2]);
+    QColor aNewColor = QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
+    aColor[0] = aNewColor.red();
+    aColor[1] = aNewColor.green();
+    aColor[2] = aNewColor.blue();
+  }
   return !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
 }
