@@ -89,7 +89,8 @@ bool ConstructionPlugin_Axis::customisePresentation(ResultPtr theResult, AISObje
   bool isCustomized = theDefaultPrs.get() != NULL &&
                       theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
 
-  isCustomized = thePrs->setLineStyle(3);
+  isCustomized = thePrs->setLineStyle(3) || isCustomized;
+  isCustomized = thePrs->setWidth(2) || isCustomized;
 
   return isCustomized;
 }
