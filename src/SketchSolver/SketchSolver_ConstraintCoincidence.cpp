@@ -199,6 +199,7 @@ bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
       anExtraIt++;
     }
     // Find first non-extra conststraint
+    anExtraIt = myExtraCoincidence.begin();
     while (anExtraIt != myExtraCoincidence.end() && anExtraIt->first == SLVS_E_UNKNOWN)
       anExtraIt++;
     if (anExtraIt != myExtraCoincidence.end()) {

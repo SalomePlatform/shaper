@@ -29,6 +29,8 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
 
 bool ParametersPlugin_VariableValidator::isVariable(const std::string& theString) const
 {
+  if (theString.empty())
+    return false;
   std::string::const_iterator it = theString.begin();
   if (!(isalpha(*it) || (*it) == '_') || it == theString.end())
     return false;
