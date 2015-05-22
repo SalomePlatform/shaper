@@ -29,6 +29,12 @@ public:
     return MY_ID;
   }
   /// attribute name of referenced object
+  inline static const std::string& OBJECT_LIST_ID()
+  {
+    static const std::string MY_OBJECT_LIST_ID("main_objects");
+    return MY_OBJECT_LIST_ID;
+  }
+  /// attribute name of referenced object
   inline static const std::string& OBJECT_ID()
   {
     static const std::string MY_OBJECT_ID("main_object");
@@ -39,6 +45,12 @@ public:
   {
     static const std::string MY_TOOL_ID("tool_object");
     return MY_TOOL_ID;
+  }
+  /// attribute name of tool object
+  inline static const std::string& TOOL_LIST_ID()
+  {
+    static const std::string MY_TOOL_LIST_ID("tool_objects");
+    return MY_TOOL_LIST_ID;
   }
   /// attribute name of operation type
   inline static const std::string& TYPE_ID()

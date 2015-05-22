@@ -11,8 +11,11 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <GeomAlgoAPI_Boolean.h>
 using namespace std;
+
+//#define DEBUG_ONE_OBJECT
 
 #define FACE 4
 #define _MODIFY_TAG 1
@@ -24,8 +27,25 @@ FeaturesPlugin_Boolean::FeaturesPlugin_Boolean()
 void FeaturesPlugin_Boolean::initAttributes()
 {
   data()->addAttribute(FeaturesPlugin_Boolean::TYPE_ID(), ModelAPI_AttributeInteger::typeId());
+
+#ifdef DEBUG_ONE_OBJECT
   data()->addAttribute(FeaturesPlugin_Boolean::OBJECT_ID(), ModelAPI_AttributeReference::typeId());
+#else
+  AttributeSelectionListPtr aSelection = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
+    FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+  // extrusion works with faces always
+  aSelection->setSelectionType("SOLID");
+#endif
+
+#ifdef DEBUG_ONE_OBJECT
   data()->addAttribute(FeaturesPlugin_Boolean::TOOL_ID(), ModelAPI_AttributeReference::typeId());
+#else
+  aSelection = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
+    FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+  // extrusion works with faces always
+  aSelection->setSelectionType("SOLID");
+#endif
 }
 
 std::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Boolean::getShape(const std::string& theAttrName)
@@ -49,12 +69,41 @@ void FeaturesPlugin_Boolean::execute()
   if (!aTypeAttr)
     return;
   int aType = aTypeAttr->value();
-
+#ifdef DEBUG_ONE_OBJECT
   std::shared_ptr<GeomAPI_Shape> anObject = this->getShape(FeaturesPlugin_Boolean::OBJECT_ID());
+#else
+  std::shared_ptr<GeomAPI_Shape> anObject;
+  {
+    AttributeSelectionListPtr anObjects = selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
+    if (anObjects->size() == 0)
+      return;
+
+    // Getting bounding planes.
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = anObjects->value(0);
+    if (!anObjRef.get())
+      return;
+    anObject = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+  }
+#endif
   if (!anObject)
     return;
 
+#ifdef DEBUG_ONE_OBJECT
   std::shared_ptr<GeomAPI_Shape> aTool = this->getShape(FeaturesPlugin_Boolean::TOOL_ID());
+#else
+  std::shared_ptr<GeomAPI_Shape> aTool;
+  {
+    AttributeSelectionListPtr anObjects = selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
+    if (anObjects->size() == 0)
+      return;
+
+    // Getting bounding planes.
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = anObjects->value(0);
+    if (!anObjRef.get())
+      return;
+    aTool = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+  }
+#endif
   if (!aTool)
     return;
 

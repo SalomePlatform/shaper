@@ -11,6 +11,7 @@
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
+#include <GeomLib_IsPlanarSurface.hxx>
 
 
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
@@ -70,11 +71,13 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
   if (aSurf.IsNull())
     return aResult;  // no surface
-  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(aSurf);
-  if (aPlane.IsNull())
-    return aResult;  // not planar
+  GeomLib_IsPlanarSurface isPlanar(aSurf);
+  if(!isPlanar.IsPlanar()) {
+    return aResult;
+  }
+  gp_Pln aPln = isPlanar.Plan();
   double aA, aB, aC, aD;
-  aPlane->Coefficients(aA, aB, aC, aD);
+  aPln.Coefficients(aA, aB, aC, aD);
   aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
 }
