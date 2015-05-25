@@ -49,7 +49,7 @@ bool Model_Session::save(const char* theFileName, std::list<std::string>& theRes
 void Model_Session::closeAll()
 {
   Model_Application::getApplication()->deleteAllDocuments();
-  ROOT_DOC->close(true);
+  //ROOT_DOC->close(true);
 }
 
 void Model_Session::startOperation(const std::string& theId)
