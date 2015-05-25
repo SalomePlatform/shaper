@@ -178,7 +178,7 @@ bool Model_AttributeSelection::isInitialized()
           return false;
       }
       if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
-          return false;
+          return true;
       }
 
       Handle(TNaming_NamedShape) aSelection;
