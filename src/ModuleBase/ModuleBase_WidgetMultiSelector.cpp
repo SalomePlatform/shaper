@@ -15,6 +15,8 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Definitions.h>
 
+#include <GeomValidators_ShapeType.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 
@@ -49,6 +51,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   myTypeCombo = new QComboBox(this);
   // There is no sence to paramerize list of types while we can not parametrize selection mode
+
+  myShapeValidator = new GeomValidators_ShapeType();
 
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();
@@ -96,6 +100,8 @@ ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 {
   activateShapeSelection(false);
   activateFilters(myWorkshop, false);
+
+  delete myShapeValidator;
 }
 
 //********************************************************************
@@ -198,6 +204,19 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
   foreach (GeomSelection aSelec, mySelection) {
     aSelectionListAttr->append(aSelec.first, aSelec.second);
   }
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::customValidators(
+                                        std::list<ModelAPI_Validator*>& theValidators,
+                                        std::list<std::list<std::string> >& theArguments) const
+{
+  std::list<std::string> anArguments;
+
+  theValidators.push_back(myShapeValidator);
+  QString aType = myTypeCombo->currentText();
+  anArguments.push_back(aType.toStdString().c_str());
+  theArguments.push_back(anArguments);
 }
 
 //********************************************************************

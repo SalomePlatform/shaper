@@ -10,6 +10,8 @@
 #include "GeomValidators.h"
 #include "ModelAPI_AttributeValidator.h"
 
+#include <GeomAPI_Shape.h>
+
 #include <string>
 
 /**
@@ -26,8 +28,11 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
   {
     AnyShape,
     Vertex,
+    Edge,
     Line,
-    Circle
+    Circle,
+    Solid,
+    Face
   };
 
  public:
@@ -44,6 +49,24 @@ protected:
 
   bool isValidArgument(const AttributePtr& theAttribute,
                        const std::string& theArgument) const;
+
+  /// Returns true if the attibute's object type satisfies the argument value
+  /// \param theAttribute a checked attribute
+  /// \param theArgument a parameter
+  bool isValidAttribute(const AttributePtr& theAttribute,
+                        const TypeOfShape theShapeType) const;
+
+  /// Returns true if the attibute's object type satisfies the argument value
+  /// \param theAttribute a checked object
+  /// \param theShapeType a shape type
+  bool isValidObject(const ObjectPtr& theObject,
+                     const TypeOfShape theShapeType) const;
+
+  /// Returns true if the attibute's object type satisfies the argument value
+  /// \param theShape a checked shape
+  /// \param theShapeType a shape type
+  bool isValidShape(const GeomShapePtr theShape,
+                    const TypeOfShape theShapeType) const;
 
 };
 

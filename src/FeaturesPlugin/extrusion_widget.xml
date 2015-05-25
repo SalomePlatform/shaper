@@ -5,7 +5,7 @@
     label="Select a sketch face"
     icon=":icons/sketch.png"
     tooltip="Select a sketch face"
-    type_choice="Faces">
+    type_choice="face">
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
   <groupbox title="From">
@@ -53,7 +53,7 @@
     label="Select a sketch face"
     icon=":icons/sketch.png"
     tooltip="Select a sketch face"
-    type_choice="Faces">
+    type_choice="face">
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
   <shape_selector id="axis_object"

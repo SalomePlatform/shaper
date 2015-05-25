@@ -5,14 +5,14 @@
     label="Main object" 
     icon=":icons/cut_shape.png" 
     tooltip="Select an object solid"
-    type_choice="Solids"
+    type_choice="solid"
     concealment="true"
   />
   <multi_selector id="tool_objects" 
     label="Tool object" 
     icon=":icons/cut_tool.png" 
     tooltip="Select a tool solid"
-    type_choice="Solids"
+    type_choice="solid"
     concealment="true" >
 	<validator id="PartSet_DifferentObjects"/>
   </multi_selector>-->

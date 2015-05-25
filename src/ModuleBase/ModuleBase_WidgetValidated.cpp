@@ -97,6 +97,8 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(myFeature->getKind(), attributeID(), aValidators, anArguments);
 
+  customValidators(aValidators, anArguments);
+
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
@@ -123,6 +125,11 @@ void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorksh
     aViewer->addSelectionFilter(aSelFilter);
   else
     aViewer->removeSelectionFilter(aSelFilter);
+}
+
+void ModuleBase_WidgetValidated::customValidators(std::list<ModelAPI_Validator*>& theValidators,
+                                          std::list<std::list<std::string> >& theArguments) const
+{
 }
 
 QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getSelectedEntitiesOrObjects(
