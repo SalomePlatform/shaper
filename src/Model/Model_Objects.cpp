@@ -105,11 +105,8 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
   if (!theFeature->isAction()) {  // do not add action to the data model
     TDF_Label aFeaturesLab = featuresLabel();
     TDF_Label aFeatureLab = aFeaturesLab.NewChild();
-    initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
-    // keep the feature ID to restore document later correctly
-    TDataStd_Comment::Set(aFeatureLab, theFeature->getKind().c_str());
-    myFeatures.Bind(aFeatureLab, theFeature);
-    // store feature in the features array
+    // store feature in the features array: before "initData" because in macro features
+    // in initData it creates new features, appeared later than this
     TDF_Label aPrevFeateureLab;
     if (theAfterThis.get()) { // searching for the previous feature label
       std::shared_ptr<Model_Data> aPrevData = 
@@ -119,6 +116,11 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
       }
     }
     AddToRefArray(aFeaturesLab, aFeatureLab, aPrevFeateureLab);
+
+    initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
+    // keep the feature ID to restore document later correctly
+    TDataStd_Comment::Set(aFeatureLab, theFeature->getKind().c_str());
+    myFeatures.Bind(aFeatureLab, theFeature);
     // event: feature is added
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);

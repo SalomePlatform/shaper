@@ -45,6 +45,9 @@ static const int kFlagInHistory = 0;
 //                             1 - is displayed or not
 static const int kFlagDisplayed = 1;
 
+// invalid data
+const static std::shared_ptr<ModelAPI_Data> kInvalid(new Model_Data());
+
 Model_Data::Model_Data() : mySendAttributeUpdated(true)
 {
 }
@@ -406,4 +409,9 @@ void Model_Data::setDisplayed(const bool theDisplay)
     static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
     aECreator->sendUpdated(myObject, EVENT_DISP);
   }
+}
+
+std::shared_ptr<ModelAPI_Data> Model_Data::invalidPtr()
+{
+  return kInvalid;
 }

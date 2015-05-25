@@ -122,6 +122,7 @@ class Sketch():
     constraint = self.my.addFeature("SketchConstraintLength")
     constraint.data().refattr("ConstraintEntityA").setObject(line)
     constraint.data().real("ConstraintValue").setValue(length)
+    self.my.execute()
     return constraint
 
   def setRadius (self, circle, radius):

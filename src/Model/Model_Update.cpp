@@ -381,7 +381,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
           if (aFactory->validate(theFeature)) {
             if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
                 || (isUpdated(theFeature) && 
-                 theFeature == theFeature->document()->currentFeature(false))) // currently edited
+                     (theFeature == theFeature->document()->currentFeature(false) || 
+                      theFeature->document()->currentFeature(false)->isMacro()))) // currently edited
             {
               if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
                 executeFeature(theFeature);

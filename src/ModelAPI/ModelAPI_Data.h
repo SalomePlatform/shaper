@@ -144,6 +144,9 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Copies all atributes content into theTarget data
   virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget) = 0;
 
+  /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)
+  virtual std::shared_ptr<ModelAPI_Data> invalidPtr() = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data();

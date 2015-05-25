@@ -13,12 +13,12 @@ class Extrusion():
     self.my = part.addFeature("Extrusion")
     self.my.data().selectionList("base").append(sketch.result(), sketch.buildShape())
     if size < 0:
-	  self.my.data().boolean("reverse").setValue(True)
-	  size = -size
+          self.my.data().real("from_size").setValue(-size)
+          self.my.data().real("to_size").setValue(0)
     else:
-	  self.my.data().boolean("reverse").setValue(False)
+          self.my.data().real("to_size").setValue(size)
+          self.my.data().real("from_size").setValue(0)
 
-    self.my.data().real("to_size").setValue(size)
 
     if ModelAPI_Session.get().validators().validate(self.my):
       self.my.execute()
@@ -29,12 +29,12 @@ class Extrusion():
   def setSize (self, size):
     """Modifies the size of this extrusion according to the given size."""
     if size < 0:
-	  self.my.data().boolean("reverse").setValue(True)
-	  size = -size
+          self.my.data().real("from_size").setValue(-size)
+          self.my.data().real("to_size").setValue(0)
     else:
-      self.my.data().boolean("reverse").setValue(False)
+          self.my.data().real("to_size").setValue(size)
+          self.my.data().real("from_size").setValue(0)
 
-    self.my.data().real("to_size").setValue(size)
     self.my.execute()
 
   def result (self):

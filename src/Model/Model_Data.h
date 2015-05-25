@@ -56,8 +56,6 @@ class Model_Data : public ModelAPI_Data
   /// flag that may block the "attribute updated" sending
   bool mySendAttributeUpdated;
 
-  Model_Data();
-
   /// Returns label of this feature
   TDF_Label label()
   {
@@ -73,6 +71,8 @@ class Model_Data : public ModelAPI_Data
   friend class Model_AttributeSelection;
 
  public:
+  /// The simplest constructor. "setLabel" must be called just after to initialize correctly.
+  Model_Data();
   /// Returns the name of the feature visible by the user in the object browser
   MODEL_EXPORT virtual std::string name();
   /// Defines the name of the feature visible by the user in the object browser
@@ -185,6 +185,9 @@ class Model_Data : public ModelAPI_Data
 
   /// Copies all atributes content into theTarget data
   MODEL_EXPORT virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget);
+
+  /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Data> invalidPtr();
 
 protected:
   /// Returns true if "is in history" custom behaviors is defined for the feature

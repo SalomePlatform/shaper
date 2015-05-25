@@ -68,8 +68,8 @@ void ModelAPI_Object::setDoc(std::shared_ptr<ModelAPI_Document> theDoc)
 
 void ModelAPI_Object::erase()
 {
-  if (myData) myData->erase();
-  setData(DataPtr());
+  if (myData.get() && myData != myData->invalidPtr()) myData->erase();
+  setData(myData->invalidPtr());
 }
 
 bool ModelAPI_Object::isDisplayed()
