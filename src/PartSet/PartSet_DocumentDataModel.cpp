@@ -483,6 +483,7 @@ void PartSet_DocumentDataModel::clearSubModels()
   foreach (PartSet_PartModel* aPart, myPartModels) 
     delete aPart;
   myPartModels.clear();
+  myActivePartModel = 0;
 }
 
 ObjectPtr PartSet_DocumentDataModel::object(const QModelIndex& theIndex) const
@@ -546,8 +547,10 @@ void PartSet_DocumentDataModel::removeSubModel(PartSet_PartModel* theModel)
     myIndexes.removeAt(aId);
     aToRemove.removeLast();
   }
-  delete theModel;
+  if (theModel == myActivePartModel)
+    myActivePartModel = 0;
   myPartModels.removeAll(theModel);
+  delete theModel;
 }
 
 

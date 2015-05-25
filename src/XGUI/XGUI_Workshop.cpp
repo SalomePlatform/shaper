@@ -1582,7 +1582,6 @@ void XGUI_Workshop::closeDocument()
 
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->closeAll();
-  objectBrowser()->clearContent();
 }
 
 //**************************************************************

@@ -74,6 +74,10 @@ class PartSet_PartModel : public PartSet_FeaturesModel
       : PartSet_FeaturesModel(theParent)
   {
   }
+  ~PartSet_PartModel()
+  {
+    myPart = FeaturePtr();
+  }
 
   /// Set part id
   /// \param theId a new id
