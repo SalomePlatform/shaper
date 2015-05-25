@@ -205,9 +205,11 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         }
       }
       if (!aFound) {
-        aDisp->erase(aObj, false);
+        aObj->setDisplayed(false);
+        //aDisp->erase(aObj, false);
       }
     }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
 
   return isDone;
@@ -269,7 +271,11 @@ void NewGeom_Module::onViewManagerRemoved(SUIT_ViewManager* theMgr)
     if (theMgr->getType() == OCCViewer_Viewer::Type()) {
       OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
       if (mySelector->viewer() == aViewer) {
-        myWorkshop->displayer()->eraseAll(false);
+        XGUI_Displayer* aDisp = myWorkshop->displayer();
+        QObjectPtrList aObjects = aDisp->displayedObjects();
+        foreach(ObjectPtr aObj, aObjects)
+          aObj->setDisplayed(false);
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
         myProxyViewer->setSelector(0);
         delete mySelector;
         mySelector = 0;
