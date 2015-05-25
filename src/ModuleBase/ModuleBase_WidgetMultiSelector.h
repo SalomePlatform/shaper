@@ -24,11 +24,13 @@
 #include <QString>
 #include <QStringList>
 #include <QPair>
+#include <QMap>
 
 class QWidget;
 class QListWidget;
 class QComboBox;
 class ModuleBase_IWorkshop;
+class GeomValidators_ShapeType;
 class QAction;
 
 
@@ -39,7 +41,7 @@ class QAction;
 * \code
 * <multi_selector id="group_list" 
 *    tooltip="Select a set of objects" 
-*    type_choice="Vertices Edges Faces Solids" /> 
+*    type_choice="vertex edge face solid" /> 
 * \endcode
 * It uses folloing parameters:
 * - id - is a name of corresponded attribute
@@ -115,6 +117,13 @@ protected slots:
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const bool theValid);
 
+  /// Puts additional validators to the given list. A separate validator is created for each of the
+  /// "type_choice" value
+  /// \param theValidators a list of validators
+  /// \param theArguments a list of validators arguments
+  virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
+                                std::list<std::list<std::string> >& theArguments) const;
+
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
 
@@ -154,6 +163,9 @@ protected slots:
 
   /// Variable of GeomSelection
   QList<GeomSelection> mySelection;
+
+  /// A map of "type_choice" validators.
+  GeomValidators_ShapeType* myShapeValidator;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

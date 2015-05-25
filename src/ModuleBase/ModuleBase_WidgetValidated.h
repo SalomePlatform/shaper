@@ -19,6 +19,7 @@
 class QWidget;
 class ModuleBase_IWorkshop;
 class ModuleBase_ISelection;
+class ModelAPI_Validator;
 class Config_WidgetAPI;
 class Handle_SelectMgr_EntityOwner;
 
@@ -78,6 +79,12 @@ protected:
   /// \param theWorkshop an active workshop
   /// \param toActivate a flag about activation or deactivation the filters
   virtual void activateFilters(ModuleBase_IWorkshop* theWorkshop, const bool toActivate) const;
+
+  /// Puts additional validators to the given list
+  /// \param theValidators a list of validators
+  /// \param theArguments a list of validators arguments
+  virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
+                                std::list<std::list<std::string> >& theArguments) const;
 
   /// Returns a list of selected presentations. Firstly it is obtained from the viewer,
   /// if there are not selected objects in the viewer, it get the selection from the object browser.
