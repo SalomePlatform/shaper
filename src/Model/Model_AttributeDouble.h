@@ -36,6 +36,12 @@ class Model_AttributeDouble : public ModelAPI_AttributeDouble
   /// Returns the double value
   MODEL_EXPORT virtual std::string text();
 
+  /// Allows to set expression (text) as invalid (by the parameters listener)
+  MODEL_EXPORT virtual void setExpressionInvalid(const bool theFlag);
+
+  /// Returns true if text is invalid
+  MODEL_EXPORT virtual bool expressionInvalid();
+
  protected:
   /// Initializes attibutes
   Model_AttributeDouble(TDF_Label& theLabel);

@@ -46,6 +46,9 @@ void ParametersPlugin_EvalListener::processEvent(const std::shared_ptr<Events_Me
       double aValue = evaluate(aDoubleAttribute->text(), anError);
       if (anError.empty()) {
         aDoubleAttribute->setValue(aValue);
+        aDoubleAttribute->setExpressionInvalid(false);
+      } else { // set feature as invalid-parameter arguments
+        aDoubleAttribute->setExpressionInvalid(true);
       }
     }
   } else {

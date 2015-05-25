@@ -10,6 +10,7 @@
 
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
+#include <TDataStd_UAttribute.hxx>
 
 using namespace std;
 
@@ -51,4 +52,20 @@ void Model_AttributeDouble::setText(const std::string& theValue)
 string Model_AttributeDouble::text()
 {
   return TCollection_AsciiString(myText->Get()).ToCString();
+}
+
+Standard_GUID kInvalidGUID("caee5ce4-34b1-4b29-abcb-685287d18096");
+
+void Model_AttributeDouble::setExpressionInvalid(const bool theFlag)
+{
+  if (theFlag) {
+    TDataStd_UAttribute::Set(myReal->Label(), kInvalidGUID);
+  } else {
+    myReal->Label().ForgetAttribute(kInvalidGUID);
+  }
+}
+
+bool Model_AttributeDouble::expressionInvalid()
+{
+  return myReal->Label().IsAttribute(kInvalidGUID);
 }

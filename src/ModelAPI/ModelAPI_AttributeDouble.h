@@ -29,6 +29,12 @@ class ModelAPI_AttributeDouble : public ModelAPI_Attribute
   /// Returns the double value
   MODELAPI_EXPORT virtual std::string text() = 0;
 
+  /// Allows to set expression (text) as invalid (by the parameters listener)
+  MODELAPI_EXPORT virtual void setExpressionInvalid(const bool theFlag) = 0;
+
+  /// Returns true if text is invalid
+  MODELAPI_EXPORT virtual bool expressionInvalid() = 0;
+
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string typeId()
   {

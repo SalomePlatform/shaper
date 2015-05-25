@@ -260,27 +260,17 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   ModelAPI_ExecState aState = theFeature->data()->execState();
   if (aState == ModelAPI_StateInvalidArgument) // a chance to be corrected
     aState = ModelAPI_StateMustBeUpdated;
-  // check the parameters: values can be changed
-  /* parameters evaluator now does this
+  // check the parameters state
   std::list<AttributePtr> aDoubles = 
     theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId()); 
   std::list<AttributePtr>::iterator aDoubleIter = aDoubles.begin();
   for(; aDoubleIter != aDoubles.end(); aDoubleIter++) {
     AttributeDoublePtr aDouble = 
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
-    if (aDouble.get() && !aDouble->text().empty()) {
-      double aNewVal;
-      if (ModelAPI_Tools::findVariable(aDouble->text(), aNewVal)) {
-        if (aNewVal != aDouble->value()) {
-          aDouble->setValue(aNewVal);
-          aJustUpdated = true;
-        }
-      } else {
-        aState = ModelAPI_StateInvalidArgument;
-      }
+    if (aDouble.get() && aDouble->expressionInvalid()) {
+      aState = ModelAPI_StateInvalidArgument;
     }
   }
-  */
 
   //if (aState == ModelAPI_StateDone) {// all referenced objects are ready to be used
     //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
