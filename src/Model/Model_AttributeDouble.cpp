@@ -7,6 +7,7 @@
 #include "Model_AttributeDouble.h"
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Events.h>
 
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
@@ -46,6 +47,12 @@ void Model_AttributeDouble::setText(const std::string& theValue)
   if (myText->Get() != aValue) {
     myText->Set(aValue);
     owner()->data()->sendAttributeUpdated(this);
+    // Send it to evaluator to convert into the double and store in the attribute
+    static Events_ID anId = ModelAPI_AttributeEvalMessage::eventId();
+    std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
+      std::shared_ptr<ModelAPI_AttributeEvalMessage>(new ModelAPI_AttributeEvalMessage(anId, this));
+    aMessage->setAttribute(owner()->data()->attribute(id())); // to get shared pointer to this
+    Events_Loop::loop()->send(aMessage);
   }
 }
 
@@ -67,5 +74,5 @@ void Model_AttributeDouble::setExpressionInvalid(const bool theFlag)
 
 bool Model_AttributeDouble::expressionInvalid()
 {
-  return myReal->Label().IsAttribute(kInvalidGUID);
+  return myReal->Label().IsAttribute(kInvalidGUID) == Standard_True;
 }

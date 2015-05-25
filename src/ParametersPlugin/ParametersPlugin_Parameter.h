@@ -40,12 +40,22 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
     return MY_EXPRESSION_ID;
   }
 
+  /// list of references to the arguments of this expression
+  inline static const std::string& ARGUMENTS_ID()
+  {
+    static const std::string MY_VARIABLE_ID("arguments");
+    return MY_VARIABLE_ID;
+  }
+
   /// Returns the kind of a feature
   PARAMETERSPLUGIN_EXPORT virtual const std::string& getKind()
   {
     static std::string MY_KIND = ParametersPlugin_Parameter::ID();
     return MY_KIND;
   }
+
+  /// Pre-execution is not needed for parameter
+  PARAMETERSPLUGIN_EXPORT virtual bool isPreviewNeeded() const;
 
   /// Creates a new part document if needed
   PARAMETERSPLUGIN_EXPORT virtual void execute();

@@ -10,7 +10,6 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_Events.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -125,12 +124,6 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
     // Here is a text of a real value or an expression.
     std::string aText = mySpinBox->text().toStdString();
     aReal->setText(aText);
-    // Send it to evaluator to convert into the double and store in the attribute
-    static Events_ID anId = ModelAPI_AttributeEvalMessage::eventId();
-    std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
-      std::shared_ptr<ModelAPI_AttributeEvalMessage>(new ModelAPI_AttributeEvalMessage(anId, this));
-    aMessage->setAttribute(aData->attribute(attributeID()));
-    Events_Loop::loop()->send(aMessage);
   }
   updateObject(myFeature);
   return true;

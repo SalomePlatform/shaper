@@ -9,6 +9,7 @@
 
 #include "ModelAPI.h"
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultParameter.h>
 #include <GeomAPI_Shape.h>
 
 #include <vector>
@@ -22,7 +23,8 @@ MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
  * in the root document (PartSet). If found, set it value in the \param outValue
  * and returns true.
  */
-MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue);
+MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue, 
+  ResultParameterPtr& theParam);
 
 /*!
  * Returns the values of the next random color. The values are in range [0, 255]

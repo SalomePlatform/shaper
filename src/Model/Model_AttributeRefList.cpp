@@ -50,6 +50,16 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
   owner()->data()->sendAttributeUpdated(this);
 }
 
+void Model_AttributeRefList::clear()
+{
+  std::list<ObjectPtr> anOldList = list();
+  myRef->Clear();
+  std::list<ObjectPtr>::iterator anOldIter = anOldList.begin();
+  for(; anOldIter != anOldList.end(); anOldIter++) {
+    REMOVE_BACK_REF((*anOldIter));
+  }
+}
+
 int Model_AttributeRefList::size() const
 {
   return myRef->Extent();
