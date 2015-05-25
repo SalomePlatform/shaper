@@ -101,6 +101,9 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
 void PartSet_WidgetPoint2D::reset()
 {
+  if (!isUseReset())
+    return;
+
   if (isComputedDefault()) {
     //return;
     if (myFeature->compute(myAttributeID))

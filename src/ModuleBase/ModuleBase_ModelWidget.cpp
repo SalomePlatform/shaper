@@ -30,6 +30,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
       myIsEditing(false)
 {
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
+  myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
   myIsComputedDefault = theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED;
   myAttributeID = theData ? theData->widgetId() : "";
   myIsObligatory = theData->getBooleanAttribute(ATTR_OBLIGATORY, true);

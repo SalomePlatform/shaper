@@ -64,6 +64,10 @@ Q_OBJECT
   /// \return the boolean result
   bool isObligatory() const { return myIsObligatory; }
 
+  /// Returns this parameter value in the xml file
+  /// \return the boolean result
+  bool isUseReset() const { return myUseReset; }
+
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
@@ -216,6 +220,9 @@ private:
                         
   /// the default value, which is defined in the XML for this attribute    
   std::string myDefaultValue; 
+
+  /// the reset state. If it is false, the reset method of the widget is not performed
+  bool myUseReset;
 };
 
 #endif

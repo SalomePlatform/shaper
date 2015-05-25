@@ -95,6 +95,9 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 
 void ModuleBase_WidgetDoubleValue::reset()
 {
+  if (!isUseReset())
+    return;
+
   if (isComputedDefault() || mySpinBox->hasVariable()) {
     return;
     //if (myFeature->compute(myAttributeID))

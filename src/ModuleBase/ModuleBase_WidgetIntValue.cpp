@@ -93,6 +93,9 @@ ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()
 
 void ModuleBase_WidgetIntValue::reset()
 {
+  if (!isUseReset())
+    return;
+
   if (isComputedDefault()) {
     return;
     //if (myFeature->compute(myAttributeID))

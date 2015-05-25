@@ -65,6 +65,8 @@ const static char* ATTR_DEFAULT = "default";
 const static char* ATTR_INTERNAL = "internal";
 const static char* ATTR_OBLIGATORY = "obligatory";
 const static char* ATTR_CONCEALMENT = "concealment";
+const static char* ATTR_USE_RESET = "use_reset";
+
 // WDG_INFO properties
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;
 const static char* INFO_WDG_TOOLTIP = FEATURE_TOOLTIP;
