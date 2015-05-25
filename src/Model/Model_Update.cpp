@@ -86,7 +86,11 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
+    bool isOnlyResults = true; // check that only results were changed: only redisplay is needed
     for(; anObjIter != anObjs.cend(); anObjIter++) {
+      if (!std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIter).get()) {
+        isOnlyResults = false;
+      }
       // created objects are always must be up to date (python box feature)
       // and updated not in internal uptation chain
       if (theMessage->eventID() == kCreatedEvent) {
@@ -96,7 +100,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       }
     }
      // this event is for solver update, not here, do not react immideately
-    if (!(theMessage->eventID() == kMovedEvent))
+    if (!isOnlyResults && !(theMessage->eventID() == kMovedEvent))
       processOperation(false);
   } else if (theMessage->eventID() == kOpStartEvent) {
     // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)
@@ -246,12 +250,13 @@ ModelAPI_ExecState stateByReference(ObjectPtr theTarget, const ModelAPI_ExecStat
 }
 
 void Model_Update::updateArguments(FeaturePtr theFeature) {
+  // perform this method also for disabled features: to make "not done" state for
+  // featuers referenced to the active and modified features
+
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (theFeature->isDisabled()) // nothing to do with disabled feature
-    return;
   bool aJustUpdated = false;
-  ModelAPI_ExecState aState = ModelAPI_StateDone;
+  ModelAPI_ExecState aState = theFeature->data()->execState();
   // check the parameters: values can be changed
   std::list<AttributePtr> aDoubles = 
     theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId()); 
@@ -272,7 +277,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     }
   }
 
-  if (aState == ModelAPI_StateDone) {// all referenced objects are ready to be used
+  //if (aState == ModelAPI_StateDone) {// all referenced objects are ready to be used
     //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
     // before execution update the selection attributes if any
     list<AttributePtr> aRefs = 
@@ -281,10 +286,16 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     for (; aRefsIter != aRefs.end(); aRefsIter++) {
       std::shared_ptr<ModelAPI_AttributeSelection> aSel =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
-      if (!aSel->update()) { // this must be done on execution since it may be long operation
-        if (!aFactory->isNotObligatory(theFeature->getKind(), theFeature->data()->id(aSel)) &&
-            aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
-          aState = ModelAPI_StateInvalidArgument;
+      ObjectPtr aContext = aSel->context();
+      // update argument onlt if the referenced object is changed
+      if (aContext.get() && isUpdated(aContext) && !aContext->isDisabled()) {
+        if (aState == ModelAPI_StateDone)
+          aState = ModelAPI_StateMustBeUpdated;
+        if (!aSel->update()) { // this must be done on execution since it may be long operation
+          if (!aFactory->isNotObligatory(theFeature->getKind(), theFeature->data()->id(aSel)) &&
+              aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
+            aState = ModelAPI_StateInvalidArgument;
+        }
       }
     }
     aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
@@ -295,16 +306,22 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
         std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
         if (aSelAttr) {
-          if (!aSelAttr->update()) {
-            if (!aFactory->isNotObligatory(
-                  theFeature->getKind(), theFeature->data()->id(aSel)) &&
+          ObjectPtr aContext = aSelAttr->context();
+          // update argument onlt if the referenced object is changed
+          if (aContext.get() && isUpdated(aContext) && !aContext->isDisabled()) {
+            if (aState == ModelAPI_StateDone)
+              aState = ModelAPI_StateMustBeUpdated;
+            if (!aSelAttr->update()) {
+              if (!aFactory->isNotObligatory(
+                theFeature->getKind(), theFeature->data()->id(aSel)) &&
                 aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
-              aState = ModelAPI_StateInvalidArgument;
+                aState = ModelAPI_StateInvalidArgument;
+            }
           }
         }
       }
     }
-  }
+  //}
   if (aJustUpdated && myJustCreated.find(theFeature) == myJustCreated.end())
   myJustUpdated.insert(theFeature);
   if (aState != ModelAPI_StateDone)
@@ -321,7 +338,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   bool aJustUpdated = false;
 
   if (theFeature) {
-    if (theFeature->data()->execState() != ModelAPI_StateDone)
+    if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
       aJustUpdated = true;
 
     ModelAPI_ExecState aState = ModelAPI_StateDone;
@@ -361,11 +378,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
       if ((std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
           !theFeature->isPersistentResult()) && theFeature->isPreviewNeeded()) {
         if (aFactory->validate(theFeature)) {
-          if (myIsAutomatic || 
-              (myJustCreated.find(theFeature) != myJustCreated.end() ||
-              (myJustUpdated.find(theFeature) != myJustUpdated.end() && 
-               theFeature == theFeature->document()->currentFeature(false)) || // currently edited
-              !theFeature->isPersistentResult() /* execute quick, not persistent results */))
+          if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
+              || (isUpdated(theFeature) && 
+               theFeature == theFeature->document()->currentFeature(false))) // currently edited
           {
             if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
               executeFeature(theFeature);
@@ -413,3 +428,8 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   redisplayWithResults(theFeature, aState);
 }
 
+bool Model_Update::isUpdated(const ObjectPtr& theObj)
+{
+  return myJustCreated.find(theObj) != myJustCreated.end() ||
+         myJustUpdated.find(theObj) != myJustUpdated.end();
+}

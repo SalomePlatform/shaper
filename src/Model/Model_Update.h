@@ -60,6 +60,9 @@ protected:
   /// Performs the feature execution
   /// \returns the status of execution
   void executeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// returns true if the object was created or updated
+  bool isUpdated(const std::shared_ptr<ModelAPI_Object>& theObj);
 };
 
 #endif
