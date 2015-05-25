@@ -44,7 +44,7 @@ void Model_AttributeDouble::setText(const std::string& theValue)
   TCollection_ExtendedString aValue(theValue.c_str());
   if (myText->Get() != aValue) {
     myText->Set(aValue);
-    //owner()->data()->sendAttributeUpdated(this); ?
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 

@@ -197,6 +197,7 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
         // number of subs can be changed in execution: like fillet
         for(int a = 0; a < aComposite->numberOfSubs(); a++) {
           FeaturePtr aSub = aComposite->subFeature(a);
+          updateArguments(aSub);
           updateFeature(aSub);
           alreadyProcessed.insert(aSub);
         }
@@ -257,7 +258,10 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
 
   bool aJustUpdated = false;
   ModelAPI_ExecState aState = theFeature->data()->execState();
+  if (aState == ModelAPI_StateInvalidArgument) // a chance to be corrected
+    aState = ModelAPI_StateMustBeUpdated;
   // check the parameters: values can be changed
+  /* parameters evaluator now does this
   std::list<AttributePtr> aDoubles = 
     theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId()); 
   std::list<AttributePtr>::iterator aDoubleIter = aDoubles.begin();
@@ -276,6 +280,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       }
     }
   }
+  */
 
   //if (aState == ModelAPI_StateDone) {// all referenced objects are ready to be used
     //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
@@ -333,7 +338,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (theFeature->isDisabled()) // nothing to do with disabled feature
+  if (theFeature->isDisabled() ||  // nothing to do with disabled feature
+      theFeature->data()->execState() == ModelAPI_StateInvalidArgument)
     return;
   bool aJustUpdated = false;
 
