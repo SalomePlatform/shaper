@@ -274,11 +274,14 @@ void ModuleBase_Operation::activateByPreselection()
     aFilledWgt = aWgt;
   }*/
 
-  // 3. activate the next obligatory widget
-  myPropertyPanel->activateNextWidget(aFilledWgt);
+  // 3. a signal should be emitted before the next widget activation
+  // because, the activation of the next widget will give a focus to the widget. As a result
+  // the value of the widget is initialized. And commit may happens until the value is entered.
   if (aFilledWgt)
     emit activatedByPreselection();
 
+  // 4. activate the next obligatory widget
+  myPropertyPanel->activateNextWidget(aFilledWgt);
 }
 
 void ModuleBase_Operation::setParentFeature(CompositeFeaturePtr theParent)

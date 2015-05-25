@@ -230,7 +230,6 @@ bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerP
   bool isDone = false;
   for (int i = thePosition; i < theValues.size(); i++) {
     ModuleBase_ViewerPrs aValue = theValues[i];
-    thePosition++;
     bool aProcessed = false;
     if (isValidSelection(aValue)) {
       aProcessed = setSelectionCustom(aValue);
@@ -240,6 +239,8 @@ bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerP
     // when an object, which do not satisfy the validating process, stop set selection
     if (!aProcessed)
       break;
+    else
+      thePosition++;
   }
   if (isDone) {
     updateObject(myFeature);
