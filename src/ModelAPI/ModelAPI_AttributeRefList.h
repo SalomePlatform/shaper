@@ -34,6 +34,9 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   /// Erases the first meet of the feature in the list
   MODELAPI_EXPORT virtual void remove(ObjectPtr theObject) = 0;
 
+  /// Removes all references from the list
+  MODELAPI_EXPORT virtual void clear() = 0;
+
   /// Returns number of features in the list
   MODELAPI_EXPORT virtual int size() const = 0;
 

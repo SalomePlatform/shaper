@@ -110,11 +110,13 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     isOperationChanged = true;
   }
   if (isOperationChanged) {
-    // remove all macros before clearing all created
+    // remove all macros before clearing all created and execute all not-previewed
     std::set<ObjectPtr>::iterator aCreatedIter = myJustCreated.begin();
-    for(; aCreatedIter != myJustCreated.end(); aCreatedIter++) {
-      FeaturePtr aFeature = 
-        std::dynamic_pointer_cast<ModelAPI_Feature>(*aCreatedIter);
+    std::set<ObjectPtr>::iterator anUpdatedIter = myJustUpdated.begin();
+    for(; aCreatedIter != myJustCreated.end() || anUpdatedIter != myJustUpdated.end();
+      aCreatedIter == myJustCreated.end() ? anUpdatedIter++ : aCreatedIter++) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*
+        (aCreatedIter == myJustCreated.end() ? anUpdatedIter : aCreatedIter));
       if (aFeature.get()) {
         // execute not-previewed feature on "apply"
         if (!aFeature->isPreviewNeeded() && (myJustCreated.find(aFeature) != myJustCreated.end() ||
@@ -267,8 +269,10 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   for(; aDoubleIter != aDoubles.end(); aDoubleIter++) {
     AttributeDoublePtr aDouble = 
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
-    if (aDouble.get() && aDouble->expressionInvalid()) {
-      aState = ModelAPI_StateInvalidArgument;
+    if (aDouble.get() && !aDouble->text().empty()) {
+      if (aDouble->expressionInvalid()) {
+        aState = ModelAPI_StateInvalidArgument;
+      }
     }
   }
 
@@ -371,31 +375,36 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     //std::cout<<"Update feature "<<theFeature->getKind()<<" must be updated = "<<aMustbeUpdated<<std::endl;
     // execute feature if it must be updated
     if (aJustUpdated) {
-      if ((std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
-          !theFeature->isPersistentResult()) && theFeature->isPreviewNeeded()) {
-        if (aFactory->validate(theFeature)) {
-          if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
-              || (isUpdated(theFeature) && 
-               theFeature == theFeature->document()->currentFeature(false))) // currently edited
-          {
-            if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
-              executeFeature(theFeature);
+      if (theFeature->isPreviewNeeded()) {
+        if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
+            !theFeature->isPersistentResult()) {
+          if (aFactory->validate(theFeature)) {
+            if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
+                || (isUpdated(theFeature) && 
+                 theFeature == theFeature->document()->currentFeature(false))) // currently edited
+            {
+              if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
+                executeFeature(theFeature);
+              }
+            } else { // must be updatet, but not updated yet
+              theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
+              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+              for (; aRIter != aResults.cend(); aRIter++) {
+                std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+                aRes->data()->execState(ModelAPI_StateMustBeUpdated);
+              }
             }
-          } else { // must be updatet, but not updated yet
-            theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
-            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-            for (; aRIter != aResults.cend(); aRIter++) {
-              std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-              aRes->data()->execState(ModelAPI_StateMustBeUpdated);
-            }
+          } else {
+            theFeature->eraseResults();
+            redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
           }
-        } else {
-          theFeature->eraseResults();
-          redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
+        } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
+          redisplayWithResults(theFeature, ModelAPI_StateNothing);
         }
-      } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
-        redisplayWithResults(theFeature, ModelAPI_StateNothing);
+      } else { // preview is not needed => make state Done
+        if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
+          theFeature->data()->execState(ModelAPI_StateDone);
       }
     }
   }

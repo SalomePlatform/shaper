@@ -66,7 +66,8 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
   std::list<std::string>::iterator it = anExprParams.begin();
   for ( ; it != anExprParams.end(); it++) {
     double aValue;
-    if (!ModelAPI_Tools::findVariable(*it, aValue)) continue;
+    ResultParameterPtr aParamRes;
+    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes)) continue;
 
     std::ostringstream sstream;
     sstream << aValue;
@@ -78,4 +79,3 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
   myInterp->clearLocalContext();
   return result;
 }
-

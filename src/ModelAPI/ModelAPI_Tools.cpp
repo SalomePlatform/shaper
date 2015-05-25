@@ -36,7 +36,7 @@ std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   return theResult->shape();
 }
 
-bool findVariable(const std::string& theName, double& outValue)
+bool findVariable(const std::string& theName, double& outValue, ResultParameterPtr& theParam)
 {
   SessionPtr aSession = ModelAPI_Session::get();
   std::list<DocumentPtr> aDocList;
@@ -48,10 +48,10 @@ bool findVariable(const std::string& theName, double& outValue)
   }
   for(std::list<DocumentPtr>::const_iterator it = aDocList.begin(); it != aDocList.end(); ++it) {
     ObjectPtr aParamObj = (*it)->objectByName(ModelAPI_ResultParameter::group(), theName);
-    ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
-    if(!aParam.get())
+    theParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
+    if(!theParam.get())
       continue;
-    AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+    AttributeDoublePtr aValueAttribute = theParam->data()->real(ModelAPI_ResultParameter::VALUE());
     outValue = aValueAttribute->value();
     return true;
   }

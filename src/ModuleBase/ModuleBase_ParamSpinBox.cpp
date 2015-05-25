@@ -164,7 +164,7 @@ bool ModuleBase_ParamSpinBox::hasVariable() const
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  QRegExp varNameMask("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
+  QRegExp varNameMask("[-+]?[0-9]*.?[0-9]+([eE][-+]?[0-9]+)?");
   return !varNameMask.exactMatch(theText);
 }
 
@@ -205,8 +205,8 @@ bool ModuleBase_ParamSpinBox::checkRange(const double theValue) const
 bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
                                            double& outValue) const
 {
-
-  return ModelAPI_Tools::findVariable(theName.toStdString(), outValue);
+  ResultParameterPtr aParam;
+  return ModelAPI_Tools::findVariable(theName.toStdString(), outValue, aParam);
 }
 
 /*!

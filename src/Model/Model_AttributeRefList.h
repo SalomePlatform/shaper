@@ -31,6 +31,9 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   /// Returns number of features in the list
   MODEL_EXPORT virtual int size() const;
 
+  /// Removes all references from the list
+  MODEL_EXPORT virtual void clear();
+
   /// Returns the list of features
   MODEL_EXPORT virtual std::list<ObjectPtr> list();
 
