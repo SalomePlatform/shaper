@@ -73,7 +73,8 @@ Q_OBJECT
   }
 
   //! Returns list of currently selected objects
-  QObjectPtrList selectedObjects() const;
+  //! \param theIndexes - output list of corresponded indexes (can be NULL)
+  QObjectPtrList selectedObjects(QModelIndexList* theIndexes = 0) const;
 
   /// Set selected list of objects
   /// \param theObjects list of objects to select

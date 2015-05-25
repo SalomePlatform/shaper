@@ -229,8 +229,13 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
 //***************************************************
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 {
-  QObjectPtrList aSelectedData = selectedObjects();
-  bool toEnable = aSelectedData.size() == 1;
+  QModelIndexList aIndexes;
+  QObjectPtrList aSelectedData = selectedObjects(&aIndexes);
+  bool toEnable = false;
+  if (aSelectedData.size() == 1) {
+    Qt::ItemFlags aFlags = dataModel()->flags(aIndexes.first());
+    toEnable = ((aFlags & Qt::ItemIsEditable) != 0);
+  }
   foreach(QAction* aCmd, actions()) {
     aCmd->setEnabled(toEnable);
   }
@@ -324,7 +329,7 @@ void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
   emit selectionChanged();
 }
 
-QObjectPtrList XGUI_ObjectsBrowser::selectedObjects() const
+QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes) const
 {
   QObjectPtrList aList;
   QModelIndexList aIndexes = selectedIndexes();
@@ -333,8 +338,11 @@ QObjectPtrList XGUI_ObjectsBrowser::selectedObjects() const
   for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
     if ((*aIt).column() == 0) {
       ObjectPtr aObject = aModel->object(*aIt);
-      if (aObject)
+      if (aObject) {
         aList.append(aObject);
+        if (theIndexes)
+          theIndexes->append(*aIt);
+      }
     }
   }
   return aList;

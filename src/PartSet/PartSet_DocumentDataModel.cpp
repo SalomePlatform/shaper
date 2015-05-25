@@ -644,7 +644,12 @@ Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) cons
   } else {
     QModelIndex* aIndex = toSourceModelIndex(theIndex);
     const QAbstractItemModel* aModel = aIndex->model();
-    return aModel->flags(*aIndex);
+    Qt::ItemFlags aFlags = aModel->flags(*aIndex);
+    if (aModel == myModel) {
+      if (myModel->object(*aIndex))
+        aFlags |= Qt::ItemIsEditable;
+    }
+    return aFlags;
   }
 }
 
