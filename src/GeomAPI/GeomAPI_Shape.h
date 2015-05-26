@@ -36,6 +36,9 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   /// Returns whether the shape is a face
   virtual bool isFace() const;
 
+  /// Returns whether the shape is a face
+  virtual bool isCompound() const;
+
   /// Returns whether the shape is a solid
   virtual bool isSolid() const;
 

@@ -30,6 +30,7 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
     MyEdgeTypes["circle"] = Circle;
     MyEdgeTypes["solid"] = Solid;
     MyEdgeTypes["face"]  = Face;
+    MyEdgeTypes["compound"] = Compound;
   }
   std::string aType = std::string(theType.c_str());
   if (MyEdgeTypes.find(aType) != MyEdgeTypes.end())
@@ -149,6 +150,9 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
         break;
       case Face:
         aValid = theShape->isFace();
+        break;
+      case Compound:
+        aValid = theShape->isCompound();
         break;
       default: break;
     }
