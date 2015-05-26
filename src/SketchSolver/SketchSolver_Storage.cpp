@@ -554,7 +554,7 @@ int SketchSolver_Storage::deleteTemporaryConstraint()
   std::set<Slvs_hConstraint>::iterator aCIt = myTemporaryConstraints.begin();
   for (; aCIt != myTemporaryConstraints.end(); aCIt++) {
     int aPos = Search(*aCIt, myConstraints);
-    if (myConstraints[aPos].type != SLVS_C_WHERE_DRAGGED)
+    if (aPos >= (int)myConstraints.size() || myConstraints[aPos].type != SLVS_C_WHERE_DRAGGED)
       break;
     std::vector<Slvs_Constraint>::iterator anIt = myConstraints.begin();
     for (; anIt != myConstraints.end(); anIt++)
