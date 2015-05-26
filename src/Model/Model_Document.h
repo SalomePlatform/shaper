@@ -133,6 +133,9 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
     const bool theVisible);
 
+  //! Makes the current feature one feature upper
+  MODEL_EXPORT virtual void setCurrentFeatureUp();
+
   /// Creates a construction cresults
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

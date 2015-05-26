@@ -90,7 +90,7 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
     aShape = BREPImport::Import(aFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
     aShape = STEPImport::Import(aFileName, anExtension, anError);
-  } else if (anExtension == "IGES") {
+  } else if (anExtension == "IGES" || anExtension == "IGS") {
     aShape = IGESImport::Import(aFileName, anExtension, anError);
   }
    // Check if shape is valid

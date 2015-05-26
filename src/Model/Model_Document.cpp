@@ -171,8 +171,7 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     setCurrentFeature(currentFeature(false), false);
     aSession->setCheckTransactions(true);
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
-    // this is done in Part result "activate", so no needed here. Causes not-blue active part.
-    //aSession->setActiveDocument(anApp->getDocument(myID), true); 
+    aSession->setActiveDocument(anApp->getDocument(myID), true);
   }
   return !isError;
 }
@@ -566,11 +565,6 @@ void Model_Document::refsToFeature(FeaturePtr theFeature,
 
 void Model_Document::removeFeature(FeaturePtr theFeature)
 {
-  // if this feature is current, make the current the previous feature
-  if (theFeature == currentFeature(false)) {
-    FeaturePtr aPrev = myObjs->nextFeature(theFeature, true);
-    setCurrentFeature(aPrev, false);
-  }
   myObjs->removeFeature(theFeature);
 }
 
@@ -719,6 +713,15 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     }
   }
   aLoop->flush(aRedispEvent);
+}
+
+void Model_Document::setCurrentFeatureUp()
+{
+  FeaturePtr aCurrent = currentFeature(false);
+  if (aCurrent.get()) { // if not, do nothing because null is the upper
+    FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
+    setCurrentFeature(aPrev, false);
+  }
 }
 
 TDF_Label Model_Document::generalLabel() const

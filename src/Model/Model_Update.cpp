@@ -413,10 +413,11 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
         if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
             !theFeature->isPersistentResult()) {
           if (aFactory->validate(theFeature)) {
+            FeaturePtr aCurrent = theFeature->document()->currentFeature(false);
             if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
                 || (isUpdated(theFeature) && 
-                     (theFeature == theFeature->document()->currentFeature(false) || 
-                      theFeature->document()->currentFeature(false)->isMacro()))) // currently edited
+                     (theFeature == aCurrent || 
+                      (aCurrent.get() && aCurrent->isMacro())))) // currently edited
             {
               if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
                 executeFeature(theFeature);
