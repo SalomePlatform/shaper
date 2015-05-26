@@ -136,6 +136,9 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
             removeSubModel(aDelPartModel);
             removeRow(aStart, partFolderNode(0));
           }
+        } if (aGroup == ModelAPI_Feature::group()) { // Update History node
+          int aRow = historyOffset() + aRootDoc->size(ModelAPI_Feature::group());
+          removeRow(aRow);
         } else {  // Update top groups (other except parts
           QModelIndex aIndex = myModel->findGroup(aGroup);
           int aStart = myModel->rowCount(aIndex);

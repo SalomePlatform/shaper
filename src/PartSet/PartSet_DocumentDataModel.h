@@ -146,7 +146,7 @@ Q_OBJECT
 
   enum
   {
-    PartsFolder = -100,
+    PartsFolder,
     HistoryNode,
     PartResult
   };
