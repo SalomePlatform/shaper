@@ -68,4 +68,7 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual ~GeomDataAPI_Point2D();
 };
 
+//! Pointer on attribute object
+typedef std::shared_ptr<GeomDataAPI_Point2D> AttributePoint2DPtr;
+
 #endif

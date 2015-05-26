@@ -23,6 +23,8 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Point2D.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
 #include <Events_Error.h>
@@ -263,15 +265,47 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   if (aState == ModelAPI_StateInvalidArgument) // a chance to be corrected
     aState = ModelAPI_StateMustBeUpdated;
   // check the parameters state
-  std::list<AttributePtr> aDoubles = 
-    theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId()); 
+  // Double
+  std::list<AttributePtr> aDoubles =
+    theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId());
   std::list<AttributePtr>::iterator aDoubleIter = aDoubles.begin();
   for(; aDoubleIter != aDoubles.end(); aDoubleIter++) {
-    AttributeDoublePtr aDouble = 
+    AttributeDoublePtr aDouble =
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
     if (aDouble.get() && !aDouble->text().empty()) {
       if (aDouble->expressionInvalid()) {
         aState = ModelAPI_StateInvalidArgument;
+      }
+    }
+  }
+  // Point
+  {
+    std::list<AttributePtr> anAttributes =
+      theFeature->data()->attributes(GeomDataAPI_Point::typeId());
+    std::list<AttributePtr>::iterator anIter = anAttributes.begin();
+    for(; anIter != anAttributes.end(); anIter++) {
+      AttributePointPtr aPointAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point>(*anIter);
+      if (aPointAttribute.get()) {
+        if ((!aPointAttribute->textX().empty() && aPointAttribute->expressionInvalid(0)) ||
+            (!aPointAttribute->textY().empty() && aPointAttribute->expressionInvalid(1)) ||
+            (!aPointAttribute->textZ().empty() && aPointAttribute->expressionInvalid(2)))
+          aState = ModelAPI_StateInvalidArgument;
+      }
+    }
+  }
+  // Point2D
+  {
+    std::list<AttributePtr> anAttributes =
+      theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+    std::list<AttributePtr>::iterator anIter = anAttributes.begin();
+    for(; anIter != anAttributes.end(); anIter++) {
+      AttributePoint2DPtr aPoint2DAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
+      if (aPoint2DAttribute.get()) {
+        if ((!aPoint2DAttribute->textX().empty() && aPoint2DAttribute->expressionInvalid(0)) ||
+            (!aPoint2DAttribute->textY().empty() && aPoint2DAttribute->expressionInvalid(1)))
+          aState = ModelAPI_StateInvalidArgument;
       }
     }
   }
