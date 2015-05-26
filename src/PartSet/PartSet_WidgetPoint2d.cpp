@@ -6,6 +6,7 @@
 
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
+#include <PartSet_Module.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ViewerProxy.h>
@@ -213,12 +214,17 @@ void PartSet_WidgetPoint2D::activateCustom()
           this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-  connect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
+  connect(aViewer, SIGNAL(enterViewPort()), this, SLOT(onLockValidating()));
+  connect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onUnlockValidating()));
 
   QIntList aModes;
   aModes << TopAbs_VERTEX;
   aModes << TopAbs_EDGE;
   myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
+
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule->isMouseOverWindow())
+    onLockValidating();
 }
 
 void PartSet_WidgetPoint2D::deactivate()
@@ -228,10 +234,11 @@ void PartSet_WidgetPoint2D::deactivate()
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-  disconnect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
+  disconnect(aViewer, SIGNAL(enterViewPort()), this, SLOT(onLockValidating()));
+  disconnect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onUnlockValidating()));
 
   myWorkshop->moduleConnector()->deactivateSubShapesSelection();
-  myWorkshop->operationMgr()->setLockValidating(false);
+  onUnlockValidating();
 }
 
 bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 
@@ -340,11 +347,6 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
 {
   if (isEditingMode())
     return;
-  myWorkshop->operationMgr()->setLockValidating(true);
-  // the Ok button should be disabled in the property panel by moving the mouse point in the viewer
-  // this leads that the user does not try to click Ok and it avoids an incorrect situation that the 
-  // line is moved to the cursor to the Ok button
-  myWorkshop->operationMgr()->setApplyEnabled(false);
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
@@ -353,7 +355,17 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
   setPoint(aX, anY);
 }
 
-void PartSet_WidgetPoint2D::onLeaveViewPort()
+void PartSet_WidgetPoint2D::onLockValidating()
+{
+  XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
+  anOperationMgr->setLockValidating(true);
+  // the Ok button should be disabled in the property panel by moving the mouse point in the viewer
+  // this leads that the user does not try to click Ok and it avoids an incorrect situation that the 
+  // line is moved to the cursor to the Ok button
+  anOperationMgr->setApplyEnabled(false);
+}
+
+void PartSet_WidgetPoint2D::onUnlockValidating()
 {
   // it is important to restore the validity state in the property panel after leaving the
   // view port. Unlock the validating.

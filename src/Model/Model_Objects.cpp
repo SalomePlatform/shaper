@@ -203,14 +203,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
 void Model_Objects::removeFeature(FeaturePtr theFeature)
 {
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theFeature->data());
-  if (aData) {
-    TDF_Label aFeatureLabel = aData->label().Father();
-    if (myFeatures.IsBound(aFeatureLabel))
-      myFeatures.UnBind(aFeatureLabel);
-    else
-      return;  // not found feature => do not remove
-
-    clearHistory(theFeature);
+  if (aData && aData->isValid()) {
     // checking that the sub-element of composite feature is removed: if yes, inform the owner
     std::set<std::shared_ptr<ModelAPI_Feature> > aRefs;
     refsToFeature(theFeature, aRefs, false);
@@ -224,6 +217,13 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
     }
     // erase fields
     theFeature->erase();
+
+    TDF_Label aFeatureLabel = aData->label().Father();
+    if (myFeatures.IsBound(aFeatureLabel))
+      myFeatures.UnBind(aFeatureLabel);
+
+    clearHistory(theFeature);
+
     static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
     // erase all attributes under the label of feature
@@ -834,7 +834,7 @@ ResultPtr Model_Objects::findByName(const std::string theName)
 FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theReverse)
 {
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
-  if (aData) {
+  if (aData && aData->isValid()) {
     TDF_Label aFeatureLabel = aData->label().Father();
     Handle(TDataStd_ReferenceArray) aRefs;
     if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
