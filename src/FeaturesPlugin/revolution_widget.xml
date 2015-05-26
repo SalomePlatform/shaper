@@ -33,7 +33,6 @@
       default="0"
       icon=":icons/angle_down.png"
       tooltip="Angle">
-      <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
   <groupbox title="To">
@@ -53,7 +52,6 @@
       default="10"
       icon=":icons/angle_up.png"
       tooltip="Angle">
-      <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
   <validator id="GeomValidators_ZeroOffset" parameters="from_object,to_object,from_angle,to_angle"/>

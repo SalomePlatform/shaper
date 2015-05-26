@@ -25,7 +25,6 @@
       default="0"
       icon=":icons/dimension_down.png"
       tooltip="Height">
-      <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
   <groupbox title="To">
@@ -45,7 +44,6 @@
       default="10"
       icon=":icons/dimension_up.png"
       tooltip="Height">
-      <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
   <validator id="GeomValidators_ZeroOffset" parameters="from_object,to_object,from_size,to_size"/>
