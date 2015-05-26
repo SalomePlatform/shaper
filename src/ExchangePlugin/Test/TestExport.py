@@ -89,7 +89,9 @@ if __name__ == '__main__':
 # Export a shape into IGES
 #=========================================================================
     testExport("IGES-5.1", "IGES-5.1", os.path.join(os.getcwd(), "Data", "screw_export-5.1.iges"), 1.98291079746e-06, 10 ** -17)
+    testExport("IGS-5.1", "IGES-5.1", os.path.join(os.getcwd(), "Data", "screw_export-5.1.igs"), 1.98291079746e-06, 10 ** -17)
     testExport("IGES-5.3", "IGES-5.3", os.path.join(os.getcwd(), "Data", "screw_export-5.3.iges"), 3.78827060085e-06, 10 ** -17)
+    testExport("IGS-5.3", "IGES-5.3", os.path.join(os.getcwd(), "Data", "screw_export-5.3.igs"), 3.78827060085e-06, 10 ** -17)
 #=========================================================================
 # End of test
 #=========================================================================
