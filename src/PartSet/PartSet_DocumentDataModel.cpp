@@ -155,9 +155,15 @@ void PartSet_DocumentDataModel::processEvent(const std::shared_ptr<Events_Messag
         }
         if (aPartModel) {
           QModelIndex aIndex = aPartModel->findGroup(aGroup);
-          int aStart = aPartModel->rowCount(aIndex);
-          aIndex = createIndex(aIndex.row(), aIndex.column(), (void*) getModelIndex(aIndex));
-          removeRow(aStart, aIndex);
+          if (aIndex.isValid()) {
+            int aStart = aPartModel->rowCount(aIndex);
+            aIndex = createIndex(aIndex.row(), aIndex.column(), (void*) getModelIndex(aIndex));
+            removeRow(aStart, aIndex);
+          } else {
+            int aRow = aPartModel->rowCount();
+            aIndex = createIndex(aPartModel->position() + historyOffset(), 0, HistoryNode);
+            removeRow(aRow, aIndex);
+          }
         }
       }
     }
