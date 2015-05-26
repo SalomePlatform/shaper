@@ -118,6 +118,17 @@ void SketchSolver_Constraint::process()
 
 bool SketchSolver_Constraint::checkAttributesChanged(ConstraintPtr theConstraint)
 {
+  std::set<Slvs_hEntity> aCurAttrs; // list of currently used attributes
+  std::vector<Slvs_hConstraint>::const_iterator aConstrIter = mySlvsConstraints.begin();
+  for (; aConstrIter != mySlvsConstraints.end(); aConstrIter++) {
+    Slvs_Constraint aConstr = myStorage->getConstraint(*aConstrIter);
+    if (aConstr.ptA != SLVS_E_UNKNOWN) aCurAttrs.insert(aConstr.ptA);
+    if (aConstr.ptB != SLVS_E_UNKNOWN) aCurAttrs.insert(aConstr.ptB);
+    if (aConstr.entityA != SLVS_E_UNKNOWN) aCurAttrs.insert(aConstr.entityA);
+    if (aConstr.entityB != SLVS_E_UNKNOWN) aCurAttrs.insert(aConstr.entityB);
+    if (aConstr.entityC != SLVS_E_UNKNOWN) aCurAttrs.insert(aConstr.entityC);
+    if (aConstr.entityD != SLVS_E_UNKNOWN) aCurAttrs.insert(aConstr.entityD);
+  }
   // Check the attrbutes of constraint are changed
   ConstraintPtr aConstraint = theConstraint ? theConstraint : myBaseConstraint;
   std::list<AttributePtr> anAttrList = aConstraint->data()->attributes(std::string());
@@ -128,11 +139,14 @@ bool SketchSolver_Constraint::checkAttributesChanged(ConstraintPtr theConstraint
     if (aRefAttr) {
       if (aRefAttr->isObject()) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-        if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
+        std::map<FeaturePtr, Slvs_hEntity>::iterator aFIt = myFeatureMap.find(aFeature);
+        if (aFeature && (aFIt == myFeatureMap.end() || aCurAttrs.find(aFIt->second) == aCurAttrs.end()))
           return true;
-      } else if (aRefAttr->attr() &&
-                 myAttributeMap.find(aRefAttr->attr()) == myAttributeMap.end())
-        return true;
+      } else if (aRefAttr->attr()) {
+        std::map<AttributePtr, Slvs_hEntity>::iterator anAIt = myAttributeMap.find(aRefAttr->attr());
+        if (anAIt == myAttributeMap.end() || aCurAttrs.find(anAIt->second) == aCurAttrs.end())
+          return true;
+      }
     }
     AttributeRefListPtr aRefList =
         std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIter);
@@ -141,7 +155,8 @@ bool SketchSolver_Constraint::checkAttributesChanged(ConstraintPtr theConstraint
       std::list<ObjectPtr>::iterator anIt = anItems.begin();
       for (; anIt != anItems.end(); anIt++) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-        if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
+        std::map<FeaturePtr, Slvs_hEntity>::iterator aFIt = myFeatureMap.find(aFeature);
+        if (aFeature && (aFIt == myFeatureMap.end() || aCurAttrs.find(aFIt->second) == aCurAttrs.end()))
           return true;
       }
     }
