@@ -106,8 +106,11 @@ protected slots:
   /// \param theEvent a mouse event
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
-  /// Process mouse leave view port to update validity state of the property panel
-  void onLeaveViewPort();
+  // Set lock validating in the operation manager. Set apply is disabled
+  void onLockValidating();
+
+  // Set unlock validating in the operation manager. Call method to update the apply state.
+  void onUnlockValidating();
 
 protected:
   /// Saves the internal parameters to the given feature
