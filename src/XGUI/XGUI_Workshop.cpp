@@ -1313,7 +1313,22 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
   foreach (ObjectPtr aObj, theList) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature.get() != NULL) {
-      aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
+      DocumentPtr aFeatureDoc = aObj->document();
+      SessionPtr aMgr = ModelAPI_Session::get();
+      DocumentPtr aModuleDoc = aMgr->moduleDocument();
+      // objects from "Part" documents can refer to the the features of "PartSet".
+      // So, it the referenced features should be checked in these documents
+      if (aFeatureDoc == aModuleDoc) {
+        std::list<DocumentPtr> aDocuments = aMgr->allOpenedDocuments();
+        std::list<DocumentPtr> anOpenedDocs = aMgr->allOpenedDocuments();
+        std::list<DocumentPtr>::const_iterator anIt = anOpenedDocs.begin(),
+                                               aLast = anOpenedDocs.end();
+        for (; anIt != aLast; anIt++) {
+          (*anIt)->refsToFeature(aFeature, aRefFeatures, false);
+        }
+      }
+      else
+        aFeatureDoc->refsToFeature(aFeature, aRefFeatures, false);
     }
   }
   // 2. warn about the references remove, break the delete operation if the user chose it
