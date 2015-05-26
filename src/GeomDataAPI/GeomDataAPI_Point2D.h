@@ -32,6 +32,24 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   /// Returns the 2D point
   virtual std::shared_ptr<GeomAPI_Pnt2d> pnt() = 0;
 
+  /// Defines the double values
+  virtual void setText(const std::string& theX,
+                       const std::string& theY) = 0;
+
+  /// Returns the double values
+  virtual std::string textX() = 0;
+  virtual std::string textY() = 0;
+
+  enum PointComponent { C_X = 0,
+                        C_Y = 1,
+  };
+
+  /// Allows to set expression (text) as invalid (by the parameters listener)
+  virtual void setExpressionInvalid(int theComponent, const bool theFlag) = 0;
+
+  /// Returns true if text is invalid
+  virtual bool expressionInvalid(int theComponent) = 0;
+
   /// Appends the delta values to point
   GEOMDATAAPI_EXPORT void move(const double theDeltaX, const double theDeltaY);
 

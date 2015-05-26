@@ -34,6 +34,27 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   /// Returns the 3D point
   virtual std::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
+  /// Defines the double values
+  virtual void setText(const std::string& theX,
+                       const std::string& theY,
+                       const std::string& theZ) = 0;
+
+  /// Returns the double values
+  virtual std::string textX() = 0;
+  virtual std::string textY() = 0;
+  virtual std::string textZ() = 0;
+
+  enum PointComponent { C_X = 0,
+                        C_Y = 1,
+                        C_Z = 2,
+  };
+
+  /// Allows to set expression (text) as invalid (by the parameters listener)
+  virtual void setExpressionInvalid(int theComponent, const bool theFlag) = 0;
+
+  /// Returns true if text is invalid
+  virtual bool expressionInvalid(int theComponent) = 0;
+
   /// Returns the type of this class of attributes
   static std::string typeId()
   {
