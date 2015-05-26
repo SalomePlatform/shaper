@@ -155,8 +155,7 @@ bool SketchSolver_Constraint::checkAttributesChanged(ConstraintPtr theConstraint
       std::list<ObjectPtr>::iterator anIt = anItems.begin();
       for (; anIt != anItems.end(); anIt++) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-        std::map<FeaturePtr, Slvs_hEntity>::iterator aFIt = myFeatureMap.find(aFeature);
-        if (aFeature && (aFIt == myFeatureMap.end() || aCurAttrs.find(aFIt->second) == aCurAttrs.end()))
+        if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
           return true;
       }
     }

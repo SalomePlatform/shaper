@@ -424,7 +424,7 @@ bool SketchSolver_Group::resolveConstraints()
       else {
         // To avoid overconstraint situation, we will remove temporary constraints one-by-one
         // and try to find the case without overconstraint
-        int aNbTemp = (int)myTempConstraints.size();
+        int aNbTemp = myStorage->numberTemporary();
         while (true) {
           aResult = myConstrSolver.solve();
           if (aResult == SLVS_RESULT_OKAY || aNbTemp <= 0)
@@ -575,7 +575,8 @@ bool SketchSolver_Group::isConsistent()
 void SketchSolver_Group::removeTemporaryConstraints()
 {
   myTempConstraints.clear();
-  myStorage->removeTemporaryConstraints();
+  while (myStorage->numberTemporary())
+    myStorage->deleteTemporaryConstraint();
   // Clean lists of removed entities in the storage
   std::set<Slvs_hParam> aRemPar;
   std::set<Slvs_hEntity> aRemEnt;

@@ -164,17 +164,6 @@ void SketchSolver_ConstraintMultiTranslation::process()
     }
   }
 
-  // Set the translation line unchanged during constraint recalculation
-  for (int i = 0; i < 2; i++) {
-    if (myStorage->isPointFixed(aTranslationLine.point[i], aConstraint.h, true))
-      continue;
-    aConstraint = Slvs_MakeConstraint(
-        SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_WHERE_DRAGGED, myGroup->getWorkplaneId(), 0.0,
-        aTranslationLine.point[i], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-    aConstraint.h = myStorage->addConstraint(aConstraint);
-    mySlvsConstraints.push_back(aConstraint.h);
-  }
-
   adjustConstraint();
 }
 
@@ -222,6 +211,18 @@ bool SketchSolver_ConstraintMultiTranslation::remove(ConstraintPtr theConstraint
 void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
 {
   Slvs_Entity aTranslationLine = myStorage->getEntity(myTranslationLine);
+  Slvs_hConstraint aFixed; // temporary variable
+  // Set the translation line unchanged during constraint recalculation
+  for (int i = 0; i < 2; i++) {
+    if (myStorage->isPointFixed(aTranslationLine.point[i], aFixed, true))
+      continue;
+    Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+        SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_WHERE_DRAGGED, myGroup->getWorkplaneId(), 0.0,
+        aTranslationLine.point[i], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+    aConstraint.h = myStorage->addConstraint(aConstraint);
+    myStorage->addTemporaryConstraint(aConstraint.h);
+  }
+
   // Check if the distance between point is 0, no need to resolve constraints (just wait another values)
   double aXY[4];
   for (int i = 0; i < 2; i++) {
@@ -239,7 +240,6 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
   std::list<Slvs_Constraint> aParallel = myStorage->getConstraintsByType(SLVS_C_PARALLEL);
   std::list<Slvs_Constraint>::iterator aParIt = aParallel.begin();
   std::vector<Slvs_hConstraint>::iterator aCIt;
-  Slvs_hConstraint aFixed; // temporary variable
   for (; aParIt != aParallel.end(); aParIt++) {
     for (aCIt = mySlvsConstraints.begin(); aCIt != mySlvsConstraints.end(); aCIt++)
       if (aParIt->h == *aCIt)

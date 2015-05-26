@@ -113,6 +113,9 @@ public:
   int deleteTemporaryConstraint();
   /// \brief Checks the constraint is temporary
   bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
+  /// \brief Number of temporary constraints
+  int numberTemporary() const
+  { return (int)myTemporaryConstraints.size(); }
 
   /// \brief Shows the sketch should be resolved
   bool isNeedToResolve() const
