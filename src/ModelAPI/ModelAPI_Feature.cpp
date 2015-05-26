@@ -117,6 +117,11 @@ const std::string& ModelAPI_Feature::documentToAdd()
 
 void ModelAPI_Feature::erase()
 {
+  // if this is the current feature, make the upper feature as current before removing
+  if (document().get() && document()->currentFeature(false).get() == this) {
+    document()->setCurrentFeatureUp();
+  }
+
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();

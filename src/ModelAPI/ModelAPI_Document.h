@@ -99,6 +99,8 @@ public:
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
   virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
     const bool theVisible) = 0;
+  //! Makes the current feature one feature upper
+  virtual void setCurrentFeatureUp() = 0;
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
