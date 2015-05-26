@@ -277,6 +277,11 @@ void SketchSolver_Constraint::cleanRemovedEntities()
     std::map<AttributePtr, Slvs_hParam>::iterator aTmpIter = aValIt++;
     myValueMap.erase(aTmpIter);
   }
+  for (size_t i = 0; i < mySlvsConstraints.size(); i++)
+    if (aRemovedConstraints.find(mySlvsConstraints[i]) != aRemovedConstraints.end()) {
+      mySlvsConstraints.erase(mySlvsConstraints.begin() + i);
+      i--;
+    }
 }
 
 void SketchSolver_Constraint::getAttributes(
