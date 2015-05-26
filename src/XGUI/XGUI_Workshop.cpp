@@ -515,16 +515,17 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
     // the validity of the data should be checked here in order to avoid display of the objects,
     // which were created, then deleted, but flush for the creation event happens after that
     // we should not display disabled objects
-    if (!anObject->data() || !anObject->data()->isValid() || anObject->isDisabled())
-      continue;
-    //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
-    //if (aPart) {
-      //aHasPart = true;
-      // If a feature is created from the aplication's python console  
-      // it doesn't stored in the operation mgr and doesn't displayed
-    //} else {
-    isDisplayed = displayObject(*aIt);
-    //}
+    bool aHide = !anObject->data() || !anObject->data()->isValid() || 
+      anObject->isDisabled() || (!anObject->isDisplayed());
+    if (!aHide) {
+      // setDisplayed has to be called in order to synchronize internal state of the object 
+      // with list of displayed objects
+      if (myModule->canDisplayObject(anObject)) {
+        anObject->setDisplayed(true);
+        isDisplayed = displayObject(*aIt);
+      } else 
+        anObject->setDisplayed(false);
+    }
   }
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
@@ -847,7 +848,7 @@ void XGUI_Workshop::onOpen()
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
-  displayAllResults();
+  //displayAllResults();
   updateCommandStatus();
   myIsLoadingData = false;
   QApplication::restoreOverrideCursor();
