@@ -44,10 +44,8 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();
 
-  EXCHANGEPLUGIN_EXPORT virtual bool isInHistory()
-  {
-    return true;
-  }
+  /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
+  EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
 
  protected:
   /// Performs the import of the file
