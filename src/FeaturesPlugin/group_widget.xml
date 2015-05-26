@@ -3,5 +3,5 @@
 <source>
   <multi_selector id="group_list" 
     tooltip="Select a set of objects" 
-    type_choice="vertex edge face solid" /> 
+    type_choice="Vertices Edges Faces Solids" /> 
 </source>

@@ -12,7 +12,7 @@
         <export_file_selector id="export_file_selector" type="save" title="Export file" path="">
           <validator id="ExchangePlugin_ExportFormat" parameters="BREP:BREP,STEP|STP:STEP,IGES:IGES-5.1,IGES:IGES-5.3" />
         </export_file_selector>
-        <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="vertex edge face solid" /> 
+        <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="Vertices Edges Faces Solids" /> 
       </feature>
     </group>
   </workbench>

@@ -41,7 +41,7 @@ class QAction;
 * \code
 * <multi_selector id="group_list" 
 *    tooltip="Select a set of objects" 
-*    type_choice="vertex edge face solid" /> 
+*    type_choice="Vertices Edges Faces Solids" /> 
 * \endcode
 * It uses folloing parameters:
 * - id - is a name of corresponded attribute
@@ -137,8 +137,12 @@ protected slots:
   QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
  protected:
-   /// Update selection list
-   void updateSelectionList(AttributeSelectionListPtr);
+  /// Update selection list
+  void updateSelectionList(AttributeSelectionListPtr);
+
+  /// Converts the XML defined type choice to the validator type
+  /// For example, the "Edges" is converted to "edge"
+  std::string validatorType(const QString& theType) const;
 
    /// List control
   QListWidget* myListControl;
@@ -164,7 +168,7 @@ protected slots:
   /// Variable of GeomSelection
   QList<GeomSelection> mySelection;
 
-  /// A map of "type_choice" validators.
+  /// An instance of the "type_choice" validator. It is returns on validating in customValidator()
   GeomValidators_ShapeType* myShapeValidator;
 };
 

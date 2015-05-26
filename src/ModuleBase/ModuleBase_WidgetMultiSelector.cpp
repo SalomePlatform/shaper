@@ -215,7 +215,7 @@ void ModuleBase_WidgetMultiSelector::customValidators(
 
   theValidators.push_back(myShapeValidator);
   QString aType = myTypeCombo->currentText();
-  anArguments.push_back(aType.toStdString().c_str());
+  anArguments.push_back(validatorType(aType));
   theArguments.push_back(anArguments);
 }
 
@@ -435,6 +435,23 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList(AttributeSelectionListP
   }
   // We have to call repaint because sometimes the List control is not updated
   myListControl->repaint();
+}
+
+//********************************************************************
+std::string ModuleBase_WidgetMultiSelector::validatorType(const QString& theType) const
+{
+  std::string aType;
+
+  if (theType == "Vertices")
+    aType = "vertex";
+  else if (theType == "Edges")
+    aType = "edge";
+  else if (theType == "Faces")
+    aType = "face";
+  else if (theType == "Solids")
+    aType = "solid";
+
+  return aType;
 }
 
 //********************************************************************

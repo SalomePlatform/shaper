@@ -26,6 +26,8 @@ class QLabel;
 class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
+class ModelAPI_Validator;
+class GeomValidators_ShapeType;
 
 /**
 * \ingroup GUI
@@ -112,6 +114,13 @@ Q_OBJECT
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const bool theValid);
 
+  /// Puts additional validators to the given list. A separate validator is created for each of the
+  /// "type_choice" value
+  /// \param theValidators a list of validators
+  /// \param theArguments a list of validators arguments
+  virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
+                                std::list<std::list<std::string> >& theArguments) const;
+
   /// Computes and updates name of selected object in the widget
   void updateSelectionName();
 
@@ -120,7 +129,7 @@ Q_OBJECT
 
   /// Returns true if selected shape corresponds to requested shape types
   /// \param theShape a shape
-  virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
+  //virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
 
   /// Clear attribute
   void clearAttribute();
@@ -166,6 +175,9 @@ Q_OBJECT
   AttributePtr myRefAttribute;
   /// A boolean value whether refAttr uses reference of object
   bool myIsObject;
+
+  /// An instance of the "shape_type" validator. It is returns on validating in customValidator()
+  GeomValidators_ShapeType* myShapeValidator;
 };
 
 #endif

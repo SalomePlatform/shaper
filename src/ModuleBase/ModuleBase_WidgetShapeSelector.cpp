@@ -13,6 +13,8 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Filter.h>
 
+#include <GeomValidators_ShapeType.h>
+
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
@@ -93,6 +95,8 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
+
+  myShapeValidator = new GeomValidators_ShapeType();
 }
 
 //********************************************************************
@@ -100,6 +104,8 @@ ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 {
   activateSelection(false);
   activateFilters(myWorkshop, false);
+
+  delete myShapeValidator;
 }
 
 //********************************************************************
@@ -228,15 +234,17 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const
+/*bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const
 {
+  return true;
+
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   foreach (QString aType, myShapeTypes) {
     if (aShape.ShapeType() == ModuleBase_Tools::shapeType(aType))
       return true;
   }
   return false;
-}
+}*/
 
 //********************************************************************
 GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
@@ -367,6 +375,20 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
 }
 
 //********************************************************************
+void ModuleBase_WidgetShapeSelector::customValidators(
+                                    std::list<ModelAPI_Validator*>& theValidators,
+                                    std::list<std::list<std::string> >& theArguments) const
+{
+  theValidators.push_back(myShapeValidator);
+
+  std::list<std::string> anArguments;
+  foreach(QString aType, myShapeTypes) {
+    anArguments.push_back(aType.toStdString().c_str());
+  }
+  theArguments.push_back(anArguments);
+}
+
+//********************************************************************
 bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   bool isDone = false;
@@ -413,8 +435,8 @@ bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerP
     aShape->setImpl(new TopoDS_Shape(thePrs.shape()));
   }
   // Check that the selection corresponds to selection type
-  if (!acceptSubShape(aShape))
-    return false;
+  //if (!acceptSubShape(aShape))
+  //  return false;
 
   setObject(aObject, aShape);
   return true;

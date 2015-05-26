@@ -251,7 +251,7 @@
         <sketch_multi_selector id="ConstraintMirrorList"
             label="List of objects"
             tooltip="Select list of mirroring objects"
-            type_choice="edge"
+            type_choice="Edges"
             use_external="true">
             <validator id="SketchPlugin_MirrorAttr" />
         </sketch_multi_selector>
@@ -264,7 +264,7 @@
         <sketch_multi_selector id="MultiTranslationList"
             label="List of objects"
             tooltip="Select list of translating objects"
-            type_choice="edge"
+            type_choice="Edges"
             use_external="true">
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
@@ -293,7 +293,7 @@
         <sketch_multi_selector id="MultiRotationList"
             label="List of objects"
             tooltip="Select list of rotating objects"
-            type_choice="edge"
+            type_choice="Edges"
             use_external="true">
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
