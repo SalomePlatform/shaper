@@ -843,10 +843,6 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       }
     }
   }
-  if (!isObjectFound) {
-    theObject->setDisplayed(aCanDisplay); // If it be set into True - set to False
-    return aCanDisplay;
-  }
 
   // 4. For created nested feature operation do not display the created feature if
   // the mouse curstor leaves the OCC window.
