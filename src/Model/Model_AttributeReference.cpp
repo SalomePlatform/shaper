@@ -28,7 +28,7 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
     REMOVE_BACK_REF(aValue);
 
     TDF_Label anObjLab;
-    if (theObject.get() && theObject->data().get() && theObject->data()->isValid()) {
+    if (theObject.get() && theObject->data()->isValid()) {
       std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
         theObject->data());
       anObjLab = aData->label().Father(); // object label

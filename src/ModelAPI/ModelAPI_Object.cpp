@@ -12,7 +12,7 @@
 
 bool ModelAPI_Object::isInHistory()
 {
-  if (myData.get() && myData->isValid()) {
+  if (myData->isValid()) {
     return myData->isInHistory();
   }
   return true; // default value
@@ -22,7 +22,7 @@ void ModelAPI_Object::setInHistory(
   const std::shared_ptr<ModelAPI_Object> theObject, const bool theFlag)
 {
   if (isInHistory() != theFlag) {
-    if (myData.get() && myData->isValid()) {
+    if (myData->isValid()) {
       myData->setIsInHistory(theFlag);
     }
     myDoc->updateHistory(theObject);
@@ -68,7 +68,7 @@ void ModelAPI_Object::setDoc(std::shared_ptr<ModelAPI_Document> theDoc)
 
 void ModelAPI_Object::erase()
 {
-  if (myData.get() && myData != myData->invalidPtr()) myData->erase();
+  if (myData->isValid() && myData != myData->invalidPtr()) myData->erase();
   setData(myData->invalidPtr());
 }
 

@@ -251,7 +251,7 @@ GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
 {
   GeomShapePtr aShape;
   DataPtr aData = myFeature->data();
-  if (aData.get() == NULL)
+  if (!aData->isValid())
     return aShape;
 
   AttributeSelectionPtr aSelect = aData->selection(attributeID());
@@ -265,7 +265,7 @@ GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
 void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
   DataPtr aData = myFeature->data();
-  if (aData.get() == NULL)
+  if (!aData->isValid())
     return;
 
   bool isNameUpdated = false;

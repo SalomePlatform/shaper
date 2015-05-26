@@ -145,7 +145,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
     for(aFIter = myJustCreated.begin(); aFIter != myJustCreated.end(); aFIter++)
     {
       FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
-      if (aF && aF->data().get() && aF->getKind() == "Extrusion") {
+      if (aF && aF->data()->isValid() && aF->getKind() == "Extrusion") {
         AttributeSelectionListPtr aBase = aF->selectionList("base");
         if (aBase.get()) {
           for(int a = aBase->size() - 1; a >= 0; a--) {

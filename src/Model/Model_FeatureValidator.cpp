@@ -23,7 +23,7 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
 
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   // "Action" features has no data, but still valid. e.g "Remove Part"  
-  if (!aData) {
+  if (!aData->isValid()) {
     return theFeature->isAction();
   }
   if (!aData->isValid())

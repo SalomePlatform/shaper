@@ -264,7 +264,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr& theAttribute) const
 {
   std::list<std::pair<std::string, std::list<ObjectPtr> > > allRefs;
-  if (theAttribute->owner().get() && theAttribute->owner()->data().get())
+  if (theAttribute->owner().get() && theAttribute->owner()->data()->isValid())
     theAttribute->owner()->data()->referencesToObjects(allRefs);
   // collect object referenced by theAttribute
   std::list<ObjectPtr>* anAttrObjs = 0;

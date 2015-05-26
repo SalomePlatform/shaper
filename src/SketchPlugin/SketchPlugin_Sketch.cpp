@@ -137,7 +137,7 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
 
 void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  if (!data().get()) // sketch is already removed (case on undo of sketch), sync is not needed
+  if (!data()->isValid()) // sketch is already removed (case on undo of sketch), sync is not needed
     return;
   list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
   list<ObjectPtr>::iterator aSubIt = aSubs.begin(), aLastIt = aSubs.end();

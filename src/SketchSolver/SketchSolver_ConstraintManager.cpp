@@ -341,7 +341,7 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager
       continue;
 
     DataPtr aData = aWP->data();
-    if (aData) {
+    if (aData->isValid()) {
       std::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
       std::list<ObjectPtr> aFeaturesList = aWPFeatures->list();

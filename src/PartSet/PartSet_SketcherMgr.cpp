@@ -460,7 +460,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
             continue;
           std::string aAttrId = anAttr->id();
           DataPtr aData = aFeature->data();
-          if (aData.get() != NULL) {
+          if (aData->isValid()) {
             std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
             if (aPoint.get() != NULL) {
@@ -723,7 +723,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   DataPtr aData = myCurrentSketch->data();
-  if ((!aData) || (!aData->isValid())) {
+  if (!aData->isValid()) {
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
@@ -734,7 +734,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
     foreach (ObjectPtr aObj, aObjects) {
       DataPtr aObjData = aObj->data();
-      if ((!aObjData) || (!aObjData->isValid()))
+      if (!aObjData->isValid())
         aObj->setDisplayed(false);
     }
     return; 

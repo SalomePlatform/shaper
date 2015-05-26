@@ -1267,7 +1267,7 @@ void XGUI_Workshop::deleteObjects()
   aDescription += tr(" %1");
   QStringList aObjectNames;
   foreach (ObjectPtr aObj, anObjects) {
-    if (!aObj->data().get())
+    if (!aObj->data()->isValid())
       continue;
     aObjectNames << QString::fromStdString(aObj->data()->name());
   }

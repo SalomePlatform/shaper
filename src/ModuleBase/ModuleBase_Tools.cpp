@@ -150,7 +150,7 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 
   if (aFeature.get()) {
     aFeatureStr.append(QString(": %1").arg(aFeature->getKind().c_str()).toStdString().c_str());
-    if (aFeature->data().get() && aFeature->data()->isValid()) {
+    if (aFeature->data()->isValid()) {
       aFeatureStr.append(QString(", name=%1").arg(aFeature->data()->name().c_str()).toStdString()
                                                                                        .c_str());
     }
