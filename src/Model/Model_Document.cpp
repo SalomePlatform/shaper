@@ -653,17 +653,6 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   CompositeFeaturePtr aMain; // main feature that may nest the new current
   if (theCurrent.get()) {
-    /*
-    if (theVisible) { // make features below which are not in history also enabled: sketch subs
-      FeaturePtr aNext = myObjs->nextFeature(theCurrent);
-      for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent)) {
-        if (aNext->isInHistory()) {
-          break; // next in history is not needed
-        } else { // next not in history is good for making current
-          theCurrent = aNext;
-        }
-      }
-    }*/
     aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theCurrent);
     if (!aMain.get()) {
       // if feature nests into compisite feature, make the composite feature as current
@@ -678,7 +667,20 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
         }
       }
     }
+  }
 
+  if (theVisible) { // make features below which are not in history also enabled: sketch subs
+    FeaturePtr aNext = 
+      theCurrent.get() ? myObjs->nextFeature(theCurrent) : myObjs->firstFeature();
+    for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent)) {
+      if (aNext->isInHistory()) {
+        break; // next in history is not needed
+      } else { // next not in history is good for making current
+        theCurrent = aNext;
+      }
+    }
+  }
+  if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (!aData.get()) return; // unknown case
     TDF_Label aFeatureLabel = aData->label().Father();
