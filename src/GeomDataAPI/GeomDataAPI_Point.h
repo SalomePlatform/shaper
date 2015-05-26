@@ -21,28 +21,28 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
 {
  public:
   /// Defines the double value
-  virtual void setValue(const double theX, const double theY, const double theZ) = 0;
+  GEOMDATAAPI_EXPORT virtual void setValue(const double theX, const double theY, const double theZ) = 0;
   /// Defines the point
-  virtual void setValue(const std::shared_ptr<GeomAPI_Pnt>& thePoint) = 0;
+  GEOMDATAAPI_EXPORT virtual void setValue(const std::shared_ptr<GeomAPI_Pnt>& thePoint) = 0;
 
   /// Returns the X double value
-  virtual double x() const = 0;
+  GEOMDATAAPI_EXPORT virtual double x() const = 0;
   /// Returns the Y double value
-  virtual double y() const = 0;
+  GEOMDATAAPI_EXPORT virtual double y() const = 0;
   /// Returns the Z double value
-  virtual double z() const = 0;
+  GEOMDATAAPI_EXPORT virtual double z() const = 0;
   /// Returns the 3D point
-  virtual std::shared_ptr<GeomAPI_Pnt> pnt() = 0;
+  GEOMDATAAPI_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
   /// Defines the double values
-  virtual void setText(const std::string& theX,
-                       const std::string& theY,
-                       const std::string& theZ) = 0;
+  GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
+                                          const std::string& theY,
+                                          const std::string& theZ) = 0;
 
   /// Returns the double values
-  virtual std::string textX() = 0;
-  virtual std::string textY() = 0;
-  virtual std::string textZ() = 0;
+  GEOMDATAAPI_EXPORT virtual std::string textX() = 0;
+  GEOMDATAAPI_EXPORT virtual std::string textY() = 0;
+  GEOMDATAAPI_EXPORT virtual std::string textZ() = 0;
 
   enum PointComponent { C_X = 0,
                         C_Y = 1,
@@ -50,10 +50,10 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   };
 
   /// Allows to set expression (text) as invalid (by the parameters listener)
-  virtual void setExpressionInvalid(int theComponent, const bool theFlag) = 0;
+  GEOMDATAAPI_EXPORT virtual void setExpressionInvalid(int theComponent, const bool theFlag) = 0;
 
   /// Returns true if text is invalid
-  virtual bool expressionInvalid(int theComponent) = 0;
+  GEOMDATAAPI_EXPORT virtual bool expressionInvalid(int theComponent) = 0;
 
   /// Returns the type of this class of attributes
   static std::string typeId()
