@@ -213,6 +213,7 @@ void PartSet_WidgetPoint2D::activateCustom()
           this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
+  connect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
 
   QIntList aModes;
   aModes << TopAbs_VERTEX;
@@ -227,6 +228,8 @@ void PartSet_WidgetPoint2D::deactivate()
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
+  disconnect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
+
   myWorkshop->moduleConnector()->deactivateSubShapesSelection();
   myWorkshop->operationMgr()->setLockValidating(false);
 }
@@ -348,6 +351,17 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
   double aX, anY;
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, anY);
   setPoint(aX, anY);
+}
+
+void PartSet_WidgetPoint2D::onLeaveViewPort()
+{
+  // it is important to restore the validity state in the property panel after leaving the
+  // view port. Unlock the validating.
+  XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
+  if (anOperationMgr->isValidationLocked()) {
+    anOperationMgr->setLockValidating(false);
+    anOperationMgr->onValidateOperation();
+  }
 }
 
 double PartSet_WidgetPoint2D::x() const
