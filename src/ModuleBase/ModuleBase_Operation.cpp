@@ -75,7 +75,8 @@ bool ModuleBase_Operation::isValid() const
 
   // the feature exec state should be checked in order to do not apply features, which result can not
   // be built. E.g. extrusion on sketch, where the "to" is a perpendicular plane to the sketch
-  bool isDone = myFeature->data()->execState() == ModelAPI_StateDone;
+  bool isDone = ( myFeature->data()->execState() == ModelAPI_StateDone
+               || myFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
 
   return aValid && isDone;
 }
