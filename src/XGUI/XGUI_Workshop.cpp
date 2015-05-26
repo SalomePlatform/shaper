@@ -468,17 +468,19 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
         // of redisplay is called. This modification is made in order to have the line is updated
         // by creation of a horizontal constraint on the line by preselection
         myDisplayer->redisplay(aObj, false);
-        if (myOperationMgr->hasOperation()) {
-          ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (!aOperation->isEditOperation() &&
-              aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
+        //if (myOperationMgr->hasOperation()) {
+        //  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+        //  if (!aOperation->isEditOperation() &&
+        //      aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
+        if (!myModule->canActivateSelection(aObj)) {
+          if (myDisplayer->isActive(aObj))
             myDisplayer->deactivate(aObj);
         }
       } else { // display object if the current operation has it
         if (displayObject(aObj)) {
-          ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (aOperation && aOperation->hasObject(aObj)) {
-            ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+          //ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+          //if (aOperation && aOperation->hasObject(aObj)) {
+          if (!myModule->canActivateSelection(aObj)) {
             #ifdef DEBUG_FEATURE_REDISPLAY
               QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
               qDebug(QString("  display object = %1").arg(anObjInfo).toStdString().c_str());

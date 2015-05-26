@@ -331,7 +331,7 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
   }
 }
 
-void XGUI_Displayer::activateObjects(const QIntList& theModes)
+void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList)
 {
 #ifdef DEBUG_ACTIVATE
   qDebug(QString("activate all features: theModes: %2, myActiveSelectionModes: %3").
@@ -356,15 +356,24 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   //aContext->UseDisplayedObjects();
   //myUseExternalObjects = true;
 
+  Handle(AIS_InteractiveObject) anAISIO;
   AIS_ListOfInteractive aPrsList;
-  ::displayedObjects(aContext, aPrsList);
+  if (theObjList.isEmpty())
+    ::displayedObjects(aContext, aPrsList);
+  else {
+    foreach(ObjectPtr aObj, theObjList) {
+      if (myResult2AISObjectMap.contains(aObj))
+        aPrsList.Append(myResult2AISObjectMap[aObj]->impl<Handle(AIS_InteractiveObject)>());
+    }
+  }
 
   Handle(AIS_Trihedron) aTrihedron;
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
-  Handle(AIS_InteractiveObject) anAISIO;
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    activate(anAISIO, myActiveSelectionModes);
+    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
+    if (aTrihedron.IsNull())
+      activate(anAISIO, myActiveSelectionModes);
   }
 }
 
@@ -833,26 +842,22 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   if (aTColModes.IsEmpty())
     aContext->Load(theIO, -1, true);
 
-  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
-  //Deactivate trihedron which can be activated in local selector
-  if (aTrihedron.IsNull()) {
     //aContext->Load(anAISIO, -1, true);
     // In order to clear active modes list
-    if (theModes.size() == 0) {
-      //aContext->Load(anAISIO, 0, true);
-      aContext->Activate(theIO);
+  if (theModes.size() == 0) {
+    //aContext->Load(anAISIO, 0, true);
+    aContext->Activate(theIO);
 #ifdef DEBUG_ACTIVATE
-      qDebug("activate in all modes");
+    qDebug("activate in all modes");
 #endif
-    } else {
-      foreach(int aMode, theModes) {
-        //aContext->Load(anAISIO, aMode, true);
-        if (!aModesActivatedForIO.contains(aMode)) {
-          aContext->Activate(theIO, aMode);
+  } else {
+    foreach(int aMode, theModes) {
+      //aContext->Load(anAISIO, aMode, true);
+      if (!aModesActivatedForIO.contains(aMode)) {
+        aContext->Activate(theIO, aMode);
 #ifdef DEBUG_ACTIVATE
-          qDebug(QString("activate: %1").arg(aMode).toStdString().c_str());
+        qDebug(QString("activate: %1").arg(aMode).toStdString().c_str());
 #endif
-        }
       }
     }
   }

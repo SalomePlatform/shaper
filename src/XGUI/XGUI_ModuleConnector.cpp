@@ -61,6 +61,18 @@ ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const
 }
 
 
+QObjectPtrList XGUI_ModuleConnector::activeObjects(const QObjectPtrList& theObjList) const
+{
+  QObjectPtrList aActiveOPbjects;
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  // Activate objects only which can be activated
+  foreach (ObjectPtr aObj, theObjList) {
+    if (aModule->canActivateSelection(aObj))
+      aActiveOPbjects.append(aObj);
+  }
+  return aActiveOPbjects;
+}
+
 void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
@@ -75,7 +87,7 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
     else
       aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
   }
-  aDisp->activateObjects(aModes);
+  aDisp->activateObjects(aModes, activeObjects(aDisp->displayedObjects()));
   //TODO: We have to open Local context because at neutral point filters don't work (bug 25340)
   //aDisp->addSelectionFilter(myDocumentShapeFilter);
 }
@@ -93,7 +105,7 @@ void XGUI_ModuleConnector::deactivateSubShapesSelection()
   // the OCC6.9.0 release. Moreother, it is possible that ClearOutdatedSelection will be called inside
   // Deactivate method of AIS_InteractiveContext. In this case, we need not call it.
   module()->activeSelectionModes(aModes);
-  aDisp->activateObjects(aModes);
+  aDisp->activateObjects(aModes, activeObjects(aDisp->displayedObjects()));
   // The document limitation selection has to be only during operation
   //aDisp->removeSelectionFilter(myDocumentShapeFilter);
   //aDisp->closeLocalContexts(false);

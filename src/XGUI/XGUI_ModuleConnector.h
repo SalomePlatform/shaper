@@ -69,6 +69,8 @@ Q_OBJECT
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
 private:
+  QObjectPtrList activeObjects(const QObjectPtrList& theObjList) const;
+
   /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 

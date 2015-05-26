@@ -148,3 +148,9 @@ void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
   anOperation->setFeature(theFeature);
   sendOperation(anOperation);
 }
+
+bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
+{
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  return !(aOperation && (!aOperation->isEditOperation()) && aOperation->hasObject(theObject));
+}

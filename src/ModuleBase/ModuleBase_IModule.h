@@ -117,6 +117,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Returns true if selection for the object can be activate.
+  /// By default a result or feature of the current operation can not be activated
+  /// \param theObject a model object
+  virtual bool canActivateSelection(const ObjectPtr& theObject) const;
+
   /// Reacts to the delete action in module
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };

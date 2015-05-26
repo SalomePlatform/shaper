@@ -169,7 +169,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Activates in local context displayed outside of the context.
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activateObjects(const QIntList& theModes);
+  /// \param theObjList - list of objects which has to be activated. Can be empty. In this case all displayed objects will be used.
+  void activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList = QObjectPtrList());
 
   /// Activates in local context displayed outside of the context.
   void deactivateObjects();
