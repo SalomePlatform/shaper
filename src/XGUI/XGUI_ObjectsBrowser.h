@@ -111,6 +111,9 @@ signals:
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
+  //! Segnal is emitted when user cliks by mouse in header label of object browser
+  void headerMouseDblClicked(const QModelIndex&);
+
  protected:
    /// Redefinition of virtual method
   virtual bool eventFilter(QObject* obj, QEvent* theEvent);

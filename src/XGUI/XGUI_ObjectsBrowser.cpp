@@ -205,6 +205,11 @@ bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
             break;
         }
       }
+    } else {
+      if (theEvent->type() == QEvent::MouseButtonDblClick) {
+        emit headerMouseDblClicked(QModelIndex());
+        return true;
+      }  
     }
   }
   return QWidget::eventFilter(obj, theEvent);
