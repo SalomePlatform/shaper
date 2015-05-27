@@ -32,7 +32,8 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
     Line,
     Circle,
     Solid,
-    Face
+    Face,
+    Compound
   };
 
  public:

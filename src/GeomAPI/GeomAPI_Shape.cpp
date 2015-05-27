@@ -55,6 +55,12 @@ bool GeomAPI_Shape::isFace() const
   return aShape.ShapeType() == TopAbs_FACE;
 }
 
+bool GeomAPI_Shape::isCompound() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  return aShape.ShapeType() == TopAbs_COMPOUND;
+}
+
 bool GeomAPI_Shape::isSolid() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
