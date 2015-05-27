@@ -125,6 +125,13 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
   theSpin->blockSignals(isBlocked);
 }
 
+void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue)
+{
+  bool isBlocked = theSpin->blockSignals(true);
+  theSpin->setValue(theValue);
+  theSpin->blockSignals(isBlocked);
+}
+
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
   QString aFeatureStr = "feature";

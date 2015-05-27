@@ -15,7 +15,7 @@
 #include <XGUI_Selection.h>
 #include <XGUI_OperationMgr.h>
 
-#include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewWindow.h>
 
@@ -72,13 +72,13 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aLabel->setPixmap(QPixmap(":pictures/x_point.png"));
     aGroupLay->addWidget(aLabel, 0, 0);
 
-    myXSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
+    myXSpin = new ModuleBase_ParamSpinBox(myGroupBox);
     myXSpin->setMinimum(-DBL_MAX);
     myXSpin->setMaximum(DBL_MAX);
     myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-    connect(myXSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
+    connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -86,13 +86,13 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aLabel->setPixmap(QPixmap(":pictures/y_point.png"));
     aGroupLay->addWidget(aLabel, 1, 0);
 
-    myYSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
+    myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
     myYSpin->setMinimum(-DBL_MAX);
     myYSpin->setMaximum(DBL_MAX);
     myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-    connect(myYSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
+    connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -105,10 +105,10 @@ void PartSet_WidgetPoint2D::reset()
   if (!isUseReset())
     return;
 
-  if (isComputedDefault()) {
-    //return;
-    if (myFeature->compute(myAttributeID))
-      restoreValue();
+  if (isComputedDefault() || myXSpin->hasVariable() || myYSpin->hasVariable()) {
+    return;
+    //if (myFeature->compute(myAttributeID))
+    //  restoreValue();
   }
   else {
     bool isOk;
@@ -167,12 +167,13 @@ bool PartSet_WidgetPoint2D::storeValueCustom() const
   PartSet_WidgetPoint2D* that = (PartSet_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
   bool isImmutable = aPoint->setImmutable(true);
-#ifdef _DEBUG
-  std::string _attr_name = myAttributeID;
-  double _X = myXSpin->value();
-  double _Y = myYSpin->value();
-#endif
-  aPoint->setValue(myXSpin->value(), myYSpin->value());
+  
+  if (myXSpin->hasVariable() || myYSpin->hasVariable()) {
+    aPoint->setText(myXSpin->text().toStdString(), myYSpin->text().toStdString());
+  } else {
+    aPoint->setValue(myXSpin->value(), myYSpin->value());
+    aPoint->setText("", "");
+  }
   // after movement the solver will call the update event: optimization
   moveObject(myFeature);
   aPoint->setImmutable(isImmutable);
@@ -186,15 +187,16 @@ bool PartSet_WidgetPoint2D::restoreValue()
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
-
-#ifdef _DEBUG
-  std::string _attr_name = myAttributeID;
-  double _X = aPoint->x();
-  double _Y = aPoint->y();
-#endif
-
-  ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
-  ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
+  std::string aTextX = aPoint->textX();
+  std::string aTextY = aPoint->textY();
+  if (aTextX.empty() || aTextY.empty()) {
+    double aX = aPoint->x();
+    ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
+    ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
+  } else {
+    ModuleBase_Tools::setSpinText(myXSpin, QString::fromStdString(aTextX));
+    ModuleBase_Tools::setSpinText(myYSpin, QString::fromStdString(aTextY));
+  }
   return true;
 }
 

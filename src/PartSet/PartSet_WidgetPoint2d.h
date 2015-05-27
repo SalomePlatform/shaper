@@ -18,7 +18,7 @@
 
 class ModelAPI_Feature;
 class ModuleBase_IWorkshop;
-class ModuleBase_DoubleSpinBox;
+class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
 class GeomAPI_Pnt2d;
 class XGUI_Workshop;
@@ -136,8 +136,8 @@ private slots:
   XGUI_Workshop* myWorkshop;
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
-  ModuleBase_DoubleSpinBox* myXSpin;  ///< the spin box for the X coordinate
-  ModuleBase_DoubleSpinBox* myYSpin;  ///< the spin box for the Y coordinate
+  ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
+  ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
 
   //std::string myOptionParam;  /// Parameter name which has to be taken from previous feature
 

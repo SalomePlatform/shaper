@@ -63,6 +63,11 @@ MODULEBASE_EXPORT QPixmap lighter(const QString& theIcon, const int theLighterVa
 MODULEBASE_EXPORT void setSpinValue(QDoubleSpinBox* theSpin, double theValue);
 
 /// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
+/// \param theSpin an X or Y coordinate widget
+/// \param theValue a new value
+MODULEBASE_EXPORT void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue);
+
+/// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
 /// \param theSpin an ModuleBase_ParamSpinBox that accepts text
 /// \param theText a new value
 MODULEBASE_EXPORT void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText);
