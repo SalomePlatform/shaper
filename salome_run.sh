@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export ROOT_DIR=$(pwd)/..
 export ROOT_DIR=`cd "${ROOT_DIR}";pwd`

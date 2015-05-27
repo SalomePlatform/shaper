@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "${INST_ROOT}" = "" ] ; then
     source /dn48/newgeom/common/SALOME/env_products.sh
