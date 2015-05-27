@@ -784,9 +784,14 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
 {
-  if (isNestedCreateOperation(theOperation))
-    visualizeFeature(theOperation, true);
-
+  if (isNestedCreateOperation(theOperation)) {
+    FeaturePtr aFeature = theOperation->feature();
+    // it is necessary to check the the feature data validity because
+    // some kind of features are removed by an operation commit(the macro state of a feature)
+    if (aFeature.get() && aFeature->data()->isValid()) {
+      visualizeFeature(theOperation, true);
+    }
+  }
 }
 
 bool PartSet_SketcherMgr::canUndo() const
