@@ -257,8 +257,11 @@ void Model_Document::close(const bool theForever)
   // close all subs
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
-  for (; aSubIter != aSubs.end(); aSubIter++)
-    subDoc(*aSubIter)->close(theForever);
+  for (; aSubIter != aSubs.end(); aSubIter++) {
+    std::shared_ptr<Model_Document> aSub = subDoc(*aSubIter);
+    if (aSub->myObjs) // if it was not closed before
+      aSub->close(theForever);
+  }
 
   // close for thid document needs no transaction in this document
   std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
@@ -423,9 +426,14 @@ bool Model_Document::canUndo()
   // check other subs contains operation that can be undoed
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
-  for (; aSubIter != aSubs.end(); aSubIter++)
-    if (subDoc(*aSubIter)->canUndo())
-      return true;
+  for (; aSubIter != aSubs.end(); aSubIter++) {
+    std::shared_ptr<Model_Document> aSub = subDoc(*aSubIter);
+    if (aSub->myObjs) {// if it was not closed before
+      if (aSub->canUndo())
+        return true;
+    }
+  }
+
   return false;
 }
 
@@ -444,8 +452,11 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
     // undo for all subs
     const std::set<std::string> aSubs = subDocuments(true);
     std::set<std::string>::iterator aSubIter = aSubs.begin();
-    for (; aSubIter != aSubs.end(); aSubIter++)
+    for (; aSubIter != aSubs.end(); aSubIter++) {
+      if (!subDoc(*aSubIter)->myObjs)
+        continue;
       subDoc(*aSubIter)->undoInternal(theWithSubs, theSynchronize);
+    }
   }
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
   if (theSynchronize) {
@@ -467,9 +478,12 @@ bool Model_Document::canRedo()
   // check other subs contains operation that can be redoed
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
-  for (; aSubIter != aSubs.end(); aSubIter++)
+  for (; aSubIter != aSubs.end(); aSubIter++) {
+    if (!subDoc(*aSubIter)->myObjs)
+      continue;
     if (subDoc(*aSubIter)->canRedo())
       return true;
+  }
   return false;
 }
 
@@ -677,7 +691,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   }
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
-    if (!aData.get()) return; // unknown case
+    if (!aData.get() || !aData->isValid()) return;
     TDF_Label aFeatureLabel = aData->label().Father();
 
     Handle(TDF_Reference) aRef;
@@ -717,10 +731,10 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
 
 void Model_Document::setCurrentFeatureUp()
 {
-  FeaturePtr aCurrent = currentFeature(false);
+  FeaturePtr aCurrent = currentFeature(true);
   if (aCurrent.get()) { // if not, do nothing because null is the upper
     FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
-    setCurrentFeature(aPrev, false);
+    setCurrentFeature(aPrev, true);
   }
 }
 

@@ -191,6 +191,8 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
   if (!anObjs) return;
   FeaturePtr aFeatureIter = anObjs->firstFeature();
   for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
+    if (!aFeatureIter->data()->isValid()) // this may be on close of the document
+      continue;
     if (aFeatureIter && alreadyProcessed.find(aFeatureIter) == alreadyProcessed.end()) {
       // update selection and parameters attributes first, before sub-features analysis (sketch plane)
       updateArguments(aFeatureIter);
