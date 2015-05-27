@@ -58,10 +58,12 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QString aTypesStr = aPropertyTypes.c_str();
   QStringList aShapeTypes = aTypesStr.split(' ');
 
+  //myIsUseChoice = theData->getBooleanAttribute("use_choice", true);
+
   myTypeCombo->addItems(aShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
   // if the xml definition contains one type, the controls to select a type should not be shown
-  if (aShapeTypes.size() == 1) {
+  if (aShapeTypes.size() == 1/* || !myIsUseChoice*/) {
     aTypeLabel->setVisible(false);
     myTypeCombo->setVisible(false);
   }
@@ -211,12 +213,45 @@ void ModuleBase_WidgetMultiSelector::customValidators(
                                         std::list<ModelAPI_Validator*>& theValidators,
                                         std::list<std::list<std::string> >& theArguments) const
 {
+  return;
   std::list<std::string> anArguments;
 
   theValidators.push_back(myShapeValidator);
-  QString aType = myTypeCombo->currentText();
-  anArguments.push_back(validatorType(aType));
+  if (true/*myIsUseChoice*/) {
+    QString aType = myTypeCombo->currentText();
+    anArguments.push_back(validatorType(aType));
+  }
+  else {
+    for(int i = 0, aCount = myTypeCombo->count(); i < aCount; i++) {
+      anArguments.push_back(validatorType(myTypeCombo->itemText(i)));
+    }
+  }
   theArguments.push_back(anArguments);
+}
+
+//********************************************************************
+bool ModuleBase_WidgetMultiSelector::acceptSubShape(const TopoDS_Shape& theShape) const
+{
+  bool aValid = true;
+  if (theShape.IsNull()) {
+    aValid = true; // do not check the shape type if the shape is empty
+    // extrusion uses a sketch object selectected in Object browser
+  }
+  else {
+    aValid = false;
+    TopAbs_ShapeEnum aShapeType = theShape.ShapeType();
+    if (myTypeCombo->count() > 1) {
+      TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->currentText());
+      aValid = aShapeType == aType;
+    }
+    else {
+      for(int i = 0, aCount = myTypeCombo->count(); i < aCount && !aValid; i++) {
+        TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->itemText(i));
+        aValid = aShapeType == aType;
+      }
+    }
+  }
+  return aValid;
 }
 
 //********************************************************************
@@ -254,11 +289,9 @@ bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerP
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   TopoDS_Shape aShape = thePrs.shape();
-  if ((myTypeCombo->count() > 1) && (!aShape.IsNull())) {
-    TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->currentText());
-    if (aShape.ShapeType() != aType)
-      return false;
-  }
+  if (!acceptSubShape(aShape))
+    return false;
+
   ResultPtr aResult;
   if (!thePrs.owner().IsNull()) {
     ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
@@ -392,7 +425,13 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection(const bool isActivat
   if (isActivated) {
     QString aNewType = myTypeCombo->currentText();
     QIntList aList;
-    aList.append(ModuleBase_Tools::shapeType(aNewType));
+    if (true /*myIsUseChoice*/) {
+      aList.append(ModuleBase_Tools::shapeType(aNewType));
+    }
+    else {
+      for(int i = 0, aCount = myTypeCombo->count(); i < aCount; i++)
+        aList.append(ModuleBase_Tools::shapeType(myTypeCombo->itemText(i)));
+    }
     myWorkshop->activateSubShapesSelection(aList);
   } else {
     myWorkshop->deactivateSubShapesSelection();

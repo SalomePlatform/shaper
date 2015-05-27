@@ -234,17 +234,14 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 }
 
 //********************************************************************
-/*bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const
+bool ModuleBase_WidgetShapeSelector::acceptSubShape(const TopoDS_Shape& theShape) const
 {
-  return true;
-
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   foreach (QString aType, myShapeTypes) {
-    if (aShape.ShapeType() == ModuleBase_Tools::shapeType(aType))
+    if (theShape.ShapeType() == ModuleBase_Tools::shapeType(aType))
       return true;
   }
   return false;
-}*/
+}
 
 //********************************************************************
 GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
@@ -379,6 +376,7 @@ void ModuleBase_WidgetShapeSelector::customValidators(
                                     std::list<ModelAPI_Validator*>& theValidators,
                                     std::list<std::list<std::string> >& theArguments) const
 {
+  return;
   theValidators.push_back(myShapeValidator);
 
   std::list<std::string> anArguments;
@@ -435,8 +433,9 @@ bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerP
     aShape->setImpl(new TopoDS_Shape(thePrs.shape()));
   }
   // Check that the selection corresponds to selection type
-  //if (!acceptSubShape(aShape))
-  //  return false;
+  TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
+  if (!acceptSubShape(aTopoShape))
+    return false;
 
   setObject(aObject, aShape);
   return true;
