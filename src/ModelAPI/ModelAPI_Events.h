@@ -170,21 +170,33 @@ class ModelAPI_AttributeEvalMessage : public Events_Message
   AttributePtr myAttribute;
 
  public:
+  /// Static. Returns EventID of the message.
+  MODELAPI_EXPORT static Events_ID& eventId()
+  {
+    static const char * MY_ATTRIBUTE_EVALUATION_EVENT_ID("AttributeEvaluationRequest");
+    static Events_ID anId = Events_Loop::eventByName(MY_ATTRIBUTE_EVALUATION_EVENT_ID);
+    return anId;
+  }
+
+  /// usefull method that creates and sends the AttributeEvalMessage event
+  MODELAPI_EXPORT static void send(AttributePtr theAttribute, const void* theSender)
+  {
+    std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
+      std::shared_ptr<ModelAPI_AttributeEvalMessage>(
+      new ModelAPI_AttributeEvalMessage(eventId(), theSender));
+    aMessage->setAttribute(theAttribute);
+    Events_Loop::loop()->send(aMessage);
+  }
+
   /// Creates an empty message
   MODELAPI_EXPORT ModelAPI_AttributeEvalMessage(const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeEvalMessage();
-  /// Static. Returns EventID of the message.
-  MODELAPI_EXPORT static Events_ID eventId()
-  {
-    static const char * MY_ATTRIBUTE_EVALUATION_EVENT_ID("AttributeEvaluationRequest");
-    return Events_Loop::eventByName(MY_ATTRIBUTE_EVALUATION_EVENT_ID);
-  }
 
   /// Returns a document stored in the message
   MODELAPI_EXPORT AttributePtr attribute() const;
-  /// Sets a document to the message
-  MODELAPI_EXPORT void setAttribute(AttributePtr theDocument);
+  /// Sets an attribute to the message
+  MODELAPI_EXPORT void setAttribute(AttributePtr theAttribute);
 };
 
 #endif

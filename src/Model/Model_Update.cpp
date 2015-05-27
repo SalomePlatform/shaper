@@ -58,6 +58,7 @@ Model_Update::Model_Update()
                                    Config_Prop::Boolean, "false");
   myIsAutomatic =
     Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+  myIsParamUpdated = false;
 }
 
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -92,6 +93,9 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       if (!std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIter).get()) {
         isOnlyResults = false;
+      }
+      if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
+        myIsParamUpdated = true;
       }
       // created objects are always must be up to date (python box feature)
       // and updated not in internal uptation chain
@@ -136,6 +140,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     }
     myJustCreated.clear();
     myJustUpdated.clear();
+    myIsParamUpdated = false;
   }
 }
 
@@ -275,6 +280,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     AttributeDoublePtr aDouble =
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
     if (aDouble.get() && !aDouble->text().empty()) {
+      if (myIsParamUpdated) {
+        ModelAPI_AttributeEvalMessage::send(aDouble, this);
+      }
       if (aDouble->expressionInvalid()) {
         aState = ModelAPI_StateInvalidArgument;
       }
@@ -289,6 +297,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       AttributePointPtr aPointAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(*anIter);
       if (aPointAttribute.get()) {
+        if (myIsParamUpdated) {
+          ModelAPI_AttributeEvalMessage::send(aPointAttribute, this);
+        }
         if ((!aPointAttribute->textX().empty() && aPointAttribute->expressionInvalid(0)) ||
             (!aPointAttribute->textY().empty() && aPointAttribute->expressionInvalid(1)) ||
             (!aPointAttribute->textZ().empty() && aPointAttribute->expressionInvalid(2)))
@@ -305,6 +316,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       AttributePoint2DPtr aPoint2DAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
       if (aPoint2DAttribute.get()) {
+        if (myIsParamUpdated) {
+          ModelAPI_AttributeEvalMessage::send(aPoint2DAttribute, this);
+        }
         if ((!aPoint2DAttribute->textX().empty() && aPoint2DAttribute->expressionInvalid(0)) ||
             (!aPoint2DAttribute->textY().empty() && aPoint2DAttribute->expressionInvalid(1)))
           aState = ModelAPI_StateInvalidArgument;

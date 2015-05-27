@@ -56,11 +56,7 @@ void GeomData_Point2D::setText(const std::string& theX,
     myTextArray->SetValue(1, aY);
     owner()->data()->sendAttributeUpdated(this);
     // Send it to evaluator to convert into the double and store in the attribute
-    static Events_ID anId = ModelAPI_AttributeEvalMessage::eventId();
-    std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
-      std::shared_ptr<ModelAPI_AttributeEvalMessage>(new ModelAPI_AttributeEvalMessage(anId, this));
-    aMessage->setAttribute(owner()->data()->attribute(id())); // to get shared pointer to this
-    Events_Loop::loop()->send(aMessage);
+    ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
   }
 }
 
