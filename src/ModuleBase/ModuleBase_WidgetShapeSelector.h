@@ -129,7 +129,7 @@ Q_OBJECT
 
   /// Returns true if selected shape corresponds to requested shape types
   /// \param theShape a shape
-  //virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
+  bool acceptSubShape(const TopoDS_Shape& theShape) const;
 
   /// Clear attribute
   void clearAttribute();

@@ -82,11 +82,9 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
 bool PartSet_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   TopoDS_Shape aShape = thePrs.shape();
-  if ((myTypeCombo->count() > 1) && (!aShape.IsNull())) {
-    TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->currentText());
-    if (aShape.ShapeType() != aType)
-      return false;
-  }
+  if (!acceptSubShape(aShape))
+    return false;
+
   ResultPtr aResult;
   if (!thePrs.owner().IsNull()) {
     ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());

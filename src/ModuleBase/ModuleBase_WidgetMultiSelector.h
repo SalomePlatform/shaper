@@ -124,6 +124,10 @@ protected slots:
   virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
                                 std::list<std::list<std::string> >& theArguments) const;
 
+  /// Returns true if selected shape corresponds to requested shape types
+  /// \param theShape a shape
+  bool acceptSubShape(const TopoDS_Shape& theShape) const;
+
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
 
@@ -170,6 +174,8 @@ protected slots:
 
   /// An instance of the "type_choice" validator. It is returns on validating in customValidator()
   GeomValidators_ShapeType* myShapeValidator;
+
+  //bool myIsUseChoice;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
