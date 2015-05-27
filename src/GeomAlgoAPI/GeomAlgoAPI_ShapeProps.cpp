@@ -30,11 +30,11 @@ std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeProps::centreOfMass(std::shared_pt
 {
   GProp_GProps aGProps;
   if(!theShape) {
-    return NULL;
+    return std::shared_ptr<GeomAPI_Pnt>();
   }
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   if(aShape.IsNull()) {
-    return NULL;
+    return std::shared_ptr<GeomAPI_Pnt>();
   }
   BRepGProp::SurfaceProperties(aShape, aGProps);
   gp_Pnt aCentre = aGProps.CentreOfMass();
