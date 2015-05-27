@@ -517,8 +517,9 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
     // the validity of the data should be checked here in order to avoid display of the objects,
     // which were created, then deleted, but flush for the creation event happens after that
     // we should not display disabled objects
-    bool aHide = !anObject->data() || !anObject->data()->isValid() || 
-      anObject->isDisabled() || (!anObject->isDisplayed());
+    bool aHide = !anObject->data()->isValid() || 
+                 anObject->isDisabled() ||
+                 !anObject->isDisplayed();
     if (!aHide) {
       // setDisplayed has to be called in order to synchronize internal state of the object 
       // with list of displayed objects
@@ -1310,25 +1311,65 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
 {
   // 1. find all referenced features
   std::set<FeaturePtr> aRefFeatures;
-  foreach (ObjectPtr aObj, theList) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    if (aFeature.get() != NULL) {
-      DocumentPtr aFeatureDoc = aObj->document();
+  foreach (ObjectPtr aDeletedObj, theList) {
+    FeaturePtr aDeletedFeature = ModelAPI_Feature::feature(aDeletedObj);
+    if (aDeletedFeature.get() != NULL) {
+      DocumentPtr aDeletedFeatureDoc = aDeletedObj->document();
+      // 1.1 find references in the current document
+      aDeletedFeatureDoc->refsToFeature(aDeletedFeature, aRefFeatures, false);
+      // 1.2 find references in all documents if the document of the feature is
+      // "PartSet". Features of this document can be used in all other documents
       SessionPtr aMgr = ModelAPI_Session::get();
       DocumentPtr aModuleDoc = aMgr->moduleDocument();
-      // objects from "Part" documents can refer to the the features of "PartSet".
-      // So, it the referenced features should be checked in these documents
-      if (aFeatureDoc == aModuleDoc) {
-        std::list<DocumentPtr> aDocuments = aMgr->allOpenedDocuments();
+      if (aDeletedFeatureDoc == aModuleDoc) {
+        // the deleted feature and results of the feature should be found in references
+        std::list<ObjectPtr> aDeletedObjects;
+        aDeletedObjects.push_back(aDeletedFeature);
+        typedef std::list<std::shared_ptr<ModelAPI_Result> > ResultsList;
+        const ResultsList& aDeletedResults = aDeletedFeature->results();
+        ResultsList::const_iterator aRIter = aDeletedResults.begin();
+        for (; aRIter != aDeletedResults.cend(); aRIter++) {
+          ResultPtr aRes = *aRIter;
+          if (aRes.get())
+            aDeletedObjects.push_back(aRes);
+        }
+        // get all opened documents; found features in the documents;
+        // get a list of objects where a feature refers;
+        // search in these objects the deleted objects.
         std::list<DocumentPtr> anOpenedDocs = aMgr->allOpenedDocuments();
         std::list<DocumentPtr>::const_iterator anIt = anOpenedDocs.begin(),
                                                aLast = anOpenedDocs.end();
+        std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
         for (; anIt != aLast; anIt++) {
-          (*anIt)->refsToFeature(aFeature, aRefFeatures, false);
+          DocumentPtr aDocument = *anIt;
+          if (aDocument == aDeletedFeatureDoc)
+            continue; // this document has been already processed in 1.1
+
+          int aFeaturesCount = aDocument->size(ModelAPI_Feature::group());
+          for (int aId = 0; aId < aFeaturesCount; aId++) {
+            ObjectPtr anObject = aDocument->object(ModelAPI_Feature::group(), aId);
+            FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+            if (!aFeature.get())
+              continue;
+
+            aRefs.clear();
+            aFeature->data()->referencesToObjects(aRefs);
+            std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRef = aRefs.begin();
+            bool aHasReferenceToDeleted = false;
+            for(; aRef != aRefs.end() && !aHasReferenceToDeleted; aRef++) {
+              std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
+              for(; aRefObj != aRef->second.end() && !aHasReferenceToDeleted; aRefObj++) {
+                std::list<ObjectPtr>::const_iterator aDelIt = aDeletedObjects.begin();
+                for(; aDelIt != aDeletedObjects.end() && !aHasReferenceToDeleted; aDelIt++) {
+                  aHasReferenceToDeleted = *aDelIt == *aRefObj;
+                }
+              }
+            }
+            if (aHasReferenceToDeleted)
+              aRefFeatures.insert(aFeature);
+          }
         }
       }
-      else
-        aFeatureDoc->refsToFeature(aFeature, aRefFeatures, false);
     }
   }
   // 2. warn about the references remove, break the delete operation if the user chose it
@@ -1545,7 +1586,7 @@ void XGUI_Workshop::registerValidators() const
 }
 
 //**************************************************************
-void XGUI_Workshop::displayAllResults()
+/*void XGUI_Workshop::displayAllResults()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aMgr->moduleDocument();
@@ -1556,7 +1597,7 @@ void XGUI_Workshop::displayAllResults()
     displayDocumentResults(aPart->partDoc());
   }
   myDisplayer->updateViewer();
-}
+}*/
 
 //**************************************************************
 void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)

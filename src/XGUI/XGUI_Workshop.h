@@ -321,7 +321,7 @@ signals:
   void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
 
   /// Display all results
-  void displayAllResults();
+  //void displayAllResults();
 
   /// Displau results from document
   /// \param theDoc a document
