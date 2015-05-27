@@ -642,6 +642,8 @@ int Model_Document::size(const std::string& theGroupID)
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theVisible)
 {
+  if (!myObjs) // on close document feature destruction it may call this method
+    return std::shared_ptr<ModelAPI_Feature>();
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   Handle(TDF_Reference) aRef;
   if (aRefLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
@@ -734,10 +736,12 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
 
 void Model_Document::setCurrentFeatureUp()
 {
-  FeaturePtr aCurrent = currentFeature(true);
+  // on remove just go up for minimum step: highlight external objects in sketch causes 
+  // problems if it is true: here and in "setCurrentFeature"
+  FeaturePtr aCurrent = currentFeature(false);
   if (aCurrent.get()) { // if not, do nothing because null is the upper
     FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
-    setCurrentFeature(aPrev, true);
+    setCurrentFeature(aPrev, false);
   }
 }
 
