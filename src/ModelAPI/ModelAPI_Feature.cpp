@@ -80,6 +80,27 @@ void ModelAPI_Feature::removeResult(const std::shared_ptr<ModelAPI_Result>& theR
   aLoop->flush(aRedispEvent);
 }
 
+void ModelAPI_Feature::eraseResultFromList(const std::shared_ptr<ModelAPI_Result>& theResult)
+{
+  std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+  for(; aResIter != myResults.end(); aResIter++) {
+    ResultPtr aRes = *aResIter;
+    if (aRes == theResult) {
+      std::string aGroup = aRes->groupName();
+      aRes->data()->erase();
+      myResults.erase(aResIter);
+
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+      ModelAPI_EventCreator::get()->sendDeleted(document(), aGroup);
+      aECreator->sendUpdated(aRes, EVENT_DISP);
+      break;
+    }
+  }
+}
+
 void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlush)
 {
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();

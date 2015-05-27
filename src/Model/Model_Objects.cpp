@@ -759,10 +759,10 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
   std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
   while(aResIter != theFeature->results().cend()) {
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(*aResIter);
-    if (aBody) {
+    if (aBody.get()) {
       if (!aBody->data()->isValid()) { 
         // found a disappeared result => remove it
-        theFeature->removeResult(aBody);
+        theFeature->eraseResultFromList(aBody);
         // start iterate from beginning because iterator is corrupted by removing
         aResIter = theFeature->results().cbegin();
         continue;

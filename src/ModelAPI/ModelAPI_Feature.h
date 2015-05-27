@@ -90,6 +90,9 @@ class ModelAPI_Feature : public ModelAPI_Object
   MODELAPI_EXPORT void eraseResults();
   /// removes all fields from this feature: results, data, etc
   MODELAPI_EXPORT virtual void erase();
+  /// removes the result from the list of feature (not doing in disabled): normally this
+  /// method is not used from features. only internally
+  MODELAPI_EXPORT void eraseResultFromList(const std::shared_ptr<ModelAPI_Result>& theResult);
 
   /// Returns true if result is persistent (stored in document) and on undo-redo, save-open
   /// it is not needed to recompute it.
