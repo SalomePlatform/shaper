@@ -642,7 +642,7 @@ Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) cons
 {
   if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
     Qt::ItemFlags aFlags = Qt::ItemIsSelectable;
-    if (object(theIndex)) {
+    if (object(theIndex).get()) {
       aFlags |= Qt::ItemIsEditable;
     }
     // Disable items which are below of last history row
@@ -658,7 +658,7 @@ Qt::ItemFlags PartSet_DocumentDataModel::flags(const QModelIndex& theIndex) cons
     const QAbstractItemModel* aModel = aIndex->model();
     Qt::ItemFlags aFlags = aModel->flags(*aIndex);
     if (aModel == myModel) {
-      if (myModel->object(*aIndex))
+      if (myModel->object(*aIndex).get())
         aFlags |= Qt::ItemIsEditable;
     }
     return aFlags;
