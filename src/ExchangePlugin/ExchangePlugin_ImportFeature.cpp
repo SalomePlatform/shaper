@@ -86,7 +86,7 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   TCollection_AsciiString anError;
 
   TopoDS_Shape aShape;
-  if (anExtension == "BREP") {
+  if (anExtension == "BREP" || anExtension == "BRP") {
     aShape = BREPImport::Import(aFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
     aShape = STEPImport::Import(aFileName, anExtension, anError);

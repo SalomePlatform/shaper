@@ -5,12 +5,12 @@
     <group id="Exchange">
       <feature id="Import" title="Import" tooltip="Import a file" icon=":icons/import.png">
         <file_selector id="import_file_selector" title="Import file" path="">
-          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREP,STEP|STP:STEP,IGES|IGS:IGES" />
+          <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES" />
         </file_selector>
       </feature>
       <feature id="Export" title="Export" tooltip="Export to file" icon=":icons/export.png">
         <export_file_selector id="export_file_selector" type="save" title="Export file" path="">
-          <validator id="ExchangePlugin_ExportFormat" parameters="BREP:BREP,STEP|STP:STEP,IGES|IGS:IGES-5.1,IGES|IGS:IGES-5.3" />
+          <validator id="ExchangePlugin_ExportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES-5.1,IGES|IGS:IGES-5.3" />
         </export_file_selector>
         <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="Vertices Edges Faces Solids" /> 
       </feature>

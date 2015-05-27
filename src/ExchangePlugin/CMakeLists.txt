@@ -51,6 +51,7 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 ADD_UNIT_TESTS(TestImport.py TestExport.py)
 
 CONFIGURE_FILE(Test/Data/solid.brep Data/solid.brep COPYONLY)
+CONFIGURE_FILE(Test/Data/solid.brp Data/solid.brp COPYONLY)
 CONFIGURE_FILE(Test/Data/screw.step Data/screw.step COPYONLY)
 CONFIGURE_FILE(Test/Data/screw.stp Data/screw.stp COPYONLY)
 CONFIGURE_FILE(Test/Data/bearing.iges Data/bearing.iges COPYONLY)
