@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Find absolute path to ROOT_DIR
 export ROOT_DIR=$(pwd)/..

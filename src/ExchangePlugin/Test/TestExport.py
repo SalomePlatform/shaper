@@ -80,6 +80,7 @@ if __name__ == '__main__':
 #=========================================================================
     aRealVolume = 3.78827059338e-06
     testExport("BREP", "BREP", os.path.join(os.getcwd(), "Data", "screw_export.brep"), aRealVolume, 10 ** -17)
+    testExport("BRP", "BREP", os.path.join(os.getcwd(), "Data", "screw_export.brp"), aRealVolume, 10 ** -17)
 #=========================================================================
 # Export a shape into STEP
 #=========================================================================
