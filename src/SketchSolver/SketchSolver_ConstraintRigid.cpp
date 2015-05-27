@@ -203,6 +203,13 @@ void SketchSolver_ConstraintRigid::fixLine(const Slvs_Entity& theLine)
         !myStorage->isPointFixed(theLine.point[1], aFixed, true))
       fixPoint(theLine.point[0]);
     if (!isUsedInEqual(theLine, anEqual)) {
+      // Check the distance is not set yet
+      std::list<Slvs_Constraint> aDistConstr = myStorage->getConstraintsByType(SLVS_C_PT_PT_DISTANCE);
+      std::list<Slvs_Constraint>::const_iterator aDIt = aDistConstr.begin();
+      for (; aDIt != aDistConstr.end(); aDIt++)
+        if ((aDIt->ptA == theLine.point[0] && aDIt->ptB == theLine.point[1]) ||
+            (aDIt->ptA == theLine.point[1] && aDIt->ptB == theLine.point[0]))
+          return;
       // Calculate distance between points on the line
       double aCoords[4];
       for (int i = 0; i < 2; i++) {
