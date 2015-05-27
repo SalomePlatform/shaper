@@ -47,6 +47,10 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
+  /// Reimplemented from ModelAPI_Feature::isMacro().
+  /// \returns true
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const;
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintFillet();
 };

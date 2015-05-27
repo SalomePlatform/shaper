@@ -307,6 +307,10 @@ AISObjectPtr SketchPlugin_ConstraintFillet::getAISObject(AISObjectPtr thePreviou
   return anAIS;
 }
 
+bool SketchPlugin_ConstraintFillet::isMacro() const
+{
+  return false;
+}
 
 
 // =========   Auxiliary functions   =================
