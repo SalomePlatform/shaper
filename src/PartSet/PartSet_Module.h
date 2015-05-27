@@ -173,10 +173,6 @@ protected slots:
   /// \param theOperation the operation
   virtual void sendOperation(ModuleBase_Operation* theOperation);
 
-  //! Activates or deactivates a part
-  //! If PartPtr is Null pointer then PartSet will be activated
-  //void activatePart(std::shared_ptr<ModelAPI_ResultPart> theFeature);
-
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();
@@ -184,6 +180,8 @@ protected slots:
    /// Called on transformation in current viewer
    /// \param theTrsfType type of tranformation
    void onViewTransformed(int theTrsfType = 2);
+
+   void onTreeViewDoubleClick(const QModelIndex&);
 
  private:
   /// Breaks sequense of automatically resterted operations

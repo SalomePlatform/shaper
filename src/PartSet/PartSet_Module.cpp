@@ -654,6 +654,9 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
     QPalette aPalet = aLabel->palette();
     aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     aLabel->setPalette(aPalet);
+    aOB->treeView()->setExpandsOnDoubleClick(false);
+    connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
+      SLOT(onTreeViewDoubleClick(const QModelIndex&)));
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       myDataModel, SLOT(onMouseDoubleClick(const QModelIndex&)));
   }
@@ -730,7 +733,8 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         if (aPart->partDoc() == aActiveDoc) {
           QModelIndex aIndex = myDataModel->partIndex(aPart);
           if (myDataModel->activatePart(aIndex)) {
-            aTreeView->setExpanded(aOldIndex, false);
+            if (aOldIndex.isValid())
+              aTreeView->setExpanded(aOldIndex, false);
             aTreeView->setExpanded(myDataModel->activePartTree(), true);
             aPalet.setColor(QPalette::Text, Qt::black);
           }
@@ -747,5 +751,27 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     foreach(ObjectPtr aObj, aObjects)
       aDisplayer->redisplay(aObj, false);
     aDisplayer->updateViewer();
+  }
+}
+
+void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
+{
+  if (theIndex.column() != 0) // Use only first column
+    return;
+  ObjectPtr aObj = myDataModel->object(theIndex);
+  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+  if (!aPart.get()) { // Probably this is Feature
+    FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aPartFeature.get() && (aPartFeature->getKind() == PartSetPlugin_Part::ID())) {
+      aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
+    }
+  }
+  if (aPart.get()) { // if this is a part
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (aPart->partDoc() == aMgr->activeDocument()) {
+      aMgr->setActiveDocument(aMgr->moduleDocument());
+    } else {
+      aPart->activate();
+    }
   }
 }
