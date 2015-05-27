@@ -394,6 +394,8 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     aMirror = myStorage->getConstraint(*aConstrIter);
     if (aMirror.type != SLVS_C_SYMMETRIC_LINE)
       continue;
+    if (aMirror.entityA != aMirrorLine.h)
+      continue; // don't update another Mirror constraints
     Slvs_Constraint aPonCircA, aPonCircB;
     aPonCircA.h = SLVS_E_UNKNOWN;
     aPonCircB.h = SLVS_E_UNKNOWN;
@@ -416,6 +418,8 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
   std::list<Slvs_Constraint> aMirrorList = myStorage->getConstraintsByType(SLVS_C_SYMMETRIC_LINE);
   std::list<Slvs_Constraint>::iterator aMirIter = aMirrorList.begin();
   for (; aMirIter != aMirrorList.end(); aMirIter++) {
+    if (aMirIter->entityA != aMirrorLine.h)
+      continue; // don't update another Mirror constraints
     if (aPointsOnCircles.find(aMirIter->ptA) != aPointsOnCircles.end())
       continue; // Avoid mirroring points on circles
     Slvs_Entity aBase = myStorage->getEntity(aMirIter->ptA);

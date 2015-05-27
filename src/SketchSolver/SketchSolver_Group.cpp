@@ -242,12 +242,14 @@ bool SketchSolver_Group::changeConstraint(
         theConstraint->attribute(SketchPlugin_ConstraintMirror::ENTITY_A()));
     if (aRefAttr && aRefAttr->isObject()) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-      SolverConstraintPtr aConstraint =
-          SketchSolver_Builder::getInstance()->createRigidConstraint(aFeature);
-      if (aConstraint) {
-        aConstraint->setGroup(this);
-        aConstraint->setStorage(myStorage);
-        setTemporary(aConstraint);
+      if (aFeature) {
+        SolverConstraintPtr aConstraint =
+            SketchSolver_Builder::getInstance()->createRigidConstraint(aFeature);
+        if (aConstraint) {
+          aConstraint->setGroup(this);
+          aConstraint->setStorage(myStorage);
+          setTemporary(aConstraint);
+        }
       }
     }
   }
