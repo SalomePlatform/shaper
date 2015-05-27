@@ -183,7 +183,12 @@ void ModuleBase_Operation::abort()
   if (myIsEditing) {
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aDoc = aMgr->activeDocument();
+    bool aIsOp = aMgr->isOperation();
+    if (!aIsOp)
+      aMgr->startOperation();
     aDoc->setCurrentFeature(myCurrentFeature, true);
+    if (!aIsOp)
+      aMgr->finishOperation();
     myCurrentFeature = FeaturePtr();
   }
   abortOperation();
