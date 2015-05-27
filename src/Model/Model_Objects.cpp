@@ -126,6 +126,8 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);
     theFeature->setDisabled(false); // by default created feature is enabled
     updateHistory(ModelAPI_Feature::group());
+  } else { // make feature has not-null data anyway
+    theFeature->setData(Model_Data::invalidData());
   }
 }
 

@@ -189,6 +189,9 @@ class Model_Data : public ModelAPI_Data
   /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Data> invalidPtr();
 
+  /// Returns the invalid data pointer: static method
+  static std::shared_ptr<ModelAPI_Data> invalidData();
+
 protected:
   /// Returns true if "is in history" custom behaviors is defined for the feature
   MODEL_EXPORT virtual bool isInHistory();

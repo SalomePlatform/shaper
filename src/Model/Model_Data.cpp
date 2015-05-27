@@ -415,3 +415,8 @@ std::shared_ptr<ModelAPI_Data> Model_Data::invalidPtr()
 {
   return kInvalid;
 }
+
+std::shared_ptr<ModelAPI_Data> Model_Data::invalidData()
+{
+  return kInvalid;
+}
