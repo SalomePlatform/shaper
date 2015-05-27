@@ -707,6 +707,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   // make all features after this feature disabled in reversed order (to remove results without deps)
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
 
   bool aPassed = false; // flag that the current object is already passed in cycle
   FeaturePtr anIter = myObjs->lastFeature();
@@ -728,6 +729,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     }
   }
   aLoop->flush(aRedispEvent);
+  aLoop->flush(aDeleteEvent);
 }
 
 void Model_Document::setCurrentFeatureUp()
