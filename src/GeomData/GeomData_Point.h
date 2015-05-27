@@ -52,7 +52,7 @@ class GeomData_Point : public GeomDataAPI_Point
   GEOMDATA_EXPORT virtual std::string textZ();
 
   /// Allows to set expression (text) as invalid (by the parameters listener)
-  GEOMDATA_EXPORT virtual void setExpressionInvalid(int, bool theFlag);
+  GEOMDATA_EXPORT virtual void setExpressionInvalid(int, const bool theFlag);
 
   /// Returns true if text is invalid
   GEOMDATA_EXPORT virtual bool expressionInvalid(int);

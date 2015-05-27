@@ -8,6 +8,7 @@
 #include <GeomAPI_Pnt.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Events.h>
 
 using namespace std;
 
@@ -65,6 +66,12 @@ void GeomData_Point::setText(const std::string& theX,
     myTextArray->SetValue(1, aY);
     myTextArray->SetValue(2, aZ);
     owner()->data()->sendAttributeUpdated(this);
+    // Send it to evaluator to convert into the double and store in the attribute
+    static Events_ID anId = ModelAPI_AttributeEvalMessage::eventId();
+    std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
+      std::shared_ptr<ModelAPI_AttributeEvalMessage>(new ModelAPI_AttributeEvalMessage(anId, this));
+    aMessage->setAttribute(owner()->data()->attribute(id())); // to get shared pointer to this
+    Events_Loop::loop()->send(aMessage);
   }
 }
 
