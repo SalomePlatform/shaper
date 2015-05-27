@@ -171,7 +171,8 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     setCurrentFeature(currentFeature(false), false);
     aSession->setCheckTransactions(true);
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
-    aSession->setActiveDocument(anApp->getDocument(myID), true);
+    // this is done in Part result "activate", so no needed here. Causes not-blue active part.
+    // aSession->setActiveDocument(anApp->getDocument(myID), true);
   }
   return !isError;
 }
