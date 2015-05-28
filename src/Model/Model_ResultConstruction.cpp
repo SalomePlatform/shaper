@@ -44,6 +44,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape()
 
 Model_ResultConstruction::Model_ResultConstruction()
 {
+  myIsDisabled = true; // by default it is not initialized and false to be after created
   myIsInHistory = true;
   myFacesUpToDate = false;
   setIsConcealed(false);

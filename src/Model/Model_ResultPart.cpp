@@ -21,6 +21,7 @@ std::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
 
 Model_ResultPart::Model_ResultPart()
 {
+  myIsDisabled = true; // by default it is not initialized and false to be after created
   setIsConcealed(false);
 }
 

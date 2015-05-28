@@ -21,6 +21,7 @@ class ModelAPI_Feature;
 class ModelAPI_Result : public ModelAPI_Object
 {
   bool myIsConcealed; ///< the result is concealed from the data tree (referenced by other objects)
+ protected:
   bool myIsDisabled; ///< the result is disabled: removed for the user, but keeps the general info
  public:
 
