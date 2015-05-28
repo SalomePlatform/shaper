@@ -31,4 +31,4 @@ CMAKE_ARGS="${CMAKE_ARGS} ${SRC_DIR}"
 
 cmake -G "Eclipse CDT4 - Unix Makefiles" ${CMAKE_ARGS}
 
-#/misc/dn48/newgeom/common/eclipse-4.4.0/eclipse&
+/misc/dn48/newgeom/common/eclipse-4.4.0/eclipse&

@@ -14,4 +14,4 @@ export LD_LIBRARY_PATH=${KERNEL_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
 export SalomeAppConfig=${ROOT_DIR}/${INSTALL_DIR}/share/salome/resources/newgeom:${GUI_ROOT_DIR}/share/salome/resources/gui
 
 ${PYTHONBIN} "${KERNEL_ROOT_DIR}/bin/salome/envSalome.py"
-${PYTHONBIN} "${KERNEL_ROOT_DIR}/bin/salome/runSalome.py" noexcepthandler
+${PYTHONBIN} "${KERNEL_ROOT_DIR}/bin/salome/runSalome.py"
