@@ -44,9 +44,6 @@ protected:
   /// Reimplemented from ModuleBase_WidgetFileSelector::storeValueCustom()
   virtual bool storeValueCustom() const;
 
-  /// Returns a short format string of theFilter string
-  static QString filterToShortFormat( const QString & theFilter );
-
   /// Returns a full format string for the short format
   QString shortFormatToFullFormat( const QString & theShortFormat ) const;
 

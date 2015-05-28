@@ -69,13 +69,21 @@ protected:
 
 protected:
   /// Converts format to filter string
-  static QString formatToFilter( const QString & theFormat );
+  static QString formatToFilter(const QString & theFormat);
+
+  /// Returns a short format string of theFilter string
+  static QString filterToShortFormat(const QString & theFilter);
+
+  /// Returns a list of extensions from theFilter
+  static QStringList filterToExtensions(const QString & theFilter);
 
   /// Returns list of validator formats
   QStringList getValidatorFormats() const;
 
   /// Returns string containing formats
   QString filterString() const;
+
+  static QString applyExtension(const QString& theFileName, const QString& theFilter);
 
 protected:
    /// A control for path input

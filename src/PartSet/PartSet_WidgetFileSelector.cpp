@@ -46,11 +46,6 @@ bool PartSet_WidgetFileSelector::storeValueCustom() const
   return ModuleBase_WidgetFileSelector::storeValueCustom();
 }
 
-QString PartSet_WidgetFileSelector::filterToShortFormat( const QString & theFilter )
-{
-  return theFilter.section(' ', 0, 0);
-}
-
 QString PartSet_WidgetFileSelector::shortFormatToFullFormat( const QString & theFormat ) const
 {
   foreach(const QString & eachFormat, getValidatorFormats())

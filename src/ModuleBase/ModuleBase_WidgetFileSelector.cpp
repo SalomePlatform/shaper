@@ -97,8 +97,6 @@ bool ModuleBase_WidgetFileSelector::restoreValue()
 QList<QWidget*> ModuleBase_WidgetFileSelector::getControls() const
 {
   QList<QWidget*> result;
-  //QPushButton * aButton = this->findChild<QPushButton *>();
-  //result << aButton;
   result << myPathField;
   return result;
 }
@@ -119,6 +117,8 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
       ? QFileDialog::getSaveFileName(this, myTitle, aDefaultPath, aFilter, &mySelectedFilter)
       : QFileDialog::getOpenFileName(this, myTitle, aDefaultPath, aFilter, &mySelectedFilter);
   if (!aFileName.isEmpty()) {
+    if (myType == WFS_SAVE)
+      aFileName = applyExtension(aFileName, mySelectedFilter);
     myPathField->setText(aFileName);
   }
 }
@@ -131,7 +131,7 @@ void ModuleBase_WidgetFileSelector::onPathChanged()
   emit valuesChanged();
 }
 
-QString ModuleBase_WidgetFileSelector::formatToFilter( const QString & theFormat )
+QString ModuleBase_WidgetFileSelector::formatToFilter(const QString & theFormat)
 {
   if (theFormat.isEmpty() && !theFormat.contains(":"))
     return QString();
@@ -140,6 +140,21 @@ QString ModuleBase_WidgetFileSelector::formatToFilter( const QString & theFormat
   QString aFormat = theFormat.section(':', 1, 1);
   return QString("%1 files (%2)").arg(aFormat)
       .arg(QStringList(aExtesionList).replaceInStrings(QRegExp("^(.*)$"), "*.\\1").join(" "));
+}
+
+QString ModuleBase_WidgetFileSelector::filterToShortFormat(const QString & theFilter)
+{
+  // Simplified implementation.
+  // It relies on theFilter was made by formatToFilter() function.
+  return theFilter.section(' ', 0, 0);
+}
+
+QStringList ModuleBase_WidgetFileSelector::filterToExtensions(const QString & theFilter)
+{
+  // Simplified implementation.
+  // It relies on theFilter was made by formatToFilter() function.
+  QStringList anExtensions = theFilter.section("(", 1, 1).section(")", 0, 0).split(" ");
+  return anExtensions;
 }
 
 QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
@@ -173,4 +188,21 @@ QString ModuleBase_WidgetFileSelector::filterString() const
   if (myType == WFS_OPEN)
     aResult << QString("All files (*.*)");
   return aResult.join(";;");
+}
+
+QString ModuleBase_WidgetFileSelector::applyExtension(const QString& theFileName,
+                                                      const QString& theFilter)
+{
+  QString aResult = theFileName;
+  bool hasExtension = false;
+  QStringList anExtensions = filterToExtensions(theFilter);
+  foreach(const QString& anExtension, anExtensions) {
+    if (theFileName.endsWith(anExtension.section(".", 1, 1), Qt::CaseInsensitive)) {
+      hasExtension = true;
+      break;
+    }
+  }
+  if (!hasExtension && !anExtensions.isEmpty())
+    aResult = QString("%1.%2").arg(theFileName).arg(anExtensions[0].section(".", 1, 1));
+  return aResult;
 }
