@@ -12,6 +12,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_Boolean.h>
 
+class GeomAlgoAPI_MakeShapeList;
+
 /**\class FeaturesPlugin_Boolean
  * \ingroup Plugins
  * \brief Feature for applying of Boolean operations on Solids.
@@ -60,8 +62,8 @@ public:
   }
 
   enum {
-	BOOL_CUT,
-	BOOL_FUSE,
+    BOOL_CUT,
+    BOOL_FUSE,
     BOOL_COMMON
   };
 
@@ -83,13 +85,14 @@ public:
 
 private:
   std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
-  
+
   /// Load Naming data structure of the feature to the document
-  void LoadNamingDS(GeomAlgoAPI_Boolean* theFeature, 
-					std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-	                std::shared_ptr<GeomAPI_Shape> theObject,
-	                std::shared_ptr<GeomAPI_Shape> theTool,
-					int theType);
+  void LoadNamingDS(std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
+                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    std::shared_ptr<GeomAPI_Shape> theResult,
+                    std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMapOfShapes,
+                    const ListOfShape& theObjects,
+                    const ListOfShape& theTools);
 };
 
 #endif

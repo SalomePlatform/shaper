@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Boolean.h
     GeomAlgoAPI_Rotation.h
     GeomAlgoAPI_MakeShape.h
+    GeomAlgoAPI_MakeShapeList.h
     GeomAlgoAPI_ShapeProps.h
     GeomAlgoAPI_DFLoader.h
     GeomAlgoAPI_Placement.h
@@ -43,6 +44,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Boolean.cpp
     GeomAlgoAPI_Rotation.cpp
     GeomAlgoAPI_MakeShape.cpp
+    GeomAlgoAPI_MakeShapeList.cpp
     GeomAlgoAPI_ShapeProps.cpp
     GeomAlgoAPI_DFLoader.cpp
     GeomAlgoAPI_Placement.cpp

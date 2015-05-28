@@ -70,10 +70,10 @@ class GeomAlgoAPI_Boolean : public GeomAPI_Interface
   GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape () const; 
  
   /// Returns map of sub-shapes of the result. To be used for History keeping
-  GEOMALGOAPI_EXPORT void  mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const;
+  GEOMALGOAPI_EXPORT void  mapOfShapes(std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theMap) const;
 
   /// Return interface for for History processing
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape* makeShape () const;
+  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAlgoAPI_MakeShape>& makeShape () const;
 
   ///Destructor
   GEOMALGOAPI_EXPORT  ~GeomAlgoAPI_Boolean();
@@ -86,9 +86,9 @@ class GeomAlgoAPI_Boolean : public GeomAPI_Interface
   double mySize;
   bool myDone;
   int  myOperation;
-  std::shared_ptr<GeomAPI_Shape> myShape;  
-  GeomAPI_DataMapOfShapeShape myMap;
-  GeomAlgoAPI_MakeShape * myMkShape;
+  std::shared_ptr<GeomAPI_Shape> myShape;
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
+  std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };
 
 #endif

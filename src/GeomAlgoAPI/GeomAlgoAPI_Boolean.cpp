@@ -67,7 +67,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(std::shared_ptr<GeomAPI_Shape> theObject,
                                          std::shared_ptr<GeomAPI_Shape> theTool,
                                          int theType)
-: myOperation(theType), myDone(false), myShape(new GeomAPI_Shape())
+: myOperation(theType), myDone(false), myShape(new GeomAPI_Shape()), myMap(new GeomAPI_DataMapOfShapeShape())
 {
   build(theObject, theTool);
 }
@@ -85,9 +85,8 @@ void GeomAlgoAPI_Boolean::build(std::shared_ptr<GeomAPI_Shape> theObject,
 	{
 	  BRepAlgoAPI_Fuse* mkFuse = new BRepAlgoAPI_Fuse(anObject, aTool);
       if (mkFuse && mkFuse->IsDone()) {
-		setImpl(mkFuse);
 		myDone = mkFuse->IsDone() == Standard_True;
-		myMkShape = new GeomAlgoAPI_MakeShape (mkFuse);
+    myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape (mkFuse));
 		aResult = mkFuse->Shape();//GeomAlgoAPI_DFLoader::refineResult(aFuse->Shape());      
 	  }
 	  break;
@@ -96,9 +95,8 @@ void GeomAlgoAPI_Boolean::build(std::shared_ptr<GeomAPI_Shape> theObject,
 	{
       BRepAlgoAPI_Cut* mkCut = new BRepAlgoAPI_Cut(anObject, aTool);
       if (mkCut && mkCut->IsDone()) {
-		setImpl(mkCut);
 		myDone = mkCut->IsDone() == Standard_True;
-		myMkShape = new GeomAlgoAPI_MakeShape (mkCut);
+		myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape (mkCut));
 		aResult = mkCut->Shape();    
 	  }
 	  break;
@@ -107,9 +105,8 @@ void GeomAlgoAPI_Boolean::build(std::shared_ptr<GeomAPI_Shape> theObject,
 	{
       BRepAlgoAPI_Common* mkCom = new BRepAlgoAPI_Common(anObject, aTool);
       if (mkCom && mkCom->IsDone()) {
-		setImpl(mkCom);
 		myDone = mkCom->IsDone() == Standard_True;
-		myMkShape = new GeomAlgoAPI_MakeShape (mkCom);
+		myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape (mkCom));
 		aResult = mkCom->Shape(); 
 	  }
 	  break;
@@ -126,7 +123,7 @@ void GeomAlgoAPI_Boolean::build(std::shared_ptr<GeomAPI_Shape> theObject,
 	for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
 	  std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-	  myMap.bind(aCurrentShape, aCurrentShape);
+	  myMap->bind(aCurrentShape, aCurrentShape);
 	}
   }  
 }
@@ -150,13 +147,13 @@ const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Boolean::shape () const
 }
 
 //============================================================================
-void GeomAlgoAPI_Boolean::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const
+void GeomAlgoAPI_Boolean::mapOfShapes(std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theMap) const
 {
   theMap = myMap;
 }
 
 //============================================================================
-GeomAlgoAPI_MakeShape * GeomAlgoAPI_Boolean::makeShape() const
+const std::shared_ptr<GeomAlgoAPI_MakeShape>& GeomAlgoAPI_Boolean::makeShape() const
 {
   return myMkShape;
 }
@@ -164,7 +161,4 @@ GeomAlgoAPI_MakeShape * GeomAlgoAPI_Boolean::makeShape() const
 //============================================================================
 GeomAlgoAPI_Boolean::~GeomAlgoAPI_Boolean()
 {
-  if (myImpl) {    
-	myMap.clear();
-  }
 }

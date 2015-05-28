@@ -216,7 +216,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
       }
     }
   }
-  else if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
+  else if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
     AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttr->context();
     GeomShapePtr aShape = anAttr->value();
@@ -255,6 +255,32 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             return false;
         }
         return true;
+      }
+    }
+  }
+  else if(anAttrType == ModelAPI_AttributeSelectionList::typeId()) {
+    std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList = 
+            std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    anAttrs = aFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
+    if(anAttrs.size() > 0) {
+      std::list<std::shared_ptr<ModelAPI_Attribute>>::iterator anAttrItr = anAttrs.begin();
+      for(; anAttrItr != anAttrs.end(); anAttrItr++){
+        if ((*anAttrItr).get() && (*anAttrItr)->id() != theAttribute->id()){
+          std::shared_ptr<ModelAPI_AttributeSelectionList> aRefSelList = 
+            std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anAttrItr);
+          for(int i = 0; i < aCurSelList->size(); i++) {
+            std::shared_ptr<ModelAPI_AttributeSelection> aCurSel = aCurSelList->value(i);
+            for(int j = 0; j < aRefSelList->size(); j++) {
+              std::shared_ptr<ModelAPI_AttributeSelection> aRefSel = aRefSelList->value(j);
+              if(aCurSel->context() == aRefSel->context()) {
+                if(aCurSel->value().get() == NULL || aRefSel->value().get() == NULL
+                  || aCurSel->value()->isEqual(aRefSel->value())) {
+                    return false;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

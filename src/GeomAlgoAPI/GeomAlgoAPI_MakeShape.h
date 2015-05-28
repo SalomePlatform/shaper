@@ -7,8 +7,10 @@
 #define GeomAlgoAPI_MakeShape_H_
 
 #include <GeomAPI_Shape.h>
-#include <memory>
 #include <GeomAlgoAPI.h>
+
+#include <list>
+#include <memory>
 
 /**\class GeomAlgoAPI_MakeShape
  * \ingroup DataAlgo
@@ -35,12 +37,12 @@ public:
 
   /// Returns whether the shape is an edge
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
-  /// Initializes the algorithm by the builder stored in the interface
-  GEOMALGOAPI_EXPORT void init(void* theMkShape);
 
   protected:
   /// The resulting shape
 	std::shared_ptr<GeomAPI_Shape> myShape;
 };
+
+typedef std::list<std::shared_ptr<GeomAlgoAPI_MakeShape> > ListOfMakeShape;
 
 #endif

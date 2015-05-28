@@ -17,10 +17,6 @@ GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape)
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
   : GeomAPI_Interface(),myShape(new GeomAPI_Shape())
 {}
-void GeomAlgoAPI_MakeShape::init(void* theMkShape)
-{
-  setImpl((void *)implPtr<BRepBuilderAPI_MakeShape>());
-}
 
 const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
 {
