@@ -37,6 +37,13 @@ static const std::string PREVIOUS_VALUE("FilletPreviousRadius");
 static void recalculateAttributes(FeaturePtr theNewArc, const std::string& theNewArcAttribute,
   FeaturePtr theFeature, const std::string& theFeatureAttribute);
 
+/// \brief Calculates center of fillet arc and coordinates of tangency points
+static void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
+                                  double theRadius, bool theNotInversed[2],
+                                  std::shared_ptr<GeomAPI_XY>& theCenter,
+                                  std::shared_ptr<GeomAPI_XY>& theTangentA,
+                                  std::shared_ptr<GeomAPI_XY>& theTangentB);
+
 
 SketchPlugin_ConstraintFillet::SketchPlugin_ConstraintFillet()
 {
@@ -78,42 +85,8 @@ void SketchPlugin_ConstraintFillet::execute()
   // Check the fillet shapes is not initialized yet
   AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_C()));
-  if (aRefListOfFillet->size() > 0) {
-    // update the Radius constraint
-    ObjectPtr aFilletArcObj = aRefListOfFillet->list().back();
-    aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFilletArcObj);
-    FeaturePtr aFilletArcFeature = aRC ? aRC->document()->feature(aRC) : 
-      std::dynamic_pointer_cast<ModelAPI_Feature>(aFilletArcObj);
+  bool needNewObjects = aRefListOfFillet->size() == 0;
 
-    int aNbSubs = sketch()->numberOfSubs();
-    FeaturePtr aSubFeature;
-    for (int aSub = 0; aSub < aNbSubs; aSub++) {
-      aSubFeature = sketch()->subFeature(aSub);
-      if (aSubFeature->getKind() != SketchPlugin_ConstraintRadius::ID())
-        continue;
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aSubFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
-      if (!aRefAttr || !aRefAttr->isObject())
-        continue;
-      aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aRefAttr->object());
-      FeaturePtr aFeature = aRC ? aRC->document()->feature(aRC) : 
-        std::dynamic_pointer_cast<ModelAPI_Feature>(aRefAttr->object());
-      if (aFeature == aFilletArcFeature) {
-        // Update radius constraint only if the value is changed in fillet's attribute
-        double aPrevRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-            aData->attribute(PREVIOUS_VALUE))->value();
-        if (aFilletRadius != aPrevRadius) {
-          AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-              aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
-          aRadius->setValue(aFilletRadius);
-          std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-              aData->attribute(PREVIOUS_VALUE))->setValue(aFilletRadius);
-        }
-        break;
-      }
-    }
-    return;
-  }
   // Obtain features for the base objects
   FeaturePtr aFeatureA, aFeatureB;
   aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseA->object());
@@ -123,39 +96,40 @@ void SketchPlugin_ConstraintFillet::execute()
   if (!aFeatureA || !aFeatureB)
     return;
 
-  // Create list of objects composing a fillet
-  // copy aFeatureA
-  FeaturePtr aNewFeatureA = sketch()->addFeature(aFeatureA->getKind());
-  aFeatureA->data()->copyTo(aNewFeatureA->data());
-  aNewFeatureA->execute();
-  aRefListOfFillet->append(aNewFeatureA->firstResult());
-  // copy aFeatureB
-  FeaturePtr aNewFeatureB = sketch()->addFeature(aFeatureB->getKind());
-  aFeatureB->data()->copyTo(aNewFeatureB->data());
-  aNewFeatureB->execute();
-  aRefListOfFillet->append(aNewFeatureB->firstResult());
-  // create filleting arc (it will be attached to the list later)
-  FeaturePtr aNewArc = sketch()->addFeature(SketchPlugin_Arc::ID());
-
-  // Wait all constraints being created, then send update events
-  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-  bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
-  if (isUpdateFlushed)
-    Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+  FeaturePtr aNewFeatureA, aNewFeatureB, aNewArc;
+  if (needNewObjects) {
+    // Create list of objects composing a fillet
+    // copy aFeatureA
+    aNewFeatureA = sketch()->addFeature(aFeatureA->getKind());
+    aFeatureA->data()->copyTo(aNewFeatureA->data());
+    // copy aFeatureB
+    aNewFeatureB = sketch()->addFeature(aFeatureB->getKind());
+    aFeatureB->data()->copyTo(aNewFeatureB->data());
+    // create filleting arc (it will be attached to the list later)
+    aNewArc = sketch()->addFeature(SketchPlugin_Arc::ID());
+  } else {
+    // Obtain features from the list
+    std::list<ObjectPtr> aNewFeatList = aRefListOfFillet->list();
+    std::list<ObjectPtr>::iterator aFeatIt = aNewFeatList.begin();
+    aNewFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
+    aNewFeatureB = ModelAPI_Feature::feature(*aFeatIt++);
+    aNewArc = ModelAPI_Feature::feature(*aFeatIt);
+  }
 
   // Calculate arc attributes
   static const int aNbFeatures = 2;
-  FeaturePtr aFeature[aNbFeatures] = {aNewFeatureA, aNewFeatureB};
+  FeaturePtr aFeature[aNbFeatures] = {aFeatureA, aFeatureB};
+  FeaturePtr aNewFeature[aNbFeatures] = {aNewFeatureA, aNewFeatureB};
   std::shared_ptr<GeomAPI_Dir2d> aTangentDir[aNbFeatures]; // tangent directions of the features in coincident point
   bool isStart[aNbFeatures]; // indicates which point the features share
   std::shared_ptr<GeomAPI_Pnt2d> aStartEndPnt[aNbFeatures * 2]; // first pair of points relate to first feature, second pair -  to second
   std::string aFeatAttributes[aNbFeatures * 2]; // attributes of features
   for (int i = 0; i < aNbFeatures; i++) {
     std::string aStartAttr, aEndAttr;
-    if (aFeature[i]->getKind() == SketchPlugin_Line::ID()) {
+    if (aNewFeature[i]->getKind() == SketchPlugin_Line::ID()) {
       aStartAttr = SketchPlugin_Line::START_ID();
       aEndAttr = SketchPlugin_Line::END_ID();
-    } else if (aFeature[i]->getKind() == SketchPlugin_Arc::ID()) {
+    } else if (aNewFeature[i]->getKind() == SketchPlugin_Arc::ID()) {
       aStartAttr = SketchPlugin_Arc::START_ID();
       aEndAttr = SketchPlugin_Arc::END_ID();
     } else { // wrong argument
@@ -185,14 +159,14 @@ void SketchPlugin_ConstraintFillet::execute()
   // tangent directions of the features
   for (int i = 0; i < aNbFeatures; i++) {
     std::shared_ptr<GeomAPI_XY> aDir;
-    if (aFeature[i]->getKind() == SketchPlugin_Line::ID()) {
+    if (aNewFeature[i]->getKind() == SketchPlugin_Line::ID()) {
       aDir = aStartEndPnt[2*i+1]->xy()->decreased(aStartEndPnt[2*i]->xy());
       if (!isStart[i])
         aDir = aDir->multiplied(-1.0);
-    } else if (aFeature[i]->getKind() == SketchPlugin_Arc::ID()) {
+    } else if (aNewFeature[i]->getKind() == SketchPlugin_Arc::ID()) {
       std::shared_ptr<GeomAPI_Pnt2d> aCenterPoint =
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aFeature[i]->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
+          aNewFeature[i]->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
       aDir = isStart[i] ? aStartEndPnt[2*i]->xy() : aStartEndPnt[2*i+1]->xy();
       aDir = aDir->decreased(aCenterPoint->xy());
 
@@ -205,86 +179,151 @@ void SketchPlugin_ConstraintFillet::execute()
     }
     aTangentDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(aDir));
   }
+
+  // Wait all constraints being created, then send update events
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+  if (isUpdateFlushed)
+    Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+
   // By default, the start point of fillet arc is connected to FeatureA,
   // and the end point - to FeatureB. But when the angle between TangentDirA and
   // TangentDirB greater 180 degree, the sequaence of features need to be reversed.
   double cosBA = aTangentDir[0]->cross(aTangentDir[1]); // cos(B-A), where A and B - angles between corresponding tanget direction and the X axis
   bool isReversed = cosBA > 0.0;
 
-  std::shared_ptr<GeomAPI_Pnt2d> aSharedPoint = aStartEndPnt[isStart[0] ? 0 : 1];
-  std::shared_ptr<GeomAPI_Dir2d> aBisect(new GeomAPI_Dir2d(
-      aTangentDir[0]->xy()->added(aTangentDir[1]->xy())));
-  std::shared_ptr<GeomAPI_XY> aStep = aBisect->xy()->multiplied(aFilletRadius);
-  std::shared_ptr<GeomAPI_XY> aCenter = aSharedPoint->xy()->added(aStep);
+  // Calculate fillet arc parameters
+  std::shared_ptr<GeomAPI_XY> aCenter, aTangentPntA, aTangentPntB;
+  calculateFilletCenter(aFeatureA, aFeatureB, aFilletRadius, isStart, aCenter, aTangentPntA, aTangentPntB);
+  // update features
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aNewFeatureA->attribute(aFeatAttributes[isStart[0] ? 0 : 1]))->setValue(
+      aTangentPntA->x(), aTangentPntA->y());
+  aNewFeatureA->execute();
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aNewFeatureB->attribute(aFeatAttributes[2 + (isStart[1] ? 0 : 1)]))->setValue(
+      aTangentPntB->x(), aTangentPntB->y());
+  aNewFeatureB->execute();
+  // update fillet arc
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(
       aCenter->x(), aCenter->y());
+  if (isReversed) {
+    std::shared_ptr<GeomAPI_XY> aTmp = aTangentPntA;
+    aTangentPntA = aTangentPntB;
+    aTangentPntB = aTmp;
+  }
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::START_ID()))->setValue(
-      aSharedPoint->x() - 1.e-5 * aStep->y(), aSharedPoint->y() + 1.e-5 * aStep->x());
+      aNewArc->attribute(SketchPlugin_Arc::START_ID()))->setValue(aTangentPntA->x(), aTangentPntA->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(
-      aSharedPoint->x() + 1.e-5 * aStep->y(), aSharedPoint->y() - 1.e-5 * aStep->x());
+      aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(aTangentPntB->x(), aTangentPntB->y());
   aNewArc->execute();
-  // attach new arc to the list
-  aRefListOfFillet->append(aNewArc->lastResult());
 
-  // Create list of additional constraints:
-  // 1. Coincidence of boundary points of features and fillet arc
-  // 1.1. coincidence
-  FeaturePtr aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(aNewArc->attribute(SketchPlugin_Arc::START_ID()));
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  int aFeatInd = isReversed ? 1 : 0;
-  int anAttrInd = (isReversed ? 2 : 0) + (isStart[isReversed ? 1 : 0] ? 0 : 1);
-  aRefAttr->setAttr(aFeature[aFeatInd]->attribute(aFeatAttributes[anAttrInd]));
-  recalculateAttributes(aNewArc, SketchPlugin_Arc::START_ID(), aFeature[aFeatInd], aFeatAttributes[anAttrInd]);
-  aConstraint->execute();
-  ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
-  // 1.2. coincidence
-  aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(aNewArc->attribute(SketchPlugin_Arc::END_ID()));
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aFeatInd = isReversed ? 0 : 1;
-  anAttrInd = (isReversed ? 0 : 2) + (isStart[isReversed ? 0 : 1] ? 0 : 1);
-  aRefAttr->setAttr(aFeature[aFeatInd]->attribute(aFeatAttributes[anAttrInd]));
-  recalculateAttributes(aNewArc, SketchPlugin_Arc::END_ID(), aFeature[aFeatInd], aFeatAttributes[anAttrInd]);
-  aConstraint->execute();
-  ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
-  // 2. Fillet arc radius
-  aConstraint = sketch()->addFeature(SketchPlugin_ConstraintRadius::ID());
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setObject(aNewArc->lastResult());
-  std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aConstraint->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aFilletRadius);
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))->setValue(
-      isStart[0] ? aStartEndPnt[0] : aStartEndPnt[1]);
-  aConstraint->execute();
-  ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
-  // 3. Tangency of fillet arc and features
-  for (int i = 0; i < aNbFeatures; i++) {
-    aConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
+  if (needNewObjects) {
+    // attach new arc to the list
+    aRefListOfFillet->append(aNewFeatureA->lastResult());
+    aRefListOfFillet->append(aNewFeatureB->lastResult());
+    aRefListOfFillet->append(aNewArc->lastResult());
+
+    // Create list of additional constraints:
+    // 1. Coincidence of boundary points of features (copied lines/arcs) and fillet arc
+    // 1.1. coincidence
+    FeaturePtr aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    aRefAttr->setAttr(aNewArc->attribute(SketchPlugin_Arc::START_ID()));
+    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+    int aFeatInd = isReversed ? 1 : 0;
+    int anAttrInd = (isReversed ? 2 : 0) + (isStart[isReversed ? 1 : 0] ? 0 : 1);
+    aRefAttr->setAttr(aNewFeature[aFeatInd]->attribute(aFeatAttributes[anAttrInd]));
+    recalculateAttributes(aNewArc, SketchPlugin_Arc::START_ID(), aNewFeature[aFeatInd], aFeatAttributes[anAttrInd]);
+    aConstraint->execute();
+    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    // 1.2. coincidence
+    aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    aRefAttr->setAttr(aNewArc->attribute(SketchPlugin_Arc::END_ID()));
+    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+    aFeatInd = isReversed ? 0 : 1;
+    anAttrInd = (isReversed ? 0 : 2) + (isStart[isReversed ? 0 : 1] ? 0 : 1);
+    aRefAttr->setAttr(aNewFeature[aFeatInd]->attribute(aFeatAttributes[anAttrInd]));
+    recalculateAttributes(aNewArc, SketchPlugin_Arc::END_ID(), aNewFeature[aFeatInd], aFeatAttributes[anAttrInd]);
+    aConstraint->execute();
+    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    // 2. Fillet arc radius
+    aConstraint = sketch()->addFeature(SketchPlugin_ConstraintRadius::ID());
     aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
     aRefAttr->setObject(aNewArc->lastResult());
-    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-    bool isArc = aFeature[i]->getKind() == SketchPlugin_Arc::ID();
-    aRefAttr->setObject(isArc ? aFeature[i]->lastResult() : aFeature[i]->firstResult());
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        aConstraint->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aFilletRadius);
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))->setValue(
+        isStart[0] ? aStartEndPnt[0] : aStartEndPnt[1]);
     aConstraint->execute();
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    // 3. Tangency of fillet arc and features
+    for (int i = 0; i < aNbFeatures; i++) {
+      aConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      aRefAttr->setObject(aNewArc->lastResult());
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      bool isArc = aNewFeature[i]->getKind() == SketchPlugin_Arc::ID();
+      aRefAttr->setObject(isArc ? aNewFeature[i]->lastResult() : aNewFeature[i]->firstResult());
+      aConstraint->execute();
+      ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    }
+    // 4. Coincidence of free boundaries of base and copied features
+    for (int i = 0; i < aNbFeatures; i++) {
+      anAttrInd = 2*i + (isStart[i] ? 1 : 0);
+      aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      aRefAttr->setAttr(aFeature[i]->attribute(aFeatAttributes[anAttrInd]));
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      aRefAttr->setAttr(aNewFeature[i]->attribute(aFeatAttributes[anAttrInd]));
+    }
+    // 5. Tangent points should be placed on the base features
+    for (int i = 0; i < aNbFeatures; i++) {
+      anAttrInd = 2*i + (isStart[i] ? 0 : 1);
+      aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      aRefAttr->setAttr(aNewFeature[i]->attribute(aFeatAttributes[anAttrInd]));
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      aRefAttr->setObject(aFeature[i]->lastResult());
+    }
+    // make base features auxiliary
+    aFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
+    aFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
+  } else {
+    // Update radius value
+    int aNbSubs = sketch()->numberOfSubs();
+    FeaturePtr aSubFeature;
+    for (int aSub = 0; aSub < aNbSubs; aSub++) {
+      aSubFeature = sketch()->subFeature(aSub);
+      if (aSubFeature->getKind() != SketchPlugin_ConstraintRadius::ID())
+        continue;
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aSubFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      if (!aRefAttr || !aRefAttr->isObject())
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+      if (aFeature == aNewArc) {
+        AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+          aSubFeature->attribute(SketchPlugin_Constraint::VALUE()));
+        aRadius->setValue(aFilletRadius);
+        break;
+      }
+    }
   }
-  // make base features auxiliary
-  aFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
-  aFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
 
   // send events to update the sub-features by the solver
   if (isUpdateFlushed)
@@ -315,38 +354,93 @@ bool SketchPlugin_ConstraintFillet::isMacro() const
 
 // =========   Auxiliary functions   =================
 void recalculateAttributes(FeaturePtr theNewArc,  const std::string& theNewArcAttribute,
-                            FeaturePtr theFeature, const std::string& theFeatureAttribute)
+                           FeaturePtr theFeature, const std::string& theFeatureAttribute)
 {
   std::shared_ptr<GeomAPI_Pnt2d> anArcPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theNewArc->attribute(theNewArcAttribute))->pnt();
-  if (theFeature->getKind() == SketchPlugin_Line::ID()) {
-    std::shared_ptr<GeomAPI_Pnt2d> aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeature->attribute(SketchPlugin_Line::START_ID()))->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeature->attribute(SketchPlugin_Line::END_ID()))->pnt();
-    std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(
-        aEndPoint->xy()->decreased(aStartPoint->xy())));
-    std::shared_ptr<GeomAPI_XY> aVec = anArcPoint->xy()->decreased(aStartPoint->xy());
-    double aDot = aVec->dot(aLineDir->xy());
-    aVec = aStartPoint->xy()->added(aLineDir->xy()->multiplied(aDot));
-    anArcPoint->setX(aVec->x());
-    anArcPoint->setY(aVec->y());
-  } else if (theFeature->getKind() == SketchPlugin_Arc::ID()) {
-    std::shared_ptr<GeomAPI_Pnt2d> aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeature->attribute(SketchPlugin_Arc::START_ID()))->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> aCenterPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeature->attribute(SketchPlugin_Arc::END_ID()))->pnt();
-    double aRadius = aStartPoint->distance(aCenterPoint);
-    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(
-        anArcPoint->xy()->decreased(aCenterPoint->xy())));
-    std::shared_ptr<GeomAPI_XY> aPoint = aCenterPoint->xy()->added(aDir->xy()->multiplied(aRadius));
-    anArcPoint->setX(aPoint->x());
-    anArcPoint->setY(aPoint->y());
-  } else
-    return;
-
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theNewArc->attribute(theNewArcAttribute))->setValue(anArcPoint->x(), anArcPoint->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theFeature->attribute(theFeatureAttribute))->setValue(anArcPoint->x(), anArcPoint->y());
+}
+
+
+void possibleFilletCenterLineLine(
+    std::shared_ptr<GeomAPI_XY> thePointA, std::shared_ptr<GeomAPI_Dir2d> theDirA,
+    std::shared_ptr<GeomAPI_XY> thePointB, std::shared_ptr<GeomAPI_Dir2d> theDirB,
+    double theRadius, std::list< std::shared_ptr<GeomAPI_XY> >& theCenters)
+{
+  std::shared_ptr<GeomAPI_Dir2d> aDirAT(new GeomAPI_Dir2d(-theDirA->y(), theDirA->x()));
+  std::shared_ptr<GeomAPI_Dir2d> aDirBT(new GeomAPI_Dir2d(-theDirB->y(), theDirB->x()));
+  std::shared_ptr<GeomAPI_XY> aPntA, aPntB;
+  double aDet = theDirA->cross(theDirB);
+  for (double aStepA = -1.0; aStepA <= 1.0; aStepA += 2.0) {
+    aPntA = thePointA->added(aDirAT->xy()->multiplied(aStepA * theRadius));
+    for (double aStepB = -1.0; aStepB <= 1.0; aStepB += 2.0) {
+      aPntB = thePointB->added(aDirBT->xy()->multiplied(aStepB * theRadius));
+      double aVX = aDirAT->xy()->dot(aPntA);
+      double aVY = aDirBT->xy()->dot(aPntB);
+      std::shared_ptr<GeomAPI_XY> aPoint(new GeomAPI_XY(
+          (theDirB->x() * aVX - theDirA->x() * aVY) / aDet,
+          (theDirB->y() * aVX - theDirA->y() * aVY) / aDet));
+      theCenters.push_back(aPoint);
+    }
+  }
+}
+
+void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
+                           double theRadius, bool theNotInversed[2],
+                           std::shared_ptr<GeomAPI_XY>& theCenter,
+                           std::shared_ptr<GeomAPI_XY>& theTangentA,
+                           std::shared_ptr<GeomAPI_XY>& theTangentB)
+{
+  if (theFeatureA->getKind() == SketchPlugin_Line::ID() &&
+      theFeatureB->getKind() == SketchPlugin_Line::ID()) {
+    std::shared_ptr<GeomAPI_XY> aStartA, aEndA, aStartB, aEndB;
+    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, aEndPoint;
+
+    aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        theFeatureA->attribute(SketchPlugin_Line::START_ID()));
+    aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        theFeatureA->attribute(SketchPlugin_Line::END_ID()));
+    aStartA = std::shared_ptr<GeomAPI_XY>(theNotInversed[0] ?
+        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()) :
+        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()));
+    aEndA = std::shared_ptr<GeomAPI_XY>(theNotInversed[0] ?
+        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()) :
+        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()));
+
+    aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        theFeatureB->attribute(SketchPlugin_Line::START_ID()));
+    aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        theFeatureB->attribute(SketchPlugin_Line::END_ID()));
+    aStartB = std::shared_ptr<GeomAPI_XY>(theNotInversed[1] ?
+        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()) :
+        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()));
+    aEndB = std::shared_ptr<GeomAPI_XY>(theNotInversed[1] ?
+        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()) :
+        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()));
+
+    std::shared_ptr<GeomAPI_Dir2d> aDirA(new GeomAPI_Dir2d(aEndA->decreased(aStartA)));
+    std::shared_ptr<GeomAPI_Dir2d> aDirB(new GeomAPI_Dir2d(aEndB->decreased(aStartB)));
+    std::shared_ptr<GeomAPI_Dir2d> aDirAT(new GeomAPI_Dir2d(-aDirA->y(), aDirA->x()));
+    std::shared_ptr<GeomAPI_Dir2d> aDirBT(new GeomAPI_Dir2d(-aDirB->y(), aDirB->x()));
+
+    // get and filter possible centers
+    std::list< std::shared_ptr<GeomAPI_XY> > aSuspectCenters;
+    possibleFilletCenterLineLine(aStartA, aDirA, aStartB, aDirB, theRadius, aSuspectCenters);
+    double aDot = 0.0;
+    std::list< std::shared_ptr<GeomAPI_XY> >::iterator anIt = aSuspectCenters.begin();
+    for (; anIt != aSuspectCenters.end(); anIt++) {
+      aDot = aDirAT->xy()->dot(aStartA->decreased(*anIt));
+      theTangentA = (*anIt)->added(aDirAT->xy()->multiplied(aDot));
+      if (theTangentA->decreased(aStartA)->dot(aDirA->xy()) < 0.0)
+        continue; // incorrect position
+      aDot = aDirBT->xy()->dot(aStartB->decreased(*anIt));
+      theTangentB = (*anIt)->added(aDirBT->xy()->multiplied(aDot));
+      if (theTangentB->decreased(aStartB)->dot(aDirB->xy()) < 0.0)
+        continue; // incorrect position
+      // the center is found, stop searching
+      theCenter = *anIt;
+      return;
+    }
+  }
 }
