@@ -105,6 +105,9 @@ void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSe
 {
   Standard_Integer aMode;
   switch (theMode) {
+  case 0: // we should use selection of all objects
+    aMode = 0;
+    break;
   case SketcherPrs_Tools::Sel_Dimension_All:
     aMode = 0;
     break;
@@ -114,8 +117,11 @@ void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSe
   case SketcherPrs_Tools::Sel_Dimension_Text:
     aMode = 2;
     break;
-  default:
-    aMode = theMode;
+  default: {
+    // there are own selection modes, so the others should be ignored
+    // otherwise, the text selection appears in the viewer
+    return; 
+  }
   }
   AIS_RadiusDimension::ComputeSelection(aSelection, aMode);
 }
