@@ -77,8 +77,9 @@ void ExchangePlugin_ExportFeature::execute()
   AttributeStringPtr aFormatAttr =
       this->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID());
   std::string aFormat = aFormatAttr->value();
-  if (aFormat.empty())
-    return;
+  // Format may be empty. In this case look at extension.
+//  if (aFormat.empty())
+//    return;
 
   AttributeStringPtr aFilePathAttr =
       this->string(ExchangePlugin_ExportFeature::FILE_PATH_ID());
@@ -105,6 +106,23 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   // retrieve the file and plugin library names
   TCollection_AsciiString aFileName(theFileName.c_str());
   TCollection_AsciiString aFormatName(theFormat.c_str());
+
+  if (theFormat.empty()) { // look at extension
+    OSD_Path aPath(aFileName);
+    TCollection_AsciiString anExtension = aPath.Extension();
+    // ".brep" -> "BREP", TCollection_AsciiString are numbered from 1
+    anExtension = anExtension.SubString(2, anExtension.Length());
+    anExtension.UpperCase();
+    if (anExtension == "BREP" || anExtension == "BRP") {
+      aFormatName = "BREP";
+    } else if (anExtension == "STEP" || anExtension == "STP") {
+      aFormatName = "STEP";
+    } else if (anExtension == "IGES" || anExtension == "IGS") {
+      aFormatName = "IGES-5.1";
+    } else {
+      aFormatName = anExtension;
+    }
+  }
 
   // Perform the export
   TCollection_AsciiString anError;
