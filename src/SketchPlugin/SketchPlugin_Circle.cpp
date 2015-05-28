@@ -55,22 +55,19 @@ void SketchPlugin_Circle::execute()
 
       // make a visible circle
       std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-          aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-      bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
-      if (aHasPlane) {
-        std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
-        // compute the circle radius
-        double aRadius = aRadiusAttr->value();
+        aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+      std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+      // compute the circle radius
+      double aRadius = aRadiusAttr->value();
 
-        std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(
-            aCenter, aNormal, aRadius);
-        aShapes.push_back(aCircleShape);
-        std::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = document()->createConstruction(
-            data(), 1);
-        aConstr2->setShape(aCircleShape);
-        aConstr2->setIsInHistory(false);
-        setResult(aConstr2, 1);
-      }
+      std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(
+        aCenter, aNormal, aRadius);
+      aShapes.push_back(aCircleShape);
+      std::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = document()->createConstruction(
+        data(), 1);
+      aConstr2->setShape(aCircleShape);
+      aConstr2->setIsInHistory(false);
+      setResult(aConstr2, 1);
     }
   }
 }
