@@ -221,7 +221,7 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
       for (; aRIter != aResults.cend(); aRIter++) {
         ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
         if (aPart.get()) {
-          if (!aPart->isDisabled() && aPart->isActivated()) {
+          if (!aPart->isDisabled() && aPart->partDoc().get()) {
             updateInDoc(aPart->partDoc());
           }
         }
@@ -382,8 +382,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (theFeature->isDisabled() ||  // nothing to do with disabled feature
-      theFeature->data()->execState() == ModelAPI_StateInvalidArgument)
+  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument)
     return;
   bool aJustUpdated = false;
 
@@ -403,7 +402,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     for(; aRef != aRefs.end(); aRef++) {
       std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
       for(; aRefObj != aRef->second.end(); aRefObj++) {
-        if (myJustCreated.find(*aRefObj) != myJustCreated.end() ||
+        // if reference is null, it may bmean that this reference is to other document
+        // the does not supported by RefList: peremeters may be recomputed
+        if (!aRefObj->get() || myJustCreated.find(*aRefObj) != myJustCreated.end() ||
             myJustUpdated.find(*aRefObj) != myJustUpdated.end()) {
           aJustUpdated = true;
         }
@@ -425,38 +426,45 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     //std::cout<<"Update feature "<<theFeature->getKind()<<" must be updated = "<<aMustbeUpdated<<std::endl;
     // execute feature if it must be updated
     if (aJustUpdated) {
-      if (theFeature->isPreviewNeeded()) {
-        if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
-            !theFeature->isPersistentResult()) {
-          if (aFactory->validate(theFeature)) {
-            FeaturePtr aCurrent = theFeature->document()->currentFeature(false);
-            if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
-                || (isUpdated(theFeature) && 
-                     (theFeature == aCurrent || 
-                      (aCurrent.get() && aCurrent->isMacro())))) // currently edited
-            {
-              if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
-                executeFeature(theFeature);
+      if (theFeature->isDisabled()) {  // do not execute the disabled feature
+        // the disabled features must be updated after enabling anyway if their arguments were changed
+        if (theFeature->data()->execState() == ModelAPI_StateDone &&
+          aState == ModelAPI_StateMustBeUpdated)
+          theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
+      } else {
+        if (theFeature->isPreviewNeeded()) {
+          if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
+              !theFeature->isPersistentResult()) {
+            if (aFactory->validate(theFeature)) {
+              FeaturePtr aCurrent = theFeature->document()->currentFeature(false);
+              if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
+                  || (isUpdated(theFeature) && 
+                       (theFeature == aCurrent || 
+                        (aCurrent.get() && aCurrent->isMacro())))) // currently edited
+              {
+                if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
+                  executeFeature(theFeature);
+                }
+              } else { // must be updatet, but not updated yet
+                theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
+                const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+                std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+                for (; aRIter != aResults.cend(); aRIter++) {
+                  std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+                  aRes->data()->execState(ModelAPI_StateMustBeUpdated);
+                }
               }
-            } else { // must be updatet, but not updated yet
-              theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
-              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-              for (; aRIter != aResults.cend(); aRIter++) {
-                std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-                aRes->data()->execState(ModelAPI_StateMustBeUpdated);
-              }
+            } else {
+              theFeature->eraseResults();
+              redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
             }
-          } else {
-            theFeature->eraseResults();
-            redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
+          } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
+            redisplayWithResults(theFeature, ModelAPI_StateNothing);
           }
-        } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
-          redisplayWithResults(theFeature, ModelAPI_StateNothing);
+        } else { // preview is not needed => make state Done
+          if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
+            theFeature->data()->execState(ModelAPI_StateDone);
         }
-      } else { // preview is not needed => make state Done
-        if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
-          theFeature->data()->execState(ModelAPI_StateDone);
       }
     }
   }

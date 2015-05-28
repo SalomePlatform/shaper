@@ -16,6 +16,7 @@
 /**\class Model_AttributeRefList
  * \ingroup DataModel
  * \brief Attribute that contains list of references to features (located in the same document).
+ * For the current moment it does not support references t oobjects in other documents.
  */
 
 class Model_AttributeRefList : public ModelAPI_AttributeRefList
