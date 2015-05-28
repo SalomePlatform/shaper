@@ -367,13 +367,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
     }
   }
 
-  Handle(AIS_Trihedron) aTrihedron;
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
-    if (aTrihedron.IsNull())
-      activate(anAISIO, myActiveSelectionModes);
+    activate(anAISIO, myActiveSelectionModes);
   }
 }
 
@@ -842,22 +839,27 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   if (aTColModes.IsEmpty())
     aContext->Load(theIO, -1, true);
 
-    //aContext->Load(anAISIO, -1, true);
-    // In order to clear active modes list
-  if (theModes.size() == 0) {
-    //aContext->Load(anAISIO, 0, true);
-    aContext->Activate(theIO);
-#ifdef DEBUG_ACTIVATE
-    qDebug("activate in all modes");
-#endif
-  } else {
-    foreach(int aMode, theModes) {
-      //aContext->Load(anAISIO, aMode, true);
-      if (!aModesActivatedForIO.contains(aMode)) {
-        aContext->Activate(theIO, aMode);
-#ifdef DEBUG_ACTIVATE
-        qDebug(QString("activate: %1").arg(aMode).toStdString().c_str());
-#endif
+  // trihedron AIS check should be after the AIS loading.
+  // If it is not loaded, it is steel selectable in the viewer.
+  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
+  if (aTrihedron.IsNull()) {
+      //aContext->Load(anAISIO, -1, true);
+      // In order to clear active modes list
+    if (theModes.size() == 0) {
+      //aContext->Load(anAISIO, 0, true);
+      aContext->Activate(theIO);
+  #ifdef DEBUG_ACTIVATE
+      qDebug("activate in all modes");
+  #endif
+    } else {
+      foreach(int aMode, theModes) {
+        //aContext->Load(anAISIO, aMode, true);
+        if (!aModesActivatedForIO.contains(aMode)) {
+          aContext->Activate(theIO, aMode);
+  #ifdef DEBUG_ACTIVATE
+          qDebug(QString("activate: %1").arg(aMode).toStdString().c_str());
+  #endif
+        }
       }
     }
   }
