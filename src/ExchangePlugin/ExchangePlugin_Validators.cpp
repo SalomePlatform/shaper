@@ -59,9 +59,11 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
   std::transform(aFileName.begin(), aFileName.end(), aFileName.begin(), toupper);
   // Is file name ends with the format
   for (; itFormats != aFormats.end(); ++itFormats) {
-    size_t aFormatBeginPos = aFileNameLen - (*itFormats).length();
-    if (aFileName.compare(aFormatBeginPos, std::string::npos, *itFormats) == 0) {
-      return true;
+    if (aFileNameLen > (*itFormats).length()) {
+      size_t aFormatBeginPos = aFileNameLen - (*itFormats).length();
+      if (aFileName.compare(aFormatBeginPos, std::string::npos, *itFormats) == 0) {
+        return true;
+      }
     }
   }
   return false;
