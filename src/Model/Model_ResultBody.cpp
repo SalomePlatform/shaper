@@ -87,7 +87,7 @@ static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
     } else if (anEvol == TNaming_DELETE) {
       aBuilder.Delete(aPairsIter->first);
     } else if (anEvol == TNaming_PRIMITIVE) {
-      aBuilder.Generated(aPairsIter->first, aPairsIter->second);
+      aBuilder.Generated(aPairsIter->second);
     }
   }
   // recursive call for all sub-labels
