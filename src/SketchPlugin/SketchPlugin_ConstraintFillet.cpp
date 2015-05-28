@@ -31,6 +31,8 @@
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 
+#include <math.h>
+
 static const std::string PREVIOUS_VALUE("FilletPreviousRadius");
 
 /// \brief Attract specified point on theNewArc to the attribute of theFeature
@@ -362,7 +364,7 @@ void recalculateAttributes(FeaturePtr theNewArc,  const std::string& theNewArcAt
       theFeature->attribute(theFeatureAttribute))->setValue(anArcPoint->x(), anArcPoint->y());
 }
 
-
+/// \brief Find intersections of lines shifted along normal direction
 void possibleFilletCenterLineLine(
     std::shared_ptr<GeomAPI_XY> thePointA, std::shared_ptr<GeomAPI_Dir2d> theDirA,
     std::shared_ptr<GeomAPI_XY> thePointB, std::shared_ptr<GeomAPI_Dir2d> theDirB,
@@ -386,58 +388,224 @@ void possibleFilletCenterLineLine(
   }
 }
 
+/// \brief Find intersections of line shifted along normal direction in both sides
+///        and a circle with extended radius
+void possibleFilletCenterLineArc(
+    std::shared_ptr<GeomAPI_XY> theStartLine, std::shared_ptr<GeomAPI_Dir2d> theDirLine,
+    std::shared_ptr<GeomAPI_XY> theCenterArc, double theRadiusArc,
+    double theRadius, std::list< std::shared_ptr<GeomAPI_XY> >& theCenters)
+{
+  std::shared_ptr<GeomAPI_Dir2d> aDirT(new GeomAPI_Dir2d(-theDirLine->y(), theDirLine->x()));
+  std::shared_ptr<GeomAPI_XY> aPnt;
+  double aDirNorm2 = theDirLine->dot(theDirLine);
+  double aRad = 0.0;
+  double aDirX = theDirLine->x();
+  double aDirX2 = theDirLine->x() * theDirLine->x();
+  double aDirY2 = theDirLine->y() * theDirLine->y();
+  double aDirXY = theDirLine->x() * theDirLine->y();
+  for (double aStepA = -1.0; aStepA <= 1.0; aStepA += 2.0) {
+    aPnt = theStartLine->added(aDirT->xy()->multiplied(aStepA * theRadius));
+    double aCoeff = aDirT->xy()->dot(aPnt->decreased(theCenterArc));
+    double aCoeff2 = aCoeff * aCoeff;
+    for (double aStepB = -1.0; aStepB <= 1.0; aStepB += 2.0) {
+      aRad = theRadiusArc + aStepB * theRadius;
+      double aD = aRad * aRad * aDirNorm2 - aCoeff2;
+      if (aD < 0.0)
+        continue;
+      double aDs = sqrt(aD);
+      double x1 = theCenterArc->x() + (aCoeff * aDirT->x() - aDirT->y() * aDs) / aDirNorm2;
+      double x2 = theCenterArc->x() + (aCoeff * aDirT->x() + aDirT->y() * aDs) / aDirNorm2;
+      double y1 = (aDirX2 * aPnt->y() + aDirY2 * theCenterArc->y() -
+          aDirXY * (aPnt->x() - theCenterArc->x()) - theDirLine->y() * aDs) / aDirNorm2;
+      double y2 = (aDirX2 * aPnt->y() + aDirY2 * theCenterArc->y() -
+          aDirXY * (aPnt->x() - theCenterArc->x()) + theDirLine->y() * aDs) / aDirNorm2;
+
+      std::shared_ptr<GeomAPI_XY> aPoint1(new GeomAPI_XY(x1, y1));
+      theCenters.push_back(aPoint1);
+      std::shared_ptr<GeomAPI_XY> aPoint2(new GeomAPI_XY(x2, y2));
+      theCenters.push_back(aPoint2);
+    }
+  }
+}
+
+/// \brief Find intersections of two circles with extended radii
+void possibleFilletCenterArcArc(
+    std::shared_ptr<GeomAPI_XY> theCenterA, double theRadiusA,
+    std::shared_ptr<GeomAPI_XY> theCenterB, double theRadiusB,
+    double theRadius, std::list< std::shared_ptr<GeomAPI_XY> >& theCenters)
+{
+  std::shared_ptr<GeomAPI_XY> aCenterDir = theCenterB->decreased(theCenterA);
+  double aCenterDist2 = aCenterDir->dot(aCenterDir);
+  double aCenterDist = sqrt(aCenterDist2);
+
+  double aRadA, aRadB;
+  for (double aStepA = -1.0; aStepA <= 1.0; aStepA += 2.0) {
+    aRadA = theRadiusA + aStepA * theRadius;
+    for (double aStepB = -1.0; aStepB <= 1.0; aStepB += 2.0) {
+      aRadB = theRadiusB + aStepB * theRadius;
+      if (aRadA + aRadB < aCenterDist || fabs(aRadA - aRadB) > aCenterDist)
+        continue; // there is no intersections
+
+      double aMedDist = (aRadA * aRadA - aRadB * aRadB + aCenterDist2) / (2.0 * aCenterDist);
+      double aHeight = sqrt(aRadA * aRadA - aMedDist * aMedDist);
+
+      double x1 = theCenterA->x() + (aMedDist * aCenterDir->x() + aCenterDir->y() * aHeight) / aCenterDist;
+      double y1 = theCenterA->y() + (aMedDist * aCenterDir->y() - aCenterDir->x() * aHeight) / aCenterDist;
+
+      double x2 = theCenterA->x() + (aMedDist * aCenterDir->x() - aCenterDir->y() * aHeight) / aCenterDist;
+      double y2 = theCenterA->y() + (aMedDist * aCenterDir->y() + aCenterDir->x() * aHeight) / aCenterDist;
+
+      std::shared_ptr<GeomAPI_XY> aPoint1(new GeomAPI_XY(x1, y1));
+      theCenters.push_back(aPoint1);
+      std::shared_ptr<GeomAPI_XY> aPoint2(new GeomAPI_XY(x2, y2));
+      theCenters.push_back(aPoint2);
+    }
+  }
+}
+
 void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
                            double theRadius, bool theNotInversed[2],
                            std::shared_ptr<GeomAPI_XY>& theCenter,
                            std::shared_ptr<GeomAPI_XY>& theTangentA,
                            std::shared_ptr<GeomAPI_XY>& theTangentB)
 {
+  static const int aNbFeatures = 2;
+  FeaturePtr aFeature[aNbFeatures] = {theFeatureA, theFeatureB};
+  std::shared_ptr<GeomAPI_XY> aStart[aNbFeatures], aEnd[aNbFeatures], aCenter[aNbFeatures];
+  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, aEndPoint;
+
+  for (int i = 0; i < aNbFeatures; i++) {
+    if (aFeature[i]->getKind() == SketchPlugin_Line::ID()) {
+      aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeature[i]->attribute(SketchPlugin_Line::START_ID()));
+      aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeature[i]->attribute(SketchPlugin_Line::END_ID()));
+    } else if (aFeature[i]->getKind() == SketchPlugin_Arc::ID()) {
+      aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeature[i]->attribute(SketchPlugin_Arc::START_ID()));
+      aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeature[i]->attribute(SketchPlugin_Arc::END_ID()));
+      aCenter[i] = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeature[i]->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt()->xy();
+    } else
+      return;
+    aStart[i] = std::shared_ptr<GeomAPI_XY>(theNotInversed[i] ?
+        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()) :
+        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()));
+    aEnd[i] = std::shared_ptr<GeomAPI_XY>(theNotInversed[i] ?
+        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()) :
+        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()));
+  }
+
   if (theFeatureA->getKind() == SketchPlugin_Line::ID() &&
       theFeatureB->getKind() == SketchPlugin_Line::ID()) {
-    std::shared_ptr<GeomAPI_XY> aStartA, aEndA, aStartB, aEndB;
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, aEndPoint;
-
-    aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeatureA->attribute(SketchPlugin_Line::START_ID()));
-    aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeatureA->attribute(SketchPlugin_Line::END_ID()));
-    aStartA = std::shared_ptr<GeomAPI_XY>(theNotInversed[0] ?
-        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()) :
-        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()));
-    aEndA = std::shared_ptr<GeomAPI_XY>(theNotInversed[0] ?
-        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()) :
-        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()));
-
-    aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeatureB->attribute(SketchPlugin_Line::START_ID()));
-    aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        theFeatureB->attribute(SketchPlugin_Line::END_ID()));
-    aStartB = std::shared_ptr<GeomAPI_XY>(theNotInversed[1] ?
-        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()) :
-        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()));
-    aEndB = std::shared_ptr<GeomAPI_XY>(theNotInversed[1] ?
-        new GeomAPI_XY(aEndPoint->x(), aEndPoint->y()) :
-        new GeomAPI_XY(aStartPoint->x(), aStartPoint->y()));
-
-    std::shared_ptr<GeomAPI_Dir2d> aDirA(new GeomAPI_Dir2d(aEndA->decreased(aStartA)));
-    std::shared_ptr<GeomAPI_Dir2d> aDirB(new GeomAPI_Dir2d(aEndB->decreased(aStartB)));
-    std::shared_ptr<GeomAPI_Dir2d> aDirAT(new GeomAPI_Dir2d(-aDirA->y(), aDirA->x()));
-    std::shared_ptr<GeomAPI_Dir2d> aDirBT(new GeomAPI_Dir2d(-aDirB->y(), aDirB->x()));
+    std::shared_ptr<GeomAPI_Dir2d> aDir[2];
+    std::shared_ptr<GeomAPI_Dir2d> aDirT[2];
+    for (int i = 0; i < aNbFeatures; i++) {
+      aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(aEnd[i]->decreased(aStart[i])));
+      aDirT[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(-aDir[i]->y(), aDir[i]->x()));
+    }
 
     // get and filter possible centers
     std::list< std::shared_ptr<GeomAPI_XY> > aSuspectCenters;
-    possibleFilletCenterLineLine(aStartA, aDirA, aStartB, aDirB, theRadius, aSuspectCenters);
+    possibleFilletCenterLineLine(aStart[0], aDir[0], aStart[1], aDir[1], theRadius, aSuspectCenters);
     double aDot = 0.0;
     std::list< std::shared_ptr<GeomAPI_XY> >::iterator anIt = aSuspectCenters.begin();
     for (; anIt != aSuspectCenters.end(); anIt++) {
-      aDot = aDirAT->xy()->dot(aStartA->decreased(*anIt));
-      theTangentA = (*anIt)->added(aDirAT->xy()->multiplied(aDot));
-      if (theTangentA->decreased(aStartA)->dot(aDirA->xy()) < 0.0)
+      aDot = aDirT[0]->xy()->dot(aStart[0]->decreased(*anIt));
+      theTangentA = (*anIt)->added(aDirT[0]->xy()->multiplied(aDot));
+      if (theTangentA->decreased(aStart[0])->dot(aDir[0]->xy()) < 0.0)
         continue; // incorrect position
-      aDot = aDirBT->xy()->dot(aStartB->decreased(*anIt));
-      theTangentB = (*anIt)->added(aDirBT->xy()->multiplied(aDot));
-      if (theTangentB->decreased(aStartB)->dot(aDirB->xy()) < 0.0)
+      aDot = aDirT[1]->xy()->dot(aStart[1]->decreased(*anIt));
+      theTangentB = (*anIt)->added(aDirT[1]->xy()->multiplied(aDot));
+      if (theTangentB->decreased(aStart[1])->dot(aDir[1]->xy()) < 0.0)
         continue; // incorrect position
+      // the center is found, stop searching
+      theCenter = *anIt;
+      return;
+    }
+  } else if ((theFeatureA->getKind() == SketchPlugin_Arc::ID() &&
+      theFeatureB->getKind() == SketchPlugin_Line::ID()) || 
+      (theFeatureA->getKind() == SketchPlugin_Line::ID() &&
+      theFeatureB->getKind() == SketchPlugin_Arc::ID())) {
+    int aLineInd = theFeatureA->getKind() == SketchPlugin_Line::ID() ? 0 : 1;
+    double anArcRadius = aStart[1-aLineInd]->distance(aCenter[1-aLineInd]);
+    std::shared_ptr<GeomAPI_Dir2d> aDirLine = std::shared_ptr<GeomAPI_Dir2d>(
+        new GeomAPI_Dir2d(aEnd[aLineInd]->decreased(aStart[aLineInd])));
+    std::shared_ptr<GeomAPI_Dir2d> aDirT = std::shared_ptr<GeomAPI_Dir2d>(
+        new GeomAPI_Dir2d(-aDirLine->y(), aDirLine->x()));
+
+    std::shared_ptr<GeomAPI_Dir2d> aStartArcDir = std::shared_ptr<GeomAPI_Dir2d>(
+        new GeomAPI_Dir2d(aStart[1-aLineInd]->decreased(aCenter[1-aLineInd])));
+    std::shared_ptr<GeomAPI_Dir2d> aEndArcDir = std::shared_ptr<GeomAPI_Dir2d>(
+        new GeomAPI_Dir2d(aEnd[1-aLineInd]->decreased(aCenter[1-aLineInd])));
+    double anArcAngle = aEndArcDir->angle(aStartArcDir);
+
+    // get and filter possible centers
+    std::list< std::shared_ptr<GeomAPI_XY> > aSuspectCenters;
+    possibleFilletCenterLineArc(aStart[aLineInd], aDirLine, aCenter[1-aLineInd], anArcRadius, theRadius, aSuspectCenters);
+    double aDot = 0.0;
+    std::shared_ptr<GeomAPI_XY> aLineTgPoint, anArcTgPoint;
+    std::list< std::shared_ptr<GeomAPI_XY> >::iterator anIt = aSuspectCenters.begin();
+    for (; anIt != aSuspectCenters.end(); anIt++) {
+      aDot = aDirT->xy()->dot(aStart[aLineInd]->decreased(*anIt));
+      aLineTgPoint = (*anIt)->added(aDirT->xy()->multiplied(aDot));
+      if (aLineTgPoint->decreased(aStart[aLineInd])->dot(aDirLine->xy()) < 0.0)
+        continue; // incorrect position
+      std::shared_ptr<GeomAPI_Dir2d> aCurDir = std::shared_ptr<GeomAPI_Dir2d>(
+          new GeomAPI_Dir2d((*anIt)->decreased(aCenter[1-aLineInd])));
+      double aCurAngle = aCurDir->angle(aStartArcDir);
+      if (anArcAngle < 0.0) aCurAngle *= -1.0;
+      if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle))
+        continue; // incorrect position
+      // the center is found, stop searching
+      theCenter = *anIt;
+      anArcTgPoint = aCenter[1-aLineInd]->added(aCurDir->xy()->multiplied(anArcRadius));
+      if (theFeatureA->getKind() == SketchPlugin_Line::ID()) {
+        theTangentA = aLineTgPoint;
+        theTangentB = anArcTgPoint;
+      } else {
+        theTangentA = anArcTgPoint;
+        theTangentB = aLineTgPoint;
+      }
+      return;
+    }
+  } else if (theFeatureA->getKind() == SketchPlugin_Arc::ID() &&
+      theFeatureB->getKind() == SketchPlugin_Arc::ID()) {
+    double anArcRadius[aNbFeatures];
+    double anArcAngle[aNbFeatures];
+    std::shared_ptr<GeomAPI_Dir2d> aStartArcDir[aNbFeatures];
+    for (int i = 0; i < aNbFeatures; i++) {
+      anArcRadius[i] = aStart[i]->distance(aCenter[i]);
+      aStartArcDir[i] = std::shared_ptr<GeomAPI_Dir2d>(
+          new GeomAPI_Dir2d(aStart[i]->decreased(aCenter[i])));
+      std::shared_ptr<GeomAPI_Dir2d> aEndArcDir = std::shared_ptr<GeomAPI_Dir2d>(
+          new GeomAPI_Dir2d(aEnd[i]->decreased(aCenter[i])));
+      anArcAngle[i] = aEndArcDir->angle(aStartArcDir[i]);
+    }
+
+    // get and filter possible centers
+    std::list< std::shared_ptr<GeomAPI_XY> > aSuspectCenters;
+    possibleFilletCenterArcArc(aCenter[0], anArcRadius[0], aCenter[1], anArcRadius[1], theRadius, aSuspectCenters);
+    double aDot = 0.0;
+    std::shared_ptr<GeomAPI_XY> aLineTgPoint, anArcTgPoint;
+    std::list< std::shared_ptr<GeomAPI_XY> >::iterator anIt = aSuspectCenters.begin();
+    for (; anIt != aSuspectCenters.end(); anIt++) {
+      std::shared_ptr<GeomAPI_Dir2d> aCurDir = std::shared_ptr<GeomAPI_Dir2d>(
+          new GeomAPI_Dir2d((*anIt)->decreased(aCenter[0])));
+      double aCurAngle = aCurDir->angle(aStartArcDir[0]);
+      if (anArcAngle[0] < 0.0) aCurAngle *= -1.0;
+      if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle[0]))
+        continue; // incorrect position
+      theTangentA = aCenter[0]->added(aCurDir->xy()->multiplied(anArcRadius[0]));
+
+      aCurDir = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d((*anIt)->decreased(aCenter[1])));
+      aCurAngle = aCurDir->angle(aStartArcDir[1]);
+      if (anArcAngle[1] < 0.0) aCurAngle *= -1.0;
+      if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle[1]))
+        continue; // incorrect position
+      theTangentB = aCenter[1]->added(aCurDir->xy()->multiplied(anArcRadius[1]));
+
       // the center is found, stop searching
       theCenter = *anIt;
       return;
