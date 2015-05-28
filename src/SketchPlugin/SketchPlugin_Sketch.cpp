@@ -280,3 +280,17 @@ void SketchPlugin_Sketch::createPoint2DResult(ModelAPI_Feature* theFeature,
 
   theFeature->setResult(aResult, theIndex);
 }
+
+FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeature,
+                                                            SketchPlugin_Sketch* theSketch)
+{
+  FeaturePtr aNewFeature = theSketch->addFeature(theFeature->getKind());
+  // addFeature generates a unique name for the feature, it caches the name
+  std::string aUniqueFeatureName = aNewFeature->data()->name();
+  // all attribute values are copied\pasted to the new feature, name is not an exception
+  theFeature->data()->copyTo(aNewFeature->data());
+  // as a name for the feature, the generated unique name is set
+  aNewFeature->data()->setName(aUniqueFeatureName);
+
+  return aNewFeature;
+}

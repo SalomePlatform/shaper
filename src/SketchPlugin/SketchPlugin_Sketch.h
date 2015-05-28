@@ -203,6 +203,14 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   static void createPoint2DResult(ModelAPI_Feature* theFeature,
                                   SketchPlugin_Sketch* theSketch,
                                   const std::string& theAttributeID, const int theIndex);
+  
+  /// Add new feature and fill the data of the feature by the data of the parameter feature.
+  /// The name of the created feature stays unique.
+  /// \param theFeature a source feature
+  /// \return a created feature
+  static FeaturePtr addUniqueNamedCopiedFeature(FeaturePtr aFeature,
+                                                SketchPlugin_Sketch* theSketch);
+
   /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)

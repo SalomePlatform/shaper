@@ -102,11 +102,9 @@ void SketchPlugin_ConstraintFillet::execute()
   if (needNewObjects) {
     // Create list of objects composing a fillet
     // copy aFeatureA
-    aNewFeatureA = sketch()->addFeature(aFeatureA->getKind());
-    aFeatureA->data()->copyTo(aNewFeatureA->data());
+    aNewFeatureA = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeatureA, sketch());
     // copy aFeatureB
-    aNewFeatureB = sketch()->addFeature(aFeatureB->getKind());
-    aFeatureB->data()->copyTo(aNewFeatureB->data());
+    aNewFeatureB = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeatureB, sketch());
     // create filleting arc (it will be attached to the list later)
     aNewArc = sketch()->addFeature(SketchPlugin_Arc::ID());
   } else {

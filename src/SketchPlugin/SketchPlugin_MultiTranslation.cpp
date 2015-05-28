@@ -41,6 +41,11 @@ void SketchPlugin_MultiTranslation::initAttributes()
 
 void SketchPlugin_MultiTranslation::execute()
 {
+  if (!sketch()) {
+    // it is possible, that 
+    return;
+  }
+
   AttributeSelectionListPtr aTranslationObjectRefs = selectionList(TRANSLATION_LIST_ID());
   int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
@@ -192,10 +197,9 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
   if (!aFeature || !aResult)
     return ObjectPtr();
 
-  FeaturePtr aNewFeature = sketch()->addFeature(aFeature->getKind());
-  aFeature->data()->copyTo(aNewFeature->data());
-  aNewFeature->execute();
+  FeaturePtr aNewFeature = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeature, sketch());
 
+  aNewFeature->execute();
   static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   ModelAPI_EventCreator::get()->sendUpdated(aNewFeature, aRedisplayEvent);
 

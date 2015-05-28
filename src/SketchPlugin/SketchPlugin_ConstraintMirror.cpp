@@ -135,8 +135,7 @@ void SketchPlugin_ConstraintMirror::execute()
       if (aMirrorIter != aMirroredList.end())
         break; // the lists are inconsistent
       // There is no mirrored object yet, create it
-      FeaturePtr aNewFeature = sketch()->addFeature(aFeatureIn->getKind());
-      aFeatureIn->data()->copyTo(aNewFeature->data());
+      FeaturePtr aNewFeature = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeatureIn, sketch());
       aNewFeature->execute();
       ModelAPI_EventCreator::get()->sendUpdated(aNewFeature, aRedisplayEvent);
 
