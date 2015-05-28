@@ -170,6 +170,10 @@ class Model_Objects
   /// Returns to the last (from the history point of view) feature, any: invisible or disabled
   FeaturePtr lastFeature();
 
+  /// Returns the result group identifier of the given feature (for this at least one result must 
+  /// be created before)
+  std::string featureResultGroup(FeaturePtr theFeature);
+
  private:
   TDF_Label myMain; ///< main label of the data storage
 

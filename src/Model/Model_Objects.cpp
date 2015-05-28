@@ -218,14 +218,16 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
         aComposite->removeFeature(theFeature);
       }
     }
+    // this must be before erase since theFeature erasing removes all information about
+    // the feature results and groups of results
+    // To reproduce: create sketch, extrusion, remove sketch => constructions tree is not updated
+    clearHistory(theFeature);
     // erase fields
     theFeature->erase();
 
     TDF_Label aFeatureLabel = aData->label().Father();
     if (myFeatures.IsBound(aFeatureLabel))
       myFeatures.UnBind(aFeatureLabel);
-
-    clearHistory(theFeature);
 
     static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
@@ -250,8 +252,13 @@ void Model_Objects::clearHistory(ObjectPtr theObj)
       myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
     if (theObj->groupName() == ModelAPI_Feature::group()) { // clear results group of the feature
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
-      if (aFeature->firstResult().get())
-        clearHistory(aFeature->firstResult());
+      std::string aResultGroup = featureResultGroup(aFeature);
+      if (!aResultGroup.empty()) {
+        std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = 
+          myHistory.find(aResultGroup);
+        if (aHIter != myHistory.end())
+          myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
+      }
     }
   }
 }
@@ -752,6 +759,22 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::feature(
     return feature(aFeatureLab);
   }
   return FeaturePtr();
+}
+
+std::string Model_Objects::featureResultGroup(FeaturePtr theFeature)
+{
+  if (theFeature->data()->isValid()) {
+    TDF_ChildIterator aLabIter(resultLabel(theFeature->data(), 0).Father());
+    if (aLabIter.More()) {
+      TDF_Label anArgLab = aLabIter.Value();
+      Handle(TDataStd_Comment) aGroup;
+      if (aLabIter.Value().FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
+        return TCollection_AsciiString(aGroup->Get()).ToCString();
+      }
+    }
+  }
+  static std::string anEmpty;
+  return anEmpty; // not found
 }
 
 void Model_Objects::updateResults(FeaturePtr theFeature)
