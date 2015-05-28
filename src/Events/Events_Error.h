@@ -24,7 +24,7 @@
  */
 class EVENTS_EXPORT Events_Error : public Events_Message
 {
-  char* myDescription;  ///< pointer to the description of the error
+  std::string myDescription;  ///< the description of the error
 
 public:
   /// default destructor   
@@ -33,15 +33,13 @@ public:
   /// Identifier of this event (one for all errors)
   static Events_ID errorID();
   /// Specific error string
-  char* description() const;
+  const char* description() const;
   /// Allows to send an error quickly: it creates and sends the error object automatically
-  static void send(char* theDescription, const void* theSender = 0);
-  /// Allows to send an error quickly: it creates and sends the error object automatically
-  static void send(std::string theDescription, const void* theSender = 0);
+  static void send(const std::string& theDescription, const void* theSender = 0);
 
 protected:
   /// Default constructor. Use "send" message for generation an error.
-  Events_Error(char* theDescription, const void* theSender = 0);
+  Events_Error(const std::string& theDescription, const void* theSender = 0);
 };
 
 #endif /* EVENTS_ERROR_H_ */

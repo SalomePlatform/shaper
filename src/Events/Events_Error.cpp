@@ -10,7 +10,7 @@
 #include <Events_Error.h>
 #include <Events_Loop.h>
 
-Events_Error::Events_Error(char* theDescription, const void* theSender)
+Events_Error::Events_Error(const std::string& theDescription, const void* theSender)
     : Events_Message(Events_Error::errorID(), theSender)
 {
   myDescription = theDescription;
@@ -26,19 +26,14 @@ Events_ID Events_Error::errorID()
   return aLoop->eventByName("ApplicationError");
 }
 
-char* Events_Error::description() const
+const char* Events_Error::description() const
 {
-  return myDescription;
+  return myDescription.c_str();
 }
 
-void Events_Error::send(char* theDescription, const void* theSender)
+void Events_Error::send(const std::string& theDescription, const void* theSender)
 {
   std::shared_ptr<Events_Message> aNewOne = 
     std::shared_ptr<Events_Message>(new Events_Error(theDescription, theSender));
   Events_Loop::loop()->send(aNewOne);
-}
-
-void Events_Error::send(std::string theDescription, const void* theSender)
-{
-  Events_Error::send((char*) theDescription.c_str(), theSender);
 }
