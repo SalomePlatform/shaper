@@ -242,6 +242,17 @@ void ModuleBase_Operation::setRunning(bool theState)
   emit triggered(theState);
 }
 
+//TODO: nds stabilization hotfix
+void ModuleBase_Operation::commitOperation()
+{
+  if(!myPropertyPanel) {
+    return;
+  }
+  ModuleBase_ModelWidget* aWidget = myPropertyPanel->activeWidget();
+  if (aWidget)
+    aWidget->disconnectSignals();
+}
+
 void ModuleBase_Operation::activateByPreselection()
 {
   if (!myPropertyPanel || myPreSelection.empty()) {

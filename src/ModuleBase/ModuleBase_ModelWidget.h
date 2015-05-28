@@ -43,6 +43,9 @@ Q_OBJECT
   {
   }
 
+  //TODO: nds stabilization hotfix
+  virtual void disconnectSignals() {};
+
   /// Fills the widget with default values
   virtual void reset() {};
 

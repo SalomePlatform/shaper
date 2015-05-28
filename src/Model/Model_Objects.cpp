@@ -340,6 +340,9 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
 ObjectPtr Model_Objects::object(const std::string& theGroupID, const int theIndex)
 {
   createHistory(theGroupID);
+  //TODO: mpv stabilization hotfix
+  if (myHistory[theGroupID].size() <= theIndex)
+    return ObjectPtr();
   return myHistory[theGroupID][theIndex];
 }
 

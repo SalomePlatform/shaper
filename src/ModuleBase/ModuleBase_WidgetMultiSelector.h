@@ -63,6 +63,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
                                  const std::string& theParentId);
   virtual ~ModuleBase_WidgetMultiSelector();
 
+  //TODO: nds stabilization hotfix
+  virtual void disconnectSignals();
+
   virtual bool restoreValue();
 
   /// Returns list of widget controls

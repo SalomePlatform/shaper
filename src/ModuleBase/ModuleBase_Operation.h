@@ -206,7 +206,7 @@ signals:
   virtual void abortOperation() {}
 
   /// Virtual method called when operation committed (see commit() method for more description)
-  virtual void commitOperation() {}
+  virtual void commitOperation();
 
   /// Virtual method called after operation committed (see commit() method for more description)
   virtual void afterCommitOperation() {}

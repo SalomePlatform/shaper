@@ -106,6 +106,12 @@ ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
   delete myShapeValidator;
 }
 
+//TODO: nds stabilization hotfix
+void ModuleBase_WidgetMultiSelector::disconnectSignals()
+{
+  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+}
+
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::activateCustom()
 {
