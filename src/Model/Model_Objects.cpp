@@ -128,6 +128,7 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     updateHistory(ModelAPI_Feature::group());
   } else { // make feature has not-null data anyway
     theFeature->setData(Model_Data::invalidData());
+    theFeature->setDoc(myDoc);
   }
 }
 

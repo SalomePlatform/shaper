@@ -559,6 +559,7 @@ bool PartSet_Module::deleteObjects()
     aWorkshop->displayer()->updateViewer();
     aMgr->finishOperation();
   } else {
+    bool isPartRemoved = false;
     // Delete part with help of PartSet plugin
     // TODO: the deleted objects has to be processed by multiselection
     QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
@@ -566,15 +567,23 @@ bool PartSet_Module::deleteObjects()
       ObjectPtr aObj = aObjects.first();
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
       if (aFeature.get() && (aFeature->getKind() == PartSetPlugin_Part::ID())) {
-        std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
-        aMgr->startOperation(PartSetPlugin_Remove::ID());
-        FeaturePtr aFeature = aDoc->addFeature(PartSetPlugin_Remove::ID());
-        aFeature->execute();
-        aMgr->finishOperation();
-      } else
-        return false;
-    } else
-      return false;
+        // Remove feature should be created in the document of the part results
+        ResultPtr aPartResult = aFeature->firstResult();
+        if (aPartResult.get()) {
+          std::shared_ptr<ModelAPI_ResultPart> aPart =
+                       std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartResult);
+          DocumentPtr aPartDoc = aPart->partDoc();
+          if (aPartDoc.get()) {
+            aMgr->startOperation(PartSetPlugin_Remove::ID());
+            FeaturePtr aFeature = aPartDoc->addFeature(PartSetPlugin_Remove::ID());
+            aFeature->execute();
+            aMgr->finishOperation();
+            isPartRemoved = true;
+          }
+        }
+      }
+    }
+    return isPartRemoved;
   }
   return true;
 }

@@ -17,14 +17,11 @@ void PartSetPlugin_Remove::execute()
 {
   std::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
-  std::shared_ptr<ModelAPI_Document> aCurrent;
   std::shared_ptr<PartSetPlugin_Part> a;
   for (int a = aRoot->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
         aRoot->object(ModelAPI_ResultPart::group(), a));
-    if (aPart
-        && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()
-            == aPManager->activeDocument()) {
+    if (aPart && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value() == document()) {
       FeaturePtr aFeature = aRoot->feature(aPart);
       if (aFeature) {
         // do remove
