@@ -40,7 +40,7 @@
 
 Model_ResultBody::Model_ResultBody()
 {
-  myIsDisabled = false; // by default it is not initialized and false to be after created
+  myIsDisabled = true; // by default it is not initialized and false to be after created
   setIsConcealed(false);
 }
 
