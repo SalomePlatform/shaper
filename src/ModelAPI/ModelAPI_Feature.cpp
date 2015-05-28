@@ -90,7 +90,6 @@ void ModelAPI_Feature::eraseResultFromList(const std::shared_ptr<ModelAPI_Result
       aRes->data()->erase();
       myResults.erase(aResIter);
 
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
       static Events_Loop* aLoop = Events_Loop::loop();
       static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
@@ -106,8 +105,11 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlus
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
   for(int anIndex = 0; anIndex < theSinceIndex && aResIter != myResults.end(); anIndex++)
     aResIter++;
+
+  std::string aGroup;
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aNextIter = aResIter;
   while( aNextIter != myResults.end()) {
+    aGroup = (*aNextIter)->groupName();
     // remove previously erased results: to enable later if needed only actual (of history change)
     if (theSinceIndex == 0 && (*aNextIter)->isDisabled()) {
       aNextIter = myResults.erase(aNextIter);
@@ -116,11 +118,13 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlus
       aNextIter++;
     }
   }
-  if (theFlush) {
+  if (!aGroup.empty() && theFlush) {
     // flush visualisation changes
     static Events_Loop* aLoop = Events_Loop::loop();
     static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     aLoop->flush(aRedispEvent);
+    static Events_ID aDelEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
+    aLoop->flush(aDelEvent);
   }
 }
 
