@@ -666,6 +666,8 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
     aOB->treeView()->setExpandsOnDoubleClick(false);
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
+    connect(aOB, SIGNAL(headerMouseDblClicked(const QModelIndex&)), 
+      SLOT(onTreeViewDoubleClick(const QModelIndex&)));
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       myDataModel, SLOT(onMouseDoubleClick(const QModelIndex&)));
   }
@@ -765,6 +767,11 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
 void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (!theIndex.isValid()) {
+    aMgr->setActiveDocument(aMgr->moduleDocument());
+    return;
+  }
   if (theIndex.column() != 0) // Use only first column
     return;
   ObjectPtr aObj = myDataModel->object(theIndex);
@@ -776,7 +783,6 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     }
   }
   if (aPart.get()) { // if this is a part
-    SessionPtr aMgr = ModelAPI_Session::get();
     if (aPart->partDoc() == aMgr->activeDocument()) {
       aMgr->setActiveDocument(aMgr->moduleDocument());
     } else {
