@@ -402,10 +402,13 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     for(; aRef != aRefs.end(); aRef++) {
       std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
       for(; aRefObj != aRef->second.end(); aRefObj++) {
-        // if reference is null, it may bmean that this reference is to other document
+        // if reference is null, it may mean that this reference is to other document
         // the does not supported by RefList: peremeters may be recomputed
-        if (!aRefObj->get() || myJustCreated.find(*aRefObj) != myJustCreated.end() ||
-            myJustUpdated.find(*aRefObj) != myJustUpdated.end()) {
+        if (!aRefObj->get() && theFeature->firstResult().get() && 
+            theFeature->firstResult()->groupName() == ModelAPI_ResultParameter::group()) {
+          aJustUpdated = true;
+        } else if (myJustCreated.find(*aRefObj) != myJustCreated.end() ||
+            myJustUpdated.find(*aRefObj) != myJustUpdated.end()) { 
           aJustUpdated = true;
         }
         aState = stateByReference(*aRefObj, aState);

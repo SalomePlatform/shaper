@@ -181,7 +181,7 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
   if(theBasis->isEqual(theContext))
     theResultBody->store(theFeature.shape());
   else
-    theResultBody->storeGenerated(theContext, theFeature.shape());
+    theResultBody->storeGenerated(theBasis, theFeature.shape());
 
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
