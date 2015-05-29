@@ -66,7 +66,12 @@ static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
   Handle(TNaming_NamedShape) aName;
   int anEvolution = -1;
   if (theLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
-    anEvolution = (int)(aName->Evolution());
+    TNaming_Evolution aNSEvol = aName->Evolution();
+    if ((aNSEvol == TNaming_SELECTED && theFlag) ||
+        (aNSEvol != TNaming_SELECTED && !theFlag)) { // nothing to do, it is already correct
+      return;
+    }
+    anEvolution = (int)(aNSEvol);
     for(TNaming_Iterator anIter(aName); anIter.More(); anIter.Next()) {
       aShapePairs.push_back(std::pair<TopoDS_Shape, TopoDS_Shape>
         (anIter.OldShape(), anIter.NewShape()));
