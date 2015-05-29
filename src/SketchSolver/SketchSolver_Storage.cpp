@@ -674,6 +674,22 @@ bool SketchSolver_Storage::isCoincident(
   for (; aCIter != myCoincidentPoints.end(); aCIter++)
     if (aCIter->find(thePoint1) != aCIter->end() && aCIter->find(thePoint2) != aCIter->end())
       return true;
+  // precise checking of coincidence
+  int aEnt1Pos = Search(thePoint1, myEntities);
+  int aEnt2Pos = Search(thePoint2, myEntities);
+  if (aEnt1Pos >= 0 && aEnt1Pos < (int)myEntities.size() &&
+      aEnt2Pos >= 0 && aEnt2Pos < (int)myEntities.size()) {
+    double aDist[2];
+    int aParamPos;
+    for (int i = 0; i < 2; i++) {
+      aParamPos = Search(myEntities[aEnt1Pos].param[i], myParameters);
+      aDist[i] = myParameters[aParamPos].val;
+      aParamPos = Search(myEntities[aEnt2Pos].param[i], myParameters);
+      aDist[i] -= myParameters[aParamPos].val;
+    }
+    if (aDist[0] * aDist[0] + aDist[1] * aDist[1] < tolerance * tolerance)
+      return true;
+  }
   return false;
 }
 
