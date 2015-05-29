@@ -74,7 +74,7 @@
 #include <QApplication>
 
 //#define DEBUG_DO_NOT_BY_ENTER
-#define DEBUG_MOUSE_OVER_WINDOW_FLAGS
+//#define DEBUG_MOUSE_OVER_WINDOW_FLAGS
 
 /// Returns list of unique objects by sum of objects from List1 and List2
 /*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
