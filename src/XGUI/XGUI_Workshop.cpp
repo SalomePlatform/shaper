@@ -18,6 +18,7 @@
 #include "XGUI_ModuleConnector.h"
 #include <XGUI_QtEvents.h>
 #include <XGUI_HistoryMenu.h>
+#include <XGUI_CustomPrs.h>
 
 #include <AppElements_Workbench.h>
 #include <AppElements_Viewer.h>
@@ -1511,20 +1512,25 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
           ObjectPtr aObject = aPartDoc->object(ModelAPI_ResultBody::group(), 0);
           ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
           if (aBody.get()) {
-            std::string aSection, aName, aDefault;
-            aBody->colorConfigInfo(aSection, aName, aDefault);
-            if (!aSection.empty() && !aName.empty()) {
-              aColor = Config_PropManager::color(aSection, aName, aDefault);
-            }
+            XGUI_CustomPrs::getResultColor(aBody, aColor);
           }
         }
       }
     }
     else {
-      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
-      if (anAISObj.get()) {
-        aColor.resize(3);
-        anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      if (aResult.get())
+        XGUI_CustomPrs::getResultColor(aResult, aColor);
+      else {
+        // TODO: remove the obtaining a color from the AIS object
+        // this does not happen never because:
+        // 1. The color can be changed only on results
+        // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
+        AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+        if (anAISObj.get()) {
+          aColor.resize(3);
+          anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+        }
       }
     }
     if (!aColor.empty())

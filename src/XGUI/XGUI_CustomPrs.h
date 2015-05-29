@@ -24,6 +24,8 @@ public:
   /// Modifies the given presentation in the custom way.
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
+
+  static void getResultColor(ResultPtr theResult, std::vector<int>& theColor);
 };
 
 #endif

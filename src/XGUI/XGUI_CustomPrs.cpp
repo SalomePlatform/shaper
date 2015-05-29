@@ -30,7 +30,7 @@ void getColor(ResultPtr theResult, std::vector<int>& theColor)
   }
 }
 
-void getDefaultColor(ResultPtr theResult, AISObjectPtr thePrs, std::vector<int>& theColor)
+void getDefaultColor(ResultPtr theResult, std::vector<int>& theColor)
 {
   theColor.clear();
   // get default color from the preferences manager for the given result
@@ -49,14 +49,19 @@ void getDefaultColor(ResultPtr theResult, AISObjectPtr thePrs, std::vector<int>&
   }
 }
 
+void XGUI_CustomPrs::getResultColor(ResultPtr theResult, std::vector<int>& theColor)
+{
+  getColor(theResult, theColor);
+  if (theColor.empty())
+    getDefaultColor(theResult, theColor);
+}
+
 bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                            std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
 {
   std::vector<int> aColor;
 
-  getColor(theResult, aColor);
-  if (aColor.empty())
-    getDefaultColor(theResult, thePrs, aColor);
+  getResultColor(theResult, aColor);
 
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->activeDocument() != theResult->document()) {
