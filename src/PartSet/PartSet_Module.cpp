@@ -592,6 +592,30 @@ bool PartSet_Module::deleteObjects()
   return true;
 }
 
+void PartSet_Module::onFeatureTriggered()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  // 1. check whether the delete should be processed in the module
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  bool isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (isNestedOp) {
+    // in case if in the viewer nothing is displayed, the create operation should not be
+    // comitted even if all values of the feature are initialized
+    if (!mySketchMgr->canDisplayCurrentCreatedFeature()) {
+      QAction* aCmd = dynamic_cast<QAction*>(sender());
+      //Do nothing on uncheck
+      if (aCmd->isCheckable() && !aCmd->isChecked())
+        return;
+
+      // the action information should be saved before the operation is aborted
+      // because this abort leads to update command status, which unchecks this action
+      anOperation->abort();
+
+      launchOperation(aCmd->data().toString());
+    }
+  }
+  ModuleBase_IModule::onFeatureTriggered();
+}
 
 void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) 
 {

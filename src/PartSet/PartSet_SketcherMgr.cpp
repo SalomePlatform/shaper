@@ -868,11 +868,16 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     if (!anEditorWdg && !myIsPopupMenuActive) {
       // during a nested create operation, the feature is redisplayed only if the mouse over view
       // of there was a value modified in the property panel after the mouse left the view
-      aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
+      aCanDisplay = canDisplayCurrentCreatedFeature();
     }
   }
   #endif
   return aCanDisplay;
+}
+
+bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
+{
+  return myIsPropertyPanelValueChanged || myIsMouseOverWindow;
 }
 
 bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const

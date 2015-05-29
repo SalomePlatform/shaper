@@ -137,6 +137,11 @@ public slots:
   /// Set a specific flag to restart the sketcher operation
   void onNoMoreWidgets();
 
+  /// Redefines the parent method in order to customize the next case:
+  /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
+  /// the operation should be always aborted.
+  virtual void onFeatureTriggered();
+
   /// Slolt called on object display
   /// \param theObject a data object
   /// \param theAIS a presentation object

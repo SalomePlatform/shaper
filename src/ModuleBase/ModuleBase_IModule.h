@@ -139,7 +139,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
 public slots:
   /// Called on call of command corresponded to a feature
-  void onFeatureTriggered();
+  virtual void onFeatureTriggered();
 
   /// Slolt called on object display
   /// \param theObject a data object

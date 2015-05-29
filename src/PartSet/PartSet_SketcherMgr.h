@@ -140,6 +140,10 @@ public:
   /// \param theObject a model object
   bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Returns true if the mouse is over viewer or property panel value is changed
+  /// \return boolean result
+  bool canDisplayCurrentCreatedFeature() const;
+
   /// Returns state of constraints showing flag 
   bool isConstraintsShown() const { return myIsConstraintsShown; }
 
