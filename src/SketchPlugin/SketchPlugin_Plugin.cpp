@@ -189,6 +189,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintTangent::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintFillet::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
     }
   }
   return aMsg;
