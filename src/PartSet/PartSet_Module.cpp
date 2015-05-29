@@ -597,7 +597,7 @@ void PartSet_Module::onFeatureTriggered()
   SessionPtr aMgr = ModelAPI_Session::get();
   // 1. check whether the delete should be processed in the module
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  bool isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  bool isNestedOp = PartSet_SketcherMgr::isNestedCreateOperation(anOperation);
   if (isNestedOp) {
     // in case if in the viewer nothing is displayed, the create operation should not be
     // comitted even if all values of the feature are initialized
