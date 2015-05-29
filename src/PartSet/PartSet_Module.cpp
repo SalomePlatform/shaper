@@ -532,8 +532,12 @@ bool PartSet_Module::deleteObjects()
     QObjectPtrList::const_iterator anIt = aSelectedObj.begin(), aLast = aSelectedObj.end();
     for ( ; anIt != aLast; anIt++) {
       ObjectPtr anObject = *anIt;
-      if (mySketchMgr->isObjectOfSketch(anObject))
-        aSketchObjects.append(anObject);
+      if (mySketchMgr->isObjectOfSketch(anObject)) {
+        // sketch feature should be used in this list because workshop deletes features only
+        // results are skipped
+        FeaturePtr aSketchFeature = ModelAPI_Feature::feature(anObject);
+        aSketchObjects.append(aSketchFeature);
+      }
     }
     // if the selection contains only local selected presentations from other sketches,
     // the Delete operation should not be done at all
