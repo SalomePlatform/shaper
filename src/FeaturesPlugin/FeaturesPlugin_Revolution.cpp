@@ -21,10 +21,11 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 
-#define _LATERAL_TAG 1
+#define FACE 4
+#define EDGE 6
+#define _GENERATE_TAG 1
 #define _FIRST_TAG 2
 #define _LAST_TAG 3
-#define EDGE 6
 
 //=================================================================================================
 FeaturesPlugin_Revolution::FeaturesPlugin_Revolution()
@@ -158,10 +159,6 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
                                              std::shared_ptr<GeomAPI_Shape> theBasis,
                                              std::shared_ptr<GeomAPI_Shape> theContext)
 {
-  //TODO: Fix naming
-  theResultBody->store(theFeature.shape());
-  return;
-
   //load result
   if(theBasis->isEqual(theContext))
     theResultBody->store(theFeature.shape());
@@ -171,27 +168,27 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
 
-  //Insert lateral face : Face from Edge
-  std::string aLatName = "LateralFace";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
+  std::string aGeneratedName = "Generated";
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_GENERATE_TAG, aGeneratedName, *aSubShapes);
 
-  ////Insert first face
-  //std::string aBotName = "FirstFace";
-  //std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();
-  //if(!aBottomFace->isNull()) {
-  //  if(aSubShapes->isBound(aBottomFace)) {
-  //    aBottomFace = aSubShapes->find(aBottomFace);
-  //  }
-  //  theResultBody->generated(aBottomFace, aBotName, _FIRST_TAG);
-  //}
+  //Insert bottom face
+  std::string aBotName = "FromFace";
+  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();
+  if(!aBottomFace->isNull()) {
+    if(aSubShapes->isBound(aBottomFace)) {
+      aBottomFace = aSubShapes->find(aBottomFace);
+    }
+    theResultBody->generated(aBottomFace, aBotName, _FIRST_TAG);
+  }
 
-  ////Insert last face
-  //std::string aTopName = "LastFace";
-  //std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
-  //if (!aTopFace->isNull()) {
-  //  if (aSubShapes->isBound(aTopFace)) {
-  //    aTopFace = aSubShapes->find(aTopFace);
-  //  }
-  //  theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
-  //}
+  //Insert top face
+  std::string aTopName = "ToFace";
+  std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
+  if (!aTopFace->isNull()) {
+    if (aSubShapes->isBound(aTopFace)) {
+      aTopFace = aSubShapes->find(aTopFace);
+    }
+    theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
+  }
+
 }

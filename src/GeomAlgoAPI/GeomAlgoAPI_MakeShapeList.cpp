@@ -26,16 +26,16 @@ GeomAlgoAPI_MakeShapeList::GeomAlgoAPI_MakeShapeList(const ListOfMakeShape& theM
 //=================================================================================================
 void GeomAlgoAPI_MakeShapeList::init(const ListOfMakeShape& theMakeShapeList)
 {
-  myMakeShapeList = theMakeShapeList;
+  myListOfMakeShape = theMakeShapeList;
 }
 
 //=================================================================================================
 const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShapeList::shape() const
 {
-  if(myMakeShapeList.empty()) {
+  if(myListOfMakeShape.empty()) {
     return std::shared_ptr<GeomAPI_Shape>();
   } else {
-    return myMakeShapeList.back()->shape();
+    return myListOfMakeShape.back()->shape();
   }
 }
 
@@ -53,34 +53,54 @@ void GeomAlgoAPI_MakeShapeList::modified(const std::shared_ptr<GeomAPI_Shape> th
   result(theShape, theHistory, GeomAlgoAPI_MakeShapeList::Modified);
 }
 
+bool GeomAlgoAPI_MakeShapeList::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
+    BRepBuilderAPI_MakeShape* aBuilder = (*aBuilderIt)->implPtr<BRepBuilderAPI_MakeShape>();
+    if(aBuilder && (aBuilder->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theShape,
                                        ListOfShape& theHistory,
                                        OperationType theOperationType)
 {
-  if(myMakeShapeList.empty()) {
+  if(myListOfMakeShape.empty()) {
     return;
   }
 
-  NCollection_Map<TopoDS_Shape> aTempShapes;
+  NCollection_Map<TopoDS_Shape> anAlgoShapes;
   NCollection_Map<TopoDS_Shape> aResultShapes;
-  aTempShapes.Add(theShape->impl<TopoDS_Shape>());
+  anAlgoShapes.Add(theShape->impl<TopoDS_Shape>());
+  aResultShapes.Add(theShape->impl<TopoDS_Shape>());
 
-  for(ListOfMakeShape::iterator aBuilderIt = myMakeShapeList.begin(); aBuilderIt != myMakeShapeList.end(); aBuilderIt++) {
+  for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
     BRepBuilderAPI_MakeShape* aBuilder = (*aBuilderIt)->implPtr<BRepBuilderAPI_MakeShape>();
-    for(NCollection_Map<TopoDS_Shape>::Iterator aShapeIt(aTempShapes); aShapeIt.More(); aShapeIt.Next()) {
+    NCollection_Map<TopoDS_Shape> aTempShapes;
+    bool hasResults = false;
+    for(NCollection_Map<TopoDS_Shape>::Iterator aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
       const TopoDS_Shape& aShape = aShapeIt.Value();
-      const TopTools_ListOfShape& aList = theOperationType == GeomAlgoAPI_MakeShapeList::Generated ?
-                                          aBuilder->Generated(aShape) : aBuilder->Modified(aShape);
-      bool prevResRemoved = false;
-      for(TopTools_ListIteratorOfListOfShape anIt(aList); anIt.More(); anIt.Next()) {
+      const TopTools_ListOfShape& aGeneratedList = aBuilder->Generated(aShape);
+      const TopTools_ListOfShape& aModifiedList = aBuilder->Modified(aShape);
+      for(TopTools_ListIteratorOfListOfShape anIt(aGeneratedList); anIt.More(); anIt.Next()) {
         aTempShapes.Add(anIt.Value());
         aResultShapes.Add(anIt.Value());
-        if(!prevResRemoved) {
-          aResultShapes.Remove(aShape);
-          prevResRemoved = true;
-        }
+        hasResults = true;
+      }
+      for(TopTools_ListIteratorOfListOfShape anIt(aModifiedList); anIt.More(); anIt.Next()) {
+        aTempShapes.Add(anIt.Value());
+        aResultShapes.Add(anIt.Value());
+        hasResults = true;
+      }
+      if(hasResults) {
+        aResultShapes.Remove(aShape);
       }
     }
+    anAlgoShapes.Unite(aTempShapes);
   }
 
   for(NCollection_Map<TopoDS_Shape>::Iterator aShapeIt(aResultShapes); aShapeIt.More(); aShapeIt.Next()) {

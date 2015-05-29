@@ -48,6 +48,9 @@ public:
   GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                            ListOfShape& theHistory);
 
+  /// Returns whether the shape is deleted
+  GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
+
 private:
   void result(const std::shared_ptr<GeomAPI_Shape> theShape,
               ListOfShape& theHistory,
@@ -55,7 +58,7 @@ private:
 
 
 protected:
-  ListOfMakeShape myMakeShapeList;
+  ListOfMakeShape myListOfMakeShape;
 };
 
 #endif
