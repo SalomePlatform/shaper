@@ -74,6 +74,7 @@
 #include <QApplication>
 
 //#define DEBUG_DO_NOT_BY_ENTER
+#define DEBUG_MOUSE_OVER_WINDOW_FLAGS
 
 /// Returns list of unique objects by sum of objects from List1 and List2
 /*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
@@ -168,12 +169,28 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
   myIsPropertyPanelValueChanged = false;
+#ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
+  qDebug(QString("onEnterViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
+#endif
 
   #ifdef DEBUG_DO_NOT_BY_ENTER
   return;
   #endif
-  //if (!isNestedCreateOperation(getCurrentOperation()))
-  //  return;
+
+  if (!isNestedCreateOperation(getCurrentOperation()))
+    return;
+  // we need change displayed state of the current operation feature
+  // if the feature is presentable, e.g. distance construction. It has no results, so workshop does
+  // not accept a signal about the result created. Nothing is shown until mouse is moved out/in view
+  // port. If the isDisplayed flag is true, the presentable feature is displayed as soon as the
+  // presentation becomes valid and redisplay happens
+  ModuleBase_Operation* aOperation = getCurrentOperation();
+  if (aOperation) {
+    FeaturePtr aFeature = aOperation->feature();
+    if (aFeature.get() && aFeature->data()->isValid()) {
+      visualizeFeature(aOperation, canDisplayObject(aFeature), false);
+    }
+  }
 }
 
 void PartSet_SketcherMgr::onLeaveViewPort()
@@ -181,6 +198,9 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
   myIsPropertyPanelValueChanged = false;
+#ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
+  qDebug(QString("onLeaveViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
+#endif
 
   #ifdef DEBUG_DO_NOT_BY_ENTER
   return;
@@ -716,6 +736,9 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverWindow = false;
   myIsConstraintsShown = true;
+#ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
+  qDebug(QString("stopSketch: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
+#endif
   // the objects activated in the sketch should be deactivated in order to do not have the specific
   // sketch selection mode activated on objects in neutral point of the application(no started operation)
   activateObjectsInSketchMode(false);
@@ -878,6 +901,9 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 {
   return myIsPropertyPanelValueChanged || myIsMouseOverWindow;
+#ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
+  qDebug(QString("canDisplayCurrentCreatedFeature: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
+#endif
 }
 
 bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
@@ -1061,7 +1087,8 @@ ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 }
 
 void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
-                                           const bool isToDisplay)
+                                           const bool isToDisplay,
+                                           const bool isFlushRedisplay)
 {
   #ifdef DEBUG_DO_NOT_BY_ENTER
   return;
@@ -1092,7 +1119,8 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
       (*aIt)->setDisplayed(false);
     }
   }
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  if (isFlushRedisplay)
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 void PartSet_SketcherMgr::activateObjectsInSketchMode(const bool isActive)
@@ -1174,4 +1202,10 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(bool theOn)
     }
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+}
+
+QString PartSet_SketcherMgr::mouseOverWindowFlagsInfo() const
+{
+  return QString("myIsPropertyPanelValueChanged = %1,    myIsMouseOverWindow = %2")
+     .arg(myIsPropertyPanelValueChanged).arg(myIsMouseOverWindow);
 }
