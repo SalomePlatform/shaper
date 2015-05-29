@@ -569,11 +569,16 @@ void SketchSolver_Constraint::refresh()
 {
   cleanErrorMsg();
   std::map<AttributePtr, Slvs_hEntity>::iterator anAttrIter = myAttributeMap.begin();
-  for (; anAttrIter != myAttributeMap.end(); anAttrIter++) {
+  while (anAttrIter != myAttributeMap.end()) {
     std::shared_ptr<GeomDataAPI_Point> aPoint =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(anAttrIter->first);
+    Slvs_Entity anEntity = myStorage->getEntity(anAttrIter->second);
+    if (anEntity.h == SLVS_E_UNKNOWN) {
+      std::map<AttributePtr, Slvs_hEntity>::iterator aTmpIter = anAttrIter++;
+      myAttributeMap.erase(aTmpIter);
+      continue;
+    }
     if (aPoint) {
-      Slvs_Entity anEntity = myStorage->getEntity(anAttrIter->second);
       double aXYZ[3];
       for (int i = 0; i < 3; i++) {
         Slvs_Param aPar = myStorage->getParameter(anEntity.param[i]);
@@ -588,7 +593,6 @@ void SketchSolver_Constraint::refresh()
       std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrIter->first);
       if (aPoint2D) {
-        Slvs_Entity anEntity = myStorage->getEntity(anAttrIter->second);
         double aXY[2];
         for (int i = 0; i < 2; i++) {
           Slvs_Param aPar = myStorage->getParameter(anEntity.param[i]);
@@ -602,13 +606,13 @@ void SketchSolver_Constraint::refresh()
         AttributeDoublePtr aScalar =
             std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttrIter->first);
         if (aScalar) {
-          Slvs_Entity anEntity = myStorage->getEntity(anAttrIter->second);
           Slvs_Param aPar = myStorage->getParameter(anEntity.param[0]);
           if (fabs(aScalar->value() - aPar.val) > tolerance)
             aScalar->setValue(aPar.val);
         }
       }
     }
+    anAttrIter++;
   }
 
   std::map<AttributePtr, Slvs_hParam>::iterator aValIter = myValueMap.begin();
