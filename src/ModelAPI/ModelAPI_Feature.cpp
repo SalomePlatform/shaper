@@ -153,9 +153,8 @@ void ModelAPI_Feature::erase()
 
   while (!myResults.empty()) {  // remove one by one with messages
     std::shared_ptr<ModelAPI_Result> aRes = *(myResults.begin());
+    aRes->setDisabled(aRes, true); // to avoid activation of the Part result
     myResults.erase(myResults.begin());
-    aECreator->sendDeleted(aRes->document(), aRes->groupName());
-    aECreator->sendUpdated(aRes, EVENT_DISP);
   }
   ModelAPI_Object::erase();
 }
