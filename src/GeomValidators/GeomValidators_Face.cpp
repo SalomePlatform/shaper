@@ -57,6 +57,7 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
               aValid = aGeomFace->isPlanar();
               break;
             case GeomAbs_Cylinder:
+              aValid = aGeomFace->isCylindrical();
               break;
             default:
               break;

@@ -30,6 +30,9 @@ public:
   /// Returns true if the face is a planar face
   bool isPlanar() const;
 
+  /// Returns true if the face is a cylindrical face
+  bool isCylindrical() const;
+
   /// Returns the base plane of the face (if it is planar) with location in the center of the face
   std::shared_ptr<GeomAPI_Pln> getPlane() const;
 };

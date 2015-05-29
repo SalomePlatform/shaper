@@ -16,6 +16,7 @@
 #include <BRepAdaptor_Surface.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom_Plane.hxx>
+#include <Geom_CylindricalSurface.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 
 GeomAPI_Face::GeomAPI_Face()
@@ -67,6 +68,13 @@ bool GeomAPI_Face::isPlanar() const
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
   GeomLib_IsPlanarSurface isPlanar(aSurf);
   return isPlanar.IsPlanar() == Standard_True;
+}
+
+bool GeomAPI_Face::isCylindrical() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
+  return aSurf->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)) == Standard_True;
 }
 
 std::shared_ptr<GeomAPI_Pln> GeomAPI_Face::getPlane() const
