@@ -93,7 +93,7 @@
 
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
-
+//#define DEBUG_DELETE
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
@@ -1280,7 +1280,8 @@ void XGUI_Workshop::deleteObjects()
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(aDescription.toStdString());
   // 2. close the documents of the removed parts if the result part is in a list of selected objects
-  foreach (ObjectPtr aObj, anObjects)
+  // this is performed in the RemoveFeature of Part object.
+  /*foreach (ObjectPtr aObj, anObjects)
   {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
     if (aPart) {
@@ -1289,7 +1290,7 @@ void XGUI_Workshop::deleteObjects()
         aDoc->close();
       }
     }
-  }
+  }*/
   // 3. delete objects
   QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   std::set<FeaturePtr> anIgnoredFeatures;
@@ -1394,22 +1395,52 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
   // 3. remove referenced features
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
+#ifdef DEBUG_DELETE
+  QStringList anInfo;
+#endif
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = (*anIt);
     DocumentPtr aDoc = aFeature->document();
-    if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end())
+    if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
       aDoc->removeFeature(aFeature);
+#ifdef DEBUG_DELETE
+      anInfo.append(ModuleBase_Tools::objectInfo(aFeature).toStdString().c_str());
+#endif
+    }
   }
+#ifdef DEBUG_DELETE
+  qDebug(QString("remove references:%1").arg(anInfo.join("; ")).toStdString().c_str());
+  anInfo.clear();
+#endif
 
   // 4. remove the parameter features
   foreach (ObjectPtr aObj, theList) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResult.get() != NULL) { // results could not be removed,
+      // they are removed by a corresponded feature remove
+      continue;
+    }
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature) {
+      // TODO: to learn the workshop to delegate the Part object deletion to the PartSet module
+      // part features are removed in the PartSet module. This condition should be moved there
+      if (aFeature->getKind() == "Part")
+        continue;
+
       DocumentPtr aDoc = aObj->document();
-      if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end())
+      if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
         aDoc->removeFeature(aFeature);
+#ifdef DEBUG_DELETE
+        QString anInfoStr = ModuleBase_Tools::objectInfo(aFeature);
+        anInfo.append(anInfoStr);
+        qDebug(QString("remove feature :%1").arg(anInfoStr).toStdString().c_str());
+#endif
+      }
     }
   }
+#ifdef DEBUG_DELETE
+  qDebug(QString("remove features:%1").arg(anInfo.join("; ")).toStdString().c_str());
+#endif
   return true;
 }
 
