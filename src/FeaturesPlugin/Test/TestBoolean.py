@@ -102,8 +102,8 @@ aSession.finishOperation()
 #=========================================================================
 aSession.startOperation()
 aBooleanFt = aPart.addFeature("Boolean")
-aBooleanFt.reference("main_object").setValue(extrudedObjects[0])
-aBooleanFt.reference("tool_object").setValue(extrudedObjects[1])
+aBooleanFt.selectionList("main_objects").append(extrudedObjects[0], extrudedObjects[0].shape())
+aBooleanFt.selectionList("tool_objects").append(extrudedObjects[1], extrudedObjects[1].shape())
 kBooleanTypeCut = 0
 aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
 aBooleanFt.execute()

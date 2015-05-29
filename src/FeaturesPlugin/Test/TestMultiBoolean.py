@@ -166,16 +166,17 @@ aSession.finishOperation()
 # Create a boolean cut of cylinders from the box:
 # result of Boolean is the first argument of the next Boolean
 #=========================================================================
-aCurrentResult = aBox.firstResult()
+aCurrentResult = modelAPI_ResultBody(aBox.firstResult())
 aSession.startOperation()
 for i in xrange(0, N * N):
+    anExtrusionResult = modelAPI_ResultBody(anExtrusions[i].firstResult())
     aBooleanFt = aPart.addFeature("Boolean")
-    aBooleanFt.reference("main_object").setValue(modelAPI_ResultBody(aCurrentResult))
-    aBooleanFt.reference("tool_object").setValue(modelAPI_ResultBody(anExtrusions[i].firstResult()))
+    aBooleanFt.selectionList("main_objects").append(aCurrentResult, aCurrentResult.shape())
+    aBooleanFt.selectionList("tool_objects").append(anExtrusionResult, anExtrusionResult.shape())
     kBooleanTypeCut = 0
     aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
     aBooleanFt.execute()
-    aCurrentResult = aBooleanFt.firstResult()
+    aCurrentResult = modelAPI_ResultBody(aBooleanFt.firstResult())
 aSession.finishOperation()
 
 #=========================================================================
