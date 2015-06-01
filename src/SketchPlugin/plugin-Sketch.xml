@@ -78,10 +78,9 @@
     <!--  SketchConstraintLength  -->      
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon=":icons/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
-        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" 
-            shape_types="edge" >
-        <validator id="GeomValidators_ShapeType" parameters="line"/>
-    </shape_selector>
+        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
+          <validator id="GeomValidators_ShapeType" parameters="line"/>
+        </shape_selector>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
