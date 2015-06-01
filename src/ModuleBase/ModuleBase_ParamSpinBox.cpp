@@ -164,7 +164,7 @@ bool ModuleBase_ParamSpinBox::hasVariable() const
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  QRegExp varNameMask("[-+]?[0-9]*.?[0-9]+([eE][-+]?[0-9]+)?");
+  QRegExp varNameMask("[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?");
   return !varNameMask.exactMatch(theText);
 }
 
