@@ -103,7 +103,10 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   }
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
     // do not select the whole shape for body:it is already must be in the data framework
-    if (theContext->shape().get() && theContext->shape()->isEqual(theSubShape)) {
+    // equal and null selected objects mean the same: object is equal to context,
+    // TODO: synchronize with GUI later that it must be null always
+    if (theContext->shape().get() && 
+        (theContext->shape()->isEqual(theSubShape) || !theSubShape.get())) {
       aSelLab.ForgetAllAttributes(true);
       TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
     } else {
