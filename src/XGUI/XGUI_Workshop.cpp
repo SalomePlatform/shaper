@@ -1587,29 +1587,46 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 }
 
 //**************************************************************
+#define SET_DISPLAY_GROUP(aGroupName, aDisplay) \
+for (int i = 0; i < aDoc->size(aGroupName); i++) { \
+  aDoc->object(aGroupName, i)->setDisplayed(aDisplay); \
+}
 void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
   foreach (ObjectPtr aObj, theList) {
-    if (isVisible) {
-      aObj->setDisplayed(true);
-      //displayObject(aObj);
+    ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    if (aPartRes) {
+      DocumentPtr aDoc = aPartRes->partDoc();
+      SET_DISPLAY_GROUP(ModelAPI_ResultBody::group(), isVisible)
+      SET_DISPLAY_GROUP(ModelAPI_ResultConstruction::group(), isVisible)
+      SET_DISPLAY_GROUP(ModelAPI_ResultGroup::group(), isVisible)
     } else {
-      aObj->setDisplayed(false);
-      //myDisplayer->erase(aObj, false);
+      aObj->setDisplayed(isVisible);
     }
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  //myDisplayer->updateViewer();
 }
 
 //**************************************************************
 void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 {
+  // Hide all displayed objects
   QObjectPtrList aList = myDisplayer->displayedObjects();
   foreach (ObjectPtr aObj, aList)
     aObj->setDisplayed(false);
-  foreach (ObjectPtr aObj, theList)
-    aObj->setDisplayed(true);
+
+  // Show only objects from the list
+  foreach (ObjectPtr aObj, theList) {
+    ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    if (aPartRes) {
+      DocumentPtr aDoc = aPartRes->partDoc();
+      SET_DISPLAY_GROUP(ModelAPI_ResultBody::group(), true)
+      SET_DISPLAY_GROUP(ModelAPI_ResultConstruction::group(), true)
+      SET_DISPLAY_GROUP(ModelAPI_ResultGroup::group(), true)
+    } else {
+      aObj->setDisplayed(true);
+    }
+  }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
 }

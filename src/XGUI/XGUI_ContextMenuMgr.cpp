@@ -164,6 +164,12 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
           } else if (hasResult && (!hasParameter)) {
             aMenu->addAction(action("SHOW_CMD"));
           }
+
+          ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+          if (aPartRes) {
+            aMenu->addAction(action("SHOW_CMD"));
+          }
+
           if (!(hasParameter || hasFeature))
             aMenu->addAction(action("SHOW_ONLY_CMD"));
         }
