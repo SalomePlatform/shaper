@@ -72,13 +72,20 @@ static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
       return;
     }
     anEvolution = (int)(aNSEvol);
+    if (!theFlag) {
+      Handle(TDataStd_Integer) anAttrEvol;
+      if (theLab.FindAttribute(TDataStd_Integer::GetID(), anAttrEvol)) {
+        anEvolution = anAttrEvol->Get();
+      }
+    } else {
+      TDataStd_Integer::Set(theLab, anEvolution);
+    }
+
     for(TNaming_Iterator anIter(aName); anIter.More(); anIter.Next()) {
       aShapePairs.push_back(std::pair<TopoDS_Shape, TopoDS_Shape>
         (anIter.OldShape(), anIter.NewShape()));
     }
   }
-  // remove old
-  theLab.ForgetAttribute(TNaming_NamedShape::GetID());
   // create new
   TNaming_Builder aBuilder(theLab);
   TNaming_Evolution anEvol = (TNaming_Evolution)(anEvolution);
