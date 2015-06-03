@@ -47,7 +47,7 @@
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
 //#define DEBUG_DISPLAY
-//#define DEBUG_ACTIVATE
+#define DEBUG_ACTIVATE
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
 //#define DEBUG_USE_CLEAR_OUTDATED_SELECTION
@@ -149,13 +149,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
 
-    bool aCanBeShaded = ::canBeShaded(anAISIO);
     // In order to avoid extra closing/opening context
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
-    if (aCanBeShaded) {
-      myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
-      closeLocalContexts(false);
-    }
     aContext->Display(anAISIO, false);
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
     if (isShading)
@@ -166,13 +161,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     if (isCustomized)
       aContext->Redisplay(anAISIO, false);
 
-    if (aCanBeShaded) {
-      openLocalContext();
-      activateObjects(myActiveSelectionModes);
-      myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
-    }
-    else
-      activate(anAISIO, myActiveSelectionModes);
+    activate(anAISIO, myActiveSelectionModes);
  }
   if (isUpdateViewer)
     updateViewer();
@@ -701,21 +690,10 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     return;
 
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-  bool aCanBeShaded = ::canBeShaded(aAISIO);
-  // In order to avoid extra closing/opening context
   SelectMgr_IndexedMapOfOwner aSelectedOwners;
-  if (aCanBeShaded) {
-    myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
-    closeLocalContexts(false);
-  }
   aContext->SetDisplayMode(aAISIO, theMode, false);
   // Redisplay in order to update new mode because it could be not computed before
   aContext->Redisplay(aAISIO, false);
-  if (aCanBeShaded) {
-    openLocalContext();
-    activateObjects(myActiveSelectionModes);
-    myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
-  }
   if (toUpdate)
     updateViewer();
 }

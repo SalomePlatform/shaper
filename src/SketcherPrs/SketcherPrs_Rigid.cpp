@@ -17,7 +17,6 @@
 
 #include <SketchPlugin_Constraint.h>
 
-#include <AIS_Drawer.hxx>
 #include <gp_Pnt2d.hxx>
 
 #include <Graphic3d_AspectLine3d.hxx>

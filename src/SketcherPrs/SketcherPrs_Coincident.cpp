@@ -18,7 +18,6 @@
 
 #include <SketchPlugin_Constraint.h>
 
-#include <AIS_Drawer.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Prs3d_PointAspect.hxx>

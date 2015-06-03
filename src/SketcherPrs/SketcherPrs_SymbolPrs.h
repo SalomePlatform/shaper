@@ -17,7 +17,7 @@
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Image_AlienPixMap.hxx>
 #include <SelectMgr_EntityOwner.hxx>
-#include <Select3D_SensitiveEntitySequence.hxx>
+#include <Select3D_EntitySequence.hxx>
 
 #include <Standard_DefineHandle.hxx>
 #include <map>
@@ -144,7 +144,7 @@ private:
 
   mutable Handle(OpenGl_VertexBuffer) myVboAttribs;
 
-  Select3D_SensitiveEntitySequence mySPoints;
+  Select3D_EntitySequence mySPoints;
 };
 
 #endif
