@@ -180,6 +180,12 @@ void ModuleBase_Operation::resume()
 
 void ModuleBase_Operation::abort()
 {
+  // the viewer update should be blocked in order to avoid the features blinking before they are
+  // hidden
+  std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+      new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+  Events_Loop::loop()->send(aMsg);
+
   if (myIsEditing) {
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aDoc = aMgr->activeDocument();
@@ -201,6 +207,12 @@ void ModuleBase_Operation::abort()
 
   ModelAPI_Session::get()->abortOperation();
   emit stopped();
+  // the viewer update should be unblocked in order to avoid the features blinking before they are
+  // hidden
+  aMsg = std::shared_ptr<Events_Message>(
+                new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+
+  Events_Loop::loop()->send(aMsg);
 }
 
 bool ModuleBase_Operation::commit()

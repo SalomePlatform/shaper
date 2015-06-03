@@ -379,6 +379,7 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)) {
     // the viewer's update context is unblocked, the viewer's update works
     myDisplayer->enableUpdateViewer(true);
+    myDisplayer->updateViewer();
   } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);
