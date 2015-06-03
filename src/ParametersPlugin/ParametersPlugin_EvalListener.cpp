@@ -5,7 +5,10 @@
  *      Author: sbh
  */
 
+#include <pyconfig.h>
+
 #include <ParametersPlugin_EvalListener.h>
+#include <ParametersPlugin_PyInterp.h>
 
 #include <Events_Error.h>
 

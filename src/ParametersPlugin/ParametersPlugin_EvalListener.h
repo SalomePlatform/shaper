@@ -10,7 +10,8 @@
 
 #include <ParametersPlugin.h>
 #include <Events_Loop.h>
-#include <ParametersPlugin_PyInterp.h>
+
+class ParametersPlugin_PyInterp;
 
 class PARAMETERSPLUGIN_EXPORT ParametersPlugin_EvalListener : public Events_Listener
 {

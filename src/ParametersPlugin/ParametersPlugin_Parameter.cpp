@@ -4,6 +4,8 @@
 // Created:     23 MArch 2015
 // Author:      sbh
 
+#include <pyconfig.h>
+
 #include "ParametersPlugin_Parameter.h"
 #include <ParametersPlugin_PyInterp.h>
 

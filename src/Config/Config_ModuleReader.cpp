@@ -7,6 +7,8 @@
  *      Author: sbh
  */
 
+#include <pyconfig.h>
+
 #include <Config_Keywords.h>
 #include <Config_Common.h>
 #include <Config_ModuleReader.h>

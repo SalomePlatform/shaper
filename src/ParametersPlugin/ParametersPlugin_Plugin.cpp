@@ -1,5 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+#include <pyconfig.h>
+
 #include <ParametersPlugin_Plugin.h>
 #include <ParametersPlugin_Parameter.h>
 #include <ParametersPlugin_Validators.h>
