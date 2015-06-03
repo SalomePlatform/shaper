@@ -1,0 +1,38 @@
+:Basic.Circle_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Circle' type='AppElements_Button' unnamed='1' visible='1'}
+:Basic.Sketch_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Sketch' type='AppElements_Button' unnamed='1' visible='1'}
+:Center.X:_ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.X:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Center.X:_QLabel	{container=':Circle.Center_QGroupBox' text='X:' type='QLabel' unnamed='1' visible='1'}
+:Center.Y:_ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.Y:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Center.Y:_QLabel	{container=':Circle.Center_QGroupBox' text='Y:' type='QLabel' unnamed='1' visible='1'}
+:Circle.Center_QGroupBox	{container=':OpenParts*.Circle_XGUI_PropertyPanel' title='Center' type='QGroupBox' unnamed='1' visible='1'}
+:Circle.CircleRadius_ModuleBase_ParamSpinBox	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='CircleRadius' type='ModuleBase_ParamSpinBox' visible='1'}
+:Circle.property_panel_ok_QToolButton	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Circle.qt_spinbox_lineedit_QLineEdit	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='3' type='QLineEdit' visible='1'}
+:Extrusion.Extrusion_AppElements_Button	{container=':Features.Extrusion_AppElements_MenuGroupPanel' text='Extrusion' type='AppElements_Button' unnamed='1' visible='1'}
+:Extrusion.Select a sketch face_QLabel	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
+:Extrusion.Select a sketch face_QListWidget	{aboveWidget=':Extrusion.Select a sketch face_QLabel' container=':OpenParts*.Extrusion_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Extrusion.property_panel_ok_QToolButton	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Extrusion_ModuleBase_PageWidget	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' occurrence='2' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
+:Features.Extrusion_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Features_AppElements_Workbench' name='Extrusion' type='AppElements_MenuGroupPanel' visible='1'}
+:General.qt_tabwidget_stackedwidget_QStackedWidget	{container=':OpenParts*.General_AppElements_DockWidget' name='qt_tabwidget_stackedwidget' type='QStackedWidget' visible='1'}
+:General.qt_tabwidget_tabbar_QTabBar	{container=':OpenParts*.General_AppElements_DockWidget' name='qt_tabwidget_tabbar' type='QTabBar' visible='1'}
+:OpenParts*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Circle'}
+:OpenParts*.Extrusion_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Extrusion'}
+:OpenParts*.General_AppElements_DockWidget	{type='AppElements_DockWidget' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='General'}
+:OpenParts*.Parameter_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Parameter'}
+:OpenParts*.Sketch_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Sketch'}
+:OpenParts*_AppElements_MainWindow	{type='AppElements_MainWindow' unnamed='1' visible='1' windowTitle?='OpenParts*'}
+:OpenParts*_AppElements_ViewPort	{type='AppElements_ViewPort' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
+:Operations.New part_AppElements_Button	{container=':Part.Operations_AppElements_MenuGroupPanel' text='New part' type='AppElements_Button' unnamed='1' visible='1'}
+:Parameter.property_panel_ok_QToolButton	{container=':OpenParts*.Parameter_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Parameter_ExpressionEditor	{container=':OpenParts*.Parameter_XGUI_PropertyPanel' type='ExpressionEditor' unnamed='1' visible='1'}
+:Parameter_QLineEdit	{container=':OpenParts*.Parameter_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
+:Parameters.Parameter_AppElements_Button	{container=':Part.Parameters_AppElements_MenuGroupPanel' text='Parameter' type='AppElements_Button' unnamed='1' visible='1'}
+:Part.Operations_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Part_AppElements_Workbench' name='Operations' type='AppElements_MenuGroupPanel' visible='1'}
+:Part.Parameters_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Part_AppElements_Workbench' name='Parameters' type='AppElements_MenuGroupPanel' visible='1'}
+:Sketch.Basic_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Basic' type='AppElements_MenuGroupPanel' visible='1'}
+:Sketch.property_panel_ok_QToolButton	{container=':OpenParts*.Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:qt_tabwidget_stackedwidget.Features_AppElements_Workbench	{container=':General.qt_tabwidget_stackedwidget_QStackedWidget' name='Features' type='AppElements_Workbench' visible='1'}
+:qt_tabwidget_stackedwidget.Part_AppElements_Workbench	{container=':General.qt_tabwidget_stackedwidget_QStackedWidget' name='Part' type='AppElements_Workbench' visible='1'}
+:qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench	{container=':General.qt_tabwidget_stackedwidget_QStackedWidget' name='Sketch' type='AppElements_Workbench' visible='1'}
+:to_size_ModuleBase_ParamSpinBox	{container=':Extrusion_ModuleBase_PageWidget' name='to_size' type='ModuleBase_ParamSpinBox' visible='1'}
