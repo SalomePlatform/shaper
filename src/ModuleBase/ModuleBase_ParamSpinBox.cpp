@@ -8,8 +8,9 @@
 
 #include <QKeyEvent>
 #include <QLineEdit>
-#include <QToolTip>
+#include <QLocale>
 #include <QRegExp>
+#include <QToolTip>
 
 #include <string>
 #include <iostream>
@@ -164,8 +165,9 @@ bool ModuleBase_ParamSpinBox::hasVariable() const
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  //QRegExp varNameMask("[-+]?[0-9]*[.]?[0-9]+([eE][-+]?[0-9]+)?"); //This row causes problem with input in sketcher (circle)
-  QRegExp varNameMask("[-+]?[0-9]*.?[0-9]+([eE][-+]?[0-9]+)?");
+  QString aPattern = QString("[-+]?[0-9]*[%1]?[0-9]+([eE][-+]?[0-9]+)?")
+      .arg(QLocale::system().decimalPoint());
+  QRegExp varNameMask(aPattern);
   return !varNameMask.exactMatch(theText);
 }
 
