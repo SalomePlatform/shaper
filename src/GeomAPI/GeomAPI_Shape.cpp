@@ -46,25 +46,25 @@ bool GeomAPI_Shape::isVertex() const
 bool GeomAPI_Shape::isEdge() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  return aShape.ShapeType() == TopAbs_EDGE;
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_EDGE;
 }
 
 bool GeomAPI_Shape::isFace() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  return aShape.ShapeType() == TopAbs_FACE;
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_FACE;
 }
 
 bool GeomAPI_Shape::isCompound() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  return aShape.ShapeType() == TopAbs_COMPOUND;
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_COMPOUND;
 }
 
 bool GeomAPI_Shape::isSolid() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  return aShape.ShapeType() == TopAbs_SOLID;
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_SOLID;
 }
 
 bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmin,
