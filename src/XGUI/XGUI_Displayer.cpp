@@ -37,6 +37,8 @@
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
+#include <StdSelect_ViewerSelector3d.hxx>
+
 #include <TColStd_MapOfTransient.hxx>
 #include <TColStd_MapIteratorOfMapOfTransient.hxx>
 
@@ -353,6 +355,14 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   if (!aContext->HasOpenedContext()) 
     return;
 
+  // we need to block the sort of the viewer selector during deactivate/activate because
+  // it takes a lot of time if there are a many objects are processed. It can be performed
+  // manualy after the activation is peformed
+  Handle(StdSelect_ViewerSelector3d) aSelector = aContext->LocalContext()->MainSelector();
+  bool isUpdateSortPossible = !aSelector.IsNull() && aSelector->IsUpdateSortPossible();
+  if (!aSelector.IsNull())
+    aSelector->SetUpdateSortPossible(false);
+
   //aContext->UseDisplayedObjects();
   //myUseExternalObjects = true;
 
@@ -371,6 +381,11 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
     activate(anAISIO, myActiveSelectionModes);
+  }
+  // restore the sorting flag and perform the sort of selection
+  if (!aSelector.IsNull()) {
+    aSelector->SetUpdateSortPossible(isUpdateSortPossible);
+    aSelector->UpdateSort();
   }
 }
 
