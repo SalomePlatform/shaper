@@ -149,8 +149,13 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
 
+    bool aCanBeShaded = ::canBeShaded(anAISIO);
     // In order to avoid extra closing/opening context
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
+    if (aCanBeShaded) {
+      myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
+      closeLocalContexts(false);
+    }
     aContext->Display(anAISIO, false);
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
     if (isShading)
@@ -161,7 +166,13 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     if (isCustomized)
       aContext->Redisplay(anAISIO, false);
 
-    activate(anAISIO, myActiveSelectionModes);
+    if (aCanBeShaded) {
+      openLocalContext();
+      activateObjects(myActiveSelectionModes);
+      myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
+    }
+    else
+      activate(anAISIO, myActiveSelectionModes);
  }
   if (isUpdateViewer)
     updateViewer();
@@ -347,10 +358,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   // we need to block the sort of the viewer selector during deactivate/activate because
   // it takes a lot of time if there are a many objects are processed. It can be performed
   // manualy after the activation is peformed
-  Handle(StdSelect_ViewerSelector3d) aSelector = aContext->LocalContext()->MainSelector();
-  bool isUpdateSortPossible = !aSelector.IsNull() && aSelector->IsUpdateSortPossible();
-  if (!aSelector.IsNull())
-    aSelector->SetUpdateSortPossible(false);
+  //Handle(StdSelect_ViewerSelector3d) aSelector = aContext->LocalContext()->MainSelector();
+  //bool isUpdateSortPossible = !aSelector.IsNull() && aSelector->IsUpdateSortPossible();
+  //if (!aSelector.IsNull())
+  //  aSelector->SetUpdateSortPossible(false);
 
   //aContext->UseDisplayedObjects();
   //myUseExternalObjects = true;
@@ -372,10 +383,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
     activate(anAISIO, myActiveSelectionModes);
   }
   // restore the sorting flag and perform the sort of selection
-  if (!aSelector.IsNull()) {
-    aSelector->SetUpdateSortPossible(isUpdateSortPossible);
-    aSelector->UpdateSort();
-  }
+  //if (!aSelector.IsNull()) {
+  //  aSelector->SetUpdateSortPossible(isUpdateSortPossible);
+  //  aSelector->UpdateSort();
+  //}
 }
 
 
@@ -690,10 +701,21 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     return;
 
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  bool aCanBeShaded = ::canBeShaded(aAISIO);
+  // In order to avoid extra closing/opening context
   SelectMgr_IndexedMapOfOwner aSelectedOwners;
+  if (aCanBeShaded) {
+    myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
+    closeLocalContexts(false);
+  }
   aContext->SetDisplayMode(aAISIO, theMode, false);
   // Redisplay in order to update new mode because it could be not computed before
   aContext->Redisplay(aAISIO, false);
+  if (aCanBeShaded) {
+    openLocalContext();
+    activateObjects(myActiveSelectionModes);
+    myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
+  }
   if (toUpdate)
     updateViewer();
 }
