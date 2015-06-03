@@ -161,10 +161,10 @@ class Sketch():
     dx = geomDataAPI_Dir( self.my.data().attribute("DirX") ).dir()
     n  = geomDataAPI_Dir( self.my.data().attribute("Norm") ).dir()
 
-    self.faces = ShapeList()      # The faces are kept otherwise they are destroyed at exit
-    GeomAlgoAPI_SketchBuilder.createFaces(o, dx, n, self.selection, self.faces)
+    faces = ShapeList()      # The faces are kept otherwise they are destroyed at exit
+    GeomAlgoAPI_SketchBuilder.createFaces(o, dx, n, self.selection, faces)
 #TODO: Deal with several faces 
-    return self.faces[0]
+    return faces[0]
 
   def result (self):
     """Returns the result data of this Feature."""

@@ -49,4 +49,7 @@
 %include "GeomAlgoAPI_ShapeProps.h"
 %include "GeomAlgoAPI_SketchBuilder.h"
 
+%typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {
+  $result = SWIG_NewPointerObj(SWIG_as_voidptr(new std::shared_ptr<GeomAPI_Shape>(*$1)), $descriptor(std::shared_ptr<GeomAPI_Shape> *), SWIG_POINTER_OWN | 0 );
+}
 %template(ShapeList) std::list<std::shared_ptr<GeomAPI_Shape> >;
