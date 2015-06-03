@@ -85,12 +85,12 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
     for(NCollection_Map<TopoDS_Shape>::Iterator aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
       const TopoDS_Shape& aShape = aShapeIt.Value();
       const TopTools_ListOfShape& aGeneratedList = aBuilder->Generated(aShape);
-      const TopTools_ListOfShape& aModifiedList = aBuilder->Modified(aShape);
       for(TopTools_ListIteratorOfListOfShape anIt(aGeneratedList); anIt.More(); anIt.Next()) {
         aTempShapes.Add(anIt.Value());
         aResultShapes.Add(anIt.Value());
         hasResults = true;
       }
+      const TopTools_ListOfShape& aModifiedList = aBuilder->Modified(aShape);
       for(TopTools_ListIteratorOfListOfShape anIt(aModifiedList); anIt.More(); anIt.Next()) {
         aTempShapes.Add(anIt.Value());
         aResultShapes.Add(anIt.Value());

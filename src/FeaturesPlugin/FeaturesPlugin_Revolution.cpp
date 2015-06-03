@@ -23,9 +23,9 @@
 
 #define FACE 4
 #define EDGE 6
-#define _GENERATE_TAG 1
-#define _FIRST_TAG 2
-#define _LAST_TAG 3
+#define _LATERAL_TAG 1
+#define _FROM_TAG 2
+#define _TO_TAG 3
 
 //=================================================================================================
 FeaturesPlugin_Revolution::FeaturesPlugin_Revolution()
@@ -168,27 +168,27 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
 
-  std::string aGeneratedName = "Generated";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_GENERATE_TAG, aGeneratedName, *aSubShapes);
+  std::string aGeneratedName = "LateralFace";
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, aGeneratedName, *aSubShapes);
 
-  //Insert bottom face
+  //Insert from face
   std::string aBotName = "FromFace";
   std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();
   if(!aBottomFace->isNull()) {
     if(aSubShapes->isBound(aBottomFace)) {
       aBottomFace = aSubShapes->find(aBottomFace);
     }
-    theResultBody->generated(aBottomFace, aBotName, _FIRST_TAG);
+    theResultBody->generated(aBottomFace, aBotName, _FROM_TAG);
   }
 
-  //Insert top face
+  //Insert to face
   std::string aTopName = "ToFace";
   std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
   if (!aTopFace->isNull()) {
     if (aSubShapes->isBound(aTopFace)) {
       aTopFace = aSubShapes->find(aTopFace);
     }
-    theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
+    theResultBody->generated(aTopFace, aTopName, _TO_TAG);
   }
 
 }
