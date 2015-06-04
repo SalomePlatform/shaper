@@ -200,11 +200,6 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
     aResult = aFromCutBuilder->Shape();
 
-    // Setting naming.
-    if(aFromCutBuilder->Modified(aRotatedFromFace).Extent() > 0) {
-      myFirst->setImpl(new TopoDS_Shape(aFromCutBuilder->Modified(aRotatedFromFace).First()));
-    }
-
     // Cutting revolution with to plane.
     BRepAlgoAPI_Cut* aToCutBuilder = new BRepAlgoAPI_Cut(aResult, aToSolid);
     aToCutBuilder->Build();
@@ -214,24 +209,22 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aToCutBuilder)));
     aResult = aToCutBuilder->Shape();
 
-    // Setting naming.
-    if(aToCutBuilder->Modified(myFirst->impl<TopoDS_Shape>()).Extent() > 0) {
-      myFirst->setImpl(new TopoDS_Shape(aToCutBuilder->Modified(myFirst->impl<TopoDS_Shape>()).First()));
-    } else {
-      for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {
-        const TopoDS_Shape& aFace = anExp.Current();
-        if (aFace.IsPartner(myFirst->impl<TopoDS_Shape>())) {
-          myFirst->implPtr<TopoDS_Shape>()->Orientation(aFace.Orientation());
-        }
-      }
-    }
-    if(aToCutBuilder->Modified(aRotatedToFace).Extent() > 0) {
-      myLast->setImpl(new TopoDS_Shape(aToCutBuilder->Modified(aRotatedToFace).First()));
-    }
-
     // If after cut we got more than one solids then take closest to the center of mass of the base face.
     aResult = findClosest(aResult, aBasisCentr);
 
+    // Setting naming.
+    for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {
+      const TopoDS_Shape& aFaceOnResult = anExp.Current();
+      Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aFaceOnResult));
+      Handle(Geom_Surface) aFromSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedFromFace));
+      Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedToFace));
+      if(aFaceSurface == aFromSurface) {
+        myFirst->setImpl(new TopoDS_Shape(aFaceOnResult));
+      }
+      if(aFaceSurface == aToSurface) {
+        myLast->setImpl(new TopoDS_Shape(aFaceOnResult));
+      }
+    }
   } else { //Case 3: When only one bounding plane was set.
     // Getting bounding face.
     TopoDS_Face aBoundingFace;
@@ -272,6 +265,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     gp_Trsf aBoundingTrsf;
     aBoundingTrsf.SetRotation(anAxis, aBoundingRotAngle / 180.0 * M_PI);
     BRepBuilderAPI_Transform aBoundingTransform(aBoundingSolid, aBoundingTrsf, true);
+    TopoDS_Shape aRotatedBoundingFace = aBoundingTransform.Modified(aBoundingFace).First();
     aBoundingSolid = aBoundingTransform.Shape();
 
     // Making revolution to the 360 angle.
@@ -309,6 +303,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     double aBasisRotAngle = isFromFaceSet ? myToAngle : -myFromAngle;
     aBasisTrsf.SetRotation(anAxis, aBasisRotAngle / 180.0 * M_PI);
     BRepBuilderAPI_Transform aBasisTransform(aBasisSolid, aBasisTrsf, true);
+    TopoDS_Shape aRotatedBasisFace = aBasisTransform.Modified(aBasisFace).First();
     aBasisSolid = aBasisTransform.Shape();
 
     // Cutting revolution with basis face.
@@ -320,29 +315,27 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
       if(anExp.More()) {
         aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aBasisCutBuilder)));
         aResult = aCutResult;
-
-        // Setting naming.
-        std::shared_ptr<GeomAPI_Shape> aBoundPtr = isFromFaceSet ? myFirst : myLast;
-        if(aBasisCutBuilder->Modified(aBoundPtr->impl<TopoDS_Shape>()).Extent() > 0) {
-          aBoundPtr->setImpl(new TopoDS_Shape(aBasisCutBuilder->Modified(aBoundPtr->impl<TopoDS_Shape>()).First()));
-        } else {
-          for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {
-            const TopoDS_Shape& aFace = anExp.Current();
-            if (aFace.IsPartner(aBoundPtr->impl<TopoDS_Shape>())) {
-              aBoundPtr->implPtr<TopoDS_Shape>()->Orientation(aFace.Orientation());
-            }
-          }
-        }
-
-        if(aBasisCutBuilder->Modified(aBasisFace).Extent() > 0) {
-          std::shared_ptr<GeomAPI_Shape> aPtr = isFromFaceSet ? myLast : myFirst;
-          aPtr->setImpl(new TopoDS_Shape(aBasisCutBuilder->Modified(aBasisFace).First()));
-        }
       }
     }
 
     // If after cut we got more than one solids then take closest to the center of mass of the base face.
     aResult = findClosest(aResult, aBasisCentr);
+
+    // Setting naming.
+    for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {
+      const TopoDS_Shape& aFaceOnResult = anExp.Current();
+      Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aFaceOnResult));
+      Handle(Geom_Surface) aBoundingSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedBoundingFace));
+      Handle(Geom_Surface) aBasisSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedBasisFace));
+      if(aFaceSurface == aBoundingSurface) {
+        std::shared_ptr<GeomAPI_Shape> aPtr = isFromFaceSet ? myFirst : myLast;
+        aPtr->setImpl(new TopoDS_Shape(aFaceOnResult));
+      }
+      if(aFaceSurface == aBasisSurface) {
+        std::shared_ptr<GeomAPI_Shape> aPtr = isFromFaceSet ? myLast : myFirst;
+        aPtr->setImpl(new TopoDS_Shape(aFaceOnResult));
+      }
+    }
   }
 
   TopExp_Explorer anExp(aResult, TopAbs_SOLID);
