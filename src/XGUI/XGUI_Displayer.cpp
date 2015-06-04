@@ -47,7 +47,7 @@
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
 //#define DEBUG_DISPLAY
-#define DEBUG_ACTIVATE
+//#define DEBUG_ACTIVATE
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
 //#define DEBUG_USE_CLEAR_OUTDATED_SELECTION
@@ -149,31 +149,15 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
 
-    bool aCanBeShaded = ::canBeShaded(anAISIO);
-    // In order to avoid extra closing/opening context
-    SelectMgr_IndexedMapOfOwner aSelectedOwners;
-    if (aCanBeShaded) {
-      myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
-      closeLocalContexts(false);
-    }
-    aContext->Display(anAISIO, false);
-    aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
+    bool isCustomized = customizeObject(theObject);
+
+    aContext->Display(anAISIO, isShading? Shading : Wireframe, 0, false, true, AIS_DS_Displayed); 
     if (isShading)
       anAISIO->Attributes()->SetFaceBoundaryDraw( Standard_True );
     emit objectDisplayed(theObject, theAIS);
 
-    bool isCustomized = customizeObject(theObject);
-    if (isCustomized)
-      aContext->Redisplay(anAISIO, false);
-
-    if (aCanBeShaded) {
-      openLocalContext();
-      activateObjects(myActiveSelectionModes);
-      myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
-    }
-    else
-      activate(anAISIO, myActiveSelectionModes);
- }
+    activate(anAISIO, myActiveSelectionModes);
+ } 
   if (isUpdateViewer)
     updateViewer();
 }
@@ -245,13 +229,13 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     // Customization of presentation
     bool isCustomized = customizeObject(theObject);
     #ifdef DEBUG_FEATURE_REDISPLAY
-      //qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
-      //  arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
+      qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
+        arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
     #endif
     if (!isEqualShapes || isCustomized) {
       aContext->Redisplay(aAISIO, false);
       #ifdef DEBUG_FEATURE_REDISPLAY
-      //qDebug("  Redisplay happens");
+        qDebug("  Redisplay happens");
       #endif
       if (isUpdateViewer)
         updateViewer();
@@ -275,41 +259,6 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
 #endif
   }
 }
-
-/*void XGUI_Displayer::activate(ObjectPtr theFeature)
-{
-  activate(theFeature, myActiveSelectionModes);
-}
-
-void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
-{
-#ifdef DEBUG_ACTIVATE
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-
-    if (aFeature.get() != NULL) {
-      QIntList aModes;
-      getModesOfActivation(theObject, aModes);
-
-
-      qDebug(QString("activate feature: %1, theModes: %2, myActiveSelectionModes: %3, getModesOf: %4").
-        arg(aFeature->data()->name().c_str()).
-        arg(theModes.size()).
-        arg(myActiveSelectionModes.size()).
-        arg(aModes.size()).toStdString().c_str());
-    }
-#endif
-
-  if (isVisible(theObject)) {
-    Handle(AIS_InteractiveContext) aContext = AISContext();
-    if (aContext.IsNull())
-      return;
-
-    AISObjectPtr anObj = myResult2AISObjectMap[theObject];
-    Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-
-    activate(anAIS, theModes);
-  }
-}*/
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
 {
@@ -701,21 +650,8 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     return;
 
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-  bool aCanBeShaded = ::canBeShaded(aAISIO);
-  // In order to avoid extra closing/opening context
-  SelectMgr_IndexedMapOfOwner aSelectedOwners;
-  if (aCanBeShaded) {
-    myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
-    closeLocalContexts(false);
-  }
   aContext->SetDisplayMode(aAISIO, theMode, false);
   // Redisplay in order to update new mode because it could be not computed before
-  aContext->Redisplay(aAISIO, false);
-  if (aCanBeShaded) {
-    openLocalContext();
-    activateObjects(myActiveSelectionModes);
-    myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
-  }
   if (toUpdate)
     updateViewer();
 }
