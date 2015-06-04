@@ -68,7 +68,10 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     myTypeCombo->setVisible(false);
   }
 
-  QLabel* aListLabel = new QLabel(tr("Selected objects:"), this);
+// Modification for specification of 1.3.0
+  std::string aLabelText = "";//theData->getProperty("label");
+  QLabel* aListLabel = new QLabel(!aLabelText.empty() ? aLabelText.c_str()
+                                                      : tr("Selected objects:"), this);
   aMainLay->addWidget(aListLabel, 1, 0);
   // if the xml definition contains one type, an information label should be shown near to the latest
   if (aShapeTypes.size() == 1) {

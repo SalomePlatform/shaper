@@ -1,0 +1,26 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="base"
+    label="Select a sketch face"
+    icon=":icons/cut_shape.png"
+    tooltip="Select a sketch face"
+    type_choice="Solids">
+  </multi_selector>
+  <shape_selector id="axis_object"
+                  icon=":icons/axis.png"
+                  label="Axis"
+                  tooltip="Select an edge for axis"
+                  shape_types="edge"
+                  default="">
+  </shape_selector>
+  <doublevalue
+    id="angle"
+    label="Angle"
+    min="0"
+    step="1.0"
+    default="0"
+    icon=":icons/radius.png"
+    tooltip="Angle">
+  </doublevalue>
+</source>

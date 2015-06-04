@@ -1,15 +1,26 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
+  <!--Modification for specification of 1.3.0
+  <multi_selector id="base"
+    label="Select a sketch face"
+    icon=":icons/cut_shape.png"
+    tooltip="Select a sketch face"
+    type_choice="Solids">
+  </multi_selector>-->
+  <!--Modification for specification of 1.3.0
+    icon=":icons/placement_from.png"-->
   <shape_selector id="placement_base_object" 
     label="Select an object" 
     icon=":icons/cut_shape.png" 
     tooltip="Select a destination element"
     shape_types="face edge vertex"
   />
+  <!--Modification for specification of 1.3.0
+      icon=":icons/placement_to.png"-->
   <shape_selector id="placement_attractable_object" 
     label="Select an object" 
-    icon=":icons/cut_shape.png" 
+    icon=":icons/cut_shape.png"
     tooltip="Select an element of moved object" 
     shape_types="face edge vertex" 
     concealment="true" >

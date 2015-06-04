@@ -4,9 +4,11 @@
 
 #include <FeaturesPlugin_Boolean.h>
 #include <FeaturesPlugin_Extrusion.h>
+#include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_Group.h>
 #include <FeaturesPlugin_Placement.h>
 #include <FeaturesPlugin_Revolution.h>
+#include <FeaturesPlugin_Rotation.h>
 
 #include <ModelAPI_Session.h>
 
@@ -30,13 +32,17 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
   if (theFeatureID == FeaturesPlugin_Extrusion::ID()) {
     return FeaturePtr(new FeaturesPlugin_Extrusion);
   } else if (theFeatureID == FeaturesPlugin_Revolution::ID()) {
-    return FeaturePtr(new FeaturesPlugin_Revolution);
+   return FeaturePtr(new FeaturesPlugin_Revolution);
+  } else if (theFeatureID == FeaturesPlugin_Rotation::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Rotation);
   } else if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
     return FeaturePtr(new FeaturesPlugin_Boolean);
   } else if (theFeatureID == FeaturesPlugin_Group::ID()) {
     return FeaturePtr(new FeaturesPlugin_Group);
   } else if (theFeatureID == FeaturesPlugin_Placement::ID()) {
     return FeaturePtr(new FeaturesPlugin_Placement);
+  } else if (theFeatureID == FeaturesPlugin_ExtrusionCut::ID()) {
+    return FeaturePtr(new FeaturesPlugin_ExtrusionCut);
   }
   // feature of such kind is not found
   return FeaturePtr();

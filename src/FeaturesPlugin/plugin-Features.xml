@@ -15,6 +15,13 @@
       <feature id="Placement" title="Placement" tooltip="Perform moving of an object to specified position" icon=":icons/placement.png">
           <source path="placement_widget.xml"/>
       </feature>
+      <!--Modification for specification of 1.3.0
+      <feature id="Rotation" title="Movement" tooltip="" icon=":icons/placement.png">
+        <source path="rotation_widget.xml"/>
+      </feature>
+      <feature id="ExtrusionCut" title="RevolutionCut" tooltip="" icon=":icons/placement.png">
+        <source path="extrusioncut_widget.xml"/>
+      </feature>-->
     </group>
     <group id="Collections">
       <feature id="Group"

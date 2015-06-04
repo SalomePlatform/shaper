@@ -31,6 +31,14 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
     static const std::string MY_PLACEMENT_ID("Placement");
     return MY_PLACEMENT_ID;
   }
+  /// attribute name of references sketch entities list, it should contain a sketch result or
+  /// a pair a sketch result to sketch face
+  /*Modification for specification of 1.3.0
+  inline static const std::string& LIST_ID()
+  {
+    static const std::string MY_GROUP_LIST_ID("base");
+    return MY_GROUP_LIST_ID;
+  }*/
   /// attribute name of referenced object
   inline static const std::string& BASE_OBJECT_ID()
   {

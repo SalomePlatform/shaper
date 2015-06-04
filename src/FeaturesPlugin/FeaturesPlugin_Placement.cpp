@@ -10,6 +10,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
@@ -26,6 +27,13 @@ FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 
 void FeaturesPlugin_Placement::initAttributes()
 {
+  /* Modification for specification of 1.3.0
+  AttributeSelectionListPtr aSelection = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
+    FeaturesPlugin_Placement::LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+  // extrusion works with faces always
+  aSelection->setSelectionType("SOLID");
+  */
   data()->addAttribute(FeaturesPlugin_Placement::BASE_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Placement::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
