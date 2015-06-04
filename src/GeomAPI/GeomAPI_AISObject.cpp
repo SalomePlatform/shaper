@@ -353,8 +353,8 @@ void GeomAPI_AISObject::setPointMarker(int theType, double theScale)
 {
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
-    Handle(AIS_Drawer) aDrawer = anAIS->Attributes();
-    if (aDrawer->HasPointAspect()) {
+    Handle(Prs3d_Drawer) aDrawer = anAIS->Attributes();
+    if (aDrawer->HasOwnPointAspect()) {
       Handle(Prs3d_PointAspect) aPA = aDrawer->PointAspect();
       aPA->SetTypeOfMarker((Aspect_TypeOfMarker)theType);
       aPA->SetScale(theScale);
@@ -370,14 +370,14 @@ bool GeomAPI_AISObject::setLineStyle(int theStyle)
   bool isChanged = false;
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
-    Handle(AIS_Drawer) aDrawer = anAIS->Attributes();
+    Handle(Prs3d_Drawer) aDrawer = anAIS->Attributes();
     Handle(Prs3d_LineAspect) aLineAspect;
 
     Aspect_TypeOfLine aType = (Aspect_TypeOfLine)theStyle;
-    if (aDrawer->HasLineAspect()) {
+    if (aDrawer->HasOwnLineAspect()) {
       aLineAspect = aDrawer->LineAspect();
     }
-    if (aDrawer->HasWireAspect()) {
+    if (aDrawer->HasOwnWireAspect()) {
       aLineAspect = aDrawer->WireAspect();
     }
     Quantity_Color aCurrentColor;

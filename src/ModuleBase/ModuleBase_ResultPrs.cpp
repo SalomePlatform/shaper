@@ -11,7 +11,6 @@
 #include <GeomAPI_PlanarEdges.h>
 
 #include <BRep_Builder.hxx>
-#include <AIS_Drawer.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <TopoDS_Builder.hxx>
 

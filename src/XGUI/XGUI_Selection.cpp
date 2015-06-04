@@ -14,10 +14,6 @@
 
 #include <AIS_InteractiveContext.hxx>
 
-#include <SelectMgr_Selection.hxx>
-#include <SelectMgr_EntityOwner.hxx>
-
-#include <SelectBasics_SensitiveEntity.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
@@ -227,11 +223,11 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
 
     Handle(SelectMgr_Selection) aSelection = theObject->Selection(aMode);
     for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-      Handle(SelectBasics_SensitiveEntity) anEntity = aSelection->Sensitive();
+      Handle(SelectMgr_SensitiveEntity) anEntity = aSelection->Sensitive();
       if (anEntity.IsNull())
         continue;
       Handle(SelectMgr_EntityOwner) anOwner =
-        Handle(SelectMgr_EntityOwner)::DownCast(anEntity->OwnerId());
+        Handle(SelectMgr_EntityOwner)::DownCast(anEntity->BaseSensitive()->OwnerId());
       if (!anOwner.IsNull())
         theOwners.Add(anOwner);
     }

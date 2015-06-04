@@ -57,20 +57,14 @@ cd %ROOT_DIR%
 @REM -------------------------
 
 @REM -------------------------
-@REM Create launch path
-rem @SET PATH=%LIBXML2_ROOT_DIR%\bin;%PATH%
-rem @SET PATH=%PDIR%\tbb\bin;%PATH%
-rem @SET PATH=%PDIR%\freeimage-3.15.4\bin;%PATH%
-rem @SET PATH=%PDIR%\ftgl-2.1.3\bin;%PATH%
-rem @SET PATH=%PDIR%\freetype-2.4.11\bin;%PATH%
-rem @SET PATH=%PDIR%\gl2ps-1.3.8\bin;%PATH%
-rem @SET PATH=%PDIR%\qwt-5.2.1\lib;%PATH%
-rem @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
-@REM -------------------------
-
-@REM -------------------------
 @SET PYTHONHOME=%PYTHON_ROOT_DIR%
 @SET PYTHON_INCLUDE=%PYTHONHOME%\include
+@REM -------------------------
+
+
+@REM -------------------------
+@REM Some OCCT headers include FREETYPE headers
+@SET FREETYPE_DIR=%PDIR%\freetype-2.4.11
 @REM -------------------------
 
 @SET PATH=%GEOM_ROOT_DIR%\lib\salome;%PATH%
