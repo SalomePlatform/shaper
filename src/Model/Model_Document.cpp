@@ -828,7 +828,7 @@ ResultPtr Model_Document::findByName(const std::string theName)
   return myObjs->findByName(theName);
 }
 
-std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures()
+std::list<std::shared_ptr<ModelAPI_Feature> > Model_Document::allFeatures()
 {
   return myObjs->allFeatures();
 }
