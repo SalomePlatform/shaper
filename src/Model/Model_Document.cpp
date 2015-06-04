@@ -662,6 +662,11 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
 void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
   const bool theVisible)
 {
+  // blocks the flush signals to avoid each objects visualization in the viewer
+  // they should not be shown once after all modifications are performed
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->activateFlushes(false);
+
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   CompositeFeaturePtr aMain; // main feature that may nest the new current
   if (theCurrent.get()) {
@@ -707,8 +712,8 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     aRefLab.ForgetAttribute(TDF_Reference::GetID());
   }
   // make all features after this feature disabled in reversed order (to remove results without deps)
-  static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID aCreateEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
   static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
 
   bool aPassed = false; // flag that the current object is already passed in cycle
@@ -730,6 +735,10 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
     }
   }
+  // unblock  the flush signals and up them after this
+  aLoop->activateFlushes(true);
+
+  aLoop->flush(aCreateEvent);
   aLoop->flush(aRedispEvent);
   aLoop->flush(aDeleteEvent);
 }

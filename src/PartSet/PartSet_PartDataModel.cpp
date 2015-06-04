@@ -577,12 +577,6 @@ int PartSet_PartDataModel::lastHistoryRow() const
 
 void PartSet_PartDataModel::setLastHistoryItem(const QModelIndex& theIndex)
 {
-  // the viewer update should be blocked in order to avoid the features blinking before they are
-  // hidden
-  std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
-      new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
-  Events_Loop::loop()->send(aMsg);
-
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = partDocument();
   std::string aOpName = tr("History change").toStdString();
@@ -596,12 +590,6 @@ void PartSet_PartDataModel::setLastHistoryItem(const QModelIndex& theIndex)
     aDoc->setCurrentFeature(FeaturePtr(), true);
     aMgr->finishOperation();
   }
-  // the viewer update should be unblocked in order to avoid the features blinking before they are
-  // hidden
-  aMsg = std::shared_ptr<Events_Message>(
-                new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
-
-  Events_Loop::loop()->send(aMsg);
 }
 
 QModelIndex PartSet_PartDataModel::lastHistoryItem() const
