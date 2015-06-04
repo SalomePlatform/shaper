@@ -4,6 +4,7 @@
   #include "GeomAPI.h"
   #include "GeomAPI_Interface.h"
   #include "GeomAPI_Shape.h"
+  #include "GeomAPI_ShapeExplorer.h"
   #include "GeomAPI_AISObject.h"
   #include "GeomAPI_Circ2d.h"
   #include "GeomAPI_Circ.h"
@@ -52,12 +53,14 @@
 %shared_ptr(GeomAPI_Pnt2d)
 %shared_ptr(GeomAPI_Pnt)
 %shared_ptr(GeomAPI_Shape)
+%shared_ptr(GeomAPI_ShapeExplorer)
 %shared_ptr(GeomAPI_XY)
 %shared_ptr(GeomAPI_XYZ)
 
 // all supported interfaces
 %include "GeomAPI_Interface.h"
 %include "GeomAPI_Shape.h"
+%include "GeomAPI_ShapeExplorer.h"
 %include "GeomAPI_AISObject.h"
 %include "GeomAPI_Circ2d.h"
 %include "GeomAPI_Circ.h"

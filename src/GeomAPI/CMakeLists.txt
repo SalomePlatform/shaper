@@ -20,6 +20,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Dir2d.h
     GeomAPI_Pln.h
     GeomAPI_Shape.h
+    GeomAPI_ShapeExplorer.h
     GeomAPI_Edge.h
     GeomAPI_Face.h
     GeomAPI_PlanarEdges.h
@@ -47,6 +48,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Dir2d.cpp
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
+    GeomAPI_ShapeExplorer.cpp
     GeomAPI_Edge.cpp
     GeomAPI_Face.cpp
     GeomAPI_PlanarEdges.cpp

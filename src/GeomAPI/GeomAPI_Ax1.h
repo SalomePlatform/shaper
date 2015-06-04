@@ -21,9 +21,9 @@ public:
   GeomAPI_Ax1();
 
   /** \brief Ñonstructor.
-  *   \param[in] theOrigin point of origin.
-  *   \param[in] theDir direction of axis.
-  */
+   *  \param[in] theOrigin point of origin.
+   *  \param[in] theDir direction of axis.
+   */
   GeomAPI_Ax1(std::shared_ptr<GeomAPI_Pnt> theOrigin,
               std::shared_ptr<GeomAPI_Dir> theDir);
 

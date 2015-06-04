@@ -9,8 +9,11 @@
   #include "GeomAlgoAPI_Extrusion.h"
   #include "GeomAlgoAPI_FaceBuilder.h"
   #include "GeomAlgoAPI_MakeShape.h"
+  #include "GeomAlgoAPI_MakeShapeList.h"
   #include "GeomAlgoAPI_PointBuilder.h"
   #include "GeomAlgoAPI_Prism.h"
+  #include "GeomAlgoAPI_Revolution.h"
+  #include "GeomAlgoAPI_Rotation.h"
   #include "GeomAlgoAPI_ShapeProps.h"
   #include "GeomAlgoAPI_SketchBuilder.h"
 
@@ -36,8 +39,11 @@
 %include "GeomAlgoAPI_Extrusion.h"
 %include "GeomAlgoAPI_FaceBuilder.h"
 %include "GeomAlgoAPI_MakeShape.h"
+%include "GeomAlgoAPI_MakeShapeList.h"
 %include "GeomAlgoAPI_PointBuilder.h"
 %include "GeomAlgoAPI_Prism.h"
+%include "GeomAlgoAPI_Revolution.h"
+%include "GeomAlgoAPI_Rotation.h"
 %include "GeomAlgoAPI_ShapeProps.h"
 %include "GeomAlgoAPI_SketchBuilder.h"
 

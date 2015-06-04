@@ -62,7 +62,7 @@ void FeaturesPlugin_Revolution::execute()
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
-  if(anObjRef && anObjRef->value()->isEdge()) {
+  if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
   }
   if(anEdge) {

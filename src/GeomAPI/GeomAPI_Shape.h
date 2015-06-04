@@ -17,6 +17,14 @@
  */
 class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
 {
+public:
+  /// Shape type enum
+  enum ShapeType {
+    COMPOUND, COMPSOLID, SOLID, SHELL,
+    FACE, WIRE, EDGE, VERTEX,
+    SHAPE
+  };
+
  public:
   /// Creation of empty (null) shape
   GeomAPI_Shape();
