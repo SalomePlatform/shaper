@@ -102,9 +102,6 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 //********************************************************************
 ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 {
-  activateSelection(false);
-  activateFilters(myWorkshop, false);
-
   delete myShapeValidator;
 }
 

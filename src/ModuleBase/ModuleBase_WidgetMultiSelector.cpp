@@ -100,9 +100,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 {
-  activateShapeSelection(false);
-  activateFilters(myWorkshop, false);
-
   delete myShapeValidator;
 }
 
