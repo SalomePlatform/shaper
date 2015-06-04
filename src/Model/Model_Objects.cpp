@@ -898,6 +898,20 @@ FeaturePtr Model_Objects::lastFeature()
   return FeaturePtr(); // no features at all
 }
 
+std::list<std::shared_ptr<ModelAPI_Feature> > Model_Objects::allFeatures()
+{
+  std::list<std::shared_ptr<ModelAPI_Feature> > aResult;
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
+      FeaturePtr aFeature = feature(aRefs->Value(a));
+      if (aFeature.get())
+        aResult.push_back(aFeature);
+    }
+  }
+  return aResult;
+}
+
 Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)
 {
   return TDF_LabelMapHasher::HashCode(theLab, theUpper);

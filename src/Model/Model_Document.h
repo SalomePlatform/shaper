@@ -168,6 +168,10 @@ class Model_Document : public ModelAPI_Document
   //! selection by name.
   ResultPtr findByName(const std::string theName);
 
+  ///! Returns all features of the document including the hidden features which are not in
+  ///! history. Not very fast method, for calling once, not in big cycles.
+  MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures();
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

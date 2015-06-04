@@ -125,6 +125,10 @@ public:
   virtual std::shared_ptr<ModelAPI_Feature> feature(
       const std::shared_ptr<ModelAPI_Result>& theResult) = 0;
 
+  ///! Returns all features of the document including the hidden features which are not in
+  ///! history. Not very fast method, for calling once, not in big cycles.
+  virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures() = 0;
+
 protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();
