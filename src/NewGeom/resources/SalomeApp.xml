@@ -27,7 +27,7 @@
     <!-- Major module parameters -->
     <parameter name="name" value="NewGeom"/>
     <parameter name="icon" value="newgeom.png"/>
-    <parameter name="version" value="1.2.0"/>
+    <parameter name="version" value="1.2.1"/>
     <parameter name="documentation" value="newgeom_help"/>
   </section>
   <section name="newgeom_help" >
