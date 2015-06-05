@@ -316,7 +316,8 @@ void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationMana
 }
 
 void SketcherPrs_SymbolPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                 const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner)
+                                                 const Quantity_NameOfColor theColor, 
+                                                 const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   thePM->Color(this, theColor);
 
@@ -375,7 +376,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
 void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
-  ClearSelected();
+  //ClearSelected();
   if ((aMode == 0) || (aMode == SketcherPrs_Tools::Sel_Constraint)) {
     for (int i = 1; i <= mySPoints.Length(); i++)
       aSelection->Add(mySPoints.Value(i));
@@ -443,8 +444,8 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
 
   // Update selection position only if there is no selected object
   // because it can corrupt selection of other objects
-  if ((GetContext()->NbCurrents() == 0) && (GetContext()->NbSelected() == 0))
-    GetContext()->RecomputeSelectionOnly(this);
+  //if ((GetContext()->NbCurrents() == 0) && (GetContext()->NbSelected() == 0))
+  //  GetContext()->RecomputeSelectionOnly(this);
 }
 
 
