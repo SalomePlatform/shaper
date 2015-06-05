@@ -68,8 +68,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     myTypeCombo->setVisible(false);
   }
 
-// Modification for specification of 1.3.0
-  std::string aLabelText = "";//theData->getProperty("label");
+  std::string aLabelText = theData->getProperty("label");
   QLabel* aListLabel = new QLabel(!aLabelText.empty() ? aLabelText.c_str()
                                                       : tr("Selected objects:"), this);
   aMainLay->addWidget(aListLabel, 1, 0);

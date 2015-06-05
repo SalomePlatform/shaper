@@ -75,6 +75,8 @@ public:
   /// \param theContext is an OpenGL context
   void Release (OpenGl_Context* theContext);
 
+  Standard_EXPORT virtual void BoundingBox (Bnd_Box& theBndBox) Standard_OVERRIDE;
+
   DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
 
 protected:

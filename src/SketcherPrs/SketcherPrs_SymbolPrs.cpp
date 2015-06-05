@@ -444,8 +444,11 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
 
   // Update selection position only if there is no selected object
   // because it can corrupt selection of other objects
-  //if ((GetContext()->NbCurrents() == 0) && (GetContext()->NbSelected() == 0))
-  //  GetContext()->RecomputeSelectionOnly(this);
+  if ((GetContext()->NbCurrents() == 0) && (GetContext()->NbSelected() == 0))
+  {
+    GetContext()->MainSelector()->RebuildSensitivesTree (this);
+    GetContext()->MainSelector()->RebuildObjectsTree (false);
+  }
 }
 
 
@@ -495,5 +498,18 @@ void SketcherPrs_SymbolPrs::drawListOfShapes(const std::shared_ptr<ModelAPI_Attr
     if (aShape.get() != NULL)
       drawShape(aShape, thePrs);
   }
+}
+
+void SketcherPrs_SymbolPrs::BoundingBox (Bnd_Box& theBndBox)
+{
+  Select3D_BndBox3d aTmpBox;
+  for (Select3D_EntitySequenceIter aPntIter (mySPoints); aPntIter.More(); aPntIter.Next())
+  {
+    const Handle(Select3D_SensitiveEntity)& anEnt = aPntIter.Value();
+    aTmpBox.Combine (anEnt->BoundingBox());
+  }
+
+  theBndBox.Update (aTmpBox.CornerMin().x(), aTmpBox.CornerMin().y(), aTmpBox.CornerMin().z(),
+                    aTmpBox.CornerMax().x(), aTmpBox.CornerMax().y(), aTmpBox.CornerMax().z());
 }
 
