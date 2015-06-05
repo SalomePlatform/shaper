@@ -45,3 +45,13 @@ void ConstructionPlugin_Point::execute()
   aConstr->setShape(GeomAlgoAPI_PointBuilder::point(aPnt));
   setResult(aConstr);
 }
+
+bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult, 
+                                                     AISObjectPtr thePrs,
+                               std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+{
+  bool isCustomized = theDefaultPrs.get() != NULL &&
+                      theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
+  return true;
+}

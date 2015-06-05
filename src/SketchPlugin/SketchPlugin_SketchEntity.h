@@ -99,7 +99,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       }
     }
     else if (aShapeType == 7) { // otherwise this is a vertex
-      //  thePrs->setPointMarker(6, 2.);
+      thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
     }
     return isCustomized;
   }
