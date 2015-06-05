@@ -421,6 +421,11 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
     if (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT)
       aLineColor = theWorkspace->HighlightColor;
 
+    if (toHilight)
+      aCtx->core11fwd->glDisable (GL_LIGHTING);
+    else
+      aCtx->core11fwd->glEnable (GL_LIGHTING);
+
     aCtx->SetColor4fv(*(const OpenGl_Vec4* )(aLineColor->rgb));
 
 
