@@ -1,11 +1,12 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <multi_selector id="base"
-    label="Select a sketch face"
+  <multi_selector id="main_objects"
+    label="Main objects"
     icon=":icons/cut_shape.png"
-    tooltip="Select a sketch face"
-    type_choice="Solids">
+    tooltip="Select a solid objects"
+    type_choice="Solids"
+    concealment="true">
   </multi_selector>
   <shape_selector id="axis_object"
                   icon=":icons/axis.png"
@@ -13,11 +14,13 @@
                   tooltip="Select an edge for axis"
                   shape_types="edge"
                   default="">
+    <validator id="GeomValidators_ShapeType" parameters="line"/>
   </shape_selector>
   <doublevalue
     id="angle"
     label="Angle"
-    min="0"
+    min="-360"
+    max="360"
     step="1.0"
     default="0"
     icon=":icons/radius.png"

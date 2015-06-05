@@ -18,7 +18,9 @@ GeomAlgoAPI_Rotation::GeomAlgoAPI_Rotation(std::shared_ptr<GeomAPI_Shape> theSou
                                            std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                            double                         theAngle)
 : myDone(false),
-  myShape(new GeomAPI_Shape())
+  myShape(new GeomAPI_Shape()),
+  myMap(new GeomAPI_DataMapOfShapeShape()),
+  myMkShape(new GeomAlgoAPI_MakeShape())
 {
   build(theSourceShape, theAxis, theAngle);
 }
@@ -48,7 +50,6 @@ void GeomAlgoAPI_Rotation::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
     return;
   }
 
-  setImpl(aBuilder);
   myDone = aBuilder->IsDone() == Standard_True;
 
   if(!myDone) {
@@ -60,11 +61,11 @@ void GeomAlgoAPI_Rotation::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
   for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More(); anExp.Next()) {
     std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
     aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
-    myMap.bind(aCurrentShape, aCurrentShape);
+    myMap->bind(aCurrentShape, aCurrentShape);
   }
 
   myShape->setImpl(new TopoDS_Shape(aResult));
-  myMkShape = new GeomAlgoAPI_MakeShape(aBuilder);
+  myMkShape->setImpl(aBuilder);
 }
 
 //=================================================================================================
@@ -91,21 +92,13 @@ const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Rotation::shape() const
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Rotation::mapOfShapes(GeomAPI_DataMapOfShapeShape& theMap) const
+std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Rotation::mapOfShapes() const
 {
-  theMap = myMap;
+  return myMap;
 }
 
 //=================================================================================================
-GeomAlgoAPI_MakeShape* GeomAlgoAPI_Rotation::makeShape() const
+std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Rotation::makeShape() const
 {
   return myMkShape;
-}
-
-//=================================================================================================
-GeomAlgoAPI_Rotation::~GeomAlgoAPI_Rotation()
-{
-  if (myImpl) {
-    myMap.clear();
-  }
 }

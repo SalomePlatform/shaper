@@ -2,9 +2,9 @@
 
 <source>
   <multi_selector id="main_objects"
-    label="Main object"
+    label="Main objects"
     icon=":icons/cut_shape.png"
-    tooltip="Select an object solid"
+    tooltip="Select a solid objects"
     type_choice="Solids"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
@@ -19,21 +19,6 @@
     <validator id="PartSet_DifferentObjects"/>
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
-  <!--<shape_selector id="main_object"
-    label="Main object"
-    icon=":icons/cut_shape.png"
-    tooltip="Select an object solid"
-    shape_types="solid"
-    concealment="true"
-  />
-  <shape_selector id="tool_object" 
-    label="Tool object" 
-    icon=":icons/cut_tool.png" 
-    tooltip="Select a tool solid"
-    shape_types="solid"
-    concealment="true" >
-	<validator id="PartSet_DifferentObjects"/>
-  </shape_selector>-->
   <choice id="bool_type" 
     label="Type" 
     tooltip="Type of boolean operation"

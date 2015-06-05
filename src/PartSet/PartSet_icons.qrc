@@ -53,5 +53,6 @@
      <file>icons/activate.png</file>
      <file>icons/deactivate.png</file>
      <file>icons/edit.png</file>
+     <file>icons/rotation.png</file>
  </qresource>
  </RCC>

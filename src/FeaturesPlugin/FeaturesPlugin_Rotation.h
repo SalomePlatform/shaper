@@ -11,42 +11,41 @@
 
 #include <ModelAPI_Feature.h>
 
+#include <GeomAlgoAPI_Rotation.h>
+
 /** \class FeaturesPlugin_Rotation
  *  \ingroup Plugins
- *  \brief Feature for creation of revolution from the planar face.
- *  Revolution creates the lateral faces based on edges of the base face and
- *  the start and end faces and/or start and end angles.
+ *  \brief Feature for rotation objects around the axis.
  */
 class FeaturesPlugin_Rotation : public ModelAPI_Feature
 {
  public:
-  /// Revolution kind.
+  /// Rotation kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_REVOLUTION_ID("Rotation");
-    return MY_REVOLUTION_ID;
+    static const std::string MY_ROTATION_ID("Rotation");
+    return MY_ROTATION_ID;
   }
 
-  /// Attribute name of references sketch entities list, it should contain a sketch result or
-  /// a pair a sketch result to sketch face.
-  inline static const std::string& LIST_ID()
+  /// Attribute name of referenced objects.
+  inline static const std::string& OBJECTS_LIST_ID()
   {
-    static const std::string MY_GROUP_LIST_ID("base");
-    return MY_GROUP_LIST_ID;
+    static const std::string MY_OBJECTS_LIST_ID("main_objects");
+    return MY_OBJECTS_LIST_ID;
   }
 
-  /// Attribute name of an object to which the extrusion grows.
+  /// Attribute name of an axis.
   inline static const std::string& AXIS_OBJECT_ID()
   {
-    static const std::string MY_TO_OBJECT_ID("axis_object");
-    return MY_TO_OBJECT_ID;
+    static const std::string MY_AXIS_OBJECT_ID("axis_object");
+    return MY_AXIS_OBJECT_ID;
   }
 
-  /// Attribute name of revolution angle.
+  /// Attribute name of angle.
   inline static const std::string& ANGLE_ID()
   {
-    static const std::string MY_TO_ANGLE_ID("angle");
-    return MY_TO_ANGLE_ID;
+    static const std::string MY_ANGLE_ID("angle");
+    return MY_ANGLE_ID;
   }
 
   /// \return the kind of a feature.
@@ -64,6 +63,11 @@ class FeaturesPlugin_Rotation : public ModelAPI_Feature
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_Rotation();
+
+private:
+  void LoadNamingDS(const GeomAlgoAPI_Rotation& theRotaionAlgo,
+                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif

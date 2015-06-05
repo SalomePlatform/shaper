@@ -43,13 +43,10 @@ public:
   GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape() const;
 
   /// \return map of sub-shapes of the result. To be used for History keeping.
-  GEOMALGOAPI_EXPORT void  mapOfShapes(GeomAPI_DataMapOfShapeShape& theMap) const;
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
 
   /// \return interface for for History processing.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape* makeShape() const;
-
-  /// Destructor.
-  GEOMALGOAPI_EXPORT virtual ~GeomAlgoAPI_Rotation();
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
 
 private:
   /// Builds resulting shape.
@@ -61,8 +58,8 @@ private:
   /// Fields.
   bool myDone;
   std::shared_ptr<GeomAPI_Shape> myShape;
-  GeomAPI_DataMapOfShapeShape    myMap;
-  GeomAlgoAPI_MakeShape*         myMkShape;
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
+  std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };
 
 #endif
