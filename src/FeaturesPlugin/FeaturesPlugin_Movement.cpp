@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        FeaturesPlugin_Rotation.cpp
-// Created:     12 May 2015
+// File:        FeaturesPlugin_Movement.cpp
+// Created:     8 June 2015
 // Author:      Dmitry Bobylev
 
-#include <FeaturesPlugin_Rotation.h>
+#include <FeaturesPlugin_Movement.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -15,29 +15,29 @@
 #include <GeomAPI_Lin.h>
 
 //=================================================================================================
-FeaturesPlugin_Rotation::FeaturesPlugin_Rotation()
+FeaturesPlugin_Movement::FeaturesPlugin_Movement()
 {
 }
 
 //=================================================================================================
-void FeaturesPlugin_Rotation::initAttributes()
+void FeaturesPlugin_Movement::initAttributes()
 {
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Rotation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+    FeaturesPlugin_Movement::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // revolution works with faces always
   aSelection->setSelectionType("SOLID");
 
-  data()->addAttribute(FeaturesPlugin_Rotation::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Rotation::ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(FeaturesPlugin_Movement::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Movement::DISTANCE_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
 //=================================================================================================
-void FeaturesPlugin_Rotation::execute()
+void FeaturesPlugin_Movement::execute()
 {
   // Getting objects.
   ListOfShape anObjects;
-  AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
+  AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Movement::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
     return;
   }
@@ -53,7 +53,7 @@ void FeaturesPlugin_Rotation::execute()
   //Getting axe.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Movement::AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
   }
@@ -61,27 +61,27 @@ void FeaturesPlugin_Rotation::execute()
     anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), anEdge->line()->direction()));
   }
 
-  // Getting angle.
-  double anAngle = real(FeaturesPlugin_Rotation::ANGLE_ID())->value();
+  // Getting distance.
+  double aDistance = real(FeaturesPlugin_Movement::DISTANCE_ID())->value();
 
-  // Rotating each object.
+  // Moving each object.
   int aResultIndex = 0;
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    GeomAlgoAPI_Rotation aRotationAlgo(aBaseShape, anAxis, anAngle);
+    GeomAlgoAPI_Movement aMovementAlgo(aBaseShape, anAxis, aDistance);
 
     // Checking that the algorithm worked properly.
-    if(!aRotationAlgo.isDone()) {
-      static const std::string aFeatureError = "Rotation algorithm failed";
+    if(!aMovementAlgo.isDone()) {
+      static const std::string aFeatureError = "Movement algorithm failed";
       setError(aFeatureError);
       break;
     }
-    if(aRotationAlgo.shape()->isNull()) {
+    if(aMovementAlgo.shape()->isNull()) {
       static const std::string aShapeError = "Resulting shape is Null";
       setError(aShapeError);
       break;
     }
-    if(!aRotationAlgo.isValid()) {
+    if(!aMovementAlgo.isValid()) {
       std::string aFeatureError = "Warning: resulting shape is not valid";
       setError(aFeatureError);
       break;
@@ -89,7 +89,7 @@ void FeaturesPlugin_Rotation::execute()
 
     // Setting result.
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    LoadNamingDS(aRotationAlgo, aResultBody, aBaseShape);
+    LoadNamingDS(aMovementAlgo, aResultBody, aBaseShape);
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
@@ -98,19 +98,19 @@ void FeaturesPlugin_Rotation::execute()
   removeResults(aResultIndex);
 }
 
-void FeaturesPlugin_Rotation::LoadNamingDS(const GeomAlgoAPI_Rotation& theRotaionAlgo,
+void FeaturesPlugin_Movement::LoadNamingDS(const GeomAlgoAPI_Movement& theMovementAlgo,
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
   // Store result.
-  theResultBody->storeModified(theBaseShape, theRotaionAlgo.shape());
+  theResultBody->storeModified(theBaseShape, theMovementAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRotaionAlgo.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theMovementAlgo.mapOfShapes();
 
-  int aRotatedTag = 1;
-  std::string aRotatedName = "Rotated";
-  theResultBody->loadAndOrientModifiedShapes(theRotaionAlgo.makeShape().get(),
+  int aMovedTag = 1;
+  std::string aMovedName = "Moved";
+  theResultBody->loadAndOrientModifiedShapes(theMovementAlgo.makeShape().get(),
                                              theBaseShape, GeomAPI_Shape::FACE,
-                                             aRotatedTag, aRotatedName, *aSubShapes.get());
+                                             aMovedTag, aMovedName, *aSubShapes.get());
 
 }

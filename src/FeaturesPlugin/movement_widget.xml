@@ -1,0 +1,27 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="main_objects"
+    label="Main objects"
+    icon=":icons/cut_shape.png"
+    tooltip="Select a solid objects"
+    type_choice="Solids"
+    concealment="true">
+  </multi_selector>
+  <shape_selector id="axis_object"
+                  icon=":icons/axis.png"
+                  label="Axis"
+                  tooltip="Select an edge for axis"
+                  shape_types="edge"
+                  default="">
+    <validator id="GeomValidators_ShapeType" parameters="line"/>
+  </shape_selector>
+  <doublevalue
+    id="distance"
+    label="Distance"
+    step="1.0"
+    default="0"
+    icon=":icons/radius.png"
+    tooltip="Distance">
+  </doublevalue>
+</source>

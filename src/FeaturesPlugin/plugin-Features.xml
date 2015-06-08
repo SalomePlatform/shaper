@@ -18,6 +18,9 @@
       <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon=":icons/rotation.png">
         <source path="rotation_widget.xml"/>
       </feature>
+      <feature id="Movement" title="Movement" tooltip="Perform movement of an objects along the axis to specified distance" icon=":icons/movement.png">
+        <source path="movement_widget.xml"/>
+      </feature>
       <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="" icon=":icons/extrusion_cut.png">
         <source path="extrusioncut_widget.xml"/>
       </feature>

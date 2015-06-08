@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_ExtrusionCut.h
     FeaturesPlugin_Revolution.h
     FeaturesPlugin_Rotation.h
+    FeaturesPlugin_Movement.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_Group.h
     FeaturesPlugin_Placement.h
@@ -21,6 +22,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_ExtrusionCut.cpp
     FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Rotation.cpp
+    FeaturesPlugin_Movement.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
     FeaturesPlugin_Placement.cpp
@@ -32,6 +34,7 @@ SET(XML_RESOURCES
   extrusioncut_widget.xml
   revolution_widget.xml
   rotation_widget.xml
+  movement_widget.xml
   boolean_widget.xml
   group_widget.xml
   placement_widget.xml

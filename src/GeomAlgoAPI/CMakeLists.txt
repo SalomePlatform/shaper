@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Revolution.h
     GeomAlgoAPI_Boolean.h
     GeomAlgoAPI_Rotation.h
+    GeomAlgoAPI_Movement.h
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_MakeShapeList.h
     GeomAlgoAPI_ShapeProps.h
@@ -43,6 +44,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Revolution.cpp
     GeomAlgoAPI_Boolean.cpp
     GeomAlgoAPI_Rotation.cpp
+    GeomAlgoAPI_Movement.cpp
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_MakeShapeList.cpp
     GeomAlgoAPI_ShapeProps.cpp
