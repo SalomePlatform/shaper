@@ -54,5 +54,6 @@
      <file>icons/deactivate.png</file>
      <file>icons/edit.png</file>
      <file>icons/rotation.png</file>
+     <file>icons/extrusion_cut.png</file>
  </qresource>
  </RCC>
