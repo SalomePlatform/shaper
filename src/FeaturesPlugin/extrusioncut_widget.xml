@@ -1,65 +1,57 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <groupbox title="Revolution">
+  <groupbox title="Extrusion">
     <shape_selector id="main_objects"
-    label="Select an object"
-    icon=":icons/sketch.png"
-    tooltip="Select a destination element"
-    shape_types="face edge vertex"
-    default="&lt;sketch&gt;"
-  />
-  <shape_selector id="axis_object"
-                    icon=":icons/axis.png"
-                    label="Axis"
-                    tooltip="Select an edge for axis"
-                    shape_types="edge"
-                    default="">
-    <validator id="GeomValidators_ShapeType" parameters="line"/>
-    </shape_selector>
+      label="Select a planar face"
+      icon=":icons/sketch.png"
+      tooltip="Select a destination element"
+      shape_types="face edge vertex"
+      default="&lt;sketch&gt;"
+    />
     <groupbox title="From">
-    <shape_selector id="from_object"
-                    icon=":icons/plane.png"
-                    label="Plane face"
-                    tooltip="Select a planar face"
-                    shape_types="face"
-                    default="&lt;sketch&gt;">
-      <validator id="GeomValidators_Face" parameters="plane"/>
-    </shape_selector>
-    <doublevalue
-      id="from_size"
-      label="Angle"
-      min="0"
-      step="1.0"
-      default="0"
-      icon=":icons/angle_down.png"
-      tooltip="Height">
-    </doublevalue>
-  </groupbox>
-  <groupbox title="To">
-    <shape_selector id="to_object"
-                    icon=":icons/plane_inverted.png"
-                    label="Plane face"
-                    tooltip="Select a planar face"
-                    shape_types="face"
-                    default="&lt;sketch&gt;">
-      <validator id="GeomValidators_Face" parameters="plane"/>
-    </shape_selector>
-    <doublevalue
-      id="to_size"
-      label="Angle"
-      min="0"
-      step="1.0"
-      default="0"
-      icon=":icons/angle_down.png"
-      tooltip="Height">
-    </doublevalue>
-  </groupbox>
+      <shape_selector id="from_object"
+                      icon=":icons/plane.png"
+                      label="Plane face"
+                      tooltip="Select a planar face"
+                      shape_types="face"
+                      default="&lt;sketch&gt;">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+      </shape_selector>
+      <doublevalue
+        id="from_size"
+        label="Size"
+        min="0"
+        step="1.0"
+        default="0"
+        icon=":icons/dimension_down.png"
+        tooltip="Height">
+      </doublevalue>
+    </groupbox>
+    <groupbox title="To">
+      <shape_selector id="to_object"
+                      icon=":icons/plane_inverted.png"
+                      label="Plane face"
+                      tooltip="Select a planar face"
+                      shape_types="face"
+                      default="&lt;sketch&gt;">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+      </shape_selector>
+      <doublevalue
+        id="to_size"
+        label="Size"
+        min="0"
+        step="1.0"
+        default="0"
+        icon=":icons/dimension_up.png"
+        tooltip="Height">
+      </doublevalue>
+    </groupbox>
   </groupbox>
   <multi_selector id="main_objects"
     label="Cut from:"
     icon=":icons/cut_shape.png"
-    tooltip="Select a sketch face"
+    tooltip="Objects to Cut"
     type_choice="Solids">
   </multi_selector>
 </source>
