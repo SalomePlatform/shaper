@@ -23,5 +23,5 @@ CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=${ROOT_DIR}/${INSTALL_DIR}
 CMAKE_ARGS="${CMAKE_ARGS} ${SRC_DIR}"
 
 cmake -G "Unix Makefiles" ${CMAKE_ARGS}
-make
+make -j4
 make install
