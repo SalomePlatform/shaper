@@ -64,7 +64,7 @@ cd %ROOT_DIR%
 
 @REM -------------------------
 @REM Some OCCT headers include FREETYPE headers
-@SET FREETYPE_DIR=%PDIR%\freetype-2.4.11
+@SET FREETYPE_ROOT_DIR=%PDIR%\freetype-2.4.11
 @REM -------------------------
 
 @SET PATH=%GEOM_ROOT_DIR%\lib\salome;%PATH%
