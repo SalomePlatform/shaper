@@ -132,7 +132,8 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
   if (theFeature->isAction() || !theFeature->data())
     return;
   foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
-    eachWidget->setFeature(theFeature);
+    if (!eachWidget->feature().get())
+      eachWidget->setFeature(theFeature);
     eachWidget->restoreValue();
   }
   // the repaint is used here to immediately react in GUI to the values change.

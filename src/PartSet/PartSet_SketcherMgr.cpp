@@ -719,7 +719,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (theOperation->isEditOperation()) {
     // If it is editing of sketch then it means that plane is already defined
     std::shared_ptr<GeomAPI_Pln> aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
-    myPlaneFilter->setPlane(aPln->impl<gp_Pln>());
+    if (aPln.get())
+      myPlaneFilter->setPlane(aPln->impl<gp_Pln>());
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   // all sketch objects should be activated in the sketch selection modes by edit operation start

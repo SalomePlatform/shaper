@@ -1206,15 +1206,15 @@ void XGUI_Workshop::hideObjectBrowser()
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureTriggered()
-{
-  QAction* aCmd = dynamic_cast<QAction*>(sender());
-  if (aCmd) {
-    QString aId = salomeConnector()->commandId(aCmd);
-    if (!aId.isNull())
-      myModule->launchOperation(aId);
-  }
-}
+//void XGUI_Workshop::onFeatureTriggered()
+//{
+//  QAction* aCmd = dynamic_cast<QAction*>(sender());
+//  if (aCmd) {
+//    QString aId = salomeConnector()->commandId(aCmd);
+//    if (!aId.isNull())
+//      myModule->launchOperation(aId);
+//  }
+//}
 
 //******************************************************
 void XGUI_Workshop::salomeViewerSelectionChanged()

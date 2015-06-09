@@ -135,6 +135,7 @@ void ModuleBase_IModule::onFeatureTriggered()
   if (aCmd->isCheckable() && !aCmd->isChecked())
     return;
   launchOperation(aCmd->data().toString());
+  emit operationLaunched();
 }
 
 

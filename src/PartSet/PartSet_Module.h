@@ -138,6 +138,10 @@ public:
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser);
 
+  /// Sends the operation for launching
+  /// \param theOperation the operation
+  virtual void sendOperation(ModuleBase_Operation* theOperation);
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
@@ -179,10 +183,6 @@ protected slots:
 
   /// Register properties of this module
   virtual void registerProperties();
-
-  /// Sends the operation for launching
-  /// \param theOperation the operation
-  virtual void sendOperation(ModuleBase_Operation* theOperation);
 
  private slots:
    /// Processing of vertex selected

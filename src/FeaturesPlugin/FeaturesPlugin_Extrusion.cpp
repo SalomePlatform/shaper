@@ -44,8 +44,6 @@ void FeaturesPlugin_Extrusion::initAttributes()
   data()->addAttribute(FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
 
-  //data()->addAttribute(FeaturesPlugin_Extrusion::AXIS_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
-
   data()->addAttribute(FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
 

@@ -2,13 +2,12 @@
 
 <source>
   <groupbox title="Extrusion">
-    <shape_selector id="main_objects"
-      label="Select a planar face"
+    <sketch_launcher id="sketch"
+      label="Sketch"
       icon=":icons/sketch.png"
-      tooltip="Select a destination element"
-      shape_types="face edge vertex"
-      default="&lt;sketch&gt;"
-    />
+      tooltip="Create or edit a sketch">
+      <validator id="GeomValidators_Face" parameters="plane"/>
+    </sketch_launcher>
     <groupbox title="From">
       <shape_selector id="from_object"
                       icon=":icons/plane.png"
@@ -18,12 +17,8 @@
                       default="&lt;sketch&gt;">
         <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
-      <doublevalue
-        id="from_size"
-        label="Size"
-        min="0"
-        step="1.0"
-        default="0"
+      <doublevalue id="from_size" label="Size"
+        min="0" step="1.0" default="0"
         icon=":icons/dimension_down.png"
         tooltip="Height">
       </doublevalue>
@@ -37,18 +32,14 @@
                       default="&lt;sketch&gt;">
         <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
-      <doublevalue
-        id="to_size"
-        label="Size"
-        min="0"
-        step="1.0"
-        default="0"
+      <doublevalue  id="to_size"
+        label="Size" min="0" step="1.0" default="0"
         icon=":icons/dimension_up.png"
         tooltip="Height">
       </doublevalue>
     </groupbox>
   </groupbox>
-  <multi_selector id="main_objects"
+  <multi_selector id="cut_objects"
     label="Cut from:"
     icon=":icons/cut_shape.png"
     tooltip="Objects to Cut"

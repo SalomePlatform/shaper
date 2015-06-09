@@ -137,6 +137,17 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser) {}
 
+  /// Creates a new operation
+  /// \param theCmdId the operation name
+  virtual ModuleBase_Operation* createOperation(const std::string& theCmdId);
+
+  /// Sends the operation for launching
+  /// \param theOperation the operation
+  virtual void sendOperation(ModuleBase_Operation* theOperation);
+
+signals:
+  void operationLaunched();
+
 public slots:
   /// Called on call of command corresponded to a feature
   virtual void onFeatureTriggered();
@@ -156,14 +167,6 @@ protected slots:
   virtual void onSelectionChanged() {}
 
  protected:
-  /// Sends the operation for launching
-  /// \param theOperation the operation
-  virtual void sendOperation(ModuleBase_Operation* theOperation);
-
-  /// Creates a new operation
-  /// \param theCmdId the operation name
-  virtual ModuleBase_Operation* createOperation(const std::string& theCmdId);
-
   /// Register validators for this module
   virtual void registerValidators() {}
 

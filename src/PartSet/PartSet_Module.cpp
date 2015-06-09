@@ -11,6 +11,7 @@
 #include "PartSet_WidgetMultiSelector.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_WidgetFileSelector.h"
+#include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
 
@@ -514,7 +515,9 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aWgt = new PartSet_WidgetEditor(theParent, workshop(), theWidgetApi, theParentId);
   } else if (theType == "export_file_selector") {
     aWgt = new PartSet_WidgetFileSelector(theParent, workshop(), theWidgetApi, theParentId);
-  } 
+  } else if (theType == "sketch_launcher") {
+    aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi, theParentId);
+  }
   return aWgt;
 }
 

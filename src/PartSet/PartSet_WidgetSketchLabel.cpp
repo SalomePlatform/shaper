@@ -354,10 +354,12 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
 {
   if (theShape.IsNull())
     return std::shared_ptr<GeomAPI_Dir>();
-
+  int aType = theShape.ShapeType();
   // get selected shape
   std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
   aGShape->setImpl(new TopoDS_Shape(theShape));
+
+
 
   // get plane parameters
   std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
