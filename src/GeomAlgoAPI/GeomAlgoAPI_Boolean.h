@@ -16,76 +16,73 @@
 
 #include <memory>
 
-/**\class GeomAlgoAPI_Boolean
- * \ingroup DataAlgo
- * \brief Allows to perform of boolean operations
+/** \class GeomAlgoAPI_Boolean
+ *  \ingroup DataAlgo
+ *  \brief Allows to perform of boolean operations
  */
 class GeomAlgoAPI_Boolean : public GeomAPI_Interface
 {
- public:
-  /**\brief Creates cut boolean operation
-   * \param[in] theShape the main shape
-   * \param[in] theTool  toole shape for boolean
-   * \return a solid as result of operation
-   */
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCut(
-	                                          std::shared_ptr<GeomAPI_Shape> theShape,
-                                            std::shared_ptr<GeomAPI_Shape> theTool);
-
-  /**\brief Creates fuse boolean operation
-   * \param[in] theShape the main shape
-   * \param[in] theTool  second shape
-   * \return a solid as result of operation
-   */
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeFuse(
-	                                          std::shared_ptr<GeomAPI_Shape> theShape,
-                                              std::shared_ptr<GeomAPI_Shape> theTool);
-
-  /**\brief Creates common boolean operation
-   * \param[in] theObject the main shape
-   * \param[in] theTool  second shape
-   * \return a solid as result of operation
-   */
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCommon(
-	                                          std::shared_ptr<GeomAPI_Shape> theObject,
-                                              std::shared_ptr<GeomAPI_Shape> theTool);
-
-   enum {
-	BOOL_CUT,
+public:
+  enum OperationType{
+    BOOL_CUT,
     BOOL_FUSE,
     BOOL_COMMON
   };
-  /// Constructor
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean (std::shared_ptr<GeomAPI_Shape> theObject,
-                                          std::shared_ptr<GeomAPI_Shape> theTool,
-										  int theType);
 
-  /// Returns True if algorithm succeed
+ public:
+  /** \brief Creates cut boolean operation.
+   *  \param[in] theObjects the main shape.
+   *  \param[in] theTools  toole shape for boolean.
+   *  \return a solid or compound of solids as result of operation.
+   */
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCut(const ListOfShape& theObjects,
+                                                                   const ListOfShape& theTools);
+
+  /** \brief Creates fuse boolean operation.
+   *  \param[in] theObjects the main shape.
+   *  \param[in] theTools  second shape.
+   *  \return a solid as result of operation.
+   */
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeFuse(const ListOfShape& theObjects,
+                                                                    const ListOfShape& theTools);
+
+  /** \brief Creates common boolean operation.
+   *  \param[in] theObjects the main shape.
+   *  \param[in] theTools  second shape.
+   *  \return a solid as result of operation.
+   */
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCommon(const ListOfShape& theObjects,
+                                                                      const ListOfShape& theTools);
+
+  /// Constructor.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
+                                         const ListOfShape& theTools,
+                                         const OperationType theOperationType);
+
+  /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT const bool isDone() const;
 
-  ///  Returns True if resulting shape is valid
+  /// \return true if resulting shape is valid.
   GEOMALGOAPI_EXPORT const bool isValid() const;
 
-  /// Returns result of the boolean algorithm which may be a Solid or a Face
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape () const; 
- 
-  /// Returns map of sub-shapes of the result. To be used for History keeping
-  GEOMALGOAPI_EXPORT void  mapOfShapes(std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theMap) const;
+  /// \return result of the boolean algorithm.
+  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape() const;
 
-  /// Return interface for for History processing
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAlgoAPI_MakeShape>& makeShape () const;
+  /// \return map of sub-shapes of the result. To be used for History keeping.
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
 
-  ///Destructor
-  GEOMALGOAPI_EXPORT  ~GeomAlgoAPI_Boolean();
+  /// \return interface for for History processing.
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
 
-  private:
-  /// builds resulting shape
-  void build(std::shared_ptr<GeomAPI_Shape> theObject,
-             std::shared_ptr<GeomAPI_Shape> theTool);
-  /// fields
-  double mySize;
+private:
+  /// Builds resulting shape.
+  void build(const ListOfShape& theObjects,
+             const ListOfShape& theTools,
+             const OperationType theOperationType);
+
+private:
+  /// Fields.
   bool myDone;
-  int  myOperation;
   std::shared_ptr<GeomAPI_Shape> myShape;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
   std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;

@@ -65,7 +65,7 @@ void FeaturesPlugin_Boolean::execute()
       ModelAPI_AttributeInteger>(data()->attribute(FeaturesPlugin_Boolean::TYPE_ID()));
   if (!aTypeAttr)
     return;
-  int aType = aTypeAttr->value();
+  GeomAlgoAPI_Boolean::OperationType aType = (GeomAlgoAPI_Boolean::OperationType)aTypeAttr->value();
 
   ListOfShape anObjects, aTools;
 
@@ -103,31 +103,39 @@ void FeaturesPlugin_Boolean::execute()
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aDataMapOfShapes;
 
   switch(aType) {
-    case GeomAlgoAPI_Boolean::BOOL_CUT: {
+    case GeomAlgoAPI_Boolean::BOOL_CUT:
+    case GeomAlgoAPI_Boolean::BOOL_COMMON:{
       // Cut each object with all tools
       for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
+        ListOfShape aListWithObject;
+        aListWithObject.push_back(anObject);
         aResShape = anObject;
-        ListOfShape aSingleObjectList; aSingleObjectList.push_back(anObject);
-        for(ListOfShape::iterator aToolsIt = aTools.begin(); aToolsIt != aTools.end(); aToolsIt++) {
-          std::shared_ptr<GeomAPI_Shape> aTool = *aToolsIt;
-          GeomAlgoAPI_Boolean* aBoolAlgo = new GeomAlgoAPI_Boolean(aResShape, aTool, aType);
-          if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
-            static const std::string aBoolAlgoError = "Boolean feature: algorithm failed";
-            setError(aBoolAlgoError);
-            return;
-          }
-          aListOfMakeShape.push_back(aBoolAlgo->makeShape());
-          aResShape = aBoolAlgo->shape();
-          aBoolAlgo->mapOfShapes(aDataMapOfShapes);
+        GeomAlgoAPI_Boolean aBoolAlgo(aListWithObject, aTools, aType);
+
+        // Checking that the algorithm worked properly.
+        if(!aBoolAlgo.isDone()) {
+          static const std::string aFeatureError = "Boolean algorithm failed";
+          setError(aFeatureError);
+          return;
+        }
+        if(aBoolAlgo.shape()->isNull()) {
+          static const std::string aShapeError = "Resulting shape is Null";
+          setError(aShapeError);
+          return;
+        }
+        if(!aBoolAlgo.isValid()) {
+          std::string aFeatureError = "Warning: resulting shape is not valid";
+          setError(aFeatureError);
+          return;
         }
 
-        if(GeomAlgoAPI_ShapeProps::volume(aResShape) > 10.e-5) {
+        if(GeomAlgoAPI_ShapeProps::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
           std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(
             new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
 
-          LoadNamingDS(aMakeShapeList, aResultBody, aResShape, aDataMapOfShapes, aSingleObjectList, aTools);
+          LoadNamingDS(aResultBody, anObject, aTools, aBoolAlgo);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -135,91 +143,39 @@ void FeaturesPlugin_Boolean::execute()
       break;
     }
     case GeomAlgoAPI_Boolean::BOOL_FUSE: {
-      // Fuse all objects.
-      std::shared_ptr<GeomAPI_Shape> aTempRes = anObjects.front();
-      for(ListOfShape::iterator anObjectsIt = ++anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
-        std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
-        GeomAlgoAPI_Boolean* aBoolAlgo = new GeomAlgoAPI_Boolean(aTempRes, anObject, aType);
-        if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
-          static const std::string aBoolAlgoError = "Boolean feature: algorithm failed";
-          setError(aBoolAlgoError);
-          return;
-        }
-        aListOfMakeShape.push_back(aBoolAlgo->makeShape());
-        aTempRes = aBoolAlgo->shape();
+      // Fuse all objects and all tools.
+      GeomAlgoAPI_Boolean aBoolAlgo(anObjects, aTools, aType);
+
+      // Checking that the algorithm worked properly.
+      if(!aBoolAlgo.isDone()) {
+        static const std::string aFeatureError = "Boolean algorithm failed";
+        setError(aFeatureError);
+        return;
+      }
+      if(aBoolAlgo.shape()->isNull()) {
+        static const std::string aShapeError = "Resulting shape is Null";
+        setError(aShapeError);
+        return;
+      }
+      if(!aBoolAlgo.isValid()) {
+        std::string aFeatureError = "Warning: resulting shape is not valid";
+        setError(aFeatureError);
+        return;
       }
 
-      // Fuse all tools with result of objects fuse.
-      for(ListOfShape::iterator aToolsIt = aTools.begin(); aToolsIt != aTools.end(); aToolsIt++) {
-        std::shared_ptr<GeomAPI_Shape> aTool = *aToolsIt;
-        GeomAlgoAPI_Boolean* aBoolAlgo = new GeomAlgoAPI_Boolean(aTempRes, aTool, aType);
-        if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
-          static const std::string aBoolAlgoError = "Boolean feature: algorithm failed";
-          setError(aBoolAlgoError);
-          return;
-        }
-        aListOfMakeShape.push_back(aBoolAlgo->makeShape());
-        aTempRes = aBoolAlgo->shape();
-        aBoolAlgo->mapOfShapes(aDataMapOfShapes);
-      }
-      aResShape = aTempRes;
-
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
       std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(
         new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
 
-      LoadNamingDS(aMakeShapeList, aResultBody, aResShape, aDataMapOfShapes, anObjects, aTools);
-      setResult(aResultBody);
+      LoadNamingDS(aResultBody, anObjects.front(), aTools, aBoolAlgo);
+      setResult(aResultBody, aResultIndex);
       aResultIndex++;
       break;
     }
-    case GeomAlgoAPI_Boolean::BOOL_COMMON: {
-      // Search common between object and tool and fuse them.
-      for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
-        std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
-        std::shared_ptr<GeomAPI_Shape> aTempRes;
-        ListOfShape aSingleObjectList; aSingleObjectList.push_back(anObject);
-        for(ListOfShape::iterator aToolsIt = aTools.begin(); aToolsIt != aTools.end(); aToolsIt++) {
-          std::shared_ptr<GeomAPI_Shape> aTool = *aToolsIt;
-          GeomAlgoAPI_Boolean* aBoolAlgo1 = new GeomAlgoAPI_Boolean(anObject, aTool, aType);
-          if(!aBoolAlgo1->isDone() || aBoolAlgo1->shape()->isNull() || !aBoolAlgo1->isValid()) {
-            static const std::string aBoolAlgoError = "Boolean feature: algorithm failed";
-            setError(aBoolAlgoError);
-            return;
-          }
-          aListOfMakeShape.push_back(aBoolAlgo1->makeShape());
-
-          if(!aTempRes) {
-            aTempRes = aBoolAlgo1->shape();
-            aBoolAlgo1->mapOfShapes(aDataMapOfShapes);
-          } else {
-            // Fuse common result with previous common results.
-            GeomAlgoAPI_Boolean* aBoolAlgo2 = new GeomAlgoAPI_Boolean(aTempRes,
-                                                                      aBoolAlgo1->shape(),
-                                                                      GeomAlgoAPI_Boolean::BOOL_FUSE);
-            if(!aBoolAlgo1->isDone() || aBoolAlgo1->shape()->isNull() || !aBoolAlgo1->isValid()) {
-              static const std::string aBoolAlgoError = "Boolean feature: algorithm failed";
-              setError(aBoolAlgoError);
-              return;
-            }
-            aListOfMakeShape.push_back(aBoolAlgo2->makeShape());
-            aTempRes = aBoolAlgo2->shape();
-            aBoolAlgo2->mapOfShapes(aDataMapOfShapes);
-          }
-        }
-        aResShape = aTempRes;
-
-        if(GeomAlgoAPI_ShapeProps::volume(aResShape) > 10.e-5) {
-          std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(
-            new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
-
-          LoadNamingDS(aMakeShapeList, aResultBody, aResShape, aDataMapOfShapes, aSingleObjectList, aTools);
-          setResult(aResultBody, aResultIndex);
-          aResultIndex++;
-        }
-      }
-      break;
+    default: {
+      std::string anOperationError = "Error: wrong type of operation";
+      setError(anOperationError);
+      return;
     }
   }
   // remove the rest results if there were produced in the previous pass
@@ -227,30 +183,28 @@ void FeaturesPlugin_Boolean::execute()
 }
 
 //=================================================================================================
-void FeaturesPlugin_Boolean::LoadNamingDS(std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
-                                          std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                          std::shared_ptr<GeomAPI_Shape> theResult,
-                                          std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMapOfShapes,
-                                          const ListOfShape& theObjects,
-                                          const ListOfShape& theTools)
+void FeaturesPlugin_Boolean::LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                          const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                                          const ListOfShape& theTools,
+                                          const GeomAlgoAPI_Boolean& theAlgo)
 {
   //load result
-  if(theObjects.front()->isEqual(theResult)) {
-    theResultBody->store(theObjects.front());
+  if(theBaseShape->isEqual(theAlgo.shape())) {
+    theResultBody->store(theAlgo.shape());
   } else {
-    theResultBody->storeModified(theObjects.front(), theResult);
+    theResultBody->storeModified(theBaseShape, theAlgo.shape());
 
     GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
 
     std::string aModName = "Modified";
-    for(ListOfShape::const_iterator anIter = theObjects.begin(); anIter != theObjects.end(); anIter++) {
-      theResultBody->loadAndOrientModifiedShapes(theMakeShapeList.get(), *anIter, FACE, _MODIFY_TAG, aModName, *theDataMapOfShapes.get());
-      theResultBody->loadDeletedShapes(theMakeShapeList.get(), *anIter, FACE, _DELETED_TAG);
-    }
+    theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, FACE,
+                                               _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
+    theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, FACE, _DELETED_TAG);
 
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      theResultBody->loadAndOrientModifiedShapes(theMakeShapeList.get(), *anIter, FACE, _MODIFY_TAG, aModName, *theDataMapOfShapes.get());
-      theResultBody->loadDeletedShapes(theMakeShapeList.get(), *anIter, FACE, _DELETED_TAG);
+      theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, FACE,
+                                                 _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
+      theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, FACE, _DELETED_TAG);
     }
   }
 }

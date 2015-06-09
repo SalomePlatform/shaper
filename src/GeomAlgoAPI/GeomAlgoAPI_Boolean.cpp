@@ -6,159 +6,151 @@
 
 #include "GeomAlgoAPI_Boolean.h"
 
-#include <BRepAlgoAPI_Cut.hxx>
+#include <BRepAlgoAPI_BooleanOperation.hxx>
 #include <BRepAlgoAPI_Common.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <TopExp_Explorer.hxx>
-#include <GeomAlgoAPI_DFLoader.h>
+#include <TopTools_ListOfShape.hxx>
 
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCut(
-  std::shared_ptr<GeomAPI_Shape> theShape,
-  std::shared_ptr<GeomAPI_Shape> theTool)
+//=================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCut(const ListOfShape& theObjects,
+                                                            const ListOfShape& theTools)
 {
-  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  const TopoDS_Shape& aTool = theTool->impl<TopoDS_Shape>();
-
-  BRepAlgoAPI_Cut aCut(aShape, aTool);
-  if (aCut.IsDone()) {
-    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
-    aResult->setImpl(new TopoDS_Shape(aCut.Shape()));
-    return aResult;
+  GeomAlgoAPI_Boolean aBoolAlgo(theObjects, theTools, BOOL_CUT);
+  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
+    return aBoolAlgo.shape();
   }
   return std::shared_ptr<GeomAPI_Shape>();
 }
 
-
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeFuse(
-  std::shared_ptr<GeomAPI_Shape> theShape,
-  std::shared_ptr<GeomAPI_Shape> theTool)
+//=================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeFuse(const ListOfShape& theObjects,
+                                                             const ListOfShape& theTools)
 {
-  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  const TopoDS_Shape& aTool = theTool->impl<TopoDS_Shape>();
-
-  BRepAlgoAPI_Fuse aFuse(aShape, aTool);
-  if (aFuse.IsDone()) {
-    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
-    aResult->setImpl(new TopoDS_Shape(aFuse.Shape()));
-    return aResult;
+  GeomAlgoAPI_Boolean aBoolAlgo(theObjects, theTools, BOOL_FUSE);
+  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
+    return aBoolAlgo.shape();
   }
   return std::shared_ptr<GeomAPI_Shape>();
 }
 
-
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(
-  std::shared_ptr<GeomAPI_Shape> theShape,
-  std::shared_ptr<GeomAPI_Shape> theTool)
+//=================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(const ListOfShape& theObjects,
+                                                               const ListOfShape& theTools)
 {
-  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  const TopoDS_Shape& aTool = theTool->impl<TopoDS_Shape>();
-
-  BRepAlgoAPI_Common aCommon(aShape, aTool);
-  if (aCommon.IsDone()) {
-    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
-    aResult->setImpl(new TopoDS_Shape(aCommon.Shape()));
-    return aResult;
+  GeomAlgoAPI_Boolean aBoolAlgo(theObjects, theTools, BOOL_COMMON);
+  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
+    return aBoolAlgo.shape();
   }
   return std::shared_ptr<GeomAPI_Shape>();
 }
 
-//============================================================================
-GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(std::shared_ptr<GeomAPI_Shape> theObject,
-                                         std::shared_ptr<GeomAPI_Shape> theTool,
-                                         int theType)
-: myOperation(theType), myDone(false), myShape(new GeomAPI_Shape()), myMap(new GeomAPI_DataMapOfShapeShape())
+//=================================================================================================
+GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
+                                         const ListOfShape& theTools,
+                                         const OperationType theOperationType)
+: myDone(false),
+  myShape(new GeomAPI_Shape()),
+  myMap(new GeomAPI_DataMapOfShapeShape()),
+  myMkShape(new GeomAlgoAPI_MakeShape())
 {
-  build(theObject, theTool);
+  build(theObjects, theTools, theOperationType);
 }
 
 
-//============================================================================
-void GeomAlgoAPI_Boolean::build(std::shared_ptr<GeomAPI_Shape> theObject,
-                                std::shared_ptr<GeomAPI_Shape> theTool)
+//=================================================================================================
+void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
+                                const ListOfShape& theTools,
+                                const OperationType theOperationType)
 {
-  const TopoDS_Shape& anObject = theObject->impl<TopoDS_Shape>();
-  const TopoDS_Shape& aTool    = theTool->impl<TopoDS_Shape>();
-  TopoDS_Shape aResult;
-  switch (myOperation) {
-  case BOOL_FUSE: 
-	{
-	  BRepAlgoAPI_Fuse* mkFuse = new BRepAlgoAPI_Fuse(anObject, aTool);
-      if (mkFuse && mkFuse->IsDone()) {
-		myDone = mkFuse->IsDone() == Standard_True;
-    myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape (mkFuse));
-		aResult = mkFuse->Shape();//GeomAlgoAPI_DFLoader::refineResult(aFuse->Shape());      
-	  }
-	  break;
-	}
-  case BOOL_CUT:
-	{
-      BRepAlgoAPI_Cut* mkCut = new BRepAlgoAPI_Cut(anObject, aTool);
-      if (mkCut && mkCut->IsDone()) {
-		myDone = mkCut->IsDone() == Standard_True;
-		myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape (mkCut));
-		aResult = mkCut->Shape();    
-	  }
-	  break;
-	}
-  case BOOL_COMMON:
-	{
-      BRepAlgoAPI_Common* mkCom = new BRepAlgoAPI_Common(anObject, aTool);
-      if (mkCom && mkCom->IsDone()) {
-		myDone = mkCom->IsDone() == Standard_True;
-		myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape (mkCom));
-		aResult = mkCom->Shape(); 
-	  }
-	  break;
-	}	
+  if(theObjects.empty() || theTools.empty()) {
+    return;
   }
-  if(myDone) {
-	if(aResult.ShapeType() == TopAbs_COMPOUND) 
-      aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
-	myShape->setImpl(new TopoDS_Shape(aResult));
-	std::shared_ptr<GeomAPI_Shape> aGeomResult(new GeomAPI_Shape());
-	aGeomResult->setImpl(new TopoDS_Shape(aResult)); 
 
-	// fill data map to keep correct orientation of sub-shapes 
-	for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-	  std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-      aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-	  myMap->bind(aCurrentShape, aCurrentShape);
-	}
-  }  
+  // Getting objects.
+  TopTools_ListOfShape anObjects;
+  for(ListOfShape::const_iterator anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++)
+  {
+    anObjects.Append((*anObjectsIt)->impl<TopoDS_Shape>());
+  }
+
+  // Getting tools.
+  TopTools_ListOfShape aTools;
+  for(ListOfShape::const_iterator aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++)
+  {
+    aTools.Append((*aToolsIt)->impl<TopoDS_Shape>());
+  }
+
+  // Creating boolean operation.
+  BRepAlgoAPI_BooleanOperation* anOperation;
+  switch (theOperationType) {
+    case BOOL_CUT: {
+      anOperation = new BRepAlgoAPI_Cut();
+      break;
+    }
+    case BOOL_FUSE: {
+      anOperation = new BRepAlgoAPI_Fuse();
+      break;
+    }
+    case BOOL_COMMON: {
+      anOperation = new BRepAlgoAPI_Common();
+      break;
+    }
+    default: {
+      return;
+    }
+  }
+  myMkShape->setImpl(anOperation);
+  anOperation->SetArguments(anObjects);
+  anOperation->SetTools(aTools);
+
+  // Building and getting result.
+  anOperation->Build();
+  myDone = anOperation->IsDone() == Standard_True;
+  if(!myDone) {
+    return;
+  }
+  TopoDS_Shape aResult = anOperation->Shape();
+
+  // fill data map to keep correct orientation of sub-shapes
+  for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
+    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+    aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
+    myMap->bind(aCurrentShape, aCurrentShape);
+  }
+  myShape->setImpl(new TopoDS_Shape(aResult));
+
 }
 
-
-//============================================================================
+//=================================================================================================
 const bool GeomAlgoAPI_Boolean::isDone() const
-{return myDone;}
+{
+  return myDone;
+}
 
-//============================================================================
+//=================================================================================================
 const bool GeomAlgoAPI_Boolean::isValid() const
 {
   BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
   return (aChecker.IsValid() == Standard_True);
 }
 
-//============================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Boolean::shape () const 
+//=================================================================================================
+const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Boolean::shape() const
 {
   return myShape;
 }
 
-//============================================================================
-void GeomAlgoAPI_Boolean::mapOfShapes(std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theMap) const
+//=================================================================================================
+std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Boolean::mapOfShapes() const
 {
-  theMap = myMap;
+  return myMap;
 }
 
-//============================================================================
-const std::shared_ptr<GeomAlgoAPI_MakeShape>& GeomAlgoAPI_Boolean::makeShape() const
+//=================================================================================================
+std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Boolean::makeShape() const
 {
   return myMkShape;
-}
-
-//============================================================================
-GeomAlgoAPI_Boolean::~GeomAlgoAPI_Boolean()
-{
 }
