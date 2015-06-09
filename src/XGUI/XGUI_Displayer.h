@@ -63,29 +63,29 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theObject an object to display
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  void display(ObjectPtr theObject, bool isUpdateViewer = true);
+  void display(ObjectPtr theObject, bool theUpdateViewer = true);
 
   /// Display the given AIS object. To hide this object use corresponde erase method
   /// \param theAIS AIOS object to display
-  /// \param isUpdate the parameter whether the viewer should be update immediatelly
-  void displayAIS(AISObjectPtr theAIS, bool isUpdate = true);
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void displayAIS(AISObjectPtr theAIS, bool theUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
    * \param theObject an object instance
-   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+   * \param theUpdateViewer the parameter whether the viewer should be update immediatelly
    */
-  void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
+  void redisplay(ObjectPtr theObject, bool theUpdateViewer = true);
 
   /**
    * Add presentations to current selection. It unhighlight and deselect the current selection.
    * The shape and result components are processed in the values. If the presentation shape is not
    * empty, select it, otherwise select the result.
    * \param theValues a list of presentation to be selected
-   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+   * \param theUpdateViewer the parameter whether the viewer should be update immediatelly
    */
-  void setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool isUpdateViewer = true);
+  void setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool theUpdateViewer = true);
 
 
   /// Unselect all objects
@@ -93,21 +93,21 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Erase the feature and a shape.
   /// \param theObject an object instance
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void erase(ObjectPtr theObject, const bool theUpdateViewer = true);
 
   /// Erase the given AIS object displayed by corresponded display method
   /// \param theAIS instance of AIS object
-  /// \param isUpdate the parameter whether the viewer should be update immediatelly
-  void eraseAIS(AISObjectPtr theAIS, const bool isUpdate = true);
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer = true);
 
   /// Erase all presentations
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void eraseAll(const bool isUpdateViewer = true);
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void eraseAll(const bool theUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void closeLocalContexts(const bool isUpdateViewer = true);
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void closeLocalContexts(const bool theUpdateViewer = true);
 
   /// \brief Add selection filter
   /// \param theFilter a filter instance
@@ -130,6 +130,15 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Updates the viewer
   void updateViewer() const;
 
+  /// Activate interactive context
+  /// \param theIO
+  /// \param theMode
+  void activateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode,
+                   const bool theUpdateViewer) const;
+
+  /// Activate interactive context. It is necessary to call ClearOutdatedSelection after deactivation
+  void deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode = -1) const;
+
   /// Searches the interactive object by feature
   /// \param theObject the object or presentable feature
   /// \return theIO an interactive object
@@ -147,7 +156,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Deactivates the given object (not allow selection)
   /// \param theObject object to deactivate
-  void deactivate(ObjectPtr theObject);
+  void deactivate(ObjectPtr theObject, const bool theUpdateViewer);
 
   /// Activates the given object (it can be selected)
   /// \param theObject object to activate
@@ -169,14 +178,12 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Activates in local context displayed outside of the context.
   /// \param theModes - modes on which it has to be activated (can be empty)
-  /// \param theObjList - list of objects which has to be activated. Can be empty. In this case all displayed objects will be used.
-  void activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList = QObjectPtrList());
-
-  /// Activates in local context displayed outside of the context.
-  void deactivateObjects();
+  /// \param theObjList - list of objects which has to be activated.
+  void activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
+                       const bool theUpdateViewer = true);
 
   /// Sets display mode for the given object if this object is displayed
-  void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate = true);
+  void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool theUpdateViewer = true);
 
   /// Returns current display mode for the given object.
   /// If object is not dis played then returns NoMode.
@@ -203,9 +210,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Set color on presentation of an object if it is displayed
   /// \param theObject an object 
   /// \param theColor a color which has to be set
-  /// \param toUpdate update viewer flag
+  /// \param theUpdateViewer update viewer flag
   /// \return previously defined color on the object
-  QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool toUpdate = true);
+  QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool theUpdateViewer = true);
 
 signals:
   /// Signal on object display
@@ -230,16 +237,20 @@ signals:
   /// \param theObject an object instance
   /// \param theAIS AIS presentation
   /// \param isShading flag to show in shading mode
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \return true if the object is succesfully displayed
   void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
-               bool isUpdateViewer = true);
+               bool theUpdateViewer = true);
 
 private:
   /// Activates the interactive object in the local context.
   /// \param theIO an interactive object
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes) const;
+  void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
+                const bool theUpdateViewer) const;
+
+  /// Find a trihedron in a list of displayed presentations and deactivate it.
+  void deactivateTrihedron() const;
 
   /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();

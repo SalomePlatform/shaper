@@ -86,8 +86,7 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
- public slots:
-
+protected:
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
 

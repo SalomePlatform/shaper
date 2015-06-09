@@ -46,6 +46,9 @@ Q_OBJECT
   /// Types has to be defined according to TopAbs_ShapeEnum
   virtual void activateSubShapesSelection(const QIntList& theTypes) = 0;
 
+  /// Activate objects in the module selection modes(opens local context)
+  virtual void activateModuleSelectionModes() = 0;
+
   /// Deactivate sub-shapes selection (closes local context)
   virtual void deactivateSubShapesSelection() = 0;
 

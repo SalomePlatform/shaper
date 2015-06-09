@@ -15,6 +15,7 @@
 #include <XGUI_Selection.h>
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_ActionsMgr.h>
+#include <XGUI_ModuleConnector.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -43,7 +44,6 @@
 #include <Config_PropManager.h>
 
 #include <QLabel>
-//#include <QTimer>
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QCheckBox>
@@ -63,10 +63,6 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myTooltip = QString::fromStdString(theData->getProperty("tooltip"));
   myLabel->setToolTip("");
   myLabel->setIndent(5);
-
-  //mySelectionTimer = new QTimer(this);
-  //connect(mySelectionTimer, SIGNAL(timeout()), SLOT(setSketchingMode()));
-  //mySelectionTimer->setSingleShot(true);
 
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -152,7 +148,10 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   //XGUI_Displayer* aDisp = myWorkshop->displayer();
   //aDisp->closeLocalContexts();
   emit planeSelected(plane());
-  //setSketchingMode();
+  // after the plane is selected in the sketch, the sketch selection should be activated
+  // it can not be performed in the sketch label widget because, we don't need to switch off
+  // the selection by any label deactivation, but need to switch it off by stop the sketch
+  activateSelection(true);
 
   // 8. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
@@ -234,8 +233,10 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
 void PartSet_WidgetSketchLabel::activateCustom()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
-  if (aPlane.get())
+  if (aPlane.get()) {
+    activateSelection(true);
     return;
+  }
 
   bool aBodyIsVisualized = false;
   XGUI_Displayer* aDisp = myWorkshop->displayer();
@@ -253,9 +254,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
     // We have to select a plane before any operation
     showPreviewPlanes();
   }
-  QIntList aModes;
-  aModes << TopAbs_FACE;
-  aDisp->activateObjects(aModes);
+  activateSelection(true);
 
   myLabel->setText(myText);
   myLabel->setToolTip(myTooltip);
@@ -268,12 +267,27 @@ void PartSet_WidgetSketchLabel::activateCustom()
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
-  // Do not set selection mode if the widget was activated for a small moment 
-  //mySelectionTimer->stop();
-  //XGUI_Displayer* aDisp = myWorkshop->displayer();
-  //aDisp->closeLocalContexts();
   erasePreviewPlanes();
+  activateSelection(false);
+
   activateFilters(myWorkshop->module()->workshop(), false);
+}
+
+void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
+{
+  if (toActivate) {
+    QIntList aModes;
+    std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+    if (aPlane.get()) {
+      myWorkshop->moduleConnector()->module()->activeSelectionModes(aModes);
+    }
+    else {
+      aModes << TopAbs_FACE;
+    }
+    myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
+  } else {
+    myWorkshop->moduleConnector()->deactivateSubShapesSelection();
+  }
 }
 
 void PartSet_WidgetSketchLabel::erasePreviewPlanes()
@@ -379,26 +393,6 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
   std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   return aDir;
 }
-
-
-/*void PartSet_WidgetSketchLabel::setSketchingMode()
-{
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
-  // Clear standard selection modes if they are defined
-  //aDisp->activateObjects(aModes);
-  //aDisp->openLocalContext();
-
-  // Get default selection modes
-  
-  QIntList aModes;
-  aModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
-  aModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
-  aModes.append(SketcherPrs_Tools::Sel_Constraint);
-  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
-  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
-
-  aDisp->activateObjects(aModes);
-}*/
 
 void PartSet_WidgetSketchLabel::showConstraints(bool theOn)
 {

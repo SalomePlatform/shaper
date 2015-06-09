@@ -596,10 +596,6 @@ void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent
 
 void PartSet_SketcherMgr::launchEditing()
 {
-  // there should be activate the sketch selection mode because the edit can happens
-  // by any sketch entity or consttant selected
-  activateObjectsInSketchMode(true);
-
   if (!myCurrentSelection.empty()) {
     FeaturePtr aFeature = myCurrentSelection.begin().key();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
@@ -608,7 +604,6 @@ void PartSet_SketcherMgr::launchEditing()
       myModule->editFeature(aSPFeature);
     }
   }
- 
 }
 
 
@@ -655,8 +650,8 @@ void PartSet_SketcherMgr::sketchSelectionModes(QIntList& theModes)
   theModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
   theModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
   theModes.append(SketcherPrs_Tools::Sel_Constraint);
-  theModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
-  theModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
+  theModes.append(TopAbs_VERTEX);
+  theModes.append(TopAbs_EDGE);
 }
 
 bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)
@@ -728,8 +723,9 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   // all sketch objects should be activated in the sketch selection modes by edit operation start
+  // in case of creation operation, there is an active widget, which activates own selection mode
   if (theOperation->isEditOperation())
-    activateObjectsInSketchMode(true);
+    aConnector->activateModuleSelectionModes();
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
@@ -739,10 +735,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("stopSketch: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
-  // the objects activated in the sketch should be deactivated in order to do not have the specific
-  // sketch selection mode activated on objects in neutral point of the application(no started operation)
-  activateObjectsInSketchMode(false);
-
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   DataPtr aData = myCurrentSketch->data();
@@ -760,8 +752,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
       if (!aObjData->isValid())
         aObj->setDisplayed(false);
     }
-    return; 
   }
+  else {
   // Hide all sketcher sub-Objects
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
@@ -783,6 +775,9 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   myCurrentSketch = CompositeFeaturePtr();
   myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
+  // restore the module selection modes, which were changed on startSketch
+  aConnector->activateModuleSelectionModes();
 }
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
@@ -799,10 +794,6 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
   myIsMouseOverViewProcessed = true;
-
-  // the sketch objects selection should be activated in order to select any sketch
-  // object
-  activateObjectsInSketchMode(true);
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -924,11 +915,6 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
   myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
-
-  // after the plane is selected in the sketch, the sketch selection should be activated
-  // it can not be performed in the sketch label widget because, we don't need to switch off
-  // the selection by any label deactivation, but need to switch it off by stop the sketch
-  activateObjectsInSketchMode(true);
 }
 
 void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
@@ -1121,18 +1107,6 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
   }
   if (isFlushRedisplay)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-}
-
-void PartSet_SketcherMgr::activateObjectsInSketchMode(const bool isActive)
-{
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-
-  QIntList aModes;
-  if (isActive)
-    sketchSelectionModes(aModes);
-  aDisplayer->activateObjects(aModes);
 }
 
 void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)

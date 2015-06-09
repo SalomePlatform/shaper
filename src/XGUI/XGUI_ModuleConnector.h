@@ -10,7 +10,6 @@
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_IWorkshop.h>
-#include <ModuleBase_ViewerFilters.h>
 
 class Handle_AIS_InteractiveContext;
 class XGUI_Workshop;
@@ -36,6 +35,9 @@ Q_OBJECT
   /// Activate sub-shapes selection (opens local context if it was not opened)
   /// Types has to be dined according to TopAbs_ShapeEnum
   virtual void activateSubShapesSelection(const QIntList& theTypes);
+
+  /// Activate objects in the module selection modes(opens local context)
+  virtual void activateModuleSelectionModes();
 
   /// Deactivate sub-shapes selection (closes local context)
   virtual void deactivateSubShapesSelection();
@@ -73,9 +75,6 @@ private:
 
   /// Reference to workshop
   XGUI_Workshop* myWorkshop;
-
-  /// A filter which provides selection within a current document or whole PartSet
-  Handle(ModuleBase_ShapeDocumentFilter) myDocumentShapeFilter;
 };
 
 #endif

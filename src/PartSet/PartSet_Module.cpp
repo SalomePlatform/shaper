@@ -298,6 +298,20 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
   return mySketchMgr->canDisplayObject(theObject);
 }
 
+bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
+{
+  bool aCanActivate = ModuleBase_IModule::canActivateSelection(theObject);
+
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
+       isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (isSketchOp || isNestedOp) {
+    // in active sketch operation it is possible to activate operation object in selection
+    // in the edit operation, e.g. points of the line can be moved when the line is edited
+    aCanActivate = aCanActivate || anOperation->isEditOperation();
+  }
+  return aCanActivate;
+}
 
 bool PartSet_Module::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
 {

@@ -314,11 +314,17 @@ signals:
   /// Process feature update message
   void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
 
-  ///Process feature created message
+  /// Process feature created message
   void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
 
   /// Process feature redisplay message
   void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
+
+  /// Deactivates the object, if it is active and the module returns that the activation
+  /// of selection for the object is not possible currently(the current operation uses it)
+  /// \param theObject an object
+  /// \param theUpdateViewer a boolean flag to update viewer immediately
+  void deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer);
 
   /// Display all results
   //void displayAllResults();

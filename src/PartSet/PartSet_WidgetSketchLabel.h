@@ -19,7 +19,6 @@
 #include <TopoDS_Shape.hxx>
 
 class QLabel;
-//class QTimer;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 class QCheckBox;
@@ -117,12 +116,13 @@ protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+ protected:
+  /// Activate or deactivate selection
+  void activateSelection(bool toActivate);
+
  private slots:
    /// Slot on change selection
   void onSelectionChanged();
-
-  /// Set sketch specific mode of selection
-  //void setSketchingMode();
 
  private:
    /// Create preview of planes for sketch plane selection
@@ -154,8 +154,6 @@ protected:
   AISObjectPtr myXZPlane;
   AISObjectPtr myXYPlane;
   bool myPreviewDisplayed;
-
-  //QTimer* mySelectionTimer;
 
   QCheckBox* myShowConstraints;
 };

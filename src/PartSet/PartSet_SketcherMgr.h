@@ -262,12 +262,6 @@ private:
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay,
                         const bool isFlushRedisplay = true);
-
-  /// Activates all visualized objects in the following selection modes: Dimension_Text/Line/Constraint,
-  /// Shape Edge and Vertex. If the active flag is empty, it deactivates all modes
-  /// \param isActive the flag whether the modes should be activated or deactivated
-  void activateObjectsInSketchMode(const bool isActive);
-
 private:
   /// Gives a debug information about internal flags myIsMouseOverWindow and myIsPropertyPanelValueChanged
   /// \return a string value

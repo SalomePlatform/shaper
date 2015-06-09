@@ -46,11 +46,16 @@
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
+#define DEBUG_CRASH_RESTORE_SELECTION
+
+//#define DEBUG_ACTIVATE_OBJECTS
+//#define DEBUG_DEACTIVATE
+//#define DEBUG_ACTIVATE_AIS
+//#define DEBUG_DEACTIVATE_AIS
+
 //#define DEBUG_DISPLAY
-//#define DEBUG_ACTIVATE
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
-//#define DEBUG_USE_CLEAR_OUTDATED_SELECTION
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -74,6 +79,15 @@ void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfIn
   }
 }
 
+QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QString(", "))
+{
+  QStringList anInfo;
+  QIntList::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  for (; anIt != aLast; anIt++) {
+    anInfo.append(QString::number(*anIt));
+  }
+  return anInfo.join(theSeparator);
+}
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop)
@@ -91,10 +105,10 @@ bool XGUI_Displayer::isVisible(ObjectPtr theObject) const
   return myResult2AISObjectMap.contains(theObject);
 }
 
-void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
+void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
 {
   if (isVisible(theObject)) {
-    redisplay(theObject, isUpdateViewer);
+    redisplay(theObject, theUpdateViewer);
   } else {
     AISObjectPtr anAIS;
 
@@ -115,7 +129,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
       }
     }
     if (anAIS)
-      display(theObject, anAIS, isShading, isUpdateViewer);
+      display(theObject, anAIS, isShading, theUpdateViewer);
   }
 }
 
@@ -139,7 +153,7 @@ bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
 }
 
 void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS, 
-                             bool isShading, bool isUpdateViewer)
+                             bool isShading, bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
@@ -158,13 +172,13 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     aContext->Display(anAISIO, aDispMode, 0, false, true, AIS_DS_Displayed); 
 
     emit objectDisplayed(theObject, theAIS);
-    activate(anAISIO, myActiveSelectionModes);
+    activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
  } 
-  if (isUpdateViewer)
+  if (theUpdateViewer)
     updateViewer();
 }
 
-void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
+void XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
 {
   if (!isVisible(theObject))
     return;
@@ -177,13 +191,13 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
       emit beforeObjectErase(theObject, anObject);
-      aContext->Remove(anAIS, isUpdateViewer);
+      aContext->Remove(anAIS, theUpdateViewer);
     }
   }
   myResult2AISObjectMap.remove(theObject);
 }
 
-void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
+void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
 {
   if (!isVisible(theObject))
     return;
@@ -195,7 +209,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
   if (aPrs) {
     AISObjectPtr aAIS_Obj = aPrs->getAISObject(aAISObj);
     if (!aAIS_Obj) {
-      erase(theObject, isUpdateViewer);
+      erase(theObject, theUpdateViewer);
       return;
     }
     if (aAIS_Obj != aAISObj) {
@@ -239,14 +253,21 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
       #ifdef DEBUG_FEATURE_REDISPLAY
         qDebug("  Redisplay happens");
       #endif
-      if (isUpdateViewer)
+      if (theUpdateViewer)
         updateViewer();
     }
   }
 }
 
-void XGUI_Displayer::deactivate(ObjectPtr theObject)
+void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
 {
+#ifdef DEBUG_DEACTIVATE
+  QString anInfoStr = ModuleBase_Tools::objectInfo(theObject);
+  qDebug(QString("deactivate: myActiveSelectionModes[%1]: %2, objects = ").
+    arg(myActiveSelectionModes.size()).arg(qIntListInfo(myActiveSelectionModes)).
+    arg(anInfoStr).
+    toStdString().c_str());
+#endif
   if (isVisible(theObject)) {
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
@@ -254,11 +275,12 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
 
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-    aContext->Deactivate(anAIS);
-#ifdef DEBUG_USE_CLEAR_OUTDATED_SELECTION
+
+    deactivateAIS(anAIS);
+    // the selection from the previous activation modes should be cleared manually (#26172)
     aContext->LocalContext()->ClearOutdatedSelection(anAIS, true);
-    updateViewer();
-#endif
+    if (theUpdateViewer)
+      updateViewer();
   }
 }
 
@@ -284,17 +306,35 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
   }
 }
 
-void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList)
+void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
+                                     const bool theUpdateViewer)
 {
-#ifdef DEBUG_ACTIVATE
-  qDebug(QString("activate all features: theModes: %2, myActiveSelectionModes: %3").
-    arg(theModes.size()).
-    arg(myActiveSelectionModes.size()).
+  // Convert shape types to selection types
+  QIntList aModes;
+  foreach(int aType, theModes) {
+    if (aType > TopAbs_SHAPE) 
+      aModes.append(aType);
+    else
+      aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
+  }
+
+#ifdef DEBUG_ACTIVATE_OBJECTS
+  QStringList anInfo;
+  QObjectPtrList::const_iterator anIt = theObjList.begin(), aLast = theObjList.end();
+  for (; anIt != aLast; ++anIt) {
+    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
+  }
+  QString anInfoStr = anInfo.join(", ");
+
+  qDebug(QString("activateObjects: aModes[%1] = %2, myActiveSelectionModes[%3] = %4, objects = %5").
+    arg(aModes.size()).arg(qIntListInfo(aModes)).
+    arg(myActiveSelectionModes.size()).arg(qIntListInfo(myActiveSelectionModes)).
+    arg(anInfoStr).
     toStdString().c_str());
 #endif
   // In order to avoid doblications of selection modes
   QIntList aNewModes;
-  foreach (int aMode, theModes) {
+  foreach (int aMode, aModes) {
     if (!aNewModes.contains(aMode))
       aNewModes.append(aMode);
   }
@@ -306,21 +346,13 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   if (!aContext->HasOpenedContext()) 
     return;
 
-  // we need to block the sort of the viewer selector during deactivate/activate because
-  // it takes a lot of time if there are a many objects are processed. It can be performed
-  // manualy after the activation is peformed
-  //Handle(StdSelect_ViewerSelector3d) aSelector = aContext->LocalContext()->MainSelector();
-  //bool isUpdateSortPossible = !aSelector.IsNull() && aSelector->IsUpdateSortPossible();
-  //if (!aSelector.IsNull())
-  //  aSelector->SetUpdateSortPossible(false);
-
   //aContext->UseDisplayedObjects();
   //myUseExternalObjects = true;
 
   Handle(AIS_InteractiveObject) anAISIO;
   AIS_ListOfInteractive aPrsList;
   if (theObjList.isEmpty())
-    ::displayedObjects(aContext, aPrsList);
+    return;
   else {
     foreach(ObjectPtr aObj, theObjList) {
       if (myResult2AISObjectMap.contains(aObj))
@@ -331,38 +363,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    activate(anAISIO, myActiveSelectionModes);
-  }
-  // restore the sorting flag and perform the sort of selection
-  //if (!aSelector.IsNull()) {
-  //  aSelector->SetUpdateSortPossible(isUpdateSortPossible);
-  //  aSelector->UpdateSort();
-  //}
-}
-
-
-void XGUI_Displayer::deactivateObjects()
-{
-  myActiveSelectionModes.clear();
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  // Open local context if there is no one
-  if (!aContext->HasOpenedContext()) 
-    return;
-
-  //aContext->NotUseDisplayedObjects();
-  AIS_ListOfInteractive aPrsList;
-  ::displayedObjects(aContext, aPrsList);
-
-  AIS_ListIteratorOfListOfInteractive aLIt;
-  //Handle(AIS_Trihedron) aTrihedron;
-  Handle(AIS_InteractiveObject) anAISIO;
-  for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
-    anAISIO = aLIt.Value();
-    aContext->Deactivate(anAISIO);
-#ifdef DEBUG_USE_CLEAR_OUTDATED_SELECTION
-    aContext->LocalContext()->ClearOutdatedSelection(anAISIO, true);
-    updateViewer();
-#endif
+    activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
   }
 }
 
@@ -381,8 +382,7 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   aContext->ActivatedModes(anAIS, aModes);
   return aModes.Extent() > 0;
 }
-
-void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool isUpdateViewer)
+void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
@@ -390,11 +390,13 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
   if (aContext->HasOpenedContext()) {
     aContext->UnhilightSelected();
     aContext->ClearSelected();
-    //if (aSelected.size() > 0) {
     foreach (ModuleBase_ViewerPrs aPrs, theValues) {
       const TopoDS_Shape& aShape = aPrs.shape();
       if (!aShape.IsNull()) {
+#ifdef DEBUG_CRASH_RESTORE_SELECTION
+#else
         aContext->AddOrRemoveSelected(aShape, false);
+#endif
       } else {
         ObjectPtr anObject = aPrs.object();
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
@@ -426,7 +428,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
       }
     }
   }
-  if (isUpdateViewer)
+  if (theUpdateViewer)
     updateViewer();
 }
 
@@ -439,7 +441,7 @@ void XGUI_Displayer::clearSelected()
   }
 }
 
-void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
+void XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
@@ -452,10 +454,25 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
         aContext->Remove(anIO, false);
       }
     }
-    if (isUpdateViewer)
+    if (theUpdateViewer)
       updateViewer();
   }
   myResult2AISObjectMap.clear();
+}
+
+void XGUI_Displayer::deactivateTrihedron() const
+{
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+
+  AIS_ListOfInteractive aList;
+  aContext->DisplayedObjects(aList, true);
+  AIS_ListIteratorOfListOfInteractive aIt;
+  for (aIt.Initialize(aList); aIt.More(); aIt.Next()) {
+    Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aIt.Value());
+    if (!aTrihedron.IsNull()) {
+      aContext->Deactivate(aTrihedron);
+    }
+  }
 }
 
 void XGUI_Displayer::openLocalContext()
@@ -480,6 +497,7 @@ void XGUI_Displayer::openLocalContext()
 
     //aContext->ClearCurrents();
     aContext->OpenLocalContext();
+    deactivateTrihedron();
     //aContext->NotUseDisplayedObjects();
 
     //myUseExternalObjects = false;
@@ -496,7 +514,7 @@ void XGUI_Displayer::openLocalContext()
   }
 }
 
-void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
+void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if ( (!aContext.IsNull()) && (aContext->HasOpenedContext()) ) {
@@ -530,7 +548,7 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
       aContext->AddFilter(aFilter);
     }
 
-    if (isUpdateViewer)
+    if (theUpdateViewer)
       updateViewer();
     //myUseExternalObjects = false;
 
@@ -585,11 +603,40 @@ void XGUI_Displayer::updateViewer() const
     aContext->UpdateCurrentViewer();
 }
 
+void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
+                                 const int theMode, const bool theUpdateViewer) const
+{
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  aContext->Activate(theIO, theMode, theUpdateViewer);
+
+#ifdef DEBUG_ACTIVATE_AIS
+  ObjectPtr anObject = getObject(theIO);
+  anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
+  qDebug(QString("activateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
+#endif
+}
+
+void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode) const
+{
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (theMode == -1)
+    aContext->Deactivate(theIO);
+  else
+    aContext->Deactivate(theIO, theMode);
+
+#ifdef DEBUG_DEACTIVATE_AIS
+  ObjectPtr anObject = getObject(theIO);
+  anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
+  qDebug(QString("deactivateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
+#endif
+}
+
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if ((!aContext.IsNull()) && (!aContext->HasOpenedContext())) {
     aContext->OpenLocalContext();
+    deactivateTrihedron();
   }
   return aContext;
 }
@@ -604,41 +651,39 @@ Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
   return myAndFilter;
 }
 
-void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
+void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
-    aContext->Display(anAISIO, isUpdate);
+    aContext->Display(anAISIO, theUpdateViewer);
     if (aContext->HasOpenedContext()) {
-      //if (myUseExternalObjects) {
-        if (myActiveSelectionModes.size() == 0)
-          aContext->Activate(anAISIO);
-        else {
-          foreach(int aMode, myActiveSelectionModes) {
-            aContext->Activate(anAISIO, aMode);
-          }
+      if (myActiveSelectionModes.size() == 0)
+        activateAIS(anAISIO, 0, theUpdateViewer);
+      else {
+        foreach(int aMode, myActiveSelectionModes) {
+          activateAIS(anAISIO, aMode, theUpdateViewer);
         }
-      //}
+      }
     }
   }
 }
 
-void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool isUpdate)
+void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
-    aContext->Remove(anAISIO, isUpdate);
+    aContext->Remove(anAISIO, theUpdateViewer);
   }
 }
 
 
-void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate)
+void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool theUpdateViewer)
 {
   if (theMode == NoMode)
     return;
@@ -654,7 +699,7 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
   aContext->SetDisplayMode(aAISIO, theMode, false);
   // Redisplay in order to update new mode because it could be not computed before
-  if (toUpdate)
+  if (theUpdateViewer)
     updateViewer();
 }
 
@@ -746,7 +791,8 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
 }
 
 void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
-                              const QIntList& theModes) const
+                              const QIntList& theModes,
+                              const bool theUpdateViewer) const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull() || theIO.IsNull())
@@ -765,32 +811,28 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   aContext->ActivatedModes(theIO, aTColModes);
   TColStd_ListIteratorOfListOfInteger itr( aTColModes );
   QIntList aModesActivatedForIO;
-  //bool isDeactivated = false;
+  bool isDeactivated = false;
   for (; itr.More(); itr.Next() ) {
     Standard_Integer aMode = itr.Value();
     if (!theModes.contains(aMode)) {
-#ifdef DEBUG_ACTIVATE
-      qDebug(QString("deactivate: %1").arg(aMode).toStdString().c_str());
-#endif
-      aContext->Deactivate(theIO, aMode);
-      //isDeactivated = true;
+      deactivateAIS(theIO, aMode);
+      isDeactivated = true;
     }
     else {
       aModesActivatedForIO.append(aMode);
-#ifdef DEBUG_ACTIVATE
-      qDebug(QString("  active: %1").arg(aMode).toStdString().c_str());
-#endif
     }
   }
-#ifdef DEBUG_USE_CLEAR_OUTDATED_SELECTION
   if (isDeactivated) {
+    // the selection from the previous activation modes should be cleared manually (#26172)
     aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
-    updateViewer();
+    if (theUpdateViewer)
+      updateViewer();
   }
-#endif
+
   // loading the interactive object allowing the decomposition
-  if (aTColModes.IsEmpty())
+  if (aTColModes.IsEmpty()) {
     aContext->Load(theIO, -1, true);
+  }
 
   // trihedron AIS check should be after the AIS loading.
   // If it is not loaded, it is steel selectable in the viewer.
@@ -800,18 +842,12 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
       // In order to clear active modes list
     if (theModes.size() == 0) {
       //aContext->Load(anAISIO, 0, true);
-      aContext->Activate(theIO);
-  #ifdef DEBUG_ACTIVATE
-      qDebug("activate in all modes");
-  #endif
+      activateAIS(theIO, 0, theUpdateViewer);
     } else {
       foreach(int aMode, theModes) {
         //aContext->Load(anAISIO, aMode, true);
         if (!aModesActivatedForIO.contains(aMode)) {
-          aContext->Activate(theIO, aMode);
-  #ifdef DEBUG_ACTIVATE
-          qDebug(QString("activate: %1").arg(aMode).toStdString().c_str());
-  #endif
+          activateAIS(theIO, aMode, theUpdateViewer);
         }
       }
     }
@@ -843,7 +879,7 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
 }
 
 
-QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject, const QColor& theColor, bool toUpdate)
+QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject, const QColor& theColor, bool theUpdateViewer)
 {
   if (!isVisible(theObject))
     return Qt::black;
@@ -852,7 +888,7 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject, const QColor& theColo
   int aR, aG, aB;
   anAISObj->getColor(aR, aG, aB);
   anAISObj->setColor(theColor.red(), theColor.green(), theColor.blue());
-  if (toUpdate)
+  if (theUpdateViewer)
     updateViewer();
   return QColor(aR, aG, aB);
 }

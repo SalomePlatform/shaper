@@ -101,6 +101,12 @@ public:
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Returns true if selection for the object can be activate.
+  /// For sketch operation allow the selection activation if the operation is edit, for other
+  /// operation uses the default result
+  /// \param theObject a model object
+  virtual bool canActivateSelection(const ObjectPtr& theObject) const;
+
   /// Add menu atems for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const;

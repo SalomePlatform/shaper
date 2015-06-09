@@ -470,32 +470,26 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
         // of redisplay is called. This modification is made in order to have the line is updated
         // by creation of a horizontal constraint on the line by preselection
         myDisplayer->redisplay(aObj, false);
-        //if (myOperationMgr->hasOperation()) {
-        //  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-        //  if (!aOperation->isEditOperation() &&
-        //      aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
-        if (!myModule->canActivateSelection(aObj)) {
-          if (myDisplayer->isActive(aObj))
-            myDisplayer->deactivate(aObj);
-        }
+        // Deactivate object of current operation from selection
+        deactivateActiveObject(aObj, false);
       } else { // display object if the current operation has it
         if (displayObject(aObj)) {
-          //ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          //if (aOperation && aOperation->hasObject(aObj)) {
-          if (!myModule->canActivateSelection(aObj)) {
-            #ifdef DEBUG_FEATURE_REDISPLAY
-              QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-              qDebug(QString("  display object = %1").arg(anObjInfo).toStdString().c_str());
-            #endif
-            // Deactivate object of current operation from selection
-            if (myDisplayer->isActive(aObj))
-              myDisplayer->deactivate(aObj);
-          }
+          // Deactivate object of current operation from selection
+          deactivateActiveObject(aObj, false);
         }
       }
     }
   }
   myDisplayer->updateViewer();
+}
+
+//******************************************************
+void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer)
+{
+  if (!myModule->canActivateSelection(theObject)) {
+    if (myDisplayer->isActive(theObject))
+      myDisplayer->deactivate(theObject, theUpdateViewer);
+  }
 }
 
 //******************************************************
@@ -553,6 +547,21 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   updateCommandStatus();
 
   myModule->operationStarted(theOperation);
+
+  // the objects of the current operation should be deactivated
+  QObjectPtrList anObjects;
+  FeaturePtr aFeature = theOperation->feature();
+  anObjects.append(aFeature);
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+    anObjects.append(*aIt);
+  }
+  QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
+  for (; anIt != aLast; anIt++)
+    deactivateActiveObject(*anIt, false);
+  if (anObjects.size() > 0)
+    myDisplayer->updateViewer();
 }
 
 //******************************************************
@@ -580,28 +589,25 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
-  // Activate objects created by current operation 
-  // in order to clean selection modes
-  // the deactivation should be pefromed in the same place, where the mode is activated,
-  // e.g. activation in the current widget activation, deactivation - in the widget's deactivation
-  //QIntList aModes;
-  //myDisplayer->activateObjects(aModes);
   myModule->operationStopped(theOperation);
 
-  // if the operation is nested, do not deactivate objects
-  //if (myOperationMgr->operationsCount() == 0) {
-    // Activate selection mode for all objects
+  // the deactivated objects of the current operation should be activated back.
+  // They were deactivated on operation start or an object redisplay
+  QObjectPtrList anObjects;
+  FeaturePtr aFeature = theOperation->feature();
+  if (myDisplayer->isVisible(aFeature) && !myDisplayer->isActive(aFeature))
+    anObjects.append(aFeature);
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+    ResultPtr anObject = *aIt;
+    if (myDisplayer->isVisible(anObject) && !myDisplayer->isActive(anObject)) {
+      anObjects.append(anObject);
+    }
+  }
   QIntList aModes;
-  // TODO: check on OCC_6.9.0
-  // the module current active modes should not be deactivated in order to save the objects selected
-  // the deactivate object in the mode of selection leads to the object is deselected in the viewer.
-  // But, in OCC_6.8.0 this deselection does not happened automatically. It is necessary to call
-  // ClearOutdatedSelection, but this method has an error in the realization, which should be fixed in
-  // the OCC_6.9.0 release. Moreother, it is possible that ClearOutdatedSelection will be called inside
-  // Deactivate method of AIS_InteractiveContext. In this case, we need not call it.
   module()->activeSelectionModes(aModes);
-  myDisplayer->activateObjects(aModes);
-  //}
+  myDisplayer->activateObjects(aModes, anObjects);
 }
 
 
