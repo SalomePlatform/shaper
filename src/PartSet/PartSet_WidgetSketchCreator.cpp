@@ -15,6 +15,7 @@
 #include <GeomAPI_Face.h>
 
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Operation.h>
@@ -24,6 +25,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QFormLayout>
+#include <QMessageBox>
 
 PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent, 
                                                          PartSet_Module* theModule,
@@ -89,13 +91,37 @@ void PartSet_WidgetSketchCreator::onStarted()
 {
   disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
 
-  CompositeFeaturePtr aCompFeature = 
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
+  // Check that model already has bodies
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Displayer* aDisp = aWorkshop->displayer();
+  QObjectPtrList aObjList = aDisp->displayedObjects();
+  bool aHasBody = false;
+  ResultBodyPtr aBody;
+  foreach(ObjectPtr aObj, aObjList) {
+    aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
+    if (aBody.get() != NULL) {
+      aHasBody = true;
+      break;
+    }
+  }
 
-  ModuleBase_Operation* anOperation = myModule->createOperation("Sketch");
-  anOperation->setFeature(aSketch);
-  myModule->sendOperation(anOperation);
+  if (aHasBody) {
+    // Launch Sketch operation
+    CompositeFeaturePtr aCompFeature = 
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
+
+    ModuleBase_Operation* anOperation = myModule->createOperation("Sketch");
+    anOperation->setFeature(aSketch);
+    myModule->sendOperation(anOperation);
+  } else {
+    // Break current operation
+    QMessageBox::warning(this, tr("Extrusion Cut"),
+        tr("There are no bodies found. Operation aborted."), QMessageBox::Ok);
+    ModuleBase_Operation* aOp = myModule->workshop()->currentOperation();
+    aOp->abort();
+  }
 }
 
 bool PartSet_WidgetSketchCreator::focusTo()

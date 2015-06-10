@@ -55,7 +55,7 @@ std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_ExtrusionCut::addFeature(std::s
     data()->reference(SKETCH_OBJECT_ID())->setValue(aNew);
   }
    // set as current also after it becomes sub to set correctly enabled for other sketch subs
-  //document()->setCurrentFeature(aNew, false);
+  document()->setCurrentFeature(aNew, false);
   return aNew;
 }
 
