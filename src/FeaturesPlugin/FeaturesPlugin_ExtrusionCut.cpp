@@ -171,13 +171,38 @@ void FeaturesPlugin_ExtrusionCut::execute()
 
     if(GeomAlgoAPI_ShapeProps::volume(aBoolAlgo.shape()) > 1.e-7) {
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      if(anObject->isEqual(aBoolAlgo.shape())) {
-        aResultBody->store(aBoolAlgo.shape());
-      } else {
-        aResultBody->storeModified(anObject, aBoolAlgo.shape());
-        setResult(aResultBody, aResultIndex);
-        aResultIndex++;
-      }
+      LoadNamingDS(aResultBody, anObject, anExtrusionList, aBoolAlgo);
+      setResult(aResultBody, aResultIndex);
+      aResultIndex++;
+    }
+  }
+}
+
+//=================================================================================================
+void FeaturesPlugin_ExtrusionCut::LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                               const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                                               const ListOfShape& theTools,
+                                               const GeomAlgoAPI_Boolean& theAlgo)
+{
+  //load result
+  if(theBaseShape->isEqual(theAlgo.shape())) {
+    theResultBody->store(theAlgo.shape());
+  } else {
+    theResultBody->storeModified(theBaseShape, theAlgo.shape());
+
+    GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
+
+    const int aModTag = 1;
+    const int aDeleteTag = 2;
+    const std::string aModName = "Modified";
+    theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE,
+                                               aModTag, aModName, *theAlgo.mapOfShapes().get());
+    theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE, aDeleteTag);
+
+    for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
+      theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, GeomAPI_Shape::FACE,
+                                                 aModTag, aModName, *theAlgo.mapOfShapes().get());
+      theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, GeomAPI_Shape::FACE, aDeleteTag);
     }
   }
 }

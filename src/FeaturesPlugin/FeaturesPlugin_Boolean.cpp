@@ -130,9 +130,6 @@ void FeaturesPlugin_Boolean::execute()
 
         if(GeomAlgoAPI_ShapeProps::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(
-            new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
-
           LoadNamingDS(aResultBody, anObject, aTools, aBoolAlgo);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;

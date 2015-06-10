@@ -11,6 +11,8 @@
 
 #include <ModelAPI_CompositeFeature.h>
 
+#include <GeomAlgoAPI_Boolean.h>
+
 /** \class FeaturesPlugin_ExtrusionCut
  *  \ingroup Plugins
  */
@@ -101,6 +103,12 @@ class FeaturesPlugin_ExtrusionCut : public ModelAPI_CompositeFeature
   /// This method to inform that sub-feature is removed and must be removed from the internal data
   /// structures of the owner (the remove from the document will be done outside just after)
   FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
+
+private:
+  void LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                    const ListOfShape& theTools,
+                    const GeomAlgoAPI_Boolean& theAlgo);
 };
 
 #endif

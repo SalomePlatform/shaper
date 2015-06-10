@@ -9,7 +9,7 @@
 
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
-#include <GeomAPI_Shape.h>
+
 #include <GeomAlgoAPI_Boolean.h>
 
 class GeomAlgoAPI_MakeShapeList;
