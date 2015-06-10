@@ -186,8 +186,8 @@ void ModuleBase_Operation::abort()
       new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
   Events_Loop::loop()->send(aMsg);
 
+  SessionPtr aMgr = ModelAPI_Session::get();
   if (myIsEditing) {
-    SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aDoc = aMgr->activeDocument();
     bool aIsOp = aMgr->isOperation();
     if (!aIsOp)
@@ -205,7 +205,7 @@ void ModuleBase_Operation::abort()
   // because abort removes the feature and activated filters should not check it
   propertyPanel()->cleanContent();
 
-  ModelAPI_Session::get()->abortOperation();
+  aMgr->abortOperation();
   emit stopped();
   // the viewer update should be unblocked in order to avoid the features blinking before they are
   // hidden

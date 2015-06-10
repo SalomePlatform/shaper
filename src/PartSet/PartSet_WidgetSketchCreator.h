@@ -29,36 +29,18 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetSketchCreator();
 
-  /// Set the given wrapped value to the current widget
-  /// This value should be processed in the widget according to the needs
-  /// The method is called by the current operation to process the operation preselection.
-  /// It is redefined to do nothing if the plane of the sketch has been already set.
-  /// \param theValues the wrapped selection values
-  /// \param thePosition an index in the list of values, the values should be get from the index
-  virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition);
-
   virtual bool restoreValue();
 
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// Set focus to the first control of the current widget. The focus policy of the control is checked.
+  /// If the widget has the NonFocus focus policy, it is skipped.
+  /// \return the state whether the widget can accept the focus
+  virtual bool focusTo();
+
 protected:
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
-  virtual void storeAttributeValue();
-
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
-  /// \param theValid a boolean flag, if restore happens for valid parameters
-  virtual void restoreAttributeValue(const bool theValid);
-
-  /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
-
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;

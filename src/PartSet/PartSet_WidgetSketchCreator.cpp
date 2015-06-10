@@ -14,6 +14,8 @@
 
 #include <GeomAPI_Face.h>
 
+#include <ModelAPI_Session.h>
+
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IPropertyPanel.h>
@@ -61,6 +63,12 @@ QList<QWidget*> PartSet_WidgetSketchCreator::getControls() const
 
 bool PartSet_WidgetSketchCreator::restoreValue()
 {
+  CompositeFeaturePtr aCompFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if (aCompFeature->numberOfSubs() > 0) {
+    FeaturePtr aSubFeature = aCompFeature->subFeature(0);
+    myTextLine->setText(QString::fromStdString(aSubFeature->data()->name()));
+  }
   return true;
 }
 
@@ -71,26 +79,18 @@ bool PartSet_WidgetSketchCreator::storeValueCustom() const
 
 void PartSet_WidgetSketchCreator::activateCustom()
 {
-  connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
-
-
-  //XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  //XGUI_Workshop* aWorkshop = aConnector->workshop();
-  //XGUI_Displayer* aDisp = aWorkshop->displayer();
-
-  //QIntList aModes;
-  //aModes << TopAbs_FACE;
-  //aDisp->activateObjects(aModes);
-  //  
-  //connect(aWorkshop->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  //activateFilters(myModule->workshop(), true);
+  CompositeFeaturePtr aCompFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if (aCompFeature->numberOfSubs() == 0)
+    connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
 }
 
 void PartSet_WidgetSketchCreator::onStarted()
 {
   disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
 
-  CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  CompositeFeaturePtr aCompFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
 
   ModuleBase_Operation* anOperation = myModule->createOperation("Sketch");
@@ -98,30 +98,19 @@ void PartSet_WidgetSketchCreator::onStarted()
   myModule->sendOperation(anOperation);
 }
 
-void PartSet_WidgetSketchCreator::storeAttributeValue()
+bool PartSet_WidgetSketchCreator::focusTo()
 {
-}
+  CompositeFeaturePtr aCompFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if (aCompFeature->numberOfSubs() == 0)
+    return ModuleBase_ModelWidget::focusTo(); 
 
-void PartSet_WidgetSketchCreator::restoreAttributeValue(const bool theValid)
-{
-}
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aIsOp = aMgr->isOperation();
+  // Open transaction if it was closed before
+  if (!aIsOp)
+    aMgr->startOperation();
 
-bool PartSet_WidgetSketchCreator::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face());
-  aFace->setImpl(new TopoDS_Shape(thePrs.shape()));
-  if (aFace->isPlanar())
-    return true;
-  //CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  //FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
-
-  //ModuleBase_Operation* anOperation = myModule->createOperation("Sketch");
-  //anOperation->setFeature(aSketch);
-  //myModule->sendOperation(anOperation);
+  restoreValue();
   return false;
-}
-
-bool PartSet_WidgetSketchCreator::setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
-{
-  return true;
 }

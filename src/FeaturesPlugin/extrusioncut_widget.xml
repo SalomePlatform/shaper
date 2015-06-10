@@ -5,8 +5,7 @@
     <sketch_launcher id="sketch"
       label="Sketch"
       icon=":icons/sketch.png"
-      tooltip="Create or edit a sketch">
-      <validator id="GeomValidators_Face" parameters="plane"/>
+      tooltip="Create or edit a sketch">/>
     </sketch_launcher>
     <groupbox title="From">
       <shape_selector id="from_object"
