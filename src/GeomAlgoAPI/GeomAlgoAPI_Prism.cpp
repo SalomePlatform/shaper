@@ -26,24 +26,24 @@
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const std::shared_ptr<GeomAPI_Shape>& theBasis,
                                      const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                                     double               theFromDistance,
+                                     double                                theFromSize,
                                      const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                                     double               theToDistance)
+                                     double                                theToSize)
 : myDone(false)
 {
-  build(theBasis, theFromShape, theFromDistance, theToShape, theToDistance);
+  build(theBasis, theFromShape, theFromSize, theToShape, theToSize);
 }
 
 //=================================================================================================
 void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
                               const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                              double                                theFromDistance,
+                              double                                theFromSize,
                               const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                              double                                theToDistance)
+                              double                                theToSize)
 {
   if(!theBasis ||
     (((!theFromShape && !theToShape) || (theFromShape && theToShape && theFromShape->isEqual(theToShape)))
-    && (theFromDistance == 0.0 && theToDistance == 0.0))) {
+    && (theFromSize == 0.0 && theToSize == 0.0))) {
     return;
   }
 
@@ -71,11 +71,11 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
   bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
 
   std::shared_ptr<GeomAPI_Pnt> aFromPnt(new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(
-                                                        aSign ? theFromDistance : -theFromDistance))));
+                                                        aSign ? theFromSize : -theFromSize))));
   aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
 
   std::shared_ptr<GeomAPI_Pnt> aToPnt(new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(
-                                                      aSign ? -theToDistance : theToDistance))));
+                                                      aSign ? -theToSize : theToSize))));
   aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
   TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());

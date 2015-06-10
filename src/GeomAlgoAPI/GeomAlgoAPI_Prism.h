@@ -25,15 +25,15 @@ public:
   /** \brief Creates extrusion for the given shape along the normal for this shape.
    *  \param[in] theBasis face or wire to be extruded.
    *  \param[in] theFromShape bottom bounding shape.
-   *  \param[in] theFromDistance offset for "from" plane.
+   *  \param[in] theFromSize offset for "from" plane.
    *  \param[in] theToShape top bounding shape.
-   *  \param[in] theToDistance offset for "to" plane.
+   *  \param[in] theToSize offset for "to" plane.
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(const std::shared_ptr<GeomAPI_Shape>& theBasis,
                                        const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                                       double               theFromDistance,
+                                       double                                theFromSize,
                                        const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                                       double               theToDistance);
+                                       double                                theToSize);
 
   /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT bool isDone() const;
@@ -63,9 +63,9 @@ private:
   /// Builds resulting shape.
   void build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
              const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-             double               theFromDistance,
+             double                                theFromSize,
              const std::shared_ptr<GeomAPI_Shape>& theToShape,
-             double               theToDistance);
+             double                                theToSize);
 
 private:
   /// Fields.

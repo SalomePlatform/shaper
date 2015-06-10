@@ -13,6 +13,12 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
+
+#include <GeomAlgoAPI_Boolean.h>
+#include <GeomAlgoAPI_Prism.h>
+#include <GeomAlgoAPI_ShapeProps.h>
 
 //=================================================================================================
 FeaturesPlugin_ExtrusionCut::FeaturesPlugin_ExtrusionCut()
@@ -31,8 +37,8 @@ void FeaturesPlugin_ExtrusionCut::initAttributes()
   data()->addAttribute(TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_ExtrusionCut::FROM_OBJECT_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_ExtrusionCut::TO_OBJECT_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FROM_OBJECT_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TO_OBJECT_ID());
 
   data()->addAttribute(CUTLIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
@@ -93,4 +99,85 @@ void FeaturesPlugin_ExtrusionCut::removeFeature(std::shared_ptr<ModelAPI_Feature
 //=================================================================================================
 void FeaturesPlugin_ExtrusionCut::execute()
 {
+  // Getting extrusion bounding planes.
+  std::shared_ptr<GeomAPI_Shape> aFromShape;
+  std::shared_ptr<GeomAPI_Shape> aToShape;
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FROM_OBJECT_ID());
+  if (anObjRef) {
+    aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+  }
+  anObjRef = selection(TO_OBJECT_ID());
+  if (anObjRef) {
+    aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+  }
+
+  // Getting extrusion sizes.
+  double aFromSize = real(FROM_SIZE_ID())->value();
+  double aToSize = real(TO_SIZE_ID())->value();
+
+  // Getting faces to extrude.
+  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+                                                     reference(SKETCH_OBJECT_ID())->value());
+  if(!aSketchFeature) {
+    return;
+  }
+  ResultPtr aSketchRes = aSketchFeature->results().front();
+  ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
+  if(!aConstruction.get()) {
+    return;
+  }
+  int aSketchFacesNum = aConstruction->facesNum();
+
+  // Extrude faces.
+  ListOfShape anExtrusionList;
+  for(int aFaceIndex = 0; aFaceIndex < aSketchFacesNum; aFaceIndex++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+    GeomAlgoAPI_Prism aPrismAlgo(aBaseShape, aFromShape, aFromSize, aToShape, aToSize);
+
+    // Checking that the algorithm worked properly.
+    if(!aPrismAlgo.isDone() || aPrismAlgo.shape()->isNull() || !aPrismAlgo.isValid()) {
+      return;
+    }
+    anExtrusionList.push_back(aPrismAlgo.shape());
+  }
+
+  // Getting objects to cut from.
+  ListOfShape aCutList;
+  AttributeSelectionListPtr anObjectsSelList = selectionList(CUTLIST_ID());
+  if (anObjectsSelList->size() == 0) {
+    return;
+  }
+  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
+    if(!anObject.get()) {
+      return;
+    }
+    aCutList.push_back(anObject);
+  }
+
+  // Cut from each objec result of extrusion.
+  int aResultIndex = 0;
+  for(ListOfShape::iterator aCutListIt = aCutList.begin(); aCutListIt != aCutList.end(); aCutListIt++) {
+    std::shared_ptr<GeomAPI_Shape> anObject = *aCutListIt;
+    ListOfShape aListWithObject;
+    aListWithObject.push_back(anObject);
+    GeomAlgoAPI_Boolean aBoolAlgo(aListWithObject, anExtrusionList, GeomAlgoAPI_Boolean::BOOL_CUT);
+
+    // Checking that the algorithm worked properly.
+    if(!aBoolAlgo.isDone() || aBoolAlgo.shape()->isNull() || !aBoolAlgo.isValid()) {
+      return;
+    }
+
+    if(GeomAlgoAPI_ShapeProps::volume(aBoolAlgo.shape()) > 1.e-7) {
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
+      if(anObject->isEqual(aBoolAlgo.shape())) {
+        aResultBody->store(aBoolAlgo.shape());
+      } else {
+        aResultBody->storeModified(anObject, aBoolAlgo.shape());
+        setResult(aResultBody, aResultIndex);
+        aResultIndex++;
+      }
+    }
+  }
 }

@@ -53,10 +53,10 @@ void FeaturesPlugin_Extrusion::execute()
 {
   AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Extrusion::LIST_ID());
 
+  // Getting bounding planes.
   std::shared_ptr<GeomAPI_Shape> aFromShape;
   std::shared_ptr<GeomAPI_Shape> aToShape;
 
-  // Getting bounding planes.
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
   if (anObjRef) {
     aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());

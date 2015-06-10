@@ -99,7 +99,6 @@ void FeaturesPlugin_Boolean::execute()
 
   int aResultIndex = 0;
   ListOfMakeShape aListOfMakeShape;
-  std::shared_ptr<GeomAPI_Shape> aResShape;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aDataMapOfShapes;
 
   switch(aType) {
@@ -110,7 +109,6 @@ void FeaturesPlugin_Boolean::execute()
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
         ListOfShape aListWithObject;
         aListWithObject.push_back(anObject);
-        aResShape = anObject;
         GeomAlgoAPI_Boolean aBoolAlgo(aListWithObject, aTools, aType);
 
         // Checking that the algorithm worked properly.
