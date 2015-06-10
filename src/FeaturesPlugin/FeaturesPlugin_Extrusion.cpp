@@ -17,8 +17,6 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeReference.h>
-#include <GeomAPI_Pln.h>
-#include <GeomAPI_XYZ.h>
 #include <GeomAlgoAPI_Extrusion.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_Prism.h>
@@ -107,37 +105,7 @@ void FeaturesPlugin_Extrusion::execute()
         aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
       }
 
-      // If bounding faces was not set creating them.
-      std::shared_ptr<GeomAPI_Face>  aBaseFace(new GeomAPI_Face(aBaseShape));
-      std::shared_ptr<GeomAPI_Pln>   aBasePln = aBaseFace->getPlane();
-      std::shared_ptr<GeomAPI_Dir>   aBaseDir = aBasePln->direction();
-      std::shared_ptr<GeomAPI_Pnt>   aBaseLoc = aBasePln->location();
-      std::shared_ptr<GeomAPI_Shape> aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
-
-      std::shared_ptr<GeomAPI_Shape> aBoundingFromShape = aFromShape ? aFromShape : aBasePlane;
-      std::shared_ptr<GeomAPI_Shape> aBoundingToShape   = aToShape   ? aToShape   : aBasePlane;
-
-      // Moving bounding faces according to "from" and "to" sizes.
-      std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aBoundingFromShape));
-      std::shared_ptr<GeomAPI_Pln>  aFromPln = aFromFace->getPlane();
-      std::shared_ptr<GeomAPI_Pnt>  aFromLoc = aFromPln->location();
-      std::shared_ptr<GeomAPI_Dir>  aFromDir = aFromPln->direction();
-
-      std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aBoundingToShape));
-      std::shared_ptr<GeomAPI_Pln>  aToPln = aToFace->getPlane();
-      std::shared_ptr<GeomAPI_Pnt>  aToLoc = aToPln->location();
-      std::shared_ptr<GeomAPI_Dir>  aToDir = aToPln->direction();
-
-      bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
-
-      std::shared_ptr<GeomAPI_Pnt> aFromPnt(new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(aSign ? aFromSize : -aFromSize))));
-      aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
-
-      std::shared_ptr<GeomAPI_Pnt> aToPnt(new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(aSign ? -aToSize : aToSize))));
-      aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
-
-      //GeomAlgoAPI_Extrusion aFeature(aFace, aFromSize);
-      GeomAlgoAPI_Prism aFeature(aBaseShape, aBoundingFromShape, aBoundingToShape);
+      GeomAlgoAPI_Prism aFeature(aBaseShape, aFromShape, aFromSize, aToShape, aToSize);
       if(!aFeature.isDone()) {
         static const std::string aFeatureError = "Extrusion algorithm failed";
         setError(aFeatureError);
@@ -181,12 +149,11 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
   else
     theResultBody->storeGenerated(theBasis, theFeature.shape());
 
-  GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
-  theFeature.mapOfShapes(*aSubShapes);
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theFeature.mapOfShapes();
 
   //Insert lateral face : Face from Edge
   std::string aLatName = "LateralFace";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes.get());
 
   //Insert bottom face
   std::string aBotName = "BottomFace";

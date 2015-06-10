@@ -35,7 +35,7 @@ class GEOMAPI_EXPORT GeomAPI_Interface
     return static_cast<T*>(myImpl);
   }
   /// Returns the reference object of the impl
-  template<class T> inline const T& impl()
+  template<class T> inline const T& impl() const
   {
     return *(static_cast<T*>(myImpl));
   }

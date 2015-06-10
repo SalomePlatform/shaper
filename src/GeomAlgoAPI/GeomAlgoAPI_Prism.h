@@ -23,55 +23,58 @@ class GeomAlgoAPI_Prism : public GeomAPI_Interface
 {
 public:
   /** \brief Creates extrusion for the given shape along the normal for this shape.
-   *  \param[in] theBasis face or wire to be extruded;
-   *  \param[in] theFromShape bottom bounding shape;
-   *  \param[in] theToShape top bounding shape;
+   *  \param[in] theBasis face or wire to be extruded.
+   *  \param[in] theFromShape bottom bounding shape.
+   *  \param[in] theFromDistance offset for "from" plane.
+   *  \param[in] theToShape top bounding shape.
+   *  \param[in] theToDistance offset for "to" plane.
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
-                                       std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                       std::shared_ptr<GeomAPI_Shape> theToShape);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(const std::shared_ptr<GeomAPI_Shape>& theBasis,
+                                       const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+                                       double               theFromDistance,
+                                       const std::shared_ptr<GeomAPI_Shape>& theToShape,
+                                       double               theToDistance);
 
   /// \return true if algorithm succeed.
-  GEOMALGOAPI_EXPORT const bool isDone() const;
+  GEOMALGOAPI_EXPORT bool isDone() const;
 
   /// \return true if resulting shape is valid.
-  GEOMALGOAPI_EXPORT const bool isValid() const;
+  GEOMALGOAPI_EXPORT bool isValid() const;
 
   /// \return true if resulting shape has volume.
-  GEOMALGOAPI_EXPORT const bool hasVolume() const;
+  GEOMALGOAPI_EXPORT bool hasVolume() const;
 
   /// \return result of the Prism algorithm.
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape() const;
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape() const;
 
   /// \returns the first shape.
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& firstShape();
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> firstShape() const;
 
   /// \return the last shape.
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& lastShape();
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> lastShape() const;
 
   /// \return map of sub-shapes of the result. To be used for History keeping.
-  GEOMALGOAPI_EXPORT void  mapOfShapes(GeomAPI_DataMapOfShapeShape& theMap) const;
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
 
   /// \return interface for History processing.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape* makeShape() const;
-
-  /// Destructor.
-  GEOMALGOAPI_EXPORT  ~GeomAlgoAPI_Prism();
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
 
 private:
   /// Builds resulting shape.
-  void build(const std::shared_ptr<GeomAPI_Shape>& theBasis);
+  void build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
+             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+             double               theFromDistance,
+             const std::shared_ptr<GeomAPI_Shape>& theToShape,
+             double               theToDistance);
 
 private:
   /// Fields.
-  std::shared_ptr<GeomAPI_Shape> myFromShape;
-  std::shared_ptr<GeomAPI_Shape> myToShape;
   bool myDone;
   std::shared_ptr<GeomAPI_Shape> myShape;
   std::shared_ptr<GeomAPI_Shape> myFirst;
   std::shared_ptr<GeomAPI_Shape> myLast;
-  GeomAPI_DataMapOfShapeShape myMap;
-  GeomAlgoAPI_MakeShape* myMkShape;
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
+  std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };
 
 #endif

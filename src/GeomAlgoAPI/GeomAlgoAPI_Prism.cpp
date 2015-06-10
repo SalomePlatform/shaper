@@ -6,7 +6,12 @@
 
 #include <GeomAlgoAPI_Prism.h>
 
+#include <GeomAPI_Face.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_XYZ.h>
 #include <GeomAlgoAPI_DFLoader.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <BRep_Tool.hxx>
 #include <BRepCheck_Analyzer.hxx>
@@ -19,25 +24,59 @@
 #include <TopoDS.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
-                                     std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                     std::shared_ptr<GeomAPI_Shape> theToShape)
-: myFromShape(theFromShape),
-  myToShape(theToShape),
-  myDone(false),
-  myShape(new GeomAPI_Shape()),
-  myFirst(new GeomAPI_Shape()),myLast(new GeomAPI_Shape())
+GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const std::shared_ptr<GeomAPI_Shape>& theBasis,
+                                     const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+                                     double               theFromDistance,
+                                     const std::shared_ptr<GeomAPI_Shape>& theToShape,
+                                     double               theToDistance)
+: myDone(false)
 {
-  build(theBasis);
+  build(theBasis, theFromShape, theFromDistance, theToShape, theToDistance);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
+void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
+                              const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+                              double                                theFromDistance,
+                              const std::shared_ptr<GeomAPI_Shape>& theToShape,
+                              double                                theToDistance)
 {
-  if(!theBasis || !myFromShape || !myToShape ||
-    (myFromShape && myToShape && myFromShape->isEqual(myToShape))) {
+  if(!theBasis ||
+    (((!theFromShape && !theToShape) || (theFromShape && theToShape && theFromShape->isEqual(theToShape)))
+    && (theFromDistance == 0.0 && theToDistance == 0.0))) {
     return;
   }
+
+  // If bounding faces was not set creating them.
+  std::shared_ptr<GeomAPI_Face>  aBaseFace(new GeomAPI_Face(theBasis));
+  std::shared_ptr<GeomAPI_Pln>   aBasePln = aBaseFace->getPlane();
+  std::shared_ptr<GeomAPI_Dir>   aBaseDir = aBasePln->direction();
+  std::shared_ptr<GeomAPI_Pnt>   aBaseLoc = aBasePln->location();
+  std::shared_ptr<GeomAPI_Shape> aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
+
+  std::shared_ptr<GeomAPI_Shape> aBoundingFromShape = theFromShape ? theFromShape : aBasePlane;
+  std::shared_ptr<GeomAPI_Shape> aBoundingToShape   = theToShape   ? theToShape   : aBasePlane;
+
+  // Moving bounding faces according to "from" and "to" sizes.
+  std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aBoundingFromShape));
+  std::shared_ptr<GeomAPI_Pln>  aFromPln = aFromFace->getPlane();
+  std::shared_ptr<GeomAPI_Pnt>  aFromLoc = aFromPln->location();
+  std::shared_ptr<GeomAPI_Dir>  aFromDir = aFromPln->direction();
+
+  std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aBoundingToShape));
+  std::shared_ptr<GeomAPI_Pln>  aToPln = aToFace->getPlane();
+  std::shared_ptr<GeomAPI_Pnt>  aToLoc = aToPln->location();
+  std::shared_ptr<GeomAPI_Dir>  aToDir = aToPln->direction();
+
+  bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
+
+  std::shared_ptr<GeomAPI_Pnt> aFromPnt(new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(
+                                                        aSign ? theFromDistance : -theFromDistance))));
+  aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
+
+  std::shared_ptr<GeomAPI_Pnt> aToPnt(new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(
+                                                      aSign ? -theToDistance : theToDistance))));
+  aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
   TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());
   Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aBasis));
@@ -49,9 +88,8 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
   BRepFeat_MakePrism* aBuilder = new BRepFeat_MakePrism(aBasis, aBasis, aBasis, aNormal, 2, Standard_True);
 
   if(aBuilder) {
-    setImpl(aBuilder);
-    TopoDS_Shape aFromShape = myFromShape->impl<TopoDS_Shape>();
-    TopoDS_Shape aToShape   = myToShape->impl<TopoDS_Shape>();
+    const TopoDS_Shape& aFromShape = aBoundingFromShape->impl<TopoDS_Shape>();
+    const TopoDS_Shape& aToShape   = aBoundingToShape->impl<TopoDS_Shape>();
     aBuilder->Perform(aFromShape, aToShape);
     myDone = aBuilder->IsDone() == Standard_True;
     if(myDone){
@@ -64,34 +102,39 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
         aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
       }
       // fill data map to keep correct orientation of sub-shapes
+      myMap = std::make_shared<GeomAPI_DataMapOfShapeShape>();
       for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
         std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
         aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-        myMap.bind(aCurrentShape, aCurrentShape);
+        myMap->bind(aCurrentShape, aCurrentShape);
       }
+      myShape = std::make_shared<GeomAPI_Shape>();
       myShape->setImpl(new TopoDS_Shape(aResult));
+      myFirst = std::make_shared<GeomAPI_Shape>();
       myFirst->setImpl(new TopoDS_Shape(aBuilder->Modified(aFromShape).First()));
+      myLast = std::make_shared<GeomAPI_Shape>();
       myLast->setImpl(new TopoDS_Shape(aBuilder->Modified(aToShape).First()));
-      myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
+      myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape());
+      myMkShape->setImpl(aBuilder);
     }
   }
 }
 
 //=================================================================================================
-const bool GeomAlgoAPI_Prism::isDone() const
+bool GeomAlgoAPI_Prism::isDone() const
 {
   return myDone;
 }
 
 //=================================================================================================
-const bool GeomAlgoAPI_Prism::isValid() const
+bool GeomAlgoAPI_Prism::isValid() const
 {
   BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
   return (aChecker.IsValid() == Standard_True);
 }
 
 //=================================================================================================
-const bool GeomAlgoAPI_Prism::hasVolume() const
+bool GeomAlgoAPI_Prism::hasVolume() const
 {
   bool hasVolume(false);
   if(isValid()) {
@@ -105,39 +148,31 @@ const bool GeomAlgoAPI_Prism::hasVolume() const
 }
 
 //=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Prism::shape () const
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Prism::shape() const
 {
   return myShape;
 }
 
 //=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Prism::firstShape()
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Prism::firstShape() const
 {
   return myFirst;
 }
 
 //=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Prism::lastShape()
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Prism::lastShape() const
 {
   return myLast;
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Prism::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const
+std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Prism::mapOfShapes() const
 {
-  theMap = myMap;
+  return myMap;
 }
 
 //=================================================================================================
-GeomAlgoAPI_MakeShape* GeomAlgoAPI_Prism::makeShape() const
+std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Prism::makeShape() const
 {
   return myMkShape;
-}
-
-//=================================================================================================
-GeomAlgoAPI_Prism::~GeomAlgoAPI_Prism()
-{
-  if (myImpl) {
-    myMap.clear();
-  }
 }
