@@ -24,6 +24,9 @@
       <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="" icon=":icons/extrusion_cut.png">
         <source path="extrusioncut_widget.xml"/>
       </feature>
+      <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip="" icon=":icons/extrusion_fuse.png">
+        <source path="extrusionfuse_widget.xml"/>
+      </feature>
     </group>
     <group id="Collections">
       <feature id="Group"

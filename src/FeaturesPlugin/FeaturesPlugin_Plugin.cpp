@@ -5,6 +5,7 @@
 #include <FeaturesPlugin_Boolean.h>
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
+#include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Group.h>
 #include <FeaturesPlugin_Movement.h>
 #include <FeaturesPlugin_Placement.h>
@@ -46,6 +47,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Placement);
   } else if (theFeatureID == FeaturesPlugin_ExtrusionCut::ID()) {
     return FeaturePtr(new FeaturesPlugin_ExtrusionCut);
+  } else if (theFeatureID == FeaturesPlugin_ExtrusionFuse::ID()) {
+    return FeaturePtr(new FeaturesPlugin_ExtrusionFuse);
   }
   // feature of such kind is not found
   return FeaturePtr();

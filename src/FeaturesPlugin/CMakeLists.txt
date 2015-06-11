@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_CompositeBoolean.h
     FeaturesPlugin_ExtrusionBoolean.h
     FeaturesPlugin_ExtrusionCut.h
+    FeaturesPlugin_ExtrusionFuse.h
 )
 
 SET(PROJECT_SOURCES
@@ -35,6 +36,7 @@ SET(XML_RESOURCES
   plugin-Features.xml
   extrusion_widget.xml
   extrusioncut_widget.xml
+  extrusionfuse_widget.xml
   revolution_widget.xml
   rotation_widget.xml
   movement_widget.xml
