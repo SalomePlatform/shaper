@@ -10,7 +10,7 @@
 #include <FeaturesPlugin_Movement.h>
 #include <FeaturesPlugin_Placement.h>
 #include <FeaturesPlugin_Revolution.h>
-#include <FeaturesPlugin_RevolutionCut.H>
+#include <FeaturesPlugin_RevolutionCut.h>
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
 
