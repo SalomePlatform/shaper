@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:        ModuleBase_ISelection.h
 // Created:     2 June 2014
@@ -10,6 +10,9 @@
 #include "ModuleBase.h"
 #include "ModuleBase_Definitions.h"
 #include "ModuleBase_ViewerPrs.h"
+
+#include <ModelAPI_Result.h>
+#include <GeomAPI_Shape.h>
 
 #include <QModelIndexList>
 #include <AIS_ListOfInteractive.hxx>
@@ -69,6 +72,18 @@ class ModuleBase_ISelection
   //! \param theOwners list of objects
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
     std::list<ObjectPtr>& theOwners) const = 0;
+
+  //! Return the shape from the viewer presentation.
+  //! If the shape is equal to the shape of selected object, it returns an empty shape
+  //! \param thePrs a selected object
+  //! \return a shape
+  MODULEBASE_EXPORT ResultPtr getResult(const ModuleBase_ViewerPrs& thePrs);
+
+  //! Return the shape from the viewer presentation.
+  //! If the shape is equal to the shape of selected object, it returns an empty shape
+  //! \param thePrs a selected object
+  //! \return a shape
+  MODULEBASE_EXPORT GeomShapePtr getShape(const ModuleBase_ViewerPrs& thePrs);
 
   //! Wraps the object list into the viewer prs list
   //! \param theObjects a list of objects

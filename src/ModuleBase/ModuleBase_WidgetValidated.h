@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:        ModuleBase_WidgetValidated.h
 // Created:     12 Mar 2015
@@ -41,7 +41,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   virtual ~ModuleBase_WidgetValidated();
 
   /// Checks all widget validator if the owner is valid
-  /// \param theOwner a selected owner in the view
+  /// \param theValue a selected presentation in the view
   /// \return a boolean value
   bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
 
@@ -64,6 +64,11 @@ protected:
   /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const bool theValid) = 0;
+
+  /// Checks the widget validity. By default, it returns true.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner

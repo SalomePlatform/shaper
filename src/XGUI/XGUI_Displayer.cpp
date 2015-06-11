@@ -363,8 +363,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
+    activate(anAISIO, myActiveSelectionModes, false);
   }
+  if (theUpdateViewer)
+    updateViewer();
 }
 
 bool XGUI_Displayer::isActive(ObjectPtr theObject) const

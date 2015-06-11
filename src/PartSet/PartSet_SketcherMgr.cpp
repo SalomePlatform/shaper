@@ -689,6 +689,8 @@ bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 {
+  myModule->onViewTransformed();
+
   // Display all sketcher sub-Objects
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theOperation->feature());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());

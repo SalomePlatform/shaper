@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_FilterFactory.h>
@@ -49,6 +49,10 @@ bool ModuleBase_WidgetValidated::setSelection(const QList<ModuleBase_ViewerPrs>&
 //********************************************************************
 bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& theValue)
 {
+  bool aValid = isValidSelectionCustom(theValue);
+  if (!aValid)
+    return aValid;
+
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
@@ -63,8 +67,7 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   storeAttributeValue();
 
   // saves the owner value to the widget attribute
-  bool aValid = setSelectionCustom(theValue);
-
+  aValid = setSelectionCustom(theValue);
   if (aValid)
     // checks the attribute validity
     aValid = isValidAttribute();
@@ -86,6 +89,12 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   aLoop->flush(aRedispEvent);
 
   return aValid;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetValidated::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+{
+  return true;
 }
 
 //********************************************************************

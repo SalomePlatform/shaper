@@ -157,6 +157,10 @@ public slots:
   /// \param theAIS a presentation object
   virtual void onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS);
 
+  /// Called on transformation in current viewer
+  /// \param theTrsfType type of tranformation
+  void onViewTransformed(int theTrsfType = 2);
+
 protected slots:
   /// Called when previous operation is finished
   virtual void onSelectionChanged();
@@ -187,10 +191,6 @@ protected slots:
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();
-
-   /// Called on transformation in current viewer
-   /// \param theTrsfType type of tranformation
-   void onViewTransformed(int theTrsfType = 2);
 
    void onTreeViewDoubleClick(const QModelIndex&);
 
