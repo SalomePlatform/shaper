@@ -38,7 +38,7 @@
       </doublevalue>
     </groupbox>
   </groupbox>
-  <multi_selector id="cut_objects"
+  <multi_selector id="boolean_objects"
     label="Cut from:"
     icon=":icons/cut_shape.png"
     tooltip="Objects to Cut"

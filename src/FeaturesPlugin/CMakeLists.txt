@@ -7,25 +7,28 @@ SET(PROJECT_HEADERS
     FeaturesPlugin.h
     FeaturesPlugin_Plugin.h
     FeaturesPlugin_Extrusion.h
-    FeaturesPlugin_ExtrusionCut.h
     FeaturesPlugin_Revolution.h
     FeaturesPlugin_Rotation.h
     FeaturesPlugin_Movement.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_Group.h
     FeaturesPlugin_Placement.h
+    FeaturesPlugin_CompositeBoolean.h
+    FeaturesPlugin_ExtrusionBoolean.h
+    FeaturesPlugin_ExtrusionCut.h
 )
 
 SET(PROJECT_SOURCES
     FeaturesPlugin_Plugin.cpp
     FeaturesPlugin_Extrusion.cpp
-    FeaturesPlugin_ExtrusionCut.cpp
     FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Rotation.cpp
     FeaturesPlugin_Movement.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
     FeaturesPlugin_Placement.cpp
+    FeaturesPlugin_CompositeBoolean.cpp
+    FeaturesPlugin_ExtrusionBoolean.cpp
 )
 
 SET(XML_RESOURCES

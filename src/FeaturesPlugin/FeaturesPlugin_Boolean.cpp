@@ -98,8 +98,6 @@ void FeaturesPlugin_Boolean::execute()
   }
 
   int aResultIndex = 0;
-  ListOfMakeShape aListOfMakeShape;
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aDataMapOfShapes;
 
   switch(aType) {
     case GeomAlgoAPI_Boolean::BOOL_CUT:
@@ -159,9 +157,6 @@ void FeaturesPlugin_Boolean::execute()
       }
 
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(
-        new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
-
       LoadNamingDS(aResultBody, anObjects.front(), aTools, aBoolAlgo);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
