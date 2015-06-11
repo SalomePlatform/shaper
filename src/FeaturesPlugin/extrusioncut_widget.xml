@@ -42,6 +42,7 @@
     label="Cut from:"
     icon=":icons/cut_shape.png"
     tooltip="Objects to Cut"
-    type_choice="Solids">
+    type_choice="Solids"
+    concealment="true">
   </multi_selector>
 </source>
