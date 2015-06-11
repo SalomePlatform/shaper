@@ -155,3 +155,8 @@ bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   return !aOperation || !aOperation->hasObject(theObject);
 }
+
+void ModuleBase_IModule::onOperationResumed(ModuleBase_Operation* theOperation) 
+{
+  emit operationResumed(theOperation);
+}

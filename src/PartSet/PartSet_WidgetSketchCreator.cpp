@@ -11,6 +11,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_SelectionMgr.h>
+#include <XGUI_OperationMgr.h>
 
 #include <GeomAPI_Face.h>
 
@@ -115,6 +116,7 @@ void PartSet_WidgetSketchCreator::onStarted()
     ModuleBase_Operation* anOperation = myModule->createOperation("Sketch");
     anOperation->setFeature(aSketch);
     myModule->sendOperation(anOperation);
+    //connect(anOperation, SIGNAL(aborted()), aWorkshop->operationMgr(), SLOT(abortAllOperations()));
   } else {
     // Break current operation
     QMessageBox::warning(this, tr("Extrusion Cut"),
@@ -131,6 +133,11 @@ bool PartSet_WidgetSketchCreator::focusTo()
   if (aCompFeature->numberOfSubs() == 0)
     return ModuleBase_ModelWidget::focusTo(); 
 
+  CompositeFeaturePtr aSketchFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
+  if (aSketchFeature->numberOfSubs() == 0) {
+    connect(myModule, SIGNAL(operationResumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
+  }
   SessionPtr aMgr = ModelAPI_Session::get();
   bool aIsOp = aMgr->isOperation();
   // Open transaction if it was closed before
@@ -139,4 +146,15 @@ bool PartSet_WidgetSketchCreator::focusTo()
 
   restoreValue();
   return false;
+}
+
+void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
+{
+  // Abort operation
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aIsOp = aMgr->isOperation();
+  // Close transaction
+  if (aIsOp)
+    aMgr->abortOperation();
+  theOp->abort();
 }

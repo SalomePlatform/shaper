@@ -185,7 +185,7 @@ void PartSet_Module::registerProperties()
                                    Config_Prop::Integer, SKETCH_WIDTH);
 }
 
-void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
+void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation) 
 {
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
@@ -221,7 +221,7 @@ void PartSet_Module::breakOperationSequence()
   myRestartingMode = RM_None;
 }
 
-void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
+void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 {
   breakOperationSequence();
 }
@@ -236,7 +236,7 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   ModuleBase_IModule::sendOperation(theOperation);
 }
 
-void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
+void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
@@ -248,7 +248,7 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
   }
 }
 
-void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
+void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);

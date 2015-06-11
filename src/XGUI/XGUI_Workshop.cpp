@@ -546,7 +546,7 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   }
   updateCommandStatus();
 
-  myModule->operationStarted(theOperation);
+  myModule->onOperationStarted(theOperation);
 
   // the objects of the current operation should be deactivated
   QObjectPtrList anObjects;
@@ -575,7 +575,7 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
   }
   updateCommandStatus();
 
-  myModule->operationResumed(theOperation);
+  myModule->onOperationResumed(theOperation);
 }
 
 
@@ -589,7 +589,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
-  myModule->operationStopped(theOperation);
+  myModule->onOperationStopped(theOperation);
 
   // the deactivated objects of the current operation should be activated back.
   // They were deactivated on operation start or an object redisplay
@@ -613,12 +613,12 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 
 void XGUI_Workshop::onOperationCommitted(ModuleBase_Operation* theOperation)
 {
-  myModule->operationCommitted(theOperation);
+  myModule->onOperationCommitted(theOperation);
 }
 
 void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
 {
-  myModule->operationAborted(theOperation);
+  myModule->onOperationAborted(theOperation);
 }
 
 void XGUI_Workshop::setNestedFeatures(ModuleBase_Operation* theOperation)

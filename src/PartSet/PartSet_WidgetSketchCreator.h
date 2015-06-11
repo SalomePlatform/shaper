@@ -51,6 +51,8 @@ protected:
 private slots:
   void onStarted();
 
+  void onResumed(ModuleBase_Operation* theOp);
+
 private:
 
   PartSet_Module* myModule;

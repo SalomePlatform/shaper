@@ -56,20 +56,21 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Realizes some functionality by an operation start
   /// \param theOperation a started operation
-  virtual void operationStarted(ModuleBase_Operation* theOperation) {}
+  virtual void onOperationStarted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation resume
+  /// By default it emits operationResumed signal
   /// \param theOperation a resumed operation
-  virtual void operationResumed(ModuleBase_Operation* theOperation) {}
+  virtual void onOperationResumed(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation stop
-  virtual void operationStopped(ModuleBase_Operation* theOperation) {}
+  virtual void onOperationStopped(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation commit
-  virtual void operationCommitted(ModuleBase_Operation* theOperation) {}
+  virtual void onOperationCommitted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation abort
-  virtual void operationAborted(ModuleBase_Operation* theOperation) {}
+  virtual void onOperationAborted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation start
   /// \param theOperation a started operation
@@ -147,6 +148,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
 signals:
   void operationLaunched();
+
+  void operationResumed(ModuleBase_Operation* theOp);
 
 public slots:
   /// Called on call of command corresponded to a feature

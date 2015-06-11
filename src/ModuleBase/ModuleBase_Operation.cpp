@@ -198,7 +198,6 @@ void ModuleBase_Operation::abort()
     myCurrentFeature = FeaturePtr();
   }
   abortOperation();
-  emit aborted();
 
   stopOperation();
   // is is necessary to deactivate current widgets before the model operation is aborted
@@ -213,6 +212,8 @@ void ModuleBase_Operation::abort()
                 new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
 
   Events_Loop::loop()->send(aMsg);
+
+  emit aborted();
 }
 
 bool ModuleBase_Operation::commit()
@@ -362,29 +363,6 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
   myPreSelection = aPreSelected;
 }
 
-//void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
-//{
-//  //activateByPreselection();
-//  //if (theWidget && myPropertyPanel) {
-//  //  myPropertyPanel->activateNextWidget();
-//  ////  //emit activateNextWidget(myActiveWidget);
-//  //}
-//}
-
-//bool ModuleBase_Operation::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
-//{
-//  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
-//  if (!aActiveWgt)
-//    return false;
-//  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
-//  aValue->setObject(theFeature);
-//  aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
-//  bool isApplyed = aActiveWgt->setValue(aValue);
-//
-//  delete aValue;
-//  myIsModified = (myIsModified || isApplyed);
-//  return isApplyed;
-//}
 
 bool ModuleBase_Operation::getViewerPoint(ModuleBase_ViewerPrs thePrs,
                                                ModuleBase_IViewer* theViewer,
