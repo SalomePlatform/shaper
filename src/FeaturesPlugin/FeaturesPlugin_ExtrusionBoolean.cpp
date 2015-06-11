@@ -48,8 +48,8 @@ ListOfShape FeaturesPlugin_ExtrusionBoolean::MakeSolids(const ListOfShape& theFa
   // Extrude faces.
   ListOfShape anExtrusionList;
   for(ListOfShape::const_iterator aFacesIt = theFaces.begin(); aFacesIt != theFaces.end(); aFacesIt++) {
-    std::shared_ptr<GeomAPI_Shape> aBaseFace = *aFacesIt;
-    GeomAlgoAPI_Prism aPrismAlgo(aBaseFace, aFromShape, aFromSize, aToShape, aToSize);
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *aFacesIt;
+    GeomAlgoAPI_Prism aPrismAlgo(aBaseShape, aFromShape, aFromSize, aToShape, aToSize);
 
     // Checking that the algorithm worked properly.
     if(!aPrismAlgo.isDone() || aPrismAlgo.shape()->isNull() || !aPrismAlgo.isValid()) {

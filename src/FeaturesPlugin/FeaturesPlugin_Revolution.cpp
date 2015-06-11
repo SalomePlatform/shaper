@@ -58,7 +58,7 @@ void FeaturesPlugin_Revolution::execute()
 {
   AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Revolution::LIST_ID());
 
-  //Getting axe.
+  //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());

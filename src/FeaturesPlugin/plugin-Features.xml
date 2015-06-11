@@ -3,29 +3,41 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Basic">
-      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
-          <source path="extrusion_widget.xml"/>
-      </feature>
-      <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon=":icons/revol.png">
-          <source path="revolution_widget.xml"/>
-      </feature>
-      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png">
-          <source path="boolean_widget.xml"/>
-      </feature>
       <feature id="Placement" title="Placement" tooltip="Perform moving of an object to specified position" icon=":icons/placement.png">
           <source path="placement_widget.xml"/>
+      </feature>
+      <feature id="Movement" title="Movement" tooltip="Perform movement of an objects along the axis to specified distance" icon=":icons/movement.png">
+        <source path="movement_widget.xml"/>
       </feature>
       <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon=":icons/rotation.png">
         <source path="rotation_widget.xml"/>
       </feature>
-      <feature id="Movement" title="Movement" tooltip="Perform movement of an objects along the axis to specified distance" icon=":icons/movement.png">
-        <source path="movement_widget.xml"/>
+    </group>
+    <group id="Extrusion">
+      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
+          <source path="extrusion_widget.xml"/>
       </feature>
       <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="" icon=":icons/extrusion_cut.png">
         <source path="extrusioncut_widget.xml"/>
       </feature>
       <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip="" icon=":icons/extrusion_fuse.png">
         <source path="extrusionfuse_widget.xml"/>
+      </feature>
+    </group>
+    <group id="Revolution">
+      <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon=":icons/revol.png">
+          <source path="revolution_widget.xml"/>
+      </feature>
+      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revolution_cut.png">
+        <source path="revolutioncut_widget.xml"/>
+      </feature>
+      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon=":icons/revolution_fuse.png">
+        <source path="revolutionfuse_widget.xml"/>
+      </feature>
+    </group>
+    <group id="Boolean">
+      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png">
+          <source path="boolean_widget.xml"/>
       </feature>
     </group>
     <group id="Collections">
@@ -36,5 +48,5 @@
         <source path="group_widget.xml"/>
       </feature>
     </group>
-  </workbench>  
+  </workbench>
 </plugin>

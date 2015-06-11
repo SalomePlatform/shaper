@@ -50,7 +50,7 @@ void FeaturesPlugin_Rotation::execute()
     anObjects.push_back(anObject);
   }
 
-  //Getting axe.
+  //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());

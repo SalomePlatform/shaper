@@ -10,6 +10,8 @@
 #include <FeaturesPlugin_Movement.h>
 #include <FeaturesPlugin_Placement.h>
 #include <FeaturesPlugin_Revolution.h>
+#include <FeaturesPlugin_RevolutionCut.H>
+#include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
 
 #include <ModelAPI_Session.h>
@@ -49,6 +51,10 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_ExtrusionCut);
   } else if (theFeatureID == FeaturesPlugin_ExtrusionFuse::ID()) {
     return FeaturePtr(new FeaturesPlugin_ExtrusionFuse);
+  } else if (theFeatureID == FeaturesPlugin_RevolutionCut::ID()) {
+    return FeaturePtr(new FeaturesPlugin_RevolutionCut);
+  } else if (theFeatureID == FeaturesPlugin_RevolutionFuse::ID()) {
+    return FeaturePtr(new FeaturesPlugin_RevolutionFuse);
   }
   // feature of such kind is not found
   return FeaturePtr();

@@ -17,6 +17,9 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_ExtrusionBoolean.h
     FeaturesPlugin_ExtrusionCut.h
     FeaturesPlugin_ExtrusionFuse.h
+    FeaturesPlugin_RevolutionBoolean.h
+    FeaturesPlugin_RevolutionCut.h
+    FeaturesPlugin_RevolutionFuse.h
 )
 
 SET(PROJECT_SOURCES
@@ -30,6 +33,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Placement.cpp
     FeaturesPlugin_CompositeBoolean.cpp
     FeaturesPlugin_ExtrusionBoolean.cpp
+    FeaturesPlugin_RevolutionBoolean.cpp
 )
 
 SET(XML_RESOURCES
@@ -38,6 +42,8 @@ SET(XML_RESOURCES
   extrusioncut_widget.xml
   extrusionfuse_widget.xml
   revolution_widget.xml
+  revolutioncut_widget.xml
+  revolutionfuse_widget.xml
   rotation_widget.xml
   movement_widget.xml
   boolean_widget.xml

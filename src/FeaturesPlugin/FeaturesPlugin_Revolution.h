@@ -39,11 +39,11 @@ class FeaturesPlugin_Revolution : public ModelAPI_Feature
     return MY_GROUP_LIST_ID;
   }
 
-  /// Attribute name of an object to which the extrusion grows.
+  /// Attribute name of an revolution axis.
   inline static const std::string& AXIS_OBJECT_ID()
   {
-    static const std::string MY_TO_OBJECT_ID("axis_object");
-    return MY_TO_OBJECT_ID;
+    static const std::string MY_AXIS_ID("axis_object");
+    return MY_AXIS_ID;
   }
 
   /// Attribute name of revolution angle.
