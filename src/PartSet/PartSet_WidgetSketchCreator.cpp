@@ -151,10 +151,5 @@ bool PartSet_WidgetSketchCreator::focusTo()
 void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
 {
   // Abort operation
-  SessionPtr aMgr = ModelAPI_Session::get();
-  bool aIsOp = aMgr->isOperation();
-  // Close transaction
-  if (aIsOp)
-    aMgr->abortOperation();
   theOp->abort();
 }
