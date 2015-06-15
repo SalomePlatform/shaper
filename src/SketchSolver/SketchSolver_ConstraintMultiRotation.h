@@ -10,6 +10,10 @@
 #include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
 
+#include <vector>
+
+typedef std::vector< std::vector<Slvs_hEntity> > AuxLinesList;
+
 /** \class   SketchSolver_ConstraintMultiRotation
  *  \ingroup Plugins
  *  \brief   Convert rotated features to the list of SolveSpace constraints
@@ -60,6 +64,7 @@ private:
   size_t myNumberOfCopies;  ///< number of previous copies of initial objects
   Slvs_hEntity myRotationCenter; ///< ID of center of rotation
   double myAngle;           ///< angle of rotation
+  AuxLinesList myAuxLines;  ///< list of auxiliary lines, created to make clear rotation
 };
 
 #endif

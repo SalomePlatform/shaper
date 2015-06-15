@@ -16,6 +16,18 @@
 
 #include <math.h>
 
+static double squareDistance(
+    StoragePtr theStorage, const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2)
+{
+  Slvs_Entity aPoint1 = theStorage->getEntity(thePoint1);
+  Slvs_Entity aPoint2 = theStorage->getEntity(thePoint2);
+  double x1 = theStorage->getParameter(aPoint1.param[0]).val;
+  double y1 = theStorage->getParameter(aPoint1.param[1]).val;
+  double x2 = theStorage->getParameter(aPoint2.param[0]).val;
+  double y2 = theStorage->getParameter(aPoint2.param[1]).val;
+  return (x1-x2) * (x1-x2) + (y1-y2) * (y1-y2);
+}
+
 void SketchSolver_ConstraintMultiRotation::getAttributes(
     Slvs_hEntity& theCenter, double& theAngle,
     std::vector<std::vector<Slvs_hEntity> >& thePoints,
@@ -118,6 +130,8 @@ void SketchSolver_ConstraintMultiRotation::process()
   if (!myErrorMsg.empty())
     return;
 
+  myAuxLines.clear();
+
   // Create lines between neighbor rotated points and make angle between them equal to anAngle.
   // Also these lines should have equal lengths.
   Slvs_Constraint aConstraint;
@@ -131,6 +145,7 @@ void SketchSolver_ConstraintMultiRotation::process()
     aPrevLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
           myGroup->getWorkplaneId(), aCenter, (*aCopyIter)[0]);
     aPrevLine.h = myStorage->addEntity(aPrevLine);
+    std::vector<Slvs_hEntity> anEqualLines(1, aPrevLine.h);
     for (size_t i = 1; i < aSize; i++) {
       Slvs_Entity aLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
           myGroup->getWorkplaneId(), aCenter, (*aCopyIter)[i]);
@@ -151,7 +166,10 @@ void SketchSolver_ConstraintMultiRotation::process()
       mySlvsConstraints.push_back(aConstraint.h);
 
       aPrevLine = aLine;
+      anEqualLines.push_back(aPrevLine.h);
     }
+
+    myAuxLines.push_back(anEqualLines);
   }
   // Equal radii constraints
   for (aCopyIter = aCircsAndCopies.begin(); aCopyIter != aCircsAndCopies.end(); aCopyIter++) {
@@ -227,6 +245,63 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   if (abs(myAngle) < tolerance) {
     myStorage->setNeedToResolve(false);
     return;
+  }
+
+  // Check the lengths of auxiliary lines are zero.
+  // If they become zero, remove corresponding Angle constraints.
+  // It they become non-zero (but were zero recently), add Angle constraint.
+  std::vector<Slvs_hConstraint>::iterator aConstr = mySlvsConstraints.begin();
+  std::map<Slvs_hEntity, Slvs_hEntity> anEqualLines;
+  bool isFirstRemoved = false;
+  for (; aConstr != mySlvsConstraints.end();
+       isFirstRemoved ? aConstr = mySlvsConstraints.begin() : ++aConstr) {
+    isFirstRemoved = false;
+    Slvs_Constraint aConstraint = myStorage->getConstraint(*aConstr);
+    if (aConstraint.type == SLVS_C_ANGLE || aConstraint.type == SLVS_C_EQUAL_LENGTH_LINES) {
+      Slvs_Entity aLine = myStorage->getEntity(aConstraint.entityA);
+      // Line length became zero => remove constraint
+      if (squareDistance(myStorage, aLine.point[0], aLine.point[1]) < tolerance * tolerance) {
+        myStorage->removeConstraint(aConstraint.h);
+        isFirstRemoved = aConstr == mySlvsConstraints.begin();
+        std::vector<Slvs_hConstraint>::iterator aTmpIter = aConstr--;
+        mySlvsConstraints.erase(aTmpIter);
+      }
+      // Store the lines into the map
+      anEqualLines[aConstraint.entityB] = aConstraint.entityA;
+    }
+  }
+  // Create Angle and Equal constraints for non-degenerated lines
+  AuxLinesList::iterator anIt = myAuxLines.begin();
+  for (; anIt != myAuxLines.end(); ++anIt) {
+    if (anEqualLines.find(anIt->back()) != anEqualLines.end())
+      continue;
+
+    std::vector<Slvs_hEntity>::iterator anEqLinesIt = anIt->begin();
+    Slvs_hEntity aPrevLine = (*anEqLinesIt);
+    // Check the length of the line
+    Slvs_Entity aLine = myStorage->getEntity(aPrevLine);
+    if (squareDistance(myStorage, aLine.point[0], aLine.point[1]) < tolerance * tolerance)
+      continue;
+
+    for (++anEqLinesIt; anEqLinesIt != anIt->end(); ++anEqLinesIt) {
+      Slvs_hEntity aLine = (*anEqLinesIt);
+      // Equal length constraint
+      Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
+          SLVS_C_EQUAL_LENGTH_LINES, myGroup->getWorkplaneId(), 0.0,
+          SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aPrevLine, aLine);
+      aConstraint.h = myStorage->addConstraint(aConstraint);
+      mySlvsConstraints.push_back(aConstraint.h);
+      // Angle constraint
+      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
+          SLVS_C_ANGLE, myGroup->getWorkplaneId(), fabs(myAngle), SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
+          aPrevLine, aLine);
+      if (myAngle < 0.0) // clockwise rotation
+        aConstraint.other = true;
+      aConstraint.h = myStorage->addConstraint(aConstraint);
+      mySlvsConstraints.push_back(aConstraint.h);
+
+      aPrevLine = aLine;
+    }
   }
 
   // Obtain coordinates of rotation center
