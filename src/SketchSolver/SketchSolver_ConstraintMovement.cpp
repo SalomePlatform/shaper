@@ -1,0 +1,89 @@
+#include <SketchSolver_ConstraintMovement.h>
+#include <SketchSolver_Error.h>
+#include <SketchSolver_Group.h>
+
+#include <GeomDataAPI_Point2D.h>
+
+SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(FeaturePtr theFeature)
+  : SketchSolver_ConstraintRigid(theFeature)
+{
+  process();
+}
+
+void SketchSolver_ConstraintMovement::process()
+{
+  cleanErrorMsg();
+  if (!myBaseFeature || !myStorage || myGroup == 0) {
+    /// TODO: Put error message here
+    return;
+  }
+  if (!mySlvsConstraints.empty()) // some data is changed, update constraint
+    update(myBaseConstraint);
+
+  double aValue;
+  std::vector<Slvs_hEntity> anEntities;
+  bool isFullyMoved;
+  getAttributes(aValue, anEntities, isFullyMoved);
+  if (!myErrorMsg.empty() || (myFeatureMap.empty() && myAttributeMap.empty()))
+    return;
+
+  if (isFullyMoved)
+    fixFeature();
+  else {
+    std::vector<Slvs_hEntity>::iterator anEntIt = anEntities.begin();
+    for (; anEntIt != anEntities.end(); ++anEntIt)
+      fixPoint(*anEntIt);
+  }
+}
+
+
+void SketchSolver_ConstraintMovement::getAttributes(
+    double& theValue,
+    std::vector<Slvs_hEntity>& theAttributes,
+    bool& theIsFullyMoved)
+{
+  theValue = 0.0;
+  theIsFullyMoved = true;
+  int aType = SLVS_E_UNKNOWN; // type of created entity
+  Slvs_hEntity anEntityID = SLVS_E_UNKNOWN;
+  anEntityID = myGroup->getFeatureId(myBaseFeature);
+  if (anEntityID == SLVS_E_UNKNOWN) {
+    anEntityID = changeEntity(myBaseFeature, aType);
+    if (anEntityID == SLVS_E_UNKNOWN) {
+      myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
+      return;
+    }
+
+    // Check the entity is complex
+    Slvs_Entity anEntity = myStorage->getEntity(anEntityID);
+    if (anEntity.point[0] != SLVS_E_UNKNOWN) {
+      for (int i = 0; i < 4 && anEntity.point[i]; i++)
+        theAttributes.push_back(anEntity.point[i]);
+    } else // simple entity
+      theAttributes.push_back(anEntityID);
+  }
+  else {
+     myFeatureMap[myBaseFeature] = anEntityID;
+
+     std::list<AttributePtr> aPoints =
+        myBaseFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+     std::list<AttributePtr>::iterator anIt = aPoints.begin();
+     for (; anIt != aPoints.end(); ++anIt) {
+       Slvs_hEntity anAttr = myGroup->getAttributeId(*anIt);
+
+       // Check the attribute changes coordinates
+       Slvs_Entity anAttrEnt = myStorage->getEntity(anAttr);
+       double aDeltaX = myStorage->getParameter(anAttrEnt.param[0]).val;
+       double aDeltaY = myStorage->getParameter(anAttrEnt.param[1]).val;
+       std::shared_ptr<GeomDataAPI_Point2D> aPt =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+       aDeltaX -= aPt->x();
+       aDeltaY -= aPt->y();
+       if (aDeltaX * aDeltaX + aDeltaY * aDeltaY >= tolerance * tolerance)
+         theAttributes.push_back(anAttr);
+       else
+         theIsFullyMoved = false;
+     }
+  }
+}
+

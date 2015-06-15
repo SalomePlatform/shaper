@@ -37,8 +37,12 @@ void SketchSolver_ConstraintRigid::process()
   getAttributes(aValue, anEntities);
   if (!myErrorMsg.empty() || (myFeatureMap.empty() && myAttributeMap.empty()))
     return;
+  fixFeature();
+}
 
-  Slvs_hEntity anEntID; 
+void SketchSolver_ConstraintRigid::fixFeature()
+{
+  Slvs_hEntity anEntID;
   if (!myFeatureMap.empty())
     anEntID = myFeatureMap.begin()->second;
   else

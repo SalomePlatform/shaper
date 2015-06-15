@@ -48,6 +48,12 @@ protected:
   ///        E.g. the distance between line and point may be signed.
   virtual void adjustConstraint();
 
+  /// \brief Fixed feature basing on its type
+  void fixFeature();
+
+  /// \brief Fix given point
+  void fixPoint(const Slvs_hEntity& thePointID);
+
 private:
   /// \brief Fixing line position (start and end points)
   void fixLine(const Slvs_Entity& theLine);
@@ -57,9 +63,6 @@ private:
   ///
   /// There will be fixed start and end points and the radius of the arc.
   void fixArc(const Slvs_Entity& theArc);
-
-  /// \brief Fix given point
-  void fixPoint(const Slvs_hEntity& thePointID);
 
   /// \brief Verifies the entity is used in any equal constraint
   /// \param[in]  theEntity entity to be found

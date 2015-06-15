@@ -35,6 +35,9 @@ public:
   /// \brief Creates temporary constraint to fix the placement of the feature
   SolverConstraintPtr createRigidConstraint(FeaturePtr theFixedFeature);
 
+  /// \brief Creates temporary constraint to fix the feature after movement
+  SolverConstraintPtr createMovementConstraint(FeaturePtr theFixedFeature);
+
   /// \brief Converts sketch parameters to the list of SolveSpace entities.
   ///        Identifiers of entities and parameters are local. They should be changed while adding into storage.
   ///        The sketch entity goes last.

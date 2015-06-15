@@ -285,7 +285,7 @@ void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFe
 {
   // Firstly, create temporary rigid constraint
   SolverConstraintPtr aConstraint =
-      SketchSolver_Builder::getInstance()->createRigidConstraint(theFeature);
+      SketchSolver_Builder::getInstance()->createMovementConstraint(theFeature);
   if (!aConstraint)
     return;
   aConstraint->setGroup(this);
