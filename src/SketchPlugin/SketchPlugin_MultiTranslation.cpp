@@ -100,6 +100,7 @@ void SketchPlugin_MultiTranslation::execute()
   for (; aUsedIter != isUsed.end(); aUsedIter++) {
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
+      aRefListOfTranslated->remove(*aTargetIter++);
       for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
         aRefListOfTranslated->remove(*aTargetIter);
         // remove the corresponding feature from the sketch

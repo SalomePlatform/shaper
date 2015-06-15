@@ -100,6 +100,7 @@ void SketchPlugin_MultiRotation::execute()
   for (; aUsedIter != isUsed.end(); aUsedIter++) {
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
+      aRefListOfRotated->remove(*aTargetIter++);
       for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
         aRefListOfRotated->remove(*aTargetIter);
         // remove the corresponding feature from the sketch
