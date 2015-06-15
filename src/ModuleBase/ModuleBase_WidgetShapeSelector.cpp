@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:        ModuleBase_WidgetShapeSelector.h
 // Created:     2 June 2014
@@ -67,6 +67,7 @@
 #include <list>
 #include <string>
 
+//#define DEBUG_SHAPE_VALIDATION_PREVIOUS
 
 ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
@@ -384,22 +385,44 @@ void ModuleBase_WidgetShapeSelector::customValidators(
 }
 
 //********************************************************************
+bool ModuleBase_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+{
+#ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS
+  return true;
+#endif
+
+  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
+  bool aValid;
+  // if there is no selected shape, the method returns true
+  if (!aShape.get())
+    aValid = true;
+  else {
+    // Check that the selection corresponds to selection type
+    TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
+    aValid = acceptSubShape(aTopoShape);
+  }
+  return aValid;
+}
+
+//********************************************************************
 bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   bool isDone = false;
 
+  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+
   // It should be checked by corresponded validator
-  ObjectPtr aObject = thePrs.object();
-  ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
+  //ObjectPtr aObject = thePrs.object();
+  //ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
   /*
   if ((!aCurrentObject) && (!aObject))
     return false;*/
 
   // It should be checked by corresponded validator
   // Check that the selected object is result (others can not be accepted)
-  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-  if (!aRes)
-    return false;
+  //ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+  //if (!aRes)
+  //  return false;
   /*if (myFeature) {
     // We can not select a result of our feature
     const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
@@ -418,6 +441,7 @@ bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerP
   if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
     return false;*/
 
+#ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS
   // It should be checked by corresponded validator
   // Check that the result has a shape
   GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
@@ -429,12 +453,18 @@ bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerP
     aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(thePrs.shape()));
   }
+
   // Check that the selection corresponds to selection type
   TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
   if (!acceptSubShape(aTopoShape))
     return false;
+#else
+  // the difference is that the next method returns an empty shape if the result has the same shape
+  // to be checked for all cases and uncommented
+  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
+#endif
 
-  setObject(aObject, aShape);
+  setObject(aResult, aShape);
   return true;
 }
 

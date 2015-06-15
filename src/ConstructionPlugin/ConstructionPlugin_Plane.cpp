@@ -95,6 +95,10 @@ std::shared_ptr<GeomAPI_Shape>  ConstructionPlugin_Plane::createPlaneByFaceAndDi
 
     double aDist = aDistAttr->value();
     GeomShapePtr aShape = aFaceAttr->value();
+    if (!aShape.get()) {
+      aShape = aFaceAttr->context()->shape();
+    }
+
     if (aShape.get() != NULL) {
       std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_FaceBuilder::plane(aShape);
       std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();

@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 /*
  * ModuleBase_WidgetMultiSelector.cpp
@@ -35,6 +35,8 @@
 
 #include <memory>
 #include <string>
+
+//#define DEBUG_SHAPE_VALIDATION_PREVIOUS
 
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
@@ -291,22 +293,54 @@ bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerP
 }
 
 //********************************************************************
+bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+{
+#ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS
+  return true;
+#endif
+  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
+  // if there is no selected shape, the method returns true
+  bool aValid;
+  if (!aShape.get())
+    aValid = true;
+  else {
+    // Check that the selection corresponds to selection type
+    TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
+    aValid = acceptSubShape(aTopoShape);
+  }
+
+  if (aValid) {
+    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+
+    if (myFeature) {
+      // We can not select a result of our feature
+      const std::list<ResultPtr>& aResList = myFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      bool isSkipSelf = false;
+      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+        if ((*aIt) == aResult) {
+          isSkipSelf = true;
+          break;
+        }
+      }
+      if(isSkipSelf)
+        aValid = false;
+    }
+  
+  }
+
+  return aValid;
+}
+
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  TopoDS_Shape aShape = thePrs.shape();
-  if (!acceptSubShape(aShape))
-    return false;
+  //TopoDS_Shape aShape = thePrs.shape();
+  //if (!acceptSubShape(aShape))
+  //  return false;
 
-  ResultPtr aResult;
-  if (!thePrs.owner().IsNull()) {
-    ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-  }
-  else {
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
-  }
-
-
+  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+  /*
   if (myFeature) {
     // We can not select a result of our feature
     const std::list<ResultPtr>& aResList = myFeature->results();
@@ -320,7 +354,7 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
     }
     if(isSkipSelf)
       return false;
-  }
+  }*/
 
   // if the result has the similar shap as the parameter shape, just the context is set to the
   // selection list attribute.
@@ -328,7 +362,7 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
   AttributeSelectionListPtr aSelectionListAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-  const TopoDS_Shape& aTDSShape = thePrs.shape();
+  /*const TopoDS_Shape& aTDSShape = thePrs.shape();
   // if only result is selected, an empty shape is set to the model
   if (aTDSShape.IsNull()) {
     aSelectionListAttr->append(aResult, GeomShapePtr());
@@ -341,7 +375,10 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
       aSelectionListAttr->append(aResult, GeomShapePtr());
     else
       aSelectionListAttr->append(aResult, aShape);
-  }
+  }*/
+  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
+  aSelectionListAttr->append(aResult, aShape);
+  
   return true;
 }
 
@@ -352,13 +389,6 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
   //result << myTypeCombo;
   result << myListControl;
   return result;
-}
-
-//********************************************************************
-bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEvent)
-{
-  //TODO: Remove maybe?
-  return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
 
 //********************************************************************

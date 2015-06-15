@@ -72,8 +72,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  virtual bool eventFilter(QObject* , QEvent* );
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
@@ -82,6 +80,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \param theValues the wrapped selection values
   /// \param thePosition an index in the list of values, the values should be get from the index
   virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition);
+
+  /// Checks the widget validity. By default, it returns true.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner

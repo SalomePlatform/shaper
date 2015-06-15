@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:        ModuleBase_WidgetShapeSelector.h
 // Created:     2 June 2014
@@ -78,6 +78,11 @@ Q_OBJECT
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
+
+  /// Checks the widget validity. By default, it returns true.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner

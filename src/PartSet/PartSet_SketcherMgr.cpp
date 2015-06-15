@@ -24,8 +24,6 @@
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ViewerProxy.h>
 
-#include <AppElements_MainWindow.h>
-
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewWindow.h>
