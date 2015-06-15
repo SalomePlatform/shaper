@@ -169,12 +169,16 @@ void XGUI_ViewerProxy::onTryCloseView(AppElements_ViewWindow* theWnd)
 
 void XGUI_ViewerProxy::onDeleteView(AppElements_ViewWindow* theWnd)
 {
+  if (myWindowScale.contains(theWnd->v3dView()))
+    myWindowScale.remove (theWnd->v3dView());
   emit deleteView(theWnd);
 }
 
 void XGUI_ViewerProxy::onViewCreated(ModuleBase_IViewWindow* theWnd)
 {
   theWnd->viewPort()->installEventFilter(this);
+
+  myWindowScale.insert (theWnd->v3dView(), theWnd->v3dView()->Camera()->Scale());
 
   emit viewCreated(theWnd);
 }
@@ -185,6 +189,8 @@ void XGUI_ViewerProxy::onViewCreated(AppElements_ViewWindow* theWnd)
 
   connect(theWnd, SIGNAL(vpTransformationFinished(AppElements_ViewWindow::OperationType)),
     this, SLOT(onViewTransformed(AppElements_ViewWindow::OperationType)));
+
+  myWindowScale.insert (theWnd->v3dView(), theWnd->v3dView()->Camera()->Scale());
 
   emit viewCreated(theWnd);
 }

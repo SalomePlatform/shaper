@@ -5,6 +5,7 @@
 
 #include "ModuleBase.h"
 #include <QObject>
+#include <QMap>
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_View.hxx>
 
@@ -75,6 +76,15 @@ Q_OBJECT
   /// Update current viewer
   virtual void update() = 0;
 
+  const double Scale(const Handle(V3d_View)& theView)
+  {
+    if (!myWindowScale.contains(theView))
+      myWindowScale.insert(theView, theView->Camera()->Scale());
+    return myWindowScale[theView];
+  }
+
+  void SetScale(const Handle(V3d_View)& theView, const double theVal) { myWindowScale[theView] = theVal; }
+
   /// Method returns True if the viewer can process editing objects 
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const { return true; }
@@ -122,6 +132,9 @@ signals:
   /// Signal emitted on transformation of view point in view window
   /// \param theTransformation type of transformation (see AppElements_ViewWindow::OperationType)
   void viewTransformed(int theTransformation);
+
+  protected:
+    QMap<Handle(V3d_View), double> myWindowScale;
 };
 
 #endif

@@ -136,6 +136,22 @@ void setArrowSize(double theSize)
   MyArrowSize = theSize;
 }
 
+static double MyTextHeight = 20;
+double getTextHeight()
+{
+  return MyTextHeight;
+}
+
+void setTextHeight(double theHeight)
+{
+  MyTextHeight = theHeight;
+}
+
+double getDefaultTextHeight()
+{
+  return 30;
+}
+
 double getFlyoutDistance(const ModelAPI_Feature* theConstraint)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutPoint =

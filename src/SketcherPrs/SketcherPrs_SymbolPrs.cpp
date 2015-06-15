@@ -368,6 +368,9 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   }
 
   aGroup->UserDraw(this, true);
+
+  // Disable frustum culling for this object by marking it as mutable
+  aGroup->Structure()->SetMutable(true);
   //aGroup->AddPrimitiveArray(myPntArray);
 }
 

@@ -223,6 +223,8 @@ void NewGeom_SalomeViewer::onTryCloseView(SUIT_ViewWindow*)
 //**********************************************
 void NewGeom_SalomeViewer::onDeleteView(SUIT_ViewWindow*)
 {
+  if(myWindowScale.contains(myView->v3dView()))
+    myWindowScale.remove(myView->v3dView());
   emit deleteView(myView);
 }
 
@@ -237,6 +239,8 @@ void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
   if (aWnd)
     connect(aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
       this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+
+  myWindowScale.insert (aView->getViewPort()->getView(), aView->getViewPort()->getView()->Camera()->Scale());
 
   emit viewCreated(myView);
 }

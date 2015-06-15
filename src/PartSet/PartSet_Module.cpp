@@ -682,7 +682,12 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     return;
   double aLen = aView->Convert(20);
 
+  double aPrevLen = SketcherPrs_Tools::getArrowSize();
   SketcherPrs_Tools::setArrowSize(aLen);
+  const double aPrevScale = aViewer->Scale(aViewer->activeView());
+  const double aCurScale = aViewer->activeView()->Camera()->Scale();
+  aViewer->SetScale(aViewer->activeView(), aCurScale);
+  SketcherPrs_Tools::setTextHeight (aCurScale / aPrevScale * SketcherPrs_Tools::getTextHeight());
   bool isModified = false;
   QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
   foreach (AISObjectPtr aAIS, aPrsList) {

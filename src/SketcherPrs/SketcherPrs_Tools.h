@@ -17,7 +17,7 @@
 
 class GeomDataAPI_Point2D;
 
-#define MyTextHeight 20
+//#define MyTextHeight 20
 
 namespace SketcherPrs_Tools {
 
@@ -61,6 +61,12 @@ enum SelectionModes {
   SKETCHERPRS_EXPORT double getArrowSize();
 
   SKETCHERPRS_EXPORT void setArrowSize(double theSize);
+
+  SKETCHERPRS_EXPORT void setTextHeight(double theHeight);
+
+  SKETCHERPRS_EXPORT double getTextHeight();
+
+  SKETCHERPRS_EXPORT double getDefaultTextHeight();
 
   SKETCHERPRS_EXPORT double getFlyoutDistance(const ModelAPI_Feature* theConstraint);
 

@@ -32,11 +32,11 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   myAspect->MakeText3d(false);
   myAspect->MakeTextShaded(false);
   myAspect->MakeUnitsDisplayed(false);
-  myAspect->TextAspect()->SetHeight(MyTextHeight);
+  myAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
   myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
   
   SetDimensionAspect(myAspect);
-  SetSelToleranceForText2d(MyTextHeight);
+  SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
 }
 
 

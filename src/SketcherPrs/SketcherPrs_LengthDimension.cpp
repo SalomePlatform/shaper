@@ -40,10 +40,10 @@ myConstraint(theConstraint), myPlane(thePlane)
   myAspect->MakeText3d(false);
   myAspect->MakeTextShaded(false);
   myAspect->MakeUnitsDisplayed(false);
-  myAspect->TextAspect()->SetHeight(MyTextHeight);
+  myAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
   myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
 
-  SetSelToleranceForText2d(MyTextHeight);
+  SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
   SetDimensionAspect(myAspect);
 }
 
@@ -178,5 +178,6 @@ void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Select
     return;
   }
   }
+  SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
   AIS_LengthDimension::ComputeSelection(aSelection, aMode);
 }
