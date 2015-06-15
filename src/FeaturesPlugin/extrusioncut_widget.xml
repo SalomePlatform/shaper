@@ -17,7 +17,7 @@
         <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
       <doublevalue id="from_size" label="Size"
-        min="0" step="1.0" default="0"
+        min="0" step="1.0" default="10"
         icon=":icons/dimension_down.png"
         tooltip="Height">
       </doublevalue>

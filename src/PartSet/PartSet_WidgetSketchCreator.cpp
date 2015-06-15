@@ -17,6 +17,11 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
+
+#include <SketchPlugin_SketchEntity.h>
+#include <FeaturesPlugin_CompositeBoolean.h>
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Operation.h>
@@ -158,5 +163,20 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
     if (aIsOp)
       aMgr->abortOperation();
     theOp->abort();
+  } else {
+    DataPtr aData = aSketchFeature->data();
+    AttributeSelectionPtr aSelAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+    if (aSelAttr.get()) {
+      ResultPtr aRes = aSelAttr->context();
+      GeomShapePtr aShape = aSelAttr->value();
+      if (aRes.get()) {
+        AttributeSelectionListPtr aSelList = 
+          aCompFeature->data()->selectionList(FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID());
+        aSelList->append(aRes, GeomShapePtr());
+        updateObject(aCompFeature);
+      }
+    }
   }
 }
