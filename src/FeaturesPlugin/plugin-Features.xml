@@ -28,10 +28,10 @@
       <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon=":icons/revol.png">
           <source path="revolution_widget.xml"/>
       </feature>
-      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revolution_cut.png">
+      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revol.png">
         <source path="revolutioncut_widget.xml"/>
       </feature>
-      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon=":icons/revolution_fuse.png">
+      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon=":icons/revol.png">
         <source path="revolutionfuse_widget.xml"/>
       </feature>
     </group>
