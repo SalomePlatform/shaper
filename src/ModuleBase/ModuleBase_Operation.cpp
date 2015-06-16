@@ -333,7 +333,7 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
   // Check that the selected result are not results of operation feature
   FeaturePtr aFeature = feature();
   if (aFeature) {
-    QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+    QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
 
     std::list<ResultPtr> aResults = aFeature->results();
     QObjectPtrList aResList;
@@ -346,7 +346,7 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
         aPreSelected.append(aPrs);
     }
   } else
-    aPreSelected = theSelection->getSelected();
+    aPreSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
 
   // convert the selection values to the values, which are set to the operation widgets
 

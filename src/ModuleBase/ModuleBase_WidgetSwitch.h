@@ -31,6 +31,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_PagedContain
                           const std::string& theParentId);
   virtual ~ModuleBase_WidgetSwitch();
 
+  /// Defines if it is supported to set the value in this widget
+  /// It returns false because this is an info widget
+  virtual bool canSetValue() const { return false; };
+
   /// Add a page to the widget
   /// \param theWidget a page widget
   /// \param theName a name of page

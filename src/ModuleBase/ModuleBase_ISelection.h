@@ -31,10 +31,12 @@ class Handle_SelectMgr_EntityOwner;
 class ModuleBase_ISelection
 {
  public:
+   /// Types of the selection place, where the selection is obtained
+   enum SelectionPlace { Browser, Viewer, AllControls };
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getSelected() const = 0;
+  virtual QList<ModuleBase_ViewerPrs> getSelected(const SelectionPlace& thePlace = Browser) const = 0;
 
   /// Returns a list of viewer highlited presentations
   /// \return list of presentations

@@ -140,19 +140,3 @@ void ModuleBase_WidgetValidated::customValidators(std::list<ModelAPI_Validator*>
                                           std::list<std::list<std::string> >& theArguments) const
 {
 }
-
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getSelectedEntitiesOrObjects(
-                                                  ModuleBase_ISelection* theSelection) const
-{
-  QList<ModuleBase_ViewerPrs> aSelectedPrs;
-
-  // find selected presentation either in the viewer or in OB
-  // the selection in OCC viewer - the selection of a sub-shapes in the viewer
-  aSelectedPrs = theSelection->getSelected();
-  if (aSelectedPrs.empty()) {
-    // the selection in Object Browser
-    QObjectPtrList anObjects = theSelection->selectedObjects();
-    aSelectedPrs = ModuleBase_ISelection::getViewerPrs(anObjects);
-  }
-  return aSelectedPrs;
-}

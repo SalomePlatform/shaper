@@ -215,7 +215,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
   setObject(ObjectPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
 
   bool aHasObject = false;
-  QList<ModuleBase_ViewerPrs> aSelectedPrs = getSelectedEntitiesOrObjects(myWorkshop->selection());
+  QList<ModuleBase_ViewerPrs> aSelectedPrs = myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
   if (!aSelectedPrs.empty()) {
     ModuleBase_ViewerPrs aPrs = aSelectedPrs.first();
     if (!aPrs.isEmpty() && isValidSelection(aPrs)) {

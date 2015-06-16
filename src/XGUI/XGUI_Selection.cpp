@@ -24,18 +24,33 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 {
 }
 
-QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected() const
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(const SelectionPlace& thePlace) const
 {
-  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
-
   QList<ModuleBase_ViewerPrs> aPresentations;
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
+  switch (thePlace) {
+    case Browser:
+      getSelectedInBrowser(aPresentations);
+    break;
+    case Viewer:
+      getSelectedInViewer(aPresentations);
+    break;
+  case AllControls:
+      getSelectedInViewer(aPresentations);
+      getSelectedInBrowser(aPresentations);
+    break;
+  }
+  return aPresentations;
+}
+
+void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresentations) const
+{
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (aContext.IsNull())
-    return aPresentations;
+    return;
 
   if (aContext->HasOpenedContext()) {
+    QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrs aPrs;
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
@@ -46,25 +61,30 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected() const
 
       fillPresentation(aPrs, anOwner);
 
-      aPresentations.append(aPrs);
+      if (!thePresentations.contains(aPrs)) // TODO: check whether the presentation in a list
+        thePresentations.append(aPrs);
     }
   }
-  /* else {
-    for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent()) {
-      ModuleBase_ViewerPrs aPrs;
-      Handle(AIS_InteractiveObject) anIO = aContext->Current();
-      if (aSelectedIds.contains((long)anIO.Access()))
-        continue;
-    
-      aSelectedIds.append((long)anIO.Access());
-      aPrs.setInteractive(anIO);
+}
 
-      ObjectPtr aFeature = aDisplayer->getObject(anIO);
-      aPrs.setFeature(aFeature);
-      aPresentations.append(aPrs);
+void XGUI_Selection::getSelectedInBrowser(QList<ModuleBase_ViewerPrs>& thePresentations) const
+{
+  // collect the objects  of the parameter presentation to avoid a repeted objects in the result
+  QObjectPtrList aPresentationObjects;
+  QList<ModuleBase_ViewerPrs>::const_iterator aPrsIt = thePresentations.begin(),
+                                              aPrsLast = thePresentations.end();
+  for (; aPrsIt != aPrsLast; aPrsIt++) {
+    aPresentationObjects.push_back((*aPrsIt).object());
+  }
+
+  QObjectPtrList anObjects = selectedObjects();
+  QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
+  for (; anIt != aLast; anIt++) {
+    ObjectPtr anObject = *anIt;
+    if (anObject.get() != NULL && !aPresentationObjects.contains(anObject)) {
+      thePresentations.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
     }
-  }*/
-  return aPresentations;
+  }
 }
 
 void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,

@@ -406,7 +406,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = getSelectedEntitiesOrObjects(myWorkshop->selection());
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
 
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 

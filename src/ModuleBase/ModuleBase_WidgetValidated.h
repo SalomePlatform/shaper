@@ -90,16 +90,6 @@ protected:
   /// \param theArguments a list of validators arguments
   virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
                                 std::list<std::list<std::string> >& theArguments) const;
-
-  /// Returns a list of selected presentations. Firstly it is obtained from the viewer,
-  /// if there are not selected objects in the viewer, it get the selection from the object browser.
-  /// If the browser has selected objects, the viewer prs objects are created with only object
-  /// field of the presentation initialized. The widget should accept the selection in the object
-  /// browser at the same way as in the viewer.
-  /// \param theSelection a selection, where the selected objects and presentations are found
-  /// \return a list of presentations
-  QList<ModuleBase_ViewerPrs> getSelectedEntitiesOrObjects(ModuleBase_ISelection* theSelection) const;
-
 };
 
 #endif /* MODULEBASE_WIDGETVALIDATED_H_ */

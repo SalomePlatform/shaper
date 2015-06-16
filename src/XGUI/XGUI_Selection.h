@@ -36,7 +36,7 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getSelected() const;
+  virtual QList<ModuleBase_ViewerPrs> getSelected(const SelectionPlace& thePlace = Browser) const;
 
   /// Fills the viewer presentation parameters by the parameters from the owner
   /// \param thePrs a container for selection
@@ -88,7 +88,18 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   void entityOwners(const Handle_AIS_InteractiveObject& theObject,
                     SelectMgr_IndexedMapOfOwner& theOwners) const;
 
- private:
+protected:
+  /// Fills the list of presentations by objects selected in the viewer.
+  /// \param thePresentations an output list of presentation
+  void getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresentations) const;
+  /// Fills the list of presentations by objects selected in the object browser.
+  /// ViewerPrs contains only object parameter not empty.
+  /// If the given list of presentations already has a viewer presentation with the same object
+  /// as selected in the browser, a new item is not appended to the list of presentations.
+  /// \param thePresentations an output list of presentation
+  void getSelectedInBrowser(QList<ModuleBase_ViewerPrs>& thePresentations) const;
+
+private:
   XGUI_Workshop* myWorkshop;
 };
 
