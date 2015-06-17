@@ -58,12 +58,18 @@ void FeaturesPlugin_Extrusion::execute()
   std::shared_ptr<GeomAPI_Shape> aToShape;
 
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
-  if (anObjRef) {
+  if(anObjRef.get() != NULL) {
     aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+    if(aFromShape.get() == NULL && anObjRef->context().get() != NULL) {
+      aFromShape = anObjRef->context()->shape();
+    }
   }
   anObjRef = selection(FeaturesPlugin_Extrusion::TO_OBJECT_ID());
-  if (anObjRef) {
+  if(anObjRef.get() != NULL) {
     aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+    if(aToShape.get() == NULL && anObjRef->context().get() != NULL) {
+      aToShape =  anObjRef->context()->shape();
+    }
   }
 
   // Getting sizes.

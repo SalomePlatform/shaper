@@ -26,11 +26,17 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   std::shared_ptr<ModelAPI_AttributeSelection> anAttrSel = theFeature->selection(*anIt);
   if(anAttrSel) {
     aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anAttrSel->value());
+    if(aFromShape.get() == NULL && anAttrSel->context().get() != NULL) {
+      aFromShape = anAttrSel->context()->shape();
+    }
   }
   anIt++;
   anAttrSel = theFeature->selection(*anIt);
   if(anAttrSel) {
     aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anAttrSel->value());
+    if(aToShape.get() == NULL && anAttrSel->context().get() != NULL) {
+      aToShape =  anAttrSel->context()->shape();
+    }
   }
   anIt++;
 
