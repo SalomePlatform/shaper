@@ -101,16 +101,16 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelectedPrs = myWorkshop->selector()->selection()->getSelected(
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selector()->selection()->getSelected(
                                                            ModuleBase_ISelection::AllControls);
-  if (aSelectedPrs.empty())
+  if (aSelected.empty())
     return;
-  ModuleBase_ViewerPrs aPrs = aSelectedPrs.first();
-  if (aPrs.isEmpty() || !isValidSelection(aPrs))
+  ModuleBase_ViewerPrs aPrs = aSelected.first();
+
+  bool isDone = ModuleBase_WidgetValidated::setSelection(aSelected);
+  if (!isDone)
     return;
 
-  // 2. set the selection to sketch
-  setSelectionCustom(aPrs);
   // 3. hide main planes if they have been displayed
   erasePreviewPlanes();
   // 4. if the planes were displayed, change the view projection

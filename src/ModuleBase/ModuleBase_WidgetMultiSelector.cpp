@@ -300,19 +300,21 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
   return true;
 #endif
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-  // if there is no selected shape, the method returns true
-  bool aValid;
-  if (!aShape.get())
-    aValid = true;
-  else {
-    // Check that the selection corresponds to selection type
-    TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
-    aValid = acceptSubShape(aTopoShape);
+  // if there is no result(the feature is presentable only), result is false
+  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+  bool aValid = aResult.get() != NULL;
+  if (aValid) {
+    // if there is no selected shape, the method returns true
+    if (!aShape.get())
+      aValid = true;
+    else {
+      // Check that the selection corresponds to selection type
+      TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
+      aValid = acceptSubShape(aTopoShape);
+    }
   }
 
   if (aValid) {
-    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-
     if (myFeature) {
       // We can not select a result of our feature
       const std::list<ResultPtr>& aResList = myFeature->results();
@@ -327,7 +329,6 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
       if(isSkipSelf)
         aValid = false;
     }
-  
   }
 
   return aValid;
@@ -412,15 +413,10 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-
   aSelectionListAttr->clear();
-  if (aSelected.size() > 0) {
-    foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
-      if (isValidSelection(aPrs)) {
-        setSelectionCustom(aPrs);
-      }
-    }
-  }
+
+  setSelection(aSelected);
+
   emit valuesChanged();
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.

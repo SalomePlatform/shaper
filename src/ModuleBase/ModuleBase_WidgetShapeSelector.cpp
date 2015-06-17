@@ -214,15 +214,9 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
   // In order to make reselection possible, set empty object and shape should be done
   setObject(ObjectPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
 
-  bool aHasObject = false;
-  QList<ModuleBase_ViewerPrs> aSelectedPrs = myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
-  if (!aSelectedPrs.empty()) {
-    ModuleBase_ViewerPrs aPrs = aSelectedPrs.first();
-    if (!aPrs.isEmpty() && isValidSelection(aPrs)) {
-      setSelectionCustom(aPrs);
-      aHasObject = true;
-    }
-  }
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
+  bool aHasObject = setSelection(aSelected);
+
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.
   updateObject(myFeature);

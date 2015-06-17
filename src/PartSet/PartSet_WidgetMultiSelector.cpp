@@ -81,21 +81,12 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
 //********************************************************************
 bool PartSet_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  TopoDS_Shape aShape = thePrs.shape();
-  if (!acceptSubShape(aShape))
-    return false;
+  //TopoDS_Shape aShape = thePrs.shape();
+  //if (!acceptSubShape(aShape))
+  //  return false;
 
-  ResultPtr aResult;
-  if (!thePrs.owner().IsNull()) {
-    ObjectPtr anObject = myWorkshop->selection()->getSelectableObject(thePrs.owner());
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-  }
-  else {
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
-  }
-
-
-  if (myFeature) {
+  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+  /*if (myFeature) {
     // We can not select a result of our feature
     const std::list<ResultPtr>& aResList = myFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
@@ -108,9 +99,9 @@ bool PartSet_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs&
     }
     if(isSkipSelf)
       return false;
-  }
+  }*/
 
-  GeomShapePtr aGShape = GeomShapePtr();
+  /*GeomShapePtr aGShape = GeomShapePtr();
   const TopoDS_Shape& aTDSShape = thePrs.shape();
   // if only result is selected, an empty shape is set to the model
   if (aTDSShape.IsNull()) {
@@ -128,8 +119,9 @@ bool PartSet_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs&
     else {
       //aSelectionListAttr->append(aResult, aShape);
     }
-  }
+  }*/
 
+  GeomShapePtr aGShape = myWorkshop->selection()->getShape(thePrs);
   setObject(aResult, aGShape);
   return true;
 }
