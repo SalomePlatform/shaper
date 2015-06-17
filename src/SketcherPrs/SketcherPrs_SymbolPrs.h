@@ -65,7 +65,7 @@ public:
   Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }
 
   /// Return array of points where symbols will be placed
-  Handle(Graphic3d_ArrayOfPoints) pointsArray() const { return myPntArray; }
+  const Handle(Graphic3d_ArrayOfPoints)& pointsArray() const { return myPntArray; }
 
   /// Render of the presentation
   /// \param theWorkspace is OpenGl workspace

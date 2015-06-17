@@ -8,7 +8,6 @@
 #define SketcherPrs_SensitivePoint_H
 
 #include <Select3D_SensitiveEntity.hxx>
-#include <Graphic3d_ArrayOfPoints.hxx>
 #include <Standard_DefineHandle.hxx>
 
 
@@ -24,8 +23,7 @@ class SketcherPrs_SensitivePoint : public Select3D_SensitiveEntity
 public: 
   //! Constructs a sensitive point object defined by the
   //! owner OwnerId and the point Point.
-  Standard_EXPORT SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& OwnerId, 
-    const Handle(Graphic3d_ArrayOfPoints)& thePntArray, int theId);
+  Standard_EXPORT SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& OwnerId, int theId);
   
   Standard_EXPORT virtual Standard_Integer NbSubElements() Standard_OVERRIDE;
 
@@ -53,7 +51,6 @@ public:
 
 private: 
   int myId;
-  Handle(Graphic3d_ArrayOfPoints) myPntArray;
 };
 
 

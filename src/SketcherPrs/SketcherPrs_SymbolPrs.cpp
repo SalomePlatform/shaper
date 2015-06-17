@@ -352,7 +352,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
 
   mySPoints.Clear();
   for (int i = 1; i <= aNbVertex; i++) {
-    Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, myPntArray, i);
+    Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, i);
     mySPoints.Append(aSP);
   }
 

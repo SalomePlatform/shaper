@@ -9,9 +9,6 @@
 #include "SketcherPrs_PositionMgr.h"
 
 #include <SketchPlugin_Constraint.h>
-#include <SketchPlugin_MultiRotation.h>
-#include <SketchPlugin_MultiTranslation.h>
-#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
 
 #include <Graphic3d_AspectLine3d.hxx>
@@ -29,14 +26,6 @@ SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theCons
                                            bool isTranslation) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane), myIsTranslation(isTranslation)
 {
-  int aPointsNb = 0;
-  if (theConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
-    aPointsNb = theConstraint->integer(SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID())->value();
-  } else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
-    aPointsNb = theConstraint->integer(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID())->value();
-  }
-  aPointsNb == 0 ? aPointsNb = 2 : aPointsNb++; // by default we have 2 points for symbols
-  myPntArray = new Graphic3d_ArrayOfPoints(aPointsNb);
 }  
 
 bool SketcherPrs_Transformation::updatePoints(double theStep) const 
@@ -51,6 +40,7 @@ bool SketcherPrs_Transformation::updatePoints(double theStep) const
     return false;
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+  myPntArray = new Graphic3d_ArrayOfPoints(aNbB);
 
   int i;
   ObjectPtr aObj;
