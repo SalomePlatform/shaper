@@ -46,8 +46,6 @@
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
-#define DEBUG_CRASH_RESTORE_SELECTION
-
 //#define DEBUG_ACTIVATE_OBJECTS
 //#define DEBUG_DEACTIVATE
 //#define DEBUG_ACTIVATE_AIS
@@ -395,10 +393,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
     foreach (ModuleBase_ViewerPrs aPrs, theValues) {
       const TopoDS_Shape& aShape = aPrs.shape();
       if (!aShape.IsNull()) {
-#ifdef DEBUG_CRASH_RESTORE_SELECTION
-#else
         aContext->AddOrRemoveSelected(aShape, false);
-#endif
       } else {
         ObjectPtr anObject = aPrs.object();
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
