@@ -26,7 +26,14 @@ bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttrib
     // It is a GeomAPI_Vertex shape for the point. The shape of the parameter is 
     // GeomAPI_Shape. It is important to use the realization of the isEqual method from
     // GeomAPI_Vertex class
-    aValid = aShapePtr.get() != NULL && aShapePtr->isEqual(aShape);
+    if (aShape.get()) {
+      aValid = aShapePtr.get() != NULL && aShapePtr->isEqual(aShape);
+    }
+    else {
+      // an empty shape is used in attribute selection if the shape of the result is equal to
+      // the selected shape, so according to the upper condifition, the result is true
+      aValid = true;
+    }
   }
   if (!aValid) {
     ResultConstructionPtr aConstr =

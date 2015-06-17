@@ -22,6 +22,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
                            const std::string& theParentId);
   virtual ~ModuleBase_WidgetToolbox();
+
+  /// Defines if it is supported to set the value in this widget
+  /// It returns false because this is an info widget
+  virtual bool canSetValue() const { return false; };
+
   /// Overrides ModuleBase_PagedContainer
   int addPage(ModuleBase_PageBase* theWidget,
               const QString& theName, const QString& theCaseId);

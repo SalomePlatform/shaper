@@ -44,7 +44,11 @@ void ConstructionPlugin_Axis::createAxisByTwoPoints()
   AttributeSelectionPtr aRef2 = data()->selection(ConstructionPlugin_Axis::POINT_SECOND());
   if ((aRef1.get() != NULL) && (aRef2.get() != NULL)) {
     GeomShapePtr aShape1 = aRef1->value();
+    if (!aShape1.get())
+      aShape1 = aRef1->context()->shape();
     GeomShapePtr aShape2 = aRef2->value();
+    if (!aShape2.get())
+      aShape2 = aRef2->context()->shape();
     if (aShape1->isVertex() && aShape2->isVertex() && (!aShape1->isEqual(aShape2))) {
       std::shared_ptr<GeomAPI_Pnt> aStart = GeomAlgoAPI_PointBuilder::point(aShape1);
       std::shared_ptr<GeomAPI_Pnt> anEnd = GeomAlgoAPI_PointBuilder::point(aShape2);

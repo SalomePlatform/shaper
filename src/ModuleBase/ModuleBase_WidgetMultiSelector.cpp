@@ -262,33 +262,34 @@ bool ModuleBase_WidgetMultiSelector::acceptSubShape(const TopoDS_Shape& theShape
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::setSelection(const QList<ModuleBase_ViewerPrs>& theValues,
-                                                  int& thePosition)
+bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
 {
-  if (thePosition < 0)
-    return false;
+  QList<ModuleBase_ViewerPrs> aSkippedValues;
 
   QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   bool isDone = false;
-  for (int i = thePosition; i < theValues.size(); i++) {
-    ModuleBase_ViewerPrs aValue = theValues[i];
+  for (; anIt != aLast; anIt++) {
+    ModuleBase_ViewerPrs aValue = *anIt;
     bool aProcessed = false;
     if (isValidSelection(aValue)) {
       aProcessed = setSelectionCustom(aValue);
     }
+    else
+      aSkippedValues.append(aValue);
     // if there is at least one set, the result is true
     isDone = isDone || aProcessed;
-    // when an object, which do not satisfy the validating process, stop set selection
-    if (!aProcessed)
-      break;
-    else
-      thePosition++;
   }
-  if (isDone) {
-    updateObject(myFeature);
+  // updateObject - to update/redisplay feature
+  // it is commented in order to perfom it outside the method
+  //if (isDone) {
+    //updateObject(myFeature);
     // this emit is necessary to call store/restore method an restore type of selection
-    emit valuesChanged();
-  }
+    //emit valuesChanged();
+  //}
+  theValues.clear();
+  if (!aSkippedValues.empty())
+    theValues.append(aSkippedValues);
+
   return isDone;
 }
 

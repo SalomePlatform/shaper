@@ -50,8 +50,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to check the value validity and if it is, fill the attribute with by value
   /// \param theValues the wrapped selection values
-  /// \param thePosition an index in the list of values, the values should be get from the index
-  virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition);
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
 
 protected:
   /// Creates a backup of the current values of the attribute
@@ -73,8 +72,6 @@ protected:
   /// Fills the attribute with the value of the selected owner
   /// \param theOwner a selected owner
   virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs) = 0;
-
-  virtual void removePresentations() {};
 
   /// Checks the current attibute in all attribute validators
   // \return true if all validators return that the attribute is valid

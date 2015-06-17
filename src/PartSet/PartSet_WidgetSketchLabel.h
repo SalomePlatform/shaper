@@ -52,8 +52,7 @@ Q_OBJECT
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to do nothing if the plane of the sketch has been already set.
   /// \param theValues the wrapped selection values
-  /// \param thePosition an index in the list of values, the values should be get from the index
-  virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition);
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
 
   virtual bool restoreValue()
   {

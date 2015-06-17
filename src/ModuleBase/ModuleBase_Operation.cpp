@@ -277,18 +277,17 @@ void ModuleBase_Operation::activateByPreselection()
     myPropertyPanel->activateNextWidget(NULL);
     return;
   }
-  
+
   ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
   bool isSet = false;
   // 1. apply the selection to controls
-  int aCurrentPosition = 0;
   for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
     aWgt = (*aWIt);
     if (!aWgt->canSetValue())
       continue;
 
-    if (!aWgt->setSelection(myPreSelection, aCurrentPosition/*aValue*/)) {
+    if (!aWgt->setSelection(myPreSelection)) {
       isSet = false;
       break;
     } else {
@@ -296,6 +295,11 @@ void ModuleBase_Operation::activateByPreselection()
       aFilledWgt = aWgt;
     }
   }
+  // in order to redisplay object in the viewer, the update/redisplay signals should be flushed
+  // it is better to perform it not in setSelection of each widget, but do it here,
+  // after the preselection is processed
+  ModuleBase_ModelWidget::updateObject(myFeature);
+
   // 2. ignore not obligatory widgets
   /*for (; aWIt != aWidgets.constEnd(); ++aWIt) {
     aWgt = (*aWIt);

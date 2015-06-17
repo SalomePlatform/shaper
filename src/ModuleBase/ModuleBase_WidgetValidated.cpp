@@ -29,19 +29,21 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
+bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
 {
-  if (thePosition < 0 || thePosition >= theValues.size())
+  if (theValues.empty())
     return false;
-  ModuleBase_ViewerPrs aValue = theValues[thePosition];
-  thePosition++;
-
+  // it removes the processed value from the parameters list
+  ModuleBase_ViewerPrs aValue = theValues.takeFirst();
   bool isDone = false;
 
   if (isValidSelection(aValue)) {
     isDone = setSelectionCustom(aValue);
-    updateObject(myFeature);
-    emit valuesChanged();
+    // updateObject - to update/redisplay feature
+    // it is commented in order to perfom it outside the method
+    //updateObject(myFeature);
+    // to storeValue()
+    //emit valuesChanged();
   }
   return isDone;
 }

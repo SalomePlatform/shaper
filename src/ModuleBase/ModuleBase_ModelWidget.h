@@ -81,8 +81,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
-  /// \param thePosition an index in the list of values, the values should be get from the index
-  virtual bool setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues)
   {
     return false;
   }
@@ -145,6 +144,14 @@ Q_OBJECT
   /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }
 
+  /// Sends Update and Redisplay for the given object
+  /// \param theObj is updating object
+  static void updateObject(ObjectPtr theObj);
+
+  /// Sends Move event for the given object
+  /// \param theObj is object for moving
+  static void moveObject(ObjectPtr theObj);
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();
@@ -186,14 +193,6 @@ signals:
 
   /// The methiod called when widget is activated
   virtual void activateCustom() {};
-
-  /// Sends Update and Redisplay for the given object
-  /// \param theObj is updating object
-  void updateObject(ObjectPtr theObj) const;
-
-  /// Sends Move event for the given object
-  /// \param theObj is object for moving
-  void moveObject(ObjectPtr theObj) const;
 
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature

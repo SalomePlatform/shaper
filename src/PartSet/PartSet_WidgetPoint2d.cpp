@@ -125,12 +125,12 @@ PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
 }
 
-bool PartSet_WidgetPoint2D::setSelection(const QList<ModuleBase_ViewerPrs>& theValues, int& thePosition)
+bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
 {
-  if (thePosition < 0 || thePosition >= theValues.size())
+  if (theValues.empty())
     return false;
-  ModuleBase_ViewerPrs aValue = theValues[thePosition];
-  thePosition++;
+
+  ModuleBase_ViewerPrs aValue = theValues.takeFirst();
 
   Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
   bool isDone = false;
