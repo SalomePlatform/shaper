@@ -665,7 +665,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   // blocks the flush signals to avoid each objects visualization in the viewer
   // they should not be shown once after all modifications are performed
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->activateFlushes(false);
+  bool isActive = aLoop->activateFlushes(false);
 
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   CompositeFeaturePtr aMain; // main feature that may nest the new current
@@ -699,7 +699,10 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   }
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
-    if (!aData.get() || !aData->isValid()) return;
+    if (!aData.get() || !aData->isValid()) {
+      aLoop->activateFlushes(isActive);
+      return;
+    }
     TDF_Label aFeatureLabel = aData->label().Father();
 
     Handle(TDF_Reference) aRef;
@@ -736,7 +739,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     }
   }
   // unblock  the flush signals and up them after this
-  aLoop->activateFlushes(true);
+  aLoop->activateFlushes(isActive);
 
   aLoop->flush(aCreateEvent);
   aLoop->flush(aRedispEvent);

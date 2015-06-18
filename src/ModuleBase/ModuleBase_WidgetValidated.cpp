@@ -71,7 +71,7 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   Events_Loop* aLoop = Events_Loop::loop();
   // blocks the flush signals to avoid the temporary objects visualization in the viewer
   // they should not be shown in order to do not lose highlight by erasing them
-  aLoop->activateFlushes(false);
+  bool isActive = aLoop->activateFlushes(false);
 
   aData->blockSendAttributeUpdated(true);
   bool isAttributeBlocked = anAttribute->blockSetInitialized(true);
@@ -87,7 +87,7 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   restoreAttributeValue(aValid);
   aData->blockSendAttributeUpdated(false);
   anAttribute->blockSetInitialized(isAttributeBlocked);
-  aLoop->activateFlushes(true);
+  aLoop->activateFlushes(isActive);
 
   // In particular case the results are deleted and called as redisplayed inside of this
   // highlight-selection, to they must be flushed as soon as possible.

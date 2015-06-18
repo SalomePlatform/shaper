@@ -68,8 +68,10 @@ class Events_Loop
 
   //! Allows to disable flushes: needed in synchronization of document mechanism 
   //! (to synchronize all and only then flush create, update, etc in correct order)
-  EVENTS_EXPORT void activateFlushes(const bool theActivate);
-
+  //! \param theActivate a state about flushe is active. If false, the flush is disabled
+  //! \return the previous active flush state
+  EVENTS_EXPORT bool activateFlushes(const bool theActivate);
+  
   //! Clears all collected messages
   EVENTS_EXPORT void clear(const Events_ID& theID);
 

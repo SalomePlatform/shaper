@@ -476,7 +476,7 @@ void Model_Objects::synchronizeFeatures(
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
   static Events_ID aToHideEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  aLoop->activateFlushes(false);
+  bool isActive = aLoop->activateFlushes(false);
 
   // update all objects by checking are they on labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
@@ -559,7 +559,7 @@ void Model_Objects::synchronizeFeatures(
   }
 
   anOwner->executeFeatures() = false;
-  aLoop->activateFlushes(true);
+  aLoop->activateFlushes(isActive);
 
   if (theFlush) {
     aLoop->flush(aCreateEvent);

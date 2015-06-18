@@ -133,9 +133,11 @@ void Events_Loop::flush(const Events_ID& theID)
   }
 }
 
-void Events_Loop::activateFlushes(const bool theActivate)
+bool Events_Loop::activateFlushes(const bool theActivate)
 {
+  bool isActive = myFlushActive;
   myFlushActive = theActivate;
+  return isActive;
 }
 
 void Events_Loop::clear(const Events_ID& theID)
