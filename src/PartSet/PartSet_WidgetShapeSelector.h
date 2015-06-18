@@ -43,11 +43,25 @@ Q_OBJECT
   CompositeFeaturePtr sketch() const { return mySketch; }
 
 protected:
+  /// Checks the widget validity. By default, it returns true.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+
   /// Store the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
-  virtual bool setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+  /// \return true if it is succeed
+  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape);
 
   /// Get the shape from the attribute if the attribute contain a shape
   /// It processes the ref attr type of attributes. It obtains the referenced attribute,

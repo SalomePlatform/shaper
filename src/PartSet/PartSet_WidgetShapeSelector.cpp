@@ -42,32 +42,44 @@ PartSet_WidgetShapeSelector::~PartSet_WidgetShapeSelector()
   delete myExternalObjectMgr;
 }
 
-bool PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
+//********************************************************************
+bool PartSet_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  ObjectPtr aSelectedObject = theSelectedObject;
-  //GeomShapePtr aShape = theShape;
+  bool aValid = ModuleBase_WidgetShapeSelector::isValidSelectionCustom(thePrs);
+  if (aValid) {
+    ObjectPtr anObject = myWorkshop->selection()->getResult(thePrs);
+    aValid = myExternalObjectMgr->isValidObject(anObject);
+  }
+  return aValid;
+}
 
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aSelectedObject);
-  if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
-    return false;
+//********************************************************************
+void PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
+{
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theSelectedObject);
   // Do check using of external feature
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+  // Processing of sketch object
+  if (aSPFeature.get() != NULL && theShape.get())
+    setPointAttribute(theSelectedObject, theShape);
+  else
+    ModuleBase_WidgetShapeSelector::setObject(theSelectedObject, theShape);
+}
 
-  // Do check that we can use external feature
-  if ((aSPFeature.get() != NULL) && aSPFeature->isExternal() && (!myExternalObjectMgr->useExternal()))
-    return false;
+void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                                   ObjectPtr& theObject,
+                                                   GeomShapePtr& theShape)
+{
+  ModuleBase_WidgetShapeSelector::getGeomSelection(thePrs, theObject, theShape);
 
-  if (aSPFeature.get() == NULL && theShape.get() != NULL && !theShape->isNull() && myExternalObjectMgr->useExternal()) {
-    aSelectedObject = myExternalObjectMgr->externalObject(theSelectedObject, theShape, sketch());
-  } else {
-    // Processing of sketch object
-    if (theShape.get()) {
-      setPointAttribute(theSelectedObject, theShape);
-      return true;
-    }
-  }
-  return ModuleBase_WidgetShapeSelector::setObject(aSelectedObject, theShape);
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+  // there is no a sketch feature is selected, but the shape exists, try to create an exernal object
+  if (aSPFeature.get() == NULL && theShape.get() != NULL && !theShape->isNull() &&
+      myExternalObjectMgr->useExternal())
+    theObject = myExternalObjectMgr->externalObject(theObject, theShape, sketch());
 }
 
 //********************************************************************

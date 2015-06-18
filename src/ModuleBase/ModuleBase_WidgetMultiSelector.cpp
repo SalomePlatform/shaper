@@ -196,6 +196,18 @@ void ModuleBase_WidgetMultiSelector::storeAttributeValue()
 }
 
 //********************************************************************
+void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
+                                               GeomShapePtr theShape)
+{
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aResult);
+  aSelectionListAttr->append(aResult, theShape);
+}
+
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 {
   DataPtr aData = myFeature->data();
@@ -211,7 +223,7 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
   // Store selection in the attribute
   int aSize = mySelection.size();
   foreach (GeomSelection aSelec, mySelection) {
-    aSelectionListAttr->append(aSelec.first, aSelec.second);
+    setObject(aSelec.first, aSelec.second);
   }
 }
 
@@ -316,50 +328,12 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  //TopoDS_Shape aShape = thePrs.shape();
-  //if (!acceptSubShape(aShape))
-  //  return false;
+  // DEBUG_THE_SAME_AS_SHAPE
+  ObjectPtr anObject;
+  GeomShapePtr aShape;
+  getGeomSelection(thePrs, anObject, aShape);
 
-  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-  /*
-  if (myFeature) {
-    // We can not select a result of our feature
-    const std::list<ResultPtr>& aResList = myFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    bool isSkipSelf = false;
-    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-      if ((*aIt) == aResult) {
-        isSkipSelf = true;
-        break;
-      }
-    }
-    if(isSkipSelf)
-      return false;
-  }*/
-
-  // if the result has the similar shap as the parameter shape, just the context is set to the
-  // selection list attribute.
-  DataPtr aData = myFeature->data();
-  AttributeSelectionListPtr aSelectionListAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-
-  /*const TopoDS_Shape& aTDSShape = thePrs.shape();
-  // if only result is selected, an empty shape is set to the model
-  if (aTDSShape.IsNull()) {
-    aSelectionListAttr->append(aResult, GeomShapePtr());
-  }
-  else {
-    GeomShapePtr aShape(new GeomAPI_Shape());
-    aShape->setImpl(new TopoDS_Shape(aTDSShape));
-    // We can not select a result of our feature
-    if (aShape->isEqual(aResult->shape()))
-      aSelectionListAttr->append(aResult, GeomShapePtr());
-    else
-      aSelectionListAttr->append(aResult, aShape);
-  }*/
-  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-  aSelectionListAttr->append(aResult, aShape);
-  
+  setObject(anObject, aShape);
   return true;
 }
 
@@ -473,6 +447,16 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetMultiSelector::getAttributeSelectio
     }
   }
   return aSelected;
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                                      ObjectPtr& theObject,
+                                                      GeomShapePtr& theShape)
+{
+  // DEBUG_THE_SAME_AS_SHAPE
+  theObject = myWorkshop->selection()->getResult(thePrs);
+  theShape = myWorkshop->selection()->getShape(thePrs);
 }
 
 //********************************************************************

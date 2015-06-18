@@ -62,6 +62,17 @@ void PartSet_WidgetMultiSelector::onSelectionChanged()
 }
 
 //********************************************************************
+bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+{
+  bool aValid = ModuleBase_WidgetMultiSelector::isValidSelectionCustom(thePrs);
+  if (aValid) {
+    ObjectPtr anObject = myWorkshop->selection()->getResult(thePrs);
+    aValid = myExternalObjectMgr->isValidObject(anObject);
+  }
+  return aValid;
+}
+
+//********************************************************************
 void PartSet_WidgetMultiSelector::storeAttributeValue()
 {
   myIsInVaildate = true;
@@ -78,88 +89,21 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
   myExternalObjectMgr->removeExternalValidated(sketch(), myFeature);
 }
 
-//********************************************************************
-bool PartSet_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                                   ObjectPtr& theObject,
+                                                   GeomShapePtr& theShape)
 {
-  //TopoDS_Shape aShape = thePrs.shape();
-  //if (!acceptSubShape(aShape))
-  //  return false;
+  ModuleBase_WidgetMultiSelector::getGeomSelection(thePrs, theObject, theShape);
 
-  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-  /*if (myFeature) {
-    // We can not select a result of our feature
-    const std::list<ResultPtr>& aResList = myFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    bool isSkipSelf = false;
-    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-      if ((*aIt) == aResult) {
-        isSkipSelf = true;
-        break;
-      }
-    }
-    if(isSkipSelf)
-      return false;
-  }*/
-
-  /*GeomShapePtr aGShape = GeomShapePtr();
-  const TopoDS_Shape& aTDSShape = thePrs.shape();
-  // if only result is selected, an empty shape is set to the model
-  if (aTDSShape.IsNull()) {
-    //aSelectionListAttr->append(aResult, GeomShapePtr());
-  }
-  else {
-    aGShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-    //GeomShapePtr aShape(new GeomAPI_Shape());
-    aGShape->setImpl(new TopoDS_Shape(aTDSShape));
-    // We can not select a result of our feature
-    if (aGShape->isEqual(aResult->shape())) {
-      //aSelectionListAttr->append(aResult, GeomShapePtr());
-      aGShape = GeomShapePtr();
-    }
-    else {
-      //aSelectionListAttr->append(aResult, aShape);
-    }
-  }*/
-
-  GeomShapePtr aGShape = myWorkshop->selection()->getShape(thePrs);
-  setObject(aResult, aGShape);
-  return true;
-}
-
-//********************************************************************
-bool PartSet_WidgetMultiSelector::setObject(const ObjectPtr& theSelectedObject,
-                                            const GeomShapePtr& theShape)
-{
-  ObjectPtr aSelectedObject = theSelectedObject;
-  GeomShapePtr aShape = theShape;
-
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aSelectedObject);
-  //if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
-  //  return false;
-
-  // Do check using of external feature
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-
-  // Do check that we can use external feature
-  if ((aSPFeature.get() != NULL) && aSPFeature->isExternal() && (!myExternalObjectMgr->useExternal()))
-    return false;
-
-  if (aSPFeature.get() == NULL && aShape.get() != NULL && !aShape->isNull() && myExternalObjectMgr->useExternal()) {
+  // there is no a sketch feature is selected, but the shape exists, try to create an exernal object
+  if (aSPFeature.get() == NULL && theShape.get() != NULL && !theShape->isNull() &&
+      myExternalObjectMgr->useExternal()) {
     if (myIsInVaildate)
-      aSelectedObject = myExternalObjectMgr->externalObjectValidated(theSelectedObject, theShape, sketch());
+      theObject = myExternalObjectMgr->externalObjectValidated(theObject, theShape, sketch());
     else
-      aSelectedObject = myExternalObjectMgr->externalObject(theSelectedObject, theShape, sketch());
+      theObject = myExternalObjectMgr->externalObject(theObject, theShape, sketch());
   }
-
-
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aSelectedObject);
-
-  DataPtr aData = myFeature->data();
-  AttributeSelectionListPtr aSelectionListAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-
-  aSelectionListAttr->append(aResult, aShape);
-
-  return true;
 }

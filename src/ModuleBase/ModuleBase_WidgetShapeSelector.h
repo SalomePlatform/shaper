@@ -136,7 +136,7 @@ protected:
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  virtual bool setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
   /// Get the shape from the attribute if the attribute contains a shape, e.g. selection attribute
   /// \return a shape
@@ -146,6 +146,14 @@ protected:
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
   QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
+
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape);
 
   //----------- Class members -------------
   protected:

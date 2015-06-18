@@ -67,8 +67,6 @@
 #include <list>
 #include <string>
 
-//#define DEBUG_SHAPE_VALIDATION_PREVIOUS
-
 ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
@@ -114,21 +112,15 @@ bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
+void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
                                                GeomShapePtr theShape)
 {
-  bool isChanged = false;
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theSelectedObject);
-  if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
-    return isChanged;
-
   DataPtr aData = myFeature->data();
   AttributeReferencePtr aRef = aData->reference(attributeID());
   if (aRef) {
     ObjectPtr aObject = aRef->value();
     if (!(aObject && aObject->isSame(theSelectedObject))) {
       aRef->setValue(theSelectedObject);
-      isChanged = true;
     }
   } else {
     AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
@@ -136,18 +128,15 @@ bool ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
       ObjectPtr aObject = aRefAttr->object();
       if (!(aObject && aObject->isSame(theSelectedObject))) {
         aRefAttr->setObject(theSelectedObject);
-        isChanged = true;
       }
     } else {
       AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
       if (aSelectAttr.get() != NULL) {
         aSelectAttr->setValue(aResult, theShape);
-        isChanged = true;
       }
     }
   }
-  return isChanged;
 }
 
 //********************************************************************
@@ -168,6 +157,15 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelectio
     aSelected.append(aPrs);
   }
   return aSelected;
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                                      ObjectPtr& theObject,
+                                                      GeomShapePtr& theShape)
+{
+  theObject = myWorkshop->selection()->getResult(thePrs);
+  theShape = myWorkshop->selection()->getShape(thePrs);
 }
 
 //********************************************************************
@@ -366,10 +364,6 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-#ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS
-  return true;
-#endif
-
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
   bool aValid;
   // if there is no selected shape, the method returns true
@@ -380,70 +374,23 @@ bool ModuleBase_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_Vie
     TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
     aValid = acceptSubShape(aTopoShape);
   }
+  if (aValid) {
+    // In order to avoid selection of the same object
+    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aResult);
+    aValid = aSelectedFeature != myFeature;
+  }
   return aValid;
 }
 
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-  bool isDone = false;
+  ObjectPtr anObject;
+  GeomShapePtr aShape;
+  getGeomSelection(thePrs, anObject, aShape);
 
-  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-
-  // It should be checked by corresponded validator
-  //ObjectPtr aObject = thePrs.object();
-  //ObjectPtr aCurrentObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
-  /*
-  if ((!aCurrentObject) && (!aObject))
-    return false;*/
-
-  // It should be checked by corresponded validator
-  // Check that the selected object is result (others can not be accepted)
-  //ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-  //if (!aRes)
-  //  return false;
-  /*if (myFeature) {
-    // We can not select a result of our feature
-    const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
-    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-      if ((*aIt) == aRes)
-        return false;
-    }
-  }
-  */
-  // It should be checked by corresponded validator
-  /*
-  // Check that object belongs to active document or PartSet
-  DocumentPtr aDoc = aRes->document();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
-    return false;*/
-
-#ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS
-  // It should be checked by corresponded validator
-  // Check that the result has a shape
-  GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
-  if (!aShape)
-    return false;
-
-  // Get sub-shapes from local selection
-  if (!thePrs.shape().IsNull()) {
-    aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-    aShape->setImpl(new TopoDS_Shape(thePrs.shape()));
-  }
-
-  // Check that the selection corresponds to selection type
-  TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
-  if (!acceptSubShape(aTopoShape))
-    return false;
-#else
-  // the difference is that the next method returns an empty shape if the result has the same shape
-  // to be checked for all cases and uncommented
-  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-#endif
-
-  setObject(aResult, aShape);
+  setObject(anObject, aShape);
   return true;
 }
 

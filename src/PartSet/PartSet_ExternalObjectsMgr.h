@@ -36,6 +36,8 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   /// Returns the state whether the external object is used
   bool useExternal() const { return myUseExternal; }
 
+  bool isValidObject(const ObjectPtr& theObject);
+
   /// Finds or create and external object
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
@@ -46,7 +48,6 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
 
   ObjectPtr externalObjectValidated(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
                            const CompositeFeaturePtr& theSketch);
-
 
   // Removes the external presentation from the model
   /// \param theSketch a current sketch

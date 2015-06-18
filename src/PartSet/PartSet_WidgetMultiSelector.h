@@ -46,15 +46,16 @@ Q_OBJECT
   /// Retrurns installed sketcher
   CompositeFeaturePtr sketch() const { return mySketch; }
 
-  /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
-
 public slots:
   /// Slot is called on selection changed
   virtual void onSelectionChanged();
 
 protected:
+  /// Checks the widget validity. By default, it returns true.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
@@ -66,12 +67,13 @@ protected:
   /// \param theValid a boolean flag, if restore happens for valid parameters
   void restoreAttributeValue(const bool theValid);
 
-  /// Store the values to the model attribute of the widget. It casts this attribute to
-  /// the specific type and set the given values
-  /// \param theSelectedObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  /// \return true if it is succeed
-  bool setObject(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape);
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape);
 
 protected:
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;

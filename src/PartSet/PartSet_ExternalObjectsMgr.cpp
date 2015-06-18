@@ -9,6 +9,8 @@
 
 #include <XGUI_Workshop.h>
 
+#include <SketchPlugin_Feature.h>
+
 #include <QString>
 
 PartSet_ExternalObjectsMgr::PartSet_ExternalObjectsMgr(const std::string& theExternal, const bool theDefaultValue)
@@ -19,6 +21,22 @@ PartSet_ExternalObjectsMgr::PartSet_ExternalObjectsMgr(const std::string& theExt
     QString aStr = aIsExternal.toUpper();
     myUseExternal = (aStr == "TRUE") || (aStr == "YES"); 
   }
+}
+
+bool PartSet_ExternalObjectsMgr::isValidObject(const ObjectPtr& theObject)
+{
+  bool aValid = true;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  // Do check using of external feature
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+
+  // Do check that we can use external feature
+  if (aSPFeature.get() != NULL && aSPFeature->isExternal() && !useExternal()) {
+    aValid = false;
+  }
+
+  return aValid;
 }
 
 ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelectedObject,

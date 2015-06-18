@@ -103,7 +103,7 @@ protected slots:
   /// Slot is called on selection of list of selected items
   void onListSelection();
 
- protected:
+protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
@@ -115,6 +115,13 @@ protected slots:
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
   virtual void storeAttributeValue();
+
+  /// Append the values to the model attribute of the widget. It casts this attribute to
+  /// the specific type and set the given values
+  /// \param theSelectedObject an object
+  /// \param theShape a selected shape, which is used in the selection attribute
+  /// \return true if it is succeed
+  void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -138,9 +145,16 @@ protected slots:
   /// a shape. If the attribute do not uses the shape, it is empty
   QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
- protected:
   /// Update selection list
   void updateSelectionList(AttributeSelectionListPtr);
+
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape);
 
   /// Converts the XML defined type choice to the validator type
   /// For example, the "Edges" is converted to "edge"
