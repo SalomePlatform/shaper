@@ -203,7 +203,7 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
   AttributeSelectionListPtr aSelectionListAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aResult);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
   aSelectionListAttr->append(aResult, theShape);
 }
 
