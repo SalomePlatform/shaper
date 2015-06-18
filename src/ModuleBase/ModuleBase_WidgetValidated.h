@@ -16,6 +16,8 @@
 
 #include <SelectMgr_ListOfFilter.hxx>
 
+#include <QList>
+
 class QWidget;
 class ModuleBase_IWorkshop;
 class ModuleBase_ISelection;
@@ -80,13 +82,24 @@ protected:
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param theWorkshop an active workshop
   /// \param toActivate a flag about activation or deactivation the filters
-  virtual void activateFilters(ModuleBase_IWorkshop* theWorkshop, const bool toActivate) const;
+  virtual void activateFilters(ModuleBase_IWorkshop* theWorkshop, const bool toActivate);
 
-  /// Puts additional validators to the given list
-  /// \param theValidators a list of validators
-  /// \param theArguments a list of validators arguments
-  virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
-                                std::list<std::list<std::string> >& theArguments) const;
+  /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
+  /// \param theValue a viewer presentation
+  /// \param theValid a valid state
+  bool getValidState(const ModuleBase_ViewerPrs& theValue, bool& theValid);
+
+  /// Store the validity state of the presentation in an internal map
+  /// \param theValue a viewer presentation
+  /// \param theValid a valid state
+  void storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid);
+
+  // Removes all presentations from internal maps.
+  void clearValidState();
+
+private:
+  QList<ModuleBase_ViewerPrs> myValidPrs;
+  QList<ModuleBase_ViewerPrs> myInvalidPrs;
 };
 
 #endif /* MODULEBASE_WIDGETVALIDATED_H_ */

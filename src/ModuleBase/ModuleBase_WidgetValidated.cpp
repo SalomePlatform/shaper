@@ -17,6 +17,8 @@
 
 #include <QWidget>
 
+//#define DEBUG_VALID_STATE
+
 ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
                                                        const Config_WidgetAPI* theData,
                                                        const std::string& theParentId)
@@ -51,9 +53,16 @@ bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theVa
 //********************************************************************
 bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& theValue)
 {
-  bool aValid = isValidSelectionCustom(theValue);
-  if (!aValid)
+  bool aValid = false;
+  if (getValidState(theValue, aValid)) {
     return aValid;
+  }
+
+  aValid = isValidSelectionCustom(theValue);
+  if (!aValid) {
+    storeValidState(theValue, aValid);
+    return aValid;
+  }
 
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
@@ -90,6 +99,7 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   aLoop->flush(aDeletedEvent);
   aLoop->flush(aRedispEvent);
 
+  storeValidState(theValue, aValid);
   return aValid;
 }
 
@@ -108,8 +118,6 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(myFeature->getKind(), attributeID(), aValidators, anArguments);
 
-  customValidators(aValidators, anArguments);
-
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
@@ -127,18 +135,66 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
 }
 
 void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorkshop,
-                                                 const bool toActivate) const
+                                                 const bool toActivate)
 {
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
 
   Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
-  else
+  else {
     aViewer->removeSelectionFilter(aSelFilter);
+    clearValidState();
+  }
 }
 
-void ModuleBase_WidgetValidated::customValidators(std::list<ModelAPI_Validator*>& theValidators,
-                                          std::list<std::list<std::string> >& theArguments) const
+//********************************************************************
+void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid)
 {
+  bool aValidPrs = myInvalidPrs.contains(theValue);
+  bool anInvalidPrs = myInvalidPrs.contains(theValue);
+
+  if (theValid) {
+    if (!aValidPrs)
+      myValidPrs.append(theValue);
+    // the commented code will be useful when the valid state of the presentation
+    // will be changable between activate/deactivate. Currently it does not happen.
+    //if (anInvalidPrs)
+    //  myInvalidPrs.removeOne(theValue);
+  }
+  else { // !theValid
+    if (!anInvalidPrs)
+      myInvalidPrs.append(theValue);
+    //if (!aValidPrs)
+    //  myValidPrs.removeOne(theValue);
+  }
+#ifdef DEBUG_VALID_STATE
+  qDebug(QString("storeValidState: myValidPrs.size() = %1, myInvalidPrs.size() = %2").arg(myValidPrs.count())
+                 .arg(myInvalidPrs.count()).toStdString().c_str());
+#endif
 }
+
+//********************************************************************
+bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrs& theValue, bool& theValid)
+{
+  bool aValidPrs = myValidPrs.contains(theValue);
+  bool anInvalidPrs = myInvalidPrs.contains(theValue);
+
+  if (aValidPrs)
+    theValid = true;
+  else if (anInvalidPrs)
+    theValid = false;
+
+  return aValidPrs || anInvalidPrs;
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::clearValidState()
+{
+#ifdef DEBUG_VALID_STATE
+  qDebug("clearValidState");
+#endif
+  myValidPrs.clear();
+  myInvalidPrs.clear();
+}
+

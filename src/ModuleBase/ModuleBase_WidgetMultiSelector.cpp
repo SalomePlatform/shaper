@@ -216,27 +216,6 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::customValidators(
-                                        std::list<ModelAPI_Validator*>& theValidators,
-                                        std::list<std::list<std::string> >& theArguments) const
-{
-  return;
-  std::list<std::string> anArguments;
-
-  theValidators.push_back(myShapeValidator);
-  if (true/*myIsUseChoice*/) {
-    QString aType = myTypeCombo->currentText();
-    anArguments.push_back(validatorType(aType));
-  }
-  else {
-    for(int i = 0, aCount = myTypeCombo->count(); i < aCount; i++) {
-      anArguments.push_back(validatorType(myTypeCombo->itemText(i)));
-    }
-  }
-  theArguments.push_back(anArguments);
-}
-
-//********************************************************************
 bool ModuleBase_WidgetMultiSelector::acceptSubShape(const TopoDS_Shape& theShape) const
 {
   bool aValid = true;

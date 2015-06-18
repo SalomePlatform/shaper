@@ -364,21 +364,6 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::customValidators(
-                                    std::list<ModelAPI_Validator*>& theValidators,
-                                    std::list<std::list<std::string> >& theArguments) const
-{
-  return;
-  theValidators.push_back(myShapeValidator);
-
-  std::list<std::string> anArguments;
-  foreach(QString aType, myShapeTypes) {
-    anArguments.push_back(aType.toStdString().c_str());
-  }
-  theArguments.push_back(anArguments);
-}
-
-//********************************************************************
 bool ModuleBase_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
 #ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS

@@ -118,13 +118,6 @@ protected:
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const bool theValid);
 
-  /// Puts additional validators to the given list. A separate validator is created for each of the
-  /// "type_choice" value
-  /// \param theValidators a list of validators
-  /// \param theArguments a list of validators arguments
-  virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
-                                std::list<std::list<std::string> >& theArguments) const;
-
   /// Computes and updates name of selected object in the widget
   void updateSelectionName();
 

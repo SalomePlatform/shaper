@@ -122,13 +122,6 @@ protected slots:
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const bool theValid);
 
-  /// Puts additional validators to the given list. A separate validator is created for each of the
-  /// "type_choice" value
-  /// \param theValidators a list of validators
-  /// \param theArguments a list of validators arguments
-  virtual void customValidators(std::list<ModelAPI_Validator*>& theValidators,
-                                std::list<std::list<std::string> >& theArguments) const;
-
   /// Returns true if selected shape corresponds to requested shape types
   /// \param theShape a shape
   bool acceptSubShape(const TopoDS_Shape& theShape) const;
