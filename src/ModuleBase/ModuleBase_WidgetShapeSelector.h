@@ -8,7 +8,7 @@
 #define ModuleBase_WidgetShapeSelector_H
 
 #include "ModuleBase.h"
-#include "ModuleBase_WidgetValidated.h"
+#include "ModuleBase_WidgetSelector.h"
 #include "ModuleBase_ViewerFilters.h"
 #include <ModuleBase_ViewerPrs.h>
 
@@ -55,7 +55,7 @@ class GeomValidators_ShapeType;
 *        which corresponds to ModelAPI_ResultConstruction object type
 * - concealment - hide or not hide selected object after operation
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_WidgetValidated
+class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_WidgetSelector
 {
 Q_OBJECT
  public:
@@ -66,46 +66,20 @@ Q_OBJECT
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-                            const Config_WidgetAPI* theData, const std::string& theParentId);
+                                 const Config_WidgetAPI* theData, const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetShapeSelector();
 
   virtual bool restoreValue();
 
-  /// Defines if it is supposed that the widget should interact with the viewer.
-  virtual bool isViewerSelector() { return true; }
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
-
-  /// Checks the widget validity. By default, it returns true.
-  /// \param theValue a selected presentation in the view
-  /// \return a boolean value
-  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
-
-  /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
-
-  /// The methiod called when widget is deactivated
-  virtual void deactivate();
-
-protected:
-  /// Activate or deactivate selection
-  void activateSelection(bool toActivate);
-
- private slots:
-   /// Slot which is called on selection event
-  void onSelectionChanged();
 
  protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
-
-  /// The methiod called when widget is activated
-  virtual void activateCustom();
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -119,17 +93,17 @@ protected:
   virtual void restoreAttributeValue(const bool theValid);
 
   /// Computes and updates name of selected object in the widget
-  void updateSelectionName();
-
-  /// Raise panel which contains this widget
-  void raisePanel() const;
-
-  /// Returns true if selected shape corresponds to requested shape types
-  /// \param theShape a shape
-  bool acceptSubShape(const TopoDS_Shape& theShape) const;
+  virtual void updateSelectionName();
 
   /// Clear attribute
-  void clearAttribute();
+  virtual void clearAttribute();
+
+  // Update focus after the attribute value change
+  virtual void updateFocus();
+
+  /// Retunrs a list of possible shape types
+  /// \return a list of shapes
+  virtual QIntList getShapeTypes() const;
 
   /// Store the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
@@ -145,15 +119,7 @@ protected:
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-  QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
-
-  /// Return an object and geom shape by the viewer presentation
-  /// \param thePrs a selection
-  /// \param theObject an output object
-  /// \param theShape a shape of the selection
-  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
-                                ObjectPtr& theObject,
-                                GeomShapePtr& theShape);
+  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
   //----------- Class members -------------
   protected:
@@ -162,9 +128,6 @@ protected:
 
   /// Input control of the widget
   QLineEdit* myTextLine;
-
-  /// Reference to workshop
-  ModuleBase_IWorkshop* myWorkshop;
 
   /// List of accepting shapes types
   QStringList myShapeTypes;
@@ -180,9 +143,6 @@ protected:
   AttributePtr myRefAttribute;
   /// A boolean value whether refAttr uses reference of object
   bool myIsObject;
-
-  /// An instance of the "shape_type" validator. It is returns on validating in customValidator()
-  GeomValidators_ShapeType* myShapeValidator;
 };
 
 #endif

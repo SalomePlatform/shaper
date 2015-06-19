@@ -11,7 +11,7 @@
 #define MODULEBASE_WIDGETMULTISELECTOR_H_
 
 #include <ModuleBase.h>
-#include <ModuleBase_WidgetValidated.h>
+#include <ModuleBase_WidgetSelector.h>
 
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_Result.h>
@@ -48,7 +48,7 @@ class QAction;
 * - tooltip - a tooltip for the widget
 * - type_choice - list of expected shape types.
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_WidgetValidated
+class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_WidgetSelector
 {
   Q_OBJECT
  public:
@@ -63,17 +63,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
                                  const std::string& theParentId);
   virtual ~ModuleBase_WidgetMultiSelector();
 
-  //TODO: nds stabilization hotfix
-  virtual void disconnectSignals();
-
   virtual bool restoreValue();
 
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
-
-  /// The methiod called when widget is deactivated
-  virtual void deactivate();
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
@@ -85,16 +79,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
-  /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
-
  public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
-
-  /// Slot is called on selection changed
-  virtual void onSelectionChanged();
 
 protected slots:
   /// Slot for copy command in a list pop-up menu
@@ -104,9 +91,6 @@ protected slots:
   void onListSelection();
 
 protected:
-  /// The methiod called when widget is activated
-  virtual void activateCustom();
-
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
@@ -115,6 +99,19 @@ protected:
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
   virtual void storeAttributeValue();
+
+  /// Clear attribute
+  virtual void clearAttribute();
+
+  // Set the focus on the last item in  the list
+  virtual void updateFocus();
+
+  /// Computes and updates name of selected object in the widget
+  virtual void updateSelectionName();
+
+  /// Retunrs a list of possible shape types
+  /// \return a list of shapes
+  virtual QIntList getShapeTypes() const;
 
   /// Append the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
@@ -129,45 +126,27 @@ protected:
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const bool theValid);
 
-  /// Returns true if selected shape corresponds to requested shape types
-  /// \param theShape a shape
-  bool acceptSubShape(const TopoDS_Shape& theShape) const;
-
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
-
-  /// Start shape selection
-  /// \param isActivated a state whether the shape is activated or deactivated in selection
-  void activateShapeSelection(const bool isActivated);
 
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-  QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
+  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
   /// Update selection list
   void updateSelectionList(AttributeSelectionListPtr);
-
-  /// Return an object and geom shape by the viewer presentation
-  /// \param thePrs a selection
-  /// \param theObject an output object
-  /// \param theShape a shape of the selection
-  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
-                                ObjectPtr& theObject,
-                                GeomShapePtr& theShape);
 
   /// Converts the XML defined type choice to the validator type
   /// For example, the "Edges" is converted to "edge"
   std::string validatorType(const QString& theType) const;
 
-   /// List control
+protected:
+  /// List control
   QListWidget* myListControl;
 
   /// Combobox of types
   QComboBox* myTypeCombo;
-
-  //TODO: Move into the base of selectors
-  ModuleBase_IWorkshop* myWorkshop;
 
   /// Provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
@@ -183,9 +162,6 @@ protected:
 
   /// Variable of GeomSelection
   QList<GeomSelection> mySelection;
-
-  /// An instance of the "type_choice" validator. It is returns on validating in customValidator()
-  GeomValidators_ShapeType* myShapeValidator;
 
   //bool myIsUseChoice;
 };

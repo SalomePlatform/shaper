@@ -42,8 +42,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData,
                                                                const std::string& theParentId)
-    : ModuleBase_WidgetValidated(theParent, theData, theParentId),
-      myWorkshop(theWorkshop)
+ : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -53,8 +52,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   myTypeCombo = new QComboBox(this);
   // There is no sence to paramerize list of types while we can not parametrize selection mode
-
-  myShapeValidator = new GeomValidators_ShapeType();
 
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();
@@ -104,37 +101,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 {
-  delete myShapeValidator;
-}
-
-//TODO: nds stabilization hotfix
-void ModuleBase_WidgetMultiSelector::disconnectSignals()
-{
-  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::activateCustom()
-{
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-  connect(myWorkshop, SIGNAL(selectionChanged()), 
-          this,       SLOT(onSelectionChanged()), 
-          Qt::UniqueConnection);
-
-  activateShapeSelection(true);
-
-  // Restore selection in the viewer by the attribute selection list
-  myWorkshop->setSelected(getAttributeSelection());
-
-  activateFilters(myWorkshop, true);
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::deactivate()
-{
-  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  activateShapeSelection(false);
-  activateFilters(myWorkshop, false);
 }
 
 //********************************************************************
@@ -196,6 +162,15 @@ void ModuleBase_WidgetMultiSelector::storeAttributeValue()
 }
 
 //********************************************************************
+void ModuleBase_WidgetMultiSelector::clearAttribute()
+{
+  DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelectionListAttr =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+  aSelectionListAttr->clear();
+}
+
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
                                                GeomShapePtr theShape)
 {
@@ -210,14 +185,12 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 {
+  clearAttribute();
+
+  // Store shape type
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-  if (aSelectionListAttr.get() == NULL)
-    return;
-  aSelectionListAttr->clear();
-
-  // Store shapes type
   aSelectionListAttr->setSelectionType(mySelectionType);
 
   // Store selection in the attribute
@@ -225,31 +198,6 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
   foreach (GeomSelection aSelec, mySelection) {
     setObject(aSelec.first, aSelec.second);
   }
-}
-
-//********************************************************************
-bool ModuleBase_WidgetMultiSelector::acceptSubShape(const TopoDS_Shape& theShape) const
-{
-  bool aValid = true;
-  if (theShape.IsNull()) {
-    aValid = true; // do not check the shape type if the shape is empty
-    // extrusion uses a sketch object selectected in Object browser
-  }
-  else {
-    aValid = false;
-    TopAbs_ShapeEnum aShapeType = theShape.ShapeType();
-    if (myTypeCombo->count() > 1) {
-      TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->currentText());
-      aValid = aShapeType == aType;
-    }
-    else {
-      for(int i = 0, aCount = myTypeCombo->count(); i < aCount && !aValid; i++) {
-        TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->itemText(i));
-        aValid = aShapeType == aType;
-      }
-    }
-  }
-  return aValid;
 }
 
 //********************************************************************
@@ -287,54 +235,28 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
-#ifdef DEBUG_SHAPE_VALIDATION_PREVIOUS
-  return true;
-#endif
-  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-  // if there is no result(the feature is presentable only), result is false
-  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-  bool aValid = aResult.get() != NULL;
+  bool aValid = ModuleBase_WidgetSelector::isValidSelectionCustom(thePrs);
   if (aValid) {
-    // if there is no selected shape, the method returns true
-    if (!aShape.get())
-      aValid = true;
-    else {
-      // Check that the selection corresponds to selection type
-      TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
-      aValid = acceptSubShape(aTopoShape);
-    }
-  }
-
-  if (aValid) {
-    if (myFeature) {
-      // We can not select a result of our feature
-      const std::list<ResultPtr>& aResList = myFeature->results();
-      std::list<ResultPtr>::const_iterator aIt;
-      bool isSkipSelf = false;
-      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-        if ((*aIt) == aResult) {
-          isSkipSelf = true;
-          break;
+    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    aValid = aResult.get() != NULL;
+    if (aValid) {
+      if (myFeature) {
+        // We can not select a result of our feature
+        const std::list<ResultPtr>& aResList = myFeature->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        bool isSkipSelf = false;
+        for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+          if ((*aIt) == aResult) {
+            isSkipSelf = true;
+            break;
+          }
         }
+        if (isSkipSelf)
+          aValid = false;
       }
-      if(isSkipSelf)
-        aValid = false;
     }
   }
-
   return aValid;
-}
-
-//********************************************************************
-bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  // DEBUG_THE_SAME_AS_SHAPE
-  ObjectPtr anObject;
-  GeomShapePtr aShape;
-  getGeomSelection(thePrs, anObject, aShape);
-
-  setObject(anObject, aShape);
-  return true;
 }
 
 //********************************************************************
@@ -349,7 +271,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
-  activateShapeSelection(true);
+  activateSelection(true);
   activateFilters(myWorkshop, true);
   QList<ModuleBase_ViewerPrs> anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
@@ -358,27 +280,33 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   myWorkshop->setSelected(anEmptyList);
 }
 
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::onSelectionChanged()
+void ModuleBase_WidgetMultiSelector::updateFocus()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
-
-  DataPtr aData = myFeature->data();
-  AttributeSelectionListPtr aSelectionListAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-  aSelectionListAttr->clear();
-
-  setSelection(aSelected);
-
-  emit valuesChanged();
-  // the updateObject method should be called to flush the updated sigal. The workshop listens it,
-  // calls validators for the feature and, as a result, updates the Apply button state.
-  updateObject(myFeature);
-
   // Set focus to List control in order to make possible 
   // to use Tab key for transfer the focus to next widgets
   myListControl->setCurrentRow(myListControl->model()->rowCount() - 1);
   myListControl->setFocus();
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::updateSelectionName()
+{
+}
+
+//********************************************************************
+QIntList ModuleBase_WidgetMultiSelector::getShapeTypes() const
+{
+  QIntList aShapeTypes;
+
+  if (myTypeCombo->count() > 1) {
+    aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->currentText()));
+  }
+  else {
+    for (int i = 0, aCount = myTypeCombo->count(); i < aCount; i++) {
+      aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->itemText(i)));
+    }
+  }
+  return aShapeTypes;
 }
 
 //********************************************************************
@@ -390,36 +318,16 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      activateShapeSelection(false);
+      activateSelection(false);
       activateFilters(myWorkshop, false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
 
-      activateShapeSelection(true);
+      activateSelection(true);
       activateFilters(myWorkshop, true);
       break;
     }
-  }
-}
-
-void ModuleBase_WidgetMultiSelector::activateShapeSelection(const bool isActivated)
-{
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-
-  if (isActivated) {
-    QString aNewType = myTypeCombo->currentText();
-    QIntList aList;
-    if (true /*myIsUseChoice*/) {
-      aList.append(ModuleBase_Tools::shapeType(aNewType));
-    }
-    else {
-      for(int i = 0, aCount = myTypeCombo->count(); i < aCount; i++)
-        aList.append(ModuleBase_Tools::shapeType(myTypeCombo->itemText(i)));
-    }
-    myWorkshop->activateSubShapesSelection(aList);
-  } else {
-    myWorkshop->deactivateSubShapesSelection();
   }
 }
 
@@ -447,16 +355,6 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetMultiSelector::getAttributeSelectio
     }
   }
   return aSelected;
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
-                                                      ObjectPtr& theObject,
-                                                      GeomShapePtr& theShape)
-{
-  // DEBUG_THE_SAME_AS_SHAPE
-  theObject = myWorkshop->selection()->getResult(thePrs);
-  theShape = myWorkshop->selection()->getShape(thePrs);
 }
 
 //********************************************************************
@@ -510,4 +408,3 @@ void ModuleBase_WidgetMultiSelector::onListSelection()
   QList<QListWidgetItem*> aItems = myListControl->selectedItems();
   myCopyAction->setEnabled(!aItems.isEmpty());
 }
-

@@ -71,8 +71,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
-    : ModuleBase_WidgetValidated(theParent, theData, theParentId),
-      myWorkshop(theWorkshop)
+ : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId)
 {
   QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
@@ -94,14 +93,11 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
-
-  myShapeValidator = new GeomValidators_ShapeType();
 }
 
 //********************************************************************
 ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 {
-  delete myShapeValidator;
 }
 
 //********************************************************************
@@ -160,32 +156,10 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelectio
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
-                                                      ObjectPtr& theObject,
-                                                      GeomShapePtr& theShape)
-{
-  theObject = myWorkshop->selection()->getResult(thePrs);
-  theShape = myWorkshop->selection()->getShape(thePrs);
-}
-
-//********************************************************************
 void ModuleBase_WidgetShapeSelector::clearAttribute()
 {
-  DataPtr aData = myFeature->data();
-  AttributeSelectionPtr aSelect = aData->selection(attributeID());
-  if (aSelect) {
-    aSelect->setValue(ResultPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
-    return;
-  }
-  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-  if (aRefAttr) {
-    aRefAttr->setObject(ObjectPtr());
-    return;
-  }
-  AttributeReferencePtr aRef = aData->reference(attributeID());
-  if (aRef) {
-    aRef->setObject(ObjectPtr());
-  }
+  // In order to make reselection possible, set empty object and shape should be done
+  setObject(ObjectPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
 }
 
 //********************************************************************
@@ -206,31 +180,21 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
   return aControls;
 }
 
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::onSelectionChanged()
+void ModuleBase_WidgetShapeSelector::updateFocus()
 {
-  // In order to make reselection possible, set empty object and shape should be done
-  setObject(ObjectPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
-
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
-  bool aHasObject = setSelection(aSelected);
-
-  // the updateObject method should be called to flush the updated sigal. The workshop listens it,
-  // calls validators for the feature and, as a result, updates the Apply button state.
-  updateObject(myFeature);
-  // the widget loses the focus only if the selected object is set
-  if (aHasObject)
+  ObjectPtr anObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
+  if (anObject.get())
     emit focusOutWidget(this);
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::acceptSubShape(const TopoDS_Shape& theShape) const
+QIntList ModuleBase_WidgetShapeSelector::getShapeTypes() const
 {
-  foreach (QString aType, myShapeTypes) {
-    if (theShape.ShapeType() == ModuleBase_Tools::shapeType(aType))
-      return true;
+  QIntList aShapeTypes;
+  foreach(QString aType, myShapeTypes) {
+    aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
   }
-  return false;
+  return aShapeTypes;
 }
 
 //********************************************************************
@@ -284,52 +248,6 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
   }
 }
 
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
-{
-  updateSelectionName();
-
-  if (toActivate) {
-    QIntList aList;
-    foreach (QString aType, myShapeTypes) {
-      aList.append(ModuleBase_Tools::shapeType(aType));
-    }
-    myWorkshop->activateSubShapesSelection(aList);
-  } else {
-    myWorkshop->deactivateSubShapesSelection();
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::raisePanel() const
-{
-  QWidget* aParent = this->parentWidget();
-  QWidget* aLastPanel = 0;
-  while (!aParent->inherits("QDockWidget")) {
-    aLastPanel = aParent;
-    aParent = aParent->parentWidget();
-    if (!aParent)
-      return;
-  }
-  if (aParent->inherits("QDockWidget")) {
-    QDockWidget* aTabWgt = (QDockWidget*) aParent;
-    aTabWgt->raise();
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::activateCustom()
-{
-  connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  activateSelection(true);
-
-  // Restore selection in the viewer by the attribute selection list
-  myWorkshop->setSelected(getAttributeSelection());
-
-  activateFilters(myWorkshop, true);
-}
-
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::storeAttributeValue()
 {
@@ -359,45 +277,4 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
     if (!myIsObject)
       aRefAttr->setAttr(myRefAttribute);
   }
-}
-
-//********************************************************************
-bool ModuleBase_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-  bool aValid;
-  // if there is no selected shape, the method returns true
-  if (!aShape.get())
-    aValid = true;
-  else {
-    // Check that the selection corresponds to selection type
-    TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
-    aValid = acceptSubShape(aTopoShape);
-  }
-  if (aValid) {
-    // In order to avoid selection of the same object
-    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-    FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aResult);
-    aValid = aSelectedFeature != myFeature;
-  }
-  return aValid;
-}
-
-//********************************************************************
-bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  ObjectPtr anObject;
-  GeomShapePtr aShape;
-  getGeomSelection(thePrs, anObject, aShape);
-
-  setObject(anObject, aShape);
-  return true;
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::deactivate()
-{
-  activateSelection(false);
-  activateFilters(myWorkshop, false);
-  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 }

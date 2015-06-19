@@ -41,24 +41,25 @@ PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
   delete myExternalObjectMgr;
 }
 
-//********************************************************************
-void PartSet_WidgetMultiSelector::onSelectionChanged()
+bool PartSet_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
 {
-  ModuleBase_WidgetMultiSelector::onSelectionChanged();
-  // TODO(nds): unite with externalObject(), remove parameters
-  //myFeature->execute();
+  bool aSucceed = ModuleBase_WidgetMultiSelector::setSelection(theValues);
+  if (aSucceed) {
+    // TODO(nds): unite with externalObject(), remove parameters
+    //myFeature->execute();
 
-  DataPtr aData = myFeature->data();
-  AttributeSelectionListPtr aSelectionListAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+    DataPtr aData = myFeature->data();
+    AttributeSelectionListPtr aSelectionListAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-  QObjectPtrList aListOfAttributeObjects;
-  for (int i = 0; i < aSelectionListAttr->size(); i++) {
-    AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-    aListOfAttributeObjects.append(anAttr->context());
+    QObjectPtrList aListOfAttributeObjects;
+    for (int i = 0; i < aSelectionListAttr->size(); i++) {
+      AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
+      aListOfAttributeObjects.append(anAttr->context());
+    }
+    myExternalObjectMgr->removeUnusedExternalObjects(aListOfAttributeObjects, sketch(), myFeature);
   }
-
-  myExternalObjectMgr->removeUnusedExternalObjects(aListOfAttributeObjects, sketch(), myFeature);
+  return aSucceed;
 }
 
 //********************************************************************
@@ -77,7 +78,6 @@ void PartSet_WidgetMultiSelector::storeAttributeValue()
 {
   myIsInVaildate = true;
   ModuleBase_WidgetMultiSelector::storeAttributeValue();
-
 }
 
 //********************************************************************
