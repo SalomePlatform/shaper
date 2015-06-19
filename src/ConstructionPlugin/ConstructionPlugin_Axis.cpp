@@ -96,5 +96,7 @@ bool ConstructionPlugin_Axis::customisePresentation(ResultPtr theResult, AISObje
   isCustomized = thePrs->setLineStyle(3) || isCustomized;
   isCustomized = thePrs->setWidth(2) || isCustomized;
 
+  thePrs->setInfiniteState(true);
+
   return isCustomized;
 }

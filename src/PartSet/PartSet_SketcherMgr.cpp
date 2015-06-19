@@ -157,6 +157,9 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 {
   if (!myPlaneFilter.IsNull())
     myPlaneFilter.Nullify();
+  if (!myFilterInfinite.IsNull())
+    myFilterInfinite.Nullify();
+
 }
 
 void PartSet_SketcherMgr::onEnterViewPort()
@@ -298,7 +301,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (aOperation && aOperation->isEditOperation()) {
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
     ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-    // If the current widget is a selector, do do nothing, it processes the mouse press
+    // If the current widget is a selector, do nothing, it processes the mouse press
     if(aActiveWgt && aActiveWgt->isViewerSelector()) {
       return;
     }
@@ -715,7 +718,12 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (myPlaneFilter.IsNull()) 
     myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
+  if (myFilterInfinite.IsNull())
+    myFilterInfinite = new PartSet_FilterInfinite();
+
   myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
+  myModule->workshop()->viewer()->addSelectionFilter(myFilterInfinite);
+
   bool aHasPlane = false;
   if (theOperation->isEditOperation()) {
     // If it is editing of sketch then it means that plane is already defined
@@ -747,6 +755,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
+    myModule->workshop()->viewer()->removeSelectionFilter(myFilterInfinite);
 
     // Erase all sketcher objects
     QStringList aSketchIds = sketchOperationIdList();
@@ -778,6 +787,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     
   myCurrentSketch = CompositeFeaturePtr();
   myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
+  myModule->workshop()->viewer()->removeSelectionFilter(myFilterInfinite);
+
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
   // restore the module selection modes, which were changed on startSketch
