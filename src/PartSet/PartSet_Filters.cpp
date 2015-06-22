@@ -7,6 +7,7 @@
 #include "PartSet_Filters.h"
 
 #include <ModuleBase_IWorkshop.h>
+#include "ModuleBase_IModule.h"
 
 #include <ModelAPI_Feature.h>
 #include <FeaturesPlugin_Group.h>
@@ -20,6 +21,12 @@ IMPLEMENT_STANDARD_RTTIEXT(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter)
 
 Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
+  ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
+  // the shapes from different documents should be provided if there is no started operation
+  // in order to show/hide results
+  if (!anOperation)
+    return true;
+
   if (ModuleBase_ShapeDocumentFilter::IsOk(theOwner)) {
     if (theOwner->HasSelectable()) {
       Handle(AIS_InteractiveObject) aAisObj = 

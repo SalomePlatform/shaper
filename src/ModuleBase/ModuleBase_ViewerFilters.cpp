@@ -7,6 +7,7 @@
 
 #include "ModuleBase_ViewerFilters.h"
 #include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_IModule.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
@@ -29,6 +30,12 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 //TODO (VSV): Check bug in OCCT: Filter result is ignored (bug25340)
 Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
+  ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
+  // the shapes from different documents should be provided if there is no started operation
+  // in order to show/hide results
+  if (!anOperation)
+    return true;
+
   if (theOwner->HasSelectable()) {
     Handle(AIS_InteractiveObject) aAisObj = 
       Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());

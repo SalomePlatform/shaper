@@ -57,12 +57,12 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QString aTypesStr = aPropertyTypes.c_str();
   QStringList aShapeTypes = aTypesStr.split(' ');
 
-  //myIsUseChoice = theData->getBooleanAttribute("use_choice", true);
+  myIsUseChoice = theData->getBooleanAttribute("use_choice", true);
 
   myTypeCombo->addItems(aShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
   // if the xml definition contains one type, the controls to select a type should not be shown
-  if (aShapeTypes.size() == 1/* || !myIsUseChoice*/) {
+  if (aShapeTypes.size() == 1 || !myIsUseChoice) {
     aTypeLabel->setVisible(false);
     myTypeCombo->setVisible(false);
   }
@@ -298,7 +298,7 @@ QIntList ModuleBase_WidgetMultiSelector::getShapeTypes() const
 {
   QIntList aShapeTypes;
 
-  if (myTypeCombo->count() > 1) {
+  if (myTypeCombo->count() > 1 && myIsUseChoice) {
     aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->currentText()));
   }
   else {

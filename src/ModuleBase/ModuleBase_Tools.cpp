@@ -204,6 +204,7 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
     MyShapeTypes["shell"] = TopAbs_SHELL;
     MyShapeTypes["solid"] = TopAbs_SOLID;
     MyShapeTypes["solids"] = TopAbs_SOLID;
+    MyShapeTypes["compound"] = TopAbs_COMPOUND;
   }
   QString aType = theType.toLower();
   if (MyShapeTypes.contains(aType))

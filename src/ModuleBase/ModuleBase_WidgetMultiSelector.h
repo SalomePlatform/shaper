@@ -163,7 +163,7 @@ protected:
   /// Variable of GeomSelection
   QList<GeomSelection> mySelection;
 
-  //bool myIsUseChoice;
+  bool myIsUseChoice;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

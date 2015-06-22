@@ -128,6 +128,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 
+  if (myDocumentShapeFilter.IsNull())
+    myDocumentShapeFilter = new PartSet_GlobalFilter(myWorkshop);
+  myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
+
   if (myFilterInfinite.IsNull())
     myFilterInfinite = new PartSet_FilterInfinite();
   myWorkshop->viewer()->addSelectionFilter(myFilterInfinite);
@@ -232,16 +236,6 @@ void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
   breakOperationSequence();
 }
 
-void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
-{
-  // Install the document filter before any other filter
-  if (myDocumentShapeFilter.IsNull())
-    myDocumentShapeFilter = new PartSet_GlobalFilter(myWorkshop);
-  myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
-
-  ModuleBase_IModule::sendOperation(theOperation);
-}
-
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
@@ -265,7 +259,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
   }
-  myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
+  //myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const

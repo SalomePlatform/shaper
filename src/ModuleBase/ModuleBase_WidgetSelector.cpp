@@ -108,11 +108,13 @@ void ModuleBase_WidgetSelector::activateCustom()
 bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-  bool aValid;
-  // if there is no selected shape, the method returns true
-  if (!aShape.get())
-    aValid = true;
-  else {
+  bool aValid = true;
+  if (!aShape.get()) {
+    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    if (aResult.get())
+      aShape = aResult->shape();
+  }
+  if (aShape.get()) {
     // Check that the selection corresponds to selection type
     TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
     aValid = acceptSubShape(aTopoShape);
