@@ -165,10 +165,21 @@ bool ModuleBase_ParamSpinBox::hasVariable() const
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  QString aPattern = QString("[-+]?[0-9]*[%1]?[0-9]+([eE][-+]?[0-9]+)?")
-      .arg(QLocale::system().decimalPoint());
-  QRegExp varNameMask(aPattern);
-  return !varNameMask.exactMatch(theText);
+  QString aDigitPattern = QString("[-+]?[0-9]*[%1]?[0-9]+([eE][-+]?[0-9]+)?");
+
+  bool aHasDigit = false;
+  {
+    QRegExp varNameMask(aDigitPattern.arg("."));
+    aHasDigit = varNameMask.exactMatch(theText);
+  }
+  if (!aHasDigit)
+  {
+    QRegExp varNameMask(aDigitPattern.arg(","));
+    aHasDigit = varNameMask.exactMatch(theText);
+  }
+
+  return !aHasDigit;
+
 }
 
 /*!
