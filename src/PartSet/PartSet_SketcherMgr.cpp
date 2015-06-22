@@ -157,9 +157,6 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 {
   if (!myPlaneFilter.IsNull())
     myPlaneFilter.Nullify();
-  if (!myFilterInfinite.IsNull())
-    myFilterInfinite.Nullify();
-
 }
 
 void PartSet_SketcherMgr::onEnterViewPort()
@@ -718,11 +715,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (myPlaneFilter.IsNull()) 
     myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
-  if (myFilterInfinite.IsNull())
-    myFilterInfinite = new PartSet_FilterInfinite();
-
   myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
-  myModule->workshop()->viewer()->addSelectionFilter(myFilterInfinite);
 
   bool aHasPlane = false;
   if (theOperation->isEditOperation()) {
@@ -755,7 +748,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
-    myModule->workshop()->viewer()->removeSelectionFilter(myFilterInfinite);
 
     // Erase all sketcher objects
     QStringList aSketchIds = sketchOperationIdList();
@@ -787,7 +779,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     
   myCurrentSketch = CompositeFeaturePtr();
   myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
-  myModule->workshop()->viewer()->removeSelectionFilter(myFilterInfinite);
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }

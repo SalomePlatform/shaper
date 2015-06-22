@@ -392,21 +392,6 @@ bool GeomAPI_AISObject::setLineStyle(int theStyle)
   return isChanged;
 }
 
-bool GeomAPI_AISObject::setInfiniteState(const bool theState)
-{
-  bool isChanged = false;
-  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (!anAIS.IsNull() && anAIS->IsInfinite() != theState) {
-    anAIS->SetInfiniteState(theState);
-    isChanged = true;
-
-    bool isInfinite = anAIS->IsInfinite();
-    int aValue = 9;
-  }
-  return isChanged;
-}
-
-
 bool GeomAPI_AISObject::setTransparensy(double theVal)
 {
   bool isChanged = false;

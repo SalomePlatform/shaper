@@ -9,8 +9,6 @@
 
 #include "PartSet.h"
 
-#include "PartSet_FilterInfinite.h"
-
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -285,7 +283,6 @@ private:
   CompositeFeaturePtr myCurrentSketch;
 
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
-  Handle(PartSet_FilterInfinite) myFilterInfinite;
   FeatureToSelectionMap myCurrentSelection;
   bool myPreviousUpdateViewerEnabled;
 

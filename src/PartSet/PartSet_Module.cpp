@@ -127,12 +127,18 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
+
+  if (myFilterInfinite.IsNull())
+    myFilterInfinite = new PartSet_FilterInfinite();
+  myWorkshop->viewer()->addSelectionFilter(myFilterInfinite);
 }
 
 PartSet_Module::~PartSet_Module()
 {
   if (!myDocumentShapeFilter.IsNull())
     myDocumentShapeFilter.Nullify();
+  if (!myFilterInfinite.IsNull())
+    myFilterInfinite.Nullify();
 }
 
 void PartSet_Module::registerValidators()

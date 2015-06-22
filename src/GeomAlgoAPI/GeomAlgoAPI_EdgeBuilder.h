@@ -21,10 +21,14 @@
 class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
 {
  public:
-  /// Creates linear edge by two points
+  /// Creates linear edge by two points.
+  /// \param theStart a first point of an edge
+  /// \param theEnd an end point of an edge
+  /// \param theInfinite if true, the shape of the edge is infinite. It is used for axis edge.
   static std::shared_ptr<GeomAPI_Edge> line(std::shared_ptr<GeomAPI_Pnt> theStart,
-                                            std::shared_ptr<GeomAPI_Pnt> theEnd);
-  /// Creates edge - axis of the given cylindrical face
+                                            std::shared_ptr<GeomAPI_Pnt> theEnd,
+                                            const bool theInfinite = false);
+  /// Creates edge - axis of the given cylindrical face. The result axis edge is infinite
   static std::shared_ptr<GeomAPI_Edge> cylinderAxis(
     std::shared_ptr<GeomAPI_Shape> theCylindricalFace);
 

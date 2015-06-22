@@ -6,6 +6,7 @@
 #include "PartSet.h"
 #include "PartSet_Filters.h"
 #include "PartSet_DocumentDataModel.h"
+#include "PartSet_FilterInfinite.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -210,6 +211,7 @@ protected slots:
 
   /// A filter which provides selection within a current document or whole PartSet
   Handle(PartSet_GlobalFilter) myDocumentShapeFilter;
+  Handle(PartSet_FilterInfinite) myFilterInfinite;
 
   PartSet_SketcherMgr* mySketchMgr;
 

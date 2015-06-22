@@ -53,7 +53,7 @@ void ConstructionPlugin_Axis::createAxisByTwoPoints()
       std::shared_ptr<GeomAPI_Pnt> aStart = GeomAlgoAPI_PointBuilder::point(aShape1);
       std::shared_ptr<GeomAPI_Pnt> anEnd = GeomAlgoAPI_PointBuilder::point(aShape2);
       if (aStart->distance(anEnd) > ConstructionPlugin_Axis::MINIMAL_LENGTH()) {
-        std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
+        std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd, true);
 
         ResultConstructionPtr aConstr = document()->createConstruction(data());
         aConstr->setShape(anEdge);
@@ -95,8 +95,6 @@ bool ConstructionPlugin_Axis::customisePresentation(ResultPtr theResult, AISObje
 
   isCustomized = thePrs->setLineStyle(3) || isCustomized;
   isCustomized = thePrs->setWidth(2) || isCustomized;
-
-  thePrs->setInfiniteState(true);
 
   return isCustomized;
 }

@@ -119,13 +119,6 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   /// \returns true if the object value differs from the current
   bool setLineStyle(int theStyle);
 
-  //! Sets the infinite state flag aFlage.
-  //! considered as infinite, i.e. its graphic presentations
-  //! are not taken in account for View FitAll...
-  //! \param theState a state
-  /// \returns true if the object value differs from the current
-  bool setInfiniteState(const bool theState);
-
   /// Set transparency of the presentation (theVal = 0 ... 1)
   /// \returns true if the object value differs from the current
   bool setTransparensy(double theVal);
