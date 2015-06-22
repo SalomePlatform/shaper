@@ -153,7 +153,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createPlaneByGeneralEqu
     std::string kDefaultPlaneSize = "200";
     double aSize = Config_PropManager::integer("Sketch planes", "planes_size", kDefaultPlaneSize);
     aSize *= 4.;
-    aPlaneFace = GeomAlgoAPI_FaceBuilder::square(aPlane, aSize);
+    aPlaneFace = GeomAlgoAPI_FaceBuilder::square(aPlane, aSize, true);
   }
   return aPlaneFace;
 }
