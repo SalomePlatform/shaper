@@ -259,7 +259,6 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
   }
-  //myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const
