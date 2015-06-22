@@ -24,16 +24,25 @@ class GeomAlgoAPI_Prism : public GeomAPI_Interface
 public:
   /** \brief Creates extrusion for the given shape along the normal for this shape.
    *  \param[in] theBasis face or wire to be extruded.
-   *  \param[in] theFromShape bottom bounding shape.
    *  \param[in] theFromSize offset for "from" plane.
-   *  \param[in] theToShape top bounding shape.
    *  \param[in] theToSize offset for "to" plane.
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(const std::shared_ptr<GeomAPI_Shape>& theBasis,
-                                       const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                                       double                                theFromSize,
-                                       const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                                       double                                theToSize);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
+                                       double                         theFromSize,
+                                       double                         theToSize);
+
+  /** \brief Creates extrusion for the given shape along the normal for this shape.
+   *  \param[in] theBasis face or wire to be extruded.
+   *  \param[in] theFromShape bottom bounding shape. Can be empty. In this case offset will be applied to the basis.
+   *  \param[in] theFromSize offset for "from" plane.
+   *  \param[in] theToShape top bounding shape.  Can be empty. In this case offset will be applied to the basis.
+   *  \param[in] theToSize offset for "to" plane.
+   */
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
+                                       std::shared_ptr<GeomAPI_Shape> theFromShape,
+                                       double                         theFromSize,
+                                       std::shared_ptr<GeomAPI_Shape> theToShape,
+                                       double                         theToSize);
 
   /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT bool isDone() const;

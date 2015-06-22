@@ -24,11 +24,20 @@
 #include <TopoDS.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const std::shared_ptr<GeomAPI_Shape>& theBasis,
-                                     const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                                     double                                theFromSize,
-                                     const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                                     double                                theToSize)
+GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
+                                     double                         theFromSize,
+                                     double                         theToSize)
+: myDone(false)
+{
+  build(theBasis, std::shared_ptr<GeomAPI_Shape>(), theFromSize, std::shared_ptr<GeomAPI_Shape>(), theToSize);
+}
+
+//=================================================================================================
+GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
+                                     std::shared_ptr<GeomAPI_Shape> theFromShape,
+                                     double                         theFromSize,
+                                     std::shared_ptr<GeomAPI_Shape> theToShape,
+                                     double                         theToSize)
 : myDone(false)
 {
   build(theBasis, theFromShape, theFromSize, theToShape, theToSize);
@@ -114,7 +123,7 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
       myFirst->setImpl(new TopoDS_Shape(aBuilder->Modified(aFromShape).First()));
       myLast = std::make_shared<GeomAPI_Shape>();
       myLast->setImpl(new TopoDS_Shape(aBuilder->Modified(aToShape).First()));
-      myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape());
+      myMkShape = std::make_shared<GeomAlgoAPI_MakeShape>();
       myMkShape->setImpl(aBuilder);
     }
   }

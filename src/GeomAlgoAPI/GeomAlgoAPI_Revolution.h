@@ -32,13 +32,22 @@ class TopoDS_Solid;
 class GeomAlgoAPI_Revolution : public GeomAPI_Interface
 {
 public:
-  /** \brief Creates revolution for the given shape
-   *  \param[in] theBasis face for revolution
-   *  \param[in] theFromShape from bounding shape
-   *  \param[in] theFromAngle from angle
-   *  \param[in] theToShape to bounding shape
-   *  \param[in] theToAngle to angle
-   *  \return a solid which is obtained from specified one
+  /** \brief Creates revolution for the given shape.
+   *  \param[in] theBasis face for revolution.
+   *  \param[in] theFromAngle from angle.
+   *  \param[in] theToAngle to angle.
+   */
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
+                                            std::shared_ptr<GeomAPI_Ax1>   theAxis,
+                                            double                         theFromAngle,
+                                            double                         theToAngle);
+
+  /** \brief Creates revolution for the given shape.
+   *  \param[in] theBasis face for revolution.
+   *  \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.
+   *  \param[in] theFromAngle from angle.
+   *  \param[in] theToShape to bounding shape. Can be empty. In this case offset will be applied to the basis.
+   *  \param[in] theToAngle to angle.
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
                                             std::shared_ptr<GeomAPI_Ax1>   theAxis,
@@ -66,13 +75,10 @@ public:
   GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& lastShape();
  
   /// \return map of sub-shapes of the result. To be used for History keeping.
-  GEOMALGOAPI_EXPORT void mapOfShapes(GeomAPI_DataMapOfShapeShape& theMap) const;
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
 
   /// \return interface for History processing.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape* makeShape() const;
-
-  /// Destructor.
-  GEOMALGOAPI_EXPORT ~GeomAlgoAPI_Revolution();
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
 
 private:
   /** \brief Constructs infinite face from thePlane, and with axis located on the same side
@@ -94,21 +100,21 @@ private:
   TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint);
 
   /// Builds resulting shape.
-  void build(const std::shared_ptr<GeomAPI_Shape>& theBasis);
+  void build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
+             const std::shared_ptr<GeomAPI_Ax1>&   theAxis,
+             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+             double                                theFromAngle,
+             const std::shared_ptr<GeomAPI_Shape>& theToShape,
+             double                                theToAngle);
 
 private:
   /// Fields.
-  std::shared_ptr<GeomAPI_Ax1>   myAxis;
-  std::shared_ptr<GeomAPI_Shape> myFromShape;
-  double myFromAngle;
-  std::shared_ptr<GeomAPI_Shape> myToShape;
-  double myToAngle;
   bool myDone;
   std::shared_ptr<GeomAPI_Shape> myShape;
   std::shared_ptr<GeomAPI_Shape> myFirst;
   std::shared_ptr<GeomAPI_Shape> myLast;
-  GeomAPI_DataMapOfShapeShape myMap;
-  GeomAlgoAPI_MakeShape* myMkShape;
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
+  std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };
 
 #endif

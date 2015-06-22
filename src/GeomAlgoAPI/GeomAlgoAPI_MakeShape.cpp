@@ -11,7 +11,7 @@
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape)
   : GeomAPI_Interface(theMkShape),myShape(new GeomAPI_Shape())
 {
-  myShape->setImpl((void *)&implPtr<BRepBuilderAPI_MakeShape>()->Shape());
+  myShape->setImpl(new TopoDS_Shape(implPtr<BRepBuilderAPI_MakeShape>()->Shape()));
 }
 
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()

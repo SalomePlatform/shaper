@@ -165,11 +165,10 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
   else
     theResultBody->storeGenerated(theContext, theFeature.shape());
 
-  GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
-  theFeature.mapOfShapes(*aSubShapes);
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theFeature.mapOfShapes();
 
   std::string aGeneratedName = "LateralFace";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, aGeneratedName, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aGeneratedName, *aSubShapes);
 
   //Insert from face
   std::string aBotName = "FromFace";

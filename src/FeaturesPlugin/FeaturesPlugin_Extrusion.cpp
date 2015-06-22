@@ -159,7 +159,7 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
 
   //Insert lateral face : Face from Edge
   std::string aLatName = "LateralFace";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes.get());
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
 
   //Insert bottom face
   std::string aBotName = "BottomFace";
