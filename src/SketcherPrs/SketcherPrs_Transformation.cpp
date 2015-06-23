@@ -47,12 +47,6 @@ bool SketcherPrs_Transformation::updatePoints(double theStep) const
   gp_Pnt aP1;
   for (i = 0; i < aNbB; i++) {
     aObj = anAttrB->object(i);
-    if (!aObj.get()) // TODO:empty_result
-      // this check should be removed here after the result flush is corrected
-      // the problem is, that feature::execute() flushes redisplay by each result creation
-      // but it is possible(e.g. in the sketch circle, that there should be more than one result.
-      // Here, crash happens, because the second result is not created yet
-      continue;
     aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(i + 1, aP1);
   }  

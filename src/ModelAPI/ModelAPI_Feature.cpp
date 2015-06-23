@@ -29,7 +29,6 @@ std::shared_ptr<ModelAPI_Result> ModelAPI_Feature::lastResult()
 
 void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
-  static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID EVENT_UPD = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
 
@@ -47,9 +46,6 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
   }
   // in any case result becomes enabled
   theResult->setDisabled(theResult, false);
-  // flush vidualisation changes
-  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  aLoop->flush(aRedispEvent);
 }
 
 void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResult,
@@ -65,10 +61,6 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
     *aResIter = theResult;
   }
   theResult->setDisabled(theResult, false);
-  // flush visualisation changes
-  static Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  aLoop->flush(aRedispEvent);
 }
 
 void ModelAPI_Feature::removeResult(const std::shared_ptr<ModelAPI_Result>& theResult)
