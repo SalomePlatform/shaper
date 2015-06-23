@@ -39,11 +39,15 @@ Standard_Boolean SketcherPrs_SensitivePoint::Matches (SelectBasics_SelectingVolu
 
 gp_Pnt SketcherPrs_SensitivePoint::Point() const
 {
+  gp_Pnt aPoint(0, 0, 0);
   const Handle(SelectMgr_EntityOwner)& anOwner =
     Handle(SelectMgr_EntityOwner)::DownCast(OwnerId());
-  const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
-    Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
-  return aSymbPrs->pointsArray()->Vertice(myId);
+  if (!anOwner.IsNull()) {
+    const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
+      Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
+    aPoint = aSymbPrs->pointsArray()->Vertice(myId);
+  }
+  return aPoint;
 }
 
 Handle(Select3D_SensitiveEntity) SketcherPrs_SensitivePoint::GetConnected()
