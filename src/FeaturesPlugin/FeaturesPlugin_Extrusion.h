@@ -75,11 +75,25 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
     return MY_TO_OBJECT_ID;
   }
 
+  /// attribute name of extrusion offset
+  inline static const std::string& TO_OFFSET_ID()
+  {
+    static const std::string MY_TO_OFFSET_ID("to_offset");
+    return MY_TO_OFFSET_ID;
+  }
+
   /// attribute name of tool object
   inline static const std::string& FROM_OBJECT_ID()
   {
     static const std::string MY_FROM_OBJECT_ID("from_object");
     return MY_FROM_OBJECT_ID;
+  }
+
+  /// attribute name of extrusion offset
+  inline static const std::string& FROM_OFFSET_ID()
+  {
+    static const std::string MY_FROM_OFFSET_ID("from_offset");
+    return MY_FROM_OFFSET_ID;
   }
 
   /// Returns the kind of a feature

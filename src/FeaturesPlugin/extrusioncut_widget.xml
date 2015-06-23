@@ -8,14 +8,14 @@
       tooltip="Create or edit a sketch">
     </sketch_launcher>
     <toolbox id="CreationMethod">
-      <box id="ByOffsets" title="By offsets">
+      <box id="BySizes" title="By sizes">
         <groupbox>
           <doublevalue
             id="to_size"
             label="Size"
             min="0"
             step="1.0"
-            default="10"
+            default="0"
             icon=":icons/dimension_up.png"
             tooltip="Size">
           </doublevalue>
@@ -26,7 +26,7 @@
             label="Size"
             min="0"
             step="1.0"
-            default="0"
+            default="10"
             icon=":icons/dimension_down.png"
             tooltip="Size">
           </doublevalue>
@@ -42,12 +42,12 @@
                           default="&lt;base sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
-          <doublevalue  id="to_size"
-            label="Size" min="0" step="1.0" default="0"
+          <doublevalue  id="to_offset"
+            label="Offset" min="0" step="1.0" default="0"
             icon=":icons/dimension_up.png"
-            tooltip="Size">
+            tooltip="Offset">
           </doublevalue>
-        </groupbox>        
+        </groupbox>
         <groupbox title="From">
           <shape_selector id="from_object"
                           icon=":icons/plane.png"
@@ -57,10 +57,10 @@
                           default="&lt;base sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
-          <doublevalue id="from_size" label="Size"
-            min="0" step="1.0" default="10"
+          <doublevalue id="from_offset"
+            label="Offset" min="0" step="1.0" default="0"
             icon=":icons/dimension_down.png"
-            tooltip="Size">
+            tooltip="Offset">
           </doublevalue>
         </groupbox>
       </box>

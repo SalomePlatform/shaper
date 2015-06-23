@@ -16,14 +16,14 @@
       <validator id="GeomValidators_ShapeType" parameters="line"/>
     </shape_selector>
     <toolbox id="CreationMethod">
-      <box id="ByOffsets" title="By offsets">
+      <box id="ByAngles" title="By angles">
         <groupbox>
           <doublevalue
             id="to_angle"
             label="Angle"
             min="0"
             step="1.0"
-            default="360"
+            default="0"
             icon=":icons/angle_up.png"
             tooltip="Angle">
           </doublevalue>
@@ -34,7 +34,7 @@
             label="Angle"
             min="0"
             step="1.0"
-            default="0"
+            default="10"
             icon=":icons/angle_down.png"
             tooltip="Angle">
           </doublevalue>
@@ -50,10 +50,10 @@
                           default="&lt;sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
-          <doublevalue  id="to_angle" label="Angle"
+          <doublevalue  id="to_offset" label="Offset"
             min="0" step="1.0" default="0"
             icon=":icons/angle_up.png"
-            tooltip="Angle">
+            tooltip="Offset">
           </doublevalue>
         </groupbox>
         <groupbox title="From">
@@ -65,10 +65,10 @@
                           default="&lt;sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
-          <doublevalue id="from_angle" label="Angle"
+          <doublevalue id="from_offset" label="Offset"
             min="0" step="1.0" default="0"
             icon=":icons/angle_down.png"
-            tooltip="Angle">
+            tooltip="Offset">
           </doublevalue>
         </groupbox>
       </box>

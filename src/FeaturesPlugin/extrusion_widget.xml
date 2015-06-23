@@ -10,7 +10,7 @@
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
   <toolbox id="CreationMethod">
-    <box id="ByOffsets" title="By offsets">
+    <box id="BySizes" title="By sizes">
       <groupbox>
         <doublevalue
           id="to_size"
@@ -45,13 +45,13 @@
           <validator id="GeomValidators_Face" parameters="plane"/>
         </shape_selector>
         <doublevalue
-          id="to_size"
-          label="Size"
+          id="to_offset"
+          label="Offset"
           min="0"
           step="1.0"
-          default="10"
+          default="0"
           icon=":icons/dimension_up.png"
-          tooltip="Size">
+          tooltip="Offset">
         </doublevalue>
       </groupbox>
       <groupbox title="From">
@@ -64,16 +64,16 @@
           <validator id="GeomValidators_Face" parameters="plane"/>
         </shape_selector>
         <doublevalue
-          id="from_size"
-          label="Size"
+          id="from_offset"
+          label="Offset"
           min="0"
           step="1.0"
           default="0"
           icon=":icons/dimension_down.png"
-          tooltip="Size">
+          tooltip="Offset">
         </doublevalue>
       </groupbox>
     </box>    
   </toolbox>
-  <validator id="GeomValidators_ZeroOffset" parameters="from_object,to_object,from_size,to_size"/>
+  <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
 </source>

@@ -23,14 +23,14 @@ class FeaturesPlugin_ExtrusionBoolean : public FeaturesPlugin_CompositeBoolean
     return METHOD_ATTR;
   }
 
-  /// Attribute name of an object from which the extrusion grows.
-  inline static const std::string& FROM_OBJECT_ID()
+  /// attribute name of extrusion size
+  inline static const std::string& TO_SIZE_ID()
   {
-    static const std::string MY_FROM_OBJECT_ID("from_object");
-    return MY_FROM_OBJECT_ID;
+    static const std::string MY_TO_SIZE_ID("to_size");
+    return MY_TO_SIZE_ID;
   }
 
-  /// Attribute name of extrusion from size.
+  /// attribute name of extrusion size
   inline static const std::string& FROM_SIZE_ID()
   {
     static const std::string MY_FROM_SIZE_ID("from_size");
@@ -44,11 +44,25 @@ class FeaturesPlugin_ExtrusionBoolean : public FeaturesPlugin_CompositeBoolean
     return MY_TO_OBJECT_ID;
   }
 
-  /// Attribute name of extrusion to size.
-  inline static const std::string& TO_SIZE_ID()
+  /// attribute name of extrusion offset
+  inline static const std::string& TO_OFFSET_ID()
   {
-    static const std::string MY_TO_SIZE_ID("to_size");
-    return MY_TO_SIZE_ID;
+    static const std::string MY_TO_OFFSET_ID("to_offset");
+    return MY_TO_OFFSET_ID;
+  }
+
+  /// Attribute name of an object from which the extrusion grows.
+  inline static const std::string& FROM_OBJECT_ID()
+  {
+    static const std::string MY_FROM_OBJECT_ID("from_object");
+    return MY_FROM_OBJECT_ID;
+  }
+
+  /// attribute name of extrusion offset
+  inline static const std::string& FROM_OFFSET_ID()
+  {
+    static const std::string MY_FROM_OFFSET_ID("from_offset");
+    return MY_FROM_OFFSET_ID;
   }
 
 protected:
