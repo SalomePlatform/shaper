@@ -3,6 +3,11 @@
 <!--
 -->
 <document>
+  <section name="language">
+    <!-- Language settings (resource manager)-->
+    <parameter name="language"    value="en"/>
+    <parameter name="locale"      value="true"/>
+  </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="background" value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />

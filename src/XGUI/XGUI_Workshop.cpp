@@ -68,6 +68,8 @@
 #include <Config_PropManager.h>
 #include <Config_SelectionFilterMessage.h>
 
+#include <SUIT_ResourceMgr.h>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -80,6 +82,7 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QAction>
+#include <QDesktopWidget>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -110,6 +113,15 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 {
   myMainWindow = mySalomeConnector ? 0 : new AppElements_MainWindow();
 
+  if (myMainWindow) {
+    SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+    bool aCloc = aResMgr->booleanValue("language", "locale", true);
+    if (aCloc)
+      QLocale::setDefault( QLocale::c() );
+    else 
+      QLocale::setDefault( QLocale::system() );
+  }
+
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
@@ -117,7 +129,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
-  myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+  myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
   connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,
           SLOT(onContextMenuCommand(const QString&, bool)));
@@ -138,7 +150,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onOperationCommitted(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
           SLOT(onOperationAborted(ModuleBase_Operation*)));
-  connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
+  if (myMainWindow)
+    connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
