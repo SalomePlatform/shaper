@@ -443,8 +443,11 @@ void NewGeom_Module::addDesktopMenuSeparator(const char* theMenuSourceText, cons
 QList<QAction*> NewGeom_Module::commandList() const
 {
   QList<QAction*> aActions;
-  for (int i = 0; i < myActionsList.size(); i++)
-    aActions.append(action(i));
+  for (int i = 0; i < myActionsList.size(); i++) {
+    QAction* aCmd = action(i);
+    if (aCmd && myActionsList.contains(aCmd->data().toString()))
+      aActions.append(aCmd);
+  }
   return aActions;
 }
 

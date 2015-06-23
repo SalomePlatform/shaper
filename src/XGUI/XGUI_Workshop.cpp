@@ -1118,20 +1118,16 @@ void XGUI_Workshop::updateCommandStatus()
   }
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->hasModuleDocument()) {
-    QAction *aUndoCmd, *aRedoCmd;
     foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
       if (aId == "UNDO_CMD")
-        aUndoCmd = aCmd;
+        aCmd->setEnabled(myModule->canUndo());
       else if (aId == "REDO_CMD")
-        aRedoCmd = aCmd;
+        aCmd->setEnabled(myModule->canRedo());
       else
         // Enable all commands
         aCmd->setEnabled(true);
     }
-
-    aUndoCmd->setEnabled(myModule->canUndo());
-    aRedoCmd->setEnabled(myModule->canRedo());
     updateHistory();
   } else {
     foreach(QAction* aCmd, aCommands) {
