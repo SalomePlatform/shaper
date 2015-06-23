@@ -4,9 +4,7 @@
 #define PartSet_Module_H
 
 #include "PartSet.h"
-#include "PartSet_Filters.h"
 #include "PartSet_DocumentDataModel.h"
-#include "PartSet_FilterInfinite.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -18,6 +16,7 @@
 
 //#include <StdSelect_FaceFilter.hxx>
 #include <TopoDS_Shape.hxx>
+#include <SelectMgr_ListOfFilter.hxx>
 
 #include <QMap>
 #include <QMenu>
@@ -57,13 +56,17 @@ public:
   PartSet_Module(ModuleBase_IWorkshop* theWshop);
   virtual ~PartSet_Module();
 
+  // Add default selection filters of the module to the current viewer
+  virtual void activateSelectionFilters();
+  // Remove default selection filters of the module from the current viewer
+  virtual void deactivateSelectionFilters();
+
   /// Creates custom widgets for property panel
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi, std::string theParentId);
 
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
-
 
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
@@ -205,9 +208,7 @@ protected slots:
    // Automatical restarting mode flag
    RestartingMode myRestartingMode;
 
-  /// A filter which provides selection within a current document or whole PartSet
-  Handle(PartSet_GlobalFilter) myDocumentShapeFilter;
-  Handle(PartSet_FilterInfinite) myFilterInfinite;
+  SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
 

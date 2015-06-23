@@ -15,6 +15,9 @@
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
 
+#include "PartSet_Filters.h"
+#include "PartSet_FilterInfinite.h"
+
 #include <PartSetPlugin_Remove.h>
 #include <PartSetPlugin_Part.h>
 
@@ -90,6 +93,8 @@
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Dir.h>
 
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -128,21 +133,38 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 
-  if (myDocumentShapeFilter.IsNull())
-    myDocumentShapeFilter = new PartSet_GlobalFilter(myWorkshop);
-  myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
-
-  if (myFilterInfinite.IsNull())
-    myFilterInfinite = new PartSet_FilterInfinite();
-  myWorkshop->viewer()->addSelectionFilter(myFilterInfinite);
+  mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
+  mySelectionFilters.Append(new PartSet_FilterInfinite());
 }
 
 PartSet_Module::~PartSet_Module()
 {
-  if (!myDocumentShapeFilter.IsNull())
-    myDocumentShapeFilter.Nullify();
-  if (!myFilterInfinite.IsNull())
-    myFilterInfinite.Nullify();
+  SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
+  for (; aIt.More(); aIt.Next()) {
+    Handle(SelectMgr_Filter) aFilter = aIt.Value();
+    if (!aFilter.IsNull())
+      aFilter.Nullify();
+  }
+}
+
+void PartSet_Module::activateSelectionFilters()
+{
+  SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
+  for (; aIt.More(); aIt.Next()) {
+    Handle(SelectMgr_Filter) aFilter = aIt.Value();
+    if (!aFilter.IsNull())
+      myWorkshop->viewer()->addSelectionFilter(aFilter);
+  }
+}
+
+void PartSet_Module::deactivateSelectionFilters()
+{
+  SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
+  for (; aIt.More(); aIt.Next()) {
+    Handle(SelectMgr_Filter) aFilter = aIt.Value();
+    if (!aFilter.IsNull())
+      myWorkshop->viewer()->removeSelectionFilter(aFilter);
+  }
 }
 
 void PartSet_Module::registerValidators()

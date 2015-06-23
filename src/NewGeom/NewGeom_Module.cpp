@@ -159,6 +159,8 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
+    // it should be pefromed after the selector creation in order to have AISContext 
+    myWorkshop->activateModule();
     //action(myEraseAll)->setEnabled(false);
 
     if (myIsOpened) {
@@ -222,6 +224,8 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 {
   setMenuShown(false);
   setToolShown(false);
+
+  myWorkshop->deactivateModule();
 
   QObject* aObj = myWorkshop->objectBrowser()->parent();
   QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);

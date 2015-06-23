@@ -176,7 +176,7 @@ void XGUI_Workshop::startApplication()
   // Calling of  loadCustomProps before activating module is required
   // by Config_PropManger to restore user-defined path to plugins
   ModuleBase_Preferences::loadCustomProps();
-  activateModule();
+  createModule();
   if (myMainWindow) {
     myMainWindow->show();
     updateCommandStatus();
@@ -185,6 +185,29 @@ void XGUI_Workshop::startApplication()
   onNew();
 
   emit applicationStarted();
+}
+
+void XGUI_Workshop::activateModule()
+{
+  myModule->activateSelectionFilters();
+
+  connect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
+    myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
+  connect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
+    myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
+
+  myActionsMgr->update();
+
+}
+
+void XGUI_Workshop::deactivateModule()
+{
+  myModule->deactivateSelectionFilters();
+
+  disconnect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
+    myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
+  disconnect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
+    myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
 }
 
 //******************************************************
@@ -1051,7 +1074,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 }
 
 //******************************************************
-bool XGUI_Workshop::activateModule()
+bool XGUI_Workshop::createModule()
 {
   Config_ModuleReader aModuleReader;
   QString moduleName = QString::fromStdString(aModuleReader.getModuleName());
@@ -1059,13 +1082,13 @@ bool XGUI_Workshop::activateModule()
   if (!myModule)
     return false;
 
-  connect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
-    myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
-  connect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
-    myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
+  //connect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
+  //  myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
+  //connect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
+  //  myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
 
   myModule->createFeatures();
-  myActionsMgr->update();
+  //myActionsMgr->update();
   return true;
 }
 

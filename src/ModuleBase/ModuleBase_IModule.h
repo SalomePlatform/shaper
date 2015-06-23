@@ -40,6 +40,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   virtual ~ModuleBase_IModule() {}
 
+  // Add default selection filters of the module to the current viewer
+  virtual void activateSelectionFilters() {};
+
+  // Remove default selection filters of the module from the current viewer
+  virtual void deactivateSelectionFilters() {};
+
   /// Reads description of features from XML file 
   virtual void createFeatures();
 

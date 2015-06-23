@@ -67,6 +67,12 @@ Q_OBJECT
   //! Starting of the application
   void startApplication();
 
+  // Activates the module controls. Should be called after module creation
+  void activateModule();
+
+  // Deactivates the module controls. Should be called after module creation
+  void deactivateModule();
+
   //! Returns main window (Desktop) of the application
   AppElements_MainWindow* mainWindow() const
   {
@@ -380,8 +386,8 @@ signals:
   /// \param theModule name of the module
   ModuleBase_IModule* loadModule(const QString& theModule);
 
-  /// Activate module
-  bool activateModule();
+  /// Create module
+  bool createModule();
 
   /// Create object browser widget
   /// \param theParent a parent of widget
