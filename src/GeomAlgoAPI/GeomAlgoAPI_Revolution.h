@@ -34,27 +34,27 @@ class GeomAlgoAPI_Revolution : public GeomAPI_Interface
 public:
   /** \brief Creates revolution for the given shape.
    *  \param[in] theBasis face for revolution.
-   *  \param[in] theFromAngle from angle.
    *  \param[in] theToAngle to angle.
+   *  \param[in] theFromAngle from angle.
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
                                             std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                            double                         theFromAngle,
-                                            double                         theToAngle);
+                                            double                         theToAngle,
+                                            double                         theFromAngle);
 
   /** \brief Creates revolution for the given shape.
    *  \param[in] theBasis face for revolution.
-   *  \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.
-   *  \param[in] theFromAngle from angle.
    *  \param[in] theToShape to bounding shape. Can be empty. In this case offset will be applied to the basis.
    *  \param[in] theToAngle to angle.
+   *  \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.
+   *  \param[in] theFromAngle from angle.
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
                                             std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                            std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                            double                         theFromAngle,
                                             std::shared_ptr<GeomAPI_Shape> theToShape,
-                                            double                         theToAngle);
+                                            double                         theToAngle,
+                                            std::shared_ptr<GeomAPI_Shape> theFromShape,
+                                            double                         theFromAngle);
 
   /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT const bool isDone() const;
@@ -102,10 +102,10 @@ private:
   /// Builds resulting shape.
   void build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
              const std::shared_ptr<GeomAPI_Ax1>&   theAxis,
-             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-             double                                theFromAngle,
              const std::shared_ptr<GeomAPI_Shape>& theToShape,
-             double                                theToAngle);
+             double                                theToAngle,
+             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+             double                                theFromAngle);
 
 private:
   /// Fields.

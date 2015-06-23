@@ -9,43 +9,71 @@
     type_choice="Faces Compound">
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
-  <groupbox title="From">
-    <shape_selector id="from_object"
-                    icon=":icons/plane.png"
-                    label="Plane face"
-                    tooltip="Select a planar face"
-                    shape_types="face"
-                    default="&lt;sketch&gt;">
-      <validator id="GeomValidators_Face" parameters="plane"/>
-    </shape_selector>
-    <doublevalue
-      id="from_size"
-      label="Size"
-      min="0"
-      step="1.0"
-      default="0"
-      icon=":icons/dimension_down.png"
-      tooltip="Height">
-    </doublevalue>
-  </groupbox>
-  <groupbox title="To">
-    <shape_selector id="to_object"
-                    icon=":icons/plane_inverted.png"
-                    label="Plane face"
-                    tooltip="Select a planar face"
-                    shape_types="face"
-                    default="&lt;sketch&gt;">
-      <validator id="GeomValidators_Face" parameters="plane"/>
-    </shape_selector>
-    <doublevalue
-      id="to_size"
-      label="Size"
-      min="0"
-      step="1.0"
-      default="10"
-      icon=":icons/dimension_up.png"
-      tooltip="Height">
-    </doublevalue>
-  </groupbox>
+  <toolbox id="CreationMethod">
+    <box id="ByOffsets" title="By offsets">
+      <groupbox>
+        <doublevalue
+          id="to_size"
+          label="Size"
+          min="0"
+          step="1.0"
+          default="10"
+          icon=":icons/dimension_up.png"
+          tooltip="Size">
+        </doublevalue>
+      </groupbox>
+      <groupbox>
+        <doublevalue
+          id="from_size"
+          label="Size"
+          min="0"
+          step="1.0"
+          default="0"
+          icon=":icons/dimension_down.png"
+          tooltip="Size">
+        </doublevalue>
+      </groupbox>
+    </box>
+    <box id="ByPlanesAndOffsets" title="By bounding planes and offsets">
+      <groupbox title="To">
+        <shape_selector id="to_object"
+                        icon=":icons/plane_inverted.png"
+                        label="Plane face"
+                        tooltip="Select a planar face"
+                        shape_types="face"
+                        default="&lt;base sketch&gt;">
+          <validator id="GeomValidators_Face" parameters="plane"/>
+        </shape_selector>
+        <doublevalue
+          id="to_size"
+          label="Size"
+          min="0"
+          step="1.0"
+          default="10"
+          icon=":icons/dimension_up.png"
+          tooltip="Size">
+        </doublevalue>
+      </groupbox>
+      <groupbox title="From">
+        <shape_selector id="from_object"
+                        icon=":icons/plane.png"
+                        label="Plane face"
+                        tooltip="Select a planar face"
+                        shape_types="face"
+                        default="&lt;base sketch&gt;">
+          <validator id="GeomValidators_Face" parameters="plane"/>
+        </shape_selector>
+        <doublevalue
+          id="from_size"
+          label="Size"
+          min="0"
+          step="1.0"
+          default="0"
+          icon=":icons/dimension_down.png"
+          tooltip="Size">
+        </doublevalue>
+      </groupbox>
+    </box>    
+  </toolbox>
   <validator id="GeomValidators_ZeroOffset" parameters="from_object,to_object,from_size,to_size"/>
 </source>

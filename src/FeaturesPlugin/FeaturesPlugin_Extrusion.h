@@ -47,6 +47,13 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
     return MY_TO_OBJECT_ID;
   }
 
+  /// attribute name for creation method
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string METHOD_ATTR("CreationMethod");
+    return METHOD_ATTR;
+  }
+
   /// attribute name of extrusion size
   inline static const std::string& TO_SIZE_ID()
   {

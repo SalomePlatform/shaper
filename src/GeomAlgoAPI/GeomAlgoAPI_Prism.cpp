@@ -25,30 +25,30 @@
 
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
-                                     double                         theFromSize,
-                                     double                         theToSize)
+                                     double                         theToSize,
+                                     double                         theFromSize)
 : myDone(false)
 {
-  build(theBasis, std::shared_ptr<GeomAPI_Shape>(), theFromSize, std::shared_ptr<GeomAPI_Shape>(), theToSize);
+  build(theBasis, std::shared_ptr<GeomAPI_Shape>(), theToSize, std::shared_ptr<GeomAPI_Shape>(), theFromSize);
 }
 
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
-                                     std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                     double                         theFromSize,
                                      std::shared_ptr<GeomAPI_Shape> theToShape,
-                                     double                         theToSize)
+                                     double                         theToSize,
+                                     std::shared_ptr<GeomAPI_Shape> theFromShape,
+                                     double                         theFromSize)
 : myDone(false)
 {
-  build(theBasis, theFromShape, theFromSize, theToShape, theToSize);
+  build(theBasis, theToShape, theToSize, theFromShape, theFromSize);
 }
 
 //=================================================================================================
 void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
-                              const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                              double                                theFromSize,
                               const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                              double                                theToSize)
+                              double                                theToSize,
+                              const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+                              double                                theFromSize)
 {
   if(!theBasis ||
     (((!theFromShape && !theToShape) || (theFromShape && theToShape && theFromShape->isEqual(theToShape)))

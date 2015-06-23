@@ -22,6 +22,13 @@ public:
     return MY_AXIS_ID;
   }
 
+  /// attribute name for creation method
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string METHOD_ATTR("CreationMethod");
+    return METHOD_ATTR;
+  }
+
   /// Attribute name of an object from which the revolution grows.
   inline static const std::string& FROM_OBJECT_ID()
   {

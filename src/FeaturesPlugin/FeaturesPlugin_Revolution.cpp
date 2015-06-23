@@ -6,20 +6,16 @@
 
 #include <FeaturesPlugin_Revolution.h>
 
-#include <GeomAlgoAPI_FaceBuilder.h>
-#include <GeomAlgoAPI_Rotation.h>
-#include <GeomAPI_Ax3.h>
-#include <GeomAPI_Edge.h>
-#include <GeomAPI_Lin.h>
-#include <GeomAPI_Pln.h>
-#include <GeomAPI_XYZ.h>
-
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
+
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Lin.h>
 
 #define FACE 4
 #define EDGE 6
@@ -37,54 +33,66 @@ void FeaturesPlugin_Revolution::initAttributes()
 {
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Revolution::LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+    LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // revolution works with faces always
   aSelection->setSelectionType("FACE");
 
-  data()->addAttribute(FeaturesPlugin_Revolution::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
 
-  data()->addAttribute(FeaturesPlugin_Revolution::FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Revolution::FROM_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(FeaturesPlugin_Revolution::TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Revolution::TO_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(TO_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_Revolution::FROM_OBJECT_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_Revolution::TO_OBJECT_ID());
+  data()->addAttribute(FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FROM_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TO_OBJECT_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FROM_OBJECT_ID());
 }
 
 //=================================================================================================
 void FeaturesPlugin_Revolution::execute()
 {
-  AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Revolution::LIST_ID());
+  AttributeSelectionListPtr aFaceRefs = selectionList(LIST_ID());
 
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
+    anEdge = std::make_shared<GeomAPI_Edge>(anObjRef->value());
+  } else if(anObjRef->context() && anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
+    anEdge = std::make_shared<GeomAPI_Edge>(anObjRef->context()->shape());
   }
   if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), anEdge->line()->direction()));
-  }
-
-  // Getting bounding planes.
-  std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape());
-  std::shared_ptr<GeomAPI_Shape> aToShape(new GeomAPI_Shape());
-
-  anObjRef = selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
-  if(anObjRef) {
-    aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
-  }
-  anObjRef = selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
-  if(anObjRef) {
-    aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+    anAxis = std::make_shared<GeomAPI_Ax1>(anEdge->line()->location(), anEdge->line()->direction());
   }
 
   // Getting angles.
-  double aFromAngle = real(FeaturesPlugin_Revolution::FROM_ANGLE_ID())->value();
-  double aToAngle = real(FeaturesPlugin_Revolution::TO_ANGLE_ID())->value();
+  double aFromAngle = real(FROM_ANGLE_ID())->value();
+  double aToAngle = real(TO_ANGLE_ID())->value();
+
+  // Getting bounding planes.
+  std::shared_ptr<GeomAPI_Shape> aFromShape;
+  std::shared_ptr<GeomAPI_Shape> aToShape;
+
+  if(string(CREATION_METHOD())->value() == "ByPlanesAndOffsets") {
+    anObjRef = selection(FROM_OBJECT_ID());
+    if(anObjRef.get() != NULL) {
+      aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+      if(aFromShape.get() == NULL && anObjRef->context().get() != NULL) {
+        aFromShape = anObjRef->context()->shape();
+      }
+    }
+    anObjRef = selection(TO_OBJECT_ID());
+    if(anObjRef.get() != NULL) {
+      aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+      if(aToShape.get() == NULL && anObjRef->context().get() != NULL) {
+        aToShape =  anObjRef->context()->shape();
+      }
+    }
+  }
 
   // for each selected face generate a result
   int anIndex = 0, aResultIndex = 0;
@@ -121,7 +129,7 @@ void FeaturesPlugin_Revolution::execute()
         aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
       }
 
-      GeomAlgoAPI_Revolution aFeature(aBaseShape, anAxis, aFromShape, aFromAngle, aToShape, aToAngle);
+      GeomAlgoAPI_Revolution aFeature(aBaseShape, anAxis, aToShape, aToAngle, aFromShape, aFromAngle);
       if(!aFeature.isDone()) {
         static const std::string aFeatureError = "Revolution algorithm failed";
         setError(aFeatureError);

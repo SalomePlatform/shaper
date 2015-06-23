@@ -30,23 +30,23 @@
 //=================================================================================================
 GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
                                                std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                               double                         theFromAngle,
-                                               double                         theToAngle)
+                                               double                         theToAngle,
+                                               double                         theFromAngle)
 : myDone(false)
 {
-  build(theBasis, theAxis, std::shared_ptr<GeomAPI_Shape>(), theFromAngle, std::shared_ptr<GeomAPI_Shape>(), theToAngle);
+  build(theBasis, theAxis, std::shared_ptr<GeomAPI_Shape>(), theToAngle, std::shared_ptr<GeomAPI_Shape>(), theFromAngle);
 }
 
 //=================================================================================================
 GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
                                                std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                               std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                               double                         theFromAngle,
                                                std::shared_ptr<GeomAPI_Shape> theToShape,
-                                               double                         theToAngle)
+                                               double                         theToAngle,
+                                               std::shared_ptr<GeomAPI_Shape> theFromShape,
+                                               double                         theFromAngle)
 : myDone(false)
 {
-  build(theBasis, theAxis, theFromShape, theFromAngle, theToShape, theToAngle);
+  build(theBasis, theAxis, theToShape, theToAngle, theFromShape, theFromAngle);
 }
 
 //=================================================================================================
@@ -107,10 +107,10 @@ TopoDS_Shape GeomAlgoAPI_Revolution::findClosest(const TopoDS_Shape& theShape, c
 //=================================================================================================
 void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
                                    const std::shared_ptr<GeomAPI_Ax1>&   theAxis,
-                                   const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                                   double                                theFromAngle,
                                    const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                                   double                                theToAngle)
+                                   double                                theToAngle,
+                                   const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+                                   double                                theFromAngle)
 {
   if(!theBasis || !theAxis ||
     (((!theFromShape && !theToShape) || (theFromShape && theToShape && theFromShape->isEqual(theToShape)))

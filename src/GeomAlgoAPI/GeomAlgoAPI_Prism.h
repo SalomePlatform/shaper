@@ -24,25 +24,25 @@ class GeomAlgoAPI_Prism : public GeomAPI_Interface
 public:
   /** \brief Creates extrusion for the given shape along the normal for this shape.
    *  \param[in] theBasis face or wire to be extruded.
-   *  \param[in] theFromSize offset for "from" plane.
    *  \param[in] theToSize offset for "to" plane.
+   *  \param[in] theFromSize offset for "from" plane.
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
-                                       double                         theFromSize,
-                                       double                         theToSize);
+                                       double                         theToSize,
+                                       double                         theFromSize);
 
   /** \brief Creates extrusion for the given shape along the normal for this shape.
    *  \param[in] theBasis face or wire to be extruded.
-   *  \param[in] theFromShape bottom bounding shape. Can be empty. In this case offset will be applied to the basis.
-   *  \param[in] theFromSize offset for "from" plane.
    *  \param[in] theToShape top bounding shape.  Can be empty. In this case offset will be applied to the basis.
    *  \param[in] theToSize offset for "to" plane.
+   *  \param[in] theFromShape bottom bounding shape. Can be empty. In this case offset will be applied to the basis.
+   *  \param[in] theFromSize offset for "from" plane.
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
-                                       std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                       double                         theFromSize,
                                        std::shared_ptr<GeomAPI_Shape> theToShape,
-                                       double                         theToSize);
+                                       double                         theToSize,
+                                       std::shared_ptr<GeomAPI_Shape> theFromShape,
+                                       double                         theFromSize);
 
   /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT bool isDone() const;
@@ -71,10 +71,10 @@ public:
 private:
   /// Builds resulting shape.
   void build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
-             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-             double                                theFromSize,
              const std::shared_ptr<GeomAPI_Shape>& theToShape,
-             double                                theToSize);
+             double                                theToSize,
+             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+             double                                theFromSize);
 
 private:
   /// Fields.

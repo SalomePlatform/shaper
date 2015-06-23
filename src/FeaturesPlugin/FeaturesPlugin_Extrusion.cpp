@@ -4,7 +4,8 @@
 // Created:     30 May 2014
 // Author:      Vitaly SMETANNIKOV
 
-#include "FeaturesPlugin_Extrusion.h"
+#include <FeaturesPlugin_Extrusion.h>
+
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Document.h>
@@ -17,64 +18,69 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeReference.h>
-#include <GeomAlgoAPI_Extrusion.h>
-#include <GeomAlgoAPI_FaceBuilder.h>
+
 #include <GeomAlgoAPI_Prism.h>
 
-using namespace std;
 #define _LATERAL_TAG 1
 #define _FIRST_TAG 2
 #define _LAST_TAG 3
 #define EDGE 6
 
+//=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 {
 }
 
+//=================================================================================================
 void FeaturesPlugin_Extrusion::initAttributes()
 {
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Extrusion::LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+    LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // extrusion works with faces always
   aSelection->setSelectionType("FACE");
 
-  data()->addAttribute(FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FeaturesPlugin_Extrusion::TO_OBJECT_ID());
+  data()->addAttribute(FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TO_OBJECT_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FROM_OBJECT_ID());
 }
 
+//=================================================================================================
 void FeaturesPlugin_Extrusion::execute()
 {
-  AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Extrusion::LIST_ID());
+  AttributeSelectionListPtr aFaceRefs = selectionList(LIST_ID());
+
+  // Getting sizes.
+  double aFromSize = real(FROM_SIZE_ID())->value();
+  double aToSize = real(TO_SIZE_ID())->value();
 
   // Getting bounding planes.
   std::shared_ptr<GeomAPI_Shape> aFromShape;
   std::shared_ptr<GeomAPI_Shape> aToShape;
 
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
-  if(anObjRef.get() != NULL) {
-    aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
-    if(aFromShape.get() == NULL && anObjRef->context().get() != NULL) {
-      aFromShape = anObjRef->context()->shape();
+  if(string(CREATION_METHOD())->value() == "ByPlanesAndOffsets") {
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FROM_OBJECT_ID());
+    if(anObjRef.get() != NULL) {
+      aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+      if(aFromShape.get() == NULL && anObjRef->context().get() != NULL) {
+        aFromShape = anObjRef->context()->shape();
+      }
+    }
+    anObjRef = selection(TO_OBJECT_ID());
+    if(anObjRef.get() != NULL) {
+      aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
+      if(aToShape.get() == NULL && anObjRef->context().get() != NULL) {
+        aToShape =  anObjRef->context()->shape();
+      }
     }
   }
-  anObjRef = selection(FeaturesPlugin_Extrusion::TO_OBJECT_ID());
-  if(anObjRef.get() != NULL) {
-    aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
-    if(aToShape.get() == NULL && anObjRef->context().get() != NULL) {
-      aToShape =  anObjRef->context()->shape();
-    }
-  }
-
-  // Getting sizes.
-  double aFromSize = real(FeaturesPlugin_Extrusion::FROM_SIZE_ID())->value();
-  double aToSize = real(FeaturesPlugin_Extrusion::TO_SIZE_ID())->value();
 
   // for each selected face generate a result
   int anIndex = 0, aResultIndex = 0;
@@ -111,7 +117,7 @@ void FeaturesPlugin_Extrusion::execute()
         aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
       }
 
-      GeomAlgoAPI_Prism aFeature(aBaseShape, aFromShape, aFromSize, aToShape, aToSize);
+      GeomAlgoAPI_Prism aFeature(aBaseShape, aToShape, aToSize, aFromShape, aFromSize);
       if(!aFeature.isDone()) {
         static const std::string aFeatureError = "Extrusion algorithm failed";
         setError(aFeatureError);
@@ -143,7 +149,7 @@ void FeaturesPlugin_Extrusion::execute()
   removeResults(aResultIndex);
 }
 
-//============================================================================
+//=================================================================================================
 void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                             std::shared_ptr<GeomAPI_Shape> theBasis,

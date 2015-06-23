@@ -46,6 +46,13 @@ class FeaturesPlugin_Revolution : public ModelAPI_Feature
     return MY_AXIS_ID;
   }
 
+  /// attribute name for creation method
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string METHOD_ATTR("CreationMethod");
+    return METHOD_ATTR;
+  }
+
   /// Attribute name of revolution angle.
   inline static const std::string& TO_ANGLE_ID()
   {
