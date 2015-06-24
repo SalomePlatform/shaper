@@ -26,7 +26,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM CASCADE
-@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.8.0
+@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.9.0
 @SET CASROOT=%CAS_ROOT_DIR%
 @REM -------------------------
 
@@ -65,7 +65,9 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM FREETYPE (Used by OCCT)
-@SET PATH=%PDIR%\freetype-2.4.11\bin;%PATH%
+@SET FREETYPE_ROOT_DIR=%PDIR%\freetype-2.4.11
+@SET PATH=%FREETYPE_ROOT_DIR%\bin;%PATH%
+@REM -------------------------
 @REM -------------------------
 
 @REM -------------------------
