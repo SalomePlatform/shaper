@@ -109,9 +109,9 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
     }
     if (aShape.get() != NULL && !aShape->isNull()) {
       if (myIsInVaildate)
-        theObject = myExternalObjectMgr->externalObjectValidated(theObject, theShape, sketch());
+        theObject = myExternalObjectMgr->externalObjectValidated(theObject, aShape, sketch());
       else
-        theObject = myExternalObjectMgr->externalObject(theObject, theShape, sketch());
+        theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch());
     }
   }
 }
