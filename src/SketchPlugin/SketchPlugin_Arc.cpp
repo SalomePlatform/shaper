@@ -214,7 +214,8 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       GeomDataAPI_Point2D>(data()->attribute(START_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(END_ID()));
-  if (theID == EXTERNAL_ID()) {
+  // the second condition for unability to move external segments anywhere
+  if (theID == EXTERNAL_ID() || isFixed()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
     // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {

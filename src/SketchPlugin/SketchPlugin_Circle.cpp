@@ -97,7 +97,8 @@ bool SketchPlugin_Circle::isFixed() {
 }
 
 void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
-  if (theID == EXTERNAL_ID()) {
+  // the second condition for unability to move external segments anywhere
+  if (theID == EXTERNAL_ID() || isFixed()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
     // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
