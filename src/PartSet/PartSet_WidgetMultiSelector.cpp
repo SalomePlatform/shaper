@@ -99,11 +99,19 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
   // there is no a sketch feature is selected, but the shape exists, try to create an exernal object
-  if (aSPFeature.get() == NULL && theShape.get() != NULL && !theShape->isNull() &&
-      myExternalObjectMgr->useExternal()) {
-    if (myIsInVaildate)
-      theObject = myExternalObjectMgr->externalObjectValidated(theObject, theShape, sketch());
-    else
-      theObject = myExternalObjectMgr->externalObject(theObject, theShape, sketch());
+  // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
+  if (aSPFeature.get() == NULL && myExternalObjectMgr->useExternal()) {
+    GeomShapePtr aShape = theShape;
+    if (!aShape.get()) {
+      ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+      if (aResult.get())
+        aShape = aResult->shape();
+    }
+    if (aShape.get() != NULL && !aShape->isNull()) {
+      if (myIsInVaildate)
+        theObject = myExternalObjectMgr->externalObjectValidated(theObject, theShape, sketch());
+      else
+        theObject = myExternalObjectMgr->externalObject(theObject, theShape, sketch());
+    }
   }
 }
