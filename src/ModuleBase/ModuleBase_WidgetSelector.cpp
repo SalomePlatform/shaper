@@ -46,14 +46,15 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 
   QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(
                                                               ModuleBase_ISelection::AllControls);
-  setSelection(aSelected);
+  bool isDone = setSelection(aSelected);
 
   emit valuesChanged();
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.
   updateObject(myFeature);
 
-  updateFocus();
+  if (isDone)
+    updateFocus();
 }
 
 //********************************************************************

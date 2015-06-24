@@ -182,9 +182,7 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 
 void ModuleBase_WidgetShapeSelector::updateFocus()
 {
-  ObjectPtr anObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
-  if (anObject.get())
-    emit focusOutWidget(this);
+  emit focusOutWidget(this);
 }
 
 //********************************************************************
