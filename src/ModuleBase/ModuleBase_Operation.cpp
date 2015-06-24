@@ -268,54 +268,44 @@ void ModuleBase_Operation::commitOperation()
 
 void ModuleBase_Operation::activateByPreselection()
 {
-  if (!myPropertyPanel || myPreSelection.empty()) {
-    myPropertyPanel->activateNextWidget(NULL);
-    return;
-  }
-  const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
-  if (aWidgets.empty()) {
-    myPropertyPanel->activateNextWidget(NULL);
-    return;
-  }
+  ModuleBase_ModelWidget* aFilledWgt = 0;
 
-  ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
-  QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-  bool isSet = false;
-  // 1. apply the selection to controls
-  for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
-    aWgt = (*aWIt);
-    if (!aWgt->canSetValue())
-      continue;
+  if (myPropertyPanel && !myPreSelection.empty()) {
+    const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
+    if (!aWidgets.empty()) {
+      ModuleBase_ModelWidget* aWgt = 0;
+      QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
+      bool isSet = false;
+      // 1. apply the selection to controls
+      for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
+        aWgt = (*aWIt);
+        if (!aWgt->canSetValue())
+          continue;
 
-    if (!aWgt->setSelection(myPreSelection)) {
-      isSet = false;
-      break;
-    } else {
-      isSet = true;
-      aFilledWgt = aWgt;
+        if (!aWgt->setSelection(myPreSelection)) {
+          isSet = false;
+          break;
+        } else {
+          isSet = true;
+          aFilledWgt = aWgt;
+        }
+      }
+      // in order to redisplay object in the viewer, the update/redisplay signals should be flushed
+      // it is better to perform it not in setSelection of each widget, but do it here,
+      // after the preselection is processed
+      ModuleBase_ModelWidget::updateObject(myFeature);
+
+      // 3. a signal should be emitted before the next widget activation
+      // because, the activation of the next widget will give a focus to the widget. As a result
+      // the value of the widget is initialized. And commit may happens until the value is entered.
+      if (aFilledWgt)
+        emit activatedByPreselection();
     }
   }
-  // in order to redisplay object in the viewer, the update/redisplay signals should be flushed
-  // it is better to perform it not in setSelection of each widget, but do it here,
-  // after the preselection is processed
-  ModuleBase_ModelWidget::updateObject(myFeature);
-
-  // 2. ignore not obligatory widgets
-  /*for (; aWIt != aWidgets.constEnd(); ++aWIt) {
-    aWgt = (*aWIt);
-    if (aWgt && aWgt->isObligatory())
-      continue;
-    aFilledWgt = aWgt;
-  }*/
-
-  // 3. a signal should be emitted before the next widget activation
-  // because, the activation of the next widget will give a focus to the widget. As a result
-  // the value of the widget is initialized. And commit may happens until the value is entered.
-  if (aFilledWgt)
-    emit activatedByPreselection();
 
   // 4. activate the next obligatory widget
   myPropertyPanel->activateNextWidget(aFilledWgt);
+  clearPreselection();
 }
 
 void ModuleBase_Operation::setParentFeature(CompositeFeaturePtr theParent)

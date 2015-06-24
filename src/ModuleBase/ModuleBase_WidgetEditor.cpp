@@ -28,6 +28,9 @@
 #include <QWidgetAction>
 #include <QRegExp>
 #include <QRegExpValidator>
+#include <QDesktopWidget>
+#include <QDialog>
+#include <QLayout>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,
@@ -42,21 +45,22 @@ ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 
 void editedValue(double& outValue, QString& outText)
 {
-  QMenu* aPopup = new QMenu();
+  QDialog aDlg(QApplication::desktop(), Qt::Popup/* | Qt::FramelessWindowHint*/);
+  QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
+  aLay->setContentsMargins(2, 2, 2, 2);
 
-  QLineEdit* aEditor = new QLineEdit(QString::number(outValue), aPopup);
-  QWidgetAction* aLineEditAction = new QWidgetAction(aPopup);
-  aLineEditAction->setDefaultWidget(aEditor);
-  aPopup->addAction(aLineEditAction);
+  ModuleBase_ParamSpinBox* aEditor = new ModuleBase_ParamSpinBox(&aDlg);
+  aEditor->setMinimum(0);
+  aEditor->setMaximum(DBL_MAX);
+  aEditor->setValue(outValue);
+  aLay->addWidget(aEditor);
 
   aEditor->setFocus();
   aEditor->selectAll();
-  QString anExpression("([0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)|([_a-zA-Z][a-zA-Z0-9_]*)");
-  aEditor->setValidator(new QRegExpValidator(QRegExp(anExpression), aEditor));
-  QObject::connect(aEditor, SIGNAL(returnPressed()), aLineEditAction, SIGNAL(triggered()));
-  QObject::connect(aLineEditAction, SIGNAL(triggered()), aPopup, SLOT(hide()));
+  QObject::connect(aEditor, SIGNAL(editingFinished()), &aDlg, SLOT(accept()));
 
-  QAction* aResult = aPopup->exec(QCursor::pos());
+  aDlg.move(QCursor::pos());
+  aDlg.exec();
   outText = aEditor->text();
   bool isDouble;
   double aValue = outText.toDouble(&isDouble);
@@ -64,7 +68,6 @@ void editedValue(double& outValue, QString& outText)
     outValue = aValue;
     outText = ""; // return empty string, if it's can be converted to a double
   }
-  aPopup->deleteLater();
 }
 
 bool ModuleBase_WidgetEditor::focusTo()
