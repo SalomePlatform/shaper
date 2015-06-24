@@ -228,8 +228,8 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
         aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
         std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
         // X axis is preferable to be dirX on the sketch
-        static const double tol = 1.e-7;
-        bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+        static const double tol = 0.1; // here can not be very small value to avoid very close to X normal axis (issue 595)
+        bool isX = fabs(anA) - 1.0 < tol && fabs(aB) < tol && fabs(aC) < tol;
         std::shared_ptr<GeomAPI_Dir> aTempDir(
           isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
         std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
