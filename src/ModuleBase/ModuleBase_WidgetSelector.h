@@ -94,9 +94,13 @@ protected:
    /// The methiod called when widget is activated
   virtual void activateCustom();
 
-  /// Returns true if selected shape corresponds to requested shape types
+  /// Returns true if selected shape corresponds to requested shape types.
+  /// If the widget type of shapes contains the faces item, the result is converted
+  /// to construction result and the method returns true if there is at least one face
+  /// in the construction.
   /// \param theShape a shape
-  bool acceptSubShape(const TopoDS_Shape& theShape) const;
+  /// \param theResult a selected result
+  bool acceptSubShape(const GeomShapePtr& theShape, const ResultPtr& theResult) const;
 
   /// Return an object and geom shape by the viewer presentation
   /// \param thePrs a selection

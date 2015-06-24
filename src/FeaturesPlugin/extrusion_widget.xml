@@ -5,8 +5,7 @@
     label="Select a sketch face"
     icon=":icons/sketch.png"
     tooltip="Select a sketch face"
-    use_choice="false"
-    type_choice="Faces Compound">
+    type_choice="Faces">
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
   <toolbox id="CreationMethod">

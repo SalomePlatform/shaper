@@ -60,14 +60,16 @@ int Model_ResultConstruction::facesNum()
   if (!myFacesUpToDate) {
     std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
       std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(myShape);
-    std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
-    GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-      aWirePtr->norm(), aWirePtr, aFaces);
-    std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
-    for(; aFIter != aFaces.end(); aFIter++) {
-      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
-      if (aFace.get())
-        myFaces.push_back(aFace);
+    if (aWirePtr.get()) {
+      std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
+      GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
+        aWirePtr->norm(), aWirePtr, aFaces);
+      std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
+      for(; aFIter != aFaces.end(); aFIter++) {
+        std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
+        if (aFace.get())
+          myFaces.push_back(aFace);
+      }
     }
     myFacesUpToDate = true;
   }

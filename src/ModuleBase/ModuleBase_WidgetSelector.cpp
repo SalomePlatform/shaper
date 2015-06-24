@@ -9,6 +9,8 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
 
+#include <ModelAPI_ResultConstruction.h>
+
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
@@ -58,22 +60,35 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::acceptSubShape(const TopoDS_Shape& theShape) const
+bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
+                                               const ResultPtr& theResult) const
 {
-  bool aValid = true;
-  if (theShape.IsNull()) {
-    aValid = true; // do not check the shape type if the shape is empty
-    // extrusion uses a sketch object selectected in Object browser
-  }
-  else {
-    aValid = false;
-    TopAbs_ShapeEnum aShapeType = theShape.ShapeType();
-    QIntList aShapeTypes = getShapeTypes();
+  bool aValid = false;
 
-    QIntList::const_iterator anIt = aShapeTypes.begin(), aLast = aShapeTypes.end();
-    for (; anIt != aLast; anIt++) {
-      if (aShapeType == *anIt)
-        aValid = true;
+  GeomShapePtr aShape = theShape;
+  if (!aShape.get() && theResult.get()) {
+    if (theResult.get())
+      aShape = theResult->shape();
+  }
+  TopAbs_ShapeEnum aShapeType = TopAbs_SHAPE;
+  if (aShape.get()) {
+    // Check that the selection corresponds to selection type
+    TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
+    aShapeType = aTopoShape.ShapeType();
+  }
+
+  QIntList aShapeTypes = getShapeTypes();
+  QIntList::const_iterator anIt = aShapeTypes.begin(), aLast = aShapeTypes.end();
+  for (; anIt != aLast; anIt++) {
+    if (aShapeType == *anIt)
+      aValid = true;
+    else if (*anIt == TopAbs_FACE) {
+      // try to process the construction shape only if there is no a selected shape in the viewer
+      if (!theShape.get() && theResult.get()) {
+        ResultConstructionPtr aCResult =
+                                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult);
+        aValid = aCResult.get() && aCResult->facesNum() > 0;
+      }
     }
   }
   return aValid;
@@ -109,17 +124,9 @@ void ModuleBase_WidgetSelector::activateCustom()
 bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
-  bool aValid = true;
-  if (!aShape.get()) {
-    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-    if (aResult.get())
-      aShape = aResult->shape();
-  }
-  if (aShape.get()) {
-    // Check that the selection corresponds to selection type
-    TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
-    aValid = acceptSubShape(aTopoShape);
-  }
+  ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+  bool aValid = acceptSubShape(aShape, aResult);
+
   if (aValid) {
     // In order to avoid selection of the same object
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
