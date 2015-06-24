@@ -102,6 +102,10 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
   // the plane should be executed in order to build the feature result immediatelly
   // the results are to be hidden in the plugin
   aPlane->execute();
+  // this flag is needed here to avoid setting it inside of the next transaction
+  // (may cause crash on redo of the first transaction in OCAF)
+  aPlane->data()->execState(ModelAPI_StateDone);
+  aPlane->firstResult()->data()->execState(ModelAPI_StateDone);
 
   return aPlane;
 }
@@ -118,6 +122,8 @@ FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
   // the point should be executed in order to build the feature result immediatelly
   // the results are to be hidden in the plugin
   aPoint->execute();
+  aPoint->data()->execState(ModelAPI_StateDone);
+  aPoint->firstResult()->data()->execState(ModelAPI_StateDone);
 
   return aPoint;
 }

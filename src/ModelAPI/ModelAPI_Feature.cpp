@@ -146,7 +146,8 @@ void ModelAPI_Feature::erase()
   while (!myResults.empty()) {  // remove one by one with messages
     std::shared_ptr<ModelAPI_Result> aRes = *(myResults.begin());
     aRes->setDisabled(aRes, true); // to avoid activation of the Part result
-    myResults.erase(myResults.begin());
+    if (!myResults.empty()) // disabling result may erase the list (on undo of Part, issue 665)
+      myResults.erase(myResults.begin());
   }
   ModelAPI_Object::erase();
 }
