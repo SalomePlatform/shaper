@@ -226,14 +226,14 @@ bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
 /*!
  \brief This function is called when the spinbox recieves key press event.
  */
-void ModuleBase_ParamSpinBox::keyPressEvent(QKeyEvent* e)
-{
-  if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
-    QWidget::keyPressEvent(e);
-  } else {
-    ModuleBase_DoubleSpinBox::keyPressEvent(e);
-  }
-}
+//void ModuleBase_ParamSpinBox::keyPressEvent(QKeyEvent* e)
+//{
+//  if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+//    QWidget::keyPressEvent(e);
+//  } else {
+//    ModuleBase_DoubleSpinBox::keyPressEvent(e);
+//  }
+//}
 
 /*!
  \brief This function is called when the spinbox recieves show event.

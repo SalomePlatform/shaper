@@ -33,8 +33,8 @@ public:
   bool isAcceptVariables() const;
   bool hasVariable() const;
 
-signals:
-  void textChanged(const QString&);
+//signals:
+  //void textChanged(const QString&);
 
  protected:
   bool hasVariable(const QString& theText) const;
@@ -45,7 +45,7 @@ signals:
   bool findVariable(const QString&, double&) const;
 
  protected:
-  virtual void keyPressEvent(QKeyEvent*);
+  //virtual void keyPressEvent(QKeyEvent*);
   virtual void showEvent(QShowEvent*);
 
  protected slots:
