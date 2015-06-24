@@ -54,6 +54,7 @@ void ConstructionPlugin_Plane::execute()
   if (!aPlaneFace.get())
     return;
   ResultConstructionPtr aConstr = document()->createConstruction(data());
+  aConstr->setInfinite(true);
   aConstr->setShape(aPlaneFace);
   setResult(aConstr);
 }
@@ -153,7 +154,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createPlaneByGeneralEqu
     std::string kDefaultPlaneSize = "200";
     double aSize = Config_PropManager::integer("Sketch planes", "planes_size", kDefaultPlaneSize);
     aSize *= 4.;
-    aPlaneFace = GeomAlgoAPI_FaceBuilder::square(aPlane, aSize, true);
+    aPlaneFace = GeomAlgoAPI_FaceBuilder::square(aPlane, aSize);
   }
   return aPlaneFace;
 }

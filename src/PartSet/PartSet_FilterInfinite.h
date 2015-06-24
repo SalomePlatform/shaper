@@ -11,6 +11,8 @@
 
 #include <SelectMgr_Filter.hxx>
 
+class ModuleBase_IWorkshop;
+
 /**
 * \class PartSet_FilterInfinite
 * \ingroup Modules
@@ -22,14 +24,17 @@ class PartSet_FilterInfinite : public SelectMgr_Filter
 public:
   /// Constructor
   /// \param theWorkshop a pointer to workshop
-  PartSet_FilterInfinite()
-    : SelectMgr_Filter() {}
+  PartSet_FilterInfinite(ModuleBase_IWorkshop* theWorkshop);
 
   /// Returns True if selected presentation can be selected
   /// \param theOwner an owner of the persentation
   Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(PartSet_FilterInfinite)
+
+protected:
+  /// Reference to workshop
+  ModuleBase_IWorkshop* myWorkshop;
 };
 
 #endif

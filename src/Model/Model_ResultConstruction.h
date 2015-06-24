@@ -25,6 +25,7 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   bool myFacesUpToDate; ///< is true if faces in myuFaces are computed and up to date
   std::vector<std::shared_ptr<GeomAPI_Face> > myFaces; ///< stores the up to date faces if they exist
   bool myIsInHistory;
+  bool myIsInfinite;
  public:
   /// default color for a result construction
   inline static const std::string& DEFAULT_COLOR()
@@ -58,6 +59,11 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   MODEL_EXPORT virtual int facesNum();
   /// if the construction result may be used as faces, this method returns face by zero based index
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Face> face(const int theIndex);
+
+  /// By default object is not infinite.
+  MODEL_EXPORT virtual bool isInfinite();
+  /// Sets the flag that it is infinite
+  MODEL_EXPORT virtual void setInfinite(const bool theInfinite);
 
  protected:
   /// Makes a body on the given feature

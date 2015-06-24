@@ -6,6 +6,10 @@
 
 #include "PartSet_FilterInfinite.h"
 
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ISelection.h>
+#include <ModelAPI_ResultConstruction.h>
+
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
 #include <TopoDS_Shape.hxx>
@@ -14,30 +18,37 @@
 IMPLEMENT_STANDARD_HANDLE(PartSet_FilterInfinite, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_FilterInfinite, SelectMgr_Filter);
 
+PartSet_FilterInfinite::PartSet_FilterInfinite(ModuleBase_IWorkshop* theWorkshop)
+: SelectMgr_Filter(), myWorkshop(theWorkshop)
+{
+}
+
 Standard_Boolean PartSet_FilterInfinite::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   Standard_Boolean aValid = Standard_True;
-  Handle(AIS_InteractiveObject) anAISObj =
-    Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-  if (!anAISObj.IsNull()) {
-    Handle(AIS_InteractiveObject) anObj = 
-        Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-    Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(anObj);
-    if (!aAISShape.IsNull()) {
-      TopoDS_Shape anAISShape = aAISShape->Shape();
-      if (!anAISShape.IsNull() && anAISShape.Infinite()) {
-        aValid = Standard_False;
+
+  ModuleBase_ViewerPrs aPrs;
+  myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+  ResultPtr aResult = myWorkshop->selection()->getResult(aPrs);
+  // to filter infinite construction results
+  if (aResult.get() && aResult->groupName() == ModelAPI_ResultConstruction::group()) {
+    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
+    if (aConstruction.get() && aConstruction->isInfinite()) {
+      Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
+      if (!aBRepOwner.IsNull() && aBRepOwner->HasShape()) {
+        const TopoDS_Shape& aShape = aBRepOwner->Shape();
+        TopAbs_ShapeEnum anOwnerShapeType = aShape.ShapeType();
+
+        TopAbs_ShapeEnum aResultShapeType = TopAbs_SHAPE;
+        GeomShapePtr aResultShape = aResult->shape();
+        if (aResultShape.get()) {
+          TopoDS_Shape aResultTopoShape = aResultShape->impl<TopoDS_Shape>();
+          aResultShapeType = aResultTopoShape.ShapeType();
+        }
         // for infinite object, the selection is possible only for shapes of owners, which are coincide
         // to the shape of corresponded AIS object. In other words, for axis, only edge can be selected
         // (vertices are not selectable), for planes, only faces can be selected (not edges or vertices)
-        TopoDS_Shape anOwnerShape;
-        Handle(StdSelect_BRepOwner) aBRO = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
-        if( !aBRO.IsNull() ) {
-          anOwnerShape = aBRO->Shape();
-          if (!anOwnerShape.IsNull()) {
-            aValid = anAISShape.ShapeType() == anOwnerShape.ShapeType();
-          }
-        }
+        aValid = anOwnerShapeType == aResultShapeType;
       }
     }
   }

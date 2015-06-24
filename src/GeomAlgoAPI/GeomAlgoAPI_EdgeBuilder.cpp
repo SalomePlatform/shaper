@@ -18,8 +18,7 @@
 #include <gp_Circ.hxx>
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
-    std::shared_ptr<GeomAPI_Pnt> theStart, std::shared_ptr<GeomAPI_Pnt> theEnd,
-    const bool theInfinite)
+    std::shared_ptr<GeomAPI_Pnt> theStart, std::shared_ptr<GeomAPI_Pnt> theEnd)
 {
   const gp_Pnt& aStart = theStart->impl<gp_Pnt>();
   const gp_Pnt& anEnd = theEnd->impl<gp_Pnt>();
@@ -31,8 +30,6 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
-  if (theInfinite)
-    anEdge.Infinite(Standard_True);
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }

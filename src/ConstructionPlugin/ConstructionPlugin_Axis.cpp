@@ -53,9 +53,10 @@ void ConstructionPlugin_Axis::createAxisByTwoPoints()
       std::shared_ptr<GeomAPI_Pnt> aStart = GeomAlgoAPI_PointBuilder::point(aShape1);
       std::shared_ptr<GeomAPI_Pnt> anEnd = GeomAlgoAPI_PointBuilder::point(aShape2);
       if (aStart->distance(anEnd) > ConstructionPlugin_Axis::MINIMAL_LENGTH()) {
-        std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd, true);
+        std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
 
         ResultConstructionPtr aConstr = document()->createConstruction(data());
+        aConstr->setInfinite(true);
         aConstr->setShape(anEdge);
         setResult(aConstr);
       }
@@ -71,6 +72,7 @@ void ConstructionPlugin_Axis::createAxisByCylindricalFace()
       std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::cylinderAxis(aSelection);
 
       ResultConstructionPtr aConstr = document()->createConstruction(data());
+      aConstr->setInfinite(true);
       aConstr->setShape(anEdge);
       setResult(aConstr);
     }

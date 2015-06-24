@@ -31,8 +31,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
 
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
     std::shared_ptr<GeomAPI_Pln> thePlane,
-    const double theSize,
-    const bool theInfinite)
+    const double theSize)
 {
   // half of the size in each direction from the center
   BRepBuilderAPI_MakeFace aFaceBuilder(thePlane->impl<gp_Pln>(),
@@ -40,8 +39,6 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
                                        -theSize / 2., theSize / 2.);
   std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
   TopoDS_Shape aFace = aFaceBuilder.Face();
-  if (theInfinite)
-    aFace.Infinite(Standard_True);
   aRes->setImpl(new TopoDS_Shape(aFace/*aFaceBuilder.Face()*/));
   return aRes;
 }

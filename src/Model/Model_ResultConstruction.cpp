@@ -46,6 +46,7 @@ Model_ResultConstruction::Model_ResultConstruction()
 {
   myIsDisabled = true; // by default it is not initialized and false to be after created
   myIsInHistory = true;
+  myIsInfinite = false;
   myFacesUpToDate = false;
   setIsConcealed(false);
 }
@@ -79,4 +80,14 @@ int Model_ResultConstruction::facesNum()
 std::shared_ptr<GeomAPI_Face> Model_ResultConstruction::face(const int theIndex)
 {
   return myFaces[theIndex];
+}
+
+bool Model_ResultConstruction::isInfinite()
+{
+  return myIsInfinite;
+}
+
+void Model_ResultConstruction::setInfinite(const bool theInfinite)
+{
+  myIsInfinite = theInfinite;
 }

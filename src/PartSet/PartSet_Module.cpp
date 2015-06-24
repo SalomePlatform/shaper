@@ -135,7 +135,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 
   mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
-  mySelectionFilters.Append(new PartSet_FilterInfinite());
+  mySelectionFilters.Append(new PartSet_FilterInfinite(myWorkshop));
 }
 
 PartSet_Module::~PartSet_Module()

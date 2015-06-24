@@ -43,6 +43,11 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
   virtual int facesNum() = 0;
   /// if the construction result may be used as faces, this method returns face by zero based index
   virtual std::shared_ptr<GeomAPI_Face> face(const int theIndex) = 0;
+
+  /// By default object is not infinite.
+  virtual bool isInfinite() = 0;
+  /// Sets the flag that it is infinite
+  virtual void setInfinite(const bool theInfinite) = 0;
 };
 
 //! Pointer on feature object
