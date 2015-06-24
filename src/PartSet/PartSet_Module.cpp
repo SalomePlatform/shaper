@@ -54,6 +54,7 @@
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Tools.h>
 #include <XGUI_ObjectsBrowser.h>
+#include <XGUI_SelectionMgr.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -228,9 +229,9 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
   // the selection is cleared after commit the create operation
   // in order to do not use the same selected objects in the restarted operation
   // for common behaviour, the selection is cleared even if the operation is not restarted
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull())
-    aContext->ClearSelected();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  aWorkshop->selector()->clearSelection();
 
   /// Restart sketcher operations automatically
   FeaturePtr aFeature = theOperation->feature();
