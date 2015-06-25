@@ -11,12 +11,14 @@
   #include "GeomAlgoAPI_MakeShape.h"
   #include "GeomAlgoAPI_MakeShapeList.h"
   #include "GeomAlgoAPI_Movement.h"
+  #include "GeomAlgoAPI_Placement.h"
   #include "GeomAlgoAPI_PointBuilder.h"
   #include "GeomAlgoAPI_Prism.h"
   #include "GeomAlgoAPI_Revolution.h"
   #include "GeomAlgoAPI_Rotation.h"
   #include "GeomAlgoAPI_ShapeProps.h"
   #include "GeomAlgoAPI_SketchBuilder.h"
+  #include "GeomAlgoAPI_Tools.h"
 
   #include <memory>
   #include <string>
@@ -42,12 +44,14 @@
 %include "GeomAlgoAPI_MakeShape.h"
 %include "GeomAlgoAPI_MakeShapeList.h"
 %include "GeomAlgoAPI_Movement.h"
+%include "GeomAlgoAPI_Placement.h"
 %include "GeomAlgoAPI_PointBuilder.h"
 %include "GeomAlgoAPI_Prism.h"
 %include "GeomAlgoAPI_Revolution.h"
 %include "GeomAlgoAPI_Rotation.h"
 %include "GeomAlgoAPI_ShapeProps.h"
 %include "GeomAlgoAPI_SketchBuilder.h"
+%include "GeomAlgoAPI_Tools.h"
 
 %typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {
   $result = SWIG_NewPointerObj(SWIG_as_voidptr(new std::shared_ptr<GeomAPI_Shape>(*$1)), $descriptor(std::shared_ptr<GeomAPI_Shape> *), SWIG_POINTER_OWN | 0 );
