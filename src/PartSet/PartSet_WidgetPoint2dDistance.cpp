@@ -116,6 +116,9 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
 
 void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (isEditingMode())
+    return;
+
   if (mySpinBox->hasVariable())
     return;
 
