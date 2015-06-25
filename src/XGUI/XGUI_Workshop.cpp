@@ -268,7 +268,7 @@ void XGUI_Workshop::initMenu()
 
   AppElements_Command* aCommand;
 
-  aCommand = aGroup->addFeature("SAVE_CMD", tr("Save..."), tr("Save the document"),
+  aCommand = aGroup->addFeature("SAVE_CMD", tr("Save"), tr("Save the document"),
                                 QIcon(":pictures/save.png"), QKeySequence::Save);
   aCommand->connectTo(this, SLOT(onSave()));
   //aCommand->disable();
@@ -881,7 +881,7 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  myCurrentDir = QFileDialog::getExistingDirectory(mainWindow());
+  myCurrentDir = QFileDialog::getExistingDirectory(mainWindow(), tr("Select folder"));
   if (myCurrentDir.isEmpty())
     return;
   QFileInfo aFileInfo(myCurrentDir);
@@ -923,7 +923,7 @@ bool XGUI_Workshop::onSaveAs()
   if(!isActiveOperationAborted())
     return false;
   QFileDialog dialog(mainWindow());
-  dialog.setWindowTitle(tr("Select directory to save files..."));
+  dialog.setWindowTitle(tr("Select folder to save files..."));
   dialog.setFileMode(QFileDialog::Directory);
   dialog.setFilter(tr("Folders (*)"));
   dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
@@ -932,6 +932,7 @@ bool XGUI_Workshop::onSaveAs()
   if (!dialog.exec()) {
     return false;
   }
+
   QString aTempDir = dialog.selectedFiles().first();
   QDir aDir(aTempDir);
   if (aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty()) {
