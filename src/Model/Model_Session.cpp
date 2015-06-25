@@ -22,6 +22,7 @@
 #include <Config_ModuleReader.h>
 #include <Config_ValidatorReader.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <TDF_CopyTool.hxx>
 #include <TDF_DataSet.hxx>
@@ -205,10 +206,20 @@ std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
   return myCurrentDoc;
 }
 
+/// makes the last feature in the document as the current
+static void makeCurrentLast(std::shared_ptr<ModelAPI_Document> theDoc) {
+  if (theDoc.get()) {
+    FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theDoc->object(
+      ModelAPI_Feature::group(), theDoc->size(ModelAPI_Feature::group()) - 1));
+    theDoc->setCurrentFeature(aLastFeature, false);
+  }
+}
+
 void Model_Session::setActiveDocument(
   std::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal)
 {
   if (myCurrentDoc != theDoc) {
+    std::shared_ptr<ModelAPI_Document> aPrevious = myCurrentDoc;
     myCurrentDoc = theDoc;
     if (theDoc.get() && theSendSignal) {
       // syncronize the document: it may be just opened or opened but removed before
@@ -223,6 +234,25 @@ void Model_Session::setActiveDocument(
       static std::shared_ptr<Events_Message> aMsg(
           new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
       Events_Loop::loop()->send(aMsg);
+    }
+    // make the current state correct and synchronised in the module and sub-documents
+    if (isOperation()) { // do it only in transaction, not on opening of document
+      if (myCurrentDoc == moduleDocument()) {
+        // make the current feature the latest in root, in previous root current become also last
+        makeCurrentLast(aPrevious);
+        makeCurrentLast(myCurrentDoc);
+      } else {
+        // make the current feature the latest in sub, root current feature becomes this sub
+        makeCurrentLast(myCurrentDoc);
+        DocumentPtr aRoot = moduleDocument();
+        ResultPtr aPartRes = ModelAPI_Tools::findPartResult(aRoot, myCurrentDoc);
+        if (aPartRes.get()) {
+          FeaturePtr aPartFeat = aRoot->feature(aPartRes);
+          if (aPartFeat.get()) {
+            aRoot->setCurrentFeature(aPartFeat, false);
+          }
+        }
+      }
     }
   }
 }
@@ -343,7 +373,8 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
       std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleted =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
       if (aDeleted && 
-          aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end()) 
+          aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end() &&
+          !ModelAPI_Tools::findPartResult(moduleDocument(), activeDocument()).get()) // another part may be disabled
       {
         setActiveDocument(moduleDocument());
       }

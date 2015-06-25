@@ -45,7 +45,8 @@ public:
 
   /// Stores the modified shape (called by the execution method).
   virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-	                          const std::shared_ptr<GeomAPI_Shape>& theNewShape) = 0;
+	                          const std::shared_ptr<GeomAPI_Shape>& theNewShape,
+                            const int theDecomposeSolidsTag = 0) = 0;
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.

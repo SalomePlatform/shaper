@@ -20,6 +20,7 @@
 #define FACE 4
 #define _MODIFY_TAG 1
 #define _DELETED_TAG 2
+#define _SUBSOLIDS_TAG 3 /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
 
 //=================================================================================================
 FeaturesPlugin_Boolean::FeaturesPlugin_Boolean()
@@ -182,7 +183,7 @@ void FeaturesPlugin_Boolean::LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
   if(theBaseShape->isEqual(theAlgo.shape())) {
     theResultBody->store(theAlgo.shape());
   } else {
-    theResultBody->storeModified(theBaseShape, theAlgo.shape());
+    theResultBody->storeModified(theBaseShape, theAlgo.shape(), _SUBSOLIDS_TAG);
 
     GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
 

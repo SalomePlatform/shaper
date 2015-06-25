@@ -56,8 +56,13 @@ public:
 	                                       const std::shared_ptr<GeomAPI_Shape>& theToShape);
 
   /// Stores the modified shape (called by the execution method).
+  /// \param theOldShape shape that produces result
+  /// \param theNewShape resulting shape
+  /// \param theDecomposeSolidsTag tag for starting of solids sub-elements placement in case 
+  ///          theNewShape is compound of solids, if zero it is not used
   MODEL_EXPORT virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-	                                       const std::shared_ptr<GeomAPI_Shape>& theNewShape);
+	                                        const std::shared_ptr<GeomAPI_Shape>& theNewShape,
+                                          const int theDecomposeSolidsTag = 0);
 
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();

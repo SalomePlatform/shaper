@@ -10,6 +10,8 @@
 #include "ModelAPI.h"
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
 
 #include <vector>
@@ -31,6 +33,14 @@ MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue,
  * \param theValues a container of component of RGB value: red, green, blue
  */
 MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues);
+
+/*!
+ * Searches for Part result that contains the reference to the given document.
+ * \param theMain document that contains the searched feature
+ * \param theSub document that is searched, the resulting feature references to it
+ * \returns numm if not found
+ */
+MODELAPI_EXPORT ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub);
 
 }
 

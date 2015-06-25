@@ -28,6 +28,10 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Sets this document as current and if it is not loaded yet, loads it
   MODEL_EXPORT virtual void activate();
 
+  /// disable all feature of the part on disable of the part result
+  MODEL_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
+    const bool theFlag);
+
 protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();

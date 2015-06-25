@@ -10,7 +10,8 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultParameter.h>
-
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_AttributeDocRef.h>
 #include <list>
 #include <map>
 
@@ -151,6 +152,18 @@ void findRandomColor(std::vector<int>& theValues)
   if (myColorMap.find(anIndex) != myColorMap.end()) {
     theValues = myColorMap.at(anIndex);
   }
+}
+
+ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub)
+{
+  for (int a = theMain->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
+        theMain->object(ModelAPI_ResultPart::group(), a));
+    if (aPart && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value() == theSub) {
+      return aPart;
+    }
+  }
+  return ResultPtr();
 }
 
 } // namespace ModelAPI_Tools

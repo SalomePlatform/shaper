@@ -8,6 +8,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Feature.h>
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
@@ -44,7 +45,16 @@ void Model_ResultPart::activate()
     }
   }
   if (aDocRef->value().get()) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    bool isNewTransaction = !aMgr->isOperation();
+    // activation may cause changes in current features in document, so it must be in transaction
+    if (isNewTransaction) {
+      aMgr->startOperation("Activation");
+    }
     ModelAPI_Session::get()->setActiveDocument(aDocRef->value());
+    if (isNewTransaction) {
+      aMgr->finishOperation();
+    }
   }
 }
 
@@ -52,4 +62,23 @@ bool Model_ResultPart::isActivated()
 {
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   return aDocRef->value().get();
+}
+
+bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
+    const bool theFlag)
+{
+  if (ModelAPI_ResultPart::setDisabled(theThis, theFlag)) {
+    DocumentPtr aDoc = Model_ResultPart::partDoc();
+    if (aDoc.get()) {
+      if (theFlag) { // disable, so make all features disabled too
+        aDoc->setCurrentFeature(FeaturePtr(), false);
+      } else { // enabled, so make the current feature the last inside of this document
+        FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aDoc->object(
+          ModelAPI_Feature::group(), aDoc->size(ModelAPI_Feature::group()) - 1));
+        aDoc->setCurrentFeature(aLastFeature, false);
+      }
+    }
+    return true;
+  }
+  return false;
 }

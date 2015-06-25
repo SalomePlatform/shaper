@@ -187,7 +187,7 @@ void Model_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theF
 }
 
 void Model_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-  const std::shared_ptr<GeomAPI_Shape>& theNewShape)
+  const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theDecomposeSolidsTag)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
@@ -205,6 +205,31 @@ void Model_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOl
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Modify(aShapeOld, aShapeNew);
+    if (theDecomposeSolidsTag && aShapeNew.ShapeType() == TopAbs_COMPOUND) { // make sub elements as subs
+
+      // register name if it is possible
+      TCollection_AsciiString aName;
+      if(!aBuilder.NamedShape()->IsEmpty()) {
+        Handle(TDataStd_Name) anAttr;
+        if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+          aName = TCollection_AsciiString(anAttr->Get()).ToCString();
+        }
+      }
+
+      TopoDS_Iterator aSubIter(aShapeNew);
+      for(int aTag = theDecomposeSolidsTag; aSubIter.More(); aSubIter.Next()) {
+        TNaming_Builder aSubBuilder(aShapeLab.FindChild(aTag++));
+        aSubBuilder.Generated(aSubIter.Value());
+        if(!aName.IsEmpty()) {
+          std::string aSolidName = 
+            (aName + "_Solid_" + TCollection_AsciiString(aTag - theDecomposeSolidsTag)).ToCString(); 
+          std::shared_ptr<Model_Document> aDoc = 
+            std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aSubBuilder.NamedShape()->Label(), aSolidName);
+          TDataStd_Name::Set(aSubBuilder.NamedShape()->Label(), aSolidName.c_str());
+        }
+      }
+    }
   }
 }
 
