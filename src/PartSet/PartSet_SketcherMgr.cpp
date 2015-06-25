@@ -1139,7 +1139,7 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
   else {
     fillFeatureList(aHighlighted, myCurrentSketch, aFeatureList);
 
-    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
+    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected(ModuleBase_ISelection::AllControls);
     fillFeatureList(aSelected, myCurrentSketch, aFeatureList);
   }
 
