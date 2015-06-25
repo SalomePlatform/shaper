@@ -380,24 +380,6 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
         }
       }
     }
-  } else {
-    // Start editing constraint
-    if (theOperation->isEditOperation()) {
-      // TODO: #391 - to be removed
-      std::string aId = theOperation->id().toStdString();
-      if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation) &&
-          PartSet_SketcherMgr::isDistanceOperation(theOperation)) {
-        // Find and activate widget for management of point for dimension line position
-        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-        foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-          PartSet_WidgetPoint2D* aPntWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-          if (aPntWgt) {
-            aPanel->activateWidget(aPntWgt);
-            return;
-          }
-        }
-      }
-    }
   }
 }
 

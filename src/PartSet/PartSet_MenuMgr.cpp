@@ -172,7 +172,7 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   bool hasAttribute = false;
   bool hasFeature = false;
 
-  QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected(ModuleBase_ISelection::AllControls);
   TopoDS_Shape aShape;
   ResultPtr aResult;
   FeaturePtr aFeature;
