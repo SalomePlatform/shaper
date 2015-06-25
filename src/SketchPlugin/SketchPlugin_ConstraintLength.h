@@ -9,7 +9,10 @@
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_ConstraintBase.h"
-#include <SketchPlugin_Sketch.h>
+#include "SketchPlugin_Sketch.h"
+
+#include <GeomAPI_ICustomPrs.h>
+
 #include <list>
 
 class GeomDataAPI_Point2D;
@@ -22,7 +25,7 @@ class GeomDataAPI_Point2D;
  *  SketchPlugin_Constraint::VALUE() (length) and SketchPlugin_Constraint::ENTITY_A() (segment),
  *  SketchPlugin_Constraint::FLYOUT_VALUE_PNT() (distance of a constraints handle)
  */
-class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase, public GeomAPI_ICustomPrs
 {
  public:
   /// Length constraint kind
@@ -60,6 +63,10 @@ class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
+  /// Customize presentation of the feature
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintLength();

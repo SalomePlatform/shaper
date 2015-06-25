@@ -30,7 +30,6 @@
  *    Also the list of possible attributes is provided to simplify assignment.
  */
 
-#define SKETCH_CONSTRAINT_COLOR "225,225,0"
 #define SKETCH_DIMENSION_COLOR "64,128,225"
 
 /** \class SketchPlugin_ConstraintBase

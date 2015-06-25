@@ -80,9 +80,6 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   Config_PropManager::registerProp("Visualization", "sketch_auxiliary_color", "Sketch auxiliary entity color",
                                    Config_Prop::Color, SKETCH_AUXILIARY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_constraint_color", "Sketch constraint color",
-                                   Config_Prop::Color, SKETCH_CONSTRAINT_COLOR);
-
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color", "Sketch dimension color",
                                    Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 

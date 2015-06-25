@@ -12,6 +12,8 @@
 #include "SketchPlugin_Sketch.h"
 #include "ModelAPI_Data.h"
 
+#include <GeomAPI_ICustomPrs.h>
+
 #include <list>
 
 class SketchPlugin_Line;
@@ -25,7 +27,7 @@ class GeomDataAPI_Point2D;
  *  This constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase, public GeomAPI_ICustomPrs
 {
  public:
   /// Distance constraint kind
@@ -67,6 +69,10 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 
   /// Returns the current distance between the feature attributes
   double calculateCurrentDistance() const;
+
+    /// Customize presentation of the feature
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
