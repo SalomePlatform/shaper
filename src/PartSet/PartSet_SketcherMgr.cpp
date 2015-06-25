@@ -90,9 +90,14 @@
   return aRes;
 }*/
 
-void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
-                           QMap<FeaturePtr, QList<AttributePtr> >& theFeature2AttributeMap,
-                           const FeaturePtr theSketch)
+// Fills the list of features the list of selected presentations.
+// \param theList a list of selected presentations
+// \param theSketch a sketch to project a vertex shape of a presentation to the plane
+// and find the corresponded attribute
+// \param theFeatureList  an output list of features
+void fillFeatureList(const QList<ModuleBase_ViewerPrs>& theList,
+                     const FeaturePtr theSketch,
+                     QList<FeaturePtr>& theFeatureList)
 {
   QList<ModuleBase_ViewerPrs> aRes;
 
@@ -102,28 +107,45 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
   {
     ModuleBase_ViewerPrs aPrs = *anIt;
     FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
-    if (aFeature.get() == NULL)
-      continue;
-
-    QList<AttributePtr> anAttributes;
-    if (theFeature2AttributeMap.contains(aFeature)) {
-      anAttributes = theFeature2AttributeMap[aFeature];
-    }
-    AttributePtr anAttr;
-    TopoDS_Shape aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      if (aShape.ShapeType() == TopAbs_VERTEX) {
-        anAttr = PartSet_Tools::findAttributeBy2dPoint(aFeature, aShape, theSketch);
-        if (anAttr.get() != NULL && !anAttributes.contains(anAttr))
-          anAttributes.push_back(anAttr);
-      }
-    }
-    theFeature2AttributeMap[aFeature] = anAttributes;
+    if (aFeature.get()  && !theFeatureList.contains(aFeature))
+      theFeatureList.append(aFeature);
   }
 }
 
-
-
+/// Fills attribute and result lists by the selected owner. In case if the attribute is found,
+/// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge, put the function
+/// result as is to the list of results.
+/// \param theOwner a viewer selected owner
+/// \param theFeature a feature, where the attribute is searched
+/// \param theSketch a current sketch
+/// \param theSelectedAttribute an output list of attributes
+/// \param theSelectedResults an output list of edge results
+void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
+                            const FeaturePtr& theFeature, const FeaturePtr& theSketch,
+                            const ResultPtr& theResult,
+                            std::set<AttributePtr>& aSelectedAttributes,
+                            std::set<ResultPtr>& aSelectedResults)
+{
+  Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
+  if (aBRepOwner.IsNull())
+    return;
+  Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(
+                                                                    aBRepOwner->Selectable());
+  if (aBRepOwner->HasShape()) {
+    const TopoDS_Shape& aShape = aBRepOwner->Shape();
+    TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+    if (aShapeType == TopAbs_VERTEX) {
+      AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature,
+                                                                    aShape, theSketch);
+      if (aPntAttr.get() != NULL)
+        aSelectedAttributes.insert(aPntAttr);
+    }
+    else if (aShapeType == TopAbs_EDGE &&
+             aSelectedResults.find(theResult) == aSelectedResults.end()) {
+      aSelectedResults.insert(theResult);
+    }
+  }
+}
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
@@ -950,29 +972,18 @@ void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
     Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
     {
-      Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(
-                                                                      aContext->SelectedOwner());
-      if (aBRepOwner.IsNull())
+      Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
+      if (anOwner->Selectable() != anAISIO)
         continue;
-      Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(
-                                                                        aBRepOwner->Selectable());
-      if (anIO != anAISIO)
+      getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
+                             aSelectedAttributes, aSelectedResults);
+    }
+    for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
+      Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
+      if (anOwner->Selectable() != anAISIO)
         continue;
-
-      if (aBRepOwner->HasShape()) {
-        const TopoDS_Shape& aShape = aBRepOwner->Shape();
-        TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
-        if (aShapeType == TopAbs_VERTEX) {
-          AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature,
-                                                                        aShape, theSketch);
-          if (aPntAttr.get() != NULL)
-            aSelectedAttributes.insert(aPntAttr);
-        }
-        else if (aShapeType == TopAbs_EDGE &&
-                 aSelectedResults.find(aResult) == aSelectedResults.end()) {
-          aSelectedResults.insert(aResult);
-        }
-      }
+      getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
+                             aSelectedAttributes, aSelectedResults);
     }
   }
   theSelection[theFeature] = std::make_pair(aSelectedAttributes, aSelectedResults);
@@ -1001,7 +1012,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   if (aAISObj.get() != NULL && aSelectedAttributes.empty() && aSelectedResults.empty()) {
     Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
 
-    SelectMgr_IndexedMapOfOwner aSelectedOwners;  
+    SelectMgr_IndexedMapOfOwner aSelectedOwners;
     aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
     for  (Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++) {
       Handle(SelectMgr_EntityOwner) anOwner = aSelectedOwners(i);
@@ -1120,25 +1131,23 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
   QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
-    
-  QMap<FeaturePtr, QList<AttributePtr> > aFeature2AttributeMap;
+
+  QList<FeaturePtr> aFeatureList;
   if (theHighlightedOnly) {
-    fillFeature2Attribute(aHighlighted, aFeature2AttributeMap, myCurrentSketch);
+    fillFeatureList(aHighlighted, myCurrentSketch, aFeatureList);
   }
   else {
-    fillFeature2Attribute(aHighlighted, aFeature2AttributeMap, myCurrentSketch);
+    fillFeatureList(aHighlighted, myCurrentSketch, aFeatureList);
 
     QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
-    fillFeature2Attribute(aSelected, aFeature2AttributeMap, myCurrentSketch);
+    fillFeatureList(aSelected, myCurrentSketch, aFeatureList);
   }
 
   // 1. it is necessary to save current selection in order to restore it after the features moving
   myCurrentSelection.clear();
-  QMap<FeaturePtr, QList<AttributePtr> >::const_iterator anIt = aFeature2AttributeMap.begin(),
-                                                         aLast = aFeature2AttributeMap.end();
+  QList<FeaturePtr>::const_iterator anIt = aFeatureList.begin(), aLast = aFeatureList.end();
   for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = anIt.key();
-    getCurrentSelection(aFeature, myCurrentSketch, aWorkshop, myCurrentSelection);
+    getCurrentSelection(*anIt, myCurrentSketch, aWorkshop, myCurrentSelection);
   }
   //qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
 }
