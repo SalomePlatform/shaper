@@ -215,13 +215,14 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
-
+  myProxyViewer->activateViewer(true);
   return isDone;
 }
 
 //******************************************************
 bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 {
+  myProxyViewer->activateViewer(false);
   setMenuShown(false);
   setToolShown(false);
 

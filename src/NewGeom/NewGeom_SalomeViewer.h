@@ -126,6 +126,10 @@ Q_OBJECT
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const;
 
+  /// Activate or deactivate viewer
+  /// \param toActivate - activation flag
+  void activateViewer(bool toActivate);
+
  private slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);

@@ -356,3 +356,27 @@ void NewGeom_SalomeViewer::onViewTransformed(OCCViewer_ViewWindow::OperationType
 {
   emit viewTransformed((int) theType);
 }
+
+//***************************************
+void NewGeom_SalomeViewer::activateViewer(bool toActivate)
+{
+  if (!mySelector || !mySelector->viewer())
+    return;
+  SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+  QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
+  if (toActivate) {
+    foreach (SUIT_ViewWindow* aView, aViews) {
+      OCCViewer_ViewFrame* aOCCView = dynamic_cast<OCCViewer_ViewFrame*>(aView);
+      OCCViewer_ViewWindow* aWnd = aOCCView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
+      connect(aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
+        this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+    }
+  } else {
+    foreach (SUIT_ViewWindow* aView, aViews) {
+      OCCViewer_ViewFrame* aOCCView = dynamic_cast<OCCViewer_ViewFrame*>(aView);
+      OCCViewer_ViewWindow* aWnd = aOCCView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
+      disconnect((OCCViewer_ViewWindow*)aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
+        this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+    }
+  }
+}
