@@ -204,19 +204,24 @@ class Model_Document : public ModelAPI_Document
   //! Returns the list of Ids of the operations that can be redoed (called for the root document)
   std::list<std::string> redoList() const;
 
-  /// Internally makes document know that feature was removed or added in history after creation
+  //! Internally makes document know that feature was removed or added in history after creation
   virtual void updateHistory(const std::shared_ptr<ModelAPI_Object> theObject);
-  /// Internally makes document know that feature was removed or added in history after creation
+  //! Internally makes document know that feature was removed or added in history after creation
   virtual void updateHistory(const std::string theGroup);
 
-  /// Returns true if the document is root module document
+  //! Returns true if the document is root module document
   bool isRoot() const;
 
-  /// Sets shared pointer to this
+  //! Sets shared pointer to this
   void setThis(DocumentPtr theDoc);
 
-  /// Returns the objects manager
+  //! Returns the objects manager
   Model_Objects* objects() {return myObjs;}
+
+  ///! Informs the document that it becomes active and some actions must be performed
+  virtual void setActive(const bool theFlag);
+  //! Returns true if this document is currently active
+  virtual bool isActive() const;
 
   friend class Model_Application;
   friend class Model_Session;
@@ -233,30 +238,32 @@ class Model_Document : public ModelAPI_Document
 
   Model_Objects *myObjs; ///< data manager of this document
 
-  /// counter value of transaction on the last "save" call, used for "IsModified" method
+  //! counter value of transaction on the last "save" call, used for "IsModified" method
   int myTransactionSave;
-  /// number of nested transactions performed (list becasue may be nested inside of nested)
-  /// the list is empty if not nested transaction is performed
+  //! number of nested transactions performed (list becasue may be nested inside of nested)
+  //! the list is empty if not nested transaction is performed
   std::list<int> myNestedNum;
 
-  /// Information related to the every user-transaction
+  //! Information related to the every user-transaction
   struct Transaction {
     int myOCAFNum; ///< number of OCAF transactions related to each "this" transaction, may be 0
     std::string myId; ///< user-identifier string of transaction
-    /// default constructor with default Id
+    //! default constructor with default Id
     Transaction(): myOCAFNum(0), myId("") {}
   };
 
-  /// transaction indexes (related to myTransactionsAfterSave) and info about the real transactions
-  /// in myDocument connected to this operation (may be zero for empty transaction)
+  //! transaction indexes (related to myTransactionsAfterSave) and info about the real transactions
+  //! in myDocument connected to this operation (may be zero for empty transaction)
   std::list<Transaction> myTransactions;
-  /// list of info about transactions undone (first is oldest undone)
+  //! list of info about transactions undone (first is oldest undone)
   std::list<Transaction> myRedos;
 
-  /// Optimization for finding the shape-label by topological naming names
+  //! Optimization for finding the shape-label by topological naming names
   std::map<std::string, TDF_Label> myNamingNames;
-  /// If it is true, features are not executed on update (on abort, undo, redo)
+  //! If it is true, features are not executed on update (on abort, undo, redo)
   bool myExecuteFeatures;
+
+  bool myIsActive; ///< flag that stores the active/not active state
 };
 
 #endif

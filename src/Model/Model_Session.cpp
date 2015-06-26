@@ -219,6 +219,11 @@ void Model_Session::setActiveDocument(
   std::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal)
 {
   if (myCurrentDoc != theDoc) {
+    if (myCurrentDoc.get())
+      myCurrentDoc->setActive(false);
+    if (theDoc.get())
+      theDoc->setActive(true);
+
     std::shared_ptr<ModelAPI_Document> aPrevious = myCurrentDoc;
     myCurrentDoc = theDoc;
     if (theDoc.get() && theSendSignal) {

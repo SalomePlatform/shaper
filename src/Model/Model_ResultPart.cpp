@@ -9,6 +9,10 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultBody.h>
+
+#include <TopoDS_Compound.hxx>
+#include <BRep_Builder.hxx>
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
@@ -81,4 +85,32 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     return true;
   }
   return false;
+}
+
+std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
+{
+  DocumentPtr aDoc = Model_ResultPart::partDoc();
+  if (aDoc.get()) {
+    const std::string& aBodyGroup = ModelAPI_ResultBody::group();
+    TopoDS_Compound aResultComp;
+    BRep_Builder aBuilder;
+    aBuilder.MakeCompound(aResultComp);
+    int aNumSubs = 0;
+    for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
+      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
+      if (aBody.get() && aBody->shape().get()) {
+        TopoDS_Shape aShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
+        if (!aShape.IsNull()) {
+          aBuilder.Add(aResultComp, aShape);
+          aNumSubs++;
+        }
+      }
+    }
+    if (aNumSubs) {
+      std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
+      aResult->setImpl(new TopoDS_Shape(aResultComp));
+      return aResult;
+    }
+  }
+  return std::shared_ptr<GeomAPI_Shape>();
 }

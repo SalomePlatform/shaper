@@ -32,6 +32,9 @@ class Model_ResultPart : public ModelAPI_ResultPart
   MODEL_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     const bool theFlag);
 
+  /// Result shape of part document is compound of bodies inside of this part
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
+
 protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();

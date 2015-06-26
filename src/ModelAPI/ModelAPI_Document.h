@@ -102,19 +102,19 @@ public:
   //! Makes the current feature one feature upper
   virtual void setCurrentFeatureUp() = 0;
 
-  /// To virtually destroy the fields of successors
+  //! To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
 
-  /// Creates a construction cresults
+  //! Creates a construction cresults
   virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-  /// Creates a body results
+  //! Creates a body results
   virtual std::shared_ptr<ModelAPI_ResultBody> createBody(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-  /// Creates a part results
+  //! Creates a part results
   virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-  /// Creates a group results
+  //! Creates a group results
   virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
@@ -125,17 +125,22 @@ public:
   virtual std::shared_ptr<ModelAPI_Feature> feature(
       const std::shared_ptr<ModelAPI_Result>& theResult) = 0;
 
-  ///! Returns all features of the document including the hidden features which are not in
-  ///! history. Not very fast method, for calling once, not in big cycles.
+  //! Returns all features of the document including the hidden features which are not in
+  //! history. Not very fast method, for calling once, not in big cycles.
   virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures() = 0;
 
+  //! Informs the document that it becomes active and some actions must be performed
+  virtual void setActive(const bool theFlag) = 0;
+  //! Returns true if this document is currently active
+  virtual bool isActive() const = 0;
+
 protected:
-  /// Only for SWIG wrapping it is here
+  //! Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();
 
-  /// Internally makes document know that feature was removed or added in history after creation
+  //! Internally makes document know that feature was removed or added in history after creation
   MODELAPI_EXPORT virtual void updateHistory(const std::shared_ptr<ModelAPI_Object> theObject) = 0;
-  /// Internally makes document know that feature was removed or added in history after creation
+  //! Internally makes document know that feature was removed or added in history after creation
   MODELAPI_EXPORT virtual void updateHistory(const std::string theGroup) = 0;
 
   friend class ModelAPI_Object; // to add or remove from the history

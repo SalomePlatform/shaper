@@ -48,7 +48,7 @@ static const int TAG_GENERAL = 1;  // general properties tag
 static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
 
 Model_Document::Model_Document(const std::string theID, const std::string theKind)
-    : myID(theID), myKind(theKind),
+    : myID(theID), myKind(theKind), myIsActive(false),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
   myObjs = new Model_Objects(myDoc->Main());
@@ -834,4 +834,31 @@ ResultPtr Model_Document::findByName(const std::string theName)
 std::list<std::shared_ptr<ModelAPI_Feature> > Model_Document::allFeatures()
 {
   return myObjs->allFeatures();
+}
+
+void Model_Document::setActive(const bool theFlag)
+{
+  if (theFlag != myIsActive) {
+    myIsActive = theFlag;
+    // redisplay all the objects of this part
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
+    for(int a = size(ModelAPI_Feature::group()) - 1; a >= 0; a--) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+        object(ModelAPI_Feature::group(), a));
+      if (aFeature.get() && aFeature->data()->isValid()) {
+        const std::list<std::shared_ptr<ModelAPI_Result> >& aResList = aFeature->results();
+        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
+        for(; aRes != aResList.end(); aRes++) {
+          ModelAPI_EventCreator::get()->sendUpdated(*aRes, aRedispEvent);
+        }
+      }
+    }
+  }
+}
+
+bool Model_Document::isActive() const
+{
+  return myIsActive;
 }

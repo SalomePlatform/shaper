@@ -400,7 +400,8 @@ void Model_Data::setIsInHistory(const bool theFlag)
 
 bool Model_Data::isDisplayed()
 {
-  return myFlags->Value(kFlagDisplayed) == Standard_True;
+  return myObject.get() && myObject->document().get() && myObject->document()->isActive() &&
+    myFlags->Value(kFlagDisplayed) == Standard_True;
 }
 
 void Model_Data::setDisplayed(const bool theDisplay)

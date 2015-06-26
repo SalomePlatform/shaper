@@ -1634,6 +1634,7 @@ for (int i = 0; i < aDoc->size(aGroupName); i++) { \
 void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
   foreach (ObjectPtr aObj, theList) {
+    /*
     ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
     if (aPartRes) {
       DocumentPtr aDoc = aPartRes->partDoc();
@@ -1641,8 +1642,9 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
       SET_DISPLAY_GROUP(ModelAPI_ResultConstruction::group(), isVisible)
       SET_DISPLAY_GROUP(ModelAPI_ResultGroup::group(), isVisible)
     } else {
+    */
       aObj->setDisplayed(isVisible);
-    }
+    //}
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
@@ -1657,6 +1659,7 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 
   // Show only objects from the list
   foreach (ObjectPtr aObj, theList) {
+    /*
     ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
     if (aPartRes) {
       DocumentPtr aDoc = aPartRes->partDoc();
@@ -1664,8 +1667,9 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
       SET_DISPLAY_GROUP(ModelAPI_ResultConstruction::group(), true)
       SET_DISPLAY_GROUP(ModelAPI_ResultGroup::group(), true)
     } else {
+    */
       aObj->setDisplayed(true);
-    }
+    //}
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
