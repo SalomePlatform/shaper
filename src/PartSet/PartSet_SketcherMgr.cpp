@@ -317,6 +317,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+  myPreviousSelectionEnabled = aViewer->isSelectionEnabled();
   if (!aViewer->canDragByMouse())
     return;
 
