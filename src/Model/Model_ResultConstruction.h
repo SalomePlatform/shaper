@@ -27,13 +27,6 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   bool myIsInHistory;
   bool myIsInfinite;
  public:
-  /// default color for a result construction
-  inline static const std::string& DEFAULT_COLOR()
-  {
-    static const std::string RESULT_CONSTRUCTION_COLOR("120,120,120");
-    return RESULT_CONSTRUCTION_COLOR;
-  }
-
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
 

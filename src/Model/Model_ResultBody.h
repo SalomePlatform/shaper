@@ -29,13 +29,6 @@ class Model_ResultBody : public ModelAPI_ResultBody
   /// label; index in vector corresponds to the label tag
   std::vector<TNaming_Builder*> myBuilders;
 public:
-  /// default color for a result body
-  inline static const std::string& DEFAULT_COLOR()
-  {
-    static const std::string RESULT_BODY_COLOR("150,150,180");
-    return RESULT_BODY_COLOR;
-  }
-
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
 

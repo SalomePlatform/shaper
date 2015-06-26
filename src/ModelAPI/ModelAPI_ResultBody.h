@@ -36,6 +36,13 @@ public:
     return MY_GROUP;
   }
 
+  /// default color for a result body
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string RESULT_BODY_COLOR("150,150,180");
+    return RESULT_BODY_COLOR;
+  }
+
   /// Stores the shape (called by the execution method).
   virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
 

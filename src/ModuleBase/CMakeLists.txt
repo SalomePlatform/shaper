@@ -121,7 +121,6 @@ INCLUDE_DIRECTORIES(
     ${CAS_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src/Config
     ${CMAKE_SOURCE_DIR}/src/Events
-    ${CMAKE_SOURCE_DIR}/src/Model
     ${CMAKE_SOURCE_DIR}/src/ModelAPI
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAPI

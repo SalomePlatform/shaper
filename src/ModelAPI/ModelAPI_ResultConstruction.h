@@ -33,6 +33,13 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
     return MY_GROUP;
   }
 
+  /// default color for a result construction
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string RESULT_CONSTRUCTION_COLOR("120,120,120");
+    return RESULT_CONSTRUCTION_COLOR;
+  }
+
   /// Sets the result
   virtual void setShape(std::shared_ptr<GeomAPI_Shape> theShape) = 0;
 
