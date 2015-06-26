@@ -45,7 +45,8 @@ public:
   //! Returns bounding box of the point. If location
   //! transformation is set, it will be applied
   Standard_EXPORT virtual Select3D_BndBox3d BoundingBox() Standard_OVERRIDE;
-  
+
+  Standard_EXPORT virtual void Clear() Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTI(SketcherPrs_SensitivePoint)
 
