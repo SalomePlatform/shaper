@@ -164,6 +164,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_construction_color", "Construction color",
                                    Config_Prop::Color, ModelAPI_ResultConstruction::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
+                                   Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
 }
 
 //******************************************************

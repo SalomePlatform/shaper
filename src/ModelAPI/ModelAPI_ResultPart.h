@@ -38,6 +38,13 @@ class ModelAPI_ResultPart : public ModelAPI_Result
     return MY_DOC_REF;
   }
 
+  /// default color for a result body
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string RESULT_BODY_COLOR("96,157,255");
+    return RESULT_BODY_COLOR;
+  }
+
   /// Returns the part-document of this result
   virtual std::shared_ptr<ModelAPI_Document> partDoc() = 0;
 

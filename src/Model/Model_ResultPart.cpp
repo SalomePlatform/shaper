@@ -114,3 +114,12 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
   }
   return std::shared_ptr<GeomAPI_Shape>();
 }
+
+
+void Model_ResultPart::colorConfigInfo(std::string& theSection, std::string& theName,
+  std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "result_part_color";
+  theDefault = DEFAULT_COLOR();
+}

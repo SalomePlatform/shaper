@@ -35,6 +35,10 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Result shape of part document is compound of bodies inside of this part
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
+  /// Returns the parameters of color definition in the resources config manager
+  MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+                                            std::string& theDefault);
+
 protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();
