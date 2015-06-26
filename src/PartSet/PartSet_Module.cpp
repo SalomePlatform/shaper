@@ -315,6 +315,11 @@ bool PartSet_Module::canRedo() const
   return aCanRedo;
 }
 
+bool PartSet_Module::canCommitOperation() const
+{
+  return mySketchMgr->canCommitOperation();
+}
+
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects display

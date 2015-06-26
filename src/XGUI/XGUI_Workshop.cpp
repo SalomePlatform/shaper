@@ -127,7 +127,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   mySelector = new XGUI_SelectionMgr(this);
   //connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
 
-  myOperationMgr = new XGUI_OperationMgr(this);
+  myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
@@ -139,6 +139,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           myActionsMgr,  SLOT(updateOnViewSelection()));
 
   myModuleConnector = new XGUI_ModuleConnector(this);
+  myOperationMgr->setWorkshop(moduleConnector());
 
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
           SLOT(onOperationStarted(ModuleBase_Operation*)));

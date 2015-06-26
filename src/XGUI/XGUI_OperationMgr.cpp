@@ -7,13 +7,17 @@
 #include "XGUI_OperationMgr.h"
 
 #include "ModuleBase_Operation.h"
+#include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_IModule.h"
 
 #include <QMessageBox>
 #include <QApplication>
 #include <QKeyEvent>
 
-XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
-    : QObject(theParent), myIsValidationLock(false), myIsApplyEnabled(false)
+XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
+                                     ModuleBase_IWorkshop* theWorkshop)
+: QObject(theParent), myIsValidationLock(false), myIsApplyEnabled(false),
+  myWorkshop(theWorkshop)
 {
 }
 
@@ -153,7 +157,8 @@ void XGUI_OperationMgr::onValidateOperation()
     return;
   ModuleBase_Operation* anOperation = currentOperation();
   if(anOperation) {
-    setApplyEnabled(!myIsValidationLock && anOperation->isValid());
+    bool aCanCommit = myWorkshop->module()->canCommitOperation();
+    setApplyEnabled(!myIsValidationLock && aCanCommit && anOperation->isValid());
   }
 }
 

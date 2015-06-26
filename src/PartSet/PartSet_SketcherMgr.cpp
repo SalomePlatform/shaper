@@ -12,6 +12,7 @@
 #include "PartSet_WidgetSketchLabel.h"
 
 #include <ModuleBase_WidgetEditor.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -19,10 +20,10 @@
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Selection.h>
 #include <XGUI_SelectionMgr.h>
-#include <ModuleBase_ModelWidget.h>
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ViewerProxy.h>
+#include <XGUI_OperationMgr.h>
 
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
@@ -189,6 +190,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
   myIsPropertyPanelValueChanged = false;
+  operationMgr()->onValidateOperation();
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("onEnterViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -218,6 +220,7 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
   myIsPropertyPanelValueChanged = false;
+  operationMgr()->onValidateOperation();
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("onLeaveViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -294,6 +297,7 @@ void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
 
   // visualize the current operation feature
   myIsPropertyPanelValueChanged = true;
+  operationMgr()->onValidateOperation();
   ModuleBase_Operation* aOperation = getCurrentOperation();
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
@@ -822,6 +826,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
   myIsMouseOverViewProcessed = true;
+  operationMgr()->onValidateOperation();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -844,6 +849,16 @@ bool PartSet_SketcherMgr::canUndo() const
 bool PartSet_SketcherMgr::canRedo() const
 {
   return isNestedCreateOperation(getCurrentOperation());
+}
+
+bool PartSet_SketcherMgr::canCommitOperation() const
+{
+  bool aCanCommit = true;
+
+  if (isNestedCreateOperation(getCurrentOperation()) && !canDisplayCurrentCreatedFeature())
+    aCanCommit = false;
+
+  return aCanCommit;
 }
 
 bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
@@ -1197,4 +1212,13 @@ QString PartSet_SketcherMgr::mouseOverWindowFlagsInfo() const
 {
   return QString("myIsPropertyPanelValueChanged = %1,    myIsMouseOverWindow = %2")
      .arg(myIsPropertyPanelValueChanged).arg(myIsMouseOverWindow);
+}
+
+XGUI_OperationMgr* PartSet_SketcherMgr::operationMgr() const
+{
+  ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+
+  return aWorkshop->operationMgr();
 }

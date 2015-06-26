@@ -17,6 +17,8 @@
 
 class QKeyEvent;
 
+class ModuleBase_IWorkshop;
+
 /**\class XGUI_OperationMgr
  * \ingroup GUI
  * \brief Operation manager. Servers to manipulate to the workshop operations. Contains a stack
@@ -32,9 +34,12 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent
-  XGUI_OperationMgr(QObject* theParent);
+  XGUI_OperationMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop);
   /// Destructor
   virtual ~XGUI_OperationMgr();
+
+  void setWorkshop(ModuleBase_IWorkshop* theWorkshop)
+  { myWorkshop = theWorkshop; };
 
   /// Returns the current operation or NULL
   /// \return the current operation
@@ -172,6 +177,10 @@ signals:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
   Operations myOperations;  ///< a stack of started operations. The active operation is on top,
                             // others are suspended and started by the active is finished
+
+  /// Current workshop
+  ModuleBase_IWorkshop* myWorkshop;
+
 
   /// Lock/Unlock access to Ok button in property panel
   bool myIsValidationLock;

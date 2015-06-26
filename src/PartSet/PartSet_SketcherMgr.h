@@ -28,6 +28,7 @@ class PartSet_Module;
 class ModuleBase_IViewWindow;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
+class XGUI_OperationMgr;
 class QMouseEvent;
 
 /**
@@ -133,6 +134,10 @@ public:
   //! Returns True if there are available Redos and the sketch manager allows redo
   /// \return the boolean result
   bool canRedo() const;
+
+  /// Returns False only if the sketch creating feature can not be visualized.
+  /// \return a boolean value
+  bool canCommitOperation() const;
 
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results for usual operation and ask the sketcher manager
@@ -266,6 +271,8 @@ private:
   /// Gives a debug information about internal flags myIsMouseOverWindow and myIsPropertyPanelValueChanged
   /// \return a string value
   QString mouseOverWindowFlagsInfo() const;
+
+  XGUI_OperationMgr* operationMgr() const;
 
 private:
   PartSet_Module* myModule;

@@ -99,6 +99,10 @@ public:
   /// \return the boolean result
   virtual bool canRedo() const;
 
+  /// Returns True if the current operation can be committed. Asks the sketch manager.
+  /// \return a boolean value
+  virtual bool canCommitOperation() const;
+
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation
