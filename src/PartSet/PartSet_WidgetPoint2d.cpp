@@ -7,17 +7,13 @@
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
-
-#include <XGUI_Workshop.h>
-#include <XGUI_ViewerProxy.h>
-#include <XGUI_ModuleConnector.h>
-#include <XGUI_SelectionMgr.h>
-#include <XGUI_Selection.h>
-#include <XGUI_OperationMgr.h>
+#include <PartSet_LockApplyMgr.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
+#include <ModuleBase_ISelection.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -52,10 +48,13 @@ const double MaxCoordinate = 1e12;
 
 
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
-                                              const Config_WidgetAPI* theData,
-                                              const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId)
+                                             ModuleBase_IWorkshop* theWorkshop,
+                                             const Config_WidgetAPI* theData,
+                                             const std::string& theParentId)
+ : ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop)
 {
+  myLockApplyMgr = new PartSet_LockApplyMgr(theParent, myWorkshop);
+
   // the control should accept the focus, so the boolen flag is corrected to be true
   myIsObligatory = true;
   //myOptionParam = theData->getProperty(PREVIOUS_FEATURE_PARAM);
@@ -211,36 +210,31 @@ QList<QWidget*> PartSet_WidgetPoint2D::getControls() const
 
 void PartSet_WidgetPoint2D::activateCustom()
 {
-  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
   connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-  connect(aViewer, SIGNAL(enterViewPort()), this, SLOT(onLockValidating()));
-  connect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onUnlockValidating()));
 
   QIntList aModes;
   aModes << TopAbs_VERTEX;
   aModes << TopAbs_EDGE;
-  myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
+  myWorkshop->activateSubShapesSelection(aModes);
 
-  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-  if (aModule->isMouseOverWindow())
-    onLockValidating();
+  myLockApplyMgr->activate();
 }
 
 void PartSet_WidgetPoint2D::deactivate()
 {
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-  disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
+  disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-  disconnect(aViewer, SIGNAL(enterViewPort()), this, SLOT(onLockValidating()));
-  disconnect(aViewer, SIGNAL(leaveViewPort()), this, SLOT(onUnlockValidating()));
 
-  myWorkshop->moduleConnector()->deactivateSubShapesSelection();
-  onUnlockValidating();
+  myWorkshop->deactivateSubShapesSelection();
+
+  myLockApplyMgr->deactivate();
 }
 
 bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 
@@ -268,7 +262,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   if (theEvent->button() != Qt::LeftButton)
     return;
 
-  XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
   Handle(V3d_View) aView = theWnd->v3dView();
   // TODO: This fragment doesn't work because bug in OCC Viewer. It can be used after fixing.
   NCollection_List<TopoDS_Shape> aShapes;
@@ -357,27 +351,6 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
   setPoint(aX, anY);
 }
 
-void PartSet_WidgetPoint2D::onLockValidating()
-{
-  XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
-  anOperationMgr->setLockValidating(true);
-  // the Ok button should be disabled in the property panel by moving the mouse point in the viewer
-  // this leads that the user does not try to click Ok and it avoids an incorrect situation that the 
-  // line is moved to the cursor to the Ok button
-  anOperationMgr->setApplyEnabled(false);
-}
-
-void PartSet_WidgetPoint2D::onUnlockValidating()
-{
-  // it is important to restore the validity state in the property panel after leaving the
-  // view port. Unlock the validating.
-  XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
-  if (anOperationMgr->isValidationLocked()) {
-    anOperationMgr->setLockValidating(false);
-    anOperationMgr->onValidateOperation();
-  }
-}
-
 double PartSet_WidgetPoint2D::x() const
 {
   return myXSpin->value();
@@ -390,6 +363,6 @@ double PartSet_WidgetPoint2D::y() const
 
 void PartSet_WidgetPoint2D::onValuesChanged()
 {
-  myWorkshop->operationMgr()->setLockValidating(false);
+  myLockApplyMgr->valuesChanged();
   emit valuesChanged();
 }

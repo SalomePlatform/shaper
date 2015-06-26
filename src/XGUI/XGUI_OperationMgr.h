@@ -81,14 +81,10 @@ Q_OBJECT
 
   /// Blocking/unblocking enabling of Ok button in property panel.
   /// It is used when operation can not be validated even all attributes are valid
-  void setLockValidating(bool toLock) { myIsValidationLock = toLock; }
+  void setLockValidating(bool toLock);
 
   /// Returns state of validation locking
   bool isValidationLocked() const { return myIsValidationLock; }
-
-  /// Sets apply state to the value and emit signal about this state is changed
-  /// \param theEnabled the state value
-  void setApplyEnabled(const bool theEnabled);
 
   /// Returns enable apply state 
   /// \return theEnabled a boolean value
@@ -136,6 +132,10 @@ signals:
   void keyEnterReleased();
 
  protected:
+  /// Sets apply state to the value and emit signal about this state is changed
+  /// \param theEnabled the state value
+  void setApplyEnabled(const bool theEnabled);
+
   /// Commits the current operatin if it is valid
   bool commitOperation();
 

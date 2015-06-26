@@ -12,8 +12,9 @@
 
 #include <ModelAPI_CompositeFeature.h>
 
+class PartSet_LockApplyMgr;
 class GeomAPI_Pnt2d;
-class XGUI_Workshop;
+class ModuleBase_IWorkshop;
 class ModuleBase_IViewWindow;
 class QMouseEvent;
 
@@ -40,10 +41,12 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent object
+  /// \param theWorkshop a current workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  PartSet_WidgetPoint2dDistance(QWidget* theParent, const Config_WidgetAPI* theData,
-                                   const std::string& theParentId);
+   PartSet_WidgetPoint2dDistance(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+                                 const Config_WidgetAPI* theData,
+                                 const std::string& theParentId);
 
   virtual ~PartSet_WidgetPoint2dDistance();
 
@@ -52,13 +55,6 @@ Q_OBJECT
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
-
-  /// Returns workshop
-  XGUI_Workshop* workshop() const { return myWorkshop; }
-
-  /// Set workshop
-  /// \param theWork a pointer to workshop
-  void setWorkshop(XGUI_Workshop* theWork) { myWorkshop = theWork; }
 
   /// \returns the sketch instance
   CompositeFeaturePtr sketch() const { return mySketch; }
@@ -97,9 +93,10 @@ private slots:
   void onValuesChanged();
 
 protected:
-  XGUI_Workshop* myWorkshop;
-  std::string myFirstPntName;
+  ModuleBase_IWorkshop* myWorkshop;
+  PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
 
+  std::string myFirstPntName;
   CompositeFeaturePtr mySketch;
 };
 

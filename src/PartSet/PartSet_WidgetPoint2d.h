@@ -21,7 +21,8 @@ class ModuleBase_IWorkshop;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
 class GeomAPI_Pnt2d;
-class XGUI_Workshop;
+class ModuleBase_IWorkshop;
+class PartSet_LockApplyMgr;
 
 class QGroupBox;
 class QMouseEvent;
@@ -40,9 +41,11 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent object
+  /// \param theWorkshop a current workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  PartSet_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData, 
+  PartSet_WidgetPoint2D(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+                        const Config_WidgetAPI* theData, 
                         const std::string& theParentId);
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
@@ -65,12 +68,6 @@ Q_OBJECT
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
-
-  /// Return workshop
-  XGUI_Workshop* workshop() const { return myWorkshop; }
-
-  /// Set workshop
-  void setWorkshop(XGUI_Workshop* theWork) { myWorkshop = theWork; }
 
   /// \returns the sketch instance
   CompositeFeaturePtr sketch() const { return mySketch; }
@@ -106,12 +103,6 @@ protected slots:
   /// \param theEvent a mouse event
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
-  // Set lock validating in the operation manager. Set apply is disabled
-  void onLockValidating();
-
-  // Set unlock validating in the operation manager. Call method to update the apply state.
-  void onUnlockValidating();
-
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -133,7 +124,8 @@ private slots:
    bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
                    double& theX, double& theY) const;
 
-  XGUI_Workshop* myWorkshop;
+  ModuleBase_IWorkshop* myWorkshop;
+  PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
   ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate

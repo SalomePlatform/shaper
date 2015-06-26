@@ -24,9 +24,10 @@
 #define PI 3.1415926535897932
 
 PartSet_WidgetPoint2dAngle::PartSet_WidgetPoint2dAngle(QWidget* theParent,
+                                                       ModuleBase_IWorkshop* theWorkshop,
                                                        const Config_WidgetAPI* theData,
                                                        const std::string& theParentId)
-: PartSet_WidgetPoint2dDistance(theParent, theData, theParentId)
+: PartSet_WidgetPoint2dDistance(theParent, theWorkshop, theData, theParentId)
 {
 }
 

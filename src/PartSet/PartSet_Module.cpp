@@ -477,48 +477,49 @@ void PartSet_Module::onVertexSelected()
 ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
                                             Config_WidgetAPI* theWidgetApi, std::string theParentId)
 {
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  ModuleBase_IWorkshop* aWorkshop = workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Workshop* aXUIWorkshop = aConnector->workshop();
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, 
       theWidgetApi, theParentId, mySketchMgr->isConstraintsShown());
-    aLabelWgt->setWorkshop(aWorkshop);
+    aLabelWgt->setWorkshop(aXUIWorkshop);
     connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
     connect(aLabelWgt, SIGNAL(showConstraintToggled(bool)),
       mySketchMgr, SLOT(onShowConstraintsToggle(bool)));
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
-    PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, theWidgetApi, theParentId);
-    aPointWgt->setWorkshop(aWorkshop);
+    PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, aWorkshop,
+                                                                 theWidgetApi, theParentId);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
     aWgt = aPointWgt;
   } else if (theType == "point2ddistance") {
-    PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent, theWidgetApi, theParentId);
-    aDistanceWgt->setWorkshop(aWorkshop);
+    PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent,
+                                                        aWorkshop, theWidgetApi, theParentId);
     aDistanceWgt->setSketch(mySketchMgr->activeSketch());
     aWgt = aDistanceWgt;
   } else if(theType == "point2dangle") {
-    PartSet_WidgetPoint2dAngle* anAngleWgt = new PartSet_WidgetPoint2dAngle(theParent, theWidgetApi, theParentId);
-    anAngleWgt->setWorkshop(aWorkshop);
+    PartSet_WidgetPoint2dAngle* anAngleWgt = new PartSet_WidgetPoint2dAngle(theParent,
+                                                           aWorkshop, theWidgetApi, theParentId);
     anAngleWgt->setSketch(mySketchMgr->activeSketch());
     aWgt = anAngleWgt;
   } else if (theType == "sketch_shape_selector") {
     PartSet_WidgetShapeSelector* aShapeSelectorWgt =
-      new PartSet_WidgetShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
+      new PartSet_WidgetShapeSelector(theParent, aWorkshop, theWidgetApi, theParentId);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
   } else if (theType == "sketch_multi_selector") {
     PartSet_WidgetMultiSelector* aShapeSelectorWgt =
-      new PartSet_WidgetMultiSelector(theParent, workshop(), theWidgetApi, theParentId);
+      new PartSet_WidgetMultiSelector(theParent, aWorkshop, theWidgetApi, theParentId);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
-    aWgt = new PartSet_WidgetEditor(theParent, workshop(), theWidgetApi, theParentId);
+    aWgt = new PartSet_WidgetEditor(theParent, aWorkshop, theWidgetApi, theParentId);
   } else if (theType == "export_file_selector") {
-    aWgt = new PartSet_WidgetFileSelector(theParent, workshop(), theWidgetApi, theParentId);
+    aWgt = new PartSet_WidgetFileSelector(theParent, aWorkshop, theWidgetApi, theParentId);
   } else if (theType == "sketch_launcher") {
     aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi, theParentId);
   }

@@ -12,6 +12,8 @@
 
 #include <ModelAPI_Feature.h>
 
+class ModuleBase_IWorkshop;
+
 class GeomAPI_Pnt2d;
 
 /**
@@ -25,10 +27,11 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent object
+  /// \param theWorkshop a current workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  PartSet_WidgetPoint2dAngle(QWidget* theParent, const Config_WidgetAPI* theData,
-                             const std::string& theParentId);
+  PartSet_WidgetPoint2dAngle(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+                             const Config_WidgetAPI* theData, const std::string& theParentId);
 
   virtual ~PartSet_WidgetPoint2dAngle();
 

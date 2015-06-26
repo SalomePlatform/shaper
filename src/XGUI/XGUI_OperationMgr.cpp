@@ -152,9 +152,15 @@ void XGUI_OperationMgr::onValidateOperation()
   if (!hasOperation())
     return;
   ModuleBase_Operation* anOperation = currentOperation();
-  if(anOperation && (!myIsValidationLock)) {
-    setApplyEnabled(anOperation->isValid());
+  if(anOperation) {
+    setApplyEnabled(!myIsValidationLock && anOperation->isValid());
   }
+}
+
+void XGUI_OperationMgr::setLockValidating(bool toLock)
+{
+  myIsValidationLock = toLock;
+  onValidateOperation();
 }
 
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)

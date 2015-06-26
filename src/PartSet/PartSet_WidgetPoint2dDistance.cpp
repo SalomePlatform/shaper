@@ -6,15 +6,13 @@
 
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
+#include "PartSet_LockApplyMgr.h"
 
 #include <ModuleBase_ParamSpinBox.h>
+#include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewWindow.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
-
-#include <XGUI_ViewerProxy.h>
-#include <XGUI_Workshop.h>
-#include <XGUI_PropertyPanel.h>
-#include <XGUI_OperationMgr.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <Config_WidgetAPI.h>
@@ -26,10 +24,13 @@
 #include <QMouseEvent>
 
 PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
-                                                                   const Config_WidgetAPI* theData,
-                                                                   const std::string& theParentId)
-    : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
+                                                             ModuleBase_IWorkshop* theWorkshop,
+                                                             const Config_WidgetAPI* theData,
+                                                             const std::string& theParentId)
+ : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId), myWorkshop(theWorkshop)
 {
+  myLockApplyMgr = new PartSet_LockApplyMgr(theParent, myWorkshop);
+
   myFirstPntName = theData->getProperty("first_point");
 
   // Reconnect to local slot
@@ -78,11 +79,13 @@ double PartSet_WidgetPoint2dDistance::computeValue(const std::shared_ptr<GeomAPI
 
 void PartSet_WidgetPoint2dDistance::activateCustom()
 {
-  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
-  connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+  connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+  myLockApplyMgr->activate();
 }
 
 void PartSet_WidgetPoint2dDistance::deactivate()
@@ -92,7 +95,8 @@ void PartSet_WidgetPoint2dDistance::deactivate()
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-  myWorkshop->operationMgr()->setLockValidating(false);
+
+  myLockApplyMgr->deactivate();
 }
 
 void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -122,9 +126,6 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
   if (mySpinBox->hasVariable())
     return;
 
-  myWorkshop->operationMgr()->setLockValidating(true);
-  myWorkshop->operationMgr()->setApplyEnabled(false);
-
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
   double aX, aY;
@@ -136,7 +137,7 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
 
 void PartSet_WidgetPoint2dDistance::onValuesChanged()
 {
-  myWorkshop->operationMgr()->setLockValidating(false);
+  myLockApplyMgr->valuesChanged();
   emit valuesChanged();
 }
 
