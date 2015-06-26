@@ -130,6 +130,9 @@ Q_OBJECT
   /// \param toActivate - activation flag
   void activateViewer(bool toActivate);
 
+  // Fit all along Z (perpendicular to display)
+  virtual void Zfitall();
+
  private slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);

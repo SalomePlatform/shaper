@@ -72,6 +72,9 @@ Q_OBJECT
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const;
 
+  // Fit all along Z (perpendicular to display)
+  virtual void Zfitall();
+
 signals:
   /// Emits by mouse entering the view port
   void enterViewPort();

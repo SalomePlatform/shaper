@@ -89,6 +89,9 @@ Q_OBJECT
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const { return true; }
 
+  // Fit all along Z (perpendicular to display)
+  virtual void Zfitall() = 0;
+
 signals:
   /// Signal emited when last view window is closed
   void lastViewClosed();

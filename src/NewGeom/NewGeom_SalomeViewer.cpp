@@ -380,3 +380,15 @@ void NewGeom_SalomeViewer::activateViewer(bool toActivate)
     }
   }
 }
+
+void NewGeom_SalomeViewer::Zfitall()
+{
+  if (!mySelector || !mySelector->viewer())
+    return;
+  SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+  OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
+  if (aView) {
+    OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
+    aWnd->getViewPort()->getView()->ZFitAll();
+  }
+}

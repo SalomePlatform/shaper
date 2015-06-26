@@ -313,3 +313,16 @@ void XGUI_ViewerProxy::onViewTransformed(AppElements_ViewWindow::OperationType t
   emit viewTransformed((int) theType);
 }
 
+
+//***************************************
+void XGUI_ViewerProxy::Zfitall()
+{
+  if (myWorkshop->isSalomeMode()) {
+    myWorkshop->salomeConnector()->viewer()->Zfitall();
+  } else {
+    AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    AppElements_ViewWindow* aView = aViewer->activeViewWindow();
+    if (aView)
+      aView->v3dView()->ZFitAll();
+  }
+}
