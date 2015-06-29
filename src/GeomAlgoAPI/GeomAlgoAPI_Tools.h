@@ -1,9 +1,8 @@
-/*
- * GeomAlgoAPI_Tools.h
- *
- *  Created on: May 18, 2015
- *      Author: spo
- */
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+// File:    GeomAlgoAPI_Tools.h
+// Created: May 18, 2015
+// Author:  Sergey POKHODENKO
 
 #ifndef GEOMALGOAPI_TOOLS_H_
 #define GEOMALGOAPI_TOOLS_H_
@@ -21,6 +20,18 @@ public:
   ~Localizer();
 private:
   std::string myCurLocale;
+};
+
+class File_Tools {
+public:
+  /**
+   * Returns an extension of theFileName
+   */
+  static std::string extension(const std::string& theFileName);
+  /**
+   * Returns a name of theFileName
+   */
+  static std::string name(const std::string& theFileName);
 };
 
 } // GeomAlgoAPI_Tools

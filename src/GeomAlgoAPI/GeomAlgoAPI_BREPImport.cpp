@@ -10,23 +10,22 @@
  *
  */
 //=============================================================================
-//extern "C" {
 namespace BREPImport {
-TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
-                    const TCollection_AsciiString&,
-                    TCollection_AsciiString& theError)
+
+TopoDS_Shape Import(const std::string& theFileName,
+                    const std::string&,
+                    std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import BREP from file " << theFileName << std::endl;
   #endif
   TopoDS_Shape aShape;
   BRep_Builder aBuilder;
-  BRepTools::Read(aShape, theFileName.ToCString(), aBuilder);
+  BRepTools::Read(aShape, theFileName.c_str(), aBuilder);
   if (aShape.IsNull()) {
     theError = "BREP Import failed";
   }
   return aShape;
 }
 
-}
-//}
+} // namespace BREPImport

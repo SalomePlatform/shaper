@@ -11,11 +11,11 @@
  *
  */
 //=============================================================================
-//extern "C" {
 namespace IGESImport {
-TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
-                    const TCollection_AsciiString&,
-                    TCollection_AsciiString& theError)
+
+TopoDS_Shape Import(const std::string& theFileName,
+                    const std::string&,
+                    std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import IGES from file " << theFileName << std::endl;
@@ -23,7 +23,7 @@ TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
   TopoDS_Shape aResShape;
   IGESControl_Reader aReader;
   try {
-    IFSelect_ReturnStatus status = aReader.ReadFile( theFileName.ToCString() );
+    IFSelect_ReturnStatus status = aReader.ReadFile( theFileName.c_str() );
 
     if (status == IFSelect_RetDone) {
       #ifdef _DEBUG
@@ -67,5 +67,4 @@ TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
   return aResShape;
 }
 
-}
-//}
+} // namespace IGESImport

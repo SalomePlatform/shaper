@@ -364,9 +364,9 @@ Handle(TCollection_HAsciiString) GetValue (const TCollection_AsciiString& theFil
   return aValue;
 }
 
-TopoDS_Shape Import (const TCollection_AsciiString& theFileName,
-                     const TCollection_AsciiString& theFormatName,
-                     TCollection_AsciiString&       theError)
+TopoDS_Shape Import (const std::string& theFileName,
+                     const std::string& theFormatName,
+                     std::string&       theError)
 {
   TopoDS_Shape aResShape;
 
@@ -387,7 +387,7 @@ TopoDS_Shape Import (const TCollection_AsciiString& theFileName,
   try {
     OCC_CATCH_SIGNALS;
 
-    IFSelect_ReturnStatus status = aReader.ReadFile(theFileName.ToCString());
+    IFSelect_ReturnStatus status = aReader.ReadFile(theFileName.c_str());
 
     if (status == IFSelect_RetDone) {
 

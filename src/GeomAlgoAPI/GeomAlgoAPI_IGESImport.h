@@ -12,18 +12,18 @@
 
 #include <GeomAlgoAPI.h>
 
-#include <TCollection_AsciiString.hxx>
+#include <string>
+
 #include <TopoDS_Shape.hxx>
-#include <TDF_Label.hxx>
 
 namespace IGESImport {
 
 /// Implementation of the import IGES files algorithms
 GEOMALGOAPI_EXPORT
-TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
-                    const TCollection_AsciiString& theFormatName,
-                    TCollection_AsciiString& theError);
+TopoDS_Shape Import(const std::string& theFileName,
+                    const std::string& theFormatName,
+                    std::string& theError);
 
-}
+} // namespace IGESImport
 
 #endif /* GEOMALGOAPI_IGESIMPORT_H_ */

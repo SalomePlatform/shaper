@@ -12,18 +12,18 @@
 
 #include <GeomAlgoAPI.h>
 
-#include <TCollection_AsciiString.hxx>
+#include <string>
+
 #include <TopoDS_Shape.hxx>
-#include <TDF_Label.hxx>
 
 namespace BREPImport {
 
 /// Implementation of the import BREP files algorithms
 GEOMALGOAPI_EXPORT
-TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
-                    const TCollection_AsciiString& theFormatName,
-                    TCollection_AsciiString& theError);
+TopoDS_Shape Import(const std::string& theFileName,
+                    const std::string& theFormatName,
+                    std::string& theError);
 
-}
+} // namespace BREPImport
 
 #endif /* GEOMALGOAPI_BREPIMPORT_H_ */
