@@ -124,8 +124,7 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   } else if (aFormatName == "STEP") {
     aResult = STEPExport(theFileName, aFormatName, aShape, anError);
   } else if (aFormatName.substr(0, 4) == "IGES") {
-    // to be uncommented when the method interface is corrected
-    //aResult = IGESExport(theFileName, aFormatName, aShape, anError);
+    aResult = IGESExport(theFileName, aFormatName, aShape, anError);
   } else {
     anError = "Unsupported format " + aFormatName;
   }
