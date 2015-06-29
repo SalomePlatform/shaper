@@ -92,15 +92,11 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 {
 }
 
-void ModuleBase_WidgetDoubleValue::reset()
+bool ModuleBase_WidgetDoubleValue::reset()
 {
-  if (!isUseReset())
-    return;
-
-  if (isComputedDefault() || mySpinBox->hasVariable()) {
-    return;
-    //if (myFeature->compute(myAttributeID))
-    //  restoreValue();
+  bool aDone = false;
+  if (!isUseReset() || isComputedDefault() || mySpinBox->hasVariable()) {
+    aDone = false;
   } else {
     bool isOk;
     double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
@@ -109,8 +105,10 @@ void ModuleBase_WidgetDoubleValue::reset()
     if (isOk) {
       ModuleBase_Tools::setSpinValue(mySpinBox, aDefValue);
       storeValueCustom();
+      aDone = true;
     }
   }
+  return aDone;
 }
 
 bool ModuleBase_WidgetDoubleValue::storeValueCustom() const

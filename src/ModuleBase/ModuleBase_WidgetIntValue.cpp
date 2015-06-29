@@ -91,15 +91,11 @@ ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()
 {
 }
 
-void ModuleBase_WidgetIntValue::reset()
+bool ModuleBase_WidgetIntValue::reset()
 {
-  if (!isUseReset())
-    return;
-
-  if (isComputedDefault()) {
-    return;
-    //if (myFeature->compute(myAttributeID))
-    //  restoreValue();
+  bool aDone = false;
+  if (!isUseReset() || isComputedDefault()) {
+    aDone = false;
   } else {
     bool isOk;
     int aDefValue = QString::fromStdString(getDefaultValue()).toInt(&isOk);
@@ -110,8 +106,10 @@ void ModuleBase_WidgetIntValue::reset()
       mySpinBox->setValue(isOk ? aDefValue : 0);
       mySpinBox->blockSignals(isBlocked);
       storeValueCustom();
+      aDone = true;
     }
   }
+  return aDone;
 }
 
 bool ModuleBase_WidgetIntValue::storeValueCustom() const

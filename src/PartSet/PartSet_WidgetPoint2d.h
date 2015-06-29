@@ -51,7 +51,7 @@ Q_OBJECT
   virtual ~PartSet_WidgetPoint2D();
 
   /// Fills the widget with default values
-  virtual void reset();
+  virtual bool reset();
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs

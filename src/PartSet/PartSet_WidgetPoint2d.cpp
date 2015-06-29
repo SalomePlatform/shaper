@@ -99,15 +99,11 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   setLayout(aLayout);
 }
 
-void PartSet_WidgetPoint2D::reset()
+bool PartSet_WidgetPoint2D::reset()
 {
-  if (!isUseReset())
-    return;
-
-  if (isComputedDefault() || myXSpin->hasVariable() || myYSpin->hasVariable()) {
-    return;
-    //if (myFeature->compute(myAttributeID))
-    //  restoreValue();
+  bool aDone = false;
+  if (!isUseReset() || isComputedDefault() || myXSpin->hasVariable() || myYSpin->hasVariable()) {
+    aDone = false;
   }
   else {
     bool isOk;
@@ -117,7 +113,9 @@ void PartSet_WidgetPoint2D::reset()
     ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
     ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
     storeValueCustom();
+    aDone = true;
   }
+  return aDone;
 }
 
 PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
