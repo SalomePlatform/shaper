@@ -42,7 +42,8 @@ void SketchPlugin_MultiTranslation::initAttributes()
 void SketchPlugin_MultiTranslation::execute()
 {
   if (!sketch()) {
-    // it is possible, that 
+    // it is possible, that this method is called before this feature has back reference to sketch
+    // in this case, the execute is performed after this is done
     return;
   }
 

@@ -47,6 +47,12 @@ void SketchPlugin_MultiRotation::initAttributes()
 
 void SketchPlugin_MultiRotation::execute()
 {
+  if (!sketch()) {
+    // it is possible, that this method is called before this feature has back reference to sketch
+    // in this case, the execute is performed after this is done
+    return;
+  }
+
   AttributeSelectionListPtr aRotationObjectRefs = selectionList(ROTATION_LIST_ID());
   int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
