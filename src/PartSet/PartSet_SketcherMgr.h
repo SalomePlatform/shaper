@@ -268,7 +268,7 @@ private:
   void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay,
                         const bool isFlushRedisplay = true);
 private:
-  /// Gives a debug information about internal flags myIsMouseOverWindow and myIsPropertyPanelValueChanged
+  /// Gives a debug information about internal flags myIsMouseOverWindow and myIsResetCurrentValue
   /// \return a string value
   QString mouseOverWindowFlagsInfo() const;
 
@@ -280,7 +280,7 @@ private:
   bool myPreviousSelectionEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
-  bool myIsPropertyPanelValueChanged; /// the state that value in the property panel is changed
+  bool myIsResetCurrentValue; /// the state that value in the property panel is reset
   bool myIsMouseOverWindow; /// the state that the mouse over the view
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   bool myIsPopupMenuActive; /// the state of the popup menu is shown

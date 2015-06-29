@@ -150,7 +150,7 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-    myIsPropertyPanelValueChanged(false), myIsMouseOverWindow(false),
+    myIsResetCurrentValue(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
     myIsPopupMenuActive(false), myIsConstraintsShown(true)
 {
@@ -189,7 +189,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // the mouse move and use the cursor position to update own values. If the presentaion is
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
-  myIsPropertyPanelValueChanged = false;
+  myIsResetCurrentValue = false;
   operationMgr()->onValidateOperation();
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("onEnterViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
@@ -219,7 +219,6 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 {
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
-  myIsPropertyPanelValueChanged = false;
   operationMgr()->onValidateOperation();
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("onLeaveViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
@@ -246,13 +245,12 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   ModuleBase_Operation* aOperation = getCurrentOperation();
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
   ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-  if (aActiveWgt) {
-    aActiveWgt->reset();
+  if (aActiveWgt && aActiveWgt->reset()) {
+    myIsResetCurrentValue = true;
   }
   aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
 
   // hides the presentation of the current operation feature
-  //myIsPropertyPanelValueChanged = false;
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
   FeaturePtr aFeature = getCurrentOperation()->feature();
@@ -296,7 +294,7 @@ void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
     return;
 
   // visualize the current operation feature
-  myIsPropertyPanelValueChanged = true;
+  myIsResetCurrentValue = false;
   operationMgr()->onValidateOperation();
   ModuleBase_Operation* aOperation = getCurrentOperation();
   // the feature is to be erased here, but it is correct to call canDisplayObject because
@@ -825,7 +823,7 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
   connectToPropertyPanel(false);
-  myIsPropertyPanelValueChanged = false;
+  myIsResetCurrentValue = false;
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
 }
@@ -856,7 +854,7 @@ bool PartSet_SketcherMgr::canCommitOperation() const
 {
   bool aCanCommit = true;
 
-  if (isNestedCreateOperation(getCurrentOperation()) && !canDisplayCurrentCreatedFeature())
+  if (isNestedCreateOperation(getCurrentOperation()) && myIsResetCurrentValue)
     aCanCommit = false;
 
   return aCanCommit;
@@ -935,7 +933,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 
 bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 {
-  return myIsPropertyPanelValueChanged || myIsMouseOverWindow;
+  return myIsMouseOverWindow || !myIsResetCurrentValue;
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("canDisplayCurrentCreatedFeature: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -1211,8 +1209,8 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(bool theOn)
 
 QString PartSet_SketcherMgr::mouseOverWindowFlagsInfo() const
 {
-  return QString("myIsPropertyPanelValueChanged = %1,    myIsMouseOverWindow = %2")
-     .arg(myIsPropertyPanelValueChanged).arg(myIsMouseOverWindow);
+  return QString("myIsResetCurrentValue = %1,    myIsMouseOverWindow = %2")
+     .arg(myIsResetCurrentValue).arg(myIsMouseOverWindow);
 }
 
 XGUI_OperationMgr* PartSet_SketcherMgr::operationMgr() const
