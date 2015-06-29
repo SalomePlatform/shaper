@@ -13,15 +13,11 @@
 
 #include <TopoDS_Shape.hxx>
 
-namespace IGESExport {
-
 /// Implementation of the export IGES files algorithms
 GEOMALGOAPI_EXPORT
-bool Export(const std::string& theFileName,
-            const std::string& theFormatName,
-            const TopoDS_Shape& theShape,
-            std::string& theError);
-
-} // namespace IGESExport
+bool IGESExport(const std::string& theFileName,
+                const std::string& theFormatName,
+                const TopoDS_Shape& theShape,
+                std::string& theError);
 
 #endif /* GEOMALGOAPI_IGESEXPORT_H_ */

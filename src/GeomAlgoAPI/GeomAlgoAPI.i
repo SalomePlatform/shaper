@@ -18,6 +18,12 @@
   #include "GeomAlgoAPI_Rotation.h"
   #include "GeomAlgoAPI_ShapeProps.h"
   #include "GeomAlgoAPI_SketchBuilder.h"
+  #include "GeomAlgoAPI_BREPExport.h"
+  #include "GeomAlgoAPI_IGESExport.h"
+  #include "GeomAlgoAPI_STEPExport.h"
+  #include "GeomAlgoAPI_BREPImport.h"
+  #include "GeomAlgoAPI_IGESImport.h"
+  #include "GeomAlgoAPI_STEPImport.h"
   #include "GeomAlgoAPI_Tools.h"
 
   #include <memory>
@@ -51,6 +57,12 @@
 %include "GeomAlgoAPI_Rotation.h"
 %include "GeomAlgoAPI_ShapeProps.h"
 %include "GeomAlgoAPI_SketchBuilder.h"
+%include "GeomAlgoAPI_BREPExport.h"
+%include "GeomAlgoAPI_IGESExport.h"
+%include "GeomAlgoAPI_STEPExport.h"
+%include "GeomAlgoAPI_BREPImport.h"
+%include "GeomAlgoAPI_IGESImport.h"
+%include "GeomAlgoAPI_STEPImport.h"
 %include "GeomAlgoAPI_Tools.h"
 
 %typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {

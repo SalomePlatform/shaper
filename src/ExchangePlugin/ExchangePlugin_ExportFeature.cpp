@@ -120,11 +120,11 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   TopoDS_Shape aShape(theShape->impl<TopoDS_Shape>());
   bool aResult = false;
   if (aFormatName == "BREP") {
-    aResult = BREPExport::Export(theFileName, aFormatName, aShape, anError);
+    aResult = BREPExport(theFileName, aFormatName, aShape, anError);
   } else if (aFormatName == "STEP") {
-    aResult = STEPExport::Export(theFileName, aFormatName, aShape, anError);
+    aResult = STEPExport(theFileName, aFormatName, aShape, anError);
   } else if (aFormatName.substr(0, 4) == "IGES") {
-    aResult = IGESExport::Export(theFileName, aFormatName, aShape, anError);
+    aResult = IGESExport(theFileName, aFormatName, aShape, anError);
   } else {
     anError = "Unsupported format " + aFormatName;
   }

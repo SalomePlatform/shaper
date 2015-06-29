@@ -16,14 +16,10 @@
 
 #include <TopoDS_Shape.hxx>
 
-namespace IGESImport {
-
 /// Implementation of the import IGES files algorithms
 GEOMALGOAPI_EXPORT
-TopoDS_Shape Import(const std::string& theFileName,
-                    const std::string& theFormatName,
-                    std::string& theError);
-
-} // namespace IGESImport
+TopoDS_Shape IGESImport(const std::string& theFileName,
+                        const std::string& theFormatName,
+                        std::string& theError);
 
 #endif /* GEOMALGOAPI_IGESIMPORT_H_ */

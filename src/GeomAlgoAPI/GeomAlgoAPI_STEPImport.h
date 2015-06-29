@@ -16,14 +16,10 @@
 
 #include <TopoDS_Shape.hxx>
 
-namespace STEPImport {
-
 /// Implementation of the import STEP files algorithms
 GEOMALGOAPI_EXPORT
-TopoDS_Shape Import(const std::string& theFileName,
-                    const std::string& theFormatName,
-                    std::string& theError);
-
-} // namespace STEPImport
+TopoDS_Shape STEPImport(const std::string& theFileName,
+                        const std::string& theFormatName,
+                        std::string& theError);
 
 #endif /* GEOMALGOAPI_STEPIMPORT_H_ */

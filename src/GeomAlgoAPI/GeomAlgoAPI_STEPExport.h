@@ -13,15 +13,11 @@
 
 #include <TopoDS_Shape.hxx>
 
-namespace STEPExport {
-
 /// Implementation of the export STEP files algorithms
 GEOMALGOAPI_EXPORT
-bool Export(const std::string& theFileName,
-            const std::string& theFormatName,
-            const TopoDS_Shape& theShape,
-            std::string& theError);
-
-} // namespace STEPExport
+bool STEPExport(const std::string& theFileName,
+                const std::string& theFormatName,
+                const TopoDS_Shape& theShape,
+                std::string& theError);
 
 #endif /* GEOMALGOAPI_STEPEXPORT_H_ */

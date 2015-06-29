@@ -11,11 +11,9 @@
  *
  */
 //=============================================================================
-namespace IGESImport {
-
-TopoDS_Shape Import(const std::string& theFileName,
-                    const std::string&,
-                    std::string& theError)
+TopoDS_Shape IGESImport(const std::string& theFileName,
+                        const std::string&,
+                        std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import IGES from file " << theFileName << std::endl;
@@ -66,5 +64,3 @@ TopoDS_Shape Import(const std::string& theFileName,
 
   return aResShape;
 }
-
-} // namespace IGESImport

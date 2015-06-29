@@ -10,11 +10,9 @@
  *
  */
 //=============================================================================
-namespace BREPImport {
-
-TopoDS_Shape Import(const std::string& theFileName,
-                    const std::string&,
-                    std::string& theError)
+TopoDS_Shape BREPImport(const std::string& theFileName,
+                        const std::string&,
+                        std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import BREP from file " << theFileName << std::endl;
@@ -27,5 +25,3 @@ TopoDS_Shape Import(const std::string& theFileName,
   }
   return aShape;
 }
-
-} // namespace BREPImport

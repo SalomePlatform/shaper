@@ -16,12 +16,10 @@
  *
  */
 //=============================================================================
-namespace BREPExport {
-
-bool Export(const std::string& theFileName,
-            const std::string&,
-            const TopoDS_Shape& theShape,
-            std::string& theError)
+bool BREPExport(const std::string& theFileName,
+                const std::string&,
+                const TopoDS_Shape& theShape,
+                std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Export BREP into file " << theFileName << std::endl;
@@ -36,5 +34,3 @@ bool Export(const std::string& theFileName,
   }
   return true;
 }
-
-} // namespace BREPExport

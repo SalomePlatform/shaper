@@ -81,11 +81,11 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 
   TopoDS_Shape aShape;
   if (anExtension == "BREP" || anExtension == "BRP") {
-    aShape = BREPImport::Import(theFileName, anExtension, anError);
+    aShape = BREPImport(theFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
-    aShape = STEPImport::Import(theFileName, anExtension, anError);
+    aShape = STEPImport(theFileName, anExtension, anError);
   } else if (anExtension == "IGES" || anExtension == "IGS") {
-    aShape = IGESImport::Import(theFileName, anExtension, anError);
+    aShape = IGESImport(theFileName, anExtension, anError);
   }
    // Check if shape is valid
   if ( aShape.IsNull() ) {

@@ -13,12 +13,10 @@
 #include <STEPControl_Writer.hxx>
 #include <Interface_Static.hxx>
 
-namespace STEPExport {
-
-bool Export(const std::string& theFileName,
-            const std::string& theFormatName,
-            const TopoDS_Shape& theShape,
-            std::string& theError)
+bool STEPExport(const std::string& theFileName,
+                const std::string& theFormatName,
+                const TopoDS_Shape& theShape,
+                std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Export STEP into file " << theFileName << std::endl;
@@ -50,5 +48,3 @@ bool Export(const std::string& theFileName,
   }
   return false;
 }
-
-} // namespace STEPExport

@@ -43,7 +43,6 @@
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx> // CAREFUL ! position of this file is critic : see Lucien PIGNOLONI / OCC
 
-namespace STEPImport {
 //=============================================================================
 /*!
  *  GetShape()
@@ -364,9 +363,9 @@ Handle(TCollection_HAsciiString) GetValue (const TCollection_AsciiString& theFil
   return aValue;
 }
 
-TopoDS_Shape Import (const std::string& theFileName,
-                     const std::string& theFormatName,
-                     std::string&       theError)
+TopoDS_Shape STEPImport(const std::string& theFileName,
+                        const std::string& theFormatName,
+                        std::string& theError)
 {
   TopoDS_Shape aResShape;
 
@@ -494,5 +493,3 @@ TopoDS_Shape Import (const std::string& theFileName,
   // Return previous locale
   return aResShape;
 }
-
-} // namespace STEPImport

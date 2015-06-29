@@ -27,11 +27,11 @@ public:
   /**
    * Returns an extension of theFileName
    */
-  static std::string extension(const std::string& theFileName);
+  GEOMALGOAPI_EXPORT static std::string extension(const std::string& theFileName);
   /**
    * Returns a name of theFileName
    */
-  static std::string name(const std::string& theFileName);
+  GEOMALGOAPI_EXPORT static std::string name(const std::string& theFileName);
 };
 
 } // GeomAlgoAPI_Tools

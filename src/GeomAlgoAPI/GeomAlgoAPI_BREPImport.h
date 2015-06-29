@@ -16,14 +16,10 @@
 
 #include <TopoDS_Shape.hxx>
 
-namespace BREPImport {
-
 /// Implementation of the import BREP files algorithms
 GEOMALGOAPI_EXPORT
-TopoDS_Shape Import(const std::string& theFileName,
-                    const std::string& theFormatName,
-                    std::string& theError);
-
-} // namespace BREPImport
+TopoDS_Shape BREPImport(const std::string& theFileName,
+                        const std::string& theFormatName,
+                        std::string& theError);
 
 #endif /* GEOMALGOAPI_BREPIMPORT_H_ */

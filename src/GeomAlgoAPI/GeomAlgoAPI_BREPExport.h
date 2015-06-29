@@ -13,15 +13,11 @@
 
 #include <TopoDS_Shape.hxx>
 
-namespace BREPExport {
-
 /// Implementation of the export BREP files algorithms
 GEOMALGOAPI_EXPORT
-bool Export(const std::string& theFileName,
-            const std::string& theFormatName,
-            const TopoDS_Shape& theShape,
-            std::string& theError);
-
-} // namespace BREPExport
+bool BREPExport(const std::string& theFileName,
+                const std::string& theFormatName,
+                const TopoDS_Shape& theShape,
+                std::string& theError);
 
 #endif /* GEOMALGOAPI_BREPEXPORT_H_ */
