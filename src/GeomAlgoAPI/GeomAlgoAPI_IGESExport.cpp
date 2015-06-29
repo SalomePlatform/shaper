@@ -78,13 +78,14 @@ int KindOfBRep (const TopoDS_Shape& theShape)
 }
 
 //=============================================================================
-bool IGESExport(const TCollection_AsciiString& theFileName,
-                const TCollection_AsciiString& theFormatName,
+bool IGESExport(const std::string& theFileName,
+                const std::string& theFormatName,
                 const TopoDS_Shape& theShape,
-                TCollection_AsciiString& theError)
+                std::string& theError)
 {
   // theFormatName expected "IGES-5.1", "IGES-5.3"...
-  TCollection_AsciiString aVersion = theFormatName.Token("-", 2);
+  TCollection_AsciiString aFormatName(theFormatName.c_str());
+  TCollection_AsciiString aVersion = aFormatName.Token("-", 2);
   #ifdef _DEBUG
   if (!aVersion.IsEqual("5.1") || !aVersion.IsEqual("5.3"))
     std::cout << "Warning: unrecognized version " << aVersion.ToCString()
@@ -128,7 +129,7 @@ bool IGESExport(const TCollection_AsciiString& theFileName,
   // perform shape writing
   if( ICW.AddShape( theShape ) ) {
     ICW.ComputeModel();
-    return ICW.Write( theFileName.ToCString() );
+    return ICW.Write(theFileName.c_str());
   }
   return false;
 }
