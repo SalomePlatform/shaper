@@ -14,11 +14,11 @@
 #include <Prs3d_IsoAspect.hxx>
 #include <TopoDS_Builder.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_ResultPrs, AIS_Shape);
-IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, AIS_Shape);
+IMPLEMENT_STANDARD_HANDLE(ModuleBase_ResultPrs, ViewerData_AISShape);
+IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
 
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
-  : AIS_Shape(TopoDS_Shape()), myResult(theResult), myIsSketchMode(false)
+  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myIsSketchMode(false)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
   std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 

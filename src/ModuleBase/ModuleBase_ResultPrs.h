@@ -11,17 +11,17 @@
 
 #include <ModelAPI_Result.h>
 
-#include <AIS_Shape.hxx>
+#include <ViewerData_AISShape.hxx>
 #include <Standard_DefineHandle.hxx>
 
-DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, AIS_Shape)
+DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, ViewerData_AISShape)
 
 /**
 * \ingroup GUI
 * A redefinition of standard AIS Interactive Object in order to provide specific behaviour 
 * for wire presentations based in a one plane
 */
-class ModuleBase_ResultPrs: public AIS_Shape
+class ModuleBase_ResultPrs: public ViewerData_AISShape
 {
 public:
   /// Constructor

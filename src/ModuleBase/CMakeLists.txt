@@ -105,6 +105,7 @@ SET(PROJECT_LIBRARIES
 	${CAS_SHAPE}
 	${suit}
 	${qtx}
+	${ViewerData}
 )
 
 SET(PROJECT_AUTOMOC 

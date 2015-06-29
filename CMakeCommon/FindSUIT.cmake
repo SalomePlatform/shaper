@@ -20,6 +20,7 @@ ELSE(HAVE_SALOME)
     FIND_LIBRARY(PyInterp PyInterp ${SUIT_LIB_DIR})
     FIND_LIBRARY(qtx qtx ${SUIT_LIB_DIR})
     FIND_LIBRARY(suit suit ${SUIT_LIB_DIR})
+    FIND_LIBRARY(ViewerData ViewerData ${SUIT_LIB_DIR})
 
     IF(WIN32)
         SET(SUIT_INCLUDE ${SUIT_DIR}/include)
