@@ -41,6 +41,7 @@
 #include <QDockWidget>
 #include <QAction>
 #include <QTimer>
+#include <QMenu>
 
 
 extern "C" {
@@ -522,7 +523,8 @@ void NewGeom_Module::selectionChanged()
 //******************************************************
 void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle)
 {
-  myWorkshop->contextMenuMgr()->addViewerMenu(theMenu);
+  theMenu->addActions(myWorkshop->contextMenuMgr()->viewerMenu()->actions());
+  //myWorkshop->contextMenuMgr()->addViewerMenu(theMenu);
   LightApp_Module::contextMenuPopup(theClient, theMenu, theTitle);
 }
 

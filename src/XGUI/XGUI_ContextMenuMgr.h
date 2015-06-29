@@ -44,14 +44,14 @@ Q_OBJECT
   void updateCommandsStatus();
 
   /// Connect to object browser from workshop. Has to called at creation of viewer.
-  void connectObjectBrowser() const;
+  void connectObjectBrowser();
 
   /// Connect to viewer from workshop. Has to called at creation of viewer.
-  void connectViewer() const;
+  void connectViewer();
 
-  /// Add menu atems for viewer into the given menu (used in SALOME mode)
-  /// \param theMenu a popup menu to be shown in the viewer
-  void addViewerMenu(QMenu* theMenu) const;
+  QMenu* objBrowserMenu() const;
+  QMenu* viewerMenu() const;
+
 
 signals:
   /// Signal aabout triggered action
@@ -82,17 +82,29 @@ signals:
    */
   void addAction(const QString& theId, QAction* theAction);
 
+  /// Updates menu for object browser
+  void updateObjectBrowserMenu();
+
+  /// Updates menu for viewer
+  void updateViewerMenu();
+
   /// Creates menu for object browser
-  QMenu* objectBrowserMenu() const;
+  void buildObjBrowserMenu();
 
   /// Creates menu for viewer
-  QMenu* viewerMenu() const;
+  void buildViewerMenu();
 
   /// Map of created actions [id : Action]
   QMap<QString, QAction*> myActions;
 
   /// Reference to workshop
   XGUI_Workshop* myWorkshop;
+
+  typedef QList<QAction*> QActionsList;
+  QMap<std::string, QActionsList> myObjBrowserMenus;
+  QMap<std::string, QActionsList> myViewerMenu;
+
+   QAction* mySeparator;
 };
 
 #endif
