@@ -229,6 +229,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;
   friend class Model_AttributeRefList;
+  friend class Model_ResultPart;
   friend class DFBrowser;
 
  private:

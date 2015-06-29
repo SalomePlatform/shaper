@@ -53,6 +53,11 @@ class ModelAPI_ResultPart : public ModelAPI_Result
 
   /// Returns true if document is activated (loaded into the memory)
   virtual bool isActivated() = 0;
+
+  /// Returns the name of the shape inside of the part
+  virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+  /// Returns the shape by the name in the part
+  virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName) = 0;
 };
 
 //! Pointer on feature object

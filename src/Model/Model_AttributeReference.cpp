@@ -36,8 +36,6 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
     // same document, use reference attribute
     if (anObjLab.IsNull() || owner()->document() == theObject->document()) {
 
-      std::shared_ptr<Model_Document> aDoc =
-        std::dynamic_pointer_cast<Model_Document>(owner()->document());
       if (anObjLab.IsNull()) {
         myRef->Set(myRef->Label());
       } else {

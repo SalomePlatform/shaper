@@ -9,6 +9,7 @@
 
 #include "Model.h"
 #include <ModelAPI_ResultPart.h>
+#include <TopoDS_Shape.hxx>
 
 /**\class Model_ResultPart
  * \ingroup DataModel
@@ -19,6 +20,7 @@
  */
 class Model_ResultPart : public ModelAPI_ResultPart
 {
+  TopoDS_Shape myShape; ///< shape of this part created from bodies (updated only of Part deactivation)
  public:
   /// Returns the part-document of this result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
@@ -34,6 +36,11 @@ class Model_ResultPart : public ModelAPI_ResultPart
 
   /// Result shape of part document is compound of bodies inside of this part
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
+
+  /// Returns the name of the shape inside of the part
+  MODEL_EXPORT virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape);
+  /// Returns the shape by the name in the part
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName);
 
   /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,

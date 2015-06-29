@@ -400,7 +400,9 @@ void Model_Data::setIsInHistory(const bool theFlag)
 
 bool Model_Data::isDisplayed()
 {
-  return myObject.get() && myObject->document().get() && myObject->document()->isActive() &&
+  return myObject.get() && myObject->document().get() && 
+    (myObject->document()->isActive() || 
+     myObject->document() == ModelAPI_Session::get()->moduleDocument()) && // root is accessible allways
     myFlags->Value(kFlagDisplayed) == Standard_True;
 }
 

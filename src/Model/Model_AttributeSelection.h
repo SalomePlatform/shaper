@@ -68,6 +68,10 @@ protected:
   virtual void selectConstruction(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
+  /// Performs the selection for the part result (selection by name of body result inside of part)
+  virtual void selectPart(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
+
   /// Returns the label where TNaming_Selection results are stored
   /// Note: there must be no attributes stored at the same label because Selector clears this lab
   TDF_Label selectionLabel();

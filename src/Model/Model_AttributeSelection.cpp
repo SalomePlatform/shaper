@@ -12,6 +12,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_PlanarEdges.h>
@@ -61,7 +62,10 @@ using namespace std;
 static const int kSTART_VERTEX_DELTA = 1000000;
 // identifier that there is simple reference: selection equals to context
 Standard_GUID kSIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb29");
+// simple reference in the construction
 Standard_GUID kCONSTUCTION_SIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb28");
+// reference to Part sub-object
+Standard_GUID kPART_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb27");
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -120,6 +124,10 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
     } else {
       selectConstruction(theContext, theSubShape);
     }
+  } else if (theContext->groupName() == ModelAPI_ResultPart::group()) {
+    aSelLab.ForgetAllAttributes(true);
+    TDataStd_UAttribute::Set(aSelLab, kPART_REF_ID);
+    selectPart(theContext, theSubShape);
   }
   //the attribute initialized state should be changed by sendAttributeUpdated only
   //myIsInitialized = true;
@@ -604,6 +612,25 @@ void Model_AttributeSelection::selectConstruction(
   TNaming_Builder aBuilder(selectionLabel());
   aBuilder.Generated(aSubShape);
   registerSubShape(selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, "", aRefs);
+}
+
+void Model_AttributeSelection::selectPart(
+  const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
+{
+  // store the shape (in case part is not loaded it should be usefull
+  TopoDS_Shape aShape;
+  std::string aName = theContext->data()->name();
+  if (theSubShape->isNull()) {// the whole part shape is selected
+    aShape = theContext->shape()->impl<TopoDS_Shape>();
+  } else {
+    aShape = theSubShape->impl<TopoDS_Shape>();
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
+    aName += "/" + aPart->nameInPart(theSubShape);
+  }
+  TNaming_Builder aBuilder(selectionLabel());
+  aBuilder.Select(aShape, aShape);
+  // identify by name in the part
+  TDataStd_Name::Set(selectionLabel(), aName.c_str());
 }
 
 TDF_Label Model_AttributeSelection::selectionLabel()
