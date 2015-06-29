@@ -5,7 +5,6 @@
 
 #include "XGUI.h"
 //#include "XGUI_Constants.h"
-#include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
@@ -33,28 +32,23 @@ class XGUI_ViewerProxy;
 class XGUI_PropertyPanel;
 class XGUI_ContextMenuMgr;
 class XGUI_ModuleConnector;
+class XGUI_WorkshopListener;
 
 class ModuleBase_Operation;
 class ModuleBase_IModule;
 class ModuleBase_IViewer;
 
-class Config_FeatureMessage;
-class Config_PointerMessage;
-
 class QWidget;
 class QDockWidget;
 class QMainWindow;
 
-class ModelAPI_ObjectUpdatedMessage;
-class ModelAPI_ObjectDeletedMessage;
-class ModelAPI_ResultPart;
 class QAction;
 
 /**\class XGUI_Workshop
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
  */
-class XGUI_EXPORT XGUI_Workshop : public QObject, public Events_Listener
+class XGUI_EXPORT XGUI_Workshop : public QObject
 {
 Q_OBJECT
  public:
@@ -118,9 +112,6 @@ Q_OBJECT
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   AppElements_Workbench* addWorkbench(const QString& theName);
 
-  //! Redefinition of Events_Listener method
-  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
-
   //! Returns an object which provides interface to Salome Module (LightApp_Module)
   XGUI_SalomeConnector* salomeConnector() const
   {
@@ -135,6 +126,13 @@ Q_OBJECT
   {
     return mySalomeConnector != 0;
   }
+
+  /// Returns true if the loading data process is started and has not been finished yet
+  /// \return boolean result
+  bool isLoadingData() const
+  {
+    return myIsLoadingData;
+  };
 
   //! Returns Object browser
   XGUI_ObjectsBrowser* objectBrowser() const
@@ -225,6 +223,12 @@ Q_OBJECT
                              QWidget* theParent = 0,
                              const bool theAskAboutDeleteReferences = false);
 
+  /// Deactivates the object, if it is active and the module returns that the activation
+  /// of selection for the object is not possible currently(the current operation uses it)
+  /// \param theObject an object
+  /// \param theUpdateViewer a boolean flag to update viewer immediately
+  void deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer);
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
@@ -306,33 +310,11 @@ signals:
   /// \param theOperation an operation
   void setPropertyPanel(ModuleBase_Operation* theOperation);
 
-  /// Procedure to process postponed events
-  bool event(QEvent * theEvent);
-
-  //Event-loop processing methods:
-
-  /// Process event "Add a feature"
-  void addFeature(const std::shared_ptr<Config_FeatureMessage>&);
-
   /// Connect to operation signals
   /// \param theOperation an operation
   void connectWithOperation(ModuleBase_Operation* theOperation);
 
-  /// Process feature update message
-  void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
-
-  /// Process feature created message
-  void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
-
-  /// Process feature redisplay message
-  void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
-
-  /// Deactivates the object, if it is active and the module returns that the activation
-  /// of selection for the object is not possible currently(the current operation uses it)
-  /// \param theObject an object
-  /// \param theUpdateViewer a boolean flag to update viewer immediately
-  void deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer);
-
+private:
   /// Display all results
   //void displayAllResults();
 
@@ -400,12 +382,6 @@ signals:
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
 
-  /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
-  /// Asks the module whether the object can be displayed
-  /// \param theObj an object
-  /// \return true if the object is displayed
-  bool displayObject(ObjectPtr theObj);
-
   //! Extends undo/redo toolbutton's with history menu
   //! \param theObject - in the OpenParts it is a QToolButton by itself,
   //! in salome mode - QAction that creates a button.
@@ -430,13 +406,9 @@ private:
   XGUI_ViewerProxy* myViewerProxy;
   XGUI_ContextMenuMgr* myContextMenuMgr;
   XGUI_ModuleConnector* myModuleConnector;
+  XGUI_WorkshopListener* myEventsListener;
 
   QString myCurrentDir;
-
-  bool myUpdatePrefs;
-
-  // Flag to check that part document is in process of activating
-  bool myPartActivating;
 
   /// The flag is true when we loading a document
   bool myIsLoadingData;

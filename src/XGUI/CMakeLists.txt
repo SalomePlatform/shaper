@@ -22,6 +22,7 @@ SET(PROJECT_HEADERS
 	XGUI_Tools.h
 	XGUI_ViewerProxy.h
 	XGUI_Workshop.h
+	XGUI_WorkshopListener.h
 	XGUI_HistoryMenu.h
 )
 
@@ -46,6 +47,7 @@ SET(PROJECT_SOURCES
 	XGUI_Tools.cpp
 	XGUI_ViewerProxy.cpp
 	XGUI_Workshop.cpp
+	XGUI_WorkshopListener.cpp
 	XGUI_HistoryMenu.cpp
 )
 
