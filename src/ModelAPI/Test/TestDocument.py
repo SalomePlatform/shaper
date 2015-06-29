@@ -77,8 +77,9 @@ assert(aSession.moduleDocument().size("Parts") == 2)
 aSession.startOperation()
 aPart.addFeature("Remove")
 aSession.finishOperation()
+# First part is deleted, but active is Part_2, so, it is still active
 assert(aSession.moduleDocument().size("Parts") == 1)
-assert(aSession.activeDocument().id() == aSession.moduleDocument().id())
+assert(aSession.activeDocument().id() == aCopyOfPart.id())
 # Remove another one document
 aSession.startOperation()
 aDoc2 = aSession.document("Part_2")
