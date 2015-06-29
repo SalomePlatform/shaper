@@ -1,8 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- *
- */
+// File:    ExchangePlugin_Plugin.cpp
+// Created: Aug 28, 2014
+// Author:  Sergey BELASH
 
 #include <ExchangePlugin_Plugin.h>
 #include <ExchangePlugin_ImportFeature.h>

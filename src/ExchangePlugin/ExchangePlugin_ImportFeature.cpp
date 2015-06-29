@@ -1,11 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- * ExchangePlugin_ImportFeature.cpp
- *
- *  Created on: Aug 28, 2014
- *      Author: sbh
- */
+// File:    ExchangePlugin_ImportFeature.cpp
+// Created: Aug 28, 2014
+// Author:  Sergey BELASH
 
 #include <ExchangePlugin_ImportFeature.h>
 #include <GeomAlgoAPI_BREPImport.h>

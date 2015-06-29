@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    ExchangePlugin_ExportFeature.h
+// Created: May 14, 2015
+// Author:  Sergey POKHODENKO
+
 #ifndef EXCHANGEPLUGIN_EXPORTFEATURE_H_
 #define EXCHANGEPLUGIN_EXPORTFEATURE_H_
 

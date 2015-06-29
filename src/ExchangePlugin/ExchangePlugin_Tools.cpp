@@ -1,9 +1,8 @@
-/*
- * ExchangePlugin_Tools.cpp
- *
- *  Created on: May 15, 2015
- *      Author: spo
- */
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+// File:    ExchangePlugin_Tools.h
+// Created: May 15, 2015
+// Author:  Sergey POKHODENKO
 
 #include <ExchangePlugin_Tools.h>
 

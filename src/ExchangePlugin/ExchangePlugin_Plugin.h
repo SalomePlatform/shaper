@@ -1,8 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ExchangePlugin_Plugin.hxx
-// Created:     07 July 2014
-// Author:      Vitaly SMETANNIKOV
+// File:    ExchangePlugin_Plugin.h
+// Created: Aug 28, 2014
+// Author:  Sergey BELASH
 
 #ifndef EXCHANGEPLUGIN_PLUGIN_H_
 #define EXCHANGEPLUGIN_PLUGIN_H_

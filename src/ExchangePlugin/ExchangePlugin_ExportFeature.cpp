@@ -1,11 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- * ExchangePlugin_ExportFeature.cpp
- *
- *  Created on: May 14, 2015
- *      Author: spo
- */
+// File:    ExchangePlugin_ExportFeature.cpp
+// Created: May 14, 2015
+// Author:  Sergey POKHODENKO
 
 #include <ExchangePlugin_ExportFeature.h>
 

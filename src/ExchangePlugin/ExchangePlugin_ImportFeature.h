@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    ExchangePlugin_ImportFeature.h
+// Created: Aug 28, 2014
+// Author:  Sergey BELASH
+
 #ifndef EXCHANGEPLUGIN_IMPORTFEATURE_H_
 #define EXCHANGEPLUGIN_IMPORTFEATURE_H_
 

@@ -1,8 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        SketchPlugin_Validators.h
-// Created:     01 Aug 2014
-// Author:      Vitaly SMETANNIKOV
+// File:    ExchangePlugin_Validators.h
+// Created: Aug 01, 2014
+// Author:  Sergey BELASH
 
 #ifndef EXCHANGEPLUGIN_VALIDATORS_H
 #define EXCHANGEPLUGIN_VALIDATORS_H
