@@ -47,7 +47,8 @@ Q_OBJECT
   virtual void disconnectSignals() {};
 
   /// Fills the widget with default values
-  virtual void reset() {};
+  /// \return true if the widget current value is reset
+  virtual bool reset() { return false; };
 
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theObject a model feature to be checked
