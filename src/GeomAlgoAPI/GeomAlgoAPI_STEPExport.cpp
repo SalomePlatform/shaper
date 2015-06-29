@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    GEOMALGOAPI_STEPExport.cpp
+// Created: May 14, 2015
+// Author:  Sergey POKHODENKO
+
 #include <GeomAlgoAPI_STEPExport.h>
 
 #include "GeomAlgoAPI_Tools.h"
@@ -11,13 +15,13 @@
 
 namespace STEPExport {
 
-bool Export(const TCollection_AsciiString& theFileName,
-            const TCollection_AsciiString& theFormatName,
+bool Export(const std::string& theFileName,
+            const std::string& theFormatName,
             const TopoDS_Shape& theShape,
-            TCollection_AsciiString& theError)
+            std::string& theError)
 {
   #ifdef _DEBUG
-  std::cout << "Export STEP into file " << theFileName.ToCString() << std::endl;
+  std::cout << "Export STEP into file " << theFileName << std::endl;
   #endif
 
   try
@@ -34,7 +38,7 @@ bool Export(const TCollection_AsciiString& theFileName,
     status = aWriter.Transfer( theShape, STEPControl_AsIs );
     //VRV: OCC 4.0 migration
     if( status == IFSelect_RetDone )
-      status = aWriter.Write( theFileName.ToCString() );
+      status = aWriter.Write( theFileName.c_str() );
 
     // Return previous locale
     if( status == IFSelect_RetDone )

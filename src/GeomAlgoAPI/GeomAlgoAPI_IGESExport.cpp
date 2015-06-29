@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    GEOMALGOAPI_IGESExport.cpp
+// Created: Dec 24, 2014
+// Author:  Sergey BELASH
+
 #include <GeomAlgoAPI_IGESExport.h>
 
 #include "GeomAlgoAPI_Tools.h"
