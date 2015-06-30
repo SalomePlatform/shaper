@@ -207,11 +207,6 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   foreach(QAction* aAction, myActions)
     aAction->setEnabled(false);
 
-  //bool aIsDone = false;
-  //ModuleBase_IModule* aModule = myWorkshop->module();
-  //if (aModule) 
-  //  aIsDone = aModule->addViewerMenu(theMenu, myActions);
-
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
   if (aObjects.size() > 0) {
@@ -332,8 +327,9 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
   QActionsList aActions;
   if (aSelected == 1) {
     ObjectPtr aObject = aObjects.first();
-    if (myViewerMenu.contains(aObject->groupName()))
-      aActions = myObjBrowserMenus[aObject->groupName()];
+    std::string aName = aObject->groupName();
+    if (myObjBrowserMenus.contains(aName))
+      aActions = myObjBrowserMenus[aName];
   } else if (aSelected > 1) {
       aActions.append(action("HIDE_CMD"));
       aActions.append(action("SHOW_ONLY_CMD"));
@@ -345,9 +341,10 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
 
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule) {
-    aModule->addObjectBrowserMenu(aMenu);
     aMenu->addSeparator();
+    aModule->addObjectBrowserMenu(aMenu);
   }
+  aMenu->addSeparator();
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
 
   return aMenu;
@@ -366,8 +363,9 @@ QMenu* XGUI_ContextMenuMgr::viewerMenu() const
   QActionsList aActions;
   if (aSelected == 1) {
     ObjectPtr aObject = aObjects.first();
-    if (myViewerMenu.contains(aObject->groupName()))
-      aActions = myViewerMenu[aObject->groupName()];
+    std::string aName = aObject->groupName();
+    if (myViewerMenu.contains(aName))
+      aActions = myViewerMenu[aName];
   } else if (aSelected > 1) {
     aActions.append(action("HIDE_CMD"));
   }
