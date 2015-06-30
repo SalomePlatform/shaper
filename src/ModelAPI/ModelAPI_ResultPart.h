@@ -58,6 +58,8 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
   /// Returns the shape by the name in the part
   virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName) = 0;
+  /// Updates the shape-result of the part (called on Part feature execution)
+  virtual void updateShape() = 0;
 };
 
 //! Pointer on feature object

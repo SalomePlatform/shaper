@@ -99,13 +99,9 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       }
       // created objects are always must be up to date (python box feature)
       // and updated not in internal uptation chain
-      if (theMessage->eventID() == kCreatedEvent) {
-        myJustCreated.insert(*anObjIter);
-      } else if (myJustCreated.find(*anObjIter) == myJustCreated.end()) { // moved and updated
-        myJustUpdated.insert(*anObjIter);
-      }
+      myJustUpdated.insert(*anObjIter);
     }
-     // this event is for solver update, not here, do not react immideately
+    // this event is for solver update, not here, do not react immideately
     if (!isOnlyResults && !(theMessage->eventID() == kMovedEvent))
       processOperation(false);
   } else if (theMessage->eventID() == kOpStartEvent) {
@@ -117,16 +113,12 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   }
   if (isOperationChanged) {
     // remove all macros before clearing all created and execute all not-previewed
-    std::set<ObjectPtr>::iterator aCreatedIter = myJustCreated.begin();
     std::set<ObjectPtr>::iterator anUpdatedIter = myJustUpdated.begin();
-    for(; aCreatedIter != myJustCreated.end() || anUpdatedIter != myJustUpdated.end();
-      aCreatedIter == myJustCreated.end() ? anUpdatedIter++ : aCreatedIter++) {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*
-        (aCreatedIter == myJustCreated.end() ? anUpdatedIter : aCreatedIter));
+    for(; anUpdatedIter != myJustUpdated.end(); anUpdatedIter++) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anUpdatedIter);
       if (aFeature.get()) {
         // execute not-previewed feature on "apply"
-        if (!aFeature->isPreviewNeeded() && (myJustCreated.find(aFeature) != myJustCreated.end() ||
-          myJustUpdated.find(aFeature) != myJustUpdated.end())) {
+        if (!aFeature->isPreviewNeeded() && myJustUpdated.find(aFeature) != myJustUpdated.end()) {
           static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
           if (aFactory->validate(aFeature)) {
             executeFeature(aFeature);
@@ -138,8 +130,6 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         }
       }
     }
-    myJustCreated.clear();
-    myJustUpdated.clear();
     myIsParamUpdated = false;
   }
 }
@@ -149,7 +139,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
   if (theFinish) {
     // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
     std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
-    for(aFIter = myJustCreated.begin(); aFIter != myJustCreated.end(); aFIter++)
+    for(aFIter = myJustUpdated.begin(); aFIter != myJustUpdated.end(); aFIter++)
     {
       FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
       if (aF && aF->data()->isValid() && aF->getKind() == "Extrusion") {
@@ -176,9 +166,20 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
       myIsAutomatic = true;
     }
 
-    updateInDoc(ModelAPI_Session::get()->moduleDocument());
+    // iterate all features in the root document to update each
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    Model_Objects* anObjs = std::dynamic_pointer_cast<Model_Document>(aRootDoc)->objects();
+    if (!anObjs) return;
+    FeaturePtr aFeatureIter = anObjs->firstFeature();
+    std::set<FeaturePtr> aProcessedFeatures; // to avoid processing twice
+    for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
+      updateFeature(aFeatureIter, aProcessedFeatures);
+    }
 
     if (isAutomaticChanged) myIsAutomatic = false;
+    // make just updated clear after each processing: it is not needed anymore, update causes
+    // execute immideately
+    //myJustUpdated.clear(); // just before myIsExecuted = false because after myJustUpdated will be processed again
     myIsExecuted = false;
 
     // flush to update display
@@ -188,44 +189,64 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
   }
 }
 
-void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
+void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& theProcessed)
 {
-  std::set<FeaturePtr> alreadyProcessed; // features that are processed before others
-  // all features one by one
-  Model_Objects* anObjs = std::dynamic_pointer_cast<Model_Document>(theDoc)->objects();
-  if (!anObjs) return;
-  FeaturePtr aFeatureIter = anObjs->firstFeature();
-  for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
-    if (!aFeatureIter->data()->isValid()) // this may be on close of the document
-      continue;
-    if (aFeatureIter && alreadyProcessed.find(aFeatureIter) == alreadyProcessed.end()) {
-      // update selection and parameters attributes first, before sub-features analysis (sketch plane)
-      updateArguments(aFeatureIter);
-      // composite feature must be executed after sub-features execution
-      CompositeFeaturePtr aComposite = 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeatureIter);
-      if (aComposite) {
-        // number of subs can be changed in execution: like fillet
-        for(int a = 0; a < aComposite->numberOfSubs(); a++) {
-          FeaturePtr aSub = aComposite->subFeature(a);
-          updateArguments(aSub);
-          updateFeature(aSub);
-          alreadyProcessed.insert(aSub);
-        }
-      }
+  // check all features this feature depended on (recursive call of updateFeature)
+  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-      updateFeature(aFeatureIter);
-      // update the document results recursively
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeatureIter->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for (; aRIter != aResults.cend(); aRIter++) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
-        if (aPart.get()) {
-          if (!aPart->isDisabled() && aPart->partDoc().get()) {
-            updateInDoc(aPart->partDoc());
-          }
+  if (theProcessed.find(theFeature) != theProcessed.end())
+    return;
+  theProcessed.insert(theFeature);
+  if (theFeature->isDisabled())
+    return;
+
+  CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  // If automatice update is not needed and feature attributes were not updated right now,
+  // do not execute it and do not update arguments.
+  if (!myIsAutomatic && myJustUpdated.find(theFeature) == myJustUpdated.end() && !aCompos.get()) {
+    // execute will be performed later, but some features may have not-result 
+    // presentations, so call update for them (like coincidence in the sketcher)
+    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
+    return;
+  }
+
+  // Update selection and parameters attributes first, before sub-features analysis (sketch plane).
+  updateArguments(theFeature);
+
+  // composite feature must be executed after sub-features execution
+  if (aCompos) {
+    // number of subs can be changed in execution: like fillet
+    for(int a = 0; a < aCompos->numberOfSubs(); a++) {
+      FeaturePtr aSub = aCompos->subFeature(a);
+      updateFeature(aSub, theProcessed);
+    }
+  }
+  // this checking must be after the composite feature sub-elements processing:
+  // composite feature status may depend on it's subelements
+  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument)
+    return;
+
+  bool aJustUpdated = myJustUpdated.find(theFeature) != myJustUpdated.end();
+
+  if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
+    aJustUpdated = true;
+
+  // execute feature if it must be updated
+  if (theFeature->isPreviewNeeded()) {
+    if ((myIsAutomatic || aJustUpdated) &&
+      std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures()) {
+        ModelAPI_ExecState aState = theFeature->data()->execState();
+        if (aFactory->validate(theFeature)) {
+          executeFeature(theFeature);
+        } else {
+          theFeature->eraseResults();
+          redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
         }
-      }
+    }
+  } else { // preview is not needed => make state Done
+    if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
+      theFeature->data()->execState(ModelAPI_StateDone);
     }
   }
 }
@@ -239,7 +260,10 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
   for (; aRIter != aResults.cend(); aRIter++) {
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
     aRes->data()->execState(theState);
-    myJustUpdated.insert(aRes);
+    if (theFeature->data()->updateID() > aRes->data()->updateID()) {
+      myJustUpdated.insert(aRes);
+      aRes->data()->setUpdateID(theFeature->data()->updateID());
+    }
     ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
   }
   // to redisplay "presentable" feature (for ex. distance constraint)
@@ -267,7 +291,6 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
 
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  bool aJustUpdated = false;
   ModelAPI_ExecState aState = theFeature->data()->execState();
   if (aState == ModelAPI_StateInvalidArgument) // a chance to be corrected
     aState = ModelAPI_StateMustBeUpdated;
@@ -301,8 +324,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
           ModelAPI_AttributeEvalMessage::send(aPointAttribute, this);
         }
         if ((!aPointAttribute->textX().empty() && aPointAttribute->expressionInvalid(0)) ||
-            (!aPointAttribute->textY().empty() && aPointAttribute->expressionInvalid(1)) ||
-            (!aPointAttribute->textZ().empty() && aPointAttribute->expressionInvalid(2)))
+          (!aPointAttribute->textY().empty() && aPointAttribute->expressionInvalid(1)) ||
+          (!aPointAttribute->textZ().empty() && aPointAttribute->expressionInvalid(2)))
           aState = ModelAPI_StateInvalidArgument;
       }
     }
@@ -320,44 +343,46 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
           ModelAPI_AttributeEvalMessage::send(aPoint2DAttribute, this);
         }
         if ((!aPoint2DAttribute->textX().empty() && aPoint2DAttribute->expressionInvalid(0)) ||
-            (!aPoint2DAttribute->textY().empty() && aPoint2DAttribute->expressionInvalid(1)))
+          (!aPoint2DAttribute->textY().empty() && aPoint2DAttribute->expressionInvalid(1)))
           aState = ModelAPI_StateInvalidArgument;
       }
     }
   }
 
   //if (aState == ModelAPI_StateDone) {// all referenced objects are ready to be used
-    //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
-    // before execution update the selection attributes if any
-    list<AttributePtr> aRefs = 
-      theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
-    list<AttributePtr>::iterator aRefsIter = aRefs.begin();
-    for (; aRefsIter != aRefs.end(); aRefsIter++) {
-      std::shared_ptr<ModelAPI_AttributeSelection> aSel =
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
-      ObjectPtr aContext = aSel->context();
-      // update argument onlt if the referenced object is changed
-      if (aContext.get() && isUpdated(aContext) && !aContext->isDisabled()) {
+  //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
+  // before execution update the selection attributes if any
+  list<AttributePtr> aRefs = 
+    theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
+  list<AttributePtr>::iterator aRefsIter = aRefs.begin();
+  for (; aRefsIter != aRefs.end(); aRefsIter++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> aSel =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
+    ObjectPtr aContext = aSel->context();
+    // update argument onlt if the referenced object is changed
+    if (aContext.get() && !aContext->isDisabled() && 
+      aContext->data()->updateID() > theFeature->data()->updateID()) {
         if (aState == ModelAPI_StateDone)
           aState = ModelAPI_StateMustBeUpdated;
         if (!aSel->update()) { // this must be done on execution since it may be long operation
           if (!aFactory->isNotObligatory(theFeature->getKind(), theFeature->data()->id(aSel)) &&
-              aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
+            aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
             aState = ModelAPI_StateInvalidArgument;
         }
-      }
     }
-    aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
-    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-      std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
-      for(int a = aSel->size() - 1; a >= 0; a--) {
-        std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
-          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
-        if (aSelAttr) {
-          ObjectPtr aContext = aSelAttr->context();
-          // update argument onlt if the referenced object is changed
-          if (aContext.get() && isUpdated(aContext) && !aContext->isDisabled()) {
+  }
+  aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
+  for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+    std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
+    for(int a = aSel->size() - 1; a >= 0; a--) {
+      std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
+      if (aSelAttr) {
+        ObjectPtr aContext = aSelAttr->context();
+        // update argument onlt if the referenced object is changed
+        if (aContext.get() && !aContext->isDisabled() &&
+          aContext->data()->updateID() > theFeature->data()->updateID()) {
             if (aState == ModelAPI_StateDone)
               aState = ModelAPI_StateMustBeUpdated;
             if (!aSelAttr->update()) {
@@ -366,111 +391,34 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
                 aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
                 aState = ModelAPI_StateInvalidArgument;
             }
-          }
-        }
-      }
-    }
-  //}
-  if (aJustUpdated && myJustCreated.find(theFeature) == myJustCreated.end())
-  myJustUpdated.insert(theFeature);
-  if (aState != ModelAPI_StateDone)
-    theFeature->data()->execState(aState);
-}
-
-void Model_Update::updateFeature(FeaturePtr theFeature)
-{
-  // check all features this feature depended on (recursive call of updateFeature)
-  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-
-  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument)
-    return;
-  bool aJustUpdated = false;
-
-  if (theFeature) {
-    if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
-      aJustUpdated = true;
-
-    ModelAPI_ExecState aState = ModelAPI_StateDone;
-
-    // check all references: if referenced objects are updated, this object also must be updated
-    // also check state of referenced objects: if they are not ready, inherit corresponding state
-    std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
-    std::shared_ptr<Model_Data> aData = 
-      std::dynamic_pointer_cast<Model_Data>(theFeature->data());
-    aData->referencesToObjects(aRefs);
-    std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRef = aRefs.begin();
-    for(; aRef != aRefs.end(); aRef++) {
-      std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
-      for(; aRefObj != aRef->second.end(); aRefObj++) {
-        // if reference is null, it may mean that this reference is to other document
-        // the does not supported by RefList: peremeters may be recomputed
-        if (!aRefObj->get() && theFeature->firstResult().get() && 
-            theFeature->firstResult()->groupName() == ModelAPI_ResultParameter::group()) {
-          aJustUpdated = true;
-        } else if (myJustCreated.find(*aRefObj) != myJustCreated.end() ||
-            myJustUpdated.find(*aRefObj) != myJustUpdated.end()) { 
-          aJustUpdated = true;
-        }
-        aState = stateByReference(*aRefObj, aState);
-      }
-    }
-
-    // some arguments were changed, so, this feature must be updated
-    if (myJustCreated.find(theFeature) != myJustCreated.end()) {
-      aJustUpdated = true;
-    } else {
-      if (aJustUpdated) {
-        if (myJustUpdated.find(theFeature) == myJustUpdated.end())
-          myJustUpdated.insert(theFeature);
-      } else {
-        aJustUpdated = myJustUpdated.find(theFeature) != myJustUpdated.end();
-      }
-    }
-    //std::cout<<"Update feature "<<theFeature->getKind()<<" must be updated = "<<aMustbeUpdated<<std::endl;
-    // execute feature if it must be updated
-    if (aJustUpdated) {
-      if (theFeature->isDisabled()) {  // do not execute the disabled feature
-        // the disabled features must be updated after enabling anyway if their arguments were changed
-        if (theFeature->data()->execState() == ModelAPI_StateDone &&
-          aState == ModelAPI_StateMustBeUpdated)
-          theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
-      } else {
-        if (theFeature->isPreviewNeeded()) {
-          if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
-              !theFeature->isPersistentResult()) {
-            if (aFactory->validate(theFeature)) {
-              FeaturePtr aCurrent = theFeature->document()->currentFeature(false);
-              if (myIsAutomatic || !theFeature->isPersistentResult() /* execute quick, not persistent results */
-                  || (isUpdated(theFeature) && 
-                       (theFeature == aCurrent || 
-                        (aCurrent.get() && aCurrent->isMacro())))) // currently edited
-              {
-                if (aState == ModelAPI_StateDone || aState == ModelAPI_StateMustBeUpdated) {
-                  executeFeature(theFeature);
-                }
-              } else { // must be updatet, but not updated yet
-                theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
-                const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-                std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-                for (; aRIter != aResults.cend(); aRIter++) {
-                  std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-                  aRes->data()->execState(ModelAPI_StateMustBeUpdated);
-                }
-              }
-            } else {
-              theFeature->eraseResults();
-              redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
-            }
-          } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
-            redisplayWithResults(theFeature, ModelAPI_StateNothing);
-          }
-        } else { // preview is not needed => make state Done
-          if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
-            theFeature->data()->execState(ModelAPI_StateDone);
         }
       }
     }
   }
+  // check all references: if referenced objects are updated, this object also must be updated
+  // also check state of referenced objects: if they are not ready, inherit corresponding state
+  std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefsObj;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theFeature->data());
+  aData->referencesToObjects(aRefsObj);
+  std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRef = aRefsObj.begin();
+  for(; aRef != aRefsObj.end(); aRef++) {
+    std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
+    for(; aRefObj != aRef->second.end(); aRefObj++) {
+      // if reference is null, it may mean that this reference is to other document
+      // the does not supported by RefList: parameters may be recomputed
+      if (!aRefObj->get() && theFeature->firstResult().get() && 
+        theFeature->firstResult()->groupName() == ModelAPI_ResultParameter::group()) {
+          aState = ModelAPI_StateMustBeUpdated;
+      } else if (myJustUpdated.find(*aRefObj) != myJustUpdated.end() || 
+        (aRefObj->get() && (*aRefObj)->data()->updateID() > theFeature->data()->updateID())) { 
+        aState = ModelAPI_StateMustBeUpdated;
+      }
+      aState = stateByReference(*aRefObj, aState);
+    }
+  }
+
+  if (aState != ModelAPI_StateDone)
+    theFeature->data()->execState(aState);
 }
 
 void Model_Update::executeFeature(FeaturePtr theFeature)
@@ -480,6 +428,7 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   theFeature->data()->execState(ModelAPI_StateDone);
   try {
     theFeature->execute();
+    myJustUpdated.erase(theFeature);
     if (theFeature->data()->execState() != ModelAPI_StateDone) {
       aState = ModelAPI_StateExecFailed;
     } else {
@@ -493,11 +442,6 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   if (aState != ModelAPI_StateDone) {
     theFeature->eraseResults();
   }
+  theFeature->data()->setUpdateID(ModelAPI_Session::get()->transactionID());
   redisplayWithResults(theFeature, aState);
-}
-
-bool Model_Update::isUpdated(const ObjectPtr& theObj)
-{
-  return myJustCreated.find(theObj) != myJustCreated.end() ||
-         myJustUpdated.find(theObj) != myJustUpdated.end();
 }

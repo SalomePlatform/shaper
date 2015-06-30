@@ -192,6 +192,13 @@ class Model_Data : public ModelAPI_Data
   /// Returns the invalid data pointer: static method
   static std::shared_ptr<ModelAPI_Data> invalidData();
 
+  /// Identifier of the transaction when object (feature or result) was updated last time.
+  MODEL_EXPORT virtual int updateID();
+
+  /// Identifier of the transaction when object (feature or result) was updated last time.
+  /// This method is called by the updater.
+  MODEL_EXPORT virtual void setUpdateID(const int theID);
+
 protected:
   /// Returns true if "is in history" custom behaviors is defined for the feature
   MODEL_EXPORT virtual bool isInHistory();

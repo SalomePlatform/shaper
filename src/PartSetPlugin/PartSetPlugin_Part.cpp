@@ -39,6 +39,8 @@ void PartSetPlugin_Part::execute()
 
       aResult->activate();
     }
+  } else { // execute is called for result update anyway
+    aResult->updateShape();
   }
 }
 
@@ -46,4 +48,71 @@ const std::string& PartSetPlugin_Part::documentToAdd()
 {
   // part must be added only to the module document
   return ModelAPI_Session::get()->moduleDocument()->kind();
+}
+
+std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::addFeature(std::string theID)
+{
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (aResult.get()) {
+    DocumentPtr aDoc = aResult->partDoc();
+    if (aDoc.get())
+      return aDoc->addFeature(theID);
+  }
+  return FeaturePtr();
+}
+
+int PartSetPlugin_Part::numberOfSubs() const
+{
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (aResult.get()) {
+    DocumentPtr aDoc = aResult->partDoc();
+    if (aDoc.get())
+      return aDoc->size(ModelAPI_Feature::group());
+  }
+  return 0;
+}
+
+std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::subFeature(const int theIndex) const
+{
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (aResult.get()) {
+    DocumentPtr aDoc = aResult->partDoc();
+    if (aDoc.get()) {
+      return std::dynamic_pointer_cast<ModelAPI_Feature>(
+        aDoc->object(ModelAPI_Feature::group(), theIndex));
+    }
+  }
+  return FeaturePtr();
+}
+
+int PartSetPlugin_Part::subFeatureId(const int theIndex) const
+{
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (aResult.get()) {
+    DocumentPtr aDoc = aResult->partDoc();
+    if (aDoc.get()) {
+      return aDoc->object(ModelAPI_Feature::group(), theIndex)->data()->featureId();
+    }
+  }
+  return 0; // none
+}
+
+bool PartSetPlugin_Part::isSub(ObjectPtr theObject) const
+{
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (aResult.get()) {
+    DocumentPtr aDoc = aResult->partDoc();
+    return document() == aDoc;
+  }
+  return false;
+}
+
+void PartSetPlugin_Part::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (aResult.get()) {
+    DocumentPtr aDoc = aResult->partDoc();
+    if (aDoc.get())
+      aDoc->removeFeature(theFeature);
+  }
 }

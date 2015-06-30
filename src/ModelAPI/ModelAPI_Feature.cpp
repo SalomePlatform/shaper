@@ -17,7 +17,7 @@ const std::list<std::shared_ptr<ModelAPI_Result> >& ModelAPI_Feature::results()
   return myResults;
 }
 
-std::shared_ptr<ModelAPI_Result> ModelAPI_Feature::firstResult()
+std::shared_ptr<ModelAPI_Result> ModelAPI_Feature::firstResult() const
 {
   return myResults.empty() ? std::shared_ptr<ModelAPI_Result>() : *(myResults.begin());
 }

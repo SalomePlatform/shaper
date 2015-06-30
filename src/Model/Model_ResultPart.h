@@ -41,6 +41,8 @@ class Model_ResultPart : public ModelAPI_ResultPart
   MODEL_EXPORT virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape);
   /// Returns the shape by the name in the part
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName);
+  /// Updates the shape-result of the part (called on Part feature execution)
+  MODEL_EXPORT virtual void updateShape();
 
   /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,

@@ -117,6 +117,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Is called only once, on startup of the application
   Model_Session();
 
+  /// Returns the global identifier of the current transaction (needed for the update algo)
+  MODEL_EXPORT virtual int transactionID();
+
  protected:
   /// Loads (if not done yet) the information about the features and plugins
   void LoadPluginsInfo();

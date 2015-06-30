@@ -46,6 +46,7 @@ static const int TAG_GENERAL = 1;  // general properties tag
 
 // general sub-labels
 static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
+static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the cransaction
 
 Model_Document::Model_Document(const std::string theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
@@ -292,6 +293,7 @@ void Model_Document::startOperation()
     myDoc->NewCommand();
   }
   // starts a new operation
+  incrementTransactionID();
   myTransactions.push_back(Transaction());
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())++;
@@ -861,4 +863,25 @@ void Model_Document::setActive(const bool theFlag)
 bool Model_Document::isActive() const
 {
   return myIsActive;
+}
+
+int Model_Document::transactionID()
+{
+  Handle(TDataStd_Integer) anIndex;
+  if (!generalLabel().FindChild(TAG_CURRENT_TRANSACTION).
+      FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
+    anIndex = TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), 1);
+  }
+  return anIndex->Get();
+}
+
+void Model_Document::incrementTransactionID()
+{
+  int aNewVal = transactionID() + 1;
+  TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), aNewVal);
+}
+void Model_Document::decrementTransactionID()
+{
+  int aNewVal = transactionID() - 1;
+  TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), aNewVal);
 }

@@ -72,7 +72,7 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// returns the current results of the feature
   MODELAPI_EXPORT const std::list<std::shared_ptr<ModelAPI_Result> >& results();
   /// returns the first result in the list or NULL reference
-  MODELAPI_EXPORT std::shared_ptr<ModelAPI_Result> firstResult();
+  MODELAPI_EXPORT std::shared_ptr<ModelAPI_Result> firstResult() const;
   /// returns the last result in the list or NULL reference
   MODELAPI_EXPORT std::shared_ptr<ModelAPI_Result> lastResult();
   /// sets the alone result

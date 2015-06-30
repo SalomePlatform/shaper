@@ -21,6 +21,7 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
@@ -30,6 +31,7 @@
 
 #include <TDataStd_Name.hxx>
 #include <TDataStd_AsciiString.hxx>
+#include <TDataStd_IntegerArray.hxx>
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
@@ -38,7 +40,7 @@
 
 // myLab contains:
 // TDataStd_Name - name of the object
-// TDataStd_Integer - state of the object execution
+// TDataStd_IntegerArray - state of the object execution, transaction ID of update
 // TDataStd_BooleanArray - array of flags of this data:
 //                             0 - is in history or not
 static const int kFlagInHistory = 0;
@@ -240,19 +242,44 @@ void Model_Data::erase()
     myLab.ForgetAllAttributes();
 }
 
+// indexes in the state array
+enum StatesIndexes {
+  STATE_INDEX_STATE = 1, // the state type itself
+  STATE_INDEX_TRANSACTION = 2, // transaction ID
+};
+
+/// Returns the label array, initialises it by default values if not exists
+static Handle(TDataStd_IntegerArray) stateArray(TDF_Label& theLab)
+{
+  Handle(TDataStd_IntegerArray) aStateArray;
+  if (!theLab.FindAttribute(TDataStd_IntegerArray::GetID(), aStateArray)) {
+    aStateArray = TDataStd_IntegerArray::Set(theLab, 1, 2);
+    aStateArray->SetValue(STATE_INDEX_STATE, ModelAPI_StateMustBeUpdated); // default state
+    aStateArray->SetValue(STATE_INDEX_TRANSACTION, 0); // default transaction ID (not existing)
+  }
+  return aStateArray;
+}
+
 void Model_Data::execState(const ModelAPI_ExecState theState)
 {
-  if (theState != ModelAPI_StateNothing)
-    TDataStd_Integer::Set(myLab, (int)theState);
+  if (theState != ModelAPI_StateNothing) {
+    stateArray(myLab)->SetValue(STATE_INDEX_STATE, (int)theState);
+  }
 }
 
 ModelAPI_ExecState Model_Data::execState()
 {
-  Handle(TDataStd_Integer) aStateAttr;
-  if (myLab.FindAttribute(TDataStd_Integer::GetID(), aStateAttr)) {
-    return ModelAPI_ExecState(aStateAttr->Get());
-  }
-  return ModelAPI_StateMustBeUpdated; // default value
+  return ModelAPI_ExecState(stateArray(myLab)->Value(STATE_INDEX_STATE));
+}
+
+int Model_Data::updateID()
+{
+  return stateArray(myLab)->Value(STATE_INDEX_TRANSACTION);
+}
+
+void Model_Data::setUpdateID(const int theID)
+{
+  stateArray(myLab)->SetValue(STATE_INDEX_TRANSACTION, theID);
 }
 
 void Model_Data::setError(const std::string& theError, bool theSend)
@@ -400,10 +427,16 @@ void Model_Data::setIsInHistory(const bool theFlag)
 
 bool Model_Data::isDisplayed()
 {
-  return myObject.get() && myObject->document().get() && 
-    (myObject->document()->isActive() || 
-     myObject->document() == ModelAPI_Session::get()->moduleDocument()) && // root is accessible allways
-    myFlags->Value(kFlagDisplayed) == Standard_True;
+  if (!myObject.get() || !myObject->document().get() || // object is in valid
+      myFlags->Value(kFlagDisplayed) != Standard_True) // or it was not displayed before
+    return false;
+  if (myObject->document()->isActive()) // for active documents it must be ok anyway
+    return true;
+  // any object from the root document except part result may be displayed
+  if (myObject->document() == ModelAPI_Session::get()->moduleDocument() &&
+      myObject->groupName() != ModelAPI_ResultPart::group())
+    return true;
+  return false;
 }
 
 void Model_Data::setDisplayed(const bool theDisplay)

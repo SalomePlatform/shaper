@@ -172,6 +172,13 @@ class Model_Document : public ModelAPI_Document
   ///! history. Not very fast method, for calling once, not in big cycles.
   MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures();
 
+  /// Returns the global identifier of the current transaction (needed for the update algo)
+  MODEL_EXPORT virtual int transactionID();
+  /// Increases the transaction ID
+  MODEL_EXPORT virtual void incrementTransactionID();
+  /// Decreases the transaction ID
+  MODEL_EXPORT virtual void decrementTransactionID();
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

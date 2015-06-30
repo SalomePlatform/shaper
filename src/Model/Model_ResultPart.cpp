@@ -10,7 +10,12 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
+#include <Model_Document.h>
 
+#include <TNaming_Tool.hxx>
+#include <TNaming_NamedShape.hxx>
+#include <TNaming_Iterator.hxx>
+#include <TDataStd_Name.hxx>
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
 
@@ -122,12 +127,6 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
   return aResult;
 }
 
-#include <Model_Document.h>
-#include <TNaming_Tool.hxx>
-#include <TNaming_NamedShape.hxx>
-#include <TNaming_Iterator.hxx>
-#include <TDataStd_Name.hxx>
-
 std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
@@ -175,4 +174,9 @@ void Model_ResultPart::colorConfigInfo(std::string& theSection, std::string& the
   theSection = "Visualization";
   theName = "result_part_color";
   theDefault = DEFAULT_COLOR();
+}
+
+void Model_ResultPart::updateShape()
+{
+  myShape.Nullify();
 }

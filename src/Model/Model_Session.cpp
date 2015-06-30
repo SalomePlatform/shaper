@@ -425,3 +425,8 @@ ModelAPI_ValidatorsFactory* Model_Session::validators()
   static Model_ValidatorsFactory* aFactory = new Model_ValidatorsFactory;
   return aFactory;
 }
+
+int Model_Session::transactionID()
+{
+  return ROOT_DOC->transactionID();
+}

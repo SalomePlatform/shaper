@@ -23,9 +23,7 @@ class ModelAPI_Feature;
  */
 class Model_Update : public Events_Listener
 {
-  /// created features during this transaction: must be updated all the time
-  std::set<std::shared_ptr<ModelAPI_Object> > myJustCreated;
-  /// updated features during this transaction: must be updated in the end of transaction
+  /// updated features during this transaction: must be updated immediately
   std::set<std::shared_ptr<ModelAPI_Object> > myJustUpdated;
   /// to know that all next updates are caused by this execution
   bool myIsExecuted;
@@ -42,13 +40,13 @@ class Model_Update : public Events_Listener
   MODEL_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
 protected:
-  /// updates all features in the document and then - in sub-documents
-  void updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc);
   /// Recoursively checks and updates the feature if needed (calls the execute method)
   /// Returns true if feature was updated.
-  void updateFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
+  void updateFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
+    std::set<std::shared_ptr<ModelAPI_Feature> >& theProcessed);
 
   /// Updates the selection and parametrical arguments before the later feature analysis
+  /// Returns true if something really was updated
   void updateArguments(std::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Sends the redisplay events for feature and results, updates the updated status
@@ -62,9 +60,6 @@ protected:
   /// Performs the feature execution
   /// \returns the status of execution
   void executeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
-
-  /// returns true if the object was created or updated
-  bool isUpdated(const std::shared_ptr<ModelAPI_Object>& theObj);
 };
 
 #endif

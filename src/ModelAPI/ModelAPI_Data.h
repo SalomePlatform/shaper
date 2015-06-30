@@ -147,6 +147,13 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)
   virtual std::shared_ptr<ModelAPI_Data> invalidPtr() = 0;
 
+  /// Identifier of the transaction when object (feature or result) was updated last time.
+  virtual int updateID() = 0;
+
+  /// Identifier of the transaction when object (feature or result) was updated last time.
+  /// This method is called by the updater.
+  virtual void setUpdateID(const int theID) = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data();
