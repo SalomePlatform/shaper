@@ -98,7 +98,7 @@ bool IGESExport(const std::string& theFileName,
     aBrepMode = 1;
 
   #ifdef _DEBUG
-  std::cout << "Export IGES into file " << theFileName.ToCString() << std::endl;
+  std::cout << "Export IGES into file " << theFileName << std::endl;
   #endif
 
   // Mantis issue 0021350: check being exported shape, as some stand-alone
