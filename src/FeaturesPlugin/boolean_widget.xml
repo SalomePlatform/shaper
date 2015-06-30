@@ -8,7 +8,7 @@
     type_choice="Solids"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="solid"/>
+    <validator id="GeomValidators_ShapeType" parameters="empty,solid"/>
   </multi_selector>
   <multi_selector id="tool_objects" 
     label="Tool object" 
@@ -17,7 +17,7 @@
     type_choice="Solids"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="solid"/>
+    <validator id="GeomValidators_ShapeType" parameters="empty,solid"/>
   </multi_selector>
   <choice id="bool_type" 
     label="Type" 
@@ -25,4 +25,5 @@
     string_list="Cut Fuse Common"
     default="0"
   />
+  <validator id="GeomValidators_BooleanArguments" parameters="main_objects,tool_objects,bool_type"/>
 </source>

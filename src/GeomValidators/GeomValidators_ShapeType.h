@@ -26,14 +26,15 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
   //  the edge type
   enum TypeOfShape
   {
-    AnyShape,
+    Empty,
     Vertex,
     Edge,
     Line,
     Circle,
-    Solid,
     Face,
-    Compound
+    Solid,
+    Compound,
+    AnyShape
   };
 
  public:

@@ -253,6 +253,25 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
   return false;
 }
 
+void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
+{
+  // Create point-edge coincedence
+  FeaturePtr aFeature = mySketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
+  std::shared_ptr<GeomDataAPI_Point2D> aThisPoint = 
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
+  aRef1->setAttr(aThisPoint);
+
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  aRef2->setObject(theObject);
+
+  aFeature->execute();
+}
 
 void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
@@ -277,33 +296,21 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
       if ((!aSPFeature) && (!aShape.IsNull())) {
         ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
         if (!aFixedObject.get())
-          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+          aObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+        setConstraintWith(aObject);
+        emit vertexSelected();
+        emit focusOutWidget(this);
+        return;
       }
     }
     double aX, aY;
     if (getPoint2d(aView, aShape, aX, aY)) {
-      setPoint(aX, aY);
-
       PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
       emit vertexSelected();
       emit focusOutWidget(this);
       return;
     } else if (aShape.ShapeType() == TopAbs_EDGE) {
-      // Create point-edge coincedence
-      FeaturePtr aFeature = mySketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-      std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
-
-      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = std::dynamic_pointer_cast<
-          ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-      AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
-      std::shared_ptr<GeomDataAPI_Point2D> aThisPoint = 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
-      aRef1->setAttr(aThisPoint);
-
-      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = std::dynamic_pointer_cast<
-          ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
-      aRef2->setObject(aObject);
-      aFeature->execute();
+      setConstraintWith(aObject);
       emit vertexSelected();
       emit focusOutWidget(this);
       return;

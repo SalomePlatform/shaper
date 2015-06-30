@@ -12,6 +12,8 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
@@ -42,6 +44,9 @@ void FeaturesPlugin_Boolean::initAttributes()
     FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // extrusion works with faces always
   aSelection->setSelectionType("SOLID");
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
 }
 
 //=================================================================================================
@@ -72,9 +77,6 @@ void FeaturesPlugin_Boolean::execute()
 
   // Getting objects.
   AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
-    return;
-  }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
@@ -86,9 +88,6 @@ void FeaturesPlugin_Boolean::execute()
 
   // Getting tools.
   AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
-  if (aToolsSelList->size() == 0) {
-    return;
-  }
   for(int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aToolAttr = aToolsSelList->value(aToolsIndex);
     std::shared_ptr<GeomAPI_Shape> aTool = aToolAttr->value();
@@ -103,6 +102,12 @@ void FeaturesPlugin_Boolean::execute()
   switch(aType) {
     case GeomAlgoAPI_Boolean::BOOL_CUT:
     case GeomAlgoAPI_Boolean::BOOL_COMMON:{
+      if(anObjects.empty() || aTools.empty()) {
+        std::string aFeatureError = "Not enough objects for boolean operation";
+        setError(aFeatureError);
+        return;
+      }
+
       // Cut each object with all tools
       for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
@@ -137,6 +142,20 @@ void FeaturesPlugin_Boolean::execute()
       break;
     }
     case GeomAlgoAPI_Boolean::BOOL_FUSE: {
+      if(anObjects.empty() && aTools.size() > 1) {
+        anObjects.push_back(aTools.back());
+        aTools.pop_back();
+      }else if(aTools.empty() && anObjects.size() > 1) {
+        aTools.push_back(anObjects.back());
+        anObjects.pop_back();
+      }
+
+      if(anObjects.empty() || aTools.empty()) {
+        std::string aFeatureError = "Not enough objects for boolean operation";
+        setError(aFeatureError);
+        return;
+      }
+
       // Fuse all objects and all tools.
       GeomAlgoAPI_Boolean aBoolAlgo(anObjects, aTools, aType);
 
