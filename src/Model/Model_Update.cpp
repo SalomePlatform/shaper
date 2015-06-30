@@ -118,7 +118,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anUpdatedIter);
       if (aFeature.get()) {
         // execute not-previewed feature on "apply"
-        if (!aFeature->isPreviewNeeded() && myJustUpdated.find(aFeature) != myJustUpdated.end()) {
+        if (!aFeature->isPreviewNeeded()) {
           static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
           if (aFactory->validate(aFeature)) {
             executeFeature(aFeature);
@@ -126,8 +126,11 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         }
         // remove macro on apply
         if (aFeature->isMacro()) {
-          myJustUpdated.erase(aFeature); // to avoid the map update problems on "remove"
           aFeature->document()->removeFeature(aFeature);
+          myJustUpdated.erase(aFeature);
+        }
+        // to avoid the map update problems on "remove"
+        if (myJustUpdated.find(aFeature) == myJustUpdated.end()) {
           anUpdatedIter = myJustUpdated.begin();
         } else {
           anUpdatedIter++;
@@ -183,9 +186,6 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
     }
 
     if (isAutomaticChanged) myIsAutomatic = false;
-    // make just updated clear after each processing: it is not needed anymore, update causes
-    // execute immideately
-    //myJustUpdated.clear(); // just before myIsExecuted = false because after myJustUpdated will be processed again
     myIsExecuted = false;
 
     // flush to update display
@@ -267,7 +267,6 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
     aRes->data()->execState(theState);
     if (theFeature->data()->updateID() > aRes->data()->updateID()) {
-      myJustUpdated.insert(aRes);
       aRes->data()->setUpdateID(theFeature->data()->updateID());
     }
     ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
