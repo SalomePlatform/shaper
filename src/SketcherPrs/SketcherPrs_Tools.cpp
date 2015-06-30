@@ -125,7 +125,7 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const FeaturePtr theLine,
 }
 
 
-static double MyArrowSize = 30.;
+static double MyArrowSize = 24.;
 double getArrowSize()
 {
   return MyArrowSize;
@@ -136,7 +136,7 @@ void setArrowSize(double theSize)
   MyArrowSize = theSize;
 }
 
-static double MyTextHeight = 20;
+static double MyTextHeight = 16;
 double getTextHeight()
 {
   return MyTextHeight;
@@ -149,7 +149,7 @@ void setTextHeight(double theHeight)
 
 double getDefaultTextHeight()
 {
-  return 30;
+  return 16;
 }
 
 double getFlyoutDistance(const ModelAPI_Feature* theConstraint)

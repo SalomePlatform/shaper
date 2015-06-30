@@ -16,14 +16,14 @@
  * \brief General base class for all interfaces in this package
  */
 
-class GEOMAPI_EXPORT GeomAPI_Interface
+class GeomAPI_Interface
 {
  private:
   std::shared_ptr<void> myImpl;  ///< pointer to the internal impl object
 
  public:
   /// None - constructor
-  GeomAPI_Interface();
+  GEOMAPI_EXPORT GeomAPI_Interface();
 
   /// Constructor by the impl pointer (used for internal needs)
   template<class T> explicit GeomAPI_Interface(T* theImpl)
@@ -32,7 +32,7 @@ class GEOMAPI_EXPORT GeomAPI_Interface
   }
 
   /// Destructor
-  virtual ~GeomAPI_Interface();
+  GEOMAPI_EXPORT virtual ~GeomAPI_Interface();
 
   /// Returns the pointer to the impl
   template<class T> inline T* implPtr()
@@ -56,7 +56,7 @@ class GEOMAPI_EXPORT GeomAPI_Interface
   }
 
   /// Returns true if the impl is empty
-  bool empty() const;
+  GEOMAPI_EXPORT bool empty() const;
 };
 
 #endif
