@@ -43,10 +43,10 @@ GeomAPI_AISObject::GeomAPI_AISObject()
 
 GeomAPI_AISObject::~GeomAPI_AISObject()
 {
-  if (myImpl) {
+  if (!empty()) {
     // This is necessary for correct deletion of Handle entity. 
     // Without this Handle does not decremented counter to 0
-    Handle(AIS_InteractiveObject) *anAIS = (Handle(AIS_InteractiveObject)*)myImpl;
+    Handle(AIS_InteractiveObject) *anAIS = implPtr<Handle(AIS_InteractiveObject)>();
     anAIS->Nullify();
   }
 }

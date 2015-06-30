@@ -8,7 +8,7 @@
 
 #include<gp_XY.hxx>
 
-#define MY_XY static_cast<gp_XY*>(myImpl)
+#define MY_XY implPtr<gp_XY>()
 
 GeomAPI_XY::GeomAPI_XY(const double theX, const double theY)
     : GeomAPI_Interface(new gp_XY(theX, theY))

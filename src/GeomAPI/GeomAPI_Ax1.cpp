@@ -8,7 +8,7 @@
 
 #include <gp_Ax1.hxx>
 
-#define MY_AX1 static_cast<gp_Ax1*>(myImpl)
+#define MY_AX1 implPtr<gp_Ax1>()
 
 //=================================================================================================
 GeomAPI_Ax1::GeomAPI_Ax1()

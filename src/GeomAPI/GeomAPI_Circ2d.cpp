@@ -18,7 +18,7 @@
 
 #include <IntAna2d_AnaIntersection.hxx>
 
-#define MY_CIRC2D static_cast<gp_Circ2d*>(myImpl)
+#define MY_CIRC2D implPtr<gp_Circ2d>()
 
 static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY, const gp_Dir2d theDir,
                             const double theRadius)

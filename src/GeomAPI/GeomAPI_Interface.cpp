@@ -8,25 +8,15 @@
 
 GeomAPI_Interface::GeomAPI_Interface()
 {
-  myImpl = 0;
-}
 
-GeomAPI_Interface::GeomAPI_Interface(void* theImpl)
-{
-  myImpl = theImpl;
 }
 
 GeomAPI_Interface::~GeomAPI_Interface()
 {
-  if (myImpl) {
-    delete myImpl;
-    myImpl = 0;
-  }
+
 }
 
-void GeomAPI_Interface::setImpl(void* theImpl)
+bool GeomAPI_Interface::empty() const
 {
-  if (myImpl)
-    delete myImpl;
-  myImpl = theImpl;
+  return myImpl.get() == 0;
 }

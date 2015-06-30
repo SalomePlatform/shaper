@@ -15,7 +15,7 @@
 #include <Precision.hxx>
 
 
-#define MY_AX3 static_cast<gp_Ax3*>(myImpl)
+#define MY_AX3 implPtr<gp_Ax3>()
 
 
 GeomAPI_Ax3::GeomAPI_Ax3()

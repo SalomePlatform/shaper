@@ -255,6 +255,6 @@ GeomAlgoAPI_MakeShape * GeomAlgoAPI_Placement::makeShape() const
 //============================================================================
 GeomAlgoAPI_Placement::~GeomAlgoAPI_Placement()
 {
-  if (myImpl)
+  if (!empty())
     myMap.clear();
 }

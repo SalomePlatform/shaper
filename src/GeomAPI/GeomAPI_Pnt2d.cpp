@@ -14,7 +14,7 @@
 
 #include <Precision.hxx>
 
-#define MY_PNT2D static_cast<gp_Pnt2d*>(myImpl)
+#define MY_PNT2D implPtr<gp_Pnt2d>()
 
 GeomAPI_Pnt2d::GeomAPI_Pnt2d(const double theX, const double theY)
     : GeomAPI_Interface(new gp_Pnt2d(theX, theY))

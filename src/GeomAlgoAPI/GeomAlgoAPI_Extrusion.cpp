@@ -132,7 +132,7 @@ GeomAlgoAPI_MakeShape * GeomAlgoAPI_Extrusion::makeShape() const
 //============================================================================
 GeomAlgoAPI_Extrusion::~GeomAlgoAPI_Extrusion()
 {
-  if (myImpl) {    
-	myMap.clear();
+  if (!empty()) {
+    myMap.clear();
   }
 }

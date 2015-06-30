@@ -13,7 +13,7 @@
 
 #include <sstream>
 
-#define MY_SHAPE static_cast<TopoDS_Shape*>(myImpl)
+#define MY_SHAPE implPtr<TopoDS_Shape>()
 
 GeomAPI_Shape::GeomAPI_Shape()
     : GeomAPI_Interface(new TopoDS_Shape())

@@ -57,8 +57,8 @@ bool GeomAPI_DataMapOfShapeShape::unBind(std::shared_ptr<GeomAPI_Shape> theKey)
 
  GeomAPI_DataMapOfShapeShape::~GeomAPI_DataMapOfShapeShape()
  {
-  if (myImpl) {
-	implPtr<TopTools_DataMapOfShapeShape>()->Clear();
+  if (!empty()) {
+    implPtr<TopTools_DataMapOfShapeShape>()->Clear();
     //delete myImpl;
   }
  }

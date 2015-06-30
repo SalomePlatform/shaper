@@ -14,7 +14,7 @@
 #include<gp_Pln.hxx>
 #include<ProjLib.hxx>
 
-#define MY_PNT static_cast<gp_Pnt*>(myImpl)
+#define MY_PNT implPtr<gp_Pnt>()
 
 GeomAPI_Pnt::GeomAPI_Pnt(const double theX, const double theY, const double theZ)
     : GeomAPI_Interface(new gp_Pnt(theX, theY, theZ))

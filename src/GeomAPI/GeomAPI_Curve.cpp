@@ -16,7 +16,7 @@
 #include <TopoDS.hxx>
 #include <GeomAdaptor_Curve.hxx>
 
-#define MY_CURVE (*(static_cast<Handle_Geom_Curve*>(myImpl)))
+#define MY_CURVE (*(implPtr<Handle_Geom_Curve>()))
 
 GeomAPI_Curve::GeomAPI_Curve()
     : GeomAPI_Interface(new Handle_Geom_Curve()), myStart(0), myEnd(1)

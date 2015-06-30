@@ -9,7 +9,7 @@
 #include <Standard_NoMoreObject.hxx>
 #include <TopExp_Explorer.hxx>
 
-#define MY_EXPLORER static_cast<TopExp_Explorer*>(myImpl)
+#define MY_EXPLORER implPtr<TopExp_Explorer>()
 
 //=================================================================================================
 GeomAPI_ShapeExplorer::GeomAPI_ShapeExplorer()

@@ -15,7 +15,7 @@
 
 #include <IntAna2d_AnaIntersection.hxx>
 
-#define MY_LIN2D static_cast<gp_Lin2d*>(myImpl)
+#define MY_LIN2D implPtr<gp_Lin2d>()
 
 static gp_Lin2d* newLine2d(const double theStartX, const double theStartY, const double theEndX,
                            const double theEndY)

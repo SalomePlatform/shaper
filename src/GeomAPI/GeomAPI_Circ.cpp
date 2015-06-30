@@ -16,7 +16,7 @@
 #include <Geom_Circle.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 
-#define MY_CIRC static_cast<gp_Circ*>(myImpl)
+#define MY_CIRC implPtr<gp_Circ>()
 
 static gp_Circ* newCirc(const gp_Pnt& theCenter, const gp_Dir& theDir, const double theRadius)
 {

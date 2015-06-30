@@ -20,7 +20,7 @@
 #include <Precision.hxx>
 #include <ProjLib.hxx>
 
-#define MY_LIN static_cast<gp_Lin*>(myImpl)
+#define MY_LIN implPtr<gp_Lin>()
 
 static gp_Lin* newLine(const double theStartX, const double theStartY, const double theStartZ,
                        const double theEndX, const double theEndY, const double theEndZ)

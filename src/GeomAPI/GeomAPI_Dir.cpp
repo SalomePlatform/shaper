@@ -9,7 +9,7 @@
 
 #include <gp_Dir.hxx>
 
-#define MY_DIR static_cast<gp_Dir*>(myImpl)
+#define MY_DIR implPtr<gp_Dir>()
 
 GeomAPI_Dir::GeomAPI_Dir(const double theX, const double theY, const double theZ)
     : GeomAPI_Interface(new gp_Dir(theX, theY, theZ))
