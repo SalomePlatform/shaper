@@ -90,6 +90,7 @@
 %include "GeomAPI_Pnt.h"
 %include "GeomAPI_Pnt2d.h"
 %include "GeomAPI_Shape.h"
+%include "GeomAPI_ShapeExplorer.h"
 %include "GeomAPI_Vertex.h"
 %include "GeomAPI_XY.h"
 %include "GeomAPI_XYZ.h"

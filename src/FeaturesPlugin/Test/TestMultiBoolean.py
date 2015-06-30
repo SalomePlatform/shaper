@@ -90,8 +90,11 @@ for i in xrange(0, N * N):
 
     anExtrusionFt.selectionList("base").append(
         aSketchResult, aSketchFaces[0])
+    anExtrusionFt.string("CreationMethod").setValue("BySizes")
     anExtrusionFt.real("from_size").setValue(0)
     anExtrusionFt.real("to_size").setValue(10)
+    anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
+    anExtrusionFt.real("from_offset").setValue(0) #TODO: remove	
     # v1.0.2 from master
     # anExtrusionFt.selection("extrusion_face").setValue(
     #    aSketchResult, aSketchFaces[0])
@@ -151,8 +154,11 @@ GeomAlgoAPI_SketchBuilder.createFaces(
 aBox = aPart.addFeature("Extrusion")
 aBox.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
+aBox.string("CreationMethod").setValue("BySizes")
 aBox.real("from_size").setValue(0)
 aBox.real("to_size").setValue(10)
+aBox.real("to_offset").setValue(0) #TODO: remove
+aBox.real("from_offset").setValue(0) #TODO: remove
 # v 1.0.2 from master
 # aBox.selection("extrusion_face").setValue(
 #     aSketchResult, aSketchFaces[0])
@@ -177,6 +183,7 @@ for i in xrange(0, N * N):
     aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
     aBooleanFt.execute()
     aCurrentResult = modelAPI_ResultBody(aBooleanFt.firstResult())
+    assert (len(aBooleanFt.results()) > 0)
 aSession.finishOperation()
 
 #=========================================================================

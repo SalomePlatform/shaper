@@ -5,16 +5,22 @@
       class FeaturesPlugin_Extrusion : public ModelAPI_Feature
         static const std::string MY_EXTRUSION_ID("Extrusion");
         static const std::string LIST_ID("base");
+        static const std::string METHOD_ATTR("CreationMethod");
         static const std::string MY_TO_SIZE_ID("to_size");
         static const std::string MY_FROM_SIZE_ID("from_size");
         static const std::string MY_TO_OBJECT_ID("to_object");
+        static const std::string MY_TO_OFFSET_ID("to_offset");
         static const std::string MY_FROM_OBJECT_ID("from_object");
+        static const std::string MY_FROM_OFFSET_ID("from_offset");
 
-        data()->addAttribute(FeaturesPlugin_Extrusion::LIST_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(LIST_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+        data()->addAttribute(TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(TO_OFFSET_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(FROM_OFFSET_ID(), ModelAPI_AttributeSelection::typeId());
 """
 #=========================================================================
 # Initialization of the test
@@ -77,8 +83,11 @@ assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
 anExtrusionFt.selectionList("base").append(
     aCircleSketchResult, aCircleSketchFaces[0])
-anExtrusionFt.real("from_size").setValue(0)
+anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
+anExtrusionFt.real("from_size").setValue(0)
+anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
+anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
 anExtrusionFt.execute()
 aSession.finishOperation()
 assert (anExtrusionFt.real("to_size").value() == 50.0)
@@ -118,14 +127,17 @@ assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
 anExtrusionFt.selectionList("base").append(
     aCircleSketchResult, aCircleSketchFaces[0])
-aFromResult = aFromPlaneFeature.firstResult()
-aFromShape = modelAPI_ResultConstruction(aFromResult).shape()
-anExtrusionFt.selection("from_object").setValue(aFromResult, aFromShape)
-anExtrusionFt.real("from_size").setValue(10)
+anExtrusionFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
+anExtrusionFt.real("to_size").setValue(0) #TODO: remove
+anExtrusionFt.real("from_size").setValue(0) #TODO: remove
 aToResult = aToPlaneFeature.firstResult()
 aToShape = modelAPI_ResultConstruction(aToResult).shape()
 anExtrusionFt.selection("to_object").setValue(aToResult, aToShape)
-anExtrusionFt.real("to_size").setValue(10)
+anExtrusionFt.real("to_offset").setValue(10)
+aFromResult = aFromPlaneFeature.firstResult()
+aFromShape = modelAPI_ResultConstruction(aFromResult).shape()
+anExtrusionFt.selection("from_object").setValue(aFromResult, aFromShape)
+anExtrusionFt.real("from_offset").setValue(10)
 anExtrusionFt.execute()
 aSession.finishOperation()
 
@@ -193,8 +205,11 @@ assert (aClampExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
 aClampExtrusionFt.selectionList("base").append(
     aClampSketchResult, aClampSketchFaces[0])
-aClampExtrusionFt.real("from_size").setValue(0)
+aClampExtrusionFt.string("CreationMethod").setValue("BySizes")
 aClampExtrusionFt.real("to_size").setValue(70)
+aClampExtrusionFt.real("from_size").setValue(0)
+aClampExtrusionFt.real("to_offset").setValue(0) #TODO: remove
+aClampExtrusionFt.real("from_offset").setValue(0) #TODO: remove
 aClampExtrusionFt.execute()
 aSession.finishOperation()
 
@@ -210,11 +225,13 @@ assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
 anExtrusionFt.selectionList("base").append(
     aCircleSketchResult, aCircleSketchFaces[0])
-aClampResult = aClampExtrusionFt.firstResult()
-anExtrusionFt.selection("from_object").selectSubShape("face", "Extrusion_3/LateralFace_1")
-anExtrusionFt.real("from_size").setValue(0)
+anExtrusionFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
+anExtrusionFt.real("to_size").setValue(0) #TODO: remove
+anExtrusionFt.real("from_size").setValue(0) #TODO: remove
 anExtrusionFt.selection("to_object").selectSubShape("face", "Extrusion_3/LateralFace_2")
-anExtrusionFt.real("to_size").setValue(0)
+anExtrusionFt.real("to_offset").setValue(0)
+anExtrusionFt.selection("from_object").selectSubShape("face", "Extrusion_3/LateralFace_1")
+anExtrusionFt.real("from_offset").setValue(0)
 anExtrusionFt.execute()
 aSession.finishOperation()
 

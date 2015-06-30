@@ -6,17 +6,23 @@
         static const std::string MY_REVOLUTION_ID("Revolution");
         static const std::string MY_GROUP_LIST_ID("base");
         static const std::string MY_TO_OBJECT_ID("axis_object");
-        static const std::string MY_TO_ANGLE_ID("to_angle");
+        static const std::string METHOD_ATTR("CreationMethod");
+        static const std::string MY_TO_ANGLE_ID("to_angle");		
         static const std::string MY_FROM_ANGLE_ID("from_angle");
         static const std::string MY_TO_OBJECT_ID("to_object");
+        static const std::string MY_TO_OFFSET_ID("to_offset");	
         static const std::string MY_FROM_OBJECT_ID("from_object");
+        static const std::string MY_FROM_OFFSET_ID("from_offset");
 
-        data()->addAttribute(FeaturesPlugin_Revolution::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
-        data()->addAttribute(FeaturesPlugin_Revolution::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(FeaturesPlugin_Revolution::FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(FeaturesPlugin_Revolution::FROM_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(FeaturesPlugin_Revolution::TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(FeaturesPlugin_Revolution::TO_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+        data()->addAttribute(AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+        data()->addAttribute(TO_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(FROM_ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(TO_OFFSET_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+        data()->addAttribute(FROM_OFFSET_ID(), ModelAPI_AttributeDouble::typeId());
 """
 #=========================================================================
 # Initialization of the test
@@ -106,8 +112,11 @@ assert (aRevolFt.getKind() == "Revolution")
 aRevolFt.selectionList("base").append(
     aCircleSketchResult, aCircleSketchFaces[0])
 aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
+aRevolFt.string("CreationMethod").setValue("ByAngles")
 aRevolFt.real("from_angle").setValue(10)
 aRevolFt.real("to_angle").setValue(10)
+aRevolFt.real("to_offset").setValue(0) #TODO: remove
+aRevolFt.real("from_offset").setValue(0) #TODO: remove
 aRevolFt.execute()
 aSession.finishOperation()
 assert (aRevolFt.real("from_angle").value() == 10.0)

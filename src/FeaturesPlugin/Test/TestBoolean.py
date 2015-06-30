@@ -92,8 +92,11 @@ for eachSketchFeature in [aCircleSketchFeature, aTriangleSketchFeature]:
     anExtrusionFt = aPart.addFeature("Extrusion")
     anExtrusionFt.selectionList("base").append(
         aSketchResult, aSketchFaces[0])
+    anExtrusionFt.string("CreationMethod").setValue("BySizes")
     anExtrusionFt.real("from_size").setValue(0)
     anExtrusionFt.real("to_size").setValue(50)
+    anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
+    anExtrusionFt.real("from_offset").setValue(0) #TODO: remove	
     anExtrusionFt.execute()
     extrudedObjects.append(modelAPI_ResultBody(anExtrusionFt.firstResult()))
 aSession.finishOperation()
