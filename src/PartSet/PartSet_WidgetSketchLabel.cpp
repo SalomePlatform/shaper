@@ -26,6 +26,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
+#include <GeomAlgoAPI_ShapeProps.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -33,6 +34,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketcherPrs_Tools.h>
 
+#include <BRepClass3d_SolidClassifier.hxx>
 #include <Precision.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
@@ -116,15 +118,22 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   // 4. if the planes were displayed, change the view projection
   TopoDS_Shape aShape = aPrs.shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
+  std::shared_ptr<GeomAPI_Shape> aBaseShape;
+
+  DataPtr aData = feature()->data();
+  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                            (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+
   // selection happens in OCC viewer
   if (!aShape.IsNull()) {
-    aGShape =  std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
+    aGShape =  std::make_shared<GeomAPI_Shape>();
     aGShape->setImpl(new TopoDS_Shape(aShape));
+
+    if (aSelAttr && aSelAttr->context()) {
+      aBaseShape = aSelAttr->context()->shape();
+    }
   }
   else { // selection happens in OCC viewer(on body) of in the OB browser
-    DataPtr aData = feature()->data();
-    AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                              (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
     if (aSelAttr) {
       aGShape = aSelAttr->value();
     }
@@ -133,8 +142,24 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
     // get plane parameters
     std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
     std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+    gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
 
-    myWorkshop->viewer()->setViewProjection(aDir->x(), aDir->y(), aDir->z());
+    // orienting projection
+    if(aBaseShape.get() != NULL) {
+      std::shared_ptr<GeomAPI_Pnt> aCenterPnt = GeomAlgoAPI_ShapeProps::centreOfMass(aGShape);
+      gp_Pnt aPnt = aCenterPnt->impl<gp_Pnt>();
+      aPnt.Translate(aDir->impl<gp_Dir>().XYZ() * (10 * Precision::Confusion()));
+
+      BRepClass3d_SolidClassifier aClassifier;
+      aClassifier.Load(aBaseShape->impl<TopoDS_Shape>());
+      aClassifier.Perform(aPnt, Precision::Confusion());
+
+      if(aClassifier.State() == TopAbs_IN) {
+        aXYZ.Reverse();
+      }
+    }
+
+    myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z());
   }
   // 5. Clear text in the label
   myLabel->setText("");
