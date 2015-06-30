@@ -38,6 +38,9 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   /// Returns the list of features
   MODEL_EXPORT virtual std::list<ObjectPtr> list();
 
+  /// Returns true if the object is in list
+  MODEL_EXPORT virtual bool isInList(const ObjectPtr& theObj);
+
   /// Returns the list of features
   MODEL_EXPORT virtual ObjectPtr object(const int theIndex) const;
 

@@ -184,11 +184,7 @@ bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
       aFeature = document()->feature(aRes);
   }
   if (aFeature) {
-    list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
-    for(list<ObjectPtr>::iterator aSubIt = aSubs.begin(); aSubIt != aSubs.end(); aSubIt++) {
-      if (*aSubIt == aFeature)
-        return true;
-    }
+    return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->isInList(aFeature);
   }
   return false;
 }

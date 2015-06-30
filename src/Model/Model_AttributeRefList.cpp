@@ -88,6 +88,26 @@ list<ObjectPtr> Model_AttributeRefList::list()
   return aResult;
 }
 
+bool Model_AttributeRefList::isInList(const ObjectPtr& theObj)
+{
+  std::list<ObjectPtr> aResult;
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
+  if (aDoc) {
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObj->data());
+    if (aData.get()) {
+      TDF_Label anObjLab = aData->label().Father();
+      const TDF_LabelList& aList = myRef->List();
+      for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
+        if (aLIter.Value().IsEqual(anObjLab)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 ObjectPtr Model_AttributeRefList::object(const int theIndex) const
 {
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
