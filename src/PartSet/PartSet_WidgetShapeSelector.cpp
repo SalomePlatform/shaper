@@ -28,6 +28,8 @@
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
+//#define DEBUG_EMPTY_SHAPE
+
 PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
                                                          const Config_WidgetAPI* theData,
@@ -61,8 +63,21 @@ void PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomSha
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
   // Processing of sketch object
-  if (aSPFeature.get() != NULL && theShape.get())
+#ifdef DEBUG_EMPTY_SHAPE
+  if (aSPFeature.get() != NULL && theShape.get()) {
     setPointAttribute(theSelectedObject, theShape);
+#else
+  if (aSPFeature.get() != NULL) {
+    GeomShapePtr aShape = theShape;
+    if (!aShape.get()) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
+      if (aResult.get()) {
+        aShape = aResult->shape();
+      }
+    }
+    setPointAttribute(theSelectedObject, aShape);
+#endif
+  }
   else
     ModuleBase_WidgetShapeSelector::setObject(theSelectedObject, theShape);
 }

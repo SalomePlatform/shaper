@@ -233,7 +233,7 @@ std::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
   return ModelAPI_Session::get()->moduleDocument();
 }
 
-std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
+/*std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
                                                                       double theX, double theY)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
@@ -251,7 +251,7 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr t
   }
 
   return aFPoint;
-}
+}*/
 
 void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
                                     const std::string& theAttribute)
@@ -327,7 +327,7 @@ void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
     aFeature->execute();
 }
 
-std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::
+/*std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::
   findAttributePoint(CompositeFeaturePtr theSketch, double theX, double theY,
   double theTolerance, const QList<FeaturePtr>& theIgnore)
 {
@@ -353,7 +353,7 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::
     }
   }
   return std::shared_ptr<GeomDataAPI_Point2D>();
-}
+}*/
 
 
 void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr theFeature,

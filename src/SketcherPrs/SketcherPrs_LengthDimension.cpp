@@ -90,7 +90,7 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
 
-bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) const
+bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
 {
   DataPtr aData = myConstraint->data();
   if (myConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
@@ -117,9 +117,9 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) co
 
   } else if (myConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
     std::shared_ptr<GeomDataAPI_Point2D> aPoint_A = SketcherPrs_Tools::getFeaturePoint(
-        aData, SketchPlugin_Constraint::ENTITY_A());
+        aData, SketchPlugin_Constraint::ENTITY_A(), myPlane);
     std::shared_ptr<GeomDataAPI_Point2D> aPoint_B = SketcherPrs_Tools::getFeaturePoint(
-        aData, SketchPlugin_Constraint::ENTITY_B());
+        aData, SketchPlugin_Constraint::ENTITY_B(), myPlane);
 
     std::shared_ptr<GeomAPI_Pnt2d> aPnt_A;
     std::shared_ptr<GeomAPI_Pnt2d> aPnt_B;

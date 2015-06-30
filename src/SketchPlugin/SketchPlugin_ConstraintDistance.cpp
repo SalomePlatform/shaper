@@ -80,10 +80,11 @@ bool SketchPlugin_ConstraintDistance::compute(const std::string& theAttributeId)
     return false;
 
   DataPtr aData = data();
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
   std::shared_ptr<GeomDataAPI_Point2D> aPoint_A = SketcherPrs_Tools::getFeaturePoint(
-      aData, SketchPlugin_Constraint::ENTITY_A());
+      aData, SketchPlugin_Constraint::ENTITY_A(), aPlane);
   std::shared_ptr<GeomDataAPI_Point2D> aPoint_B = SketcherPrs_Tools::getFeaturePoint(
-      aData, SketchPlugin_Constraint::ENTITY_B());
+      aData, SketchPlugin_Constraint::ENTITY_B(), aPlane);
 
   std::shared_ptr<GeomAPI_Pnt2d> aPnt_A;
   std::shared_ptr<GeomAPI_Pnt2d> aPnt_B;
@@ -145,10 +146,11 @@ void SketchPlugin_ConstraintDistance::move(double theDeltaX, double theDeltaY)
 
   // Recalculate a shift of flyout point in terms of local coordinates
   std::shared_ptr<GeomAPI_XY> aDir(new GeomAPI_XY(theDeltaX, theDeltaY));
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
   std::shared_ptr<GeomDataAPI_Point2D> aPointA = SketcherPrs_Tools::getFeaturePoint(
-      data(), SketchPlugin_Constraint::ENTITY_A());
+      data(), SketchPlugin_Constraint::ENTITY_A(), aPlane);
   std::shared_ptr<GeomDataAPI_Point2D> aPointB = SketcherPrs_Tools::getFeaturePoint(
-      data(), SketchPlugin_Constraint::ENTITY_B());
+      data(), SketchPlugin_Constraint::ENTITY_B(), aPlane);
 
   std::shared_ptr<GeomAPI_XY> aStartPnt;
   std::shared_ptr<GeomAPI_XY> aEndPnt;
@@ -185,15 +187,16 @@ void SketchPlugin_ConstraintDistance::move(double theDeltaX, double theDeltaY)
   myFlyoutUpdate = false;
 }
 
-double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
+double SketchPlugin_ConstraintDistance::calculateCurrentDistance()
 {
   double aDistance = -1.;
 
   std::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
   std::shared_ptr<GeomDataAPI_Point2D> aPointA =
-    SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A());
+    SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A(), aPlane);
   std::shared_ptr<GeomDataAPI_Point2D> aPointB =
-      SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B());
+      SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B(), aPlane);
 
   if (aPointA.get() && aPointB.get()) {  // both points
     aDistance = aPointA->pnt()->distance(aPointB->pnt());
@@ -241,10 +244,11 @@ void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
         attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
     std::shared_ptr<GeomAPI_Pnt2d> aFlyoutPnt = aFlyoutAttr->pnt();
 
+    std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
     std::shared_ptr<GeomDataAPI_Point2D> aPointA = SketcherPrs_Tools::getFeaturePoint(
-        data(), SketchPlugin_Constraint::ENTITY_A());
+        data(), SketchPlugin_Constraint::ENTITY_A(), aPlane);
     std::shared_ptr<GeomDataAPI_Point2D> aPointB = SketcherPrs_Tools::getFeaturePoint(
-        data(), SketchPlugin_Constraint::ENTITY_B());
+        data(), SketchPlugin_Constraint::ENTITY_B(), aPlane);
 
     std::shared_ptr<GeomAPI_XY> aStartPnt;
     std::shared_ptr<GeomAPI_XY> aEndPnt;

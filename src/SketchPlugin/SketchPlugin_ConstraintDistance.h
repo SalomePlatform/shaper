@@ -68,7 +68,7 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase, publ
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Returns the current distance between the feature attributes
-  double calculateCurrentDistance() const;
+  double calculateCurrentDistance();
 
     /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,

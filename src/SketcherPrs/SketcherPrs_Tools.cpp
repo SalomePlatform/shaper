@@ -19,6 +19,12 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Lin2d.h>
 
+#include <TopoDS.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Vertex.hxx>
+
+#include <BRep_Tool.hxx>
+#include <Precision.hxx>
 
 namespace SketcherPrs_Tools {
 
@@ -67,8 +73,48 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
 }
 
 //*************************************************************************************
+std::shared_ptr<GeomDataAPI_Point2D> findGeomPoint(ObjectPtr theObject, 
+                                    const TopoDS_Shape& theShape, 
+                                    const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aGeomPoint;
+
+  FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObject);
+  if (anObjectFeature) {
+    if (theShape.ShapeType() == TopAbs_VERTEX) {
+      const TopoDS_Vertex& aShapeVertex = TopoDS::Vertex(theShape);
+      if (!aShapeVertex.IsNull())  {
+        gp_Pnt aShapePoint = BRep_Tool::Pnt(aShapeVertex);
+        std::shared_ptr<GeomAPI_Pnt> aShapeGeomPnt = std::shared_ptr<GeomAPI_Pnt>(
+            new GeomAPI_Pnt(aShapePoint.X(), aShapePoint.Y(), aShapePoint.Z()));
+
+        // find the given point in the feature attributes
+        std::list<AttributePtr> anObjectAttiributes = 
+          anObjectFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+        std::list<AttributePtr>::const_iterator anIt = anObjectAttiributes.begin(), 
+                                                aLast = anObjectAttiributes.end();
+        for (; anIt != aLast && !aGeomPoint; anIt++) {
+          std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint = 
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+
+          std::shared_ptr<GeomAPI_Pnt> anAttributePnt = thePlane->to3D(anAttributePoint->x(),
+                                                                       anAttributePoint->y());
+          if (anAttributePnt.get() &&
+              anAttributePnt->distance(aShapeGeomPnt) < Precision::Confusion()) {
+            aGeomPoint = anAttributePoint;
+            break;
+          }
+        }
+      }
+    }
+  }
+  return aGeomPoint;
+}
+
+//*************************************************************************************
 std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
-                                                     const std::string& theAttribute)
+                                                     const std::string& theAttribute,
+                                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
 
@@ -78,15 +124,28 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
   FeaturePtr aFeature;
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
-  if (anAttr)
-    aFeature = ModelAPI_Feature::feature(anAttr->object());
-
-  if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
-
-  else if (anAttr->attr()) {
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+  if (anAttr) {
+    if (anAttr->isObject()) {
+      ObjectPtr anObject = anAttr->object();
+      aFeature = ModelAPI_Feature::feature(anObject);
+      if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID()) {
+        aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                     aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
+      }
+      else {
+        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+        if (aRes.get()) {
+          GeomShapePtr aShape = aRes->shape();
+          if (aShape.get()) {
+            TopoDS_Shape aTDSShape = aShape->impl<TopoDS_Shape>();
+            aPointAttr = findGeomPoint(anObject, aTDSShape, thePlane);
+          }
+        }
+      }
+    }
+    else if (anAttr->attr()) {
+      aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+    }
   }
   return aPointAttr;
 }

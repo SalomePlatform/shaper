@@ -89,15 +89,15 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theY Y coordinate
   /// \param theTolerance tolerance
   /// \param theIgnore list of features which has to be ignored
-  static std::shared_ptr<GeomDataAPI_Point2D> findAttributePoint(CompositeFeaturePtr theSketch, 
-    double theX, double theY, double theTolerance, const QList<FeaturePtr>& theIgnore = QList<FeaturePtr>());
+  //static std::shared_ptr<GeomDataAPI_Point2D> findAttributePoint(CompositeFeaturePtr theSketch, 
+  //  double theX, double theY, double theTolerance, const QList<FeaturePtr>& theIgnore = QList<FeaturePtr>());
 
   /// Returns a point attribute of the feature by the coordinates if it is
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
-  static std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
-                                                                double theX, double theY);
+  //static std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
+  //                                                              double theX, double theY);
 
   /// \brief Save the double to the feature. If the attribute is double, it is filled.
   /// \param theFeature the feature

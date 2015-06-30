@@ -43,7 +43,7 @@ protected:
     const Standard_Integer aMode);
 
 private:
-  bool getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2) const;
+  bool getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2);
 
   /// Constraint feature
   ModelAPI_Feature* myConstraint;

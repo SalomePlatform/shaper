@@ -66,7 +66,12 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
 
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
     // If it is a line then we have to check that first attribute id not a line
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint = SketcherPrs_Tools::getFeaturePoint(aFeature->data(), aParamA);
+    std::shared_ptr<SketchPlugin_Feature> aSFeature =
+                            std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+    SketchPlugin_Sketch* aSketch = aSFeature->sketch();
+    std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(aSketch);
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint = SketcherPrs_Tools::getFeaturePoint(
+                                                               aFeature->data(), aParamA, aPlane);
     if (aPoint)
       return true;
   }

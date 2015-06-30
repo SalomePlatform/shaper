@@ -211,6 +211,10 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   static FeaturePtr addUniqueNamedCopiedFeature(FeaturePtr aFeature,
                                                 SketchPlugin_Sketch* theSketch);
 
+  /// Creates a plane of the sketch.
+  /// \param theSketch a sketch intance
+  static std::shared_ptr<GeomAPI_Ax3> plane(SketchPlugin_Sketch* theSketch);
+
   /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)

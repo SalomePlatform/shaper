@@ -290,3 +290,17 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
 
   return aNewFeature;
 }
+
+std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::plane(SketchPlugin_Sketch* theSketch)
+{
+  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+
+  return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(anOrigin->pnt(), aDirX->dir(), aNorm->dir()));
+}

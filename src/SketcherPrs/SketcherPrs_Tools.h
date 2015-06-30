@@ -56,7 +56,8 @@ enum SelectionModes {
 
   /// Obtain the point object from specified constraint parameter
   SKETCHERPRS_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
-                                                       const std::string& theAttribute);
+                                                       const std::string& theAttribute,
+                                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   SKETCHERPRS_EXPORT double getArrowSize();
 
