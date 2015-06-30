@@ -124,6 +124,10 @@ private slots:
    bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
                    double& theX, double& theY) const;
 
+   /// Create a coincidence constraint between the attribute and the parameter object
+   /// \theObject a result object
+   void setConstraintWith(const ObjectPtr& theObject);
+
   ModuleBase_IWorkshop* myWorkshop;
   PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
 
