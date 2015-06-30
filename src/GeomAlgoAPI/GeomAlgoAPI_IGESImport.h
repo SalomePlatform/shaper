@@ -11,12 +11,12 @@
 
 #include <string>
 
-#include <TopoDS_Shape.hxx>
+#include <GeomAPI_Shape.h>
 
 /// Implementation of the import IGES files algorithms
 GEOMALGOAPI_EXPORT
-TopoDS_Shape IGESImport(const std::string& theFileName,
-                        const std::string& theFormatName,
-                        std::string& theError);
+std::shared_ptr<GeomAPI_Shape> IGESImport(const std::string& theFileName,
+                                          const std::string& theFormatName,
+                                          std::string& theError);
 
 #endif /* GEOMALGOAPI_IGESIMPORT_H_ */

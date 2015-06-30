@@ -80,9 +80,18 @@ int KindOfBRep (const TopoDS_Shape& theShape)
 //=============================================================================
 bool IGESExport(const std::string& theFileName,
                 const std::string& theFormatName,
-                const TopoDS_Shape& theShape,
+                const std::shared_ptr<GeomAPI_Shape>& theShape,
                 std::string& theError)
 {
+  #ifdef _DEBUG
+  std::cout << "Export IGES into file " << theFileName << std::endl;
+  #endif
+
+  if (!theShape.get()) {
+    theError = "IGES Export failed: An invalid argument";
+    return false;
+  }
+
   // theFormatName expected "IGES-5.1", "IGES-5.3"...
   TCollection_AsciiString aFormatName(theFormatName.c_str());
   TCollection_AsciiString aVersion = aFormatName.Token("-", 2);
@@ -97,14 +106,10 @@ bool IGESExport(const std::string& theFileName,
   if( aVersion.IsEqual( "5.3" ) )
     aBrepMode = 1;
 
-  #ifdef _DEBUG
-  std::cout << "Export IGES into file " << theFileName << std::endl;
-  #endif
-
   // Mantis issue 0021350: check being exported shape, as some stand-alone
   // entities (edges, wires and vertices) cannot be saved in BRepMode
   if( aBrepMode == 1 ) {
-    int aKind = KindOfBRep( theShape );
+    int aKind = KindOfBRep( theShape->impl<TopoDS_Shape>() );
     if( aKind == -1 ) {
       theError = "EXPORT_IGES_HETEROGENEOUS_COMPOUND";
       return false;
@@ -127,7 +132,7 @@ bool IGESExport(const std::string& theFileName,
   Interface_Static::SetCVal( "write.precision.mode", "Max" );
 
   // perform shape writing
-  if( ICW.AddShape( theShape ) ) {
+  if( ICW.AddShape( theShape->impl<TopoDS_Shape>() ) ) {
     ICW.ComputeModel();
     return ICW.Write(theFileName.c_str());
   }

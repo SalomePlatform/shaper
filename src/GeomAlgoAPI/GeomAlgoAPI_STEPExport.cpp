@@ -8,6 +8,8 @@
 
 #include "GeomAlgoAPI_Tools.h"
 
+#include <TopoDS_Shape.hxx>
+
 // OOCT includes
 #include <IFSelect_ReturnStatus.hxx>
 #include <STEPControl_Writer.hxx>
@@ -15,12 +17,17 @@
 
 bool STEPExport(const std::string& theFileName,
                 const std::string& theFormatName,
-                const TopoDS_Shape& theShape,
+                const std::shared_ptr<GeomAPI_Shape>& theShape,
                 std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Export STEP into file " << theFileName << std::endl;
   #endif
+
+  if (!theShape.get()) {
+    theError = "STEP Export failed: An invalid argument";
+    return false;
+  }
 
   try
   {
@@ -33,10 +40,10 @@ bool STEPExport(const std::string& theFileName,
     Interface_Static::SetCVal("xstep.cascade.unit","M");
     Interface_Static::SetCVal("write.step.unit", "M");
     Interface_Static::SetIVal("write.step.nonmanifold", 1);
-    status = aWriter.Transfer( theShape, STEPControl_AsIs );
+    status = aWriter.Transfer(theShape->impl<TopoDS_Shape>(), STEPControl_AsIs);
     //VRV: OCC 4.0 migration
     if( status == IFSelect_RetDone )
-      status = aWriter.Write( theFileName.c_str() );
+      status = aWriter.Write(theFileName.c_str());
 
     // Return previous locale
     if( status == IFSelect_RetDone )

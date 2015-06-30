@@ -41,6 +41,8 @@
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Iterator.hxx>
+#include <TopoDS_Shape.hxx>
+
 
 #include <TColStd_SequenceOfAsciiString.hxx>
 
@@ -367,9 +369,9 @@ Handle(TCollection_HAsciiString) GetValue (const TCollection_AsciiString& theFil
   return aValue;
 }
 
-TopoDS_Shape STEPImport(const std::string& theFileName,
-                        const std::string& theFormatName,
-                        std::string& theError)
+std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
+                                          const std::string& theFormatName,
+                                          std::string& theError)
 {
   TopoDS_Shape aResShape;
 
@@ -413,7 +415,9 @@ TopoDS_Shape STEPImport(const std::string& theFileName,
             Interface_Static::SetCVal("xstep.cascade.unit", "INCH");
           else {
             theError = "The file contains not supported units.";
-            return aResShape;
+            std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+            aGeomShape->setImpl(new TopoDS_Shape(aResShape));
+            return aGeomShape;
           }
           // TODO (for other units than mm, cm, m or inch)
           //else if (aLenUnits == "")
@@ -482,7 +486,9 @@ TopoDS_Shape STEPImport(const std::string& theFileName,
       if ( !TopExp_Explorer( aResShape, TopAbs_VERTEX ).More() )
       {
         theError = "No geometrical data in the imported file.";
-        return TopoDS_Shape();
+        std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+        aGeomShape->setImpl(new TopoDS_Shape());
+        return aGeomShape;
       }
     } else {
       theError = "Wrong format of the imported file. Can't import file.";
@@ -495,5 +501,7 @@ TopoDS_Shape STEPImport(const std::string& theFileName,
     aResShape.Nullify();
   }
   // Return previous locale
-  return aResShape;
+  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+  aGeomShape->setImpl(new TopoDS_Shape(aResShape));
+  return aGeomShape;
 }

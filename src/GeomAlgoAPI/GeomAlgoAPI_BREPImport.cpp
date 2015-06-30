@@ -6,6 +6,8 @@
 
 #include <GeomAlgoAPI_BREPImport.h>
 
+#include <TopoDS_Shape.hxx>
+
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
 
@@ -14,9 +16,9 @@
  *
  */
 //=============================================================================
-TopoDS_Shape BREPImport(const std::string& theFileName,
-                        const std::string&,
-                        std::string& theError)
+std::shared_ptr<GeomAPI_Shape> BREPImport(const std::string& theFileName,
+                                          const std::string&,
+                                          std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import BREP from file " << theFileName << std::endl;
@@ -27,5 +29,8 @@ TopoDS_Shape BREPImport(const std::string& theFileName,
   if (aShape.IsNull()) {
     theError = "BREP Import failed";
   }
-  return aShape;
+
+  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+  aGeomShape->setImpl(new TopoDS_Shape(aShape));
+  return aGeomShape;
 }

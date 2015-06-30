@@ -6,6 +6,8 @@
 
 #include <GeomAlgoAPI_IGESImport.h>
 
+#include <TopoDS_Shape.hxx>
+
 // OOCT includes
 #include <IGESControl_Reader.hxx>
 #include <IGESData_IGESModel.hxx>
@@ -15,14 +17,14 @@
  *
  */
 //=============================================================================
-TopoDS_Shape IGESImport(const std::string& theFileName,
-                        const std::string&,
-                        std::string& theError)
+std::shared_ptr<GeomAPI_Shape> IGESImport(const std::string& theFileName,
+                                          const std::string&,
+                                          std::string& theError)
 {
   #ifdef _DEBUG
   std::cout << "Import IGES from file " << theFileName << std::endl;
   #endif
-  TopoDS_Shape aResShape;
+  TopoDS_Shape aShape;
   IGESControl_Reader aReader;
   try {
     IFSelect_ReturnStatus status = aReader.ReadFile( theFileName.c_str() );
@@ -37,7 +39,7 @@ TopoDS_Shape IGESImport(const std::string& theFileName,
       #ifdef _DEBUG
       std::cout << "ImportIGES : count of shapes produced = " << aReader.NbShapes() << std::endl;
       #endif
-      aResShape = aReader.OneShape();
+      aShape = aReader.OneShape();
     }
     else {
       switch (status) {
@@ -57,14 +59,16 @@ TopoDS_Shape IGESImport(const std::string& theFileName,
           theError = "Wrong format of the imported file. Can't import file.";
           break;
       }
-      aResShape.Nullify();
+      aShape.Nullify();
     }
   }
   catch( Standard_Failure ) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     theError = aFail->GetMessageString();
-    aResShape.Nullify();
+    aShape.Nullify();
   }
 
-  return aResShape;
+  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+  aGeomShape->setImpl(new TopoDS_Shape(aShape));
+  return aGeomShape;
 }

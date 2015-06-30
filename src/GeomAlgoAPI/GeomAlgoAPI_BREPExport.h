@@ -11,13 +11,13 @@
 
 #include <string>
 
-#include <TopoDS_Shape.hxx>
+#include <GeomAPI_Shape.h>
 
 /// Implementation of the export BREP files algorithms
 GEOMALGOAPI_EXPORT
 bool BREPExport(const std::string& theFileName,
                 const std::string& theFormatName,
-                const TopoDS_Shape& theShape,
+                const std::shared_ptr<GeomAPI_Shape>& theShape,
                 std::string& theError);
 
 #endif /* GEOMALGOAPI_BREPEXPORT_H_ */

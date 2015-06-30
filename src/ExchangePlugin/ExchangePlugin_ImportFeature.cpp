@@ -79,16 +79,16 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   // Perform the import
   std::string anError;
 
-  TopoDS_Shape aShape;
+  std::shared_ptr<GeomAPI_Shape> aGeomShape;
   if (anExtension == "BREP" || anExtension == "BRP") {
-    aShape = BREPImport(theFileName, anExtension, anError);
+    aGeomShape = BREPImport(theFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
-    aShape = STEPImport(theFileName, anExtension, anError);
+    aGeomShape = STEPImport(theFileName, anExtension, anError);
   } else if (anExtension == "IGES" || anExtension == "IGS") {
-    aShape = IGESImport(theFileName, anExtension, anError);
+    aGeomShape = IGESImport(theFileName, anExtension, anError);
   }
    // Check if shape is valid
-  if ( aShape.IsNull() ) {
+  if ( aGeomShape->isNull() ) {
     const static std::string aShapeError =
       "An error occurred while importing " + theFileName + ": " + anError;
     setError(aShapeError);
@@ -99,8 +99,6 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
   data()->setName(anObjectName);
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-  aGeomShape->setImpl(new TopoDS_Shape(aShape));
 
   //LoadNamingDS of the imported shape
   loadNamingDS(aGeomShape, aResultBody);

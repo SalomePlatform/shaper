@@ -11,13 +11,13 @@
 
 #include <string>
 
-#include <TopoDS_Shape.hxx>
+#include <GeomAPI_Shape.h>
 
 /// Implementation of the export STEP files algorithms
 GEOMALGOAPI_EXPORT
 bool STEPExport(const std::string& theFileName,
                 const std::string& theFormatName,
-                const TopoDS_Shape& theShape,
+                const std::shared_ptr<GeomAPI_Shape>& theShape,
                 std::string& theError);
 
 #endif /* GEOMALGOAPI_STEPEXPORT_H_ */
