@@ -19,21 +19,23 @@
 
 
 typedef std::map<std::string, GeomValidators_ShapeType::TypeOfShape> EdgeTypes;
-static EdgeTypes MyEdgeTypes;
 
 GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const std::string& theType)
 {
-  if (MyEdgeTypes.size() == 0) {
-    MyEdgeTypes["vertex"] = Vertex;
-    MyEdgeTypes["edge"]   = Edge;
-    MyEdgeTypes["line"]   = Line;
-    MyEdgeTypes["circle"] = Circle;
-    MyEdgeTypes["solid"] = Solid;
-    MyEdgeTypes["face"]  = Face;
+  static EdgeTypes MyShapeTypes;
+
+  if (MyShapeTypes.size() == 0) {
+    MyShapeTypes["empty"]  = Empty;
+    MyShapeTypes["vertex"] = Vertex;
+    MyShapeTypes["edge"]   = Edge;
+    MyShapeTypes["line"]   = Line;
+    MyShapeTypes["circle"] = Circle;
+    MyShapeTypes["face"]   = Face;
+    MyShapeTypes["solid"]  = Solid;
   }
   std::string aType = std::string(theType.c_str());
-  if (MyEdgeTypes.find(aType) != MyEdgeTypes.end())
-    return MyEdgeTypes[aType];
+  if (MyShapeTypes.find(aType) != MyShapeTypes.end())
+    return MyShapeTypes[aType];
   
   Events_Error::send("Shape type defined in XML is not implemented!");
   return AnyShape;
@@ -63,6 +65,9 @@ bool GeomValidators_ShapeType::isValidArgument(const AttributePtr& theAttribute,
   AttributeSelectionListPtr aListAttr = 
            std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if (aListAttr.get()) {
+    if(aListAttr->size() == 0 && shapeType(theArgument) == Empty) {
+      return true;
+    }
     for (int i = 0; i < aListAttr->size(); i++) {
       aValid = isValidAttribute(aListAttr->value(i), aShapeType);
       if (!aValid) // if at least one attribute is invalid, the result is false

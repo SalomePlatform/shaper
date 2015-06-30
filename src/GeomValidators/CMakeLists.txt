@@ -4,6 +4,7 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
     GeomValidators.h
+    GeomValidators_BooleanArguments.h
     GeomValidators_ConstructionComposite.h
     GeomValidators_Face.h
     GeomValidators_Positive.h
@@ -13,6 +14,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+    GeomValidators_BooleanArguments.cpp
     GeomValidators_ConstructionComposite.cpp
     GeomValidators_Face.cpp
     GeomValidators_Positive.cpp
