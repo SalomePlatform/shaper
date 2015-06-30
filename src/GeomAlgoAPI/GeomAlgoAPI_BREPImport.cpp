@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    GeomAlgoAPI_BREPImport.cpp
+// Created: May 14, 2015
+// Author:  Sergey POKHODENKO
+
 #include <GeomAlgoAPI_BREPImport.h>
 
 #include <BRepTools.hxx>

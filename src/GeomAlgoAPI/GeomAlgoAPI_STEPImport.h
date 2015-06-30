@@ -1,11 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- * GEOMALGOAPI_STEPImport.h
- *
- *  Created on: Dec 24, 2014
- *      Author: sbh
- */
+// File:    GEOMALGOAPI_STEPImport.h
+// Created: Dec 24, 2014
+// Author:  Sergey BELASH
+
 
 #ifndef GEOMALGOAPI_STEPIMPORT_H_
 #define GEOMALGOAPI_STEPIMPORT_H_

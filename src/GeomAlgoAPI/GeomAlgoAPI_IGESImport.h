@@ -1,11 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- * GEOMALGOAPI_IGESImport.h
- *
- *  Created on: May 14, 2015
- *      Author: spo
- */
+// File:    GEOMALGOAPI_IGESImport.h
+// Created: May 14, 2015
+// Author:  Sergey POKHODENKO
 
 #ifndef GEOMALGOAPI_IGESIMPORT_H_
 #define GEOMALGOAPI_IGESIMPORT_H_

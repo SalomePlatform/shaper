@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    GEOMALGOAPI_IGESImport.cpp
+// Created: May 14, 2015
+// Author:  Sergey POKHODENKO
+
 #include <GeomAlgoAPI_IGESImport.h>
 
 // OOCT includes

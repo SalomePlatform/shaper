@@ -55,7 +55,7 @@ class GEOMAPI_EXPORT GeomAPI_Interface
     myImpl.reset(theImpl);
   }
 
-  // Returns true if the impl is empty
+  /// Returns true if the impl is empty
   bool empty() const;
 };
 

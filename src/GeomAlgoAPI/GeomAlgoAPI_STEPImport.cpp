@@ -1,5 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+// File:    GEOMALGOAPI_STEPImport.cpp
+// Created: Dec 24, 2014
+// Author:  Sergey BELASH
+
 #include <GeomAlgoAPI_STEPImport.h>
 
 #include <TDF_ChildIDIterator.hxx>

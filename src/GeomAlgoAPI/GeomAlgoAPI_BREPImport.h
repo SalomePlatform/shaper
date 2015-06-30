@@ -1,11 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- * GEOMALGOAPI_BREPImport.h
- *
- *  Created on: Dec 24, 2014
- *      Author: sbh
- */
+// File:    GEOMALGOAPI_BREPImport.h
+// Created: Dec 24, 2014
+// Author:  Sergey BELASH
 
 #ifndef GEOMALGOAPI_BREPIMPORT_H_
 #define GEOMALGOAPI_BREPIMPORT_H_
