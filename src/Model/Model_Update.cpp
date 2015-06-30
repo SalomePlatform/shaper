@@ -114,7 +114,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   if (isOperationChanged) {
     // remove all macros before clearing all created and execute all not-previewed
     std::set<ObjectPtr>::iterator anUpdatedIter = myJustUpdated.begin();
-    for(; anUpdatedIter != myJustUpdated.end(); anUpdatedIter++) {
+    while(anUpdatedIter != myJustUpdated.end()) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anUpdatedIter);
       if (aFeature.get()) {
         // execute not-previewed feature on "apply"
@@ -126,8 +126,14 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         }
         // remove macro on apply
         if (aFeature->isMacro()) {
+          myJustUpdated.erase(aFeature); // to avoid the map update problems on "remove"
           aFeature->document()->removeFeature(aFeature);
+          anUpdatedIter = myJustUpdated.begin();
+        } else {
+          anUpdatedIter++;
         }
+      } else {
+        anUpdatedIter++;
       }
     }
     myIsParamUpdated = false;
