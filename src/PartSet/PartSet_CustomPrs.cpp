@@ -27,11 +27,14 @@
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop)
 {
+  Handle(PartSet_OperationPrs) myOperationPrs = new PartSet_OperationPrs(); /// AIS presentation for the feature of operation
 }
 
-void PartSet_CustomPrs::setCustomized(const ObjectPtr& theObject)
+void PartSet_CustomPrs::setCustomized(const FeaturePtr& theFeature)
 {
-/*  QMap<ResultPtr, QList<GeomShapePtr> > aNewCustomized;
+
+  myOperationPrs->setFeature(theFeature);
+  /*  QMap<ResultPtr, QList<GeomShapePtr> > aNewCustomized;
 
   QList<GeomShapePtr> aShapeList;
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
@@ -117,7 +120,7 @@ bool PartSet_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr 
                                               std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
 {
   bool isDone = false;
-  if (myCustomized.contains(theResult)) {
+  /*if (myCustomized.contains(theResult)) {
     std::vector<int> aColor = Config_PropManager::color("Visualization", "operation_parameter_color",
                                                         OPERATION_PARAMETER_COLOR);
     isDone = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
@@ -136,7 +139,7 @@ bool PartSet_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr 
         }
       }
     }
-    thePrs->setPointMarker(5, 5.); // Set point as a '+' symbol*/
+    thePrs->setPointMarker(5, 5.); // Set point as a '+' symbol*+/
   }
   /*
   std::vector<int> aColor;

@@ -6,19 +6,23 @@
 
 #include "PartSet_OperationPrs.h"
 
-#include <ModelAPI_Tools.h>
-#include <ModelAPI_ResultConstruction.h>
-#include <GeomAPI_PlanarEdges.h>
+//#include <ModelAPI_Tools.h>
+//#include <ModelAPI_ResultConstruction.h>
+//#include <GeomAPI_PlanarEdges.h>
 
-#include <BRep_Builder.hxx>
-#include <Prs3d_IsoAspect.hxx>
-#include <TopoDS_Builder.hxx>
+//#include <BRep_Builder.hxx>
+//#include <Prs3d_IsoAspect.hxx>
+//#include <TopoDS_Builder.hxx>
 
 IMPLEMENT_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 
-PartSet_OperationPrs::PartSet_OperationPrs(FeaturePtr theFeature)
-  : ViewerData_AISShape(TopoDS_Shape()), myFeature(theFeature)
+PartSet_OperationPrs::PartSet_OperationPrs()
+  : ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr())
+{
+}
+
+void PartSet_OperationPrs::setFeature(FeaturePtr theFeature)
 {
 /*  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
   std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 

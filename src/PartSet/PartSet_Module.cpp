@@ -720,12 +720,12 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
-void PartSet_Module::setCustomized(const ObjectPtr& theObject)
+void PartSet_Module::setCustomized(const FeaturePtr& theFeature)
 {
  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
                         std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
  if (aCustomPrs.get())
-   aCustomPrs->setCustomized(theObject);
+   aCustomPrs->setCustomized(theFeature);
 }
 
 bool PartSet_Module::customizeObject(ObjectPtr theObject)

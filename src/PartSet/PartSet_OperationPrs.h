@@ -27,9 +27,15 @@ class PartSet_OperationPrs : public ViewerData_AISShape
 public:
   /// Constructor
   /// \param theResult a result object
-  Standard_EXPORT PartSet_OperationPrs(FeaturePtr theFeature);
+  Standard_EXPORT PartSet_OperationPrs();
+
+  /// set the operation feature. It is used in Compute method to group the feature parameter shapes
+  /// theFeature a feature
+  void setFeature(FeaturePtr theFeature);
+
 
   DEFINE_STANDARD_RTTI(PartSet_OperationPrs)
+
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(

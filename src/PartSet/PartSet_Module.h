@@ -145,8 +145,8 @@ public:
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Set the object with the object results are customized
-  /// \param theObject an object
-  void setCustomized(const ObjectPtr& theObject);
+  /// \param theFeature a feature
+  void setCustomized(const FeaturePtr& theFeature);
 
   /** Update the object presentable properties such as color, lines width and other
   * If the object is result with the color attribute value set, it is used,

@@ -834,7 +834,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
 
-  myModule->setCustomized(ObjectPtr());
+  myModule->setCustomized(FeaturePtr());
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
