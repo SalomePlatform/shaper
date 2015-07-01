@@ -67,7 +67,7 @@ int PartSetPlugin_Part::numberOfSubs() const
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
     if (aDoc.get())
-      return aDoc->size(ModelAPI_Feature::group());
+      return aDoc->numInternalFeatures();
   }
   return 0;
 }
@@ -78,8 +78,7 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::subFeature(const int theIn
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
     if (aDoc.get()) {
-      return std::dynamic_pointer_cast<ModelAPI_Feature>(
-        aDoc->object(ModelAPI_Feature::group(), theIndex));
+      return aDoc->internalFeature(theIndex);
     }
   }
   return FeaturePtr();

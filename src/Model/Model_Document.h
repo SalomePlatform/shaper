@@ -136,6 +136,11 @@ class Model_Document : public ModelAPI_Document
   //! Makes the current feature one feature upper
   MODEL_EXPORT virtual void setCurrentFeatureUp();
 
+  //! Returns the number of all features: in the history or not
+  MODEL_EXPORT virtual int numInternalFeatures();
+  //! Returns the feature by zero-based index: features in the history or not
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
+
   /// Creates a construction cresults
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

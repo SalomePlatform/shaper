@@ -102,6 +102,12 @@ public:
   //! Makes the current feature one feature upper
   virtual void setCurrentFeatureUp() = 0;
 
+  //! Returns the number of all features: in the history or not
+  virtual int numInternalFeatures() = 0;
+  //! Returns the feature by zero-based index: features in the history or not
+  virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex) = 0;
+
+
   //! To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
 

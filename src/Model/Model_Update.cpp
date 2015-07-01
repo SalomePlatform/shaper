@@ -59,6 +59,7 @@ Model_Update::Model_Update()
   myIsAutomatic =
     Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
+  myIsFinish = false;
 }
 
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -72,7 +73,6 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
-  bool isOperationChanged = false;
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
     bool aPropVal =
       Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
@@ -104,34 +104,28 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // this event is for solver update, not here, do not react immideately
     if (!isOnlyResults && !(theMessage->eventID() == kMovedEvent))
       processOperation(false);
-  } else if (theMessage->eventID() == kOpStartEvent) {
-    // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)
-    isOperationChanged = true;
-  } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
-    processOperation(true, theMessage->eventID() == kOpFinishEvent);
-    isOperationChanged = true;
-  }
-  if (isOperationChanged) {
-    // remove all macros before clearing all created and execute all not-previewed
-    std::set<ObjectPtr>::iterator anUpdatedIter = myJustUpdated.begin();
-    while(anUpdatedIter != myJustUpdated.end()) {
+  } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent ||
+      theMessage->eventID() == kOpStartEvent) {
+    myIsParamUpdated = false;
+
+    if (!(theMessage->eventID() == kOpStartEvent)) {
+      myIsFinish = true;
+      processOperation(true, theMessage->eventID() == kOpFinishEvent);
+      myIsFinish = false;
+    }
+    // remove all macros before clearing all created
+    std::set<ObjectPtr>::iterator anUpdatedIter = myWaitForFinish.begin();
+    while(anUpdatedIter != myWaitForFinish.end()) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anUpdatedIter);
       if (aFeature.get()) {
-        // execute not-previewed feature on "apply"
-        if (!aFeature->isPreviewNeeded()) {
-          static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-          if (aFactory->validate(aFeature)) {
-            executeFeature(aFeature);
-          }
-        }
-        // remove macro on apply
+        // remove macro on finish
         if (aFeature->isMacro()) {
           aFeature->document()->removeFeature(aFeature);
-          myJustUpdated.erase(aFeature);
+          myWaitForFinish.erase(aFeature);
         }
         // to avoid the map update problems on "remove"
-        if (myJustUpdated.find(aFeature) == myJustUpdated.end()) {
-          anUpdatedIter = myJustUpdated.begin();
+        if (myWaitForFinish.find(aFeature) == myWaitForFinish.end()) {
+          anUpdatedIter = myWaitForFinish.begin();
         } else {
           anUpdatedIter++;
         }
@@ -139,7 +133,10 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         anUpdatedIter++;
       }
     }
-    myIsParamUpdated = false;
+    // in the end of transaction everything is updated, so clear the old objects (the only one
+    // place where results are cleared)
+    myJustUpdated.clear();
+    myWaitForFinish.clear();
   }
 }
 
@@ -163,7 +160,6 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
         }
       }
     }
-    myWaitForFinish.clear();
   }
   // perform update of everything if needed
   if (!myIsExecuted) {
@@ -243,8 +239,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
     aJustUpdated = true;
 
   // execute feature if it must be updated
-  if (theFeature->isPreviewNeeded()) {
-    if ((myIsAutomatic || aJustUpdated) &&
+  if (theFeature->isPreviewNeeded() || myIsFinish) {
+    if (aJustUpdated &&
       std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures()) {
         ModelAPI_ExecState aState = theFeature->data()->execState();
         if (aFactory->validate(theFeature)) {
@@ -257,6 +253,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
   } else { // preview is not needed => make state Done
     if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
       theFeature->data()->execState(ModelAPI_StateDone);
+      if (aJustUpdated) // store that it must be updated on finish
+        myJustUpdated.insert(theFeature);
     }
   }
 }
@@ -431,6 +429,21 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       aState = stateByReference(*aRefObj, aState);
     }
   }
+  // composites sub-elements
+  CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  // composite feature must be executed after sub-features execution
+  if (aCompos) {
+    // number of subs can be changed in execution: like fillet
+    for(int a = 0; a < aCompos->numberOfSubs(); a++) {
+      FeaturePtr aSub = aCompos->subFeature(a);
+      if (myJustUpdated.find(aSub) != myJustUpdated.end() || 
+             (aSub.get() && aSub->data()->updateID() > theFeature->data()->updateID())) {
+          if (aState == ModelAPI_StateDone)
+            aState = ModelAPI_StateMustBeUpdated;
+      }
+    }
+  }
+
 
   if (aState != ModelAPI_StateDone)
     theFeature->data()->execState(aState);

@@ -86,6 +86,11 @@ class Model_Objects
   ///! Returns all (and disabled) results of the given type. Not fast method (iterates all features).
   void allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults);
 
+  //! Returns the number of all features: in the history or not
+  int numInternalFeatures();
+  //! Returns the feature by zero-based index: features in the history or not
+  std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
+
   /// Creates a construction cresults
   std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

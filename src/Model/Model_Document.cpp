@@ -902,3 +902,13 @@ bool Model_Document::isOpened()
 {
   return myObjs && !myDoc.IsNull();
 }
+
+int Model_Document::numInternalFeatures()
+{
+  return myObjs->numInternalFeatures();
+}
+
+std::shared_ptr<ModelAPI_Feature> Model_Document::internalFeature(const int theIndex)
+{
+  return myObjs->internalFeature(theIndex);
+}

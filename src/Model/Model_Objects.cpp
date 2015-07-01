@@ -913,6 +913,24 @@ std::list<std::shared_ptr<ModelAPI_Feature> > Model_Objects::allFeatures()
   return aResult;
 }
 
+int Model_Objects::numInternalFeatures()
+{
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    return aRefs->Upper() - aRefs->Lower() + 1;
+  }
+  return 0; // invalid
+}
+
+std::shared_ptr<ModelAPI_Feature> Model_Objects::internalFeature(const int theIndex)
+{
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    return feature(aRefs->Value(aRefs->Lower() + theIndex));
+  }
+  return FeaturePtr(); // invalid
+}
+
 Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)
 {
   return TDF_LabelMapHasher::HashCode(theLab, theUpper);

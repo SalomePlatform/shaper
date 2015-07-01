@@ -33,6 +33,8 @@ class Model_Update : public Events_Listener
   bool myIsAutomatic;
   /// to know that some parameter was changed during this operation
   bool myIsParamUpdated;
+  /// to execute features of finish if perview is not needed
+  bool myIsFinish;
 
  public:
   /// Is called only once, on startup of the application
