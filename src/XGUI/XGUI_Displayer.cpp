@@ -21,6 +21,7 @@
 
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IModule.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
@@ -874,7 +875,9 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
       return false;
     aCustomPrs = myCustomPrs;
   }
-  return aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+  bool isCustomized = aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+  isCustomized = myWorkshop->module()->customizeObject(theObject) || isCustomized;
+  return isCustomized;
 }
 
 

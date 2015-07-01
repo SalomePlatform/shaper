@@ -12,6 +12,8 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 
+#include <GeomAPI_ICustomPrs.h>
+
 #include <Events_Listener.h>
 
 //#include <StdSelect_FaceFilter.hxx>
@@ -142,6 +144,18 @@ public:
   /// \param theMessage an event message
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  /// Set the object with the object results are customized
+  /// \param theObject an object
+  void setCustomized(const ObjectPtr& theObject);
+
+  /** Update the object presentable properties such as color, lines width and other
+  * If the object is result with the color attribute value set, it is used,
+  * otherwise the customize is applyed to the object's feature if it is a custom prs
+  * \param theObject an object instance
+  * \return the true state if there is changes and the presentation is customized
+  */
+  virtual bool customizeObject(ObjectPtr theObject);
+
   /// This method is called on object browser creation for customisation of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser);
@@ -215,8 +229,9 @@ protected slots:
   SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
-
   PartSet_MenuMgr* myMenuMgr;
+  /// A default custom presentation, which is used for references objects of started operation
+  GeomCustomPrsPtr myCustomPrs;
 
   int myVisualLayerId;
 

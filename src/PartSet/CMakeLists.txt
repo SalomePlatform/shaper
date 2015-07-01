@@ -7,8 +7,10 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
+	PartSet_CustomPrs.h
 	PartSet_ExternalObjectsMgr.h
 	PartSet_Module.h
+	PartSet_OperationPrs.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
@@ -24,15 +26,17 @@ SET(PROJECT_HEADERS
 	PartSet_FilterInfinite.h
 	PartSet_SketcherMgr.h
 	PartSet_MenuMgr.h
-    PartSet_DocumentDataModel.h
-    PartSet_PartDataModel.h
-    PartSet_DataTreeModel.h
+	PartSet_DocumentDataModel.h
+	PartSet_PartDataModel.h
+	PartSet_DataTreeModel.h
 	PartSet_WidgetSketchCreator.h
 )
 
 SET(PROJECT_SOURCES
+	PartSet_CustomPrs.cpp
 	PartSet_ExternalObjectsMgr.cpp
 	PartSet_Module.cpp
+	PartSet_OperationPrs.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp
@@ -48,8 +52,8 @@ SET(PROJECT_SOURCES
 	PartSet_FilterInfinite.cpp
 	PartSet_SketcherMgr.cpp
 	PartSet_MenuMgr.cpp
-    PartSet_DocumentDataModel.cpp
-    PartSet_PartDataModel.cpp
+	PartSet_DocumentDataModel.cpp
+	PartSet_PartDataModel.cpp
 	PartSet_WidgetSketchCreator.cpp
 )
 

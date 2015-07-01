@@ -144,6 +144,14 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theModes a list of modes
   virtual void activeSelectionModes(QIntList& theModes) {}
 
+  /** Update the object presentable properties such as color, lines width and other
+  * If the object is result with the color attribute value set, it is used,
+  * otherwise the customize is applyed to the object's feature if it is a custom prs
+  * \param theObject an object instance
+  * \return the true state if there is changes and the presentation is customized
+  */
+  virtual bool customizeObject(ObjectPtr theObject) { return false; }
+
   /// This method is called on object browser creation for customisation of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser) {}

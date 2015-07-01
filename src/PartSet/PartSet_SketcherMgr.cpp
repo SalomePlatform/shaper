@@ -290,6 +290,12 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
 {
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+  bool isSketchOp = isSketchOperation(anOperation);
+  bool isNestedSketchOp = isNestedSketchOperation(anOperation);
+  if (isSketchOp || isNestedSketchOp)
+    myModule->setCustomized(anOperation->feature());
+
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
 
@@ -818,6 +824,7 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
     onShowConstraintsToggle(true);
   }
   connectToPropertyPanel(true);
+  myModule->setCustomized(getCurrentOperation()->feature());
 }
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
@@ -826,6 +833,8 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   myIsResetCurrentValue = false;
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
+
+  myModule->setCustomized(ObjectPtr());
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -994,6 +1003,8 @@ void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
     }
     for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
       Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
+      if (anOwner.IsNull())
+        continue;
       if (anOwner->Selectable() != anAISIO)
         continue;
       getAttributesOrResults(anOwner, theFeature, theSketch, aResult,

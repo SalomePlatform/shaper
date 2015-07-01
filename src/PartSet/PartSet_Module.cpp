@@ -14,6 +14,7 @@
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
+#include <PartSet_CustomPrs.h>
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -131,6 +132,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           SLOT(onViewTransformed(int)));
 
   myMenuMgr = new PartSet_MenuMgr(this);
+  myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new PartSet_CustomPrs(theWshop));
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
@@ -718,6 +720,25 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
+void PartSet_Module::setCustomized(const ObjectPtr& theObject)
+{
+ std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
+                        std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
+ if (aCustomPrs.get())
+   aCustomPrs->setCustomized(theObject);
+}
+
+bool PartSet_Module::customizeObject(ObjectPtr theObject)
+{
+ ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+
+ XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+ XGUI_Workshop* aWorkshop = aConnector->workshop();
+ XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+
+ AISObjectPtr anAISObj = aDisplayer->getAISObject(aResult);
+ return myCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+}
 
 void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
