@@ -470,6 +470,8 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
 
 void PartSet_MenuMgr::onActivatePart(bool)
 {
+  if (myModule->workshop()->currentOperation())
+    return;
   QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
   if (aObjects.size() > 0) {
     ObjectPtr aObj = aObjects.first();
@@ -487,6 +489,8 @@ void PartSet_MenuMgr::onActivatePart(bool)
 
 void PartSet_MenuMgr::onActivatePartSet(bool)
 {
+  if (myModule->workshop()->currentOperation())
+    return;
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isNewTransaction = !aMgr->isOperation();
   // activation may cause changes in current features in document, so it must be in transaction

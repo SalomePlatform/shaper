@@ -781,11 +781,18 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       if (aMgr->activeDocument() != aMgr->moduleDocument())
         theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
   }
+  bool aCanDeactivate = (myWorkshop->currentOperation() == 0);
+  myMenuMgr->action("ACTIVATE_PARTSET_CMD")->setEnabled(aCanDeactivate);
+  myMenuMgr->action("DEACTIVATE_PART_CMD")->setEnabled(aCanDeactivate);
+  myMenuMgr->action("ACTIVATE_PART_CMD")->setEnabled(aCanDeactivate);
 }
 
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
+    // Do not change activation of parts if an operation active
+    if (myWorkshop->currentOperation() && myWorkshop->currentOperation()->id().toStdString() != PartSetPlugin_Part::ID())
+      return;
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
     XGUI_Workshop* aWorkshop = aConnector->workshop();
     XGUI_DataTree* aTreeView = aWorkshop->objectBrowser()->treeView();
@@ -831,6 +838,8 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
 void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
 {
+  if (myWorkshop->currentOperation()) // Do not change activation of parts if an operation active
+    return;
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!theIndex.isValid()) {
     aMgr->setActiveDocument(aMgr->moduleDocument());
