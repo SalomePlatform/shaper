@@ -230,8 +230,11 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
   }
   // this checking must be after the composite feature sub-elements processing:
   // composite feature status may depend on it's subelements
-  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument)
+  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument) {
+    theFeature->eraseResults();
+    redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
     return;
+  }
 
   bool aJustUpdated = myJustUpdated.find(theFeature) != myJustUpdated.end();
 
@@ -282,7 +285,8 @@ ModelAPI_ExecState stateByReference(ObjectPtr theTarget, const ModelAPI_ExecStat
   if (theTarget) {
     ModelAPI_ExecState aRefState = theTarget->data()->execState();
     if (aRefState == ModelAPI_StateMustBeUpdated) {
-      return ModelAPI_StateMustBeUpdated;
+      if (theCurrent == ModelAPI_StateDone)
+        return ModelAPI_StateMustBeUpdated;
     } else if (aRefState != ModelAPI_StateDone) {
       return ModelAPI_StateInvalidArgument;
     }
@@ -412,11 +416,13 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       // if reference is null, it may mean that this reference is to other document
       // the does not supported by RefList: parameters may be recomputed
       if (!aRefObj->get() && theFeature->firstResult().get() && 
-        theFeature->firstResult()->groupName() == ModelAPI_ResultParameter::group()) {
-          aState = ModelAPI_StateMustBeUpdated;
+               theFeature->firstResult()->groupName() == ModelAPI_ResultParameter::group()) {
+          if (aState == ModelAPI_StateDone)
+            aState = ModelAPI_StateMustBeUpdated;
       } else if (myJustUpdated.find(*aRefObj) != myJustUpdated.end() || 
-        (aRefObj->get() && (*aRefObj)->data()->updateID() > theFeature->data()->updateID())) { 
-        aState = ModelAPI_StateMustBeUpdated;
+             (aRefObj->get() && (*aRefObj)->data()->updateID() > theFeature->data()->updateID())) {
+          if (aState == ModelAPI_StateDone)
+            aState = ModelAPI_StateMustBeUpdated;
       }
       aState = stateByReference(*aRefObj, aState);
     }
