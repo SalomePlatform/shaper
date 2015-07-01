@@ -7,6 +7,7 @@
 #include<GeomAPI_Shape.h>
 
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Iterator.hxx>
 #include <BRepBndLib.hxx>
 #include <Bnd_Box.hxx>
 #include <BRepTools.hxx>
@@ -59,6 +60,20 @@ bool GeomAPI_Shape::isCompound() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
   return !aShape.IsNull() && aShape.ShapeType() == TopAbs_COMPOUND;
+}
+
+bool GeomAPI_Shape::isCompoundOfSolids() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND)
+    return false;
+  bool isAtLeastOne = false;
+  for(TopoDS_Iterator aSubs(aShape); aSubs.More(); aSubs.Next()) {
+    if (aSubs.Value().IsNull() || aSubs.Value().ShapeType() != TopAbs_SOLID)
+      return false;
+    isAtLeastOne = true;
+  }
+  return isAtLeastOne;
 }
 
 bool GeomAPI_Shape::isSolid() const

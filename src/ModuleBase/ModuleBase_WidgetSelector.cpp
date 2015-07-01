@@ -59,6 +59,8 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
     updateFocus();
 }
 
+#include <TopoDS_Iterator.hxx>
+
 //********************************************************************
 bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
                                                const ResultPtr& theResult) const
@@ -75,6 +77,25 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
     // Check that the selection corresponds to selection type
     TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
     aShapeType = aTopoShape.ShapeType();
+    // for compounds check sub-shapes: it may be compound of needed type:
+    // Booleans may produce compounds of Solids
+    if (aShapeType == TopAbs_COMPOUND) {
+      for(TopoDS_Iterator aSubs(aTopoShape); aSubs.More(); aSubs.Next()) {
+        if (!aSubs.Value().IsNull()) {
+          TopAbs_ShapeEnum aSubType = aSubs.Value().ShapeType();
+          if (aSubType == TopAbs_COMPOUND) { // compound of compound(s)
+            aShapeType = TopAbs_COMPOUND;
+            break;
+          }
+          if (aShapeType == TopAbs_COMPOUND) {
+            aShapeType = aSubType;
+          } else if (aShapeType != aSubType) { // compound of shapes of different types
+            aShapeType = TopAbs_COMPOUND;
+            break;
+          }
+        }
+      }
+    }
   }
 
   QIntList aShapeTypes = getShapeTypes();

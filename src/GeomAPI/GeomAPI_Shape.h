@@ -44,8 +44,11 @@ public:
   /// Returns whether the shape is a face
   virtual bool isFace() const;
 
-  /// Returns whether the shape is a face
+  /// Returns whether the shape is a compound
   virtual bool isCompound() const;
+
+  /// Returns whether the shape is a compound of solids
+  virtual bool isCompoundOfSolids() const;
 
   /// Returns whether the shape is a solid
   virtual bool isSolid() const;
