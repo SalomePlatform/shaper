@@ -174,6 +174,7 @@ aSession.finishOperation()
 #=========================================================================
 aCurrentResult = modelAPI_ResultBody(aBox.firstResult())
 aSession.startOperation()
+aFactory = ModelAPI_Session.get().validators()
 for i in xrange(0, N * N):
     anExtrusionResult = modelAPI_ResultBody(anExtrusions[i].firstResult())
     aBooleanFt = aPart.addFeature("Boolean")
@@ -182,8 +183,10 @@ for i in xrange(0, N * N):
     kBooleanTypeCut = 0
     aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
     aBooleanFt.execute()
-    aCurrentResult = modelAPI_ResultBody(aBooleanFt.firstResult())
+    assert (aFactory.validate(aBooleanFt))
     assert (len(aBooleanFt.results()) > 0)
+    aCurrentResult = modelAPI_ResultBody(aBooleanFt.firstResult())
+    assert (aCurrentResult is not None)
 aSession.finishOperation()
 
 #=========================================================================
