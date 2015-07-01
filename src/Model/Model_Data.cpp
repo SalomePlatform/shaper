@@ -321,6 +321,31 @@ void Model_Data::removeBackReference(FeaturePtr theFeature, std::string theAttrI
     return;
 
   myRefsToMe.erase(anAttribute);
+
+  // remove concealment immideately: on deselection it must be posible to reselect in GUI the same
+  if (ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
+    std::set<AttributePtr>::iterator aRefsIter = myRefsToMe.begin();
+    for(; aRefsIter != myRefsToMe.end(); aRefsIter++) {
+      if (aRefsIter->get()) {
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefsIter)->owner());
+        if (aFeature.get()) {
+          if (ModelAPI_Session::get()->validators()->isConcealed(
+                aFeature->getKind(), (*aRefsIter)->id())) {
+            return; // it is still concealed, nothing to do
+          }
+        }
+      }
+    }
+    // thus, no concealment references anymore => make not-concealed
+    std::shared_ptr<ModelAPI_Result> aRes = 
+      std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+    if (aRes.get()) {
+      aRes->setIsConcealed(false);
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+      ModelAPI_EventCreator::get()->sendUpdated(aRes, anEvent);
+      Events_Loop::loop()->flush(anEvent);
+    }
+  }
 }
 
 void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID, 

@@ -96,7 +96,15 @@ void Model_AttributeSelectionList::clear()
     mySize->Set(0);
     TDF_ChildIterator aSubIter(mySize->Label());
     for(; aSubIter.More(); aSubIter.Next()) {
-      aSubIter.Value().ForgetAllAttributes(Standard_True);
+      TDF_Label aLab = aSubIter.Value();
+      std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+        std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
+      if (owner()) {
+        aNewAttr->setObject(owner());
+      }
+      REMOVE_BACK_REF(aNewAttr->context());
+
+      aLab.ForgetAllAttributes(Standard_True);
     }
     owner()->data()->sendAttributeUpdated(this);
   }
