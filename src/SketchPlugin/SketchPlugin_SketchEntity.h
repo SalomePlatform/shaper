@@ -98,9 +98,9 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
         isCustomized = thePrs->setLineStyle(0) || isCustomized;
       }
     }
-    else if (aShapeType == 7) { // otherwise this is a vertex
-      thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
-    }
+    //else if (aShapeType == 7) { // otherwise this is a vertex
+    //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
+    //}
     return isCustomized;
   }
 

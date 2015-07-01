@@ -52,6 +52,6 @@ bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
 {
   bool isCustomized = theDefaultPrs.get() != NULL &&
                       theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
-  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
+  //thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
   return true;
 }

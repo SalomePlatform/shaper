@@ -11,6 +11,8 @@
 #include <GeomAPI_PlanarEdges.h>
 
 #include <BRep_Builder.hxx>
+#include <Prs3d_Drawer.hxx>
+#include <Prs3d_PointAspect.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <TopoDS_Builder.hxx>
 
@@ -30,7 +32,15 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
       myIsSketchMode = true;
     }
   }
-  Set(aShapePtr->impl<TopoDS_Shape>());
+  TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+  Set(aShape);
+  if (aShape.ShapeType() == TopAbs_VERTEX) {
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    if (aDrawer->HasOwnPointAspect()) 
+      aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
+    else
+      aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
+  }
 }
 
 

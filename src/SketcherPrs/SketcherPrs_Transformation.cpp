@@ -9,10 +9,16 @@
 #include "SketcherPrs_PositionMgr.h"
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_MultiTranslation.h>
+#include <SketchPlugin_MultiRotation.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <GeomDataAPI_Point2D.h>
 
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
+#include <Geom_CartesianPoint.hxx>
+#include <gp_Pnt.hxx>
+#include <StdPrs_Point.hxx>
 
 
 
@@ -67,5 +73,29 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
   aGroup->SetPrimitivesAspect(aLineAspect);
 
   drawListOfShapes(anAttrB, thePrs);
+  if (myConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
+    std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID()));
+  
+    if (aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized()) {
+      std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aStart->x(), aStart->y());
+      Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
+      StdPrs_Point::Add(thePrs, aPoint, myDrawer);
+
+      aPnt = myPlane->to3D(aEnd->x(), aEnd->y());
+      aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
+      StdPrs_Point::Add(thePrs, aPoint, myDrawer);
+    }
+  } else if (myConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
+    std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_MultiRotation::CENTER_ID()));
+    if (aCenter.get() && aCenter->isInitialized()) {
+      std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aCenter->x(), aCenter->y());
+      Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
+      StdPrs_Point::Add(thePrs, aPoint, myDrawer);
+    }
+  }
 }
 
