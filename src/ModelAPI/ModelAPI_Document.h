@@ -134,6 +134,10 @@ public:
   //! Returns true if this document is currently active
   virtual bool isActive() const = 0;
 
+  /// Returns true if document is opened and valid
+  virtual bool isOpened() = 0;
+
+
 protected:
   //! Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();

@@ -25,6 +25,8 @@ class Model_Update : public Events_Listener
 {
   /// updated features during this transaction: must be updated immediately
   std::set<std::shared_ptr<ModelAPI_Object> > myJustUpdated;
+  /// features that must be additionally processed after execution of finish operation
+  std::set<std::shared_ptr<ModelAPI_Object> > myWaitForFinish;
   /// to know that all next updates are caused by this execution
   bool myIsExecuted;
   /// to know execute or not automatically all update

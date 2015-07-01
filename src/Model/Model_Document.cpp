@@ -723,6 +723,7 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
 
   bool aPassed = false; // flag that the current object is already passed in cycle
   FeaturePtr anIter = myObjs->lastFeature();
+  bool aWasChanged = false;
   for(; anIter.get(); anIter = myObjs->nextFeature(anIter, true)) {
     // check this before passed become enabled: the current feature is enabled!
     if (anIter == theCurrent) aPassed = true;
@@ -738,6 +739,17 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
       ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
       // flush is in the end of this method
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
+      aWasChanged = true;
+    }
+    // update for everyone the concealment flag immideately: on edit feature in the midle of history
+    if (aWasChanged) {
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResList = anIter->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
+      for(; aRes != aResList.end(); aRes++) {
+        if ((*aRes).get() && (*aRes)->data()->isValid() && !(*aRes)->isDisabled())
+          std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->updateConcealmentFlag();
+      }
+
     }
   }
   // unblock  the flush signals and up them after this
@@ -884,4 +896,9 @@ void Model_Document::decrementTransactionID()
 {
   int aNewVal = transactionID() - 1;
   TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), aNewVal);
+}
+
+bool Model_Document::isOpened()
+{
+  return myObjs && !myDoc.IsNull();
 }

@@ -179,6 +179,9 @@ class Model_Document : public ModelAPI_Document
   /// Decreases the transaction ID
   MODEL_EXPORT virtual void decrementTransactionID();
 
+  /// Returns true if document is opened and valid
+  MODEL_EXPORT virtual bool isOpened();
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

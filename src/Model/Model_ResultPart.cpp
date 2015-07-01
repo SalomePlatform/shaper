@@ -78,7 +78,7 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
 {
   if (ModelAPI_ResultPart::setDisabled(theThis, theFlag)) {
     DocumentPtr aDoc = Model_ResultPart::partDoc();
-    if (aDoc.get()) {
+    if (aDoc.get() && aDoc->isOpened()) {
       // make the current feature the last in any case: to update shapes defore deactivation too
       FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aDoc->object(
         ModelAPI_Feature::group(), aDoc->size(ModelAPI_Feature::group()) - 1));

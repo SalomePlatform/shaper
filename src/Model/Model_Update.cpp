@@ -148,7 +148,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
   if (theFinish) {
     // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
     std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
-    for(aFIter = myJustUpdated.begin(); aFIter != myJustUpdated.end(); aFIter++)
+    for(aFIter = myWaitForFinish.begin(); aFIter != myWaitForFinish.end(); aFIter++)
     {
       FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
       if (aF && aF->data()->isValid() && aF->getKind() == "Extrusion") {
@@ -163,6 +163,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
         }
       }
     }
+    myWaitForFinish.clear();
   }
   // perform update of everything if needed
   if (!myIsExecuted) {
@@ -444,6 +445,7 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
       aState = ModelAPI_StateExecFailed;
     } else {
       aState = ModelAPI_StateDone;
+      myWaitForFinish.insert(theFeature);
     }
   } catch(...) {
     aState = ModelAPI_StateExecFailed;

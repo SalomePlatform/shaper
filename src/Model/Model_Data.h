@@ -222,6 +222,9 @@ private:
   void addBackReference(FeaturePtr theFeature, std::string theAttrID, 
     const bool theApplyConcealment = true);
 
+  /// Makes the concealment flag up to date for this object-owner.
+  MODEL_EXPORT virtual void updateConcealmentFlag();
+
   /// Returns true if object must be displayed in the viewer: flag is stored in the
   /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
   /// the original state i nthe current transaction.
