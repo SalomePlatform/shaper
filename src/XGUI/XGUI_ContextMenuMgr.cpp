@@ -334,6 +334,7 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
       aActions.append(action("SHADING_CMD"));
       aActions.append(action("WIREFRAME_CMD"));
       aActions.append(mySeparator);
+      aActions.append(action("SHOW_CMD"));
       aActions.append(action("HIDE_CMD"));
       aActions.append(action("SHOW_ONLY_CMD"));
       aActions.append(mySeparator);
