@@ -302,6 +302,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
   ModelAPI_ExecState aState = theFeature->data()->execState();
+  if (aState == ModelAPI_StateExecFailed) { // try again failed feature: issue 577
+    aState = ModelAPI_StateMustBeUpdated;
+  }
   if (aState == ModelAPI_StateInvalidArgument) // a chance to be corrected
     aState = ModelAPI_StateMustBeUpdated;
   // check the parameters state
