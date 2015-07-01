@@ -237,6 +237,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     action("HIDEALL_CMD")->setEnabled(true);
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
+
+  action("DELETE_CMD")->setEnabled(true);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser()
