@@ -331,11 +331,13 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
     if (myObjBrowserMenus.contains(aName))
       aActions = myObjBrowserMenus[aName];
   } else if (aSelected > 1) {
+      aActions.append(action("SHADING_CMD"));
+      aActions.append(action("WIREFRAME_CMD"));
+      aActions.append(mySeparator);
       aActions.append(action("HIDE_CMD"));
       aActions.append(action("SHOW_ONLY_CMD"));
       aActions.append(mySeparator);
-      aActions.append(action("SHADING_CMD"));
-      aActions.append(action("WIREFRAME_CMD"));
+      aActions.append(action("DELETE_CMD"));
   }
   aMenu->addActions(aActions);
 
