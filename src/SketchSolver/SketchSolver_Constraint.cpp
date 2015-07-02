@@ -140,8 +140,21 @@ bool SketchSolver_Constraint::checkAttributesChanged(ConstraintPtr theConstraint
       if (aRefAttr->isObject()) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
         std::map<FeaturePtr, Slvs_hEntity>::iterator aFIt = myFeatureMap.find(aFeature);
-        if (aFeature && (aFIt == myFeatureMap.end() || aCurAttrs.find(aFIt->second) == aCurAttrs.end()))
-          return true;
+        if (aFeature) {
+          if (aFIt == myFeatureMap.end())
+            return true;
+          // Additional check the points of entity
+          if (aCurAttrs.find(aFIt->second) == aCurAttrs.end()) {
+            Slvs_Entity anEntity = myStorage->getEntity(aFIt->second);
+            bool isFound = false;
+            for (int i = 0; i < 4 && !isFound; i++)
+              if (anEntity.point[i] != SLVS_E_UNKNOWN && 
+                  aCurAttrs.find(anEntity.point[i]) != aCurAttrs.end())
+                isFound = true;
+            if (!isFound)
+              return true;
+          }
+        }
       } else if (aRefAttr->attr()) {
         std::map<AttributePtr, Slvs_hEntity>::iterator anAIt = myAttributeMap.find(aRefAttr->attr());
         if (anAIt == myAttributeMap.end() || aCurAttrs.find(anAIt->second) == aCurAttrs.end())
