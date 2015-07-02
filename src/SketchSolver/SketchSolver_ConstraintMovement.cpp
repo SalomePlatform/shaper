@@ -79,8 +79,16 @@ void SketchSolver_ConstraintMovement::getAttributes(
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
        aDeltaX -= aPt->x();
        aDeltaY -= aPt->y();
-       if (aDeltaX * aDeltaX + aDeltaY * aDeltaY >= tolerance * tolerance)
+       if (aDeltaX * aDeltaX + aDeltaY * aDeltaY >= tolerance * tolerance) {
          theAttributes.push_back(anAttr);
+         // update point coordinates
+         double aNewPos[2] = {aPt->x(), aPt->y()};
+         for (int i = 0; i < 2; i++) {
+           Slvs_Param aParam = myStorage->getParameter(anAttrEnt.param[i]);
+           aParam.val = aNewPos[i];
+           myStorage->updateParameter(aParam);
+         }
+       }
        else
          theIsFullyMoved = false;
      }

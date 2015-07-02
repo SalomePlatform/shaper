@@ -170,6 +170,12 @@ bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
       return false; // there is no constraint, which is specified to remove
     else {
       bool isEmpty = anExtraIt->first == SLVS_E_UNKNOWN;
+      if (!isEmpty) {
+        for (aPos = 0; aPos < (int)mySlvsConstraints.size(); aPos++)
+          if (mySlvsConstraints[aPos] == anExtraIt->first)
+            break;
+        aPos -= 1;
+      }
       myExtraCoincidence.erase(anExtraIt);
       if (isEmpty)
         return false;
