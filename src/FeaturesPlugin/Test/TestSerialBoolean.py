@@ -170,23 +170,23 @@ aSession.finishOperation()
 
 #=========================================================================
 # Create a boolean cut of cylinders from the box:
+# result of Boolean is the first argument of the next Boolean
 #=========================================================================
 aCurrentResult = modelAPI_ResultBody(aBox.firstResult())
 aSession.startOperation()
-
-aBooleanFt = aPart.addFeature("Boolean")
-aBooleanFt.selectionList("main_objects").append(aCurrentResult, aCurrentResult.shape())
+aFactory = ModelAPI_Session.get().validators()
 for i in xrange(0, N * N):
     anExtrusionResult = modelAPI_ResultBody(anExtrusions[i].firstResult())
+    aBooleanFt = aPart.addFeature("Boolean")
+    aBooleanFt.selectionList("main_objects").append(aCurrentResult, aCurrentResult.shape())
     aBooleanFt.selectionList("tool_objects").append(anExtrusionResult, anExtrusionResult.shape())
-kBooleanTypeCut = 0
-aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
-aBooleanFt.execute()
-aFactory = ModelAPI_Session.get().validators()
-assert (aFactory.validate(aBooleanFt))
-assert (len(aBooleanFt.results()) > 0)
-aCurrentResult = modelAPI_ResultBody(aBooleanFt.firstResult())
-assert (aCurrentResult is not None)
+    kBooleanTypeCut = 0
+    aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
+    aBooleanFt.execute()
+    assert (aFactory.validate(aBooleanFt))
+    assert (len(aBooleanFt.results()) > 0)
+    aCurrentResult = modelAPI_ResultBody(aBooleanFt.firstResult())
+    assert (aCurrentResult is not None)
 aSession.finishOperation()
 
 #=========================================================================
