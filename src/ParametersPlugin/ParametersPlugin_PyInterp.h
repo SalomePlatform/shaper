@@ -13,6 +13,7 @@
 
 #include <list>
 #include <string>
+#include <utility>
 
 class PARAMETERSPLUGIN_EXPORT ParametersPlugin_PyInterp : public PyInterp_Interp
 {
@@ -20,6 +21,8 @@ class PARAMETERSPLUGIN_EXPORT ParametersPlugin_PyInterp : public PyInterp_Interp
   ParametersPlugin_PyInterp();
   virtual ~ParametersPlugin_PyInterp();
 
+  std::list<std::pair<int, int> > positions(const std::string& theExpression,
+                                            const std::string& theName);
   std::list<std::string> compile(const std::string&);
   void extendLocalContext(const std::list<std::string>&);
   void clearLocalContext();

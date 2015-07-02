@@ -19,6 +19,57 @@ ParametersPlugin_PyInterp::~ParametersPlugin_PyInterp()
 {
 }
 
+const char* aSearchCode =
+  "import ast\n"
+  "class FindName(ast.NodeVisitor):\n"
+  "    def __init__(self, name):\n"
+  "        self.name = name\n"
+  "    def visit_Name(self, node):\n"
+  "        if node.id == self.name:\n"
+  "            positions.append((node.lineno, node.col_offset))\n"
+  "FindName(name).visit(ast.parse(expression))";
+
+std::list<std::pair<int, int> >
+ParametersPlugin_PyInterp::positions(const std::string& theExpression,
+                                     const std::string& theName)
+{
+  PyLockWrapper lck; // Acquire GIL until the end of the method
+
+  std::list<std::pair<int, int> > aResult;
+
+  // prepare a context
+  PyObject* aContext = PyDict_New();
+  PyObject* aBuiltinModule = PyImport_AddModule("__builtin__");
+  PyDict_SetItemString(aContext, "__builtins__", aBuiltinModule);
+
+  // extend aContext with variables 
+  PyDict_SetItemString(aContext, "expression", PyString_FromString(theExpression.c_str()));
+  PyDict_SetItemString(aContext, "name", PyString_FromString(theName.c_str()));
+  PyDict_SetItemString(aContext, "positions", Py_BuildValue("[]"));
+
+  // run the search code
+  PyObject* aExecResult = PyRun_String(aSearchCode, Py_file_input, aContext, aContext);
+  Py_XDECREF(aExecResult);
+
+  // receive results from context
+  PyObject* aPositions = PyDict_GetItemString(aContext, "positions");
+  for (int anIndex = 0; anIndex < PyList_Size(aPositions); ++anIndex) {
+    PyObject* aPosition = PyList_GetItem(aPositions, anIndex);
+    PyObject* aLineNo = PyTuple_GetItem(aPosition, 0);
+    PyObject* aColOffset = PyTuple_GetItem(aPosition, 1);
+
+    aResult.push_back(
+        std::pair<int, int>((int)PyInt_AsLong(aLineNo),
+                            (int)PyInt_AsLong(aColOffset)));
+  }
+
+  // TODO(spo): after this refCount of the variable is not 0. Is there memory leak?
+  Py_DECREF(aContext);
+
+  return aResult;
+}
+
+
 std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& theExpression)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method

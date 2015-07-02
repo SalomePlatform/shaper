@@ -77,6 +77,7 @@ std::string Model_Data::name()
 void Model_Data::setName(const std::string& theName)
 {
   bool isModified = false;
+  std::string anOldName = name();
   Handle(TDataStd_Name) aName;
   if (!myLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
     TDataStd_Name::Set(myLab, theName.c_str());
@@ -86,6 +87,8 @@ void Model_Data::setName(const std::string& theName)
     if (isModified)
       aName->Set(theName.c_str());
   }
+  if (isModified)
+    ModelAPI_ObjectRenamedMessage::send(myObject, anOldName, theName, this);
 }
 
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)

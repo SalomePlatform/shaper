@@ -128,3 +128,58 @@ void ModelAPI_AttributeEvalMessage::setAttribute(AttributePtr theDocument)
 {
   myAttribute = theDocument;
 }
+
+ModelAPI_ObjectRenamedMessage::ModelAPI_ObjectRenamedMessage(const Events_ID theID,
+                                                             const void* theSender)
+: Events_Message(theID, theSender)
+{
+
+}
+
+ModelAPI_ObjectRenamedMessage::~ModelAPI_ObjectRenamedMessage()
+{
+
+}
+
+void ModelAPI_ObjectRenamedMessage::send(ObjectPtr theObject,
+                                         const std::string& theOldName,
+                                         const std::string& theNewName,
+                                         const void* theSender)
+{
+  std::shared_ptr<ModelAPI_ObjectRenamedMessage> aMessage(
+    new ModelAPI_ObjectRenamedMessage(eventId(), theSender));
+  aMessage->setObject(theObject);
+  aMessage->setOldName(theOldName);
+  aMessage->setNewName(theNewName);
+  Events_Loop::loop()->send(aMessage);
+}
+
+ObjectPtr ModelAPI_ObjectRenamedMessage::object() const
+{
+  return myObject;
+}
+
+void ModelAPI_ObjectRenamedMessage::setObject(ObjectPtr theObject)
+{
+  myObject = theObject;
+}
+
+std::string ModelAPI_ObjectRenamedMessage::oldName() const
+{
+  return myOldName;
+}
+
+void ModelAPI_ObjectRenamedMessage::setOldName(const std::string& theOldName)
+{
+  myOldName = theOldName;
+}
+
+std::string ModelAPI_ObjectRenamedMessage::newName() const
+{
+  return myNewName;
+}
+
+void ModelAPI_ObjectRenamedMessage::setNewName(const std::string& theNewName)
+{
+  myNewName = theNewName;
+}
