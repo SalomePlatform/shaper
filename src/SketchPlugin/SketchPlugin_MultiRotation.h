@@ -72,6 +72,10 @@ class SketchPlugin_MultiRotation : public SketchPlugin_ConstraintBase
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 

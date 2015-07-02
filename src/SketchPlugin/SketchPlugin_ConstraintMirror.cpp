@@ -201,3 +201,37 @@ AISObjectPtr SketchPlugin_ConstraintMirror::getAISObject(AISObjectPtr thePreviou
 }
 
 
+void SketchPlugin_ConstraintMirror::attributeChanged(const std::string& theID)
+{
+  if (theID == MIRROR_LIST_ID()) {
+    AttributeSelectionListPtr aMirrorObjectRefs = selectionList(MIRROR_LIST_ID());
+    if (aMirrorObjectRefs->size() == 0) {
+      // Wait all objects being created, then send update events
+      static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+      if (isUpdateFlushed)
+        Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+
+      // Clear list of objects
+      AttributeRefListPtr aRefListOfMirrored = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+          data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
+      std::list<ObjectPtr> aTargetList = aRefListOfMirrored->list();
+      std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
+      for (; aTargetIter != aTargetList.end(); aTargetIter++) {
+        aRefListOfMirrored->remove(*aTargetIter);
+        // remove the corresponding feature from the sketch
+        ResultConstructionPtr aRC =
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aTargetIter);
+        DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
+        FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
+        if (aFeature)
+          aDoc->removeFeature(aFeature);
+      }
+
+      // send events to update the sub-features by the solver
+      if (isUpdateFlushed)
+        Events_Loop::loop()->setFlushed(anUpdateEvent, true);
+    }
+  }
+}
+

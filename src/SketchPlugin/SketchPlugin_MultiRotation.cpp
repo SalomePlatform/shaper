@@ -277,3 +277,42 @@ void SketchPlugin_MultiRotation::rotateFeature(
   aTargetFeature->data()->blockSendAttributeUpdated(false);
 }
 
+
+void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
+{
+  if (theID == ROTATION_LIST_ID()) {
+    AttributeSelectionListPtr aRotationObjectRefs = selectionList(ROTATION_LIST_ID());
+    if (aRotationObjectRefs->size() == 0) {
+      // Wait all objects being created, then send update events
+      static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+      if (isUpdateFlushed)
+        Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+
+      int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
+      // Clear list of objects
+      AttributeRefListPtr aRefListOfRotated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+          data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      std::list<ObjectPtr> aTargetList = aRefListOfRotated->list();
+      std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
+      while (aTargetIter != aTargetList.end()) {
+        aTargetIter++;
+        for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
+          aRefListOfRotated->remove(*aTargetIter);
+          // remove the corresponding feature from the sketch
+          ResultConstructionPtr aRC =
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aTargetIter);
+          DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
+          FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
+          if (aFeature)
+            aDoc->removeFeature(aFeature);
+        }
+      }
+      integer(NUMBER_OF_COPIES_ID())->setValue(0);
+
+      // send events to update the sub-features by the solver
+      if (isUpdateFlushed)
+        Events_Loop::loop()->setFlushed(anUpdateEvent, true);
+    }
+  }
+}
