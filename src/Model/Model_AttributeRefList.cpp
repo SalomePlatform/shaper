@@ -95,7 +95,7 @@ bool Model_AttributeRefList::isInList(const ObjectPtr& theObj)
       owner()->document());
   if (aDoc) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObj->data());
-    if (aData.get()) {
+    if (aData.get() && aData->isValid()) {
       TDF_Label anObjLab = aData->label().Father();
       const TDF_LabelList& aList = myRef->List();
       for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
