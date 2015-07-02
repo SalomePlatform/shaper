@@ -199,12 +199,26 @@ bool SketchSolver_ConstraintMultiTranslation::remove(ConstraintPtr theConstraint
   for (; aFeatIt != myFeatureMap.end(); aFeatIt++)
     myStorage->removeEntity(aFeatIt->second);
 
+  std::map<FeaturePtr, Slvs_hEntity> aFeatureMapCopy = myFeatureMap;
+
   if (isFullyRemoved) {
     myFeatureMap.clear();
     myAttributeMap.clear();
     myValueMap.clear();
   } else
     cleanRemovedEntities();
+
+  // Restore initial features
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aFIter = aFeatureMapCopy.begin();
+  for (; aFIter != aFeatureMapCopy.end(); ++aFIter)
+  {
+    if (myFeatureMap.find(aFIter->first) != myFeatureMap.end())
+      continue; // the feature was not removed
+    Slvs_hEntity anEntity = myGroup->getFeatureId(aFIter->first);
+    if (anEntity != SLVS_E_UNKNOWN)
+      myFeatureMap[aFIter->first] = anEntity;
+  }
+
   return true;
 }
 

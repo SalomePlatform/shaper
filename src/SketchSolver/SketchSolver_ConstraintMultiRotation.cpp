@@ -230,6 +230,9 @@ bool SketchSolver_ConstraintMultiRotation::remove(ConstraintPtr theConstraint)
   std::map<FeaturePtr, Slvs_hEntity>::iterator aFeatIt = myFeatureMap.begin();
   for (; aFeatIt != myFeatureMap.end(); aFeatIt++)
     myStorage->removeEntity(aFeatIt->second);
+  myStorage->removeUnusedEntities();
+
+  std::map<FeaturePtr, Slvs_hEntity> aFeatureMapCopy = myFeatureMap;
 
   if (isFullyRemoved) {
     myFeatureMap.clear();
@@ -237,6 +240,18 @@ bool SketchSolver_ConstraintMultiRotation::remove(ConstraintPtr theConstraint)
     myValueMap.clear();
   } else
     cleanRemovedEntities();
+
+  // Restore initial features
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aFIter = aFeatureMapCopy.begin();
+  for (; aFIter != aFeatureMapCopy.end(); ++aFIter)
+  {
+    if (myFeatureMap.find(aFIter->first) != myFeatureMap.end())
+      continue; // the feature was not removed
+    Slvs_hEntity anEntity = myGroup->getFeatureId(aFIter->first);
+    if (anEntity != SLVS_E_UNKNOWN)
+      myFeatureMap[aFIter->first] = anEntity;
+  }
+
   return true;
 }
 
@@ -263,7 +278,9 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
       if (squareDistance(myStorage, aLine.point[0], aLine.point[1]) < tolerance * tolerance) {
         myStorage->removeConstraint(aConstraint.h);
         isFirstRemoved = aConstr == mySlvsConstraints.begin();
-        std::vector<Slvs_hConstraint>::iterator aTmpIter = aConstr--;
+        std::vector<Slvs_hConstraint>::iterator aTmpIter = aConstr;
+        if (!isFirstRemoved)
+          --aConstr;
         mySlvsConstraints.erase(aTmpIter);
       }
       // Store the lines into the map

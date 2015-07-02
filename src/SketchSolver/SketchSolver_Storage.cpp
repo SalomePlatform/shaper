@@ -187,6 +187,65 @@ bool SketchSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
   return aResult;
 }
 
+void SketchSolver_Storage::removeUnusedEntities()
+{
+  std::set<Slvs_hEntity> anUnusedEntities;
+  std::vector<Slvs_Entity>::const_iterator aEIt = myEntities.begin();
+  for (; aEIt != myEntities.end(); ++aEIt) {
+    if (aEIt->h == aEIt->wrkpl) {
+      // don't remove workplane
+      anUnusedEntities.erase(aEIt->point[0]);
+      anUnusedEntities.erase(aEIt->normal);
+      continue;
+    }
+    anUnusedEntities.insert(aEIt->h);
+  }
+
+  std::vector<Slvs_Constraint>::const_iterator aCIt = myConstraints.begin();
+  for (; aCIt != myConstraints.end(); ++aCIt) {
+    Slvs_hEntity aSubs[6] = {
+        aCIt->entityA, aCIt->entityB,
+        aCIt->entityC, aCIt->entityD,
+        aCIt->ptA,     aCIt->ptB};
+    for (int i = 0; i < 6; i++) {
+      if (aSubs[i] != SLVS_E_UNKNOWN) {
+        anUnusedEntities.erase(aSubs[i]);
+        int aPos = Search(aSubs[i], myEntities);
+        if (aPos >= 0 && aPos < (int)myEntities.size()) {
+          for (int j = 0; j < 4; j++)
+            if (myEntities[aPos].point[j] != 0)
+              anUnusedEntities.erase(myEntities[aPos].point[j]);
+        }
+      }
+    }
+  }
+
+  std::set<Slvs_hEntity>::const_iterator anEntIt = anUnusedEntities.begin();
+  for (; anEntIt != anUnusedEntities.end(); ++anEntIt) {
+    int aPos = Search(*anEntIt, myEntities);
+    if (aPos >= 0 && aPos < (int)myEntities.size()) {
+      // Remove entity and its parameters
+      Slvs_Entity anEntity = myEntities[aPos];
+      myEntities.erase(myEntities.begin() + aPos);
+      myEntityMaxID = myEntities.empty() ? SLVS_E_UNKNOWN : myEntities.back().h;
+      if (anEntity.distance != SLVS_E_UNKNOWN)
+        removeParameter(anEntity.distance);
+      for (int i = 0; i < 4; i++)
+        if (anEntity.param[i] != SLVS_E_UNKNOWN)
+          removeParameter(anEntity.param[i]);
+      for (int i = 0; i < 4; i++)
+        if (anEntity.point[i] != SLVS_E_UNKNOWN)
+          removeEntity(anEntity.point[i]);
+      myRemovedEntities.insert(*anEntIt);
+      if (anEntity.type == SLVS_E_POINT_IN_2D || anEntity.type == SLVS_E_POINT_IN_3D)
+        removeCoincidentPoint(*anEntIt);
+    }
+  }
+
+  if (!anUnusedEntities.empty())
+    myNeedToResolve = true;
+}
+
 const Slvs_Entity& SketchSolver_Storage::getEntity(const Slvs_hEntity& theEntityID) const
 {
   int aPos = Search(theEntityID, myEntities);
