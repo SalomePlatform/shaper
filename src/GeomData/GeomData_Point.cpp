@@ -72,9 +72,9 @@ void GeomData_Point::setText(const std::string& theX,
     myTextArray->SetValue(0, aX);
     myTextArray->SetValue(1, aY);
     myTextArray->SetValue(2, aZ);
-    owner()->data()->sendAttributeUpdated(this);
     // Send it to evaluator to convert into the double and store in the attribute
     ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 

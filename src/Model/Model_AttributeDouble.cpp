@@ -51,10 +51,9 @@ void Model_AttributeDouble::setText(const std::string& theValue)
   TCollection_ExtendedString aValue(theValue.c_str());
   if (myText->Get() != aValue) {
     myText->Set(aValue);
-    owner()->data()->sendAttributeUpdated(this);
-
     // Send it to evaluator to convert into the double and store in the attribute
     ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
