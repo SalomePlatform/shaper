@@ -88,6 +88,11 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   void entityOwners(const Handle_AIS_InteractiveObject& theObject,
                     SelectMgr_IndexedMapOfOwner& theOwners) const;
 
+  //! Return the IO from the viewer presentation.
+  //! \param thePrs a selected object
+  //! \return an interactive object
+  virtual Handle(AIS_InteractiveObject) getIO(const ModuleBase_ViewerPrs& thePrs);
+
 protected:
   /// Fills the list of presentations by objects selected in the viewer.
   /// \param thePresentations an output list of presentation

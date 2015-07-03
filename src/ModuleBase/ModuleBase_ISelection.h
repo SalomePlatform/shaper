@@ -87,6 +87,11 @@ class ModuleBase_ISelection
   //! \return a shape
   MODULEBASE_EXPORT GeomShapePtr getShape(const ModuleBase_ViewerPrs& thePrs);
 
+  //! Return the IO from the viewer presentation.
+  //! \param thePrs a selected object
+  //! \return an interactive object
+  virtual MODULEBASE_EXPORT Handle(AIS_InteractiveObject) getIO(const ModuleBase_ViewerPrs& thePrs) = 0;
+
   //! Wraps the object list into the viewer prs list
   //! \param theObjects a list of objects
   //! \return a list of prs, where only object is not empty

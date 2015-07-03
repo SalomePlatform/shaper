@@ -92,8 +92,6 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
           return aD1 && aD2 && aD3;
         }
       default:
-        // This is not object controlled by the filter
-        return Standard_True;
         // The object can be selected in Object browser and contain, for example, compound.
         // The compound could not belong to any plane, so the result is false
         return Standard_False;

@@ -142,6 +142,9 @@ void ModuleBase_WidgetSelector::activateCustom()
 }
 
 //********************************************************************
+#include <ModuleBase_IViewer.h>
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+#include <StdSelect_BRepOwner.hxx>
 bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
@@ -153,6 +156,30 @@ bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPr
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aResult);
     aValid = aSelectedFeature != myFeature;
+  }
+  
+  // selection happens in the Object browser.
+  // it creates a selection owner and check whether the viewer filters process it
+  if (thePrs.owner().IsNull() && thePrs.object().get()) {
+    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    if (aResult.get())
+      aShape = aResult->shape();
+
+    const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
+
+    Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
+    Handle(StdSelect_BRepOwner) aShapeOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+
+    const SelectMgr_ListOfFilter& aFilters = myWorkshop->viewer()->AISContext()->Filters();
+    SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+    for (; anIt.More() && aValid; anIt.Next()) {
+      Handle(SelectMgr_Filter) aFilter = anIt.Value();
+      if (aFilter == myWorkshop->validatorFilter())
+        continue;
+
+      aValid = aFilter->IsOk(aShapeOwner);
+    }
+    aShapeOwner.Nullify();
   }
   return aValid;
 }

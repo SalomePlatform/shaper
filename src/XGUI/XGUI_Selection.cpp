@@ -43,6 +43,24 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(const SelectionPlace& th
   return aPresentations;
 }
 
+Handle(AIS_InteractiveObject) XGUI_Selection::getIO(const ModuleBase_ViewerPrs& thePrs)
+{
+  Handle(AIS_InteractiveObject) anIO = thePrs.interactive();
+  if (anIO.IsNull()) {
+    Handle(SelectMgr_EntityOwner) anOwner = thePrs.owner();
+    if (!anOwner.IsNull())
+      anIO = Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
+
+    if (anIO.IsNull() && thePrs.object()) {
+      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+      AISObjectPtr anAISObject = aDisplayer->getAISObject(thePrs.object());
+      if (anAISObject.get())
+        anIO = anAISObject->impl<Handle(AIS_InteractiveObject)>();
+    }
+  }
+  return anIO;
+}
+
 void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresentations) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
