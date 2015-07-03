@@ -4,6 +4,7 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Validators.h"
 #include "PartSet_Tools.h"
+#include "ModuleBase_WidgetValidated.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_WidgetShapeSelector.h"
@@ -757,6 +758,25 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
   }
 }
 
+ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
+{
+  ObjectPtr anObject;
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (aOperation) {
+    /// If last line finished on vertex the lines creation sequence has to be break
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+    // if there is an active widget, find the presented object in it
+    if (!anActiveWidget)
+      anActiveWidget = aPanel->preselectionWidget();
+    
+    ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
+                                                                           (anActiveWidget);
+    if (aWidgetValidated)
+      anObject = aWidgetValidated->findPresentedObject(theAIS);
+  }
+  return anObject;
+}
 
 void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
 {

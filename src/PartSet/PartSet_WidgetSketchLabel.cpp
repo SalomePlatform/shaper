@@ -104,8 +104,8 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(
-                                                           ModuleBase_ISelection::AllControls);
+  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
+
   if (aSelected.empty())
     return;
   ModuleBase_ViewerPrs aPrs = aSelected.first();

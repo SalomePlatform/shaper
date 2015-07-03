@@ -37,23 +37,23 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_Ent
   if (!anOperation)
     return true;
 
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
   if (theOwner->HasSelectable()) {
-    Handle(AIS_InteractiveObject) aAisObj = 
-      Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
+    Handle(AIS_InteractiveObject) aAisObj =
+                     Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
     if (!aAisObj.IsNull()) {
-      std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
       aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
-      ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
-      if (aObj) {
-        DocumentPtr aDoc = aObj->document();
-        SessionPtr aMgr = ModelAPI_Session::get();
-        return (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
-      }
-      else {
-        // This is not object controlled by the filter
-        return Standard_True;
-      }
     }
+  }
+  ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
+  if (aObj) {
+    DocumentPtr aDoc = aObj->document();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    return (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
+  }
+  else {
+    // This object is not controlled by the filter
+    return Standard_True;
   }
   return Standard_False;
 }

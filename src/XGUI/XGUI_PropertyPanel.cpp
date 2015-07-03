@@ -34,6 +34,7 @@
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
     : ModuleBase_IPropertyPanel(theParent), 
     myActiveWidget(NULL),
+    myPreselectionWidget(NULL),
     myPanelPage(NULL)
 {
   this->setWindowTitle(tr("Property Panel"));
@@ -224,4 +225,14 @@ void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
     QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));
     aBtn->setDefaultAction(anAct);
   }
+}
+
+ModuleBase_ModelWidget* XGUI_PropertyPanel::preselectionWidget() const
+{
+  return myPreselectionWidget;
+}
+
+void XGUI_PropertyPanel::setPreselectionWidget(ModuleBase_ModelWidget* theWidget)
+{
+  myPreselectionWidget = theWidget;
 }

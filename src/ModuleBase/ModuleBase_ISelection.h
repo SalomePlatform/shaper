@@ -38,6 +38,13 @@ class ModuleBase_ISelection
   /// \return list of presentations
   virtual QList<ModuleBase_ViewerPrs> getSelected(const SelectionPlace& thePlace = Browser) const = 0;
 
+  /// The values are appended to the first parameter list if the first list does not contain an item
+  /// with the same object
+  /// \param theValues a list of new values
+  /// \param theValuesTo a list, that will be changed
+  static void appendSelected(const QList<ModuleBase_ViewerPrs> theValues,
+                             QList<ModuleBase_ViewerPrs>& theValuesTo);
+
   /// Returns a list of viewer highlited presentations
   /// \return list of presentations
   virtual QList<ModuleBase_ViewerPrs> getHighlighted() const = 0;

@@ -88,6 +88,12 @@ Q_OBJECT
   //! Allows to set predefined actions for the property panel fetched from the ActionsMgr
   void setupActions(XGUI_ActionsMgr* theMgr);
 
+  /// Returns widget processed by preselection
+  virtual ModuleBase_ModelWidget* preselectionWidget() const;
+
+  /// Sets widget processed by preselection
+  virtual void setPreselectionWidget(ModuleBase_ModelWidget* theWidget);
+
  public slots:
 
    /// \brief Update all widgets in property panel with values from the given feature
@@ -108,6 +114,8 @@ Q_OBJECT
 
   /// Currently active widget
   ModuleBase_ModelWidget* myActiveWidget;
+  /// Currently widget processed by preselection
+  ModuleBase_ModelWidget* myPreselectionWidget;
 };
 
 #endif /* XGUI_PROPERTYPANEL_H_ */

@@ -164,6 +164,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theOperation the operation
   virtual void sendOperation(ModuleBase_Operation* theOperation);
 
+  //! Returns data object by AIS
+  virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;
+
 signals:
   void operationLaunched();
 

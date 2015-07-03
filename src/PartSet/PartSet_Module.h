@@ -164,6 +164,9 @@ public:
   /// Returns the viewer Z layer
   int getVisualLayerId() const { return myVisualLayerId; }
 
+  //! Returns data object by AIS
+  virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

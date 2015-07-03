@@ -55,37 +55,54 @@ bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theVa
 }
 
 //********************************************************************
+ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& theAIS) const
+{
+  return myPresentedObject;
+}
+
+//********************************************************************
 bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& thePrs)
 {
   bool aValid = true;
   Handle(SelectMgr_EntityOwner) anOwner = thePrs.owner();
 
-  // if an owern is null, the selection happens in the Object browser.
+  // if an owner is null, the selection happens in the Object browser.
   // creates a selection owner on the base of object shape and the object AIS object
   if (anOwner.IsNull() && thePrs.owner().IsNull() && thePrs.object().get()) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
     if (aResult.get()) {
       GeomShapePtr aShape = aResult->shape();
-
       const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
       Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
       anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+      myPresentedObject = aResult;
     }
+    else
+      aValid = false; // only results can be filtered
   }
-  // finds 
+  // checks the owner by the AIS context activated filters
   if (!anOwner.IsNull()) {
+    // the widget validator filter should be active, but during check by preselection
+    // it is not yet activated, so we need to activate/deactivate it manually
+    bool isActivated = isFilterActivated();
+    if (!isActivated)
+      activateFilters(true);
+
     const SelectMgr_ListOfFilter& aFilters = myWorkshop->viewer()->AISContext()->Filters();
     SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
     for (; anIt.More() && aValid; anIt.Next()) {
       Handle(SelectMgr_Filter) aFilter = anIt.Value();
-      //if (aFilter == myWorkshop->validatorFilter())
-      //  continue;
       aValid = aFilter->IsOk(anOwner);
     }
+    if (!isActivated)
+      activateFilters(false);
   }
+
   // removes created owner
-  if (!anOwner.IsNull() && anOwner != thePrs.owner())
+  if (!anOwner.IsNull() && anOwner != thePrs.owner()) {
     anOwner.Nullify();
+    myPresentedObject = ObjectPtr();
+  }
   return aValid;
 }
 
@@ -178,6 +195,22 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   return aValid;
 }
 
+bool ModuleBase_WidgetValidated::isFilterActivated() const
+{
+  bool isActivated = false;
+
+  Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
+
+  const SelectMgr_ListOfFilter& aFilters = myWorkshop->viewer()->AISContext()->Filters();
+  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+  for (; aIt.More(); aIt.Next()) {
+    if (aSelFilter.Access() == aIt.Value().Access())
+      isActivated = true;
+  }
+  return isActivated;
+}
+
+
 void ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
 {
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
@@ -241,3 +274,35 @@ void ModuleBase_WidgetValidated::clearValidState()
   myInvalidPrs.clear();
 }
 
+//********************************************************************
+QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getFilteredSelected()
+{
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(
+                                                       ModuleBase_ISelection::Viewer);
+
+  QList<ModuleBase_ViewerPrs> anOBSelected = myWorkshop->selection()->getSelected(
+                                                       ModuleBase_ISelection::Browser);
+  // filter the OB presentations
+  filterPresentations(anOBSelected);
+  if (!anOBSelected.isEmpty())
+    ModuleBase_ISelection::appendSelected(anOBSelected, aSelected);
+
+  return aSelected;
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrs>& theValues)
+{
+  QList<ModuleBase_ViewerPrs> aValidatedValues;
+
+  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  bool isDone = false;
+  for (; anIt != aLast; anIt++) {
+    if (isValidInFilters(*anIt))
+      aValidatedValues.append(*anIt);
+  }
+  if (aValidatedValues.size() != theValues.size()) {
+    theValues.clear();
+    theValues = aValidatedValues;
+  }
+}

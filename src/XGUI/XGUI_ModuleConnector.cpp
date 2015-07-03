@@ -99,7 +99,10 @@ AISObjectPtr XGUI_ModuleConnector::findPresentation(const ObjectPtr& theObject) 
 ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) const
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
-  return aDisp->getObject(theAIS);
+  ObjectPtr anObject = aDisp->getObject(theAIS);
+  if (!anObject.get())
+    anObject = module()->findPresentedObject(theAIS);
+  return anObject;
 }
 
 void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrs>& theValues)

@@ -47,10 +47,9 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 {
   clearAttribute();
 
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(
-                                                              ModuleBase_ISelection::AllControls);
-  bool isDone = setSelection(aSelected, true);
+  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
 
+  bool isDone = setSelection(aSelected, false);
   emit valuesChanged();
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.
@@ -174,3 +173,4 @@ void ModuleBase_WidgetSelector::deactivate()
   activateSelection(false);
   activateFilters(false);
 }
+

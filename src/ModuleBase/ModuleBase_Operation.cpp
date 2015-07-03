@@ -287,7 +287,7 @@ void ModuleBase_Operation::activateByPreselection()
         aWgt = (*aWIt);
         if (!aWgt->canSetValue())
           continue;
-
+        myPropertyPanel->setPreselectionWidget(aWgt);
         if (!aWgt->setSelection(myPreSelection, true)) {
           isSet = false;
           break;
@@ -296,6 +296,7 @@ void ModuleBase_Operation::activateByPreselection()
           aFilledWgt = aWgt;
         }
       }
+      myPropertyPanel->setPreselectionWidget(NULL);
       // in order to redisplay object in the viewer, the update/redisplay signals should be flushed
       // it is better to perform it not in setSelection of each widget, but do it here,
       // after the preselection is processed

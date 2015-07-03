@@ -52,6 +52,12 @@ public:
   /// \return Enable/Disable state of Cancel button
   virtual bool isCancelEnabled() const = 0;
 
+  /// Returns widget processed by preselection
+  virtual ModuleBase_ModelWidget* preselectionWidget() const = 0;
+
+  /// Sets widget processed by preselection
+  virtual void setPreselectionWidget(ModuleBase_ModelWidget* theWidget) = 0;
+
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event

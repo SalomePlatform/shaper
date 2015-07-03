@@ -12,6 +12,7 @@
 #include <ModuleBase_ModelWidget.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_AISObject.h>
 #include <ModelAPI_Object.h>
 
 #include <SelectMgr_ListOfFilter.hxx>
@@ -61,6 +62,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// \param theValues the wrapped selection values
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
+
+  //! Returns data object by AIS
+  ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
+
 protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -86,10 +91,14 @@ protected:
   // \return true if all validators return that the attribute is valid
   bool isValidAttribute() const;
 
+  /// Returns true if the workshop validator filter has been already activated
+  /// \return boolean value
+  bool isFilterActivated() const;
+
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param theWorkshop an active workshop
   /// \param toActivate a flag about activation or deactivation the filters
-  virtual void activateFilters(const bool toActivate);
+  void activateFilters(const bool toActivate);
 
   /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
@@ -104,10 +113,21 @@ protected:
   // Removes all presentations from internal maps.
   void clearValidState();
 
+  /// Returns a list of selected presentations in the viewer and object browser
+  /// The presentations from the object browser are filtered by the AIS context filters
+  /// \return a list of presentations
+  QList<ModuleBase_ViewerPrs> getFilteredSelected();
+
+  /// Applies AIS context filters to the parameter list. The not approved presentations are
+  /// removed from the parameters.
+  /// \param theValues a list of presentations.
+  void filterPresentations(QList<ModuleBase_ViewerPrs>& theValues);
+
 protected:
   ModuleBase_IWorkshop* myWorkshop;  /// Reference to workshop
 
 private:
+  ObjectPtr myPresentedObject; /// back up of the filtered object
   QList<ModuleBase_ViewerPrs> myValidPrs;
   QList<ModuleBase_ViewerPrs> myInvalidPrs;
   bool isValidateBlocked;
