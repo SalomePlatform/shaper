@@ -55,7 +55,7 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::addFeature(std::string the
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    if (aDoc.get())
+    if (aDoc.get() && aDoc->isOpened())
       return aDoc->addFeature(theID);
   }
   return FeaturePtr();
@@ -66,7 +66,7 @@ int PartSetPlugin_Part::numberOfSubs() const
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    if (aDoc.get())
+    if (aDoc.get() && aDoc->isOpened())
       return aDoc->numInternalFeatures();
   }
   return 0;
@@ -77,7 +77,7 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::subFeature(const int theIn
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    if (aDoc.get()) {
+    if (aDoc.get() && aDoc->isOpened()) {
       return aDoc->internalFeature(theIndex);
     }
   }
@@ -89,7 +89,7 @@ int PartSetPlugin_Part::subFeatureId(const int theIndex) const
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    if (aDoc.get()) {
+    if (aDoc.get() && aDoc->isOpened()) {
       return aDoc->object(ModelAPI_Feature::group(), theIndex)->data()->featureId();
     }
   }
@@ -111,7 +111,7 @@ void PartSetPlugin_Part::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeat
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    if (aDoc.get())
+    if (aDoc.get() && aDoc->isOpened())
       aDoc->removeFeature(theFeature);
   }
 }
