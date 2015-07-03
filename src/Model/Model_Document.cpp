@@ -731,8 +731,10 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     bool aDisabledFlag = !aPassed;
     if (aMain.get() && aMain->isSub(anIter)) // sub-elements of not-disabled feature are not disabled
       aDisabledFlag = false;
-    if (anIter->getKind() == "Parameter") // parameters are always out of the history
-      aDisabledFlag = false;
+    if (anIter->getKind() == "Parameter") {// parameters are always out of the history of features, but not parameters
+      if (theCurrent.get() && theCurrent->getKind() != "Parameter")
+        aDisabledFlag = false;
+    }
     if (anIter->setDisabled(aDisabledFlag)) {
       // state of feature is changed => so feature become updated
       static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);

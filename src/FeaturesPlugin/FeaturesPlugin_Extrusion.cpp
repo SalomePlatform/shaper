@@ -136,7 +136,7 @@ void FeaturesPlugin_Extrusion::execute()
       }
 
       // Check if shape is valid
-      if(aFeature.shape()->isNull()) {
+      if(!aFeature.shape().get() || aFeature.shape()->isNull()) {
         static const std::string aShapeError = "Resulting shape is Null";
         setError(aShapeError);
         break;
