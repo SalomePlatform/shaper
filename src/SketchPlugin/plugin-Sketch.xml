@@ -55,7 +55,7 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
-        </sketch_shape_selector>/>
+        </sketch_shape_selector>
         <sketch_shape_selector 
           id="ConstraintEntityB" 
           label="Second object" 
