@@ -11,6 +11,8 @@
 
 #include <ModelAPI_ResultConstruction.h>
 
+#include <TopoDS_Iterator.hxx>
+
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
@@ -57,8 +59,6 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
   if (isDone)
     updateFocus();
 }
-
-#include <TopoDS_Iterator.hxx>
 
 //********************************************************************
 bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
