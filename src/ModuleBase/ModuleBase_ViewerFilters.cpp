@@ -22,6 +22,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <Geom_Curve.hxx>
+#include <gp_Pln.hxx>
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
@@ -57,22 +58,25 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_Ent
   return Standard_False;
 }
 
-
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 
 Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
+  if (!myPlane.get())
+    return Standard_True;
+
   if (theOwner->HasSelectable()) {
     Handle(StdSelect_BRepOwner) aShapeOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
     if (!aShapeOwner.IsNull()) {
       TopoDS_Shape aShape = aShapeOwner->Shape();
       TopAbs_ShapeEnum aType = aShape.ShapeType();
+      gp_Pln aPlane = myPlane->impl<gp_Pln>();
       switch (aType) {
       case TopAbs_VERTEX:
         {
           gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-          return myPlane.Distance(aPnt) < Precision::Confusion();
+          return aPlane.Distance(aPnt) < Precision::Confusion();
         }
       case TopAbs_EDGE:
         {
@@ -82,14 +86,17 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
           gp_Pnt aFirstPnt = aCurve->Value(aFirst);
           gp_Pnt aMidPnt = aCurve->Value((aFirst + aLast) / 2.);
           gp_Pnt aLastPnt = aCurve->Value(aLast);
-          bool aD1 = myPlane.Distance(aFirstPnt) < Precision::Confusion();
-          bool aD2 = myPlane.Distance(aMidPnt) < Precision::Confusion();
-          bool aD3 = myPlane.Distance(aLastPnt) < Precision::Confusion();
+          bool aD1 = aPlane.Distance(aFirstPnt) < Precision::Confusion();
+          bool aD2 = aPlane.Distance(aMidPnt) < Precision::Confusion();
+          bool aD3 = aPlane.Distance(aLastPnt) < Precision::Confusion();
           return aD1 && aD2 && aD3;
         }
       default:
         // This is not object controlled by the filter
         return Standard_True;
+        // The object can be selected in Object browser and contain, for example, compound.
+        // The compound could not belong to any plane, so the result is false
+        return Standard_False;
       break;
       }
     } else {

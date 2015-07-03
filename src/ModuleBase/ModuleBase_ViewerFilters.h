@@ -12,7 +12,8 @@
 
 #include <SelectMgr_Filter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
-#include <gp_Pln.hxx>
+
+#include <GeomAPI_Pln.h>
 
 
 class ModuleBase_IWorkshop;
@@ -60,10 +61,10 @@ public:
 
   /// Set working plane
   /// \param thePane plane object
-  void setPlane(const gp_Pln& thePane) { myPlane = thePane; }
+  void setPlane(const std::shared_ptr<GeomAPI_Pln>& thePlane) { myPlane = thePlane; }
 
   /// Returns current working plane
-  gp_Pln plane() const { return myPlane; }
+  std::shared_ptr<GeomAPI_Pln> plane() const { return myPlane; }
 
   /// Returns True if the given owner is acceptable for selection
   /// \param theOwner the selected owner
@@ -72,7 +73,7 @@ public:
   DEFINE_STANDARD_RTTI(ModuleBase_ShapeInPlaneFilter)
 private:
   /// Working plane
-  gp_Pln myPlane;
+  std::shared_ptr<GeomAPI_Pln> myPlane;
 };
 
 #endif
