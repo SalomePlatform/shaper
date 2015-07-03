@@ -288,7 +288,7 @@ void ModuleBase_Operation::activateByPreselection()
         if (!aWgt->canSetValue())
           continue;
 
-        if (!aWgt->setSelection(myPreSelection)) {
+        if (!aWgt->setSelection(myPreSelection, true)) {
           isSet = false;
           break;
         } else {

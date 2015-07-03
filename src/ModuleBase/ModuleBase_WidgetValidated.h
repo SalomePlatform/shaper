@@ -38,9 +38,16 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetValidated(QWidget* theParent,
+                             ModuleBase_IWorkshop* theWorkshop,
                              const Config_WidgetAPI* theData,
                              const std::string& theParentId);
   virtual ~ModuleBase_WidgetValidated();
+
+  /// Checks whether all active viewer filters validate the presentation
+  /// \param theWorkshop an active workshop
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
 
   /// Checks all widget validator if the owner is valid
   /// \param theValue a selected presentation in the view
@@ -52,8 +59,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to check the value validity and if it is, fill the attribute with by value
   /// \param theValues the wrapped selection values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
-
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
 protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -82,7 +89,7 @@ protected:
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param theWorkshop an active workshop
   /// \param toActivate a flag about activation or deactivation the filters
-  virtual void activateFilters(ModuleBase_IWorkshop* theWorkshop, const bool toActivate);
+  virtual void activateFilters(const bool toActivate);
 
   /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
@@ -96,6 +103,9 @@ protected:
 
   // Removes all presentations from internal maps.
   void clearValidState();
+
+protected:
+  ModuleBase_IWorkshop* myWorkshop;  /// Reference to workshop
 
 private:
   QList<ModuleBase_ViewerPrs> myValidPrs;

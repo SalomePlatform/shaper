@@ -52,12 +52,12 @@
 
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
+                                                     ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId,
                                                      bool toShowConstraints)
-    : ModuleBase_WidgetValidated(theParent, theData, theParentId),
-      myPreviewDisplayed(false),
-      myWorkshop(NULL)
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData, theParentId),
+  myPreviewDisplayed(false)
 {
   myText = QString::fromStdString(theData->getProperty("title"));
   myLabel = new QLabel("", theParent);
@@ -83,7 +83,8 @@ PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
   erasePreviewPlanes();
 }
 
-bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
+bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                             const bool theToValidate)
 {
   // do not use the given selection if the plane of the sketch has been already set.
   // If this check is absent, a selected plane in the viewer can be set in the sketch
@@ -91,7 +92,7 @@ bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theVal
   if (plane().get())
     return true;
 
-  return ModuleBase_WidgetValidated::setSelection(theValues);
+  return ModuleBase_WidgetValidated::setSelection(theValues, theToValidate);
 }
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
@@ -103,13 +104,13 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selector()->selection()->getSelected(
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(
                                                            ModuleBase_ISelection::AllControls);
   if (aSelected.empty())
     return;
   ModuleBase_ViewerPrs aPrs = aSelected.first();
 
-  bool isDone = ModuleBase_WidgetValidated::setSelection(aSelected);
+  bool isDone = ModuleBase_WidgetValidated::setSelection(aSelected, true);
   if (!isDone)
     return;
 
@@ -164,13 +165,13 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   // 5. Clear text in the label
   myLabel->setText("");
   myLabel->setToolTip("");
-  disconnect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
+  disconnect(workshop()->selector(), SIGNAL(selectionChanged()), 
               this, SLOT(onSelectionChanged()));
   // 6. deactivate face selection filter
-  activateFilters(myWorkshop->module()->workshop(), false);
+  activateFilters(false);
 
   // 7. Clear selection mode and define sketching mode
-  //XGUI_Displayer* aDisp = myWorkshop->displayer();
+  //XGUI_Displayer* aDisp = workshop()->displayer();
   //aDisp->closeLocalContexts();
   emit planeSelected(plane());
   // after the plane is selected in the sketch, the sketch selection should be activated
@@ -179,7 +180,7 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   activateSelection(true);
 
   // 8. Update sketcher actions
-  XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
+  XGUI_ActionsMgr* anActMgr = workshop()->actionsMgr();
   anActMgr->update();
   myWorkshop->viewer()->update();
 }
@@ -264,7 +265,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
   }
 
   bool aBodyIsVisualized = false;
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  XGUI_Displayer* aDisp = workshop()->displayer();
   QObjectPtrList aDisplayed = aDisp->displayedObjects();
   foreach (ObjectPtr anObj, aDisplayed) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
@@ -284,8 +285,8 @@ void PartSet_WidgetSketchLabel::activateCustom()
   myLabel->setText(myText);
   myLabel->setToolTip(myTooltip);
 
-  connect(myWorkshop->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  activateFilters(myWorkshop->module()->workshop(), true);
+  connect(workshop()->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  activateFilters(true);
 
   aDisp->updateViewer();
 }
@@ -295,7 +296,7 @@ void PartSet_WidgetSketchLabel::deactivate()
   erasePreviewPlanes();
   activateSelection(false);
 
-  activateFilters(myWorkshop->module()->workshop(), false);
+  activateFilters(false);
 }
 
 void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
@@ -304,21 +305,21 @@ void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
     QIntList aModes;
     std::shared_ptr<GeomAPI_Pln> aPlane = plane();
     if (aPlane.get()) {
-      myWorkshop->moduleConnector()->module()->activeSelectionModes(aModes);
+      myWorkshop->module()->activeSelectionModes(aModes);
     }
     else {
       aModes << TopAbs_FACE;
     }
-    myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
+    myWorkshop->activateSubShapesSelection(aModes);
   } else {
-    myWorkshop->moduleConnector()->deactivateSubShapesSelection();
+    myWorkshop->deactivateSubShapesSelection();
   }
 }
 
 void PartSet_WidgetSketchLabel::erasePreviewPlanes()
 {
   if (myPreviewDisplayed) {
-    XGUI_Displayer* aDisp = myWorkshop->displayer();
+    XGUI_Displayer* aDisp = workshop()->displayer();
     aDisp->eraseAIS(myYZPlane, false);
     aDisp->eraseAIS(myXZPlane, false);
     aDisp->eraseAIS(myXYPlane, false);
@@ -353,7 +354,7 @@ void PartSet_WidgetSketchLabel::showPreviewPlanes()
     myXZPlane = createPreviewPlane(anOrigin, aXZDir, aG);
     myXYPlane = createPreviewPlane(anOrigin, aXYDir, aB);
   }
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  XGUI_Displayer* aDisp = workshop()->displayer();
   aDisp->displayAIS(myYZPlane, false);
   aDisp->displayAIS(myXZPlane, false);
   aDisp->displayAIS(myXYPlane, false);
@@ -425,4 +426,10 @@ void PartSet_WidgetSketchLabel::showConstraints(bool theOn)
 {
   myShowConstraints->setChecked(theOn);
   emit showConstraintToggled(theOn);
+}
+
+XGUI_Workshop* PartSet_WidgetSketchLabel::workshop() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  return aConnector->workshop();
 }

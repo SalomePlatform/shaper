@@ -12,6 +12,7 @@
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
+#include <StdSelect_BRepOwner.hxx>
 
 #include <Events_Loop.h>
 
@@ -20,9 +21,11 @@
 //#define DEBUG_VALID_STATE
 
 ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
+                                                       ModuleBase_IWorkshop* theWorkshop,
                                                        const Config_WidgetAPI* theData,
                                                        const std::string& theParentId)
- : ModuleBase_ModelWidget(theParent, theData, theParentId), isValidateBlocked(false)
+: ModuleBase_ModelWidget(theParent, theData, theParentId), isValidateBlocked(false),
+  myWorkshop(theWorkshop)
 {
 }
 
@@ -31,7 +34,8 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
+bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                              const bool theToValidate)
 {
   if (theValues.empty())
     return false;
@@ -39,7 +43,7 @@ bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theVa
   ModuleBase_ViewerPrs aValue = theValues.takeFirst();
   bool isDone = false;
 
-  if (isValidSelection(aValue)) {
+  if (!theToValidate || isValidInFilters(aValue)) {
     isDone = setSelectionCustom(aValue);
     // updateObject - to update/redisplay feature
     // it is commented in order to perfom it outside the method
@@ -48,6 +52,41 @@ bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theVa
     //emit valuesChanged();
   }
   return isDone;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& thePrs)
+{
+  bool aValid = true;
+  Handle(SelectMgr_EntityOwner) anOwner = thePrs.owner();
+
+  // if an owern is null, the selection happens in the Object browser.
+  // creates a selection owner on the base of object shape and the object AIS object
+  if (anOwner.IsNull() && thePrs.owner().IsNull() && thePrs.object().get()) {
+    ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    if (aResult.get()) {
+      GeomShapePtr aShape = aResult->shape();
+
+      const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
+      Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
+      anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+    }
+  }
+  // finds 
+  if (!anOwner.IsNull()) {
+    const SelectMgr_ListOfFilter& aFilters = myWorkshop->viewer()->AISContext()->Filters();
+    SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+    for (; anIt.More() && aValid; anIt.Next()) {
+      Handle(SelectMgr_Filter) aFilter = anIt.Value();
+      //if (aFilter == myWorkshop->validatorFilter())
+      //  continue;
+      aValid = aFilter->IsOk(anOwner);
+    }
+  }
+  // removes created owner
+  if (!anOwner.IsNull() && anOwner != thePrs.owner())
+    anOwner.Nullify();
+  return aValid;
 }
 
 //********************************************************************
@@ -139,12 +178,11 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
   return aValid;
 }
 
-void ModuleBase_WidgetValidated::activateFilters(ModuleBase_IWorkshop* theWorkshop,
-                                                 const bool toActivate)
+void ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
 {
-  ModuleBase_IViewer* aViewer = theWorkshop->viewer();
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
-  Handle(SelectMgr_Filter) aSelFilter = theWorkshop->validatorFilter();
+  Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else {

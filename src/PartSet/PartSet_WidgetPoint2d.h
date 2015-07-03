@@ -56,7 +56,8 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped widget values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
 
   virtual bool restoreValue();
 

@@ -111,9 +111,6 @@ protected:
                                 GeomShapePtr& theShape);
 
   //----------- Class members -------------
-protected:
-  /// Reference to workshop
-  ModuleBase_IWorkshop* myWorkshop;
 };
 
 #endif

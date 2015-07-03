@@ -72,7 +72,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param theValue a selected presentation in the view

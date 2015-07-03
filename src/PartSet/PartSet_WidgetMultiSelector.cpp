@@ -41,9 +41,10 @@ PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
   delete myExternalObjectMgr;
 }
 
-bool PartSet_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
+bool PartSet_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                               const bool theToValidate)
 {
-  bool aSucceed = ModuleBase_WidgetMultiSelector::setSelection(theValues);
+  bool aSucceed = ModuleBase_WidgetMultiSelector::setSelection(theValues, theToValidate);
   if (aSucceed) {
     // TODO(nds): unite with externalObject(), remove parameters
     //myFeature->execute();

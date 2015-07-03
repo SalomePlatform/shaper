@@ -49,7 +49,8 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
 
 protected:
   /// Checks the widget validity. By default, it returns true.

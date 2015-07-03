@@ -201,7 +201,8 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
+bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                                  const bool theToValidate)
 {
   QList<ModuleBase_ViewerPrs> aSkippedValues;
 
@@ -210,7 +211,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
   for (; anIt != aLast; anIt++) {
     ModuleBase_ViewerPrs aValue = *anIt;
     bool aProcessed = false;
-    if (isValidSelection(aValue)) {
+    if (!theToValidate || isValidInFilters(aValue)) {
       aProcessed = setSelectionCustom(aValue);
     }
     else
@@ -272,7 +273,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateSelection(true);
-  activateFilters(myWorkshop, true);
+  activateFilters(true);
   QList<ModuleBase_ViewerPrs> anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
   // To clear mySelection, myListControl and storeValue()
@@ -319,13 +320,13 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
       activateSelection(false);
-      activateFilters(myWorkshop, false);
+      activateFilters(false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
 
       activateSelection(true);
-      activateFilters(myWorkshop, true);
+      activateFilters(true);
       break;
     }
   }

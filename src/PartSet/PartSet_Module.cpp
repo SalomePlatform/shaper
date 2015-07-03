@@ -503,9 +503,8 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   XGUI_Workshop* aXUIWorkshop = aConnector->workshop();
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
-    PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, 
+    PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, aWorkshop,
       theWidgetApi, theParentId, mySketchMgr->isConstraintsShown());
-    aLabelWgt->setWorkshop(aXUIWorkshop);
     connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
     connect(aLabelWgt, SIGNAL(showConstraintToggled(bool)),

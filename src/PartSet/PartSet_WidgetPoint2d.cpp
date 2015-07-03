@@ -122,7 +122,8 @@ PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
 }
 
-bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues)
+bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                         const bool theToValidate)
 {
   if (theValues.empty())
     return false;

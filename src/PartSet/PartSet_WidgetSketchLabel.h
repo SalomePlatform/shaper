@@ -42,7 +42,8 @@ Q_OBJECT
   /// \param theParent the parent object
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  PartSet_WidgetSketchLabel(QWidget* theParent, const Config_WidgetAPI* theData,
+  PartSet_WidgetSketchLabel(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+                            const Config_WidgetAPI* theData,
                             const std::string& theParentId, bool toShowConstraints);
 
   virtual ~PartSet_WidgetSketchLabel();
@@ -52,7 +53,8 @@ Q_OBJECT
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to do nothing if the plane of the sketch has been already set.
   /// \param theValues the wrapped selection values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues);
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
 
   virtual bool restoreValue()
   {
@@ -65,13 +67,6 @@ Q_OBJECT
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
-
-  /// Returns pointer to workshop
-  XGUI_Workshop* workshop() const { return myWorkshop; }
-
-  /// Set pointer to workshop
-  /// \param theWork a pointer to workshop
-  void setWorkshop(XGUI_Workshop* theWork) { myWorkshop = theWork; }
 
   /// Returns sketcher plane
   std::shared_ptr<GeomAPI_Pln> plane() const;
@@ -132,6 +127,9 @@ protected:
                                   std::shared_ptr<GeomAPI_Dir> theNorm, 
                                   const int theRGB[3]);
 
+  //! Returns workshop
+  XGUI_Workshop* workshop() const;
+
   /// Set sketch plane by shape
   /// \param theShape a planar face
   std::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);
@@ -146,8 +144,6 @@ protected:
   QLabel* myLabel;
   QString myText;
   QString myTooltip;
-
-  XGUI_Workshop* myWorkshop;
 
   AISObjectPtr myYZPlane;
   AISObjectPtr myXZPlane;

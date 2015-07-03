@@ -17,6 +17,7 @@
 #include <memory>
 
 class Config_WidgetAPI;
+class ModuleBase_IWorkshop;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
@@ -82,7 +83,9 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues)
+  /// \param toValidate the boolean value whether the value should be checked by filters
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate)
   {
     return false;
   }
