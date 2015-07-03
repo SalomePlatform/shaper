@@ -18,8 +18,8 @@ class FeaturesPlugin_ExtrusionFuse : public FeaturesPlugin_ExtrusionBoolean
   /// Feature kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_REVOLUTION_ID("ExtrusionFuse");
-    return MY_REVOLUTION_ID;
+    static const std::string MY_EXTRUSION_ID("ExtrusionFuse");
+    return MY_EXTRUSION_ID;
   }
 
   /// \return the kind of a feature

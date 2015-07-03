@@ -73,10 +73,14 @@ INSTALL(TARGETS FeaturesPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 ADD_UNIT_TESTS(TestExtrusion.py
+               TestExtrusionCut.py
+               TestExtrusionFuse.py
                TestRevolution.py
+               TestRevolutionCut.py
+               TestRevolutionFuse.py
                TestMovement.py
                TestRotation.py
                TestBoolean.py
                TestMultiBoolean.py
-			   TestSerialBoolean.py
+               TestSerialBoolean.py
                TestGroup.py)
