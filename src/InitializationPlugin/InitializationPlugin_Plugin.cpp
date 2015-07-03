@@ -91,11 +91,11 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
   aPlane->real("D")->setValue(0.);
 
   if (theX) {
-    aPlane->data()->setName("Y0Z");
+    aPlane->data()->setName("YOZ");
   } else if (theY) {
-    aPlane->data()->setName("X0Z");
+    aPlane->data()->setName("XOZ");
   } else if (theZ) {
-    aPlane->data()->setName("X0Y");
+    aPlane->data()->setName("XOY");
   }
   aPlane->setInHistory(aPlane, false);  // don't show automatically created feature in the features history
 
