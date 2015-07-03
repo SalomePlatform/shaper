@@ -15,10 +15,11 @@
  *  \brief This class is used to explore subshapes on shape.
  */
 
-class GEOMAPI_EXPORT GeomAPI_ShapeExplorer : public GeomAPI_Interface
+class GeomAPI_ShapeExplorer : public GeomAPI_Interface
 {
 public:
   /// Default constructor. Creates an empty explorer, becomes usefull after Init.
+  GEOMAPI_EXPORT 
   GeomAPI_ShapeExplorer();
 
   /** \brief Constructs an explorer to search on theShape, for shapes of type toFind,
@@ -27,6 +28,7 @@ public:
       \param[in] toFind shape type to find.
       \param[in] toAvoid shape type to avoid.
    */
+  GEOMAPI_EXPORT 
   GeomAPI_ShapeExplorer(const std::shared_ptr<GeomAPI_Shape>& theShape,
                         const GeomAPI_Shape::ShapeType toFind,
                         const GeomAPI_Shape::ShapeType toAvoid = GeomAPI_Shape::SHAPE);
@@ -37,26 +39,33 @@ public:
       \param[in] toFind shape type to find.
       \param[in] toAvoid shape type to avoid.
    */
+  GEOMAPI_EXPORT 
   void init(const std::shared_ptr<GeomAPI_Shape>& theShape,
             const GeomAPI_Shape::ShapeType toFind,
             const GeomAPI_Shape::ShapeType toAvoid = GeomAPI_Shape::SHAPE);
 
   /// \return true if there are more shapes in the exploration.
+  GEOMAPI_EXPORT 
   bool more() const;
 
   /// Moves to the next Shape in the exploration or do nothing if there are no more shapes to explore.
+  GEOMAPI_EXPORT 
   void next();
 
   /// Returns the current shape in the exploration or empty pointer if this explorer has no more shapes to explore.
+  GEOMAPI_EXPORT 
   std::shared_ptr<GeomAPI_Shape> current();
 
   /// Reinitialize the exploration with the original arguments.
+  GEOMAPI_EXPORT 
   void reinit();
 
   /// Returns the current depth of the exploration. 0 is the shape to explore itself.
+  GEOMAPI_EXPORT 
   int depth() const;
 
   /// Clears the content of the explorer. It will return False on more().
+  GEOMAPI_EXPORT 
   void clear();
 
 };

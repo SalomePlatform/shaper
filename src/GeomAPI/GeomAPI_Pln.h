@@ -19,26 +19,32 @@ class GeomAPI_Dir;
  * \brief 3D point defined by three coordinates
  */
 
-class GEOMAPI_EXPORT GeomAPI_Pln : public GeomAPI_Interface
+class GeomAPI_Pln : public GeomAPI_Interface
 {
  public:
   /// Creation of plane by the axis placement
+  GEOMAPI_EXPORT 
   GeomAPI_Pln(const std::shared_ptr<GeomAPI_Ax3>& theAxis);
 
   /// Creation of plane by the point and normal
+  GEOMAPI_EXPORT 
   GeomAPI_Pln(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
               const std::shared_ptr<GeomAPI_Dir>& theNormal);
 
   /// Creation of plane by coefficients (Ax+By+Cz+D=0)
+  GEOMAPI_EXPORT 
   GeomAPI_Pln(const double theA, const double theB, const double theC, const double theD);
 
   /// Returns a point of this plane
+  GEOMAPI_EXPORT 
   std::shared_ptr<GeomAPI_Pnt> location();
 
   /// Returns a plane normal
+  GEOMAPI_EXPORT 
   std::shared_ptr<GeomAPI_Dir> direction();
 
   /// Returns the plane coefficients (Ax+By+Cz+D=0)
+  GEOMAPI_EXPORT 
   void coefficients(double& theA, double& theB, double& theC, double& theD);
 };
 

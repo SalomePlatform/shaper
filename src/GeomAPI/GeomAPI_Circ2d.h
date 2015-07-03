@@ -18,24 +18,29 @@ class GeomAPI_Dir2d;
  * \brief Circle in 2D
  */
 
-class GEOMAPI_EXPORT GeomAPI_Circ2d : public GeomAPI_Interface
+class GeomAPI_Circ2d : public GeomAPI_Interface
 {
  public:
   /// Creation of circle defined by center point and circle radius
+  GEOMAPI_EXPORT 
   GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                  const std::shared_ptr<GeomAPI_Pnt2d>& theCirclePoint);
 
   /// Creation of circle defined by center point, direction and circle radius
+  GEOMAPI_EXPORT 
   GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                  const std::shared_ptr<GeomAPI_Dir2d>& theDir, double theRadius);
 
   /// Return center of the circle
+  GEOMAPI_EXPORT 
   const std::shared_ptr<GeomAPI_Pnt2d> center() const;
 
   /// Return radius of the circle
+  GEOMAPI_EXPORT 
   double radius() const;
 
   /// Project point on line
+  GEOMAPI_EXPORT 
   const std::shared_ptr<GeomAPI_Pnt2d> project(
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
 };
