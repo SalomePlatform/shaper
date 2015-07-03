@@ -136,6 +136,7 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
 
 void ModuleBase_Operation::start()
 {
+  myIsModified = false;
   QString anId = getDescription()->operationId();
   if (myIsEditing) {
     anId = anId.append(EditSuffix());
@@ -253,6 +254,11 @@ bool ModuleBase_Operation::commit()
 void ModuleBase_Operation::setRunning(bool theState)
 {
   emit triggered(theState);
+}
+
+void ModuleBase_Operation::onValuesChanged()
+{
+  myIsModified = true;
 }
 
 //TODO: nds stabilization hotfix
@@ -374,6 +380,15 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 { 
   myPropertyPanel = theProp; 
   myPropertyPanel->setEditingMode(isEditOperation());
+
+  if (myPropertyPanel) {
+    const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
+    QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
+    for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
+      ModuleBase_ModelWidget* aWgt = (*aWIt);
+      connect(aWgt, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
+    }
+  }
 
   // Do not activate widgets by default if the current operation is editing operation
   // Because we don't know which widget is going to be edited. 

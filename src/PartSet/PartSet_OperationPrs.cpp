@@ -5,101 +5,168 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "PartSet_OperationPrs.h"
+#include "PartSet_Tools.h"
 
-//#include <ModelAPI_Tools.h>
-//#include <ModelAPI_ResultConstruction.h>
-//#include <GeomAPI_PlanarEdges.h>
+#include <ModelAPI_Result.h>
+#include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
+#include <GeomValidators_Tools.h>
 
-//#include <BRep_Builder.hxx>
-//#include <Prs3d_IsoAspect.hxx>
-//#include <TopoDS_Builder.hxx>
+#include <StdPrs_WFDeflectionShape.hxx>
+
+#include <QList>
 
 IMPLEMENT_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 
-PartSet_OperationPrs::PartSet_OperationPrs()
-  : ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr())
+PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
+  : ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr()), myWorkshop(theWorkshop)
 {
 }
 
-void PartSet_OperationPrs::setFeature(FeaturePtr theFeature)
+bool PartSet_OperationPrs::canActivate(const FeaturePtr& theFeature)
 {
-/*  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
-  std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
-    std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
-  if (aWirePtr) {
-    if (aWirePtr->hasPlane() ) {
-      // If this is a wire with plane defined thin it is a sketch-like object
-      // It must have invisible faces
-      myIsSketchMode = true;
-    }
-  }
-  Set(aShapePtr->impl<TopoDS_Shape>());
-*/
+  bool aHasSelectionAttribute = false;
+
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes("");
+  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+  for (; anIt != aLast && !aHasSelectionAttribute; anIt++)
+    aHasSelectionAttribute = isSelectionAttribute(*anIt);
+
+  return aHasSelectionAttribute;
 }
 
+void PartSet_OperationPrs::setFeature(const FeaturePtr& theFeature)
+{
+  myFeature = theFeature;
+  updateShapes();
+}
 
-/*#include <TopExp_Explorer.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <StdPrs_ShadedShape.hxx>
-#include <StdPrs_WFDeflectionShape.hxx>
-*/
+bool PartSet_OperationPrs::dependOn(const ObjectPtr& theResult)
+{
+  return myFeatureShapes.contains(theResult);
+}
+
+void PartSet_OperationPrs::updateShapes()
+{
+  myFeatureShapes.clear();
+  getFeatureShapes(myFeatureShapes);
+}
+
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
-/*  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
-  if (!aShapePtr)
-    return;
-  if (myIsSketchMode) {
-    myFacesList.clear();
-    ResultConstructionPtr aConstruction = 
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myResult);
-    if (aConstruction.get()) {
-      int aFacesNum = aConstruction->facesNum();
-      for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
-        myFacesList.push_back(aConstruction->face(aFaceIndex));
-      }
+  thePresentation->Clear();
+
+  // create presentations on the base of the shapes
+  Handle(Prs3d_Drawer) aDrawer = Attributes();
+  QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
+                                                        aLast = myFeatureShapes.end();
+  for (; anIt != aLast; anIt++) {
+    QList<GeomShapePtr> aShapes = anIt.value();
+    QList<GeomShapePtr>::const_iterator aShIt = aShapes.begin(), aShLast = aShapes.end();
+    for (; aShIt != aShLast; aShIt++) {
+      GeomShapePtr aGeomShape = *aShIt;
+      TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
+      StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
     }
   }
-  myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
-  if (!myOriginalShape.IsNull()) {
-    Set(myOriginalShape);
-
-    AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
-    /*
-    TopExp_Explorer anExp(myOriginalShape, TopAbs_VERTEX);
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
-    for (; anExp.More(); anExp.Next()) {
-      const TopoDS_Vertex& aVertex = (const TopoDS_Vertex&)anExp.Current();
-      StdPrs_WFDeflectionShape::Add(thePresentation, aVertex, aDrawer);
-    }*|/
-  }*/
 }
-
 
 void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
-/*  if (aMode > TopAbs_SHAPE)
-    // In order to avoid using custom selection modes
+  // the presentation is not used in the selection
+}
+
+void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
+              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+{
+  if (theObjectShapes.contains(theObject))
+    theObjectShapes[theObject].append(theShape);
+  else {
+    QList<GeomShapePtr> aShapes;
+    aShapes.append(theShape);
+    theObjectShapes[theObject] = aShapes;
+  }
+}
+
+void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+{
+  if (!myFeature.get())
     return;
 
-  if (myIsSketchMode) {
-    if (aMode == TopAbs_FACE) {
-      BRep_Builder aBuilder;
-      TopoDS_Compound aComp;
-      aBuilder.MakeCompound(aComp);
-      aBuilder.Add(aComp, myOriginalShape);
-      std::list<std::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
-      for (aIt = myFacesList.cbegin(); aIt != myFacesList.cend(); ++aIt) {
-        TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
-        aBuilder.Add(aComp, aFace);
+  QList<GeomShapePtr> aShapes;
+  std::list<AttributePtr> anAttributes = myFeature->data()->attributes("");
+  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+  for (; anIt != aLast; anIt++) {
+    AttributePtr anAttribute = *anIt;
+    if (!isSelectionAttribute(anAttribute))
+      continue;
+
+    std::string anAttrType = anAttribute->attributeType();
+
+    if (anAttrType == ModelAPI_AttributeSelectionList::typeId()) {
+      std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList = 
+              std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
+      for(int i = 0; i < aCurSelList->size(); i++) {
+        std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
+        ResultPtr aResult = aSelAttribute->context();
+        GeomShapePtr aShape = aSelAttribute->value();
+        if (!aShape.get())
+          aShape = aResult->shape();
+        addValue(aResult, aShape, theObjectShapes);
       }
-      Set(aComp);
-    } else {
-      Set(myOriginalShape);
     }
-  }*/
-  AIS_Shape::ComputeSelection(aSelection, aMode);
+    else {
+      ObjectPtr anObject;
+      GeomShapePtr aShape;
+      if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
+        AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+        if (anAttr->isObject()) {
+          anObject = anAttr->object();
+        }
+        else {
+          aShape = PartSet_Tools::findShapeBy2DPoint(anAttr, myWorkshop);
+          // the distance point is not found if the point is selected in the 2nd time
+          // TODO: after debug, this check can be removed
+          if (!aShape.get())
+            continue;
+          anObject = anAttr->attr()->owner();
+        }
+      }
+      if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
+        AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttribute);
+        anObject = anAttr->context();
+        aShape = anAttr->value();
+      }
+      if (anAttrType == ModelAPI_AttributeReference::typeId()) {
+        AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
+        anObject = anAttr->value();
+      }
+
+      if (anObject.get()) {
+        if (!aShape.get()) {
+          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+          if (aResult.get())
+            aShape = aResult->shape();
+        }
+        addValue(anObject, aShape, theObjectShapes);
+      }
+    }
+  }
+}
+
+bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute)
+{
+  std::string anAttrType = theAttribute->attributeType();
+
+  return anAttrType == ModelAPI_AttributeSelectionList::typeId() ||
+         anAttrType == ModelAPI_AttributeRefAttr::typeId() ||
+         anAttrType == ModelAPI_AttributeSelection::typeId() ||
+         anAttrType == ModelAPI_AttributeReference::typeId();
 }

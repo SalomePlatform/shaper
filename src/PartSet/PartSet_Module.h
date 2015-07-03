@@ -31,6 +31,7 @@
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
 class PartSet_MenuMgr;
+class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
 
 class QAction;
@@ -159,6 +160,9 @@ public:
   /// This method is called on object browser creation for customisation of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser);
+
+  /// Returns the viewer Z layer
+  int getVisualLayerId() const { return myVisualLayerId; }
 
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel

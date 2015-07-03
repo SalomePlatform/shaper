@@ -861,6 +861,7 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
 
   // Customization of presentation
+  bool isPresentable = false;
   GeomCustomPrsPtr aCustomPrs;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (aFeature.get() != NULL) {
@@ -871,11 +872,12 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   if (aCustomPrs.get() == NULL) {
     // we ignore presentable not customized objects
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-    if (aPrs.get() != NULL)
-      return false;
+    isPresentable = aPrs.get() != NULL;
     aCustomPrs = myCustomPrs;
   }
-  bool isCustomized = aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+  bool isCustomized = false;
+  if (!isPresentable)
+    aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
   isCustomized = myWorkshop->module()->customizeObject(theObject) || isCustomized;
   return isCustomized;
 }

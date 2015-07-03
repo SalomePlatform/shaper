@@ -8,6 +8,7 @@
 #define PartSet_CustomPrs_H
 
 #include "PartSet.h"
+
 #include "PartSet_OperationPrs.h"
 
 #include <ModelAPI_Object.h>
@@ -17,9 +18,6 @@
 #include <GeomAPI_ICustomPrs.h>
 #include <GeomAPI_AISObject.h>
 #include <GeomAPI_Shape.h>
-
-#include <QMap>
-#include <QList>
 
 class ModuleBase_IWorkshop;
 
@@ -33,17 +31,34 @@ public:
   PARTSET_EXPORT PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop);
   PARTSET_EXPORT virtual ~PartSet_CustomPrs() {};
 
-  /// Set the feature is customized
-  /// \param theObject a feature object
-  void setCustomized(const FeaturePtr& theObject);
+  /// Returns true if the presentation is active
+  bool isActive() const;
+
+  /// Initializes the presentation by the parameter object
+  void activate(const FeaturePtr& theObject);
+
+  void deactivate();
+
+  /// Modifies the given presentation in the custom way.
+  bool customize(const ObjectPtr& theObject);
 
   /// Modifies the given presentation in the custom way.
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
 private:
+  /// Returns the AIS presentation
+  Handle(PartSet_OperationPrs) getPresentation() const;
+
+  /// Displays the internal presentation in the viewer of workshop
+  void displayPresentation();
+  /// Erases the internal presentation from the viewer of workshop
+  void erasePresentation();
+  /// Sets color, point size and width of the presentation
+  void customizePresentation();
+
+private:
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
-  Handle(PartSet_OperationPrs) myOperationPrs; /// AIS presentation for the feature of operation
-  //QMap<ResultPtr, QList<GeomShapePtr> > myCustomized; /// objects, which are customized
+  AISObjectPtr myOperationPrs; /// the AIS presentation, which is displayed/erased in the viewer
 };
 
 #endif

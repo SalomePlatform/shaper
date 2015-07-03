@@ -272,7 +272,6 @@ void GeomAPI_AISObject::setColor(const int& theColor)
   if (anAIS.IsNull())
     return;
   Quantity_Color aColor((Quantity_NameOfColor) theColor);
-  anAIS->SetColor(aColor);
   Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
@@ -305,7 +304,6 @@ bool GeomAPI_AISObject::setColor(int theR, int theG, int theB)
   if (aColor.IsEqual(aCurrentColor))
     return false;
 
-  anAIS->SetColor(aColor);
   Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);

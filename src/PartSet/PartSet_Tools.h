@@ -25,6 +25,7 @@
 
 class Handle_V3d_View;
 class ModuleBase_ViewerPrs;
+class ModuleBase_IWorkshop;
 class GeomDataAPI_Point2D;
 class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
@@ -205,7 +206,16 @@ class PARTSET_EXPORT PartSet_Tools
   * \param theShape - a Shape
   * \param theSketch - a Sketch to get a plane of converting to 2d
   */
-  static AttributePtr findAttributeBy2dPoint(ObjectPtr theObj, const TopoDS_Shape theShape, FeaturePtr theSketch);
+  static AttributePtr findAttributeBy2dPoint(ObjectPtr theObj, const TopoDS_Shape theShape,
+                                             FeaturePtr theSketch);
+
+  /**
+  * Finds an attribute value in attribute reference attribute value
+  * \param theAttribute - an attribure reference filled with an attribute
+  * \return a geometry shape
+  */
+  static GeomShapePtr findShapeBy2DPoint(const AttributePtr& theAttribute,
+                                         ModuleBase_IWorkshop* theWorkshop);
 
 protected:
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,

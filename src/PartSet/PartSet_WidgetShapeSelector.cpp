@@ -109,58 +109,10 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
 GeomShapePtr PartSet_WidgetShapeSelector::getShape() const
 {
   // an empty shape by default
-  GeomShapePtr aShape;
-
-  // 1. find an attribute value in attribute reference attribute value
   DataPtr aData = myFeature->data();
-  AttributePtr aAttr = aData->attribute(attributeID());
-  AttributeRefAttrPtr aRefAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
-  if (aRefAttr) {
-    if (!aRefAttr->isObject()) {
-      AttributePtr anAttribute = aRefAttr->attr();
-      if (anAttribute.get()) {
-        XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-        XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  AttributePtr anAttribute = aData->attribute(attributeID());
+  GeomShapePtr aShape = PartSet_Tools::findShapeBy2DPoint(anAttribute, myWorkshop);
 
-        // 2. find visualized vertices of the attribute and if the attribute of the vertex is
-        // the same, return it
-        FeaturePtr anAttributeFeature = ModelAPI_Feature::feature(anAttribute->owner());
-        // 2.1 get visualized results of the feature
-        const std::list<ResultPtr>& aResList = anAttributeFeature->results();
-        std::list<ResultPtr>::const_iterator anIt = aResList.begin(), aLast = aResList.end();
-        for (; anIt != aLast; anIt++) {
-          AISObjectPtr aAISObj = aDisplayer->getAISObject(*anIt);
-          if (aAISObj.get() != NULL) {
-            Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-            // 2.2 find selected owners of a visualizedd object
-            SelectMgr_IndexedMapOfOwner aSelectedOwners;  
-            aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
-            for  (Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++) {
-              Handle(SelectMgr_EntityOwner) anOwner = aSelectedOwners(i);
-              if (!anOwner.IsNull()) {
-                Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
-                if (!aBRepOwner.IsNull() && aBRepOwner->HasShape()) {
-                  const TopoDS_Shape& aBRepShape = aBRepOwner->Shape();
-                  if (aBRepShape.ShapeType() == TopAbs_VERTEX) {
-                    // 2.3 if the owner is vertex and an attribute of the vertex is equal to the initial
-                    // attribute, returns the shape
-                    AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(anAttributeFeature,
-                                                                                  aBRepShape, sketch());
-                    if (aPntAttr.get() != NULL && aPntAttr == anAttribute) {
-                      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
-                      aShape->setImpl(new TopoDS_Shape(aBRepShape));
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
   if (!aShape.get())
     aShape = ModuleBase_WidgetShapeSelector::getShape();
   return aShape;

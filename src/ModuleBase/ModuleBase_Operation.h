@@ -76,6 +76,9 @@ Q_OBJECT
   /// Returns True if data of its feature was modified during operation
   virtual bool isModified() const { return myIsModified; }
 
+  /// Change the modified state of the operation
+  void setIsModified(const bool theIsModified) { myIsModified = theIsModified;  }
+
   /// Returns True id the current operation is launched in editing mode
   bool isEditOperation() const { return myIsEditing; }
 
@@ -190,6 +193,9 @@ signals:
   /// Provided for S/S compatibility with QAction's toggle(bool)
   /// \param theState th flag to abort, if it is true, do nothing, overwise abort
   void setRunning(bool theState);
+
+  /// Changes the modified flag of the operation
+  void onValuesChanged();
 
  protected:
   /// Virtual method called when operation started (see start() method for more description)

@@ -267,27 +267,37 @@ void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
+  // z layer is created for all started operations in order to visualize operation AIS presentation
+  // over the object
+  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+  aViewer->AddZLayer(myVisualLayerId);
+
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
-    Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
-    aViewer->AddZLayer(myVisualLayerId);
     mySketchMgr->startSketch(theOperation);
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->startNestedSketch(theOperation);
   }
+
+  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
+                        std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
+  aCustomPrs->activate(theOperation->feature());
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);
-    Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
-    aViewer->RemoveZLayer(myVisualLayerId);
-    myVisualLayerId = 0;
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
   }
+  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+  aViewer->RemoveZLayer(myVisualLayerId);
+  myVisualLayerId = 0;
+  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
+                        std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
+  aCustomPrs->deactivate();
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const
@@ -720,24 +730,14 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
-void PartSet_Module::setCustomized(const FeaturePtr& theFeature)
-{
- std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
-                        std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
- if (aCustomPrs.get())
-   aCustomPrs->setCustomized(theFeature);
-}
-
 bool PartSet_Module::customizeObject(ObjectPtr theObject)
 {
- ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-
- XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
- XGUI_Workshop* aWorkshop = aConnector->workshop();
- XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-
- AISObjectPtr anAISObj = aDisplayer->getAISObject(aResult);
- return myCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
+                          std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
+  bool isCustomized = false;
+  if (aCustomPrs->isActive())
+    isCustomized = aCustomPrs->customize(theObject);
+  return isCustomized;
 }
 
 void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)

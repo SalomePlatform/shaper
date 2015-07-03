@@ -5,6 +5,8 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <PartSet_Tools.h>
+#include <PartSet_Module.h>
+#include <PartSet_SketcherMgr.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -12,6 +14,12 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultConstruction.h>
+
+#include <XGUI_ModuleConnector.h>
+#include <XGUI_Displayer.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_SelectionMgr.h>
+#include <XGUI_Selection.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -38,6 +46,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 
+#include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ViewerPrs.h>
 
 #include <V3d_View.hxx>
@@ -51,6 +60,9 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
+#include <AIS_InteractiveObject.hxx>
+#include <StdSelect_BRepOwner.hxx>
+#include <SelectMgr_IndexedMapOfOwner.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -630,6 +642,63 @@ bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePt
   }
 
   return aHasVertex;
+}
+
+GeomShapePtr PartSet_Tools::findShapeBy2DPoint(const AttributePtr& theAttribute,
+                                               ModuleBase_IWorkshop* theWorkshop)
+{
+  // 1. find an attribute value in attribute reference attribute value
+  GeomShapePtr aShape;
+  AttributeRefAttrPtr aRefAttr =
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (aRefAttr) {
+    if (!aRefAttr->isObject()) {
+      AttributePtr theAttribute = aRefAttr->attr();
+      if (theAttribute.get()) {
+        XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
+        XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+        // 2. find visualized vertices of the attribute and if the attribute of the vertex is
+        // the same, return it
+        FeaturePtr anAttributeFeature = ModelAPI_Feature::feature(theAttribute->owner());
+        // 2.1 get visualized results of the feature
+        const std::list<ResultPtr>& aResList = anAttributeFeature->results();
+        std::list<ResultPtr>::const_iterator anIt = aResList.begin(), aLast = aResList.end();
+        for (; anIt != aLast; anIt++) {
+          AISObjectPtr aAISObj = aDisplayer->getAISObject(*anIt);
+          if (aAISObj.get() != NULL) {
+            Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+            // 2.2 find selected owners of a visualizedd object
+            SelectMgr_IndexedMapOfOwner aSelectedOwners;
+            aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
+            for (Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++) {
+              Handle(SelectMgr_EntityOwner) anOwner = aSelectedOwners(i);
+              if (!anOwner.IsNull()) {
+                Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
+                if (!aBRepOwner.IsNull() && aBRepOwner->HasShape()) {
+                  const TopoDS_Shape& aBRepShape = aBRepOwner->Shape();
+                  if (aBRepShape.ShapeType() == TopAbs_VERTEX) {
+                    // 2.3 if the owner is vertex and an attribute of the vertex is equal to the initial
+                    // attribute, returns the shape
+                    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(theWorkshop->module());
+                    PartSet_SketcherMgr* aSketchMgr = aModule->sketchMgr();
+                    AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(anAttributeFeature,
+                                                             aBRepShape, aSketchMgr->activeSketch());
+                    if (aPntAttr.get() != NULL && aPntAttr == theAttribute) {
+                      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
+                      aShape->setImpl(new TopoDS_Shape(aBRepShape));
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return aShape;
 }
 
 AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj, 

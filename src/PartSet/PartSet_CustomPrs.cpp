@@ -5,6 +5,8 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <PartSet_CustomPrs.h>
+#include <PartSet_Module.h>
+#include "PartSet_OperationPrs.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
@@ -21,139 +23,101 @@
 #include <Config_PropManager.h>
 
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_InteractiveObject.hxx>
+#include <Prs3d_PointAspect.hxx>
 
 #define OPERATION_PARAMETER_COLOR "255, 255, 0"
 
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop)
 {
-  Handle(PartSet_OperationPrs) myOperationPrs = new PartSet_OperationPrs(); /// AIS presentation for the feature of operation
+  myOperationPrs = AISObjectPtr(new GeomAPI_AISObject());
+  myOperationPrs->setImpl(new Handle(AIS_InteractiveObject)(new PartSet_OperationPrs(theWorkshop)));
+
+  std::vector<int> aColor = Config_PropManager::color("Visualization", "operation_parameter_color",
+                                                      OPERATION_PARAMETER_COLOR);
+  myOperationPrs->setColor(aColor[0], aColor[1], aColor[2]);
+
+  myOperationPrs->setPointMarker(5, 2.);
+  myOperationPrs->setWidth(1);
 }
 
-void PartSet_CustomPrs::setCustomized(const FeaturePtr& theFeature)
+bool PartSet_CustomPrs::isActive() const
 {
-
-  myOperationPrs->setFeature(theFeature);
-  /*  QMap<ResultPtr, QList<GeomShapePtr> > aNewCustomized;
-
-  QList<GeomShapePtr> aShapeList;
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aResult.get()) {
-    aNewCustomized[aResult] = aShapeList;
-  }
-  else {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get()) {
-      std::list<AttributePtr> anAttributes = aFeature->data()->attributes("");
-      std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
-      for (; anIt != aLast; anIt++) {
-        AttributePtr anAttribute = *anIt;
-        ObjectPtr anObject = GeomValidators_Tools::getObject(anAttribute);
-        if (anObject.get()) {
-          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-          if (aResult.get())
-            aNewCustomized[aResult] = aShapeList;
-        }
-        else if (anAttribute->attributeType() == ModelAPI_AttributeSelectionList::typeId()) {
-          std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList = 
-                  std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
-          for(int i = 0; i < aCurSelList->size(); i++) {
-            std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
-            ObjectPtr anObject = GeomValidators_Tools::getObject(aSelAttribute);
-            if (anObject.get()) {
-              ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-              if (aResult.get())
-                aNewCustomized[aResult] = aShapeList;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  bool isDone = false;
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  // find objects which are not customized anymore
-  QMap<ResultPtr, QList<GeomShapePtr> > aNotCustomized;
-  QMap<ResultPtr, QList<GeomShapePtr> >::const_iterator anIt = myCustomized.begin(),
-                                                        aLast = myCustomized.end();
-  for (; anIt != aLast; anIt++) {
-    ResultPtr aResult = anIt.key();
-    if (!aNewCustomized.contains(aResult))
-      aNotCustomized[aResult] = aShapeList;
-  }
 
-  myCustomized.clear();
-  // restore the previous state of the object if there is no such object in the new map
-  for (anIt = aNotCustomized.begin(), aLast = aNotCustomized.end(); anIt != aLast; anIt++) {
-    ResultPtr aResult = anIt.key();
-    AISObjectPtr anAISObj = aDisplayer->getAISObject(aResult);
-    if (anAISObj.get()) {
-      Handle(AIS_InteractiveObject) anAISIO = anAISObj->impl<Handle(AIS_InteractiveObject)>();
-      aContext->Redisplay(anAISIO, false);
-    }
-    isDone = aDisplayer->customizeObject(aResult);
-  }
-
-  // set customized for the new objects
-  myCustomized = aNewCustomized;
-  for (anIt = myCustomized.begin(), aLast = myCustomized.end(); anIt != aLast; anIt++) {
-    ResultPtr aResult = anIt.key();
-    AISObjectPtr anAISObj = aDisplayer->getAISObject(aResult);
-    if (anAISObj.get())
-      isDone = customisePresentation(aResult, anAISObj, 0) || isDone;
-  }
-  if (isDone)
-    aDisplayer->updateViewer();*/
+  return aContext->IsDisplayed(anOperationPrs);
 }
 
-/*#include <AIS_InteractiveObject.hxx>
-#include <AIS_Shape.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <StdPrs_ShadedShape.hxx>
-#include <StdPrs_WFDeflectionShape.hxx>*/
+void PartSet_CustomPrs::activate(const FeaturePtr& theFeature)
+{
+  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
+
+  if (anOperationPrs->canActivate(theFeature)) {
+    anOperationPrs->setFeature(theFeature);
+    if (theFeature.get())
+      displayPresentation();
+  }
+}
+
+void PartSet_CustomPrs::deactivate()
+{
+  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
+  anOperationPrs->setFeature(FeaturePtr());
+
+  erasePresentation();
+}
+
+
+void PartSet_CustomPrs::displayPresentation()
+{
+  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
+
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (!aContext->IsDisplayed(anOperationPrs)) {
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+    aContext->Display(anOperationPrs);
+    aContext->SetZLayer(anOperationPrs, aModule->getVisualLayerId());
+  }
+  else
+    anOperationPrs->Redisplay();
+}
+
+void PartSet_CustomPrs::erasePresentation()
+{
+  Handle(AIS_InteractiveObject) anOperationPrs = myOperationPrs->impl<Handle(AIS_InteractiveObject)>();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext->IsDisplayed(anOperationPrs))
+    aContext->Remove(anOperationPrs);
+}
+
+Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation() const
+{
+  Handle(AIS_InteractiveObject) anAISIO = myOperationPrs->impl<Handle(AIS_InteractiveObject)>();
+  return Handle(PartSet_OperationPrs)::DownCast(anAISIO);
+}
+
+bool PartSet_CustomPrs::customize(const ObjectPtr& theObject)
+{
+  // the presentation should be recomputed if the previous AIS depend on the result
+  // [it should be hiddend] or the new AIS depend on it [it should be visualized]
+  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext->IsDisplayed(anOperationPrs)) {
+    bool aChanged = anOperationPrs->dependOn(theObject);
+
+    anOperationPrs->updateShapes();
+    aChanged = aChanged || anOperationPrs->dependOn(theObject);
+
+    //if (aChanged)
+    anOperationPrs->Redisplay();
+  }
+  return false;
+}
+
 bool PartSet_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                               std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
 {
-  bool isDone = false;
-  /*if (myCustomized.contains(theResult)) {
-    std::vector<int> aColor = Config_PropManager::color("Visualization", "operation_parameter_color",
-                                                        OPERATION_PARAMETER_COLOR);
-    isDone = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-    /*
-    Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
-
-    const Handle(Prs3d_Presentation)& aPresentation = anAISIO->Presentation();
-    if (!aPresentation.IsNull()) {
-      Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAISIO);
-      if (!aShapeAIS.IsNull()) {
-        TopExp_Explorer anExp(aShapeAIS->Shape(), TopAbs_VERTEX);
-        Handle(Prs3d_Drawer) aDrawer = aShapeAIS->Attributes();
-        for (; anExp.More(); anExp.Next()) {
-          const TopoDS_Vertex& aVertex = (const TopoDS_Vertex&)anExp.Current();
-          StdPrs_WFDeflectionShape::Add(aPresentation, aVertex, aDrawer);
-        }
-      }
-    }
-    thePrs->setPointMarker(5, 5.); // Set point as a '+' symbol*+/
-  }
-  /*
-  std::vector<int> aColor;
-
-  getResultColor(theResult, aColor);
-
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (aMgr->activeDocument() != theResult->document()) {
-    QColor aQColor(aColor[0], aColor[1], aColor[2]);
-    QColor aNewColor = QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
-    aColor[0] = aNewColor.red();
-    aColor[1] = aNewColor.green();
-    aColor[2] = aNewColor.blue();
-  }
-  return !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);*/
-  return isDone;
+  return false;
 }
