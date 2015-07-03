@@ -378,12 +378,22 @@ void Model_Data::updateConcealmentFlag()
   }
 }
 
+#include <Model_Validator.h>
+
 void Model_Data::referencesToObjects(
   std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs)
 {
+  static Model_ValidatorsFactory* aValidators = 
+    static_cast<Model_ValidatorsFactory*>(ModelAPI_Session::get()->validators());
+  FeaturePtr aMyFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myObject);
+
   std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
   std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory menagement
   for(; anAttr != myAttrs.end(); anAttr++) {
+    // skip not-case attributres, that really may refer to anything not-used (issue 671)
+    if (aMyFeature.get() && !aValidators->isCase(aMyFeature, anAttr->second->id()))
+      continue;
+
     std::string aType = anAttr->second->attributeType();
     if (aType == ModelAPI_AttributeReference::typeId()) { // reference to object
       std::shared_ptr<ModelAPI_AttributeReference> aRef = std::dynamic_pointer_cast<
