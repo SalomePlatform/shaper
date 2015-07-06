@@ -296,29 +296,6 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     aDocList.push_back(aRootDocument);
   }
 
-  // Find parameters and rename in its expressions
-  for (std::list<DocumentPtr>::const_iterator aDicumentIt = aDocList.begin(); 
-       aDicumentIt != aDocList.end(); ++aDicumentIt) {
-    const DocumentPtr& aDocument = *aDicumentIt;
-    const int aSize = aDocument->size(ModelAPI_ResultParameter::group());
-    for (int anIndex = 0; anIndex < aSize; ++anIndex) {
-      ResultParameterPtr aResultParameter =
-          std::dynamic_pointer_cast<ModelAPI_ResultParameter>(
-              aDocument->object(ModelAPI_ResultParameter::group(), anIndex));
-      if (!aResultParameter.get())
-        continue;
-
-      std::shared_ptr<ParametersPlugin_Parameter> aParameter =
-          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
-              aDocument->feature(aResultParameter));
-      if (!aParameter.get())
-        continue;
-
-      // Rename
-      renameInParameter(aParameter, aMessage->oldName(), aMessage->newName());
-    }
-  }
-
   // Find all features
   for (std::list<DocumentPtr>::const_iterator aDicumentIt = aDocList.begin(); 
        aDicumentIt != aDocList.end(); ++aDicumentIt) {
@@ -328,6 +305,15 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     for (; aFeatureIt != aFeatures.end(); ++aFeatureIt) {
       const FeaturePtr& aFeature = *aFeatureIt;
       
+      // If Parameter feature then rename its expression
+      std::shared_ptr<ParametersPlugin_Parameter> aParameter =
+          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(aFeature);
+      if (aParameter.get()) {
+        // Rename
+        renameInParameter(aParameter, aMessage->oldName(), aMessage->newName());
+        continue;
+      }      
+
       // Find all attributes
       std::list<AttributePtr> anAttributes = aFeature->data()->attributes(std::string());
       std::list<AttributePtr>::const_iterator anAttributeIt = anAttributes.begin();
