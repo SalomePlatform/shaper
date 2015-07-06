@@ -18,6 +18,9 @@
 
 #include <string>
 
+class ModuleBase_IWorkshop;
+class XGUI_Workshop;
+
 /**
 * \ingroup Modules
 * Customosation of ModuleBase_WidgetShapeSelector in order to provide 
@@ -52,11 +55,14 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   // Removes the external presentation from the model
   /// \param theSketch a current sketch
   /// \param theFeature a current feature
+  /// \param theFeature a current workshop
   void removeExternal(const CompositeFeaturePtr& theSketch,
-                      const FeaturePtr& theFeature);
+                      const FeaturePtr& theFeature,
+                      ModuleBase_IWorkshop* theWorkshop);
 
   void removeExternalValidated(const CompositeFeaturePtr& theSketch,
-                               const FeaturePtr& theFeature);
+                               const FeaturePtr& theFeature,
+                               ModuleBase_IWorkshop* theWorkshop);
 
   void removeUnusedExternalObjects(const QObjectPtrList& theIgnoreObjects,
                             const CompositeFeaturePtr& theSketch,
@@ -65,7 +71,11 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
 protected:
   void removeExternalObject(const ObjectPtr& theObject,
                             const CompositeFeaturePtr& theSketch,
-                            const FeaturePtr& theFeature);
+                            const FeaturePtr& theFeature,
+                            ModuleBase_IWorkshop* theWorkshop);
+
+  /// Returns the workshop
+  static XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop);
 
 protected:
   /// An external object

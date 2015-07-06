@@ -122,7 +122,7 @@ GeomShapePtr PartSet_WidgetShapeSelector::getShape() const
 void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
-  myExternalObjectMgr->removeExternal(sketch(), myFeature);
+  myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop);
 }
 
 //********************************************************************

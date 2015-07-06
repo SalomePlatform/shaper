@@ -24,7 +24,7 @@ ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
                                                        ModuleBase_IWorkshop* theWorkshop,
                                                        const Config_WidgetAPI* theData,
                                                        const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId), isValidateBlocked(false),
+: ModuleBase_ModelWidget(theParent, theData, theParentId),
   myWorkshop(theWorkshop)
 {
 }
@@ -120,10 +120,6 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
     return aValid;
   }
 
-  if (isValidateBlocked)
-    return true;
-  isValidateBlocked = true;
-
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
@@ -160,7 +156,6 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   aLoop->flush(aRedispEvent);
 
   storeValidState(theValue, aValid);
-  isValidateBlocked = false;
   return aValid;
 }
 

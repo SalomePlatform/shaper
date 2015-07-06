@@ -130,7 +130,6 @@ private:
   ObjectPtr myPresentedObject; /// back up of the filtered object
   QList<ModuleBase_ViewerPrs> myValidPrs;
   QList<ModuleBase_ViewerPrs> myInvalidPrs;
-  bool isValidateBlocked;
 };
 
 #endif /* MODULEBASE_WIDGETVALIDATED_H_ */

@@ -87,7 +87,7 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
   myIsInVaildate = false;
   ModuleBase_WidgetMultiSelector::restoreAttributeValue(theValid);
 
-  myExternalObjectMgr->removeExternalValidated(sketch(), myFeature);
+  myExternalObjectMgr->removeExternalValidated(sketch(), myFeature, myWorkshop);
 }
 
 void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,

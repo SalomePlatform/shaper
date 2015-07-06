@@ -8,6 +8,7 @@
 #include "PartSet_Tools.h"
 
 #include <XGUI_Workshop.h>
+#include <XGUI_ModuleConnector.h>
 
 #include <SketchPlugin_Feature.h>
 
@@ -75,7 +76,8 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObjectValidated(const ObjectPtr& t
 
 //********************************************************************
 void PartSet_ExternalObjectsMgr::removeExternal(const CompositeFeaturePtr& theSketch,
-                                                const FeaturePtr& theFeature)
+                                                const FeaturePtr& theFeature,
+                                                ModuleBase_IWorkshop* theWorkshop)
 {
   QObjectPtrList::const_iterator anIt = myExternalObjects.begin(), aLast = myExternalObjects.end();
   for (; anIt != aLast; anIt++) {
@@ -94,7 +96,7 @@ void PartSet_ExternalObjectsMgr::removeExternal(const CompositeFeaturePtr& theSk
         // to delete this feature. Test case is creation of a constraint on external point,
         // use in this control after an external point, the point of the sketch.
         anIgnoredFeatures.insert(theFeature);
-        XGUI_Workshop::deleteFeatures(anObjects, anIgnoredFeatures);
+        workshop(theWorkshop)->deleteFeatures(anObjects, anIgnoredFeatures);
       }
     }
     //removeExternalObject(anObject, theSketch, theFeature);
@@ -126,16 +128,18 @@ void PartSet_ExternalObjectsMgr::removeUnusedExternalObjects(const QObjectPtrLis
 
 //********************************************************************
 void PartSet_ExternalObjectsMgr::removeExternalValidated(const CompositeFeaturePtr& theSketch,
-                                                         const FeaturePtr& theFeature)
+                                                         const FeaturePtr& theFeature,
+                                                         ModuleBase_IWorkshop* theWorkshop)
 {
   // TODO(nds): unite with removeExternal(), remove parameters
-  removeExternalObject(myExternalObjectValidated, theSketch, theFeature);
+  removeExternalObject(myExternalObjectValidated, theSketch, theFeature, theWorkshop);
   myExternalObjectValidated = ObjectPtr();
 }
 
 void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject,
                                                       const CompositeFeaturePtr& theSketch,
-                                                      const FeaturePtr& theFeature)
+                                                      const FeaturePtr& theFeature,
+                                                      ModuleBase_IWorkshop* theWorkshop)
 {
   if (theObject.get()) {
     DocumentPtr aDoc = theObject->document();
@@ -151,7 +155,13 @@ void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject
       // to delete this feature. Test case is creation of a constraint on external point,
       // use in this control after an external point, the point of the sketch.
       anIgnoredFeatures.insert(theFeature);
-      XGUI_Workshop::deleteFeatures(anObjects, anIgnoredFeatures);
+      workshop(theWorkshop)->deleteFeatures(anObjects, anIgnoredFeatures);
     }
   }
+}
+
+XGUI_Workshop* PartSet_ExternalObjectsMgr::workshop(ModuleBase_IWorkshop* theWorkshop)
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
+  return aConnector->workshop();
 }

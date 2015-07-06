@@ -1045,7 +1045,7 @@ void XGUI_Workshop::deleteObjects()
 
 //**************************************************************
 bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
-                                   std::set<FeaturePtr> theIgnoredFeatures,
+                                   const std::set<FeaturePtr>& theIgnoredFeatures,
                                    QWidget* theParent,
                                    const bool theAskAboutDeleteReferences)
 {
@@ -1152,13 +1152,16 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
   anInfo.clear();
 #endif
 
+  QString anId = QString::fromStdString("DELETE_CMD");
+  QStringList anObjectGroups = contextMenuMgr()->actionObjectGroups(anId);
   // 4. remove the parameter features
   foreach (ObjectPtr aObj, theList) {
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-    if (aResult.get() != NULL) { // results could not be removed,
-      // they are removed by a corresponded feature remove
+    // features and parameters can be removed here,
+    // the results are removed only by a corresponded feature remove
+    std::string aGroupName = aObj->groupName();
+    if (!anObjectGroups.contains(aGroupName.c_str()))
       continue;
-    }
+
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature) {
       // TODO: to learn the workshop to delegate the Part object deletion to the PartSet module

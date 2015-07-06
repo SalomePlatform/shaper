@@ -52,6 +52,10 @@ Q_OBJECT
   QMenu* objBrowserMenu() const;
   QMenu* viewerMenu() const;
 
+  /// Returns a list of object group names of the action
+  /// \param theName a name of the action
+  /// \return a list of group names
+  QStringList actionObjectGroups(const QString& theName);
 
 signals:
   /// Signal aabout triggered action

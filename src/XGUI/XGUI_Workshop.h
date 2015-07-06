@@ -218,10 +218,10 @@ Q_OBJECT
   //! \param theAskAboutDeleteReferences if true, the message box with a list of references to the
   //! objects features appear. If the user chose do not continue, the deletion is not performed
   //! \return the success of the delete 
-  static bool deleteFeatures(const QObjectPtrList& theList,
-                             std::set<FeaturePtr> theIgnoredFeatures = std::set<FeaturePtr>(),
-                             QWidget* theParent = 0,
-                             const bool theAskAboutDeleteReferences = false);
+  bool deleteFeatures(const QObjectPtrList& theList,
+                      const std::set<FeaturePtr>& theIgnoredFeatures,
+                      QWidget* theParent = 0,
+                      const bool theAskAboutDeleteReferences = false);
 
   /// Deactivates the object, if it is active and the module returns that the activation
   /// of selection for the object is not possible currently(the current operation uses it)

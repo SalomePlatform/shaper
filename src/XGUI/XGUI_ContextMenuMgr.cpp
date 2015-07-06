@@ -386,3 +386,24 @@ QMenu* XGUI_ContextMenuMgr::viewerMenu() const
   }
   return aMenu;
 }
+
+QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)
+{
+  QStringList aGroups;
+
+  QMap<std::string, QActionsList>::const_iterator anIt = myObjBrowserMenus.begin(),
+                                                  aLast = myObjBrowserMenus.end();
+  for (; anIt != aLast; anIt++) {
+    QString aGroupName(anIt.key().c_str());
+    if (aGroups.contains(aGroupName))
+      continue;
+    QActionsList anActions = anIt.value();
+    QActionsList::const_iterator anAIt = anActions.begin(), anALast = anActions.end();
+    bool aFound = false;
+    for (; anAIt != anALast && !aFound; anAIt++)
+      aFound = (*anAIt)->data().toString() == theName;
+    if (aFound)
+      aGroups.append(aGroupName);
+  }
+  return aGroups;
+}
