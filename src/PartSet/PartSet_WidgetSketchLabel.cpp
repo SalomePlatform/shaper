@@ -110,7 +110,7 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
     return;
   ModuleBase_ViewerPrs aPrs = aSelected.first();
 
-  bool isDone = ModuleBase_WidgetValidated::setSelection(aSelected, true);
+  bool isDone = ModuleBase_WidgetValidated::setSelection(aSelected, false);
   if (!isDone)
     return;
 
