@@ -579,7 +579,7 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  myCurrentDir = QFileDialog::getExistingDirectory(mainWindow(), tr("Select folder"));
+  myCurrentDir = QFileDialog::getExistingDirectory(mainWindow(), tr("Select directory"));
   if (myCurrentDir.isEmpty())
     return;
   QFileInfo aFileInfo(myCurrentDir);
@@ -621,9 +621,9 @@ bool XGUI_Workshop::onSaveAs()
   if(!isActiveOperationAborted())
     return false;
   QFileDialog dialog(mainWindow());
-  dialog.setWindowTitle(tr("Select folder to save files..."));
+  dialog.setWindowTitle(tr("Select directory to save files..."));
   dialog.setFileMode(QFileDialog::Directory);
-  dialog.setFilter(tr("Folders (*)"));
+  dialog.setFilter(tr("Directories (*)"));
   dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
   dialog.setViewMode(QFileDialog::Detail);
 
@@ -638,7 +638,7 @@ bool XGUI_Workshop::onSaveAs()
         myMainWindow,
         //: Title of the dialog which asks user if he wants to save study in existing non-empty folder
         tr("Save"),
-        tr("The folder already contains some files, save anyway?"),
+        tr("The directory already contains some files, save anyway?"),
         QMessageBox::Save | QMessageBox::Cancel);
     if (answer == QMessageBox::Cancel) {
       return false;
