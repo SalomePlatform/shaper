@@ -163,6 +163,9 @@ Q_OBJECT
   //! Delete features
   void deleteObjects();
 
+  //! Move selected features to be after the current feature
+  void moveObjects();
+
   //! Returns true if there is at least one selected body/construction/group result
   //! \return boolean value
   bool canChangeColor() const;

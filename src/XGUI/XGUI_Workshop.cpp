@@ -965,6 +965,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
   if (theId == "DELETE_CMD")
     deleteObjects();
+  if (theId == "MOVE_CMD")
+    moveObjects();
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
   else if (theId == "SHOW_CMD")
@@ -1041,6 +1043,31 @@ void XGUI_Workshop::deleteObjects()
   else {
     aMgr->abortOperation();
   }
+}
+
+//**************************************************************
+void XGUI_Workshop::moveObjects()
+{
+  if (!isActiveOperationAborted())
+    return;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+
+  QString aDescription = contextMenuMgr()->action("MOVE_CMD")->text();
+  aMgr->startOperation(aDescription.toStdString());
+
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  DocumentPtr anActiveDocument = aMgr->activeDocument();
+
+  FeaturePtr aCurrentFeature = anActiveDocument->currentFeature(true);
+  foreach (ObjectPtr aObj, anObjects) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature.get()) {
+      anActiveDocument->moveFeature(aFeature, aCurrentFeature);
+      aCurrentFeature = anActiveDocument->currentFeature(true);
+    }
+  }
+  aMgr->finishOperation();
 }
 
 //**************************************************************

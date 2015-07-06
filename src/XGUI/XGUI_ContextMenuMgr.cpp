@@ -54,6 +54,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction->setShortcut(Qt::Key_Delete);
   aAction->setShortcutContext(Qt::ApplicationShortcut);
 
+  aAction = new QAction(QIcon(":pictures/move.png"), tr("Move..."), this);
+  addAction("MOVE_CMD", aAction);
+
   aAction = new QAction(QIcon(":pictures/color.png"), tr("Color..."), this);
   addAction("COLOR_CMD", aAction);
 
@@ -197,6 +200,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     }
     if (hasFeature || hasParameter)
       action("DELETE_CMD")->setEnabled(true);
+
+    if (hasFeature || hasParameter)
+      action("MOVE_CMD")->setEnabled(true);
   }
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
@@ -286,6 +292,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   // Feature menu
   aList.clear();
   aList.append(action("DELETE_CMD"));
+  aList.append(action("MOVE_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
   //-------------------------------------
@@ -341,6 +348,7 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
       aActions.append(action("SHOW_ONLY_CMD"));
       aActions.append(mySeparator);
       aActions.append(action("DELETE_CMD"));
+      aActions.append(action("MOVE_CMD"));
   }
   aMenu->addActions(aActions);
 
