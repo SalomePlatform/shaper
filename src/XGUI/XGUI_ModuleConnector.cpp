@@ -100,8 +100,6 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   ObjectPtr anObject = aDisp->getObject(theAIS);
-  if (!anObject.get())
-    anObject = module()->findPresentedObject(theAIS);
   return anObject;
 }
 

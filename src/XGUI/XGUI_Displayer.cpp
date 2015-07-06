@@ -575,14 +575,23 @@ ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
-  ObjectPtr aFeature;
+  ObjectPtr anObject;
   foreach (ObjectPtr anObj, myResult2AISObjectMap.keys()) {
     AISObjectPtr aAIS = myResult2AISObjectMap[anObj];
     Handle(AIS_InteractiveObject) anAIS = aAIS->impl<Handle(AIS_InteractiveObject)>();
     if (anAIS == theIO)
-      return anObj;
+      anObject = anObj;
+    if (anObject.get())
+      break;
   }
-  return aFeature;
+  if (!anObject.get()) {
+    std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
+    if (!theIO.IsNull()) {
+      anAISObj->setImpl(new Handle(AIS_InteractiveObject)(theIO));
+    }
+    anObject = myWorkshop->module()->findPresentedObject(anAISObj);
+  }
+  return anObject;
 }
 
 bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
