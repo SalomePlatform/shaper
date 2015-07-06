@@ -22,6 +22,8 @@ class Model_ResultPart : public ModelAPI_ResultPart
 {
   TopoDS_Shape myShape; ///< shape of this part created from bodies (updated only of Part deactivation)
  public:
+  /// Request for initialization of data model of the result: adding all attributes
+  virtual void initAttributes();
   /// Returns the part-document of this result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
   /// Part has no stored feature: this method returns NULL

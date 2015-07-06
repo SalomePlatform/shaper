@@ -1240,38 +1240,18 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   // The objects are iterated until a first valid color is found 
   std::vector<int> aColor;
   foreach(ObjectPtr anObject, theObjects) {
-    if (anObject->groupName() == ModelAPI_ResultPart::group()) {
-      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anObject);
-      DocumentPtr aPartDoc = aPart->partDoc();
-      // the document should be checked on null, because in opened document if the part
-      // has not been activated yet, the part document is empty
-      if (!aPartDoc.get()) {
-        emit errorOccurred(QString::fromLatin1("Color can not be changed on a part with an empty document"));
-      }
-      else {
-        if (aPartDoc->size(ModelAPI_ResultBody::group()) > 0) {
-          ObjectPtr aObject = aPartDoc->object(ModelAPI_ResultBody::group(), 0);
-          ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
-          if (aBody.get()) {
-            XGUI_CustomPrs::getResultColor(aBody, aColor);
-          }
-        }
-      }
-    }
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    if (aResult.get())
+      XGUI_CustomPrs::getResultColor(aResult, aColor);
     else {
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-      if (aResult.get())
-        XGUI_CustomPrs::getResultColor(aResult, aColor);
-      else {
-        // TODO: remove the obtaining a color from the AIS object
-        // this does not happen never because:
-        // 1. The color can be changed only on results
-        // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
-        AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
-        if (anAISObj.get()) {
-          aColor.resize(3);
-          anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
-        }
+      // TODO: remove the obtaining a color from the AIS object
+      // this does not happen never because:
+      // 1. The color can be changed only on results
+      // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
+      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+      if (anAISObj.get()) {
+        aColor.resize(3);
+        anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
       }
     }
     if (!aColor.empty())
@@ -1302,24 +1282,8 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      if (aResult->groupName() == ModelAPI_ResultPart::group()) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aResult);
-        DocumentPtr aPartDoc = aPart->partDoc();
-        // the document should be checked on null, because in opened document if the part
-        // has not been activated yet, the part document is empty
-        if (aPartDoc.get()) {
-          for (int i = 0; i < aPartDoc->size(ModelAPI_ResultBody::group()); i++) {
-            ObjectPtr aObject = aPartDoc->object(ModelAPI_ResultBody::group(), i);
-            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
-            std::vector<int> aColorResult = aDlg->getColor();
-            setColor(aBody, aColorResult);
-          }
-        }
-      }
-      else {
-        std::vector<int> aColorResult = aDlg->getColor();
-        setColor(aResult, aColorResult);
-      }
+      std::vector<int> aColorResult = aDlg->getColor();
+      setColor(aResult, aColorResult);
     }
   }
   if (!aWasOperation)

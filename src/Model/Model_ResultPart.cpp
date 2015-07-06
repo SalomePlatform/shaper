@@ -10,6 +10,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <Model_Document.h>
 
 #include <TNaming_Tool.hxx>
@@ -18,6 +19,13 @@
 #include <TDataStd_Name.hxx>
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
+
+void Model_ResultPart::initAttributes()
+{
+  // append the color attribute. It is empty, the attribute will be filled by a request
+  DataPtr aData = data();
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
+}
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
