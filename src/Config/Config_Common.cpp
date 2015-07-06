@@ -17,6 +17,7 @@
 
 #include <string>
 #include <algorithm> // for std::transform
+#include <vector>
 
 bool isElementNode(xmlNodePtr theNode)
 {
@@ -55,12 +56,14 @@ bool isAttributeNode(xmlNodePtr theNode)
     return false;
   // it's parent is "feature" or "source" or page ("case" or "box")
   if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, 
+                         WDG_GROUP, WDG_CHECK_GROUP,
                          WDG_TOOLBOX_BOX, WDG_SWITCH_CASE, NULL))
     return false;
 
   //it should not be a "source" or a "validator" node
   bool isLogical = isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NODE_SELFILTER, NULL);
   bool isPagedContainer = isNode(theNode, WDG_TOOLBOX, WDG_TOOLBOX_BOX,
+                                          WDG_GROUP, WDG_CHECK_GROUP,
                                           WDG_SWITCH, WDG_SWITCH_CASE,  NULL);
   return !isLogical && !isPagedContainer;
 }
@@ -138,6 +141,39 @@ bool hasParent(xmlNodePtr theNode, const char* theNodeName, ...)
   }
   va_end(args);  // cleanup the system stack
   return false;
+}
+
+bool hasParentRecursive(xmlNodePtr theNode, const std::vector<const char*>& theNodeNames)
+{
+  if (!hasParent(theNode)) {
+    return false; // have no parents at all
+  }
+  xmlNodePtr aNode = theNode->parent;
+  const xmlChar* aName = aNode->name;
+  if (!aName || !isElementNode(aNode)) {
+    return false;
+  }
+  for (size_t anIndex = 0; anIndex < theNodeNames.size(); ++anIndex) {
+    if (!xmlStrcmp(aName, (const xmlChar *) theNodeNames[anIndex]))
+      return true;
+  }
+  return hasParentRecursive(aNode, theNodeNames);
+}
+
+bool hasParentRecursive(xmlNodePtr theNode, const char* theNodeName, ...)
+{
+  std::vector<const char*> aNodeNames;
+  va_list args;  // define argument list variable
+  va_start(args, theNodeName);  // init list; point to last defined argument
+  aNodeNames.push_back(theNodeName);
+  while (true) {
+    char *anArg = va_arg (args, char*);  // get next argument
+    if (anArg == NULL)
+      break;
+    aNodeNames.push_back(anArg);
+  }
+  va_end(args);  // cleanup the system stack
+  return hasParentRecursive(theNode, aNodeNames);
 }
 
 bool getParametersInfo(xmlNodePtr theNode, std::string& outPropertyId,

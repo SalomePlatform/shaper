@@ -82,6 +82,12 @@ CONFIG_EXPORT bool hasParent(xmlNodePtr theNode);
 CONFIG_EXPORT bool hasParent(xmlNodePtr theNode, const char* theNodeName, ...);
 
 /*!
+ * Checks if the given node has any valid parent in hierarchy with any of the given node names.
+ */
+CONFIG_EXPORT bool hasParentRecursive(xmlNodePtr theNode, const char* theNodeName, ...);
+
+
+/*!
  * Returns named property for an id node as std::string and the parameters of the node.
  */
 CONFIG_EXPORT bool getParametersInfo(xmlNodePtr theNode, std::string& outPropertyId,

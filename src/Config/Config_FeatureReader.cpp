@@ -72,11 +72,11 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
         aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
         // nested "paged" widgets are not allowed, this issue may be resolved here:
-        if (hasParent(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL)) {
-          const char* kWdgCase = hasParent(theNode, WDG_SWITCH_CASE, NULL)
+        if (hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL)) {
+          const char* kWdgCase = hasParentRecursive(theNode, WDG_SWITCH_CASE, NULL)
                                  ? WDG_SWITCH_CASE
                                  : WDG_TOOLBOX_BOX;
-          const char* kWdgSwitch = hasParent(theNode, WDG_SWITCH_CASE, NULL)
+          const char* kWdgSwitch = hasParentRecursive(theNode, WDG_SWITCH_CASE, NULL)
                                    ? WDG_SWITCH
                                    : WDG_TOOLBOX;
           aMessage->setCaseId(restoreAttribute(kWdgCase, _ID));
@@ -106,6 +106,7 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
   bool result = isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
   if(!result && myIsProcessWidgets) {
     result = isNode(theNode, NODE_FEATURE, 
+                             WDG_GROUP, WDG_CHECK_GROUP,
                              WDG_TOOLBOX, WDG_TOOLBOX_BOX,
                              WDG_SWITCH, WDG_SWITCH_CASE, NULL);
   }
