@@ -243,6 +243,56 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
   }
 }
 
+void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
+{
+  TDF_Label aFeaturesLab = featuresLabel();
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (!aFeaturesLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+    return;
+  TDF_Label anAfterLab, aMovedLab = 
+    std::dynamic_pointer_cast<Model_Data>(theMoved->data())->label().Father();
+  if (theAfterThis.get())
+    anAfterLab = std::dynamic_pointer_cast<Model_Data>(theAfterThis->data())->label().Father();
+
+  Handle(TDataStd_HLabelArray1) aNewArray = 
+    new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper());
+  int aPassedMovedFrom = 0; // the prev feature location is found and passed
+  int aPassedMovedTo = 0; // the feature is added and this location is passed
+  if (!theAfterThis.get()) { // null means that inserted feature must be the first
+    aNewArray->SetValue(aRefs->Lower(), aMovedLab);
+    aPassedMovedTo = 1;
+  }
+  for (int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
+    if (aPassedMovedTo == 0 && aRefs->Value(a) == anAfterLab) { // add two
+      aPassedMovedTo++;
+      aNewArray->SetValue(a - aPassedMovedFrom, anAfterLab);
+      if (a + 1 - aPassedMovedFrom <= aRefs->Upper())
+        aNewArray->SetValue(a + 1 - aPassedMovedFrom, aMovedLab);
+    } else if (aPassedMovedFrom == 0 && aRefs->Value(a) == aMovedLab) { // skip
+      aPassedMovedFrom++;
+    } else { // just copy one
+      if (a - aPassedMovedFrom + aPassedMovedTo <= aRefs->Upper())
+        aNewArray->SetValue(a - aPassedMovedFrom + aPassedMovedTo, aRefs->Value(a));
+    }
+  }
+  if (!aPassedMovedFrom || !aPassedMovedTo) {// not found: unknown situation
+    if (!aPassedMovedFrom) {
+      static std::string aMovedFromError("The moved feature is not found");
+      Events_Error::send(aMovedFromError);
+    } else {
+      static std::string aMovedToError("The 'after' feature for movement is not found");
+      Events_Error::send(aMovedToError);
+    }
+    return;
+  }
+  // store the new array
+  aRefs->SetInternalArray(aNewArray);
+  // update the feature and the history
+  clearHistory(theMoved);
+  static Events_ID EVENT_UPD = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  ModelAPI_EventCreator::get()->sendUpdated(theMoved, EVENT_UPD);
+}
+
 void Model_Objects::clearHistory(ObjectPtr theObj)
 {
   if (theObj) {

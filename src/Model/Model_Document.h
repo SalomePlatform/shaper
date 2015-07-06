@@ -88,6 +88,9 @@ class Model_Document : public ModelAPI_Document
   //! \param theFeature a removed feature
   MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 
+  //! Moves the feature to make it after the given one in the history.
+  MODEL_EXPORT virtual void moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis);
+
   //! Returns the first found object in the group by the object name
   //! \param theGroupID group that contains an object
   //! \param theName name of the object to search

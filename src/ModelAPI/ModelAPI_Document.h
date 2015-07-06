@@ -60,6 +60,10 @@ public:
   //! \param theFeature a feature to be removed
   virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
+  //! Moves the feature to make it after the given one in the history.
+  virtual void moveFeature(std::shared_ptr<ModelAPI_Feature> theMoved, 
+                           std::shared_ptr<ModelAPI_Feature> theAfterThis) = 0;
+
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
 

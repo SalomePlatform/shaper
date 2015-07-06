@@ -51,6 +51,9 @@ class Model_Objects
   //! \param theFeature a removed feature
   void removeFeature(FeaturePtr theFeature);
 
+  //! Moves the feature to make it after the given one in the history.
+  void moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis);
+
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
   FeaturePtr feature(TDF_Label theLabel) const;
