@@ -133,7 +133,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           SLOT(onViewTransformed(int)));
 
   myMenuMgr = new PartSet_MenuMgr(this);
-  myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new PartSet_CustomPrs(theWshop));
+  myCustomPrs = new PartSet_CustomPrs(theWshop);
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
@@ -280,9 +280,7 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     mySketchMgr->startNestedSketch(theOperation);
   }
 
-  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
-                        std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
-  aCustomPrs->activate(theOperation->feature());
+  myCustomPrs->activate(theOperation->feature());
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -296,9 +294,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
   aViewer->RemoveZLayer(myVisualLayerId);
   myVisualLayerId = 0;
-  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
-                        std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
-  aCustomPrs->deactivate();
+  myCustomPrs->deactivate();
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const
@@ -730,14 +726,10 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
-bool PartSet_Module::customizeObject(ObjectPtr theObject)
+void PartSet_Module::customizeObject(ObjectPtr theObject)
 {
-  std::shared_ptr<PartSet_CustomPrs> aCustomPrs =
-                          std::dynamic_pointer_cast<PartSet_CustomPrs>(myCustomPrs);
-  bool isCustomized = false;
-  if (aCustomPrs->isActive())
-    isCustomized = aCustomPrs->customize(theObject);
-  return isCustomized;
+  if (myCustomPrs->isActive())
+    myCustomPrs->customize(theObject);
 }
 
 void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)

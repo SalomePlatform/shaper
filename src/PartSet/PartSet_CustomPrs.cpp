@@ -98,26 +98,18 @@ Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation() const
   return Handle(PartSet_OperationPrs)::DownCast(anAISIO);
 }
 
-bool PartSet_CustomPrs::customize(const ObjectPtr& theObject)
+void PartSet_CustomPrs::customize(const ObjectPtr& theObject)
 {
   // the presentation should be recomputed if the previous AIS depend on the result
   // [it should be hiddend] or the new AIS depend on it [it should be visualized]
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (aContext->IsDisplayed(anOperationPrs)) {
-    bool aChanged = anOperationPrs->dependOn(theObject);
-
+    // if there are performance poblems, to improve them, the necessity of redisplay can be checked
+    //bool aChanged = anOperationPrs->dependOn(theObject);
     anOperationPrs->updateShapes();
-    aChanged = aChanged || anOperationPrs->dependOn(theObject);
-
+    //aChanged = aChanged || anOperationPrs->dependOn(theObject);
     //if (aChanged)
     anOperationPrs->Redisplay();
   }
-  return false;
-}
-
-bool PartSet_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                              std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
-{
-  return false;
 }

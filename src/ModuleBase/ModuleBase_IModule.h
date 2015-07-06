@@ -148,9 +148,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   * If the object is result with the color attribute value set, it is used,
   * otherwise the customize is applyed to the object's feature if it is a custom prs
   * \param theObject an object instance
-  * \return the true state if there is changes and the presentation is customized
   */
-  virtual bool customizeObject(ObjectPtr theObject) { return false; }
+  virtual void customizeObject(ObjectPtr theObject) {}
 
   /// This method is called on object browser creation for customisation of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget

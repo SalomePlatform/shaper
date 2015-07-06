@@ -25,7 +25,7 @@ class ModuleBase_IWorkshop;
 * Interface of a class which can provide specific customization of
 * object presentation
 */
-class PartSet_CustomPrs : public GeomAPI_ICustomPrs
+class PartSet_CustomPrs
 {
 public:
   PARTSET_EXPORT PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop);
@@ -40,11 +40,8 @@ public:
   void deactivate();
 
   /// Modifies the given presentation in the custom way.
-  bool customize(const ObjectPtr& theObject);
+  void customize(const ObjectPtr& theObject);
 
-  /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
 private:
   /// Returns the AIS presentation
   Handle(PartSet_OperationPrs) getPresentation() const;
