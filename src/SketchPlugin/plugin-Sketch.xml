@@ -248,7 +248,7 @@
             <validator id="GeomValidators_ShapeType" parameters="line"/>
         </sketch_shape_selector>
         <sketch_multi_selector id="ConstraintMirrorList"
-            label="segments"
+            label="Segments:"
             tooltip="Select list of mirroring objects"
             type_choice="Edges"
             use_external="true">
@@ -261,7 +261,7 @@
         title="Translation" icon=":icons/translate.png"
         tooltip="Translation">
         <sketch_multi_selector id="MultiTranslationList"
-            label="segments"
+            label="Segments:"
             tooltip="Select list of translating objects"
             type_choice="Edges"
             use_external="true">
@@ -290,7 +290,7 @@
         title="Rotation" icon=":icons/rotate.png"
         tooltip="Rotation">
         <sketch_multi_selector id="MultiRotationList"
-            label="segments"
+            label="Segments:"
             tooltip="Select list of rotating objects"
             type_choice="Edges"
             use_external="true">

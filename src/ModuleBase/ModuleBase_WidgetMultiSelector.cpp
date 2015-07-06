@@ -73,12 +73,12 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   aMainLay->addWidget(aListLabel, 1, 0);
   // if the xml definition contains one type, an information label should be shown near to the latest
   if (aShapeTypes.size() == 1) {
-    QString aLabelText = QString::fromStdString(theData->widgetLabel());
     QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-    QLabel* aSelectedLabel = new QLabel(aLabelText, this);
-    if (!aLabelIcon.isEmpty())
+    if (!aLabelIcon.isEmpty()) {
+      QLabel* aSelectedLabel = new QLabel("", this);
       aSelectedLabel->setPixmap(QPixmap(aLabelIcon));
-    aMainLay->addWidget(aSelectedLabel, 1, 1);
+      aMainLay->addWidget(aSelectedLabel, 1, 1);
+    }
     aMainLay->setColumnStretch(2, 1);
   }
 
