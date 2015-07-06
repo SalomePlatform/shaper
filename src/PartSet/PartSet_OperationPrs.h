@@ -25,6 +25,9 @@
 
 DEFINE_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape)
 
+class XGUI_Workshop;
+class XGUI_Displayer;
+
 /**
 * \ingroup GUI
 * A redefinition of standard AIS Interactive Object in order to provide colored presentation of
@@ -66,6 +69,13 @@ protected:
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                                 const Standard_Integer aMode) ;
 private:
+  /// Return true if the object is visible. If the object is feature, it returns true
+  /// if all results of the feature are shown
+  /// \param theDisplayer a displayer
+  /// \param theObject an object
+  /// \return a boolean value
+  bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
+
   /// Fills the map by the feature object and shapes, which should be visuaziled
   /// Gets the feature attribute, collect objects to whom the attribute refers
   /// \param theObjectShape an output map of objects
@@ -75,6 +85,10 @@ private:
   /// \param theAttribute an attribute
   /// \return a boolean value
   static bool isSelectionAttribute(const AttributePtr& theAttribute);
+
+  /// Converts the current workshop to XGUI workshop
+  /// \return a workshop instance
+  XGUI_Workshop* workshop() const;
 
 private:
   ModuleBase_IWorkshop* myWorkshop;

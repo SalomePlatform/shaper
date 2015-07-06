@@ -7,13 +7,20 @@
 #include "PartSet_OperationPrs.h"
 #include "PartSet_Tools.h"
 
+#include "XGUI_Workshop.h"
+#include "XGUI_ModuleConnector.h"
+#include "XGUI_Displayer.h"
+
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
+
 #include <GeomValidators_Tools.h>
+
+#include <GeomAPI_IPresentable.h>
 
 #include <StdPrs_WFDeflectionShape.hxx>
 
@@ -61,12 +68,16 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Standard_Integer theMode)
 {
   thePresentation->Clear();
+  XGUI_Displayer* aDisplayer = workshop()->displayer();
 
   // create presentations on the base of the shapes
   Handle(Prs3d_Drawer) aDrawer = Attributes();
   QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
                                                         aLast = myFeatureShapes.end();
   for (; anIt != aLast; anIt++) {
+    ObjectPtr anObject = anIt.key();
+    if (!isVisible(aDisplayer, anObject))
+      continue;
     QList<GeomShapePtr> aShapes = anIt.value();
     QList<GeomShapePtr>::const_iterator aShIt = aShapes.begin(), aShLast = aShapes.end();
     for (; aShIt != aShLast; aShIt++) {
@@ -81,6 +92,26 @@ void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
                                             const Standard_Integer aMode)
 {
   // the presentation is not used in the selection
+}
+
+bool PartSet_OperationPrs::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& theObject)
+{
+  bool aVisible = false;
+  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aPrs.get() || aResult.get())
+    aVisible = theDisplayer->isVisible(theObject);
+  else {
+    // check if all results of the feature are visible
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    aVisible = !aResults.empty();
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+      aVisible = aVisible && theDisplayer->isVisible(*aIt);
+    }
+  }
+  return aVisible;
 }
 
 void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
@@ -169,4 +200,10 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
          anAttrType == ModelAPI_AttributeRefAttr::typeId() ||
          anAttrType == ModelAPI_AttributeSelection::typeId() ||
          anAttrType == ModelAPI_AttributeReference::typeId();
+}
+
+XGUI_Workshop* PartSet_OperationPrs::workshop() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  return aConnector->workshop();
 }
