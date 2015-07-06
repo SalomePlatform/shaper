@@ -188,7 +188,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           if (!(hasParameter || hasFeature))
             action("SHOW_ONLY_CMD")->setEnabled(true);
         }
-      } 
+        else if (hasFeature && myWorkshop->canMoveFeature())
+          action("MOVE_CMD")->setEnabled(true);
+      }
     } else {
       if (hasResult && (!hasParameter)) {
         action("SHOW_CMD")->setEnabled(true);
@@ -200,9 +202,6 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     }
     if (hasFeature || hasParameter)
       action("DELETE_CMD")->setEnabled(true);
-
-    if (hasFeature || hasParameter)
-      action("MOVE_CMD")->setEnabled(true);
   }
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
@@ -294,6 +293,9 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("DELETE_CMD"));
   aList.append(action("MOVE_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
+
+  aList.clear();
+  aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
   //-------------------------------------
 }
@@ -348,7 +350,7 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
       aActions.append(action("SHOW_ONLY_CMD"));
       aActions.append(mySeparator);
       aActions.append(action("DELETE_CMD"));
-      aActions.append(action("MOVE_CMD"));
+      //aActions.append(action("MOVE_CMD"));
   }
   aMenu->addActions(aActions);
 

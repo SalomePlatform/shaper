@@ -1230,6 +1230,12 @@ bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes
 }
 
 //**************************************************************
+bool XGUI_Workshop::canMoveFeature()
+{
+  return true;
+}
+
+//**************************************************************
 bool XGUI_Workshop::canChangeColor() const
 {
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();

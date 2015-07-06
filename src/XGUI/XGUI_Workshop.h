@@ -163,6 +163,10 @@ Q_OBJECT
   //! Delete features
   void deleteObjects();
 
+  //! Returns true if the selected feature can be moved to the position after the current feature
+  //! \return boolean value
+  bool canMoveFeature();
+
   //! Move selected features to be after the current feature
   void moveObjects();
 
