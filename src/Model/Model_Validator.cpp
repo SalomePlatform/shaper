@@ -196,6 +196,9 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
       std::map<std::string, AttrValidators>::const_iterator anAttr = 
           aFeatureIter->second.find(*anAttrIter);
       if (anAttr != aFeatureIter->second.end()) {
+        // skip not-case attributres, that really may be invalid (issue 671)
+        if (!const_cast<Model_ValidatorsFactory*>(this)->isCase(theFeature, anAttr->first))
+          continue;
         AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
         for (; aValIter != anAttr->second.cend(); aValIter++) {
           std::map<std::string, ModelAPI_Validator*>::const_iterator aFound = myIDs.find(
