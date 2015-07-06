@@ -23,7 +23,7 @@
     max="360"
     step="1.0"
     default="0"
-    icon=":icons/radius.png"
+    icon=":icons/angle.png"
     tooltip="Angle">
   </doublevalue>
 </source>

@@ -255,6 +255,7 @@
             <validator id="SketchPlugin_MirrorAttr" />
         </sketch_multi_selector>
       </feature>
+      
       <!--  SketchMultiTranslation  -->
       <feature
         id="SketchMultiTranslation"
@@ -284,6 +285,7 @@
           <validator id="GeomValidators_Positive"/>
         </integervalue>
       </feature>
+      
       <!--  SketchMultiRotation  -->
       <feature
         id="SketchMultiRotation"
