@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void GeomData_Point::setValue(const double theX, const double theY, const double theZ)
+void GeomData_Point::setCalculatedValue(const double theX, const double theY, const double theZ)
 {
   if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY
       || myCoords->Value(2) != theZ) {
@@ -21,6 +21,13 @@ void GeomData_Point::setValue(const double theX, const double theY, const double
     myCoords->SetValue(2, theZ);
     owner()->data()->sendAttributeUpdated(this);
   }
+}
+
+void GeomData_Point::setValue(const double theX, const double theY, const double theZ)
+{
+  setCalculatedValue(textX().empty() ? theX : x(),
+                     textY().empty() ? theY : y(),
+                     textZ().empty() ? theZ : z());
 }
 
 void GeomData_Point::setValue(const std::shared_ptr<GeomAPI_Pnt>& thePoint)

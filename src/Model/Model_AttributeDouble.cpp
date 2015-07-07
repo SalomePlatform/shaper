@@ -15,12 +15,17 @@
 
 using namespace std;
 
-void Model_AttributeDouble::setValue(const double theValue)
+void Model_AttributeDouble::setCalculatedValue(const double theValue)
 {
   if (!myIsInitialized || myReal->Get() != theValue) {
     myReal->Set(theValue);
     owner()->data()->sendAttributeUpdated(this);
   }
+}
+
+void Model_AttributeDouble::setValue(const double theValue)
+{
+  setCalculatedValue(text().empty() ? theValue : value());
 }
 
 double Model_AttributeDouble::value()

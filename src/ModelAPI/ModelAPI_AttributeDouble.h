@@ -23,10 +23,13 @@ class ModelAPI_AttributeDouble : public ModelAPI_Attribute
   /// Returns the double value
   MODELAPI_EXPORT virtual double value() = 0;
 
-  /// Defines the double value
+  /// Defines the calculated double value
+  MODELAPI_EXPORT virtual void setCalculatedValue(const double theValue) = 0;
+
+  /// Defines the text value
   MODELAPI_EXPORT virtual void setText(const std::string& theText) = 0;
 
-  /// Returns the double value
+  /// Returns the text value
   MODELAPI_EXPORT virtual std::string text() = 0;
 
   /// Allows to set expression (text) as invalid (by the parameters listener)

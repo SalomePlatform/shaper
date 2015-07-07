@@ -165,13 +165,14 @@ bool PartSet_WidgetPoint2D::storeValueCustom() const
   PartSet_WidgetPoint2D* that = (PartSet_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
   bool isImmutable = aPoint->setImmutable(true);
-  
-  if (myXSpin->hasVariable() || myYSpin->hasVariable()) {
-    aPoint->setText(myXSpin->text().toStdString(), myYSpin->text().toStdString());
-  } else {
-    aPoint->setValue(myXSpin->value(), myYSpin->value());
-    aPoint->setText("", "");
-  }
+
+  // if text is not empty then setValue will be ignored
+  // so we should set the text at first
+  aPoint->setText(myXSpin->hasVariable() ? myXSpin->text().toStdString() : "",
+                  myYSpin->hasVariable() ? myYSpin->text().toStdString() : "");
+  aPoint->setValue(!myXSpin->hasVariable() ? myXSpin->value() : aPoint->x(),
+                   !myYSpin->hasVariable() ? myYSpin->value() : aPoint->y());
+
   // after movement the solver will call the update event: optimization
   moveObject(myFeature);
   aPoint->setImmutable(isImmutable);

@@ -31,6 +31,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_SketchEntity.h>
+#include <SketchPlugin_Tools.h>
 
 #include <Events_Loop.h>
 
@@ -287,6 +288,8 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
   theFeature->data()->copyTo(aNewFeature->data());
   // as a name for the feature, the generated unique name is set
   aNewFeature->data()->setName(aUniqueFeatureName);
+  // text expressions could block setValue of some attributes
+  clearExpressions(aNewFeature);
 
   return aNewFeature;
 }

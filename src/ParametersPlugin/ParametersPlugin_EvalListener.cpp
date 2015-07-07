@@ -96,7 +96,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     std::string anError;
     double aValue = evaluate(aDoubleAttribute->text(), anError);
     if (anError.empty()) {
-      aDoubleAttribute->setValue(aValue);
+      aDoubleAttribute->setCalculatedValue(aValue);
       aDoubleAttribute->setExpressionInvalid(false);
     } else { // set feature as invalid-parameter arguments
       aDoubleAttribute->setExpressionInvalid(true);
@@ -122,7 +122,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     aPointAttribute->setExpressionInvalid(1, !isValid[1]);
     aPointAttribute->setExpressionInvalid(2, !isValid[2]);
 
-    aPointAttribute->setValue(
+    aPointAttribute->setCalculatedValue(
         isValid[0] ? aValue[0] : aPointAttribute->x(),
         isValid[1] ? aValue[1] : aPointAttribute->y(),
         isValid[2] ? aValue[2] : aPointAttribute->z()
@@ -145,7 +145,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     aPoint2DAttribute->setExpressionInvalid(0, !isValid[0]);
     aPoint2DAttribute->setExpressionInvalid(1, !isValid[1]);
 
-    aPoint2DAttribute->setValue(
+    aPoint2DAttribute->setCalculatedValue(
         isValid[0] ? aValue[0] : aPoint2DAttribute->x(),
         isValid[1] ? aValue[1] : aPoint2DAttribute->y()
     );

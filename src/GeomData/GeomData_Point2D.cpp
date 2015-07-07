@@ -12,13 +12,19 @@
 
 using namespace std;
 
-void GeomData_Point2D::setValue(const double theX, const double theY)
+void GeomData_Point2D::setCalculatedValue(const double theX, const double theY)
 {
   if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY) {
     myCoords->SetValue(0, theX);
     myCoords->SetValue(1, theY);
     owner()->data()->sendAttributeUpdated(this);
   }
+}
+
+void GeomData_Point2D::setValue(const double theX, const double theY)
+{
+  setCalculatedValue(textX().empty() ? theX : x(),
+                     textY().empty() ? theY : y());
 }
 
 void GeomData_Point2D::setValue(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)

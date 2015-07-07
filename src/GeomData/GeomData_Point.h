@@ -39,6 +39,9 @@ class GeomData_Point : public GeomDataAPI_Point
   /// Returns the 3D point
   GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> pnt();
 
+  /// Defines the calculated double value
+  GEOMDATA_EXPORT virtual void setCalculatedValue(const double theX, const double theY, const double theZ);
+
   /// Defines the text values
   GEOMDATA_EXPORT virtual void setText(const std::string& theX,
                                        const std::string& theY,

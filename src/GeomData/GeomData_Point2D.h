@@ -37,11 +37,14 @@ class GeomData_Point2D : public GeomDataAPI_Point2D
   /// Returns the 2D point
   GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_Pnt2d> pnt();
 
-  /// Defines the double values
+  /// Defines the calculated double value
+  GEOMDATA_EXPORT virtual void setCalculatedValue(const double theX, const double theY);
+
+  /// Defines the text values
   GEOMDATA_EXPORT virtual void setText(const std::string& theX,
                                        const std::string& theY);
 
-  /// Returns the double values
+  /// Returns the text values
   GEOMDATA_EXPORT virtual std::string textX();
   GEOMDATA_EXPORT virtual std::string textY();
 

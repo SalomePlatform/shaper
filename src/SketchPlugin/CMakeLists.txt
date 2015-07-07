@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_MultiTranslation.h
     SketchPlugin_ExternalValidator.h
     SketchPlugin_Validators.h
+    SketchPlugin_Tools.h
 )
 
 SET(PROJECT_SOURCES
@@ -61,6 +62,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_ExternalValidator.cpp
     SketchPlugin_Validators.cpp
+    SketchPlugin_Tools.cpp
 )
 
 SET(PROJECT_LIBRARIES

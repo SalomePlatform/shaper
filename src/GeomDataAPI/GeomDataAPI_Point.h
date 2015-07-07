@@ -34,12 +34,15 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   /// Returns the 3D point
   GEOMDATAAPI_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
-  /// Defines the double values
+  /// Defines the calculated double value
+  GEOMDATAAPI_EXPORT virtual void setCalculatedValue(const double theX, const double theY, const double theZ) = 0;
+  
+  /// Defines the text values
   GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
                                           const std::string& theY,
                                           const std::string& theZ) = 0;
 
-  /// Returns the double values
+  /// Returns the text values
   GEOMDATAAPI_EXPORT virtual std::string textX() = 0;
   GEOMDATAAPI_EXPORT virtual std::string textY() = 0;
   GEOMDATAAPI_EXPORT virtual std::string textZ() = 0;
