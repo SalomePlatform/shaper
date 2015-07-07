@@ -26,6 +26,20 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_AttributeValidator
                        const std::list<std::string>& theArguments) const;
 };
 
+/**\class SketchPlugin_CoincidentAttr
+ * \ingroup Validators
+ * \brief Validator to check whether there is a coincident constraint between
+ * the attribute and attribute of argument.
+ */
+class SketchPlugin_CoincidentAttr : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const;
+};
 
 /**\class SketchPlugin_TangentAttrValidator
  * \ingroup Validators
