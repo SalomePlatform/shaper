@@ -276,14 +276,14 @@ void XGUI_OperationMgr::onOperationResumed()
 void XGUI_OperationMgr::onOperationStopped()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  ModuleBase_Operation* anOperation = currentOperation();
-  if (!aSenderOperation || !anOperation || aSenderOperation != anOperation)
+  ModuleBase_Operation* aCurrentOperation = currentOperation();
+  if (!aSenderOperation || !aCurrentOperation || aSenderOperation != aCurrentOperation)
     return;
 
-  myOperations.removeAll(anOperation);
-  anOperation->deleteLater();
+  myOperations.removeAll(aCurrentOperation);
+  aCurrentOperation->deleteLater();
 
-  emit operationStopped(anOperation);
+  emit operationStopped(aCurrentOperation);
 
   // get last operation which can be resumed
   ModuleBase_Operation* aResultOp = 0;
@@ -297,6 +297,8 @@ void XGUI_OperationMgr::onOperationStopped()
     }
   }
   if (aResultOp) {
+    bool isModified = aCurrentOperation->isModified();
+    aResultOp->setIsModified(isModified);
     resumeOperation(aResultOp);
     onValidateOperation();
   }

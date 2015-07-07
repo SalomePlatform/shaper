@@ -233,13 +233,7 @@ bool ModuleBase_Operation::commit()
       myCurrentFeature = FeaturePtr();
     }
     commitOperation();
-    // check whether there are modifications performed during the current operation
-    // in the model
-    // in case if there are no modifications, do not increase the undo/redo stack
-    if (aMgr->isModified())
-      aMgr->finishOperation();
-    else
-      aMgr->abortOperation();
+    aMgr->finishOperation();
 
     stopOperation();
     emit stopped();

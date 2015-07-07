@@ -463,10 +463,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
     aViewer->enableSelection(false);
 
-    ModuleBase_Operation* aOperation = getCurrentOperation();
-    if (!aOperation)
+    ModuleBase_Operation* aCurrentOperation = getCurrentOperation();
+    if (!aCurrentOperation)
       return;
-    if (isSketchOperation(aOperation))
+    if (isSketchOperation(aCurrentOperation))
       return; // No edit operation activated
 
     Handle(V3d_View) aView = theWnd->v3dView();
@@ -489,6 +489,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     FeatureToSelectionMap::const_iterator anIt = myCurrentSelection.begin(),
                                           aLast = myCurrentSelection.end();
     // 4. the features and attributes modification(move)
+    bool isModified = false;
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
 
@@ -509,6 +510,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
             if (aPoint.get() != NULL) {
               bool isImmutable = aPoint->setImmutable(true);
               aPoint->move(dX, dY);
+              isModified = true;
               ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent);
               aPoint->setImmutable(isImmutable);
             }
@@ -520,10 +522,15 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) {
           aSketchFeature->move(dX, dY);
+          isModified = true;
           ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, aMoveEvent);
         }
       }
     }
+    // the modified state of the current operation should be updated if there are features, which
+    // were changed here
+    if (isModified)
+      aCurrentOperation->onValuesChanged();
     Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
 
