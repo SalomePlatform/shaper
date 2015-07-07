@@ -417,7 +417,7 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
     aDisplayer->display(theObj, false);
     if (aNb == 0)
       myWorkshop->viewer()->fitAll();
-  } else if (!aWorkshop->isLoadingData())
+  } else 
     aDisplayer->display(theObj, false);
 
   return true;

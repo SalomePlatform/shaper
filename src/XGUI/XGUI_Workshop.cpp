@@ -105,8 +105,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0),
-     myIsLoadingData(false)
+      myDisplayer(0)
 {
   myMainWindow = mySalomeConnector ? 0 : new AppElements_MainWindow();
 
@@ -589,13 +588,11 @@ void XGUI_Workshop::onOpen()
     return;
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  myIsLoadingData = true;
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
   //displayAllResults();
   updateCommandStatus();
-  myIsLoadingData = false;
   QApplication::restoreOverrideCursor();
 }
 

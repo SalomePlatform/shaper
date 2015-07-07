@@ -127,13 +127,6 @@ Q_OBJECT
     return mySalomeConnector != 0;
   }
 
-  /// Returns true if the loading data process is started and has not been finished yet
-  /// \return boolean result
-  bool isLoadingData() const
-  {
-    return myIsLoadingData;
-  };
-
   //! Returns Object browser
   XGUI_ObjectsBrowser* objectBrowser() const
   {
@@ -416,9 +409,6 @@ private:
   XGUI_WorkshopListener* myEventsListener;
 
   QString myCurrentDir;
-
-  /// The flag is true when we loading a document
-  bool myIsLoadingData;
 };
 
 #endif
