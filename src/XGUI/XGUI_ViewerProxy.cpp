@@ -285,6 +285,12 @@ void XGUI_ViewerProxy::removeSelectionFilter(const Handle(SelectMgr_Filter)& the
 }
 
 //***************************************
+bool XGUI_ViewerProxy::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  return myWorkshop->displayer()->hasSelectionFilter(theFilter);
+}
+
+//***************************************
 void XGUI_ViewerProxy::clearSelectionFilters()
 {
   myWorkshop->displayer()->removeFilters();

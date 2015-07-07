@@ -205,13 +205,15 @@
       <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects" icon=":icons/tangent.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
+          <validator id="SketchPlugin_CoincidentAttr" parameters="ConstraintEntityB"/>
           <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
         
         <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line or arc" shape_types="edge">
-        <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityA"/>
-        <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_CoincidentAttr" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityA"/>
+          <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
         <validator id="PartSet_TangentSelection"/>
       </feature>
@@ -225,11 +227,13 @@
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_CoincidentAttr" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line or arc" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_CoincidentAttr" parameters="ConstraintEntityA"/>
         </sketch_shape_selector>
 
         <doublevalue label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0" default="1" use_reset="false">

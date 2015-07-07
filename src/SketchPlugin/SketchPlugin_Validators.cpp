@@ -77,7 +77,8 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   }
   return false;
 }
-bool SketchPlugin_TangentAttrValidator::isValid(
+
+bool SketchPlugin_CoincidentAttr::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
@@ -94,20 +95,12 @@ bool SketchPlugin_TangentAttrValidator::isValid(
   ObjectPtr anObject = aRefAttr->object();
   if (isObject && anObject) {
     FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
-
     AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
     ObjectPtr aOtherObject = aOtherAttr->object();
+    // if the other attribute is not filled still, the result is true
+    if (!aOtherObject.get())
+      return true;
     FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
-
-    if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Arc::ID())
-        return false;
-    } else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Arc::ID())
-        return false;
-    } else
-      return false;
 
     // check that both have coincidence
     FeaturePtr aConstrFeature;
@@ -142,6 +135,43 @@ bool SketchPlugin_TangentAttrValidator::isValid(
           return true;
       }
     }
+  }
+  return false;
+}
+
+bool SketchPlugin_TangentAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  // there is a check whether the feature contains a point and a linear edge or two point values
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+
+  bool isObject = aRefAttr->isObject();
+  ObjectPtr anObject = aRefAttr->object();
+  if (isObject && anObject) {
+    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+
+    AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
+    ObjectPtr aOtherObject = aOtherAttr->object();
+    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+
+    if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
+      if (aOtherFea->getKind() != SketchPlugin_Arc::ID())
+        return false;
+    } else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
+      if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
+          aOtherFea->getKind() != SketchPlugin_Arc::ID())
+        return false;
+    } else
+      return false;
+
+    return true;
   }
   return false;
 }

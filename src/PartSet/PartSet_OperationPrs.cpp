@@ -114,6 +114,16 @@ bool PartSet_OperationPrs::isVisible(XGUI_Displayer* theDisplayer, const ObjectP
   return aVisible;
 }
 
+bool isSubObject(const ObjectPtr& theObject, const FeaturePtr& theFeature)
+{
+  bool isSub = false;
+  CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  if (aComposite.get())
+    isSub = aComposite->isSub(theObject);
+
+  return isSub;
+}
+
 void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
@@ -150,7 +160,8 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         GeomShapePtr aShape = aSelAttribute->value();
         if (!aShape.get())
           aShape = aResult->shape();
-        addValue(aResult, aShape, theObjectShapes);
+        if (!isSubObject(aResult, myFeature))
+          addValue(aResult, aShape, theObjectShapes);
       }
     }
     else {
@@ -186,7 +197,8 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
           if (aResult.get())
             aShape = aResult->shape();
         }
-        addValue(anObject, aShape, theObjectShapes);
+        if (!isSubObject(anObject, myFeature))
+          addValue(anObject, aShape, theObjectShapes);
       }
     }
   }
