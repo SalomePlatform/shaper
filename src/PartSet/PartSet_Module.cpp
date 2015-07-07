@@ -285,16 +285,19 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
+  // the custom presentation should be deactivated before stop sketch,
+  // because it uses the active sketch of the sketch manager without checking if it is not null
+  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+  aViewer->RemoveZLayer(myVisualLayerId);
+  myVisualLayerId = 0;
+  myCustomPrs->deactivate();
+
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
   }
-  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
-  aViewer->RemoveZLayer(myVisualLayerId);
-  myVisualLayerId = 0;
-  myCustomPrs->deactivate();
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const
