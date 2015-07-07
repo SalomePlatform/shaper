@@ -1143,6 +1143,16 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
                                    QWidget* theParent,
                                    const bool theAskAboutDeleteReferences)
 {
+#ifdef DEBUG_DELETE
+  QStringList aDInfo;
+  QObjectPtrList::const_iterator aDIt = theList.begin(), aDLast = theList.end();
+  for (; aDIt != aDLast; ++aDIt) {
+    aDInfo.append(ModuleBase_Tools::objectInfo((*aDIt)));
+  }
+  QString anInfoStr = aDInfo.join(", ");
+  qDebug(QString("deleteFeatures: %1, %2").arg(theList.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
   // 1. find all referenced features
   std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aDeletedObj, theList) {
@@ -1208,12 +1218,12 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
 
       DocumentPtr aDoc = aObj->document();
       if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
-        aDoc->removeFeature(aFeature);
 #ifdef DEBUG_DELETE
         QString anInfoStr = ModuleBase_Tools::objectInfo(aFeature);
         anInfo.append(anInfoStr);
         qDebug(QString("remove feature :%1").arg(anInfoStr).toStdString().c_str());
 #endif
+        aDoc->removeFeature(aFeature);
       }
     }
   }

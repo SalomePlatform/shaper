@@ -560,22 +560,6 @@ void Model_Objects::synchronizeFeatures(
       }
     }
   }
-  // update results of the features (after features created because they may be connected, like sketch and sub elements)
-  std::list<FeaturePtr> aComposites; // composites must be updated after their subs (issue 360)
-  TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
-  for (; aLabIter2.More(); aLabIter2.Next()) {
-    TDF_Label aFeatureLabel = aLabIter2.Value()->Label();
-    if (myFeatures.IsBound(aFeatureLabel)) {  // a new feature is inserted
-      FeaturePtr aFeature = myFeatures.Find(aFeatureLabel);
-      if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature).get())
-        aComposites.push_back(aFeature);
-      updateResults(aFeature);
-    }
-  }
-  std::list<FeaturePtr>::iterator aComposite = aComposites.begin();
-  for(; aComposite != aComposites.end(); aComposite++) {
-    updateResults(*aComposite);
-  }
 
   // check all features are checked: if not => it was removed
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myFeatures);
@@ -600,6 +584,28 @@ void Model_Objects::synchronizeFeatures(
       aFIter.Next();
   }
 
+  if (theUpdateReferences) {
+    synchronizeBackRefs();
+  }
+  // update results of the features (after features created because they may be connected, like sketch and sub elements)
+  // After synchronisation of back references because sketch must be set in sub-elements before "execute" by updateResults
+  std::list<FeaturePtr> aComposites; // composites must be updated after their subs (issue 360)
+  TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
+  for (; aLabIter2.More(); aLabIter2.Next()) {
+    TDF_Label aFeatureLabel = aLabIter2.Value()->Label();
+    if (myFeatures.IsBound(aFeatureLabel)) {  // a new feature is inserted
+      FeaturePtr aFeature = myFeatures.Find(aFeatureLabel);
+      if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature).get())
+        aComposites.push_back(aFeature);
+      updateResults(aFeature);
+    }
+  }
+  std::list<FeaturePtr>::iterator aComposite = aComposites.begin();
+  for(; aComposite != aComposites.end(); aComposite++) {
+    updateResults(*aComposite);
+  }
+
+  // the synchronize should be done after updateResults in order to correct back references of updated results
   if (theUpdateReferences) {
     synchronizeBackRefs();
   }
