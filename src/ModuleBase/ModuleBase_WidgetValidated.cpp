@@ -195,16 +195,10 @@ bool ModuleBase_WidgetValidated::isFilterActivated() const
   bool isActivated = false;
 
   Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
-  const SelectMgr_ListOfFilter& aFilters = myWorkshop->viewer()->AISContext()->Filters();
-  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-  for (; aIt.More(); aIt.Next()) {
-    if (aSelFilter.Access() == aIt.Value().Access())
-      isActivated = true;
-  }
-  return isActivated;
+  return aViewer->hasSelectionFilter(aSelFilter);
 }
-
 
 void ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
 {

@@ -70,6 +70,10 @@ Q_OBJECT
   /// \param theFilter a selection filter
   virtual void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
 
+  /// Returns true if the selection filter is set to the viewer
+  /// \param theFilter a selection filter
+  virtual bool hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
+
   /// Remove all selection filters from the viewer
   virtual void clearSelectionFilters() = 0;
 

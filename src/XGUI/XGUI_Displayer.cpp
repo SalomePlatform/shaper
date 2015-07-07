@@ -729,20 +729,10 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
 void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
+  if (aContext.IsNull() || hasSelectionFilter(theFilter))
     return;
-  const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
-  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-  for (; aIt.More(); aIt.Next()) {
-    if (theFilter.Access() == aIt.Value().Access())
-      return;
-  }
+
   Handle(SelectMgr_CompositionFilter) aCompFilter = GetFilter();
-  const SelectMgr_ListOfFilter& aStoredFilters = aCompFilter->StoredFilters();
-  for (aIt.Initialize(aStoredFilters); aIt.More(); aIt.Next()) {
-    if (theFilter.Access() == aIt.Value().Access())
-      return;
-  }
   aCompFilter->Add(theFilter);
 #ifdef DEBUG_SELECTION_FILTERS
   int aCount = GetFilter()->StoredFilters().Extent();
@@ -762,6 +752,28 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
   int aCount = GetFilter()->StoredFilters().Extent();
   qDebug(QString("removeSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
 #endif
+}
+
+bool XGUI_Displayer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  bool aFilterFound = false;
+
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return aFilterFound;
+  const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+  for (; aIt.More() && !aFilterFound; aIt.Next()) {
+    if (theFilter.Access() == aIt.Value().Access())
+      aFilterFound = true;
+  }
+  Handle(SelectMgr_CompositionFilter) aCompFilter = GetFilter();
+  const SelectMgr_ListOfFilter& aStoredFilters = aCompFilter->StoredFilters();
+  for (aIt.Initialize(aStoredFilters); aIt.More() && !aFilterFound; aIt.Next()) {
+    if (theFilter.Access() == aIt.Value().Access())
+      aFilterFound = true;
+  }
+  return aFilterFound;
 }
 
 void XGUI_Displayer::removeFilters()

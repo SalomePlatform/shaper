@@ -8,6 +8,8 @@
 
 #include <SUIT_ViewManager.h>
 
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 
@@ -331,6 +333,21 @@ void NewGeom_SalomeViewer::removeSelectionFilter(const Handle(SelectMgr_Filter)&
   if (!aContext.IsNull()) {
     aContext->RemoveFilter(theFilter);
   }
+}
+
+//***************************************
+bool NewGeom_SalomeViewer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  bool aFoundFilter = false;
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+    SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+    for (; aIt.More() && !aFoundFilter; aIt.Next()) {
+      aFoundFilter = theFilter.Access() == aIt.Value().Access();
+    }
+  }
+  return aFoundFilter;
 }
 
 //***************************************
