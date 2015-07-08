@@ -135,6 +135,7 @@ void ModuleBase_ParamSpinBox::setValue(const double value)
  */
 void ModuleBase_ParamSpinBox::setText(const QString& value)
 {
+  myTextValue = value;
   lineEdit()->setText(value);
 }
 
@@ -165,19 +166,20 @@ bool ModuleBase_ParamSpinBox::hasVariable() const
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  QString aDigitPattern = QString("[-+]?[0-9]*[%1]?[0-9]+([eE][-+]?[0-9]+)?");
+  //const QString aDigitPattern = QString("[-+]?[0-9]*[%1]?[0-9]*([eE][-+]?[0-9]+)?");
 
+  //bool aHasDigit = false;
+  //{
+  //  QRegExp varNameMask(aDigitPattern.arg("."));
+  //  aHasDigit = varNameMask.exactMatch(theText);
+  //}
+  //if (!aHasDigit)
+  //{
+  //  QRegExp varNameMask(aDigitPattern.arg(","));
+  //  aHasDigit = varNameMask.exactMatch(theText);
+  //}
   bool aHasDigit = false;
-  {
-    QRegExp varNameMask(aDigitPattern.arg("."));
-    aHasDigit = varNameMask.exactMatch(theText);
-  }
-  if (!aHasDigit)
-  {
-    QRegExp varNameMask(aDigitPattern.arg(","));
-    aHasDigit = varNameMask.exactMatch(theText);
-  }
-
+  theText.toDouble(&aHasDigit);
   return !aHasDigit;
 
 }

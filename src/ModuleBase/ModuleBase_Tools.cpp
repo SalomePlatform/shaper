@@ -114,17 +114,19 @@ QPixmap lighter(const QString& theIcon, const int theLighterValue)
 
 void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText)
 {
-  if (theSpin->text() != theText) {
-    // In order to avoid extra text setting because it will
-    // reset cursor position in control
-    bool isBlocked = theSpin->blockSignals(true);
-    theSpin->setText(theText);
-    theSpin->blockSignals(isBlocked);
-  }
+  if (theSpin->text() == theText) 
+    return;
+  // In order to avoid extra text setting because it will
+  // reset cursor position in control
+  bool isBlocked = theSpin->blockSignals(true);
+  theSpin->setText(theText);
+  theSpin->blockSignals(isBlocked);
 }
 
 void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 {
+  if (theSpin->value() == theValue)
+    return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
   theSpin->blockSignals(isBlocked);
@@ -132,6 +134,8 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 
 void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue)
 {
+  if (theSpin->value() == theValue)
+    return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
   theSpin->blockSignals(isBlocked);
