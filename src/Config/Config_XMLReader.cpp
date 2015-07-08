@@ -144,11 +144,11 @@ std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
   return result;
 }
 
-void Config_XMLReader::storeAttribute(xmlNodePtr theNode, const char* theAttribute)
+void Config_XMLReader::storeAttribute(xmlNodePtr theNode, const char* theAttribute, bool doClean)
 {
   std::string aKey = getNodeName(theNode) + ":" + std::string(theAttribute);
   std::string aValue = getProperty(theNode, theAttribute);
-  if(!aValue.empty()) {
+  if (doClean || !aValue.empty()) {
     myCachedAttributes[aKey] = aValue;
   }
 }

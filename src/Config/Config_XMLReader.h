@@ -87,7 +87,7 @@ class Config_XMLReader
   std::string getNodeName(xmlNodePtr theNode);
   /// Stores an attribute in internal map for later use.
   /// Key is "Node_Name:Node_Attribute" and value is getProperty(theNodeAttribute)
-  void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute, bool doClean = false);
   /// Restores an attribute from internal map.
   std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
   /// Restores an attribute from internal map.

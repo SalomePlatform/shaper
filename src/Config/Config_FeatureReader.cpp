@@ -60,7 +60,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     //The m_last* variables always defined before fillFeature() call. XML is a tree.
   } else if (isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL)) {
     storeAttribute(theNode, _ID);
-    storeAttribute(theNode, WORKBENCH_DOC);
+    storeAttribute(theNode, WORKBENCH_DOC, true);
   } else if (myIsProcessWidgets) {
     // widgets, like shape_selector or containers, like toolbox
     if (isAttributeNode(theNode)) {

@@ -1,19 +1,6 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <plugin>
-  <workbench id="Movement">
-    <group id="Basic">
-      <feature id="Placement" title="Placement" tooltip="Perform moving of an object to specified position" icon=":icons/placement.png">
-        <source path="placement_widget.xml"/>
-      </feature>
-      <feature id="Movement" title="Movement" tooltip="Perform movement of an objects along the axis to specified distance" icon=":icons/movement.png">
-        <source path="movement_widget.xml"/>
-      </feature>
-      <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon=":icons/rotation.png">
-        <source path="rotation_widget.xml"/>
-      </feature>
-    </group>
-  </workbench>
   <workbench id="Features" document="Part">
     <group id="Extrusion">
       <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
@@ -48,6 +35,19 @@
         tooltip="Create named collection of geometry entities"
         icon=":icons/shape_group.png">
         <source path="group_widget.xml"/>
+      </feature>
+    </group>
+  </workbench>
+  <workbench id="Features">
+    <group id="Basic">
+      <feature id="Placement" title="Placement" tooltip="Perform moving of an object to specified position" icon=":icons/placement.png">
+        <source path="placement_widget.xml"/>
+      </feature>
+      <feature id="Movement" title="Movement" tooltip="Perform movement of an objects along the axis to specified distance" icon=":icons/movement.png">
+        <source path="movement_widget.xml"/>
+      </feature>
+      <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon=":icons/rotation.png">
+        <source path="rotation_widget.xml"/>
       </feature>
     </group>
   </workbench>
