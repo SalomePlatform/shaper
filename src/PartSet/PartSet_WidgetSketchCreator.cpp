@@ -164,6 +164,15 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       aMgr->abortOperation();
     theOp->abort();
   } else {
+    // Hide sketcher result
+    std::list<ResultPtr> aResults = aSketchFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+      (*aIt)->setDisplayed(false);
+    }
+    aSketchFeature->setDisplayed(false);
+
+    // Add Selected body were created the sketcher to list of selected objects
     DataPtr aData = aSketchFeature->data();
     AttributeSelectionPtr aSelAttr = 
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
