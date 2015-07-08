@@ -23,6 +23,7 @@
         <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
         <sketch-2dpoint_selector id="EndPoint" title="End point" tooltip="End point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create circle" icon=":icons/circle.png">
         <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center coordinates"/>
@@ -36,6 +37,7 @@
         <sketch-2dpoint_selector id="ArcStartPoint" title="Start point" tooltip="Start point"/>
         <sketch-2dpoint_selector id="ArcEndPoint" title="End point" tooltip="End point"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <validator id="GeomValidators_Different" parameters="ArcCenter,ArcStartPoint,ArcEndPoint"/>
       </feature>
     </group>
       

@@ -36,6 +36,7 @@
 #include <GeomValidators_ConstructionComposite.h>
 #include <GeomValidators_ZeroOffset.h>
 #include <GeomValidators_BooleanArguments.h>
+#include <GeomValidators_Different.h>
 
 
 #include <ModelAPI_Object.h>
@@ -208,6 +209,9 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("PartSet_SameTypeAttr",
                               new PartSet_SameTypeAttrValidator);
+
+  aFactory->registerValidator("GeomValidators_Different",
+                              new GeomValidators_Different);
 }
 
 void PartSet_Module::registerFilters()
