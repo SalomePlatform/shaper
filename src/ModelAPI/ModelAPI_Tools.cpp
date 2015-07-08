@@ -174,7 +174,7 @@ CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
     for(; aRefIter != aRefs.end(); aRefIter++) {
       CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
         ((*aRefIter)->owner());
-      if (aComp.get() && aComp->isSub(theFeature))
+      if (aComp.get() && aComp->data()->isValid() && aComp->isSub(theFeature))
         return aComp;
     }
   }

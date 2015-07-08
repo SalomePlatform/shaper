@@ -112,7 +112,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
 {
   if (myShape.IsNull()) {
     DocumentPtr aDoc = Model_ResultPart::partDoc();
-    if (aDoc.get()) {
+    if (aDoc.get() && aDoc->isOpened()) {
       const std::string& aBodyGroup = ModelAPI_ResultBody::group();
       TopoDS_Compound aResultComp;
       BRep_Builder aBuilder;
