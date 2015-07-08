@@ -25,10 +25,10 @@ public:
   virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   /// Returns the number of sub-elements
-  virtual int numberOfSubs() const = 0;
+  virtual int numberOfSubs(bool forTree = false) const = 0;
 
   /// Returns the sub-feature by zero-base index
-  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex) const = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false) const = 0;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   virtual int subFeatureId(const int theIndex) const = 0;

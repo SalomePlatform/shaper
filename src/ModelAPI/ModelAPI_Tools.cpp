@@ -166,4 +166,19 @@ ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub)
   return ResultPtr();
 }
 
+CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
+{
+  if (theFeature.get() && theFeature->data()->isValid()) {
+    const std::set<std::shared_ptr<ModelAPI_Attribute> > aRefs = theFeature->data()->refsToMe();
+    std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.begin();
+    for(; aRefIter != aRefs.end(); aRefIter++) {
+      CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
+        ((*aRefIter)->owner());
+      if (aComp.get() && aComp->isSub(theFeature))
+        return aComp;
+    }
+  }
+  return CompositeFeaturePtr(); // not found
+}
+
 } // namespace ModelAPI_Tools

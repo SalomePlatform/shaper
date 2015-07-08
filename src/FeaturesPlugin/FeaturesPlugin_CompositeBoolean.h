@@ -43,10 +43,10 @@ class FeaturesPlugin_CompositeBoolean : public ModelAPI_CompositeFeature
   FEATURESPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
   /// \return the number of sub-elements.
-  FEATURESPLUGIN_EXPORT virtual int numberOfSubs() const;
+  FEATURESPLUGIN_EXPORT virtual int numberOfSubs(bool forTree = false) const;
 
   /// \return the sub-feature by zero-base index.
-  FEATURESPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex) const;
+  FEATURESPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false) const;
 
   /// \return the sub-feature unique identifier in this composite feature by zero-base index.
   FEATURESPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;

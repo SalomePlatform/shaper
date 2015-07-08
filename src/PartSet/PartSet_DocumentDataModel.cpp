@@ -2,6 +2,7 @@
 
 #include "PartSet_DocumentDataModel.h"
 #include "PartSet_PartDataModel.h"
+#include "PartSet_TopDataModel.h"
 #include "PartSet_Module.h"
 //#include "XGUI_Tools.h"
 

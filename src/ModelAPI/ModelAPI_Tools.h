@@ -13,6 +13,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <vector>
 
@@ -41,6 +42,13 @@ MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues);
  * \returns numm if not found
  */
 MODELAPI_EXPORT ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub);
+
+/*!
+ * Returns the cpomposite feature - parent of this feature.
+ * \param theFeature the sub-element of composite
+ * \returns null if it is not sub-element of composite
+ */
+MODELAPI_EXPORT CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature);
 
 }
 

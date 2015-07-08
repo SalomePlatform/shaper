@@ -1,25 +1,23 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-#ifndef PartSet_PartDataModel_H
-#define PartSet_PartDataModel_H
+#ifndef PartSet_TopDataModel_H
+#define PartSet_TopDataModel_H
 
 #include "PartSet.h"
 #include "PartSet_DataTreeModel.h"
 
-
-/**\class PartSet_PartDataModel
+/**\class PartSet_TopDataModel
  * \ingroup GUI
  * \brief This is a data model for Object Browser (QTreeView).
- * It represents data tree only of a one part
+ * It represents only upper part of data tree (non-parts tree items)
  */
-class PartSet_PartDataModel : public PartSet_PartModel
+class PARTSET_EXPORT PartSet_TopDataModel : public PartSet_FeaturesModel
 {
 Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent object
-  PartSet_PartDataModel(QObject* theParent);
-  virtual ~PartSet_PartDataModel();
+  PartSet_TopDataModel(QObject* theParent);
+  virtual ~PartSet_TopDataModel();
 
   // Reimpl from QAbstractItemModel
 
@@ -45,9 +43,6 @@ Q_OBJECT
   /// \param theParent a parent model index
   virtual int columnCount(const QModelIndex &theParent = QModelIndex()) const;
 
-  /// Returns the item flags for the given index.
-  /// \param theIndex a model index
-  virtual Qt::ItemFlags flags(const QModelIndex& theIndex) const;
 
   /// Returns the index of the item in the model specified by the given row, column and parent index.
   /// \param theRow a row
@@ -73,47 +68,24 @@ Q_OBJECT
   //! If the object is not found then index is not valid
   virtual QModelIndex objectIndex(const ObjectPtr& theObject) const;
 
-  //! Returns true if the given document is a sub-document of this tree
-  virtual bool hasDocument(const DocumentPtr& theDoc) const;
-
   //! Returns parent index of the given object
   virtual QModelIndex findParent(const ObjectPtr& theObject) const;
 
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const;
 
-  //! Set an Index which will be considered as a last history index
-  //! \param theIndex a last index for history
-  void setLastHistoryItem(const QModelIndex& theIndex);
-
-  //! Returns last history item
-  QModelIndex lastHistoryItem() const;
-
  private:
-
-  //! Returns document of the current part
-  DocumentPtr partDocument() const;
-
-  //! Returns defult number of rows
-  int getRowsNumber() const;
-
-  int lastHistoryRow() const;
-
   //! Types of QModelIndexes
-  //! All types have negative Id's. Positive Id means sub-feature and contains row of its parent
   enum DataIds
   {
-    //MyRoot,
-    ParamsFolder = -100,
+    ParamsFolder,
     ParamObject,
     ConstructFolder,
-    ConstructObject,
-    BodiesFolder,
-    BodiesObject,
-    GroupsFolder,
-    GroupObject,
-    HistoryObject
+    ConstructObject
+    //GroupsFolder,
+    //GroupObject
   };
+
 };
 
 #endif

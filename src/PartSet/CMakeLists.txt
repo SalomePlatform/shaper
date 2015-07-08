@@ -30,6 +30,7 @@ SET(PROJECT_HEADERS
 	PartSet_PartDataModel.h
 	PartSet_DataTreeModel.h
 	PartSet_WidgetSketchCreator.h
+	PartSet_TopDataModel.h
 )
 
 SET(PROJECT_SOURCES
@@ -55,6 +56,7 @@ SET(PROJECT_SOURCES
 	PartSet_DocumentDataModel.cpp
 	PartSet_PartDataModel.cpp
 	PartSet_WidgetSketchCreator.cpp
+	PartSet_TopDataModel.cpp
 )
 
 SET(PROJECT_RESOURCES 

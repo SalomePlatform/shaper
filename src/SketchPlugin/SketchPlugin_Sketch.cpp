@@ -159,12 +159,12 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
     data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(ObjectPtr());
 }
 
-int SketchPlugin_Sketch::numberOfSubs() const
+int SketchPlugin_Sketch::numberOfSubs(bool forTree) const
 {
   return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size();
 }
 
-std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(const int theIndex) const
+std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(const int theIndex, bool forTree) const
 {
   ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex);
   return std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);

@@ -180,11 +180,11 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Returns the number of sub-elements
-  SKETCHPLUGIN_EXPORT virtual int numberOfSubs() const;
+  SKETCHPLUGIN_EXPORT virtual int numberOfSubs(bool forTree = false) const;
 
   /// Returns the sub-feature by zero-base index
   SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
-    subFeature(const int theIndex) const;
+    subFeature(const int theIndex, bool forTree = false) const;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   SKETCHPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;

@@ -39,14 +39,14 @@ std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeBoolean::addFeature(st
 }
 
 //=================================================================================================
-int FeaturesPlugin_CompositeBoolean::numberOfSubs() const
+int FeaturesPlugin_CompositeBoolean::numberOfSubs(bool forTree) const
 {
   ObjectPtr aObj = data()->reference(SKETCH_OBJECT_ID())->value();
   return aObj.get()? 1 : 0;
 }
 
 //=================================================================================================
-std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeBoolean::subFeature(const int theIndex) const
+std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeBoolean::subFeature(const int theIndex, bool forTree) const
 {
   if (theIndex == 0)
     return std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_OBJECT_ID())->value());
