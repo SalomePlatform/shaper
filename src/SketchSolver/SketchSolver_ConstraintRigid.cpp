@@ -163,6 +163,7 @@ bool SketchSolver_ConstraintRigid::remove(ConstraintPtr theConstraint)
     myFeatureMap.clear();
     myAttributeMap.clear();
     myValueMap.clear();
+    mySlvsConstraints.clear();
   } else
     cleanRemovedEntities();
   return true;

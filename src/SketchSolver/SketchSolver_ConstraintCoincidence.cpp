@@ -67,7 +67,6 @@ void SketchSolver_ConstraintCoincidence::attach(
     std::shared_ptr<SketchSolver_ConstraintCoincidence> theConstraint)
 {
   cleanErrorMsg();
-  Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
   // Remove constraints from theConstraint
   std::vector<Slvs_hConstraint>::iterator aCIter = theConstraint->mySlvsConstraints.begin();
   for (; aCIter != theConstraint->mySlvsConstraints.end(); aCIter++)
@@ -129,9 +128,13 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
     myCoincidentPoints.insert(aRefAttr->attr());
   }
 
-  Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
   Slvs_hConstraint aNewConstr = SLVS_E_UNKNOWN;
   std::vector<Slvs_hEntity>::iterator anEntIter = anEntities.begin();
+  if (mySlvsConstraints.empty()) {
+    aNewConstr = addConstraint(*anEntIter, *(anEntIter + 1));
+    anEntIter += 2;
+  }
+  Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
   for (; anEntIter != anEntities.end(); anEntIter++)
     aNewConstr = addConstraint(aBaseCoincidence.ptA, *anEntIter);
   myExtraCoincidence[aNewConstr] = theConstraint;
@@ -212,12 +215,14 @@ bool SketchSolver_ConstraintCoincidence::remove(ConstraintPtr theConstraint)
       // Need to specify another base coincidence constraint
       myBaseConstraint = anExtraIt->second;
       myExtraCoincidence.erase(anExtraIt);
-      std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
-      Slvs_Constraint aBase = myStorage->getConstraint(*aCIter);
-      for (++aCIter; aCIter != mySlvsConstraints.end(); aCIter++) {
-        Slvs_Constraint aConstr = myStorage->getConstraint(*aCIter);
-        aConstr.ptA = aBase.ptA;
-        myStorage->updateConstraint(aConstr);
+      if (mySlvsConstraints.empty()) {
+        std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
+        Slvs_Constraint aBase = myStorage->getConstraint(*aCIter);
+        for (++aCIter; aCIter != mySlvsConstraints.end(); aCIter++) {
+          Slvs_Constraint aConstr = myStorage->getConstraint(*aCIter);
+          aConstr.ptA = aBase.ptA;
+          myStorage->updateConstraint(aConstr);
+        }
       }
     }
   }
