@@ -1250,15 +1250,55 @@ bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes
 }
 
 //**************************************************************
+// Returns the list of features placed between theObject and the current feature
+// in the same document. Excludes theObject, includes the current feature.
+std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
+{
+  std::list<FeaturePtr> aResult;
+  DocumentPtr aDocument = theObject->document();
+  std::list<FeaturePtr> anAllFeatures = aDocument->allFeatures();
+  // find the object iterator
+  std::list<FeaturePtr>::iterator aObjectIt = std::find(anAllFeatures.begin(), anAllFeatures.end(), theObject);
+  if (aObjectIt == anAllFeatures.end()) 
+    return aResult;
+  // find the current feature iterator
+  std::list<FeaturePtr>::iterator aCurrentIt = std::find(anAllFeatures.begin(), anAllFeatures.end(), aDocument->currentFeature(true));
+  if (aCurrentIt == anAllFeatures.end()) 
+    return aResult;
+  // check the right order
+  if (std::distance(aObjectIt, anAllFeatures.end()) <= std::distance(aCurrentIt, anAllFeatures.end()))
+    return aResult;
+  // exclude the object
+  std::advance(aObjectIt, 1);
+  // include the current feature
+  std::advance(aCurrentIt, 1);
+  return std::list<FeaturePtr>(aObjectIt, aCurrentIt);
+}
+
 bool XGUI_Workshop::canMoveFeature()
 {
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
-  std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aObject, aObjects) {
-    std::set<FeaturePtr> aFeatures = refFeatures(aObject, false);
-    aRefFeatures.insert(aFeatures.begin(), aFeatures.end());
+    // 1. Get features placed between selected and current in the document 
+    std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(aObject);
+    // if aFeaturesBetween is empty it means wrong order or aObject is the current feature
+    if (aFeaturesBetween.empty())
+      return false;
+    std::set<FeaturePtr> aPlacedFeatures(aFeaturesBetween.begin(), aFeaturesBetween.end());
+    // 2. Get all reference features to the selected object in the document 
+    std::set<FeaturePtr> aRefFeatures = refFeatures(aObject, false);
+    if (aRefFeatures.empty())
+      continue;
+    // 3. Find any placed features in all reference features
+    std::set<FeaturePtr> aIntersectionFeatures;
+    std::set_intersection(aRefFeatures.begin(), aRefFeatures.end(),
+                          aPlacedFeatures.begin(), aPlacedFeatures.end(),
+                          std::inserter(aIntersectionFeatures, aIntersectionFeatures.begin()));
+    // 4. Return false if any reference feature is placed before curent feature
+    if (!aIntersectionFeatures.empty())
+      return false;
   }
-  return aRefFeatures.empty();
+  return true;
 }
 
 //**************************************************************
