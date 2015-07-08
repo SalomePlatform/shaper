@@ -19,19 +19,24 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
 
 Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
+  bool aValid = true;
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
-  if (!anOperation)
-    return true;
+  if (anOperation) {
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+    if (!anActiveWidget)
+      anActiveWidget = aPanel->preselectionWidget();
+    ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
+                                                                           (anActiveWidget);
+    ModuleBase_ViewerPrs aPrs;
+    myWorkshop->selection()->fillPresentation(aPrs, theOwner);
 
-  ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-  ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-  if (!anActiveWidget)
-    anActiveWidget = aPanel->preselectionWidget();
-  ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
-                                                                         (anActiveWidget);
-  ModuleBase_ViewerPrs aPrs;
-  myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+    aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
+  }
 
-  return !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
+#ifdef DEBUG_FILTERS
+  qDebug(QString("ModuleBase_FilterValidated::IsOk = %1").arg(aValid).toStdString().c_str());
+#endif
+  return aValid;
 }
 

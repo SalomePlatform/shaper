@@ -13,6 +13,8 @@
 
 class ModuleBase_IWorkshop;
 
+//#define DEBUG_FILTERS
+
 /**
 * \ingroup GUI
 * \class ModuleBase_FilterValidated
