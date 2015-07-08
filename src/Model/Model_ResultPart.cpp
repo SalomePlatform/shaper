@@ -6,12 +6,16 @@
 
 #include <Model_ResultPart.h>
 #include <ModelAPI_Data.h>
+#include <Model_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <Model_Document.h>
+#include <Events_Loop.h>
+#include <ModelAPI_Events.h>
 
 #include <TNaming_Tool.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -19,6 +23,7 @@
 #include <TDataStd_Name.hxx>
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
+#include <TopExp_Explorer.hxx>
 
 void Model_ResultPart::initAttributes()
 {
@@ -135,9 +140,34 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
   return aResult;
 }
 
-std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape)
+std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
+  int& theIndex)
 {
+  theIndex = 0; // not initialized
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return "";
+  if (data()->isOwner(this)) { // if this is moved copy of part => return the name of original shape
+    FeaturePtr anOrigFeature = 
+      std::dynamic_pointer_cast<ModelAPI_Feature>(data()->attribute(COLOR_ID())->owner());
+    if (anOrigFeature.get()) {
+      if (anOrigFeature->firstResult().get() && anOrigFeature->firstResult()->shape().get()) {
+        TopoDS_Shape anOrigShape = anOrigFeature->firstResult()->shape()->impl<TopoDS_Shape>();
+        if (!anOrigShape.IsNull()) {
+          TopExp_Explorer anExp(anOrigShape, aShape.ShapeType());
+          for(; anExp.More(); anExp.Next()) {
+            if (aShape.IsPartner(anExp.Current())) {
+              std::shared_ptr<GeomAPI_Shape> anOrigGeomShape(new GeomAPI_Shape);
+              anOrigGeomShape->setImpl(new TopoDS_Shape(anExp.Current()));
+
+              return std::dynamic_pointer_cast<Model_ResultPart>(anOrigFeature->firstResult())->
+                nameInPart(theShape, theIndex);
+            }
+          }
+        }
+      }
+    }
+  }
   // getting an access to the document of part
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
   if (!aDoc.get()) // the part document is not presented for the moment
@@ -166,7 +196,45 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
       }	
     }
   }
+  if (aName.empty()) { // not found, so use the selection mechanism
+    // for this the context result is needed
+    ResultPtr aContext;
+    const std::string& aBodyGroup = ModelAPI_ResultBody::group();
+    for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
+      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
+      if (aBody.get() && aBody->shape().get() && !aBody->isDisabled()) {
+        TopoDS_Shape aBodyShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
+        // check is body contain the selected sub-shape
+        for(TopExp_Explorer anExp(aBodyShape, aShape.ShapeType()); anExp.More(); anExp.Next()) {
+          if (aShape.IsEqual(anExp.Current())) {
+            aContext = aBody;
+            break;
+          }
+        }
+      }
+    }
+    if (aContext.get()) {
+      AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+      aSelAttr->append(aContext, theShape);
+      theIndex = aSelAttr->size();
+      AttributeSelectionPtr aNewAttr = aSelAttr->value(theIndex - 1);
+      return aNewAttr->namingName();
+    }
+  }
   return aName;
+}
+
+bool Model_ResultPart::updateInPart(const int theIndex)
+{
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
+  if (aDoc.get()) {
+    AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+    AttributeSelectionPtr aThisAttr = aSelAttr->value(theIndex - 1);
+    if (aThisAttr.get()) {
+      return aThisAttr->update();
+    }
+  }
+  return false; // something is wrong
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(const std::string& theName)
@@ -187,4 +255,14 @@ void Model_ResultPart::colorConfigInfo(std::string& theSection, std::string& the
 void Model_ResultPart::updateShape()
 {
   myShape.Nullify();
+}
+
+void Model_ResultPart::setShape(std::shared_ptr<ModelAPI_Result> theThis, 
+    const std::shared_ptr<GeomAPI_Shape>& theTransformed)
+{
+  myShape = theTransformed->impl<TopoDS_Shape>();
+  // the result must be explicitly updated
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(theThis, EVENT_DISP); // flush is in preview-update
 }

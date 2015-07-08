@@ -35,10 +35,7 @@ class ModelAPI_Result : public ModelAPI_Object
   }
 
   /// Returns true if the result is concealed from the data tree (referenced by other objects)
-  inline bool isConcealed()
-  {
-    return myIsConcealed;
-  }
+  MODELAPI_EXPORT virtual bool isConcealed();
 
   /// Returns true if the result is concealed from the data tree (referenced by other objects)
   MODELAPI_EXPORT void setIsConcealed(const bool theValue);

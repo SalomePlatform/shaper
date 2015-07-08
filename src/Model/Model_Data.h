@@ -200,6 +200,10 @@ class Model_Data : public ModelAPI_Data
   /// This method is called by the updater.
   MODEL_EXPORT virtual void setUpdateID(const int theID);
 
+  /// Returns true if the given object is owner of this data (needed for correct erase of object
+  /// with duplicated data)
+  MODEL_EXPORT virtual bool isOwner(ModelAPI_Object* theOwner);
+
 protected:
   /// Returns true if "is in history" custom behaviors is defined for the feature
   MODEL_EXPORT virtual bool isInHistory();

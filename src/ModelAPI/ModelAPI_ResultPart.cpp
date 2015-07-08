@@ -12,3 +12,9 @@ std::string ModelAPI_ResultPart::groupName()
 {
   return ModelAPI_ResultPart::group();
 }
+
+bool ModelAPI_ResultPart::isConcealed()
+{
+  //return false;
+  return ModelAPI_Result::isConcealed(); // the way with different results is applied
+}

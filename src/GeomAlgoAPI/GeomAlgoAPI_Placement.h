@@ -30,13 +30,15 @@ public:
    *  \param[in] theDestShape    destination object
    *  \param[in] theIsReverse    indicates that the solid materials should be on the same side against the destination plane
    *  \param[in] theIsCentering  indicates the planes should be centered
+   *  \param[in] theSimpleTransform makes just transformation of shape without changing of topology or geometry
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Placement(std::shared_ptr<GeomAPI_Shape> theSourceSolid,
                                            std::shared_ptr<GeomAPI_Shape> theDestSolid,
                                            std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                            std::shared_ptr<GeomAPI_Shape> theDestShape,
                                            bool theIsReverse = false,
-                                           bool theIsCentering = false);
+                                           bool theIsCentering = false,
+                                           bool theSimpleTransform = false);
 
   /// Returns True if algorithm succeed
   GEOMALGOAPI_EXPORT const bool isDone() const
@@ -67,7 +69,8 @@ private:
              const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
              const std::shared_ptr<GeomAPI_Shape>& theDestShape,
              bool theIsReverse,
-             bool theIsCentering);
+             bool theIsCentering,
+             bool theSimpleTransform);
 
   /// fields
   bool myDone;

@@ -8,6 +8,7 @@
 
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultPart.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -55,14 +56,11 @@ void FeaturesPlugin_Placement::execute()
 
   std::shared_ptr<GeomAPI_Shape> aBaseObject;
   ResultPtr aContextRes = anObjRef->context();
-  if (aContextRes) {
-    if (aContextRes->groupName() == ModelAPI_ResultBody::group())
-      aBaseObject = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
-    else if (aContextRes->groupName() == ModelAPI_ResultConstruction::group())
-      aBaseObject = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
+  if (aContextRes.get()) {
+    aBaseObject = aContextRes->shape();
   }
-  if (!aBaseObject) {
-    static const std::string aContextError = "The selection context is bad";
+  if (!aBaseObject.get()) {
+    static const std::string aContextError = "The base selection context is bad";
     setError(aContextError);
     return;
   }
@@ -78,14 +76,11 @@ void FeaturesPlugin_Placement::execute()
 
   std::shared_ptr<GeomAPI_Shape> aSlaveObject;
   aContextRes = anObjRef->context();
-  if (aContextRes) {
-    if (aContextRes->groupName() == ModelAPI_ResultBody::group())
-      aSlaveObject = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
-    else if (aContextRes->groupName() == ModelAPI_ResultConstruction::group())
-      aSlaveObject = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
+  if (aContextRes.get()) {
+    aSlaveObject = aContextRes->shape();
   }
-  if (!aSlaveObject) {
-    static const std::string aContextError = "The selection context is bad";
+  if (!aSlaveObject.get()) {
+    static const std::string aContextError = "The tool selection context is bad";
     setError(aContextError);
     return;
   }
@@ -119,7 +114,11 @@ void FeaturesPlugin_Placement::execute()
       data()->attribute(FeaturesPlugin_Placement::CENTERING_ID()));
   bool isCentering = aBoolAttr->value();
 
-  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+  bool isPart = aContextRes->groupName() == ModelAPI_ResultPart::group();
+
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody;
+  if (isPart) 
+    aResultBody = document()->createBody(data());
   GeomAlgoAPI_Placement aFeature(aSlaveObject, aBaseObject, aSlaveShape, aBaseShape, isReverse, isCentering);
   if(!aFeature.isDone()) {
     static const std::string aFeatureError = "Placement algorithm failed";
@@ -138,10 +137,18 @@ void FeaturesPlugin_Placement::execute()
     setError(aFeatureError);
     return;
   }  
-  //LoadNamingDS
-  LoadNamingDS(aFeature, aResultBody, aSlaveObject);
 
-  setResult(aResultBody);
+  if (isPart) { // for part results just set transformation
+    ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aContextRes);
+    ResultPartPtr aResultPart = document()->copyPart(firstResult(), anOrigin);
+    aResultPart->setShape(aContextRes, aFeature.shape());
+    setResult(aResultPart);
+  } else {
+    //LoadNamingDS
+    LoadNamingDS(aFeature, aResultBody, aSlaveObject);
+
+    setResult(aResultBody);
+  }
 }
 
 //============================================================================

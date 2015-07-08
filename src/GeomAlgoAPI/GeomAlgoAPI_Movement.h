@@ -24,10 +24,12 @@ public:
    *  \param[in] theSourceShape  a shape to be moved.
    *  \param[in] theAxis         movement axis.
    *  \param[in] theDistance     movement distance.
+   *  \param[in] theSimpleTransform makes just transformation of shape without changing of topology or geometry
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Movement(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                          double                         theDistance);
+                                          double                         theDistance,
+                                          bool theSimpleTransform = false);
 
   /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT const bool isDone() const
@@ -52,7 +54,8 @@ private:
   /// Builds resulting shape.
   void build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
              std::shared_ptr<GeomAPI_Ax1>   theAxis,
-             double                         theDistance);
+             double                         theDistance,
+             bool theSimpleTransform);
 
 private:
   /// Fields.

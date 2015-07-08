@@ -86,6 +86,7 @@ class ModelAPI_Object
   MODELAPI_EXPORT virtual void erase();
 
   friend class Model_Objects;
+  friend class Model_Document;
 
 };
 

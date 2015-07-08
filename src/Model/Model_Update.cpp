@@ -238,17 +238,37 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
   if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
     aJustUpdated = true;
 
+  // On abort, undo or redo execute is not needed: results in document are updated automatically
+  // But redisplay is needed: results are updated, must be also updated in the viewer.
+  if (aJustUpdated && 
+      !std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures()) {
+    if (!theFeature->isPersistentResult()) { // not persistent must be re-executed on abort, etc.
+      ModelAPI_ExecState aState = theFeature->data()->execState();
+      if (aFactory->validate(theFeature)) {
+        executeFeature(theFeature);
+      } else {
+        theFeature->eraseResults();
+        redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
+      }
+    } else {
+      redisplayWithResults(theFeature, ModelAPI_StateNothing);
+      if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) { // it is done (in the tree)
+        theFeature->data()->execState(ModelAPI_StateDone);
+      }
+    }
+    return;
+  }
+
   // execute feature if it must be updated
   if (theFeature->isPreviewNeeded() || myIsFinish) {
-    if (aJustUpdated &&
-      std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures()) {
-        ModelAPI_ExecState aState = theFeature->data()->execState();
-        if (aFactory->validate(theFeature)) {
-          executeFeature(theFeature);
-        } else {
-          theFeature->eraseResults();
-          redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
-        }
+    if (aJustUpdated) {
+      ModelAPI_ExecState aState = theFeature->data()->execState();
+      if (aFactory->validate(theFeature)) {
+        executeFeature(theFeature);
+      } else {
+        theFeature->eraseResults();
+        redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
+      }
     }
   } else { // preview is not needed => make state Done
     if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {

@@ -38,7 +38,7 @@
   #include "ModelAPI_ResultParameter.h"
   #include "ModelAPI_ResultGroup.h"
   #include "ModelAPI_Tools.h"
-
+  
   #include <memory>
   #include <string>
   

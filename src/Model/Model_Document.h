@@ -19,6 +19,7 @@
 
 class Handle_Model_Document;
 class Model_Objects;
+class ModelAPI_AttributeSelectionList;
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -153,6 +154,11 @@ class Model_Document : public ModelAPI_Document
   /// Creates a part results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  //! Copies a part result, keeping the same data
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> copyPart(
+      const std::shared_ptr<ModelAPI_Result>& theOldPart, 
+      const std::shared_ptr<ModelAPI_ResultPart>& theOrigin, 
+      const int theIndex = 0);
   /// Creates a group results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
@@ -241,6 +247,9 @@ class Model_Document : public ModelAPI_Document
   //! Returns true if this document is currently active
   virtual bool isActive() const;
 
+  //! Returns the selection attribute that is used for calculation of selection externally from the document
+  std::shared_ptr<ModelAPI_AttributeSelectionList> selectionInPartFeature();
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;
@@ -283,6 +292,9 @@ class Model_Document : public ModelAPI_Document
   bool myExecuteFeatures;
 
   bool myIsActive; ///< flag that stores the active/not active state
+
+  //! The selection feature, if needed
+  FeaturePtr mySelectionFeature;
 };
 
 #endif

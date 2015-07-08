@@ -502,3 +502,8 @@ std::shared_ptr<ModelAPI_Data> Model_Data::invalidData()
 {
   return kInvalid;
 }
+
+bool Model_Data::isOwner(ModelAPI_Object* theOwner)
+{
+  return theOwner == myObject.get();
+}

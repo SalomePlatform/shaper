@@ -774,6 +774,22 @@ std::shared_ptr<ModelAPI_ResultPart> Model_Objects::createPart(
   return aResult;
 }
 
+std::shared_ptr<ModelAPI_ResultPart> Model_Objects::copyPart(
+    const std::shared_ptr<ModelAPI_Result>& theOldPart, 
+    const std::shared_ptr<ModelAPI_ResultPart>& theOrigin, const int theIndex)
+{
+  std::shared_ptr<ModelAPI_ResultPart> aResult;
+  if (theOldPart.get()) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theOldPart);
+  }
+  if (!aResult) {
+    aResult = std::shared_ptr<ModelAPI_ResultPart>(new Model_ResultPart);
+    aResult->setDoc(myDoc);
+    aResult->setData(theOrigin->data());
+  }
+  return aResult;
+}
+
 std::shared_ptr<ModelAPI_ResultGroup> Model_Objects::createGroup(
     const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {

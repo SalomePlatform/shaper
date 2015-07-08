@@ -41,6 +41,11 @@ bool ModelAPI_Result::isDisabled() const
   return myIsDisabled;
 }
 
+bool ModelAPI_Result::isConcealed()
+{
+  return myIsConcealed;
+}
+
 void ModelAPI_Result::setIsConcealed(const bool theValue)
 {
   if (myIsConcealed != theValue) {

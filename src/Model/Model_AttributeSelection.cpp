@@ -73,7 +73,6 @@ Standard_GUID kPART_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb27");
 // TDataStd_IntPackedMap - indexes of edges in composite element (for construction)
 // TDataStd_Integer - type of the selected shape (for construction)
 // TDF_Reference - from ReferenceAttribute, the context
-#define DDDD 1
 void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
@@ -137,13 +136,6 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   std::string aSelName = namingName();
   if(!aSelName.empty())
     TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
-#ifdef DDDD
-  //####
-  //selectSubShape("FACE",  "Extrusion_1/LateralFace_3");
-  //selectSubShape("FACE",  "Extrusion_1/TopFace");
-  //selectSubShape("EDGE", "Extrusion_1/TopFace|Extrusion_1/LateralFace_1");
-  //selectSubShape("EDGE", "Sketch_1/Edge_6");
-#endif
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
@@ -159,6 +151,22 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
     }
     if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
         return aResult; // empty result
+    }
+    if (aSelLab.IsAttribute(kPART_REF_ID)) {
+      /* TODO: implement used text here
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(context());
+      if (!aPart.get() || !aPart->isActivated())
+        return std::shared_ptr<GeomAPI_Shape>(); // postponed naming needed
+      Handle(TDataStd_Integer) anIndex;
+      if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
+        return aPart->selectionValue(anIndex->Get());
+      }
+      Handle(TDataStd_Name) aName;
+      if (!selectionLabel().FindAttribute(TDataStd_Name::GetID(), aName)) {
+        return std::shared_ptr<GeomAPI_Shape>(); // something is wrong
+      }
+      return aPart->shapeInPart(TCollection_AsciiString(aName).ToCString());
+      */
     }
 
     Handle(TNaming_NamedShape) aSelection;
@@ -262,6 +270,11 @@ bool Model_AttributeSelection::update()
   }
   if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, not sub-shape
     return aContext->shape() && !aContext->shape()->isNull();
+  }
+
+  if (aSelLab.IsAttribute(kPART_REF_ID)) { // it is reference to the part object
+    std::shared_ptr<GeomAPI_Shape> aNoSelection;
+    return selectPart(aContext, aNoSelection, true);
   }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
@@ -614,9 +627,25 @@ void Model_AttributeSelection::selectConstruction(
   registerSubShape(selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, "", aRefs);
 }
 
-void Model_AttributeSelection::selectPart(
-  const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
+bool Model_AttributeSelection::selectPart(
+  const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+  const bool theUpdate)
 {
+  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
+  if (!aPart.get() || !aPart->isActivated())
+    return true; // postponed naming
+  if (theUpdate) {
+    Handle(TDataStd_Integer) anIndex;
+    if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) { // by internal selection
+      if (anIndex->Get() > 0) {
+        // update the selection by index
+        return aPart->updateInPart(anIndex->Get());
+      } else {
+        return true; // nothing to do, referencing just by name
+      }
+    }
+    return true; // nothing to do, referencing just by name
+  }
   // store the shape (in case part is not loaded it should be usefull
   TopoDS_Shape aShape;
   std::string aName = theContext->data()->name();
@@ -624,13 +653,15 @@ void Model_AttributeSelection::selectPart(
     aShape = theContext->shape()->impl<TopoDS_Shape>();
   } else {
     aShape = theSubShape->impl<TopoDS_Shape>();
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
-    aName += "/" + aPart->nameInPart(theSubShape);
+    int anIndex;
+    aName += "/" + aPart->nameInPart(theSubShape, anIndex);
+    TDataStd_Integer::Set(selectionLabel(), anIndex);
   }
   TNaming_Builder aBuilder(selectionLabel());
   aBuilder.Select(aShape, aShape);
   // identify by name in the part
   TDataStd_Name::Set(selectionLabel(), aName.c_str());
+  return !aName.empty();
 }
 
 TDF_Label Model_AttributeSelection::selectionLabel()

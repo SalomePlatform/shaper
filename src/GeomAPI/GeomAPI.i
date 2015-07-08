@@ -69,6 +69,8 @@
 
 
 // all supported interfaces
+%include "GeomAPI_Interface.h"
+%include "GeomAPI_Shape.h"
 %include "GeomAPI_AISObject.h"
 %include "GeomAPI_Ax1.h"
 %include "GeomAPI_Ax3.h"
@@ -81,7 +83,6 @@
 %include "GeomAPI_Edge.h"
 %include "GeomAPI_Face.h"
 %include "GeomAPI_ICustomPrs.h"
-%include "GeomAPI_Interface.h"
 %include "GeomAPI_IPresentable.h"
 %include "GeomAPI_Lin.h"
 %include "GeomAPI_Lin2d.h"
@@ -89,7 +90,6 @@
 %include "GeomAPI_Pln.h"
 %include "GeomAPI_Pnt.h"
 %include "GeomAPI_Pnt2d.h"
-%include "GeomAPI_Shape.h"
 %include "GeomAPI_ShapeExplorer.h"
 %include "GeomAPI_Vertex.h"
 %include "GeomAPI_XY.h"

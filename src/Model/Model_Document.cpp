@@ -13,6 +13,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -47,6 +48,7 @@ static const int TAG_GENERAL = 1;  // general properties tag
 // general sub-labels
 static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
 static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the cransaction
+static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 
 Model_Document::Model_Document(const std::string theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
@@ -274,6 +276,7 @@ void Model_Document::close(const bool theForever)
     myObjs = 0;
     if (myDoc->CanClose() == CDM_CCS_OK)
       myDoc->Close();
+    mySelectionFeature.reset();
   } else {
     setCurrentFeature(FeaturePtr(), false); // disables all features
   }
@@ -801,6 +804,14 @@ std::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
   return myObjs->createPart(theFeatureData, theIndex);
 }
 
+std::shared_ptr<ModelAPI_ResultPart> Model_Document::copyPart(
+      const std::shared_ptr<ModelAPI_Result>& theOldPart, 
+      const std::shared_ptr<ModelAPI_ResultPart>& theOrigin, 
+      const int theIndex)
+{
+  return myObjs->copyPart(theOldPart, theOrigin, theIndex);
+}
+
 std::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
     const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
@@ -918,4 +929,46 @@ int Model_Document::numInternalFeatures()
 std::shared_ptr<ModelAPI_Feature> Model_Document::internalFeature(const int theIndex)
 {
   return myObjs->internalFeature(theIndex);
+}
+
+// Feature that is used for selection in the Part document by the external request
+class Model_SelectionInPartFeature : public ModelAPI_Feature {
+public:
+  /// Nothing to do in constructor
+  Model_SelectionInPartFeature() : ModelAPI_Feature() {}
+
+  /// Returns the unique kind of a feature
+  virtual const std::string& getKind() {
+    static std::string MY_KIND("InternalSelectionInPartFeature");
+    return MY_KIND;
+  }
+  /// Request for initialization of data model of the object: adding all attributes
+  virtual void initAttributes() {
+    data()->addAttribute("selection", ModelAPI_AttributeSelectionList::typeId());
+  }
+  /// Nothing to do in the execution function
+  virtual void execute() {}
+
+};
+
+//! Returns the feature that is used for calculation of selection externally from the document
+AttributeSelectionListPtr Model_Document::selectionInPartFeature()
+{
+  // return already created, otherwise create
+  if (!mySelectionFeature.get() || !mySelectionFeature->data()->isValid()) {
+    // create a new one
+    mySelectionFeature = FeaturePtr(new Model_SelectionInPartFeature);
+  
+    TDF_Label aFeatureLab = generalLabel().FindChild(TAG_SELECTION_FEATURE);
+    std::shared_ptr<Model_Data> aData(new Model_Data);
+    aData->setLabel(aFeatureLab.FindChild(1));
+    aData->setObject(mySelectionFeature);
+    mySelectionFeature->setDoc(myObjs->owner());
+    mySelectionFeature->setData(aData);
+    std::string aName = id() + "_Part";
+    mySelectionFeature->data()->setName(aName);
+    mySelectionFeature->setDoc(myObjs->owner());
+    mySelectionFeature->initAttributes();
+  }
+  return mySelectionFeature->selectionList("selection");
 }

@@ -45,6 +45,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
     return RESULT_BODY_COLOR;
   }
 
+  // Part result can not be cencealed, even by the movement features
+  MODELAPI_EXPORT virtual bool isConcealed();
+
   /// Returns the part-document of this result
   virtual std::shared_ptr<ModelAPI_Document> partDoc() = 0;
 
@@ -55,7 +58,15 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   virtual bool isActivated() = 0;
 
   /// Returns the name of the shape inside of the part
-  virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+  virtual std::string nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
+    int& theIndex) = 0;
+  /// Updates the selection inside of the part by the selection index
+  virtual bool updateInPart(const int theIndex) = 0;
+
+  /// Applies the additional transformation ofthe part
+  virtual void setShape(std::shared_ptr<ModelAPI_Result> theThis, 
+    const std::shared_ptr<GeomAPI_Shape>& theTransformed) = 0;
+
   /// Returns the shape by the name in the part
   virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName) = 0;
   /// Updates the shape-result of the part (called on Part feature execution)

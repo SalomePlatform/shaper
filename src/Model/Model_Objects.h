@@ -103,6 +103,10 @@ class Model_Objects
   /// Creates a part results
   std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  /// Copies a part results, keeping the same data
+  std::shared_ptr<ModelAPI_ResultPart> copyPart(
+      const std::shared_ptr<ModelAPI_Result>& theOldPart, 
+      const std::shared_ptr<ModelAPI_ResultPart>& theOrigin, const int theIndex = 0);
   /// Creates a group results
   std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

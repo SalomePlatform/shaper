@@ -31,11 +31,13 @@ GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
   std::shared_ptr<GeomAPI_Shape> theSourceShape,
   std::shared_ptr<GeomAPI_Shape> theDestShape,
   bool theIsReverse,
-  bool theIsCentering)
+  bool theIsCentering, 
+  bool theSimpleTransform)
   : myDone(false),
   myShape(new GeomAPI_Shape())
 {
-  build(theSourceSolid, theDestSolid, theSourceShape, theDestShape, theIsReverse, theIsCentering);
+  build(theSourceSolid, theDestSolid, theSourceShape, theDestShape, 
+    theIsReverse, theIsCentering, theSimpleTransform);
 }
 
 void GeomAlgoAPI_Placement::build(
@@ -44,7 +46,8 @@ void GeomAlgoAPI_Placement::build(
   const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
   const std::shared_ptr<GeomAPI_Shape>& theDestShape,
   bool theIsReverse,
-  bool theIsCentering)
+  bool theIsCentering,
+  bool theSimpleTransform)
 {
   // Filling the parameters of the objects
   static const int aNbObjects = 2;
@@ -188,27 +191,33 @@ void GeomAlgoAPI_Placement::build(
   gp_Vec aTrans = aDstLoc - aSrcLoc;
   aTrsf.SetTransformation(aRot, aTrans);
 
-  // Transform the shape with copying it
-  BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
-  if(aBuilder) {
-    setImpl(aBuilder);
-    myDone = aBuilder->IsDone() == Standard_True;
-    if (myDone) {
-      TopoDS_Shape aResult = aBuilder->Shape();
-      // fill data map to keep correct orientation of sub-shapes 
-      for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-        std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-        aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-        myMap.bind(aCurrentShape, aCurrentShape);
+  if (theSimpleTransform) { // just add transformation
+    TopLoc_Location aDelta(aTrsf);
+    TopoDS_Shape aResult = aSourceShape.Moved(aDelta);
+    myShape->setImpl(new TopoDS_Shape(aResult));
+  } else { // internal rebuild of the shape
+    // Transform the shape with copying it
+    BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
+    if(aBuilder) {
+      setImpl(aBuilder);
+      myDone = aBuilder->IsDone() == Standard_True;
+      if (myDone) {
+        TopoDS_Shape aResult = aBuilder->Shape();
+        // fill data map to keep correct orientation of sub-shapes 
+        for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
+          std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+          aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
+          myMap.bind(aCurrentShape, aCurrentShape);
+        }
+  #ifdef DEB_PLACEMENT
+        int aNum = myMap.size();
+        cout << "MAP of Oriented shapes =" << aNum <<endl;
+
+  #endif
+
+        myShape->setImpl(new TopoDS_Shape(aResult));
+        myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
       }
-#ifdef DEB_PLACEMENT
-      int aNum = myMap.size();
-      cout << "MAP of Oriented shapes =" << aNum <<endl;
-
-#endif
-
-      myShape->setImpl(new TopoDS_Shape(aResult));
-      myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
     }
   }
 }
@@ -216,8 +225,11 @@ void GeomAlgoAPI_Placement::build(
 //============================================================================
 const bool GeomAlgoAPI_Placement::isValid() const
 {
-  BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
-  return (aChecker.IsValid() == Standard_True);
+  if (myShape.get()) { // only for not-simple transform
+    BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
+    return (aChecker.IsValid() == Standard_True);
+  }
+  return true;
 }
 
 //============================================================================
