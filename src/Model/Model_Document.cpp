@@ -14,6 +14,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -660,7 +661,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
     TDF_Label aLab = aRef->Get();
     FeaturePtr aResult = myObjs->feature(aLab);
     if (theVisible) { // get nearest visible (in history) going up
-      while(aResult.get() && !aResult->isInHistory()) {
+      while(aResult.get() &&  // sub-composites are never in history
+             (!aResult->isInHistory() || ModelAPI_Tools::compositeOwner(aResult).get())) {
         aResult = myObjs->nextFeature(aResult, true);
       }
     }

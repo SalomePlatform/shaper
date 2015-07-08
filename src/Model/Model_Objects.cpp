@@ -16,6 +16,7 @@
 #include <Model_ResultParameter.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -326,18 +327,21 @@ void Model_Objects::createHistory(const std::string& theGroupID)
       for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
         FeaturePtr aFeature = feature(aRefs->Value(a));
         if (aFeature.get()) {
-          if (isFeature) { // here may be also disabled features
-            if (aFeature->isInHistory()) {
-              aResult.push_back(aFeature);
-            }
-          } else if (!aFeature->isDisabled()) { // iterate all results of not-disabled feature
-            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-            for (; aRIter != aResults.cend(); aRIter++) {
-              ResultPtr aRes = *aRIter;
-              if (aRes->groupName() != theGroupID) break; // feature have only same group results
-              if (!aRes->isDisabled() && aRes->isInHistory() && !aRes->isConcealed()) {
-                aResult.push_back(*aRIter);
+          // if feature is in sub-component, remove it from history: it is in sub-tree of sub-component
+          if (!ModelAPI_Tools::compositeOwner(aFeature).get()) {
+            if (isFeature) { // here may be also disabled features
+              if (aFeature->isInHistory()) {
+                aResult.push_back(aFeature);
+              }
+            } else if (!aFeature->isDisabled()) { // iterate all results of not-disabled feature
+              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+              for (; aRIter != aResults.cend(); aRIter++) {
+                ResultPtr aRes = *aRIter;
+                if (aRes->groupName() != theGroupID) break; // feature have only same group results
+                if (!aRes->isDisabled() && aRes->isInHistory() && !aRes->isConcealed()) {
+                  aResult.push_back(*aRIter);
+                }
               }
             }
           }
