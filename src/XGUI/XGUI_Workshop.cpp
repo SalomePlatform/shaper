@@ -1000,7 +1000,8 @@ void XGUI_Workshop::deleteObjects()
   bool hasResult = false;
   bool hasFeature = false;
   bool hasParameter = false;
-  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter);
+  bool hasSubFeature = false;
+  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasSubFeature);
   if (!(hasFeature || hasParameter))
     return;
 

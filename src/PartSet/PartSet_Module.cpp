@@ -782,7 +782,8 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
-    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
+    bool hasSubFeature = false;
+    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter, hasSubFeature);
 
     ObjectPtr aObject = aObjects.first();
     if (aObject) {

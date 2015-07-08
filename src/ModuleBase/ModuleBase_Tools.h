@@ -89,8 +89,9 @@ Check types of objects which are in the given list
 \param hasResult will be set to true if list contains Result objects
 \param hasFeature will be set to true if list contains Feature objects
 \param hasParameter will be set to true if list contains Parameter objects
+\param hasSubFeature will be set to true if list contains Sub-Feature objects
 */
-MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter);
+MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter, bool& hasSubFeature);
 }
 
 #endif

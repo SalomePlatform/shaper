@@ -802,6 +802,8 @@ void PartSet_DocumentDataModel::onMouseDoubleClick(const QModelIndex& theIndex)
 {
   if (theIndex.column() != 1)
     return;
+  if (flags(theIndex) == 0)
+    return;
   QTreeView* aTreeView = dynamic_cast<QTreeView*>(sender());
   if ((theIndex.internalId() >= PartsFolder) && (theIndex.internalId() <= PartResult)) {
     if (myActivePartModel)

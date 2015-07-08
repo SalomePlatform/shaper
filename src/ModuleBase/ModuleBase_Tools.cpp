@@ -12,6 +12,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Error.h>
@@ -216,11 +217,12 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
   return TopAbs_SHAPE;
 }
 
-void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter)
+void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter, bool& hasSubFeature)
 {
   hasResult = false;
   hasFeature = false;
   hasParameter = false;
+  hasSubFeature = false;
   foreach(ObjectPtr aObj, theObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -229,7 +231,9 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     hasResult = (aResult.get() != NULL);
     hasFeature = (aFeature.get() != NULL);
     hasParameter = (aConstruction.get() != NULL);
-    if (hasFeature && hasResult  && hasParameter)
+    if (hasFeature) 
+      hasSubFeature = (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
+    if (hasFeature && hasResult  && hasParameter && hasSubFeature)
       break;
   }
 }

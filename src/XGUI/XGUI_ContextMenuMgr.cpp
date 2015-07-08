@@ -163,7 +163,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
-    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter);
+    bool hasSubFeature = false;
+    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter, hasSubFeature);
 
     //Process Feature
     if (aSelected == 1) {
@@ -200,8 +201,10 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("WIREFRAME_CMD")->setEnabled(true);
       }
     }
-    if (hasFeature || hasParameter)
-      action("DELETE_CMD")->setEnabled(true);
+    if (!hasSubFeature) {
+      if (hasFeature || hasParameter)
+        action("DELETE_CMD")->setEnabled(true);
+    }
   }
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);

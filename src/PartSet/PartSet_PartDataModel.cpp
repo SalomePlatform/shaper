@@ -424,10 +424,15 @@ QModelIndex PartSet_PartDataModel::lastHistoryItem() const
 
 Qt::ItemFlags PartSet_PartDataModel::flags(const QModelIndex& theIndex) const
 {
+  // Disable sub-features at column 1
+  if ((theIndex.column() == 1)  && (theIndex.internalId() >= 0))
+    return 0;
+
   Qt::ItemFlags aFlags = Qt::ItemIsSelectable;
   if (object(theIndex)) {
     aFlags |= Qt::ItemIsEditable;
   }
+
   if (theIndex.internalId() == HistoryObject) {
     if (theIndex.row() <= lastHistoryRow() || (theIndex.column() == 1))
       aFlags |= Qt::ItemIsEnabled;
