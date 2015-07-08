@@ -248,8 +248,19 @@ void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
   
-  bool isNestedOk = (myOperations.count() >= 1) && 
-                     myOperations.at(0)->isValid();
+  // the enable state of the parent operation of the nested one is defined by the rules that
+  // firstly there are nested operations and secondly the parent operation is valid
+  ModuleBase_Operation* aPrevOp;
+  Operations::const_iterator anIt = myOperations.end();
+  if (anIt != myOperations.begin()) { // there are items in the operations list
+    --anIt;
+    aPrevOp = *anIt; // the last top operation, the operation which is started
+    if (anIt != myOperations.begin()) { // find the operation where the started operation is nested
+      --anIt;
+      aPrevOp = *anIt;
+    }
+  }
+  bool isNestedOk = (myOperations.count() >= 1) && aPrevOp->isValid();
   emit nestedStateChanged(isNestedOk);
   emit operationStarted(aSenderOperation);
 }
