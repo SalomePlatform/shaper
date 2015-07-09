@@ -53,7 +53,7 @@ ModuleBase_ParamSpinBox::~ModuleBase_ParamSpinBox()
  */
 void ModuleBase_ParamSpinBox::stepBy(int steps)
 {
-  if (hasVariable())
+  if ((!myTextValue.isEmpty()) && hasVariable())
     return;
 
   ModuleBase_DoubleSpinBox::stepBy(steps);
@@ -93,7 +93,7 @@ double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
 
 QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
 {
-  if (hasVariable(myTextValue)){
+  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)){
     return myTextValue;
   }
   return ModuleBase_DoubleSpinBox::textFromValue(theValue);
@@ -124,9 +124,8 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
  */
 void ModuleBase_ParamSpinBox::setValue(const double value)
 {
-  ModuleBase_DoubleSpinBox::setValue(value);
-
   myTextValue = ModuleBase_DoubleSpinBox::textFromValue(value);
+  ModuleBase_DoubleSpinBox::setValue(value);
 }
 
 /*!
@@ -243,7 +242,7 @@ bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
 void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
 {
   ModuleBase_DoubleSpinBox::showEvent(theEvent);
-  if (hasVariable(myTextValue)) {
+  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)) {
     setText(myTextValue);
   }
 }
