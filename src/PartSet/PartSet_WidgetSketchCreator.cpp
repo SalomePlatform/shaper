@@ -140,10 +140,12 @@ bool PartSet_WidgetSketchCreator::focusTo()
 
   connect(myModule, SIGNAL(operationResumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
   SessionPtr aMgr = ModelAPI_Session::get();
+  // Open transaction that is general for the previous nested one: it will be closed on nested commit
   bool aIsOp = aMgr->isOperation();
-  // Open transaction if it was closed before
-  if (!aIsOp)
-    aMgr->startOperation();
+  if (!aIsOp) {
+    const static std::string aNestedOpID("Parameters modification");
+    aMgr->startOperation(aNestedOpID, true);
+  }
 
   restoreValue();
   return false;
@@ -158,10 +160,14 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
   if (aSketchFeature->numberOfSubs() == 0) {
     // Abort operation
     SessionPtr aMgr = ModelAPI_Session::get();
-    bool aIsOp = aMgr->isOperation();
     // Close transaction
-    if (aIsOp)
-      aMgr->abortOperation();
+    /*
+    bool aIsOp = aMgr->isOperation();
+    if (aIsOp) {
+      const static std::string aNestedOpID("Parameters cancelation");
+      aMgr->startOperation(aNestedOpID, true);
+    }
+    */
     theOp->abort();
   } else {
     // Hide sketcher result

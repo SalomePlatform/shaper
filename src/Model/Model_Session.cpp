@@ -52,8 +52,9 @@ void Model_Session::closeAll()
   Model_Application::getApplication()->deleteAllDocuments();
 }
 
-void Model_Session::startOperation(const std::string& theId)
+void Model_Session::startOperation(const std::string& theId, const bool theAttachedToNested)
 {
+  myOperationAttachedToNext = theAttachedToNested;
   ROOT_DOC->startOperation();
   ROOT_DOC->operationId(theId);
   static std::shared_ptr<Events_Message> aStartedMsg
@@ -68,6 +69,10 @@ void Model_Session::finishOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->finishOperation();
+  if (myOperationAttachedToNext) { // twice, with nested
+    ROOT_DOC->finishOperation();
+    myOperationAttachedToNext = false;
+  }
   setCheckTransactions(true);
 }
 
@@ -75,6 +80,10 @@ void Model_Session::abortOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->abortOperation();
+  if (myOperationAttachedToNext) { // twice, with nested
+    ROOT_DOC->abortOperation();
+    myOperationAttachedToNext = false;
+  }
   setCheckTransactions(true);
   // here the update mechanism may work after abort, so, supress the warnings about
   // modifications outside of the transactions
@@ -314,6 +323,7 @@ Model_Session::Model_Session()
 {
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
+  myOperationAttachedToNext = false;
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();

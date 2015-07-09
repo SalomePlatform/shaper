@@ -82,10 +82,12 @@ void FeaturesPlugin_CompositeBoolean::removeFeature(std::shared_ptr<ModelAPI_Fea
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::erase()
 {
-  FeaturePtr aSketch =
-    std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_OBJECT_ID())->value());
-  if (aSketch.get() && aSketch->data()->isValid()) {
-    document()->removeFeature(aSketch);
+  if (data().get() && data()->isValid()) { // on abort of sketch of this composite it may be invalid
+    FeaturePtr aSketch =
+      std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_OBJECT_ID())->value());
+    if (aSketch.get() && aSketch->data()->isValid()) {
+      document()->removeFeature(aSketch);
+    }
   }
   ModelAPI_CompositeFeature::erase();
 }

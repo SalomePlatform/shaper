@@ -31,6 +31,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   std::string myCurrentPluginName;  ///< name of the plugin that must be loaded currently
   std::shared_ptr<ModelAPI_Document> myCurrentDoc;  ///< current working document
   bool myCheckTransactions;  ///< if true, generates error if document is updated outside of transaction
+  bool myOperationAttachedToNext; ///< the current operation must be commited twice, with nested
  public:
 
   //! Loads the OCAF document from the file.
@@ -48,7 +49,10 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void closeAll();
 
   //! Starts a new operation (opens a tansaction)
-  MODEL_EXPORT virtual void startOperation(const std::string& theId = "");
+  //! \param theAttachedToNested if it is true, it means that this transaction is attached to the nested 
+  //!          where it is located and will be commited on the next commit with the nested
+  MODEL_EXPORT virtual void startOperation(
+    const std::string& theId = "", const bool theAttachedToNested = false);
   //! Finishes the previously started operation (closes the transaction)
   MODEL_EXPORT virtual void finishOperation();
   //! Aborts the operation 
