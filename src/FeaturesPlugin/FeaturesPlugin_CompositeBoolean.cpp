@@ -202,12 +202,14 @@ void FeaturesPlugin_CompositeBoolean::LoadNamingDS(std::shared_ptr<ModelAPI_Resu
   if(theBaseShape->isEqual(theAlgo.shape())) {
     theResultBody->store(theAlgo.shape());
   } else {
-    theResultBody->storeModified(theBaseShape, theAlgo.shape());
+    const int aModTag = 1;
+    const int aDeleteTag = 2;
+    const int aSubsolidsTag=3; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+
+    theResultBody->storeModified(theBaseShape, theAlgo.shape(), aSubsolidsTag);
 
     GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
 
-    const int aModTag = 1;
-    const int aDeleteTag = 2;
     const std::string aModName = "Modified";
     theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE,
                                                aModTag, aModName, *theAlgo.mapOfShapes().get());
