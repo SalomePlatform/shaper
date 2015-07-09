@@ -1011,6 +1011,30 @@ void XGUI_Workshop::deleteObjects()
   if (!isActiveOperationAborted())
     return;
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  // check whether the object can be deleted
+  bool anAllPartActivated = true;
+  {
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
+    for (int i = 0; i < aSize && anAllPartActivated; i++) {
+      ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+      anAllPartActivated = aPart->isActivated();
+    }
+  }
+  if (!anAllPartActivated) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aModuleDoc = aMgr->moduleDocument();
+
+    bool aFoundPartSetObject = false;
+    foreach (ObjectPtr aObj, anObjects) {
+      aFoundPartSetObject = aObj->document() == aModuleDoc;
+    }
+    if (aFoundPartSetObject)
+      QMessageBox::critical(myMainWindow, tr("Warning"), tr("Some Part documents are not loaded. It is not possible to perform the operation because the selected objects can be used in the documents."));
+  }
+
+
   bool hasResult = false;
   bool hasFeature = false;
   bool hasParameter = false;
@@ -1116,6 +1140,7 @@ std::set<FeaturePtr> refFeatures(const ObjectPtr& theObject,
       // get all opened documents; found features in the documents;
       // get a list of objects where a feature refers;
       // search in these objects the deleted objects.
+    SessionPtr aMgr = ModelAPI_Session::get();
       std::list<DocumentPtr> anOpenedDocs = aMgr->allOpenedDocuments();
       std::list<DocumentPtr>::const_iterator anIt = anOpenedDocs.begin(),
                                               aLast = anOpenedDocs.end();
