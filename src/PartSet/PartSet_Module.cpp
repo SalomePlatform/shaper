@@ -151,6 +151,7 @@ PartSet_Module::~PartSet_Module()
     if (!aFilter.IsNull())
       aFilter.Nullify();
   }
+  delete myCustomPrs;
 }
 
 void PartSet_Module::activateSelectionFilters()
