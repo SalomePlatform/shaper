@@ -70,7 +70,8 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
   // creates a selection owner on the base of object shape and the object AIS object
   if (anOwner.IsNull() && thePrs.owner().IsNull() && thePrs.object().get()) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-    if (aResult.get()) {
+    if (aResult.get() && aResult->shape().get()) {
+      // some results have no shape, e.g. the parameter one. So, they should not be validated
       GeomShapePtr aShape = aResult->shape();
       const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
       Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
@@ -78,7 +79,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
       myPresentedObject = aResult;
     }
     else
-      aValid = false; // only results can be filtered
+      aValid = false; // only results with a shape can be filtered
   }
   // checks the owner by the AIS context activated filters
   if (!anOwner.IsNull()) {
