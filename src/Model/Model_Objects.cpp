@@ -118,10 +118,12 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     }
     AddToRefArray(aFeaturesLab, aFeatureLab, aPrevFeateureLab);
 
-    initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
     // keep the feature ID to restore document later correctly
     TDataStd_Comment::Set(aFeatureLab, theFeature->getKind().c_str());
     myFeatures.Bind(aFeatureLab, theFeature);
+    // must be after binding to the map because of "Box" macro feature that 
+    // creates other features in "initData"
+    initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
     // event: feature is added
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);

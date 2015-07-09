@@ -11,6 +11,7 @@ class Extrusion():
   def __init__ (self, part, sketch, size):
     """Inserts an extrusion of the given Sketch to the given Part and executes the operation."""
     self.my = part.addFeature("Extrusion")
+    self.my.string("CreationMethod").setValue("BySizes")
     self.my.data().selectionList("base").append(sketch.result(), sketch.buildShape())
     if size < 0:
           self.my.data().real("from_size").setValue(-size)
