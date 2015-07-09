@@ -195,7 +195,7 @@ bool XGUI_OperationMgr::isParentOperationValid() const
   bool isValid = false;
   // the enable state of the parent operation of the nested one is defined by the rules that
   // firstly there are nested operations and secondly the parent operation is valid
-  ModuleBase_Operation* aPrevOp;
+  ModuleBase_Operation* aPrevOp = 0;
   Operations::const_iterator anIt = myOperations.end();
   if (anIt != myOperations.begin()) { // there are items in the operations list
     --anIt;
