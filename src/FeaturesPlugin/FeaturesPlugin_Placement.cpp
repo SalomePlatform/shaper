@@ -117,7 +117,7 @@ void FeaturesPlugin_Placement::execute()
   bool isPart = aContextRes->groupName() == ModelAPI_ResultPart::group();
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody;
-  if (isPart) 
+  if (!isPart) 
     aResultBody = document()->createBody(data());
   GeomAlgoAPI_Placement aFeature(aSlaveObject, aBaseObject, aSlaveShape, aBaseShape, isReverse, isCentering);
   if(!aFeature.isDone()) {
