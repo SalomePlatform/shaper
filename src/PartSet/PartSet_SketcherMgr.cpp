@@ -792,28 +792,33 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     }
   }
   else {
-  // Hide all sketcher sub-Objects
-  for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
-    FeaturePtr aFeature = myCurrentSketch->subFeature(i);
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      (*aIt)->setDisplayed(false);
+    // Hide all sketcher sub-Objects
+    for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+      FeaturePtr aFeature = myCurrentSketch->subFeature(i);
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+        (*aIt)->setDisplayed(false);
+      }
+      aFeature->setDisplayed(false);
     }
-    aFeature->setDisplayed(false);
-  }
-  // Display sketcher result
-  std::list<ResultPtr> aResults = myCurrentSketch->results();
-  std::list<ResultPtr>::const_iterator aIt;
-  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    (*aIt)->setDisplayed(true);
-  }
-  myCurrentSketch->setDisplayed(true);
+    // Display sketcher result
+    std::list<ResultPtr> aResults = myCurrentSketch->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID aDispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+      (*aIt)->setDisplayed(true);
+      // this display event is needed because sketch already may have "displayed" state,
+      // but not displayed while it is still active (issue 613, abort of existing sketch)
+      ModelAPI_EventCreator::get()->sendUpdated(*aIt, aDispEvent);
+    }
+    myCurrentSketch->setDisplayed(true);
     
-  myCurrentSketch = CompositeFeaturePtr();
-  myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
+    myCurrentSketch = CompositeFeaturePtr();
+    myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    Events_Loop::loop()->flush(aDispEvent);
   }
   // restore the module selection modes, which were changed on startSketch
   aConnector->activateModuleSelectionModes();
