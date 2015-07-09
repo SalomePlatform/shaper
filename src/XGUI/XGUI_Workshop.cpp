@@ -1083,7 +1083,9 @@ void XGUI_Workshop::moveObjects()
 }
 
 //**************************************************************
-std::set<FeaturePtr> refFeatures(const ObjectPtr& theObject, bool checkAllDocuments = true)
+std::set<FeaturePtr> refFeatures(const ObjectPtr& theObject, 
+                                 bool checkAllDocuments = true,
+                                 bool useRecursion = false)
 {
   std::set<FeaturePtr> aRefFeatures;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -1101,15 +1103,15 @@ std::set<FeaturePtr> refFeatures(const ObjectPtr& theObject, bool checkAllDocume
     DocumentPtr aModuleDoc = aMgr->moduleDocument();
     if (aFeatureDoc == aModuleDoc) {
       // the feature and results of the feature should be found in references
-      std::list<ObjectPtr> aDeletedObjects;
-      aDeletedObjects.push_back(aFeature);
+      std::list<ObjectPtr> aObjects;
+      aObjects.push_back(aFeature);
       typedef std::list<std::shared_ptr<ModelAPI_Result> > ResultsList;
       const ResultsList& aResults = aFeature->results();
       ResultsList::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
         ResultPtr aRes = *aRIter;
         if (aRes.get())
-          aDeletedObjects.push_back(aRes);
+          aObjects.push_back(aRes);
       }
       // get all opened documents; found features in the documents;
       // get a list of objects where a feature refers;
@@ -1137,8 +1139,8 @@ std::set<FeaturePtr> refFeatures(const ObjectPtr& theObject, bool checkAllDocume
           for(; aRef != aRefs.end() && !aHasReferenceToObjetc; aRef++) {
             std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
             for(; aRefObj != aRef->second.end() && !aHasReferenceToObjetc; aRefObj++) {
-              std::list<ObjectPtr>::const_iterator aObjIt = aDeletedObjects.begin();
-              for(; aObjIt != aDeletedObjects.end() && !aHasReferenceToObjetc; aObjIt++) {
+              std::list<ObjectPtr>::const_iterator aObjIt = aObjects.begin();
+              for(; aObjIt != aObjects.end() && !aHasReferenceToObjetc; aObjIt++) {
                 aHasReferenceToObjetc = *aObjIt == *aRefObj;
               }
             }
@@ -1149,6 +1151,16 @@ std::set<FeaturePtr> refFeatures(const ObjectPtr& theObject, bool checkAllDocume
       }
     }
   }
+
+  // Run recursion 
+  if (useRecursion) {
+    std::set<FeaturePtr>::const_iterator aFeatureIt = aRefFeatures.begin();
+    for (; aFeatureIt != aRefFeatures.end(); ++aFeatureIt) {
+      std::set<FeaturePtr> aRecursiveRefFeatures = refFeatures(*aFeatureIt, checkAllDocuments, useRecursion);
+      aRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
+    } 
+  }
+
   return aRefFeatures;
 }
 
@@ -1171,7 +1183,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
   // 1. find all referenced features
   std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aDeletedObj, theList) {
-    std::set<FeaturePtr> aFeatures = refFeatures(aDeletedObj);
+    std::set<FeaturePtr> aFeatures = refFeatures(aDeletedObj, true, true);
     aRefFeatures.insert(aFeatures.begin(), aFeatures.end());
   }
   // 2. warn about the references remove, break the delete operation if the user chose it
