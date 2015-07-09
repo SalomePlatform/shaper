@@ -266,7 +266,7 @@
       <feature
         id="SketchMultiTranslation"
         title="Translation" icon=":icons/translate.png"
-        tooltip="Translation">
+        tooltip="Multiple translation">
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
             tooltip="Select list of translating objects"
@@ -296,7 +296,7 @@
       <feature
         id="SketchMultiRotation"
         title="Rotation" icon=":icons/rotate.png"
-        tooltip="Rotation">
+        tooltip="Multiple rotation">
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
             tooltip="Select list of rotating objects"
