@@ -151,6 +151,7 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
       aViewAct->setEnabled(true);
       myWorkshop->objectBrowser()->setVisible(true);
       aObjDoc->setVisible(true);
+      desktop()->tabifyDockWidget(aObjDoc, myWorkshop->propertyPanel());
     }
 
     if (!mySelector) {
