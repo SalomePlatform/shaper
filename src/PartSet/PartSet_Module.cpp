@@ -22,6 +22,7 @@
 
 #include <PartSetPlugin_Remove.h>
 #include <PartSetPlugin_Part.h>
+#include <PartSetPlugin_Duplicate.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IViewer.h>
@@ -832,7 +833,14 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     // Do not change activation of parts if an operation active
-    if (myWorkshop->currentOperation() && myWorkshop->currentOperation()->id().toStdString() != PartSetPlugin_Part::ID())
+    static QStringList aAllowActivationList;
+    if (aAllowActivationList.isEmpty())
+      aAllowActivationList << 
+      QString(PartSetPlugin_Part::ID().c_str()) << 
+      QString(PartSetPlugin_Duplicate::ID().c_str()) <<
+      QString(PartSetPlugin_Remove::ID().c_str());
+    if (myWorkshop->currentOperation() && 
+      (!aAllowActivationList.contains(myWorkshop->currentOperation()->id())))
       return;
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
     XGUI_Workshop* aWorkshop = aConnector->workshop();
