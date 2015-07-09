@@ -333,7 +333,7 @@ void XGUI_OperationMgr::onOperationStopped()
   }
   if (aResultOp) {
     bool isModified = aCurrentOperation->isModified();
-    aResultOp->setIsModified(isModified);
+    aResultOp->setIsModified(aResultOp->isModified() || isModified);
     resumeOperation(aResultOp);
     onValidateOperation();
   }
