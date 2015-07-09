@@ -134,8 +134,8 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 
 void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue)
 {
-  if (theSpin->value() == theValue)
-    return;
+  //if (theSpin->value() == theValue)
+  //  return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
   theSpin->blockSignals(isBlocked);
