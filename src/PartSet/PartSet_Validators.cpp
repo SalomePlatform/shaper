@@ -6,6 +6,8 @@
 
 #include "PartSet_Validators.h"
 
+#include "PartSet_Tools.h"
+
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <BRep_Tool.hxx>
@@ -23,6 +25,8 @@
 #include <ModelAPI_Session.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_Arc.h>
 #include <GeomAPI_Edge.h>
 
 #include <list>
@@ -391,6 +395,66 @@ bool PartSet_SameTypeAttrValidator::isValid(
     ObjectPtr aOtherObject = aOtherAttr->object();
     FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
     return aRefFea->getKind() == aOtherFea->getKind();
+  }
+  return false;
+}
+
+bool PartSet_CoincidentAttr::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  // there is a check whether the feature contains a point and a linear edge or two point values
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
+    return false;
+
+  QList<FeaturePtr> aCoinsideLines;
+
+  bool isObject = aRefAttr->isObject();
+  ObjectPtr anObject = aRefAttr->object();
+  if (isObject && anObject) {
+    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+    AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
+    ObjectPtr aOtherObject = aOtherAttr->object();
+    // if the other attribute is not filled still, the result is true
+    if (!aOtherObject.get())
+      return true;
+    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+
+    // check that both have coincidence
+    FeaturePtr aConstrFeature;
+    std::set<FeaturePtr> aCoinList;
+    const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefsList = aRefFea->data()->refsToMe();
+    std::set<std::shared_ptr<ModelAPI_Attribute>>::const_iterator aIt;
+    for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+        AttributeRefAttrPtr aRAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
+        AttributePtr aAR = aRAttr->attr();
+        if (aAR->id() != SketchPlugin_Arc::CENTER_ID()) // ignore constraint to center of arc
+          aCoinList.insert(aConstrFeature);
+          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines,
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_A());
+          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines,
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_B());
+      }
+    }
+    // if there is no coincidence then it is not valid
+    if (aCoinList.size() == 0)
+      return false;
+
+    QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(), aLast = aCoinsideLines.end();
+    bool aValid = false;
+    for (; anIt != aLast && !aValid; anIt++) {
+      aValid = *anIt == aOtherFea;
+    }
+    if (aValid)
+      return true;
   }
   return false;
 }

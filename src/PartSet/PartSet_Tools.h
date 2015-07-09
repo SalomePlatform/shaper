@@ -217,6 +217,22 @@ class PARTSET_EXPORT PartSet_Tools
   static GeomShapePtr findShapeBy2DPoint(const AttributePtr& theAttribute,
                                          ModuleBase_IWorkshop* theWorkshop);
 
+  /* Returns point of coincidence feature
+  * \param theFeature the coincidence feature
+  * \param theAttribute the attribute name
+  */
+  static std::shared_ptr<GeomAPI_Pnt2d> getPoint(std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                 const std::string& theAttribute);
+
+  /**
+  * Returns list of features connected in a councedence feature point
+  * \param theStartCoin the coincidence feature
+  * \param theList a list which collects lines features
+  * \param theAttr the attribute name
+  */
+  static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
+                               std::string theAttr);
+
 protected:
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
   /// if it exists, the first object is returned. Secondly, there is an iteration on

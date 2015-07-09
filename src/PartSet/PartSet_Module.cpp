@@ -194,6 +194,8 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
 
+  aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
+
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
 

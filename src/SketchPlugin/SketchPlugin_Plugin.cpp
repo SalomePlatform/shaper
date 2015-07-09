@@ -57,8 +57,6 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ExternalValidator);
   aFactory->registerValidator("SketchPlugin_TangentAttr",
                               new SketchPlugin_TangentAttrValidator);
-  aFactory->registerValidator("SketchPlugin_CoincidentAttr",
-                              new SketchPlugin_CoincidentAttr);
   aFactory->registerValidator("SketchPlugin_NotFixed",
                               new SketchPlugin_NotFixedValidator);
   aFactory->registerValidator("SketchPlugin_EqualAttr",

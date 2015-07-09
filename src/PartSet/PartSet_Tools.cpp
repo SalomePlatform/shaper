@@ -701,6 +701,58 @@ GeomShapePtr PartSet_Tools::findShapeBy2DPoint(const AttributePtr& theAttribute,
   return aShape;
 }
 
+std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                       const std::string& theAttribute)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
+
+  if (!theFeature->data())
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  FeaturePtr aFeature;
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(theFeature->data()->attribute(theAttribute));
+  if (anAttr)
+    aFeature = ModelAPI_Feature::feature(anAttr->object());
+
+  if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
+    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
+
+  else if (anAttr->attr()) {
+    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+  }
+  if (aPointAttr.get() != NULL)
+    return aPointAttr->pnt();
+  return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
+                                     std::string theAttr)
+{
+  AttributeRefAttrPtr aPnt = theStartCoin->refattr(theAttr);
+  FeaturePtr aObj = ModelAPI_Feature::feature(aPnt->object());
+  if (!theList.contains(aObj)) {
+    std::shared_ptr<GeomAPI_Pnt2d> aOrig = getPoint(theStartCoin, theAttr);
+    if (aOrig.get() == NULL)
+      return;
+    theList.append(aObj);
+    const std::set<AttributePtr>& aRefsList = aObj->data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aIt;
+    for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+        std::shared_ptr<GeomAPI_Pnt2d> aPnt = getPoint(aConstrFeature, theAttr);
+        if (aPnt.get() && aOrig->isEqual(aPnt)) {
+          findCoincidences(aConstrFeature, theList, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+          findCoincidences(aConstrFeature, theList, SketchPlugin_ConstraintCoincidence::ENTITY_B());
+        }
+      }
+    }
+  }
+}
+
 AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj, 
                                                    const TopoDS_Shape theShape, 
                                                    FeaturePtr theSketch)
