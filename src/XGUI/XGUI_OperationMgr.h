@@ -95,7 +95,12 @@ Q_OBJECT
   /// \return theEnabled a boolean value
   bool isApplyEnabled() const;
 
-  public slots:
+  /// Returns valid state of the parent operation. If the current operation is the last one
+  /// it returns the valid state of the operation
+  /// \return boolean value
+  bool isParentOperationValid() const;
+
+public slots:
   /// Slot that commits the current operation.
   void onCommitOperation();
   /// Slot that aborts the current operation.

@@ -10,6 +10,9 @@
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
 
+#include "ModelAPI_CompositeFeature.h"
+#include "ModelAPI_Session.h"
+
 #include <QMessageBox>
 #include <QApplication>
 #include <QKeyEvent>
@@ -141,12 +144,20 @@ bool XGUI_OperationMgr::abortAllOperations()
 
 bool XGUI_OperationMgr::commitAllOperations()
 {
+  bool isCompositeCommitted = false;
   while (hasOperation()) {
+    ModuleBase_Operation* anOperation = currentOperation();
     if (isApplyEnabled()) {
       onCommitOperation();
     } else {
-      currentOperation()->abort();
+      anOperation->abort();
     }
+    FeaturePtr aFeature = anOperation->feature();
+    CompositeFeaturePtr aComposite = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+    isCompositeCommitted = aComposite.get();
+    if (isCompositeCommitted)
+      break;
   }
   return true;
 }
@@ -177,6 +188,24 @@ void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
 bool XGUI_OperationMgr::isApplyEnabled() const
 {
   return myIsApplyEnabled;
+}
+
+bool XGUI_OperationMgr::isParentOperationValid() const
+{
+  bool isValid = false;
+  // the enable state of the parent operation of the nested one is defined by the rules that
+  // firstly there are nested operations and secondly the parent operation is valid
+  ModuleBase_Operation* aPrevOp;
+  Operations::const_iterator anIt = myOperations.end();
+  if (anIt != myOperations.begin()) { // there are items in the operations list
+    --anIt;
+    aPrevOp = *anIt; // the last top operation, the operation which is started
+    if (anIt != myOperations.begin()) { // find the operation where the started operation is nested
+      --anIt;
+      aPrevOp = *anIt;
+    }
+  }
+  return aPrevOp && aPrevOp->isValid();
 }
 
 bool XGUI_OperationMgr::canStopOperation()
@@ -248,20 +277,12 @@ void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
   
-  // the enable state of the parent operation of the nested one is defined by the rules that
-  // firstly there are nested operations and secondly the parent operation is valid
-  ModuleBase_Operation* aPrevOp;
-  Operations::const_iterator anIt = myOperations.end();
-  if (anIt != myOperations.begin()) { // there are items in the operations list
-    --anIt;
-    aPrevOp = *anIt; // the last top operation, the operation which is started
-    if (anIt != myOperations.begin()) { // find the operation where the started operation is nested
-      --anIt;
-      aPrevOp = *anIt;
-    }
-  }
-  bool isNestedOk = (myOperations.count() >= 1) && aPrevOp->isValid();
-  emit nestedStateChanged(isNestedOk);
+  bool aParentValid = isParentOperationValid();
+  // in order to apply is enabled only if there are modifications in the model
+  // e.g. sketch can be applyed only if at least one nested element modification is finished
+  bool aCanUndo = ModelAPI_Session::get()->canUndo();
+  emit nestedStateChanged(aParentValid && aCanUndo);
+
   emit operationStarted(aSenderOperation);
 }
 
@@ -274,7 +295,10 @@ void XGUI_OperationMgr::onOperationAborted()
 void XGUI_OperationMgr::onOperationCommitted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  emit nestedStateChanged(myOperations.count() >= 1);
+  // in order to apply is enabled only if there are modifications in the model
+  // e.g. sketch can be applyed only if at least one nested element create is finished
+  bool aCanUndo = ModelAPI_Session::get()->canUndo();
+  emit nestedStateChanged(myOperations.count() >= 1 && aCanUndo);
   emit operationCommitted(aSenderOperation);
 }
 
