@@ -87,7 +87,7 @@ void Model_Data::setName(const std::string& theName)
     if (isModified)
       aName->Set(theName.c_str());
   }
-  if (isModified)
+  if (mySendAttributeUpdated && isModified)
     ModelAPI_ObjectRenamedMessage::send(myObject, anOldName, theName, this);
 }
 
