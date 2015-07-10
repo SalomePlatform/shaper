@@ -15,6 +15,7 @@
 class GeomAPI_IPresentable
 {
  public:
+  virtual ~GeomAPI_IPresentable();
   /** Returns the AIS preview
    *   \param thePrevious - defines a presentation if it was created previously
    */

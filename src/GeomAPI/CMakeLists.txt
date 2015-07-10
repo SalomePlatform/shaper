@@ -59,6 +59,7 @@ SET(PROJECT_SOURCES
     GeomAPI_ICustomPrs.cpp
     GeomAPI_Ax1.cpp
     GeomAPI_Ax3.cpp
+    GeomAPI_IPresentable.cpp
 )
 
 SET(PROJECT_LIBRARIES
