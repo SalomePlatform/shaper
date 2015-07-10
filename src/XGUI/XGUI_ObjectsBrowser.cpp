@@ -266,6 +266,12 @@ void XGUI_ObjectsBrowser::onEditItem()
   if (aSelectedData.size() > 0) {
     ObjectPtr aFeature = aSelectedData.first();
     if (aFeature) {  // Selection happens in TreeView
+      QObjectPtrList aList;
+      aList.append(aFeature);
+      // check whether the object can be deleted. There should not be parts which are not loaded
+      if (!XGUI_Tools::canRemoveOrRename((QWidget*)parent(), aList))
+        return;
+
       // Find index which corresponds the feature
       QModelIndex aIndex;
       foreach(QModelIndex aIdx, selectedIndexes()) {

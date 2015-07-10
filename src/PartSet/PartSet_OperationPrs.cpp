@@ -125,14 +125,25 @@ bool isSubObject(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 }
 
 void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
+              const FeaturePtr& theFeature,
               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
-  if (theObjectShapes.contains(theObject))
-    theObjectShapes[theObject].append(theShape);
-  else {
-    QList<GeomShapePtr> aShapes;
-    aShapes.append(theShape);
-    theObjectShapes[theObject] = aShapes;
+  if (theObject.get()) {
+    GeomShapePtr aShape = theShape;
+    if (!aShape.get()) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      if (aResult.get())
+        aShape = aResult->shape();
+    }
+    if (!isSubObject(theObject, theFeature)) {
+      if (theObjectShapes.contains(theObject))
+        theObjectShapes[theObject].append(theShape);
+      else {
+        QList<GeomShapePtr> aShapes;
+        aShapes.append(theShape);
+        theObjectShapes[theObject] = aShapes;
+      }
+    }
   }
 }
 
@@ -158,10 +169,7 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
         ResultPtr aResult = aSelAttribute->context();
         GeomShapePtr aShape = aSelAttribute->value();
-        if (!aShape.get())
-          aShape = aResult->shape();
-        if (!isSubObject(aResult, myFeature))
-          addValue(aResult, aShape, theObjectShapes);
+        addValue(aResult, aShape, myFeature, theObjectShapes);
       }
     }
     else {
@@ -190,16 +198,7 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
         anObject = anAttr->value();
       }
-
-      if (anObject.get()) {
-        if (!aShape.get()) {
-          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-          if (aResult.get())
-            aShape = aResult->shape();
-        }
-        if (!isSubObject(anObject, myFeature))
-          addValue(anObject, aShape, theObjectShapes);
-      }
+      addValue(anObject, aShape, myFeature, theObjectShapes);
     }
   }
 }

@@ -9,7 +9,11 @@
 
 #include <ModelAPI_Feature.h>
 
+#include <ModuleBase_Definitions.h>
+
 #include <memory>
+
+class QWidget;
 
 /*!
  \ingroup GUI
@@ -64,7 +68,21 @@ bool XGUI_EXPORT isModelObject(FeaturePtr theFeature);
  */
 std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
 
+/*!
+ Returns true if there are no parts in the document, which are not activated or
+ all objects in the list are not PartSet document.
+ It shows the warning control if the result is false.
+ \param theParent a parent for the warning control
+ \param theList a list of object
+ \return a boolean value
+ */
+bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aList);
 
+/*!
+ Returns true if there are no parts in the document, which are not activated
+ \return a boolean value
+ */
+bool XGUI_EXPORT allDocumentsActivated(QString& theNotActivatedNames);
 };
 
 #endif

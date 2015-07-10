@@ -1011,29 +1011,9 @@ void XGUI_Workshop::deleteObjects()
   if (!isActiveOperationAborted())
     return;
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  // check whether the object can be deleted
-  bool anAllPartActivated = true;
-  {
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-    int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
-    for (int i = 0; i < aSize && anAllPartActivated; i++) {
-      ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
-      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-      anAllPartActivated = aPart->isActivated();
-    }
-  }
-  if (!anAllPartActivated) {
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aModuleDoc = aMgr->moduleDocument();
-
-    bool aFoundPartSetObject = false;
-    foreach (ObjectPtr aObj, anObjects) {
-      aFoundPartSetObject = aObj->document() == aModuleDoc;
-    }
-    if (aFoundPartSetObject)
-      QMessageBox::critical(myMainWindow, tr("Warning"), tr("Some Part documents are not loaded. It is not possible to perform the operation because the selected objects can be used in the documents."));
-  }
-
+  // check whether the object can be deleted. There should not be parts which are not loaded
+  if (!XGUI_Tools::canRemoveOrRename(myMainWindow, anObjects))
+    return;
 
   bool hasResult = false;
   bool hasFeature = false;

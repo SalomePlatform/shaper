@@ -7,9 +7,14 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_ResultPart.h>
+
 #include <GeomAPI_Shape.h>
 
 #include <QDir>
+#include <QMessageBox>
 
 #include <iostream>
 #include <sstream>
@@ -74,6 +79,48 @@ std::string featureInfo(FeaturePtr theFeature)
  }
  }*/
 
+//******************************************************************
+bool canRemoveOrRename(QWidget* theParent, const QObjectPtrList& theObjects)
+{
+  bool aResult = true;
+  QString aNotActivatedNames;
+  if (!XGUI_Tools::allDocumentsActivated(aNotActivatedNames)) {
+    DocumentPtr aModuleDoc = ModelAPI_Session::get()->moduleDocument();
+    bool aFoundPartSetObject = false;
+    foreach (ObjectPtr aObj, theObjects) {
+      if (aObj->groupName() == ModelAPI_ResultPart::group())
+        continue;
+      aFoundPartSetObject = aObj->document() == aModuleDoc;
+    }
+    if (aFoundPartSetObject) {
+      QMessageBox::StandardButton aRes = QMessageBox::warning(theParent, QObject::tr("Warning"),
+               QObject::tr("Selected objects can be used in Part documents which are not loaded: \
+%1. Whould you like to continue?").arg(aNotActivatedNames),
+               QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+      aResult = aRes == QMessageBox::Yes;
+    }
+  }
+  return aResult;
+}
 
+//******************************************************************
+bool allDocumentsActivated(QString& theNotActivatedNames)
+{
+  bool anAllPartActivated = true;
+  QStringList aRefNames;
+
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
+  for (int i = 0; i < aSize; i++) {
+    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    if (!aPart->isActivated()) {
+      anAllPartActivated = false;
+      aRefNames.append(aObject->data()->name().c_str());
+    }
+  }
+  theNotActivatedNames = aRefNames.join(", ");
+  return anAllPartActivated;
+}
 
 }
