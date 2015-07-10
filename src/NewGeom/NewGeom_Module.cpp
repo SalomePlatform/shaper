@@ -366,8 +366,21 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
                                     const QIcon& theIcon, const QKeySequence& theKeys,
                                     bool isCheckable)
 {
+  static QString aLastTool = "";
+  static int aNb = 0;
+  if (aLastTool.isEmpty())
+    aLastTool = theWBName;
+  else if (theWBName != aLastTool) {
+    aLastTool = theWBName;
+    if (aNb > 20) {
+      desktop()->addToolBarBreak();
+      aNb = 0;
+    }
+  }
+  aNb++;
+
   int aMenu = createMenu(theWBName, -1, -1, 50);
-  int aTool = createTool(theWBName);
+  int aTool = createTool(theWBName, theWBName);
 
   int aId = myActionsList.size();
   myActionsList.append(theId);
@@ -390,7 +403,7 @@ QAction* NewGeom_Module::addNestedFeature(const QString& theWBName,
                                           const QList<QAction*>& theNestedActions)
 {
   int aMenu = createMenu(theWBName, -1, -1, 50);
-  int aTool = createTool(theWBName);
+  int aTool = createTool(theWBName, theWBName);
 
   int aId = myActionsList.size();
   myActionsList.append(theInfo.id);
