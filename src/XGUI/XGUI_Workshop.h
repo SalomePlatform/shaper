@@ -219,7 +219,7 @@ Q_OBJECT
   //! objects features appear. If the user chose do not continue, the deletion is not performed
   //! \return the success of the delete 
   bool deleteFeatures(const QObjectPtrList& theList,
-                      const std::set<FeaturePtr>& theIgnoredFeatures,
+                      const std::set<FeaturePtr>& theIgnoredFeatures = std::set<FeaturePtr>(),
                       QWidget* theParent = 0,
                       const bool theAskAboutDeleteReferences = false);
 

@@ -283,12 +283,10 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
       anOperation->abort();
 
     SessionPtr aMgr = ModelAPI_Session::get();
-    std::set<FeaturePtr> anIgnoredFeatures;
-    anIgnoredFeatures.insert(myModule->sketchMgr()->activeSketch());
 
     QString aName = tr("Detach %1").arg(aLine->data()->name().c_str());
     aMgr->startOperation(aName.toStdString());
-    aWorkshop->deleteFeatures(aToDelFeatures, anIgnoredFeatures);
+    aWorkshop->deleteFeatures(aToDelFeatures);
     aMgr->finishOperation();
   }
   myCoinsideLines.clear();

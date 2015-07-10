@@ -79,7 +79,8 @@ void FeaturesPlugin_ExtrusionBoolean::makeSolids(const ListOfShape& theFaces,
                                                                                         aFromShape, aFromSize);
 
     // Checking that the algorithm worked properly.
-    if(!aPrismAlgo->isDone() || aPrismAlgo->shape()->isNull() || !aPrismAlgo->isValid()) {
+    if(!aPrismAlgo->isDone() || !aPrismAlgo->shape().get() || aPrismAlgo->shape()->isNull() ||
+       !aPrismAlgo->isValid()) {
       setError("Extrusion algorithm failed");
       theResults.clear();
       return;

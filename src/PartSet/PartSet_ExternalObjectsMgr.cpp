@@ -90,7 +90,6 @@ void PartSet_ExternalObjectsMgr::removeExternal(const CompositeFeaturePtr& theSk
         anObjects.append(aFeature);
         // the external feature should be removed with all references, sketch feature should be ignored
         std::set<FeaturePtr> anIgnoredFeatures;
-        anIgnoredFeatures.insert(theSketch);
         // the current feature should be ignored, because it can use the external feature in the
         // attributes and, therefore have a references to it. So, the delete functionality tries
         // to delete this feature. Test case is creation of a constraint on external point,
@@ -149,7 +148,6 @@ void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject
       anObjects.append(aFeature);
       // the external feature should be removed with all references, sketch feature should be ignored
       std::set<FeaturePtr> anIgnoredFeatures;
-      anIgnoredFeatures.insert(theSketch);
       // the current feature should be ignored, because it can use the external feature in the
       // attributes and, therefore have a references to it. So, the delete functionality tries
       // to delete this feature. Test case is creation of a constraint on external point,

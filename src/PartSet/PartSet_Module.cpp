@@ -605,10 +605,7 @@ bool PartSet_Module::deleteObjects()
     // 4. delete features
     // sketch feature should be skipped, only sub-features can be removed
     // when sketch operation is active
-    std::set<FeaturePtr> anIgnoredFeatures;
-    anIgnoredFeatures.insert(mySketchMgr->activeSketch());
-    aWorkshop->deleteFeatures(aSketchObjects, anIgnoredFeatures);
-  
+    aWorkshop->deleteFeatures(aSketchObjects);
     // 5. stop operation
     aWorkshop->displayer()->updateViewer();
     aMgr->finishOperation();
