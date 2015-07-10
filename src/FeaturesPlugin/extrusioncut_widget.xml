@@ -73,4 +73,5 @@
     type_choice="Solids"
     concealment="true">
   </multi_selector>
+  <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
 </source>

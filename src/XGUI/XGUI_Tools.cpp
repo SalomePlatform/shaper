@@ -10,6 +10,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -121,6 +122,121 @@ bool allDocumentsActivated(QString& theNotActivatedNames)
   }
   theNotActivatedNames = aRefNames.join(", ");
   return anAllPartActivated;
+}
+
+//**************************************************************
+void refsToFeatureInFeatureDocument(const ObjectPtr& theObject, std::set<FeaturePtr>& theRefFeatures)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get()) {
+    DocumentPtr aFeatureDoc = aFeature->document();
+    // 1. find references in the current document
+    aFeatureDoc->refsToFeature(aFeature, theRefFeatures, false);
+  }
+}
+
+//**************************************************************
+bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
+{
+  bool isSub = false;
+  CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  if (aComposite.get()) {
+    isSub = aComposite->isSub(theObject);
+    // the recursive is possible, the parameters are sketch circle and extrusion cut. They are
+    // separated by composite sketch feature
+    if (!isSub) {
+      int aNbSubs = aComposite->numberOfSubs();
+      for (int aSub = 0; aSub < aNbSubs && !isSub; aSub++) {
+        isSub = isSubOfComposite(theObject, aComposite->subFeature(aSub));
+      }
+    }
+  }
+  return isSub;
+}
+
+//**************************************************************
+void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
+                                 std::set<FeaturePtr>& theRefFeatures)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (!aFeature.get())
+    return;
+
+  // 1. find references in the current document
+  std::set<FeaturePtr> aRefFeatures;
+  refsToFeatureInFeatureDocument(theObject, aRefFeatures);
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    if (!isSubOfComposite(theSourceObject, *anIt))
+      theRefFeatures.insert(*anIt);
+  }
+
+  // 2. find references in all documents if the document of the feature is
+  // "PartSet". Features of this document can be used in all other documents
+  DocumentPtr aFeatureDoc = aFeature->document();
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aModuleDoc = aMgr->moduleDocument();
+  if (aFeatureDoc == aModuleDoc) {
+    // the feature and results of the feature should be found in references
+    std::list<ObjectPtr> aObjects;
+    aObjects.push_back(aFeature);
+    typedef std::list<std::shared_ptr<ModelAPI_Result> > ResultsList;
+    const ResultsList& aResults = aFeature->results();
+    ResultsList::const_iterator aRIter = aResults.begin();
+    for (; aRIter != aResults.cend(); aRIter++) {
+      ResultPtr aRes = *aRIter;
+      if (aRes.get())
+        aObjects.push_back(aRes);
+    }
+    // get all opened documents; found features in the documents;
+    // get a list of objects where a feature refers;
+    // search in these objects the deleted objects.
+    SessionPtr aMgr = ModelAPI_Session::get();
+    std::list<DocumentPtr> anOpenedDocs = aMgr->allOpenedDocuments();
+    std::list<DocumentPtr>::const_iterator anIt = anOpenedDocs.begin(),
+                                            aLast = anOpenedDocs.end();
+    std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+    for (; anIt != aLast; anIt++) {
+      DocumentPtr aDocument = *anIt;
+      if (aDocument == aFeatureDoc)
+        continue; // this document has been already processed in 1.1
+
+      int aFeaturesCount = aDocument->size(ModelAPI_Feature::group());
+      for (int aId = 0; aId < aFeaturesCount; aId++) {
+        ObjectPtr anObject = aDocument->object(ModelAPI_Feature::group(), aId);
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+        if (!aFeature.get())
+          continue;
+
+        aRefs.clear();
+        aFeature->data()->referencesToObjects(aRefs);
+        std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRef = aRefs.begin();
+        bool aHasReferenceToObject = false;
+        for(; aRef != aRefs.end() && !aHasReferenceToObject; aRef++) {
+          std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
+          for(; aRefObj != aRef->second.end() && !aHasReferenceToObject; aRefObj++) {
+            std::list<ObjectPtr>::const_iterator aObjIt = aObjects.begin();
+            for(; aObjIt != aObjects.end() && !aHasReferenceToObject; aObjIt++) {
+              aHasReferenceToObject = *aObjIt == *aRefObj;
+            }
+          }
+        }
+        if (aHasReferenceToObject && !isSubOfComposite(theSourceObject, aFeature))
+          theRefFeatures.insert(aFeature);
+      }
+    }
+  }
+
+  // Run recursion. It is possible recusive dependency, like the folowing: plane, extrusion uses plane,
+  // axis is built on extrusion. Delete of a plane should check the dependency from the axis also.
+  std::set<FeaturePtr> aRecursiveRefFeatures;
+  std::set<FeaturePtr>::const_iterator aFeatureIt = theRefFeatures.begin();
+  for (; aFeatureIt != theRefFeatures.end(); ++aFeatureIt) {
+    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, aRecursiveRefFeatures);
+  } 
+  theRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
 }
 
 }

@@ -83,6 +83,38 @@ bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aLi
  \return a boolean value
  */
 bool XGUI_EXPORT allDocumentsActivated(QString& theNotActivatedNames);
+
+/*!
+  Returns a container of referenced feature to the current object in the object document.
+  \param theObject an object, which will be casted to a feature type
+  \param theRefFeatures an output container
+ */
+void XGUI_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
+                                                std::set<FeaturePtr>& theRefFeatures);
+
+/*!
+ Returns true if the object if a sub child of the feature. The feature is casted to the
+ composite one. If it is possible, the sub object check happens. The method is applyed
+ recursively to the feature subs.
+ \param theObject a candidate to be a sub object
+ \param theFeature a candidate to be a composite feature
+ \return a boolean value
+ */
+bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
+
+/*!
+ Returns a container of references feature to the source object. The search happens in the object
+ document and in other Part documents if the object belongs to the PartSet. The search is recursive,
+ in other words it is applyed to set of the found objects until it is possible.
+ It do not returns the referenced features to the object if this references is a composite feature
+ which has the object as a sub object.
+ \param theSourceObject an object, which references are searched
+ \param theObject an intermediate recursive object, should be set in the source object
+ \return a boolean value
+ */
+void XGUI_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
+                                             const ObjectPtr& theObject,
+                                             std::set<FeaturePtr>& theRefFeatures);
 };
 
 #endif
