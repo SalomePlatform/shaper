@@ -18,6 +18,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeValidator.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <GeomDataAPI_Point.h>
@@ -260,6 +261,39 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   }
 }
 
+bool isValidAttribute(const AttributePtr& theAttribute)
+{
+  std::list<ModelAPI_Validator*> aValidators;
+  std::list<std::list<std::string> > anArguments;
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  if (!aFeature.get())
+    return false;
+
+  ModelAPI_Session::get()->validators()->validators(aFeature->getKind(), 
+                                                    theAttribute->id(), 
+                                                    aValidators, anArguments);
+  std::list<ModelAPI_Validator*>::const_iterator aValidatorIt = aValidators.begin();
+  std::list<std::list<std::string> >::const_iterator anArgumentIt = anArguments.begin();
+  for (; aValidatorIt != aValidators.end() || anArgumentIt != anArguments.end(); ++aValidatorIt, ++anArgumentIt) {
+    const ModelAPI_AttributeValidator * anAttributeValidator =
+        dynamic_cast<const ModelAPI_AttributeValidator *>(*aValidatorIt);
+    if (!anAttributeValidator)
+      continue;
+    if (!anAttributeValidator->isValid(theAttribute, *anArgumentIt))
+      return false;
+  }
+  return true;
+}
+
+void setParameterName(std::shared_ptr<ParametersPlugin_Parameter> theParameter, const std::string& theName)
+{
+  theParameter->data()->blockSendAttributeUpdated(true);
+  theParameter->data()->setName(theName);
+  theParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(theName);
+  theParameter->data()->blockSendAttributeUpdated(false);
+}
+
 void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     const std::shared_ptr<Events_Message>& theMessage)
 {
@@ -270,13 +304,13 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     return;
 
   // check that the renamed object is a result 
-  std::shared_ptr<ModelAPI_ResultParameter> aResultParameter =
+  ResultParameterPtr aResultParameter =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aMessage->object());
   if (!aResultParameter.get()) 
     return;
-  
+
   // get parameter feature for the result
-  std::shared_ptr<ModelAPI_Feature> aFeature = aResultParameter->document()->feature(aResultParameter);
+  FeaturePtr aFeature = aResultParameter->document()->feature(aResultParameter);
   std::shared_ptr<ParametersPlugin_Parameter> aParameter =
       std::dynamic_pointer_cast<ParametersPlugin_Parameter>(aFeature);
   if (!aParameter.get())
@@ -287,8 +321,15 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   //aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(aMessage->newName());
   //aParameter->execute();
   // manual way:
-  aParameter->data()->setName(aMessage->newName());
-  aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(aMessage->newName());
+  setParameterName(aParameter, aMessage->newName());
+
+  // TODO(spo): replace with ModelAPI_Session::get()->validators()->validate(aParameter, ParametersPlugin_Parameter::VARIABLE_ID())
+  // when ModelAPI_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttribute) const
+  // is ready
+  if (!isValidAttribute(aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID()))) {
+    setParameterName(aParameter, aMessage->oldName());
+    return;
+  }
 
   // List of documents to process
   std::list<DocumentPtr> aDocList;
