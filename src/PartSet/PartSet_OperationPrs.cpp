@@ -137,10 +137,10 @@ void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
     }
     if (!isSubObject(theObject, theFeature)) {
       if (theObjectShapes.contains(theObject))
-        theObjectShapes[theObject].append(theShape);
+        theObjectShapes[theObject].append(aShape);
       else {
         QList<GeomShapePtr> aShapes;
-        aShapes.append(theShape);
+        aShapes.append(aShape);
         theObjectShapes[theObject] = aShapes;
       }
     }
