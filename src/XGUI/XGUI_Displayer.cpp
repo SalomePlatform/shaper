@@ -37,6 +37,8 @@
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+#include <Prs3d_Drawer.hxx>
+#include <Prs3d_IsoAspect.hxx>
 
 #include <StdSelect_ViewerSelector3d.hxx>
 
@@ -646,6 +648,8 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   if ((!aContext.IsNull()) && (!aContext->HasOpenedContext())) {
     aContext->OpenLocalContext();
     deactivateTrihedron();
+    aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
+    aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
   }
   return aContext;
 }
