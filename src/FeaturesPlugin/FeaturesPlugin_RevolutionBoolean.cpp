@@ -37,7 +37,9 @@ void FeaturesPlugin_RevolutionBoolean::initMakeSolidsAttributes()
 }
 
 //=================================================================================================
-ListOfShape FeaturesPlugin_RevolutionBoolean::MakeSolids(const ListOfShape& theFaces)
+void FeaturesPlugin_RevolutionBoolean::makeSolids(const ListOfShape& theFaces,
+                                                  ListOfShape& theResults,
+                                                  std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos)
 {
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
@@ -86,18 +88,20 @@ ListOfShape FeaturesPlugin_RevolutionBoolean::MakeSolids(const ListOfShape& theF
   }
 
   // Revol faces.
-  ListOfShape aRevolutionList;
+  theResults.clear();
   for(ListOfShape::const_iterator aFacesIt = theFaces.begin(); aFacesIt != theFaces.end(); aFacesIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *aFacesIt;
-    GeomAlgoAPI_Revolution aRevolAlgo(aBaseShape, anAxis, aToShape, aToAngle, aFromShape, aFromAngle);
+    std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo = std::make_shared<GeomAlgoAPI_Revolution>(aBaseShape, anAxis,
+                                                                                                  aToShape, aToAngle,
+                                                                                                  aFromShape, aFromAngle);
 
     // Checking that the algorithm worked properly.
-    if(!aRevolAlgo.isDone() || aRevolAlgo.shape()->isNull() || !aRevolAlgo.isValid()) {
+    if(!aRevolAlgo->isDone() || aRevolAlgo->shape()->isNull() || !aRevolAlgo->isValid()) {
       setError("Revolution algorithm failed");
-      return ListOfShape();
+      theResults.clear();
+      return;
     }
-    aRevolutionList.push_back(aRevolAlgo.shape());
+    theResults.push_back(aRevolAlgo->shape());
+    theAlgos.push_back(aRevolAlgo);
   }
-
-  return aRevolutionList;
 }

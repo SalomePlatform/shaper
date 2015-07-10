@@ -33,7 +33,9 @@ void FeaturesPlugin_ExtrusionBoolean::initMakeSolidsAttributes()
 }
 
 //=================================================================================================
-ListOfShape FeaturesPlugin_ExtrusionBoolean::MakeSolids(const ListOfShape& theFaces)
+void FeaturesPlugin_ExtrusionBoolean::makeSolids(const ListOfShape& theFaces,
+                                                 ListOfShape& theResults,
+                                                 std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos)
 {
   // Getting extrusion sizes.
   double aToSize = 0.0;
@@ -69,18 +71,20 @@ ListOfShape FeaturesPlugin_ExtrusionBoolean::MakeSolids(const ListOfShape& theFa
   }
 
   // Extrude faces.
-  ListOfShape anExtrusionList;
+  theResults.clear();
   for(ListOfShape::const_iterator aFacesIt = theFaces.begin(); aFacesIt != theFaces.end(); aFacesIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *aFacesIt;
-    GeomAlgoAPI_Prism aPrismAlgo(aBaseShape, aToShape, aToSize, aFromShape, aFromSize);
+    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::make_shared<GeomAlgoAPI_Prism>(aBaseShape,
+                                                                                        aToShape, aToSize,
+                                                                                        aFromShape, aFromSize);
 
     // Checking that the algorithm worked properly.
-    if(!aPrismAlgo.isDone() || aPrismAlgo.shape()->isNull() || !aPrismAlgo.isValid()) {
+    if(!aPrismAlgo->isDone() || aPrismAlgo->shape()->isNull() || !aPrismAlgo->isValid()) {
       setError("Extrusion algorithm failed");
-      return ListOfShape();
+      theResults.clear();
+      return;
     }
-    anExtrusionList.push_back(aPrismAlgo.shape());
+    theResults.push_back(aPrismAlgo->shape());
+    theAlgos.push_back(aPrismAlgo);
   }
-
-  return anExtrusionList;
 }

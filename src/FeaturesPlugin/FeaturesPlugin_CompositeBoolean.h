@@ -68,10 +68,14 @@ protected:
   virtual void initMakeSolidsAttributes() = 0;
 
   /// Define this function to create solids from faces with extrusion/revolution.
-  virtual ListOfShape MakeSolids(const ListOfShape& theFaces) = 0;
+  virtual void makeSolids(const ListOfShape& theFaces,
+                          ListOfShape& theResults,
+                          std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos) = 0;
 
-  void LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                    const ListOfShape& theFaces,
+                    const std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos,
                     const ListOfShape& theTools,
                     const GeomAlgoAPI_Boolean& theAlgo);
 
