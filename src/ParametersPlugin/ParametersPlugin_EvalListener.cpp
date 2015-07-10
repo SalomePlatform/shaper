@@ -286,12 +286,20 @@ bool isValidAttribute(const AttributePtr& theAttribute)
   return true;
 }
 
-void setParameterName(std::shared_ptr<ParametersPlugin_Parameter> theParameter, const std::string& theName)
+void setParameterName(ResultParameterPtr theResultParameter, const std::string& theName)
 {
-  theParameter->data()->blockSendAttributeUpdated(true);
-  theParameter->data()->setName(theName);
-  theParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(theName);
-  theParameter->data()->blockSendAttributeUpdated(false);
+  theResultParameter->data()->blockSendAttributeUpdated(true);
+  theResultParameter->data()->setName(theName);
+  theResultParameter->data()->blockSendAttributeUpdated(false);
+
+  std::shared_ptr<ParametersPlugin_Parameter> aParameter = 
+      std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+          ModelAPI_Feature::feature(theResultParameter));
+
+  aParameter->data()->blockSendAttributeUpdated(true);
+  aParameter->data()->setName(theName);
+  aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(theName);
+  aParameter->data()->blockSendAttributeUpdated(false);
 }
 
 void ParametersPlugin_EvalListener::processObjectRenamedEvent(
@@ -303,31 +311,26 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   if (!aMessage.get() || aMessage->oldName().empty() || aMessage->newName().empty())
     return;
 
-  // check that the renamed object is a result 
+  // check if the renamed object is a result perameter
   ResultParameterPtr aResultParameter =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aMessage->object());
   if (!aResultParameter.get()) 
     return;
 
   // get parameter feature for the result
-  FeaturePtr aFeature = aResultParameter->document()->feature(aResultParameter);
   std::shared_ptr<ParametersPlugin_Parameter> aParameter =
-      std::dynamic_pointer_cast<ParametersPlugin_Parameter>(aFeature);
+      std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+          ModelAPI_Feature::feature(aResultParameter));
   if (!aParameter.get())
     return;
 
-  // rename a parameter attributes
-  // short way:
-  //aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(aMessage->newName());
-  //aParameter->execute();
-  // manual way:
-  setParameterName(aParameter, aMessage->newName());
-
+  // try to update the parameter feature according the new name
+  setParameterName(aResultParameter, aMessage->newName());
   // TODO(spo): replace with ModelAPI_Session::get()->validators()->validate(aParameter, ParametersPlugin_Parameter::VARIABLE_ID())
   // when ModelAPI_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttribute) const
   // is ready
   if (!isValidAttribute(aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID()))) {
-    setParameterName(aParameter, aMessage->oldName());
+    setParameterName(aResultParameter, aMessage->oldName());
     return;
   }
 

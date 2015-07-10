@@ -10,6 +10,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_Tools.h>
 
 ParametersPlugin_VariableValidator::ParametersPlugin_VariableValidator()
 {
@@ -23,7 +24,7 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments) const
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
-  bool result = isVariable(aStrAttr->value());
+  bool result = isVariable(aStrAttr->value()) && isUnique(theAttribute, aStrAttr->value());
   return result;
 }
 
@@ -39,6 +40,26 @@ bool ParametersPlugin_VariableValidator::isVariable(const std::string& theString
     if(!(isalnum(*it) || (*it) == '_')) {
       return false;
     }
+  }
+  return true;
+}
+
+bool ParametersPlugin_VariableValidator::isUnique(const AttributePtr& theAttribute, 
+                                                  const std::string& theString) const
+{
+  DocumentPtr aDocument = theAttribute->owner()->document();
+  for (int anIndex = 0, aSize = aDocument->size(ModelAPI_ResultParameter::group());
+       anIndex < aSize; ++anIndex) {
+    ObjectPtr aParamObj = aDocument->object(ModelAPI_ResultParameter::group(), anIndex);
+    if (aParamObj->data()->name() != theString)
+      continue;
+    ResultParameterPtr aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
+    if (!aParam.get())
+      continue;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aParam);
+    if (aFeature == theAttribute->owner())
+      continue;
+    return false;
   }
   return true;
 }

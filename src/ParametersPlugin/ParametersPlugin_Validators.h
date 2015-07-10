@@ -29,7 +29,8 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
 
  protected:
   PARAMETERSPLUGIN_EXPORT bool isVariable(const std::string& theString) const;
-
+  PARAMETERSPLUGIN_EXPORT bool isUnique(const AttributePtr& theAttribute, 
+                                        const std::string& theString) const;
 };
 
 class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator
