@@ -469,7 +469,7 @@ void Model_Objects::setUniqueName(FeaturePtr theFeature)
     return;  // not needed, name is already defined
   std::string aName;  // result
   // first count all features of such kind to start with index = count + 1
-  int aNumObjects = 0;
+  int aNumObjects = -1; // this feature is already in this map
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myFeatures);
   for (; aFIter.More(); aFIter.Next()) {
     if (aFIter.Value()->getKind() == theFeature->getKind())
