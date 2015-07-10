@@ -202,7 +202,11 @@ void ParametersPlugin_EvalListener::renameInParameter(
   anExpressionString = renameInPythonExpression(anExpressionString,
                                                 theOldName,
                                                 theNewName);
+  // Issue #588. No need for reevaluating expression. 
+  // Moreover, current history may not contain necessary parameters.
+  anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(true);
   anExpressionAttribute->setValue(anExpressionString);
+  anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(false);
 }
 
 void ParametersPlugin_EvalListener::renameInAttribute(
