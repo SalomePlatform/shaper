@@ -181,11 +181,6 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
             action("SHOW_CMD")->setEnabled(true);
           }
 
-          ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-          if (aPartRes) {
-            action("SHOW_CMD")->setEnabled(true);
-          }
-
           if (!(hasParameter || hasFeature))
             action("SHOW_ONLY_CMD")->setEnabled(true);
         }
@@ -275,8 +270,6 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(action("COLOR_CMD"));
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
-  // Result part menu
-  myObjBrowserMenus[ModelAPI_ResultPart::group()] = aList;
   //-------------------------------------
   // Result body menu
   aList.clear();
@@ -290,6 +283,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
+  // Result part menu
+  myObjBrowserMenus[ModelAPI_ResultPart::group()] = aList;
   //-------------------------------------
   // Feature menu
   aList.clear();
