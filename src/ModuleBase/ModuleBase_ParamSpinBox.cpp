@@ -87,8 +87,8 @@ double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
   if (!hasVariable(theText)) {
     return ModuleBase_DoubleSpinBox::valueFromText(theText);
   }
-  // small hack: return length of the string to iniiate valuesChanged signal
-  return theText.length();
+  // small hack: return length of the string to initiate valuesChanged signal
+  return qHash(theText);
 }
 
 QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
