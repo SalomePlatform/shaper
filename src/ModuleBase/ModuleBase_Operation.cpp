@@ -268,8 +268,10 @@ void ModuleBase_Operation::commitOperation()
 
 void ModuleBase_Operation::activateByPreselection()
 {
-  ModuleBase_ModelWidget* aFilledWgt = 0;
+  if (myPreSelection.empty())
+    return;
 
+  ModuleBase_ModelWidget* aFilledWgt = 0;
   if (myPropertyPanel && !myPreSelection.empty()) {
     const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
     if (!aWidgets.empty()) {
@@ -387,8 +389,10 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 
   // Do not activate widgets by default if the current operation is editing operation
   // Because we don't know which widget is going to be edited. 
-  if (!isEditOperation())
-    activateByPreselection();
+  if (!isEditOperation()) {
+    // 4. activate the first obligatory widget
+    myPropertyPanel->activateNextWidget(NULL);
+  }
 }
 
 bool ModuleBase_Operation::isGranted(QString theId) const

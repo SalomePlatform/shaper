@@ -384,6 +384,12 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
     deactivateActiveObject(*anIt, false);
   if (anObjects.size() > 0)
     myDisplayer->updateViewer();
+
+  // filling the operation values by the selection in the viewer
+  // it should be perfomed at the end of the method because it can commit the operation
+  // if after the controls fill, the operation becomes valid
+  if (!theOperation->isEditOperation())
+    theOperation->activateByPreselection();
 }
 
 //******************************************************
