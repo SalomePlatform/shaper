@@ -33,6 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
+// #define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -100,6 +101,12 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       // created objects are always must be up to date (python box feature)
       // and updated not in internal uptation chain
       myJustUpdated.insert(*anObjIter);
+      #ifdef DEB_UPDATE
+      if ((*anObjIter)->data() && (*anObjIter)->data()->isValid()) {
+        std::cout<<"Add updated "<<(*anObjIter)->groupName()<<" "
+          <<(*anObjIter)->data()->name()<<std::endl;
+      }
+      #endif
     }
     // this event is for solver update, not here, do not react immideately
     if (!isOnlyResults && !(theMessage->eventID() == kMovedEvent))
@@ -163,6 +170,9 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
   }
   // perform update of everything if needed
   if (!myIsExecuted) {
+    #ifdef DEB_UPDATE
+      std::cout<<"****** Start processing"<<std::endl;
+    #endif
     myIsExecuted = true;
 
     bool isAutomaticChanged = false;
@@ -196,6 +206,9 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
     static Events_Loop* aLoop = Events_Loop::loop();
     static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     aLoop->flush(EVENT_DISP);
+    #ifdef DEB_UPDATE
+      std::cout<<"****** End processing"<<std::endl;
+    #endif
   }
 }
 
@@ -210,6 +223,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
   if (theFeature->isDisabled())
     return;
 
+  #ifdef DEB_UPDATE
+    std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
+  #endif
   CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
   // If automatice update is not needed and feature attributes were not updated right now,
   // do not execute it and do not update arguments.
@@ -278,6 +294,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
     if (aJustUpdated) {
       ModelAPI_ExecState aState = theFeature->data()->execState();
       if (aFactory->validate(theFeature)) {
+        #ifdef DEB_UPDATE
+          std::cout<<"Execute Feature "<<theFeature->name()<<std::endl;
+        #endif
         executeFeature(theFeature);
       } else {
         theFeature->eraseResults();
@@ -406,7 +425,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     ObjectPtr aContext = aSel->context();
     // update argument onlt if the referenced object is changed
     if (aContext.get() && !aContext->isDisabled() && 
-      aContext->data()->updateID() > theFeature->data()->updateID()) {
+      (myJustUpdated.find(aContext) != myJustUpdated.end() ||
+      aContext->data()->updateID() > theFeature->data()->updateID())) {
         if (aState == ModelAPI_StateDone)
           aState = ModelAPI_StateMustBeUpdated;
         if (!aSel->update()) { // this must be done on execution since it may be long operation
@@ -427,7 +447,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
         ObjectPtr aContext = aSelAttr->context();
         // update argument onlt if the referenced object is changed
         if (aContext.get() && !aContext->isDisabled() &&
-          aContext->data()->updateID() > theFeature->data()->updateID()) {
+            (myJustUpdated.find(aContext) != myJustUpdated.end() ||
+             aContext->data()->updateID() > theFeature->data()->updateID())) {
             if (aState == ModelAPI_StateDone)
               aState = ModelAPI_StateMustBeUpdated;
             if (!aSelAttr->update()) {
@@ -471,7 +492,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
       if (myJustUpdated.find(aSub) != myJustUpdated.end() || 
-             (aSub.get() && aSub->data()->updateID() > theFeature->data()->updateID())) {
+            (aSub.get() && aSub->data()->updateID() > theFeature->data()->updateID())) {
           if (aState == ModelAPI_StateDone)
             aState = ModelAPI_StateMustBeUpdated;
       }
