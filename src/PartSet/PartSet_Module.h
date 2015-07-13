@@ -200,6 +200,9 @@ protected slots:
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();
 
+  /// A slot called on view window creation
+  void onViewCreated(ModuleBase_IViewWindow*);
+
  protected:
   /// Register validators for this module
   virtual void registerValidators();

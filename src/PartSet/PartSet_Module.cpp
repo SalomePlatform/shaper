@@ -133,6 +133,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           this, SLOT(onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
   connect(aViewer, SIGNAL(viewTransformed(int)),
           SLOT(onViewTransformed(int)));
+  connect(aViewer, SIGNAL(viewCreated(ModuleBase_IViewWindow*)),
+          SLOT(onViewCreated(ModuleBase_IViewWindow*)));
 
   myMenuMgr = new PartSet_MenuMgr(this);
   myCustomPrs = new PartSet_CustomPrs(theWshop);
@@ -276,11 +278,6 @@ void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
-  // z layer is created for all started operations in order to visualize operation AIS presentation
-  // over the object
-  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
-  aViewer->AddZLayer(myVisualLayerId);
-
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->startSketch(theOperation);
   }
@@ -293,11 +290,6 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  // the custom presentation should be deactivated before stop sketch,
-  // because it uses the active sketch of the sketch manager without checking if it is not null
-  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
-  aViewer->RemoveZLayer(myVisualLayerId);
-  myVisualLayerId = 0;
   myCustomPrs->deactivate();
 
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
@@ -909,5 +901,30 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     } else {
       aPart->activate();
     }
+  }
+}
+
+
+void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
+{
+  // z layer is created for all started operations in order to visualize operation AIS presentation
+  // over the object
+  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+  if (myVisualLayerId == 0) {
+    if (myVisualLayerId == 0)
+      aViewer->AddZLayer(myVisualLayerId);
+  } else {
+    TColStd_SequenceOfInteger aZList;
+    aViewer->GetAllZLayers(aZList);
+    bool aFound = false;
+    //TColStd_SequenceIteratorOfSequenceOfInteger aIt;
+    for (int i = 1; i <= aZList.Length(); i++) {
+      if (aZList(i) == myVisualLayerId) {
+        aFound = true;
+        break;
+      }
+    }
+    if (!aFound)
+      aViewer->AddZLayer(myVisualLayerId);
   }
 }
