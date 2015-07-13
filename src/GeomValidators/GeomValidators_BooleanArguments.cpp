@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomValidators_BooleanArguments.h
+// File:        GeomValidators_BooleanArguments.cpp
 // Created:     30 June 2015
 // Author:      Dmitry Bobylev
 

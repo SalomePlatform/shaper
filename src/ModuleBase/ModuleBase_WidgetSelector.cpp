@@ -1,6 +1,6 @@
 ﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_WidgetSelector.h
+// File:        ModuleBase_WidgetSelector.cpp
 // Created:     19 June 2015
 // Author:      Natalia ERMOLAEVA
 

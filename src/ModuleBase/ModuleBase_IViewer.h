@@ -25,10 +25,7 @@ Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent object
-  ModuleBase_IViewer(QObject* theParent)
-      : QObject(theParent)
-  {
-  }
+  ModuleBase_IViewer(QObject* theParent);
 
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const = 0;

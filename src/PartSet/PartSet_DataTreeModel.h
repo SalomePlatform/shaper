@@ -22,11 +22,7 @@ class PARTSET_EXPORT PartSet_FeaturesModel : public QAbstractItemModel
  public:
    /// Constructor
    /// \param theParent a parent object
-  PartSet_FeaturesModel(QObject* theParent)
-      : QAbstractItemModel(theParent),
-        myItemsColor(Qt::black)
-  {
-  }
+  PartSet_FeaturesModel(QObject* theParent);
 
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
@@ -70,14 +66,9 @@ class PartSet_PartModel : public PartSet_FeaturesModel
  public:
    /// Constructor
    /// \param theParent a parent object
-  PartSet_PartModel(QObject* theParent)
-      : PartSet_FeaturesModel(theParent)
-  {
-  }
-  ~PartSet_PartModel()
-  {
-    myPart = FeaturePtr();
-  }
+  PartSet_PartModel(QObject* theParent);
+   /// Destructor 
+  ~PartSet_PartModel();
 
   /// Set part id
   /// \param theId a new id

@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_FilterValidated.h
+// File:        ModuleBase_FilterValidated.cpp
 // Created:     17 Mar 2015
 // Author:      Natalia ERMOLAEVA
 

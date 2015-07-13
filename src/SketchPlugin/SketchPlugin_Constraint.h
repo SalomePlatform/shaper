@@ -79,9 +79,7 @@ class SketchPlugin_Constraint : public SketchPlugin_Feature
 
  protected:
   /// \brief Use plugin manager for features creation
-  SketchPlugin_Constraint()
-  {
-  }
+  SketchPlugin_Constraint();
 };
 
 typedef std::shared_ptr<SketchPlugin_Constraint> ConstraintPtr;

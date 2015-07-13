@@ -1,6 +1,6 @@
 ﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_WidgetShapeSelector.h
+// File:        ModuleBase_WidgetShapeSelector.cpp
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 

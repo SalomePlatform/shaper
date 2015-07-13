@@ -20,30 +20,21 @@
  * \ingroup GUI
  * \brief Presentation. Provides container to have feature, shape and/or selection owner.
  */
-class ModuleBase_ViewerPrs
+class MODULEBASE_EXPORT ModuleBase_ViewerPrs
 {
  public:
   /// Constructor
-  ModuleBase_ViewerPrs()
-  {
-  }
+  ModuleBase_ViewerPrs();
 
   /// Constructor
   /// \param theResult an object
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
   ModuleBase_ViewerPrs(ObjectPtr theResult, const TopoDS_Shape& theShape,
-                       Handle_SelectMgr_EntityOwner theOwner)
-      : myResult(theResult),
-        myShape(theShape),
-        myOwner(theOwner)
-  {
-  }
+                       Handle_SelectMgr_EntityOwner theOwner);
 
   /// Destructor
-  virtual ~ModuleBase_ViewerPrs()
-  {
-  }
+  virtual ~ModuleBase_ViewerPrs();
 
   /// Sets the object.
   /// \param theResult an object instance

@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        FeaturesPlugin_RevolutionBoolean.h
+// File:        FeaturesPlugin_RevolutionBoolean.cpp
 // Created:     11 June 2015
 // Author:      Dmitry Bobylev
 

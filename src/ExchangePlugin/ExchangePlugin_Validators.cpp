@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:    ExchangePlugin_Validators.h
+// File:    ExchangePlugin_Validators.cpp
 // Created: Aug 01, 2014
 // Author:  Sergey BELASH
 

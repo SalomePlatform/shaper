@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        PartSet_WidgetPoint2dDistance.h
+// File:        PartSet_WidgetPoint2dDistance.cpp
 // Created:     23 June 2014
 // Author:      Vitaly Smetannikov
 

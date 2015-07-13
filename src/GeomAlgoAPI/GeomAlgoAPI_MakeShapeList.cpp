@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomAlgoAPI_MakeShapeListList.h
+// File:        GeomAlgoAPI_MakeShapeListList.cpp
 // Created:     27 May 2015
 // Author:      Dmitry Bobylev
 

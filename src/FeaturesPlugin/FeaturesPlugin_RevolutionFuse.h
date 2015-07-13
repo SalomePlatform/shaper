@@ -30,10 +30,7 @@ class FeaturesPlugin_RevolutionFuse : public FeaturesPlugin_RevolutionBoolean
   }
 
   /// Use plugin manager for features creation.
-  FeaturesPlugin_RevolutionFuse()
-  {
-    myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_FUSE;
-  }
+  FeaturesPlugin_RevolutionFuse();
 };
 
 #endif

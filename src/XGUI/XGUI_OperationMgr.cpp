@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-// File:        XGUI_OperationMgr.h
+// File:        XGUI_OperationMgr.cpp
 // Created:     20 Apr 2014
 // Author:      Natalia ERMOLAEVA
 

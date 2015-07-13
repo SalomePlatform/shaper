@@ -16,7 +16,7 @@ class MODULEBASE_EXPORT ModuleBase_IDocumentDataModel : public QAbstractItemMode
 {
 Q_OBJECT
 public:
-  ModuleBase_IDocumentDataModel(QObject* theParent): QAbstractItemModel(theParent) {}
+  ModuleBase_IDocumentDataModel(QObject* theParent);
 
   //! Returns an object by the given Model index.
   //! Returns 0 if the given index is not index of an object
@@ -27,10 +27,10 @@ public:
   virtual QModelIndex objectIndex(const ObjectPtr theObject) const = 0;
 
   //! Clear internal data
-  virtual void clear() {}
+  virtual void clear();
 
   //! Rebuild data tree
-  virtual void rebuildDataTree() {}
+  virtual void rebuildDataTree();
 };
 
 #endif

@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_Widgets.h
+// File:        ModuleBase_WidgetIntValue.cpp
 // Created:     04 June 2014
 // Author:      Vitaly Smetannikov
 

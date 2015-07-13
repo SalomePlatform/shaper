@@ -27,7 +27,7 @@ Q_OBJECT
 public:
   /// Constructor
   /// \param theParent is a parent of the property panel
-  ModuleBase_IPropertyPanel(QWidget* theParent) : QDockWidget(theParent), myIsEditing(false) {}
+  ModuleBase_IPropertyPanel(QWidget* theParent);
 
   /// Returns currently active widget
   virtual ModuleBase_ModelWidget* activeWidget() const = 0;

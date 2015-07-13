@@ -73,6 +73,7 @@ void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
  */
 void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
 {
+  ModuleBase_DoubleSpinBox::onTextChanged(text);
   myTextValue = text;
 }
 

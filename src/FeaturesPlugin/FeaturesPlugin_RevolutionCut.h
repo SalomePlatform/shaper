@@ -30,10 +30,7 @@ class FeaturesPlugin_RevolutionCut : public FeaturesPlugin_RevolutionBoolean
   }
 
   /// Use plugin manager for features creation.
-  FeaturesPlugin_RevolutionCut()
-  {
-    myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_CUT;
-  }
+  FeaturesPlugin_RevolutionCut();
 };
 
 #endif

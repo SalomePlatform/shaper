@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:    ExchangePlugin_Tools.h
+// File:    ExchangePlugin_Tools.cpp
 // Created: May 15, 2015
 // Author:  Sergey POKHODENKO
 

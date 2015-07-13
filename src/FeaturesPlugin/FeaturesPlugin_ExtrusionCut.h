@@ -30,10 +30,7 @@ class FeaturesPlugin_ExtrusionCut : public FeaturesPlugin_ExtrusionBoolean
   }
 
   /// Use plugin manager for features creation.
-  FeaturesPlugin_ExtrusionCut()
-  {
-    myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_CUT;
-  }
+  FeaturesPlugin_ExtrusionCut();
 };
 
 #endif

@@ -30,10 +30,7 @@ class FeaturesPlugin_ExtrusionFuse : public FeaturesPlugin_ExtrusionBoolean
   }
 
   /// Use plugin manager for features creation.
-  FeaturesPlugin_ExtrusionFuse()
-  {
-    myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_FUSE;
-  }
+  FeaturesPlugin_ExtrusionFuse();
 };
 
 #endif

@@ -8,6 +8,8 @@
 #ifndef ModuleBase_IPrefMgr_H
 #define ModuleBase_IPrefMgr_H
 
+#include "ModuleBase.h"
+
 #include <QString>
 #include <SUIT_PreferenceMgr.h>
 
@@ -17,9 +19,13 @@
 * It is used in order to make common interface to Preference manager in Salome 
 * and this application
 */
-class ModuleBase_IPrefMgr
+class MODULEBASE_EXPORT ModuleBase_IPrefMgr
 {
 public:
+  /// Default constructor
+  ModuleBase_IPrefMgr();
+  /// Virtual destructor
+  virtual ~ModuleBase_IPrefMgr();
 
   /** 
   * Add preference item into preference dialog box

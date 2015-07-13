@@ -58,6 +58,7 @@ SET(PROJECT_SOURCES
     ModelAPI_Document.cpp
     ModelAPI_Events.cpp
     ModelAPI_Feature.cpp
+    ModelAPI_FeatureValidator.cpp
     ModelAPI_Object.cpp
     ModelAPI_Plugin.cpp
     ModelAPI_Result.cpp

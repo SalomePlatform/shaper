@@ -49,7 +49,7 @@ public:
   virtual void showEvent(QShowEvent*);
 
  protected slots:
-  void onTextChanged(const QString&);
+  virtual void onTextChanged(const QString&);
 
  private:
   void connectSignalsAndSlots();

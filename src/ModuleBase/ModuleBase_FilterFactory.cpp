@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_FilterFactory.h
+// File:        ModuleBase_FilterFactory.cpp
 // Created:     10 Dec 2014
 // Author:      Natalia ERMOLAEVA
 

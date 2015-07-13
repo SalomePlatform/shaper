@@ -18,9 +18,14 @@
  * used: it checks each argument of the feature and if one of it is not valid (and obligatory),
  * the hole feature is invalid.
  */
-class ModelAPI_FeatureValidator : public ModelAPI_Validator
+class MODELAPI_EXPORT ModelAPI_FeatureValidator : public ModelAPI_Validator
 {
  public:
+  /// Default constructor
+  ModelAPI_FeatureValidator();
+  /// Virtual destructor
+  virtual ~ModelAPI_FeatureValidator();
+
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
   /// \param theArguments list of string, feature attribute names: dependent attributes

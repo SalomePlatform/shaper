@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        FeaturesPlugin_ExtrusionBoolean.h
+// File:        FeaturesPlugin_ExtrusionBoolean.cpp
 // Created:     11 June 2015
 // Author:      Dmitry Bobylev
 

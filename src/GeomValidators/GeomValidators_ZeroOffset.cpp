@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomValidators_ZeroOffset.h
+// File:        GeomValidators_ZeroOffset.cpp
 // Created:     13 May 2015
 // Author:      Dmitry Bobylev
 

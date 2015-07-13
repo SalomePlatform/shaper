@@ -48,7 +48,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetExprEditor.h
 	ModuleBase_ParamSpinBox.h
 	ModuleBase_WidgetIntValue.h
-    ModuleBase_IDocumentDataModel.h
+  ModuleBase_IDocumentDataModel.h
 )
 
 SET(PROJECT_SOURCES
@@ -58,6 +58,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_Tools.cpp
 	ModuleBase_IModule.cpp
 	ModuleBase_ISelection.cpp
+	ModuleBase_IViewer.cpp
 	ModuleBase_IWorkshop.cpp
 	ModuleBase_Operation.cpp
 	ModuleBase_OperationDescription.cpp
@@ -69,11 +70,14 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
 	ModuleBase_DoubleSpinBox.cpp
+	ModuleBase_IPropertyPanel.cpp
 	ModuleBase_WidgetLineEdit.cpp
 	ModuleBase_WidgetMultiSelector.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
+	ModuleBase_IViewWindow.cpp
 	ModuleBase_WidgetLabel.cpp
+	ModuleBase_IPrefMgr.cpp
 	ModuleBase_Preferences.cpp
 	ModuleBase_ActionInfo.cpp
 	ModuleBase_PageBase.cpp
@@ -88,7 +92,9 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetExprEditor.cpp
 	ModuleBase_ParamSpinBox.cpp
 	ModuleBase_SelectionValidator.cpp
+	ModuleBase_ViewerPrs.cpp
 	ModuleBase_WidgetIntValue.cpp
+  ModuleBase_IDocumentDataModel.cpp
 )
 
 SET(PROJECT_LIBRARIES

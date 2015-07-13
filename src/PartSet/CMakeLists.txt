@@ -55,6 +55,7 @@ SET(PROJECT_SOURCES
 	PartSet_MenuMgr.cpp
 	PartSet_DocumentDataModel.cpp
 	PartSet_PartDataModel.cpp
+	PartSet_DataTreeModel.cpp
 	PartSet_WidgetSketchCreator.cpp
 	PartSet_TopDataModel.cpp
 )

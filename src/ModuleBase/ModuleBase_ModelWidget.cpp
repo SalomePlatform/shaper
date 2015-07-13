@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_ModelWidget.h
+// File:        ModuleBase_ModelWidget.cpp
 // Created:     25 Apr 2014
 // Author:      Natalia ERMOLAEVA
 

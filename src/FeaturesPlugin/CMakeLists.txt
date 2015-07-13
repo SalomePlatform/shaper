@@ -33,7 +33,11 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Placement.cpp
     FeaturesPlugin_CompositeBoolean.cpp
     FeaturesPlugin_ExtrusionBoolean.cpp
+    FeaturesPlugin_ExtrusionCut.cpp
+    FeaturesPlugin_ExtrusionFuse.cpp
     FeaturesPlugin_RevolutionBoolean.cpp
+    FeaturesPlugin_RevolutionCut.cpp
+    FeaturesPlugin_RevolutionFuse.cpp
 )
 
 SET(XML_RESOURCES

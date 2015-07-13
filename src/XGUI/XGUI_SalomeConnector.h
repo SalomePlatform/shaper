@@ -21,6 +21,11 @@ class ModuleBase_IViewer;
 class XGUI_EXPORT XGUI_SalomeConnector
 {
  public:
+  /// Default constructor
+  XGUI_SalomeConnector();
+  /// Virtual destructor
+  virtual ~XGUI_SalomeConnector();
+
   //! Creates a feature (command) in SALOME desktop
   //! \param theWBName - a workbench name
   //! \param theId - an id of the feature

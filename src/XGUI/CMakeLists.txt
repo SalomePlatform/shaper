@@ -42,6 +42,7 @@ SET(PROJECT_SOURCES
 	XGUI_OperationMgr.cpp
 	XGUI_PropertyPanel.cpp
 	XGUI_QtEvents.cpp
+	XGUI_SalomeConnector.cpp
 	XGUI_Selection.cpp
 	XGUI_SelectionMgr.cpp
 	XGUI_Tools.cpp
