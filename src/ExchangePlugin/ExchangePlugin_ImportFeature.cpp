@@ -22,8 +22,6 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
 
-#include <TopoDS_Shape.hxx>
-
 #include <algorithm>
 #include <string>
 #ifdef _DEBUG

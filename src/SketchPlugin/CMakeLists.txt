@@ -74,8 +74,6 @@ SET(PROJECT_LIBRARIES
     ModelAPI
     SketcherPrs
     GeomDataAPI
-    ${CAS_KERNEL}
-    ${CAS_SHAPE}
 )
 
 SET(XML_RESOURCES

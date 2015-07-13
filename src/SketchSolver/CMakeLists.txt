@@ -49,7 +49,6 @@ SET(PROJECT_SOURCES
 
 SET(PROJECT_LIBRARIES
     ${SLVS_LIBRARIES}
-    ${CAS_SHAPE}
     Config
     Events
     ModelAPI
