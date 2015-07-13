@@ -148,7 +148,7 @@ Q_OBJECT
   void onTryCloseView(SUIT_ViewWindow*);
   void onDeleteView(SUIT_ViewWindow*);
   void onViewCreated(SUIT_ViewWindow*);
-  void onActivated(SUIT_ViewWindow*);
+  void onActivated(SUIT_ViewManager*);
 
   void onSelectionChanged();
   void onViewTransformed(OCCViewer_ViewWindow::OperationType);

@@ -118,8 +118,8 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
           this, SLOT(onDeleteView(SUIT_ViewWindow*)));
   connect(aMgr, SIGNAL(viewCreated(SUIT_ViewWindow*)), 
           this, SLOT(onViewCreated(SUIT_ViewWindow*)));
-  connect(aMgr, SIGNAL(activated(SUIT_ViewWindow*)), 
-          this, SLOT(onActivated(SUIT_ViewWindow*)));
+  connect(aMgr, SIGNAL(activated(SUIT_ViewManager*)), 
+          this, SLOT(onActivated(SUIT_ViewManager*)));
 
   connect(aMgr, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), this,
           SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
@@ -248,9 +248,9 @@ void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onActivated(SUIT_ViewWindow* theView)
+void NewGeom_SalomeViewer::onActivated(SUIT_ViewManager* theMgr)
 {
-  myView->setCurrentView(theView);
+  myView->setCurrentView(theMgr->getActiveView());
   emit activated(myView);
 }
 
