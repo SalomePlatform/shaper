@@ -164,6 +164,10 @@ public:
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  /// Update state of pop-up menu items in viewer
+  /// \param theStdActions - a map of standard actions
+  virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

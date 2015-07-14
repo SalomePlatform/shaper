@@ -49,13 +49,16 @@ Q_OBJECT
   /// Connect to viewer from workshop. Has to called at creation of viewer.
   void connectViewer();
 
-  QMenu* objBrowserMenu() const;
-  QMenu* viewerMenu() const;
+  void addObjBrowserMenu(QMenu*) const;
+  void addViewerMenu(QMenu*) const;
 
   /// Returns a list of object group names of the action
   /// \param theName a name of the action
   /// \return a list of group names
   QStringList actionObjectGroups(const QString& theName);
+
+  /// Updates menu for viewer
+  void updateViewerMenu();
 
 signals:
   /// Signal aabout triggered action
@@ -88,9 +91,6 @@ signals:
 
   /// Updates menu for object browser
   void updateObjectBrowserMenu();
-
-  /// Updates menu for viewer
-  void updateViewerMenu();
 
   /// Creates menu for object browser
   void buildObjBrowserMenu();

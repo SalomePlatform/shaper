@@ -362,6 +362,12 @@ bool PartSet_Module::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>
   return myMenuMgr->addViewerMenu(theMenu, theStdActions);
 }
 
+void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActions)
+{
+  myMenuMgr->updateViewerMenu(theStdActions);
+}
+
+
 void PartSet_Module::activeSelectionModes(QIntList& theModes)
 {
   theModes.clear();
@@ -917,7 +923,6 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
     TColStd_SequenceOfInteger aZList;
     aViewer->GetAllZLayers(aZList);
     bool aFound = false;
-    //TColStd_SequenceIteratorOfSequenceOfInteger aIt;
     for (int i = 1; i <= aZList.Length(); i++) {
       if (aZList(i) == myVisualLayerId) {
         aFound = true;
