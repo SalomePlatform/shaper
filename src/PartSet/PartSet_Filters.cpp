@@ -25,7 +25,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
   // the shapes from different documents should be provided if there is no started operation
   // in order to show/hide results
-  if (!anOperation) {
+  if (anOperation) {
     aValid = false;
     if (ModuleBase_ShapeDocumentFilter::IsOk(theOwner)) {
       std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
