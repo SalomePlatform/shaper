@@ -196,6 +196,10 @@ class Model_Document : public ModelAPI_Document
   /// Returns true if document is opened and valid
   MODEL_EXPORT virtual bool isOpened();
 
+  /// Returns the last feature in the document (even not visible or disabled)
+  /// \returns null if there is no features
+  FeaturePtr lastFeature();
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

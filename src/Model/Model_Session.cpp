@@ -218,9 +218,8 @@ std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 /// makes the last feature in the document as the current
 static void makeCurrentLast(std::shared_ptr<ModelAPI_Document> theDoc) {
   if (theDoc.get()) {
-    FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theDoc->object(
-      ModelAPI_Feature::group(), theDoc->size(ModelAPI_Feature::group()) - 1));
-    theDoc->setCurrentFeature(aLastFeature, false);
+    FeaturePtr aLast = std::dynamic_pointer_cast<Model_Document>(theDoc)->lastFeature();
+    theDoc->setCurrentFeature(aLast, false);
   }
 }
 

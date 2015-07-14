@@ -974,3 +974,10 @@ AttributeSelectionListPtr Model_Document::selectionInPartFeature()
   }
   return mySelectionFeature->selectionList("selection");
 }
+
+FeaturePtr Model_Document::lastFeature()
+{
+  if (myObjs)
+    return myObjs->lastFeature();
+  return FeaturePtr();
+}
