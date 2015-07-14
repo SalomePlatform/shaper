@@ -51,7 +51,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   aMainLay->addWidget(aTypeLabel, 0, 0);
 
   myTypeCombo = new QComboBox(this);
-  // There is no sence to paramerize list of types while we can not parametrize selection mode
+  // There is no sense to parameterize list of types while we can not parameterize selection mode
 
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();

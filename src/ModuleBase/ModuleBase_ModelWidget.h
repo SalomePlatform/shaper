@@ -35,7 +35,7 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent object
-  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData,
                          const std::string& theParentId);
@@ -98,10 +98,10 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
-  /// The methiod called when widget is activated
+  /// The method called when widget is activated
   void activate();
 
-  /// The methiod called when widget is deactivated
+  /// The method called when widget is deactivated
   virtual void deactivate() {}
 
   /// Returns list of widget controls
@@ -177,7 +177,7 @@ signals:
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
-  /// Sets default value of widget. Nornaly, widget should fetch this value 
+  /// Sets default value of widget. Normally, widget should fetch this value
   /// from the xml. However, some widgets derived widgets could define it
   void setDefaultValue(const std::string& theValue);
   /// \brief Set the attribute name
@@ -195,7 +195,7 @@ signals:
   /// \return True in success
   virtual bool storeValueCustom() const = 0;
 
-  /// The methiod called when widget is activated
+  /// The method called when widget is activated
   virtual void activateCustom() {};
 
 protected slots:

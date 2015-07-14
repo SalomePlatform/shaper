@@ -16,7 +16,7 @@ class ModuleBase_IWorkshop;
 
 /**
 * \ingroup Modules
-* Customosation of ModuleBase_WidgetEditor in order to do not show the editor value if the mouse
+* Customization of ModuleBase_WidgetEditor in order to do not show the editor value if the mouse
 * cursor is not over the OCC window
 */
 class PARTSET_EXPORT PartSet_WidgetEditor : public ModuleBase_WidgetEditor
@@ -26,7 +26,7 @@ Q_OBJECT
   /// Constructor
   /// \param theParent the parent object
   /// \param theWorkshop instance of workshop interface
-  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   PartSet_WidgetEditor(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                        const Config_WidgetAPI* theData, const std::string& theParentId);

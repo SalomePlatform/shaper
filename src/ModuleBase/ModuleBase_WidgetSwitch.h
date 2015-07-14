@@ -18,7 +18,7 @@ class QStackedLayout;
 
 /**
 * \ingroup GUI
-* Implements a model widget for swithch as a container widget. It can be defined in XML with "switch" keyword
+* Implements a model widget for switch as a container widget. It can be defined in XML with "switch" keyword
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_PagedContainer
 {

@@ -33,6 +33,9 @@ class QLineEdit;
 *          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP:STEPImport" />
 *      </file_selector>
 *  \endcode
+* It can use following parameters:
+* - id - name of object attribute
+* - type - type of dialog. Possible values: open, save.
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelWidget
 {
@@ -40,7 +43,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
  public:
   /// Constructor
   /// \param theParent the parent object
-  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetFileSelector(QWidget* theParent,
                                 const Config_WidgetAPI* theData,

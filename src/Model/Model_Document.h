@@ -110,7 +110,7 @@ class Model_Document : public ModelAPI_Document
   //! Internal sub-document by ID
   MODEL_EXPORT virtual std::shared_ptr<Model_Document> subDoc(std::string theDocID);
 
-  ///! Returns the id of hte document
+  ///! Returns the id of the document
   MODEL_EXPORT virtual const std::string& id() const
   {
     return myID;

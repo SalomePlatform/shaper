@@ -94,7 +94,7 @@ class Model_Objects
   //! Returns the feature by zero-based index: features in the history or not
   std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
 
-  /// Creates a construction cresults
+  /// Creates a construction results
   std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a body results

@@ -119,7 +119,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   } else if (theAttrType == ModelAPI_AttributeIntArray::typeId()) {
     anAttr = new Model_AttributeIntArray(anAttrLab);
   } 
-  // create also GeomData attributes here because only here the OCAF strucure is known
+  // create also GeomData attributes here because only here the OCAF structure is known
   else if (theAttrType == GeomData_Point::typeId()) {
     anAttr = new GeomData_Point(anAttrLab);
   } else if (theAttrType == GeomData_Dir::typeId()) {

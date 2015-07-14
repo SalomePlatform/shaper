@@ -39,7 +39,7 @@ class Config_FeatureReader : public Config_XMLReader
   /// Overloaded method. Defines how to process each node
   virtual void processNode(xmlNodePtr aNode);
 
-  /// Overloaded method. Clears attribute cache on extit from attribute's node
+  /// Overloaded method. Clears attribute cache on exit from attribute's node
   virtual void cleanup(xmlNodePtr aNode);
 
   /// Overloaded method. Defines if the given node should be parsed recursively

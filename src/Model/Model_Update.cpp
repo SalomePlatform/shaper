@@ -108,7 +108,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       }
       #endif
     }
-    // this event is for solver update, not here, do not react immideately
+    // this event is for solver update, not here, do not react immediately
     if (!isOnlyResults && !(theMessage->eventID() == kMovedEvent))
       processOperation(false);
   } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent ||
@@ -348,7 +348,7 @@ ModelAPI_ExecState stateByReference(ObjectPtr theTarget, const ModelAPI_ExecStat
 
 void Model_Update::updateArguments(FeaturePtr theFeature) {
   // perform this method also for disabled features: to make "not done" state for
-  // featuers referenced to the active and modified features
+  // features referenced to the active and modified features
 
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 

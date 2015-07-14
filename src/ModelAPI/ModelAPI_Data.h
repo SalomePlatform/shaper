@@ -141,7 +141,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) =0;
 
-  /// Copies all atributes content into theTarget data
+  /// Copies all attributes content into theTarget data
   virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget) = 0;
 
   /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)

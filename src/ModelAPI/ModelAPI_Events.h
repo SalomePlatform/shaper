@@ -180,7 +180,7 @@ class ModelAPI_AttributeEvalMessage : public Events_Message
     return anId;
   }
 
-  /// usefull method that creates and sends the AttributeEvalMessage event
+  /// Useful method that creates and sends the AttributeEvalMessage event
   MODELAPI_EXPORT static void send(AttributePtr theAttribute, const void* theSender)
   {
     std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =

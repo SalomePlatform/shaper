@@ -44,7 +44,7 @@ class MODELAPI_EXPORT ModelAPI_Session
   //! Closes all documents
   virtual void closeAll() = 0;
 
-  //! Starts a new operation (opens a tansaction)
+  //! Starts a new operation (opens a transaction)
   //! \param theId of operation for history (optional)
   //! \param theAttachedToNested if it is true, it means that this transaction is attached to the nested 
   //!          where it is located and will be commited on the next commit with the nested

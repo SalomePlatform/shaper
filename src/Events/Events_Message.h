@@ -14,9 +14,9 @@
  * \brief Identifier of the event kind.
  *
  * Each event ID is created in main Envent_Loop class
- * that stores correspondance between the string-name of the
+ * that stores correspondence between the string-name of the
  * identifier and the pointer to the static string that is really
- * used as an identifier (this is usefull for debugging of the events
+ * used as an identifier (this is useful for debugging of the events
  * with log files and in debugger).
  */
 class EVENTS_EXPORT Events_ID
