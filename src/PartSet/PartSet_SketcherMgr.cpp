@@ -969,6 +969,9 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
+  if (myPlaneFilter.IsNull()) 
+   myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
+
   myPlaneFilter->setPlane(thePln);
 }
 

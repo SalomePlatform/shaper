@@ -365,6 +365,14 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     connectWithOperation(theOperation);
     setPropertyPanel(theOperation);
+    // filling the operation values by the current selection
+    // if the operation can be commited after the controls filling, the method perform should
+    // be stopped. Otherwise unnecessary presentations can be shown(e.g. operation prs in sketch)
+    if (!theOperation->isEditOperation()) {
+      theOperation->activateByPreselection();
+      if (operationMgr()->currentOperation() != theOperation)
+        return;
+    }
   }
   updateCommandStatus();
 
@@ -384,12 +392,6 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
     deactivateActiveObject(*anIt, false);
   if (anObjects.size() > 0)
     myDisplayer->updateViewer();
-
-  // filling the operation values by the selection in the viewer
-  // it should be perfomed at the end of the method because it can commit the operation
-  // if after the controls fill, the operation becomes valid
-  if (!theOperation->isEditOperation())
-    theOperation->activateByPreselection();
 }
 
 //******************************************************

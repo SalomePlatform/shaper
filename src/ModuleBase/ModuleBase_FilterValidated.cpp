@@ -23,11 +23,11 @@ Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityO
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
   if (anOperation) {
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-    if (!anActiveWidget)
-      anActiveWidget = aPanel->preselectionWidget();
+    ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
+    if (!aCurrentWidget)
+      aCurrentWidget = aPanel->activeWidget();
     ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
-                                                                           (anActiveWidget);
+                                                                           (aCurrentWidget);
     ModuleBase_ViewerPrs aPrs;
     myWorkshop->selection()->fillPresentation(aPrs, theOwner);
 

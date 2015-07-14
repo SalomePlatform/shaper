@@ -92,6 +92,11 @@ Check types of objects which are in the given list
 \param hasSubFeature will be set to true if list contains Sub-Feature objects
 */
 MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter, bool& hasSubFeature);
+
+/*! Returns the default deviation coefficient value
+\return double value
+*/
+MODULEBASE_EXPORT double defaultDeviationCoefficient();
 }
 
 #endif

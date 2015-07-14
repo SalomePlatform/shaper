@@ -92,7 +92,12 @@ bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theVal
   if (plane().get())
     return true;
 
-  return ModuleBase_WidgetValidated::setSelection(theValues, theToValidate);
+  ModuleBase_ViewerPrs aPrs = theValues.first();
+  bool aDone = ModuleBase_WidgetValidated::setSelection(theValues, theToValidate);
+  if (aDone)
+    updateByPlaneSelected(aPrs);
+
+  return aDone;
 }
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
@@ -110,14 +115,17 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
     return;
   ModuleBase_ViewerPrs aPrs = aSelected.first();
 
-  bool isDone = ModuleBase_WidgetValidated::setSelection(aSelected, false);
-  if (!isDone)
-    return;
+  bool aDone = ModuleBase_WidgetValidated::setSelection(aSelected, false);
+  if (aDone)
+    updateByPlaneSelected(aPrs);
+}
 
-  // 3. hide main planes if they have been displayed
+void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs)
+{
+  // 1. hide main planes if they have been displayed
   erasePreviewPlanes();
-  // 4. if the planes were displayed, change the view projection
-  TopoDS_Shape aShape = aPrs.shape();
+  // 2. if the planes were displayed, change the view projection
+  TopoDS_Shape aShape = thePrs.shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
   std::shared_ptr<GeomAPI_Shape> aBaseShape;
 
@@ -162,15 +170,15 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
 
     myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z());
   }
-  // 5. Clear text in the label
+  // 3. Clear text in the label
   myLabel->setText("");
   myLabel->setToolTip("");
   disconnect(workshop()->selector(), SIGNAL(selectionChanged()), 
               this, SLOT(onSelectionChanged()));
-  // 6. deactivate face selection filter
+  // 4. deactivate face selection filter
   activateFilters(false);
 
-  // 7. Clear selection mode and define sketching mode
+  // 5. Clear selection mode and define sketching mode
   //XGUI_Displayer* aDisp = workshop()->displayer();
   //aDisp->closeLocalContexts();
   emit planeSelected(plane());
@@ -179,7 +187,7 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   // the selection by any label deactivation, but need to switch it off by stop the sketch
   activateSelection(true);
 
-  // 8. Update sketcher actions
+  // 6. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = workshop()->actionsMgr();
   anActMgr->update();
   myWorkshop->viewer()->update();

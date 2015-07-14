@@ -5,6 +5,7 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "ModuleBase_ResultPrs.h"
+#include "ModuleBase_Tools.h"
 
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -65,7 +66,15 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   if (!myOriginalShape.IsNull()) {
     Set(myOriginalShape);
+
+    // change deviation coefficient to provide more precise circle
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    Standard_Real aPrevDeviation = aDrawer->DeviationCoefficient();
+    //aDrawer->SetDeviationCoefficient(ModuleBase_Tools::defaultDeviationCoefficient());
+
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+
+    //aDrawer->SetDeviationCoefficient(aPrevDeviation);
   }
 }
 

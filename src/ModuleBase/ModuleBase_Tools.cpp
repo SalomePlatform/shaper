@@ -242,6 +242,10 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
   }
 }
 
+double defaultDeviationCoefficient()
+{
+ return 1.e-5;
+}
 
 }
 

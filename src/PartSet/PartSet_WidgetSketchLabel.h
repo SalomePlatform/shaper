@@ -110,6 +110,10 @@ protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+  /// Erase preview planes, disconnect widget, change the view projection
+  /// \param thePrs a selected presentation
+  void updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs);
+
  protected:
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
