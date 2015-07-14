@@ -140,12 +140,19 @@ QVariant PartSet_PartDataModel::data(const QModelIndex& theIndex, int theRole) c
         case ConstructObject:
         case GroupObject:
         case BodiesObject: {
-          std::string aGroup = theIndex.internalId() == ConstructObject ?
-            ModelAPI_ResultConstruction::group() : ModelAPI_ResultBody::group();
-          ObjectPtr anObject = aPartDoc->object(aGroup, theIndex.row());
-          if (anObject && anObject->data() && 
-              anObject->data()->execState() == ModelAPI_StateMustBeUpdated) {
-            return QIcon(":pictures/constr_object_modified.png");
+          std::string aGroup;
+          if (theIndex.internalId() == ConstructObject)
+            aGroup = ModelAPI_ResultConstruction::group();
+          else if (theIndex.internalId() == BodiesObject)
+            aGroup = ModelAPI_ResultBody::group();
+          else if (theIndex.internalId() == GroupObject)
+            aGroup = ModelAPI_ResultGroup::group();
+          if (aGroup.length() > 0) {
+            ObjectPtr anObject = aPartDoc->object(aGroup, theIndex.row());
+            if (anObject && anObject->data() && 
+                anObject->data()->execState() == ModelAPI_StateMustBeUpdated) {
+              return QIcon(":pictures/constr_object_modified.png");
+            }
           }
           return QIcon(":pictures/constr_object.png");
         }
