@@ -36,7 +36,7 @@
 
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();  
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   int aCount = 0;
   foreach (ModuleBase_ViewerPrs aPrs, aList) {
     const TopoDS_Shape& aShape = aPrs.shape();
@@ -50,7 +50,7 @@ int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 
 int shapesNbLines(const ModuleBase_ISelection* theSelection)
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   int aCount = 0;
   foreach(ModuleBase_ViewerPrs aPrs, aList) {
     const TopoDS_Shape& aShape = aPrs.shape();
@@ -94,7 +94,7 @@ bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelectio
 
 bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   ModuleBase_ViewerPrs aPrs;
   int aCount = 0;
   foreach (ModuleBase_ViewerPrs aPrs, aList) {
@@ -115,7 +115,7 @@ bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection)
 
 bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();  
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   return (aList.count() == 1);
 }
 
@@ -140,7 +140,7 @@ bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection)
 
 bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   if ((aList.size() == 0) || (aList.size() > 2))
     return false;
 

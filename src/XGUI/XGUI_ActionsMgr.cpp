@@ -140,7 +140,8 @@ void XGUI_ActionsMgr::updateOnViewSelection()
 
   //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
-  if (aSelection->getSelected().size() == 0) {
+  // only viewer selection is processed
+  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     // it seems that this code is not nesessary anymore. It leads to incorrect case:
     // sketch operation start, click in any place in the viewer. The result is all nested
     // entities are enabled(but the sketch plane is not selected yet). Any sketch operation
