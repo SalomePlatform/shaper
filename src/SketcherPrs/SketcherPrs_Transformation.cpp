@@ -43,7 +43,13 @@ bool SketcherPrs_Transformation::updatePoints(double theStep) const
 
   int aNbB = anAttrB->size();
   if (aNbB == 0)
+  {
+#ifdef DEBUG_SENSITIVE_TO_BE_CORRECTED
+  //if (!myPntArray.IsNull())
+    //  mySPoints.Clear();
+#endif
     return false;
+  }
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   myPntArray = new Graphic3d_ArrayOfPoints(aNbB);

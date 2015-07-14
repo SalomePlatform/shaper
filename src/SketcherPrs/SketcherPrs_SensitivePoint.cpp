@@ -10,6 +10,8 @@
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include "SketcherPrs_SymbolPrs.h"
 
+#define DEBUG_SENSITIVE_TO_BE_CORRECTED
+
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity);
 
@@ -54,11 +56,27 @@ Handle(Select3D_SensitiveEntity) SketcherPrs_SensitivePoint::GetConnected()
 
 gp_Pnt SketcherPrs_SensitivePoint::CenterOfGeometry() const
 {
+#ifdef DEBUG_SENSITIVE_TO_BE_CORRECTED
+  const Handle(SelectMgr_EntityOwner)& anOwner =
+    Handle(SelectMgr_EntityOwner)::DownCast(OwnerId());
+  const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
+    Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
+  if (aSymbPrs->pointsArray()->VertexNumber() < myId)
+    return gp_Pnt();
+#endif
   return Point();
 }
 
 Select3D_BndBox3d SketcherPrs_SensitivePoint::BoundingBox()
 {
+#ifdef DEBUG_SENSITIVE_TO_BE_CORRECTED
+  const Handle(SelectMgr_EntityOwner)& anOwner =
+    Handle(SelectMgr_EntityOwner)::DownCast(OwnerId());
+  const Handle(SketcherPrs_SymbolPrs)& aSymbPrs =
+    Handle(SketcherPrs_SymbolPrs)::DownCast(anOwner->Selectable());
+  if (aSymbPrs->pointsArray()->VertexNumber() < myId)
+    return Select3D_BndBox3d();
+#endif
   gp_Pnt aPnt = Point();
   return Select3D_BndBox3d (SelectMgr_Vec3 (aPnt.X(), aPnt.Y(), aPnt.Z()),
                             SelectMgr_Vec3 (aPnt.X(), aPnt.Y(), aPnt.Z()));

@@ -343,7 +343,6 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   }
 
   if (!updatePoints(20)) {
-    mySPoints.Clear();
     return;
   }
 
