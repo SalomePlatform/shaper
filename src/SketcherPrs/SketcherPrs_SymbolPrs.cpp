@@ -342,8 +342,10 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
     aDriver->UserDrawCallback() = SymbolPrsCallBack;
   }
 
-  if (!updatePoints(20))
+  if (!updatePoints(20)) {
+    mySPoints.Clear();
     return;
+  }
 
   int aNbVertex = myPntArray->VertexNumber();
   if (myOwner.IsNull()) {

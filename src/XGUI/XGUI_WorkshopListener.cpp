@@ -245,8 +245,15 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       // Redisplay the visible object or the object of the current operation
       bool isVisibleObject = aDisplayer->isVisible(aObj);
       #ifdef DEBUG_FEATURE_REDISPLAY
-      //QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-      //qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+      QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
+      qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      if (aFeature.get()) {
+        std::string aKind = aFeature->getKind();
+        if (aKind == "SketchMultiRotation")
+          bool aValue = true;
+      }
       #endif
 
       if (isVisibleObject)  { // redisplay visible object
