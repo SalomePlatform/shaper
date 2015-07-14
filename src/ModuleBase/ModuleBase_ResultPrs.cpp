@@ -35,13 +35,11 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   }
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
-  if (aShape.ShapeType() == TopAbs_VERTEX) {
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
-    if (aDrawer->HasOwnPointAspect()) 
-      aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
-    else
-      aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
-  }
+  Handle(Prs3d_Drawer) aDrawer = Attributes();
+  if (aDrawer->HasOwnPointAspect()) 
+    aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
+  else
+    aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
 }
 
 
