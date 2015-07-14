@@ -272,7 +272,7 @@ void ModuleBase_Operation::activateByPreselection()
     return;
 
   ModuleBase_ModelWidget* aFilledWgt = 0;
-  if (myPropertyPanel && !myPreSelection.empty()) {
+  if (myPropertyPanel) {
     const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
     if (!aWidgets.empty()) {
       ModuleBase_ModelWidget* aWgt = 0;
@@ -304,10 +304,10 @@ void ModuleBase_Operation::activateByPreselection()
       if (aFilledWgt)
         emit activatedByPreselection();
     }
+    // 4. activate the next obligatory widget
+    myPropertyPanel->activateNextWidget(aFilledWgt);
   }
 
-  // 4. activate the next obligatory widget
-  myPropertyPanel->activateNextWidget(aFilledWgt);
   clearPreselection();
 }
 
