@@ -42,6 +42,10 @@ public:
   /// \return true if items are added and there is no necessity to provide standard menu
   bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
 
+  /// Update state of pop-up menu items in viewer
+  /// \param theStdActions - a map of standard actions
+  void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
+
 public slots:
   /// Processes the context menu action click
   /// \param isChecked a state of toggle if the action is checkable

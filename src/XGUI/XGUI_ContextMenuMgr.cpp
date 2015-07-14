@@ -129,13 +129,13 @@ void XGUI_ContextMenuMgr::updateCommandsStatus()
 
 void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
 {
-  QMenu* aMenu = 0;
+  QMenu* aMenu = new QMenu();
   if (sender() == myWorkshop->objectBrowser()) {
     updateObjectBrowserMenu();
-    aMenu = objBrowserMenu();
+    addObjBrowserMenu(aMenu);
   } else if (sender() == myWorkshop->viewer()) {
     updateViewerMenu();
-    aMenu = viewerMenu();
+    addViewerMenu(aMenu);
   }
 
   if (aMenu && (aMenu->actions().size() > 0)) {
@@ -203,6 +203,10 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
   }
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
+
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule)
+    aModule->updateObjectBrowserMenu(myActions);
 }
 
 void XGUI_ContextMenuMgr::updateViewerMenu()
@@ -211,13 +215,14 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     aAction->setEnabled(false);
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
-  if (aObjects.size() > 0) {
+  QList<ModuleBase_ViewerPrs> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  if (aPrsList.size() > 0) {
     bool isVisible = false;
     bool isShading = false;
     bool canBeShaded = false;
-    foreach(ObjectPtr aObject, aObjects)
-    {
+    ObjectPtr aObject;
+    foreach(ModuleBase_ViewerPrs aPrs, aPrsList) {
+      aObject = aPrs.object();
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && aRes->isDisplayed()) {
         isVisible = true;
@@ -242,6 +247,10 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     action("COLOR_CMD")->setEnabled(true);
 
   action("DELETE_CMD")->setEnabled(true);
+
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule)
+    aModule->updateViewerMenu(myActions);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser()
@@ -327,9 +336,8 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
 }
 
 
-QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
+void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
 {
-  QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
   int aSelected = aObjects.size();
@@ -350,49 +358,46 @@ QMenu* XGUI_ContextMenuMgr::objBrowserMenu() const
       aActions.append(action("DELETE_CMD"));
       //aActions.append(action("MOVE_CMD"));
   }
-  aMenu->addActions(aActions);
+  theMenu->addActions(aActions);
 
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule) {
-    aMenu->addSeparator();
-    aModule->addObjectBrowserMenu(aMenu);
+    theMenu->addSeparator();
+    aModule->addObjectBrowserMenu(theMenu);
   }
-  aMenu->addSeparator();
-  aMenu->addActions(myWorkshop->objectBrowser()->actions());
-
-  return aMenu;
+  theMenu->addSeparator();
+  theMenu->addActions(myWorkshop->objectBrowser()->actions());
 }
 
-QMenu* XGUI_ContextMenuMgr::viewerMenu() const
+void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 {
-  QMenu* aMenu = new QMenu();
   ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule) 
-    aModule->addViewerMenu(aMenu, myActions);
-
+  if (aModule) {
+    if (aModule->addViewerMenu(theMenu, myActions))
+      theMenu->addSeparator();
+  }
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
-  int aSelected = aObjects.size();
+  QList<ModuleBase_ViewerPrs> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  int aSelected = aPrsList.size();
   QActionsList aActions;
   if (aSelected == 1) {
-    ObjectPtr aObject = aObjects.first();
+    ObjectPtr aObject = aPrsList.first().object();
     std::string aName = aObject->groupName();
     if (myViewerMenu.contains(aName))
       aActions = myViewerMenu[aName];
   } else if (aSelected > 1) {
     aActions.append(action("HIDE_CMD"));
   }
-  aMenu->addActions(aActions);
+  theMenu->addActions(aActions);
 
   if (!myWorkshop->isSalomeMode()) {
-    aMenu->addSeparator();
+    theMenu->addSeparator();
     QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
     if (aMDI->actions().size() > 0) {
-      QMenu* aSubMenu = aMenu->addMenu(tr("Windows"));
+      QMenu* aSubMenu = theMenu->addMenu(tr("Windows"));
       aSubMenu->addActions(aMDI->actions());
     }
   }
-  return aMenu;
 }
 
 QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)

@@ -537,11 +537,9 @@ void NewGeom_Module::selectionChanged()
 //******************************************************
 void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle)
 {
-  QMenu* aMenu = myWorkshop->contextMenuMgr()->viewerMenu();
-  theMenu->addActions(aMenu->actions());
-  //myWorkshop->contextMenuMgr()->addViewerMenu(theMenu);
+  myWorkshop->contextMenuMgr()->updateViewerMenu();
+  myWorkshop->contextMenuMgr()->addViewerMenu(theMenu);
   LightApp_Module::contextMenuPopup(theClient, theMenu, theTitle);
-  delete aMenu; // Delete menu because it is not controlled by menu manager
 }
 
 

@@ -113,7 +113,7 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   bool hasAttribute = false;
   bool hasFeature = false;
 
-  QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected(ModuleBase_ISelection::AllControls);
+  QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
   TopoDS_Shape aShape;
   ResultPtr aResult;
   FeaturePtr aFeature;
@@ -204,6 +204,23 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   }
   return true;
 }
+
+void PartSet_MenuMgr::updateViewerMenu(const QMap<QString, QAction*>& theStdActions)
+{
+  ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
+
+  bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
+                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (isActiveSketch) {
+    theStdActions["WIREFRAME_CMD"]->setEnabled(false);
+    theStdActions["SHADING_CMD"]->setEnabled(false);
+    theStdActions["SHOW_ONLY_CMD"]->setEnabled(false);
+    theStdActions["SHOW_CMD"]->setEnabled(false);
+    theStdActions["HIDE_CMD"]->setEnabled(false);
+    theStdActions["HIDEALL_CMD"]->setEnabled(false);
+  }
+}
+
 
 void PartSet_MenuMgr::onLineHighlighted(QAction* theAction)
 {
