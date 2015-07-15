@@ -11,6 +11,7 @@
 #include <QLocale>
 #include <QRegExp>
 #include <QToolTip>
+#include <QApplication>
 
 #include <string>
 #include <iostream>
@@ -179,6 +180,14 @@ bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
   //}
   bool aHasDigit = false;
   theText.toDouble(&aHasDigit);
+  if (aHasDigit) {
+    QLocale aLoc; // create default locale
+    QChar aDecPnt = aLoc.decimalPoint();
+    if (aDecPnt == '.') 
+      aHasDigit = theText.contains(aDecPnt) || (!theText.contains(','));
+    else if (aDecPnt == ',') 
+      aHasDigit = theText.contains(aDecPnt) || (!theText.contains('.'));
+  }
   return !aHasDigit;
 
 }
