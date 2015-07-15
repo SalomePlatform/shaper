@@ -221,6 +221,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
     }
 
     if (isAutomaticChanged) myIsAutomatic = false;
+    myProcessed.clear(); // to avoid keeping features in memory
     myIsExecuted = false;
 
     // flush to update display
