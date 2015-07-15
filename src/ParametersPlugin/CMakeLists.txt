@@ -51,4 +51,6 @@ INSTALL(TARGETS ParametersPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 ADD_UNIT_TESTS(TestParameterCreation.py
+               TestParameterRename.py
+               TestParameterChangeValue.py
               )
