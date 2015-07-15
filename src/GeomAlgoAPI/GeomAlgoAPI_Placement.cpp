@@ -24,7 +24,6 @@
 #include <BRepGProp.hxx>
 #include <Precision.hxx>
 
-#define DEB_PLACEMENT 1
 GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
   std::shared_ptr<GeomAPI_Shape> theSourceSolid,
   std::shared_ptr<GeomAPI_Shape> theDestSolid,
@@ -195,6 +194,10 @@ void GeomAlgoAPI_Placement::build(
     TopLoc_Location aDelta(aTrsf);
     TopoDS_Shape aResult = aSourceShape.Moved(aDelta);
     myShape->setImpl(new TopoDS_Shape(aResult));
+    // store the accumulated information about the result and this delta
+    myTrsf = std::make_shared<GeomAPI_Trsf>(
+      new gp_Trsf(aTrsf * aSourceShape.Location().Transformation()));
+    myDone = true; // it is allways true for simple transformation generation
   } else { // internal rebuild of the shape
     // Transform the shape with copying it
     BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
@@ -209,12 +212,6 @@ void GeomAlgoAPI_Placement::build(
           aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
           myMap.bind(aCurrentShape, aCurrentShape);
         }
-  #ifdef DEB_PLACEMENT
-        int aNum = myMap.size();
-        cout << "MAP of Oriented shapes =" << aNum <<endl;
-
-  #endif
-
         myShape->setImpl(new TopoDS_Shape(aResult));
         myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
       }
@@ -262,6 +259,11 @@ void GeomAlgoAPI_Placement::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) co
 GeomAlgoAPI_MakeShape * GeomAlgoAPI_Placement::makeShape() const
 {
   return myMkShape;
+}
+
+std::shared_ptr<GeomAPI_Trsf> GeomAlgoAPI_Placement::transformation() const
+{
+  return myTrsf;
 }
 
 //============================================================================

@@ -28,8 +28,8 @@
 void Model_ResultPart::initAttributes()
 {
   // append the color attribute. It is empty, the attribute will be filled by a request
-  DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
+  data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId());
+  data()->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
 }
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
@@ -46,14 +46,6 @@ Model_ResultPart::Model_ResultPart()
 {
   myIsDisabled = true; // by default it is not initialized and false to be after created
   setIsConcealed(false);
-}
-
-void Model_ResultPart::setData(std::shared_ptr<ModelAPI_Data> theData)
-{
-  ModelAPI_Result::setData(theData);
-  if (theData) {
-    data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId());
-  }
 }
 
 void Model_ResultPart::activate()
@@ -83,24 +75,26 @@ void Model_ResultPart::activate()
 bool Model_ResultPart::isActivated() 
 {
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
-  return aDocRef->value().get();
+  return aDocRef->value().get() != NULL;
 }
 
 bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     const bool theFlag)
 {
   if (ModelAPI_ResultPart::setDisabled(theThis, theFlag)) {
-    DocumentPtr aDoc = Model_ResultPart::partDoc();
-    if (aDoc.get() && aDoc->isOpened()) {
-      // make the current feature the last in any case: to update shapes defore deactivation too
-      FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aDoc->object(
-        ModelAPI_Feature::group(), aDoc->size(ModelAPI_Feature::group()) - 1));
-      aDoc->setCurrentFeature(aLastFeature, false);
-      if (theFlag) { // disable, so make all features disabled too
-        // update the shape just before the deactivation: it will be used outside of part
-        myShape.Nullify();
-        shape();
-        aDoc->setCurrentFeature(FeaturePtr(), false);
+    if (!myTrsf.get()) { // disable of base result part
+      DocumentPtr aDoc = Model_ResultPart::partDoc();
+      if (aDoc.get() && aDoc->isOpened()) {
+        // make the current feature the last in any case: to update shapes defore deactivation too
+        FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aDoc->object(
+          ModelAPI_Feature::group(), aDoc->size(ModelAPI_Feature::group()) - 1));
+        aDoc->setCurrentFeature(aLastFeature, false);
+        if (theFlag) { // disable, so make all features disabled too
+          // update the shape just before the deactivation: it will be used outside of part
+          updateShape();
+          shape();
+          aDoc->setCurrentFeature(FeaturePtr(), false);
+        }
       }
     }
     return true;
@@ -110,7 +104,21 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
 
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
 {
-  if (myShape.IsNull()) {
+  std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
+  if (myTrsf.get()) { // get shape of the base result and apply the transformation
+    ResultPtr anOrigResult = 
+      std::dynamic_pointer_cast<ModelAPI_Result>(data()->attribute(COLOR_ID())->owner());
+    std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
+    if (anOrigShape.get()) {
+      TopoDS_Shape aShape = anOrigShape->impl<TopoDS_Shape>();
+      if (!aShape.IsNull()) {
+        aShape.Move(*(myTrsf.get()));
+        aResult->setImpl(new TopoDS_Shape(aShape));
+      }
+    }
+    return aResult;
+  }
+  if (myShape.IsNull()) { // shape is not produced yet, create it
     DocumentPtr aDoc = Model_ResultPart::partDoc();
     if (aDoc.get() && aDoc->isOpened()) {
       const std::string& aBodyGroup = ModelAPI_ResultBody::group();
@@ -120,7 +128,8 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
       int aNumSubs = 0;
       for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
         ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
-        if (aBody.get() && aBody->shape().get() && !aBody->isDisabled()) {
+        // "object" method filters out disabled and concealed anyway, so don't check
+        if (aBody.get() && aBody->shape().get()) {
           TopoDS_Shape aShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
           if (!aShape.IsNull()) {
             aBuilder.Add(aResultComp, aShape);
@@ -133,41 +142,57 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
       }
     }
   }
-  if (myShape.IsNull())
-    return std::shared_ptr<GeomAPI_Shape>();
-  std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
-  aResult->setImpl(new TopoDS_Shape(myShape));
+  if (!myShape.IsNull())
+    aResult->setImpl(new TopoDS_Shape(myShape));
   return aResult;
+}
+
+// Returns true is transformation matrices are equal
+static bool IsEqualTrsf(gp_Trsf& theT1, gp_Trsf theT2) {
+  for(int aRow = 1; aRow < 4; aRow++) {
+    for(int aCol = 1; aCol < 5; aCol++) {
+      double aDiff = theT1.Value(aRow, aCol) - theT2.Value(aRow, aCol);
+      if (Abs(aDiff) > 1.e-9)
+        return false;
+    }
+  }
+  return true;
 }
 
 std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& theShape,
   int& theIndex)
 {
   theIndex = 0; // not initialized
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-  if (aShape.IsNull())
-    return "";
-  if (data()->isOwner(this)) { // if this is moved copy of part => return the name of original shape
-    FeaturePtr anOrigFeature = 
-      std::dynamic_pointer_cast<ModelAPI_Feature>(data()->attribute(COLOR_ID())->owner());
-    if (anOrigFeature.get()) {
-      if (anOrigFeature->firstResult().get() && anOrigFeature->firstResult()->shape().get()) {
-        TopoDS_Shape anOrigShape = anOrigFeature->firstResult()->shape()->impl<TopoDS_Shape>();
-        if (!anOrigShape.IsNull()) {
-          TopExp_Explorer anExp(anOrigShape, aShape.ShapeType());
-          for(; anExp.More(); anExp.Next()) {
-            if (aShape.IsPartner(anExp.Current())) {
-              std::shared_ptr<GeomAPI_Shape> anOrigGeomShape(new GeomAPI_Shape);
-              anOrigGeomShape->setImpl(new TopoDS_Shape(anExp.Current()));
 
-              return std::dynamic_pointer_cast<Model_ResultPart>(anOrigFeature->firstResult())->
-                nameInPart(theShape, theIndex);
-            }
+  if (myTrsf.get()) { // if this is moved copy of part => return the name of original shape
+    ResultPartPtr anOrigResult = 
+      std::dynamic_pointer_cast<ModelAPI_ResultPart>(data()->attribute(COLOR_ID())->owner());
+    // searching in the origin the shape equal to the given but with myTrsf
+    TopoDS_Shape aSelection = theShape->impl<TopoDS_Shape>();
+    gp_Trsf aSelTrsf = aSelection.Location().Transformation();
+    TopoDS_Shape anOrigMain = anOrigResult->shape()->impl<TopoDS_Shape>();
+    if (!aSelection.IsNull() && !anOrigMain.IsNull()) {
+      TopExp_Explorer anExp(anOrigMain, aSelection.ShapeType());
+      for(; anExp.More(); anExp.Next()) {
+        if (anExp.Current().IsPartner(aSelection)) {
+          TopoDS_Shape anOrigMoved = anExp.Current().Moved(*(myTrsf.get()));
+          //if (anOrigMoved.IsSame(aSelection)) {
+          if (IsEqualTrsf(aSelTrsf, anOrigMoved.Location().Transformation())) {
+            std::shared_ptr<GeomAPI_Shape> anOrigSel(new GeomAPI_Shape);
+            anOrigSel->setImpl(new TopoDS_Shape(anExp.Current()));
+            return anOrigResult->nameInPart(anOrigSel, theIndex);
           }
         }
       }
     }
+    // something is not right
+    return "";
   }
+
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return "";
+
   // getting an access to the document of part
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
   if (!aDoc.get()) // the part document is not presented for the moment
@@ -255,12 +280,16 @@ void Model_ResultPart::colorConfigInfo(std::string& theSection, std::string& the
 void Model_ResultPart::updateShape()
 {
   myShape.Nullify();
+  myTrsf.reset();
 }
 
-void Model_ResultPart::setShape(std::shared_ptr<ModelAPI_Result> theThis, 
-    const std::shared_ptr<GeomAPI_Shape>& theTransformed)
+void Model_ResultPart::setTrsf(std::shared_ptr<ModelAPI_Result> theThis, 
+    const std::shared_ptr<GeomAPI_Trsf>& theTransformation)
 {
-  myShape = theTransformed->impl<TopoDS_Shape>();
+  updateShape();
+  if (theTransformation.get()) {
+    myTrsf = std::make_shared<gp_Trsf>(theTransformation->impl<gp_Trsf>());
+  }
   // the result must be explicitly updated
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);

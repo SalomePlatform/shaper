@@ -110,7 +110,7 @@ void FeaturesPlugin_Movement::execute()
         }
       }
       ResultPartPtr aResultPart = document()->copyPart(aCurrentResult, anOrigin, aResultIndex);
-      aResultPart->setShape(*aContext, aMovementAlgo.shape());
+      aResultPart->setTrsf(*aContext, aMovementAlgo.transformation());
       setResult(aResultPart);
     } else {
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);

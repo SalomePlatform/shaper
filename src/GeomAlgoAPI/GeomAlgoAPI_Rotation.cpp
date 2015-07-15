@@ -51,6 +51,8 @@ void GeomAlgoAPI_Rotation::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
   if (theSimpleTransform) {
     TopLoc_Location aDelta(aTrsf);
     aResult = aSourceShape.Moved(aDelta);
+    myTrsf = std::make_shared<GeomAPI_Trsf>(
+      new gp_Trsf(aTrsf * aSourceShape.Location().Transformation()));
     myDone = true; // is OK for sure
   } else {
     BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
@@ -110,4 +112,10 @@ std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Rotation::mapOfShapes()
 std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Rotation::makeShape() const
 {
   return myMkShape;
+}
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_Trsf> GeomAlgoAPI_Rotation::transformation() const
+{
+  return myTrsf;
 }

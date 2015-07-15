@@ -110,7 +110,7 @@ void FeaturesPlugin_Rotation::execute()
         }
       }
       ResultPartPtr aResultPart = document()->copyPart(aCurrentResult, anOrigin, aResultIndex);
-      aResultPart->setShape(*aContext, aRotationAlgo.shape());
+      aResultPart->setTrsf(*aContext, aRotationAlgo.transformation());
       setResult(aResultPart);
     } else {
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);

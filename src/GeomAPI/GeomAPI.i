@@ -27,6 +27,7 @@
   #include "GeomAPI_Vertex.h"
   #include "GeomAPI_XY.h"
   #include "GeomAPI_XYZ.h"
+  #include "GeomAPI_Trsf.h"
 
   #include <memory>
   #include <string>
@@ -66,6 +67,7 @@
 %shared_ptr(GeomAPI_Vertex)
 %shared_ptr(GeomAPI_XY)
 %shared_ptr(GeomAPI_XYZ)
+%shared_ptr(GeomAPI_Trsf)
 
 
 // all supported interfaces
@@ -94,3 +96,4 @@
 %include "GeomAPI_Vertex.h"
 %include "GeomAPI_XY.h"
 %include "GeomAPI_XYZ.h"
+%include "GeomAPI_Trsf.h"

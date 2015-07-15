@@ -193,7 +193,7 @@ bool Model_AttributeSelection::isInitialized()
       TDF_Label aSelLab = selectionLabel();
       if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
         ResultPtr aContext = context();
-        return aContext.get();
+        return aContext.get() != NULL;
       }
       if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
           return true;
@@ -206,7 +206,7 @@ bool Model_AttributeSelection::isInitialized()
         ResultConstructionPtr aConstr = 
           std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(context());
         if (aConstr.get()) {
-          return aConstr->shape().get();
+          return aConstr->shape().get() != NULL;
         }
       }
     }
@@ -227,7 +227,23 @@ void Model_AttributeSelection::setID(const std::string theID)
 }
 
 ResultPtr Model_AttributeSelection::context() {
-  return std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
+  // for parts there could be same-data result, so take the last enabled
+  if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group()) {
+    int aSize = aResult->document()->size(ModelAPI_ResultPart::group());
+    for(int a = aSize - 1; a >= 0; a--) {
+      ObjectPtr aPart = aResult->document()->object(ModelAPI_ResultPart::group(), a);
+      if (aPart.get() && aPart->data() == aResult->data()) {
+        ResultPtr aPartResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPart);
+        FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+        // check that this result is not this-feature result (it is forbidden t oselect itself)
+        if (anOwnerFeature.get() && anOwnerFeature->firstResult() != aPartResult) {
+          return aPartResult;
+        }
+      }
+    }
+  }
+  return aResult;
 }
 
 
@@ -240,19 +256,21 @@ void Model_AttributeSelection::setObject(const std::shared_ptr<ModelAPI_Object>&
 TDF_LabelMap& Model_AttributeSelection::scope()
 {
   if (myScope.IsEmpty()) { // create a new scope if not yet done
-    // gets all labels with named shapes that are bofore this feature label (before in history)
-    TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
-      owner()->data())->label().Father();
-    int aFeatureID = aFeatureLab.Tag();
-    TDF_ChildIterator aFeaturesIter(aFeatureLab.Father());
-    for(; aFeaturesIter.More(); aFeaturesIter.Next()) {
-      if (aFeaturesIter.Value().Tag() >= aFeatureID) // the left labels are created later
-        break;
-      TDF_ChildIDIterator aNSIter(aFeaturesIter.Value(), TNaming_NamedShape::GetID(), 1);
-      for(; aNSIter.More(); aNSIter.Next()) {
-        Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
-        if (!aNS.IsNull() && aNS->Evolution() != TNaming_SELECTED) {
-          myScope.Add(aNS->Label());
+    // gets all featueres with named shapes that are bofore this feature label (before in history)
+    DocumentPtr aMyDoc = owner()->document();
+    std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures = aMyDoc->allFeatures();
+    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFIter = allFeatures.begin();
+    for(; aFIter != allFeatures.end(); aFIter++) {
+      if (*aFIter == owner()) break; // the left features are created later
+      if (aFIter->get() && (*aFIter)->data()->isValid()) {
+        TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
+          (*aFIter)->data())->label().Father();
+        TDF_ChildIDIterator aNSIter(aFeatureLab, TNaming_NamedShape::GetID(), 1);
+        for(; aNSIter.More(); aNSIter.Next()) {
+          Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
+          if (!aNS.IsNull() && aNS->Evolution() != TNaming_SELECTED) {
+            myScope.Add(aNS->Label());
+          }
         }
       }
     }

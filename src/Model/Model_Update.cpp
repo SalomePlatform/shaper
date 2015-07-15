@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-// #define DEB_UPDATE
+//#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -113,7 +113,6 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       processOperation(false);
   } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent ||
       theMessage->eventID() == kOpStartEvent) {
-    myIsParamUpdated = false;
 
     if (!(theMessage->eventID() == kOpStartEvent)) {
       myIsFinish = true;
@@ -142,6 +141,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     }
     // in the end of transaction everything is updated, so clear the old objects (the only one
     // place where results are cleared)
+    myIsParamUpdated = false;
     myJustUpdated.clear();
     myWaitForFinish.clear();
   }
@@ -190,12 +190,12 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
     FeaturePtr aFeatureIter = anObjs->firstFeature();
     std::set<FeaturePtr> aProcessedFeatures; // to avoid processing twice
     for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
-      if (aFeatureIter->groupName() == "Parameter")
+      if (aFeatureIter->getKind() == "Parameter")
         updateFeature(aFeatureIter, aProcessedFeatures);
     }
     aFeatureIter = anObjs->firstFeature();
     for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
-      if (aFeatureIter->groupName() != "Parameter")
+      if (aFeatureIter->getKind() != "Parameter")
         updateFeature(aFeatureIter, aProcessedFeatures);
     }
 
@@ -245,13 +245,13 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
     // two cycles: parameters must be processed first
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
-      if (aSub->groupName() == "Parameter")
+      if (aSub->getKind() == "Parameter")
         updateFeature(aSub, theProcessed);
     }
     // number of subs can be changed in execution: like fillet
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
-      if (aSub->groupName() != "Parameter")
+      if (aSub->getKind() != "Parameter")
        updateFeature(aSub, theProcessed);
     }
   }
@@ -320,7 +320,8 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
   std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
   for (; aRIter != aResults.cend(); aRIter++) {
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-    aRes->data()->execState(theState);
+    if (!aRes->isDisabled()) // update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
+      aRes->data()->execState(theState);
     if (theFeature->data()->updateID() > aRes->data()->updateID()) {
       aRes->data()->setUpdateID(theFeature->data()->updateID());
     }
@@ -491,10 +492,21 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     // number of subs can be changed in execution: like fillet
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
-      if (myJustUpdated.find(aSub) != myJustUpdated.end() || 
-            (aSub.get() && aSub->data()->updateID() > theFeature->data()->updateID())) {
-          if (aState == ModelAPI_StateDone)
+      if (aSub.get() && aState == ModelAPI_StateDone) {
+        if (myJustUpdated.find(aSub) != myJustUpdated.end() || 
+              (aSub->data()->updateID() > theFeature->data()->updateID())) {
+          aState = ModelAPI_StateMustBeUpdated;
+        }
+        // also check that all results of subs were updated: composite also depends on the results
+        const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aResults.begin();
+        for(; aResIter != aResults.end(); aResIter++) {
+          if (aResIter->get() && (*aResIter)->data()->isValid() && !(*aResIter)->isDisabled() &&
+                (myJustUpdated.find(*aResIter) != myJustUpdated.end() || 
+                  ((*aResIter)->data()->updateID() > theFeature->data()->updateID()))) {
             aState = ModelAPI_StateMustBeUpdated;
+          }
+        }
       }
     }
   }

@@ -10,6 +10,7 @@
 #include "Model.h"
 #include <ModelAPI_ResultPart.h>
 #include <TopoDS_Shape.hxx>
+#include <gp_Trsf.hxx>
 
 /**\class Model_ResultPart
  * \ingroup DataModel
@@ -21,6 +22,7 @@
 class Model_ResultPart : public ModelAPI_ResultPart
 {
   TopoDS_Shape myShape; ///< shape of this part created from bodies (updated only of Part deactivation)
+  std::shared_ptr<gp_Trsf> myTrsf; ///< if it is just copy of original shape, keep just transformation
  public:
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
@@ -52,8 +54,9 @@ class Model_ResultPart : public ModelAPI_ResultPart
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName);
   /// Updates the shape-result of the part (called on Part feature execution)
   MODEL_EXPORT virtual void updateShape();
-  MODEL_EXPORT virtual void setShape(std::shared_ptr<ModelAPI_Result> theThis, 
-    const std::shared_ptr<GeomAPI_Shape>& theTransformed);
+  /// Applies the additional transformation of the part
+  MODEL_EXPORT virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis, 
+    const std::shared_ptr<GeomAPI_Trsf>& theTransformation);
 
   /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
@@ -62,9 +65,6 @@ class Model_ResultPart : public ModelAPI_ResultPart
 protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();
-
-  /// Sets the data manager of an object (document does), here also attributes are initialized
-  virtual void setData(std::shared_ptr<ModelAPI_Data> theData);
 
   /// Returns true if document is activated (loaded into the memory)
   virtual bool isActivated();

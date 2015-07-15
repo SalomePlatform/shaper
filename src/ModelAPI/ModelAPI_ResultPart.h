@@ -8,6 +8,7 @@
 #define ModelAPI_ResultPart_H_
 
 #include "ModelAPI_Result.h"
+#include <GeomAPI_Trsf.h>
 
 #include <string>
 
@@ -63,9 +64,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   /// Updates the selection inside of the part by the selection index
   virtual bool updateInPart(const int theIndex) = 0;
 
-  /// Applies the additional transformation ofthe part
-  virtual void setShape(std::shared_ptr<ModelAPI_Result> theThis, 
-    const std::shared_ptr<GeomAPI_Shape>& theTransformed) = 0;
+  /// Applies the additional transformation of the part
+  virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis, 
+    const std::shared_ptr<GeomAPI_Trsf>& theTransformation) = 0;
 
   /// Returns the shape by the name in the part
   virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName) = 0;

@@ -11,6 +11,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Face.h>
+#include <GeomAPI_Trsf.h>
 #include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <memory>
@@ -59,6 +60,9 @@ public:
   /// Return interface for for History processing
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape* makeShape () const;
 
+  /// Returns the simple transformation
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Trsf> transformation() const;
+
   /// Destructor
   GEOMALGOAPI_EXPORT virtual ~GeomAlgoAPI_Placement();
 
@@ -77,6 +81,7 @@ private:
   std::shared_ptr<GeomAPI_Shape> myShape;
   GeomAPI_DataMapOfShapeShape myMap;
   GeomAlgoAPI_MakeShape * myMkShape;
+  std::shared_ptr<GeomAPI_Trsf> myTrsf; ///< transformation of the shape in case theSimpleTransform
 };
 
 #endif

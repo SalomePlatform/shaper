@@ -119,7 +119,8 @@ void FeaturesPlugin_Placement::execute()
   std::shared_ptr<ModelAPI_ResultBody> aResultBody;
   if (!isPart) 
     aResultBody = document()->createBody(data());
-  GeomAlgoAPI_Placement aFeature(aSlaveObject, aBaseObject, aSlaveShape, aBaseShape, isReverse, isCentering);
+  GeomAlgoAPI_Placement aFeature(
+    aSlaveObject, aBaseObject, aSlaveShape, aBaseShape, isReverse, isCentering, isPart);
   if(!aFeature.isDone()) {
     static const std::string aFeatureError = "Placement algorithm failed";
     setError(aFeatureError);
@@ -141,7 +142,7 @@ void FeaturesPlugin_Placement::execute()
   if (isPart) { // for part results just set transformation
     ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aContextRes);
     ResultPartPtr aResultPart = document()->copyPart(firstResult(), anOrigin);
-    aResultPart->setShape(aContextRes, aFeature.shape());
+    aResultPart->setTrsf(aContextRes, aFeature.transformation());
     setResult(aResultPart);
   } else {
     //LoadNamingDS

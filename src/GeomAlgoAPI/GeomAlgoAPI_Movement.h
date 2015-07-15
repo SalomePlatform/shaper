@@ -12,6 +12,7 @@
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Trsf.h>
 
 /** \class GeomAlgoAPI_Movement
  *  \ingroup DataAlgo
@@ -50,6 +51,9 @@ public:
   /// \return interface for for History processing.
   GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
 
+  /// Returns the simple transformation
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Trsf> transformation() const;
+
 private:
   /// Builds resulting shape.
   void build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
@@ -63,6 +67,7 @@ private:
   std::shared_ptr<GeomAPI_Shape> myShape;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
   std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
+  std::shared_ptr<GeomAPI_Trsf> myTrsf; ///< transformation of the shape in case theSimpleTransform
 };
 
 #endif
