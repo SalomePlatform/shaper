@@ -1019,6 +1019,9 @@ void XGUI_Workshop::deleteObjects()
   if (!isActiveOperationAborted())
     return;
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  // It is necessary to clear selection in order to avoid selection changed event during
+  // deleteion and negative consequences connected with processing of already deleted items
+  mySelector->clearSelection();
   // check whether the object can be deleted. There should not be parts which are not loaded
   if (!XGUI_Tools::canRemoveOrRename(myMainWindow, anObjects))
     return;

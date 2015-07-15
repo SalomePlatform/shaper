@@ -152,7 +152,7 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myParentId);
     #ifdef _DEBUG
     if (!result) {
-      qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");
+      qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type %s", theType.c_str());
     }
     #endif
   }
