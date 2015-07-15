@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-//#define DEB_UPDATE
+#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -101,6 +101,27 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       // created objects are always must be up to date (python box feature)
       // and updated not in internal uptation chain
       myJustUpdated.insert(*anObjIter);
+
+      // something is updated during the execution: re-execute it (sketch update by parameters)
+      if (myIsExecuted) { 
+        FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
+        if (anUpdated.get() &&  anUpdated->data()->isValid() &&
+            myProcessed.find(anUpdated) != myProcessed.end()) {
+            if (anUpdated->isPreviewNeeded() || myIsFinish) {
+              ModelAPI_ExecState aState = anUpdated->data()->execState();
+              static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+              if (aFactory->validate(anUpdated)) {
+                #ifdef DEB_UPDATE
+                  std::cout<<"Execute immideately "<<anUpdated->name()<<std::endl;
+                #endif
+                executeFeature(anUpdated);
+              } else {
+                anUpdated->eraseResults();
+                redisplayWithResults(anUpdated, ModelAPI_StateInvalidArgument); // result also must be updated
+              }
+            }
+        }
+      }
       #ifdef DEB_UPDATE
       if ((*anObjIter)->data() && (*anObjIter)->data()->isValid()) {
         std::cout<<"Add updated "<<(*anObjIter)->groupName()<<" "
@@ -188,15 +209,15 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
     if (!anObjs) return;
     // two cycles: parameters are first to process
     FeaturePtr aFeatureIter = anObjs->firstFeature();
-    std::set<FeaturePtr> aProcessedFeatures; // to avoid processing twice
+    myProcessed.clear(); // to avoid processing twice
     for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
       if (aFeatureIter->getKind() == "Parameter")
-        updateFeature(aFeatureIter, aProcessedFeatures);
+        updateFeature(aFeatureIter);
     }
     aFeatureIter = anObjs->firstFeature();
     for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
       if (aFeatureIter->getKind() != "Parameter")
-        updateFeature(aFeatureIter, aProcessedFeatures);
+        updateFeature(aFeatureIter);
     }
 
     if (isAutomaticChanged) myIsAutomatic = false;
@@ -212,14 +233,14 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
   }
 }
 
-void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& theProcessed)
+void Model_Update::updateFeature(FeaturePtr theFeature)
 {
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (theProcessed.find(theFeature) != theProcessed.end())
+  if (myProcessed.find(theFeature) != myProcessed.end())
     return;
-  theProcessed.insert(theFeature);
+  myProcessed.insert(theFeature);
   if (theFeature->isDisabled())
     return;
 
@@ -246,14 +267,17 @@ void Model_Update::updateFeature(FeaturePtr theFeature, std::set<FeaturePtr>& th
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
       if (aSub->getKind() == "Parameter")
-        updateFeature(aSub, theProcessed);
+        updateFeature(aSub);
     }
     // number of subs can be changed in execution: like fillet
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
       if (aSub->getKind() != "Parameter")
-       updateFeature(aSub, theProcessed);
+       updateFeature(aSub);
     }
+    // reupdate arguments of composite feature: it may be changed during subs execution
+    if (theFeature->data()->execState() != ModelAPI_StateMustBeUpdated)
+      updateArguments(theFeature);
   }
   // this checking must be after the composite feature sub-elements processing:
   // composite feature status may depend on it's subelements
@@ -320,8 +344,11 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
   std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
   for (; aRIter != aResults.cend(); aRIter++) {
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-    if (!aRes->isDisabled()) // update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
+    if (!aRes->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
       aRes->data()->execState(theState);
+      if (theState == ModelAPI_StateDone) // feature become "done", so execution changed results
+        myJustUpdated.insert(aRes);
+    }
     if (theFeature->data()->updateID() > aRes->data()->updateID()) {
       aRes->data()->setUpdateID(theFeature->data()->updateID());
     }

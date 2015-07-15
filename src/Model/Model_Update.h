@@ -35,6 +35,8 @@ class Model_Update : public Events_Listener
   bool myIsParamUpdated;
   /// to execute features of finish if perview is not needed
   bool myIsFinish;
+  /// Set of already processed features in the "processOperation" method
+  std::set<std::shared_ptr<ModelAPI_Feature> > myProcessed;
 
  public:
   /// Is called only once, on startup of the application
@@ -46,8 +48,7 @@ class Model_Update : public Events_Listener
 protected:
   /// Recoursively checks and updates the feature if needed (calls the execute method)
   /// Returns true if feature was updated.
-  void updateFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
-    std::set<std::shared_ptr<ModelAPI_Feature> >& theProcessed);
+  void updateFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Updates the selection and parametrical arguments before the later feature analysis
   /// Returns true if something really was updated
