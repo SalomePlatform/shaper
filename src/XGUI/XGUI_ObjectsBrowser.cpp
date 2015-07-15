@@ -6,6 +6,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IDocumentDataModel.h>
@@ -18,7 +19,7 @@
 #include <QMouseEvent>
 #include <QAction>
 #include <QStyledItemDelegate>
-
+#include <QMessageBox>
 
 /// Width of second column (minimum acceptable = 27)
 #define SECOND_COL_WIDTH 30
@@ -86,15 +87,36 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
 {
   QLineEdit* aEditor = dynamic_cast<QLineEdit*>(theEditor);
   if (aEditor) {
-    QString aRes = aEditor->text();
+    QString aName = aEditor->text();
     QModelIndexList aIndexList = selectionModel()->selectedIndexes();
     ModuleBase_IDocumentDataModel* aModel = dataModel();
     ObjectPtr aObj = aModel->object(aIndexList.first());
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->startOperation("Rename");
-    aObj->data()->setName(qPrintable(aRes));
+
+    if (!canRename(aObj, aName)) {
+      aMgr->abortOperation();
+      return;
+    }
+
+    aObj->data()->setName(qPrintable(aName));
     aMgr->finishOperation();
   }
+}
+
+bool XGUI_DataTree::canRename(const ObjectPtr& theObject, const QString& theName)
+{
+  double aValue;
+  ResultParameterPtr aParam;
+
+  bool isVariableFound = ModelAPI_Tools::findVariable(theObject->document(), qPrintable(theName), aValue, aParam);
+
+  if (isVariableFound)
+    QMessageBox::information(this, tr("Rename parameter"),
+      QString(tr("Selected parameter can not be renamed to: %1. \
+There is a parameter with the same name. Its value is: %2.")).arg(qPrintable(theName)).arg(aValue));
+
+  return !isVariableFound;
 }
 
 void XGUI_DataTree::clear() 

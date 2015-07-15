@@ -45,50 +45,58 @@ bool ParametersPlugin_Parameter::isInHistory()
 
 void ParametersPlugin_Parameter::attributeChanged(const std::string& theID)
 {
-  if (theID == EXPRESSION_ID()) { // recompute only on change of the expression
-    ResultParameterPtr aParam = document()->createParameter(data());
+  if (theID == EXPRESSION_ID())
+    updateExpression();
+}
 
-    std::string anExpression = string(EXPRESSION_ID())->value();
-    if(anExpression.empty()) {
-      // clear error/result if the expression is empty
-      setError("", false);
-      return;
-    }
-    std::string outErrorMessage;
-    double aValue = evaluate(anExpression, outErrorMessage);
-    // Name
-    std::string aName = string(VARIABLE_ID())->value();
-    std::ostringstream sstream;
-    sstream << aValue;
-    std::string aParamValue = sstream.str();
-    data()->setName(aName);
-    aParam->data()->setName(aName);
-    // Error
-    if (!outErrorMessage.empty()) {
-      std::string aStateMsg("Error: " + outErrorMessage);
-      data()->execState(ModelAPI_StateExecFailed);
-      setError(aStateMsg, false);
-    } else {
-      static const std::string anEmptyMsg(""); // it is checked in the validator by the empty message
-      setError(anEmptyMsg, false);
-      data()->execState(ModelAPI_StateDone);
-    }
-    // Value
-    AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-    aValueAttribute->setValue(aValue);
-    setResult(aParam);
+void ParametersPlugin_Parameter::updateName()
+{
+  std::string aName = string(VARIABLE_ID())->value();
+  data()->setName(aName);
+
+  ResultParameterPtr aParam = document()->createParameter(data());
+  aParam->data()->setName(aName);
+  setResult(aParam);
+}
+
+void ParametersPlugin_Parameter::updateExpression()
+{
+  std::string anExpression = string(EXPRESSION_ID())->value();
+  if(anExpression.empty()) {
+    // clear error/result if the expression is empty
+    setError("", false);
+    return;
   }
+  std::string outErrorMessage;
+  double aValue = evaluate(anExpression, outErrorMessage);
+  std::ostringstream sstream;
+  sstream << aValue;
+  std::string aParamValue = sstream.str();
+  // Error
+  if (!outErrorMessage.empty()) {
+    std::string aStateMsg("Error: " + outErrorMessage);
+    data()->execState(ModelAPI_StateExecFailed);
+    setError(aStateMsg, false);
+  } else {
+    static const std::string anEmptyMsg(""); // it is checked in the validator by the empty message
+    setError(anEmptyMsg, false);
+    data()->execState(ModelAPI_StateDone);
+  }
+
+  ResultParameterPtr aParam = document()->createParameter(data());
+  AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+  aValueAttribute->setValue(aValue);
+  setResult(aParam);
 }
 
 void ParametersPlugin_Parameter::execute()
 {
-  // just call recompute
-  attributeChanged(EXPRESSION_ID());
+  updateName();
+  updateExpression();
 }
 
 double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
 {
-
   std::list<std::string> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
   std::list<std::string> aContext;

@@ -59,6 +59,18 @@ bool findVariable(const std::string& theName, double& outValue, ResultParameterP
   return false;
 }
 
+bool findVariable(const DocumentPtr& theDocument, const std::string& theName, 
+                  double& outValue, ResultParameterPtr& theParam)
+{
+  ObjectPtr aParamObj = theDocument->objectByName(ModelAPI_ResultParameter::group(), theName);
+  theParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
+  if (!theParam.get())
+    return false;
+  AttributeDoublePtr aValueAttribute = theParam->data()->real(ModelAPI_ResultParameter::VALUE());
+  outValue = aValueAttribute->value();
+  return true;
+}
+
 static std::map<int, std::vector<int> > myColorMap;
 
 void appendValues(std::vector<int>& theRGB, const int theRed, const int theGreen, const int theBlue)

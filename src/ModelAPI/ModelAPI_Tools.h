@@ -30,6 +30,13 @@ MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue,
   ResultParameterPtr& theParam);
 
 /*!
+ * Searches for variable with name \param theName in the document. 
+ * If found, set it value in the \param outValue and returns true.
+ */
+MODELAPI_EXPORT bool findVariable(const DocumentPtr& theDocument, const std::string& theName, 
+                                  double& outValue, ResultParameterPtr& theParam);
+
+/*!
  * Returns the values of the next random color. The values are in range [0, 255]
  * \param theValues a container of component of RGB value: red, green, blue
  */

@@ -72,6 +72,8 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
 
  protected:
   double evaluate(const std::string& theExpression, std::string& theError);
+  void updateName();
+  void updateExpression();
 
  private:
   std::shared_ptr<ParametersPlugin_PyInterp> myInterp;
