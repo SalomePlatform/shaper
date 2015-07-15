@@ -52,7 +52,11 @@ void editedValue(double& outValue, QString& outText)
   ModuleBase_ParamSpinBox* aEditor = new ModuleBase_ParamSpinBox(&aDlg);
   aEditor->setMinimum(0);
   aEditor->setMaximum(DBL_MAX);
-  aEditor->setValue(outValue);
+  if (outText.isEmpty())
+    aEditor->setValue(outValue);
+  else
+    aEditor->setText(outText);
+
   aLay->addWidget(aEditor);
 
   aEditor->setFocus();
@@ -95,6 +99,9 @@ void ModuleBase_WidgetEditor::showPopupEditor()
   //QApplication::processEvents();
   double aValue = mySpinBox->value();
   QString aText;
+  if (mySpinBox->hasVariable())
+    aText = mySpinBox->text();
+
   editedValue(aValue, aText);
   if (aText.isEmpty()) {
     ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
