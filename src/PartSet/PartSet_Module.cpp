@@ -331,6 +331,20 @@ bool PartSet_Module::canRedo() const
   return aCanRedo;
 }
 
+bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const
+{
+  bool aValid = true;
+  if (theActionId == "DELETE_CMD" || theActionId == "MOVE_CMD") {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature) {
+      // part features are removed in the PartSet module only.
+      if (aFeature->getKind() == PartSetPlugin_Part::ID())
+        aValid = false;
+    }
+  }
+  return aValid;
+}
+
 bool PartSet_Module::canCommitOperation() const
 {
   return mySketchMgr->canCommitOperation();

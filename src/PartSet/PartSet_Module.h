@@ -100,6 +100,12 @@ public:
   /// \return the boolean result
   virtual bool canRedo() const;
 
+  /// Returnas true if the action can be applyed to the object
+  /// \param theObject a checked object
+  /// \param theActionId an identifier of action, to be found in the menu manager like "DELETE_CMD"
+  /// \return the a booean result
+  virtual bool canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const;
+
   /// Returns True if the current operation can be committed. Asks the sketch manager.
   /// \return a boolean value
   virtual bool canCommitOperation() const;

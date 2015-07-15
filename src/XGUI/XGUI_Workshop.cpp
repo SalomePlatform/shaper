@@ -1077,15 +1077,19 @@ void XGUI_Workshop::moveObjects()
 
   SessionPtr aMgr = ModelAPI_Session::get();
 
-  QString aDescription = contextMenuMgr()->action("MOVE_CMD")->text();
+  QString anActionId = "MOVE_CMD";
+  QString aDescription = contextMenuMgr()->action(anActionId)->text();
   aMgr->startOperation(aDescription.toStdString());
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   DocumentPtr anActiveDocument = aMgr->activeDocument();
 
   FeaturePtr aCurrentFeature = anActiveDocument->currentFeature(true);
-  foreach (ObjectPtr aObj, anObjects) {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+  foreach (ObjectPtr aObject, anObjects) {
+    if (!myModule->canApplyAction(aObject, anActionId))
+      continue;
+
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
     if (aFeature.get()) {
       anActiveDocument->moveFeature(aFeature, aCurrentFeature);
       aCurrentFeature = anActiveDocument->currentFeature(true);
@@ -1155,7 +1159,8 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
   anInfo.clear();
 #endif
 
-  QString anId = QString::fromStdString("DELETE_CMD");
+  QString anActionId = "DELETE_CMD";
+  QString anId = QString::fromStdString(anActionId.toStdString().c_str());
   QStringList anObjectGroups = contextMenuMgr()->actionObjectGroups(anId);
   // 4. remove the parameter features
   foreach (ObjectPtr aObj, theList) {
@@ -1165,13 +1170,16 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
     if (!anObjectGroups.contains(aGroupName.c_str()))
       continue;
 
+    if (!myModule->canApplyAction(aObj, anActionId))
+      continue;
+
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature) {
-      // TODO: to learn the workshop to delegate the Part object deletion to the PartSet module
+      /*// TODO: to learn the workshop to delegate the Part object deletion to the PartSet module
       // part features are removed in the PartSet module. This condition should be moved there
       if (aFeature->getKind() == "Part")
         continue;
-
+        */
       DocumentPtr aDoc = aObj->document();
       if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
 #ifdef DEBUG_DELETE
@@ -1233,30 +1241,48 @@ std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
 
 bool XGUI_Workshop::canMoveFeature()
 {
+  QString anActionId = "MOVE_CMD";
+
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  QObjectPtrList aValidatedObjects;
   foreach (ObjectPtr aObject, aObjects) {
+    if (myModule->canApplyAction(aObject, anActionId))
+      aValidatedObjects.append(aObject);
+  }
+  if (aValidatedObjects.size() != aObjects.size())
+    aObjects = aValidatedObjects;
+
+  bool aCanMove = !aObjects.empty();
+
+  QObjectPtrList::const_iterator anIt = aObjects.begin(), aLast = aObjects.end();
+  for (; anIt != aLast && aCanMove; anIt++) {
+    ObjectPtr aObject = *anIt;
     // 1. Get features placed between selected and current in the document 
     std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(aObject);
     // if aFeaturesBetween is empty it means wrong order or aObject is the current feature
     if (aFeaturesBetween.empty())
-      return false;
-    std::set<FeaturePtr> aPlacedFeatures(aFeaturesBetween.begin(), aFeaturesBetween.end());
-    // 2. Get all reference features to the selected object in the document 
-    std::set<FeaturePtr> aRefFeatures;
-    XGUI_Tools::refsToFeatureInFeatureDocument(aObject, aRefFeatures);
+      aCanMove = false;
+    else {
+      std::set<FeaturePtr> aPlacedFeatures(aFeaturesBetween.begin(), aFeaturesBetween.end());
+      // 2. Get all reference features to the selected object in the document 
+      std::set<FeaturePtr> aRefFeatures;
+      XGUI_Tools::refsToFeatureInFeatureDocument(aObject, aRefFeatures);
 
-    if (aRefFeatures.empty())
-      continue;
-    // 3. Find any placed features in all reference features
-    std::set<FeaturePtr> aIntersectionFeatures;
-    std::set_intersection(aRefFeatures.begin(), aRefFeatures.end(),
-                          aPlacedFeatures.begin(), aPlacedFeatures.end(),
-                          std::inserter(aIntersectionFeatures, aIntersectionFeatures.begin()));
-    // 4. Return false if any reference feature is placed before curent feature
-    if (!aIntersectionFeatures.empty())
-      return false;
+      if (aRefFeatures.empty())
+        continue;
+      else {
+        // 3. Find any placed features in all reference features
+        std::set<FeaturePtr> aIntersectionFeatures;
+        std::set_intersection(aRefFeatures.begin(), aRefFeatures.end(),
+                              aPlacedFeatures.begin(), aPlacedFeatures.end(),
+                              std::inserter(aIntersectionFeatures, aIntersectionFeatures.begin()));
+        // 4. Return false if any reference feature is placed before curent feature
+        if (!aIntersectionFeatures.empty())
+          aCanMove = false;
+      }
+    }
   }
-  return true;
+  return aCanMove;
 }
 
 //**************************************************************

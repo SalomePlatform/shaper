@@ -120,6 +120,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! Returns True if there are available Redos and there is not an active operation
   virtual bool canRedo() const;
 
+  /// Returnas true if the action can be applyed to the object
+  /// \param theObject a checked object
+  /// \param theActionId an identifier of action, to be found in the menu manager like "DELETE_CMD"
+  /// \return the a booean result
+  virtual bool canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const = 0;
+
   /// Returns True if the current operation can be committed. By default it is true.
   /// \return a boolean value
   virtual bool canCommitOperation() const;
