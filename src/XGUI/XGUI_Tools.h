@@ -78,6 +78,11 @@ std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
  */
 bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aList);
 
+/*! 
+ Returns true if theObject can be renamed in theName
+ */
+bool canRename(QWidget* theParent, const ObjectPtr& theObject, const QString& theName);
+
 /*!
  Returns true if there are no parts in the document, which are not activated
  \return a boolean value

@@ -47,9 +47,6 @@ public slots:
   /// Commit modified data (used for renaming of objects)
   virtual void commitData(QWidget* theEditor);
 
-  /// Returns true if theObject can be renamed in theName
-  bool canRename(const ObjectPtr& theObject, const QString& theName);
-
  protected:
    /// Redefinition of virtual method
   virtual void contextMenuEvent(QContextMenuEvent* theEvent);

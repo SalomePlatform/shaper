@@ -95,7 +95,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->startOperation("Rename");
 
-    if (!canRename(aObj, aName)) {
+    if (!XGUI_Tools::canRename(this, aObj, aName)) {
       aMgr->abortOperation();
       return;
     }
@@ -103,21 +103,6 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
     aObj->data()->setName(qPrintable(aName));
     aMgr->finishOperation();
   }
-}
-
-bool XGUI_DataTree::canRename(const ObjectPtr& theObject, const QString& theName)
-{
-  double aValue;
-  ResultParameterPtr aParam;
-
-  bool isVariableFound = ModelAPI_Tools::findVariable(theObject->document(), qPrintable(theName), aValue, aParam);
-
-  if (isVariableFound)
-    QMessageBox::information(this, tr("Rename parameter"),
-      QString(tr("Selected parameter can not be renamed to: %1. \
-There is a parameter with the same name. Its value is: %2.")).arg(qPrintable(theName)).arg(aValue));
-
-  return !isVariableFound;
 }
 
 void XGUI_DataTree::clear() 
