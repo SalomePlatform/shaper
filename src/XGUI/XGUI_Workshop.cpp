@@ -857,9 +857,11 @@ void XGUI_Workshop::updateCompositeActionState()
   // e.g. sketch can be applyed only if at least one nested element create is finished
   bool aCanUndo = ModelAPI_Session::get()->canUndo();
   bool aParentValid = operationMgr()->isParentOperationValid();
+  bool aCurrentValid = operationMgr()->currentOperation() &&
+                       operationMgr()->currentOperation()->isValid();
 
   QAction* aAcceptAllAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
-  aAcceptAllAct->setEnabled(aParentValid && aCanUndo);
+  aAcceptAllAct->setEnabled(aParentValid && (aCanUndo || aCurrentValid));
 }
 
 void XGUI_Workshop::updateHistory()
