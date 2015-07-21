@@ -19,6 +19,7 @@ class ModelAPI_Object;
 class ModelAPI_Result;
 class ModelAPI_ResultConstruction;
 class ModelAPI_ResultBody;
+class ModelAPI_ResultCompSolid;
 class ModelAPI_ResultPart;
 class ModelAPI_ResultGroup;
 class ModelAPI_ResultParameter;
@@ -120,6 +121,9 @@ public:
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   //! Creates a body results
   virtual std::shared_ptr<ModelAPI_ResultBody> createBody(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  /// Creates a compsolid results
+  virtual std::shared_ptr<ModelAPI_ResultCompSolid> createCompSolid(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   //! Creates a part results
   virtual std::shared_ptr<ModelAPI_ResultPart> createPart(

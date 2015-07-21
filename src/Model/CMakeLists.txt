@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
     Model_Update.h
     Model_Validator.h
     Model_ResultBody.h
+    Model_ResultCompSolid.h
     Model_ResultConstruction.h
     Model_ResultPart.h
     Model_ResultGroup.h
@@ -52,6 +53,7 @@ SET(PROJECT_SOURCES
     Model_Update.cpp
     Model_Validator.cpp
     Model_ResultBody.cpp
+    Model_ResultCompSolid.cpp
     Model_ResultConstruction.cpp
     Model_ResultPart.cpp
     Model_ResultGroup.cpp

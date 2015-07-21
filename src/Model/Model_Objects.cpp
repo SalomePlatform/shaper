@@ -12,6 +12,7 @@
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
+#include <Model_ResultCompSolid.h>
 #include <Model_ResultGroup.h>
 #include <Model_ResultParameter.h>
 #include <ModelAPI_Validator.h>
@@ -758,6 +759,23 @@ std::shared_ptr<ModelAPI_ResultBody> Model_Objects::createBody(
   }
   if (!aResult) {
     aResult = std::shared_ptr<ModelAPI_ResultBody>(new Model_ResultBody);
+    storeResult(theFeatureData, aResult, theIndex);
+  }
+  return aResult;
+}
+
+std::shared_ptr<ModelAPI_ResultCompSolid> Model_Objects::createCompSolid(
+    const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultCompSolid::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
+  std::shared_ptr<ModelAPI_ResultCompSolid> aResult;
+  if (anOldObject) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = std::shared_ptr<ModelAPI_ResultCompSolid>(new Model_ResultCompSolid);
     storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;

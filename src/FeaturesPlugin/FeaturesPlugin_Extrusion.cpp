@@ -11,6 +11,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -25,6 +26,8 @@
 #define _FIRST_TAG 2
 #define _LAST_TAG 3
 #define EDGE 6
+
+//#define DEBUG_COMPSOLID
 
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
@@ -120,7 +123,12 @@ void FeaturesPlugin_Extrusion::execute()
     }
 
     for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
+      //ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+#ifdef DEBUG_COMPSOLID
+      ResultCompSolidPtr aResultBody = document()->createCompSolid(data(), aResultIndex);
+#else
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+#endif
       std::shared_ptr<GeomAPI_Shape> aBaseShape;
       if (aFacesNum == -1) {
         aBaseShape = aValueFace;
@@ -147,8 +155,10 @@ void FeaturesPlugin_Extrusion::execute()
         break;
       }
       //LoadNamingDS
+#ifdef DEBUG_COMPSOLID
+#else
       LoadNamingDS(aFeature, aResultBody, aBaseShape, aContext);
-
+#endif
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
 

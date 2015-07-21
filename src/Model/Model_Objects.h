@@ -100,6 +100,9 @@ class Model_Objects
   /// Creates a body results
   std::shared_ptr<ModelAPI_ResultBody> createBody(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  /// Creates a body results
+  std::shared_ptr<ModelAPI_ResultCompSolid> createCompSolid(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a part results
   std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
