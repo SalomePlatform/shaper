@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	XGUI_DataModel.h
 	XGUI_Displayer.h
 	XGUI_ErrorDialog.h
+	XGUI_ErrorMgr.h
 	XGUI_HistoryMenu.h
 	XGUI_ModuleConnector.h
 	XGUI_ObjectsBrowser.h
@@ -39,6 +40,7 @@ SET(PROJECT_SOURCES
 	XGUI_DataModel.cpp
 	XGUI_Displayer.cpp
 	XGUI_ErrorDialog.cpp
+	XGUI_ErrorMgr.cpp
 	XGUI_HistoryMenu.cpp
 	XGUI_ModuleConnector.cpp
 	XGUI_ObjectsBrowser.cpp

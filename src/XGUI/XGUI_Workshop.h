@@ -24,6 +24,7 @@ class XGUI_ActionsMgr;
 class XGUI_ContextMenuMgr;
 class XGUI_Displayer;
 class XGUI_ErrorDialog;
+class XGUI_ErrorMgr;
 class XGUI_ModuleConnector;
 class XGUI_ObjectsBrowser;
 class XGUI_OperationMgr;
@@ -399,6 +400,7 @@ private:
 private:
   AppElements_MainWindow* myMainWindow;
   ModuleBase_IModule* myModule;
+  XGUI_ErrorMgr* myErrorMgr;
   XGUI_ObjectsBrowser* myObjectBrowser;
   XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;

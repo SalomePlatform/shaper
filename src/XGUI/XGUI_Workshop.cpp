@@ -8,6 +8,7 @@
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_ErrorDialog.h"
+#include "XGUI_ErrorMgr.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_OperationMgr.h"
@@ -125,6 +126,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
+  myErrorMgr = new XGUI_ErrorMgr(this);
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
   connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,
           SLOT(onContextMenuCommand(const QString&, bool)));
@@ -150,6 +152,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onOperationCommitted(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
           SLOT(onOperationAborted(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(validationStateChanged(bool)), 
+          myErrorMgr, SLOT(onValidationStateChanged()));
+
   if (myMainWindow)
     connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
@@ -483,6 +488,8 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
   myModule->propertyPanelDefined(theOperation);
 
   myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
+
+  myErrorMgr->setPropertyPanel(myPropertyPanel);
 }
 
 /*

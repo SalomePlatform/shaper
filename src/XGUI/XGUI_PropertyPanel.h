@@ -50,6 +50,9 @@ Q_OBJECT
 
   virtual ~XGUI_PropertyPanel();
 
+  /// Returns header widget
+  virtual QWidget* headerWidget() const { return myHeaderWidget; }
+
   /// Returns main widget of the property panel, which children will be created
   /// by WidgetFactory using the XML definition
   ModuleBase_PageBase* contentWidget();
@@ -107,6 +110,9 @@ Q_OBJECT
   * \param theWidget which has to be activated
   */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
+
+ protected:
+  QWidget* myHeaderWidget;
 
  private:
   ModuleBase_PageWidget* myPanelPage;

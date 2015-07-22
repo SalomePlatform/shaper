@@ -56,6 +56,8 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   ModuleBase_Tools::zeroMargins(aBtnLay);
   aMainLayout->addWidget(aFrm, aPanelRow++, kPanelColumn);
 
+  myHeaderWidget = aFrm;
+
   QStringList aBtnNames;
   aBtnNames << QString(PROP_PANEL_HELP)
             << QString(PROP_PANEL_OK)

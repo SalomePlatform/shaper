@@ -29,6 +29,9 @@ public:
   /// \param theParent is a parent of the property panel
   ModuleBase_IPropertyPanel(QWidget* theParent);
 
+  /// Returns header widget
+  virtual QWidget* headerWidget() const = 0;
+
   /// Returns currently active widget
   virtual ModuleBase_ModelWidget* activeWidget() const = 0;
 
