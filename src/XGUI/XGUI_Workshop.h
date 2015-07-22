@@ -20,23 +20,23 @@ class AppElements_MainWindow;
 class AppElements_Command;
 class AppElements_Workbench;
 
-class XGUI_SelectionMgr;
-class XGUI_Displayer;
-class XGUI_OperationMgr;
-class XGUI_SalomeConnector;
-class XGUI_ObjectsBrowser;
 class XGUI_ActionsMgr;
-class XGUI_ErrorDialog;
-class XGUI_SalomeViewer;
-class XGUI_ViewerProxy;
-class XGUI_PropertyPanel;
 class XGUI_ContextMenuMgr;
+class XGUI_Displayer;
+class XGUI_ErrorDialog;
 class XGUI_ModuleConnector;
+class XGUI_ObjectsBrowser;
+class XGUI_OperationMgr;
+class XGUI_PropertyPanel;
+class XGUI_SalomeConnector;
+class XGUI_SalomeViewer;
+class XGUI_SelectionMgr;
+class XGUI_ViewerProxy;
 class XGUI_WorkshopListener;
 
-class ModuleBase_Operation;
 class ModuleBase_IModule;
 class ModuleBase_IViewer;
+class ModuleBase_Operation;
 
 class QWidget;
 class QDockWidget;

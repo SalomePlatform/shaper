@@ -9,8 +9,10 @@ SET(PROJECT_HEADERS
 	XGUI_ColorDialog.h
 	XGUI_ContextMenuMgr.h
 	XGUI_CustomPrs.h
+	XGUI_DataModel.h
 	XGUI_Displayer.h
 	XGUI_ErrorDialog.h
+	XGUI_HistoryMenu.h
 	XGUI_ModuleConnector.h
 	XGUI_ObjectsBrowser.h
 	XGUI_OperationMgr.h
@@ -23,8 +25,6 @@ SET(PROJECT_HEADERS
 	XGUI_ViewerProxy.h
 	XGUI_Workshop.h
 	XGUI_WorkshopListener.h
-	XGUI_HistoryMenu.h
-	XGUI_DataModel.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -36,8 +36,10 @@ SET(PROJECT_SOURCES
 	XGUI_ColorDialog.cpp
 	XGUI_ContextMenuMgr.cpp
 	XGUI_CustomPrs.cpp
+	XGUI_DataModel.cpp
 	XGUI_Displayer.cpp
 	XGUI_ErrorDialog.cpp
+	XGUI_HistoryMenu.cpp
 	XGUI_ModuleConnector.cpp
 	XGUI_ObjectsBrowser.cpp
 	XGUI_OperationMgr.cpp
@@ -50,8 +52,6 @@ SET(PROJECT_SOURCES
 	XGUI_ViewerProxy.cpp
 	XGUI_Workshop.cpp
 	XGUI_WorkshopListener.cpp
-	XGUI_HistoryMenu.cpp
-	XGUI_DataModel.cpp
 )
 
 SET(PROJECT_RESOURCES 

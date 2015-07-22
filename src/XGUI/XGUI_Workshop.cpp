@@ -1,50 +1,47 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 //#include "XGUI_Constants.h"
-#include "XGUI_Tools.h"
 #include "XGUI_Workshop.h"
-#include "XGUI_SelectionMgr.h"
-#include "XGUI_Selection.h"
-#include "XGUI_ObjectsBrowser.h"
-#include "XGUI_Displayer.h"
-#include "XGUI_OperationMgr.h"
-#include "XGUI_SalomeConnector.h"
+
 #include "XGUI_ActionsMgr.h"
-#include "XGUI_ErrorDialog.h"
 #include "XGUI_ColorDialog.h"
-#include "XGUI_ViewerProxy.h"
-#include "XGUI_PropertyPanel.h"
 #include "XGUI_ContextMenuMgr.h"
+#include "XGUI_Displayer.h"
+#include "XGUI_ErrorDialog.h"
 #include "XGUI_ModuleConnector.h"
+#include "XGUI_ObjectsBrowser.h"
+#include "XGUI_OperationMgr.h"
+#include "XGUI_PropertyPanel.h"
+#include "XGUI_SalomeConnector.h"
+#include "XGUI_Selection.h"
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_Tools.h"
+#include "XGUI_ViewerProxy.h"
 #include "XGUI_WorkshopListener.h"
-
-#include <XGUI_QtEvents.h>
-#include <XGUI_HistoryMenu.h>
 #include <XGUI_CustomPrs.h>
+#include <XGUI_HistoryMenu.h>
+#include <XGUI_QtEvents.h>
 
-#include <AppElements_Workbench.h>
-#include <AppElements_Viewer.h>
+#include <AppElements_Button.h>
 #include <AppElements_Command.h>
 #include <AppElements_MainMenu.h>
 #include <AppElements_MainWindow.h>
 #include <AppElements_MenuGroupPanel.h>
-#include <AppElements_Button.h>
+#include <AppElements_Viewer.h>
+#include <AppElements_Workbench.h>
 
-#include <ModuleBase_IModule.h>
-#include <ModuleBase_Preferences.h>
-
-#include <ModelAPI_Events.h>
-#include <ModelAPI_Session.h>
-#include <ModelAPI_Feature.h>
-#include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
-#include <ModelAPI_Object.h>
-#include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultGroup.h>
-#include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Events.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -52,20 +49,21 @@
 #include <Events_Error.h>
 #include <Events_LongOp.h>
 
+#include <ModuleBase_FilterFactory.h>
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
-#include <ModuleBase_SelectionValidator.h>
-#include <ModuleBase_WidgetFactory.h>
-#include <ModuleBase_Tools.h>
-#include <ModuleBase_IViewer.h>
-#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_PageBase.h>
+#include <ModuleBase_Preferences.h>
+#include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_WidgetFactory.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
-#include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
+#include <Config_PointerMessage.h>
 #include <Config_PropManager.h>
 #include <Config_SelectionFilterMessage.h>
 
