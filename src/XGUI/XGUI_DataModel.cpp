@@ -8,12 +8,59 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Events.h>
+
+#include <Config_FeatureMessage.h>
+
+#include <Events_Loop.h>
 
 #include <QIcon>
 
 XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)
 {
   myXMLReader.readAll();
+
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName(Config_FeatureMessage::GUI_EVENT()));
+}
+
+//******************************************************
+void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  std::string aRootType = myXMLReader.rootType();
+  int aNbFolders = myXMLReader.rootFoldersNumber();
+
+  // Created object event *******************
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+
+    std::set<ObjectPtr>::const_iterator aIt;
+    std::string aObjType;
+    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+      ObjectPtr aObject = (*aIt);
+      aObjType = aObject->groupName();
+      DocumentPtr aDoc = aObject->document();
+      if (aDoc == aRootDoc) {
+        int aRow = aRootDoc->size(aObjType) - 1;
+        if (aRow != -1) {
+          if (aObjType == aRootType) {
+            insertRow(aRow + aNbFolders);
+          } else {
+            int aFolderId = myXMLReader.rootFolderId(aObjType);
+            if (aFolderId != -1) {
+              insertRow(aRow, createIndex(aFolderId, 0, -1));
+            }
+          } 
+        }
+      }
+    }
+  }
 }
 
 //******************************************************
@@ -37,7 +84,12 @@ ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
 //******************************************************
 QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
 {
-  return QModelIndex();
+  //std::string aType = theObject->groupName();
+  //DocumentPtr aDoc = theObject->document();
+  //int aRow = aDoc->index(theObject);
+  //if (aRow == -1)
+    return QModelIndex();
+  //return createIndex(aRow, 0, theObject.get());
 }
 
 //******************************************************
@@ -49,11 +101,11 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
   int theIndexRow = theIndex.row();
 
   if ((theIndex.column() == 1) ) {
-    if (theIndexRow >= aNbFolders) {
-      if (theRole == Qt::DecorationRole) {
-        return QIcon(":pictures/arrow.png");
-      }
-    }
+    //if (theIndexRow >= aNbFolders) {
+    //  if (theRole == Qt::DecorationRole) {
+    //    return QIcon(":pictures/arrow.png");
+    //  }
+    //}
     return QVariant();
   }
 
@@ -164,3 +216,19 @@ bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
   return false;
 }
 
+//******************************************************
+bool XGUI_DataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
+{
+  beginInsertRows(theParent, theRow, theRow + theCount - 1);
+  endInsertRows();
+
+  return true;
+}
+
+//******************************************************
+bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& theParent)
+{
+  beginRemoveRows(theParent, theRow, theRow + theCount - 1);
+  endRemoveRows();
+  return true;
+}

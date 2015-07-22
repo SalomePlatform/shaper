@@ -50,6 +50,10 @@ class Config_DataModelReader : public Config_XMLReader
   /// \param theId id of the folder
   CONFIG_EXPORT std::string rootFolderIcon(int theId) const { return myRootFolderIcons[theId]; }
 
+  /// Returns id of a folder containing the given type
+  /// \param theType type of objects in folder
+  CONFIG_EXPORT int rootFolderId(std::string theType) const;
+
  protected:
   /// Overloaded method. Defines how to process each node
   virtual void processNode(xmlNodePtr theNode);

@@ -12,12 +12,23 @@
 #include <ModelAPI_Object.h>
 #include <Config_DataModelReader.h>
 #include <QAbstractItemModel>
+#include <Events_Listener.h>
 
-class XGUI_EXPORT XGUI_DataModel : public QAbstractItemModel
+
+/**\class XGUI_DataModel
+ * \ingroup GUI
+ * \brief This is a data model for Object Browser (QTreeView).
+ * It uses XML file for definition of data tree.
+ */
+class XGUI_EXPORT XGUI_DataModel : public QAbstractItemModel, public Events_Listener
 {
 Q_OBJECT
 public:
   XGUI_DataModel(QObject* theParent);
+
+  /// Event Listener method
+  /// \param theMessage an event message
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   //! Returns an object by the given Model index.
   //! Returns 0 if the given index is not index of an object
@@ -71,6 +82,19 @@ public:
   /// Returns true if parent has any children; otherwise returns false.
   /// \param theParent a parent model index
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
+
+  /// Inserts count rows into the model before the given row. 
+  /// Items in the new row will be children of the item represented by the parent model index.
+  /// \param theRow a start row
+  /// \param theCount a nember of rows to insert
+  /// \param theParent a parent model index
+  virtual bool insertRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
+
+  /// Removes count rows starting with the given row under parent parent from the model.
+  /// \param theRow a start row
+  /// \param theCount a nember of rows to remove
+  /// \param theParent a parent model index
+  virtual bool removeRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
 
 
 private:

@@ -38,3 +38,14 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     myRootTypes = getProperty(theNode, GROUP_TYPE);
   }
 }
+
+int Config_DataModelReader::rootFolderId(std::string theType) const
+{
+  std::vector<std::string>::const_iterator aIt;
+  int aId;
+  for (aIt = myRootFolderTypes.cbegin(), aId = 0; aIt != myRootFolderTypes.cend(); ++aIt, ++aId) {
+    if ((*aIt) == theType)
+      return aId;
+  }
+  return -1;
+}
