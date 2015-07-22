@@ -2,6 +2,7 @@
 
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Tools.h"
+#include "XGUI_DataModel.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
@@ -349,7 +350,11 @@ void XGUI_ObjectsBrowser::clearContent()
 
 void XGUI_ObjectsBrowser::setDataModel(ModuleBase_IDocumentDataModel* theModel)
 {
+#ifdef ModuleDataModel
   myDocModel = theModel;
+#else
+  myDocModel = new XGUI_DataModel(this);
+#endif
   myTreeView->setModel(myDocModel);
   QItemSelectionModel* aSelMod = myTreeView->selectionModel();
   connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -366,7 +371,11 @@ QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes)
 {
   QObjectPtrList aList;
   QModelIndexList aIndexes = selectedIndexes();
+#ifdef ModuleDataModel
   ModuleBase_IDocumentDataModel* aModel = dataModel();
+#else
+  XGUI_DataModel* aModel = dataModel();
+#endif
   QModelIndexList::const_iterator aIt;
   for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
     if ((*aIt).column() == 0) {

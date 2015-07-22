@@ -14,6 +14,9 @@
 
 class ModuleBase_IDocumentDataModel;
 class QLineEdit;
+class XGUI_DataModel;
+
+#define ModuleDataModel
 
 /**
 * \ingroup GUI
@@ -70,10 +73,17 @@ Q_OBJECT
   virtual ~XGUI_ObjectsBrowser();
 
   //! Returns Model which provides access to data objects
+#ifdef ModuleDataModel
   ModuleBase_IDocumentDataModel* dataModel() const
   {
     return myDocModel;
   }
+#else
+  XGUI_DataModel* dataModel() const
+  {
+    return myDocModel;
+  }
+#endif
 
   //! Returns list of currently selected objects
   //! \param theIndexes - output list of corresponded indexes (can be NULL)
@@ -140,8 +150,11 @@ signals:
   void closeDocNameEditing(bool toSave);
 
   //! Internal model
+#ifdef ModuleDataModel
   ModuleBase_IDocumentDataModel* myDocModel;
-
+#else
+  XGUI_DataModel* myDocModel;
+#endif
   QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 };

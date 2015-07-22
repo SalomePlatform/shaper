@@ -95,6 +95,14 @@ const static char* PLUGIN_DEPENDENCY = "dependency";
 const static char* PLUGIN_PLATFORM_SALOME = "salome";
 const static char* PLUGIN_PLATFORM_NEWGEOM = "openparts";
 
-
+/*
+ * Hardcoded xml entities of dataModel.xml
+ */
+const static char* DATAMODEL_FILE = "dataModel.xml";
+const static char* NODE_FOLDER = "folder";
+const static char* FOLDER_NAME = "name";
+const static char* GROUP_TYPE = "group_type";
+const static char* ROOT_NODE = "tree_root";
+const static char* NODE_ICON = "icon";
 
 #endif /* CONFIG_KEYWORDS_H_ */

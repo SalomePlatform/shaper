@@ -23,6 +23,7 @@ SET(PROJECT_HEADERS
   Config_AttributeMessage.h
   Config_SelectionFilterMessage.h
   Config_ValidatorReader.h
+  Config_DataModelReader.h
  )
  
 SET(PROJECT_SOURCES
@@ -40,10 +41,12 @@ SET(PROJECT_SOURCES
   Config_AttributeMessage.cpp
   Config_SelectionFilterMessage.cpp
   Config_ValidatorReader.cpp
+  Config_DataModelReader.cpp
 )
 
 SET(XML_RESOURCES
   plugins.xml
+  dataModel.xml
 )
 
 SET(PROJECT_LIBRARIES

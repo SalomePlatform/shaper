@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
 	XGUI_Workshop.h
 	XGUI_WorkshopListener.h
 	XGUI_HistoryMenu.h
+	XGUI_DataModel.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -50,6 +51,7 @@ SET(PROJECT_SOURCES
 	XGUI_Workshop.cpp
 	XGUI_WorkshopListener.cpp
 	XGUI_HistoryMenu.cpp
+	XGUI_DataModel.cpp
 )
 
 SET(PROJECT_RESOURCES 

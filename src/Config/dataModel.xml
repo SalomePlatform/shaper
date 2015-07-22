@@ -1,0 +1,8 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+<data_model>
+    <tree_root group_type="Features">
+        <folder name="Parameters" group_type="Parameters" icon=":pictures/constr_folder.png"/>
+        <folder name="Constructions" group_type="Construction" icon=":pictures/constr_folder.png"/>
+        <folder name="Parts" group_type="Parts" icon=":pictures/constr_folder.png"/>
+    </tree_root>
+</data_model>
