@@ -25,10 +25,10 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   // "Action" features has no data, but still valid. e.g "Remove Part"  
   if (!aData->isValid()) {
+    if (!theFeature->isAction())
+      theError = "There is no data.";
     return theFeature->isAction();
   }
-  if (!aData->isValid())
-    return false;
   const std::string kAllTypes = "";
   std::list<std::string> aLtAttributes = aData->attributesIDs(kAllTypes);
   std::list<std::string>::iterator it = aLtAttributes.begin();
@@ -41,6 +41,7 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
         myNotObligatory.find(theFeature->getKind());
       if (aFeatureFind == myNotObligatory.end() || // and it is obligatory for filling
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
+        theError = "Attribute \"" + anAttr->id() + "\" is not initialized.";
         return false;
       }
     }

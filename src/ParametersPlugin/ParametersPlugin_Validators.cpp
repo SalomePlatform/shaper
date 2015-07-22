@@ -25,8 +25,15 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
                                                  std::string& theError) const
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
-  bool result = isVariable(aStrAttr->value()) && isUnique(theAttribute, aStrAttr->value());
-  return result;
+  if (!isVariable(aStrAttr->value())) {
+    theError = "Incorrect variable name.";
+    return false;
+  } 
+  if (!isUnique(theAttribute, aStrAttr->value())) {
+    theError = "Variable name is not unique.";
+    return false;
+  }
+  return true;
 }
 
 bool ParametersPlugin_VariableValidator::isVariable(const std::string& theString) const
@@ -84,13 +91,18 @@ bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttrib
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
 
   AttributeStringPtr aStrAttr =
-    std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
+      std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   bool isEmptyExpr = aStrAttr->value().empty();
-  if(isEmptyExpr)
+  if(isEmptyExpr) {
+    theError = "Expression is empty.";
     return false;
+  }
 
-  if(!aParam.get())
+  if(!aParam.get()) {
+    theError = "Result is empty.";
     return false;
+  }
 
+  theError = aFeature->error();
   return aFeature->error().empty();
 }
