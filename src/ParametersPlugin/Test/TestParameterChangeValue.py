@@ -51,15 +51,15 @@ class TestParameterRename(unittest.TestCase):
         ltNames = ["x1", "y1", "x2"]
         ltExpressions = ["150.", "200.", "x1 + y1 + 100.0"]
         self.dtParams = {}
-        self.aSession.startOperation()
         for name, expr in zip(ltNames, ltExpressions):
+            self.aSession.startOperation()
             aParam = self.aDocument.addFeature("Parameter")
             aParamName = aParam.string("variable")
             aParamName.setValue(name)
             aParamExpr = aParam.string("expression")
             aParamExpr.setValue(expr)
             self.dtParams[name] = aParam
-        self.aSession.finishOperation()
+            self.aSession.finishOperation()
         self.assertEqual(len(self.dtParams), len(ltNames))
 
         aParam = self.dtParams["x2"]
