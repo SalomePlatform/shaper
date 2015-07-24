@@ -452,7 +452,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     std::shared_ptr<ModelAPI_AttributeSelection> aSel =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
     ObjectPtr aContext = aSel->context();
-    // update argument onlt if the referenced object is changed
+    // update argument only if the referenced object is changed
     if (aContext.get() && !aContext->isDisabled() && 
       (myJustUpdated.find(aContext) != myJustUpdated.end() ||
       aContext->data()->updateID() > theFeature->data()->updateID())) {

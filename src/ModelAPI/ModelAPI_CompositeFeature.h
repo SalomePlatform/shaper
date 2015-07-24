@@ -33,7 +33,7 @@ public:
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   virtual int subFeatureId(const int theIndex) const = 0;
 
-  /// Returns true if feature or reuslt belong to this composite feature as subs
+  /// Returns true if feature or result belong to this composite feature as subs
   virtual bool isSub(ObjectPtr theObject) const = 0;
 
   /// This method to inform that sub-feature is removed and must be removed from the internal data

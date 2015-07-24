@@ -281,7 +281,7 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   if (!aMessage.get() || aMessage->oldName().empty() || aMessage->newName().empty())
     return;
 
-  // check if the renamed object is a result perameter
+  // check if the renamed object is a result parameter
   ResultParameterPtr aResultParameter =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aMessage->object());
   if (!aResultParameter.get()) 

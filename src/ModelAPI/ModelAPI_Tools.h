@@ -8,12 +8,14 @@
 #define ModelAPI_Tools_HeaderFile
 
 #include "ModelAPI.h"
-#include <ModelAPI_Result.h>
-#include <ModelAPI_ResultParameter.h>
+
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
+#include <ModelAPI_ResultParameter.h>
+
 #include <GeomAPI_Shape.h>
-#include <ModelAPI_CompositeFeature.h>
 
 #include <vector>
 
@@ -46,12 +48,12 @@ MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues);
  * Searches for Part result that contains the reference to the given document.
  * \param theMain document that contains the searched feature
  * \param theSub document that is searched, the resulting feature references to it
- * \returns numm if not found
+ * \returns null if not found
  */
 MODELAPI_EXPORT ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub);
 
 /*!
- * Returns the cpomposite feature - parent of this feature.
+ * Returns the composite feature - parent of this feature.
  * \param theFeature the sub-element of composite
  * \returns null if it is not sub-element of composite
  */

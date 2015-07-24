@@ -402,9 +402,9 @@ void Model_Data::referencesToObjects(
   FeaturePtr aMyFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myObject);
 
   std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
-  std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory menagement
+  std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory management
   for(; anAttr != myAttrs.end(); anAttr++) {
-    // skip not-case attributres, that really may refer to anything not-used (issue 671)
+    // skip not-case attributes, that really may refer to anything not-used (issue 671)
     if (aMyFeature.get() && !aValidators->isCase(aMyFeature, anAttr->second->id()))
       continue;
 
