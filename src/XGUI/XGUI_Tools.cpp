@@ -174,7 +174,7 @@ bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 
 //**************************************************************
 void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
-                                 std::set<FeaturePtr>& theRefFeatures)
+                                 std::set<FeaturePtr>& theDirectRefFeatures, std::set<FeaturePtr>& theIndirectRefFeatures)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (!aFeature.get())
@@ -187,7 +187,7 @@ void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectP
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
     if (!isSubOfComposite(theSourceObject, *anIt))
-      theRefFeatures.insert(*anIt);
+      theDirectRefFeatures.insert(*anIt);
   }
 
   // 2. find references in all documents if the document of the feature is
@@ -242,19 +242,19 @@ void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectP
           }
         }
         if (aHasReferenceToObject && !isSubOfComposite(theSourceObject, aFeature))
-          theRefFeatures.insert(aFeature);
+          theDirectRefFeatures.insert(aFeature);
       }
     }
   }
 
-  // Run recursion. It is possible recusive dependency, like the folowing: plane, extrusion uses plane,
+  // Run recursion. It is possible recursive dependency, like the following: plane, extrusion uses plane,
   // axis is built on extrusion. Delete of a plane should check the dependency from the axis also.
   std::set<FeaturePtr> aRecursiveRefFeatures;
-  std::set<FeaturePtr>::const_iterator aFeatureIt = theRefFeatures.begin();
-  for (; aFeatureIt != theRefFeatures.end(); ++aFeatureIt) {
-    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, aRecursiveRefFeatures);
+  std::set<FeaturePtr>::const_iterator aFeatureIt = theDirectRefFeatures.begin();
+  for (; aFeatureIt != theDirectRefFeatures.end(); ++aFeatureIt) {
+    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, aRecursiveRefFeatures, aRecursiveRefFeatures);
   } 
-  theRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
+  theIndirectRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
 }
 
 }

@@ -119,7 +119,8 @@ bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& 
  */
 void XGUI_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
                                              const ObjectPtr& theObject,
-                                             std::set<FeaturePtr>& theRefFeatures);
+                                             std::set<FeaturePtr>& theDirectRefFeatures,
+                                             std::set<FeaturePtr>& theIndirectRefFeatures);
 };
 
 #endif

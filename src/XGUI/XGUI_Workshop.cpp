@@ -85,6 +85,8 @@
 #include <QAction>
 #include <QDesktopWidget>
 
+#include <iterator>
+
 #ifdef _DEBUG
 #include <QDebug>
 #include <iostream>
@@ -1126,32 +1128,42 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
 #endif
 
   // 1. find all referenced features
-  std::set<FeaturePtr> aRefFeatures;
+  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
   foreach (ObjectPtr aDeletedObj, theList) {
-    XGUI_Tools::refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, aRefFeatures);
+    XGUI_Tools::refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, aDirectRefFeatures, aIndirectRefFeatures);
+    std::set<FeaturePtr> aDifference;
+    std::set_difference(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end(), 
+                        aDirectRefFeatures.begin(), aDirectRefFeatures.end(), 
+                        std::inserter(aDifference, aDifference.begin()));
+    aIndirectRefFeatures = aDifference;
   }
   // 2. warn about the references remove, break the delete operation if the user chose it
-  if (theAskAboutDeleteReferences && !aRefFeatures.empty()) {
-    QStringList aRefNames;
-    std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                         aLast = aRefFeatures.end();
-    for (; anIt != aLast; anIt++) {
-      aRefNames.append((*anIt)->name().c_str());
-    }
-    QString aNames = aRefNames.join(", ");
+  if (theAskAboutDeleteReferences && !aDirectRefFeatures.empty()) {
+    QStringList aDirectRefNames;
+    foreach(const FeaturePtr& aFeature, aDirectRefFeatures)
+      aDirectRefNames.append(aFeature->name().c_str());
+    QString aDirectNames = aDirectRefNames.join(", ");
+
+    QStringList aIndirectRefNames;
+    foreach(const FeaturePtr& aFeature, aIndirectRefFeatures)
+      aIndirectRefNames.append(aFeature->name().c_str());
+    QString aIndirectNames = aIndirectRefNames.join(", ");
 
     QMessageBox::StandardButton aRes = QMessageBox::warning(
         theParent, tr("Delete features"),
         QString(tr("Selected features are used in the following features: %1.\
-These features will be deleted also. Would you like to continue?")).arg(aNames),
+These features will be deleted.\n%2Would you like to continue?")).arg(aDirectNames)
+            .arg(aIndirectNames.isEmpty() ? QString() : QString("Also these features will be deleted: %1.\n").arg(aIndirectNames)),
         QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
     if (aRes != QMessageBox::Yes)
       return false;
   }
 
   // 3. remove referenced features
-  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                       aLast = aRefFeatures.end();
+  std::set<FeaturePtr> aFeaturesToDelete = aDirectRefFeatures;
+  aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
+  std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin(),
+                                       aLast = aFeaturesToDelete.end();
 #ifdef DEBUG_DELETE
   QStringList anInfo;
 #endif
