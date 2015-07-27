@@ -10,6 +10,7 @@
 
 #include "XGUI.h"
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Document.h>
 #include <Config_DataModelReader.h>
 #include <QAbstractItemModel>
 #include <Events_Listener.h>
@@ -107,6 +108,9 @@ public:
 
 
 private:
+  QModelIndex findDocumentRootIndex(ModelAPI_Document* theDoc) const;
+
+
   Config_DataModelReader myXMLReader;
 };
 

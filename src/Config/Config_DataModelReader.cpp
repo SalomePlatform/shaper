@@ -75,3 +75,14 @@ int Config_DataModelReader::rootFolderId(std::string theType) const
   }
   return -1;
 }
+
+int Config_DataModelReader::subFolderId(std::string theType) const
+{
+  std::vector<std::string>::const_iterator aIt;
+  int aId;
+  for (aIt = mySubFolderTypes.cbegin(), aId = 0; aIt != mySubFolderTypes.cend(); ++aIt, ++aId) {
+    if ((*aIt) == theType)
+      return aId;
+  }
+  return -1;
+}
