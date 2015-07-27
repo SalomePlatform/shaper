@@ -19,6 +19,11 @@
  * \ingroup GUI
  * \brief This is a data model for Object Browser (QTreeView).
  * It uses XML file for definition of data tree.
+ * Some tips about organization of the model:
+ * - Non Valid Index - root index
+ * - An index with internal Id == -1 is a folder of root document
+ * - An index which contains internal pointer as ModelAPI_Object its the object
+ * - An index which contains internal pointer as ModelAPI_Document is a folder which belongs to this document
  */
 class XGUI_EXPORT XGUI_DataModel : public QAbstractItemModel, public Events_Listener
 {
@@ -95,6 +100,10 @@ public:
   /// \param theCount a nember of rows to remove
   /// \param theParent a parent model index
   virtual bool removeRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
+
+  /// Returns the item flags for the given index.
+  /// \param theIndex a model index
+  virtual Qt::ItemFlags flags(const QModelIndex& theIndex) const;
 
 
 private:

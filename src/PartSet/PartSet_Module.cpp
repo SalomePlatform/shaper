@@ -761,12 +761,14 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
     aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     aLabel->setPalette(aPalet);
     aOB->treeView()->setExpandsOnDoubleClick(false);
+#ifdef ModuleDataModel
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
     connect(aOB, SIGNAL(headerMouseDblClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       myDataModel, SLOT(onMouseDoubleClick(const QModelIndex&)));
+#endif
   }
 }
 

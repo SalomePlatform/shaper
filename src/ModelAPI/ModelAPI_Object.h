@@ -9,6 +9,7 @@
 
 #include "ModelAPI.h"
 #include "ModelAPI_Data.h"
+#include "ModelAPI_Entity.h"
 
 #include <memory>
 
@@ -24,7 +25,7 @@ class ModelAPI_Document;
  * objects related to the features and their results. Contains attributes of this 
  * object in the "Data".
  */
-class ModelAPI_Object
+class ModelAPI_Object: public ModelAPI_Entity
 {
   std::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to

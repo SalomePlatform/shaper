@@ -102,7 +102,10 @@ const static char* DATAMODEL_FILE = "dataModel.xml";
 const static char* NODE_FOLDER = "folder";
 const static char* FOLDER_NAME = "name";
 const static char* GROUP_TYPE = "group_type";
-const static char* ROOT_NODE = "tree_root";
+const static char* ROOT_DOCUMENT = "root_document";
+const static char* SUB_DOCUMENT = "sub_document";
 const static char* NODE_ICON = "icon";
+const static char* SHOW_EMPTY = "show_empty";
+const static char* LINK_ITEM = "from_result";
 
 #endif /* CONFIG_KEYWORDS_H_ */

@@ -7,7 +7,9 @@
 #ifndef ModelAPI_Document_H_
 #define ModelAPI_Document_H_
 
-#include <ModelAPI.h>
+#include "ModelAPI.h"
+#include "ModelAPI_Entity.h"
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -31,7 +33,7 @@ class ModelAPI_Data;
  * Document contains all data that must be stored/retrived in the file.
  * Also it provides acces to this data: open/save, transactions management etc.
  */
-class ModelAPI_Document
+class ModelAPI_Document: public ModelAPI_Entity
 {
 public:
   //! Returns the kind of the document: "PartSet", "Part", or something else.

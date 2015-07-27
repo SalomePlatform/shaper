@@ -15,7 +15,7 @@
 
 
 Config_DataModelReader::Config_DataModelReader()
-    : Config_XMLReader(DATAMODEL_FILE)
+    : Config_XMLReader(DATAMODEL_FILE), isRootReading(true), myIsResultLink(false)
 {
 }
 
@@ -31,11 +31,37 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     if (aName.empty() || aGroupType.empty())
       Events_Error::send("Reading dataModel.xml: wrong folder definition");
    
-    myRootFolderNames.push_back(aName);
-    myRootFolderTypes.push_back(aGroupType);
-    myRootFolderIcons.push_back(getProperty(theNode, NODE_ICON));
-  } else if  (isNode(theNode, ROOT_NODE, NULL)) {
+    std::string aIcon = getProperty(theNode, NODE_ICON);
+    std::string aEmpty = getProperty(theNode, SHOW_EMPTY);
+    std::string::iterator aIt;
+    for (aIt = aEmpty.begin(); aIt != aEmpty.end(); aIt++) {
+      (*aIt) = toupper(*aIt);
+    }
+    bool aIsEmpty = (aEmpty == "FALSE")? false : true;
+
+   if (isRootReading) {
+      myRootFolderNames.push_back(aName);
+      myRootFolderTypes.push_back(aGroupType);
+      myRootFolderIcons.push_back(aIcon);
+      myRootFolderShowEmpty.push_back(aIsEmpty);
+   } else {
+      mySubFolderNames.push_back(aName);
+      mySubFolderTypes.push_back(aGroupType);
+      mySubFolderIcons.push_back(aIcon);
+      mySubFolderShowEmpty.push_back(aIsEmpty);
+   }
+  } else if  (isNode(theNode, ROOT_DOCUMENT, NULL)) {
+    isRootReading = true;
     myRootTypes = getProperty(theNode, GROUP_TYPE);
+  } else if  (isNode(theNode, SUB_DOCUMENT, NULL)) {
+    isRootReading = false;
+    mySubTypes = getProperty(theNode, GROUP_TYPE);
+    std::string isResult = getProperty(theNode, LINK_ITEM);
+    std::string::iterator aIt;
+    for (aIt = isResult.begin(); aIt != isResult.end(); aIt++) {
+      (*aIt) = toupper(*aIt);
+    }
+    myIsResultLink = (isResult == "TRUE")? true : false;
   }
 }
 
