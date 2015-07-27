@@ -74,45 +74,37 @@ void Model_ValidatorsFactory::assignValidator(const std::string& theID,
 }
 
 void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
-  std::list<ModelAPI_Validator*>& theResult,
-  std::list<std::list<std::string> >& theArguments) const
+                                         Validators& theValidators) const
 {
-  std::map<std::string, AttrValidators>::const_iterator aFeature = myFeatures.find(theFeatureID);
-  if (aFeature != myFeatures.cend()) {
-    AttrValidators::const_iterator aValIter = aFeature->second.cbegin();
-    for (; aValIter != aFeature->second.cend(); aValIter++) {
-      std::map<std::string, ModelAPI_Validator*>::const_iterator aFound = 
-        myIDs.find(aValIter->first);
-      if (aFound == myIDs.end()) {
-        Events_Error::send(std::string("Validator ") + aValIter->first + " was not registered");
+  std::map<std::string, AttrValidators>::const_iterator aFeatureIt = 
+      myFeatures.find(theFeatureID);
+  if (aFeatureIt != myFeatures.cend()) {
+    AttrValidators::const_iterator aValidatorsIt = aFeatureIt->second.cbegin();
+    for (; aValidatorsIt != aFeatureIt->second.cend(); aValidatorsIt++) {
+      if (!validator(aValidatorsIt->first)) {
+        Events_Error::send(std::string("Validator ") + aValidatorsIt->first + " was not registered");
       } else {
-        theResult.push_back(aFound->second);
-        theArguments.push_back(aValIter->second);
+        theValidators.push_back(std::make_pair(aValidatorsIt->first, aValidatorsIt->second));
       }
     }
   }
-  addDefaultValidators(theResult, theArguments);
+  addDefaultValidators(theValidators);
 }
 
-void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
-  const std::string& theAttrID,
-  std::list<ModelAPI_Validator*>& theValidators,
-  std::list<std::list<std::string> >& theArguments) const
+void Model_ValidatorsFactory::validators(const std::string& theFeatureID, const std::string& theAttrID,
+                                         Validators& theValidators) const
 {
-  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeature = 
-    myAttrs.find(theFeatureID);
-  if (aFeature != myAttrs.cend()) {
-    std::map<std::string, AttrValidators>::const_iterator anAttr = aFeature->second.find(theAttrID);
-    if (anAttr != aFeature->second.end()) {
-      AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
-      for (; aValIter != anAttr->second.cend(); aValIter++) {
-        std::map<std::string, ModelAPI_Validator*>::const_iterator aFound = myIDs.find(
-          aValIter->first);
-        if (aFound == myIDs.end()) {
-          Events_Error::send(std::string("Validator ") + aValIter->first + " was not registered");
+  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIt = 
+      myAttrs.find(theFeatureID);
+  if (aFeatureIt != myAttrs.cend()) {
+    std::map<std::string, AttrValidators>::const_iterator anAttrIt = aFeatureIt->second.find(theAttrID);
+    if (anAttrIt != aFeatureIt->second.end()) {
+      AttrValidators::const_iterator aValidatorsIt = anAttrIt->second.cbegin();
+      for (; aValidatorsIt != anAttrIt->second.cend(); aValidatorsIt++) {
+        if (!validator(aValidatorsIt->first)) {
+          Events_Error::send(std::string("Validator ") + aValidatorsIt->first + " was not registered");
         } else {
-          theValidators.push_back(aFound->second);
-          theArguments.push_back(aValIter->second);
+          theValidators.push_back(std::make_pair(aValidatorsIt->first, aValidatorsIt->second));
         }
       }
     }
@@ -135,15 +127,12 @@ const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& 
   return NULL;
 }
 
-void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators,
-  std::list<std::list<std::string> >& theArguments) const
+void Model_ValidatorsFactory::addDefaultValidators(Validators& theValidators) const
 {
   const static std::string kDefaultId = "Model_FeatureValidator";
-  std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
-  if(it == myIDs.end())
+  if (!validator(kDefaultId))
     return;
-  theValidators.push_back(it->second);
-  theArguments.push_back(std::list<std::string>());
+  theValidators.push_back(std::make_pair(kDefaultId, std::list<std::string>()));
 }
 
 bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
@@ -155,52 +144,53 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
   theFeature->data()->execState(anExecState);
 
   // check feature validators first
-  std::map<std::string, AttrValidators>::const_iterator aFeature = 
-    myFeatures.find(theFeature->getKind());
-  if (aFeature != myFeatures.end()) {
-    AttrValidators::const_iterator aValidator = aFeature->second.begin();
-    for(; aValidator != aFeature->second.end(); aValidator++) {
-      const std::string& aValidatorID = aValidator->first;
-      const std::list<std::string>& anArguments = aValidator->second;
-      std::map<std::string, ModelAPI_Validator*>::const_iterator aValFind = 
-        myIDs.find(aValidatorID);
-      if (aValFind == myIDs.end()) {
-        Events_Error::send(std::string("Validator ") + aValidatorID + " was not registered");
-        continue;
-      }
+  Validators aValidators;
+  validators(theFeature->getKind(), aValidators);
+
+  if (!aValidators.empty()) {
+    Validators::const_iterator aValidatorIt = aValidators.cbegin();
+    for(; aValidatorIt != aValidators.cend(); aValidatorIt++) {
+      const std::string& aValidatorID = aValidatorIt->first;
+      const std::list<std::string>& anArguments = aValidatorIt->second;
+      // validators() checks invalid validator names
+      //if (!aValidator) {
+      //  Events_Error::send(std::string("Validator ") + aValidatorID + " was not registered");
+      //  continue;
+      //}
       const ModelAPI_FeatureValidator* aFValidator = 
-        dynamic_cast<const ModelAPI_FeatureValidator*>(aValFind->second);
+        dynamic_cast<const ModelAPI_FeatureValidator*>(validator(aValidatorID));
       if (aFValidator) {
         std::string anError;
         if (!aFValidator->isValid(theFeature, anArguments, anError)) {
           if (anError.empty())
             anError = "Unknown error.";
-          theFeature->setValidationError(aValidatorID, anError);
+          anError = "Feature invalidated by \"" + aValidatorID + "\" with error: " + anError;
+          theFeature->setError(anError, false);
+          theFeature->data()->execState(ModelAPI_StateInvalidArgument);
           return false;
-        } else {
-          theFeature->setValidationError(aValidatorID, "");
         }
       }
     }
   }
-  // check default validator
-  std::map<std::string, ModelAPI_Validator*>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
-  if(aDefaultVal != myIDs.end()) {
-    static const std::list<std::string> anEmptyArgList;
-    const ModelAPI_FeatureValidator* aFValidator = 
-      dynamic_cast<const ModelAPI_FeatureValidator*>(aDefaultVal->second);
-    if (aFValidator) {
-      std::string anError;
-      if (!aFValidator->isValid(theFeature, anEmptyArgList, anError)) {
-        if (anError.empty())
-          anError = "Unknown error.";
-        theFeature->setValidationError(kDefaultId, anError);
-        return false;
-      } else {
-        theFeature->setValidationError(kDefaultId, "");
-      }
-    }
-  }
+  // The default validator was retrned by validators() and was checked in previous cycle
+  //// check default validator
+  //std::map<std::string, ModelAPI_Validator*>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
+  //if(aDefaultVal != myIDs.end()) {
+  //  static const std::list<std::string> anEmptyArgList;
+  //  const ModelAPI_FeatureValidator* aFValidator = 
+  //    dynamic_cast<const ModelAPI_FeatureValidator*>(aDefaultVal->second);
+  //  if (aFValidator) {
+  //    std::string anError;
+  //    if (!aFValidator->isValid(theFeature, anEmptyArgList, anError)) {
+  //      if (anError.empty())
+  //        anError = "Unknown error.";
+  //      anError = "Feature invalidated by \"" + kDefaultId + "\" with error: " + anError;
+  //      theFeature->setError(anError, false);
+  //      theFeature->data()->execState(ModelAPI_StateInvalidArgument);
+  //      return false;
+  //    }
+  //  }
+  //}
   
   // check all attributes for validity
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
@@ -208,46 +198,59 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
   // if (!aData || !aData->isValid())
   //   return false;
   static const std::string kAllTypes = "";
-  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIter = 
-    myAttrs.find(theFeature->getKind());
-  if (aFeatureIter != myAttrs.cend()) {
-    std::list<std::string> aLtAttributes = aData->attributesIDs(kAllTypes);
-    std::list<std::string>::iterator anAttrIter = aLtAttributes.begin();
-    for (; anAttrIter != aLtAttributes.end(); anAttrIter++) {
-      const std::string& anAttributeID = *anAttrIter; 
-      std::map<std::string, AttrValidators>::const_iterator anAttr = 
-          aFeatureIter->second.find(anAttributeID);
-      if (anAttr != aFeatureIter->second.end()) {
-        // skip not-case attributres, that really may be invalid (issue 671)
-        if (!const_cast<Model_ValidatorsFactory*>(this)->isCase(theFeature, anAttributeID))
-          continue;
-        AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
-        for (; aValIter != anAttr->second.cend(); aValIter++) {
-          const std::string& aValidatorID = aValIter->first;
-          const std::list<std::string>& anArguments = aValIter->second;
-          std::map<std::string, ModelAPI_Validator*>::const_iterator aFound = myIDs.find(aValidatorID);
-          if (aFound == myIDs.end()) {
-            Events_Error::send(std::string("Validator ") + aValidatorID + " was not registered");
-          } else {
-            const ModelAPI_AttributeValidator* anAttrValidator = 
-              dynamic_cast<const ModelAPI_AttributeValidator*>(aFound->second);
-            if (anAttrValidator) {
-              AttributePtr anAttribute = theFeature->data()->attribute(anAttributeID);
-              std::string anError;
-              if (!anAttrValidator->isValid(anAttribute, anArguments, anError)) {
-                if (anError.empty())
-                  anError = "Unknown error.";
-                theFeature->setAttributeValidationError(anAttributeID, aValidatorID, anError);
-                return false;
-              } else {
-                theFeature->setAttributeValidationError(anAttributeID, aValidatorID, "");
-              }
-            }
-          }
-        }
-      }
-    }
+  std::list<std::string> aLtAttributes = aData->attributesIDs(kAllTypes);
+  std::list<std::string>::const_iterator anAttrIt = aLtAttributes.cbegin();
+  for (; anAttrIt != aLtAttributes.cend(); anAttrIt++) {
+    const std::string& anAttributeID = *anAttrIt; 
+    AttributePtr anAttribute = theFeature->data()->attribute(anAttributeID);
+
+    std::string aValidatorID;
+    std::string anError;
+    if (!validate(anAttribute, aValidatorID, anError)) {
+      if (anError.empty())
+        anError = "Unknown error.";
+      anError = "Attribute \"" + anAttributeID + "\" invalidated by \"" + aValidatorID + "\" with error: " + anError;
+      theFeature->setError(anError, false);
+      theFeature->data()->execState(ModelAPI_StateInvalidArgument);
+      return false;
+    } 
   }
+
+  return true;
+}
+
+bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Attribute>& theAttribute,
+                                       std::string& theValidator,
+                                       std::string& theError) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  if (!aFeature.get()) {
+    theValidator = "Model_ValidatorsFactory";
+    theError = "Attribute has no feature.";
+    return false;
+  }
+
+  // skip not-case attributes, that really may be invalid (issue 671)
+  if (!const_cast<Model_ValidatorsFactory*>(this)->isCase(aFeature, theAttribute->id()))
+    return true;
+
+  Validators aValidators;
+  validators(aFeature->getKind(), theAttribute->id(), aValidators);
+
+  Validators::iterator aValidatorIt = aValidators.begin();
+  for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
+    const std::string& aValidatorID = aValidatorIt->first;
+    const std::list<std::string>& anArguments = aValidatorIt->second;
+    const ModelAPI_AttributeValidator* anAttrValidator =
+        dynamic_cast<const ModelAPI_AttributeValidator*>(validator(aValidatorID));
+    if (!anAttrValidator)
+      continue;
+    if (!anAttrValidator->isValid(theAttribute, anArguments, theError)) {
+      theValidator = aValidatorID;
+      return false;
+    } 
+  }
+
   return true;
 }
 

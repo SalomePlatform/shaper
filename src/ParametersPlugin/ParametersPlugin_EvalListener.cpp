@@ -263,27 +263,8 @@ void ParametersPlugin_EvalListener::renameInAttribute(
 
 bool isValidAttribute(const AttributePtr& theAttribute)
 {
-  std::list<ModelAPI_Validator*> aValidators;
-  std::list<std::list<std::string> > anArguments;
-
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
-  if (!aFeature.get())
-    return false;
-
-  ModelAPI_Session::get()->validators()->validators(aFeature->getKind(), 
-                                                    theAttribute->id(), 
-                                                    aValidators, anArguments);
-  std::list<ModelAPI_Validator*>::const_iterator aValidatorIt = aValidators.begin();
-  std::list<std::list<std::string> >::const_iterator anArgumentIt = anArguments.begin();
-  for (; aValidatorIt != aValidators.end() || anArgumentIt != anArguments.end(); ++aValidatorIt, ++anArgumentIt) {
-    const ModelAPI_AttributeValidator * anAttributeValidator =
-        dynamic_cast<const ModelAPI_AttributeValidator *>(*aValidatorIt);
-    if (!anAttributeValidator)
-      continue;
-    if (!anAttributeValidator->isValid(theAttribute, *anArgumentIt))
-      return false;
-  }
-  return true;
+  std::string aValidator, anError;
+  return ModelAPI_Session::get()->validators()->validate(theAttribute, aValidator, anError);
 }
 
 void setParameterName(ResultParameterPtr theResultParameter, const std::string& theName)

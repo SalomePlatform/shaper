@@ -162,12 +162,11 @@ QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  std::list<ModelAPI_Validator*> allValidators;
-  std::list<std::list<std::string> > allArguments;
-  aFactory->validators(myFeature->getKind(), myAttributeID, allValidators, allArguments);
+  ModelAPI_ValidatorsFactory::Validators allValidators;
+  aFactory->validators(myFeature->getKind(), myAttributeID, allValidators);
 
   QStringList aResult;
-  std::list<std::string> anArgumentList = allArguments.front();
+  std::list<std::string> anArgumentList = allValidators.front().second;
   std::list<std::string>::const_iterator it = anArgumentList.begin();
   for (; it != anArgumentList.end(); ++it) {
     QString aFormat = QString::fromStdString(*it);

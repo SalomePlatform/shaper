@@ -64,19 +64,20 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
   /// Provides a validator for the feature, returns NULL if no validator
   MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
-                                       std::list<ModelAPI_Validator*>& theResult,
-                                       std::list<std::list<std::string> >& theArguments) const;
+                                       Validators& theResult) const;
   /// Provides a validator for the attribute, returns NULL if no validator
-  MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
-                                       const std::string& theAttrID,
-                                       std::list<ModelAPI_Validator*>& theValidators,
-                                       std::list<std::list<std::string> >& theArguments) const;
+  MODEL_EXPORT virtual void validators(const std::string& theFeatureID, const std::string& theAttrID,
+                                       Validators& theResult) const;
 
   /// Returns registered validator by its Id
   MODEL_EXPORT virtual const ModelAPI_Validator* validator(const std::string& theID) const;
 
   /// Returns true if feature and all its attributes are valid.
   MODEL_EXPORT virtual bool validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const;
+
+  /// Returns true if the attribute is valid.
+  MODEL_EXPORT virtual bool validate(const std::shared_ptr<ModelAPI_Attribute>& theAttribute,
+                                     std::string& theValidator, std::string& theError) const;
 
   /// register that this attribute in feature is not obligatory for the feature execution
   /// so, it is not needed for the standard validation mechanism
@@ -102,8 +103,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
 protected:
   /// Adds the defualt validators that are usefull for all features.
-  void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators,
-                            std::list<std::list<std::string> >& theArguments) const;
+  void addDefaultValidators(Validators& theValidators) const;
   /// Get instance from Session
   Model_ValidatorsFactory();
 

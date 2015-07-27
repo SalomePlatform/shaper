@@ -171,24 +171,9 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::list<ModelAPI_Validator*> aValidators;
-  std::list<std::list<std::string> > anArguments;
-  aFactory->validators(myFeature->getKind(), attributeID(), aValidators, anArguments);
-
-  DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
-
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
-  bool aValid = true;
-  for (; aValidator != aValidators.end() && aValid; aValidator++, aArgs++) {
-    const ModelAPI_AttributeValidator* aAttrValidator =
-        dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
-    if (aAttrValidator) {
-      aValid = aAttrValidator->isValid(anAttribute, *aArgs);
-    }
-  }
-  return aValid;
+  std::string aValidatorID, anError;
+  return aFactory->validate(anAttribute, aValidatorID, anError);
 }
 
 bool ModuleBase_WidgetValidated::isFilterActivated() const

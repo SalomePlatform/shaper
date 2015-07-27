@@ -67,20 +67,24 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
                                const std::string& theAttrID,
                                const std::list<std::string>& theArguments) = 0;
 
+  /// Validators is a list of pairs <Validator, list of arguments>
+  typedef std::list<std::pair<std::string, std::list<std::string> > > Validators;
   /// Provides a validator for the feature, returns NULL if no validator
   virtual void validators(const std::string& theFeatureID,
-                          std::list<ModelAPI_Validator*>& theResult,
-                          std::list<std::list<std::string> >& theArguments) const = 0;
+                          Validators& theResult) const = 0;
   /// Provides a validator for the attribute, returns NULL if no validator
   virtual void validators(const std::string& theFeatureID, const std::string& theAttrID,
-                          std::list<ModelAPI_Validator*>& theValidators,
-                          std::list<std::list<std::string> >& theArguments) const = 0;
+                          Validators& theResult) const = 0;
 
   /// Returns registered validator by its Id
   virtual const ModelAPI_Validator* validator(const std::string& theID) const = 0;
 
   /// Returns true if feature and all its attributes are valid.
   virtual bool validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
+
+  /// Returns true if the attribute is valid.
+  virtual bool validate(const std::shared_ptr<ModelAPI_Attribute>& theAttribute,
+                        std::string& theValidator, std::string& theError) const = 0;
 
   /// register that this attribute in feature is not obligatory for the feature execution
   /// so, it is not needed for the standard validation mechanism
