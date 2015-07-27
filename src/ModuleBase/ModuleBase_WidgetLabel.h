@@ -33,7 +33,7 @@ Q_OBJECT
   /// It returns false because this is an info widget
   virtual bool canSetValue() const { return false; };
 
-  virtual bool restoreValue()
+  virtual bool restoreValueCustom()
   {
     return true;
   }

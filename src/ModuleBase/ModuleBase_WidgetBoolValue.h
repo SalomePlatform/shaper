@@ -31,8 +31,6 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetBoolValue();
 
-  virtual bool restoreValue();
-
   virtual QList<QWidget*> getControls() const;
 
   virtual void setHighlighted(bool isHighlighted);
@@ -41,6 +39,8 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
+
+  virtual bool restoreValueCustom();
 
  private:
    /// The check box

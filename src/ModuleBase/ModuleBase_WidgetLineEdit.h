@@ -38,8 +38,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetLineEdit();
 
-  virtual bool restoreValue();
-
   virtual QList<QWidget*> getControls() const;
 
  public slots:
@@ -50,6 +48,8 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
+
+  virtual bool restoreValueCustom();
 
 private:
    /// A line edit control

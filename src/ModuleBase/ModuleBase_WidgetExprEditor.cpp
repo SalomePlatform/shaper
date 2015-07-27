@@ -202,7 +202,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
   return true;
 }
 
-bool ModuleBase_WidgetExprEditor::restoreValue()
+bool ModuleBase_WidgetExprEditor::restoreValueCustom()
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

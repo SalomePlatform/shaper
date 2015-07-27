@@ -69,7 +69,7 @@ void ModuleBase_PagedContainer::enableFocusProcessing()
   myIsFocusOnCurrentPage = true;
 }
 
-bool ModuleBase_PagedContainer::restoreValue()
+bool ModuleBase_PagedContainer::restoreValueCustom()
 {
   // A rare case when plugin was not loaded.
   if(!myFeature)

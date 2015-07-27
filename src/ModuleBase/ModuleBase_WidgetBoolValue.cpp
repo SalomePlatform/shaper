@@ -54,7 +54,7 @@ bool ModuleBase_WidgetBoolValue::storeValueCustom() const
   return true;
 }
 
-bool ModuleBase_WidgetBoolValue::restoreValue()
+bool ModuleBase_WidgetBoolValue::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(attributeID());

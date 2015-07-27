@@ -124,7 +124,7 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::restoreValue()
+bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

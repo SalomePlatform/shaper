@@ -28,7 +28,6 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   virtual bool focusTo();
   virtual void setHighlighted(bool isHighlighted);
   virtual void enableFocusProcessing();
-  virtual bool restoreValue();
 
  protected:
   virtual int currentPageIndex() const = 0;
@@ -36,6 +35,7 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   // ModuleBase_ModelWidget
   virtual void activateCustom();
   virtual bool storeValueCustom() const;
+  virtual bool restoreValueCustom();
 
  protected slots:
   void onPageChanged();

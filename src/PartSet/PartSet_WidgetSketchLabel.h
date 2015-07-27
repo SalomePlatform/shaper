@@ -56,11 +56,6 @@ Q_OBJECT
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
-  virtual bool restoreValue()
-  {
-    return true;
-  }
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -103,6 +98,11 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const
+  {
+    return true;
+  }
+
+  virtual bool restoreValueCustom()
   {
     return true;
   }

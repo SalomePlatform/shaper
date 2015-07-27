@@ -163,7 +163,7 @@ void ModuleBase_WidgetShapeSelector::clearAttribute()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::restoreValue()
+bool ModuleBase_WidgetShapeSelector::restoreValueCustom()
 {
   bool isBlocked = this->blockSignals(true);
   updateSelectionName();

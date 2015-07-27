@@ -139,6 +139,15 @@ bool ModuleBase_ModelWidget::storeValue()
   return isDone;
 }
 
+bool ModuleBase_ModelWidget::restoreValue()
+{
+  emit beforeValuesRestored();
+  bool isDone = restoreValueCustom();
+  emit afterValuesRestored();
+
+  return isDone;
+}
+
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));

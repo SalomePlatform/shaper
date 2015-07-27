@@ -69,7 +69,7 @@ QList<QWidget*> PartSet_WidgetSketchCreator::getControls() const
   return aControls;
 }
 
-bool PartSet_WidgetSketchCreator::restoreValue()
+bool PartSet_WidgetSketchCreator::restoreValueCustom()
 {
   CompositeFeaturePtr aCompFeature = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);

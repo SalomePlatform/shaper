@@ -64,7 +64,7 @@ bool ModuleBase_WidgetLineEdit::storeValueCustom() const
   return true;
 }
 
-bool ModuleBase_WidgetLineEdit::restoreValue()
+bool ModuleBase_WidgetLineEdit::restoreValueCustom()
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

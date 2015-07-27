@@ -104,7 +104,7 @@ bool ModuleBase_WidgetDoubleValue::reset()
     // if the double value can not be found by the default value, do nothing
     if (isOk) {
       ModuleBase_Tools::setSpinValue(mySpinBox, aDefValue);
-      storeValueCustom();
+      storeValue();
       aDone = true;
     }
   }
@@ -130,7 +130,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
   return true;
 }
 
-bool ModuleBase_WidgetDoubleValue::restoreValue()
+bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aRef = aData->real(attributeID());

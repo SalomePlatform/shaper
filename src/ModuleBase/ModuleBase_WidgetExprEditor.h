@@ -65,8 +65,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetExprEditor();
 
-  virtual bool restoreValue();
-
   virtual QList<QWidget*> getControls() const;
 
  public slots:
@@ -77,6 +75,8 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
+
+  virtual bool restoreValueCustom();
 
 private:
    /// A line edit control

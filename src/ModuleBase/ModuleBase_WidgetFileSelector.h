@@ -50,8 +50,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetFileSelector();
 
-  virtual bool restoreValue();
-
   virtual QList<QWidget*> getControls() const;
 
   /// Returns true if a file on the current path in the line edit
@@ -69,6 +67,8 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
+
+  virtual bool restoreValueCustom();
 
 protected:
   /// Converts format to filter string

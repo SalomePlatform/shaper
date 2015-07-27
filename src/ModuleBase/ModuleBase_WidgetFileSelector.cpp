@@ -79,7 +79,7 @@ bool ModuleBase_WidgetFileSelector::storeValueCustom() const
   return true;
 }
 
-bool ModuleBase_WidgetFileSelector::restoreValue()
+bool ModuleBase_WidgetFileSelector::restoreValueCustom()
 {
   // A rare case when plugin was not loaded. 
   if (!myFeature)

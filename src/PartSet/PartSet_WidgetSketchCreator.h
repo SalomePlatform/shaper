@@ -29,8 +29,6 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetSketchCreator();
 
-  virtual bool restoreValue();
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -44,6 +42,8 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
+
+  virtual bool restoreValueCustom();
 
   /// The methiod called when widget is activated
   virtual void activateCustom();

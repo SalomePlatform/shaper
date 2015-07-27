@@ -20,7 +20,7 @@ PartSet_WidgetFileSelector::PartSet_WidgetFileSelector(QWidget* theParent,
 {
 }
 
-bool PartSet_WidgetFileSelector::restoreValue()
+bool PartSet_WidgetFileSelector::restoreValueCustom()
 {
   // A rare case when plugin was not loaded.
   if (!myFeature)
@@ -30,7 +30,7 @@ bool PartSet_WidgetFileSelector::restoreValue()
   AttributeStringPtr aStringAttr = aData->string("export_file_format");
   mySelectedFilter = formatToFilter(shortFormatToFullFormat(QString::fromStdString(aStringAttr->value())));
 
-  return ModuleBase_WidgetFileSelector::restoreValue();
+  return ModuleBase_WidgetFileSelector::restoreValueCustom();
 }
 
 bool PartSet_WidgetFileSelector::storeValueCustom() const

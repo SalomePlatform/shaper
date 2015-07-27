@@ -63,8 +63,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
                                  const std::string& theParentId);
   virtual ~ModuleBase_WidgetMultiSelector();
 
-  virtual bool restoreValue();
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -95,6 +93,8 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
+
+  virtual bool restoreValueCustom();
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different

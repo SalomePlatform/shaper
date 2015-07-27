@@ -180,7 +180,7 @@ bool PartSet_WidgetPoint2D::storeValueCustom() const
   return true;
 }
 
-bool PartSet_WidgetPoint2D::restoreValue()
+bool PartSet_WidgetPoint2D::restoreValueCustom()
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

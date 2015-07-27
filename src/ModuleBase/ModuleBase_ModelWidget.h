@@ -90,8 +90,9 @@ Q_OBJECT
     return false;
   }
 
-  /// Restore value from attribute data to the widget's control
-  virtual bool restoreValue() = 0;
+  /// Restore value from attribute data to the widget's control. Emits signals before and after store
+  /// \return True in success
+  bool restoreValue();
 
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
@@ -164,6 +165,11 @@ signals:
   /// The signal about widget values are to be changed
   void afterValuesChanged();
 
+  /// The signal about widget values are to be restored
+  void beforeValuesRestored();
+  /// The signal about widget values are to be restored
+  void afterValuesRestored();
+
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
   void keyReleased(QKeyEvent* theEvent);
@@ -176,7 +182,7 @@ signals:
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
- protected:
+protected:
   /// Sets default value of widget. Normally, widget should fetch this value
   /// from the xml. However, some widgets derived widgets could define it
   void setDefaultValue(const std::string& theValue);
@@ -194,6 +200,9 @@ signals:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const = 0;
+
+  /// Restore value from attribute data to the widget's control
+  virtual bool restoreValueCustom() = 0;
 
   /// The method called when widget is activated
   virtual void activateCustom() {};

@@ -37,12 +37,12 @@ public:
 
   virtual ~PartSet_WidgetFileSelector() {}
 
-  /// Reimplemented from ModuleBase_WidgetFileSelector::restoreValue()
-  virtual bool restoreValue();
-
 protected:
   /// Reimplemented from ModuleBase_WidgetFileSelector::storeValueCustom()
   virtual bool storeValueCustom() const;
+
+  /// Reimplemented from ModuleBase_WidgetFileSelector::restoreValue()
+  virtual bool restoreValueCustom();
 
   /// Returns a full format string for the short format
   QString shortFormatToFullFormat( const QString & theShortFormat ) const;
