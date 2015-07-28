@@ -252,6 +252,8 @@ protected slots:
   int myVisualLayerId;
 
   PartSet_DocumentDataModel* myDataModel;
+
+  QModelIndex aActivePartIndex;
 };
 
 #endif

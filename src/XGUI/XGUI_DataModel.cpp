@@ -6,6 +6,8 @@
 
 #include "XGUI_DataModel.h"
 
+#include <ModuleBase_IconFactory.h>
+
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultParameter.h>
@@ -18,6 +20,10 @@
 #include <Events_Error.h>
 
 #include <QIcon>
+#include <QBrush>
+
+#define ACTIVE_COLOR QColor(0,72,140)
+#define PASSIVE_COLOR Qt::black
 
 /// Returns ResultPart object if the given object is a Part feature
 /// Otherwise returns NULL
@@ -51,7 +57,6 @@ XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParen
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  aLoop->registerListener(this, Events_Loop::eventByName(Config_FeatureMessage::GUI_EVENT()));
 }
 
 //******************************************************
@@ -78,7 +83,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       if (aDoc == aRootDoc) {
         int aRow = aRootDoc->size(aObjType) - 1;
         if (aObjType == aRootType) {
-          insertRow(aRow + aNbFolders);
+          insertRow(aRow + aNbFolders + 1);
         } else {
           int aFolderId = myXMLReader.rootFolderId(aObjType);
           if (aFolderId != -1) {
@@ -212,9 +217,29 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
           QString(" (%1)").arg(rowCount(theIndex));
       case Qt::DecorationRole:
         return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
+      case Qt::ForegroundRole:
+        if (aRootDoc->isActive())
+          return QBrush(ACTIVE_COLOR);
+        else
+          return QBrush(PASSIVE_COLOR);
     }
   } else {
     ModelAPI_Document* aSubDoc = getSubDocument(theIndex.internalPointer());
+
+    if (theRole == Qt::ForegroundRole) {
+      bool aIsActive = false;
+      if (aSubDoc)
+        aIsActive = aSubDoc->isActive();
+      else {
+        ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
+        aIsActive = aObj->document()->isActive();
+      }
+      if (aIsActive)
+        return QBrush(ACTIVE_COLOR);
+      else
+        return QBrush(PASSIVE_COLOR);
+    }
+
     if (aSubDoc) { // this is a folder of sub document
       switch (theRole) {
         case Qt::DisplayRole:
@@ -235,6 +260,8 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
           return aTitle + " = " + aVal;
         }
         return aObj->data()->name().c_str();
+      case Qt::DecorationRole:
+        return ModuleBase_IconFactory::get()->getIcon(object(theIndex));
       }
     }
   }
@@ -269,10 +296,9 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
   if (aId == -1) { 
     // this is a folder under root
     int aParentPos = theParent.row();
-    if (aId == -1) { // first level of folders
-      std::string aType = myXMLReader.rootFolderType(aParentPos);
-      return aRootDoc->size(aType);
-    }
+    std::string aType = myXMLReader.rootFolderType(aParentPos);
+    //qDebug("### %s = %i\n", aType.c_str(), aRootDoc->size(aType));
+    return aRootDoc->size(aType);
   } else {
     // It is an object which could have children
     ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
@@ -508,4 +534,15 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(ModelAPI_Document* theDoc) con
     }
   }
   return QModelIndex();
+}
+
+//******************************************************
+QModelIndex XGUI_DataModel::documentRootIndex(DocumentPtr theDoc) const
+{
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aRootDoc = aSession->moduleDocument();
+  if (theDoc == aRootDoc)
+    return QModelIndex();
+  else 
+    return findDocumentRootIndex(theDoc.get());
 }

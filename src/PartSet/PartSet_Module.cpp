@@ -15,7 +15,8 @@
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_MenuMgr.h"
-#include <PartSet_CustomPrs.h>
+#include "PartSet_CustomPrs.h"
+#include "PartSet_IconFactory.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -60,6 +61,7 @@
 #include <XGUI_Tools.h>
 #include <XGUI_ObjectsBrowser.h>
 #include <XGUI_SelectionMgr.h>
+#include <XGUI_DataModel.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -117,6 +119,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   : ModuleBase_IModule(theWshop),
   myRestartingMode(RM_None), myVisualLayerId(0)
 {
+  new PartSet_IconFactory();
+
   mySketchMgr = new PartSet_SketcherMgr(this);
   myDataModel = new PartSet_DocumentDataModel(this);
 
@@ -863,8 +867,9 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-    DocumentPtr aDoc = aMgr->moduleDocument();
+#ifdef ModuleDataModel
     QModelIndex aOldIndex = myDataModel->activePartTree();
+    DocumentPtr aDoc = aMgr->moduleDocument();
     if (aActiveDoc == aDoc) {
       if (aOldIndex.isValid())
         aTreeView->setExpanded(aOldIndex, false);
@@ -886,6 +891,16 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         }
       }
     }
+#else
+    // Problem with MPV: At first time on creation it doesn't work because Part feature
+    // creation event will be sent after
+    if (aActivePartIndex.isValid())
+      aTreeView->setExpanded(aActivePartIndex, false);
+    XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
+    aActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
+    if (aActivePartIndex.isValid())
+      aTreeView->setExpanded(aActivePartIndex, true);
+#endif
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
 

@@ -26,6 +26,8 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
+#include <XGUI_DataModel.h>
+#include <XGUI_ObjectsBrowser.h>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>

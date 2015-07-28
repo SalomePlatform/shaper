@@ -106,6 +106,9 @@ public:
   /// \param theIndex a model index
   virtual Qt::ItemFlags flags(const QModelIndex& theIndex) const;
 
+  /// Returns an index which is root of the given document
+  /// \param theDoc a document
+  QModelIndex documentRootIndex(DocumentPtr theDoc) const;
 
 private:
   QModelIndex findDocumentRootIndex(ModelAPI_Document* theDoc) const;

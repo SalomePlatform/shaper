@@ -49,6 +49,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetSwitch.h
   ModuleBase_WidgetToolbox.h
   ModuleBase_WidgetValidated.h
+  ModuleBase_IconFactory.h
 )
 
 SET(PROJECT_SOURCES
@@ -95,6 +96,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetSwitch.cpp
   ModuleBase_WidgetToolbox.cpp
   ModuleBase_WidgetValidated.cpp
+  ModuleBase_IconFactory.cpp
 )
 
 SET(PROJECT_LIBRARIES
