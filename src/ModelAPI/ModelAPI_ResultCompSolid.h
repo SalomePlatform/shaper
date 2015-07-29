@@ -27,18 +27,16 @@ public:
   /// Returns the group identifier of this result
   inline static std::string group()
   {
-    static std::string MY_GROUP = "CompSolid";
+    static std::string MY_GROUP = "Bodies";
     return MY_GROUP;
   }
-
-  /// Request for initialization of data model of the object: adding all attributes
-  MODELAPI_EXPORT virtual void initAttributes();
 
   /// Returns the feature is disabled or not.
   MODELAPI_EXPORT virtual bool isDisabled() const;
 
   /// Adds result to the sketch and to its document
-  virtual std::shared_ptr<ModelAPI_ResultBody> addResult(std::string theID) = 0;
+  /// \param theIndex an index of the created body result in the compsolid
+  virtual std::shared_ptr<ModelAPI_ResultBody> addResult(const int theIndex) = 0;
 
   /// Returns the number of sub-elements
   virtual int numberOfSubs(bool forTree = false) const = 0;
@@ -48,7 +46,7 @@ public:
                                                          bool forTree = false) const = 0;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
-  virtual int subResultId(const int theIndex) const = 0;
+  //virtual int subResultId(const int theIndex) const = 0;
 
   /// Returns true if feature or reuslt belong to this composite feature as subs
   virtual bool isSub(ObjectPtr theObject) const = 0;

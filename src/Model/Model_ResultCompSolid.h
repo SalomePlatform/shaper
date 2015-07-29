@@ -19,11 +19,24 @@
 class Model_ResultCompSolid : public ModelAPI_ResultCompSolid
 {
 public:
+  /// All features of this sketch (list of references)
+  inline static const std::string& BODIES_ID()
+  {
+    static const std::string MY_BODIES_ID("Bodies");
+    return MY_BODIES_ID;
+  }
+
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultCompSolid();
 
+  /// Request for initialization of data model of the object: adding all attributes
+  MODEL_EXPORT virtual void initAttributes();
+
   /// Adds result to the sketch and to its document
-  virtual std::shared_ptr<ModelAPI_ResultBody> addResult(std::string theID);
+  /// \param theIndex an index of the created body result in the compsolid
+  /// The real index in the document of the result is an incremented given index
+  /// The reason is that the first index is used for the comp solid result on the data
+  virtual std::shared_ptr<ModelAPI_ResultBody> addResult(const int theIndex);
 
   /// Returns the number of sub-elements
   virtual int numberOfSubs(bool forTree = false) const;
@@ -33,7 +46,7 @@ public:
                                                          bool forTree = false) const;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
-  virtual int subResultId(const int theIndex) const;
+  //virtual int subResultId(const int theIndex) const;
 
   /// Returns true if feature or reuslt belong to this composite feature as subs
   virtual bool isSub(ObjectPtr theObject) const;

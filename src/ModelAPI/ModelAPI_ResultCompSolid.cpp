@@ -15,10 +15,6 @@ std::string ModelAPI_ResultCompSolid::groupName()
   return group();
 }
 
-void ModelAPI_ResultCompSolid::initAttributes()
-{
-}
-
 bool ModelAPI_ResultCompSolid::isDisabled() const
 {
   return false;
