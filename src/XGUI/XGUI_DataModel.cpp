@@ -65,8 +65,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   std::string aRootType = myXMLReader.rootType();
   std::string aSubType = myXMLReader.subType();
-  int aNbFolders = myXMLReader.rootFoldersNumber();
-  int aNbSubFolders = myXMLReader.subFoldersNumber();
+  int aNbFolders = foldersCount();
 
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
@@ -81,6 +80,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       aObjType = aObject->groupName();
       DocumentPtr aDoc = aObject->document();
       if (aDoc == aRootDoc) {
+        // Check that new folders could appear
+        QStringList aNotEmptyFolders = listOfShowNotEmptyFolders();
+        foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
+          if ((aNotEmptyFolder.toStdString() == aObjType) && (aRootDoc->size(aObjType) == 1))
+            // Appears first object in folder which can not be shown empty
+            insertRow(myXMLReader.rootFolderId(aObjType));
+        }
+        // Insert new object
         int aRow = aRootDoc->size(aObjType) - 1;
         if (aObjType == aRootType) {
           insertRow(aRow + aNbFolders + 1);
@@ -94,10 +101,20 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         // Object created in sub-document
         QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
         if (aDocRoot.isValid()) {
+          // Check that new folders could appear
+          QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
+          foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
+            if ((aNotEmptyFolder.toStdString() == aObjType) && (aDoc->size(aObjType) == 1))
+              // Appears first object in folder which can not be shown empty
+              insertRow(myXMLReader.subFolderId(aObjType), aDocRoot);
+          }
           int aRow = aDoc->size(aObjType) - 1;
+          int aNbSubFolders = foldersCount(aDoc.get());
           if (aObjType == aSubType) {
+            // List of objects under document root
             insertRow(aRow + aNbSubFolders, aDocRoot);
           } else {
+            // List of objects under a folder
             int aFolderId = myXMLReader.subFolderId(aObjType);
             if (aFolderId != -1) {
               insertRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
@@ -131,6 +148,42 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             removeRow(aRow, aFolderIndex);
           }
         }
+        // Check that some folders could erased
+        QStringList aNotEmptyFolders = listOfShowNotEmptyFolders();
+        foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
+          if ((aNotEmptyFolder.toStdString() == aGroup) && (aRootDoc->size(aGroup) == 0))
+            // Appears first object in folder which can not be shown empty
+            removeRow(myXMLReader.rootFolderId(aGroup));
+        }
+      } else {
+        // Remove row for sub-document
+        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+        if (aDocRoot.isValid()) {
+          int aRow = aDoc->size(aGroup);
+          int aNbSubFolders = foldersCount(aDoc.get());
+          if (aGroup == aSubType) {
+            // List of objects under document root
+            removeRow(aRow + aNbSubFolders, aDocRoot);
+          } else {
+            // List of objects under a folder
+            int aFolderId = myXMLReader.subFolderId(aGroup);
+            if (aFolderId != -1) {
+              removeRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
+            }
+          }
+          // Check that some folders could disappear
+          QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
+          foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
+            if ((aNotEmptyFolder.toStdString() == aGroup) && (aDoc->size(aGroup) == 1))
+              // Appears first object in folder which can not be shown empty
+              removeRow(myXMLReader.subFolderId(aGroup), aDocRoot);
+          }
+        } 
+#ifdef _DEBUG
+        else {
+          Events_Error::send("Problem with Data Model definition of sub-document");
+        }
+#endif
       }
     }
   } 
@@ -184,10 +237,10 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
   DocumentPtr aRootDoc = aSession->moduleDocument();
   if (aDoc == aRootDoc && myXMLReader.rootType() == aType) { 
     // The object from root document
-    aRow += myXMLReader.rootFoldersNumber();
+    aRow += foldersCount();
   } else if (myXMLReader.subType() == aType) { 
     // The object from sub document
-    aRow += myXMLReader.subFoldersNumber();
+    aRow += foldersCount(aDoc.get());
   }
   return createIndex(aRow, 0, theObject.get());
 }
@@ -197,7 +250,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
 {
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
-  int aNbFolders = myXMLReader.rootFoldersNumber();
+  int aNbFolders = foldersCount();
   int theIndexRow = theIndex.row();
 
   if ((theIndex.column() == 1) ) {
@@ -284,7 +337,7 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
 
   if (!theParent.isValid()) {
     // Return number of items in root
-    int aNbFolders = myXMLReader.rootFoldersNumber();
+    int aNbFolders = foldersCount();
     int aNbItems = 0;
     std::string aType = myXMLReader.rootType();
     if (!aType.empty())
@@ -312,7 +365,7 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
       ResultPartPtr aPartRes = getPartResult(aObj);
       if (aPartRes.get()) {
         DocumentPtr aSubDoc = aPartRes->partDoc();
-        int aNbSubFolders = myXMLReader.subFoldersNumber();
+        int aNbSubFolders = foldersCount(aSubDoc.get());
         int aNbSubItems = 0;
         std::string aSubType = myXMLReader.subType();
         if (!aSubType.empty())
@@ -335,7 +388,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
 {
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
-  int aNbFolders = myXMLReader.rootFoldersNumber();
+  int aNbFolders = foldersCount();
 
   if (!theParent.isValid()) {
     if (theRow < aNbFolders) // Return first level folder index
@@ -384,7 +437,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       ResultPartPtr aPartRes = getPartResult(aParentObj);
       if (aPartRes.get()) {
         DocumentPtr aSubDoc = aPartRes->partDoc();
-        int aNbSubFolders = myXMLReader.subFoldersNumber();
+        int aNbSubFolders = foldersCount(aSubDoc.get());
         if (theRow < aNbSubFolders) { // Create a Folder of sub-document
           return createIndex(theRow, theColumn, aSubDoc.get());
         } else {
@@ -443,9 +496,14 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
 //******************************************************
 bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
 {
-  int aNbFolders = myXMLReader.rootFoldersNumber();
-  if (!theParent.isValid() && aNbFolders)
-    return true;
+  if (!theParent.isValid()) {
+    int aNbFolders = foldersCount();
+    if (aNbFolders > 0)
+      return true;
+    SessionPtr aSession = ModelAPI_Session::get();
+    DocumentPtr aRootDoc = aSession->moduleDocument();
+    return aRootDoc->size(myXMLReader.rootType()) > 0;
+  }
   if (theParent.internalId() == -1) {
     std::string aType = myXMLReader.rootFolderType(theParent.row());
     if (!aType.empty()) {
@@ -500,7 +558,7 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 }
 
 //******************************************************
-QModelIndex XGUI_DataModel::findDocumentRootIndex(ModelAPI_Document* theDoc) const
+QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDoc) const
 {
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
@@ -514,7 +572,7 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(ModelAPI_Document* theDoc) con
       if (aPartRes.get() && (aPartRes->partDoc().get() == theDoc)) {
         int aRow = i;
         if (myXMLReader.rootType() == ModelAPI_Feature::group())
-          aRow += myXMLReader.rootFoldersNumber();
+          aRow += foldersCount();
         return createIndex(aRow, 0, aObj.get());
       }
     }
@@ -528,7 +586,7 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(ModelAPI_Document* theDoc) con
       if (aPartRes.get() && (aPartRes->partDoc().get() == theDoc)) {
         int aRow = i;
         if (myXMLReader.rootType() == ModelAPI_Feature::group())
-          aRow += myXMLReader.rootFoldersNumber();
+          aRow += foldersCount();
         return createIndex(aRow, 0, aObj.get());
       }
     }
@@ -545,4 +603,50 @@ QModelIndex XGUI_DataModel::documentRootIndex(DocumentPtr theDoc) const
     return QModelIndex();
   else 
     return findDocumentRootIndex(theDoc.get());
+}
+
+//******************************************************
+int XGUI_DataModel::foldersCount(ModelAPI_Document* theDoc) const
+{
+  int aNb = 0;
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aRootDoc = aSession->moduleDocument();
+  if ((theDoc == 0) || (theDoc == aRootDoc.get())) {
+    for (int i = 0; i < myXMLReader.rootFoldersNumber(); i++) {
+      if (myXMLReader.rootShowEmpty(i))
+        aNb++;
+      else {
+        if (aRootDoc->size(myXMLReader.rootFolderType(i)) > 0)
+          aNb++;
+      }
+    }
+  } else {
+    for (int i = 0; i < myXMLReader.subFoldersNumber(); i++) {
+      if (myXMLReader.subShowEmpty(i))
+        aNb++;
+      else {
+        if (theDoc->size(myXMLReader.subFolderType(i)) > 0)
+          aNb++;
+      }
+    }
+  }
+  return aNb;
+}
+
+//******************************************************
+QStringList XGUI_DataModel::listOfShowNotEmptyFolders(bool fromRoot) const
+{
+  QStringList aResult;
+  if (fromRoot) {
+    for (int i = 0; i < myXMLReader.rootFoldersNumber(); i++) {
+      if (!myXMLReader.rootShowEmpty(i))
+        aResult << myXMLReader.rootFolderType(i).c_str();
+    }
+  } else {
+    for (int i = 0; i < myXMLReader.subFoldersNumber(); i++) {
+      if (!myXMLReader.subShowEmpty(i))
+        aResult << myXMLReader.subFolderType(i).c_str();
+    }
+  }
+  return aResult;
 }

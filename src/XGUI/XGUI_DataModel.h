@@ -111,8 +111,17 @@ public:
   QModelIndex documentRootIndex(DocumentPtr theDoc) const;
 
 private:
-  QModelIndex findDocumentRootIndex(ModelAPI_Document* theDoc) const;
+  /// Find a root index which contains objects of the given document
+  /// \param theDoc the document object
+  QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc) const;
 
+  /// Returns number of folders in document. Considered folders which has to be shown only if they are not empty.
+  /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
+  int foldersCount(ModelAPI_Document* theDoc = 0) const;
+
+  /// Returns list of folders types which can not be shown empty
+  /// \param fromRoot - root document flag
+  QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
   Config_DataModelReader myXMLReader;
 };
