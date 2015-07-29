@@ -24,7 +24,8 @@ public:
    *  \returns true if feature is valid.
    */
   GEOMVALIDATORS_EXPORT virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                             const std::list<std::string>& theArguments) const;
+                                             const std::list<std::string>& theArguments,
+                                             std::string& theError) const;
 
   /// \return true if the attribute in feature is not obligatory for the feature execution.
   GEOMVALIDATORS_EXPORT virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);

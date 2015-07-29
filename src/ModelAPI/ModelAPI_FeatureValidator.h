@@ -30,7 +30,8 @@ class MODELAPI_EXPORT ModelAPI_FeatureValidator : public ModelAPI_Validator
   /// \param theFeature the validated feature
   /// \param theArguments list of string, feature attribute names: dependent attributes
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-    const std::list<std::string>& theArguments) const = 0;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError = std::string()) const = 0;
 
   /// Returns true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute) = 0;

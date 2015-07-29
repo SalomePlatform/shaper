@@ -16,7 +16,8 @@
 #include <memory>
 
 bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  const std::list<std::string>& theArguments) const
+                                     const std::list<std::string>& theArguments,
+                                     std::string& theError) const
 {
   static Model_ValidatorsFactory* aValidators = 
     static_cast<Model_ValidatorsFactory*>(ModelAPI_Session::get()->validators());

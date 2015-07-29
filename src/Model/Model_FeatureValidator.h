@@ -33,7 +33,8 @@ public:
   /// \param theArguments the arguments in the configuration file for this validator
   /// \returns true if feature is valid
   MODEL_EXPORT virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-    const std::list<std::string>& theArguments) const;
+                                    const std::list<std::string>& theArguments,
+                                    std::string& theError) const;
 
   /// sets not obligatory attributes, not checked for initialization
   virtual void registerNotObligatory(std::string theFeature, std::string theAttribute);

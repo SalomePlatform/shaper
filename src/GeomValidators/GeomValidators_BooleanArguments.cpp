@@ -11,7 +11,8 @@
 
 //=================================================================================================
 bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                              const std::list<std::string>& theArguments) const
+                                              const std::list<std::string>& theArguments,
+                                              std::string& theError) const
 {
   if(theArguments.size() != 3) {
     return false;

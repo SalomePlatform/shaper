@@ -45,7 +45,8 @@ public:
 };
 
 bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                       const std::list<std::string>& theArguments) const
+                                       const std::list<std::string>& theArguments,
+                                       std::string& theError) const
 {
   std::map<std::string, std::list<AttributePtr> > anAttributesMap;
   // For all attributes referred by theArguments 

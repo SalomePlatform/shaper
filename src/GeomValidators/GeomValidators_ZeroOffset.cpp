@@ -13,7 +13,8 @@
 
 //=================================================================================================
 bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                        const std::list<std::string>& theArguments) const
+                                        const std::list<std::string>& theArguments,
+                                        std::string& theError) const
 {
   if(theArguments.size() != 8) {
     return false;
