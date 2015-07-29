@@ -1,28 +1,23 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <!--Modification for specification of 1.3.0
-  <multi_selector id="base"
-    label="Select a sketch face"
+  <multi_selector id="placement_objects_list"
+    label="Select a solid objects"
     icon=":icons/cut_shape.png"
-    tooltip="Select a sketch face"
+    tooltip="Select a solid objects"
     type_choice="Solids">
-  </multi_selector>-->
-  <!--Modification for specification of 1.3.0
-    icon=":icons/placement_from.png"-->
-  <shape_selector id="placement_base_object" 
+  </multi_selector>
+  <shape_selector id="placement_start_face"
     label="Select an object" 
-    icon=":icons/cut_shape.png" 
-    tooltip="Select a destination element"
-    shape_types="face edge vertex"
+    icon=":icons/placement_from.png"
+    tooltip="Select a start face"
+    shape_types="face"
   />
-  <!--Modification for specification of 1.3.0
-      icon=":icons/placement_to.png"-->
-  <shape_selector id="placement_attractable_object" 
+  <shape_selector id="placement_end_face"
     label="Select an object" 
-    icon=":icons/cut_shape.png"
-    tooltip="Select an element of moved object" 
-    shape_types="face edge vertex" 
+    icon=":icons/placement_to.png"
+    tooltip="Select an end face"
+    shape_types="face"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
   </shape_selector>

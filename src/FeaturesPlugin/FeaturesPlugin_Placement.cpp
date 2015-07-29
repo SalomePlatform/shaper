@@ -17,6 +17,7 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAlgoAPI_Placement.h>
+#include <GeomAlgoAPI_Transform.h>
 
 #define _MODIFIEDF_TAG 1
 #define _MODIFIEDE_TAG 2
@@ -28,144 +29,155 @@ FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 
 void FeaturesPlugin_Placement::initAttributes()
 {
-  /* Modification for specification of 1.3.0
+
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Placement::LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+    OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // extrusion works with faces always
   aSelection->setSelectionType("SOLID");
-  */
-  data()->addAttribute(FeaturesPlugin_Placement::BASE_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Placement::REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(FeaturesPlugin_Placement::CENTERING_ID(), ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(START_FACE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(END_FACE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(CENTERING_ID(), ModelAPI_AttributeBoolean::typeId());
 }
 
 void FeaturesPlugin_Placement::execute()
 {
-  // Verify the base face
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = std::dynamic_pointer_cast<
-    ModelAPI_AttributeSelection>(data()->attribute(FeaturesPlugin_Placement::BASE_OBJECT_ID()));
-  if (!anObjRef)
+  // Getting objects.
+  ListOfShape anObjects;
+  std::list<ResultPtr> aContextes;
+  AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECTS_LIST_ID());
+  if(anObjectsSelList->size() == 0) {
     return;
+  }
+  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
+    if(!anObject.get()) {
+      return;
+    }
+    anObjects.push_back(anObject);
+    aContextes.push_back(anObjectAttr->context());
+  }
 
-  std::shared_ptr<GeomAPI_Shape> aBaseShape = 
-    std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
-  if (!aBaseShape)
+  // Verify the start face
+  AttributeSelectionPtr anObjRef = selection(START_FACE_ID());
+  if(!anObjRef) {
     return;
+  }
+  std::shared_ptr<GeomAPI_Shape> aStartFace = anObjRef->value();
+  if(!aStartFace || !GeomAPI_Face(aStartFace).isPlanar()) {
+    static const std::string aSelectionError = "The start face selection is bad";
+    setError(aSelectionError);
+    return;
+  }
 
-  std::shared_ptr<GeomAPI_Shape> aBaseObject;
+
+  std::shared_ptr<GeomAPI_Shape> aStartShape;
   ResultPtr aContextRes = anObjRef->context();
   if (aContextRes.get()) {
-    aBaseObject = aContextRes->shape();
+    aStartShape = aContextRes->shape();
   }
-  if (!aBaseObject.get()) {
-    static const std::string aContextError = "The base selection context is bad";
+  if(!aStartShape.get()) {
+    static const std::string aContextError = "The start face selection context is bad";
     setError(aContextError);
     return;
   }
 
-  // Verify the attractive face
-  anObjRef = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(
-      data()->attribute(FeaturesPlugin_Placement::ATTRACT_OBJECT_ID()));
-
-  std::shared_ptr<GeomAPI_Shape> aSlaveShape = 
-    std::dynamic_pointer_cast<GeomAPI_Shape>(anObjRef->value());
-  if (!aSlaveShape)
+  // Verify the end face
+  anObjRef = selection(END_FACE_ID());
+  std::shared_ptr<GeomAPI_Shape> anEndFace = anObjRef->value();
+  if(!anEndFace || !GeomAPI_Face(anEndFace).isPlanar()) {
+    static const std::string aSelectionError = "The end face selection is bad";
+    setError(aSelectionError);
     return;
+  }
 
-  std::shared_ptr<GeomAPI_Shape> aSlaveObject;
+  std::shared_ptr<GeomAPI_Shape> anEndShape;
   aContextRes = anObjRef->context();
-  if (aContextRes.get()) {
-    aSlaveObject = aContextRes->shape();
+  if(aContextRes.get()) {
+    anEndShape = aContextRes->shape();
   }
-  if (!aSlaveObject.get()) {
-    static const std::string aContextError = "The tool selection context is bad";
+  if(!anEndShape.get()) {
+    static const std::string aContextError = "The end face selection context is bad";
     setError(aContextError);
     return;
-  }
-
-  // Verify planarity of faces and linearity of edges
-  std::shared_ptr<GeomAPI_Shape> aShapes[2] = {aBaseShape, aSlaveShape};
-  for (int i = 0; i < 2; i++) {
-    if (aShapes[i]->isFace()) {
-      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShapes[i]));
-      if (!aFace->isPlanar()) {
-        static const std::string aPlanarityError = "One of selected faces is not planar";
-        setError(aPlanarityError);
-        return;
-      }
-    }
-    else if (aShapes[i]->isEdge()) {
-      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShapes[i]));
-      if (!anEdge->isLine()) {
-        static const std::string aLinearityError = "One of selected endges is not linear";
-        setError(aLinearityError);
-        return;
-      }
-    }
   }
 
   // Flags of the Placement
-  AttributeBooleanPtr aBoolAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
-      data()->attribute(FeaturesPlugin_Placement::REVERSE_ID()));
-  bool isReverse = aBoolAttr->value();
-  aBoolAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
-      data()->attribute(FeaturesPlugin_Placement::CENTERING_ID()));
-  bool isCentering = aBoolAttr->value();
+  bool isReverse = boolean(REVERSE_ID())->value();
+  bool isCentering = boolean(CENTERING_ID())->value();
 
   bool isPart = aContextRes->groupName() == ModelAPI_ResultPart::group();
 
-  std::shared_ptr<ModelAPI_ResultBody> aResultBody;
-  if (!isPart) 
-    aResultBody = document()->createBody(data());
-  GeomAlgoAPI_Placement aFeature(
-    aSlaveObject, aBaseObject, aSlaveShape, aBaseShape, isReverse, isCentering, isPart);
-  if(!aFeature.isDone()) {
+  // Getting transformation.
+  GeomAlgoAPI_Placement aPlacementAlgo(
+    aStartShape, anEndShape, aStartFace, anEndFace, isReverse, isCentering, true);
+  if(!aPlacementAlgo.isDone()) {
     static const std::string aFeatureError = "Placement algorithm failed";
     setError(aFeatureError);
     return;
   }
+  std::shared_ptr<GeomAPI_Trsf> aTrsf = aPlacementAlgo.transformation();
 
-  // Check if shape is valid
-  if (aFeature.shape()->isNull()) {
-    static const std::string aShapeError = "Resulting shape is Null";
-    setError(aShapeError);
-    return;
+  // Applying transformation to each object.
+  int aResultIndex = 0;
+  std::list<ResultPtr>::iterator aContext = aContextes.begin();
+  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
+      anObjectsIt++, aContext++) {
+
+    if (isPart) { // for part results just set transformation
+      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aContextRes);
+      ResultPartPtr aResultPart = document()->copyPart(firstResult(), anOrigin);
+      aResultPart->setTrsf(aContextRes, aTrsf);
+      setResult(aResultPart);
+    } else {
+      std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+      GeomAlgoAPI_Transform aTransformAlgo(aBaseShape, aTrsf);
+
+      // Checking that the algorithm worked properly.
+      if(!aTransformAlgo.isDone()) {
+        static const std::string aFeatureError = "Transform algorithm failed";
+        setError(aFeatureError);
+        break;
+      }
+      if(aTransformAlgo.shape()->isNull()) {
+        static const std::string aShapeError = "Resulting shape is Null";
+        setError(aShapeError);
+        break;
+      }
+      if(!aTransformAlgo.isValid()) {
+        std::string aFeatureError = "Warning: resulting shape is not valid";
+        setError(aFeatureError);
+        break;
+      }
+
+      //LoadNamingDS
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
+      LoadNamingDS(aTransformAlgo, aResultBody, aBaseShape);
+      setResult(aResultBody, aResultIndex);
+    }
+    aResultIndex++;
   }
-  if(!aFeature.isValid()) {
-    std::string aFeatureError = "Warning: resulting shape is not valid";
-    setError(aFeatureError);
-    return;
-  }  
 
-  if (isPart) { // for part results just set transformation
-    ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aContextRes);
-    ResultPartPtr aResultPart = document()->copyPart(firstResult(), anOrigin);
-    aResultPart->setTrsf(aContextRes, aFeature.transformation());
-    setResult(aResultPart);
-  } else {
-    //LoadNamingDS
-    LoadNamingDS(aFeature, aResultBody, aSlaveObject);
-
-    setResult(aResultBody);
-  }
+  // Remove the rest results if there were produced in the previous pass.
+  removeResults(aResultIndex);
 }
 
 //============================================================================
-void FeaturesPlugin_Placement::LoadNamingDS(
-    GeomAlgoAPI_Placement& theFeature,
-    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-    std::shared_ptr<GeomAPI_Shape> theSlaveObject)
+void FeaturesPlugin_Placement::LoadNamingDS(GeomAlgoAPI_Transform& theTransformAlgo,
+                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                            std::shared_ptr<GeomAPI_Shape> theSlaveObject)
 {
   //load result
-  theResultBody->storeModified(theSlaveObject, theFeature.shape()); // the initial Slave, the resulting Slave
+  theResultBody->storeModified(theSlaveObject, theTransformAlgo.shape()); // the initial Slave, the resulting Slave
 
-  GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
-  theFeature.mapOfShapes(*aSubShapes);
-  
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfShapes();
+
     // put modifed faces in DF
   std::string aModName = "Modified";
-  theResultBody->loadAndOrientModifiedShapes(theFeature.makeShape(), theSlaveObject, _FACE, _MODIFIEDF_TAG, aModName, *aSubShapes); 
-
+  theResultBody->loadAndOrientModifiedShapes(theTransformAlgo.makeShape().get(),
+                                             theSlaveObject, _FACE,
+                                             _MODIFIEDF_TAG, aModName, *aSubShapes.get());
 }

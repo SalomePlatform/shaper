@@ -10,6 +10,7 @@
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
 #include <GeomAlgoAPI_Placement.h>
+#include <GeomAlgoAPI_Transform.h>
 
 class ModelAPI_ResultBody;
 class GeomAPI_Shape;
@@ -31,25 +32,26 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
     static const std::string MY_PLACEMENT_ID("Placement");
     return MY_PLACEMENT_ID;
   }
+
   /// attribute name of references sketch entities list, it should contain a sketch result or
   /// a pair a sketch result to sketch face
-  /*Modification for specification of 1.3.0
-  inline static const std::string& LIST_ID()
+  inline static const std::string& OBJECTS_LIST_ID()
   {
-    static const std::string MY_GROUP_LIST_ID("base");
-    return MY_GROUP_LIST_ID;
-  }*/
+    static const std::string MY_OBJECTS_LIST_ID("placement_objects_list");
+    return MY_OBJECTS_LIST_ID;
+  }
+
   /// attribute name of referenced object
-  inline static const std::string& BASE_OBJECT_ID()
+  inline static const std::string& START_FACE_ID()
   {
-    static const std::string MY_BASE_OBJECT_ID("placement_base_object");
-    return MY_BASE_OBJECT_ID;
+    static const std::string MY_START_FACE_ID("placement_start_face");
+    return MY_START_FACE_ID;
   }
   /// attribute name of attractable face
-  inline static const std::string& ATTRACT_OBJECT_ID()
+  inline static const std::string& END_FACE_ID()
   {
-    static const std::string MY_ATTRACT_OBJECT_ID("placement_attractable_object");
-    return MY_ATTRACT_OBJECT_ID;
+    static const std::string MY_END_FACE_ID("placement_end_face");
+    return MY_END_FACE_ID;
   }
   /// attribute name of flag of reverse direction
   inline static const std::string& REVERSE_ID()
@@ -81,7 +83,7 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
   FeaturesPlugin_Placement();
 private:
   /// Load Naming data structure of the feature to the document
-  void LoadNamingDS(GeomAlgoAPI_Placement& theFeature,
+  void LoadNamingDS(GeomAlgoAPI_Transform& theTransformAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theSlaveObject);
 };
