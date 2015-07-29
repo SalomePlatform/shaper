@@ -27,7 +27,7 @@
 #define _LAST_TAG 3
 #define EDGE 6
 
-//#define DEBUG_COMPSOLID
+#define DEBUG_COMPSOLID
 
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
@@ -98,7 +98,11 @@ void FeaturesPlugin_Extrusion::execute()
 
   // for each selected face generate a result
   int anIndex = 0, aResultIndex = 0;
-
+#ifdef DEBUG_COMPSOLID
+  ResultCompSolidPtr aCompSolidResult = document()->createCompSolid(data(), aResultIndex);
+  setResult(aCompSolidResult, aResultIndex);
+  aResultIndex++;
+#endif
   for(; anIndex < aFaceRefs->size(); anIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(anIndex);
     ResultPtr aContextRes = aFaceRef->context();
@@ -122,12 +126,6 @@ void FeaturesPlugin_Extrusion::execute()
         break;
       }
     }
-
-#ifdef DEBUG_COMPSOLID
-    ResultCompSolidPtr aCompSolidResult = document()->createCompSolid(data(), aResultIndex);
-    setResult(aCompSolidResult, aResultIndex);
-    aResultIndex++;
-#endif
     for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
 #ifdef DEBUG_COMPSOLID
       ResultBodyPtr aResultBody = aCompSolidResult->addResult(aResultIndex);
@@ -160,10 +158,7 @@ void FeaturesPlugin_Extrusion::execute()
         break;
       }
       //LoadNamingDS
-//#ifdef DEBUG_COMPSOLID
-//#else
       LoadNamingDS(aFeature, aResultBody, aBaseShape, aContext);
-//#endif
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
 
