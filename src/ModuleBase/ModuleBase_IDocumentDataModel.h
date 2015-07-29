@@ -31,6 +31,10 @@ public:
 
   //! Rebuild data tree
   virtual void rebuildDataTree();
+
+  /// Returns last history object index
+  virtual QModelIndex lastHistoryIndex() const { return QModelIndex(); }
+
 };
 
 #endif

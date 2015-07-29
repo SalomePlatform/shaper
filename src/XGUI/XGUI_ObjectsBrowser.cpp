@@ -68,6 +68,11 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
   setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   setItemDelegateForColumn(0, new XGUI_TreeViewItemDelegate(this));
+
+#ifndef ModuleDataModel
+  connect(this, SIGNAL(doubleClicked(const QModelIndex&)), 
+    SLOT(onDoubleClick(const QModelIndex&)));
+#endif
 }
 
 XGUI_DataTree::~XGUI_DataTree()
@@ -121,6 +126,50 @@ void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
   }
 }
 
+void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
+{
+  if (theIndex.column() != 1)
+    return;
+  ModuleBase_IDocumentDataModel* aModel = dataModel();
+  if (aModel->flags(theIndex) == 0)
+    return;
+  ObjectPtr aObj = aModel->object(theIndex);
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+  
+  QModelIndex aOldIndex = aModel->lastHistoryIndex();
+
+  std::string aOpName = tr("History change").toStdString();
+  if (aObj.get()) {
+    if (aObj->document() != aDoc)
+      return;
+    aMgr->startOperation(aOpName);
+    aDoc->setCurrentFeature(std::dynamic_pointer_cast<ModelAPI_Feature>(aObj), true);
+    aMgr->finishOperation();
+  } else {
+    // Ignore clicks on folders outside current document
+    if ((theIndex.internalId() == -1) && (aDoc != aMgr->moduleDocument()))
+      // Clicked folder under root but active document is another
+      return;
+    if ((theIndex.internalId() != -1) && (aDoc.get() != theIndex.internalPointer()))
+      // Cliced not on active document folder
+      return;
+
+    aMgr->startOperation(aOpName);
+    aDoc->setCurrentFeature(FeaturePtr(), true);
+    aMgr->finishOperation();
+  }
+  QModelIndex aNewIndex = aModel->lastHistoryIndex();
+  QModelIndex aParent = theIndex.parent();
+  int aStartRow = std::min(aOldIndex.row(), aNewIndex.row());
+  int aEndRow = std::max(aOldIndex.row(), aNewIndex.row());
+  for (int i = aStartRow; i <= aEndRow; i++) {
+    update(aModel->index(i, 0, aParent));
+  }
+  update(aOldIndex);
+  update(aNewIndex);
+}
 
 //********************************************************************
 //********************************************************************

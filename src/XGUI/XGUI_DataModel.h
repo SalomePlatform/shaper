@@ -110,6 +110,9 @@ public:
   /// \param theDoc a document
   QModelIndex documentRootIndex(DocumentPtr theDoc) const;
 
+  /// Returns last history object index
+  virtual QModelIndex lastHistoryIndex() const;
+
 private:
   /// Find a root index which contains objects of the given document
   /// \param theDoc the document object

@@ -13,6 +13,7 @@
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Feature.h>
 
 #include <Config_FeatureMessage.h>
 
@@ -115,9 +116,11 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             insertRow(aRow + aNbSubFolders, aDocRoot);
           } else {
             // List of objects under a folder
-            int aFolderId = myXMLReader.subFolderId(aObjType);
-            if (aFolderId != -1) {
-              insertRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
+            if (aRow != -1) {
+              int aFolderId = myXMLReader.subFolderId(aObjType);
+              if (aFolderId != -1) {
+                insertRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
+              }
             }
           }
         } 
@@ -253,14 +256,11 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
   int aNbFolders = foldersCount();
   int theIndexRow = theIndex.row();
 
-  if ((theIndex.column() == 1) ) {
-    //if (theIndexRow >= aNbFolders) {
-    //  if (theRole == Qt::DecorationRole) {
-    //    return QIcon(":pictures/arrow.png");
-    //  }
-    //}
+  if ((theRole == Qt::DecorationRole) && (theIndex == lastHistoryIndex()))
+    return QIcon(":pictures/arrow.png");
+
+  if (theIndex.column() == 1)
     return QVariant();
-  }
 
   int aParentId = theIndex.internalId();
   if (aParentId == -1) { // root folders
@@ -271,21 +271,23 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       case Qt::DecorationRole:
         return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
       case Qt::ForegroundRole:
-        if (aRootDoc->isActive())
+        if (aSession->activeDocument() == aRootDoc)
           return QBrush(ACTIVE_COLOR);
         else
           return QBrush(PASSIVE_COLOR);
     }
-  } else {
+  } else { // an object or sub-document
     ModelAPI_Document* aSubDoc = getSubDocument(theIndex.internalPointer());
 
     if (theRole == Qt::ForegroundRole) {
       bool aIsActive = false;
       if (aSubDoc)
-        aIsActive = aSubDoc->isActive();
+        aIsActive = (aSession->activeDocument().get() == aSubDoc);
       else {
         ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
-        aIsActive = aObj->document()->isActive();
+        if (aObj->isDisabled())
+          return QBrush(Qt::lightGray);
+        aIsActive = (aSession->activeDocument() == aObj->document());
       }
       if (aIsActive)
         return QBrush(ACTIVE_COLOR);
@@ -550,10 +552,20 @@ bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& the
 //******************************************************
 Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 {
-  Qt::ItemFlags aFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-  if (theIndex.internalId() > -1) {
-    aFlags |= Qt::ItemIsEditable;
+  Qt::ItemFlags aFlags = Qt::ItemIsSelectable;
+
+  ModelAPI_Object* aObj = 0;
+  if (theIndex.internalId() != -1) {
+    if (!getSubDocument(theIndex.internalPointer()))
+      aObj = (ModelAPI_Object*) theIndex.internalPointer();
   }
+  if (aObj) {
+    aFlags |= Qt::ItemIsEditable;
+  
+    if (!aObj->isDisabled())
+      aFlags |= Qt::ItemIsEnabled;
+  } else
+    aFlags |= Qt::ItemIsEnabled;
   return aFlags;
 }
 
@@ -649,4 +661,21 @@ QStringList XGUI_DataModel::listOfShowNotEmptyFolders(bool fromRoot) const
     }
   }
   return aResult;
+}
+
+//******************************************************
+QModelIndex XGUI_DataModel::lastHistoryIndex() const
+{
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aCurDoc = aSession->activeDocument();
+  FeaturePtr aFeature = aCurDoc->currentFeature(true);
+  if (aFeature.get()) {
+    QModelIndex aInd = objectIndex(aFeature);
+    return createIndex(aInd.row(), 1, aInd.internalPointer());
+  } else {
+    if (aCurDoc == aSession->moduleDocument())
+      return createIndex(foldersCount() - 1, 1, -1);
+    else 
+      return createIndex(foldersCount(aCurDoc.get()) - 1, 1, aCurDoc.get());
+  }
 }

@@ -47,6 +47,8 @@ public slots:
   /// Commit modified data (used for renaming of objects)
   virtual void commitData(QWidget* theEditor);
 
+  void onDoubleClick(const QModelIndex&);
+
  protected:
    /// Redefinition of virtual method
   virtual void contextMenuEvent(QContextMenuEvent* theEvent);
