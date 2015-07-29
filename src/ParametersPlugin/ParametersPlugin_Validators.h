@@ -25,7 +25,8 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
-                                               const std::list<std::string>& theArguments) const;
+                                               const std::list<std::string>& theArguments,
+                                               std::string& theError) const;
 
  protected:
   PARAMETERSPLUGIN_EXPORT bool isVariable(const std::string& theString) const;
@@ -43,7 +44,8 @@ class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
-                                               const std::list<std::string>& theArguments) const;
+                                               const std::list<std::string>& theArguments,
+                                               std::string& theError) const;
 };
 
 

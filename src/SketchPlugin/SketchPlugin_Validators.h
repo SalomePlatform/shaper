@@ -23,7 +23,8 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 /**\class SketchPlugin_TangentAttrValidator
@@ -39,7 +40,8 @@ class SketchPlugin_TangentAttrValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 
@@ -56,7 +58,8 @@ class SketchPlugin_NotFixedValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 /**\class SketchPlugin_EqualAttrValidator
@@ -72,7 +75,8 @@ class SketchPlugin_EqualAttrValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 /**\class SketchPlugin_MirrorAttrValidator
@@ -88,7 +92,8 @@ class SketchPlugin_MirrorAttrValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute (not used)
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 
@@ -105,7 +110,8 @@ class SketchPlugin_CoincidenceAttrValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute (not used)
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 
@@ -123,7 +129,8 @@ class SketchPlugin_CopyValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute (not used)
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 #endif

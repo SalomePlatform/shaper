@@ -24,7 +24,8 @@ class GeomValidators_Face : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
-                                             const std::list<std::string>& theArguments) const;
+                                             const std::list<std::string>& theArguments,
+                                             std::string& theError) const;
 protected:
   /// Convert string to TypeOfFace value
   /// \param theType a string value

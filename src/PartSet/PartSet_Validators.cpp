@@ -184,7 +184,8 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
 
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
-                                                const std::list<std::string>& theArguments) const
+                                                const std::list<std::string>& theArguments,
+                                                std::string& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
 
@@ -322,7 +323,8 @@ bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr&
 }
 
 bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
-                                            const std::list<std::string>& theArguments) const
+                                            const std::list<std::string>& theArguments,
+                                            std::string& theError) const
 {
   bool isSketchEntities = true;
   std::set<std::string> anEntityKinds;
@@ -373,8 +375,9 @@ bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
 
 
 
-bool PartSet_SameTypeAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool PartSet_SameTypeAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                            const std::list<std::string>& theArguments,
+                                            std::string& theError ) const
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
@@ -399,8 +402,9 @@ bool PartSet_SameTypeAttrValidator::isValid(
   return false;
 }
 
-bool PartSet_CoincidentAttr::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute, 
+                                     const std::list<std::string>& theArguments,
+                                     std::string& theError) const
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();

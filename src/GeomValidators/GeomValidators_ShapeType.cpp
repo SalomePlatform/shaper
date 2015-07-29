@@ -42,7 +42,8 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
 }
 
 bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
-                                       const std::list<std::string>& theArguments) const
+                                       const std::list<std::string>& theArguments,
+                                       std::string& theError) const
 {
   bool aValid = false;
 

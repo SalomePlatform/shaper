@@ -28,8 +28,9 @@
 #include <GeomDataAPI_Point2D.h>
 
 
-bool SketchPlugin_DistanceAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                                 const std::list<std::string>& theArguments,
+                                                 std::string& theError) const
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
@@ -78,8 +79,9 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   return false;
 }
 
-bool SketchPlugin_TangentAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                                const std::list<std::string>& theArguments,
+                                                std::string& theError) const
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
@@ -115,8 +117,9 @@ bool SketchPlugin_TangentAttrValidator::isValid(
   return false;
 }
 
-bool SketchPlugin_NotFixedValidator::isValid(
-    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
+bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute, 
+                                             const std::list<std::string>& theArguments,
+                                             std::string& theError) const
 {
   std::shared_ptr<SketchPlugin_Feature> aFeature =
       std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
@@ -144,8 +147,9 @@ bool SketchPlugin_NotFixedValidator::isValid(
   return true;
 }
 
-bool SketchPlugin_EqualAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                              const std::list<std::string>& theArguments,
+                                              std::string& theError) const
 {
   std::string aParamA = theArguments.front();
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
@@ -188,8 +192,9 @@ bool SketchPlugin_EqualAttrValidator::isValid(
   return true;
 }
 
-bool SketchPlugin_MirrorAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                               const std::list<std::string>& theArguments,
+                                               std::string& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeSelectionListPtr aSelAttr = 
@@ -212,8 +217,9 @@ bool SketchPlugin_MirrorAttrValidator::isValid(
 }
 
 
-bool SketchPlugin_CoincidenceAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                                    const std::list<std::string>& theArguments,
+                                                    std::string& theError) const
 {
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
@@ -255,8 +261,9 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(
 }
 
 
-bool SketchPlugin_CopyValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute, 
+                                         const std::list<std::string>& theArguments,
+                                         std::string& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeSelectionListPtr aSelAttr = 

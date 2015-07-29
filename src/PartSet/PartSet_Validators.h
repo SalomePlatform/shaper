@@ -112,7 +112,8 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute an attribute
   //! \param theArguments a list of arguments (names of attributes to check)
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 
 protected:
   //! Checks whethe other feature attributes has a reference to the given attribute
@@ -132,7 +133,8 @@ class PartSet_SketchEntityValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute an attribute
   //! \param theArguments a list of arguments (names of attributes to check)
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 /**\class PartSet_SameTypeAttrValidator
@@ -148,7 +150,8 @@ class PartSet_SameTypeAttrValidator : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 /**\class PartSet_CoincidentAttr
@@ -163,7 +166,8 @@ class PartSet_CoincidentAttr : public ModelAPI_AttributeValidator
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 

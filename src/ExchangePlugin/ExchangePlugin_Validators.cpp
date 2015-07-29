@@ -38,7 +38,8 @@ bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& 
 }
 
 bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
-                                             const std::list<std::string>& theArguments) const
+                                             const std::list<std::string>& theArguments,
+                                             std::string& theError) const
 {
   if (!theAttribute->isInitialized())
     return false;

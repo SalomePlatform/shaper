@@ -24,7 +24,8 @@ public:
   /// \param theAttribute an attribute to check
   /// \param theArguments a filter parameters
   SKETCHPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
-                                           const std::list<std::string>& theArguments) const;
+                                           const std::list<std::string>& theArguments,
+                                           std::string& theError) const;
 
 protected:
   /// returns true if the feature of the attribute is external

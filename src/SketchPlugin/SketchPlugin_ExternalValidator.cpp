@@ -13,7 +13,8 @@
 #include <ModelAPI_AttributeRefAttr.h>
 
 bool SketchPlugin_ExternalValidator::isValid(const AttributePtr& theAttribute,
-                                          const std::list<std::string>& theArguments) const
+                                             const std::list<std::string>& theArguments,
+                                             std::string& theError) const
 {
   if (theArguments.size() != 1)
     return true;

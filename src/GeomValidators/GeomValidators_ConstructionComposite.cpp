@@ -7,7 +7,8 @@
 #include "ModelAPI_CompositeFeature.h"
 
 bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttribute,
-                                              const std::list<std::string>& theArguments) const
+                                                   const std::list<std::string>& theArguments,
+                                                   std::string& theError) const
 {
   bool aValid = false;
   AttributeSelectionPtr aSelectionAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>

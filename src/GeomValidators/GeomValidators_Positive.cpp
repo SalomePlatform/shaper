@@ -21,8 +21,9 @@ GeomValidators_Positive::GeomValidators_Positive()
   aFactory->registerValidator("GeomValidators_Positive", this);
 }
 
-bool GeomValidators_Positive::isValid(
-    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
+bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute, 
+                                      const std::list<std::string>& theArguments,
+                                      std::string& theError) const
 {
   AttributeDoublePtr aDouble = 
     std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);

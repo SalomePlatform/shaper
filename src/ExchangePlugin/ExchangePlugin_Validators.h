@@ -33,7 +33,8 @@ public:
    * allowed formats.
    */
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments) const;
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 class ExchangePlugin_ImportFormatValidator : public ExchangePlugin_FormatValidator

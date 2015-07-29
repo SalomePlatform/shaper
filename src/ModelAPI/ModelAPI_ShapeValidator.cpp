@@ -10,7 +10,8 @@
 #include "ModelAPI_Object.h"
 
 bool ModelAPI_ShapeValidator::isValid(const AttributePtr& theAttribute,
-                                       const std::list<std::string>& theArguments) const
+                                      const std::list<std::string>& theArguments,
+                                      std::string& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeSelectionPtr aSelectionAttribute = 
