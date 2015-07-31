@@ -357,8 +357,8 @@ void XGUI_ActionsMgr::updateByPlugins(FeaturePtr anActiveFeature)
 {
   static Events_ID aStateRequestEventId = Events_Loop::loop()->eventByName(
       EVENT_FEATURE_STATE_REQUEST);
-  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg =
-      std::make_shared<ModelAPI_FeatureStateMessage>(aStateRequestEventId, this);
+  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg(
+      new ModelAPI_FeatureStateMessage(aStateRequestEventId, this));
   aMsg->setFeature(anActiveFeature);
   Events_Loop::loop()->send(aMsg, false);
 }

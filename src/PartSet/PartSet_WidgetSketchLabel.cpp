@@ -135,7 +135,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
 
   // selection happens in OCC viewer
   if (!aShape.IsNull()) {
-    aGShape =  std::make_shared<GeomAPI_Shape>();
+    aGShape =  std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
     aGShape->setImpl(new TopoDS_Shape(aShape));
 
     if (aSelAttr && aSelAttr->context()) {

@@ -48,7 +48,7 @@ void FeaturesPlugin_RevolutionBoolean::makeSolids(const ListOfShape& theFaces,
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
   } else if(anObjRef->context() && anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
-    anEdge = std::make_shared<GeomAPI_Edge>(anObjRef->context()->shape());
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
   }
   if(anEdge) {
     anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), anEdge->line()->direction()));
@@ -91,9 +91,7 @@ void FeaturesPlugin_RevolutionBoolean::makeSolids(const ListOfShape& theFaces,
   theResults.clear();
   for(ListOfShape::const_iterator aFacesIt = theFaces.begin(); aFacesIt != theFaces.end(); aFacesIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *aFacesIt;
-    std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo = std::make_shared<GeomAlgoAPI_Revolution>(aBaseShape, anAxis,
-                                                                                                  aToShape, aToAngle,
-                                                                                                  aFromShape, aFromAngle);
+    std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo = std::shared_ptr<GeomAlgoAPI_Revolution>(new GeomAlgoAPI_Revolution(aBaseShape, anAxis, aToShape, aToAngle, aFromShape, aFromAngle));
 
     // Checking that the algorithm worked properly.
     if(!aRevolAlgo->isDone()  || !aRevolAlgo->shape().get() || aRevolAlgo->shape()->isNull() ||

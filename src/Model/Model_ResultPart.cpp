@@ -288,7 +288,7 @@ void Model_ResultPart::setTrsf(std::shared_ptr<ModelAPI_Result> theThis,
 {
   updateShape();
   if (theTransformation.get()) {
-    myTrsf = std::make_shared<gp_Trsf>(theTransformation->impl<gp_Trsf>());
+    myTrsf = std::shared_ptr<gp_Trsf>(new gp_Trsf(theTransformation->impl<gp_Trsf>()));
   }
   // the result must be explicitly updated
   static Events_Loop* aLoop = Events_Loop::loop();

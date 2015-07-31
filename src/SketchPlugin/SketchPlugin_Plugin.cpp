@@ -156,8 +156,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
 ::getFeaturesState(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
 {
   const Events_ID kResponseEvent = Events_Loop::loop()->eventByName(EVENT_FEATURE_STATE_RESPONSE);
-  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg =
-      std::make_shared<ModelAPI_FeatureStateMessage>(kResponseEvent, this);
+  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg(
+      new ModelAPI_FeatureStateMessage(kResponseEvent, this));
 
   bool aHasSketchPlane = false;
   std::shared_ptr<SketchPlugin_Sketch> aSketchFeature =

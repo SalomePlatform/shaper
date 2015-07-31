@@ -127,8 +127,8 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
   gp_Ax1 anAxis = theAxis->impl<gp_Ax1>();
 
   ListOfMakeShape aListOfMakeShape;
-  myFirst = std::make_shared<GeomAPI_Shape>();
-  myLast = std::make_shared<GeomAPI_Shape>();
+  myFirst = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+  myLast = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
 
   TopoDS_Shape aResult;
   if(!theFromShape && !theToShape) { // Case 1: When only angles was set.
@@ -138,7 +138,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     BRepBuilderAPI_Transform* aBaseTransform = new BRepBuilderAPI_Transform(aBasisFace,
                                                                             aBaseTrsf,
                                                                             true);
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aBaseTransform));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aBaseTransform)));
     TopoDS_Shape aRotatedBaseShape = aBaseTransform->Shape();
 
     // Making revolution to the angle equal to the sum of "from angle" and "to angle".
@@ -151,7 +151,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     if(!aRevolBuilder->IsDone()) {
       return;
     }
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aRevolBuilder));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aRevolBuilder)));
     aResult = aRevolBuilder->Shape();
 
     // Setting naming.
@@ -198,7 +198,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     // Making revolution to the 360 angle.
     BRepPrimAPI_MakeRevol* aRevolBuilder = new BRepPrimAPI_MakeRevol(aBasisFace, anAxis, 2 * M_PI, Standard_True);
     aRevolBuilder->Build();
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aRevolBuilder));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aRevolBuilder)));
     TopoDS_Shape aRevolShape = aRevolBuilder->Shape();
 
     // Cutting revolution with from plane.
@@ -207,7 +207,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     if(!aFromCutBuilder->IsDone()) {
       return;
     }
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aFromCutBuilder));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
     aResult = aFromCutBuilder->Shape();
 
     // Cutting revolution with to plane.
@@ -216,7 +216,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     if(!aToCutBuilder->IsDone()) {
       return;
     }
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aToCutBuilder));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aToCutBuilder)));
     aResult = aToCutBuilder->Shape();
 
     // If after cut we got more than one solids then take closest to the center of mass of the base face.
@@ -281,7 +281,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     // Making revolution to the 360 angle.
     BRepPrimAPI_MakeRevol* aRevolBuilder = new BRepPrimAPI_MakeRevol(aBasisFace, anAxis, 2 * M_PI, Standard_True);
     aRevolBuilder->Build();
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aRevolBuilder));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aRevolBuilder)));
     TopoDS_Shape aRevolShape = aRevolBuilder->Shape();
 
     // Cutting revolution with bounding plane.
@@ -290,7 +290,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     if(!aBoundingCutBuilder->IsDone()) {
       return;
     }
-    aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aBoundingCutBuilder));
+    aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aBoundingCutBuilder)));
     aResult = aBoundingCutBuilder->Shape();
     TopExp_Explorer anExp1(aResult, TopAbs_SOLID);
 
@@ -323,7 +323,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
       TopoDS_Shape aCutResult = aBasisCutBuilder->Shape();
       TopExp_Explorer anExp(aCutResult, TopAbs_SOLID);
       if(anExp.More()) {
-        aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aBasisCutBuilder));
+        aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aBasisCutBuilder)));
         aResult = aCutResult;
       }
     }
@@ -354,15 +354,15 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
   }
 
   // fill data map to keep correct orientation of sub-shapes
-  myMap = std::make_shared<GeomAPI_DataMapOfShapeShape>();
+  myMap = std::shared_ptr<GeomAPI_DataMapOfShapeShape>(new GeomAPI_DataMapOfShapeShape());
   for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
     std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
     aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
     myMap->bind(aCurrentShape, aCurrentShape);
   }
-  myShape = std::make_shared<GeomAPI_Shape>();
+  myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
   myShape->setImpl(new TopoDS_Shape(aResult));
-  myMkShape = std::make_shared<GeomAlgoAPI_MakeShapeList>();
+  myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(new GeomAlgoAPI_MakeShapeList());
   myDone = true;
   return;
 }

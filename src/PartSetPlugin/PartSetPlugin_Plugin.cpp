@@ -58,8 +58,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> PartSetPlugin_Plugin::getFeaturesS
 {
   const Events_ID kResponseEvent =
         Events_Loop::loop()->eventByName(EVENT_FEATURE_STATE_RESPONSE);
-  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg =
-      std::make_shared<ModelAPI_FeatureStateMessage>(kResponseEvent, this);
+  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg(
+      new ModelAPI_FeatureStateMessage(kResponseEvent, this));
   std::string aStdDocKind = ModelAPI_Session::get()->activeDocument()->kind();
   bool aDocIsPart = (aStdDocKind == PartSetPlugin_Part::ID());
   aMsg->setState(PartSetPlugin_Part::ID(), true);
