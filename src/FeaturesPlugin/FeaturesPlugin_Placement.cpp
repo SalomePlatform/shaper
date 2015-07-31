@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_BodyBuilder.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
@@ -170,14 +171,15 @@ void FeaturesPlugin_Placement::LoadNamingDS(GeomAlgoAPI_Transform& theTransformA
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                             std::shared_ptr<GeomAPI_Shape> theSlaveObject)
 {
+  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   //load result
-  theResultBody->storeModified(theSlaveObject, theTransformAlgo.shape()); // the initial Slave, the resulting Slave
+  aResultBuilder->storeModified(theSlaveObject, theTransformAlgo.shape()); // the initial Slave, the resulting Slave
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfShapes();
 
     // put modifed faces in DF
   std::string aModName = "Modified";
-  theResultBody->loadAndOrientModifiedShapes(theTransformAlgo.makeShape().get(),
-                                             theSlaveObject, _FACE,
-                                             _MODIFIEDF_TAG, aModName, *aSubShapes.get());
+  aResultBuilder->loadAndOrientModifiedShapes(theTransformAlgo.makeShape().get(),
+                                              theSlaveObject, _FACE,
+                                              _MODIFIEDF_TAG, aModName, *aSubShapes.get());
 }

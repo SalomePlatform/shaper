@@ -17,6 +17,7 @@
 #include <Config_PropManager.h>
 
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
@@ -112,9 +113,9 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody)
 {
   //load result
-  theResultBody->store(theGeomShape);
+  theResultBody->getBodyBuilder()->store(theGeomShape);
 
   int aTag(1);
   std::string aNameMS = "Shape";
-  theResultBody->loadFirstLevel(theGeomShape, aNameMS, aTag);
+  theResultBody->getBodyBuilder()->loadFirstLevel(theGeomShape, aNameMS, aTag);
 }

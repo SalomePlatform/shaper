@@ -8,6 +8,7 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
@@ -128,15 +129,16 @@ void FeaturesPlugin_Movement::LoadNamingDS(const GeomAlgoAPI_Movement& theMoveme
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
+  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   // Store result.
-  theResultBody->storeModified(theBaseShape, theMovementAlgo.shape());
+  aResultBuilder->storeModified(theBaseShape, theMovementAlgo.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theMovementAlgo.mapOfShapes();
 
   int aMovedTag = 1;
   std::string aMovedName = "Moved";
-  theResultBody->loadAndOrientModifiedShapes(theMovementAlgo.makeShape().get(),
-                                             theBaseShape, GeomAPI_Shape::FACE,
-                                             aMovedTag, aMovedName, *aSubShapes.get());
+  aResultBuilder->loadAndOrientModifiedShapes(theMovementAlgo.makeShape().get(),
+                                              theBaseShape, GeomAPI_Shape::FACE,
+                                              aMovedTag, aMovedName, *aSubShapes.get());
 
 }

@@ -1,55 +1,33 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModelAPI_ResultBody.hxx
+// File:        ModelAPI_BodyBuilder.hxx
 // Created:     07 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_ResultBody_H_
-#define ModelAPI_ResultBody_H_
+#ifndef ModelAPI_BodyBuilder_H_
+#define ModelAPI_BodyBuilder_H_
 
-#include "ModelAPI_Result.h"
+#include <ModelAPI.h>
 #include <GeomAPI_Shape.h>
-//#include <GeomAlgoAPI_MakeShape.h>
-//#include <GeomAPI_DataMapOfShapeShape.h>
-//#include <memory>
+#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAPI_DataMapOfShapeShape.h>
+#include <memory>
 #include <string>
 
-class ModelAPI_BodyBuilder;
+class ModelAPI_Data;
+class ModelAPI_Document;
+class ModelAPI_Object;
 
-/**\class ModelAPI_ResultBody
+/**\class ModelAPI_BodyBuilder
 * \ingroup DataModel
-* \brief The body (shape) result of a feature.
-*
-* Provides a shape that may be displayed in the viewer.
-* May provide really huge results, so, working with this kind
-* of result must be optimized.
 */
-class ModelAPI_ResultBody : public ModelAPI_Result
+class ModelAPI_BodyBuilder
 {
 public:
-  MODELAPI_EXPORT virtual ~ModelAPI_ResultBody();
-  /// Returns the group identifier of this result
-  MODELAPI_EXPORT virtual std::string groupName();
-
-  /// Returns the group identifier of this result
-  inline static std::string group()
-  {
-    static std::string MY_GROUP = "Bodies";
-    return MY_GROUP;
-  }
-
-  /// default color for a result body
-  inline static const std::string& DEFAULT_COLOR()
-  {
-    static const std::string RESULT_BODY_COLOR("150,150,180");
-    return RESULT_BODY_COLOR;
-  }
-
-  /// Returns the builder, which processes the shapes
-  ModelAPI_BodyBuilder* getBodyBuilder() { return myBuilder; }
+  MODELAPI_EXPORT virtual ~ModelAPI_BodyBuilder() {};
 
   /// Stores the shape (called by the execution method).
-  /*virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+  virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
 
   /// Stores the generated shape (called by the execution method).
   virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
@@ -111,15 +89,21 @@ public:
 
   /// load disconnected vetexes
   virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName,int&  theTag) = 0;
-  */
-protected:
-  MODELAPI_EXPORT ModelAPI_ResultBody();
 
 protected:
-  ModelAPI_BodyBuilder* myBuilder; /// provide the body processing in naming shape
+  /// Returns the data manager of this object: attributes
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Data> data() const;
+
+  /// Returns document this feature belongs to
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> document() const;
+
+protected:
+  MODELAPI_EXPORT ModelAPI_BodyBuilder(ModelAPI_Object* theOwner);
+
+  ModelAPI_Object* myOwner;
 };
 
 //! Pointer on feature object
-typedef std::shared_ptr<ModelAPI_ResultBody> ResultBodyPtr;
+typedef std::shared_ptr<ModelAPI_BodyBuilder> BodyBuilderPtr;
 
 #endif

@@ -9,10 +9,13 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Object.h>
 
+#include <Model_BodyBuilder.h>
+
 #include <Model_Document.h>
 
 Model_ResultCompSolid::Model_ResultCompSolid()
 {
+  myBuilder = new Model_BodyBuilder(this);
 }
 
 Model_ResultCompSolid::~Model_ResultCompSolid()

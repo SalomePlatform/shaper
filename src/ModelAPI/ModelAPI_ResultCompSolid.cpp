@@ -10,11 +10,6 @@ ModelAPI_ResultCompSolid::~ModelAPI_ResultCompSolid()
 {
 }
 
-std::string ModelAPI_ResultCompSolid::groupName()
-{
-  return group();
-}
-
 bool ModelAPI_ResultCompSolid::isDisabled() const
 {
   return false;

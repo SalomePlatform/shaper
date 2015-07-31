@@ -17,19 +17,11 @@
 *
 * Provides a conainer of body result that may be displayed in the viewer.
 */
-class ModelAPI_ResultCompSolid : public ModelAPI_Result
+class ModelAPI_ResultCompSolid : public ModelAPI_ResultBody
 {
 public:
   MODELAPI_EXPORT virtual ~ModelAPI_ResultCompSolid();
   /// Returns the group identifier of this result
-  MODELAPI_EXPORT virtual std::string groupName();
-
-  /// Returns the group identifier of this result
-  inline static std::string group()
-  {
-    static std::string MY_GROUP = "Bodies";
-    return MY_GROUP;
-  }
 
   /// Returns the feature is disabled or not.
   MODELAPI_EXPORT virtual bool isDisabled() const;

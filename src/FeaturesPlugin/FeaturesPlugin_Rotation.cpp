@@ -8,6 +8,7 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
@@ -128,15 +129,16 @@ void FeaturesPlugin_Rotation::LoadNamingDS(const GeomAlgoAPI_Rotation& theRotaio
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
+  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   // Store result.
-  theResultBody->storeModified(theBaseShape, theRotaionAlgo.shape());
+  aResultBuilder->storeModified(theBaseShape, theRotaionAlgo.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRotaionAlgo.mapOfShapes();
 
   int aRotatedTag = 1;
   std::string aRotatedName = "Rotated";
-  theResultBody->loadAndOrientModifiedShapes(theRotaionAlgo.makeShape().get(),
-                                             theBaseShape, GeomAPI_Shape::FACE,
-                                             aRotatedTag, aRotatedName, *aSubShapes.get());
+  aResultBuilder->loadAndOrientModifiedShapes(theRotaionAlgo.makeShape().get(),
+                                              theBaseShape, GeomAPI_Shape::FACE,
+                                              aRotatedTag, aRotatedName, *aSubShapes.get());
 
 }

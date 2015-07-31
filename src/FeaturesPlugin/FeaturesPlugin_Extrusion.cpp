@@ -6,6 +6,7 @@
 
 #include <FeaturesPlugin_Extrusion.h>
 
+#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Document.h>
@@ -177,16 +178,17 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
                                             std::shared_ptr<GeomAPI_Shape> theContext)
 {
   //load result
+  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   if(theBasis->isEqual(theContext))
-    theResultBody->store(theFeature.shape());
+    aResultBuilder->store(theFeature.shape());
   else
-    theResultBody->storeGenerated(theBasis, theFeature.shape());
+    aResultBuilder->storeGenerated(theBasis, theFeature.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theFeature.mapOfShapes();
 
   //Insert lateral face : Face from Edge
   std::string aLatName = "LateralFace";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
+  aResultBuilder->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
 
   //Insert bottom face
   std::string aBotName = "BottomFace";
@@ -195,7 +197,7 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
     if(aSubShapes->isBound(aBottomFace)) {
       aBottomFace = aSubShapes->find(aBottomFace);
     }
-    theResultBody->generated(aBottomFace, aBotName, _FIRST_TAG);
+    aResultBuilder->generated(aBottomFace, aBotName, _FIRST_TAG);
   }
 
   //Insert top face
@@ -205,6 +207,6 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
     if (aSubShapes->isBound(aTopFace)) {
       aTopFace = aSubShapes->find(aTopFace);
     }
-    theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
+    aResultBuilder->generated(aTopFace, aTopName, _LAST_TAG);
   }
 }

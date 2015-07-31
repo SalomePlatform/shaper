@@ -10,6 +10,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Session.h>
@@ -198,23 +199,24 @@ void FeaturesPlugin_Boolean::LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
                                           const ListOfShape& theTools,
                                           const GeomAlgoAPI_Boolean& theAlgo)
 {
+  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   //load result
   if(theBaseShape->isEqual(theAlgo.shape())) {
-    theResultBody->store(theAlgo.shape());
+    aResultBuilder->store(theAlgo.shape());
   } else {
-    theResultBody->storeModified(theBaseShape, theAlgo.shape(), _SUBSOLIDS_TAG);
+    aResultBuilder->storeModified(theBaseShape, theAlgo.shape(), _SUBSOLIDS_TAG);
 
     GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
 
     std::string aModName = "Modified";
-    theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, FACE,
+    aResultBuilder->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, FACE,
                                                _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
-    theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, FACE, _DELETED_TAG);
+    aResultBuilder->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, FACE, _DELETED_TAG);
 
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, FACE,
+      aResultBuilder->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, FACE,
                                                  _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
-      theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, FACE, _DELETED_TAG);
+      aResultBuilder->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, FACE, _DELETED_TAG);
     }
   }
 }

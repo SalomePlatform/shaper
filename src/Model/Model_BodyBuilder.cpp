@@ -4,12 +4,11 @@
 // Created:     08 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#include <Model_ResultBody.h>
 #include <Model_BodyBuilder.h>
+
 #include <Model_Data.h>
 #include <Model_Document.h>
 #include <ModelAPI_AttributeIntArray.h>
-
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>
@@ -34,34 +33,15 @@
 #include <BRep_Tool.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
-
 #include <Config_PropManager.h>
 // DEB
 //#include <TCollection_AsciiString.hxx>
 //#include <TDF_Tool.hxx>
 //#define DEB_IMPORT 1
 
-Model_ResultBody::Model_ResultBody()
+Model_BodyBuilder::Model_BodyBuilder(ModelAPI_Object* theOwner)
+: ModelAPI_BodyBuilder(theOwner)
 {
-  myBuilder = new Model_BodyBuilder(this);
-
-  myIsDisabled = true; // by default it is not initialized and false to be after created
-  setIsConcealed(false);
-}
-
-void Model_ResultBody::initAttributes()
-{
-  // append the color attribute. It is empty, the attribute will be filled by a request
-  DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
-}
-
-void Model_ResultBody::colorConfigInfo(std::string& theSection, std::string& theName,
-  std::string& theDefault)
-{
-  theSection = "Visualization";
-  theName = "result_body_color";
-  theDefault = DEFAULT_COLOR();
 }
 
 // Converts evolution of naming shape to selection evelution and back to avoid
@@ -115,21 +95,7 @@ static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
   }
 }
 
-bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)
-{
-  bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
-  if (aChanged) { // state is changed, so modifications are needed
-    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-    if (!aData) // unknown case
-      return aChanged;
-    TDF_Label& aShapeLab = aData->shapeLab();
-    EvolutionToSelection(aShapeLab, theFlag);
-  }
-  return aChanged;
-}
-
-/*
-void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
+void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
@@ -159,7 +125,7 @@ void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
   }
 }
 
-void Model_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+void Model_BodyBuilder::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
   const std::shared_ptr<GeomAPI_Shape>& theToShape)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
@@ -192,7 +158,7 @@ void Model_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theF
   }
 }
 
-void Model_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
   const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theDecomposeSolidsTag)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
@@ -238,26 +204,7 @@ void Model_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOl
     }
   }
 }
-*/
-std::shared_ptr<GeomAPI_Shape> Model_ResultBody::shape()
-{
-  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-  if (aData) {
-    TDF_Label& aShapeLab = aData->shapeLab();
-    Handle(TNaming_NamedShape) aName;
-    if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
-      TopoDS_Shape aShape = aName->Get();
-      if (!aShape.IsNull()) {
-        std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-        aRes->setImpl(new TopoDS_Shape(aShape));
-        return aRes;
-      }
-    }
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-/*
-void Model_ResultBody::clean()
+void Model_BodyBuilder::clean()
 {
   std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
   for(; aBuilder != myBuilders.end(); aBuilder++)
@@ -265,12 +212,12 @@ void Model_ResultBody::clean()
   myBuilders.clear();
 }
 
-Model_ResultBody::~Model_ResultBody()
+Model_BodyBuilder::~Model_BodyBuilder()
 {
   clean();
 }
 
-TNaming_Builder* Model_ResultBody::builder(const int theTag)
+TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
 {
   if (myBuilders.size() <= (unsigned int)theTag) {
     myBuilders.insert(myBuilders.end(), theTag - myBuilders.size() + 1, NULL);
@@ -285,14 +232,14 @@ TNaming_Builder* Model_ResultBody::builder(const int theTag)
   return myBuilders[theTag];
 }
 
-void Model_ResultBody::buildName(const int theTag, const std::string& theName)
+void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
 {
   std::string aName = data()->name() + "/" + theName; 
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
   aDoc->addNamingName(builder(theTag)->NamedShape()->Label(), aName);
   TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(),aName.c_str());
 }
-void Model_ResultBody::generated(
+void Model_BodyBuilder::generated(
   const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag)
 {
   TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
@@ -301,7 +248,7 @@ void Model_ResultBody::generated(
     buildName(theTag, theName);
 }
 
-void Model_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+void Model_BodyBuilder::generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
   const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag)
 {
   TopoDS_Shape anOldShape = theOldShape->impl<TopoDS_Shape>();
@@ -312,7 +259,7 @@ void Model_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theOldSha
 }
 
 
-void Model_ResultBody::modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+void Model_BodyBuilder::modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
   const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag)
 {
   TopoDS_Shape anOldShape = theOldShape->impl<TopoDS_Shape>();
@@ -322,14 +269,14 @@ void Model_ResultBody::modified(const std::shared_ptr<GeomAPI_Shape>& theOldShap
     buildName(theTag, theName);
 }
 
-void Model_ResultBody::deleted(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+void Model_BodyBuilder::deleted(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
   const int theTag)
 {
   TopoDS_Shape aShape = theOldShape->impl<TopoDS_Shape>();
   builder(theTag)->Delete(aShape);
 }
 
-void Model_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
+void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
   const int  theKindOfShape,
   const int  theTag)
@@ -348,7 +295,7 @@ void Model_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
   }
 }
 
-void Model_ResultBody::loadAndOrientModifiedShapes (
+void Model_BodyBuilder::loadAndOrientModifiedShapes (
   GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
   const int  theKindOfShape,
@@ -383,7 +330,7 @@ void Model_ResultBody::loadAndOrientModifiedShapes (
   }
 }
 
-void Model_ResultBody::loadAndOrientGeneratedShapes (
+void Model_BodyBuilder::loadAndOrientGeneratedShapes (
   GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
   const int  theKindOfShape,
@@ -452,7 +399,7 @@ void loadGeneratedDangleShapes(
 }
 
 //=======================================================================
-void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape, 
+void Model_BodyBuilder::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape, 
   const std::string& theName, int&  theTag)
 {
   if(theShape->isNull()) return;
@@ -593,7 +540,7 @@ int findAmbiguities(const TopoDS_Shape&           theShapeIn,
 }
 
 //=======================================================================
-void Model_ResultBody::loadFirstLevel(
+void Model_BodyBuilder::loadFirstLevel(
   std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)
 {
   if(theShape->isNull()) return;
@@ -637,7 +584,7 @@ void Model_ResultBody::loadFirstLevel(
 }
 
 //=======================================================================
-void Model_ResultBody::loadDisconnectedEdges(
+void Model_BodyBuilder::loadDisconnectedEdges(
   std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)
 {
   if(theShape->isNull()) return;
@@ -680,7 +627,7 @@ void Model_ResultBody::loadDisconnectedEdges(
   #endif
   theTag++;
   }
-  *+/
+  */
   TopTools_MapOfShape anEdgesToDelete;
   TopExp_Explorer anEx(aShape,TopAbs_EDGE); 
   std::string aName;
@@ -728,7 +675,7 @@ void Model_ResultBody::loadDisconnectedEdges(
   }  
 }
 
-void Model_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)
+void Model_BodyBuilder::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  
@@ -767,4 +714,3 @@ void Model_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> t
     }
   }
 }
-*/

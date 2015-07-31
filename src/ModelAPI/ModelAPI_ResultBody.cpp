@@ -6,9 +6,15 @@
 
 #include "ModelAPI_ResultBody.h"
 
+ModelAPI_ResultBody::ModelAPI_ResultBody()
+: myBuilder(0)
+{
+}
+
 ModelAPI_ResultBody::~ModelAPI_ResultBody()
 {
-  
+  if (myBuilder)
+  delete myBuilder;
 }
 
 std::string ModelAPI_ResultBody::groupName()
