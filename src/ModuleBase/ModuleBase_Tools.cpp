@@ -12,6 +12,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
 #include <GeomDataAPI_Point2D.h>
@@ -221,6 +222,14 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
   return TopAbs_SHAPE;
 }
 
+bool isSubResult(ObjectPtr theObject)
+{
+  bool aSubResult = false;
+
+  //ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+  return aSubResult;
+}
+
 void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter, bool& hasSubFeature)
 {
   hasResult = false;
@@ -232,7 +241,10 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
 
-    hasResult = (aResult.get() != NULL);
+    bool aSubResult = isSubResult(aResult);
+
+    /// results of compsolids are not processed in SHOW/HIDE/WIREFRAME operations
+    hasResult = (aResult.get() != NULL && !aSubResult);
     hasFeature = (aFeature.get() != NULL);
     hasParameter = (aConstruction.get() != NULL);
     if (hasFeature) 

@@ -83,6 +83,11 @@ MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, const bool isUseAt
 /// \return TopAbs_ShapeEnum value
 MODULEBASE_EXPORT TopAbs_ShapeEnum shapeType(const QString& theType);
 
+/// Checks whether the object is a sub result. It gets the feature of the object,
+/// obtains all results of the feature and check if the object is a sub result
+/// \return boolean result
+MODULEBASE_EXPORT bool isSubResult(ObjectPtr theObject);
+
 /*!
 Check types of objects which are in the given list
 \param theObjects the list of objects
