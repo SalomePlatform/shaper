@@ -14,7 +14,7 @@
   <multi_selector id="tool_objects" 
     label="Tool object" 
     icon=":icons/cut_tool.png" 
-    tooltip="Select a tool solid"
+    tooltip="Select a tool face or solid"
     type_choice="Faces"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>

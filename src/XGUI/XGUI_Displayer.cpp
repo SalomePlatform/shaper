@@ -18,6 +18,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
@@ -58,6 +59,7 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
 
+//#define DEBUG_COMPOSILID_DISPLAY
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
@@ -109,7 +111,20 @@ bool XGUI_Displayer::isVisible(ObjectPtr theObject) const
 void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
 {
   if (isVisible(theObject)) {
-    redisplay(theObject, theUpdateViewer);
+#ifdef DEBUG_COMPOSILID_DISPLAY
+    ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
+    if (aCompsolidResult.get()) {
+      for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+        ResultPtr aSubResult = aCompsolidResult->subResult(i);
+        if (aSubResult.get())
+          redisplay(aSubResult, false);
+      }
+      if (theUpdateViewer)
+        updateViewer();
+    }
+    else
+#endif
+      redisplay(theObject, theUpdateViewer);
   } else {
     AISObjectPtr anAIS;
 
@@ -120,6 +135,19 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult.get() != NULL) {
+#ifdef DEBUG_COMPOSILID_DISPLAY
+        ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
+        if (aCompsolidResult.get()) {
+          for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+            ResultPtr aSubResult = aCompsolidResult->subResult(i);
+            if (aSubResult.get())
+              display(aSubResult, false);
+          }
+          if (theUpdateViewer)
+            updateViewer();
+        }
+        else {
+#endif
         std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr.get() != NULL) {
           anAIS = AISObjectPtr(new GeomAPI_AISObject());
@@ -127,6 +155,9 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
           //anAIS->createShape(aShapePtr);
           isShading = true;
         }
+#ifdef DEBUG_COMPOSILID_DISPLAY
+        } // close else
+#endif
       }
     }
     if (anAIS)
