@@ -38,7 +38,9 @@ std::shared_ptr<ModelAPI_ResultBody> Model_ResultCompSolid::addResult(const int 
 
 int Model_ResultCompSolid::numberOfSubs(bool forTree) const
 {
-  return 0;
+  if (forTree)
+    return 0;
+  return data()->reflist(Model_ResultCompSolid::BODIES_ID())->size();
 }
 
 std::shared_ptr<ModelAPI_ResultBody> Model_ResultCompSolid::subResult(const int theIndex,

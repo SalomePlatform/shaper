@@ -29,6 +29,7 @@
 #define EDGE 6
 
 #define DEBUG_COMPSOLID
+//#define DEBUG_COMPSOLID_SHAPE
 
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
@@ -104,6 +105,11 @@ void FeaturesPlugin_Extrusion::execute()
   setResult(aCompSolidResult, aResultIndex);
   aResultIndex++;
 #endif
+#ifdef DEBUG_COMPSOLID_SHAPE
+  bool aFirstShapeInCompsolid = aFaceRefs->size() > 0;
+  if (aFirstShapeInCompsolid)
+    aResultIndex--;
+#endif
   for(; anIndex < aFaceRefs->size(); anIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(anIndex);
     ResultPtr aContextRes = aFaceRef->context();
@@ -128,10 +134,22 @@ void FeaturesPlugin_Extrusion::execute()
       }
     }
     for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
+      ResultBodyPtr aResultBody;
+
+#ifdef DEBUG_COMPSOLID_SHAPE
+      if (aFirstShapeInCompsolid && anIndex == 0)
+        aResultBody = aCompSolidResult;
+      else {
+#endif
+
 #ifdef DEBUG_COMPSOLID
-      ResultBodyPtr aResultBody = aCompSolidResult->addResult(aResultIndex);
+      aResultBody = aCompSolidResult->addResult(aResultIndex);
 #else
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+      aResultBody = document()->createBody(data(), aResultIndex);
+#endif
+
+#ifdef DEBUG_COMPSOLID_SHAPE
+      }
 #endif
       std::shared_ptr<GeomAPI_Shape> aBaseShape;
       if (aFacesNum == -1) {

@@ -42,6 +42,7 @@
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -1327,8 +1328,9 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   std::vector<int> aColor;
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-    if (aResult.get())
+    if (aResult.get()) {
       XGUI_CustomPrs::getResultColor(aResult, aColor);
+    }
     else {
       // TODO: remove the obtaining a color from the AIS object
       // this does not happen never because:
@@ -1365,10 +1367,18 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   }
 
   // 4. set the value to all results
+  std::vector<int> aColorResult = aDlg->getColor();
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      std::vector<int> aColorResult = aDlg->getColor();
+      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
+        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+          ResultPtr aSubResult = aCompsolidResult->subResult(i);
+          if (aSubResult.get())
+            setColor(aSubResult, aColorResult);
+        }
+      }
       setColor(aResult, aColorResult);
     }
   }
