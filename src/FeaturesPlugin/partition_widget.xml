@@ -1,0 +1,22 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="main_objects"
+    label="Main objects"
+    icon=":icons/cut_shape.png"
+    tooltip="Select a solid objects"
+    type_choice="Solids"
+    use_choice="false"
+    concealment="true">
+    <validator id="PartSet_DifferentObjects"/>
+    <validator id="GeomValidators_ShapeType" parameters="empty,solid"/>
+  </multi_selector>
+  <multi_selector id="tool_objects" 
+    label="Tool object" 
+    icon=":icons/cut_tool.png" 
+    tooltip="Select a tool solid"
+    type_choice="Faces"
+    concealment="true" >
+    <validator id="PartSet_DifferentObjects"/>
+  </multi_selector>
+</source>

@@ -28,6 +28,9 @@
       <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png">
           <source path="boolean_widget.xml"/>
       </feature>
+      <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon=":icons/partition.png">
+          <source path="partition_widget.xml"/>
+      </feature>
     </group>
     <group id="Collections">
       <feature id="Group"

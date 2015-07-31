@@ -28,7 +28,7 @@
 #define _LAST_TAG 3
 #define EDGE 6
 
-#define DEBUG_COMPSOLID
+//#define DEBUG_COMPSOLID
 //#define DEBUG_COMPSOLID_SHAPE
 
 //=================================================================================================

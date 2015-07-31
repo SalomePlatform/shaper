@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Movement.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_Group.h
+    FeaturesPlugin_Partition.h
     FeaturesPlugin_Placement.h
     FeaturesPlugin_CompositeBoolean.h
     FeaturesPlugin_ExtrusionBoolean.h
@@ -30,6 +31,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Movement.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
+    FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Placement.cpp
     FeaturesPlugin_CompositeBoolean.cpp
     FeaturesPlugin_ExtrusionBoolean.cpp
@@ -52,6 +54,7 @@ SET(XML_RESOURCES
   movement_widget.xml
   boolean_widget.xml
   group_widget.xml
+  partition_widget.xml
   placement_widget.xml
 )
 
