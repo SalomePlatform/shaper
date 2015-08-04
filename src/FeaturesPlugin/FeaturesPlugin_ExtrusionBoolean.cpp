@@ -74,9 +74,7 @@ void FeaturesPlugin_ExtrusionBoolean::makeSolids(const ListOfShape& theFaces,
   theResults.clear();
   for(ListOfShape::const_iterator aFacesIt = theFaces.begin(); aFacesIt != theFaces.end(); aFacesIt++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *aFacesIt;
-    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::make_shared<GeomAlgoAPI_Prism>(aBaseShape,
-                                                                                        aToShape, aToSize,
-                                                                                        aFromShape, aFromSize);
+    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::shared_ptr<GeomAlgoAPI_Prism>(new GeomAlgoAPI_Prism(aBaseShape, aToShape, aToSize, aFromShape, aFromSize));
 
     // Checking that the algorithm worked properly.
     if(!aPrismAlgo->isDone() || !aPrismAlgo->shape().get() || aPrismAlgo->shape()->isNull() ||

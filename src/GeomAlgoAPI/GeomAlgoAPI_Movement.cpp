@@ -53,8 +53,7 @@ void GeomAlgoAPI_Movement::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
     TopLoc_Location aDelta(aTrsf);
     aResult = aSourceShape.Moved(aDelta);
     // store the accumulated information about the result and this delta
-    myTrsf = std::make_shared<GeomAPI_Trsf>(
-      new gp_Trsf(aTrsf * aSourceShape.Location().Transformation()));
+    myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf * aSourceShape.Location().Transformation())));
     myDone = true; // is OK for sure
   } else {
     BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);

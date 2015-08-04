@@ -92,8 +92,8 @@ void Config_ValidatorReader::processSelectionFilter(xmlNodePtr theNode)
 {
   Events_ID aFilterEvent = Events_Loop::eventByName(EVENT_SELFILTER_LOADED);
   Events_Loop* aEvLoop = Events_Loop::loop();
-  std::shared_ptr<Config_SelectionFilterMessage> aMessage =
-      std::make_shared<Config_SelectionFilterMessage>(aFilterEvent, this);
+  std::shared_ptr<Config_SelectionFilterMessage> aMessage(
+      new Config_SelectionFilterMessage(aFilterEvent, this));
   std::string aSelectionFilterId;
   std::list<std::string> aParameters;
   getParametersInfo(theNode, aSelectionFilterId, aParameters);

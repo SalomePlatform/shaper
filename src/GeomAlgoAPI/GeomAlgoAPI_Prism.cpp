@@ -111,19 +111,19 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
         aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
       }
       // fill data map to keep correct orientation of sub-shapes
-      myMap = std::make_shared<GeomAPI_DataMapOfShapeShape>();
+      myMap = std::shared_ptr<GeomAPI_DataMapOfShapeShape>(new GeomAPI_DataMapOfShapeShape());
       for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
         std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
         aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
         myMap->bind(aCurrentShape, aCurrentShape);
       }
-      myShape = std::make_shared<GeomAPI_Shape>();
+      myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       myShape->setImpl(new TopoDS_Shape(aResult));
-      myFirst = std::make_shared<GeomAPI_Shape>();
+      myFirst = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       myFirst->setImpl(new TopoDS_Shape(aBuilder->Modified(aFromShape).First()));
-      myLast = std::make_shared<GeomAPI_Shape>();
+      myLast = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       myLast->setImpl(new TopoDS_Shape(aBuilder->Modified(aToShape).First()));
-      myMkShape = std::make_shared<GeomAlgoAPI_MakeShape>();
+      myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape());
       myMkShape->setImpl(aBuilder);
     }
   }

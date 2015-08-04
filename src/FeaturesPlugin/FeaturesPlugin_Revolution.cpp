@@ -65,12 +65,12 @@ void FeaturesPlugin_Revolution::execute()
   std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
-    anEdge = std::make_shared<GeomAPI_Edge>(anObjRef->value());
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
   } else if(anObjRef->context() && anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
-    anEdge = std::make_shared<GeomAPI_Edge>(anObjRef->context()->shape());
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
   }
   if(anEdge) {
-    anAxis = std::make_shared<GeomAPI_Ax1>(anEdge->line()->location(), anEdge->line()->direction());
+    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), anEdge->line()->direction()));
   }
 
   // Getting angles.
