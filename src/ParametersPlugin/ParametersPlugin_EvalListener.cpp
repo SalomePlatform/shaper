@@ -25,6 +25,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <string>
+#include <set>
 #include <sstream>
 
 ParametersPlugin_EvalListener::ParametersPlugin_EvalListener()
@@ -84,6 +85,11 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
   return result;
 }
 
+std::set<std::string> toSet(const std::list<std::string>& theContainer)
+{
+  return std::set<std::string>(theContainer.begin(), theContainer.end());
+}
+
 void ParametersPlugin_EvalListener::processEvaluationEvent(
     const std::shared_ptr<Events_Message>& theMessage)
 {
@@ -98,6 +104,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
+    anAttribute->setUsedParameters(isValid ? toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
   } else
@@ -119,6 +126,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
       double aValue = evaluate(aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
+      anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }
@@ -142,6 +150,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
       double aValue = evaluate(aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
+      anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }

@@ -20,9 +20,14 @@
 #include <Model_Expression.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
+
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Point2D.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
@@ -397,6 +402,45 @@ void Model_Data::updateConcealmentFlag()
 
 #include <Model_Validator.h>
 
+std::set<std::string> set_union(const std::set<std::string>& theLeft, 
+                                const std::set<std::string>& theRight)
+{
+  std::set<std::string> aResult;
+  aResult.insert(theLeft.begin(), theLeft.end());
+  aResult.insert(theRight.begin(), theRight.end());
+  return aResult;
+}
+
+std::set<std::string> usedParameters(const AttributePointPtr& theAttribute)
+{
+  std::set<std::string> anUsedParameters;
+  for (int aComponent = 0; aComponent < 3; ++aComponent)
+    anUsedParameters = set_union(anUsedParameters, theAttribute->usedParameters(aComponent));
+  return anUsedParameters;
+}
+
+std::set<std::string> usedParameters(const AttributePoint2DPtr& theAttribute)
+{
+  std::set<std::string> anUsedParameters;
+  for (int aComponent = 0; aComponent < 2; ++aComponent)
+    anUsedParameters = set_union(anUsedParameters, theAttribute->usedParameters(aComponent));
+  return anUsedParameters;
+}
+
+std::list<ResultParameterPtr> findVariables(const std::set<std::string>& theParameters)
+{
+  std::list<ResultParameterPtr> aResult;
+  std::set<std::string>::const_iterator aParamIt = theParameters.cbegin();
+  for (; aParamIt != theParameters.cend(); ++aParamIt) {
+    const std::string& aName = *aParamIt;
+    double aValue;
+    ResultParameterPtr aParam;
+    if (ModelAPI_Tools::findVariable(aName, aValue, aParam))
+      aResult.push_back(aParam);
+  }
+  return aResult;
+}
+
 void Model_Data::referencesToObjects(
   std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs)
 {
@@ -432,6 +476,24 @@ void Model_Data::referencesToObjects(
       for(int a = aRef->size() - 1; a >= 0; a--) {
         aReferenced.push_back(aRef->value(a)->context());
       }
+    } else if (aType == ModelAPI_AttributeDouble::typeId()) { // double attribute
+      AttributeDoublePtr anAttribute =
+          std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr->second);
+      std::set<std::string> anUsedParameters = anAttribute->usedParameters();
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
+      aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
+    } else if (aType == GeomDataAPI_Point::typeId()) { // point attribute
+      AttributePointPtr anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->second);
+      std::set<std::string> anUsedParameters = usedParameters(anAttribute);
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
+      aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
+    } else if (aType == GeomDataAPI_Point2D::typeId()) { // point attribute
+      AttributePoint2DPtr anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->second);
+      std::set<std::string> anUsedParameters = usedParameters(anAttribute);
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
+      aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else
       continue; // nothing to do, not reference
 
