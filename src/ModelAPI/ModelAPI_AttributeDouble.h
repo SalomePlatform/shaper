@@ -9,6 +9,10 @@
 
 #include "ModelAPI_Attribute.h"
 
+#include <set>
+
+class ModelAPI_Expression;
+
 /**\class ModelAPI_AttributeDouble
  * \ingroup DataModel
  * \brief Attribute that contains real value with double precision.
@@ -37,6 +41,18 @@ class ModelAPI_AttributeDouble : public ModelAPI_Attribute
 
   /// Returns true if text is invalid
   MODELAPI_EXPORT virtual bool expressionInvalid() = 0;
+
+  /// Allows to set expression (text) error (by the parameters listener)
+  MODELAPI_EXPORT virtual void setExpressionError(const std::string& theError) = 0;
+
+  /// Returns an expression error
+  MODELAPI_EXPORT virtual std::string expressionError() = 0;
+
+  /// Defines the used parameters
+  MODELAPI_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters) = 0;
+
+  /// Returns the used parameters
+  MODELAPI_EXPORT virtual std::set<std::string> usedParameters() const = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string typeId()

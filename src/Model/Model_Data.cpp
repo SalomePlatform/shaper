@@ -17,6 +17,7 @@
 #include <Model_AttributeSelectionList.h>
 #include <Model_AttributeIntArray.h>
 #include <Model_Events.h>
+#include <Model_Expression.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
@@ -101,7 +102,10 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   } else if (theAttrType == Model_AttributeInteger::typeId()) {
     anAttr = new Model_AttributeInteger(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeDouble::typeId()) {
-    anAttr = new Model_AttributeDouble(anAttrLab);
+    Model_AttributeDouble* anAttribute = new Model_AttributeDouble(anAttrLab);
+    anAttribute->myExpression.reset(new Model_Expression(myLab.FindChild(myLab.NbChildren() + 1)));
+    anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression->isInitialized(); 
+    anAttr = anAttribute;
   } else if (theAttrType == Model_AttributeBoolean::typeId()) {
     anAttr = new Model_AttributeBoolean(anAttrLab);
   } else if (theAttrType == Model_AttributeString::typeId()) {
@@ -121,11 +125,21 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   } 
   // create also GeomData attributes here because only here the OCAF structure is known
   else if (theAttrType == GeomData_Point::typeId()) {
-    anAttr = new GeomData_Point(anAttrLab);
+    GeomData_Point* anAttribute = new GeomData_Point(anAttrLab);
+    for (int aComponent = 0; aComponent < GeomData_Point::NUM_COMPONENTS; ++aComponent) {
+      anAttribute->myExpression[aComponent].reset(new Model_Expression(myLab.FindChild(myLab.NbChildren() + 1)));
+      anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression[aComponent]->isInitialized(); 
+    }
+    anAttr = anAttribute;
   } else if (theAttrType == GeomData_Dir::typeId()) {
     anAttr = new GeomData_Dir(anAttrLab);
   } else if (theAttrType == GeomData_Point2D::typeId()) {
-    anAttr = new GeomData_Point2D(anAttrLab);
+    GeomData_Point2D* anAttribute = new GeomData_Point2D(anAttrLab);
+    for (int aComponent = 0; aComponent < GeomData_Point2D::NUM_COMPONENTS; ++aComponent) {
+      anAttribute->myExpression[aComponent].reset(new Model_Expression(myLab.FindChild(myLab.NbChildren() + 1)));
+      anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression[aComponent]->isInitialized(); 
+    }
+    anAttr = anAttribute;
   }
   if (anAttr) {
     aResult = std::shared_ptr<ModelAPI_Attribute>(anAttr);

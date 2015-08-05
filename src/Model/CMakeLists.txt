@@ -22,6 +22,7 @@ SET(PROJECT_HEADERS
     Model_AttributeSelectionList.h
     Model_BodyBuilder.h
     Model_Events.h
+    Model_Expression.h
     Model_Update.h
     Model_Validator.h
     Model_ResultBody.h
@@ -52,6 +53,7 @@ SET(PROJECT_SOURCES
     Model_AttributeSelectionList.cpp
     Model_BodyBuilder.cpp
     Model_Events.cpp
+    Model_Expression.cpp
     Model_Update.cpp
     Model_Validator.cpp
     Model_ResultBody.cpp

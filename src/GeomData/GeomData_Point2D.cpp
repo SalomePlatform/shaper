@@ -5,18 +5,26 @@
 // Author:      Mikhail PONIKAROV
 
 #include "GeomData_Point2D.h"
+
 #include <GeomAPI_Pnt2d.h>
-#include <ModelAPI_Feature.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Expression.h>
+#include <ModelAPI_Feature.h>
 
-using namespace std;
+#include <cassert>
+
+GeomData_Point2D::GeomData_Point2D(TDF_Label& theLabel)
+{
+  myIsInitialized = true;
+}
 
 void GeomData_Point2D::setCalculatedValue(const double theX, const double theY)
 {
-  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY) {
-    myCoords->SetValue(0, theX);
-    myCoords->SetValue(1, theY);
+  if (!myIsInitialized || x() != theX || y() != theY) {
+    myExpression[0]->setValue(theX);
+    myExpression[1]->setValue(theY);
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -34,32 +42,26 @@ void GeomData_Point2D::setValue(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 
 double GeomData_Point2D::x() const
 {
-  return myCoords->Value(0);
+  return myExpression[0]->value();
 }
 
 double GeomData_Point2D::y() const
 {
-  return myCoords->Value(1);
+  return myExpression[1]->value();
 }
 
 std::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
 {
-  std::shared_ptr<GeomAPI_Pnt2d> aResult(
-      new GeomAPI_Pnt2d(myCoords->Value(0), myCoords->Value(1)));
+  std::shared_ptr<GeomAPI_Pnt2d> aResult(new GeomAPI_Pnt2d(x(), y()));
   return aResult;
 }
 
 void GeomData_Point2D::setText(const std::string& theX,
                                const std::string& theY)
 {
-  TCollection_ExtendedString aX(theX.c_str());
-  TCollection_ExtendedString aY(theY.c_str());
-
-  if (!myIsInitialized ||
-      myTextArray->Value(0) != aX ||
-      myTextArray->Value(1) != aY) {
-    myTextArray->SetValue(0, aX);
-    myTextArray->SetValue(1, aY);
+  if (!myIsInitialized || textX() != theX || textY() != theY) {
+    myExpression[0]->setText(theX);
+    myExpression[1]->setText(theY);
     // Send it to evaluator to convert into the double and store in the attribute
     ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
     owner()->data()->sendAttributeUpdated(this);
@@ -68,42 +70,47 @@ void GeomData_Point2D::setText(const std::string& theX,
 
 std::string GeomData_Point2D::textX()
 {
-  return TCollection_AsciiString(myTextArray->Value(0)).ToCString();;
+  return myExpression[0]->text();
 }
 std::string GeomData_Point2D::textY()
 {
-  return TCollection_AsciiString(myTextArray->Value(1)).ToCString();;
+  return myExpression[1]->text();
 }
 
 void GeomData_Point2D::setExpressionInvalid(int theComponent, bool theFlag)
 {
-  if (!myIsInitialized || myExpressionInvalidArray->Value(theComponent) != theFlag) {
-    myExpressionInvalidArray->SetValue(theComponent, theFlag);
-  }
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  if (!myIsInitialized || expressionInvalid(theComponent) != theFlag)
+    myExpression[theComponent]->setInvalid(theFlag);
 }
 
 bool GeomData_Point2D::expressionInvalid(int theComponent)
 {
-  return myExpressionInvalidArray->Value(theComponent);
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  return myExpression[theComponent]->isInvalid();
 }
 
-GeomData_Point2D::GeomData_Point2D(TDF_Label& theLabel)
+void GeomData_Point2D::setExpressionError(int theComponent, const std::string& theError)
 {
-  myIsInitialized = true;
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  if (expressionError(theComponent) != theError)
+    myExpression[theComponent]->setError(theError);
+}
 
-  if (theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords) != Standard_True) {
-    // create attribute: not initialized by value yet, just zero
-    myCoords = TDataStd_RealArray::Set(theLabel, 0, 1);
-    myIsInitialized = false;
-  }
-  if (theLabel.FindAttribute(TDataStd_ExtStringArray::GetID(), myTextArray) != Standard_True) {
-    // create attribute: not initialized by value yet, just zero
-    myTextArray = TDataStd_ExtStringArray::Set(theLabel, 0, 1);
-    myIsInitialized = false;
-  }
-  if (theLabel.FindAttribute(TDataStd_BooleanArray::GetID(), myExpressionInvalidArray) != Standard_True) {
-    // create attribute: not initialized by value yet, just zero
-    myExpressionInvalidArray = TDataStd_BooleanArray::Set(theLabel, 0, 1);
-    myIsInitialized = false;
-  }
+std::string GeomData_Point2D::expressionError(int theComponent)
+{
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  return myExpression[theComponent]->error();
+}
+
+void GeomData_Point2D::setUsedParameters(int theComponent, const std::set<std::string>& theUsedParameters)
+{
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  myExpression[theComponent]->setUsedParameters(theUsedParameters);
+}
+
+std::set<std::string> GeomData_Point2D::usedParameters(int theComponent) const
+{
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  return myExpression[theComponent]->usedParameters();
 }

@@ -9,10 +9,10 @@
 
 #include "Model.h"
 #include "ModelAPI_AttributeDouble.h"
-#include <TDataStd_Real.hxx>
+
 #include <TDF_Label.hxx>
 
-#include <TDataStd_Name.hxx>
+class ModelAPI_Expression;
 
 /**\class Model_AttributeDouble
  * \ingroup DataModel
@@ -21,8 +21,8 @@
 
 class Model_AttributeDouble : public ModelAPI_AttributeDouble
 {
-  Handle_TDataStd_Real myReal;  ///< double is Real attribute
-  Handle_TDataStd_Name myText;  ///< Text representation of the attribute (may differ for parametres)
+  std::shared_ptr<ModelAPI_Expression> myExpression;
+
  public:
   /// Defines the double value
   MODEL_EXPORT virtual void setValue(const double theValue);
@@ -45,8 +45,20 @@ class Model_AttributeDouble : public ModelAPI_AttributeDouble
   /// Returns true if text is invalid
   MODEL_EXPORT virtual bool expressionInvalid();
 
+  /// Allows to set expression (text) error (by the parameters listener)
+  MODEL_EXPORT virtual void setExpressionError(const std::string& theError);
+
+  /// Returns an expression error
+  MODEL_EXPORT virtual std::string expressionError();
+
+  /// Defines the used parameters
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters);
+
+  /// Returns the used parameters
+  MODEL_EXPORT virtual std::set<std::string> usedParameters() const;
+
  protected:
-  /// Initializes attibutes
+  /// Initializes attributes
   Model_AttributeDouble(TDF_Label& theLabel);
 
   friend class Model_Data;

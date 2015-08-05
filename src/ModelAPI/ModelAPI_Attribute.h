@@ -61,12 +61,12 @@ class ModelAPI_Attribute
   /// Returns true if attribute causes the result change
   MODELAPI_EXPORT bool isArgument();
 
-  /// Immutable argument can not be changed programaticaly (e.g. by constraint)
+  /// Immutable argument can not be changed programmatically (e.g. by constraint)
   /// By default it is false.
   /// Returns the previous state of the attribute's immutability.
   MODELAPI_EXPORT bool setImmutable(const bool theFlag);
 
-  /// Returns true if can not be changed programaticaly
+  /// Returns true if can not be changed programmatically
   MODELAPI_EXPORT bool isImmutable();
 
   /// ID of the attribute in Data

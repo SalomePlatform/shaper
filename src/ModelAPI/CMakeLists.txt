@@ -25,6 +25,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Data.h
     ModelAPI_Document.h
     ModelAPI_Events.h
+    ModelAPI_Expression.h
     ModelAPI_Feature.h
     ModelAPI_FeatureValidator.h
     ModelAPI_Object.h
@@ -61,6 +62,7 @@ SET(PROJECT_SOURCES
     ModelAPI_Data.cpp
     ModelAPI_Document.cpp
     ModelAPI_Events.cpp
+    ModelAPI_Expression.cpp
     ModelAPI_Feature.cpp
     ModelAPI_FeatureValidator.cpp
     ModelAPI_Object.cpp

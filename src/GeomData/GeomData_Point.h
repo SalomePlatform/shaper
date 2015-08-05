@@ -9,21 +9,19 @@
 
 #include "GeomData.h"
 #include "GeomDataAPI_Point.h"
-#include <TDataStd_RealArray.hxx>
-#include <TDataStd_ExtStringArray.hxx>
-#include <TDataStd_BooleanArray.hxx>
+
 #include <TDF_Label.hxx>
+
+class ModelAPI_Expression;
 
 /**\class GeomData_Point
  * \ingroup DataModel
  * \brief Attribute that contains 3D point.
  */
-
 class GeomData_Point : public GeomDataAPI_Point
 {
-  Handle_TDataStd_RealArray myCoords;  ///< X, Y and Z doubles as real array attribute [0; 2]
-  Handle_TDataStd_ExtStringArray myTextArray;  ///< Text representation of the X, Y and Z attributes [0; 2]
-  Handle_TDataStd_BooleanArray myExpressionInvalidArray;  ///< Flag of invalid expression of the X, Y and Z attributes [0; 2]
+  enum { NUM_COMPONENTS = 3 };
+  std::shared_ptr<ModelAPI_Expression> myExpression[NUM_COMPONENTS]; ///< Expressions for X, Y and Z 
  public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);
@@ -59,6 +57,19 @@ class GeomData_Point : public GeomDataAPI_Point
 
   /// Returns true if text is invalid
   GEOMDATA_EXPORT virtual bool expressionInvalid(int);
+
+  /// Allows to set expression (text) error (by the parameters listener)
+  GEOMDATA_EXPORT virtual void setExpressionError(int theComponent, const std::string& theError);
+
+  /// Returns an expression error
+  GEOMDATA_EXPORT virtual std::string expressionError(int theComponent);
+
+  /// Defines the used parameters
+  GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent, 
+    const std::set<std::string>& theUsedParameters);
+
+  /// Returns the used parameters
+  GEOMDATA_EXPORT virtual std::set<std::string> usedParameters(int theComponent) const;
 
  protected:
   /// Initializes attributes

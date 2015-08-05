@@ -10,6 +10,8 @@
 #include "GeomDataAPI.h"
 #include <ModelAPI_Attribute.h>
 
+#include <set>
+
 class GeomAPI_Pnt;
 
 /**\class GeomDataAPI_Point
@@ -57,6 +59,19 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
 
   /// Returns true if text is invalid
   GEOMDATAAPI_EXPORT virtual bool expressionInvalid(int theComponent) = 0;
+
+  /// Allows to set expression (text) error (by the parameters listener)
+  GEOMDATAAPI_EXPORT virtual void setExpressionError(int theComponent, const std::string& theError) = 0;
+
+  /// Returns an expression error
+  GEOMDATAAPI_EXPORT virtual std::string expressionError(int theComponent) = 0;
+
+  /// Defines the used parameters
+  GEOMDATAAPI_EXPORT virtual void setUsedParameters(int theComponent, 
+    const std::set<std::string>& theUsedParameters) = 0;
+
+  /// Returns the used parameters
+  GEOMDATAAPI_EXPORT virtual std::set<std::string> usedParameters(int theComponent) const = 0;
 
   /// Returns the type of this class of attributes
   static std::string typeId()

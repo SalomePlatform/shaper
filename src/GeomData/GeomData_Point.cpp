@@ -5,20 +5,27 @@
 // Author:      Mikhail PONIKAROV
 
 #include "GeomData_Point.h"
+
 #include <GeomAPI_Pnt.h>
-#include <ModelAPI_Feature.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Expression.h>
+#include <ModelAPI_Feature.h>
 
-using namespace std;
+#include <cassert>
+
+GeomData_Point::GeomData_Point(TDF_Label& theLabel)
+{
+  myIsInitialized = true;
+}
 
 void GeomData_Point::setCalculatedValue(const double theX, const double theY, const double theZ)
 {
-  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY
-      || myCoords->Value(2) != theZ) {
-    myCoords->SetValue(0, theX);
-    myCoords->SetValue(1, theY);
-    myCoords->SetValue(2, theZ);
+  if (!myIsInitialized || x() != theX || y() != theY || z() != theZ) {
+    myExpression[0]->setValue(theX);
+    myExpression[1]->setValue(theY);
+    myExpression[2]->setValue(theZ);
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -37,23 +44,22 @@ void GeomData_Point::setValue(const std::shared_ptr<GeomAPI_Pnt>& thePoint)
 
 double GeomData_Point::x() const
 {
-  return myCoords->Value(0);
+  return myExpression[0]->value();
 }
 
 double GeomData_Point::y() const
 {
-  return myCoords->Value(1);
+  return myExpression[1]->value();
 }
 
 double GeomData_Point::z() const
 {
-  return myCoords->Value(2);
+  return myExpression[2]->value();
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
 {
-  std::shared_ptr<GeomAPI_Pnt> aResult(
-      new GeomAPI_Pnt(myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
+  std::shared_ptr<GeomAPI_Pnt> aResult(new GeomAPI_Pnt(x(), y(), z()));
   return aResult;
 }
 
@@ -61,17 +67,10 @@ void GeomData_Point::setText(const std::string& theX,
                              const std::string& theY,
                              const std::string& theZ)
 {
-  TCollection_ExtendedString aX(theX.c_str());
-  TCollection_ExtendedString aY(theY.c_str());
-  TCollection_ExtendedString aZ(theZ.c_str());
-
-  if (!myIsInitialized ||
-      myTextArray->Value(0) != aX ||
-      myTextArray->Value(1) != aY ||
-      myTextArray->Value(2) != aZ) {
-    myTextArray->SetValue(0, aX);
-    myTextArray->SetValue(1, aY);
-    myTextArray->SetValue(2, aZ);
+  if (!myIsInitialized || textX() != theX || textY() != theY || textZ() != theZ) {
+    myExpression[0]->setText(theX);
+    myExpression[1]->setText(theY);
+    myExpression[2]->setText(theZ);
     // Send it to evaluator to convert into the double and store in the attribute
     ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
     owner()->data()->sendAttributeUpdated(this);
@@ -80,46 +79,51 @@ void GeomData_Point::setText(const std::string& theX,
 
 std::string GeomData_Point::textX()
 {
-  return TCollection_AsciiString(myTextArray->Value(0)).ToCString();;
+  return myExpression[0]->text();
 }
 std::string GeomData_Point::textY()
 {
-  return TCollection_AsciiString(myTextArray->Value(1)).ToCString();;
+  return myExpression[1]->text();
 }
 std::string GeomData_Point::textZ()
 {
-  return TCollection_AsciiString(myTextArray->Value(2)).ToCString();;
+  return myExpression[2]->text();
 }
 
 void GeomData_Point::setExpressionInvalid(int theComponent, bool theFlag)
 {
-  if (!myIsInitialized || myExpressionInvalidArray->Value(theComponent) != theFlag) {
-    myExpressionInvalidArray->SetValue(theComponent, theFlag);
-  }
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  if (!myIsInitialized || expressionInvalid(theComponent) != theFlag)
+    myExpression[theComponent]->setInvalid(theFlag);
 }
 
 bool GeomData_Point::expressionInvalid(int theComponent)
 {
-  return myExpressionInvalidArray->Value(theComponent);
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  return myExpression[theComponent]->isInvalid();
 }
 
-GeomData_Point::GeomData_Point(TDF_Label& theLabel)
+void GeomData_Point::setExpressionError(int theComponent, const std::string& theError)
 {
-  myIsInitialized = true;
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  if (expressionError(theComponent) != theError)
+    myExpression[theComponent]->setError(theError);
+}
 
-  if (theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords) != Standard_True) {
-    // create attribute: not initialized by value yet, just zero
-    myCoords = TDataStd_RealArray::Set(theLabel, 0, 2);
-    myIsInitialized = false;
-  }
-  if (theLabel.FindAttribute(TDataStd_ExtStringArray::GetID(), myTextArray) != Standard_True) {
-    // create attribute: not initialized by value yet, just zero
-    myTextArray = TDataStd_ExtStringArray::Set(theLabel, 0, 2);
-    myIsInitialized = false;
-  }
-  if (theLabel.FindAttribute(TDataStd_BooleanArray::GetID(), myExpressionInvalidArray) != Standard_True) {
-    // create attribute: not initialized by value yet, just zero
-    myExpressionInvalidArray = TDataStd_BooleanArray::Set(theLabel, 0, 2);
-    myIsInitialized = false;
-  }
+std::string GeomData_Point::expressionError(int theComponent)
+{
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  return myExpression[theComponent]->error();
+}
+
+void GeomData_Point::setUsedParameters(int theComponent, const std::set<std::string>& theUsedParameters)
+{
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  myExpression[theComponent]->setUsedParameters(theUsedParameters);
+}
+
+std::set<std::string> GeomData_Point::usedParameters(int theComponent) const
+{
+  assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
+  return myExpression[theComponent]->usedParameters();
 }
