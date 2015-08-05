@@ -13,12 +13,13 @@
 
 #include <Events_Error.h>
 
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
-#include <ModelAPI_AttributeValidator.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <GeomDataAPI_Point.h>
@@ -62,8 +63,8 @@ void ParametersPlugin_EvalListener::processEvent(
   }
 }
 
-double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
-                                               std::string& theError)
+double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression, std::string& theError, 
+                                               const std::shared_ptr<ModelAPI_Document>& theDocument)
 {
   std::list<std::string> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
@@ -72,7 +73,7 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
   for ( ; it != anExprParams.end(); it++) {
     double aValue;
     ResultParameterPtr aParamRes;
-    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes)) continue;
+    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes, theDocument)) continue;
 
     std::ostringstream sstream;
     sstream << aValue;
@@ -100,7 +101,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     AttributeDoublePtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
     std::string anError;
-    double aValue = evaluate(anAttribute->text(), anError);
+    double aValue = evaluate(anAttribute->text(), anError, anAttribute->owner()->document());
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
@@ -123,7 +124,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     };
     for (int i = 0; i < 3; ++i) {
       std::string anError;
-      double aValue = evaluate(aText[i], anError);
+      double aValue = evaluate(aText[i], anError, anAttribute->owner()->document());
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
       anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
@@ -147,7 +148,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     };
     for (int i = 0; i < 2; ++i) {
       std::string anError;
-      double aValue = evaluate(aText[i], anError);
+      double aValue = evaluate(aText[i], anError, anAttribute->owner()->document());
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
       anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
@@ -313,44 +314,24 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     return;
   }
 
-  // List of documents to process
-  std::list<DocumentPtr> aDocList;
-  SessionPtr aSession = ModelAPI_Session::get();
-  DocumentPtr aDocument = aSession->activeDocument();
-  DocumentPtr aRootDocument = aSession->moduleDocument();
-  aDocList.push_back(aDocument);
-  if (aDocument != aRootDocument) {
-    aDocList.push_back(aRootDocument);
-  }
-
-  // Find all features
-  for (std::list<DocumentPtr>::const_iterator aDicumentIt = aDocList.begin(); 
-       aDicumentIt != aDocList.end(); ++aDicumentIt) {
-    const DocumentPtr& aDocument = *aDicumentIt;
-    std::list<FeaturePtr> aFeatures = aDocument->allFeatures();
-    std::list<FeaturePtr>::iterator aFeatureIt = aFeatures.begin();
-    for (; aFeatureIt != aFeatures.end(); ++aFeatureIt) {
-      const FeaturePtr& aFeature = *aFeatureIt;
-      
-      // If Parameter feature then rename its expression
+  std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes = 
+      aResultParameter->data()->refsToMe();
+  std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
+      anAttributes.cbegin();
+  for (; anAttributeIt != anAttributes.cend(); ++anAttributeIt) {
+    const AttributePtr& anAttribute = *anAttributeIt;
+    AttributeRefListPtr anAttributeRefList =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
+    if (anAttributeRefList.get()) {
       std::shared_ptr<ParametersPlugin_Parameter> aParameter =
-          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(aFeature);
-      if (aParameter.get()) {
+          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+              anAttributeRefList->owner());
+      if (aParameter.get())
         // Rename
         renameInParameter(aParameter, aMessage->oldName(), aMessage->newName());
-        continue;
-      }      
-
-      // Find all attributes
-      std::list<AttributePtr> anAttributes = aFeature->data()->attributes(std::string());
-      std::list<AttributePtr>::const_iterator anAttributeIt = anAttributes.begin();
-      for (; anAttributeIt != anAttributes.end(); ++anAttributeIt) {
-        const AttributePtr& anAttribute = *anAttributeIt;
-
+    } else
         // Rename
         renameInAttribute(anAttribute, aMessage->oldName(), aMessage->newName());
-      }
-    }
   }
 }
 

@@ -24,19 +24,19 @@ namespace ModelAPI_Tools {
 MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult);
 
 /*!
- * Searches for variable with name \param theName in the active document (Part), when
- * in the root document (PartSet). If found, set it value in the \param outValue
- * and returns true.
- */
-MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue, 
-  ResultParameterPtr& theParam);
-
-/*!
- * Searches for variable with name \param theName in the document. 
+ * Searches for variable with name \param theName in \param theDocument. 
  * If found, set it value in the \param outValue and returns true.
  */
-MODELAPI_EXPORT bool findVariable(const DocumentPtr& theDocument, const std::string& theName, 
-                                  double& outValue, ResultParameterPtr& theParam);
+MODELAPI_EXPORT bool findVariable(const DocumentPtr& theDocument, 
+                                  const std::string& theName, double& outValue, ResultParameterPtr& theParam);
+
+/*!
+ * Searches for variable with name \param theName in the active document (Part), when
+ * in the root document (PartSet). If found, set it value in the \param outValue
+ * and returns true. If \param theDocument is empty active document is used.
+ */
+MODELAPI_EXPORT bool findVariable(const std::string& theName, double& outValue, ResultParameterPtr& theParam,
+                                  const DocumentPtr& theDocument = DocumentPtr());
 
 /*!
  * Returns the values of the next random color. The values are in range [0, 255]

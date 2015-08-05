@@ -12,6 +12,7 @@
 #include <Events_Loop.h>
 
 class ModelAPI_Attribute;
+class ModelAPI_Document;
 class ParametersPlugin_Parameter;
 class ParametersPlugin_PyInterp;
 
@@ -24,7 +25,8 @@ class PARAMETERSPLUGIN_EXPORT ParametersPlugin_EvalListener : public Events_List
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
-  double evaluate(const std::string& theExpression, std::string& theError);
+  double evaluate(const std::string& theExpression, std::string& theError, 
+                  const std::shared_ptr<ModelAPI_Document>& theDocument);
 
   void processEvaluationEvent(const std::shared_ptr<Events_Message>& theMessage);
   void processObjectRenamedEvent(const std::shared_ptr<Events_Message>& theMessage);

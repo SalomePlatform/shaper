@@ -37,38 +37,45 @@ std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   return theResult->shape();
 }
 
-bool findVariable(const std::string& theName, double& outValue, ResultParameterPtr& theParam)
+ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup, const std::string& theName)
 {
-  SessionPtr aSession = ModelAPI_Session::get();
-  std::list<DocumentPtr> aDocList;
-  DocumentPtr aDocument = aSession->activeDocument();
-  DocumentPtr aRootDocument = aSession->moduleDocument();
-  aDocList.push_back(aDocument);
-  if (aDocument != aRootDocument) {
-    aDocList.push_back(aRootDocument);
+  for (int anIndex = 0; anIndex < theDocument->size(theGroup); ++anIndex) {
+    ObjectPtr anObject = theDocument->object(theGroup, anIndex);
+    if (anObject->data()->name() == theName)
+      return anObject;
   }
-  for(std::list<DocumentPtr>::const_iterator it = aDocList.begin(); it != aDocList.end(); ++it) {
-    ObjectPtr aParamObj = (*it)->objectByName(ModelAPI_ResultParameter::group(), theName);
-    theParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
-    if(!theParam.get())
-      continue;
-    AttributeDoublePtr aValueAttribute = theParam->data()->real(ModelAPI_ResultParameter::VALUE());
-    outValue = aValueAttribute->value();
-    return true;
-  }
-  return false;
+  // not found
+  return ObjectPtr();
 }
 
-bool findVariable(const DocumentPtr& theDocument, const std::string& theName, 
-                  double& outValue, ResultParameterPtr& theParam)
+bool findVariable(const DocumentPtr& theDocument, 
+                  const std::string& theName, double& outValue, ResultParameterPtr& theParam)
 {
-  ObjectPtr aParamObj = theDocument->objectByName(ModelAPI_ResultParameter::group(), theName);
+  ObjectPtr aParamObj = objectByName(theDocument, ModelAPI_ResultParameter::group(), theName);
   theParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
   if (!theParam.get())
     return false;
   AttributeDoublePtr aValueAttribute = theParam->data()->real(ModelAPI_ResultParameter::VALUE());
   outValue = aValueAttribute->value();
   return true;
+}
+
+bool findVariable(const std::string& theName, double& outValue, ResultParameterPtr& theParam,
+                  const DocumentPtr& theDocument /*= DocumentPtr()*/)
+{
+  SessionPtr aSession = ModelAPI_Session::get();
+  std::list<DocumentPtr> aDocList;
+  DocumentPtr aDocument = theDocument.get() ? theDocument : aSession->activeDocument();
+  DocumentPtr aRootDocument = aSession->moduleDocument();
+  aDocList.push_back(aDocument);
+  if (aDocument != aRootDocument) {
+    aDocList.push_back(aRootDocument);
+  }
+  for(std::list<DocumentPtr>::const_iterator it = aDocList.begin(); it != aDocList.end(); ++it) {
+    if (findVariable(*it, theName, outValue, theParam))
+      return true;
+  }
+  return false;
 }
 
 static std::map<int, std::vector<int> > myColorMap;

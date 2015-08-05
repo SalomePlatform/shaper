@@ -35,6 +35,7 @@ void ParametersPlugin_Parameter::initAttributes()
   data()->addAttribute(VARIABLE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EXPRESSION_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ARGUMENTS_ID(), ModelAPI_AttributeRefList::typeId());
+  data()->reflist(ARGUMENTS_ID())->setIsArgument(false);
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ARGUMENTS_ID());
 }
 
@@ -105,7 +106,7 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
   for ( ; it != anExprParams.end(); it++) {
     double aValue;
     ResultParameterPtr aParamRes;
-    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes)) continue;
+    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes, document())) continue;
     aParamsList.push_back(aParamRes);
 
     std::ostringstream sstream;
