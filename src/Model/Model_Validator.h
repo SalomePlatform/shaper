@@ -104,6 +104,8 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 protected:
   /// Adds the defualt validators that are usefull for all features.
   void addDefaultValidators(Validators& theValidators) const;
+  /// Adds the defualt validators that are usefull for all attributes.
+  void addDefaultAttributeValidators(Validators& theValidators) const;
   /// Get instance from Session
   Model_ValidatorsFactory();
 

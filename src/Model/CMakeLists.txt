@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     Model_ResultGroup.h
     Model_ResultParameter.h
     Model_FeatureValidator.h
+    Model_AttributeValidator.h
 )
 
 SET(PROJECT_SOURCES
@@ -63,6 +64,7 @@ SET(PROJECT_SOURCES
     Model_ResultGroup.cpp
     Model_ResultParameter.cpp
     Model_FeatureValidator.cpp
+    Model_AttributeValidator.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -4,13 +4,17 @@
 // Created:     2 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#include <Model_Validator.h>
-#include <Model_FeatureValidator.h>
-#include <ModelAPI_Feature.h>
+#include "Model_Validator.h"
+
+#include "Model_AttributeValidator.h"
+#include "Model_FeatureValidator.h"
+
 #include <ModelAPI_Attribute.h>
-#include <ModelAPI_Data.h>
-#include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeValidator.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Feature.h>
+
 #include <Events_Error.h>
 
 void Model_ValidatorsFactory::registerValidator(const std::string& theID,
@@ -109,13 +113,14 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID, const 
       }
     }
   }
+  addDefaultAttributeValidators(theValidators);
 }
 
 Model_ValidatorsFactory::Model_ValidatorsFactory()
   : ModelAPI_ValidatorsFactory()
 {
-  const static std::string kDefaultId = "Model_FeatureValidator";
-  registerValidator(kDefaultId, new Model_FeatureValidator);
+  registerValidator("Model_FeatureValidator", new Model_FeatureValidator);
+  registerValidator("Model_AttributeValidator", new Model_AttributeValidator);
 }
 
 const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& theID) const
@@ -135,10 +140,16 @@ void Model_ValidatorsFactory::addDefaultValidators(Validators& theValidators) co
   theValidators.push_back(std::make_pair(kDefaultId, std::list<std::string>()));
 }
 
+void Model_ValidatorsFactory::addDefaultAttributeValidators(Validators& theValidators) const
+{
+  const static std::string kDefaultId = "Model_AttributeValidator";
+  if (!validator(kDefaultId))
+    return;
+  theValidators.push_back(std::make_pair(kDefaultId, std::list<std::string>()));
+}
+
 bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
 {
-  const static std::string kDefaultId = "Model_FeatureValidator";
-
   ModelAPI_ExecState anExecState = theFeature->data()->execState();
   theFeature->setError("", false);
   theFeature->data()->execState(anExecState);

@@ -90,66 +90,63 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
   std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
       std::dynamic_pointer_cast<ModelAPI_AttributeEvalMessage>(theMessage);
 
-  // Double
-  AttributeDoublePtr aDoubleAttribute =
-      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
-  if (aDoubleAttribute.get()) {
+  if (aMessage->attribute()->attributeType() == ModelAPI_AttributeDouble::typeId()) {
+    AttributeDoublePtr anAttribute =
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
     std::string anError;
-    double aValue = evaluate(aDoubleAttribute->text(), anError);
-    if (anError.empty()) {
-      aDoubleAttribute->setCalculatedValue(aValue);
-      aDoubleAttribute->setExpressionInvalid(false);
-    } else { // set feature as invalid-parameter arguments
-      aDoubleAttribute->setExpressionInvalid(true);
+    double aValue = evaluate(anAttribute->text(), anError);
+    bool isValid = anError.empty();
+    if (isValid)
+      anAttribute->setCalculatedValue(aValue);
+    anAttribute->setExpressionInvalid(!isValid);
+    anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
+  } else
+  if (aMessage->attribute()->attributeType() == GeomDataAPI_Point::typeId()) {
+    AttributePointPtr anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point>(aMessage->attribute());
+    std::string aText[] = {
+      anAttribute->textX(),
+      anAttribute->textY(),
+      anAttribute->textZ()
+    };
+    double aCalculatedValue[] = {
+      anAttribute->x(),
+      anAttribute->y(),
+      anAttribute->z()
+    };
+    for (int i = 0; i < 3; ++i) {
+      std::string anError;
+      double aValue = evaluate(aText[i], anError);
+      bool isValid = anError.empty();
+      if (isValid) aCalculatedValue[i] = aValue;
+      anAttribute->setExpressionInvalid(i, !isValid);
+      anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }
-  }
-
-  // Point
-  AttributePointPtr aPointAttribute =
-      std::dynamic_pointer_cast<GeomDataAPI_Point>(aMessage->attribute());
-  if (aPointAttribute.get()) {
-    std::string anError[3];
-    double aValue[3] = {
-        evaluate(aPointAttribute->textX(), anError[0]),
-        evaluate(aPointAttribute->textY(), anError[1]),
-        evaluate(aPointAttribute->textZ(), anError[2])
+    anAttribute->setCalculatedValue(aCalculatedValue[0],
+                                    aCalculatedValue[1],
+                                    aCalculatedValue[2]);
+  } else
+  if (aMessage->attribute()->attributeType() == GeomDataAPI_Point2D::typeId()) {
+    AttributePoint2DPtr anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMessage->attribute());
+    std::string aText[] = {
+      anAttribute->textX(),
+      anAttribute->textY()
     };
-    bool isValid[3] = {
-        anError[0].empty(),
-        anError[1].empty(),
-        anError[2].empty()
+    double aCalculatedValue[] = {
+      anAttribute->x(),
+      anAttribute->y()
     };
-    aPointAttribute->setExpressionInvalid(0, !isValid[0]);
-    aPointAttribute->setExpressionInvalid(1, !isValid[1]);
-    aPointAttribute->setExpressionInvalid(2, !isValid[2]);
-
-    aPointAttribute->setCalculatedValue(
-        isValid[0] ? aValue[0] : aPointAttribute->x(),
-        isValid[1] ? aValue[1] : aPointAttribute->y(),
-        isValid[2] ? aValue[2] : aPointAttribute->z()
-    );
-  }
-
-  // Point2D
-  AttributePoint2DPtr aPoint2DAttribute =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMessage->attribute());
-  if (aPoint2DAttribute.get()) {
-    std::string anError[2];
-    double aValue[2] = {
-        evaluate(aPoint2DAttribute->textX(), anError[0]),
-        evaluate(aPoint2DAttribute->textY(), anError[1])
-    };
-    bool isValid[2] = {
-        anError[0].empty(),
-        anError[1].empty()
-    };
-    aPoint2DAttribute->setExpressionInvalid(0, !isValid[0]);
-    aPoint2DAttribute->setExpressionInvalid(1, !isValid[1]);
-
-    aPoint2DAttribute->setCalculatedValue(
-        isValid[0] ? aValue[0] : aPoint2DAttribute->x(),
-        isValid[1] ? aValue[1] : aPoint2DAttribute->y()
-    );
+    for (int i = 0; i < 2; ++i) {
+      std::string anError;
+      double aValue = evaluate(aText[i], anError);
+      bool isValid = anError.empty();
+      if (isValid) aCalculatedValue[i] = aValue;
+      anAttribute->setExpressionInvalid(i, !isValid);
+      anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
+    }
+    anAttribute->setCalculatedValue(aCalculatedValue[0],
+                                    aCalculatedValue[1]);
   }
 }
 
@@ -215,49 +212,41 @@ void ParametersPlugin_EvalListener::renameInAttribute(
     const std::string& theOldName,
     const std::string& theNewName)
 {
-  // Double
-  AttributeDoublePtr aDoubleAttribute =
-      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-  if (aDoubleAttribute.get()) {
-    std::string anExpressionString = aDoubleAttribute->text();
+  if (theAttribute->attributeType() == ModelAPI_AttributeDouble::typeId()) {
+    AttributeDoublePtr anAttribute =
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+    std::string anExpressionString = anAttribute->text();
     anExpressionString = renameInPythonExpression(anExpressionString,
-                                                  theOldName,
-                                                  theNewName);
-    aDoubleAttribute->setText(anExpressionString);
-  }
-
-  // Point
-  AttributePointPtr aPointAttribute =
-      std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttribute);
-  if (aPointAttribute.get()) {
+                                                  theOldName, theNewName);
+    anAttribute->setText(anExpressionString);
+  } else
+  if (theAttribute->attributeType() == GeomDataAPI_Point::typeId()) {
+    AttributePointPtr anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttribute);
     std::string anExpressionString[3] = {
-      aPointAttribute->textX(),
-      aPointAttribute->textY(),
-      aPointAttribute->textZ()
+      anAttribute->textX(),
+      anAttribute->textY(),
+      anAttribute->textZ()
     };
     for (int i = 0; i < 3; ++i)
       anExpressionString[i] = renameInPythonExpression(anExpressionString[i],
-                                                       theOldName,
-                                                       theNewName);
-    aPointAttribute->setText(anExpressionString[0],
-                             anExpressionString[1],
-                             anExpressionString[2]);
-  }
-
-  // Point2D
-  AttributePoint2DPtr aPoint2DAttribute =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
-  if (aPoint2DAttribute.get()) {
+                                                       theOldName, theNewName);
+    anAttribute->setText(anExpressionString[0],
+                         anExpressionString[1],
+                         anExpressionString[2]);
+  } else
+  if (theAttribute->attributeType() == GeomDataAPI_Point2D::typeId()) {
+    AttributePoint2DPtr anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
     std::string anExpressionString[2] = {
-      aPoint2DAttribute->textX(),
-      aPoint2DAttribute->textY()
+      anAttribute->textX(),
+      anAttribute->textY()
     };
     for (int i = 0; i < 2; ++i)
       anExpressionString[i] = renameInPythonExpression(anExpressionString[i],
-                                                       theOldName,
-                                                       theNewName);
-    aPoint2DAttribute->setText(anExpressionString[0],
-                               anExpressionString[1]);
+                                                       theOldName, theNewName);
+    anAttribute->setText(anExpressionString[0],
+                         anExpressionString[1]);
   }
 }
 
