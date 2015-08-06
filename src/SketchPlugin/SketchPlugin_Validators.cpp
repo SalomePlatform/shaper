@@ -53,14 +53,16 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
       dynamic_cast<const GeomValidators_ShapeType*>(aFactory->validator("GeomValidators_ShapeType"));
     std::list<std::string> anArguments;
     anArguments.push_back("circle");
-    bool aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments);
+    std::string aCircleError;
+    bool aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments, aCircleError);
     // the circle line is not a valid case
     if (aShapeValid)
       return false;
       
     anArguments.clear();
     anArguments.push_back("line");
-    aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments);
+    std::string aLineError;
+    aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments, aLineError);
     // if the attribute value is not a line, that means it is a vertex. A vertex is always valid
     if (!aShapeValid)
       return true;
