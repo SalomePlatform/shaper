@@ -108,7 +108,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr = new Model_AttributeInteger(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeDouble::typeId()) {
     Model_AttributeDouble* anAttribute = new Model_AttributeDouble(anAttrLab);
-    TDF_Label anExpressionLab = anAttrLab.FindChild(anAttrLab.NbChildren() + 1);
+    TDF_Label anExpressionLab = anAttrLab.FindChild(1);
     anAttribute->myExpression.reset(new Model_Expression(anExpressionLab));
     anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression->isInitialized(); 
     anAttr = anAttribute;
@@ -133,7 +133,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   else if (theAttrType == GeomData_Point::typeId()) {
     GeomData_Point* anAttribute = new GeomData_Point(anAttrLab);
     for (int aComponent = 0; aComponent < GeomData_Point::NUM_COMPONENTS; ++aComponent) {
-      TDF_Label anExpressionLab = anAttrLab.FindChild(anAttrLab.NbChildren() + 1);
+      TDF_Label anExpressionLab = anAttrLab.FindChild(aComponent + 1);
       anAttribute->myExpression[aComponent].reset(new Model_Expression(anExpressionLab));
       anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression[aComponent]->isInitialized(); 
     }
@@ -143,7 +143,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   } else if (theAttrType == GeomData_Point2D::typeId()) {
     GeomData_Point2D* anAttribute = new GeomData_Point2D(anAttrLab);
     for (int aComponent = 0; aComponent < GeomData_Point2D::NUM_COMPONENTS; ++aComponent) {
-      TDF_Label anExpressionLab = anAttrLab.FindChild(anAttrLab.NbChildren() + 1);
+      TDF_Label anExpressionLab = anAttrLab.FindChild(aComponent + 1);
       anAttribute->myExpression[aComponent].reset(new Model_Expression(anExpressionLab));
       anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression[aComponent]->isInitialized(); 
     }
