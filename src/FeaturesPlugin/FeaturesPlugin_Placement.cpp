@@ -110,8 +110,6 @@ void FeaturesPlugin_Placement::execute()
   bool isReverse = boolean(REVERSE_ID())->value();
   bool isCentering = boolean(CENTERING_ID())->value();
 
-  bool isPart = aContextRes->groupName() == ModelAPI_ResultPart::group();
-
   // Getting transformation.
   GeomAlgoAPI_Placement aPlacementAlgo(
     aStartShape, anEndShape, aStartFace, anEndFace, isReverse, isCentering, true);
@@ -128,11 +126,11 @@ void FeaturesPlugin_Placement::execute()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
       anObjectsIt++, aContext++) {
 
-    if (isPart) { // for part results just set transformation
-      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aContextRes);
-      ResultPartPtr aResultPart = document()->copyPart(firstResult(), anOrigin);
+    if ((*aContext)->groupName() == ModelAPI_ResultPart::group()) { // for part results just set transformation
+      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
+      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
       aResultPart->setTrsf(aContextRes, aTrsf);
-      setResult(aResultPart);
+      setResult(aResultPart, aResultIndex);
     } else {
       std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
       GeomAlgoAPI_Transform aTransformAlgo(aBaseShape, aTrsf);

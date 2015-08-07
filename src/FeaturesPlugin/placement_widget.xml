@@ -5,7 +5,8 @@
     label="Select a solid objects"
     icon=":icons/cut_shape.png"
     tooltip="Select a solid objects"
-    type_choice="Solids">
+    type_choice="Solids"
+    concealment="true" >
   </multi_selector>
   <shape_selector id="placement_start_face"
     label="Select an object" 
@@ -17,8 +18,7 @@
     label="Select an object" 
     icon=":icons/placement_to.png"
     tooltip="Select an end face"
-    shape_types="face"
-    concealment="true" >
+    shape_types="face" >
     <validator id="PartSet_DifferentObjects"/>
   </shape_selector>
   <boolvalue id="placement_reverse_direction"

@@ -100,17 +100,7 @@ void FeaturesPlugin_Rotation::execute()
     // Setting result.
     if (isPart) {
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-
-      ResultPartPtr aCurrentResult;
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aResults.begin();
-      for(int a = 0; aResIter != aResults.end(); aResIter++, a++)  {
-        if (a == aResultIndex) {
-          aCurrentResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aResIter);
-          break;
-        }
-      }
-      ResultPartPtr aResultPart = document()->copyPart(aCurrentResult, anOrigin, aResultIndex);
+      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
       aResultPart->setTrsf(*aContext, aRotationAlgo.transformation());
       setResult(aResultPart);
     } else {

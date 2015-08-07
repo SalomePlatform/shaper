@@ -157,11 +157,10 @@ class Model_Document : public ModelAPI_Document
   /// Creates a part results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  //! Copies a part result, keeping the same data
+  //! Copies a part result, keeping the reference to origin
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> copyPart(
-      const std::shared_ptr<ModelAPI_Result>& theOldPart, 
-      const std::shared_ptr<ModelAPI_ResultPart>& theOrigin, 
-      const int theIndex = 0);
+    const std::shared_ptr<ModelAPI_ResultPart>& theOrigin,
+    const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a group results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

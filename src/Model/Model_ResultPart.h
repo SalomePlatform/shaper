@@ -24,12 +24,17 @@ class Model_ResultPart : public ModelAPI_ResultPart
   TopoDS_Shape myShape; ///< shape of this part created from bodies (updated only of Part deactivation)
   std::shared_ptr<gp_Trsf> myTrsf; ///< if it is just copy of original shape, keep just transformation
  public:
+
+  /// the reference to the base result document, may be null if this is the root, others make sequence of references
+  inline static const std::string& BASE_REF_ID()
+  {
+    static const std::string MY_BASE_REF("BaseReference");
+    return MY_BASE_REF;
+  }
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
   /// Returns the part-document of this result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
-  /// Part has no stored feature: this method returns NULL
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> owner();
 
   /// Sets this document as current and if it is not loaded yet, loads it
   MODEL_EXPORT virtual void activate();

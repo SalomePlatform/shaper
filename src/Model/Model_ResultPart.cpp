@@ -13,6 +13,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeReference.h>
 #include <Model_Document.h>
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -25,21 +26,22 @@
 #include <BRep_Builder.hxx>
 #include <TopExp_Explorer.hxx>
 
+#define baseRef() std::dynamic_pointer_cast<Model_ResultPart>(data()->reference(BASE_REF_ID())->value())
+
 void Model_ResultPart::initAttributes()
 {
   // append the color attribute. It is empty, the attribute will be filled by a request
   data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId());
   data()->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
+  data()->addAttribute(BASE_REF_ID(), ModelAPI_AttributeReference::typeId());
 }
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
+  if (myTrsf.get()) {
+    return baseRef()->partDoc();
+  }
   return data()->document("PartDocument")->value();
-}
-
-std::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
-{
-  return std::shared_ptr<ModelAPI_Feature>();  // return empty pointer
 }
 
 Model_ResultPart::Model_ResultPart()
@@ -50,6 +52,11 @@ Model_ResultPart::Model_ResultPart()
 
 void Model_ResultPart::activate()
 {
+  if (myTrsf.get()) {
+    baseRef()->activate();
+    return;
+  }
+
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
@@ -74,6 +81,10 @@ void Model_ResultPart::activate()
 
 bool Model_ResultPart::isActivated() 
 {
+  if (myTrsf.get()) {
+    return baseRef()->isActivated();
+  }
+
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   return aDocRef->value().get() != NULL;
 }
@@ -106,8 +117,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
 {
   std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
   if (myTrsf.get()) { // get shape of the base result and apply the transformation
-    ResultPtr anOrigResult = 
-      std::dynamic_pointer_cast<ModelAPI_Result>(data()->attribute(COLOR_ID())->owner());
+    ResultPtr anOrigResult = baseRef();
     std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
     if (anOrigShape.get()) {
       TopoDS_Shape aShape = anOrigShape->impl<TopoDS_Shape>();
@@ -165,8 +175,7 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
   theIndex = 0; // not initialized
 
   if (myTrsf.get()) { // if this is moved copy of part => return the name of original shape
-    ResultPartPtr anOrigResult = 
-      std::dynamic_pointer_cast<ModelAPI_ResultPart>(data()->attribute(COLOR_ID())->owner());
+    ResultPartPtr anOrigResult = baseRef();
     // searching in the origin the shape equal to the given but with myTrsf
     TopoDS_Shape aSelection = theShape->impl<TopoDS_Shape>();
     gp_Trsf aSelTrsf = aSelection.Location().Transformation();

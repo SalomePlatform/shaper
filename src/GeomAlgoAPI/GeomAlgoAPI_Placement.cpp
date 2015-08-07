@@ -195,7 +195,8 @@ void GeomAlgoAPI_Placement::build(
     TopoDS_Shape aResult = aSourceShape.Moved(aDelta);
     myShape->setImpl(new TopoDS_Shape(aResult));
     // store the accumulated information about the result and this delta
-    myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf * aSourceShape.Location().Transformation())));
+    //myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf * aSourceShape.Location().Transformation())));
+    myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf)));
     myDone = true; // it is allways true for simple transformation generation
   } else { // internal rebuild of the shape
     // Transform the shape with copying it

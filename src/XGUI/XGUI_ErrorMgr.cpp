@@ -53,7 +53,7 @@ void XGUI_ErrorMgr::onValidationStateChanged()
 
   // get feature
   FeaturePtr aFeature = anOperationMgr->currentOperation()->feature();
-  if (!aFeature.get())
+  if (!aFeature.get() || !aFeature->data()->isValid())
     return;
 
   // set error indication

@@ -10,6 +10,7 @@
 
 %{
   #include "ModelAPI.h"
+  #include "ModelAPI_Entity.h"
   #include "ModelAPI_Document.h"
   #include "ModelAPI_Session.h"
   #include "ModelAPI_Object.h"
@@ -69,6 +70,7 @@
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()
+%shared_ptr(ModelAPI_Entity)
 %shared_ptr(ModelAPI_Document)
 %shared_ptr(ModelAPI_Session)
 %shared_ptr(ModelAPI_Plugin)
@@ -98,6 +100,7 @@
 %shared_ptr(ModelAPI_ResultParameter)
 
 // all supported interfaces
+%include "ModelAPI_Entity.h"
 %include "ModelAPI_Document.h"
 %include "ModelAPI_Session.h"
 %include "ModelAPI_Plugin.h"

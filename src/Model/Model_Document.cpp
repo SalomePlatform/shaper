@@ -813,11 +813,10 @@ std::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
 }
 
 std::shared_ptr<ModelAPI_ResultPart> Model_Document::copyPart(
-      const std::shared_ptr<ModelAPI_Result>& theOldPart, 
-      const std::shared_ptr<ModelAPI_ResultPart>& theOrigin, 
-      const int theIndex)
+      const std::shared_ptr<ModelAPI_ResultPart>& theOrigin,
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  return myObjs->copyPart(theOldPart, theOrigin, theIndex);
+  return myObjs->copyPart(theOrigin, theFeatureData, theIndex);
 }
 
 std::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
