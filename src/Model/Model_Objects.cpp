@@ -59,16 +59,17 @@ Model_Objects::~Model_Objects()
 {
   // delete all features of this document
   Events_Loop* aLoop = Events_Loop::loop();
-  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeaturesIter(myFeatures);
-  for(; aFeaturesIter.More(); aFeaturesIter.Next()) {
+  // erase one by one to avoid access from the feature destructor itself from he map
+  while(!myFeatures.IsEmpty()) {
+    NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeaturesIter(myFeatures);
     FeaturePtr aFeature = aFeaturesIter.Value();
     static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Feature::group());
     ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
     aFeature->eraseResults();
     aFeature->erase();
+    myFeatures.UnBind(aFeaturesIter.Key());
   }
-  myFeatures.Clear();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
