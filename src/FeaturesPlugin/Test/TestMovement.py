@@ -3,7 +3,7 @@
       Unit test of FeaturesPlugin_Movement class
 
       class FeaturesPlugin_Movement : public ModelAPI_Feature
-        static const std::string MY_MOVEMENT_ID("Movement");
+        static const std::string MY_MOVEMENT_ID("Translation");
         static const std::string MY_OBJECTS_LIST_ID("main_objects");
         static const std::string MY_AXIS_OBJECT_ID("axis_object");
         static const std::string MY_DISTANCE_ID("distance");
@@ -115,8 +115,8 @@ aLineEdge = aShapeExplorer.current()
 # Test movement
 #=========================================================================
 aSession.startOperation()
-aMoveFt = aPart.addFeature("Movement")
-assert (aMoveFt.getKind() == "Movement")
+aMoveFt = aPart.addFeature("Translation")
+assert (aMoveFt.getKind() == "Translation")
 aMoveFt.selectionList("main_objects").append(
     anExtrusionResult, anExtrusionResult.shape())
 aMoveFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
