@@ -104,7 +104,10 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
           createWidget(aPage);
           if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX) {
             ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
-            aContainer->addPage(aPage, aPageName, aCaseId);
+
+            QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
+            QIcon anIcon( anIconPath );
+            aContainer->addPage( aPage, aPageName, aCaseId, anIcon );
           }
         } while (myWidgetApi->toNextWidget());
       }

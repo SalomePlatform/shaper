@@ -11,9 +11,8 @@
 #include <ModuleBase.h>
 #include <ModuleBase_PagedContainer.h>
 
-#include <QToolBox>
-
 class ModuleBase_PageBase;
+class ModuleBase_ToolBox;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContainer
 {
@@ -28,8 +27,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   virtual bool canSetValue() const { return false; };
 
   /// Overrides ModuleBase_PagedContainer
-  int addPage(ModuleBase_PageBase* theWidget,
-              const QString& theName, const QString& theCaseId);
+  virtual int addPage( ModuleBase_PageBase* theWidget,
+                       const QString& theName,
+                       const QString& theCaseId,
+                       const QIcon& theIcon );
 
  protected:
   /// Implements ModuleBase_PagedContainer
@@ -38,7 +39,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   virtual void setCurrentPageIndex(int);
 
  private:
-  QToolBox* myToolBox;
+  ModuleBase_ToolBox* myToolBox;
 };
 
 #endif /* MODULEBASE_WIDGETTOOLBOX_H_ */

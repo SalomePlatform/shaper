@@ -38,8 +38,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_PagedContain
   /// Add a page to the widget
   /// \param theWidget a page widget
   /// \param theName a name of page
-  virtual int addPage(ModuleBase_PageBase* theWidget,
-                        const QString& theName, const QString& theCaseId);
+  virtual int addPage( ModuleBase_PageBase* theWidget,
+                       const QString& theName,
+                       const QString& theCaseId,
+                       const QIcon& theIcon );
 
  protected:
   virtual int currentPageIndex() const;

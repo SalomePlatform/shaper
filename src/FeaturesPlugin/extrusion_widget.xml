@@ -9,7 +9,7 @@
     <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
   </multi_selector>
   <toolbox id="CreationMethod">
-    <box id="BySizes" title="By sizes">
+    <box id="BySizes" title="By sizes" icon=":icons/dimension_up.png">
       <groupbox>
         <doublevalue
           id="to_size"
@@ -33,7 +33,7 @@
         </doublevalue>
       </groupbox>
     </box>
-    <box id="ByPlanesAndOffsets" title="By bounding planes and offsets">
+    <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted.png">
       <groupbox title="To">
         <shape_selector id="to_object"
                         icon=":icons/plane_inverted.png"

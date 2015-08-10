@@ -16,7 +16,7 @@
       <validator id="GeomValidators_ShapeType" parameters="line"/>
     </shape_selector>
     <toolbox id="CreationMethod">
-      <box id="ByAngles" title="By angles">
+      <box id="ByAngles" title="By angles" icon=":icons/angle_up.png">
         <groupbox>
           <doublevalue
             id="to_angle"
@@ -40,7 +40,7 @@
           </doublevalue>
         </groupbox>
       </box>
-      <box id="ByPlanesAndOffsets" title="By bounding planes and offsets">
+      <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted.png">
         <groupbox title="To">
           <shape_selector id="to_object"
                           icon=":icons/plane_inverted.png"

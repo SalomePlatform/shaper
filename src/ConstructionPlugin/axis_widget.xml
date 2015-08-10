@@ -2,7 +2,7 @@
 
 <source>
   <toolbox id="CreationMethod">
-    <box id="AxisByPointsCase" title="By two points">
+    <box id="AxisByPointsCase" title="By two points" icon=":icons/point.png">
       <shape_selector id="FirstPoint"
         label="First point"
         icon=":icons/point.png"
@@ -21,7 +21,7 @@
         <validator id="PartSet_DifferentShapes"/>
       </shape_selector>
     </box>
-    <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face">
+    <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face" icon=":icons/circle.png">
       <shape_selector id="CylindricalFace"
         label="Main object" 
         icon=":icons/circle.png" 

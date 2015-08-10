@@ -42,9 +42,10 @@ ModuleBase_WidgetSwitch::~ModuleBase_WidgetSwitch()
 
 
 int ModuleBase_WidgetSwitch::addPage(ModuleBase_PageBase* thePage, const QString& theName,
-                                                                   const QString& theCaseId)
+                                                                   const QString& theCaseId,
+                                                                   const QIcon& theIcon )
 {
-  int aSuperCount = ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId);
+  int aSuperCount = ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon);
   myCombo->addItem(theName);
   int aResultCount = myCombo->count();
   if (aResultCount == 2)

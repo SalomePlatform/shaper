@@ -21,8 +21,11 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
                            const std::string& theParentId);
   virtual ~ModuleBase_PagedContainer();
 
-  virtual int addPage(ModuleBase_PageBase* theWidget,
-                      const QString& theName, const QString& theCaseId);
+  virtual int addPage( ModuleBase_PageBase* theWidget,
+                       const QString& theName,
+                       const QString& theCaseId,
+                       const QIcon& theIcon );
+
   // ModuleBase_ModelWidget
   virtual QList<QWidget*> getControls() const;
   virtual bool focusTo();

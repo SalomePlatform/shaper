@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
   ModuleBase_Preferences.h
   ModuleBase_ResultPrs.h
   ModuleBase_SelectionValidator.h
+  ModuleBase_ToolBox.h
   ModuleBase_Tools.h
   ModuleBase_ViewerFilters.h
   ModuleBase_ViewerPrs.h
@@ -79,6 +80,7 @@ SET(PROJECT_SOURCES
   ModuleBase_Preferences.cpp
   ModuleBase_ResultPrs.cpp
   ModuleBase_SelectionValidator.cpp
+  ModuleBase_ToolBox.cpp
   ModuleBase_Tools.cpp
   ModuleBase_ViewerFilters.cpp
   ModuleBase_ViewerPrs.cpp

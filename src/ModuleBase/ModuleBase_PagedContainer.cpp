@@ -29,7 +29,8 @@ ModuleBase_PagedContainer::~ModuleBase_PagedContainer()
 }
 
 int ModuleBase_PagedContainer::addPage(ModuleBase_PageBase* thePage,
-                                      const QString& theName, const QString& theCaseId)
+                                      const QString& theName, const QString& theCaseId,
+                                      const QIcon& theIcon )
 {
   if (!myPages.count()) {
     setDefaultValue(theCaseId.toStdString());

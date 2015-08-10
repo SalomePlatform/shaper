@@ -77,6 +77,7 @@ const static char* DOUBLE_WDG_STEP = "step";
 const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
 // WDG_TOOLBOX/WDG_SWITCH properties
 const static char* CONTAINER_PAGE_NAME = "title";
+const static char* CONTAINER_PAGE_ICON = "icon";
 
 /*
  * Hardcoded xml entities of plugins.xml
