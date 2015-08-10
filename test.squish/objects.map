@@ -2,11 +2,10 @@
 :Basic.Line_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Line' type='AppElements_Button' unnamed='1' visible='1'}
 :Basic.Point_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Point' type='AppElements_Button' unnamed='1' visible='1'}
 :Basic.Sketch_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Sketch' type='AppElements_Button' unnamed='1' visible='1'}
-:Sketch.Ok_QToolButton	{container=':Sketch.Basic_AppElements_MenuGroupPanel' occurrence='6' type='QToolButton' unnamed='1' visible='1'}
 :Center.X:_ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.X:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:Center.X:_QLabel	{container=':Circle.Center_QGroupBox' text='X:' type='QLabel' unnamed='1' visible='1'}
+:Center.X:_QLabel	{container=':Circle.Center_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
 :Center.Y:_ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.Y:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:Center.Y:_QLabel	{container=':Circle.Center_QGroupBox' text='Y:' type='QLabel' unnamed='1' visible='1'}
+:Center.Y:_QLabel	{container=':Circle.Center_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Circle.Center_QGroupBox	{container=':OpenParts*.Circle_XGUI_PropertyPanel' title='Center' type='QGroupBox' unnamed='1' visible='1'}
 :Circle.CircleRadius_ModuleBase_ParamSpinBox	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='CircleRadius' type='ModuleBase_ParamSpinBox' visible='1'}
 :Circle.property_panel_ok_QToolButton	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
@@ -21,9 +20,9 @@
 :Distance.Second object_QLabel	{container=':OpenParts*.Distance_XGUI_PropertyPanel' text='Second object' type='QLabel' unnamed='1' visible='1'}
 :Distance.Second object_QLineEdit	{container=':OpenParts*.Distance_XGUI_PropertyPanel' leftWidget=':Distance.Second object_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :End point.X:_ModuleBase_ParamSpinBox	{container=':Line.End point_QGroupBox' leftWidget=':End point.X:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:End point.X:_QLabel	{container=':Line.End point_QGroupBox' text='X:' type='QLabel' unnamed='1' visible='1'}
+:End point.X:_QLabel	{container=':Line.End point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
 :End point.Y:_ModuleBase_ParamSpinBox	{container=':Line.End point_QGroupBox' leftWidget=':End point.Y:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:End point.Y:_QLabel	{container=':Line.End point_QGroupBox' text='Y:' type='QLabel' unnamed='1' visible='1'}
+:End point.Y:_QLabel	{container=':Line.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :End point.qt_spinbox_lineedit_QLineEdit	{container=':Line.End point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :End point.qt_spinbox_lineedit_QLineEdit_2	{container=':Line.End point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :Extrusion.Extrusion_AppElements_Button	{container=':Features.Extrusion_AppElements_MenuGroupPanel' text='Extrusion' type='AppElements_Button' unnamed='1' visible='1'}
@@ -58,20 +57,21 @@
 :Part.Parameters_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Part_AppElements_Workbench' name='Parameters' type='AppElements_MenuGroupPanel' visible='1'}
 :Point.Point_QGroupBox	{container=':OpenParts*.Point_XGUI_PropertyPanel' title='Point' type='QGroupBox' unnamed='1' visible='1'}
 :Point.X:_ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.X:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:Point.X:_QLabel	{container=':Point.Point_QGroupBox' text='X:' type='QLabel' unnamed='1' visible='1'}
+:Point.X:_QLabel	{container=':Point.Point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
 :Point.Y:_ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.Y:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:Point.Y:_QLabel	{container=':Point.Point_QGroupBox' text='Y:' type='QLabel' unnamed='1' visible='1'}
+:Point.Y:_QLabel	{container=':Point.Point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Point.property_panel_ok_QToolButton	{container=':OpenParts*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit_2	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :Sketch.Basic_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Basic' type='AppElements_MenuGroupPanel' visible='1'}
 :Sketch.Constraints_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Constraints' type='AppElements_MenuGroupPanel' visible='1'}
+:Sketch.Ok_QToolButton	{container=':Sketch.Basic_AppElements_MenuGroupPanel' occurrence='6' type='QToolButton' unnamed='1' visible='1'}
 :Sketch.property_panel_ok_QToolButton	{container=':OpenParts*.Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Sketch_QScrollArea	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' type='QScrollArea' unnamed='1' visible='1'}
 :Start point.X:_ModuleBase_ParamSpinBox	{container=':Line.Start point_QGroupBox' leftWidget=':Start point.X:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:Start point.X:_QLabel	{container=':Line.Start point_QGroupBox' text='X:' type='QLabel' unnamed='1' visible='1'}
+:Start point.X:_QLabel	{container=':Line.Start point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
 :Start point.Y:_ModuleBase_ParamSpinBox	{container=':Line.Start point_QGroupBox' leftWidget=':Start point.Y:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
-:Start point.Y:_QLabel	{container=':Line.Start point_QGroupBox' text='Y:' type='QLabel' unnamed='1' visible='1'}
+:Start point.Y:_QLabel	{container=':Line.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Start point.qt_spinbox_lineedit_QLineEdit	{container=':Line.Start point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Start point.qt_spinbox_lineedit_QLineEdit_2	{container=':Line.Start point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :_ModuleBase_ParamSpinBox	{type='ModuleBase_ParamSpinBox' unnamed='1' visible='1' window=':_QDialog'}
