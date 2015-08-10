@@ -1,7 +1,7 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <doublevalue id="x" label="X:" tooltip="X coordinate" default="0"/>
-  <doublevalue id="y" label="Y:" tooltip="Y coordinate" default="0"/>
-  <doublevalue id="z" label="Z:" tooltip="Z coordinate" default="0"/>
+  <doublevalue id="x" label="X " tooltip="X coordinate" default="0"/>
+  <doublevalue id="y" label="Y " tooltip="Y coordinate" default="0"/>
+  <doublevalue id="z" label="Z " tooltip="Z coordinate" default="0"/>
 </source>

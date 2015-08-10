@@ -68,7 +68,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   aGroupLay->setColumnStretch(1, 1);
   {
     QLabel* aLabel = new QLabel(myGroupBox);
-    aLabel->setText(tr("X:"));
+    aLabel->setText(tr("X "));
     aGroupLay->addWidget(aLabel, 0, 0);
 
     myXSpin = new ModuleBase_ParamSpinBox(myGroupBox);
@@ -81,7 +81,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
-    aLabel->setText(tr("Y:"));
+    aLabel->setText(tr("Y "));
     aGroupLay->addWidget(aLabel, 1, 0);
 
     myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
