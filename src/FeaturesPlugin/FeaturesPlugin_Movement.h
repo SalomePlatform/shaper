@@ -23,7 +23,7 @@ class FeaturesPlugin_Movement : public ModelAPI_Feature
   /// Movement kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_MOVEMENT_ID("Movement");
+    static const std::string MY_MOVEMENT_ID("Translation");
     return MY_MOVEMENT_ID;
   }
 
