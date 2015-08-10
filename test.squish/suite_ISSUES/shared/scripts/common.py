@@ -1,3 +1,6 @@
+testSettings.logScreenshotOnError = True
+testSettings.logScreenshotOnFail = True
+
 def parameter_create(name, expression):
     clickButton(waitForObject(":Parameters.Parameter_AppElements_Button"))
     type(waitForObject(":Parameter_QLineEdit"), name)
@@ -16,7 +19,7 @@ def sketch_create(point, actions):
     actions()
     
     clickButton(waitForObject(":Sketch.Ok_QToolButton"))
-    
+
 def point_create(point):
     clickButton(waitForObject(":Basic.Point_AppElements_Button"))
 
@@ -26,7 +29,7 @@ def point_create(point):
     type(waitForObject(":Point.Y:_ModuleBase_ParamSpinBox"), point[1])
 
     clickButton(waitForObject(":Point.property_panel_ok_QToolButton"))       
-    
+
 def line_create(start_point, end_point):
     clickButton(waitForObject(":Basic.Line_AppElements_Button"))
 
@@ -41,7 +44,7 @@ def line_create(start_point, end_point):
     type(waitForObject(":End point.Y:_ModuleBase_ParamSpinBox"), end_point[1])
 
     clickButton(waitForObject(":Line.property_panel_ok_QToolButton"))    
-    
+
 def circle_create(x, y, radius):
     clickButton(waitForObject(":Basic.Circle_AppElements_Button"))
     
@@ -54,7 +57,7 @@ def circle_create(x, y, radius):
     type(waitForObject(":Circle.CircleRadius_ModuleBase_ParamSpinBox"), radius)
     
     clickButton(waitForObject(":Circle.property_panel_ok_QToolButton"))
-    
+
 def distance_create(point_1, point_2, annotaion_point, distance):
     clickButton(waitForObject(":Constraints.Distance_AppElements_Button"))
     
@@ -67,7 +70,7 @@ def distance_create(point_1, point_2, annotaion_point, distance):
     type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Return>")
 
     clickButton(waitForObject(":Constraints.Distance_AppElements_Button"))    
-    
+
 def extrusion_feature(points, to_size):
     clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
     clickButton(waitForObject(":Extrusion.Extrusion_AppElements_Button"))    

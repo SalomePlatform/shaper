@@ -8,4 +8,3 @@ def main():
     sketch_create(point, lambda: circle_create(0, 0, "a"))
     points = [(489, 319)] # circle
     extrusion_feature(points, "a")
-    
