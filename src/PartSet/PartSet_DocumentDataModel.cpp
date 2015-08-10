@@ -289,7 +289,20 @@ QVariant PartSet_DocumentDataModel::data(const QModelIndex& theIndex, int theRol
           case Qt::DecorationRole:
             return featureIcon(aFeature);
           case Qt::ToolTipRole:
-            return tr("Feature object");
+            {
+              ResultPtr aResult = aFeature->firstResult();
+              bool isResultAndNotLoaded = false;
+              if( aResult.get() )
+              {
+                ResultPartPtr aResultPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>( aResult );
+                if( aResultPart.get() )
+                  isResultAndNotLoaded = !aResultPart->isActivated();
+              }
+              if( isResultAndNotLoaded )
+                return tr( "The part should be activated before the user may edit it" );
+              else
+                return tr( "Feature object" );
+            }
           case Qt::ForegroundRole:
             if (theIndex.row() > lastHistoryRow())
               return QBrush(Qt::lightGray);
