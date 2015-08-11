@@ -617,8 +617,9 @@ const std::set<std::string> Model_Document::subDocuments(const bool theActivated
   std::list<ResultPtr>::iterator aPartRes = aPartResults.begin();
   for(; aPartRes != aPartResults.end(); aPartRes++) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
-    if (aPart && (!theActivatedOnly || aPart->isActivated()))
-      aResult.insert(aPart->data()->name());
+    if (aPart && (!theActivatedOnly || aPart->isActivated())) {
+      aResult.insert(aPart->original()->data()->name());
+    }
   }
   return aResult;
 }

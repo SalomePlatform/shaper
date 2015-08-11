@@ -36,6 +36,10 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Returns the part-document of this result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
 
+  /// Returns the original part result: for transfomration features results this is 
+  /// the original Part feature result
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> original();
+
   /// Sets this document as current and if it is not loaded yet, loads it
   MODEL_EXPORT virtual void activate();
 

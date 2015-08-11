@@ -79,6 +79,14 @@ void Model_ResultPart::activate()
   }
 }
 
+std::shared_ptr<ModelAPI_ResultPart> Model_ResultPart::original()
+{
+  if (myTrsf.get()) {
+    return baseRef()->original();
+  }
+  return std::dynamic_pointer_cast<ModelAPI_ResultPart>(data()->owner());
+}
+
 bool Model_ResultPart::isActivated() 
 {
   if (myTrsf.get()) {

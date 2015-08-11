@@ -44,6 +44,10 @@
 
 #include <string>
 
+#ifdef WNT // to avoid too long decorated name warning 
+#pragma warning( disable : 4503 )
+#endif
+
 // myLab contains:
 // TDataStd_Name - name of the object
 // TDataStd_IntegerArray - state of the object execution, transaction ID of update
@@ -583,7 +587,7 @@ std::shared_ptr<ModelAPI_Data> Model_Data::invalidData()
   return kInvalid;
 }
 
-bool Model_Data::isOwner(ModelAPI_Object* theOwner)
+std::shared_ptr<ModelAPI_Object> Model_Data::owner()
 {
-  return theOwner == myObject.get();
+  return myObject;
 }

@@ -68,7 +68,7 @@ void ModelAPI_Object::setDoc(std::shared_ptr<ModelAPI_Document> theDoc)
 
 void ModelAPI_Object::erase()
 {
-  if (myData->isValid() && myData != myData->invalidPtr() && myData->isOwner(this))
+  if (myData->isValid() && myData != myData->invalidPtr())
     myData->erase();
   setData(myData->invalidPtr());
 }

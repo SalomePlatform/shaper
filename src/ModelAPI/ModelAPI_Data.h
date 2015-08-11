@@ -154,9 +154,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// This method is called by the updater.
   virtual void setUpdateID(const int theID) = 0;
 
-  /// Returns true if the given object is owner of this data (needed for correct erase of object
-  /// with duplicated data)
-  virtual bool isOwner(ModelAPI_Object* theOwner) = 0;
+  /// Returns the owner of htis data
+  virtual std::shared_ptr<ModelAPI_Object> owner() = 0;
 
  protected:
   /// Objects are created for features automatically

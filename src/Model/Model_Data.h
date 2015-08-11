@@ -202,7 +202,7 @@ class Model_Data : public ModelAPI_Data
 
   /// Returns true if the given object is owner of this data (needed for correct erase of object
   /// with duplicated data)
-  MODEL_EXPORT virtual bool isOwner(ModelAPI_Object* theOwner);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Object> owner();
 
 protected:
   /// Returns true if "is in history" custom behaviors is defined for the feature

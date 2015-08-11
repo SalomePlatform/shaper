@@ -5,6 +5,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include "ModelAPI_ResultBody.h"
+#include <ModelAPI_BodyBuilder.h>
 
 ModelAPI_ResultBody::ModelAPI_ResultBody()
 : myBuilder(0)

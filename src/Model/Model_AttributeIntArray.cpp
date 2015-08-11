@@ -23,7 +23,7 @@ int Model_AttributeIntArray::size()
   if (myArray.IsNull() || !myArray->IsValid()) {
     // this could be on undo and then redo creation of the attribute
     // in result creation it may be uninitialized
-      myIsInitialized = myLab.FindAttribute(TDataStd_IntegerArray::GetID(), myArray);
+    myIsInitialized = myLab.FindAttribute(TDataStd_IntegerArray::GetID(), myArray) == Standard_True;
   }
   // checking the validity because attribute (as a field) may be presented,
   // but without label: it is undoed
