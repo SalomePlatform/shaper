@@ -1,6 +1,13 @@
 testSettings.logScreenshotOnError = True
 testSettings.logScreenshotOnFail = True
 
+g_points = {"XY_plane": (320, 320)} # one of the construction planes
+def help_points(name):
+    return g_points[name] 
+
+def set_defaults():
+    waitForObject(":OpenParts*_AppElements_MainWindow").resize(1024, 768)
+
 def parameter_create(name, expression):
     clickButton(waitForObject(":Parameters.Parameter_AppElements_Button"))
     type(waitForObject(":Parameter_QLineEdit"), name)

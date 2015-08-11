@@ -2,10 +2,11 @@ def main():
     source(findFile("scripts", "common.py"))
     
     startApplication("GeomApp")
+    set_defaults()
+    
     parameter_create("a", "100")
     
-    point = (446, 297) # one of the construction planes
-    sketch_create(point, lambda: line_create((0, 0), ("a", 0)))
+    sketch_create(points["XY_plane"], lambda: line_create((0, 0), ("a", 0)))
 
     waitForObjectItem(":Object browser_XGUI_DataTree", "Parameters (1)")
     clickItem(":Object browser_XGUI_DataTree", "Parameters (1)", -10, 10, 0, Qt.LeftButton)

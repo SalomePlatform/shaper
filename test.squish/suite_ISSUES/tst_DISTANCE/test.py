@@ -19,6 +19,6 @@ def main():
     source(findFile("scripts", "common.py"))
     
     startApplication("GeomApp")
+    set_defaults()
     
-    point = (446, 297) # one of the construction planes
-    sketch_create(point, lambda: sketch())
+    sketch_create(points["XY_plane"], lambda: sketch())
