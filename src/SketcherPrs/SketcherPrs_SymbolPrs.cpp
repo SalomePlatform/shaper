@@ -239,7 +239,9 @@ SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
   aMgr->deleteConstraint(this);
 }
 
-
+#ifdef _WINDOWS
+#pragma warning( disable : 4996 )
+#endif
 
 Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
 {

@@ -134,7 +134,7 @@ bool IGESExport(const std::string& theFileName,
   // perform shape writing
   if( ICW.AddShape( theShape->impl<TopoDS_Shape>() ) ) {
     ICW.ComputeModel();
-    return ICW.Write(theFileName.c_str());
+    return ICW.Write(theFileName.c_str()) == Standard_True;
   }
   return false;
 }

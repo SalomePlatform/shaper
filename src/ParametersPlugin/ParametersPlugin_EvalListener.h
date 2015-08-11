@@ -16,13 +16,13 @@ class ModelAPI_Document;
 class ParametersPlugin_Parameter;
 class ParametersPlugin_PyInterp;
 
-class PARAMETERSPLUGIN_EXPORT ParametersPlugin_EvalListener : public Events_Listener
+class ParametersPlugin_EvalListener : public Events_Listener
 {
  public:
-  ParametersPlugin_EvalListener();
-  virtual ~ParametersPlugin_EvalListener();
+  PARAMETERSPLUGIN_EXPORT ParametersPlugin_EvalListener();
+  PARAMETERSPLUGIN_EXPORT virtual ~ParametersPlugin_EvalListener();
 
-  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+  PARAMETERSPLUGIN_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
   double evaluate(const std::string& theExpression, std::string& theError, 

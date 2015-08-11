@@ -44,10 +44,6 @@
 
 #include <string>
 
-#ifdef WNT // to avoid too long decorated name warning 
-#pragma warning( disable : 4503 )
-#endif
-
 // myLab contains:
 // TDataStd_Name - name of the object
 // TDataStd_IntegerArray - state of the object execution, transaction ID of update

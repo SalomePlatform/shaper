@@ -12,11 +12,11 @@
 /**\class ParametersPlugin_Plugin
  * TODO: Add documentation
  */
-class PARAMETERSPLUGIN_EXPORT ParametersPlugin_Plugin : public ModelAPI_Plugin
+class ParametersPlugin_Plugin : public ModelAPI_Plugin
 {
  public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual FeaturePtr createFeature(std::string theFeatureID);
+  PARAMETERSPLUGIN_EXPORT virtual FeaturePtr createFeature(std::string theFeatureID);
 
  public:
   ParametersPlugin_Plugin();

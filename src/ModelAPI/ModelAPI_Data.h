@@ -7,6 +7,10 @@
 #ifndef ModelAPI_Data_H_
 #define ModelAPI_Data_H_
 
+#ifdef _WINDOWS // to avoid too long decorated name warning 
+#pragma warning( disable : 4503 )
+#endif
+
 #include "ModelAPI.h"
 #include <string>
 #include <list>

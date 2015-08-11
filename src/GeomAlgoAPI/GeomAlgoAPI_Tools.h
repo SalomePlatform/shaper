@@ -13,11 +13,11 @@
 
 namespace GeomAlgoAPI_Tools {
 
-class GEOMALGOAPI_EXPORT Localizer
+class Localizer
 {
 public:
-  Localizer();
-  ~Localizer();
+  GEOMALGOAPI_EXPORT Localizer();
+  GEOMALGOAPI_EXPORT ~Localizer();
 private:
   std::string myCurLocale;
 };
