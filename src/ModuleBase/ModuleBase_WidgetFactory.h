@@ -24,8 +24,8 @@ class ModuleBase_PageBase;
 
 /**
 * \ingroup GUI
-* A class for creation of widgets instances in for property panel using XML deskription of 
-* a feature
+* A class for creation of widgets instances in for property panel using
+* XML description of a feature
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 {

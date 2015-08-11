@@ -16,7 +16,7 @@
 
 #include <string>
 
-Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
+Config_WidgetAPI::Config_WidgetAPI(const std::string& theRawXml)
 {
   myDoc = xmlParseDoc(BAD_CAST theRawXml.c_str());
   myCurrentNode = xmlDocGetRootElement(myDoc);
@@ -61,6 +61,29 @@ bool Config_WidgetAPI::toParentWidget()
     myCurrentNode = myCurrentNode->parent;
   }
   return myCurrentNode != NULL;
+}
+
+std::list<xmlNodePtr> Config_WidgetAPI::attributes() const
+{
+  std::list<xmlNodePtr> aResult;
+  if (myCurrentNode && hasChild(myCurrentNode)) {
+    xmlNodePtr anAttributesNode = myCurrentNode->children;
+    while (anAttributesNode &&
+           (!isElementNode(anAttributesNode) ||
+            std::string((char *) anAttributesNode->name) != NODE_NAME_ATTRIBUTES)) {
+      anAttributesNode = anAttributesNode->next;
+    }
+    if (anAttributesNode && hasChild(anAttributesNode)) {
+      xmlNodePtr anAttributeNode = anAttributesNode->children;
+      while (anAttributeNode) {
+        if (isElementNode(anAttributeNode) &&
+            std::string((char *) anAttributeNode->name) == NODE_NAME_ATTRIBUTE)
+          aResult.push_back(anAttributeNode);
+        anAttributeNode = anAttributeNode->next;
+      }
+    }
+  }
+  return aResult;
 }
 
 std::string Config_WidgetAPI::widgetType() const
@@ -113,3 +136,39 @@ std::string Config_WidgetAPI::widgetTooltip() const
 {
   return getProperty(ATTR_TOOLTIP);
 }
+
+std::list<std::string> Config_WidgetAPI::getAttributes(const std::string& theRole/* = std::string()*/) const
+{
+  std::list<std::string> aResult;
+
+  if (theRole.empty() || theRole == ATTR_MAIN_ROLE)
+    aResult.push_back(widgetId());
+
+  if (theRole == ATTR_MAIN_ROLE)
+    return aResult;
+
+  std::list<xmlNodePtr> anAttributes = attributes();
+  for (auto it = anAttributes.begin(); it != anAttributes.end(); ++it) {
+    if (theRole.empty() || theRole == ::getProperty(*it, ATTR_ROLE))
+      aResult.push_back(::getProperty(*it, ATTR_ID));
+  }
+  return aResult;
+}
+
+std::string Config_WidgetAPI::getAttributeProperty(const std::string& theAttribute,
+                                                   const std::string& thePropName) const
+{
+  if (theAttribute == widgetId()) {
+    if (thePropName == ATTR_ROLE)
+      return ATTR_MAIN_ROLE;
+    return ::getProperty(myCurrentNode, thePropName.c_str());
+  }
+
+  std::list<xmlNodePtr> anAttributes = attributes();
+  for (auto it = anAttributes.begin(); it != anAttributes.end(); ++it) {
+    if (theAttribute == ::getProperty(*it, ATTR_ID))
+      return ::getProperty(*it, thePropName.c_str());
+  }
+  return std::string();
+}
+

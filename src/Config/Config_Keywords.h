@@ -18,6 +18,8 @@ const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
 const static char* NODE_SOURCE = "source";
 const static char* NODE_VALIDATOR = "validator";
+const static char* NODE_NAME_ATTRIBUTES = "attributes";
+const static char* NODE_NAME_ATTRIBUTE = "attribute";
 const static char* NODE_SELFILTER = "selection_filter";
 const static char* NODE_XMLPARENT = "libxml_parent";
 
@@ -66,6 +68,9 @@ const static char* ATTR_INTERNAL = "internal";
 const static char* ATTR_OBLIGATORY = "obligatory";
 const static char* ATTR_CONCEALMENT = "concealment";
 const static char* ATTR_USE_RESET = "use_reset";
+const static char* ATTR_ID = _ID;
+const static char* ATTR_ROLE = "role";
+const static char* ATTR_MAIN_ROLE = "main";
 
 // WDG_INFO properties
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

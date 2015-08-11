@@ -35,6 +35,12 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myAttributeID = theData ? theData->widgetId() : "";
   myIsObligatory = theData->getBooleanAttribute(ATTR_OBLIGATORY, true);
 
+  std::list<std::string> anAttributes = theData->getAttributes();
+  for (auto it = anAttributes.begin(); it != anAttributes.end(); ++it) {
+    std::string aRole = theData->getAttributeProperty(*it, ATTR_ROLE);
+    myRoleAttributesID[aRole] << *it;
+  }
+
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
 }
 
@@ -80,6 +86,17 @@ void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
       aWidget->setGraphicsEffect(NULL);
     }
   }
+}
+
+std::string ModuleBase_ModelWidget::attributeID(const std::string& theRole/* = std::string()*/) const
+{
+  if (theRole.empty())
+    return myAttributeID;
+
+  if (myRoleAttributesID.contains(theRole) && !myRoleAttributesID[theRole].isEmpty())
+    return myRoleAttributesID[theRole].last();
+
+  return std::string();
 }
 
 void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool theToStoreValue)

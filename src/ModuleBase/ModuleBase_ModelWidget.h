@@ -12,6 +12,8 @@
 
 #include <ModelAPI_Feature.h>
 
+#include <QList>
+#include <QMap>
 #include <QWidget>
 
 #include <memory>
@@ -121,10 +123,7 @@ Q_OBJECT
 
   /// Returns the attribute name
   /// \returns the string value
-  std::string attributeID() const
-  {
-    return myAttributeID;
-  }
+  std::string attributeID(const std::string& theRole = std::string()) const;
 
   /// Returns the parent of the attribute
   /// \returns the string value
@@ -215,6 +214,9 @@ protected slots:
 
   /// The attribute name of the model feature
   std::string myAttributeID; 
+
+  /// The list of attribute names of the model feature for a role
+  QMap<std::string, QList<std::string> > myRoleAttributesID;
 
   /// Name of parent
   std::string myParentId;    
