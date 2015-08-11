@@ -6,7 +6,7 @@ def main():
     
     parameter_create("a", "100")
     
-    sketch_create(points["XY_plane"], lambda: line_create((0, 0), ("a", 0)))
+    sketch_create(help_points("XY_plane"), lambda: line_create((0, 0), ("a", 0)))
 
     waitForObjectItem(":Object browser_XGUI_DataTree", "Parameters (1)")
     clickItem(":Object browser_XGUI_DataTree", "Parameters (1)", -10, 10, 0, Qt.LeftButton)
