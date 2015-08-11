@@ -1,3 +1,5 @@
+:Application errors.Close_QPushButton	{text='Close' type='QPushButton' unnamed='1' visible='1' window=':Application errors_XGUI_ErrorDialog'}
+:Application errors_XGUI_ErrorDialog	{type='XGUI_ErrorDialog' unnamed='1' visible='1' windowTitle='Application errors'}
 :Basic.Circle_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Circle' type='AppElements_Button' unnamed='1' visible='1'}
 :Basic.Line_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Line' type='AppElements_Button' unnamed='1' visible='1'}
 :Basic.Point_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Point' type='AppElements_Button' unnamed='1' visible='1'}
@@ -11,6 +13,7 @@
 :Circle.property_panel_ok_QToolButton	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Circle.qt_spinbox_lineedit_QLineEdit	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='3' type='QLineEdit' visible='1'}
 :Constraints.Distance_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Distance' type='AppElements_Button' unnamed='1' visible='1'}
+:Constraints.Radius_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Radius' type='AppElements_Button' unnamed='1' visible='1'}
 :Delete features.Label_QLabel	{name='qt_msgbox_label' type='QLabel' visible='1' window=':Delete features_QMessageBox'}
 :Delete features.Yes_QPushButton	{text='Yes' type='QPushButton' unnamed='1' visible='1' window=':Delete features_QMessageBox'}
 :Delete features_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Delete features'}
@@ -63,6 +66,8 @@
 :Point.property_panel_ok_QToolButton	{container=':OpenParts*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit_2	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Save current file.Discard_QPushButton	{text='Discard' type='QPushButton' unnamed='1' visible='1' window=':Save current file_QMessageBox'}
+:Save current file_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Save current file'}
 :Sketch.Basic_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Basic' type='AppElements_MenuGroupPanel' visible='1'}
 :Sketch.Constraints_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Constraints' type='AppElements_MenuGroupPanel' visible='1'}
 :Sketch.Ok_QToolButton	{container=':Sketch.Basic_AppElements_MenuGroupPanel' occurrence='6' type='QToolButton' unnamed='1' visible='1'}

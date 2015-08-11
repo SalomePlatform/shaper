@@ -57,6 +57,14 @@ def circle_create(x, y, radius):
     type(waitForObject(":Circle.CircleRadius_ModuleBase_ParamSpinBox"), radius)
     
     clickButton(waitForObject(":Circle.property_panel_ok_QToolButton"))
+    
+def circle_create_in_view(point_1, point_2):
+    clickButton(waitForObject(":Basic.Circle_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Basic.Circle_AppElements_Button"))
 
 def distance_create(point_1, point_2, annotaion_point, distance):
     clickButton(waitForObject(":Constraints.Distance_AppElements_Button"))
@@ -70,6 +78,17 @@ def distance_create(point_1, point_2, annotaion_point, distance):
     type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Return>")
 
     clickButton(waitForObject(":Constraints.Distance_AppElements_Button"))    
+
+def radius_create(point_1, point_2, radius):
+    clickButton(waitForObject(":Constraints.Radius_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
+    type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":_ModuleBase_ParamSpinBox"), radius)
+    type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Keypad_Enter>")
+    
+    clickButton(waitForObject(":Constraints.Radius_AppElements_Button"))
 
 def extrusion_feature(points, to_size):
     clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
