@@ -67,7 +67,7 @@ public:
   Slvs_hEntity getId(AttributePtr theAttribute) const;
 
   /// \brief Adds a feature to constraint and create its analogue in SolveSpace
-  void addFeature(FeaturePtr theFeature);
+  virtual void addFeature(FeaturePtr theFeature);
 
   /// \brief Shows error message
   const std::string& error() const

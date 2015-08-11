@@ -33,6 +33,8 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_MultiRotation.h>
+#include <SketchPlugin_MultiTranslation.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -269,14 +271,28 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
   if (aConstraints.empty())
     return false;
   std::set<ConstraintPtr>::iterator aCIter = aConstraints.begin();
+  std::set<SolverConstraintPtr> aPostponed; // postponed constraints Multi-Rotation and Multi-Translation
   for (; aCIter != aConstraints.end(); aCIter++) {
     ConstraintConstraintMap::iterator aSolConIter = myConstraints.find(*aCIter);
     if (aSolConIter == myConstraints.end() || !aSolConIter->first->data() ||
         !aSolConIter->first->data()->isValid())
       continue;
     myFeatureStorage->changeFeature(theFeature, aSolConIter->first);
+
+    if (aSolConIter->first->getKind() == SketchPlugin_MultiRotation::ID() ||
+        aSolConIter->first->getKind() == SketchPlugin_MultiTranslation::ID()) {
+      aPostponed.insert(aSolConIter->second);
+      continue;
+    }
     aSolConIter->second->addFeature(theFeature);
     aSolConIter->second->update();
+  }
+
+  // Update postponed constraints
+  std::set<SolverConstraintPtr>::iterator aSCIter = aPostponed.begin();
+  for (; aSCIter != aPostponed.end(); ++aSCIter) {
+    (*aSCIter)->addFeature(theFeature);
+    (*aSCIter)->update();
   }
   return true;
 }
@@ -426,12 +442,20 @@ bool SketchSolver_Group::resolveConstraints()
       else {
         // To avoid overconstraint situation, we will remove temporary constraints one-by-one
         // and try to find the case without overconstraint
+        bool isLastChance = false;
         int aNbTemp = myStorage->numberTemporary();
         while (true) {
           aResult = myConstrSolver.solve();
-          if (aResult == SLVS_RESULT_OKAY || aNbTemp <= 0)
+          if (aResult == SLVS_RESULT_OKAY || isLastChance)
             break;
-          aNbTemp = myStorage->deleteTemporaryConstraint();
+          if (aNbTemp <= 0) {
+            // try to update parameters and resolve once again
+            ConstraintConstraintMap::iterator aConstrIt = myConstraints.begin();
+            for (; aConstrIt != myConstraints.end(); ++aConstrIt)
+              aConstrIt->second->update();
+            isLastChance = true;
+          } else
+            aNbTemp = myStorage->deleteTemporaryConstraint();
           myStorage->initializeSolver(myConstrSolver);
         }
       }

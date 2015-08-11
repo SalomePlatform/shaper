@@ -201,13 +201,13 @@ void SketchSolver_ConstraintRigid::fixPoint(const Slvs_hEntity& thePointID)
 void SketchSolver_ConstraintRigid::fixLine(const Slvs_Entity& theLine)
 {
   Slvs_Constraint anEqual;
-  if (isAxisParallel(theLine)) {
+  if (myStorage->isAxisParallel(theLine.h)) {
     // Fix one point and a line length
     Slvs_hConstraint aFixed;
     if (!myStorage->isPointFixed(theLine.point[0], aFixed, true) &&
         !myStorage->isPointFixed(theLine.point[1], aFixed, true))
       fixPoint(theLine.point[0]);
-    if (!isUsedInEqual(theLine, anEqual)) {
+    if (!myStorage->isUsedInEqual(theLine.h, anEqual)) {
       // Check the distance is not set yet
       std::list<Slvs_Constraint> aDistConstr = myStorage->getConstraintsByType(SLVS_C_PT_PT_DISTANCE);
       std::list<Slvs_Constraint>::const_iterator aDIt = aDistConstr.begin();
@@ -235,7 +235,7 @@ void SketchSolver_ConstraintRigid::fixLine(const Slvs_Entity& theLine)
     }
     return;
   }
-  else if (isUsedInEqual(theLine, anEqual)) {
+  else if (myStorage->isUsedInEqual(theLine.h, anEqual)) {
     // Check another entity of Equal is already fixed
     Slvs_hEntity anOtherEntID = anEqual.entityA == theLine.h ? anEqual.entityB : anEqual.entityA;
     if (myStorage->isEntityFixed(anOtherEntID, true)) {
@@ -280,7 +280,7 @@ void SketchSolver_ConstraintRigid::fixCircle(const Slvs_Entity& theCircle)
   bool isFixRadius = true;
   // Verify the arc is under Equal constraint
   Slvs_Constraint anEqual;
-  if (isUsedInEqual(theCircle, anEqual)) {
+  if (myStorage->isUsedInEqual(theCircle.h, anEqual)) {
     // Check another entity of Equal is already fixed
     Slvs_hEntity anOtherEntID = anEqual.entityA == theCircle.h ? anEqual.entityB : anEqual.entityA;
     if (myStorage->isEntityFixed(anOtherEntID, true))
@@ -317,7 +317,7 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
 
   // Verify the arc is under Equal constraint
   Slvs_Constraint anEqual;
-  if (isUsedInEqual(theArc, anEqual)) {
+  if (myStorage->isUsedInEqual(theArc.h, anEqual)) {
     // Check another entity of Equal is already fixed
     Slvs_hEntity anOtherEntID = anEqual.entityA == theArc.h ? anEqual.entityB : anEqual.entityA;
     if (myStorage->isEntityFixed(anOtherEntID, true)) {
@@ -382,36 +382,4 @@ void SketchSolver_ConstraintRigid::fixArc(const Slvs_Entity& theArc)
         myStorage->addConstraintWhereDragged(aFixedR.h);
     }
   }
-}
-
-bool SketchSolver_ConstraintRigid::isUsedInEqual(
-    const Slvs_Entity& theEntity, Slvs_Constraint& theEqual) const
-{
-  // Check the entity is used in Equal constraint
-  std::list<Slvs_Constraint> anEqualConstr = myStorage->getConstraintsByType(SLVS_C_EQUAL_LENGTH_LINES);
-  std::list<Slvs_Constraint> anAddList = myStorage->getConstraintsByType(SLVS_C_EQUAL_LINE_ARC_LEN);
-  anEqualConstr.insert(anEqualConstr.end(), anAddList.begin(), anAddList.end());
-  anAddList = myStorage->getConstraintsByType(SLVS_C_EQUAL_RADIUS);
-  anEqualConstr.insert(anEqualConstr.end(), anAddList.begin(), anAddList.end());
-
-  std::list<Slvs_Constraint>::const_iterator anEqIter = anEqualConstr.begin();
-  for (; anEqIter != anEqualConstr.end(); anEqIter++)
-    if (anEqIter->entityA == theEntity.h || anEqIter->entityB == theEntity.h) {
-      theEqual = *anEqIter;
-      return true;
-    }
-  return false;
-}
-
-bool SketchSolver_ConstraintRigid::isAxisParallel(const Slvs_Entity& theEntity) const
-{
-  std::list<Slvs_Constraint> aConstr = myStorage->getConstraintsByType(SLVS_C_HORIZONTAL);
-  std::list<Slvs_Constraint> aVert = myStorage->getConstraintsByType(SLVS_C_VERTICAL);
-  aConstr.insert(aConstr.end(), aVert.begin(), aVert.end());
-
-  std::list<Slvs_Constraint>::const_iterator anIter = aConstr.begin();
-  for (; anIter != aConstr.end(); anIter++)
-    if (anIter->entityA == theEntity.h)
-      return true;
-  return false;
 }

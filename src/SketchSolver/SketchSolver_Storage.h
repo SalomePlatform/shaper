@@ -150,6 +150,38 @@ public:
   /// \brief Check two points are coincident
   bool isCoincident(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
 
+  /// \brief Check the entity is horizontal of vertical
+  bool isAxisParallel(const Slvs_hEntity& theEntity) const;
+
+  /// \brief Verifies the entity is used in any equal constraint
+  /// \param[in]  theEntity entity to be found
+  /// \param[out] theEqual  constraint, which uses the entity
+  /// \return \c true, if the Equal constrait is found
+  bool isUsedInEqual(const Slvs_hEntity& theEntity, Slvs_Constraint& theEqual) const;
+
+  /// \brief Fixes specified entity
+  /// \param theEntity  ID of the entity to be fixed
+  /// \return List of created constraints
+  std::vector<Slvs_hConstraint> fixEntity(const Slvs_hEntity& theEntity);
+
+private:
+  /// \brief Fixes specified point
+  /// \param [in]  thePoint    point to be fixed
+  /// \param [out] theCreated  list of the Fixed constraints created
+  void fixPoint(const Slvs_Entity& thePoint, std::vector<Slvs_hConstraint>& theCreated);
+  /// \brief Fixes specified line
+  /// \param [in]  theLine     line to be fixed
+  /// \param [out] theCreated  list of the Fixed constraints created
+  void fixLine(const Slvs_Entity& theLine, std::vector<Slvs_hConstraint>& theCreated);
+  /// \brief Fixes specified circle
+  /// \param [in]  theCircle   circle to be fixed
+  /// \param [out] theCreated  list of the Fixed constraints created
+  void fixCircle(const Slvs_Entity& theCircle, std::vector<Slvs_hConstraint>& theCreated);
+  /// \brief Fixes specified arc
+  /// \param [in]  theArc      arc to be fixed
+  /// \param [out] theCreated  list of the Fixed constraints created
+  void fixArc(const Slvs_Entity& theArc, std::vector<Slvs_hConstraint>& theCreated);
+
 private:
   Slvs_hParam myParamMaxID; ///< current parameter index (may differs with the number of parameters)
   std::vector<Slvs_Param> myParameters; ///< list of parameters used in the current group of constraints (sorted by the identifier)

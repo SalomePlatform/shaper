@@ -12,8 +12,6 @@
 
 #include <vector>
 
-typedef std::vector< std::vector<Slvs_hEntity> > AuxLinesList;
-
 /** \class   SketchSolver_ConstraintMultiRotation
  *  \ingroup Plugins
  *  \brief   Convert rotated features to the list of SolveSpace constraints
@@ -37,6 +35,9 @@ public:
   /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
   virtual bool remove(ConstraintPtr theConstraint = ConstraintPtr());
 
+  /// \brief Adds a feature to constraint and create its analogue in SolveSpace
+  virtual void addFeature(FeaturePtr theFeature);
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
@@ -51,10 +52,10 @@ protected:
   /// \param[out] theCenter   ID of central point of rotation
   /// \param[out] theAngle    rotation angle
   /// \param[out] thePoints   list of IDs of initial points and their rotated copies
-  /// \param[out] theCircular list of IDs of arcs and circles and their copies
+  /// \param[out] theEntities list of IDs of entities and their rotated copies
   void getAttributes(Slvs_hEntity& theCenter, double& theAngle,
-                     std::vector<std::vector<Slvs_hEntity> >& thePoints,
-                     std::vector<std::vector<Slvs_hEntity> >& theCircular);
+                     std::vector< std::vector<Slvs_hEntity> >& thePoints,
+                     std::vector< std::vector<Slvs_hEntity> >& theEntities);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
   virtual void adjustConstraint();
@@ -64,7 +65,10 @@ private:
   size_t myNumberOfCopies;  ///< number of previous copies of initial objects
   Slvs_hEntity myRotationCenter; ///< ID of center of rotation
   double myAngle;           ///< angle of rotation
-  AuxLinesList myAuxLines;  ///< list of auxiliary lines, created to make clear rotation
+  std::vector< std::vector<Slvs_hEntity> > myPointsAndCopies; ///< list of initial points and their rotated copies
+  std::vector< std::vector<Slvs_hEntity> > myCircsAndCopies;  ///< list of circles and their copies (to change their radii together)
+
+  std::set<Slvs_hEntity> myPointsJustUpdated; ///< list of points touched by user
 };
 
 #endif

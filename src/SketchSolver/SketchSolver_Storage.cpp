@@ -6,6 +6,8 @@
 
 #include <SketchSolver_Storage.h>
 
+#include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_XY.h>
 #include <math.h>
 
 /** \brief Search the entity/parameter with specified ID in the list of elements
@@ -751,6 +753,281 @@ bool SketchSolver_Storage::isCoincident(
   }
   return false;
 }
+
+
+std::vector<Slvs_hConstraint> SketchSolver_Storage::fixEntity(const Slvs_hEntity& theEntity)
+{
+  std::vector<Slvs_hConstraint> aNewConstraints;
+
+  int aPos = Search(theEntity, myEntities);
+  if (aPos >= 0 && aPos < (int)myEntities.size()) {
+    switch (myEntities[aPos].type) {
+    case SLVS_E_POINT_IN_2D:
+    case SLVS_E_POINT_IN_3D:
+      fixPoint(myEntities[aPos], aNewConstraints);
+      break;
+    case SLVS_E_LINE_SEGMENT:
+      fixLine(myEntities[aPos], aNewConstraints);
+      break;
+    case SLVS_E_CIRCLE:
+      fixCircle(myEntities[aPos], aNewConstraints);
+      break;
+    case SLVS_E_ARC_OF_CIRCLE:
+      fixArc(myEntities[aPos], aNewConstraints);
+      break;
+    default:
+      break;
+    }
+  }
+
+  return aNewConstraints;
+}
+
+void SketchSolver_Storage::fixPoint(const Slvs_Entity& thePoint,
+    std::vector<Slvs_hConstraint>& theCreated)
+{
+  Slvs_Constraint aConstraint;
+  Slvs_hConstraint aConstrID = SLVS_E_UNKNOWN;
+  bool isFixed = isPointFixed(thePoint.h, aConstrID, true);
+  bool isForceUpdate = (isFixed && isTemporary(aConstrID));
+  if (!isForceUpdate) { // create new constraint
+    if (isFixed) return;
+    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, thePoint.group, SLVS_C_WHERE_DRAGGED, thePoint.wrkpl,
+        0.0, thePoint.h, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+    aConstraint.h = addConstraint(aConstraint);
+    theCreated.push_back(aConstraint.h);
+  } else { // update already existent constraint
+    if (!isFixed || aConstrID == SLVS_E_UNKNOWN)
+      return;
+    int aPos = Search(aConstrID, myConstraints);
+    if (aPos >= 0 && aPos < (int)myConstraints.size())
+      myConstraints[aPos].ptA = thePoint.h;
+  }
+}
+
+void SketchSolver_Storage::fixLine(const Slvs_Entity& theLine,
+    std::vector<Slvs_hConstraint>& theCreated)
+{
+  Slvs_Entity aPoint[2] = {
+      getEntity(theLine.point[0]),
+      getEntity(theLine.point[1])
+  };
+
+  Slvs_Constraint anEqual;
+  if (isAxisParallel(theLine.h)) {
+    // Fix one point and a line length
+    Slvs_hConstraint aFixed;
+    if (!isPointFixed(theLine.point[0], aFixed, true) &&
+        !isPointFixed(theLine.point[1], aFixed, true))
+      fixPoint(aPoint[0], theCreated);
+    if (!isUsedInEqual(theLine.h, anEqual)) {
+      // Check the distance is not set yet
+      std::vector<Slvs_Constraint>::const_iterator aDistIt = myConstraints.begin();
+      for (; aDistIt != myConstraints.end(); ++aDistIt)
+        if ((aDistIt->type == SLVS_C_PT_PT_DISTANCE) &&
+           ((aDistIt->ptA == theLine.point[0] && aDistIt->ptB == theLine.point[1]) ||
+            (aDistIt->ptA == theLine.point[1] && aDistIt->ptB == theLine.point[0])))
+          return;
+      // Calculate distance between points on the line
+      double aCoords[4];
+      for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++) {
+          Slvs_Param aParam = getParameter(aPoint[i].param[j]);
+          aCoords[2*i+j] = aParam.val;
+        }
+
+      double aLength = sqrt((aCoords[2] - aCoords[0]) * (aCoords[2] - aCoords[0]) + 
+                            (aCoords[3] - aCoords[1]) * (aCoords[3] - aCoords[1]));
+      // fix line length
+      Slvs_Constraint aDistance = Slvs_MakeConstraint(SLVS_E_UNKNOWN, theLine.group,
+          SLVS_C_PT_PT_DISTANCE, theLine.wrkpl, aLength,
+          theLine.point[0], theLine.point[1], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+      aDistance.h = addConstraint(aDistance);
+      theCreated.push_back(aDistance.h);
+    }
+    return;
+  }
+  else if (isUsedInEqual(theLine.h, anEqual)) {
+    // Check another entity of Equal is already fixed
+    Slvs_hEntity anOtherEntID = anEqual.entityA == theLine.h ? anEqual.entityB : anEqual.entityA;
+    if (isEntityFixed(anOtherEntID, true)) {
+      // Fix start point of the line (if end point is not fixed yet) ...
+      Slvs_hConstraint anEndFixedID = SLVS_E_UNKNOWN;
+      bool isFixed = isPointFixed(theLine.point[1], anEndFixedID, true);
+      if (isFixed == SLVS_E_UNKNOWN)
+        fixPoint(aPoint[0], theCreated);
+      // ...  and create fixed point lying on this line
+      Slvs_hEntity aPointToCopy = anEndFixedID == SLVS_E_UNKNOWN ? theLine.point[1] : theLine.point[0];
+      // Firstly, search already fixed point on line
+      bool isPonLineFixed = false;
+      Slvs_hEntity aFixedPoint;
+      std::vector<Slvs_Constraint>::const_iterator aPLIter = myConstraints.begin();
+      for (; aPLIter != myConstraints.end() && !isPonLineFixed; ++aPLIter)
+        if (aPLIter->type == SLVS_C_PT_ON_LINE && aPLIter->entityA == theLine.h) {
+          isPonLineFixed = isPointFixed(aPLIter->ptA, anEndFixedID);
+          aFixedPoint = aPLIter->ptA;
+        }
+
+      if (isPonLineFixed) { // update existent constraint
+        copyEntity(aPointToCopy, aFixedPoint);
+      } else { // create new constraint
+        Slvs_hEntity aCopied = copyEntity(aPointToCopy);
+        Slvs_Constraint aPonLine = Slvs_MakeConstraint(SLVS_E_UNKNOWN, theLine.group, SLVS_C_PT_ON_LINE,
+            theLine.wrkpl, 0.0, aCopied, SLVS_E_UNKNOWN, theLine.h, SLVS_E_UNKNOWN);
+        aPonLine.h = addConstraint(aPonLine);
+        theCreated.push_back(aPonLine.h);
+        fixPoint(getEntity(aCopied), theCreated);
+      }
+      return;
+    }
+  }
+
+  // Fix both points
+  for (int i = 0; i < 2; i++)
+    fixPoint(aPoint[i], theCreated);
+}
+
+void SketchSolver_Storage::fixCircle(const Slvs_Entity& theCircle,
+    std::vector<Slvs_hConstraint>& theCreated)
+{
+  bool isFixRadius = true;
+  // Verify the arc is under Equal constraint
+  Slvs_Constraint anEqual;
+  if (isUsedInEqual(theCircle.h, anEqual)) {
+    // Check another entity of Equal is already fixed
+    Slvs_hEntity anOtherEntID = anEqual.entityA == theCircle.h ? anEqual.entityB : anEqual.entityA;
+    if (isEntityFixed(anOtherEntID, true))
+      isFixRadius = false;
+  }
+
+  fixPoint(getEntity(theCircle.point[0]), theCreated);
+
+  if (isFixRadius) {
+    // Search the radius is already fixed
+    std::vector<Slvs_Constraint>::const_iterator aDiamIter = myConstraints.begin();
+    for (; aDiamIter != myConstraints.end(); ++aDiamIter)
+      if (aDiamIter->type == SLVS_C_DIAMETER && aDiamIter->entityA == theCircle.h)
+        return;
+
+    // Fix radius of a circle
+    const Slvs_Entity& aRadEnt = getEntity(theCircle.distance);
+    double aRadius = getParameter(aRadEnt.param[0]).val;
+    Slvs_Constraint aFixedR = Slvs_MakeConstraint(SLVS_E_UNKNOWN, theCircle.group, SLVS_C_DIAMETER,
+        theCircle.wrkpl, aRadius * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, theCircle.h, SLVS_E_UNKNOWN);
+    aFixedR.h = addConstraint(aFixedR);
+    theCreated.push_back(aFixedR.h);
+  }
+}
+
+void SketchSolver_Storage::fixArc(const Slvs_Entity& theArc,
+    std::vector<Slvs_hConstraint>& theCreated)
+{
+  Slvs_Entity aPoint[3] = {
+      getEntity(theArc.point[0]),
+      getEntity(theArc.point[1]),
+      getEntity(theArc.point[2])
+  };
+
+  bool isFixRadius = true;
+  std::list<Slvs_Entity> aPointsToFix;
+  aPointsToFix.push_back(aPoint[1]);
+  aPointsToFix.push_back(aPoint[2]);
+
+  // Verify the arc is under Equal constraint
+  Slvs_Constraint anEqual;
+  if (isUsedInEqual(theArc.h, anEqual)) {
+    // Check another entity of Equal is already fixed
+    Slvs_hEntity anOtherEntID = anEqual.entityA == theArc.h ? anEqual.entityB : anEqual.entityA;
+    if (isEntityFixed(anOtherEntID, true)) {
+      isFixRadius = false;
+      Slvs_Entity anOtherEntity = getEntity(anOtherEntID);
+      if (anOtherEntity.type == SLVS_E_LINE_SEGMENT) {
+        aPointsToFix.pop_back();
+        aPointsToFix.push_back(aPoint[0]);
+      }
+    }
+  }
+
+  Slvs_hConstraint aConstrID;
+  int aNbPointsToFix = 2; // number of fixed points for the arc
+  if (isPointFixed(theArc.point[0], aConstrID, true))
+    aNbPointsToFix--;
+
+  double anArcPoints[3][2];
+  for (int i = 0; i < 3; i++) {
+    const Slvs_Entity& aPointOnArc = getEntity(theArc.point[i]);
+    for (int j = 0; j < 2; j++)
+      anArcPoints[i][j] = getParameter(aPointOnArc.param[j]).val;
+  }
+
+  // Radius of the arc
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter(new GeomAPI_Pnt2d(anArcPoints[0][0], anArcPoints[0][1]));
+  std::shared_ptr<GeomAPI_Pnt2d> aStart(new GeomAPI_Pnt2d(anArcPoints[1][0], anArcPoints[1][1]));
+  double aRadius = aCenter->distance(aStart);
+
+  // Update end point of the arc to be on a curve
+  std::shared_ptr<GeomAPI_Pnt2d> anEnd(new GeomAPI_Pnt2d(anArcPoints[2][0], anArcPoints[2][1]));
+  double aDistance = anEnd->distance(aCenter);
+  std::shared_ptr<GeomAPI_XY> aDir = anEnd->xy()->decreased(aCenter->xy());
+  if (aDistance < tolerance)
+    aDir = aStart->xy()->decreased(aCenter->xy())->multiplied(-1.0);
+  else
+    aDir = aDir->multiplied(aRadius / aDistance);
+  double xy[2] = {aCenter->x() + aDir->x(), aCenter->y() + aDir->y()};
+  const Slvs_Entity& aEndPoint = getEntity(theArc.point[2]);
+  for (int i = 0; i < 2; i++) {
+    Slvs_Param aParam = getParameter(aEndPoint.param[i]);
+    aParam.val = xy[i];
+    updateParameter(aParam);
+  }
+
+  std::list<Slvs_Entity>::iterator aPtIt = aPointsToFix.begin();
+  for (; aNbPointsToFix > 0; aPtIt++, aNbPointsToFix--)
+    fixPoint(*aPtIt, theCreated);
+
+  if (isFixRadius) {
+    // Fix radius of the arc
+    bool isExists = false;
+    std::vector<Slvs_Constraint>::iterator anIt = myConstraints.begin();
+    for (; anIt != myConstraints.end() && !isExists; ++anIt)
+      if (anIt->type == SLVS_C_DIAMETER && anIt->entityA == theArc.h)
+        isExists = true;
+    if (!isExists) {
+      Slvs_Constraint aFixedR = Slvs_MakeConstraint(SLVS_E_UNKNOWN, theArc.group, SLVS_C_DIAMETER,
+          theArc.wrkpl, aRadius * 2.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, theArc.h, SLVS_E_UNKNOWN);
+      aFixedR.h = addConstraint(aFixedR);
+      theCreated.push_back(aFixedR.h);
+    }
+  }
+}
+
+
+bool SketchSolver_Storage::isAxisParallel(const Slvs_hEntity& theEntity) const
+{
+  std::vector<Slvs_Constraint>::const_iterator anIter = myConstraints.begin();
+  for (; anIter != myConstraints.end(); anIter++)
+    if ((anIter->type == SLVS_C_HORIZONTAL || anIter->type == SLVS_C_VERTICAL) && 
+        anIter->entityA == theEntity)
+      return true;
+  return false;
+}
+
+bool SketchSolver_Storage::isUsedInEqual(
+    const Slvs_hEntity& theEntity, Slvs_Constraint& theEqual) const
+{
+  // Check the entity is used in Equal constraint
+  std::vector<Slvs_Constraint>::const_iterator anEqIter = myConstraints.begin();
+  for (; anEqIter != myConstraints.end(); anEqIter++)
+    if ((anEqIter->type == SLVS_C_EQUAL_LENGTH_LINES ||
+         anEqIter->type == SLVS_C_EQUAL_LINE_ARC_LEN ||
+         anEqIter->type == SLVS_C_EQUAL_RADIUS) &&
+       (anEqIter->entityA == theEntity || anEqIter->entityB == theEntity)) {
+      theEqual = *anEqIter;
+      return true;
+    }
+  return false;
+}
+
 
 
 

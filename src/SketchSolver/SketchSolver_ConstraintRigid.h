@@ -64,15 +64,6 @@ private:
   /// There will be fixed start and end points and the radius of the arc.
   void fixArc(const Slvs_Entity& theArc);
 
-  /// \brief Verifies the entity is used in any equal constraint
-  /// \param[in]  theEntity entity to be found
-  /// \param[out] theEqual  constraint, which uses the entity
-  /// \return \c true, if the Equal constrait is found
-  bool isUsedInEqual(const Slvs_Entity& theEntity, Slvs_Constraint& theEqual) const;
-
-  /// \brief Check the entity is horizontal of vertical
-  bool isAxisParallel(const Slvs_Entity& theEntity) const;
-
 protected:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
 };
