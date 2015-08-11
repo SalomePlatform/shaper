@@ -60,9 +60,16 @@ void Model_AttributeRefList::clear()
   }
 }
 
-int Model_AttributeRefList::size() const
+int Model_AttributeRefList::size(const bool theWithEmpty) const
 {
-  return myRef->Extent();
+  if (theWithEmpty)
+    return myRef->Extent();
+  int aResult = 0;
+  const TDF_LabelList& aList = myRef->List();
+  for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
+    if (!aLIter.Value().IsNull()) aResult++;
+  }
+  return aResult;
 }
 
 bool Model_AttributeRefList::isInitialized()
@@ -81,7 +88,9 @@ list<ObjectPtr> Model_AttributeRefList::list()
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
     for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-      ObjectPtr anObj = aDoc->objects()->object(aLIter.Value());
+      ObjectPtr anObj;
+      if (!aLIter.Value().IsNull())
+        anObj = aDoc->objects()->object(aLIter.Value());
       aResult.push_back(anObj);
     }
   }
@@ -108,19 +117,43 @@ bool Model_AttributeRefList::isInList(const ObjectPtr& theObj)
   return false;
 }
 
-ObjectPtr Model_AttributeRefList::object(const int theIndex) const
+ObjectPtr Model_AttributeRefList::object(const int theIndex, const bool theWithEmpty) const
 {
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
       owner()->document());
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
-    int anIndex = 0;
-    for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next(), anIndex++) {
+    int anIndex = -1;
+    for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
+      if (theWithEmpty || !aLIter.Value().IsNull())
+        anIndex++;
       if (anIndex == theIndex)
         return aDoc->objects()->object(aLIter.Value());
     }
   }
   return ObjectPtr();
+}
+
+void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew)
+{
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
+  if (aDoc) {
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theCurrent->data());
+    if (aData.get() && aData->isValid()) {
+      TDF_Label aCurrentLab = aData->label().Father();
+      TDF_Label aNewLab;
+      if (theNew.get() && theNew->data()->isValid()) { // the new may be null
+        std::shared_ptr<Model_Data> aNewData = 
+          std::dynamic_pointer_cast<Model_Data>(theNew->data());
+        aNewLab = aNewData->label().Father();
+      }
+      // do the substitution
+      if (myRef->InsertAfter(aNewLab, aCurrentLab)) {
+        myRef->Remove(aCurrentLab);
+      }
+    }
+  }
 }
 
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)

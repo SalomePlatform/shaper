@@ -392,7 +392,7 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
       new GeomAPI_Pnt2d(theClickedX, theClickedY));
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    if (theFeature == aFeature)
+    if (!aFeature.get() || theFeature == aFeature)
       continue;
     // find the given point in the feature attributes
     anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());

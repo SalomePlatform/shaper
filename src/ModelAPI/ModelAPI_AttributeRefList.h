@@ -29,25 +29,31 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual std::string attributeType();
 
   /// Appends the feature to the end of a list
-  MODELAPI_EXPORT virtual void append(ObjectPtr theObject) = 0;
+  virtual void append(ObjectPtr theObject) = 0;
 
   /// Erases the first meet of the feature in the list
-  MODELAPI_EXPORT virtual void remove(ObjectPtr theObject) = 0;
+  virtual void remove(ObjectPtr theObject) = 0;
 
   /// Removes all references from the list
-  MODELAPI_EXPORT virtual void clear() = 0;
+  virtual void clear() = 0;
 
   /// Returns number of features in the list
-  MODELAPI_EXPORT virtual int size() const = 0;
+  ///\param theWithEmpty if it is false, returns the number of not-empty referenced objects
+  virtual int size(const bool theWithEmpty = true) const = 0;
 
   /// Returns the list of features
-  MODELAPI_EXPORT virtual std::list<ObjectPtr> list() = 0;
+  virtual std::list<ObjectPtr> list() = 0;
 
   /// Returns true if the object is in list
-  MODELAPI_EXPORT virtual bool isInList(const ObjectPtr& theObj) = 0;
+  virtual bool isInList(const ObjectPtr& theObj) = 0;
 
- /// Returns the referenced object by the zero-based index
-  MODELAPI_EXPORT virtual ObjectPtr object(const int theIndex) const = 0;
+  /// Returns the referenced object by the zero-based index
+  ///\param theIndex zero-based index in the list
+  ///\param theWithEmpty if it is false, counts the not-empty referenced objects only
+  virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true) const = 0;
+
+  /// Substitutes the feature by another one. Does nothing if such object is not found.
+  virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew) = 0;
 
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeRefList();
  protected:

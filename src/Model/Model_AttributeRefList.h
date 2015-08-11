@@ -30,7 +30,8 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   MODEL_EXPORT virtual void remove(ObjectPtr theObject);
 
   /// Returns number of features in the list
-  MODEL_EXPORT virtual int size() const;
+  ///\param theWithEmpty if it is false, returns the number of not-empty referenced objects
+  MODEL_EXPORT virtual int size(const bool theWithEmpty = true) const;
 
   /// Removes all references from the list
   MODEL_EXPORT virtual void clear();
@@ -42,7 +43,12 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   MODEL_EXPORT virtual bool isInList(const ObjectPtr& theObj);
 
   /// Returns the list of features
-  MODEL_EXPORT virtual ObjectPtr object(const int theIndex) const;
+  ///\param theIndex zero-based index in the list
+  ///\param theWithEmpty if it is false, counts the not-empty referenced objects only
+  MODEL_EXPORT virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true) const;
+
+  /// Substitutes the feature by another one. Does nothing if such object is not found.
+  MODEL_EXPORT virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew);
 
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();

@@ -140,6 +140,10 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
 {
   if (!data()->isValid()) // sketch is already removed (case on undo of sketch), sync is not needed
     return;
+  // to keep the persistent sub-elements indexing, do not remove elements from list,
+  // but substitute by nulls
+  reflist(SketchPlugin_Sketch::FEATURES_ID())->substitute(theFeature, ObjectPtr());
+  /*
   list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
   list<ObjectPtr>::iterator aSubIt = aSubs.begin(), aLastIt = aSubs.end();
   bool isRemoved = false;
@@ -157,27 +161,42 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
   // Find the first empty element and remove it
   if (!isRemoved && aHasEmtpyFeature)
     data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(ObjectPtr());
+  */
 }
 
 int SketchPlugin_Sketch::numberOfSubs(bool forTree) const
 {
   if (forTree)
     return 0;
-  return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size();
+  return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size(false);
 }
 
-std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(const int theIndex, bool forTree) const
+std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(
+  const int theIndex, bool forTree) const
 {
   if (forTree)
     return FeaturePtr();
 
-  ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex);
+  ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex, false);
   return std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
 }
 
 int SketchPlugin_Sketch::subFeatureId(const int theIndex) const
 {
-  return subFeature(theIndex)->data()->featureId();
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+  std::list<ObjectPtr> aFeatures = aRefList->list();
+  std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin();
+  int aResultIndex = 1; // number of the counted (created) features, started from 1
+  int aFeatureIndex = -1; // number of the not-empty features in the list
+  for (; anIt != aFeatures.end(); anIt++) {
+    if (anIt->get()) 
+      aFeatureIndex++;
+    if (aFeatureIndex == theIndex)
+      break;
+    aResultIndex++;
+  }
+  return aResultIndex;
 }
 
 bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
@@ -256,7 +275,8 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
     std::list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
     std::list<ObjectPtr>::iterator aSub = aSubs.begin();
     for(; aSub != aSubs.end(); aSub++) {
-      ModelAPI_EventCreator::get()->sendUpdated(*aSub, anUpdateEvent);
+      if (aSub->get())
+        ModelAPI_EventCreator::get()->sendUpdated(*aSub, anUpdateEvent);
     }
   }
 }
