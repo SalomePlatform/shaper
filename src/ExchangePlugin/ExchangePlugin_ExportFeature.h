@@ -27,17 +27,17 @@ public:
     static const std::string MY_EXPORT_ID("Export");
     return MY_EXPORT_ID;
   }
-  /// attribute name of file format
-  inline static const std::string& FILE_FORMAT_ID()
-  {
-    static const std::string MY_FILE_FORMAT_ID("export_file_format");
-    return MY_FILE_FORMAT_ID;
-  }
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
-    static const std::string MY_FILE_PATH_ID("export_file_selector");
+    static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
+  }
+  /// attribute name of file format
+  inline static const std::string& FILE_FORMAT_ID()
+  {
+    static const std::string MY_FILE_FORMAT_ID("file_format");
+    return MY_FILE_FORMAT_ID;
   }
   /// attribute name of selection list
   inline static const std::string& SELECTION_LIST_ID()

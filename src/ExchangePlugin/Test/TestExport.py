@@ -39,7 +39,7 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     
     aSession.startOperation()
     anImportFeature = aPart.addFeature("Import")
-    anImportFeature.string("import_file_selector").setValue("Data/screw.step")
+    anImportFeature.string("file_path").setValue("Data/screw.step")
     anImportFeature.execute()
     aSession.finishOperation()
     
@@ -50,12 +50,12 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     anExportFeature = aPart.addFeature(aFeatureKind)
     assert anExportFeature, "{0}: Can not create a feature {1}".format(theType, aFeatureKind)
     
-    aFormatAttrName = "export_file_format"
+    aFormatAttrName = "file_format"
     aFormatAttr = anExportFeature.string(aFormatAttrName)
     assert aFormatAttr, "{0}: Can not receive string field {1}".format(theType, aFormatAttrName)
     aFormatAttr.setValue(theFormat)
     
-    aFileAttrName = "export_file_selector"
+    aFileAttrName = "file_path"
     aFileAttr = anExportFeature.string(aFileAttrName)
     assert aFileAttr, "{0}: Can not receive string field {1}".format(theType, aFileAttrName)
     aFileAttr.setValue(theFile)

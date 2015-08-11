@@ -31,7 +31,7 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
   /// attribute name of referenced face
   inline static const std::string& FILE_PATH_ID()
   {
-    static const std::string MY_FILE_PATH_ID("import_file_selector");
+    static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
   /// default constructor

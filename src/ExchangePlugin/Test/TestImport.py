@@ -29,7 +29,7 @@ def testImport(theType, theFile, theVolume, theDelta):
     aFeatureKind = "Import"
     anImportFeature = aPart.addFeature(aFeatureKind)
     assert anImportFeature, "{0}: Can not create a feature {1}".format(theType, aFeatureKind)
-    aFieldName = "import_file_selector"
+    aFieldName = "file_path"
     file = anImportFeature.string(aFieldName)
     assert file, "{0}: Can not receive string field {1}".format(theType, aFieldName)
     file.setValue(theFile)
