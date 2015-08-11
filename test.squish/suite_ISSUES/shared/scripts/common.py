@@ -85,7 +85,23 @@ def distance_create(point_1, point_2, annotaion_point, distance):
     type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Return>")
 
     clickButton(waitForObject(":Constraints.Distance_AppElements_Button"))    
-
+    
+def parallel_create(point_1, point_2):
+    clickButton(waitForObject(":Constraints.Parallel_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Constraints.Parallel_AppElements_Button"))
+    
+def perpendicular_create(point_1, point_2):
+    clickButton(waitForObject(":Constraints.Perpendicular_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Constraints.Perpendicular_AppElements_Button"))
+    
 def radius_create(point_1, point_2, radius):
     clickButton(waitForObject(":Constraints.Radius_AppElements_Button"))
     
