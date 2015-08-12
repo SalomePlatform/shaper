@@ -13,7 +13,6 @@
 #include <Config_def.h>
 
 #include <cstdarg>
-#include <list>
 #include <string>
 
 //>> Forward declaration of xmlNodePtr.
@@ -57,15 +56,6 @@ class CONFIG_EXPORT Config_WidgetAPI
   //! Returns a custom property of current widget
   std::string getProperty(const char* thePropName) const;
 
-  /*! Returns a list of attributes.
-   *  If theRole is 0 then returns all attributes.
-   *  If theRole is "main" then returns widgetId().
-   */
-  std::list<std::string> getAttributes(const std::string& theRole = std::string()) const;
-  //! Returns a custom property of attribute
-  std::string getAttributeProperty(const std::string& theAttribute,
-                                   const std::string& thePropName) const;
-
   /*! Checks if the XML representation of widget has given attribute,
    *  if yes - returns it's bool value, if no, or if the value can not
    *  be converted to bool - returns theDefault.
@@ -77,15 +67,13 @@ class CONFIG_EXPORT Config_WidgetAPI
 
  protected:
   /// These fields are accessible for ModuleBase_WidgetFactory only
-  Config_WidgetAPI(const std::string& theRawXml);
+  Config_WidgetAPI(std::string theRawXml);
   //! Pass to the next (sibling) node of widget's xml definition. If impossible, returns false
   bool toNextWidget();
   //! Pass into the child node of widget's xml definition. If impossible, returns false
   bool toChildWidget();
   //! Pass into the parent node of widget's xml definition. If impossible, returns false
   bool toParentWidget();
-
-  std::list<xmlNodePtr> attributes() const;
 
  private:
   xmlDocPtr myDoc; //!< Pointer to the root of widget's xml definition
