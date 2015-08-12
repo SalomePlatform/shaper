@@ -6,7 +6,7 @@ Compilation on LINUX:
 
   cd <sources_directory>
   source salome_env.sh
-  source linux_env.sh
+  source env_linux.sh
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=${ROOT_DIR}/install ${ROOT_DIR}/sources
   make
   make install

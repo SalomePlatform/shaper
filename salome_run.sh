@@ -1,17 +1,11 @@
-#!/bin/bash
+#!/bin/bash -x
 
-export ROOT_DIR=$(pwd)/..
-export ROOT_DIR=`cd "${ROOT_DIR}";pwd`
+export SALOME_PORT=2820
 
-source ${ROOT_DIR}/sources/salome_env.sh
-source ${ROOT_DIR}/sources/linux_env.sh $1
+source env.sh
+source env_salome.sh
 
-INSTALL_DIR=install
-if [ $1 ]; then INSTALL_DIR=${INSTALL_DIR}-$1; fi
-
-# Correcting path which defined with error
-export LD_LIBRARY_PATH=${KERNEL_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
-export SalomeAppConfig=${ROOT_DIR}/${INSTALL_DIR}/share/salome/resources/newgeom:${GUI_ROOT_DIR}/share/salome/resources/gui
-
-${PYTHONBIN} "${KERNEL_ROOT_DIR}/bin/salome/envSalome.py"
-${PYTHONBIN} "${KERNEL_ROOT_DIR}/bin/salome/runSalome.py"
+${KERNEL_ROOT_DIR}/bin/salome/killSalomeWithPort.py ${SALOME_PORT}
+${KERNEL_ROOT_DIR}/bin/salome/runSalome.py --port ${SALOME_PORT}
+sleep 5
+${KERNEL_ROOT_DIR}/bin/salome/killSalomeWithPort.py ${SALOME_PORT}
