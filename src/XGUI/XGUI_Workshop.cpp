@@ -1159,7 +1159,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
     QMessageBox::StandardButton aRes = QMessageBox::warning(
         theParent, tr("Delete features"),
         QString(tr("Selected features are used in the following features: %1.\
-These features will be deleted.\n%2Would you like to continue?")).arg(aDirectNames)
+ These features will be deleted.\n%2Would you like to continue?")).arg(aDirectNames)
             .arg(aIndirectNames.isEmpty() ? QString() : QString("Also these features will be deleted: %1.\n").arg(aIndirectNames)),
         QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
     if (aRes != QMessageBox::Yes)

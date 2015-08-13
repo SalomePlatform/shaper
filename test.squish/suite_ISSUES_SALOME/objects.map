@@ -2,6 +2,9 @@
 :Activate module_LightApp_ModuleDlg	{type='LightApp_ModuleDlg' unnamed='1' visible='1' windowTitle='Activate module'}
 :Close active study.Close w/o saving_QPushButton	{text='Close w/o saving' type='QPushButton' unnamed='1' visible='1' window=':Close active study_SUIT_MessageBox'}
 :Close active study_SUIT_MessageBox	{type='SUIT_MessageBox' unnamed='1' visible='1' windowTitle='Close active study'}
+:Delete features.No_QPushButton	{text='No' type='QPushButton' unnamed='1' visible='1' window=':Delete features_QMessageBox'}
+:Delete features._QLabel	{name='qt_msgbox_label' type='QLabel' visible='1' window=':Delete features_QMessageBox'}
+:Delete features_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Delete features'}
 :Exit.Ok_QPushButton	{text='Ok' type='QPushButton' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
 :Exit.Shutdown servers_QCheckBox	{text='Shutdown servers' type='QCheckBox' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
 :Exit_SalomeApp_ExitDlg	{type='SalomeApp_ExitDlg' unnamed='1' visible='1' windowTitle='Exit'}
@@ -18,6 +21,7 @@
 :Point_QFrame	{container=':SALOME*.Point_XGUI_PropertyPanel' type='QFrame' unnamed='1' visible='1'}
 :SALOME*.ConstructionPoint_QToolButton	{container=':SALOME*.Construction_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Construction_QtxToolBar	{name='Construction' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Construction'}
+:SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Object browser'}
 :SALOME*.Parameter_QToolButton	{text='Parameter' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
