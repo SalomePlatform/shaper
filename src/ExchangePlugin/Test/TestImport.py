@@ -46,7 +46,7 @@ def testImport(theType, theFile, theVolume, theDelta):
     
     # Check shape volume
     aRefVolume = theVolume
-    aResVolume = GeomAlgoAPI_ShapeProps.volume(aShape)
+    aResVolume = GeomAlgoAPI_ShapeTools.volume(aShape)
     assert (math.fabs(aResVolume - aRefVolume) < theDelta), "{0}: The volume is wrong: expected = {1}, real = {2}".format(theType, aRefVolume, aResVolume)
 
 if __name__ == '__main__':
