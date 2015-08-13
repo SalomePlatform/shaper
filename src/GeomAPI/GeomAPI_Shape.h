@@ -62,6 +62,10 @@ public:
   GEOMAPI_EXPORT 
   virtual bool isSolid() const;
 
+  /// Returns the shape type
+  GEOMAPI_EXPORT
+  virtual ShapeType shapeType() const;
+
   /// Computes boundary dimensions of the shape
   /// Returns False if it is not possible
   GEOMAPI_EXPORT 

@@ -26,7 +26,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
-#include <GeomAlgoAPI_ShapeProps.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -155,7 +155,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
 
     // orienting projection
     if(aBaseShape.get() != NULL) {
-      std::shared_ptr<GeomAPI_Pnt> aCenterPnt = GeomAlgoAPI_ShapeProps::centreOfMass(aGShape);
+      std::shared_ptr<GeomAPI_Pnt> aCenterPnt = GeomAlgoAPI_ShapeTools::centreOfMass(aGShape);
       gp_Pnt aPnt = aCenterPnt->impl<gp_Pnt>();
       aPnt.Translate(aDir->impl<gp_Dir>().XYZ() * (10 * Precision::Confusion()));
 

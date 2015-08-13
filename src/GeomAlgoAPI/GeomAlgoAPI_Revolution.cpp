@@ -9,7 +9,7 @@
 #include <GeomAlgoAPI_DFLoader.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Rotation.h>
-#include <GeomAlgoAPI_ShapeProps.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
@@ -173,7 +173,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
 
     // Orienting bounding planes properly so that the center of mass of the base face stays
     // on the result shape after cut.
-    gp_Pnt aBasisCentr = GeomAlgoAPI_ShapeProps::centreOfMass(theBasis)->impl<gp_Pnt>();
+    gp_Pnt aBasisCentr = GeomAlgoAPI_ShapeTools::centreOfMass(theBasis)->impl<gp_Pnt>();
     aFromFace = makeFaceFromPlane(aFromPln, aBasisCentr);
     aToFace   = makeFaceFromPlane(aToPln, aBasisCentr);
 
@@ -255,7 +255,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
 
     // Orienting bounding plane properly so that the center of mass of the base face stays
     // on the result shape after cut.
-    gp_Pnt aBasisCentr = GeomAlgoAPI_ShapeProps::centreOfMass(theBasis)->impl<gp_Pnt>();
+    gp_Pnt aBasisCentr = GeomAlgoAPI_ShapeTools::centreOfMass(theBasis)->impl<gp_Pnt>();
     aBoundingFace = makeFaceFromPlane(aBoundingPln, aBasisCentr);
 
     // Making solid from bounding plane.
@@ -362,7 +362,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
   }
   myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
   myShape->setImpl(new TopoDS_Shape(aResult));
-  myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(new GeomAlgoAPI_MakeShapeList());
+  myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
   myDone = true;
   return;
 }

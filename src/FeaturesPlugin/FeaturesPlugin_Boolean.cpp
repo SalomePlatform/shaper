@@ -18,7 +18,7 @@
 
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
-#include <GeomAlgoAPI_ShapeProps.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 #define FACE 4
 #define _MODIFY_TAG 1
@@ -133,7 +133,7 @@ void FeaturesPlugin_Boolean::execute()
           return;
         }
 
-        if(GeomAlgoAPI_ShapeProps::volume(aBoolAlgo.shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
           LoadNamingDS(aResultBody, anObject, aTools, aBoolAlgo);
           setResult(aResultBody, aResultIndex);

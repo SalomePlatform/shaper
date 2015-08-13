@@ -21,7 +21,6 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Movement.h
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_MakeShapeList.h
-    GeomAlgoAPI_ShapeProps.h
     GeomAlgoAPI_DFLoader.h
     GeomAlgoAPI_Placement.h
     GeomAlgoAPI_BREPImport.h
@@ -31,6 +30,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_STEPExport.h
     GeomAlgoAPI_IGESExport.h
     GeomAlgoAPI_Transform.h
+    GeomAlgoAPI_ShapeTools.h
 )
 
 SET(PROJECT_SOURCES
@@ -48,7 +48,6 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Movement.cpp
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_MakeShapeList.cpp
-    GeomAlgoAPI_ShapeProps.cpp
     GeomAlgoAPI_DFLoader.cpp
     GeomAlgoAPI_Placement.cpp
     GeomAlgoAPI_BREPImport.cpp
@@ -58,6 +57,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_STEPExport.cpp
     GeomAlgoAPI_IGESExport.cpp
     GeomAlgoAPI_Transform.cpp
+    GeomAlgoAPI_ShapeTools.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -76,7 +76,8 @@ SET(PROJECT_LIBRARIES
     ${CAS_TKSTEPBase}
     ${CAS_TKIGES}
     ${CAS_TKTopAlgo}
-    ${CAS_TKXSBase} 
+    ${CAS_TKXSBase}
+    ${CAS_TKOffset}
 )
 
 ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})

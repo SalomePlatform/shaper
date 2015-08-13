@@ -82,6 +82,12 @@ bool GeomAPI_Shape::isSolid() const
   return !aShape.IsNull() && aShape.ShapeType() == TopAbs_SOLID;
 }
 
+GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
+{
+  const TopoDS_Shape& aShape = impl<TopoDS_Shape>();
+  return (ShapeType)aShape.ShapeType();
+}
+
 bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmin,
                                 double& theXmax, double& theYmax, double& theZmax) const
 {

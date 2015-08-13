@@ -148,7 +148,7 @@ assert (anExtrusionResult is not None)
 
 # Check extrusion volume
 aRefVolume = 100530.96491487337
-aResVolume = GeomAlgoAPI_ShapeProps_volume(anExtrusionResult.shape())
+aResVolume = GeomAlgoAPI_ShapeTools_volume(anExtrusionResult.shape())
 assert (math.fabs(aResVolume - aRefVolume) < 10 ** -5)
 
 #=========================================================================

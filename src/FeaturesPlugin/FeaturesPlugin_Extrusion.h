@@ -113,9 +113,9 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
   FeaturesPlugin_Extrusion();
 private:
   /// Load Naming data structure of the feature to the document
-  void LoadNamingDS(GeomAlgoAPI_Prism& theFeature, std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBasis,
-                    std::shared_ptr<GeomAPI_Shape> theContext);
+  void loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
+                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    std::shared_ptr<GeomAPI_Shape> theBasis);
 };
 
 #endif

@@ -14,7 +14,7 @@
 
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_Revolution.h>
-#include <GeomAlgoAPI_ShapeProps.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::initAttributes()
@@ -162,7 +162,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
           return;
         }
 
-        if(GeomAlgoAPI_ShapeProps::volume(aBoolAlgo.shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
           loadNamingDS(aResultBody, anObject, aSketchFacesList, theSolidsAlgos, aBooleanTools, aBoolAlgo);
           setResult(aResultBody, aResultIndex);
@@ -237,8 +237,9 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         aSubShapes = aPrismAlgo->mapOfShapes();
         aResultBuilder->loadAndOrientGeneratedShapes(aPrismAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
-        aFromFace = aPrismAlgo->firstShape();
-        aToFace = aPrismAlgo->lastShape();
+        //TODO:fix
+        //aFromFace = aPrismAlgo->firstShape();
+        //aToFace = aPrismAlgo->lastShape();
       } else if(std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter)) {
         std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter);
         aSubShapes = aRevolAlgo->mapOfShapes();

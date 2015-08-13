@@ -9,19 +9,37 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomAlgoAPI_DFLoader.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
+#include <Bnd_Box.hxx>
+#include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeShape.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepCheck_Analyzer.hxx>
-#include <BRepFeat_MakePrism.hxx>
+#include <BRepExtrema_ExtCF.hxx>
 #include <BRepGProp.hxx>
+#include <BRepOffsetAPI_MakePipe.hxx>
+#include <BRepTools.hxx>
 #include <Geom_Plane.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
+#include <TCollection_AsciiString.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
+#include <TopoDS_Shell.hxx>
+#include <TopoDS_Solid.hxx>
+#include <TopoDS_Wire.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
 
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBasis,
@@ -52,12 +70,24 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
 {
   if(!theBasis ||
     (((!theFromShape && !theToShape) || (theFromShape && theToShape && theFromShape->isEqual(theToShape)))
-    && (theFromSize == 0.0 && theToSize == 0.0))) {
+    && (theFromSize == -theToSize))) {
     return;
   }
 
   // If bounding faces was not set creating them.
-  std::shared_ptr<GeomAPI_Face>  aBaseFace(new GeomAPI_Face(theBasis));
+  std::shared_ptr<GeomAPI_Face> aBaseFace;
+  if(theBasis->shapeType() == GeomAPI_Shape::SHELL) {
+    GeomAPI_ShapeExplorer anExp(theBasis, GeomAPI_Shape::FACE);
+    if(anExp.more()) {
+      std::shared_ptr<GeomAPI_Shape> aFaceOnShell = anExp.current();
+      aBaseFace = std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(aFaceOnShell));
+    }
+  } else {
+    aBaseFace = std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(theBasis));
+  }
+  if(!aBaseFace.get()) {
+    return;
+  }
   std::shared_ptr<GeomAPI_Pln>   aBasePln = aBaseFace->getPlane();
   std::shared_ptr<GeomAPI_Dir>   aBaseDir = aBasePln->direction();
   std::shared_ptr<GeomAPI_Pnt>   aBaseLoc = aBasePln->location();
@@ -87,46 +117,165 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
                                                       aSign ? -theToSize : theToSize))));
   aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
-  TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());
-  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aBasis));
-  if(aPlane.IsNull()) { // non-planar shapes is not supported for extrusion yet
-    return;
-  }
-
-  const gp_Dir& aNormal = aPlane->Pln().Axis().Direction();
-  BRepFeat_MakePrism* aBuilder = new BRepFeat_MakePrism(aBasis, aBasis, aBasis, aNormal, 2, Standard_True);
-
-  if(aBuilder) {
-    const TopoDS_Shape& aFromShape = aBoundingFromShape->impl<TopoDS_Shape>();
-    const TopoDS_Shape& aToShape   = aBoundingToShape->impl<TopoDS_Shape>();
-    aBuilder->Perform(aFromShape, aToShape);
-    myDone = aBuilder->IsDone() == Standard_True;
-    if(myDone){
-      TopoDS_Shape aResult = aBuilder->Shape();
-      TopExp_Explorer anExp(aResult, TopAbs_SOLID);
-      if(!anExp.More()) {
-        return;
+  // Getting bounding box for base shape.
+  const TopoDS_Shape& aBasisShape = theBasis->impl<TopoDS_Shape>();
+  Bnd_Box aBndBox;
+  BRepBndLib::Add(aBasisShape, aBndBox);
+  Standard_Real aXArr[2] = {aBndBox.CornerMin().X(), aBndBox.CornerMax().X()};
+  Standard_Real aYArr[2] = {aBndBox.CornerMin().Y(), aBndBox.CornerMax().Y()};
+  Standard_Real aZArr[2] = {aBndBox.CornerMin().Z(), aBndBox.CornerMax().Z()};
+  gp_Pnt aPoints[8];
+  int aNum = 0;
+  for(int i = 0; i < 2; i++) {
+    for(int j = 0; j < 2; j++) {
+      for(int k = 0; k < 2; k++) {
+        aPoints[aNum] = gp_Pnt(aXArr[i], aYArr[j], aZArr[k]);
+        aNum++;
       }
-      if(aResult.ShapeType() == TopAbs_COMPOUND) {
-        aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
-      }
-      // fill data map to keep correct orientation of sub-shapes
-      myMap = std::shared_ptr<GeomAPI_DataMapOfShapeShape>(new GeomAPI_DataMapOfShapeShape());
-      for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-        std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-        aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-        myMap->bind(aCurrentShape, aCurrentShape);
-      }
-      myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-      myShape->setImpl(new TopoDS_Shape(aResult));
-      myFirst = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-      myFirst->setImpl(new TopoDS_Shape(aBuilder->Modified(aFromShape).First()));
-      myLast = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-      myLast->setImpl(new TopoDS_Shape(aBuilder->Modified(aToShape).First()));
-      myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape());
-      myMkShape->setImpl(aBuilder);
     }
   }
+
+  // Project points to bounding planes. Search max distance to them.
+  const TopoDS_Shape& aBndToShape = aBoundingToShape->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aBndFromShape = aBoundingFromShape->impl<TopoDS_Shape>();
+  Standard_Real aMaxToDist = 0, aMaxFromDist = 0;
+  gp_Vec aNormal(aBaseDir->impl<gp_Dir>());
+  for(int i = 0; i < 8; i++) {
+    gp_Lin aLine(aPoints[i], aNormal);
+    TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(aLine).Edge();
+    BRepExtrema_ExtCF aToExt(anEdge, TopoDS::Face(aBndToShape));
+    BRepExtrema_ExtCF aFromExt(anEdge, TopoDS::Face(aBndFromShape));
+    if(aToExt.NbExt() == 0 || aFromExt.NbExt() == 0) {
+      return;
+    }
+    const gp_Pnt& aPntOnToFace = aToExt.PointOnFace(1);
+    const gp_Pnt& aPntOnFromFace = aFromExt.PointOnFace(1);
+    if(aPoints[i].Distance(aPntOnToFace) > aMaxToDist) {
+      aMaxToDist = aPoints[i].Distance(aPntOnToFace);
+    }
+    if(aPoints[i].Distance(aPntOnFromFace) > aMaxFromDist) {
+      aMaxFromDist = aPoints[i].Distance(aPntOnFromFace);
+    }
+  }
+  Standard_Real aPipeLength = aMaxToDist + aMaxFromDist;
+
+  // Making wire for pipe.
+  std::shared_ptr<GeomAPI_Pnt> aCentreOfMass = GeomAlgoAPI_ShapeTools::centreOfMass(theBasis);
+  const gp_Pnt aCentrePnt = aCentreOfMass->impl<gp_Pnt>();
+  TopoDS_Face aFace = TopoDS::Face(aBaseFace->impl<TopoDS_Shape>());
+  gp_Pnt aPipeStartPnt = aCentrePnt.Translated(aNormal.Scaled(aPipeLength));
+  gp_Pnt aPipeEndPnt = aCentrePnt.Translated(aNormal.Scaled(-aPipeLength));
+  TopoDS_Edge aPipeEdge = BRepBuilderAPI_MakeEdge(aPipeStartPnt, aPipeEndPnt);
+  TopoDS_Wire aPipeWire = BRepBuilderAPI_MakeWire(aPipeEdge).Wire();
+
+  // Making pipe.
+  ListOfMakeShape aListOfMakeShape;
+  BRepOffsetAPI_MakePipe* aPipeBuilder = new BRepOffsetAPI_MakePipe(aPipeWire, aBasisShape);
+  if(!aPipeBuilder) {
+    return;
+  }
+  std::shared_ptr<GeomAPI_Shape> aWire(new GeomAPI_Shape);
+  aWire->setImpl(new TopoDS_Shape(aPipeWire));
+  aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aPipeBuilder, aWire));
+  TopoDS_Shape aResult = aPipeBuilder->Shape();
+
+  // Orienting bounding planes.
+  gp_Lin aLine(aCentrePnt, aNormal);
+  TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(aLine).Edge();
+  BRepExtrema_ExtCF aToExt(anEdge, TopoDS::Face(aBndToShape));
+  BRepExtrema_ExtCF aFromExt(anEdge, TopoDS::Face(aBndFromShape));
+  Standard_Real aToParameter = aToExt.ParameterOnEdge(1);
+  Standard_Real aFromParameter = aFromExt.ParameterOnEdge(1);
+  if(aToParameter > aFromParameter) {
+    gp_Vec aVec = aToDir->impl<gp_Dir>();
+    if((aVec * aNormal) > 0) {
+      aToDir->setImpl(new gp_Dir(aVec.Reversed()));
+      aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
+    }
+    aVec = aFromDir->impl<gp_Dir>();
+    if((aVec * aNormal) < 0) {
+      aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
+      aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
+    }
+  } else {
+    gp_Vec aVec = aToDir->impl<gp_Dir>();
+    if((aVec * aNormal) < 0) {
+      aToDir->setImpl(new gp_Dir(aVec.Reversed()));
+      aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
+    }
+    aVec = aFromDir->impl<gp_Dir>();
+    if((aVec * aNormal) > 0) {
+      aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
+      aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
+    }
+  }
+
+  // Making solids from bounding planes.
+  TopoDS_Shell aToShell, aFromShell;
+  TopoDS_Solid aToSolid, aFromSolid;
+  const TopoDS_Shape& aToShape   = aBoundingToShape->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aFromShape = aBoundingFromShape->impl<TopoDS_Shape>();
+  BRep_Builder aBoundingBuilder;
+  aBoundingBuilder.MakeShell(aToShell);
+  aBoundingBuilder.MakeShell(aFromShell);
+  aBoundingBuilder.Add(aToShell, aToShape);
+  aBoundingBuilder.Add(aFromShell, aFromShape);
+  aBoundingBuilder.MakeSolid(aToSolid);
+  aBoundingBuilder.MakeSolid(aFromSolid);
+  aBoundingBuilder.Add(aToSolid, aToShell);
+  aBoundingBuilder.Add(aFromSolid, aFromShell);
+
+  // Cutting with to plane.
+  BRepAlgoAPI_Cut* aToCutBuilder = new BRepAlgoAPI_Cut(aResult, aToSolid);
+  aToCutBuilder->Build();
+  if(!aToCutBuilder->IsDone()) {
+    return;
+  }
+  aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aToCutBuilder));
+  const TopTools_ListOfShape& aToShapes = aToCutBuilder->Modified(aToShape);
+  for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
+    std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(anIt.Value()));
+    myToFaces.push_back(aShape);
+  }
+  aResult = aToCutBuilder->Shape();
+
+  // Cutting with from plane.
+  BRepAlgoAPI_Cut* aFromCutBuilder = new BRepAlgoAPI_Cut(aResult, aFromSolid);
+  aFromCutBuilder->Build();
+  if(!aFromCutBuilder->IsDone()) {
+    return;
+  }
+  aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aFromCutBuilder));
+  const TopTools_ListOfShape& aFromShapes = aFromCutBuilder->Modified(aFromShape);
+  for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
+    std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(anIt.Value()));
+    myFromFaces.push_back(aShape);
+  }
+  aResult = aFromCutBuilder->Shape();
+
+  TopExp_Explorer anExp(aResult, TopAbs_SOLID);
+  if(!anExp.More()) {
+    return;
+  }
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  }
+
+  myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
+  myShape->setImpl(new TopoDS_Shape(aResult));
+
+  // Fill data map to keep correct orientation of sub-shapes.
+  myMap = std::shared_ptr<GeomAPI_DataMapOfShapeShape>(new GeomAPI_DataMapOfShapeShape);
+  for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
+    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+    aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
+    myMap->bind(aCurrentShape, aCurrentShape);
+  }
+
+  myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
+  myDone = true;
 }
 
 //=================================================================================================
@@ -163,15 +312,15 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Prism::shape() const
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Prism::firstShape() const
+const ListOfShape& GeomAlgoAPI_Prism::fromFaces() const
 {
-  return myFirst;
+  return myFromFaces;
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Prism::lastShape() const
+const ListOfShape& GeomAlgoAPI_Prism::toFaces() const
 {
-  return myLast;
+  return myToFaces;
 }
 
 //=================================================================================================

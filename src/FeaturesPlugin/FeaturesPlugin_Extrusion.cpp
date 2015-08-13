@@ -22,14 +22,7 @@
 #include <ModelAPI_AttributeReference.h>
 
 #include <GeomAlgoAPI_Prism.h>
-
-#define _LATERAL_TAG 1
-#define _FIRST_TAG 2
-#define _LAST_TAG 3
-#define EDGE 6
-
-//#define DEBUG_COMPSOLID
-//#define DEBUG_COMPSOLID_SHAPE
+#include <GeomAlgoAPI_ShapeTools.h>
 
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
@@ -63,7 +56,43 @@ void FeaturesPlugin_Extrusion::initAttributes()
 //=================================================================================================
 void FeaturesPlugin_Extrusion::execute()
 {
-  AttributeSelectionListPtr aFaceRefs = selectionList(LIST_ID());
+  // Getting faces.
+  ListOfShape aFacesList;
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> aFaceSel = aFacesSelectionList->value(anIndex);
+    ResultPtr aContext = aFaceSel->context();
+    std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
+    if(!aContextShape.get()) {
+      static const std::string aContextError = "The selection context is bad";
+      setError(aContextError);
+      break;
+    }
+
+    std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();
+    int aFacesNum = -1; // this mean that "aFace" is used
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if(!aFaceShape.get()) { // this may be the whole sketch result selected, check and get faces
+      if (aConstruction.get()) {
+        aFacesNum = aConstruction->facesNum();
+      } else {
+        static const std::string aFaceError = "Can not find basis for extrusion";
+        setError(aFaceError);
+        break;
+      }
+    }
+    for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
+      std::shared_ptr<GeomAPI_Shape> aBaseShape;
+      if (aFacesNum == -1) {
+        aFacesList.push_back(aFaceShape);
+        break;
+      } else {
+        aFaceShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+        aFacesList.push_back(aFaceShape);
+      }
+    }
+  }
 
   // Getting sizes.
   double aToSize = 0.0;
@@ -98,133 +127,88 @@ void FeaturesPlugin_Extrusion::execute()
     }
   }
 
-  // for each selected face generate a result
+  // Searching faces with common edges.
+  ListOfShape aShells;
+  ListOfShape aFreeFaces;
+  GeomAlgoAPI_ShapeTools::combineFacesToShells(aFacesList, aShells, aFreeFaces);
+  aShells.merge(aFreeFaces);
+
+  // Generating result for each shell and face.
   int anIndex = 0, aResultIndex = 0;
-#ifdef DEBUG_COMPSOLID
-  ResultCompSolidPtr aCompSolidResult = document()->createCompSolid(data(), aResultIndex);
-  setResult(aCompSolidResult, aResultIndex);
-  aResultIndex++;
-#endif
-#ifdef DEBUG_COMPSOLID_SHAPE
-  bool aFirstShapeInCompsolid = aFaceRefs->size() > 0;
-  if (aFirstShapeInCompsolid)
-    aResultIndex--;
-#endif
-  for(; anIndex < aFaceRefs->size(); anIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(anIndex);
-    ResultPtr aContextRes = aFaceRef->context();
-    std::shared_ptr<GeomAPI_Shape> aContext = aContextRes->shape();
-    if (!aContext.get()) {
-      static const std::string aContextError = "The selection context is bad";
-      setError(aContextError);
+  for(ListOfShape::const_iterator anIter = aShells.cbegin(); anIter != aShells.cend(); anIter++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIter;
+
+    GeomAlgoAPI_Prism aPrismAlgo(aBaseShape, aToShape, aToSize, aFromShape, aFromSize);
+    if(!aPrismAlgo.isDone()) {
+      static const std::string aPrismAlgoError = "Extrusion algorithm failed";
+      setError(aPrismAlgoError);
+      aResultIndex = 0;
       break;
     }
 
-    std::shared_ptr<GeomAPI_Shape> aValueFace = aFaceRef->value();
-    int aFacesNum = -1; // this mean that "aFace" is used
-    ResultConstructionPtr aConstruction =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes);
-    if (!aValueFace.get()) { // this may be the whole sketch result selected, check and get faces
-      if (aConstruction.get()) {
-        aFacesNum = aConstruction->facesNum();
-      } else {
-        static const std::string aFaceError = "Can not find basis for extrusion";
-        setError(aFaceError);
-        break;
-      }
+    // Check if shape is valid
+    if(!aPrismAlgo.shape().get() || aPrismAlgo.shape()->isNull()) {
+      static const std::string aShapeError = "Resulting shape is Null";
+      setError(aShapeError);
+      aResultIndex = 0;
+      break;
     }
-    for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
-      ResultBodyPtr aResultBody;
-
-#ifdef DEBUG_COMPSOLID_SHAPE
-      if (aFirstShapeInCompsolid && anIndex == 0)
-        aResultBody = aCompSolidResult;
-      else {
-#endif
-
-#ifdef DEBUG_COMPSOLID
-      aResultBody = aCompSolidResult->addResult(aResultIndex);
-#else
-      aResultBody = document()->createBody(data(), aResultIndex);
-#endif
-
-#ifdef DEBUG_COMPSOLID_SHAPE
-      }
-#endif
-      std::shared_ptr<GeomAPI_Shape> aBaseShape;
-      if (aFacesNum == -1) {
-        aBaseShape = aValueFace;
-      } else {
-        aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
-      }
-
-      GeomAlgoAPI_Prism aFeature(aBaseShape, aToShape, aToSize, aFromShape, aFromSize);
-      if(!aFeature.isDone()) {
-        static const std::string aFeatureError = "Extrusion algorithm failed";
-        setError(aFeatureError);
-        break;
-      }
-
-      // Check if shape is valid
-      if(!aFeature.shape().get() || aFeature.shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";
-        setError(aShapeError);
-        break;
-      }
-      if(!aFeature.isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";
-        setError(aFeatureError);
-        break;
-      }
-      //LoadNamingDS
-      LoadNamingDS(aFeature, aResultBody, aBaseShape, aContext);
-      setResult(aResultBody, aResultIndex);
-      aResultIndex++;
-
-      if (aFacesNum == -1)
-        break;
+    if(!aPrismAlgo.isValid()) {
+      std::string aPrismAlgoError = "Warning: resulting shape is not valid";
+      setError(aPrismAlgoError);
+      aResultIndex = 0;
+      break;
     }
+
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    loadNamingDS(aPrismAlgo, aResultBody, aBaseShape);
+    setResult(aResultBody, aResultIndex);
+    aResultIndex++;
   }
-  // remove the rest results if there were produced in the previous pass
+
   removeResults(aResultIndex);
 }
 
 //=================================================================================================
-void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Prism& theFeature,
+void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                            std::shared_ptr<GeomAPI_Shape> theBasis,
-                                            std::shared_ptr<GeomAPI_Shape> theContext)
+                                            std::shared_ptr<GeomAPI_Shape> theBasis)
 {
   //load result
   ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
-  if(theBasis->isEqual(theContext))
-    aResultBuilder->store(theFeature.shape());
-  else
-    aResultBuilder->storeGenerated(theBasis, theFeature.shape());
+  if(thePrismAlgo.shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {
+    int a = 1;
+  }
+  aResultBuilder->storeGenerated(theBasis, thePrismAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theFeature.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = thePrismAlgo.mapOfShapes();
 
   //Insert lateral face : Face from Edge
   std::string aLatName = "LateralFace";
-  aResultBuilder->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
+  const int aLatTag = 1;
+  aResultBuilder->loadAndOrientGeneratedShapes(thePrismAlgo.makeShape().get(), theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
 
-  //Insert bottom face
-  std::string aBotName = "BottomFace";
-  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();
-  if(!aBottomFace->isNull()) {
-    if(aSubShapes->isBound(aBottomFace)) {
-      aBottomFace = aSubShapes->find(aBottomFace);
+  //Insert to faces
+  std::string aToName = "ToFace";
+  const int aToTag = 2;
+  const ListOfShape& aToFaces = thePrismAlgo.toFaces();
+  for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
+    std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
+    if(aSubShapes->isBound(aToFace)) {
+      aToFace = aSubShapes->find(aToFace);
     }
-    aResultBuilder->generated(aBottomFace, aBotName, _FIRST_TAG);
+    aResultBuilder->generated(aToFace, aToName, aToTag);
   }
 
-  //Insert top face
-  std::string aTopName = "TopFace";
-  std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
-  if (!aTopFace->isNull()) {
-    if (aSubShapes->isBound(aTopFace)) {
-      aTopFace = aSubShapes->find(aTopFace);
+  //Insert from faces
+  std::string aFromName = "FromFace";
+  const int aFromTag = 3;
+  const ListOfShape& aFromFaces = thePrismAlgo.fromFaces();
+  for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
+    std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
+    if(aSubShapes->isBound(aFromFace)) {
+      aFromFace = aSubShapes->find(aFromFace);
     }
-    aResultBuilder->generated(aTopFace, aTopName, _LAST_TAG);
+    aResultBuilder->generated(aFromFace, aFromName, aFromTag);
   }
 }

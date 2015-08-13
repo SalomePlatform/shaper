@@ -56,11 +56,11 @@ public:
   /// \return result of the Prism algorithm.
   GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape() const;
 
-  /// \returns the first shape.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> firstShape() const;
+  /// \returns the list of from faces.
+  GEOMALGOAPI_EXPORT const ListOfShape& fromFaces() const;
 
-  /// \return the last shape.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> lastShape() const;
+  /// \return the list of to faces.
+  GEOMALGOAPI_EXPORT const ListOfShape& toFaces() const;
 
   /// \return map of sub-shapes of the result. To be used for History keeping.
   GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
@@ -80,8 +80,8 @@ private:
   /// Fields.
   bool myDone;
   std::shared_ptr<GeomAPI_Shape> myShape;
-  std::shared_ptr<GeomAPI_Shape> myFirst;
-  std::shared_ptr<GeomAPI_Shape> myLast;
+  ListOfShape myFromFaces;
+  ListOfShape myToFaces;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
   std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };

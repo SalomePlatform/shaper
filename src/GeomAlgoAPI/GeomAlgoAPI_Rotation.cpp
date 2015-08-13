@@ -6,7 +6,7 @@
 
 #include <GeomAlgoAPI_Rotation.h>
 
-#include <GeomAlgoAPI_ShapeProps.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepCheck_Analyzer.hxx>
@@ -90,7 +90,7 @@ const bool GeomAlgoAPI_Rotation::isValid() const
 const bool GeomAlgoAPI_Rotation::hasVolume() const
 {
   bool hasVolume(false);
-  if(isValid() && (GeomAlgoAPI_ShapeProps::volume(myShape) > Precision::Confusion())) {
+  if(isValid() && (GeomAlgoAPI_ShapeTools::volume(myShape) > Precision::Confusion())) {
     hasVolume = true;
   }
   return hasVolume;

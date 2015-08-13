@@ -43,7 +43,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   anIt++;
 
   if(aSelectedMethod == aCreationMethod) {
-    if(aToSize == 0.0 && aFromSize == 0.0) {
+    if(aToSize == -aFromSize) {
       return false;
     } else {
       return true;
@@ -83,7 +83,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   }
 
   if(((!aFromShape && !aToShape) || ((aFromShape && aToShape) && aFromShape->isEqual(aToShape)))
-    && (aFromSize == 0.0 && aToSize == 0.0)) {
+    && (aFromSize == -aToSize)) {
     return false;
   }
 

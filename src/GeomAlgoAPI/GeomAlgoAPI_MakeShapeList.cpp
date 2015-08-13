@@ -79,25 +79,28 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
   aResultShapes.Add(theShape->impl<TopoDS_Shape>());
 
   for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
-    BRepBuilderAPI_MakeShape* aBuilder = (*aBuilderIt)->implPtr<BRepBuilderAPI_MakeShape>();
+    std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape = *aBuilderIt;
     NCollection_Map<TopoDS_Shape> aTempShapes;
     bool hasResults = false;
     for(NCollection_Map<TopoDS_Shape>::Iterator aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
-      const TopoDS_Shape& aShape = aShapeIt.Value();
-      const TopTools_ListOfShape& aGeneratedList = aBuilder->Generated(aShape);
-      for(TopTools_ListIteratorOfListOfShape anIt(aGeneratedList); anIt.More(); anIt.Next()) {
-        aTempShapes.Add(anIt.Value());
-        aResultShapes.Add(anIt.Value());
+      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+      aShape->setImpl(new TopoDS_Shape(aShapeIt.Value()));
+      ListOfShape aGeneratedShapes;
+      aMakeShape->generated(aShape, aGeneratedShapes);
+      for(ListOfShape::const_iterator anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
+        aTempShapes.Add((*anIt)->impl<TopoDS_Shape>());
+        aResultShapes.Add((*anIt)->impl<TopoDS_Shape>());
         hasResults = true;
       }
-      const TopTools_ListOfShape& aModifiedList = aBuilder->Modified(aShape);
-      for(TopTools_ListIteratorOfListOfShape anIt(aModifiedList); anIt.More(); anIt.Next()) {
-        aTempShapes.Add(anIt.Value());
-        aResultShapes.Add(anIt.Value());
+      ListOfShape aModifiedShapes;
+      aMakeShape->modified(aShape, aModifiedShapes);
+      for(ListOfShape::const_iterator anIt = aModifiedShapes.cbegin(); anIt != aModifiedShapes.cend(); anIt++) {
+        aTempShapes.Add((*anIt)->impl<TopoDS_Shape>());
+        aResultShapes.Add((*anIt)->impl<TopoDS_Shape>());
         hasResults = true;
       }
       if(hasResults) {
-        aResultShapes.Remove(aShape);
+        aResultShapes.Remove(aShape->impl<TopoDS_Shape>());
       }
     }
     anAlgoShapes.Unite(aTempShapes);
