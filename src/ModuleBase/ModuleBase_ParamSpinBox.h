@@ -15,7 +15,7 @@ class MODULEBASE_EXPORT ModuleBase_ParamSpinBox : public ModuleBase_DoubleSpinBo
   enum State { Invalid = 0, NoVariable, Incompatible, Acceptable };
 
 public:
-  explicit ModuleBase_ParamSpinBox(QWidget* theParent = 0, int thePrecision = 6);
+  explicit ModuleBase_ParamSpinBox( QWidget* theParent = 0, int thePrecision = 15 );
   virtual ~ModuleBase_ParamSpinBox();
 
   virtual void stepBy(int);
