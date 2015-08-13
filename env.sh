@@ -2,17 +2,11 @@
 
 set -o nounset
 
-PLATFORM=""
-if [ -f PLATFORM ]; then
-PLATFORM="$(lsb_release -is)"
-RELEASE="$(lsb_release -rs)"
-if [ "${PLATFORM}" = 'CentOS' ]; then PLATFORM=-centos
-elif [ "${PLATFORM}" = 'Debian' ]; then
-  if [ "${RELEASE}" = '8.0' ]; then PLATFORM=-d8
-  else PLATFORM=-d6
-  fi
+if [[ ! -f env_config.sh ]]; then
+  echo "Can not find env_config.sh. Please, run config.sh."
+  exit 1
 fi
-fi
+source env_config.sh
 
 export ROOT_DIR=$(cd $(dirname $0)/.. && pwd)
 export SOURCES_DIR=${ROOT_DIR}/sources

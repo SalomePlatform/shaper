@@ -1,7 +1,6 @@
 #!/bin/bash
 
 pushd ${SOURCES_DIR}
-  source salome_env.sh
   source env_linux.sh
 popd
 

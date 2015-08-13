@@ -1,7 +1,24 @@
-#!/bin/bash
+#!/bin/bash -ex
+
+rm env_config.sh || echo "File env_config.sh was not found."
+
+echo "#!/bin/bash -ex" >> env_config.sh
+
+PLATFORM=""
+if [ -f PLATFORM ]; then
+PLATFORM="$(lsb_release -is)"
+RELEASE="$(lsb_release -rs)"
+if [ "${PLATFORM}" = 'CentOS' ]; then PLATFORM=-centos
+elif [ "${PLATFORM}" = 'Debian' ]; then
+  if [ "${RELEASE}" = '8.0' ]; then PLATFORM=-d8
+  else PLATFORM=-d6
+  fi
+fi
+fi
+echo "export PLATFORM=${PLATFORM}" >> env_config.sh
 
 main() {
-  local salome_version=7.6.0
+  local salome_version='7.6.0'
   local platform="$(lsb_release -is)"
   local release="$(lsb_release -rs)"
   if [[ ${salome_version} = '7.5.1' ]]; then
@@ -12,9 +29,12 @@ main() {
   elif [[ ${salome_version} = '7.6.0' ]]; then
     if   [[ "${platform}" = 'CentOS' ]]; then export INST_ROOT=/dn23/NEWGEOM/common/SALOME-7.6.0_CentOS-6.3_SOURCES
     elif [[ "${platform}" = 'Debian' && ${release} =~ ^6 ]]; then export INST_ROOT=/dn23/NEWGEOM/common/SALOME-7.6.0_Debian-6.0_SOURCES
+    else 
+      echo "Could not find SALOME for the platform ${platform} ${release}"
+      exit 1
     fi
   fi
 }
-
 main
+echo "export INST_ROOT=${INST_ROOT}" >> env_config.sh
 

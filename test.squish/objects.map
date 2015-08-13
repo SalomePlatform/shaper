@@ -124,7 +124,7 @@
 :Point.property_panel_ok_QToolButton	{container=':OpenParts*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit_2	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
-:Save current file.Discard_QPushButton	{text='Discard' type='QPushButton' unnamed='1' visible='1' window=':Save current file_QMessageBox'}
+:Save current file.Discard_QPushButton	{text~='Close without Saving|Discard' type='QPushButton' unnamed='1' visible='1' window=':Save current file_QMessageBox'}
 :Save current file_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Save current file'}
 :Sketch.Basic_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Basic' type='AppElements_MenuGroupPanel' visible='1'}
 :Sketch.Basic_QFrame	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' leftWidget=':Sketch.Basic_AppElements_MenuGroupPanel' type='QFrame' unnamed='1' visible='1'}

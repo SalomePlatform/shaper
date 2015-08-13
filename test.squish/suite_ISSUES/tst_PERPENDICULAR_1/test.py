@@ -10,7 +10,7 @@ def sketch():
 def main():
     source(findFile("scripts", "common.py"))
     
-    startApplication("GeomApp")
+    startApplication("linux_run.sh")
     set_defaults()
     
     sketch_create(help_points("XY_plane"), lambda: sketch())
