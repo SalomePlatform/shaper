@@ -391,11 +391,15 @@ bool Model_AttributeSelection::update()
             TopoDS_Face aFace = 
               TopoDS::Face(aConstructionContext->face(aFaceIndex)->impl<TopoDS_Shape>());
             TopExp_Explorer anEdgesExp(aFace, TopAbs_EDGE);
+            TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
             for(; anEdgesExp.More(); anEdgesExp.Next()) {
               TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
               if (!anEdge.IsNull()) {
                 Standard_Real aFirst, aLast;
                 Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                if (alreadyProcessed.Contains(aCurve))
+                  continue;
+                alreadyProcessed.Add(aCurve);
                 if (allCurves.IsBound(aCurve)) {
                   aFound++;
                   int anOrient = allCurves.Find(aCurve);
