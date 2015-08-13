@@ -109,8 +109,8 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
   TopoDS_Shape aContext  = theContext->shape()->impl<TopoDS_Shape>();
 #ifdef DEB_NAMING
   if(aSubShape.ShapeType() == TopAbs_COMPOUND) {
-  BRepTools::Write(aSubShape, "Selection.brep");
-  BRepTools::Write(aContext, "Context.brep");
+    BRepTools::Write(aSubShape, "Selection.brep");
+    BRepTools::Write(aContext, "Context.brep");
   }
 #endif
   std::shared_ptr<Model_Document> aDoc = 
@@ -123,69 +123,60 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
     switch (aType) {
     case TopAbs_FACE:
       // the Face should be in DF. If it is not the case, it is an error ==> to be debugged		
-		break;
-	  case TopAbs_EDGE:
-		  {
-		  // name structure: F1 | F2 [| F3 | F4], where F1 & F2 the faces which gives the Edge in trivial case
-		  // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces	
-		  if (BRep_Tool::Degenerated(TopoDS::Edge(aSubShape))) {
-			  aName = "Degenerated_Edge";
-			  break;
-		  }    
-		  TopTools_IndexedDataMapOfShapeListOfShape aMap;
-		  TopExp::MapShapesAndAncestors(aContext, TopAbs_EDGE, TopAbs_FACE, aMap);
-		  TopTools_IndexedMapOfShape aSMap; // map for ancestors of the sub-shape
-		  bool isTrivialCase(true);
-/*		  for (int i = 1; i <= aMap.Extent(); i++) {
-			const TopoDS_Shape& aKey = aMap.FindKey(i);
-			//if (aKey.IsNotEqual(aSubShape)) continue; // find exactly the selected key
-			if (aKey.IsSame(aSubShape)) continue;
-            const TopTools_ListOfShape& anAncestors = aMap.FindFromIndex(i);
-			// check that it is not a trivial case (F1 & F2: aNumber = 1)
-			isTrivialCase = isTrivial(anAncestors, aSMap);			
-			break;
-		  }*/
-		  if(aMap.Contains(aSubShape)) {
-			const TopTools_ListOfShape& anAncestors = aMap.FindFromKey(aSubShape);
-			// check that it is not a trivial case (F1 & F2: aNumber = 1)
-			isTrivialCase = isTrivial(anAncestors, aSMap);		
-		  } else 
-			  break;
-		  TopTools_ListOfShape aListOfNbs;
-		  if(!isTrivialCase) { // find Neighbors
-			TNaming_Localizer aLocalizer;
-			TopTools_MapOfShape aMap3;
-			aLocalizer.FindNeighbourg(aContext, aSubShape, aMap3);
-			//int n = aMap3.Extent();
-			TopTools_MapIteratorOfMapOfShape it(aMap3);
-			for(;it.More();it.Next()) {
-			  const TopoDS_Shape& aNbShape = it.Key(); // neighbor edge
-			  //TopAbs_ShapeEnum aType = aNbShape.ShapeType();
-			  const TopTools_ListOfShape& aList  = aMap.FindFromKey(aNbShape);
-			  TopTools_ListIteratorOfListOfShape it2(aList);
-			  for(;it2.More();it2.Next()) {
-				if(aSMap.Contains(it2.Value())) continue; // skip this Face
-				aListOfNbs.Append(it2.Value());
-			  }
-			}
-		  }  // else a trivial case
-		  
-		  // build name of the sub-shape Edge
-		  for(int i=1; i <= aSMap.Extent(); i++) {
-			const TopoDS_Shape& aFace = aSMap.FindKey(i);
-			std::string aFaceName = getShapeName(aDoc, aFace);
-			if(i == 1)
-			  aName = aFaceName;
-			else 
-			  aName += "|" + aFaceName;
-		  }
-		  TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
-		  for (;itl.More();itl.Next()) {
-			std::string aFaceName = getShapeName(aDoc, itl.Value());
-			aName += "|" + aFaceName;
-		  }		  
-		  }
-		  break;
+      break;
+    case TopAbs_EDGE:
+      {
+        // name structure: F1 | F2 [| F3 | F4], where F1 & F2 the faces which gives the Edge in trivial case
+        // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces	
+        if (BRep_Tool::Degenerated(TopoDS::Edge(aSubShape))) {
+          aName = "Degenerated_Edge";
+          break;
+        }    
+        TopTools_IndexedDataMapOfShapeListOfShape aMap;
+        TopExp::MapShapesAndAncestors(aContext, TopAbs_EDGE, TopAbs_FACE, aMap);
+        TopTools_IndexedMapOfShape aSMap; // map for ancestors of the sub-shape
+        bool isTrivialCase(true);
+        if(aMap.Contains(aSubShape)) {
+          const TopTools_ListOfShape& anAncestors = aMap.FindFromKey(aSubShape);
+          // check that it is not a trivial case (F1 & F2: aNumber = 1)
+          isTrivialCase = isTrivial(anAncestors, aSMap);		
+        } else 
+          break;
+        TopTools_ListOfShape aListOfNbs;
+        if(!isTrivialCase) { // find Neighbors
+          TNaming_Localizer aLocalizer;
+          TopTools_MapOfShape aMap3;
+          aLocalizer.FindNeighbourg(aContext, aSubShape, aMap3);
+          //int n = aMap3.Extent();
+          TopTools_MapIteratorOfMapOfShape it(aMap3);
+          for(;it.More();it.Next()) {
+            const TopoDS_Shape& aNbShape = it.Key(); // neighbor edge
+            //TopAbs_ShapeEnum aType = aNbShape.ShapeType();
+            const TopTools_ListOfShape& aList  = aMap.FindFromKey(aNbShape);
+            TopTools_ListIteratorOfListOfShape it2(aList);
+            for(;it2.More();it2.Next()) {
+              if(aSMap.Contains(it2.Value())) continue; // skip this Face
+              aListOfNbs.Append(it2.Value());
+            }
+          }
+        }  // else a trivial case
+
+        // build name of the sub-shape Edge
+        for(int i=1; i <= aSMap.Extent(); i++) {
+          const TopoDS_Shape& aFace = aSMap.FindKey(i);
+          std::string aFaceName = getShapeName(aDoc, aFace);
+          if(i == 1)
+            aName = aFaceName;
+          else 
+            aName += "|" + aFaceName;
+        }
+        TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
+        for (;itl.More();itl.Next()) {
+          std::string aFaceName = getShapeName(aDoc, itl.Value());
+          aName += "|" + aFaceName;
+        }		  
+      }
+      break;
 
     case TopAbs_VERTEX:
       // name structure (Monifold Topology): 
@@ -204,16 +195,15 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
         TopTools_ListOfShape aList;
         TopTools_MapOfShape aFMap;
-        //int n = aList2.Extent(); //bug! duplication
         // fix is below
         TopTools_ListIteratorOfListOfShape itl2(aList2);
         for (int i = 1;itl2.More();itl2.Next(),i++) {
           if(aFMap.Add(itl2.Value()))
             aList.Append(itl2.Value());
         }
-        //n = aList.Extent();
         int n = aList.Extent();
-        if(n < 3) { // open topology case or Compound case => via edges
+        bool isByFaces = n >= 3;
+        if(!isByFaces) { // open topology case or Compound case => via edges
           TopTools_IndexedDataMapOfShapeListOfShape aMap;
           TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_EDGE, aMap);
           const TopTools_ListOfShape& aList22  = aMap.FindFromKey(aSubShape);
@@ -232,6 +222,11 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             for (int i = 1;itl.More();itl.Next(),i++) {
               const TopoDS_Shape& anEdge = itl.Value();
               std::string anEdgeName = getShapeName(aDoc, anEdge);
+              if (anEdgeName.empty()) { // edge is not in DS, trying by faces anyway
+                isByFaces = true;
+                aName.clear();
+                break;
+              }
               if(i == 1)
                 aName = anEdgeName;
               else 
@@ -242,7 +237,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             //it should be already in DF
           }
         } 
-        else {
+        if (isByFaces) {
           TopTools_ListIteratorOfListOfShape itl(aList);
           for (int i = 1;itl.More();itl.Next(),i++) {
             const TopoDS_Shape& aFace = itl.Value();
