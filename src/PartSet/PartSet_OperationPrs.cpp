@@ -84,6 +84,8 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     QList<GeomShapePtr>::const_iterator aShIt = aShapes.begin(), aShLast = aShapes.end();
     for (; aShIt != aShLast; aShIt++) {
       GeomShapePtr aGeomShape = *aShIt;
+      if (!aGeomShape.get())
+        continue;
       TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
       // change deviation coefficient to provide more precise circle
       Standard_Real aPrevDeviation = aDrawer->DeviationCoefficient();
