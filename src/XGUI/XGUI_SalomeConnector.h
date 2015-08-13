@@ -72,6 +72,8 @@ class XGUI_EXPORT XGUI_SalomeConnector
   virtual void addDesktopMenuSeparator(const char* theMenuSourceText,
                                        const int theMenuPosition = 10) = 0;
 
+  virtual bool addActionInToolbar( QAction* theAction, const QString& theToolBarTitle ) = 0;
+
   //! Returns desktop window of SALOME
   virtual QMainWindow* desktop() const = 0;
 

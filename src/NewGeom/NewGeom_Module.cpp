@@ -30,6 +30,7 @@
 
 #include <QtxPopupMgr.h>
 #include <QtxActionMenuMgr.h>
+#include <QtxActionToolMgr.h>
 #include <QtxResourceMgr.h>
 
 #include <Config_PropManager.h>
@@ -453,6 +454,23 @@ void NewGeom_Module::addDesktopMenuSeparator(const char* theMenuSourceText, cons
 {
   int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
   createMenu(separator(), aMenu, -1, theMenuPosition);
+}
+
+bool NewGeom_Module::addActionInToolbar( QAction* theAction, const QString& theToolBarTitle )
+{
+  if( !theAction )
+    return false;
+
+  SUIT_Desktop* aDesktop = application()->desktop();
+  if( !aDesktop )
+    return false;
+
+  QtxActionToolMgr* aToolMgr = aDesktop->toolMgr();
+  if( !aToolMgr )
+    return false;
+
+  aToolMgr->append( theAction, theToolBarTitle );
+  return true;
 }
 
 //******************************************************

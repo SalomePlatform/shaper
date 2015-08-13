@@ -70,6 +70,8 @@ Q_OBJECT
   virtual void addDesktopMenuSeparator(const char* theMenuSourceText,
                                        const int theMenuPosition = 10);
 
+  virtual bool addActionInToolbar( QAction* theAction, const QString& theToolBarTitle );
+    
   virtual QMainWindow* desktop() const;
 
   virtual QString commandId(const QAction* theCmd) const;

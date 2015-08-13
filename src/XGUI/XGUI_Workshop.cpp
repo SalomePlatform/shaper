@@ -243,12 +243,17 @@ void XGUI_Workshop::initMenu()
                                                          tr("Undo last command"),
                                                          QIcon(":pictures/undo.png"),
                                                          QKeySequence::Undo, false, "MEN_DESK_EDIT");
+    QString aToolBarTitle = tr( "INF_DESK_TOOLBAR_STANDARD" );
+    salomeConnector()->addActionInToolbar( aAction,aToolBarTitle  );
+
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
     addHistoryMenu(aAction, SIGNAL(updateUndoHistory(const QList<ActionInfo>&)), SLOT(onUndo(int)));
 
     aAction = salomeConnector()->addDesktopCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
                                                 QIcon(":pictures/redo.png"), QKeySequence::Redo,
                                                 false, "MEN_DESK_EDIT");
+    salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
+
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
     addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
 
@@ -256,6 +261,8 @@ void XGUI_Workshop::initMenu()
     aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                                 QIcon(":pictures/rebuild.png"), QKeySequence(),
                                                 false, "MEN_DESK_EDIT");
+    salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
+
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
     salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
