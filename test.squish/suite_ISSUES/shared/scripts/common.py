@@ -52,6 +52,28 @@ def line_create(start_point, end_point):
 
     clickButton(waitForObject(":Line.property_panel_ok_QToolButton"))    
 
+def line_create_in_view(start_point, end_point):
+    clickButton(waitForObject(":Basic.Line_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), start_point[0], start_point[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), end_point[0], end_point[1], 0, Qt.LeftButton)
+    
+def auxiliary_line_create(start_point, end_point):
+    clickButton(waitForObject(":Basic.Line_AppElements_Button"))
+    clickButton(waitForObject(":Line.Auxiliary_QCheckBox"))
+
+    type(waitForObject(":Start point.X:_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Start point.X:_ModuleBase_ParamSpinBox"), start_point[0])
+    type(waitForObject(":Start point.Y:_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Start point.Y:_ModuleBase_ParamSpinBox"), start_point[1])
+
+    type(waitForObject(":End point.X:_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":End point.X:_ModuleBase_ParamSpinBox"), end_point[0])
+    type(waitForObject(":End point.Y:_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":End point.Y:_ModuleBase_ParamSpinBox"), end_point[1])
+
+    #clickButton(waitForObject(":Line.property_panel_ok_QToolButton"))  
+    
 def circle_create(x, y, radius):
     clickButton(waitForObject(":Basic.Circle_AppElements_Button"))
     
@@ -80,10 +102,11 @@ def distance_create(point_1, point_2, annotaion_point, distance):
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), annotaion_point[0], annotaion_point[1], 0, Qt.LeftButton) # move annotation
 
+
     type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":_ModuleBase_ParamSpinBox"), distance)
-    type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Return>")
-
+    type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Keypad_Enter>")
+    
     clickButton(waitForObject(":Constraints.Distance_AppElements_Button"))    
     
 def parallel_create(point_1, point_2):
@@ -100,8 +123,22 @@ def perpendicular_create(point_1, point_2):
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
     
-    clickButton(waitForObject(":Constraints.Perpendicular_AppElements_Button"))
+    clickButton(waitForObject(":Perpendicular.property_panel_cancel_QToolButton"))
     
+def horizontal_create(point_1):
+    clickButton(waitForObject(":Constraints.Horizontal_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Constraints.Horizontal_AppElements_Button"))
+
+def vertical_create(point_1):
+    cclickButton(waitForObject(":Constraints.Vertical_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Constraints.Vertical_AppElements_Button"))
+        
 def radius_create(point_1, point_2, radius):
     clickButton(waitForObject(":Constraints.Radius_AppElements_Button"))
     
@@ -113,7 +150,11 @@ def radius_create(point_1, point_2, radius):
     
     clickButton(waitForObject(":Constraints.Radius_AppElements_Button"))
 
-def extrusion_feature(points, to_size):
+def part_create():
+    clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Part")
+    clickButton(waitForObject(":Operations.New part_AppElements_Button"))
+    
+def extrusion_feature(points, to_size, from_size):
     clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
     clickButton(waitForObject(":Extrusion.Extrusion_AppElements_Button"))    
 
@@ -123,5 +164,49 @@ def extrusion_feature(points, to_size):
     
     type(waitForObject(":to_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":to_size_ModuleBase_ParamSpinBox"), to_size)
-
+    
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox"), from_size)
+    
     clickButton(waitForObject(":Extrusion.property_panel_ok_QToolButton"))
+
+def extrusion_cut_by_sizes_feature(point, actions, to_size, from_size):
+    clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
+    clickButton(waitForObject(":Extrusion.ExtrusionCut_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point[0], point[1], 0, Qt.LeftButton)
+    
+    actions()
+    
+    clickButton(waitForObject(":Sketch.Ok_QToolButton"))
+      
+    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox"), to_size)
+
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox_2"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox_2"), from_size)
+
+    clickButton(waitForObject(":ExtrusionCut.property_panel_ok_QToolButton"))
+    #clickButton(waitForObject(":Sketch.property_panel_cancel_QToolButton"))
+    
+def extrusion_fuse_by_sizes_feature(point, actions, to_size, from_size):  
+      
+    clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
+    clickButton(waitForObject(":Extrusion.ExtrusionFuse_AppElements_Button"))
+    
+    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point[0], point[1], 0, Qt.LeftButton)
+    
+    actions()
+    
+    clickButton(waitForObject(":Sketch.Ok_QToolButton"))
+            
+    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox_2"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox_2"), to_size)
+
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox_3"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox_3"), from_size)
+    
+    clickButton(waitForObject(":ExtrusionFuse.property_panel_ok_QToolButton"))
+    #clickButton(waitForObject(":Sketch.property_panel_cancel_QToolButton"))
+    
+    

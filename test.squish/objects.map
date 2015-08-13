@@ -1,6 +1,7 @@
 :Abort operation.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Abort operation_QMessageBox'}
 :Abort operation_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Abort operation'}
 :Application errors.Close_QPushButton	{text='Close' type='QPushButton' unnamed='1' visible='1' window=':Application errors_XGUI_ErrorDialog'}
+:Application errors_QTextEdit	{type='QTextEdit' unnamed='1' visible='1' window=':Application errors_XGUI_ErrorDialog'}
 :Application errors_XGUI_ErrorDialog	{type='XGUI_ErrorDialog' unnamed='1' visible='1' windowTitle='Application errors'}
 :Basic.Circle_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Circle' type='AppElements_Button' unnamed='1' visible='1'}
 :Basic.Line_AppElements_Button	{container=':Sketch.Basic_AppElements_MenuGroupPanel' text='Line' type='AppElements_Button' unnamed='1' visible='1'}
@@ -15,10 +16,14 @@
 :Circle.CircleRadius_ModuleBase_ParamSpinBox	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='CircleRadius' type='ModuleBase_ParamSpinBox' visible='1'}
 :Circle.property_panel_ok_QToolButton	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Circle.qt_spinbox_lineedit_QLineEdit	{container=':OpenParts*.Circle_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='3' type='QLineEdit' visible='1'}
+:Coincident.property_panel_cancel_QToolButton	{container=':OpenParts*.Coincident_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Constraints.Coincident_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Coincident' type='AppElements_Button' unnamed='1' visible='1'}
 :Constraints.Distance_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Distance' type='AppElements_Button' unnamed='1' visible='1'}
+:Constraints.Horizontal_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Horizontal' type='AppElements_Button' unnamed='1' visible='1'}
 :Constraints.Parallel_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Parallel' type='AppElements_Button' unnamed='1' visible='1'}
 :Constraints.Perpendicular_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Perpendicular' type='AppElements_Button' unnamed='1' visible='1'}
 :Constraints.Radius_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Radius' type='AppElements_Button' unnamed='1' visible='1'}
+:Constraints.Vertical_AppElements_Button	{container=':Sketch.Constraints_AppElements_MenuGroupPanel' text='Vertical' type='AppElements_Button' unnamed='1' visible='1'}
 :Default.Exit_AppElements_Button	{container=':General.Default_AppElements_MenuGroupPanel' text='Exit' type='AppElements_Button' unnamed='1' visible='1'}
 :Default.Open..._AppElements_Button	{container=':General.Default_AppElements_MenuGroupPanel' text='Open...' type='AppElements_Button' unnamed='1' visible='1'}
 :Default.Preferences_AppElements_Button	{container=':General.Default_AppElements_MenuGroupPanel' text='Preferences' type='AppElements_Button' unnamed='1' visible='1'}
@@ -43,12 +48,34 @@
 :End point.Y:_QLabel	{container=':Line.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :End point.qt_spinbox_lineedit_QLineEdit	{container=':Line.End point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :End point.qt_spinbox_lineedit_QLineEdit_2	{container=':Line.End point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Extrusion.ExtrusionCut_AppElements_Button	{container=':Features.Extrusion_AppElements_MenuGroupPanel' text='ExtrusionCut' type='AppElements_Button' unnamed='1' visible='1'}
+:Extrusion.ExtrusionFuse_AppElements_Button	{container=':Features.Extrusion_AppElements_MenuGroupPanel' text='ExtrusionFuse' type='AppElements_Button' unnamed='1' visible='1'}
 :Extrusion.Extrusion_AppElements_Button	{container=':Features.Extrusion_AppElements_MenuGroupPanel' text='Extrusion' type='AppElements_Button' unnamed='1' visible='1'}
+:Extrusion.OK_QPushButton	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' text='OK' type='QPushButton' unnamed='1' visible='1'}
 :Extrusion.Select a sketch face_QLabel	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
 :Extrusion.Select a sketch face_QListWidget	{aboveWidget=':Extrusion.Select a sketch face_QLabel' container=':OpenParts*.Extrusion_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Extrusion.from_size_ModuleBase_ParamSpinBox	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' name='from_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:Extrusion.from_size_ModuleBase_ParamSpinBox_2	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' name='from_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:Extrusion.from_size_ModuleBase_ParamSpinBox_3	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' name='from_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:Extrusion.property_panel_cancel_QToolButton	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Extrusion.property_panel_ok_QToolButton	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Extrusion.qt_spinbox_lineedit_QLineEdit	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Extrusion.qt_spinbox_lineedit_QLineEdit_2	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Extrusion.qt_spinbox_lineedit_QLineEdit_3	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Extrusion.qt_spinbox_lineedit_QLineEdit_4	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Extrusion.qt_spinbox_lineedit_QLineEdit_5	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Extrusion.qt_spinbox_lineedit_QLineEdit_6	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Extrusion.to_size_ModuleBase_ParamSpinBox	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' name='to_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:Extrusion.to_size_ModuleBase_ParamSpinBox_2	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' name='to_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:ExtrusionCut.Extrusion_ModuleBase_PageGroupBox	{container=':OpenParts*.ExtrusionCut_XGUI_PropertyPanel' title='Extrusion' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:ExtrusionCut.property_panel_ok_QToolButton	{container=':OpenParts*.ExtrusionCut_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox	{container=':OpenParts*.ExtrusionFuse_XGUI_PropertyPanel' title='Extrusion' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:ExtrusionFuse.property_panel_ok_QToolButton	{container=':OpenParts*.ExtrusionFuse_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Extrusion_ModuleBase_PageWidget	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' occurrence='2' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
+:Extrusion_QToolButton	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Extrusion_QToolButton_2	{container=':OpenParts*.Extrusion_XGUI_PropertyPanel' type='QToolButton' unnamed='1' visible='1'}
 :Features.Extrusion_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Features_AppElements_Workbench' name='Extrusion' type='AppElements_MenuGroupPanel' visible='1'}
+:Features_QScrollArea	{container=':qt_tabwidget_stackedwidget.Features_AppElements_Workbench' type='QScrollArea' unnamed='1' visible='1'}
 :General.Default_AppElements_MenuGroupPanel	{container=':OpenParts*.General_AppElements_DockWidget' name='Default' type='AppElements_MenuGroupPanel' visible='1'}
 :General.General_AppElementsDockTitleLabel	{container=':OpenParts*.General_AppElements_DockWidget' text='General' type='AppElementsDockTitleLabel' unnamed='1' visible='1'}
 :General.Sketch_QTabWidget	{container=':OpenParts*.General_AppElements_DockWidget' leftWidget=':General.Default_AppElements_MenuGroupPanel' text='Sketch' type='QTabWidget' unnamed='1' visible='1'}
@@ -59,6 +86,7 @@
 :General_QToolButton	{container=':OpenParts*.General_AppElements_DockWidget' occurrence='29' type='QToolButton' unnamed='1' visible='1'}
 :General_QToolButton_2	{container=':OpenParts*.General_AppElements_DockWidget' occurrence='30' type='QToolButton' unnamed='1' visible='1'}
 :General_QToolButton_3	{container=':OpenParts*.General_AppElements_DockWidget' occurrence='31' type='QToolButton' unnamed='1' visible='1'}
+:Line.Auxiliary_QCheckBox	{container=':OpenParts*.Line_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Line.End point_QGroupBox	{container=':OpenParts*.Line_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
 :Line.Start point_QGroupBox	{container=':OpenParts*.Line_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
 :Line.property_panel_ok_QToolButton	{container=':OpenParts*.Line_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
@@ -73,8 +101,11 @@
 :OpenParts*.Bottom_QToolButton	{text='Bottom' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
 :OpenParts*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Circle'}
 :OpenParts*.Clone_QToolButton	{text='Clone' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
+:OpenParts*.Coincident_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Coincident'}
 :OpenParts*.Distance_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Distance'}
 :OpenParts*.Dump view_QToolButton	{text='Dump view' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
+:OpenParts*.ExtrusionCut_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='ExtrusionCut'}
+:OpenParts*.ExtrusionFuse_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='ExtrusionFuse'}
 :OpenParts*.Extrusion_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Extrusion'}
 :OpenParts*.Fit all_QToolButton	{text='Fit all' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
 :OpenParts*.Fit area_QToolButton	{text='Fit area' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
@@ -88,6 +119,7 @@
 :OpenParts*.Panning_QToolButton	{text='Panning' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
 :OpenParts*.Parallel_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Parallel'}
 :OpenParts*.Parameter_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Parameter'}
+:OpenParts*.Perpendicular_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Perpendicular'}
 :OpenParts*.Point_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Point'}
 :OpenParts*.Reset_QToolButton	{text='Reset' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
 :OpenParts*.Right_QToolButton	{text='Right' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
@@ -116,11 +148,13 @@
 :Parameters.Parameter_AppElements_Button	{container=':Part.Parameters_AppElements_MenuGroupPanel' text='Parameter' type='AppElements_Button' unnamed='1' visible='1'}
 :Part.Operations_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Part_AppElements_Workbench' name='Operations' type='AppElements_MenuGroupPanel' visible='1'}
 :Part.Parameters_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Part_AppElements_Workbench' name='Parameters' type='AppElements_MenuGroupPanel' visible='1'}
+:Perpendicular.property_panel_cancel_QToolButton	{container=':OpenParts*.Perpendicular_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Point.Point_QGroupBox	{container=':OpenParts*.Point_XGUI_PropertyPanel' title='Point' type='QGroupBox' unnamed='1' visible='1'}
 :Point.X:_ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.X:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Point.X:_QLabel	{container=':Point.Point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
 :Point.Y:_ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.Y:_QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Point.Y:_QLabel	{container=':Point.Point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Point.property_panel_cancel_QToolButton	{container=':OpenParts*.Point_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Point.property_panel_ok_QToolButton	{container=':OpenParts*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit_2	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
@@ -133,6 +167,8 @@
 :Sketch.Edit_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Edit' type='AppElements_MenuGroupPanel' visible='1'}
 :Sketch.Edit_QFrame	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' leftWidget=':Sketch.Edit_AppElements_MenuGroupPanel' type='QFrame' unnamed='1' visible='1'}
 :Sketch.Ok_QToolButton	{container=':Sketch.Basic_AppElements_MenuGroupPanel' occurrence='6' type='QToolButton' unnamed='1' visible='1'}
+:Sketch.Show constraints_QCheckBox	{container=':OpenParts*.Sketch_XGUI_PropertyPanel' text='Show constraints' type='QCheckBox' unnamed='1' visible='1'}
+:Sketch.property_panel_cancel_QToolButton	{container=':OpenParts*.Sketch_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Sketch.property_panel_ok_QToolButton	{container=':OpenParts*.Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Sketch_QLabel	{container=':OpenParts*.Sketch_XGUI_PropertyPanel' type='QLabel' unnamed='1' visible='1'}
 :Sketch_QScrollArea	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' type='QScrollArea' unnamed='1' visible='1'}
