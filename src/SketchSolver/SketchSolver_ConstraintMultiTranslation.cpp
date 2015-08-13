@@ -20,8 +20,8 @@
 
 void SketchSolver_ConstraintMultiTranslation::getAttributes(
     Slvs_hEntity& theStartPoint, Slvs_hEntity& theEndPoint,
-    std::vector<std::vector<Slvs_hEntity> >& thePoints,
-    std::vector<std::vector<Slvs_hEntity> >& theCircular)
+    std::vector< std::vector<Slvs_hEntity> >& thePoints,
+    std::vector< std::vector<Slvs_hEntity> >& theEntities)
 {
   DataPtr aData = myBaseConstraint->data();
   AttributePtr aStartPointAttr = aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
@@ -59,20 +59,22 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
   // Also all circles and arc collected too, because they will be constrained by equal radii.
   FeaturePtr aFeature;
   ResultConstructionPtr aRC;
-  std::vector<Slvs_hEntity> aPoints[2]; // lists of points of features
-  std::vector<Slvs_hEntity> aCircs;     // list of circular objects
+  static const size_t MAX_POINTS = 3;
+  std::vector<Slvs_hEntity> aPoints[MAX_POINTS]; // lists of points of features
+  std::vector<Slvs_hEntity> anEntities;          // list of translated entities
   std::list<ObjectPtr> anObjectList = aRefList->list();
   std::list<ObjectPtr>::iterator anObjectIter = anObjectList.begin();
   while (anObjectIter != anObjectList.end()) {
-    aPoints[0].clear();
-    aPoints[1].clear();
-    aCircs.clear();
+    for (size_t i = 0; i < MAX_POINTS; i++)
+      aPoints[i].clear();
+    anEntities.clear();
 
     for (size_t i = 0; i <= myNumberOfCopies && anObjectIter != anObjectList.end(); i++, anObjectIter++) {
       aFeature = ModelAPI_Feature::feature(*anObjectIter);
       if (!aFeature)
         continue;
       anEntityID = changeEntity(aFeature, aType);
+      anEntities.push_back(anEntityID);
       Slvs_Entity anEntity = myStorage->getEntity(anEntityID);
       switch (aType) {
       case SLVS_E_POINT_IN_2D:
@@ -85,12 +87,11 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
         break;
       case SLVS_E_CIRCLE:
         aPoints[0].push_back(anEntity.point[0]); // center of circle
-        aCircs.push_back(anEntityID);
         break;
       case SLVS_E_ARC_OF_CIRCLE:
-        aPoints[0].push_back(anEntity.point[1]); // start point of arc
-        aPoints[1].push_back(anEntity.point[2]); // end point of arc
-        aCircs.push_back(anEntityID);
+        aPoints[0].push_back(anEntity.point[0]); // center of arc
+        aPoints[1].push_back(anEntity.point[1]); // start point of arc
+        aPoints[2].push_back(anEntity.point[2]); // end point of arc
         break;
       default:
         myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
@@ -98,12 +99,11 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
       }
     }
 
-    if (!aPoints[0].empty())
-      thePoints.push_back(aPoints[0]);
-    if (!aPoints[1].empty())
-      thePoints.push_back(aPoints[1]);
-    if (!aCircs.empty())
-      theCircular.push_back(aCircs);
+    for (size_t i = 0; i < MAX_POINTS; ++i)
+      if (!aPoints[i].empty())
+        thePoints.push_back(aPoints[i]);
+    if (!anEntities.empty())
+      theEntities.push_back(anEntities);
   }
 }
 
@@ -118,50 +118,46 @@ void SketchSolver_ConstraintMultiTranslation::process()
     update(myBaseConstraint);
 
   Slvs_hEntity aStartPoint, aEndPoint;
-  std::vector<std::vector<Slvs_hEntity> > aPointsAndCopies;
-  std::vector<std::vector<Slvs_hEntity> > aCircsAndCopies;
-  getAttributes(aStartPoint, aEndPoint, aPointsAndCopies, aCircsAndCopies);
+  std::vector<std::vector<Slvs_hEntity> > anEntitiesAndCopies;
+  getAttributes(aStartPoint, aEndPoint, myPointsAndCopies, anEntitiesAndCopies);
   if (!myErrorMsg.empty())
     return;
 
-  // Create lines between neighbor translated points and make them parallel to the translation line.
-  // Also these lines should have equal lengths.
-  Slvs_Constraint aConstraint;
-  Slvs_Entity aTranslationLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
-      myGroup->getWorkplaneId(), aStartPoint, aEndPoint);
-  aTranslationLine.h = myStorage->addEntity(aTranslationLine);
-  myTranslationLine = aTranslationLine.h;
-  std::vector<std::vector<Slvs_hEntity> >::iterator aCopyIter = aPointsAndCopies.begin();
-  for (; aCopyIter != aPointsAndCopies.end(); aCopyIter++) {
-    size_t aSize = aCopyIter->size();
-    for (size_t i = 0; i < aSize - 1; i++) {
-      Slvs_Entity aLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
-          myGroup->getWorkplaneId(), (*aCopyIter)[i], (*aCopyIter)[i+1]);
-      aLine.h = myStorage->addEntity(aLine);
-      // Equal length constraint
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
-          SLVS_C_EQUAL_LENGTH_LINES, myGroup->getWorkplaneId(), 0.0,
-          SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aTranslationLine.h, aLine.h);
-      aConstraint.h = myStorage->addConstraint(aConstraint);
-      mySlvsConstraints.push_back(aConstraint.h);
-      // Parallel constraint
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
-          SLVS_C_PARALLEL, myGroup->getWorkplaneId(), 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
-          aTranslationLine.h, aLine.h);
-      aConstraint.h = myStorage->addConstraint(aConstraint);
-      mySlvsConstraints.push_back(aConstraint.h);
+  // Create translation line
+  if (myTranslationLine == SLVS_E_UNKNOWN) {
+    Slvs_Entity aTranslationLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
+        myGroup->getWorkplaneId(), aStartPoint, aEndPoint);
+    aTranslationLine.h = myStorage->addEntity(aTranslationLine);
+    myTranslationLine = aTranslationLine.h;
+  } else {
+    Slvs_Entity aTranslationLine = myStorage->getEntity(myTranslationLine);
+    if (aTranslationLine.point[0] != aStartPoint || aTranslationLine.point[1] != aEndPoint) {
+      aTranslationLine.point[0] = aStartPoint;
+      aTranslationLine.point[1] = aEndPoint;
+      myStorage->updateEntity(aTranslationLine);
     }
   }
-  // Equal radii constraints
-  for (aCopyIter = aCircsAndCopies.begin(); aCopyIter != aCircsAndCopies.end(); aCopyIter++) {
-    size_t aSize = aCopyIter->size();
-    for (size_t i = 0; i < aSize - 1; i++) {
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
-          SLVS_C_EQUAL_RADIUS, myGroup->getWorkplaneId(), 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
-          (*aCopyIter)[i], (*aCopyIter)[i+1]);
-      aConstraint.h = myStorage->addConstraint(aConstraint);
-      mySlvsConstraints.push_back(aConstraint.h);
+
+  // Set all objects unchanged (only initial object may be changed by user)
+  myCircsAndCopies.clear();
+  std::vector<std::vector<Slvs_hEntity> >::const_iterator anEntIt = anEntitiesAndCopies.begin();
+  std::vector<Slvs_hEntity>::const_iterator aCpIt;
+  for (; anEntIt != anEntitiesAndCopies.end(); ++anEntIt) {
+    std::vector<Slvs_hEntity> aCircs;
+    for (aCpIt = anEntIt->begin(); aCpIt != anEntIt->end(); ++aCpIt) {
+      const Slvs_Entity& anEntity = myStorage->getEntity(*aCpIt);
+      std::vector<Slvs_hConstraint> aNewConstr;
+      if (anEntity.type == SLVS_E_CIRCLE) {
+        aCircs.push_back(anEntity.distance);
+        // for circles we fix only center
+        aNewConstr = myStorage->fixEntity(anEntity.point[0]);
+      } else
+        aNewConstr = myStorage->fixEntity(*aCpIt);
+      mySlvsConstraints.insert(mySlvsConstraints.end(), aNewConstr.begin(), aNewConstr.end());
     }
+
+    if (!aCircs.empty())
+      myCircsAndCopies.push_back(aCircs);
   }
 
   adjustConstraint();
@@ -222,6 +218,21 @@ bool SketchSolver_ConstraintMultiTranslation::remove(ConstraintPtr theConstraint
   return true;
 }
 
+void SketchSolver_ConstraintMultiTranslation::addFeature(FeaturePtr theFeature)
+{
+  SketchSolver_Constraint::addFeature(theFeature);
+
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aFeatIt = myFeatureMap.find(theFeature);
+  if (aFeatIt == myFeatureMap.end())
+    return;
+
+  // store list of points of the feature
+  const Slvs_Entity& theEntity = myStorage->getEntity(aFeatIt->second);
+  for (int i = 0; i < 4; i++)
+    if (theEntity.point[i] != SLVS_E_UNKNOWN)
+      myPointsJustUpdated.insert(theEntity.point[i]);
+}
+
 void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
 {
   Slvs_Entity aTranslationLine = myStorage->getEntity(myTranslationLine);
@@ -250,55 +261,69 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
     return;
   }
 
+  std::list<Slvs_Constraint> aCoincident = myStorage->getConstraintsByType(SLVS_C_POINTS_COINCIDENT);
+  std::list<Slvs_Constraint>::const_iterator aCoIt;
+
+  double aCoord[2];
+
   // Update positions of all points to satisfy distances
-  std::list<Slvs_Constraint> aParallel = myStorage->getConstraintsByType(SLVS_C_PARALLEL);
-  std::list<Slvs_Constraint>::iterator aParIt = aParallel.begin();
-  std::vector<Slvs_hConstraint>::iterator aCIt;
-  for (; aParIt != aParallel.end(); aParIt++) {
-    for (aCIt = mySlvsConstraints.begin(); aCIt != mySlvsConstraints.end(); aCIt++)
-      if (aParIt->h == *aCIt)
-        break;
-    if (aCIt == mySlvsConstraints.end())
-      continue;
-    Slvs_Entity aLine = myStorage->getEntity(aParIt->entityB);
-    if (myStorage->isPointFixed(aLine.point[1], aFixed))
-      continue;
-    Slvs_Entity aStart = myStorage->getEntity(aLine.point[0]);
-    Slvs_Entity aEnd = myStorage->getEntity(aLine.point[1]);
-    for (int i = 0; i < 2; i++) {
-      Slvs_Param aFrom = myStorage->getParameter(aStart.param[i]);
-      Slvs_Param aTo = myStorage->getParameter(aEnd.param[i]);
-      aTo.val = aFrom.val + aDelta[i];
-      myStorage->updateParameter(aTo);
+  std::vector< std::vector<Slvs_hEntity> >::const_iterator aPointsIter = myPointsAndCopies.begin();
+  std::vector<Slvs_hEntity>::const_iterator aCopyIter;
+  for (; aPointsIter != myPointsAndCopies.end(); ++aPointsIter) {
+    aCopyIter = aPointsIter->begin();
+    const Slvs_Entity& anInitial = myStorage->getEntity(*aCopyIter);
+    for (int i = 0; i < 2; i++)
+      aCoord[i] = myStorage->getParameter(anInitial.param[i]).val;
+
+    // if the point is coincident with another one which is temporary fixed (moved by user),
+    // we will update its position correspondingly
+    Slvs_hConstraint aFixed;
+    for (aCoIt = aCoincident.begin(); aCoIt != aCoincident.end(); ++aCoIt) {
+      if ((aCoIt->ptA == anInitial.h && myStorage->isPointFixed(aCoIt->ptB, aFixed, true)) ||
+          (aCoIt->ptB == anInitial.h && myStorage->isPointFixed(aCoIt->ptA, aFixed, true))) {
+        Slvs_hEntity anOtherId = aCoIt->ptA == anInitial.h ? aCoIt->ptB : aCoIt->ptA;
+        if (!myStorage->isTemporary(aFixed) &&
+            myPointsJustUpdated.find(anOtherId) == myPointsJustUpdated.end())
+          continue; // nothing to change
+
+        const Slvs_Entity& anOtherPnt = myStorage->getEntity(anOtherId);
+        for (int i = 0; i < 2; i++) {
+          Slvs_Param anInitParam = myStorage->getParameter(anInitial.param[i]);
+          const Slvs_Param& anOtherParam = myStorage->getParameter(anOtherPnt.param[i]);
+          anInitParam.val = anOtherParam.val;
+          myStorage->updateParameter(anInitParam);
+          aCoord[i] = anOtherParam.val;
+        }
+      }
+    }
+
+    // update copied points
+    aCopyIter = aPointsIter->begin();
+    for (++aCopyIter; aCopyIter != aPointsIter->end(); ++aCopyIter) {
+      // update position
+      aCoord[0] += aDelta[0];
+      aCoord[1] += aDelta[1];
+
+      const Slvs_Entity& aTarget = myStorage->getEntity(*aCopyIter);
+      for (int i = 0; i < 2; i++) {
+        Slvs_Param aParam = myStorage->getParameter(aTarget.param[i]);
+        aParam.val = aCoord[i];
+        myStorage->updateParameter(aParam);
+      }
     }
   }
 
-  // update positions of centers of arcs for correct radius calculation
-  std::list<Slvs_Constraint> aRadii = myStorage->getConstraintsByType(SLVS_C_EQUAL_RADIUS);
-  std::map<FeaturePtr, Slvs_hEntity>::iterator aFeatIt;
-  for (aParIt = aRadii.begin(); aParIt != aRadii.end(); aParIt++) {
-    int aNbFound = 0; // number of arcs used in translation
-    for (aFeatIt = myFeatureMap.begin(); aFeatIt != myFeatureMap.end(); aFeatIt++)
-      if (aFeatIt->second == aParIt->entityA || aFeatIt->second == aParIt->entityB) {
-        if (aFeatIt->first->getKind() == SketchPlugin_Arc::ID())
-          aNbFound++;
-        else
-          break;
-      }
-    if (aNbFound != 2)
-      continue;
-    // two arcs were found, update their centers
-    Slvs_Entity anArcA = myStorage->getEntity(aParIt->entityA);
-    Slvs_Entity anArcB = myStorage->getEntity(aParIt->entityB);
-    if (myStorage->isPointFixed(anArcB.point[0], aFixed))
-      continue;
-    Slvs_Entity aCenterA = myStorage->getEntity(anArcA.point[0]);
-    Slvs_Entity aCenterB = myStorage->getEntity(anArcB.point[0]);
-    for (int i = 0; i < 2; i++) {
-      Slvs_Param aFrom = myStorage->getParameter(aCenterA.param[i]);
-      Slvs_Param aTo = myStorage->getParameter(aCenterB.param[i]);
-      aTo.val = aFrom.val + aDelta[i];
-      myStorage->updateParameter(aTo);
+  for (aPointsIter = myCircsAndCopies.begin(); aPointsIter != myCircsAndCopies.end(); ++aPointsIter) {
+    aCopyIter = aPointsIter->begin();
+    const Slvs_Entity& anInitial = myStorage->getEntity(*aCopyIter);
+    const Slvs_Param& anInitRad = myStorage->getParameter(anInitial.param[0]);
+    for (++aCopyIter; aCopyIter != aPointsIter->end(); ++aCopyIter) {
+      const Slvs_Entity& aCopy = myStorage->getEntity(*aCopyIter);
+      Slvs_Param aCopyRad = myStorage->getParameter(aCopy.param[0]);
+      aCopyRad.val = anInitRad.val;
+      myStorage->updateParameter(aCopyRad);
     }
   }
+
+  myPointsJustUpdated.clear();
 }
