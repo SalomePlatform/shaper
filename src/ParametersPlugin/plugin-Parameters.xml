@@ -4,10 +4,10 @@
   <workbench id="Part">
     <group id="Parameters">
       <feature id="Parameter" title="Parameter" tooltip="Create a parameter" icon=":pictures/expression.png">
-        <stringvalue id="variable" label="Name" icon=":pictures/expression.png">
+        <stringvalue id="variable" label="Name" icon=":pictures/expression.png" placeholder="Please input the parameter name">
           <validator id="Parameters_VariableValidator"/>
         </stringvalue>
-        <expr_editor id="expression">
+        <expr_editor id="expression" placeholder="Please input the expression">
           <validator id="Parameters_ExpressionValidator"/>
         </expr_editor>
       </feature>

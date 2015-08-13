@@ -33,6 +33,9 @@ class ExpressionEditor: public QPlainTextEdit
 
   void setCompletionList(QStringList&);
 
+  void setPlaceHolderText( const QString& );
+  QString placeHolderText() const;
+
  public slots:
   void insertCompletion(const QString&, bool isSingleWord = false);
   void performCompletion();
@@ -41,11 +44,13 @@ class ExpressionEditor: public QPlainTextEdit
   void performCompletion(const QString& theCompletionPrefix);
   virtual void keyPressEvent(QKeyEvent* theEvent);
   bool handledCompletedAndSelected(QKeyEvent* theEvent);
+  virtual void paintEvent( QPaintEvent* );
 
  private:
   QStringListModel* myCompleterModel;
   QCompleter* myCompleter;
   bool myCompletedAndSelected;
+  QString myPlaceHolderText;
 };
 
 /**
@@ -60,9 +65,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// \param theParent the parent object
   /// \param theData the widget configuration.
   /// \param theParentId is Id of a parent of the current attribute
-  ModuleBase_WidgetExprEditor(QWidget* theParent,
-                                const Config_WidgetAPI* theData,
-                                const std::string& theParentId);
+  ModuleBase_WidgetExprEditor( QWidget* theParent,
+                               const Config_WidgetAPI* theData,
+                               const std::string& theParentId,
+                               const std::string& thePlaceHolder );
   virtual ~ModuleBase_WidgetExprEditor();
 
   virtual QList<QWidget*> getControls() const;

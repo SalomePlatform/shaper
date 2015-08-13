@@ -33,9 +33,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
   /// \param theParent the parent object
   /// \param theData the widget configuration.
   /// \param theParentId is Id of a parent of the current attribute
-  ModuleBase_WidgetLineEdit(QWidget* theParent,
-                                const Config_WidgetAPI* theData,
-                                const std::string& theParentId);
+  ModuleBase_WidgetLineEdit( QWidget* theParent,
+                             const Config_WidgetAPI* theData,
+                             const std::string& theParentId,
+                             const std::string& thePlaceHolder );
   virtual ~ModuleBase_WidgetLineEdit();
 
   virtual QList<QWidget*> getControls() const;
@@ -48,7 +49,6 @@ protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
-
   virtual bool restoreValueCustom();
 
 private:

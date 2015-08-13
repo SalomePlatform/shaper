@@ -139,9 +139,11 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
   } else if (theType == WDG_CHOICE) {
     result = new ModuleBase_WidgetChoice(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_STRINGVALUE) {
-    result = new ModuleBase_WidgetLineEdit(theParent, myWidgetApi, myParentId);
+    std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
+    result = new ModuleBase_WidgetLineEdit( theParent, myWidgetApi, myParentId, aPlaceHolder );
   } else if (theType == WDG_EXPR_EDITOR) {
-    result = new ModuleBase_WidgetExprEditor(theParent, myWidgetApi, myParentId);
+    std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
+    result = new ModuleBase_WidgetExprEditor( theParent, myWidgetApi, myParentId, aPlaceHolder );
   } else if (theType == WDG_MULTISELECTOR) {
     result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   } else if (theType == WDG_TOOLBOX) {

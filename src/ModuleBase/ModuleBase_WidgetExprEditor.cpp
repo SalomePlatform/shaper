@@ -30,6 +30,7 @@
 #include <QShortcut>
 #include <QScrollBar>
 #include <QFontMetrics>
+#include <QPainter>
 
 #include <memory>
 #include <string>
@@ -144,9 +145,51 @@ bool ExpressionEditor::handledCompletedAndSelected(QKeyEvent* theEvent)
   return true;
 }
 
-ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor(QWidget* theParent,
-                                                     const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId)
+void ExpressionEditor::setPlaceHolderText( const QString& thePlaceHolderText )
+{
+  myPlaceHolderText = thePlaceHolderText;
+}
+
+QString ExpressionEditor::placeHolderText() const
+{
+  return myPlaceHolderText;
+}
+
+void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
+{
+  QPlainTextEdit::paintEvent( theEvent );
+
+  if( toPlainText().isEmpty() )
+  {
+    QPainter aPainter( viewport() );
+    QFontMetrics aFontMetrics = fontMetrics();
+
+    QPointF offset(contentOffset());
+    QRect r = rect();
+    int m = (int)document()->documentMargin();
+    QRect lineRect( r.x() + m + offset.x(), offset.y(),
+                    r.width() - 2*m, aFontMetrics.height() );
+
+    Qt::Alignment va = QStyle::visualAlignment( layoutDirection(), Qt::AlignLeft );
+    int minLB = qMax( 0, -aFontMetrics.minLeftBearing() );
+
+    QColor aColor = palette().text().color();
+    aColor.setAlpha( 128 );
+    QPen anOldpen = aPainter.pen();
+    aPainter.setPen( aColor );
+    lineRect.adjust(minLB, 0, 0, 0);
+    QString elidedText = aFontMetrics.elidedText( myPlaceHolderText, Qt::ElideRight, lineRect.width() );
+    aPainter.drawText( lineRect, va, elidedText );
+    aPainter.setPen( anOldpen );
+  }
+}
+
+
+
+ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
+                                                          const Config_WidgetAPI* theData,
+                                                          const std::string& theParentId,
+                                                          const std::string& thePlaceHolder )
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   QVBoxLayout* aMainLay = new QVBoxLayout(this);
@@ -160,6 +203,7 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor(QWidget* theParent,
   aMainLay->addWidget(myResultLabel);
   myEditor = new ExpressionEditor(this);
   myEditor->setMinimumHeight(20);
+  myEditor->setPlaceHolderText( QString::fromStdString( thePlaceHolder ) );
   aMainLay->addWidget(myEditor);
   this->setLayout(aMainLay);
 
