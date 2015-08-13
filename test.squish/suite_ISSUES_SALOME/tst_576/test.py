@@ -1,8 +1,9 @@
 def main():
-    startApplication("salome_run.sh")
+    source(findFile("scripts", "common.py"))
     
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
-    clickButton(waitForObject(":Activate module.New_QPushButton"))
+    startApplication("salome_run.sh")
+   
+    create_new_document()
     
     clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
     type(waitForObject(":Parameter_QLineEdit"), "a")
@@ -24,8 +25,4 @@ def main():
     waitFor("object.exists(':Parameter_ExpressionEditor')", 20000)
     test.compare(str(findObject(":Parameter_ExpressionEditor").plainText), "3")
 
-    sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
-    clickButton(waitForObject(":Exit.Shutdown servers_QCheckBox"))
-    clickButton(waitForObject(":Exit.Ok_QPushButton"))
-    clickButton(waitForObject(":Close active study.Close w/o saving_QPushButton"))
-   
+    close_application()

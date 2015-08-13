@@ -6,17 +6,25 @@
 :Exit.Shutdown servers_QCheckBox	{text='Shutdown servers' type='QCheckBox' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
 :Exit_SalomeApp_ExitDlg	{type='SalomeApp_ExitDlg' unnamed='1' visible='1' windowTitle='Exit'}
 :Object browser_XGUI_DataTree	{container=':SALOME*.Object browser_QDockWidget' type='XGUI_DataTree' unnamed='1' visible='1'}
-:Parameter.Attribute "expression" invalidated by "Parameters_ExpressionValidator" with error: Expression is empty._ExpressionEditor	{aboveWidget=':Parameter.Attribute "expression" invalidated by "Parameters_ExpressionValidator" with error: Expression is empty._QLabel' container=':SALOME*.Parameter_XGUI_PropertyPanel' type='ExpressionEditor' unnamed='1' visible='1'}
 :Parameter.Attribute "expression" invalidated by "Parameters_ExpressionValidator" with error: Expression is empty._QLabel	{container=':SALOME*.Parameter_XGUI_PropertyPanel' text='Attribute "expression" invalidated by "Parameters_ExpressionValidator" with error: Expression is empty.' type='QLabel' unnamed='1' visible='1'}
 :Parameter.property_panel_ok_QToolButton	{container=':SALOME*.Parameter_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Parameter_ExpressionEditor	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='ExpressionEditor' unnamed='1' visible='1'}
 :Parameter_QLineEdit	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
 :Parameters (1).b = 3_QModelIndex	{column='0' container=':Parameters (1)_QModelIndex' text='b = 3' type='QModelIndex'}
 :Parameters (1)_QModelIndex	{column='0' container=':Object browser_XGUI_DataTree' text='Parameters (1)' type='QModelIndex'}
+:Point.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Point_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Point.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Point_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Point.x_ModuleBase_ParamSpinBox	{container=':SALOME*.Point_XGUI_PropertyPanel' name='x' type='ModuleBase_ParamSpinBox' visible='1'}
+:Point_QFrame	{container=':SALOME*.Point_XGUI_PropertyPanel' type='QFrame' unnamed='1' visible='1'}
+:SALOME*.ConstructionPoint_QToolButton	{container=':SALOME*.Construction_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.Construction_QtxToolBar	{name='Construction' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Construction'}
 :SALOME*.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Object browser'}
 :SALOME*.Parameter_QToolButton	{text='Parameter' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Parameter_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Parameter'}
+:SALOME*.Point_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Point'}
+:SALOME*.SketchPoint_QToolButton	{container=':SALOME*.Sketch_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.Sketch_QtxToolBar	{name='Sketch' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
 :SALOME*_STD_TabDesktop	{type='STD_TabDesktop' unnamed='1' visible='1' windowTitle?='SALOME*'}
 :_QExpandingLineEdit	{columnIndex='0' container=':Object browser_XGUI_DataTree' rowIndex='0' type='QExpandingLineEdit' unnamed='1' visible='1'}
 :_QMenu	{type='QMenu' unnamed='1' visible='1'}
