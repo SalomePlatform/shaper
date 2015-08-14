@@ -369,6 +369,8 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     if (isColumnButton) {
       aAction = aSalomeConnector->addNestedFeature(aWchName, aFeatureInfo, aNestedActList);
     } else {
+      //Issue #650: in the SALOME mode the tooltip should be same as text
+      aFeatureInfo.toolTip = aFeatureInfo.text;
       aAction = aSalomeConnector->addFeature(aWchName, aFeatureInfo);
     }
     aSalomeConnector->setNestedActions(aFeatureInfo.id, aNestedFeatures);
