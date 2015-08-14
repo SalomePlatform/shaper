@@ -67,6 +67,7 @@ private:
   std::vector< std::vector<Slvs_hEntity> > myCircsAndCopies;  ///< list of circles and their copies (to change their radii together)
 
   std::set<Slvs_hEntity> myPointsJustUpdated; ///< list of points touched by user
+  std::set<Slvs_hEntity> myInitialPoints;     ///< list of points containig initial objects
 };
 
 #endif

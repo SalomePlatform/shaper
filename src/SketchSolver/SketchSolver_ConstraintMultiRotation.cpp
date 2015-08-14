@@ -138,13 +138,24 @@ void SketchSolver_ConstraintMultiRotation::process()
     mySlvsConstraints.push_back(aConstraint.h);
   }
 
-  // Set all objects unchanged (only initial object may be changed by user)
+  // Keep all objects unchanged (only initial object may be changed by user)
   myCircsAndCopies.clear();
   std::vector<std::vector<Slvs_hEntity> >::const_iterator anEntIt = anEntitiesAndCopies.begin();
   std::vector<Slvs_hEntity>::const_iterator aCpIt;
   for (; anEntIt != anEntitiesAndCopies.end(); ++anEntIt) {
     std::vector<Slvs_hEntity> aCircs;
-    for (aCpIt = anEntIt->begin(); aCpIt != anEntIt->end(); ++aCpIt) {
+    aCpIt = anEntIt->begin();
+    // Obtain initial points
+    Slvs_Entity anInitial = myStorage->getEntity(*aCpIt);
+    if (anInitial.type == SLVS_E_POINT_IN_2D || anInitial.type == SLVS_E_POINT_IN_3D)
+      myInitialPoints.insert(anInitial.h);
+    else {
+      for (int i = 0; i < 4 && anInitial.point[i] != SLVS_E_UNKNOWN; i++)
+        myInitialPoints.insert(anInitial.point[i]);
+    }
+
+    // Fix the copies
+    for (++aCpIt; aCpIt != anEntIt->end(); ++aCpIt) {
       const Slvs_Entity& anEntity = myStorage->getEntity(*aCpIt);
       std::vector<Slvs_hConstraint> aNewConstr;
       if (anEntity.type == SLVS_E_CIRCLE) {
@@ -222,6 +233,7 @@ bool SketchSolver_ConstraintMultiRotation::remove(ConstraintPtr theConstraint)
 
   // Clear list of rotated points
   myPointsAndCopies.clear();
+  myInitialPoints.clear();
 
   return true;
 }
@@ -293,8 +305,8 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
     // we will update its position correspondingly
     Slvs_hConstraint aFixed;
     for (aCoIt = aCoincident.begin(); aCoIt != aCoincident.end(); ++aCoIt) {
-      if ((aCoIt->ptA == anInitial.h && myStorage->isPointFixed(aCoIt->ptB, aFixed, true)) ||
-          (aCoIt->ptB == anInitial.h && myStorage->isPointFixed(aCoIt->ptA, aFixed, true))) {
+      if ((aCoIt->ptA == anInitial.h && myInitialPoints.find(aCoIt->ptB) != myInitialPoints.end()) ||
+          (aCoIt->ptB == anInitial.h && myInitialPoints.find(aCoIt->ptA) != myInitialPoints.end())) {
         Slvs_hEntity anOtherId = aCoIt->ptA == anInitial.h ? aCoIt->ptB : aCoIt->ptA;
         if (!myStorage->isTemporary(aFixed) &&
             myPointsJustUpdated.find(anOtherId) == myPointsJustUpdated.end())
