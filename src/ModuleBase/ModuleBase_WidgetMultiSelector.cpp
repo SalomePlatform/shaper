@@ -38,6 +38,29 @@
 
 //#define DEBUG_SHAPE_VALIDATION_PREVIOUS
 
+class CustomListWidget : public QListWidget
+{
+public:
+  CustomListWidget( QWidget* theParent )
+    : QListWidget( theParent )
+  {
+  }
+
+  virtual QSize	sizeHint() const
+  {
+    int aHeight = 2*QFontMetrics( font() ).height();
+    QSize aSize = QListWidget::sizeHint();
+    return QSize( aSize.width(), aHeight );
+  }
+
+  virtual QSize	minimumSizeHint() const
+  {
+    int aHeight = 2*QFontMetrics( font() ).height();
+    QSize aSize = QListWidget::minimumSizeHint();
+    return QSize( aSize.width(), aHeight );
+  }
+};
+
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData,
@@ -82,12 +105,12 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     aMainLay->setColumnStretch(2, 1);
   }
 
-  myListControl = new QListWidget(this);
-  aMainLay->addWidget(myListControl, 2, 0, 2, -1);
+  myListControl = new CustomListWidget(this);
+  aMainLay->addWidget(myListControl, 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);
-  aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???
-  aMainLay->setRowMinimumHeight(3, 20);
-  this->setLayout(aMainLay);
+  //aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???
+  //aMainLay->setRowMinimumHeight(3, 20);
+  //this->setLayout(aMainLay);
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   myCopyAction = new QAction(QIcon(":pictures/copy.png"), tr("Copy"), this);
