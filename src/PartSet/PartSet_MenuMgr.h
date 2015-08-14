@@ -73,6 +73,8 @@ private slots:
   /// A slot called on edit of feature
   void onEdit(bool);
 
+  void onSelectParentFeature();
+
 private:
   /// Returns true if the current operation is sketch entity create operation
   /// \param theValue the current auxiliary value

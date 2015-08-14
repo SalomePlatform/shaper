@@ -53,6 +53,8 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
    */
   virtual QObjectPtrList selectedObjects() const;
 
+  virtual void setSelectedObjects( const QObjectPtrList& ) const;
+
   /**
    * Returns list of currently selected results
    */

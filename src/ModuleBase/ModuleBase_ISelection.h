@@ -60,6 +60,8 @@ class ModuleBase_ISelection
    */
   virtual QObjectPtrList selectedObjects() const = 0;
 
+  virtual void setSelectedObjects( const QObjectPtrList& ) const = 0;
+
   /**
    * Returns list of currently selected results
    */

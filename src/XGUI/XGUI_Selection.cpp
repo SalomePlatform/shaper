@@ -165,6 +165,11 @@ QObjectPtrList XGUI_Selection::selectedObjects() const
   return myWorkshop->objectBrowser()->selectedObjects();
 }
 
+void XGUI_Selection::setSelectedObjects( const QObjectPtrList& theObjects ) const
+{
+  return myWorkshop->objectBrowser()->setObjectsSelected( theObjects );
+}
+
 QObjectPtrList XGUI_Selection::selectedPresentations() const
 {
   QObjectPtrList aSelectedList;

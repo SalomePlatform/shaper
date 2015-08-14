@@ -829,6 +829,12 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
         if (hasParameter || hasFeature)
           theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
       }
+
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+      if( aResult.get() )
+      {
+        theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
+      }
     } else {  // If feature is 0 the it means that selected root object (document)
       if (aMgr->activeDocument() != aMgr->moduleDocument())
         theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
