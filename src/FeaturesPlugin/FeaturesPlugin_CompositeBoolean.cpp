@@ -248,6 +248,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         aToFace = aRevolAlgo->lastShape();
       }
 
+      /*
       //Insert bottom face
       if(!aFromFace->isNull()) {
         if(aSubShapes->isBound(aFromFace)) {
@@ -263,6 +264,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         }
         theResultBody->generated(aToFace, aToName, aToTag);
       }
+      */
     }
 
     theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE,
