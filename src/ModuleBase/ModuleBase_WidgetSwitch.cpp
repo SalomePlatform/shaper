@@ -43,7 +43,7 @@ ModuleBase_WidgetSwitch::~ModuleBase_WidgetSwitch()
 
 int ModuleBase_WidgetSwitch::addPage(ModuleBase_PageBase* thePage, const QString& theName,
                                                                    const QString& theCaseId,
-                                                                   const QIcon& theIcon )
+                                                                   const QPixmap& theIcon )
 {
   int aSuperCount = ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon);
   myCombo->addItem(theName);

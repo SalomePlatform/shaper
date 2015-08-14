@@ -38,7 +38,7 @@ ModuleBase_ToolBox::~ModuleBase_ToolBox()
 {
 }
 
-void ModuleBase_ToolBox::addItem( QWidget* thePage, const QString& theName, const QIcon& theIcon )
+void ModuleBase_ToolBox::addItem( QWidget* thePage, const QString& theName, const QPixmap& theIcon )
 {
   int anOldCount = myStack->count();
 
@@ -47,6 +47,7 @@ void ModuleBase_ToolBox::addItem( QWidget* thePage, const QString& theName, cons
   QToolButton* aButton = new QToolButton( myButtonsFrame );
   aButton->setCheckable( true );
   aButton->setIcon( theIcon );
+  aButton->setIconSize( theIcon.size() );
   aButton->setToolTip( theName );
   myButtonsGroup->addButton( aButton, anOldCount );
   myButtonsLayout->insertWidget( anOldCount, aButton );

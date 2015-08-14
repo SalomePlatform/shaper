@@ -41,7 +41,7 @@
         </doublevalue>
       </groupbox>
     </box>
-    <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted.png">
+    <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted_32x32.png">
       <groupbox title="To">
         <shape_selector id="to_object"
                         icon=":icons/plane_inverted.png"

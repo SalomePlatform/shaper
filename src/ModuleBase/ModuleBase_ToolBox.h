@@ -23,7 +23,7 @@ public:
   ModuleBase_ToolBox( QWidget* theParent );
   virtual ~ModuleBase_ToolBox();
 
-  void addItem( QWidget* thePage, const QString& theName, const QIcon& theIcon );
+  void addItem( QWidget* thePage, const QString& theName, const QPixmap& theIcon );
   int count() const;
   int currentIndex() const;
   void setCurrentIndex( const int );

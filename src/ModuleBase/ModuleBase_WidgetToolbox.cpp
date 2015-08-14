@@ -46,7 +46,7 @@ ModuleBase_WidgetToolbox::~ModuleBase_WidgetToolbox()
 int ModuleBase_WidgetToolbox::addPage(ModuleBase_PageBase* thePage,
                                       const QString& theName,
                                       const QString& theCaseId,
-                                      const QIcon& theIcon )
+                                      const QPixmap& theIcon )
 {
   ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon);
   QFrame* aFrame = dynamic_cast<QFrame*>(thePage);

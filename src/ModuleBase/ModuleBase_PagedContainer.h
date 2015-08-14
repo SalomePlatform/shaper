@@ -24,7 +24,7 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   virtual int addPage( ModuleBase_PageBase* theWidget,
                        const QString& theName,
                        const QString& theCaseId,
-                       const QIcon& theIcon );
+                       const QPixmap& theIcon );
 
   // ModuleBase_ModelWidget
   virtual QList<QWidget*> getControls() const;

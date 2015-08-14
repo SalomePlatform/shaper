@@ -106,7 +106,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
             ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
 
             QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
-            QIcon anIcon( anIconPath );
+            QPixmap anIcon( anIconPath );
             aContainer->addPage( aPage, aPageName, aCaseId, anIcon );
           }
         } while (myWidgetApi->toNextWidget());
