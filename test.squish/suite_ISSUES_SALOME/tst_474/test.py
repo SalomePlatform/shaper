@@ -20,7 +20,7 @@ def main():
     openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Parameters (1).aa = 4", 10, 10, 0)
     activateItem(waitForObjectItem(":_QMenu", "Delete"))
     waitFor("object.exists(':Delete features._QLabel')", 20000)
-    test.compare(str(findObject(":Delete features._QLabel").text), "Selected features are used in the following features: bb.These features will be deleted.\nWould you like to continue?")
+    test.compare(str(findObject(":Delete features._QLabel").text), "Selected features are used in the following features: bb. These features will be deleted.\nWould you like to continue?")
     clickButton(waitForObject(":Delete features.No_QPushButton"))
     
     close_application()

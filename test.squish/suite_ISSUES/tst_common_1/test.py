@@ -28,7 +28,7 @@ def sketch_1():
     radius_create((282, 203), (299, 177), 15)
     radius_create((456, 174), (402, 157), 15)
     radius_create((284, 454), (304, 438), 15)
-    radius_create((483, 459), (472, 486), 15)
+    radius_create((467, 484), (472, 486), 15)
     
     distance_create((269, 191), (463,198), (433, 101), 170)
     distance_create((265, 463), (445, 404), (328, 545), 170)
@@ -56,7 +56,7 @@ def sketch_2():
 def main():
     source(findFile("scripts", "common.py"))
     
-    startApplication("GeomApp")
+    startApplication("linux_run.sh")
     set_defaults()
     
     part_create()

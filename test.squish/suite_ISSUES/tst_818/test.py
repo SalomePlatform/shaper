@@ -17,6 +17,6 @@ def main():
     activateItem(waitForObjectItem(":_QMenu", "Delete"))
     
     waitFor("object.exists(':Delete features.Label_QLabel')", 20000)
-    test.compare(str(findObject(":Delete features.Label_QLabel").text), "Selected features are used in the following features: SketchLine_1.These features will be deleted.\nAlso these features will be deleted: Sketch_1.\nWould you like to continue?")
+    test.compare(str(findObject(":Delete features.Label_QLabel").text), "Selected features are used in the following features: SketchLine_1. These features will be deleted.\nAlso these features will be deleted: Sketch_1.\nWould you like to continue?")
 
     clickButton(waitForObject(":Delete features.Yes_QPushButton"))
