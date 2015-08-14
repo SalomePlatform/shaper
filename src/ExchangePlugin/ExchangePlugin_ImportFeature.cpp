@@ -113,9 +113,9 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody)
 {
   //load result
-  theResultBody->getBodyBuilder()->store(theGeomShape);
+  theResultBody->store(theGeomShape);
 
   int aTag(1);
   std::string aNameMS = "Shape";
-  theResultBody->getBodyBuilder()->loadFirstLevel(theGeomShape, aNameMS, aTag);
+  theResultBody->loadFirstLevel(theGeomShape, aNameMS, aTag);
 }

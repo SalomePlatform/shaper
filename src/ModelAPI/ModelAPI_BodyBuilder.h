@@ -38,6 +38,9 @@ public:
 	                          const std::shared_ptr<GeomAPI_Shape>& theNewShape,
                             const int theDecomposeSolidsTag = 0) = 0;
 
+  /// Returns the shape-result produced by this feature
+  virtual std::shared_ptr<GeomAPI_Shape> shape() = 0;
+
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
   virtual void generated(
@@ -89,6 +92,10 @@ public:
 
   /// load disconnected vetexes
   virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName,int&  theTag) = 0;
+
+  /// Converts evolution of sub-shapes stored in naming structure to selection 
+  /// (theFlag = true) and back (theFlag = false)
+  virtual void evolutionToSelection(const bool theFlag) = 0;
 
 protected:
   /// Returns the data manager of this object: attributes

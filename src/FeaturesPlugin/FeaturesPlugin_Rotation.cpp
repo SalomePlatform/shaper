@@ -119,15 +119,14 @@ void FeaturesPlugin_Rotation::LoadNamingDS(const GeomAlgoAPI_Rotation& theRotaio
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   // Store result.
-  aResultBuilder->storeModified(theBaseShape, theRotaionAlgo.shape());
+  theResultBody->storeModified(theBaseShape, theRotaionAlgo.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRotaionAlgo.mapOfShapes();
 
   int aRotatedTag = 1;
   std::string aRotatedName = "Rotated";
-  aResultBuilder->loadAndOrientModifiedShapes(theRotaionAlgo.makeShape().get(),
+  theResultBody->loadAndOrientModifiedShapes(theRotaionAlgo.makeShape().get(),
                                               theBaseShape, GeomAPI_Shape::FACE,
                                               aRotatedTag, aRotatedName, *aSubShapes.get());
 

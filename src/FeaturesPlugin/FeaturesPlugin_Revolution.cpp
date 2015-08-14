@@ -179,18 +179,15 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
                                              std::shared_ptr<GeomAPI_Shape> theBasis,
                                              std::shared_ptr<GeomAPI_Shape> theContext)
 {
-  //load result
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
-
   if(theBasis->isEqual(theContext))
-    aResultBuilder->store(theFeature.shape());
+    theResultBody->store(theFeature.shape());
   else
-    aResultBuilder->storeGenerated(theContext, theFeature.shape());
+    theResultBody->storeGenerated(theContext, theFeature.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theFeature.mapOfShapes();
 
   std::string aGeneratedName = "LateralFace";
-  aResultBuilder->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aGeneratedName, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aGeneratedName, *aSubShapes);
 
   //Insert from face
   std::string aBotName = "FromFace";
@@ -199,7 +196,7 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
     if(aSubShapes->isBound(aBottomFace)) {
       aBottomFace = aSubShapes->find(aBottomFace);
     }
-    aResultBuilder->generated(aBottomFace, aBotName, _FROM_TAG);
+    theResultBody->generated(aBottomFace, aBotName, _FROM_TAG);
   }
 
   //Insert to face
@@ -209,7 +206,7 @@ void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
     if (aSubShapes->isBound(aTopFace)) {
       aTopFace = aSubShapes->find(aTopFace);
     }
-    aResultBuilder->generated(aTopFace, aTopName, _TO_TAG);
+    theResultBody->generated(aTopFace, aTopName, _TO_TAG);
   }
 
 }

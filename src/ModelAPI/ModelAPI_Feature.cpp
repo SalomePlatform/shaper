@@ -85,7 +85,7 @@ void ModelAPI_Feature::eraseResultFromList(const std::shared_ptr<ModelAPI_Result
       static Events_Loop* aLoop = Events_Loop::loop();
       static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-      ModelAPI_EventCreator::get()->sendDeleted(document(), aGroup);
+      aECreator->sendDeleted(document(), aGroup);
       aECreator->sendUpdated(aRes, EVENT_DISP);
       break;
     }

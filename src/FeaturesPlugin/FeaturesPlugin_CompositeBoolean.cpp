@@ -205,10 +205,9 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
                                                    const ListOfShape& theTools,
                                                    const GeomAlgoAPI_Boolean& theAlgo)
 {
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   //load result
   if(theBaseShape->isEqual(theAlgo.shape())) {
-    aResultBuilder->store(theAlgo.shape());
+    theResultBody->store(theAlgo.shape());
   } else {
     const int aGenTag = 1;
     const int aFrTag = 2;
@@ -222,7 +221,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
     const std::string aFrName = "FromFace";
     const std::string aToName = "ToFace";
 
-    aResultBuilder->storeModified(theBaseShape, theAlgo.shape(), aSubsolidsTag);
+    theResultBody->storeModified(theBaseShape, theAlgo.shape(), aSubsolidsTag);
 
     ListOfShape::const_iterator aFaceIter = theFaces.begin();
     std::list<std::shared_ptr<GeomAPI_Interface>>::const_iterator aSolidsAlgosIter = theSolidsAlgos.begin();
@@ -235,7 +234,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
       if(std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(*aSolidsAlgosIter)) {
         std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(*aSolidsAlgosIter);
         aSubShapes = aPrismAlgo->mapOfShapes();
-        aResultBuilder->loadAndOrientGeneratedShapes(aPrismAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
+        theResultBody->loadAndOrientGeneratedShapes(aPrismAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
         //TODO:fix
         //aFromFace = aPrismAlgo->firstShape();
@@ -243,7 +242,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
       } else if(std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter)) {
         std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter);
         aSubShapes = aRevolAlgo->mapOfShapes();
-        aResultBuilder->loadAndOrientGeneratedShapes(aRevolAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
+        theResultBody->loadAndOrientGeneratedShapes(aRevolAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
         aFromFace = aRevolAlgo->firstShape();
         aToFace = aRevolAlgo->lastShape();
@@ -254,7 +253,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         if(aSubShapes->isBound(aFromFace)) {
           aFromFace = aSubShapes->find(aFromFace);
         }
-        aResultBuilder->generated(aFromFace, aFrName, aFrTag);
+        theResultBody->generated(aFromFace, aFrName, aFrTag);
       }
 
       //Insert top face
@@ -262,18 +261,18 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         if (aSubShapes->isBound(aToFace)) {
           aToFace = aSubShapes->find(aToFace);
         }
-        aResultBuilder->generated(aToFace, aToName, aToTag);
+        theResultBody->generated(aToFace, aToName, aToTag);
       }
     }
 
-    aResultBuilder->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE,
+    theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE,
                                                aModTag, aModName, *theAlgo.mapOfShapes().get());
-    aResultBuilder->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE, aDelTag);
+    theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, GeomAPI_Shape::FACE, aDelTag);
 
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      aResultBuilder->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, GeomAPI_Shape::FACE,
+      theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, GeomAPI_Shape::FACE,
                                                  aModTag, aModName, *theAlgo.mapOfShapes().get());
-      aResultBuilder->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, GeomAPI_Shape::FACE, aDelTag);
+      theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, GeomAPI_Shape::FACE, aDelTag);
     }
   }
 }

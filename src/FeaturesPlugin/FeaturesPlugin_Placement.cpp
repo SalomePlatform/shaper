@@ -169,15 +169,14 @@ void FeaturesPlugin_Placement::LoadNamingDS(GeomAlgoAPI_Transform& theTransformA
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                             std::shared_ptr<GeomAPI_Shape> theSlaveObject)
 {
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   //load result
-  aResultBuilder->storeModified(theSlaveObject, theTransformAlgo.shape()); // the initial Slave, the resulting Slave
+  theResultBody->storeModified(theSlaveObject, theTransformAlgo.shape()); // the initial Slave, the resulting Slave
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfShapes();
 
     // put modifed faces in DF
   std::string aModName = "Modified";
-  aResultBuilder->loadAndOrientModifiedShapes(theTransformAlgo.makeShape().get(),
+  theResultBody->loadAndOrientModifiedShapes(theTransformAlgo.makeShape().get(),
                                               theSlaveObject, _FACE,
                                               _MODIFIEDF_TAG, aModName, *aSubShapes.get());
 }

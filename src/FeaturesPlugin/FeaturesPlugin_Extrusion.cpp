@@ -175,18 +175,17 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
                                             std::shared_ptr<GeomAPI_Shape> theBasis)
 {
   //load result
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   if(thePrismAlgo.shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {
     int a = 1;
   }
-  aResultBuilder->storeGenerated(theBasis, thePrismAlgo.shape());
+  theResultBody->storeGenerated(theBasis, thePrismAlgo.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = thePrismAlgo.mapOfShapes();
 
   //Insert lateral face : Face from Edge
   std::string aLatName = "LateralFace";
   const int aLatTag = 1;
-  aResultBuilder->loadAndOrientGeneratedShapes(thePrismAlgo.makeShape().get(), theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(thePrismAlgo.makeShape().get(), theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
 
   //Insert to faces
   std::string aToName = "ToFace";
@@ -197,7 +196,7 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
     if(aSubShapes->isBound(aToFace)) {
       aToFace = aSubShapes->find(aToFace);
     }
-    aResultBuilder->generated(aToFace, aToName, aToTag);
+    theResultBody->generated(aToFace, aToName, aToTag);
   }
 
   //Insert from faces
@@ -209,6 +208,6 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
     if(aSubShapes->isBound(aFromFace)) {
       aFromFace = aSubShapes->find(aFromFace);
     }
-    aResultBuilder->generated(aFromFace, aFromName, aFromTag);
+    theResultBody->generated(aFromFace, aFromName, aFromTag);
   }
 }

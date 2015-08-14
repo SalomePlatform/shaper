@@ -151,9 +151,6 @@ class Model_Document : public ModelAPI_Document
   /// Creates a body results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultBody> createBody(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  /// Creates a compsolid results
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultCompSolid> createCompSolid(
-      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a part results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
@@ -263,6 +260,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_AttributeRefAttr;
   friend class Model_AttributeRefList;
   friend class Model_ResultPart;
+  friend class Model_ResultCompSolid;
   friend class DFBrowser;
 
  private:

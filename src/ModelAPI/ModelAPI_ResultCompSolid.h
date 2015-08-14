@@ -26,10 +26,6 @@ public:
   /// Returns the feature is disabled or not.
   MODELAPI_EXPORT virtual bool isDisabled() const;
 
-  /// Adds result to the sketch and to its document
-  /// \param theIndex an index of the created body result in the compsolid
-  virtual std::shared_ptr<ModelAPI_ResultBody> addResult(const int theIndex) = 0;
-
   /// Returns the number of sub-elements
   virtual int numberOfSubs(bool forTree = false) const = 0;
 
@@ -37,15 +33,8 @@ public:
   virtual std::shared_ptr<ModelAPI_ResultBody> subResult(const int theIndex,
                                                          bool forTree = false) const = 0;
 
-  /// Returns the sub-feature unique identifier in this composite feature by zero-base index
-  //virtual int subResultId(const int theIndex) const = 0;
-
   /// Returns true if feature or reuslt belong to this composite feature as subs
   virtual bool isSub(ObjectPtr theObject) const = 0;
-
-  /// This method to inform that sub-feature is removed and must be removed from the internal data
-  /// structures of the owner (the remove from the document will be done outside just after)
-  virtual void removeResult(std::shared_ptr<ModelAPI_ResultBody> theResult) = 0;
 
 protected:
 };

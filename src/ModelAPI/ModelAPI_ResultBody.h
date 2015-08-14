@@ -9,12 +9,11 @@
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
-//#include <GeomAlgoAPI_MakeShape.h>
-//#include <GeomAPI_DataMapOfShapeShape.h>
-//#include <memory>
+#include <GeomAPI_DataMapOfShapeShape.h>
 #include <string>
 
 class ModelAPI_BodyBuilder;
+class GeomAlgoAPI_MakeShape;
 
 /**\class ModelAPI_ResultBody
 * \ingroup DataModel
@@ -45,77 +44,72 @@ public:
     return RESULT_BODY_COLOR;
   }
 
-  /// Returns the builder, which processes the shapes
-  ModelAPI_BodyBuilder* getBodyBuilder() { return myBuilder; }
-
   /// Stores the shape (called by the execution method).
-  /*virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+  MODELAPI_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
   /// Stores the generated shape (called by the execution method).
-  virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-	                          const std::shared_ptr<GeomAPI_Shape>& theToShape) = 0;
+  MODELAPI_EXPORT virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+    const std::shared_ptr<GeomAPI_Shape>& theToShape);
 
   /// Stores the modified shape (called by the execution method).
-  virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-	                          const std::shared_ptr<GeomAPI_Shape>& theNewShape,
-                            const int theDecomposeSolidsTag = 0) = 0;
+  MODELAPI_EXPORT virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theDecomposeSolidsTag = 0);
+
+  /// Returns the shape-result produced by this feature
+  MODELAPI_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
-  virtual void generated(
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag = 1) = 0;
+  MODELAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape,
+    const std::string& theName, const int theTag = 1);
 
   /// Records the shape newShape which was generated from the shape oldShape during a topological 
   /// construction. As an example, consider the case of a face generated from an edge in 
   /// construction of a prism.
-  virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag = 1) = 0;
+  MODELAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, 
+    const int theTag = 1);
 
   /// Records the shape newShape which is a modification of the shape oldShape.
   /// As an example, consider the case of a face split or merged in a Boolean operation.
-  virtual void modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag = 1) = 0;
+  MODELAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
+    const int theTag = 1);
 
   /// Records the shape oldShape which was deleted from the current label.
   /// As an example, consider the case of a face removed by a Boolean operation.
-  virtual void deleted(
-    const std::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1) = 0;
+  MODELAPI_EXPORT virtual void deleted(
+    const std::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1);
   
   /// load deleted shapes
-  virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
-                                               std::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                               const int  theKindOfShape,
-                                               const int  theTag) = 0;
+  MODELAPI_EXPORT virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
+                                  std::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                  const int  theKindOfShape,
+                                  const int  theTag);
   /// load and orient modified shapes
-  virtual void loadAndOrientModifiedShapes (
-	                                           GeomAlgoAPI_MakeShape* theMS,
-                                               std::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                               const int  theKindOfShape,
-                                               const int  theTag,
-											   const std::string& theName,
-                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+  MODELAPI_EXPORT virtual void loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
+    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes);
   /// load and orient generated shapes
-  virtual void loadAndOrientGeneratedShapes (
-	                                           GeomAlgoAPI_MakeShape* theMS,
-                                               std::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                               const int  theKindOfShape,
-                                               const int  theTag,
-											   const std::string& theName,
-                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+  MODELAPI_EXPORT virtual void loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* theMS,
+    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape,
+    const int  theTag, const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes);
 
   /// load shapes of the first level (to be used during shape import)
-  virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag) = 0;
+  MODELAPI_EXPORT virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape, 
+    const std::string& theName, int&  theTag);
   
   /// load disconnected edges
-  virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag) = 0;
+  MODELAPI_EXPORT virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape,
+    const std::string& theName, int&  theTag);
 
   /// load disconnected vetexes
-  virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName,int&  theTag) = 0;
-  */
+  MODELAPI_EXPORT virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape,
+    const std::string& theName,int&  theTag);
+
 protected:
   MODELAPI_EXPORT ModelAPI_ResultBody();
 
-protected:
   ModelAPI_BodyBuilder* myBuilder; /// provide the body processing in naming shape
 };
 

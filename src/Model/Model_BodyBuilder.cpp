@@ -46,7 +46,7 @@ Model_BodyBuilder::Model_BodyBuilder(ModelAPI_Object* theOwner)
 
 // Converts evolution of naming shape to selection evelution and back to avoid
 // naming support on the disabled results. Deeply in the labels tree, recursively.
-static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
+static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
   std::list<std::pair<TopoDS_Shape, TopoDS_Shape> > aShapePairs; // to store old and new shapes
   Handle(TNaming_NamedShape) aName;
   int anEvolution = -1;
@@ -91,8 +91,17 @@ static void EvolutionToSelection(TDF_Label theLab, const bool theFlag) {
   // recursive call for all sub-labels
   TDF_ChildIterator anIter(theLab, Standard_False);
   for(; anIter.More(); anIter.Next()) {
-    EvolutionToSelection(anIter.Value(), theFlag);
+    evolutionToSelectionRec(anIter.Value(), theFlag);
   }
+}
+
+void Model_BodyBuilder::evolutionToSelection(const bool theFlag)
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (!aData) // unknown case
+    return;
+  TDF_Label& aShapeLab = aData->shapeLab();
+  evolutionToSelectionRec(aShapeLab, theFlag);
 }
 
 void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
@@ -713,4 +722,22 @@ void Model_BodyBuilder::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> 
       theTag++;
     }
   }
+}
+
+std::shared_ptr<GeomAPI_Shape> Model_BodyBuilder::shape()
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    Handle(TNaming_NamedShape) aName;
+    if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
+      TopoDS_Shape aShape = aName->Get();
+      if (!aShape.IsNull()) {
+        std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+        aRes->setImpl(new TopoDS_Shape(aShape));
+        return aRes;
+      }
+    }
+  }
+  return std::shared_ptr<GeomAPI_Shape>();
 }

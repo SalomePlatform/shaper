@@ -801,12 +801,6 @@ std::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
   return myObjs->createBody(theFeatureData, theIndex);
 }
 
-std::shared_ptr<ModelAPI_ResultCompSolid> Model_Document::createCompSolid(
-    const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
-{
-  return myObjs->createCompSolid(theFeatureData, theIndex);
-}
-
 std::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
     const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
@@ -835,12 +829,7 @@ std::shared_ptr<ModelAPI_ResultParameter> Model_Document::createParameter(
 std::shared_ptr<ModelAPI_Feature> Model_Document::feature(
     const std::shared_ptr<ModelAPI_Result>& theResult)
 {
-  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theResult->data());
-  if (aData) {
-    TDF_Label aFeatureLab = aData->label().Father().Father().Father();
-    return myObjs->feature(aFeatureLab);
-  }
-  return FeaturePtr();
+  return myObjs->feature(theResult);
 }
 
 Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)

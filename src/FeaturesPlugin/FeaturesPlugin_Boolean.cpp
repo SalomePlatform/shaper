@@ -199,24 +199,23 @@ void FeaturesPlugin_Boolean::LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
                                           const ListOfShape& theTools,
                                           const GeomAlgoAPI_Boolean& theAlgo)
 {
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   //load result
   if(theBaseShape->isEqual(theAlgo.shape())) {
-    aResultBuilder->store(theAlgo.shape());
+    theResultBody->store(theAlgo.shape());
   } else {
-    aResultBuilder->storeModified(theBaseShape, theAlgo.shape(), _SUBSOLIDS_TAG);
+    theResultBody->storeModified(theBaseShape, theAlgo.shape(), _SUBSOLIDS_TAG);
 
     GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
 
     std::string aModName = "Modified";
-    aResultBuilder->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, FACE,
+    theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, FACE,
                                                _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
-    aResultBuilder->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, FACE, _DELETED_TAG);
+    theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, FACE, _DELETED_TAG);
 
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      aResultBuilder->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, FACE,
+      theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, FACE,
                                                  _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
-      aResultBuilder->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, FACE, _DELETED_TAG);
+      theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, FACE, _DELETED_TAG);
     }
   }
 }

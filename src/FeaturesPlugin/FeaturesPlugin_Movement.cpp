@@ -119,15 +119,14 @@ void FeaturesPlugin_Movement::LoadNamingDS(const GeomAlgoAPI_Movement& theMoveme
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
-  ModelAPI_BodyBuilder* aResultBuilder = theResultBody->getBodyBuilder();
   // Store result.
-  aResultBuilder->storeModified(theBaseShape, theMovementAlgo.shape());
+  theResultBody->storeModified(theBaseShape, theMovementAlgo.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theMovementAlgo.mapOfShapes();
 
   int aMovedTag = 1;
   std::string aMovedName = "Moved";
-  aResultBuilder->loadAndOrientModifiedShapes(theMovementAlgo.makeShape().get(),
+  theResultBody->loadAndOrientModifiedShapes(theMovementAlgo.makeShape().get(),
                                               theBaseShape, GeomAPI_Shape::FACE,
                                               aMovedTag, aMovedName, *aSubShapes.get());
 
