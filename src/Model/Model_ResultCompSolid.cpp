@@ -23,6 +23,7 @@
 Model_ResultCompSolid::Model_ResultCompSolid()
 {
   myBuilder = new Model_BodyBuilder(this);
+  setIsConcealed(false);
   updateSubs(shape()); // in case of open, etc.
 }
 
