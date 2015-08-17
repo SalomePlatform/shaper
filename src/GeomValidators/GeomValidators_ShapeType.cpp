@@ -8,6 +8,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
@@ -32,6 +33,7 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
     MyShapeTypes["circle"] = Circle;
     MyShapeTypes["face"]   = Face;
     MyShapeTypes["solid"]  = Solid;
+    MyShapeTypes["plane"]  = Plane;
   }
   std::string aType = std::string(theType.c_str());
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
@@ -123,6 +125,13 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
   if (theObject.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if( theShapeType==Plane )
+    {
+      ResultConstructionPtr aResultConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
+      const std::string& aKind = aFeature->getKind();
+      return aResult.get() != NULL && aKind == "Plane";
+    }
+
     if (aResult.get() != NULL) {
       GeomShapePtr aShape = aResult->shape();
       aValid = isValidShape(aShape, theShapeType);

@@ -34,6 +34,7 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
     Face,
     Solid,
     Compound,
+    Plane,
     AnyShape
   };
 

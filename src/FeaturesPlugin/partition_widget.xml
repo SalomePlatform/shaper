@@ -18,5 +18,6 @@
     type_choice="Faces"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
+    <validator id="GeomValidators_ShapeType" parameters="empty,solid,plane"/>
   </multi_selector>
 </source>
