@@ -11,13 +11,12 @@
 #include <TDataStd_ListIteratorOfListOfExtendedString.hxx>
 #include <TDataStd_UAttribute.hxx>
 
+#include <TDataStd_RealArray.hxx>
+#include <TDataStd_ExtStringArray.hxx>
+
 Model_Expression::Model_Expression(TDF_Label& theLabel)
 {
   myIsInitialized = true;
-  if (!theLabel.FindAttribute(TDataStd_Real::GetID(), myReal)) {
-    myReal = TDataStd_Real::Set(theLabel, 0.);
-    myIsInitialized = false;
-  }
   if (!theLabel.FindAttribute(TDataStd_Name::GetID(), myText)) {
     myText = TDataStd_Name::Set(theLabel, TCollection_ExtendedString());
     myIsInitialized = false;
@@ -29,6 +28,31 @@ Model_Expression::Model_Expression(TDF_Label& theLabel)
   if (!theLabel.FindAttribute(TDataStd_ExtStringList::GetID(), myUsedParameters)) {
     myUsedParameters = TDataStd_ExtStringList::Set(theLabel);
     myIsInitialized = false;
+  }
+  if (!theLabel.FindAttribute(TDataStd_Real::GetID(), myReal)) {
+    myReal = TDataStd_Real::Set(theLabel, 0.);
+    myIsInitialized = false;
+    // MPV: temporarily to support the previously saved files (to check and resolve bugs), to be removed
+    Handle(TDataStd_RealArray) anOldArray;
+    if (theLabel.Father().FindAttribute(TDataStd_RealArray::GetID(), anOldArray) == Standard_True) {
+      myReal->Set(anOldArray->Value(theLabel.Tag() - 1));
+      myIsInitialized = true;
+      Handle(TDataStd_ExtStringArray) anOldExp;
+      if (theLabel.Father().FindAttribute(TDataStd_ExtStringArray::GetID(), anOldExp) == Standard_True) {
+        myText->Set(anOldExp->Value(theLabel.Tag() - 1));
+      }
+    } else {
+      Handle(TDataStd_Real) anOldReal;
+      if (theLabel.Father().FindAttribute(TDataStd_Real::GetID(), anOldReal)) {
+        myIsInitialized = true;
+        myReal->Set(anOldReal->Get());
+        Handle(TDataStd_Name) aText;
+        if (theLabel.Father().FindAttribute(TDataStd_Name::GetID(), aText)) {
+          myText->Set(aText->Get());
+        }
+      }
+    }
+
   }
 }
 
