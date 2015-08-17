@@ -215,8 +215,10 @@ void SketchSolver_Storage::removeUnusedEntities()
         int aPos = Search(aSubs[i], myEntities);
         if (aPos >= 0 && aPos < (int)myEntities.size()) {
           for (int j = 0; j < 4; j++)
-            if (myEntities[aPos].point[j] != 0)
+            if (myEntities[aPos].point[j] != SLVS_E_UNKNOWN)
               anUnusedEntities.erase(myEntities[aPos].point[j]);
+          if (myEntities[aPos].distance != SLVS_E_UNKNOWN)
+            anUnusedEntities.erase(myEntities[aPos].distance);
         }
       }
     }
