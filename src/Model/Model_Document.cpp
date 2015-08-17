@@ -28,8 +28,12 @@
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
+#include <TDF_Delta.hxx>
 #include <OSD_File.hxx>
 #include <OSD_Path.hxx>
+#include <TDF_AttributeDelta.hxx>
+#include <TDF_AttributeDeltaList.hxx>
+#include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -383,10 +387,37 @@ bool Model_Document::finishOperation()
   return aResult;
 }
 
+/// Returns in theDelta labels that has been modified in the latest transaction of theDoc
+static void modifiedLabels(const Handle(TDocStd_Document)& theDoc, TDF_LabelList& theDelta,
+  const bool isRedo = false) {
+  Handle(TDF_Delta) aDelta;
+  if (isRedo)
+    aDelta = theDoc->GetRedos().First();
+  else 
+    aDelta = theDoc->GetUndos().Last();
+  aDelta->Labels(theDelta);
+  // add also label of the modified attributes
+  const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
+  for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
+    theDelta.Append(anAttr.Value()->Label());
+  }
+}
+
 void Model_Document::abortOperation()
 {
+  TDF_LabelList aDeltaLabels; // labels that are updated during "abort"
   if (!myNestedNum.empty() && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
     compactNested();
+    // store undo-delta here as undo actually does in the method later
+    int a, aNumTransactions = myTransactions.rbegin()->myOCAFNum;
+    for(a = 0; a < aNumTransactions; a++) {
+      modifiedLabels(myDoc, aDeltaLabels);
+      myDoc->Undo();
+    }
+    for(a = 0; a < aNumTransactions; a++) {
+      myDoc->Redo();
+    }
+
     undoInternal(false, false);
     myDoc->ClearRedos();
     myRedos.clear();
@@ -397,8 +428,10 @@ void Model_Document::abortOperation()
       (*myNestedNum.rbegin())--;
     // roll back the needed number of transactions
     myDoc->AbortCommand();
-    for(int a = 0; a < aNumTransactions; a++)
+    for(int a = 0; a < aNumTransactions; a++) {
+      modifiedLabels(myDoc, aDeltaLabels);
       myDoc->Undo();
+    }
     myDoc->ClearRedos();
   }
   // abort for all subs, flushes will be later, in the end of root abort
@@ -407,7 +440,7 @@ void Model_Document::abortOperation()
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->abortOperation();
   // references may be changed because they are set in attributes on the fly
-  myObjs->synchronizeFeatures(true, true, isRoot());
+  myObjs->synchronizeFeatures(aDeltaLabels, true, isRoot());
 }
 
 bool Model_Document::isOperation() const
@@ -452,8 +485,12 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())--;
   // roll back the needed number of transactions
-  for(int a = 0; a < aNumTransactions; a++)
+  TDF_LabelList aDeltaLabels;
+  for(int a = 0; a < aNumTransactions; a++) {
+    if (theSynchronize)
+      modifiedLabels(myDoc, aDeltaLabels);
     myDoc->Undo();
+  }
 
   if (theWithSubs) {
     // undo for all subs
@@ -467,7 +504,7 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
   }
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
   if (theSynchronize) {
-    myObjs->synchronizeFeatures(true, true, isRoot());
+    myObjs->synchronizeFeatures(aDeltaLabels, true, isRoot());
     // update the current features status
     setCurrentFeature(currentFeature(false), false);
   }
@@ -501,8 +538,11 @@ void Model_Document::redo()
   int aNumRedos = myRedos.rbegin()->myOCAFNum;
   myTransactions.push_back(*myRedos.rbegin());
   myRedos.pop_back();
-  for(int a = 0; a < aNumRedos; a++)
+  TDF_LabelList aDeltaLabels;
+  for(int a = 0; a < aNumRedos; a++) {
+    modifiedLabels(myDoc, aDeltaLabels, true);
     myDoc->Redo();
+  }
 
   // redo for all subs
   const std::set<std::string> aSubs = subDocuments(true);
@@ -511,7 +551,7 @@ void Model_Document::redo()
     subDoc(*aSubIter)->redo();
 
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
-  myObjs->synchronizeFeatures(true, true, isRoot());
+  myObjs->synchronizeFeatures(aDeltaLabels, true, isRoot());
   // update the current features status
   setCurrentFeature(currentFeature(false), false);
 }

@@ -240,7 +240,8 @@ void Model_Session::setActiveDocument(
       if (aDoc.get()) {
         bool aWasChecked = myCheckTransactions;
         setCheckTransactions(false);
-        aDoc->objects()->synchronizeFeatures(false, true, true);
+        TDF_LabelList anEmptyUpdated;
+        aDoc->objects()->synchronizeFeatures(anEmptyUpdated, true, true);
         if (aWasChecked)
             setCheckTransactions(true);
       }
@@ -314,7 +315,8 @@ std::shared_ptr<ModelAPI_Document> Model_Session::copy(
   aRT->SetRelocation(aSourceRoot, aTargetRoot);
   TDF_CopyTool::Copy(aDS, aRT);
 
-  aNew->objects()->synchronizeFeatures(false, true, true);
+  TDF_LabelList anEmptyUpdated;
+  aNew->objects()->synchronizeFeatures(anEmptyUpdated, true, true);
   return aNew;
 }
 

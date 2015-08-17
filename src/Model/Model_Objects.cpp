@@ -31,6 +31,8 @@
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
+#include <TDF_LabelMap.hxx>
+#include <TDF_ListIteratorOfLabelList.hxx>
 
 static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
 
@@ -51,7 +53,8 @@ void Model_Objects::setOwner(DocumentPtr theDoc)
 {
   myDoc = theDoc;
   // update all fields and recreate features and result objects if needed
-  synchronizeFeatures(false, true, true);
+  TDF_LabelList aNoUpdated;
+  synchronizeFeatures(aNoUpdated, true, true);
   myHistory.clear();
 }
 
@@ -542,7 +545,7 @@ void Model_Objects::initData(ObjectPtr theObj, TDF_Label theLab, const int theTa
 }
 
 void Model_Objects::synchronizeFeatures(
-  const bool theMarkUpdated, const bool theUpdateReferences, const bool theFlush)
+  const TDF_LabelList& theUpdated, const bool theUpdateReferences, const bool theFlush)
 {
   Model_Document* anOwner = std::dynamic_pointer_cast<Model_Document>(myDoc).get();
   if (!anOwner) // this may happen on creation of document: nothing there, so nothing to synchronize
@@ -556,6 +559,17 @@ void Model_Objects::synchronizeFeatures(
   static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
   static Events_ID aToHideEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   bool isActive = aLoop->activateFlushes(false);
+
+  // collect all updated labels map
+  TDF_LabelMap anUpdatedMap;
+  TDF_ListIteratorOfLabelList anUpdatedIter(theUpdated);
+  for(; anUpdatedIter.More(); anUpdatedIter.Next()) {
+    TDF_Label& aFeatureLab = anUpdatedIter.Value();
+    while(aFeatureLab.Depth() > 3)
+      aFeatureLab = aFeatureLab.Father();
+    if (myFeatures.IsBound(aFeatureLab))
+      anUpdatedMap.Add(aFeatureLab);
+  }
 
   // update all objects by checking are they on labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
@@ -585,7 +599,7 @@ void Model_Objects::synchronizeFeatures(
     } else {  // nothing is changed, both iterators are incremented
       aFeature = myFeatures.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
-      if (theMarkUpdated) {
+      if (anUpdatedMap.Contains(aFeatureLabel)) {
         ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
       }
     }
@@ -639,7 +653,7 @@ void Model_Objects::synchronizeFeatures(
   if (theUpdateReferences) {
     synchronizeBackRefs();
   }
-  if (theMarkUpdated) { // this means there is no control what was modified => remove history cash
+  if (!theUpdated.IsEmpty()) { // this means there is no control what was modified => remove history cash
     myHistory.clear();
   }
 

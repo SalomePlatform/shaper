@@ -16,6 +16,7 @@
 #include <TDocStd_Document.hxx>
 #include <NCollection_DataMap.hxx>
 #include <TDF_Label.hxx>
+#include <TDF_LabelList.hxx>
 #include <map>
 #include <set>
 #include <vector>
@@ -137,10 +138,10 @@ class Model_Objects
   void setUniqueName(FeaturePtr theFeature);
 
   //! Synchronizes myFeatures list with the updated document
-  //! \param theMarkUpdated causes the "update" event for all features
+  //! \param theUpdated list of labels that are marked as modified, so featrues must be also
   //! \param theUpdateReferences causes the update of back-references
   //! \param theFlush makes flush all events in the end of all modifications of this method
-  void synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences,
+  void synchronizeFeatures(const TDF_LabelList& theUpdated, const bool theUpdateReferences,
     const bool theFlush);
   //! Synchronizes the BackReferences list in Data of Features and Results
   void synchronizeBackRefs();
