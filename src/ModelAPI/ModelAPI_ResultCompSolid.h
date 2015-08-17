@@ -23,9 +23,6 @@ public:
   MODELAPI_EXPORT virtual ~ModelAPI_ResultCompSolid();
   /// Returns the group identifier of this result
 
-  /// Returns the feature is disabled or not.
-  MODELAPI_EXPORT virtual bool isDisabled() const;
-
   /// Returns the number of sub-elements
   virtual int numberOfSubs(bool forTree = false) const = 0;
 

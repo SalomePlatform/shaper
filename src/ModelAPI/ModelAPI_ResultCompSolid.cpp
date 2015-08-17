@@ -9,10 +9,3 @@
 ModelAPI_ResultCompSolid::~ModelAPI_ResultCompSolid()
 {
 }
-
-bool ModelAPI_ResultCompSolid::isDisabled() const
-{
-  return false;
-}
-
-
