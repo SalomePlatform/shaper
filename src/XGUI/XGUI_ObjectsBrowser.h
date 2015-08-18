@@ -116,6 +116,10 @@ Q_OBJECT
   /// Set Data Model for the Object Browser
   void setDataModel(ModuleBase_IDocumentDataModel* theModel);
 
+public slots:
+  //! Called on Edit command request
+  void onEditItem();
+
 signals:
   //! Emited when selection is changed
   void selectionChanged();
@@ -138,9 +142,6 @@ signals:
   /// Show context menu on upper label
   /// \param thePnt a position of context menu
   void onLabelContextMenuRequested(const QPoint& thePnt);
-
-  //! Called on Edit command request
-  void onEditItem();
 
   //! Called when selection in Data Tree is changed
   void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);

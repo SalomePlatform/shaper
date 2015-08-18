@@ -225,12 +225,6 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
           SLOT(onLabelContextMenuRequested(const QPoint&)));
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SLOT(onContextMenuRequested(QContextMenuEvent*)));
-
-  // Create internal actions
-  QAction* aAction = new QAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this);
-  aAction->setData("RENAME_CMD");
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onEditItem()));
-  addAction(aAction);
 }
 
 //***************************************************

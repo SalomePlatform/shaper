@@ -54,6 +54,10 @@ void XGUI_ContextMenuMgr::createActions()
   aAction->setShortcut(Qt::Key_Delete);
   aAction->setShortcutContext(Qt::ApplicationShortcut);
 
+  aAction = new QAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this);
+  addAction("RENAME_CMD", aAction);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRename()));
+
   aAction = new QAction(QIcon(":pictures/move.png"), tr("Move..."), this);
   addAction("MOVE_CMD", aAction);
 
@@ -186,6 +190,12 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         }
         else if (hasFeature && myWorkshop->canMoveFeature())
           action("MOVE_CMD")->setEnabled(true);
+
+        if( aMgr->activeDocument() == aObject->document() )
+        {
+          action("RENAME_CMD")->setEnabled(true);
+          action("DELETE_CMD")->setEnabled(true);
+        }
       }
     } else {
       if (hasResult && (!hasParameter)) {
@@ -196,7 +206,14 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("WIREFRAME_CMD")->setEnabled(true);
       }
     }
-    if (!hasSubFeature) {
+    bool allActive = true;
+    foreach( ObjectPtr aObject, aObjects )
+      if( aMgr->activeDocument() != aObject->document() )
+      {
+        allActive = false;
+        break;
+      }
+    if (!hasSubFeature && allActive ) {
       if (hasFeature || hasParameter)
         action("DELETE_CMD")->setEnabled(true);
     }
@@ -278,6 +295,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(action("COLOR_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("RENAME_CMD"));
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
   //-------------------------------------
   // Result body menu
@@ -289,6 +308,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("RENAME_CMD"));
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
@@ -299,10 +320,14 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.clear();
   aList.append(action("DELETE_CMD"));
   aList.append(action("MOVE_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("RENAME_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
 
   aList.clear();
   aList.append(action("DELETE_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("RENAME_CMD"));
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
   //-------------------------------------
 }
@@ -419,4 +444,9 @@ QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)
       aGroups.append(aGroupName);
   }
   return aGroups;
+}
+
+void XGUI_ContextMenuMgr::onRename()
+{
+  myWorkshop->objectBrowser()->onEditItem();
 }

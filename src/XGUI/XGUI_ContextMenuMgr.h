@@ -81,6 +81,8 @@ signals:
   /// \param theEvent a context menu event
   void onContextMenuRequest(QContextMenuEvent* theEvent);
 
+  void onRename();
+
  private:
   /** 
    * Add action
