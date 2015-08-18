@@ -225,14 +225,6 @@ void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
   if (theID == TRANSLATION_LIST_ID()) {
     AttributeSelectionListPtr aTranslationObjectRefs = selectionList(TRANSLATION_LIST_ID());
     if (aTranslationObjectRefs->size() == 0) {
-      // the commented code is not necessary here because if an update event is flushed
-      // before the setFlushed with true value happens, it leads to crash
-      // Wait all objects being created, then send update events
-      //static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-      //bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
-      //if (isUpdateFlushed)
-      //  Events_Loop::loop()->setFlushed(anUpdateEvent, false);
-
       int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
       // Clear list of objects
       AttributeRefListPtr aRefListOfTranslated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
@@ -257,10 +249,6 @@ void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
         data()->attribute(SketchPlugin_Constraint::ENTITY_A()))->clear();
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
-
-      // send events to update the sub-features by the solver
-      //if (isUpdateFlushed)
-      //  Events_Loop::loop()->setFlushed(anUpdateEvent, true);
     }
   }
 }
