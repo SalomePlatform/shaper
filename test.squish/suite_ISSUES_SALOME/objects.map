@@ -1,5 +1,31 @@
+:Abort operation.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Abort operation_QMessageBox'}
+:Abort operation_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Abort operation'}
 :Activate module.New_QPushButton	{text='New' type='QPushButton' unnamed='1' visible='1' window=':Activate module_LightApp_ModuleDlg'}
 :Activate module_LightApp_ModuleDlg	{type='LightApp_ModuleDlg' unnamed='1' visible='1' windowTitle='Activate module'}
+:Arc.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
+:Arc.Center_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' title='Center' type='QGroupBox' unnamed='1' visible='1'}
+:Arc.End point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
+:Arc.Start point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
+:Arc.property_panel_cancel_QToolButton	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Arc.property_panel_ok_QToolButton	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Center.X _ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Center.X _ModuleBase_ParamSpinBox_2	{container=':Arc.Center_QGroupBox' leftWidget=':Center.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Center.X _QLabel	{container=':Circle.Center_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:Center.X _QLabel_2	{container=':Arc.Center_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:Center.Y _ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.Y _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Center.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.Center_QGroupBox' leftWidget=':Center.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Center.Y _QLabel	{container=':Circle.Center_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Center.Y _QLabel_2	{container=':Arc.Center_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Center.qt_spinbox_lineedit_QLineEdit	{container=':Circle.Center_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Center.qt_spinbox_lineedit_QLineEdit_2	{container=':Circle.Center_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Center.qt_spinbox_lineedit_QLineEdit_3	{container=':Arc.Center_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Center.qt_spinbox_lineedit_QLineEdit_4	{container=':Arc.Center_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Circle.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
+:Circle.Center_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel' title='Center' type='QGroupBox' unnamed='1' visible='1'}
+:Circle.CircleRadius_ModuleBase_ParamSpinBox	{container=':SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel' name='CircleRadius' type='ModuleBase_ParamSpinBox' visible='1'}
+:Circle.property_panel_cancel_QToolButton	{container=':SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Circle.property_panel_ok_QToolButton	{container=':SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Circle.qt_spinbox_lineedit_QLineEdit	{container=':SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='3' type='QLineEdit' visible='1'}
 :Close active study.Close w/o saving_QPushButton	{text='Close w/o saving' type='QPushButton' unnamed='1' visible='1' window=':Close active study_SUIT_MessageBox'}
 :Close active study_SUIT_MessageBox	{type='SUIT_MessageBox' unnamed='1' visible='1' windowTitle='Close active study'}
 :Delete features.No_QPushButton	{text='No' type='QPushButton' unnamed='1' visible='1' window=':Delete features_QMessageBox'}
@@ -31,4 +57,70 @@
 :SALOME*.Sketch_QtxToolBar	{name='Sketch' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
 :SALOME*_STD_TabDesktop	{type='STD_TabDesktop' unnamed='1' visible='1' windowTitle?='SALOME*'}
 :_QExpandingLineEdit	{columnIndex='0' container=':Object browser_XGUI_DataTree' rowIndex='0' type='QExpandingLineEdit' unnamed='1' visible='1'}
+:End point.X _ModuleBase_ParamSpinBox	{container=':Line.End point_QGroupBox' leftWidget=':End point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:End point.X _ModuleBase_ParamSpinBox_2	{container=':Arc.End point_QGroupBox' leftWidget=':End point.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:End point.X _QLabel	{container=':Line.End point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:End point.X _QLabel_2	{container=':Arc.End point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:End point.Y _ModuleBase_ParamSpinBox	{container=':Line.End point_QGroupBox' leftWidget=':End point.Y _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:End point.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.End point_QGroupBox' leftWidget=':End point.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:End point.Y _QLabel	{container=':Line.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:End point.Y _QLabel_2	{container=':Arc.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:End point.qt_spinbox_lineedit_QLineEdit	{container=':Line.End point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:End point.qt_spinbox_lineedit_QLineEdit_2	{container=':Line.End point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:End point.qt_spinbox_lineedit_QLineEdit_3	{container=':Arc.End point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:End point.qt_spinbox_lineedit_QLineEdit_4	{container=':Arc.End point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Exit.Ok_QPushButton	{text='Ok' type='QPushButton' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
+:Exit.Shutdown servers_QCheckBox	{text='Shutdown servers' type='QCheckBox' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
+:Exit_SalomeApp_ExitDlg	{type='SalomeApp_ExitDlg' unnamed='1' visible='1' windowTitle='Exit'}
+:Line.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
+:Line.End point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
+:Line.Start point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
+:Line.property_panel_cancel_QToolButton	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Line.property_panel_ok_QToolButton	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Object browser_XGUI_DataTree	{container=':SALOME 7.6.0 - [Study1].Object browser_QDockWidget' type='XGUI_DataTree' unnamed='1' visible='1'}
+:Part_QMenu	{title='Part' type='QMenu' unnamed='1' visible='1'}
+:Point.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
+:Point.Point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' title='Point' type='QGroupBox' unnamed='1' visible='1'}
+:Point.X _ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Point.X _QLabel	{container=':Point.Point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:Point.Y _ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.Y _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Point.Y _QLabel	{container=':Point.Point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Point.property_panel_cancel_QToolButton	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Point.property_panel_ok_QToolButton	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Point.qt_spinbox_lineedit_QLineEdit	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Point.qt_spinbox_lineedit_QLineEdit_2	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:SALOME 7.6.0 - [Study1].3D View Operations_OCCViewer_ViewPort3d	{aboveWidget=':SALOME 7.6.0 - [Study1].3D View Operations_QtxToolBar' type='OCCViewer_ViewPort3d' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].3D View Operations_QtxToolBar	{name='OCCViewer3DViewOperations' type='QtxToolBar' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='3D View Operations'}
+:SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Arc'}
+:SALOME 7.6.0 - [Study1].Circle_QToolButton	{text='Circle' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Circle'}
+:SALOME 7.6.0 - [Study1].Fit All_QToolButton	{text='Fit All' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].Line_QToolButton	{text='Line' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Line'}
+:SALOME 7.6.0 - [Study1].Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Object browser'}
+:SALOME 7.6.0 - [Study1].Point_QToolButton	{text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Point'}
+:SALOME 7.6.0 - [Study1].Sketch_QToolButton	{text='Sketch' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].Sketch_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Sketch'}
+:SALOME 7.6.0 - [Study1]_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1]_QToolButton	{occurrence='16' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1]_QToolButton_2	{occurrence='17' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1]_STD_TabDesktop	{type='STD_TabDesktop' unnamed='1' visible='1' windowTitle='SALOME 7.6.0 - [Study1]'}
+:SALOME 7.6.0.Geometry_QToolButton	{text='Geometry' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0_STD_TabDesktop'}
+:SALOME 7.6.0.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0_STD_TabDesktop'}
+:SALOME 7.6.0_STD_TabDesktop	{type='STD_TabDesktop' unnamed='1' visible='1' windowTitle='SALOME 7.6.0'}
+:Sketch.property_panel_ok_QToolButton	{container=':SALOME 7.6.0 - [Study1].Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Sketch_QMenu	{title='Sketch' type='QMenu' unnamed='1' visible='1'}
+:Start point.X _ModuleBase_ParamSpinBox	{container=':Line.Start point_QGroupBox' leftWidget=':Start point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Start point.X _ModuleBase_ParamSpinBox_2	{container=':Arc.Start point_QGroupBox' leftWidget=':Start point.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Start point.X _QLabel	{container=':Line.Start point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:Start point.X _QLabel_2	{container=':Arc.Start point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
+:Start point.Y _ModuleBase_ParamSpinBox	{container=':Line.Start point_QGroupBox' leftWidget=':Start point.Y _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Start point.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.Start point_QGroupBox' leftWidget=':Start point.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
+:Start point.Y _QLabel	{container=':Line.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Start point.Y _QLabel_2	{container=':Arc.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Start point.qt_spinbox_lineedit_QLineEdit	{container=':Line.Start point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Start point.qt_spinbox_lineedit_QLineEdit_2	{container=':Line.Start point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Start point.qt_spinbox_lineedit_QLineEdit_3	{container=':Arc.Start point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Start point.qt_spinbox_lineedit_QLineEdit_4	{container=':Arc.Start point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :_QMenu	{type='QMenu' unnamed='1' visible='1'}
