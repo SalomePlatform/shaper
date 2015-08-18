@@ -24,6 +24,8 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   /// to avoid cyclic dependencies in automatic updates: they mean that 
   /// update is performed right now and automatic updates are not needed
   bool myStartUpdate, myEndUpdate;
+  /// to avoid (if possible) additional modification of changed coordinate (issue #855)
+  double myXEndBefore, myYEndBefore;
 
  public:
   /// Arc feature kind
