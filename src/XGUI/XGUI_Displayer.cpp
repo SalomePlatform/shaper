@@ -170,6 +170,8 @@ bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
   Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(theAIS);
   if (!aShapePrs.IsNull()) {
     TopoDS_Shape aShape = aShapePrs->Shape();
+    if (aShape.IsNull())
+      return false;
     TopAbs_ShapeEnum aType = aShape.ShapeType();
     if ((aType == TopAbs_VERTEX) || (aType == TopAbs_EDGE) || (aType == TopAbs_WIRE))
       return false;
@@ -227,6 +229,13 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
     }
   }
   myResult2AISObjectMap.remove(theObject);
+
+#ifdef DEBUG_DISPLAY
+  std::ostringstream aPtrStr;
+  aPtrStr << theObject.get();
+  qDebug(QString("erase object: %1").arg(aPtrStr.str().c_str()).toStdString().c_str());
+  qDebug(getResult2AISObjectMapInfo().c_str());
+#endif
 }
 
 void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
@@ -489,6 +498,10 @@ void XGUI_Displayer::eraseAll(const bool theUpdateViewer)
       updateViewer();
   }
   myResult2AISObjectMap.clear();
+#ifdef DEBUG_DISPLAY
+  qDebug("eraseAll");
+  qDebug(getResult2AISObjectMapInfo().c_str());
+#endif
 }
 
 void XGUI_Displayer::deactivateTrihedron() const
