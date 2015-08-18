@@ -22,7 +22,6 @@
         <doublevalue
           id="to_angle"
           label="Angle"
-          min="0"
           step="1.0"
           default="360"
           icon=":icons/angle_up.png"
@@ -33,7 +32,6 @@
         <doublevalue
           id="from_angle"
           label="Angle"
-          min="0"
           step="1.0"
           default="0"
           icon=":icons/angle_down.png"
@@ -54,7 +52,6 @@
         <doublevalue
           id="to_offset"
           label="Offset"
-          min="0"
           step="1.0"
           default="0"
           icon=":icons/angle_up.png"
@@ -73,7 +70,6 @@
         <doublevalue
           id="from_offset"
           label="Offset"
-          min="0"
           step="1.0"
           default="0"
           icon=":icons/angle_down.png"

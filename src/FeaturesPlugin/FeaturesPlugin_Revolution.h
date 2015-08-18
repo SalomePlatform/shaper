@@ -113,9 +113,9 @@ class FeaturesPlugin_Revolution : public ModelAPI_Feature
 
 private:
   /// Load Naming data structure of the feature to the document.
-  void LoadNamingDS(GeomAlgoAPI_Revolution& theFeature, std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBasis,
-                    std::shared_ptr<GeomAPI_Shape> theContext);
+  void loadNamingDS(GeomAlgoAPI_Revolution& theRevolAlgo,
+                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    std::shared_ptr<GeomAPI_Shape> theBasis);
 };
 
 #endif

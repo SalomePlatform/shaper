@@ -236,7 +236,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         aSubShapes = aPrismAlgo->mapOfShapes();
         theResultBody->loadAndOrientGeneratedShapes(aPrismAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
-        //TODO:fix
+        //TODO: fix
         //aFromFace = aPrismAlgo->firstShape();
         //aToFace = aPrismAlgo->lastShape();
       } else if(std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter)) {
@@ -244,8 +244,9 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         aSubShapes = aRevolAlgo->mapOfShapes();
         theResultBody->loadAndOrientGeneratedShapes(aRevolAlgo->makeShape().get(), *aFaceIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
-        aFromFace = aRevolAlgo->firstShape();
-        aToFace = aRevolAlgo->lastShape();
+        //TODO: fix
+        //aFromFace = aRevolAlgo->firstShape();
+        //aToFace = aRevolAlgo->lastShape();
       }
 
       /*

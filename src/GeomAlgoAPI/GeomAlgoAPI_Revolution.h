@@ -68,11 +68,11 @@ public:
   /// \return result of the Revolution algorithm.
   GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape() const;
 
-  /// \return the first shape.
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& firstShape();
+  /// \returns the list of from faces.
+  GEOMALGOAPI_EXPORT const ListOfShape& fromFaces() const;
 
-  /// \return the last shape.
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& lastShape();
+  /// \return the list of to faces.
+  GEOMALGOAPI_EXPORT const ListOfShape& toFaces() const;
  
   /// \return map of sub-shapes of the result. To be used for History keeping.
   GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
@@ -89,8 +89,8 @@ private:
    */
   TopoDS_Face makeFaceFromPlane(gp_Pln& thePlane, const gp_Pnt& thePoint);
 
-  /// \return solid created from face.
-  TopoDS_Solid makeSolidFromFace(const TopoDS_Face& theFace);
+  /// \return solid created from face or shell.
+  TopoDS_Solid makeSolidFromShape(const TopoDS_Shape& theShape);
 
   /** \brief Selects solid from theShape with closest center of mass to thePoint
    *  \param[in] theShape compound with solids.
@@ -111,8 +111,8 @@ private:
   /// Fields.
   bool myDone;
   std::shared_ptr<GeomAPI_Shape> myShape;
-  std::shared_ptr<GeomAPI_Shape> myFirst;
-  std::shared_ptr<GeomAPI_Shape> myLast;
+  ListOfShape myFromFaces;
+  ListOfShape myToFaces;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
   std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };

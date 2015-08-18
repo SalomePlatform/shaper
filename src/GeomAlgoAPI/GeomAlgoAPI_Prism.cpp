@@ -175,8 +175,10 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
     return;
   }
   std::shared_ptr<GeomAPI_Shape> aWire(new GeomAPI_Shape);
+  std::shared_ptr<GeomAPI_Shape> aBShape(new GeomAPI_Shape);
   aWire->setImpl(new TopoDS_Shape(aPipeWire));
-  aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aPipeBuilder, aWire));
+  aBShape->setImpl(new TopoDS_Shape(aBasisShape));
+  aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aPipeBuilder, aWire, aBShape)));
   TopoDS_Shape aResult = aPipeBuilder->Shape();
 
   // Orienting bounding planes.
@@ -231,7 +233,7 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
   if(!aToCutBuilder->IsDone()) {
     return;
   }
-  aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aToCutBuilder));
+  aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aToCutBuilder)));
   const TopTools_ListOfShape& aToShapes = aToCutBuilder->Modified(aToShape);
   for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
     std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
@@ -246,7 +248,7 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
   if(!aFromCutBuilder->IsDone()) {
     return;
   }
-  aListOfMakeShape.push_back(std::make_shared<GeomAlgoAPI_MakeShape>(aFromCutBuilder));
+  aListOfMakeShape.push_back(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
   const TopTools_ListOfShape& aFromShapes = aFromCutBuilder->Modified(aFromShape);
   for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
     std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());

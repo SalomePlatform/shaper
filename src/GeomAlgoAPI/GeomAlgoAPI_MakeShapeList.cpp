@@ -86,6 +86,7 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
       aShape->setImpl(new TopoDS_Shape(aShapeIt.Value()));
       ListOfShape aGeneratedShapes;
+      const TopoDS_Shape& aSh = aShape->impl<TopoDS_Shape>();
       aMakeShape->generated(aShape, aGeneratedShapes);
       for(ListOfShape::const_iterator anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
         aTempShapes.Add((*anIt)->impl<TopoDS_Shape>());

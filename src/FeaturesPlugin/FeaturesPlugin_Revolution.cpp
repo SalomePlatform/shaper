@@ -15,14 +15,9 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
-
-#define FACE 4
-#define EDGE 6
-#define _LATERAL_TAG 1
-#define _FROM_TAG 2
-#define _TO_TAG 3
 
 //=================================================================================================
 FeaturesPlugin_Revolution::FeaturesPlugin_Revolution()
@@ -58,7 +53,43 @@ void FeaturesPlugin_Revolution::initAttributes()
 //=================================================================================================
 void FeaturesPlugin_Revolution::execute()
 {
-  AttributeSelectionListPtr aFaceRefs = selectionList(LIST_ID());
+  // Getting faces.
+  ListOfShape aFacesList;
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> aFaceSel = aFacesSelectionList->value(anIndex);
+    ResultPtr aContext = aFaceSel->context();
+    std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
+    if(!aContextShape.get()) {
+      static const std::string aContextError = "The selection context is bad";
+      setError(aContextError);
+      break;
+    }
+
+    std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();
+    int aFacesNum = -1; // this mean that "aFace" is used
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if(!aFaceShape.get()) { // this may be the whole sketch result selected, check and get faces
+      if (aConstruction.get()) {
+        aFacesNum = aConstruction->facesNum();
+      } else {
+        static const std::string aFaceError = "Can not find basis for revolution";
+        setError(aFaceError);
+        break;
+      }
+    }
+    for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
+      std::shared_ptr<GeomAPI_Shape> aBaseShape;
+      if (aFacesNum == -1) {
+        aFacesList.push_back(aFaceShape);
+        break;
+      } else {
+        aFaceShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+        aFacesList.push_back(aFaceShape);
+      }
+    }
+  }
 
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
@@ -106,107 +137,88 @@ void FeaturesPlugin_Revolution::execute()
     }
   }
 
-  // for each selected face generate a result
-  int anIndex = 0, aResultIndex = 0;
-  for(; anIndex < aFaceRefs->size(); anIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(anIndex);
-    ResultPtr aContextRes = aFaceRef->context();
-    std::shared_ptr<GeomAPI_Shape> aContext = aContextRes->shape();
-    if (!aContext.get()) {
-      static const std::string aContextError = "The selection context is bad";
-      setError(aContextError);
+  // Searching faces with common edges.
+  ListOfShape aShells;
+  ListOfShape aFreeFaces;
+  GeomAlgoAPI_ShapeTools::combineFacesToShells(aFacesList, aShells, aFreeFaces);
+  if(aShells.empty()) {
+    aShells = aFreeFaces;
+  } else {
+    aShells.merge(aFreeFaces);
+  }
+
+  // Generating result for each shell and face.
+  int aResultIndex = 0;
+  for(ListOfShape::const_iterator anIter = aShells.cbegin(); anIter != aShells.cend(); anIter++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIter;
+
+    GeomAlgoAPI_Revolution aRevolAlgo(aBaseShape, anAxis, aToShape, aToAngle, aFromShape, aFromAngle);
+    if(!aRevolAlgo.isDone()) {
+      static const std::string aPrismAlgoError = "Revolution algorithm failed";
+      setError(aPrismAlgoError);
+      aResultIndex = 0;
       break;
     }
 
-    std::shared_ptr<GeomAPI_Shape> aValueFace = aFaceRef->value();
-    int aFacesNum = -1; // this mean that "aFace" is used
-    ResultConstructionPtr aConstruction =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes);
-    if (!aValueFace.get()) { // this may be the whole sketch result selected, check and get faces
-      if (aConstruction.get()) {
-        aFacesNum = aConstruction->facesNum();
-      } else {
-        static const std::string aFaceError = "Can not find basis for extrusion";
-        setError(aFaceError);
-        break;
-      }
+    // Check if shape is valid
+    if(!aRevolAlgo.shape().get() || aRevolAlgo.shape()->isNull()) {
+      static const std::string aShapeError = "Resulting shape is Null";
+      setError(aShapeError);
+      aResultIndex = 0;
+      break;
+    }
+    if(!aRevolAlgo.isValid()) {
+      std::string aPrismAlgoError = "Warning: resulting shape is not valid";
+      setError(aPrismAlgoError);
+      aResultIndex = 0;
+      break;
     }
 
-    for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      std::shared_ptr<GeomAPI_Shape> aBaseShape;
-      if (aFacesNum == -1) {
-        aBaseShape = aValueFace;
-      } else {
-        aBaseShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
-      }
-
-      GeomAlgoAPI_Revolution aFeature(aBaseShape, anAxis, aToShape, aToAngle, aFromShape, aFromAngle);
-      if(!aFeature.isDone()) {
-        static const std::string aFeatureError = "Revolution algorithm failed";
-        setError(aFeatureError);
-        break;
-      }
-
-      // Check if shape is valid
-      if(aFeature.shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";
-        setError(aShapeError);
-        break;
-      }
-      if(!aFeature.isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";
-        setError(aFeatureError);
-        break;
-      }
-      //LoadNamingDS
-      LoadNamingDS(aFeature, aResultBody, aBaseShape, aContext);
-
-      setResult(aResultBody, aResultIndex);
-      aResultIndex++;
-
-      if (aFacesNum == -1)
-        break;
-    }
+    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+    loadNamingDS(aRevolAlgo, aResultBody, aBaseShape);
+    setResult(aResultBody, aResultIndex);
+    aResultIndex++;
   }
-  // remove the rest results if there were produced in the previous pass
+
   removeResults(aResultIndex);
 }
 
 //=================================================================================================
-void FeaturesPlugin_Revolution::LoadNamingDS(GeomAlgoAPI_Revolution& theFeature,
+void FeaturesPlugin_Revolution::loadNamingDS(GeomAlgoAPI_Revolution& theRevolAlgo,
                                              std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                             std::shared_ptr<GeomAPI_Shape> theBasis,
-                                             std::shared_ptr<GeomAPI_Shape> theContext)
+                                             std::shared_ptr<GeomAPI_Shape> theBasis)
 {
-  if(theBasis->isEqual(theContext))
-    theResultBody->store(theFeature.shape());
-  else
-    theResultBody->storeGenerated(theContext, theFeature.shape());
+  //load result
+  theResultBody->storeGenerated(theBasis, theRevolAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theFeature.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRevolAlgo.mapOfShapes();
 
-  std::string aGeneratedName = "LateralFace";
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape().get(), theBasis, EDGE,_LATERAL_TAG, aGeneratedName, *aSubShapes);
+  //Insert lateral face : Face from Edge
+  const std::string aLatName = "LateralFace";
+  const int aLatTag = 1;
+  theResultBody->loadAndOrientGeneratedShapes(theRevolAlgo.makeShape().get(), theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
 
-  //Insert from face
-  std::string aBotName = "FromFace";
-  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();
-  if(!aBottomFace->isNull()) {
-    if(aSubShapes->isBound(aBottomFace)) {
-      aBottomFace = aSubShapes->find(aBottomFace);
+  //Insert to faces
+  const std::string aToName = "ToFace";
+  const int aToTag = 2;
+  const ListOfShape& aToFaces = theRevolAlgo.toFaces();
+  for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
+    std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
+    if(aSubShapes->isBound(aToFace)) {
+      aToFace = aSubShapes->find(aToFace);
     }
-    theResultBody->generated(aBottomFace, aBotName, _FROM_TAG);
+    theResultBody->generated(aToFace, aToName, aToTag);
   }
 
-  //Insert to face
-  std::string aTopName = "ToFace";
-  std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
-  if (!aTopFace->isNull()) {
-    if (aSubShapes->isBound(aTopFace)) {
-      aTopFace = aSubShapes->find(aTopFace);
+  //Insert from faces
+  const std::string aFromName = "FromFace";
+  const int aFromTag = 3;
+  const ListOfShape& aFromFaces = theRevolAlgo.fromFaces();
+  for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
+    std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
+    if(aSubShapes->isBound(aFromFace)) {
+      aFromFace = aSubShapes->find(aFromFace);
     }
-    theResultBody->generated(aTopFace, aTopName, _TO_TAG);
+    theResultBody->generated(aFromFace, aFromName, aFromTag);
   }
-
 }

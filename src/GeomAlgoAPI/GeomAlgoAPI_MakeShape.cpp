@@ -17,10 +17,13 @@ GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape)
   myShape->setImpl(new TopoDS_Shape(implPtr<BRepBuilderAPI_MakeShape>()->Shape()));
 }
 
-GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape, const std::shared_ptr<GeomAPI_Shape> theWire)
+GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape,
+                                             const std::shared_ptr<GeomAPI_Shape> theWire,
+                                             const std::shared_ptr<GeomAPI_Shape> theBaseShape)
 : GeomAPI_Interface(theMkShape),
   myShape(new GeomAPI_Shape()),
-  myWire(theWire)
+  myWire(theWire),
+  myBaseShape(theBaseShape)
 {
   myShape->setImpl(new TopoDS_Shape(implPtr<BRepBuilderAPI_MakeShape>()->Shape()));
 }
@@ -53,7 +56,24 @@ void GeomAlgoAPI_MakeShape::generated(
     if(aPipeBuilder) {
       TopExp_Explorer aShapeExplorer(myWire->impl<TopoDS_Wire>(), TopAbs_EDGE);
       for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
-        const TopoDS_Shape& aGeneratedShape = aPipeBuilder->Generated(aShapeExplorer.Current(), theShape->impl<TopoDS_Shape>());
+        const TopoDS_Shape& aSpine = aShapeExplorer.Current();
+        const TopoDS_Shape& aProfile = theShape->impl<TopoDS_Shape>();
+        if(aProfile.ShapeType() != TopAbs_EDGE && aProfile.ShapeType() != TopAbs_VERTEX) {
+            return;
+        }
+        const TopoDS_Shape& aBaseShape = myBaseShape->impl<TopoDS_Shape>();
+        TopExp_Explorer anExp(aBaseShape, aProfile.ShapeType());
+        Standard_Boolean hasShape = Standard_False;
+        for(; anExp.More(); anExp.Next()) {
+          if(anExp.Current().IsSame(aProfile)) {
+            hasShape = Standard_True;
+            break;
+          }
+        }
+        if(!hasShape) {
+          return;
+        }
+        const TopoDS_Shape& aGeneratedShape = aPipeBuilder->Generated(aSpine, aProfile);
         std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(aGeneratedShape));
         theHistory.push_back(aShape);

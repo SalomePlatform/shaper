@@ -127,7 +127,7 @@ void GeomAlgoAPI_ShapeTools::combineFacesToShells(const ListOfShape& theFacesLis
       const TopoDS_Shape& aFace = aShIter.Value();
       aBuilder.Add(aShell, aFace);
     }
-    std::shared_ptr<GeomAPI_Shape> aGeomShell(std::make_shared<GeomAPI_Shape>());
+    std::shared_ptr<GeomAPI_Shape> aGeomShell(new GeomAPI_Shape);
     aGeomShell->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShell));
     theShells.push_back(aGeomShell);
   }
@@ -135,7 +135,7 @@ void GeomAlgoAPI_ShapeTools::combineFacesToShells(const ListOfShape& theFacesLis
   // Adding free faces.
   for(NCollection_Map<TopoDS_Shape>::Iterator aShIter(aFreeFaces); aShIter.More(); aShIter.Next()) {
     const TopoDS_Shape& aFace = aShIter.Value();
-    std::shared_ptr<GeomAPI_Shape> aGeomFace(std::make_shared<GeomAPI_Shape>());
+    std::shared_ptr<GeomAPI_Shape> aGeomFace(new GeomAPI_Shape);
     aGeomFace->setImpl<TopoDS_Shape>(new TopoDS_Shape(aFace));
     theFreeFaces.push_back(aGeomFace);
   }
