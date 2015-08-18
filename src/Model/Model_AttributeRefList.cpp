@@ -149,9 +149,12 @@ void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const Objec
         aNewLab = aNewData->label().Father();
       }
       // do the substitution
+      ADD_BACK_REF(theNew);
       if (myRef->InsertAfter(aNewLab, aCurrentLab)) {
         myRef->Remove(aCurrentLab);
+        REMOVE_BACK_REF(theCurrent);
       }
+      owner()->data()->sendAttributeUpdated(this);
     }
   }
 }

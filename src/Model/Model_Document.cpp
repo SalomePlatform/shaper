@@ -34,6 +34,7 @@
 #include <TDF_AttributeDelta.hxx>
 #include <TDF_AttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
+#include <TDF_ListIteratorOfLabelList.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -395,7 +396,11 @@ static void modifiedLabels(const Handle(TDocStd_Document)& theDoc, TDF_LabelList
     aDelta = theDoc->GetRedos().First();
   else 
     aDelta = theDoc->GetUndos().Last();
-  aDelta->Labels(theDelta);
+  TDF_LabelList aDeltaList;
+  aDelta->Labels(aDeltaList); // it clears list, so, use new one and then append to the result
+  for(TDF_ListIteratorOfLabelList aListIter(aDeltaList); aListIter.More(); aListIter.Next()) {
+    theDelta.Append(aListIter.Value());
+  }
   // add also label of the modified attributes
   const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
   for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
