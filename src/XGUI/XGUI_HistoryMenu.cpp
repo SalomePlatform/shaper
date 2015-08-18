@@ -82,9 +82,23 @@ void XGUI_HistoryMenu::setStackSelectedTo(QListWidgetItem * theItem)
   myHistoryList->repaint();
 }
 
+void hideUpToMenuBar( QMenu* theMenu )
+{
+  theMenu->hide();
+  foreach( QWidget* aWidget, theMenu->menuAction()->associatedWidgets() )
+  {
+    QMenu* aMenu = qobject_cast<QMenu*>( aWidget );
+    if( aMenu )
+    {
+      aMenu->hide();
+      hideUpToMenuBar( aMenu );
+    }
+  }
+}
+
 void XGUI_HistoryMenu::onItemPressed(QListWidgetItem * theItem)
 {
   int selectedSize = myHistoryList->row(theItem) + 1;
   emit actionSelected(selectedSize);
-  hide();
+  hideUpToMenuBar( this );
 }
