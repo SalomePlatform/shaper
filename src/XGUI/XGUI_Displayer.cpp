@@ -279,7 +279,8 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
         std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr.get()) {
           const TopoDS_Shape& aOldShape = aShapePrs->Shape();
-          isEqualShapes = aOldShape.IsEqual(aShapePtr->impl<TopoDS_Shape>());
+          if (!aOldShape.IsNull())
+            isEqualShapes = aOldShape.IsEqual(aShapePtr->impl<TopoDS_Shape>());
         }
       }
     }

@@ -75,7 +75,7 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
     aValid = Standard_False;
     if (theOwner->HasSelectable()) {
       Handle(StdSelect_BRepOwner) aShapeOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
-      if (!aShapeOwner.IsNull()) {
+      if (!aShapeOwner.IsNull() && aShapeOwner->HasShape()) {
         TopoDS_Shape aShape = aShapeOwner->Shape();
         TopAbs_ShapeEnum aType = aShape.ShapeType();
         gp_Pln aPlane = myPlane->impl<gp_Pln>();

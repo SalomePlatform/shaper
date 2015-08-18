@@ -341,7 +341,9 @@ int GeomAPI_AISObject::getShapeType() const
   if (!anAIS.IsNull()) {
     Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(anAIS);
     if (!aAISShape.IsNull()) {
-      return aAISShape->Shape().ShapeType();
+      const TopoDS_Shape aShape = aAISShape->Shape();
+      if (!aShape.IsNull())
+        return aShape.ShapeType();
     }
   }
   return -1;

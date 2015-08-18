@@ -117,7 +117,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
   // we should not check the appearance of this feature because there can be some selected shapes
   // for one feature
   Handle(StdSelect_BRepOwner) aBRO = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
-  if( !aBRO.IsNull() ) {
+  if( !aBRO.IsNull() && aBRO->HasShape() ) {
     // the located method is called in the context to obtain the shape by the SelectedShape() method,
     // so the shape is located by the same rules
     TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
