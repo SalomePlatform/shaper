@@ -154,7 +154,7 @@ def part_create():
     clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Part")
     clickButton(waitForObject(":Operations.New part_AppElements_Button"))
     
-def extrusion_feature(points, to_size, from_size):
+def extrusion_feature(points, to_size=0, from_size=0):
     clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
     clickButton(waitForObject(":Extrusion.Extrusion_AppElements_Button"))    
 

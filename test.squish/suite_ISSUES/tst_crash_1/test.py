@@ -1,7 +1,7 @@
 def main():
     source(findFile("scripts", "common.py"))
     
-    startApplication("GeomApp")
+    startApplication("linux_run.sh")
     set_defaults()
     
     part_create()

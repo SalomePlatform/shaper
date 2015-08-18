@@ -1,6 +1,10 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
-export SALOME_PORT=2900
+if [ "$#" = 1 ]; then
+  export SALOME_PORT="$1"
+else
+  export SALOME_PORT=2900
+fi
 
 source env.sh
 source env_salome.sh
