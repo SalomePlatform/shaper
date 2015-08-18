@@ -54,9 +54,6 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
-  //TODO: nds stabilization hotfix
-  virtual void disconnectSignals();
-
 protected:
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);

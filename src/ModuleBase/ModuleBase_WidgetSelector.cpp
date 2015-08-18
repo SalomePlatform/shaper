@@ -26,12 +26,6 @@ ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 {
 }
 
-//TODO: nds stabilization hotfix
-void ModuleBase_WidgetSelector::disconnectSignals()
-{
-  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-}
-
 //********************************************************************
 void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
                                                       ObjectPtr& theObject,

@@ -255,15 +255,11 @@ void ModuleBase_Operation::onValuesChanged()
   myIsModified = true;
 }
 
-//TODO: nds stabilization hotfix
 void ModuleBase_Operation::commitOperation()
 {
   if(!myPropertyPanel) {
     return;
   }
-  ModuleBase_ModelWidget* aWidget = myPropertyPanel->activeWidget();
-  if (aWidget)
-    aWidget->disconnectSignals();
 }
 
 void ModuleBase_Operation::activateByPreselection()
