@@ -427,7 +427,12 @@ void Model_Document::abortOperation()
     if (!myNestedNum.empty())
       (*myNestedNum.rbegin())--;
     // roll back the needed number of transactions
-    myDoc->AbortCommand();
+    // make commit/undo to get the modification delta
+    //myDoc->AbortCommand();
+    if (myDoc->CommitCommand()) {
+      modifiedLabels(myDoc, aDeltaLabels);
+      myDoc->Undo();
+    }
     for(int a = 0; a < aNumTransactions; a++) {
       modifiedLabels(myDoc, aDeltaLabels);
       myDoc->Undo();
