@@ -47,6 +47,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ShapeValidator.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -830,7 +831,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
           theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
       }
 
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+      ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
       if( aResult.get() )
       {
         theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
