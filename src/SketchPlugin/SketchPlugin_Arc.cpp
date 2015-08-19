@@ -20,6 +20,8 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+// for sqrt on Linux
+#include <math.h>
 
 const double tolerance = 1e-7;
 
