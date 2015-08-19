@@ -27,6 +27,9 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// The type of shape is taken from the current selection type
   virtual void append(std::string theNamingName) = 0;
 
+  /// Removes the last element in the list
+  virtual void removeLast() = 0;
+
   /// Returns the number of selection attributes in the list
   virtual int size() = 0;
 

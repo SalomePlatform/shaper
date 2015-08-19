@@ -33,6 +33,9 @@ public:
   /// The type of shape is taken from the current selection type
   MODEL_EXPORT virtual void append(std::string theNamingName);
 
+  /// Removes the last element in the list
+  MODEL_EXPORT virtual void removeLast();
+
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
 

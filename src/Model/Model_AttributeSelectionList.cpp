@@ -60,6 +60,21 @@ void Model_AttributeSelectionList::append(std::string theNamingName)
   owner()->data()->sendAttributeUpdated(this);
 }
 
+void Model_AttributeSelectionList::removeLast() 
+{
+  int anOldSize = mySize->Get();
+  if (anOldSize != 0) {
+    mySize->Set(anOldSize - 1);
+    TDF_Label aLab = mySize->Label().FindChild(anOldSize);
+    std::shared_ptr<Model_AttributeSelection> aOldAttr = 
+      std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
+    aOldAttr->setObject(owner());
+    REMOVE_BACK_REF(aOldAttr->context());
+    aLab.ForgetAllAttributes(Standard_True);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
 int Model_AttributeSelectionList::size()
 {
   return mySize->Get();
