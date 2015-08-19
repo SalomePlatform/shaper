@@ -50,31 +50,37 @@ std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeTools::centreOfMass(std::shared_pt
 }
 
 //=================================================================================================
-void GeomAlgoAPI_ShapeTools::combineFacesToShells(const ListOfShape& theFacesList,
-                                                  ListOfShape& theShells,
-                                                  ListOfShape& theFreeFaces)
+void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
+                                           const GeomAPI_Shape::ShapeType theType,
+                                           ListOfShape& theCombinedShapes,
+                                           ListOfShape& theFreeShapes)
 {
-  if(theFacesList.empty()) {
+  if(!theCompound.get()) {
     return;
   }
 
-  // Adding all faces to compoud.
-  std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(theFacesList);
-  if(!aFacesCompound.get()) {
+  if(theType != GeomAPI_Shape::SHELL && theType != GeomAPI_Shape::COMPSOLID) {
     return;
   }
 
-  // Map edges and faces.
-  const TopoDS_Shape& aFacesComp = aFacesCompound->impl<TopoDS_Shape>();
+  TopAbs_ShapeEnum aTS = TopAbs_EDGE;
+  TopAbs_ShapeEnum aTA = TopAbs_FACE;
+  if(theType == GeomAPI_Shape::COMPSOLID) {
+    aTS = TopAbs_FACE;
+    aTA = TopAbs_SOLID;
+  }
+
+  // Map subshapes and shapes.
+  const TopoDS_Shape& aShapesComp = theCompound->impl<TopoDS_Shape>();
   BOPCol_IndexedDataMapOfShapeListOfShape aMapEF;
-  BOPTools::MapShapesAndAncestors(aFacesComp, TopAbs_EDGE, TopAbs_FACE, aMapEF);
+  BOPTools::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapEF);
   if(aMapEF.IsEmpty()) {
     return;
   }
 
-  // Get all faces with common edges and free faces.
-  NCollection_Map<TopoDS_Shape> aFreeFaces;
-  NCollection_Vector<NCollection_Map<TopoDS_Shape>> aFacesWithCommonEdges;
+  // Get all shapes with common subshapes and free shapes.
+  NCollection_Map<TopoDS_Shape> aFreeShapes;
+  NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
   for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator anIter(aMapEF); anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
     BOPCol_ListOfShape& aListOfShape = anIter.ChangeValue();
@@ -82,14 +88,14 @@ void GeomAlgoAPI_ShapeTools::combineFacesToShells(const ListOfShape& theFacesLis
       continue;
     }
     else if(aListOfShape.Size() == 1) {
-      aFreeFaces.Add(aListOfShape.First());
+      aFreeShapes.Add(aListOfShape.First());
       aListOfShape.Clear();
     } else {
       NCollection_Map<TopoDS_Shape> aTempMap;
       aTempMap.Add(aListOfShape.First());
       aTempMap.Add(aListOfShape.Last());
-      aFreeFaces.Remove(aListOfShape.First());
-      aFreeFaces.Remove(aListOfShape.Last());
+      aFreeShapes.Remove(aListOfShape.First());
+      aFreeShapes.Remove(aListOfShape.Last());
       aListOfShape.Clear();
       for(NCollection_Map<TopoDS_Shape>::Iterator aTempIter(aTempMap); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
@@ -102,41 +108,42 @@ void GeomAlgoAPI_ShapeTools::combineFacesToShells(const ListOfShape& theFacesLis
           } else if(aTempListOfShape.Size() > 1) {
             if(aTempListOfShape.First() == aTempShape) {
               aTempMap.Add(aTempListOfShape.Last());
-              aFreeFaces.Remove(aTempListOfShape.Last());
+              aFreeShapes.Remove(aTempListOfShape.Last());
               aTempListOfShape.Clear();
             } else if(aTempListOfShape.Last() == aTempShape) {
               aTempMap.Add(aTempListOfShape.First());
-              aFreeFaces.Remove(aTempListOfShape.First());
+              aFreeShapes.Remove(aTempListOfShape.First());
               aTempListOfShape.Clear();
             }
           }
         }
       }
-      aFacesWithCommonEdges.Append(aTempMap);
+      aShapesWithCommonSubshapes.Append(aTempMap);
     }
   }
 
-  // Make shells from faces with common edges.
-  NCollection_Vector<TopoDS_Shape> aShells;
-  for(NCollection_Vector<NCollection_Map<TopoDS_Shape>>::Iterator anIter(aFacesWithCommonEdges); anIter.More(); anIter.Next()) {
+  // Combine shapes with common subshapes.
+  for(NCollection_Vector<NCollection_Map<TopoDS_Shape>>::Iterator anIter(aShapesWithCommonSubshapes); anIter.More(); anIter.Next()) {
     TopoDS_Shell aShell;
+    TopoDS_CompSolid aCSolid;
     TopoDS_Builder aBuilder;
-    aBuilder.MakeShell(aShell);
+    theType == GeomAPI_Shape::COMPSOLID ? aBuilder.MakeCompSolid(aCSolid) : aBuilder.MakeShell(aShell);
     const NCollection_Map<TopoDS_Shape>& aShapesMap = anIter.Value();
     for(NCollection_Map<TopoDS_Shape>::Iterator aShIter(aShapesMap); aShIter.More(); aShIter.Next()) {
-      const TopoDS_Shape& aFace = aShIter.Value();
-      aBuilder.Add(aShell, aFace);
+      const TopoDS_Shape& aShape = aShIter.Value();
+      theType == GeomAPI_Shape::COMPSOLID ? aBuilder.Add(aCSolid, aShape) : aBuilder.Add(aShell, aShape);
     }
-    std::shared_ptr<GeomAPI_Shape> aGeomShell(new GeomAPI_Shape);
-    aGeomShell->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShell));
-    theShells.push_back(aGeomShell);
+    std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+    TopoDS_Shape* aSh = theType == GeomAPI_Shape::COMPSOLID ? new TopoDS_Shape(aCSolid) : new TopoDS_Shape(aShell);
+    aGeomShape->setImpl<TopoDS_Shape>(aSh);
+    theCombinedShapes.push_back(aGeomShape);
   }
 
-  // Adding free faces.
-  for(NCollection_Map<TopoDS_Shape>::Iterator aShIter(aFreeFaces); aShIter.More(); aShIter.Next()) {
-    const TopoDS_Shape& aFace = aShIter.Value();
-    std::shared_ptr<GeomAPI_Shape> aGeomFace(new GeomAPI_Shape);
-    aGeomFace->setImpl<TopoDS_Shape>(new TopoDS_Shape(aFace));
-    theFreeFaces.push_back(aGeomFace);
+  // Adding free shapes.
+  for(NCollection_Map<TopoDS_Shape>::Iterator aShIter(aFreeShapes); aShIter.More(); aShIter.Next()) {
+    const TopoDS_Shape& aShape = aShIter.Value();
+    std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+    aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
+    theFreeShapes.push_back(aGeomShape);
   }
 }

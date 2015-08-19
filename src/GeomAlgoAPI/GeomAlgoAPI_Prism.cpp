@@ -264,9 +264,26 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   }
-
-  myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
-  myShape->setImpl(new TopoDS_Shape(aResult));
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    std::shared_ptr<GeomAPI_Shape> aCompound(new GeomAPI_Shape);
+    aCompound->setImpl(new TopoDS_Shape(aResult));
+    ListOfShape aCompSolids, aFreeSolids;
+    GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCompSolids, aFreeSolids);
+    if(aCompSolids.size() == 1 && aFreeSolids.size() == 0) {
+      aResult = aCompSolids.front()->impl<TopoDS_Shape>();
+    } else if (aCompSolids.size() > 1 || (aCompSolids.size() >= 1 && aFreeSolids.size() >= 1)) {
+      TopoDS_Compound aResultComp;
+      TopoDS_Builder aBuilder;
+      aBuilder.MakeCompound(aResultComp);
+      for(ListOfShape::const_iterator anIter = aCompSolids.cbegin(); anIter != aCompSolids.cend(); anIter++) {
+        aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+      }
+      for(ListOfShape::const_iterator anIter = aFreeSolids.cbegin(); anIter != aFreeSolids.cend(); anIter++) {
+        aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+      }
+      aResult = aResultComp;
+    }
+  }
 
   // Fill data map to keep correct orientation of sub-shapes.
   myMap = std::shared_ptr<GeomAPI_DataMapOfShapeShape>(new GeomAPI_DataMapOfShapeShape);
@@ -275,7 +292,8 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
     aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
     myMap->bind(aCurrentShape, aCurrentShape);
   }
-
+  myShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
+  myShape->setImpl(new TopoDS_Shape(aResult));
   myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
   myDone = true;
 }

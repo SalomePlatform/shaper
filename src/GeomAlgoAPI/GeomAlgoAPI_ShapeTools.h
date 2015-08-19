@@ -27,14 +27,16 @@ public:
   /// are expressed in the absolute Cartesian coordinate system. (This function works only for surfaces).
   static std::shared_ptr<GeomAPI_Pnt> centreOfMass(std::shared_ptr<GeomAPI_Shape> theShape);
 
-  /** \brief Combines faces with common edges to shells
-   *  \param[in] theFacesList list of faces to be combined.
+  /** \brief Combines faces with common edges to shells, or solids to compsolids.
+   *  \param[in] theCompound compound of shapes.
+   *  \param[in] theType type of combine.
    *  \param[out] theShells resulting shells.
    *  \param[out] theFreeFaces faces that does not have common edges.
    */
-  static void combineFacesToShells(const ListOfShape& theFacesList,
-                                   ListOfShape& theShells,
-                                   ListOfShape& theFreeFaces);
+  static void combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
+                            const GeomAPI_Shape::ShapeType theType,
+                            ListOfShape& theCombinedShapes,
+                            ListOfShape& theFreeShapes);
 };
 
 #endif

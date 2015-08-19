@@ -158,14 +158,21 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
   GeomLib_IsPlanarSurface isBasisPlanar(BRep_Tool::Surface(aBasisFace));
   gp_Pln aBasisPln = isBasisPlanar.Plan();
   Geom_Plane aBasisPlane(aBasisPln);
+  gp_Ax1 anAxis = theAxis->impl<gp_Ax1>();
+  if(aBasisPlane.Axis().Angle(anAxis) < Precision::Confusion()) {
+    return;
+  }
+  gp_Lin anAxisLin(anAxis);
 
   // Creating circle for pipe.
   gp_Pnt aBasisCentre = GeomAlgoAPI_ShapeTools::centreOfMass(theBasis)->impl<gp_Pnt>();
+  gp_Pnt aStartPnt = aBasisCentre;
   const TopoDS_Shape& aBasisShape = theBasis->impl<TopoDS_Shape>();
-  gp_Ax1 anAxis = theAxis->impl<gp_Ax1>();
-  gp_Lin anAxisLin(anAxis);
   Handle(Geom_Line) anAxisLine = new Geom_Line(anAxis);
-  GeomAPI_ProjectPointOnCurve aProjection(aBasisCentre, anAxisLine);
+  if(anAxisLin.Contains(aStartPnt, Precision::Confusion())) {
+    aStartPnt.Translate(anAxis.Direction() ^ aBasisPln.Axis().Direction());
+  }
+  GeomAPI_ProjectPointOnCurve aProjection(aStartPnt, anAxisLine);
   if(aProjection.NbPoints() != 1) {
     return;
   }
@@ -178,7 +185,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     // Rotating base face with the negative value of "from angle".
     gp_Trsf aBaseTrsf;
     aBaseTrsf.SetRotation(anAxis, -theFromAngle / 180.0 * M_PI);
-    gp_Pnt aFromPnt = aBasisCentre.Transformed(aBaseTrsf);
+    gp_Pnt aFromPnt = aStartPnt.Transformed(aBaseTrsf);
     aCircle = gp_Circ(gp_Ax2(aProjection.NearestPoint(), anAxis.Direction(), gp_Vec(aProjection.NearestPoint(), aFromPnt)),
                       aRadius);
     BRepBuilderAPI_Transform* aBaseTransform = new BRepBuilderAPI_Transform(aBasisShape,
@@ -446,6 +453,29 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
   if(!anExp.More()) {
     return;
   }
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  }
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    std::shared_ptr<GeomAPI_Shape> aCompound(new GeomAPI_Shape);
+    aCompound->setImpl(new TopoDS_Shape(aResult));
+    ListOfShape aCompSolids, aFreeSolids;
+    GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCompSolids, aFreeSolids);
+    if(aCompSolids.size() == 1 && aFreeSolids.size() == 0) {
+      aResult = aCompSolids.front()->impl<TopoDS_Shape>();
+    } else if (aCompSolids.size() > 1 || (aCompSolids.size() >= 1 && aFreeSolids.size() >= 1)) {
+      TopoDS_Compound aResultComp;
+      TopoDS_Builder aBuilder;
+      aBuilder.MakeCompound(aResultComp);
+      for(ListOfShape::const_iterator anIter = aCompSolids.cbegin(); anIter != aCompSolids.cend(); anIter++) {
+        aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+      }
+      for(ListOfShape::const_iterator anIter = aFreeSolids.cbegin(); anIter != aFreeSolids.cend(); anIter++) {
+        aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+      }
+      aResult = aResultComp;
+    }
+  }
 
   // fill data map to keep correct orientation of sub-shapes
   myMap = std::shared_ptr<GeomAPI_DataMapOfShapeShape>(new GeomAPI_DataMapOfShapeShape());
@@ -458,7 +488,6 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
   myShape->setImpl(new TopoDS_Shape(aResult));
   myMkShape = std::shared_ptr<GeomAlgoAPI_MakeShapeList>(new GeomAlgoAPI_MakeShapeList(aListOfMakeShape));
   myDone = true;
-  return;
 }
 
 //=================================================================================================

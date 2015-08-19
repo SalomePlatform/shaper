@@ -15,6 +15,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
@@ -140,7 +141,8 @@ void FeaturesPlugin_Revolution::execute()
   // Searching faces with common edges.
   ListOfShape aShells;
   ListOfShape aFreeFaces;
-  GeomAlgoAPI_ShapeTools::combineFacesToShells(aFacesList, aShells, aFreeFaces);
+  std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aFacesList);
+  GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
   if(aShells.empty()) {
     aShells = aFreeFaces;
   } else {

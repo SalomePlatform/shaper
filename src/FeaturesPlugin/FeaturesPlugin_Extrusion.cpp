@@ -21,6 +21,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeReference.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -130,7 +131,8 @@ void FeaturesPlugin_Extrusion::execute()
   // Searching faces with common edges.
   ListOfShape aShells;
   ListOfShape aFreeFaces;
-  GeomAlgoAPI_ShapeTools::combineFacesToShells(aFacesList, aShells, aFreeFaces);
+  std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aFacesList);
+  GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
   if(aShells.empty()) {
     aShells = aFreeFaces;
   } else {
