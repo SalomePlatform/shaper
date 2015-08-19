@@ -14,6 +14,9 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_Tools.h>
 
 #include <Config_FeatureMessage.h>
 
@@ -233,9 +236,38 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
   std::string aType = theObject->groupName();
   DocumentPtr aDoc = theObject->document();
   int aRow = aDoc->index(theObject);
-  if (aRow == -1)
-    return QModelIndex();
-
+  if (aRow == -1) {
+    // it could be a part of complex object
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+    if (aFeature.get()) {
+      CompositeFeaturePtr aCompFea = ModelAPI_Tools::compositeOwner(aFeature);
+      if (aCompFea.get()) {
+        for (int i = 0; i < aCompFea->numberOfSubs(); i++) {
+          if (aCompFea->subFeature(i, true) == theObject) {
+            aRow = i;
+            break;
+          }
+        }
+      }
+    } else {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      //if (aResult.get()) {
+      //  ResultCompSolidPtr aCompRes = ModelAPI_Tools::compositeOwner(aResult);
+      //  if (aCompRes.get()) {
+      //    for (int i = 0; i < aCompRes->numberOfSubs(); i++) {
+      //      if (aCompRes->subResult(i, true) == theObject) {
+      //        aRow = i;
+      //        break;
+      //      }
+      //    }
+      //  }
+      //}
+    }
+    if (aRow == -1)
+      return QModelIndex();
+    else 
+      return createIndex(aRow, 0, theObject.get());
+  }
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
   if (aDoc == aRootDoc && myXMLReader.rootType() == aType) { 
@@ -362,8 +394,8 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
       std::string aType = myXMLReader.subFolderType(theParent.row());
       return aDoc->size(aType);
     } else {
-      // Check for Part feature
       ModelAPI_Object* aObj = (ModelAPI_Object*)theParent.internalPointer();
+      // Check for Part feature
       ResultPartPtr aPartRes = getPartResult(aObj);
       if (aPartRes.get()) {
         DocumentPtr aSubDoc = aPartRes->partDoc();
@@ -373,6 +405,14 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
         if (!aSubType.empty())
           aNbSubItems = aSubDoc->size(aSubType);
         return aNbSubItems + aNbSubFolders;
+      } else {
+        // Check for composite object
+        ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aObj);
+        if (aCompFeature) 
+          return aCompFeature->numberOfSubs(true);
+        ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aObj);
+        if (aCompRes) 
+          return aCompRes->numberOfSubs(true);
       }
     }
   }
@@ -392,6 +432,8 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
   DocumentPtr aRootDoc = aSession->moduleDocument();
   int aNbFolders = foldersCount();
 
+  QModelIndex aIndex;
+
   if (!theParent.isValid()) {
     if (theRow < aNbFolders) // Return first level folder index
       return createIndex(theRow, theColumn, -1);
@@ -400,61 +442,61 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       int aObjId = theRow - aNbFolders;
       if (aObjId < aRootDoc->size(aType)) {
         ObjectPtr aObj = aRootDoc->object(aType, aObjId);
-        QModelIndex aIndex = objectIndex(aObj);
-        if (theColumn != 0)
-          return createIndex(aIndex.row(), theColumn, aIndex.internalPointer());
-        return aIndex;
+        aIndex = objectIndex(aObj);
       }
-      return QModelIndex();
-    }
-  }
-  int aId = theParent.internalId();
-  int aParentPos = theParent.row();
-  if (aId == -1) { // return object index inside of first level of folders
-    std::string aType = myXMLReader.rootFolderType(aParentPos);
-    if (theRow < aRootDoc->size(aType)) {
-      ObjectPtr aObj = aRootDoc->object(aType, theRow);
-      QModelIndex aIndex = objectIndex(aObj);
-      if (theColumn != 0)
-        return createIndex(aIndex.row(), theColumn, aIndex.internalPointer());
-      return aIndex;
     }
   } else {
-    // It is an object which could have children
-    ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
-    if (aDoc) { 
-      // It is a folder of sub-document
-      std::string aType = myXMLReader.subFolderType(aParentPos);
-      if (theRow < aDoc->size(aType)) {
-        ObjectPtr aObj = aDoc->object(aType, theRow);
-        QModelIndex aIndex = objectIndex(aObj);
-        if (theColumn != 0)
-          return createIndex(aIndex.row(), theColumn, aIndex.internalPointer());
-        return aIndex;
+    int aId = theParent.internalId();
+    int aParentPos = theParent.row();
+    if (aId == -1) { // return object index inside of first level of folders
+      std::string aType = myXMLReader.rootFolderType(aParentPos);
+      if (theRow < aRootDoc->size(aType)) {
+        ObjectPtr aObj = aRootDoc->object(aType, theRow);
+        aIndex = objectIndex(aObj);
       }
     } else {
-      ModelAPI_Object* aParentObj = (ModelAPI_Object*)theParent.internalPointer();
+      // It is an object which could have children
+      ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
+      if (aDoc) { 
+        // It is a folder of sub-document
+        std::string aType = myXMLReader.subFolderType(aParentPos);
+        if (theRow < aDoc->size(aType)) {
+          ObjectPtr aObj = aDoc->object(aType, theRow);
+          aIndex = objectIndex(aObj);
+        }
+      } else {
+        ModelAPI_Object* aParentObj = (ModelAPI_Object*)theParent.internalPointer();
 
-      // Check for Part feature
-      ResultPartPtr aPartRes = getPartResult(aParentObj);
-      if (aPartRes.get()) {
-        DocumentPtr aSubDoc = aPartRes->partDoc();
-        int aNbSubFolders = foldersCount(aSubDoc.get());
-        if (theRow < aNbSubFolders) { // Create a Folder of sub-document
-          return createIndex(theRow, theColumn, aSubDoc.get());
+        // Check for Part feature
+        ResultPartPtr aPartRes = getPartResult(aParentObj);
+        if (aPartRes.get()) {
+          DocumentPtr aSubDoc = aPartRes->partDoc();
+          int aNbSubFolders = foldersCount(aSubDoc.get());
+          if (theRow < aNbSubFolders) { // Create a Folder of sub-document
+            aIndex = createIndex(theRow, theColumn, aSubDoc.get());
+          } else {
+            // this is an object under sub document root
+            std::string aType = myXMLReader.subType();
+            ObjectPtr aObj = aSubDoc->object(aType, theRow - aNbSubFolders);
+            aIndex = objectIndex(aObj);
+          }
         } else {
-          // this is an object under sub document root
-          std::string aType = myXMLReader.subType();
-          ObjectPtr aObj = aSubDoc->object(aType, theRow - aNbSubFolders);
-          QModelIndex aIndex = objectIndex(aObj);
-          if (theColumn != 0)
-            return createIndex(aIndex.row(), theColumn, aIndex.internalPointer());
-          return aIndex;
+          // Check for composite object
+          ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aParentObj);
+          if (aCompFeature) {
+            aIndex = objectIndex(aCompFeature->subFeature(theRow));
+          } else {
+            ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aParentObj);
+            if (aCompRes) 
+              aIndex = objectIndex(aCompRes->subResult(theRow));
+          }
         }
       }
     }
   }
-  return QModelIndex();
+  if (theColumn != 0)
+    return createIndex(aIndex.row(), theColumn, aIndex.internalPointer());
+  return aIndex;
 }
 
 //******************************************************
@@ -527,6 +569,15 @@ bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
       ResultPartPtr aPartRes = getPartResult(aObj);
       if (aPartRes.get())
         return true;
+      else {
+        // Check for composite object
+        ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aObj);
+        if (aCompFeature) 
+          return aCompFeature->numberOfSubs(true) > 0;
+        ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aObj);
+        if (aCompRes) 
+          return aCompRes->numberOfSubs(true) > 0;
+      }
     }
   }
   return false;

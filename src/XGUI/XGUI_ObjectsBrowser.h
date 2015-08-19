@@ -16,7 +16,7 @@ class ModuleBase_IDocumentDataModel;
 class QLineEdit;
 class XGUI_DataModel;
 
-#define ModuleDataModel
+//#define ModuleDataModel
 
 /**
 * \ingroup GUI
