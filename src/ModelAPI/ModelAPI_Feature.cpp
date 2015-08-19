@@ -79,6 +79,7 @@ void ModelAPI_Feature::eraseResultFromList(const std::shared_ptr<ModelAPI_Result
     ResultPtr aRes = *aResIter;
     if (aRes == theResult) {
       std::string aGroup = aRes->groupName();
+      aRes->setDisabled(aRes, true); // for complex results to disable all subs
       aRes->data()->erase();
       myResults.erase(aResIter);
 

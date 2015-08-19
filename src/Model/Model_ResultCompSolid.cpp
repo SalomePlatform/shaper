@@ -91,6 +91,7 @@ bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
   if (aChanged) { // state is changed, so modifications are needed
     myBuilder->evolutionToSelection(theFlag);
+    updateSubs(shape()); // to set disabled/enabled 
   }
   return aChanged;
 }
@@ -109,7 +110,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
       std::shared_ptr<GeomAPI_Shape> aSolidShape(new GeomAPI_Shape);
       aSolidShape->setImpl(new TopoDS_Shape(aSolids.Current()));
       ResultBodyPtr aSub;
-      if (mySubs.size() >= aSubIndex) { // it is needed to create a new sub-result
+      if (mySubs.size() <= aSubIndex) { // it is needed to create a new sub-result
         aSub = anObjects->createBody(this->data(), aSubIndex);
         mySubs.push_back(aSub);
       } else { // just update shape of this result
@@ -124,7 +125,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
-      aSub->setDisabled(aSub, false);
+      aSub->setDisabled(aSub, isDisabled());
     }
     // erase left, unused results
     while(mySubs.size() > aSubIndex) {

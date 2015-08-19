@@ -109,7 +109,7 @@
 #include <QDebug>
 #endif
 
-//#define DEBUG_COMPOSOLID
+#define DEBUG_COMPOSOLID
 
 
 /*!Create and return new instance of XGUI_Module*/
