@@ -208,8 +208,8 @@ bool SketchSolver_Group::changeConstraint(
         std::shared_ptr<SketchSolver_ConstraintCoincidence> aCoinc2 =
           std::dynamic_pointer_cast<SketchSolver_ConstraintCoincidence>(aConstraint);
         if (aCoincidence != aCoinc2 && aCoincidence->isCoincide(aCoinc2)) {
-          aCoincidence->attach(aCoinc2);
-          aConstraint = aCoincidence;
+          aCoinc2->attach(aCoincidence);
+          aCIter->second = aCoinc2;
         }
       }
     }

@@ -60,7 +60,7 @@ private:
 
 private:
   int myType; ///< type of constraint (applicable SLVS_C_POINTS_COINCIDENT or SLVS_C_PT_ON_LINE or SLVS_C_PT_ON_CIRCLE)
-  std::map<Slvs_hConstraint, ConstraintPtr> myExtraCoincidence; ///< multiple coincidence of points
+  std::map<ConstraintPtr, Slvs_hConstraint> myExtraCoincidence; ///< multiple coincidence of points
   std::set<AttributePtr> myCoincidentPoints; ///< list of points under the Coincidence constraint
 };
 

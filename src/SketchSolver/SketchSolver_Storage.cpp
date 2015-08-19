@@ -704,7 +704,8 @@ void SketchSolver_Storage::addCoincidentPoints(
         aFoundIter->insert(aCIter->begin(), aCIter->end());
         myCoincidentPoints.erase(aCIter);
         break;
-      }
+      } else
+        aFoundIter = aCIter;
       aCIter->insert(thePoint1);
       aCIter->insert(thePoint2);
     }
