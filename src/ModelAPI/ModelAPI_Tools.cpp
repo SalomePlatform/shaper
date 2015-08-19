@@ -185,4 +185,23 @@ CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
   return CompositeFeaturePtr(); // not found
 }
 
+ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub)
+{
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
+  if (theSub.get()) {
+    FeaturePtr aFeatureOwner = aBody->document()->feature(aBody);
+    if (aFeatureOwner.get()) {
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = 
+        aFeatureOwner->results().cbegin();
+      for(; aResIter != aFeatureOwner->results().cend(); aResIter++) {
+        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIter);
+        if (aComp && aComp->isSub(aBody))
+          return aComp;
+      }
+    }
+  }
+  return ResultCompSolidPtr(); // not found
+}
+
 } // namespace ModelAPI_Tools
+

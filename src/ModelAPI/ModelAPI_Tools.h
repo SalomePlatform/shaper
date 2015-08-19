@@ -14,6 +14,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -58,6 +59,13 @@ MODELAPI_EXPORT ResultPtr findPartResult(const DocumentPtr& theMain, const Docum
  * \returns null if it is not sub-element of composite
  */
 MODELAPI_EXPORT CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature);
+
+/*!
+ * Returns the compsolid result - parent of this result.
+ * \param theSub the sub-element of comp-solid
+ * \returns null if it is not sub-element of composite
+ */
+MODELAPI_EXPORT ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub);
 
 }
 
