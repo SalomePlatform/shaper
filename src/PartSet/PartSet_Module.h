@@ -189,6 +189,11 @@ public slots:
   /// \param theAIS a presentation object
   virtual void onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS);
 
+  /// Slot called on before object erase
+  /// \param theObject a data object
+  /// \param theAIS a presentation object
+  virtual void onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS);
+
   /// Called on transformation in current viewer
   /// \param theTrsfType type of tranformation
   void onViewTransformed(int theTrsfType = 2);

@@ -709,6 +709,14 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
   }
 }
 
+void PartSet_Module::onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS)
+{
+  // it should be recomputed in order to disappear in the viewer if the corresponded object
+  // is erased
+  if (myCustomPrs->isActive())
+    myCustomPrs->customize(theObject);
+}
+
 void PartSet_Module::onViewTransformed(int theTrsfType)
 {
   // Set length of arrows constant in pixel size
