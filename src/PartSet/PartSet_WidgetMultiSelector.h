@@ -61,11 +61,6 @@ protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
-  virtual void storeAttributeValue();
-
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
   void restoreAttributeValue(const bool theValid);
 
@@ -81,8 +76,6 @@ protected:
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;
-
-  bool myIsInVaildate;
 };
 
 #endif

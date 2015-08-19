@@ -75,16 +75,8 @@ bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Viewer
 }
 
 //********************************************************************
-void PartSet_WidgetMultiSelector::storeAttributeValue()
-{
-  myIsInVaildate = true;
-  ModuleBase_WidgetMultiSelector::storeAttributeValue();
-}
-
-//********************************************************************
 void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
 {
-  myIsInVaildate = false;
   ModuleBase_WidgetMultiSelector::restoreAttributeValue(theValid);
 
   myExternalObjectMgr->removeExternalValidated(sketch(), myFeature, myWorkshop);
@@ -109,7 +101,7 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
         aShape = aResult->shape();
     }
     if (aShape.get() != NULL && !aShape->isNull()) {
-      if (myIsInVaildate)
+      if (myIsInValidate)
         theObject = myExternalObjectMgr->externalObjectValidated(theObject, aShape, sketch());
       else
         theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch());
