@@ -98,6 +98,14 @@ class PartSet_FilletSelection : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Validators
+//! A class to validate a selection for Angle constraints operation
+class PartSet_AngleSelection : public ModuleBase_SelectionValidator
+{
+ protected:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+};
+
 ////////////// Attribute validators ////////////////
 
 

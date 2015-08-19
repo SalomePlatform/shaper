@@ -71,6 +71,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -199,6 +200,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_HVDirSelection", new PartSet_HVDirSelection);
   aFactory->registerValidator("PartSet_TangentSelection", new PartSet_TangentSelection);
   aFactory->registerValidator("PartSet_FilletSelection", new PartSet_FilletSelection);
+  aFactory->registerValidator("PartSet_AngleSelection", new PartSet_AngleSelection);
 
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
@@ -463,7 +465,8 @@ void PartSet_Module::onSelectionChanged()
         std::string aId = aFeature->getKind();
         if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
             (aId == SketchPlugin_ConstraintLength::ID()) || 
-            (aId == SketchPlugin_ConstraintDistance::ID())) {
+            (aId == SketchPlugin_ConstraintDistance::ID()) ||
+            (aId == SketchPlugin_ConstraintAngle::ID())) {
           editFeature(aFeature);
         }
       }

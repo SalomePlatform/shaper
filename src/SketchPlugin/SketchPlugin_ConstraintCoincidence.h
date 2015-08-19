@@ -22,7 +22,7 @@
 class SketchPlugin_ConstraintCoincidence : public SketchPlugin_ConstraintBase
 {
  public:
-  /// Parallel constraint kind
+  /// Coincidence constraint kind
   inline static const std::string& ID()
   {
     static const std::string MY_CONSTRAINT_COINCIDENCE_ID("SketchConstraintCoincidence");

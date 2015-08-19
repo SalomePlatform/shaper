@@ -182,6 +182,12 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
   return false;
 }
 
+bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbLines(theSelection);
+  return (aCount > 0) && (aCount < 3);
+}
+
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments,

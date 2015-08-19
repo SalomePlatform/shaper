@@ -6,6 +6,7 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
@@ -136,6 +137,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_MultiTranslation);
   } else if (theFeatureID == SketchPlugin_MultiRotation::ID()) {
     return FeaturePtr(new SketchPlugin_MultiRotation);
+  } else if (theFeatureID == SketchPlugin_ConstraintAngle::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintAngle);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -186,6 +189,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintTangent::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintFillet::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
     }

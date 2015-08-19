@@ -74,3 +74,9 @@ AISObjectPtr SketcherPrs_Factory::rotateConstraint(ModelAPI_Feature* theConstrai
   aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); 
   return aAISObj; 
 }
+
+AISObjectPtr SketcherPrs_Factory::angleConstraint(ModelAPI_Feature* theConstraint,
+                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  return AISObjectPtr(new GeomAPI_AISObject());
+}

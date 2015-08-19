@@ -1,0 +1,57 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+// File:    SketchPlugin_ConstraintAngle.h
+// Created: 19 August 2015
+// Author:  Artem ZHIDKOV
+
+#ifndef SketchPlugin_ConstraintAngle_H_
+#define SketchPlugin_ConstraintAngle_H_
+
+#include "SketchPlugin.h"
+#include <SketchPlugin_Sketch.h>
+#include "SketchPlugin_ConstraintBase.h"
+
+/** \class SketchPlugin_ConstraintAngle
+ *  \ingroup Plugins
+ *  \brief Feature for creation of a new constraint fix angle between two lines
+ *
+ *  This constraint has two attributes:
+ *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
+ */
+class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
+{
+ public:
+  /// Angle constraint kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_CONSTRAINT_ANGLE_ID("SketchConstraintAngle");
+    return MY_CONSTRAINT_ANGLE_ID;
+  }
+  /// \brief Returns the kind of a feature
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_ConstraintAngle::ID();
+    return MY_KIND;
+  }
+
+  /// \brief Creates a new part document if needed
+  SKETCHPLUGIN_EXPORT virtual void execute();
+
+  /// \brief Request for initialization of data model of the feature: adding all attributes
+  SKETCHPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+
+  /// Calculate current value of the angle
+  double calculateAngle();
+
+  /// \brief Use plugin manager for features creation
+  SketchPlugin_ConstraintAngle();
+};
+
+#endif

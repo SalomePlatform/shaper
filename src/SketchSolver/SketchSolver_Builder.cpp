@@ -5,6 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchSolver_Builder.h"
+#include <SketchPlugin_ConstraintAngle.h>
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>
@@ -127,6 +128,8 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintMultiTranslation(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintMultiRotation(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintAngle::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintAngle(theConstraint));
   }
   return aResult;
 }

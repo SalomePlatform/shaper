@@ -89,6 +89,11 @@ public:
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(rotateConstraint)
+
+  /// Creates angle constraint presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  GET_CONSTRAINT_PRS(angleConstraint)
 };
 
 #endif

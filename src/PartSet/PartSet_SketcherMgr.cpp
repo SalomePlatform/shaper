@@ -55,6 +55,7 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
@@ -672,6 +673,7 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
     aIds << SketchPlugin_ConstraintTangent::ID().c_str();
     aIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
     aIds << SketchPlugin_ConstraintMirror::ID().c_str();
+    aIds << SketchPlugin_ConstraintAngle::ID().c_str();
     aIds << SketchPlugin_MultiRotation::ID().c_str();
     aIds << SketchPlugin_MultiTranslation::ID().c_str();
   }
@@ -719,7 +721,8 @@ bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation
 
   return (aId == SketchPlugin_ConstraintLength::ID()) ||
          (aId == SketchPlugin_ConstraintDistance::ID()) ||
-         (aId == SketchPlugin_ConstraintRadius::ID());
+         (aId == SketchPlugin_ConstraintRadius::ID()) ||
+         (aId == SketchPlugin_ConstraintAngle::ID());
 }
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)

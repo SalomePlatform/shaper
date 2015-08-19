@@ -28,6 +28,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintMirror.h
     SketchPlugin_ConstraintFillet.h
+    SketchPlugin_ConstraintAngle.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_ExternalValidator.h
@@ -59,6 +60,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintMirror.cpp
     SketchPlugin_ConstraintFillet.cpp
+    SketchPlugin_ConstraintAngle.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_ExternalValidator.cpp
