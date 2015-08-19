@@ -21,7 +21,8 @@
 using namespace std;
 
 void Model_AttributeSelectionList::append(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily)
 {
   // do not use the degenerated edge as a shape, a list is not incremented in this case
   if (theSubShape.get() && !theSubShape->isNull() && theSubShape->isEdge()) {
@@ -41,7 +42,7 @@ void Model_AttributeSelectionList::append(
   }
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
-  aNewAttr->setValue(theContext, theSubShape);
+  aNewAttr->setValue(theContext, theSubShape, theTemporarily);
   owner()->data()->sendAttributeUpdated(this);
 }
 

@@ -21,10 +21,19 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
 {
   Model_AttributeReference myRef;  ///< The reference functionality reusage
   TDF_LabelMap myScope; ///< the map of valid labels for naming selection solving
+  /// temporarily storages to avoid keeping in the data structure if not needed
+  ResultPtr myTmpContext;
+  /// temporarily storages to avoid keeping in the data structure if not needed
+  std::shared_ptr<GeomAPI_Shape> myTmpSubShape;
 public:
   /// Defines the result and its selected sub-shape
+  /// \param theContext object where the sub-shape was selected
+  /// \param theSubShape selected sub-shape (if null, the whole context is selected)
+  /// \param theTemporarily if it is true, do not store and name the added in the data framework
+  ///           (used to remove immideately, without the following updates)
   MODEL_EXPORT virtual void setValue(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false);
 
   /// Returns the selected subshape
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> value();

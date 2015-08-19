@@ -20,8 +20,13 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
 {
  public:
   /// Adds the new reference to the end of the list
+  /// \param theContext object where the sub-shape was selected
+  /// \param theSubShape selected sub-shape (if null, the whole context is selected)
+  /// \param theTemporarily if it is true, do not store and name the added in the data framework
+  ///           (used to remove immideately, without the following updates)
   virtual void append(const ResultPtr& theContext,
-                      const GeomShapePtr& theSubShape) = 0;
+                      const GeomShapePtr& theSubShape,
+                      const bool theTemporarily = false) = 0;
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape
   /// The type of shape is taken from the current selection type

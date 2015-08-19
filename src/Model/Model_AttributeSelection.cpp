@@ -76,8 +76,18 @@ Standard_GUID kPART_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb27");
 // TDataStd_Integer - type of the selected shape (for construction)
 // TDF_Reference - from ReferenceAttribute, the context
 void Model_AttributeSelection::setValue(const ResultPtr& theContext,
-  const std::shared_ptr<GeomAPI_Shape>& theSubShape)
+  const std::shared_ptr<GeomAPI_Shape>& theSubShape, const bool theTemporarily)
 {
+  if (theTemporarily) { // just keep the stored without DF update
+    myTmpContext = theContext;
+    myTmpSubShape = theSubShape;
+    owner()->data()->sendAttributeUpdated(this);
+    return;
+  } else {
+    myTmpContext.reset();
+    myTmpSubShape.reset();
+  }
+
   const std::shared_ptr<GeomAPI_Shape>& anOldShape = value();
   bool isOldContext = theContext == myRef.value();
   bool isOldShape = isOldContext &&
@@ -142,6 +152,10 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
+  if (myTmpContext.get() || myTmpSubShape.get()) {
+    return myTmpSubShape;
+  }
+
   std::shared_ptr<GeomAPI_Shape> aResult;
   if (myRef.isInitialized()) {
     TDF_Label aSelLab = selectionLabel();
@@ -229,6 +243,10 @@ void Model_AttributeSelection::setID(const std::string theID)
 }
 
 ResultPtr Model_AttributeSelection::context() {
+  if (myTmpContext.get() || myTmpSubShape.get()) {
+    return myTmpContext;
+  }
+
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
   // for parts there could be same-data result, so take the last enabled
   if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group()) {

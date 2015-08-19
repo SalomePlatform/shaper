@@ -26,8 +26,13 @@ class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
   Handle(TDataStd_Comment) mySelectionType;  ///< Contains current type name (same as selection attribute)
 public:
   /// Adds the new reference to the end of the list
+  /// \param theContext object where the sub-shape was selected
+  /// \param theSubShape selected sub-shape (if null, the whole context is selected)
+  /// \param theTemporarily if it is true, do not store and name the added in the data framework
+  ///           (used to remove immideately, without the following updates)
   MODEL_EXPORT virtual void append(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false);
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape
   /// The type of shape is taken from the current selection type
