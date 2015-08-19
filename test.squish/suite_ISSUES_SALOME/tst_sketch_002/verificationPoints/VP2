@@ -6,7 +6,7 @@
    <Rect width="66" x="373" y="185" height="77" type="negative"/>
   </Mask>
   <Algorithm description="Simple comparison (pixel by pixel)" name="simplecompare">
-   <Parameter description="Threshold" name="threshold">0.01</Parameter>
+   <Parameter description="Threshold" name="threshold">1</Parameter>
    <Parameter description="Tolerance" name="tolerance">0</Parameter>
   </Algorithm>
  </Verification>
