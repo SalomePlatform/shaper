@@ -43,6 +43,10 @@ void Model_AttributeSelectionList::append(
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
   aNewAttr->setValue(theContext, theSubShape, theTemporarily);
+  if (theTemporarily)
+    myTmpAttr = aNewAttr;
+  else 
+    myTmpAttr.reset();
   owner()->data()->sendAttributeUpdated(this);
 }
 
@@ -72,6 +76,7 @@ void Model_AttributeSelectionList::removeLast()
     aOldAttr->setObject(owner());
     REMOVE_BACK_REF(aOldAttr->context());
     aLab.ForgetAllAttributes(Standard_True);
+    myTmpAttr.reset();
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -94,6 +99,9 @@ void Model_AttributeSelectionList::setSelectionType(const std::string& theType)
 std::shared_ptr<ModelAPI_AttributeSelection> 
   Model_AttributeSelectionList::value(const int theIndex)
 {
+  if (myTmpAttr.get() && theIndex == size() - 1) {
+    return myTmpAttr;
+  }
   TDF_Label aLabel = mySize->Label().FindChild(theIndex + 1);
   // create a new attribute each time, by demand
   // supporting of old attributes is too slow (synch each time) and buggy on redo
@@ -110,6 +118,7 @@ void Model_AttributeSelectionList::clear()
 {
   if (mySize->Get() != 0) {
     mySize->Set(0);
+    myTmpAttr.reset();
     TDF_ChildIterator aSubIter(mySize->Label());
     for(; aSubIter.More(); aSubIter.Next()) {
       TDF_Label aLab = aSubIter.Value();

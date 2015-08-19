@@ -24,6 +24,7 @@ class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 {
   Handle(TDataStd_Integer) mySize;  ///< Contains size of this list
   Handle(TDataStd_Comment) mySelectionType;  ///< Contains current type name (same as selection attribute)
+  std::shared_ptr<Model_AttributeSelection> myTmpAttr; ///< temporary attribute (the last one)
 public:
   /// Adds the new reference to the end of the list
   /// \param theContext object where the sub-shape was selected
