@@ -18,6 +18,7 @@
 #include <Geom_Plane.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
 
 GeomAPI_Face::GeomAPI_Face()
   : GeomAPI_Shape()
@@ -66,6 +67,10 @@ bool GeomAPI_Face::isPlanar() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
+  Handle(Geom_RectangularTrimmedSurface) aTrimmed = 
+    Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
+  if (!aTrimmed.IsNull())
+    aSurf = aTrimmed->BasisSurface();
   GeomLib_IsPlanarSurface isPlanar(aSurf);
   return isPlanar.IsPlanar() == Standard_True;
 }
@@ -74,6 +79,10 @@ bool GeomAPI_Face::isCylindrical() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
+  Handle(Geom_RectangularTrimmedSurface) aTrimmed = 
+    Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
+  if (!aTrimmed.IsNull())
+    aSurf = aTrimmed->BasisSurface();
   return aSurf->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)) == Standard_True;
 }
 

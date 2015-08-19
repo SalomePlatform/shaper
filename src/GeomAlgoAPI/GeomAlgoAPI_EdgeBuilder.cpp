@@ -13,9 +13,12 @@
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_CylindricalSurface.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
 
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
+#include <Bnd_Box.hxx>
+#include <BRepBndLib.hxx>
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     std::shared_ptr<GeomAPI_Pnt> theStart, std::shared_ptr<GeomAPI_Pnt> theEnd)
@@ -48,14 +51,55 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace, aLoc);
   if (aSurf.IsNull())
     return aResult;
+  Handle(Geom_RectangularTrimmedSurface) aTrimmed = 
+    Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
+  if (!aTrimmed.IsNull())
+    aSurf = aTrimmed->BasisSurface();
   Handle(Geom_CylindricalSurface) aCyl = Handle(Geom_CylindricalSurface)::DownCast(aSurf);
   if (aCyl.IsNull())
     return aResult;
   gp_Ax1 anAxis = aCyl->Axis();
+  // compute the start and the end points of the resulting edge by the bounding box of the face
+  // (vertices projected to the axis) plus 10%
+  Bnd_Box aFaceBnd;
+  BRepBndLib::Add(aFace, aFaceBnd);
+  gp_Pnt aBoxMin(aFaceBnd.CornerMin()), aBoxMax(aFaceBnd.CornerMax());
+  bool isFirst = true;
+  double aParamMin = 0, aParamMax = 0;
+  for(int aX = 0; aX < 2; aX++) {
+    for(int aY = 0; aY < 2; aY++) {
+      for(int aZ = 0; aZ < 2; aZ++) {
+        gp_XYZ aBoxVertex(aX == 0 ? aBoxMin.X() : aBoxMax.X(), 
+          aY == 0 ? aBoxMin.Y() : aBoxMax.Y(), aZ == 0 ? aBoxMin.Z() : aBoxMax.Z());
+        gp_XYZ aVec(aBoxVertex - anAxis.Location().XYZ());
+        double aProjParam = aVec.Dot(anAxis.Direction().XYZ());
+        if (isFirst) {
+          isFirst = false;
+          aParamMin = aProjParam;
+          aParamMax = aProjParam;
+        } else {
+          if (aParamMin > aProjParam)
+            aParamMin = aProjParam;
+          else if (aParamMax < aProjParam)
+            aParamMax = aProjParam;
+        }
+      }
+    }
+  }
+  // add 10%
+  double aDelta = aParamMax - aParamMin;
+  if (aDelta < 1.e-4) aDelta = 1.e-4;
+  aParamMin -= aDelta * 0.1;
+  aParamMax += aDelta * 0.1;
+
+  gp_Pnt aStart(aParamMin * anAxis.Direction().XYZ() + anAxis.Location().XYZ());
+  gp_Pnt anEnd(aParamMax * anAxis.Direction().XYZ() + anAxis.Location().XYZ());
+  /*
   gp_Pnt aStart(anAxis.Location().Transformed(aLoc.Transformation()));
   // edge length is 100, "-" because cylinder of extrusion has negative direction with the cylinder
   gp_Pnt anEnd(anAxis.Location().XYZ() - anAxis.Direction().XYZ() * 100.);
   anEnd.Transform(aLoc.Transformation());
+  */
   
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
