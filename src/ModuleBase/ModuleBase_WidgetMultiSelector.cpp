@@ -36,10 +36,6 @@
 #include <memory>
 #include <string>
 
-//#define DEBUG_ATTRIBUTE_SELECTION
-
-//#define DEBUG_SHAPE_VALIDATION_PREVIOUS
-
 class CustomListWidget : public QListWidget
 {
 public:
@@ -68,7 +64,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                const Config_WidgetAPI* theData,
                                                                const std::string& theParentId)
  : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId),
-   mySelectionCount(0)
+   mySelectionCount(0), myIsInValidate(false)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -152,8 +148,6 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
 {
-  myIsInValidate = false;
-
   // A rare case when plugin was not loaded. 
   if(!myFeature)
     return false;
@@ -182,17 +176,7 @@ void ModuleBase_WidgetMultiSelector::storeAttributeValue()
     return;
 
   mySelectionType = aSelectionListAttr->selectionType();
-
-#ifdef DEBUG_ATTRIBUTE_SELECTION
-  mySelection.clear();
-  int aSize = aSelectionListAttr->size();
-  for (int i = 0; i < aSelectionListAttr->size(); i++) {
-    AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
-    mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
-  }
-#else
   mySelectionCount = aSelectionListAttr->size();
-#endif
 }
 
 //********************************************************************
@@ -214,26 +198,14 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
 
   int aSelCount = aSelectionListAttr->size();
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-  aSelectionListAttr->append(aResult, theShape/*, myIsInValidate*/);
+  aSelectionListAttr->append(aResult, theShape, myIsInValidate);
 }
 
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 {
-#ifdef DEBUG_ATTRIBUTE_SELECTION
-  clearAttribute();
+  myIsInValidate = false;
 
-  // Store shape type
-  DataPtr aData = myFeature->data();
-  AttributeSelectionListPtr aSelectionListAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-  aSelectionListAttr->setSelectionType(mySelectionType);
-
-  // Store selection in the attribute
-  foreach (GeomSelection aSelec, mySelection) {
-    setObject(aSelec.first, aSelec.second);
-  }
-#else
   // Store shape type
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
@@ -244,7 +216,6 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
   int aCountAppened = aSelectionListAttr->size() - mySelectionCount;
   for ( int i = 0; i < aCountAppened; i++)
     aSelectionListAttr->removeLast();
-#endif
 }
 
 //********************************************************************

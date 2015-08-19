@@ -162,7 +162,6 @@ protected:
   std::string mySelectionType;
 
   /// Variable of GeomSelection
-  QList<GeomSelection> mySelection;
   int mySelectionCount; // number of elements in the attribute selection list when store
   bool myIsInValidate; // the widget is in validation mode: store is performed, restore is not
 
