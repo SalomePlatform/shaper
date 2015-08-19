@@ -43,7 +43,8 @@ def main():
     #[step] Type name of file
     #[step] Click 'Save' button    
     save("RESULTS_PATH + sketch_003")
-    clickButton(waitForObject(":Warning.Yes_QPushButton"))
+    if findObject(":Warning.Yes_QPushButton"):
+        clickButton(waitForObject(":Warning.Yes_QPushButton"))
     
     #[step] Close document
     clickButton(waitForObject(":SALOME*.Close_QToolButton"))

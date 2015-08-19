@@ -45,7 +45,8 @@ def main():
     sketch_create(help_points("XY_plane"), lambda: sketch())
     #[step] Save study
     save("RESULTS_PATH + sketch_002")
-    clickButton(waitForObject(":Warning.Yes_QPushButton"))
+    if findObject(":Warning.Yes_QPushButton"):
+        clickButton(waitForObject(":Warning.Yes_QPushButton"))
     ##[step] Close application
     sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
     clickButton(waitForObject(":Exit.Shutdown servers_QCheckBox"))
