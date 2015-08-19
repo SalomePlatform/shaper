@@ -35,10 +35,13 @@
 :Delete features.No_QPushButton	{text='No' type='QPushButton' unnamed='1' visible='1' window=':Delete features_QMessageBox'}
 :Delete features._QLabel	{name='qt_msgbox_label' type='QLabel' visible='1' window=':Delete features_QMessageBox'}
 :Delete features_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Delete features'}
+<<<<<<< HEAD
 :Distance.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
 :Distance.property_panel_cancel_QToolButton	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Distance.property_panel_ok_QToolButton	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Distance.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+=======
+>>>>>>> Make all tests PASSED
 :End point.X _ModuleBase_ParamSpinBox	{container=':Line.End point_QGroupBox' leftWidget=':End point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :End point.X _ModuleBase_ParamSpinBox_2	{container=':Arc.End point_QGroupBox' leftWidget=':End point.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :End point.X _QLabel	{container=':Line.End point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
@@ -78,6 +81,10 @@
 :Parameter_QLineEdit	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
 :Parameters (1).b = 3_QModelIndex	{column='0' container=':Parameters (1)_QModelIndex' text='b = 3' type='QModelIndex'}
 :Parameters (1)_QModelIndex	{column='0' container=':Object browser_XGUI_DataTree' text='Parameters (1)' type='QModelIndex'}
+:Parameters (1).bb = 5_QModelIndex	{column='0' container=':Part_1.Parameters (1)_QModelIndex' text='bb = 5' type='QModelIndex'}
+:Parameters (1)_QModelIndex	{column='0' container=':Object browser_XGUI_DataTree' text='Parameters (1)' type='QModelIndex'}
+:Part_1.Parameters (1)_QModelIndex	{column='0' container=':Part_1_QModelIndex' text='Parameters (1)' type='QModelIndex'}
+:Part_1_QModelIndex	{column='0' container=':Object browser_XGUI_DataTree' text='Part_1' type='QModelIndex'}
 :Part_QMenu	{title='Part' type='QMenu' unnamed='1' visible='1'}
 :Point.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Point.Point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' title='Point' type='QGroupBox' unnamed='1' visible='1'}
@@ -127,6 +134,8 @@
 :SALOME*.Distance_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Distance'}
 :SALOME*.Extrusion_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Extrusion'}
 :SALOME*.Fit All_QToolButton	{text='Fit All' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.ConstructionPoint_QToolButton	{container=':SALOME*.Construction_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.Construction_QtxToolBar	{name='Construction' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Construction'}
 :SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Object browser'}
@@ -144,6 +153,8 @@
 :Save File.newFolderButton_QToolButton	{name='newFolderButton' type='QToolButton' visible='1' window=':Save File_SUIT_FileDlg'}
 :Save File.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Save File_SUIT_FileDlg'}
 :Save File_SUIT_FileDlg	{name='QFileDialog' type='SUIT_FileDlg' visible='1' windowTitle='Save File'}
+:SALOME*.Sketch_QtxToolBar	{name='Sketch' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
+:SALOME*_STD_TabDesktop	{type='STD_TabDesktop' unnamed='1' visible='1' windowTitle?='SALOME*'}
 :Sketch.property_panel_ok_QToolButton	{container=':SALOME 7.6.0 - [Study1].Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Sketch.property_panel_ok_QToolButton_2	{container=':SALOME*.Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Sketch_QMenu	{title='Sketch' type='QMenu' unnamed='1' visible='1'}

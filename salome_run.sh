@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+cd $(dirname $0)
+
 if [ "$#" = 1 ]; then
   export SALOME_PORT="$1"
 else
