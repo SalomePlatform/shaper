@@ -89,10 +89,9 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
       // change deviation coefficient to provide more precise circle
       Standard_Real aPrevDeviation = aDrawer->DeviationCoefficient();
-      //aDrawer->SetDeviationCoefficient(ModuleBase_Tools::defaultDeviationCoefficient());
-
+      aDrawer->SetDeviationCoefficient(ModuleBase_Tools::defaultDeviationCoefficient());
       StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
-      //aDrawer->SetDeviationCoefficient(aPrevDeviation);
+      aDrawer->SetDeviationCoefficient(aPrevDeviation);
     }
   }
 }

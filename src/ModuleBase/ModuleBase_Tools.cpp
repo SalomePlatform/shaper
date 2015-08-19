@@ -257,7 +257,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
 double defaultDeviationCoefficient()
 {
   // this value is chosen by performance check. Test case is an extrusion on sketch circle.
-  return 1.e-3;
+  return 1.e-4;
 }
 
 }
