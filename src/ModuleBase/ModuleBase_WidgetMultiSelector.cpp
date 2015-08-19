@@ -65,7 +65,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData,
                                                                const std::string& theParentId)
- : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId)
+ : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId),
+   mySelectionType(""), mySelectionCount(0)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -176,12 +177,14 @@ void ModuleBase_WidgetMultiSelector::storeAttributeValue()
     return;
 
   mySelectionType = aSelectionListAttr->selectionType();
-  mySelection.clear();
+  mySelectionCount = aSelectionListAttr->size();
+
+  /*mySelection.clear();
   int aSize = aSelectionListAttr->size();
   for (int i = 0; i < aSelectionListAttr->size(); i++) {
     AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
     mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
-  }
+  }*/
 }
 
 //********************************************************************
@@ -208,7 +211,7 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
 {
-  clearAttribute();
+  //clearAttribute();
 
   // Store shape type
   DataPtr aData = myFeature->data();
@@ -217,10 +220,14 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool/* theValid*/)
   aSelectionListAttr->setSelectionType(mySelectionType);
 
   // Store selection in the attribute
-  int aSize = mySelection.size();
-  foreach (GeomSelection aSelec, mySelection) {
-    setObject(aSelec.first, aSelec.second);
-  }
+  //int aSize = mySelection.size();
+  //foreach (GeomSelection aSelec, mySelection) {
+  //  setObject(aSelec.first, aSelec.second);
+  //}
+
+  //int aCountAppened = aSelectionListAttr->size() - mySelectionCount;
+  //for ( int i = 0; i < aCountAppened; i++)
+  //  aSelectionListAttr->removeLast();
 }
 
 //********************************************************************

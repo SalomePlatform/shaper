@@ -162,7 +162,8 @@ protected:
   std::string mySelectionType;
 
   /// Variable of GeomSelection
-  QList<GeomSelection> mySelection;
+  //QList<GeomSelection> mySelection;
+  int mySelectionCount; // number of elements in the attribute selection list when store
 
   bool myIsUseChoice;
 };
