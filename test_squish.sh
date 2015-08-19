@@ -4,7 +4,7 @@ set -e
 
 if [ "$#" = 1 ]; then
   SQUISHSERVER_PORT=$1
-else
+elif [ -z ${SQUISHSERVER_PORT} ]; then
   SQUISHSERVER_PORT=4320
 fi
 
@@ -13,6 +13,8 @@ source env_squish.sh
 for aut in linux_run.sh salome_run.sh; do
   squishserver --config addAUT ${aut} $(pwd)
 done
+squishserver --config setAUTTimeout 60
+squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
 squishserver --verbose --port=${SQUISHSERVER_PORT} --daemon
 
 RETVAL=0
