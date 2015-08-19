@@ -216,18 +216,7 @@ ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
   if (getSubDocument(aObj)) // the selected index is a folder of sub-document
     return ObjectPtr();
 
-  // We can not create the ObjectPtr directly because the pointer will be deleted 
-  // with deletion of the ObjectPtr because its counter become to 0.
-  DocumentPtr aDoc = aObj->document();
-  std::string aType = aObj->groupName();
-
-  ObjectPtr aObjPtr;
-  for (int i = 0; i < aDoc->size(aType); i++) {
-    aObjPtr = aDoc->object(aType, i);
-    if (aObjPtr.get() == aObj)
-      return aObjPtr;
-  }
-  return ObjectPtr();
+  return aObj->data()->owner();
 }
 
 //******************************************************
@@ -242,7 +231,7 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
     if (aFeature.get()) {
       CompositeFeaturePtr aCompFea = ModelAPI_Tools::compositeOwner(aFeature);
       if (aCompFea.get()) {
-        for (int i = 0; i < aCompFea->numberOfSubs(); i++) {
+        for (int i = 0; i < aCompFea->numberOfSubs(true); i++) {
           if (aCompFea->subFeature(i, true) == theObject) {
             aRow = i;
             break;
@@ -251,17 +240,17 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
       }
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      //if (aResult.get()) {
-      //  ResultCompSolidPtr aCompRes = ModelAPI_Tools::compositeOwner(aResult);
-      //  if (aCompRes.get()) {
-      //    for (int i = 0; i < aCompRes->numberOfSubs(); i++) {
-      //      if (aCompRes->subResult(i, true) == theObject) {
-      //        aRow = i;
-      //        break;
-      //      }
-      //    }
-      //  }
-      //}
+      if (aResult.get()) {
+        ResultCompSolidPtr aCompRes = ModelAPI_Tools::compSolidOwner(aResult);
+        if (aCompRes.get()) {
+          for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
+            if (aCompRes->subResult(i, true) == theObject) {
+              aRow = i;
+              break;
+            }
+          }
+        }
+      }
     }
     if (aRow == -1)
       return QModelIndex();
@@ -509,7 +498,23 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
       // It is a folder of sub-document
       return findDocumentRootIndex(aDoc);
     }
-    ModelAPI_Object* aObj = (ModelAPI_Object*) theIndex.internalPointer();
+    ObjectPtr aObj = object(theIndex);
+    // Check is it object a sub-object of a complex object
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature.get()) {
+      CompositeFeaturePtr aCompFea = ModelAPI_Tools::compositeOwner(aFeature);
+      if (aCompFea.get()) {
+        return objectIndex(aCompFea);
+      }
+    }
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResult.get()) {
+      ResultCompSolidPtr aCompRes = ModelAPI_Tools::compSolidOwner(aResult);
+      if (aCompRes.get()) {
+        return objectIndex(aCompRes);
+      }
+    }
+    // Use as ordinary object
     std::string aType = aObj->groupName();
     SessionPtr aSession = ModelAPI_Session::get();
     DocumentPtr aRootDoc = aSession->moduleDocument();

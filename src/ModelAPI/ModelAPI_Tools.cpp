@@ -188,7 +188,7 @@ CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
 ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub)
 {
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
-  if (theSub.get()) {
+  if (aBody.get()) {
     FeaturePtr aFeatureOwner = aBody->document()->feature(aBody);
     if (aFeatureOwner.get()) {
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = 
