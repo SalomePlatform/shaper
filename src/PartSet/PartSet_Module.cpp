@@ -4,7 +4,6 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Validators.h"
 #include "PartSet_Tools.h"
-#include "ModuleBase_WidgetValidated.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_WidgetShapeSelector.h"
@@ -30,6 +29,7 @@
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_WidgetEditor.h>
+#include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Tools.h>
 #include <GeomValidators_ShapeType.h>
@@ -48,6 +48,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ShapeValidator.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -108,6 +109,7 @@
 #include <QDebug>
 #endif
 
+//#define DEBUG_COMPOSOLID
 
 
 /*!Create and return new instance of XGUI_Module*/
@@ -357,6 +359,13 @@ bool PartSet_Module::canCommitOperation() const
 
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
+#ifdef DEBUG_COMPOSOLID
+  ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>
+                                                                         (theObject);
+  if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0)
+    return false;
+#endif
+
   // the sketch manager put the restriction to the objects display
   return mySketchMgr->canDisplayObject(theObject);
 }

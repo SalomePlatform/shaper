@@ -26,6 +26,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -53,6 +54,7 @@
 #include <iostream>
 #endif
 
+//#define DEBUG_CANDISPLAY
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
 
@@ -239,21 +241,28 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();
     }
-    if (aHide)
+    if (aHide) {
       aDisplayer->erase(aObj, false);
+      #ifdef DEBUG_FEATURE_REDISPLAY
+        // Redisplay the visible object or the object of the current operation
+        bool isVisibleObject = aDisplayer->isVisible(aObj);
+
+        QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
+        qDebug(QString("visible=%1 : erase  = %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+      #endif
+    }
     else {
       // Redisplay the visible object or the object of the current operation
       bool isVisibleObject = aDisplayer->isVisible(aObj);
       #ifdef DEBUG_FEATURE_REDISPLAY
-      QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-      qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
-
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      if (aFeature.get()) {
-        std::string aKind = aFeature->getKind();
-        if (aKind == "SketchMultiRotation")
-          bool aValue = true;
-      }
+        QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
+        qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+        /*FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+        if (aFeature.get()) {
+          std::string aKind = aFeature->getKind();
+          if (aKind == "SketchMultiRotation")
+            bool aValue = true;
+        }*/
       #endif
 
       if (isVisibleObject)  { // redisplay visible object
@@ -261,6 +270,12 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
         // in order to avoid the check whether the object can be redisplayed, the exact method
         // of redisplay is called. This modification is made in order to have the line is updated
         // by creation of a horizontal constraint on the line by preselection
+        /*ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>
+                                                                                   (aObj);
+        if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0) {
+          aDisplayer->erase(aObj, false);
+        }*/
+
         aDisplayer->redisplay(aObj, false);
         // Deactivate object of current operation from selection
         aWorkshop->deactivateActiveObject(aObj, false);
@@ -301,9 +316,15 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     if (!aHide) {
       // setDisplayed has to be called in order to synchronize internal state of the object 
       // with list of displayed objects
+#ifdef DEBUG_CANDISPLAY
+      if (displayObject(anObject)/*myWorkshop->module()->canDisplayObject(anObject)*/) {
+        anObject->setDisplayed(true);
+        //isDisplayed = displayObject(anObject);
+#else
       if (myWorkshop->module()->canDisplayObject(anObject)) {
         anObject->setDisplayed(true);
-        isDisplayed = displayObject(*aIt);
+        isDisplayed = displayObject(anObject);
+#endif
       } else 
         anObject->setDisplayed(false);
     }
