@@ -1,7 +1,9 @@
 testSettings.logScreenshotOnError = True
 testSettings.logScreenshotOnFail = True
+RESULTS_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testresults/"
+DATA_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testdata/"
 
-g_points = {"XY_plane": (332, 250)} # one of the construction planes
+g_points = {"XY_plane": (332, 250), "XZ_plane": (355, 207)} # one of the construction planes
 def help_points(name):
     return g_points[name] 
 
@@ -76,7 +78,17 @@ def line_create_in_view(start_point, end_point, aux=0):
     mouseClick(waitForObject(":SALOME 7.6.0 - [Study1].3D View Operations_OCCViewer_ViewPort3d"), end_point[0], end_point[1], 0, Qt.LeftButton)
     
     clickButton(waitForObject(":Line.property_panel_cancel_QToolButton"))
+
+def closing_line_create_in_view(start_point, end_point, aux=0):
+    mouseClick(waitForObjectItem(":SALOME 7.6.0 - [Study1]_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Line"))
     
+    if aux==1:       
+        clickButton(waitForObject(":Line.Auxiliary_QCheckBox"))
+    
+    mouseClick(waitForObject(":SALOME 7.6.0 - [Study1].3D View Operations_OCCViewer_ViewPort3d"), start_point[0], start_point[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME 7.6.0 - [Study1].3D View Operations_OCCViewer_ViewPort3d"), end_point[0], end_point[1], 0, Qt.LeftButton)
+        
 def line_create(start_point, end_point, aux=0): #Set aux=1 to create auxiliary line
     mouseClick(waitForObjectItem(":SALOME 7.6.0 - [Study1]_QMenuBar", "Sketch"))
     mouseClick(waitForObjectItem(":Sketch_QMenu", "Line"))
@@ -168,3 +180,44 @@ def arc_create_in_view(center, start_point, end_point, aux=0):
     
     clickButton(waitForObject(":Arc.property_panel_cancel_QToolButton"))
 
+def parallel(points):
+    mouseClick(waitForObjectItem(":SALOME 7.6.0 - [Study1]_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Parallel"))
+    
+    for point in points:
+        mouseClick(waitForObject(":SALOME 7.6.0 - [Study1].3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Parallel.property_panel_cancel_QToolButton"))
+    
+def save(filename):
+    mouseClick(waitForObjectItem(":SALOME 7.6.0 - [Study1]_QMenuBar", "File"))
+    mouseClick(waitForObjectItem(":_QMenu", "Save As..."))
+    
+    type(waitForObject(":fileNameEdit_QLineEdit"), filename)
+    clickButton(waitForObject(":Save File.Save_QPushButton"))
+    
+def extrusion(point, to_size, from_size):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Features"))
+    mouseClick(waitForObjectItem(":_QMenu", "Extrusion"))
+    
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    
+    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox"), to_size)
+    
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox"), from_size)
+    
+    clickButton(waitForObject(":Extrusion.property_panel_ok_QToolButton"))
+    
+def open(filename):
+    clickButton(waitForObject(":SALOME 7.6.0.Open_QToolButton"))
+    type(waitForObject(":fileNameEdit_QLineEdit_2"), filename)
+    clickButton(waitForObject(":Open File.Open_QPushButton"))
+    
+
+    
+    
+    
+    
+    

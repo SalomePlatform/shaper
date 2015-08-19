@@ -42,7 +42,7 @@ def main():
     #[step] 'Save as' dialog appears
     #[step] Type name of file
     #[step] Click 'Save' button    
-    save("sketch_003")
+    save("RESULTS_PATH + sketch_003")
     clickButton(waitForObject(":Warning.Yes_QPushButton"))
     
     #[step] Close document
@@ -50,7 +50,7 @@ def main():
     
     #[step] File - Open 
     #[step} Open just saved file  
-    open("sketch_003.hdf")
+    open("RESULTS_PATH + sketch_003.hdf")
     #[step] Activate NewGeom
     clickButton(waitForObject(":SALOME 7.6.0.NewGeom_QToolButton"))
     
