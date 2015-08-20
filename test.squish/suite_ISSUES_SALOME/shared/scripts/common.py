@@ -1,6 +1,6 @@
 testSettings.logScreenshotOnError = True
 testSettings.logScreenshotOnFail = True
-RESULTS_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testresults/"
+#RESULTS_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testresults/"
 DATA_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testdata/"
 
 g_points = {"XY_plane": (332, 250), "XZ_plane": (355, 207)} # one of the construction planes
@@ -215,7 +215,7 @@ def open(filename):
     type(waitForObject(":fileNameEdit_QLineEdit_2"), filename)
     clickButton(waitForObject(":Open File.Open_QPushButton"))
 
-def fixed(point):
+def point_fixe(point):
     mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
     mouseClick(waitForObjectItem(":Sketch_QMenu", "Fixed"))
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
@@ -238,7 +238,7 @@ def distance(start_point, end_point, annotation_point):
 def change_distance(point, value):
     doubleClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
     type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
-    type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), 500)
+    type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), value)
     clickButton(waitForObject(":Distance.property_panel_ok_QToolButton"))    
         
 

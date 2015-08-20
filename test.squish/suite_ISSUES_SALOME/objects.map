@@ -2,6 +2,9 @@
 :Abort operation_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Abort operation'}
 :Activate module.New_QPushButton	{text='New' type='QPushButton' unnamed='1' visible='1' window=':Activate module_LightApp_ModuleDlg'}
 :Activate module_LightApp_ModuleDlg	{type='LightApp_ModuleDlg' unnamed='1' visible='1' windowTitle='Activate module'}
+:Application errors.Close_QPushButton	{text='Close' type='QPushButton' unnamed='1' visible='1' window=':Application errors_XGUI_ErrorDialog'}
+:Application errors_QTextEdit	{type='QTextEdit' unnamed='1' visible='1' window=':Application errors_XGUI_ErrorDialog'}
+:Application errors_XGUI_ErrorDialog	{type='XGUI_ErrorDialog' unnamed='1' visible='1' windowTitle='Application errors'}
 :Arc.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Arc.Center_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' title='Center' type='QGroupBox' unnamed='1' visible='1'}
 :Arc.End point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Arc_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}

@@ -1,8 +1,8 @@
     
 def main():
     #[project] NewGEOM
-    #[Scenario] Sketch_001
-    #[Topic]
+    #[Scenario] Sketch_004
+    #[Topic] 'Distance' constraint
     #[Tested functionality]
     #[Summary description]
     #[Expected results]
