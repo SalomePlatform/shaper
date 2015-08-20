@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd $(dirname $0)
+a_dir=$(dirname $0)
 
-source env.sh
-source env_standalone.sh
+source ${a_dir}/env.sh
+source ${a_dir}/env_standalone.sh
 
 ${INSTALL_DIR}/bin/GeomApp "$@"

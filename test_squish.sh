@@ -15,7 +15,7 @@ for aut in linux_run.sh salome_run.sh; do
 done
 squishserver --config setAUTTimeout 60
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
-squishserver --verbose --port=${SQUISHSERVER_PORT} --daemon
+squishserver --verbose --port=${SQUISHSERVER_PORT} 2>server.err &
 
 RETVAL=0
 for suite in ./test.squish/suite_*

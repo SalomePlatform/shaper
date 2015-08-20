@@ -1,11 +1,14 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
-source env.sh
-source env_salome.sh
+a_dir=$(dirname $0)
+
+source ${a_dir}/env.sh
+source ${a_dir}/env_salome.sh
+
+set +e -x
 
 ${KERNEL_ROOT_DIR}/bin/salome/killSalome.py
-set +e
 killall SALOME_LauncherServer
 killall SALOME_Session_Server
 killall SALOME_ConnectionManagerServer
-set -e
+killall omniNames

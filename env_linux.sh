@@ -1,11 +1,9 @@
 #!/bin/bash
 
-set +x
 set +u
 echo "Export SALOME from ${INST_ROOT}..."
 source ${INST_ROOT}/env_products.sh
 set -u
-set -x
 
 #------ SolveSpace ------
 export SOLVESPACE_ROOT_DIR=${NEWGEOM_PDIR}/solvespace-2.0
