@@ -58,6 +58,7 @@ void Model_AttributeRefList::clear()
   for(; anOldIter != anOldList.end(); anOldIter++) {
     REMOVE_BACK_REF((*anOldIter));
   }
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 int Model_AttributeRefList::size(const bool theWithEmpty) const

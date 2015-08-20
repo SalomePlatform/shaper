@@ -193,11 +193,9 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
   else {
     AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
     // restore objects in the attribute. Indeed there is only one stored object
-#ifdef DEBUG_REFLIST
     int aCountAppened = aRefListAttr->size() - mySelectionCount;
     for (int i = 0; i < aCountAppened; i++)
       aRefListAttr->removeLast();
-#endif
   }
 }
 

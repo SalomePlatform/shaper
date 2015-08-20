@@ -216,6 +216,9 @@ void SketchPlugin_ConstraintMirror::attributeChanged(const std::string& theID)
         if (aFeature)
           aDoc->removeFeature(aFeature);
       }
+      aRefListOfMirrored->clear();
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
     }
   }
 }
