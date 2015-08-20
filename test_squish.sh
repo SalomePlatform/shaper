@@ -17,6 +17,8 @@ squishserver --config setAUTTimeout 60
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
 squishserver --verbose --port=${SQUISHSERVER_PORT} 2>server.err &
 
+squishrunner --port=${SQUISHSERVER_PORT} --config setCursorAnimation off
+
 RETVAL=0
 for suite in ./test.squish/suite_*
 do

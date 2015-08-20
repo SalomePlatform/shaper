@@ -2,6 +2,8 @@
 
 a_dir=$(dirname $0)
 
+cd ${a_dir}
+
 if [ "$#" = 1 ]; then
   export SALOME_PORT="$1"
 elif [ -z ${SALOME_PORT} ]; then
