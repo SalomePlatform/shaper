@@ -24,14 +24,26 @@ squishserver --verbose --port=${SQUISHSERVER_PORT} 2>server.err &
 squishrunner --port=${SQUISHSERVER_PORT} --config setCursorAnimation off
 
 RETVAL=0
-for suite in ./test.squish/suite_*
-do
+
+squishrunner_run() {
+  local suite=$1
+  local tests=$2
+
+  set +x
+  local tests_arg=
+  for test in ${tests}; do
+    tests_arg="${tests_arg} --testcase ${test}"
+  done
+  set -x
+
   set +e
-  squishrunner --port=${SQUISHSERVER_PORT} --testsuite ${suite} --reportgen stdout --exitCodeOnFail 1
+  squishrunner --port=${SQUISHSERVER_PORT} --testsuite ${suite} ${tests_arg} --reportgen stdout --exitCodeOnFail 1
   EXIT_CODE=$?
   set -e
   if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
-done
+}
+
+squishrunner_run ./test.squish/suite_ISSUES 'tst_BASE tst_DISTANCE tst_PARALLEL_1 tst_PARALLEL_2 tst_RADIUS tst_c tst_common_1 tst_crash_1 tst_818'
 
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
 for aut in linux_run.sh salome_run.sh; do
