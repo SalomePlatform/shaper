@@ -518,14 +518,14 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         anEdge->setImpl(new TopoDS_Shape(theShape));
 
         anAttr->setValue(aRes, anEdge);
-        if (!theTemporary) {
+        //if (!theTemporary) {
           aMyFeature->execute();
 
           // fix this edge
           FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
           aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
             setObject(aMyFeature->lastResult());
-        }
+        //}
         return aMyFeature->lastResult();
       }
     }
@@ -545,14 +545,14 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         aVert->setImpl(new TopoDS_Shape(theShape));
 
         anAttr->setValue(aRes, aVert);
-        if (theTemporary) {
+        //if (theTemporary) {
           aMyFeature->execute();
 
           // fix this edge
           FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
           aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
             setObject(aMyFeature->lastResult());
-        }
+        //}
         return aMyFeature->lastResult();
       }
     }
