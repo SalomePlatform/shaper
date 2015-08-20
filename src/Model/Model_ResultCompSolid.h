@@ -60,6 +60,8 @@ public:
   MODEL_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     const bool theFlag);
 
+  /// The compsolid is concealed if at least one of the sub is concealed
+  MODEL_EXPORT virtual bool isConcealed();
 protected:
   /// Makes a body on the given feature
   Model_ResultCompSolid();

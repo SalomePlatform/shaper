@@ -688,9 +688,23 @@ void Model_Objects::synchronizeBackRefs()
     for (; aRIter != aResults.cend(); aRIter++) {
       std::shared_ptr<Model_Data> aResData = 
         std::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
-      if (aResData) {
+      if (aResData.get()) {
         aConcealed.push_back(std::pair<ResultPtr, bool>(*aRIter, (*aRIter)->isConcealed()));
         aResData->eraseBackReferences();
+      }
+      // iterate sub-bodies of compsolid
+      ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
+      if (aComp.get()) {
+        int aNumSub = aComp->numberOfSubs();
+        for(int a = 0; a < aNumSub; a++) {
+          ResultPtr aSub = aComp->subResult(a);
+          std::shared_ptr<Model_Data> aResData = 
+            std::dynamic_pointer_cast<Model_Data>(aSub->data());
+          if (aResData.get()) {
+            aConcealed.push_back(std::pair<ResultPtr, bool>(aSub, aSub->isConcealed()));
+            aResData->eraseBackReferences();
+          }
+        }
       }
     }
   }

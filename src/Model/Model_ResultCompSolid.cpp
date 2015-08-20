@@ -96,6 +96,17 @@ bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis
   return aChanged;
 }
 
+bool Model_ResultCompSolid::isConcealed()
+{
+  if (ModelAPI_ResultCompSolid::isConcealed())
+    return true;
+  std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+  for(; aSubIter != mySubs.cend(); aSubIter++)
+    if ((*aSubIter)->isConcealed())
+      return true;
+  return false;
+}
+
 void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape)
 {
   // iterate all sub-solids of compsolid to make sub-results synchronized with them
