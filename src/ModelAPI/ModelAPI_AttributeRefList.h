@@ -55,6 +55,9 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   /// Substitutes the feature by another one. Does nothing if such object is not found.
   virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew) = 0;
 
+  /// Removes the last element in the list.
+  virtual void removeLast() = 0;
+
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeRefList();
  protected:
   /// Objects are created for features automatically

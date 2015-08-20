@@ -159,6 +159,20 @@ void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const Objec
   }
 }
 
+void Model_AttributeRefList::removeLast()
+{
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
+  if (aDoc && !myRef->IsEmpty()) {
+    ObjectPtr anObj = aDoc->objects()->object(myRef->Last());
+    if (anObj.get()) {
+      myRef->Remove(myRef->Last());
+      REMOVE_BACK_REF(anObj);
+      owner()->data()->sendAttributeUpdated(this);
+    }
+  }
+}
+
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)
 {
   myIsInitialized = theLabel.FindAttribute(TDataStd_ReferenceList::GetID(), myRef) == Standard_True;

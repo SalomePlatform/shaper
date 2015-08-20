@@ -50,6 +50,9 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   /// Substitutes the feature by another one. Does nothing if such object is not found.
   MODEL_EXPORT virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew);
 
+  /// Removes the last element in the list.
+  MODEL_EXPORT virtual void removeLast();
+
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
  protected:
