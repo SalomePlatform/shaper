@@ -41,12 +41,17 @@ std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
   if (myTrsf.get()) {
     return baseRef()->partDoc();
   }
-  return data()->document("PartDocument")->value();
+  DocumentPtr aRes = data()->document(DOC_REF())->value();
+  if (!aRes.get() && myIsInLoad) { // trying to get this document from the session
+    aRes = document()->subDocument(data()->name());
+  }
+  return aRes;
 }
 
 Model_ResultPart::Model_ResultPart()
 {
   myIsDisabled = true; // by default it is not initialized and false to be after created
+  myIsInLoad = false;
   setIsConcealed(false);
 }
 
@@ -60,7 +65,9 @@ void Model_ResultPart::activate()
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
+    myIsInLoad = true;
     std::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
+    myIsInLoad = false;
     if (aDoc) {
       aDocRef->setValue(aDoc);
     }

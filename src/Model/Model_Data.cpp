@@ -25,6 +25,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
+#include <Model_Validator.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -399,8 +400,6 @@ void Model_Data::updateConcealmentFlag()
     Events_Loop::loop()->flush(anEvent);
   }
 }
-
-#include <Model_Validator.h>
 
 std::set<std::string> set_union(const std::set<std::string>& theLeft, 
                                 const std::set<std::string>& theRight)
