@@ -214,8 +214,8 @@ def extrusion(point, to_size, from_size):
     
 def open(filename):
     clickButton(waitForObject(":SALOME 7.6.0.Open_QToolButton"))
-    type(waitForObject(":fileNameEdit_QLineEdit_2"), filename)
-    clickButton(waitForObject(":Open File.Open_QPushButton"))
+    waitForObject(":fileNameEdit_QLineEdit_2").setText(filename)
+    type(waitForObject(":fileNameEdit_QLineEdit_2"), "<Return>")
 
 def point_fixe(point):
     mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
