@@ -214,7 +214,34 @@ def open(filename):
     clickButton(waitForObject(":SALOME 7.6.0.Open_QToolButton"))
     type(waitForObject(":fileNameEdit_QLineEdit_2"), filename)
     clickButton(waitForObject(":Open File.Open_QPushButton"))
+
+def fixed(point):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Fixed"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    clickButton(waitForObject(":Fixed.property_panel_cancel_QToolButton"))
     
+    
+def distance(start_point, end_point, annotation_point):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Distance"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), start_point[0], start_point[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), end_point[0], end_point[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), annotation_point[0], annotation_point[1], 0, Qt.LeftButton)
+    
+    #if length!=0:
+        #type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+        #type(waitForObject(":_ModuleBase_ParamSpinBox"), length)
+           
+    clickButton(waitForObject(":Distance.property_panel_cancel_QToolButton"))
+    
+def change_distance(point, value):
+    doubleClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), 500)
+    clickButton(waitForObject(":Distance.property_panel_ok_QToolButton"))    
+        
+
 
     
     

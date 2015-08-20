@@ -56,6 +56,7 @@
 :Extrusion.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Extrusion.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :Extrusion.to_size_ModuleBase_ParamSpinBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='to_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:Fixed.property_panel_cancel_QToolButton	{container=':SALOME 7.6.0 - [Study1].Fixed_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Line.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Line.End point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
 :Line.Start point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
@@ -94,6 +95,7 @@
 :SALOME 7.6.0 - [Study1].Circle_QToolButton	{text='Circle' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
 :SALOME 7.6.0 - [Study1].Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Circle'}
 :SALOME 7.6.0 - [Study1].Fit All_QToolButton	{text='Fit All' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
+:SALOME 7.6.0 - [Study1].Fixed_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Fixed'}
 :SALOME 7.6.0 - [Study1].Line_QToolButton	{text='Line' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop'}
 :SALOME 7.6.0 - [Study1].Line_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Line'}
 :SALOME 7.6.0 - [Study1].Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME 7.6.0 - [Study1]_STD_TabDesktop' windowTitle='Object browser'}
