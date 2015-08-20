@@ -67,6 +67,12 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   gp_Pln aPln = isPlanar.Plan();
   double aA, aB, aC, aD;
   aPln.Coefficients(aA, aB, aC, aD);
+  if (aFace.Orientation() == TopAbs_REVERSED) {
+    aA = -aA;
+    aB = -aB;
+    aC = -aC;
+    aD = -aD;
+  }
   aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
 }
