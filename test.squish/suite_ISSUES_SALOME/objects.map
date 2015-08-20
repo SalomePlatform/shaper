@@ -75,6 +75,9 @@
 :Open File.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Open File_SUIT_FileDlg'}
 :Open File_SUIT_FileDlg	{name='QFileDialog' type='SUIT_FileDlg' visible='1' windowTitle='Open File'}
 :Parallel.property_panel_cancel_QToolButton	{container=':SALOME 7.6.0 - [Study1].Parallel_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Parallel.property_panel_cancel_QToolButton_2	{container=':SALOME*.Parallel_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Parallel.property_panel_ok_QToolButton	{container=':SALOME*.Parallel_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Parallel_ModuleBase_PageWidget	{container=':SALOME*.Parallel_XGUI_PropertyPanel' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
 :Parameter.Attribute "expression" invalidated by "Parameters_ExpressionValidator" with error: Expression is empty._QLabel	{container=':SALOME*.Parameter_XGUI_PropertyPanel' text='Attribute "expression" invalidated by "Parameters_ExpressionValidator" with error: Expression is empty.' type='QLabel' unnamed='1' visible='1'}
 :Parameter.property_panel_ok_QToolButton	{container=':SALOME*.Parameter_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Parameter_ExpressionEditor	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='ExpressionEditor' unnamed='1' visible='1'}
@@ -86,6 +89,9 @@
 :Part_1.Parameters (1)_QModelIndex	{column='0' container=':Part_1_QModelIndex' text='Parameters (1)' type='QModelIndex'}
 :Part_1_QModelIndex	{column='0' container=':Object browser_XGUI_DataTree' text='Part_1' type='QModelIndex'}
 :Part_QMenu	{title='Part' type='QMenu' unnamed='1' visible='1'}
+:Perpendicular.property_panel_cancel_QToolButton	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Perpendicular.property_panel_ok_QToolButton	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Perpendicular_ModuleBase_PageWidget	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
 :Point.Auxiliary_QCheckBox	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Point.Point_QGroupBox	{container=':SALOME 7.6.0 - [Study1].Point_XGUI_PropertyPanel' title='Point' type='QGroupBox' unnamed='1' visible='1'}
 :Point.X _ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
@@ -124,6 +130,7 @@
 :SALOME 7.6.0.Open_QToolButton	{text='Open' type='QToolButton' unnamed='1' visible='1' window=':SALOME 7.6.0_STD_TabDesktop'}
 :SALOME 7.6.0_STD_TabDesktop	{type='STD_TabDesktop' unnamed='1' visible='1' windowTitle='SALOME 7.6.0'}
 :SALOME*.+OY_QToolButton	{text='+OY' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.+OZ_QToolButton	{text='+OZ' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.3D View Operations_OCCViewer_ViewPort3d	{aboveWidget=':SALOME*.3D View Operations_QtxToolBar' type='OCCViewer_ViewPort3d' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.3D View Operations_QtxToolBar	{name='OCCViewer3DViewOperations' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='3D View Operations'}
 :SALOME*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Circle'}
@@ -139,8 +146,10 @@
 :SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Object browser'}
+:SALOME*.Parallel_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Parallel'}
 :SALOME*.Parameter_QToolButton	{text='Parameter' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Parameter_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Parameter'}
+:SALOME*.Perpendicular_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Perpendicular'}
 :SALOME*.Point_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Point'}
 :SALOME*.SketchPoint_QToolButton	{container=':SALOME*.Sketch_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QToolButton	{text='Sketch' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
