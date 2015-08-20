@@ -187,6 +187,14 @@ void ModuleBase_Operation::abort()
       new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
   Events_Loop::loop()->send(aMsg);
 
+  // the widgets of property panel should not process any events come from data mode
+  // after abort clicked. Some signal such as redisplay/create influence on content
+  // of the object browser and viewer context. Therefore it influence to the current
+  // selection and if the active widget listens it, the attribute value is errnoneous
+  // changed.
+  if (myPropertyPanel)
+    myPropertyPanel->cleanContent();
+
   SessionPtr aMgr = ModelAPI_Session::get();
   if (myIsEditing) {
     DocumentPtr aDoc = aMgr->activeDocument();
@@ -220,6 +228,14 @@ void ModuleBase_Operation::abort()
 bool ModuleBase_Operation::commit()
 {
   if (canBeCommitted()) {
+    // the widgets of property panel should not process any events come from data mode
+    // after commit clicked. Some signal such as redisplay/create influence on content
+    // of the object browser and viewer context. Therefore it influence to the current
+    // selection and if the active widget listens it, the attribute value is errnoneous
+    // changed.
+    if (myPropertyPanel)
+      myPropertyPanel->cleanContent();
+
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
     if (myIsEditing) {
