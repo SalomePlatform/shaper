@@ -61,6 +61,7 @@ XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParen
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 }
 
 //******************************************************
@@ -128,9 +129,8 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           }
         } 
 #ifdef _DEBUG
-        else {
+        else
           Events_Error::send("Problem with Data Model definition of sub-document");
-        }
 #endif
       }
     }
@@ -186,11 +186,21 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           }
         } 
 #ifdef _DEBUG
-        else {
+        else
           Events_Error::send("Problem with Data Model definition of sub-document");
-        }
 #endif
       }
+    }
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
+    DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
+    if (aDoc != aRootDoc) {
+      QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+      if (aDocRoot.isValid())
+        emit dataChanged(aDocRoot, aDocRoot);
+#ifdef _DEBUG
+      else
+        Events_Error::send("Problem with Data Model definition of sub-document");
+#endif
     }
   } 
 }
@@ -584,7 +594,7 @@ bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
       // Check for Part feature
       ResultPartPtr aPartRes = getPartResult(aObj);
       if (aPartRes.get())
-        return true;
+        return aPartRes->partDoc().get() != NULL;
       else {
         // Check for composite object
         ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aObj);
