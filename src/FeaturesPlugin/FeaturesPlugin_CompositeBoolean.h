@@ -74,7 +74,7 @@ protected:
 
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                    const ListOfShape& theFaces,
+                    const ListOfShape& theShells,
                     const std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos,
                     const ListOfShape& theTools,
                     const GeomAlgoAPI_Boolean& theAlgo);

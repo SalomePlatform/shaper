@@ -6,6 +6,8 @@
 
 #include "GeomAlgoAPI_Boolean.h"
 
+#include <GeomAlgoAPI_DFLoader.h>
+
 #include <BRepAlgoAPI_BooleanOperation.hxx>
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
@@ -113,6 +115,10 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
     return;
   }
   TopoDS_Shape aResult = anOperation->Shape();
+
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  }
 
   // fill data map to keep correct orientation of sub-shapes
   for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
