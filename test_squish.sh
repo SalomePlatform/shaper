@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+a_dir=$(dirname $0)
+
 set -e
 
 if [ "$#" = 1 ]; then
@@ -8,7 +10,9 @@ elif [ -z ${SQUISHSERVER_PORT} ]; then
   SQUISHSERVER_PORT=4320
 fi
 
-source env_squish.sh
+export TEST_DATA_DIR=$(cd ${a_dir}; pwd)/test.squish/shared/testdata
+
+source ${a_dir}/env_squish.sh
 
 for aut in linux_run.sh salome_run.sh; do
   squishserver --config addAUT ${aut} $(pwd)

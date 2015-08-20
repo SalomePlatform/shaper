@@ -1,0 +1,168 @@
+#!/bin/bash
+
+# This script starts an instance of vncserver, runs a command
+# with that server available, and kills the X server when done.  The return
+# value of the command becomes the return value of this script.
+
+set -e
+
+PROGNAME=vnc-run
+SERVERNUM=99
+AUTHFILE=
+ERRORFILE=/dev/null
+STARTWAIT=3
+VNCARGS="-screen 0 640x480x8"
+LISTENTCP="-nolisten tcp"
+XAUTHPROTO=.
+
+# Query the terminal to establish a default number of columns to use for
+# displaying messages to the user.  This is used only as a fallback in the event
+# the COLUMNS variable is not set.  ($COLUMNS can react to SIGWINCH while the
+# script is running, and this cannot, only being calculated once.)
+DEFCOLUMNS=$(stty size 2>/dev/null | awk '{print $2}') || true
+if ! expr "$DEFCOLUMNS" : "[[:digit:]]\+$" >/dev/null 2>&1; then
+    DEFCOLUMNS=80
+fi
+
+# Display a message, wrapping lines at the terminal width.
+message () {
+    echo "$PROGNAME: $*" | fmt -t -w ${COLUMNS:-$DEFCOLUMNS}
+}
+
+# Display an error message.
+error () {
+    message "error: $*" >&2
+}
+
+# Display a usage message.
+usage () {
+    if [ -n "$*" ]; then
+        message "usage error: $*"
+    fi
+    cat <<EOF
+Usage: $PROGNAME [OPTION ...] COMMAND
+Run COMMAND (usually an X client) in a virtual X server environment.
+Options:
+-a        --auto-servernum          try to get a free server number, starting at
+                                    --server-num
+-e FILE   --error-file=FILE         file used to store xauth errors and VNC
+                                    output (default: $ERRORFILE)
+-f FILE   --auth-file=FILE          file used to store auth cookie
+                                    (default: ./.Xauthority)
+-h        --help                    display this usage message and exit
+-n NUM    --server-num=NUM          server number to use (default: $SERVERNUM)
+-l        --listen-tcp              enable TCP port listening in the X server
+-p PROTO  --xauth-protocol=PROTO    X authority protocol name to use
+                                    (default: xauth command's default)
+-s ARGS   --server-args=ARGS        arguments (other than server number and
+                                    "-nolisten tcp") to pass to the VNC server
+                                    (default: "$VNCARGS")
+-w DELAY  --wait=DELAY              delay in seconds to wait for VNC to start
+                                    before running COMMAND (default: $STARTWAIT)
+EOF
+}
+
+# Find a free server number by looking at .X*-lock files in /tmp.
+find_free_servernum() {
+    # Sadly, the "local" keyword is not POSIX.  Leave the next line commented in
+    # the hope Debian Policy eventually changes to allow it in /bin/sh scripts
+    # anyway.
+    #local i
+
+    i=$SERVERNUM
+    while [ -f /tmp/.X$i-lock ]; do
+        i=$(($i + 1))
+    done
+    echo $i
+}
+
+# Parse the command line.
+ARGS=$(getopt --options +ae:f:hn:lp:s:w: \
+       --long auto-servernum,error-file:auth-file:,help,server-num:,listen-tcp,xauth-protocol:,server-args:,wait: \
+       --name "$PROGNAME" -- "$@")
+GETOPT_STATUS=$?
+
+if [ $GETOPT_STATUS -ne 0 ]; then
+    error "internal error; getopt exited with status $GETOPT_STATUS"
+    exit 6
+fi
+
+eval set -- "$ARGS"
+
+while :; do
+    case "$1" in
+        -a|--auto-servernum) SERVERNUM=$(find_free_servernum) ;;
+        -e|--error-file) ERRORFILE="$2"; shift ;;
+        -f|--auth-file) AUTHFILE="$2"; shift ;;
+        -h|--help) SHOWHELP="yes" ;;
+        -n|--server-num) SERVERNUM="$2"; shift ;;
+        -l|--listen-tcp) LISTENTCP="" ;;
+        -p|--xauth-protocol) XAUTHPROTO="$2"; shift ;;
+        -s|--server-args) VNCARGS="$2"; shift ;;
+        -w|--wait) STARTWAIT="$2"; shift ;;
+        --) shift; break ;;
+        *) error "internal error; getopt permitted \"$1\" unexpectedly"
+           exit 6
+           ;;
+    esac
+    shift
+done
+
+if [ "$SHOWHELP" ]; then
+    usage
+    exit 0
+fi
+
+if [ -z "$*" ]; then
+    usage "need a command to run" >&2
+    exit 2
+fi
+
+if ! which xauth >/dev/null; then
+    error "xauth command not found"
+    exit 3
+fi
+
+if ! which vncserver >/dev/null; then
+    error "vncserver command not found"
+    exit 4
+fi
+
+# If the user did not specify an X authorization file to use, set up a temporary
+# directory to house one.
+if [ -z "$AUTHFILE" ]; then
+    VNC_RUN_TMPDIR="$(mktemp --directory --tmpdir $PROGNAME.XXXXXX)"
+    AUTHFILE=$(mktemp -p "$VNC_RUN_TMPDIR" Xauthority.XXXXXX)
+fi
+
+# Start VNC.
+MCOOKIE=$(mcookie)
+
+XAUTHORITY=$AUTHFILE xauth source - << EOF >>"$ERRORFILE" 2>&1
+add :$SERVERNUM $XAUTHPROTO $MCOOKIE
+EOF
+XAUTHORITY=$AUTHFILE vncserver ":$SERVERNUM" -noxstartup >>"$ERRORFILE" 2>&1 &
+VNCPID=$!
+sleep "$STARTWAIT"
+
+# Start the command and save its exit status.
+set +e
+DISPLAY=:$SERVERNUM XAUTHORITY=$AUTHFILE "$@" 2>&1
+RETVAL=$?
+set -e
+
+# Kill VNC now that the command has exited.
+vncserver -kill ":$SERVERNUM"
+
+# Clean up.
+XAUTHORITY=$AUTHFILE xauth remove ":$SERVERNUM" >"$ERRORFILE" 2>&1
+if [ -n "$VNC_RUN_TMPDIR" ]; then
+    if ! rm -r "$VNC_RUN_TMPDIR"; then
+        error "problem while cleaning up temporary directory"
+        exit 5
+    fi
+fi
+
+# Return the executed command's exit status.
+exit $RETVAL
+

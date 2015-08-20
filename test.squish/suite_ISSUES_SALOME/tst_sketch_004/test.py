@@ -1,3 +1,4 @@
+import os
     
 def main():
     #[project] NewGEOM
@@ -17,7 +18,7 @@ def main():
     set_defaults()
     
     #[step] Open 'for_sketch_004.hdf'
-    open(DATA_PATH + "for_sketch_004.hdf")
+    open(os.path.join(DATA_PATH, "for_sketch_004.hdf"))
     
     #[step] Activate NewGeom
     clickButton(waitForObject(":SALOME 7.6.0.NewGeom_QToolButton"))

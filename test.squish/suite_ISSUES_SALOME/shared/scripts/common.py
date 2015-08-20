@@ -1,7 +1,9 @@
+import os
+
 testSettings.logScreenshotOnError = True
 testSettings.logScreenshotOnFail = True
 #RESULTS_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testresults/"
-DATA_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testdata/"
+DATA_PATH = os.getenv('TEST_DATA_DIR')
 
 g_points = {"XY_plane": (332, 250), "XZ_plane": (355, 207)} # one of the construction planes
 def help_points(name):
