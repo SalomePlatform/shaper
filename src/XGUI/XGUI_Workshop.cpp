@@ -1001,7 +1001,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
   if (theId == "DELETE_CMD")
     deleteObjects();
-  if (theId == "MOVE_CMD")
+  else if (theId == "MOVE_CMD")
     moveObjects();
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);

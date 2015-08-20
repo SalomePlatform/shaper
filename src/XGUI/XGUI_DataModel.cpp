@@ -489,8 +489,13 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
 }
 
 //******************************************************
+static QModelIndex MYLastDeleted;
 QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
 {
+  // To avoid additional request about index which was already deleted
+  if (theIndex == MYLastDeleted)
+    return QModelIndex();
+
   int aId = theIndex.internalId();
   if (aId != -1) { // The object is not a root folder
     ModelAPI_Document* aDoc = getSubDocument(theIndex.internalPointer());
@@ -499,6 +504,11 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
       return findDocumentRootIndex(aDoc);
     }
     ObjectPtr aObj = object(theIndex);
+    if (!aObj.get()) {
+      // To avoid additional request about index which was already deleted
+      MYLastDeleted = theIndex;
+      return QModelIndex();
+    }
     // Check is it object a sub-object of a complex object
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     if (aFeature.get()) {
