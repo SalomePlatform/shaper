@@ -506,6 +506,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
     ObjectPtr aObj = object(theIndex);
     if (!aObj.get()) {
       // To avoid additional request about index which was already deleted
+      // If deleted it causes a crash on delete object from Part
       MYLastDeleted = theIndex;
       return QModelIndex();
     }
