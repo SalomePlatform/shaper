@@ -48,10 +48,6 @@ std::list<ConstraintPtr> SketchSolver_ConstraintCoincidence::constraints() const
 bool SketchSolver_ConstraintCoincidence::isCoincide(
     std::shared_ptr<SketchSolver_ConstraintCoincidence> theConstraint) const
 {
-  // Multi-coincidence allowed for two points only
-  if (getType() != theConstraint->getType() || getType() != SLVS_C_POINTS_COINCIDENT)
-    return false;
-
   std::set<AttributePtr>::const_iterator anAttrIter = theConstraint->myCoincidentPoints.begin();
   for (; anAttrIter != theConstraint->myCoincidentPoints.end(); anAttrIter++)
     if (myCoincidentPoints.find(*anAttrIter) != myCoincidentPoints.end())
@@ -112,6 +108,9 @@ void SketchSolver_ConstraintCoincidence::attach(
 Slvs_hConstraint SketchSolver_ConstraintCoincidence::addConstraint(
     Slvs_hEntity thePoint1, Slvs_hEntity thePoint2)
 {
+  if (thePoint1 == thePoint2)
+    return SLVS_E_UNKNOWN;
+
   bool hasDuplicated = myStorage->hasDuplicatedConstraint();
   Slvs_Constraint aNewConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
       SLVS_C_POINTS_COINCIDENT, myGroup->getWorkplaneId(), 0.0, thePoint1, thePoint2, 
@@ -126,34 +125,96 @@ Slvs_hConstraint SketchSolver_ConstraintCoincidence::addConstraint(
   return aNewID;
 }
 
+Slvs_hConstraint SketchSolver_ConstraintCoincidence::addPointOnEntity(
+    Slvs_hEntity thePoint, Slvs_hEntity theEntity)
+{
+  // Check the point is not coincident with boundaries of the entity
+  Slvs_Entity anEnt = myStorage->getEntity(theEntity);
+  int aPos = anEnt.type == SLVS_E_LINE_SEGMENT ? 0 : 1;
+  for (; anEnt.point[aPos] != SLVS_E_UNKNOWN; aPos++)
+    if (anEnt.point[aPos] == thePoint ||
+        myStorage->isCoincident(anEnt.point[aPos], thePoint))
+      return SLVS_E_UNKNOWN;
+
+  bool hasDuplicated = myStorage->hasDuplicatedConstraint();
+  Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
+  Slvs_hConstraint aType = anEnt.type == SLVS_E_LINE_SEGMENT ?
+      SLVS_C_PT_ON_LINE : SLVS_C_PT_ON_CIRCLE;
+  Slvs_Constraint aNewConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(),
+      aType, myGroup->getWorkplaneId(), 0.0, aBaseCoincidence.ptA, SLVS_E_UNKNOWN,
+      theEntity, SLVS_E_UNKNOWN);
+  Slvs_hConstraint aNewID = myStorage->addConstraint(aNewConstraint);
+  if (!hasDuplicated && myStorage->hasDuplicatedConstraint()) {
+    // the duplicated constraint appears
+    myStorage->removeConstraint(aNewID);
+    return SLVS_E_UNKNOWN;
+  }
+  mySlvsConstraints.push_back(aNewID);
+  return aNewID;
+}
+
 void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstraint)
 {
+  if (mySlvsConstraints.empty()) {
+    // This constraint is empty, rebuild it from scratch
+    myBaseConstraint = theConstraint;
+    process();
+    return;
+  }
+
   std::list<AttributePtr> anAttrList =
       theConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
   std::list<AttributePtr>::iterator anIter = anAttrList.begin();
-  std::vector<Slvs_hEntity> anEntities;
+  std::vector<Slvs_hEntity> aPoints;
+  Slvs_hEntity anEntity = SLVS_E_UNKNOWN;
+  int anEntType;
   for (; anIter != anAttrList.end(); anIter++) {
     AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
-    if (!aRefAttr || aRefAttr->isObject() ||
-        myAttributeMap.find(aRefAttr->attr()) != myAttributeMap.end())
+    if (!aRefAttr)
       continue;
-    int aType;
-    Slvs_hEntity anEntityID = myGroup->getAttributeId(aRefAttr->attr());
-    if (anEntityID == SLVS_E_UNKNOWN)
-      anEntityID = changeEntity(aRefAttr->attr(), aType);
-    anEntities.push_back(anEntityID);
-    myCoincidentPoints.insert(aRefAttr->attr());
+    if (aRefAttr->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+      std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFeatFound = 
+          myFeatureMap.find(aFeature);
+      if (aFeatFound != myFeatureMap.end())
+        anEntity = aFeatFound->second;
+      else {
+        anEntity = myGroup->getFeatureId(aFeature);
+        if (anEntity == SLVS_E_UNKNOWN)
+          anEntity = changeEntity(aFeature, anEntType);
+        else
+          myFeatureMap[aFeature] = anEntity;
+      }
+    } else {
+      Slvs_hEntity anEntID = SLVS_E_UNKNOWN;
+      std::map<AttributePtr, Slvs_hEntity>::const_iterator anAttrFound =
+          myAttributeMap.find(aRefAttr->attr());
+      if (anAttrFound != myAttributeMap.end())
+        anEntID = anAttrFound->second;
+      else {
+        anEntID = myGroup->getAttributeId(aRefAttr->attr());
+        if (anEntID == SLVS_E_UNKNOWN)
+          anEntID = changeEntity(aRefAttr->attr(), anEntType);
+        else
+          myAttributeMap[aRefAttr->attr()] = anEntID;
+      }
+      aPoints.push_back(anEntID);
+      myCoincidentPoints.insert(aRefAttr->attr());
+    }
   }
 
   Slvs_hConstraint aNewConstr = SLVS_E_UNKNOWN;
-  std::vector<Slvs_hEntity>::iterator anEntIter = anEntities.begin();
-  if (mySlvsConstraints.empty()) {
-    aNewConstr = addConstraint(*anEntIter, *(anEntIter + 1));
-    anEntIter += 2;
+  if (anEntity != SLVS_E_UNKNOWN)
+    aNewConstr = addPointOnEntity(aPoints.front(), anEntity);
+  else { // coincidence between two points
+    Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
+    std::vector<Slvs_hEntity>::const_iterator aPtIter = aPoints.begin();
+    for (; aPtIter != aPoints.end(); aPtIter++) {
+      Slvs_hConstraint aC = addConstraint(aBaseCoincidence.ptA, *aPtIter);
+      if (aC != SLVS_E_UNKNOWN)
+        aNewConstr = aC;
+    }
   }
-  Slvs_Constraint aBaseCoincidence = myStorage->getConstraint(mySlvsConstraints.front());
-  for (; anEntIter != anEntities.end(); anEntIter++)
-    aNewConstr = addConstraint(aBaseCoincidence.ptA, *anEntIter);
   myExtraCoincidence[theConstraint] = aNewConstr;
 }
 

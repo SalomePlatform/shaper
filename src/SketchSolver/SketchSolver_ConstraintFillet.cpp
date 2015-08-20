@@ -104,7 +104,7 @@ void SketchSolver_ConstraintFillet::process()
   bool isPointFound = false;
   for (int i = 0; i < 2 && !isPointFound; i++)
     for (int j = 2; j < 4 && !isPointFound; j++)
-      if (myStorage->isCoincident(aPointsToFind[i], aPointsToFind[j])) {
+      if (myStorage->isEqual(aPointsToFind[i], aPointsToFind[j])) {
         aCoincInd[0] = i;
         aCoincInd[1] = j - 2;
         isPointFound = true;

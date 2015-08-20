@@ -58,6 +58,9 @@ private:
   /// \brief Create full SolveSpace structure according to given constraint
   void addConstraint(ConstraintPtr theConstraint);
 
+  /// \brief Create constraint of point concident to the line or circle
+  Slvs_hConstraint addPointOnEntity(Slvs_hEntity thePoint, Slvs_hEntity theEntity);
+
 private:
   int myType; ///< type of constraint (applicable SLVS_C_POINTS_COINCIDENT or SLVS_C_PT_ON_LINE or SLVS_C_PT_ON_CIRCLE)
   std::map<ConstraintPtr, Slvs_hConstraint> myExtraCoincidence; ///< multiple coincidence of points

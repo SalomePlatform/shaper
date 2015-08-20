@@ -738,7 +738,16 @@ bool SketchSolver_Storage::isCoincident(
   for (; aCIter != myCoincidentPoints.end(); aCIter++)
     if (aCIter->find(thePoint1) != aCIter->end() && aCIter->find(thePoint2) != aCIter->end())
       return true;
-  // precise checking of coincidence
+  return false;
+}
+
+bool SketchSolver_Storage::isEqual(
+    const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const
+{
+  if (isCoincident(thePoint1, thePoint2))
+    return true;
+
+  // Precise checking of coincidence: verify that points have equal coordinates
   int aEnt1Pos = Search(thePoint1, myEntities);
   int aEnt2Pos = Search(thePoint2, myEntities);
   if (aEnt1Pos >= 0 && aEnt1Pos < (int)myEntities.size() &&

@@ -150,6 +150,9 @@ public:
   /// \brief Check two points are coincident
   bool isCoincident(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
 
+  /// \brief Check two points are coincident or have same coordinates
+  bool isEqual(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
+
   /// \brief Check the entity is horizontal of vertical
   bool isAxisParallel(const Slvs_hEntity& theEntity) const;
 

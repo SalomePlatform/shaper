@@ -209,6 +209,11 @@ bool SketchSolver_Group::changeConstraint(
           std::dynamic_pointer_cast<SketchSolver_ConstraintCoincidence>(aConstraint);
         if (aCoincidence != aCoinc2 && aCoincidence->isCoincide(aCoinc2)) {
           aCoinc2->attach(aCoincidence);
+          // update other coincidences
+          ConstraintConstraintMap::iterator anIt = aCIter;
+          for (++anIt; anIt != myConstraints.end(); ++anIt)
+            if (anIt->second == aCIter->second)
+              anIt->second = aCoinc2;
           aCIter->second = aCoinc2;
         }
       }
