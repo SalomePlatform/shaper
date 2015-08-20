@@ -480,8 +480,9 @@ ResultPtr PartSet_Tools::findFixedObjectByExternal(const TopoDS_Shape& theShape,
 }
 
 ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShape, 
-                                                 const ObjectPtr& theObject, 
-                                                 CompositeFeaturePtr theSketch)
+                                                     const ObjectPtr& theObject, 
+                                                     CompositeFeaturePtr theSketch,
+                                                     const bool theTemporary)
 {
   if (theShape.ShapeType() == TopAbs_EDGE) {
     Standard_Real aStart, aEnd;
@@ -517,14 +518,14 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         anEdge->setImpl(new TopoDS_Shape(theShape));
 
         anAttr->setValue(aRes, anEdge);
+        if (!theTemporary) {
+          aMyFeature->execute();
 
-        aMyFeature->execute();
-
-        // fix this edge
-        FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
-        aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
-          setObject(aMyFeature->lastResult());
-
+          // fix this edge
+          FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
+          aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
+            setObject(aMyFeature->lastResult());
+        }
         return aMyFeature->lastResult();
       }
     }
@@ -544,13 +545,14 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         aVert->setImpl(new TopoDS_Shape(theShape));
 
         anAttr->setValue(aRes, aVert);
-        aMyFeature->execute();
+        if (theTemporary) {
+          aMyFeature->execute();
 
-        // fix this edge
-        FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
-        aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
-          setObject(aMyFeature->lastResult());
-
+          // fix this edge
+          FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
+          aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
+            setObject(aMyFeature->lastResult());
+        }
         return aMyFeature->lastResult();
       }
     }

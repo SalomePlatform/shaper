@@ -94,7 +94,7 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
         aShape = aResult->shape();
     }
     if (aShape.get() != NULL && !aShape->isNull())
-      theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch());
+      theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
   }
 }
 
@@ -115,7 +115,7 @@ GeomShapePtr PartSet_WidgetShapeSelector::getShape() const
 void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
-  myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop);
+  myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 }
 
 //********************************************************************

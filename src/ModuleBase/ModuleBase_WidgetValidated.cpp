@@ -25,7 +25,7 @@ ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
                                                        const Config_WidgetAPI* theData,
                                                        const std::string& theParentId)
 : ModuleBase_ModelWidget(theParent, theData, theParentId),
-  myWorkshop(theWorkshop)
+  myWorkshop(theWorkshop), myIsInValidate(false)
 {
 }
 
@@ -58,6 +58,18 @@ bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theVa
 ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& theAIS) const
 {
   return myPresentedObject;
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::storeAttributeValue()
+{
+  myIsInValidate = true;
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::restoreAttributeValue(const bool theValid)
+{
+  myIsInValidate = false;
 }
 
 //********************************************************************

@@ -48,7 +48,6 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ShapeValidator.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -109,9 +108,6 @@
 #ifdef _DEBUG
 #include <QDebug>
 #endif
-
-#define DEBUG_COMPOSOLID
-
 
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop* theWshop)
@@ -361,13 +357,6 @@ bool PartSet_Module::canCommitOperation() const
 
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
-#ifdef DEBUG_COMPOSOLID
-  ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>
-                                                                         (theObject);
-  if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0)
-    return false;
-#endif
-
   // the sketch manager put the restriction to the objects display
   return mySketchMgr->canDisplayObject(theObject);
 }

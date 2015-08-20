@@ -42,22 +42,27 @@ bool PartSet_ExternalObjectsMgr::isValidObject(const ObjectPtr& theObject)
 
 ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelectedObject,
                                                      const GeomShapePtr& theShape,
-                                                     const CompositeFeaturePtr& theSketch)
+                                                     const CompositeFeaturePtr& theSketch,
+                                                     const bool theTemporary)
 {
-  ObjectPtr aSelectedObject = PartSet_Tools::findFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                             theSelectedObject, theSketch);
+  ObjectPtr aSelectedObject = PartSet_Tools::findFixedObjectByExternal(
+                                  theShape->impl<TopoDS_Shape>(), theSelectedObject, theSketch);
   if (!aSelectedObject.get()) {
     // Processing of external (non-sketch) object
     aSelectedObject = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                                 theSelectedObject, theSketch);
-    if (aSelectedObject.get())
-      myExternalObjects.append(aSelectedObject);
+                                                    theSelectedObject, theSketch, theTemporary);
+    if (aSelectedObject.get()) {
+      if (theTemporary)
+        myExternalObjectValidated = aSelectedObject;
+      else
+        myExternalObjects.append(aSelectedObject);
+    }
   }
   return aSelectedObject;
 }
 
 //********************************************************************
-ObjectPtr PartSet_ExternalObjectsMgr::externalObjectValidated(const ObjectPtr& theSelectedObject,
+/*ObjectPtr PartSet_ExternalObjectsMgr::externalObjectValidated(const ObjectPtr& theSelectedObject,
                                                      const GeomShapePtr& theShape,
                                                      const CompositeFeaturePtr& theSketch)
 {
@@ -72,35 +77,24 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObjectValidated(const ObjectPtr& t
       myExternalObjectValidated = aSelectedObject;
   }
   return aSelectedObject;
-}
+}*/
 
 //********************************************************************
 void PartSet_ExternalObjectsMgr::removeExternal(const CompositeFeaturePtr& theSketch,
                                                 const FeaturePtr& theFeature,
-                                                ModuleBase_IWorkshop* theWorkshop)
+                                                ModuleBase_IWorkshop* theWorkshop,
+                                                const bool theTemporary)
 {
-  QObjectPtrList::const_iterator anIt = myExternalObjects.begin(), aLast = myExternalObjects.end();
-  for (; anIt != aLast; anIt++) {
-    ObjectPtr anObject = *anIt;
-    if (anObject.get()) {
-      DocumentPtr aDoc = anObject->document();
-      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
-      if (aFeature.get() != NULL) {
-        QObjectPtrList anObjects;
-        anObjects.append(aFeature);
-        // the external feature should be removed with all references, sketch feature should be ignored
-        std::set<FeaturePtr> anIgnoredFeatures;
-        // the current feature should be ignored, because it can use the external feature in the
-        // attributes and, therefore have a references to it. So, the delete functionality tries
-        // to delete this feature. Test case is creation of a constraint on external point,
-        // use in this control after an external point, the point of the sketch.
-        anIgnoredFeatures.insert(theFeature);
-        workshop(theWorkshop)->deleteFeatures(anObjects, anIgnoredFeatures);
-      }
+  if (theTemporary)
+    removeExternalObject(myExternalObjectValidated, theSketch, theFeature, theWorkshop);
+  else{
+    QObjectPtrList::const_iterator anIt = myExternalObjects.begin(), aLast = myExternalObjects.end();
+    for (; anIt != aLast; anIt++) {
+      ObjectPtr anObject = *anIt;
+      removeExternalObject(anObject, theSketch, theFeature, theWorkshop);
     }
-    //removeExternalObject(anObject, theSketch, theFeature);
+    myExternalObjects.clear();
   }
-  myExternalObjects.clear();
 }
 
 //********************************************************************
@@ -126,14 +120,14 @@ void PartSet_ExternalObjectsMgr::removeUnusedExternalObjects(const QObjectPtrLis
 }
 
 //********************************************************************
-void PartSet_ExternalObjectsMgr::removeExternalValidated(const CompositeFeaturePtr& theSketch,
+/*void PartSet_ExternalObjectsMgr::removeExternalValidated(const CompositeFeaturePtr& theSketch,
                                                          const FeaturePtr& theFeature,
                                                          ModuleBase_IWorkshop* theWorkshop)
 {
   // TODO(nds): unite with removeExternal(), remove parameters
   removeExternalObject(myExternalObjectValidated, theSketch, theFeature, theWorkshop);
   myExternalObjectValidated = ObjectPtr();
-}
+}*/
 
 void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject,
                                                       const CompositeFeaturePtr& theSketch,

@@ -17,9 +17,6 @@
 
 #include <GeomValidators_Tools.h>
 
-#include <ModelAPI_Attribute.h>
-#include <ModelAPI_AttributeSelectionList.h>
-
 #include <Config_PropManager.h>
 
 #include <AIS_InteractiveContext.hxx>

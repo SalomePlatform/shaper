@@ -13,7 +13,6 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefList.h>
-#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -31,10 +30,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
   data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
-  AttributeSelectionListPtr aSelection = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    TRANSLATION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  aSelection->setSelectionType("EDGE");
+  data()->addAttribute(TRANSLATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
 }
@@ -47,7 +43,7 @@ void SketchPlugin_MultiTranslation::execute()
     return;
   }
 
-  AttributeSelectionListPtr aTranslationObjectRefs = selectionList(TRANSLATION_LIST_ID());
+  AttributeRefListPtr aTranslationObjectRefs = reflist(TRANSLATION_LIST_ID());
   int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
   // Calculate shift vector
@@ -79,20 +75,21 @@ void SketchPlugin_MultiTranslation::execute()
       aRefListOfTranslated->size() / aRefListOfShapes->size() - 1 : 0;
   std::list<ObjectPtr> anInitialList = aRefListOfShapes->list();
   std::list<ObjectPtr> aTargetList = aRefListOfTranslated->list();
-  std::list<ResultPtr> anAddition;
+  std::list<ObjectPtr> anAddition;
   std::vector<bool> isUsed(anInitialList.size(), false);
   // collect new items and check the items to remove
   for(int anInd = 0; anInd < aTranslationObjectRefs->size(); anInd++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aTranslationObjectRefs->value(anInd);
+    //std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aTranslationObjectRefs->value(anInd);
+    ObjectPtr anObject = aTranslationObjectRefs->object(anInd);
     std::list<ObjectPtr>::const_iterator anIt = anInitialList.begin();
     std::vector<bool>::iterator aUsedIt = isUsed.begin();
     for (; anIt != anInitialList.end(); anIt++, aUsedIt++)
-      if (*anIt == aSelect->context()) {
+      if (*anIt == anObject) {
         *aUsedIt = true;
         break;
       }
     if (anIt == anInitialList.end())
-      anAddition.push_back(aSelect->context());
+      anAddition.push_back(anObject);
   }
   // remove unused items
   std::list<ObjectPtr>::iterator anInitIter = anInitialList.begin();
@@ -165,7 +162,7 @@ void SketchPlugin_MultiTranslation::execute()
       aRefListOfTranslated->append(*aTargetIter);
   }
   // add new items
-  std::list<ResultPtr>::iterator anAddIter = anAddition.begin();
+  std::list<ObjectPtr>::iterator anAddIter = anAddition.begin();
   for (; anAddIter != anAddition.end(); anAddIter++) {
     aRefListOfShapes->append(*anAddIter);
     aRefListOfTranslated->append(*anAddIter);
@@ -223,7 +220,7 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
 void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
 {
   if (theID == TRANSLATION_LIST_ID()) {
-    AttributeSelectionListPtr aTranslationObjectRefs = selectionList(TRANSLATION_LIST_ID());
+    AttributeRefListPtr aTranslationObjectRefs = reflist(TRANSLATION_LIST_ID());
     if (aTranslationObjectRefs->size() == 0) {
       int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
       // Clear list of objects

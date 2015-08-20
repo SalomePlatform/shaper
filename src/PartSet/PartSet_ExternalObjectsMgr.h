@@ -45,24 +45,27 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \param theSketch a current sketch
+  /// \param theTemporary the created external object is temporary, execute is not performed for it
   /// \return the object
   ObjectPtr externalObject(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
-                           const CompositeFeaturePtr& theSketch);
+                           const CompositeFeaturePtr& theSketch, const bool theTemporary = false);
 
-  ObjectPtr externalObjectValidated(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
-                           const CompositeFeaturePtr& theSketch);
+  //ObjectPtr externalObjectValidated(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
+  //                         const CompositeFeaturePtr& theSketch);
 
   // Removes the external presentation from the model
   /// \param theSketch a current sketch
   /// \param theFeature a current feature
   /// \param theFeature a current workshop
+  /// \param theTemporary if true, a temporary external object is removed overwise all ext objects
   void removeExternal(const CompositeFeaturePtr& theSketch,
                       const FeaturePtr& theFeature,
-                      ModuleBase_IWorkshop* theWorkshop);
+                      ModuleBase_IWorkshop* theWorkshop,
+                      const bool theTemporary);
 
-  void removeExternalValidated(const CompositeFeaturePtr& theSketch,
-                               const FeaturePtr& theFeature,
-                               ModuleBase_IWorkshop* theWorkshop);
+  //void removeExternalVali+dated(const CompositeFeaturePtr& theSketch,
+  //                             const FeaturePtr& theFeature,
+  //                             ModuleBase_IWorkshop* theWorkshop);
 
   void removeUnusedExternalObjects(const QObjectPtrList& theIgnoreObjects,
                             const CompositeFeaturePtr& theSketch,

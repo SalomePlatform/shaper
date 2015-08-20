@@ -27,6 +27,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -54,7 +55,6 @@
 #include <iostream>
 #endif
 
-//#define DEBUG_CANDISPLAY
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
 
@@ -270,15 +270,14 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
         // in order to avoid the check whether the object can be redisplayed, the exact method
         // of redisplay is called. This modification is made in order to have the line is updated
         // by creation of a horizontal constraint on the line by preselection
-        /*ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>
-                                                                                   (aObj);
-        if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0) {
+        if (ModelAPI_Tools::hasSubResults(std::dynamic_pointer_cast<ModelAPI_Result>(aObj))) {
           aDisplayer->erase(aObj, false);
-        }*/
-
-        aDisplayer->redisplay(aObj, false);
-        // Deactivate object of current operation from selection
-        aWorkshop->deactivateActiveObject(aObj, false);
+        }
+        else {
+          aDisplayer->redisplay(aObj, false);
+          // Deactivate object of current operation from selection
+          aWorkshop->deactivateActiveObject(aObj, false);
+        }
       } else { // display object if the current operation has it
         if (displayObject(aObj)) {
           // Deactivate object of current operation from selection
@@ -316,15 +315,8 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     if (!aHide) {
       // setDisplayed has to be called in order to synchronize internal state of the object 
       // with list of displayed objects
-#ifdef DEBUG_CANDISPLAY
-      if (displayObject(anObject)/*myWorkshop->module()->canDisplayObject(anObject)*/) {
+      if (displayObject(anObject)) {
         anObject->setDisplayed(true);
-        //isDisplayed = displayObject(anObject);
-#else
-      if (myWorkshop->module()->canDisplayObject(anObject)) {
-        anObject->setDisplayed(true);
-        isDisplayed = displayObject(anObject);
-#endif
       } else 
         anObject->setDisplayed(false);
     }
@@ -436,8 +428,9 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
 //**************************************************************
 bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
 {
-   XGUI_Workshop* aWorkshop = workshop();
-  if (!aWorkshop->module()->canDisplayObject(theObj))
+  XGUI_Workshop* aWorkshop = workshop();
+  if (ModelAPI_Tools::hasSubResults(std::dynamic_pointer_cast<ModelAPI_Result>(theObj)) ||
+      !aWorkshop->module()->canDisplayObject(theObj))
     return false;
 
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();

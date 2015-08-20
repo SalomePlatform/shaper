@@ -166,10 +166,12 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theShape an edge
   /// \param theObject a selected result object
   /// \param theSketch a sketch feature
+  /// \param theTemporary the created external object is temporary, execute is not performed for it
   /// \return result of created feature
   static ResultPtr createFixedObjectByExternal(const TopoDS_Shape& theShape, 
                                                const ObjectPtr& theObject, 
-                                               CompositeFeaturePtr theSketch);
+                                               CompositeFeaturePtr theSketch,
+                                               const bool theTemporary = false);
 
   /// Checks whether the list of selected presentations contains the given one
   /// \param theSelected a list of presentations

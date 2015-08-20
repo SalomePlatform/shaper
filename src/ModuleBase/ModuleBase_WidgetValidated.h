@@ -70,13 +70,13 @@ protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
-  virtual void storeAttributeValue() = 0;
+  virtual void storeAttributeValue();
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
-  virtual void restoreAttributeValue(const bool theValid) = 0;
+  virtual void restoreAttributeValue(const bool theValid);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param theValue a selected presentation in the view
@@ -125,6 +125,7 @@ protected:
 
 protected:
   ModuleBase_IWorkshop* myWorkshop;  /// Reference to workshop
+  bool myIsInValidate; // the widget is in validation mode: store is performed, restore is not
 
 private:
   ObjectPtr myPresentedObject; /// back up of the filtered object

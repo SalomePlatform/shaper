@@ -203,5 +203,11 @@ ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub)
   return ResultCompSolidPtr(); // not found
 }
 
+bool hasSubResults(const ResultPtr& theResult)
+{
+  ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theResult);
+  return aCompSolid.get() && aCompSolid->numberOfSubs() > 0;
+}
+
 } // namespace ModelAPI_Tools
 

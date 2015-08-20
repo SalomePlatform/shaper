@@ -249,6 +249,8 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::storeAttributeValue()
 {
+  ModuleBase_WidgetValidated::storeAttributeValue();
+
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
@@ -266,6 +268,8 @@ void ModuleBase_WidgetShapeSelector::storeAttributeValue()
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
 {
+  ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
+
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 

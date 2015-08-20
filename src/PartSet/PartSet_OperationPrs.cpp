@@ -19,6 +19,8 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeRefList.h>
+
 
 #include <GeomValidators_Tools.h>
 
@@ -88,7 +90,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
         continue;
       TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
       // change deviation coefficient to provide more precise circle
-      //aDrawer->SetDeviationCoefficient(ModuleBase_Tools::defaultDeviationCoefficient());
+      ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
       StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
     }
   }
@@ -178,6 +180,14 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         addValue(aResult, aShape, myFeature, theObjectShapes);
       }
     }
+    if (anAttrType == ModelAPI_AttributeRefList::typeId()) {
+      std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
+      for (int i = 0; i < aCurSelList->size(); i++) {
+        GeomShapePtr aShape;
+        addValue(aCurSelList->object(i), aShape, myFeature, theObjectShapes);
+      }
+    }
     else {
       ObjectPtr anObject;
       GeomShapePtr aShape;
@@ -214,6 +224,7 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
   std::string anAttrType = theAttribute->attributeType();
 
   return anAttrType == ModelAPI_AttributeSelectionList::typeId() ||
+         anAttrType == ModelAPI_AttributeRefList::typeId() ||
          anAttrType == ModelAPI_AttributeRefAttr::typeId() ||
          anAttrType == ModelAPI_AttributeSelection::typeId() ||
          anAttrType == ModelAPI_AttributeReference::typeId();

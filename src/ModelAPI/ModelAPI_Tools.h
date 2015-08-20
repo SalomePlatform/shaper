@@ -67,6 +67,13 @@ MODELAPI_EXPORT CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
  */
 MODELAPI_EXPORT ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub);
 
+/*!
+* Returns true if the result contains a not empty list of sub results. It processes result compsolid.
+* \param theResult a result object
+* \returns boolean value
+*/
+MODELAPI_EXPORT bool hasSubResults(const ResultPtr& theResult);
+
 }
 
 #endif

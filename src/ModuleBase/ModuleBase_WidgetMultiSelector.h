@@ -15,7 +15,6 @@
 
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_Result.h>
-#include <ModelAPI_AttributeSelectionList.h>
 
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
@@ -135,8 +134,8 @@ protected:
   /// a shape. If the attribute do not uses the shape, it is empty
   virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
-  /// Update selection list
-  void updateSelectionList(AttributeSelectionListPtr);
+  /// Fills the list control by the attribute values
+  void updateSelectionList();
 
   /// Converts the XML defined type choice to the validator type
   /// For example, the "Edges" is converted to "edge"
@@ -163,7 +162,6 @@ protected:
 
   /// Variable of GeomSelection
   int mySelectionCount; // number of elements in the attribute selection list when store
-  bool myIsInValidate; // the widget is in validation mode: store is performed, restore is not
 
   bool myIsUseChoice;
 };

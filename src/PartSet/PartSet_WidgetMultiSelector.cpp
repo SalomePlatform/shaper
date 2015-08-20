@@ -7,6 +7,8 @@
 #include "PartSet_WidgetMultiSelector.h"
 
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -49,15 +51,25 @@ bool PartSet_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theV
     // TODO(nds): unite with externalObject(), remove parameters
     //myFeature->execute();
 
-    DataPtr aData = myFeature->data();
-    AttributeSelectionListPtr aSelectionListAttr = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
-
     QObjectPtrList aListOfAttributeObjects;
-    for (int i = 0; i < aSelectionListAttr->size(); i++) {
-      AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-      aListOfAttributeObjects.append(anAttr->context());
+
+    AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+    if (anAttribute->attributeType() == ModelAPI_AttributeSelectionList::typeId()) {
+      AttributeSelectionListPtr aSelectionListAttr = 
+                           std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
+      for (int i = 0; i < aSelectionListAttr->size(); i++) {
+        AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
+        aListOfAttributeObjects.append(anAttr->context());
+      }
     }
+    else if (anAttribute->attributeType() == ModelAPI_AttributeRefList::typeId()) {
+      AttributeRefListPtr aRefListAttr = 
+                                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
+      for (int i = 0; i < aRefListAttr->size(); i++) {
+        aListOfAttributeObjects.append(aRefListAttr->object(i));
+      }
+    }
+
     myExternalObjectMgr->removeUnusedExternalObjects(aListOfAttributeObjects, sketch(), myFeature);
   }
   return aSucceed;
@@ -79,7 +91,7 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetMultiSelector::restoreAttributeValue(theValid);
 
-  myExternalObjectMgr->removeExternalValidated(sketch(), myFeature, myWorkshop);
+  myExternalObjectMgr->removeExternal/*Validated*/(sketch(), myFeature, myWorkshop, true);
 }
 
 void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
@@ -101,10 +113,10 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
         aShape = aResult->shape();
     }
     if (aShape.get() != NULL && !aShape->isNull()) {
-      if (myIsInValidate)
-        theObject = myExternalObjectMgr->externalObjectValidated(theObject, aShape, sketch());
-      else
-        theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch());
+      //if (myIsInValidate)
+      //  theObject = myExternalObjectMgr->externalObjectValidated(theObject, aShape, sketch());
+      //else
+      theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
     }
   }
 }

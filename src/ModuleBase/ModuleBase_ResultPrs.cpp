@@ -66,8 +66,7 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     Set(myOriginalShape);
 
     // change deviation coefficient to provide more precise circle
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
-    //aDrawer->SetDeviationCoefficient(ModuleBase_Tools::defaultDeviationCoefficient());
+    ModuleBase_Tools::setDefaultDeviationCoefficient(myOriginalShape, Attributes());
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }
 }

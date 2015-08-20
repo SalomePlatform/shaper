@@ -199,8 +199,8 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
                                                std::string& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeSelectionListPtr aSelAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  AttributeRefListPtr aSelAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
   if (!aSelAttr)
     return false;
 
@@ -209,10 +209,10 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
   std::list<ObjectPtr> aMirroredObjects = aRefListOfMirrored->list();
 
   for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aSelAttr->value(anInd);
+    ObjectPtr aSelObject = aSelAttr->object(anInd);
     std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
     for (; aMirIter != aMirroredObjects.end(); aMirIter++)
-      if (aSelect->context() == *aMirIter)
+      if (aSelObject == *aMirIter)
         return false;
   }
   return true;
@@ -268,8 +268,8 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
                                          std::string& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeSelectionListPtr aSelAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  AttributeRefListPtr aSelAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
   if (!aSelAttr)
     return false;
 
@@ -282,16 +282,16 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
 
   std::list<ObjectPtr>::iterator anObjIter;
   for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aSelAttr->value(anInd);
+    ObjectPtr aSelObject = aSelAttr->object(anInd);
     anObjIter = anInitialObjects.begin();
     for (; anObjIter != anInitialObjects.end(); anObjIter++)
-      if (aSelect->context() == *anObjIter)
+      if (aSelObject == *anObjIter)
         break;
     if (anObjIter != anInitialObjects.end())
       continue;
     anObjIter = aCopiedObjects.begin();
     for (; anObjIter != aCopiedObjects.end(); anObjIter++)
-      if (aSelect->context() == *anObjIter)
+      if (aSelObject == *anObjIter)
         return false;
   }
   return true;

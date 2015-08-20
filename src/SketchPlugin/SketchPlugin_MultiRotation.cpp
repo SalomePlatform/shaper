@@ -12,7 +12,6 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefList.h>
-#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -37,10 +36,7 @@ void SketchPlugin_MultiRotation::initAttributes()
   data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
-  AttributeSelectionListPtr aSelection = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    ROTATION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  aSelection->setSelectionType("EDGE");
+  data()->addAttribute(ROTATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
 }
@@ -53,7 +49,7 @@ void SketchPlugin_MultiRotation::execute()
     return;
   }
 
-  AttributeSelectionListPtr aRotationObjectRefs = selectionList(ROTATION_LIST_ID());
+  AttributeRefListPtr aRotationObjectRefs = reflist(ROTATION_LIST_ID());
   int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
 
   // Obtain center and angle of rotation
@@ -84,20 +80,20 @@ void SketchPlugin_MultiRotation::execute()
       aRefListOfRotated->size() / aRefListOfShapes->size() - 1 : 0;
   std::list<ObjectPtr> anInitialList = aRefListOfShapes->list();
   std::list<ObjectPtr> aTargetList = aRefListOfRotated->list();
-  std::list<ResultPtr> anAddition;
+  std::list<ObjectPtr> anAddition;
   std::vector<bool> isUsed(anInitialList.size(), false);
   // collect new items and check the items to remove
   for(int anInd = 0; anInd < aRotationObjectRefs->size(); anInd++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aRotationObjectRefs->value(anInd);
+    ObjectPtr anObject = aRotationObjectRefs->object(anInd);
     std::list<ObjectPtr>::const_iterator anIt = anInitialList.begin();
     std::vector<bool>::iterator aUsedIt = isUsed.begin();
     for (; anIt != anInitialList.end(); anIt++, aUsedIt++)
-      if (*anIt == aSelect->context()) {
+      if (*anIt == anObject) {
         *aUsedIt = true;
         break;
       }
     if (anIt == anInitialList.end())
-      anAddition.push_back(aSelect->context());
+      anAddition.push_back(anObject);
   }
   // remove unused items
   std::list<ObjectPtr>::iterator anInitIter = anInitialList.begin();
@@ -170,7 +166,7 @@ void SketchPlugin_MultiRotation::execute()
       aRefListOfRotated->append(*aTargetIter);
   }
   // add new items
-  std::list<ResultPtr>::iterator anAddIter = anAddition.begin();
+  std::list<ObjectPtr>::iterator anAddIter = anAddition.begin();
   for (; anAddIter != anAddition.end(); anAddIter++) {
     aRefListOfShapes->append(*anAddIter);
     aRefListOfRotated->append(*anAddIter);
@@ -281,7 +277,7 @@ void SketchPlugin_MultiRotation::rotateFeature(
 void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
 {
   if (theID == ROTATION_LIST_ID()) {
-    AttributeSelectionListPtr aRotationObjectRefs = selectionList(ROTATION_LIST_ID());
+    AttributeRefListPtr aRotationObjectRefs = reflist(ROTATION_LIST_ID());
     if (aRotationObjectRefs->size() == 0) {
       int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
       // Clear list of objects

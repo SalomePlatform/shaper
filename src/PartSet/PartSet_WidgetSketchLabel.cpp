@@ -197,7 +197,6 @@ std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
 {
   CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   return PartSet_Tools::sketchPlane(aSketch);
-
 }
 
 bool PartSet_WidgetSketchLabel::focusTo()
@@ -213,10 +212,13 @@ void PartSet_WidgetSketchLabel::enableFocusProcessing()
 
 void PartSet_WidgetSketchLabel::storeAttributeValue()
 {
+  ModuleBase_WidgetValidated::storeAttributeValue();
 }
 
 void PartSet_WidgetSketchLabel::restoreAttributeValue(const bool theValid)
 {
+  ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
+
   // it is not necessary to save the previous plane value because the plane is chosen once
   DataPtr aData = feature()->data();
   AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>

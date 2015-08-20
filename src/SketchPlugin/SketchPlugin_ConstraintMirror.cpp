@@ -10,7 +10,6 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefList.h>
-#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -31,18 +30,14 @@ void SketchPlugin_ConstraintMirror::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefList::typeId());
-  AttributeSelectionListPtr aSelection = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  aSelection->setSelectionType("EDGE");
+  data()->addAttribute(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(), ModelAPI_AttributeRefList::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_C());
 }
 
 void SketchPlugin_ConstraintMirror::execute()
 {
-  AttributeSelectionListPtr aMirrorObjectRefs =
-      selectionList(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID());
+  AttributeRefListPtr aMirrorObjectRefs = reflist(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID());
 
   // Wait all objects being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -60,16 +55,16 @@ void SketchPlugin_ConstraintMirror::execute()
   std::vector<bool> isUsed(anInitialList.size(), false);
   // add new items to the list
   for(int anInd = 0; anInd < aMirrorObjectRefs->size(); anInd++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aMirrorObjectRefs->value(anInd);
+    ObjectPtr anObject = aMirrorObjectRefs->object(anInd);
     std::list<ObjectPtr>::const_iterator anIt = anInitialList.begin();
     std::vector<bool>::iterator aUsedIt = isUsed.begin();
     for (; anIt != anInitialList.end(); anIt++, aUsedIt++)
-      if (*anIt == aSelect->context()) {
+      if (*anIt == anObject) {
         *aUsedIt = true;
         break;
       }
     if (anIt == anInitialList.end())
-      aRefListOfShapes->append(aSelect->context());
+      aRefListOfShapes->append(anObject);
   }
   // remove unused items
   std::list<ObjectPtr>::iterator anInitIter = anInitialList.begin();
@@ -204,7 +199,7 @@ AISObjectPtr SketchPlugin_ConstraintMirror::getAISObject(AISObjectPtr thePreviou
 void SketchPlugin_ConstraintMirror::attributeChanged(const std::string& theID)
 {
   if (theID == MIRROR_LIST_ID()) {
-    AttributeSelectionListPtr aMirrorObjectRefs = selectionList(MIRROR_LIST_ID());
+    AttributeRefListPtr aMirrorObjectRefs = reflist(MIRROR_LIST_ID());
     if (aMirrorObjectRefs->size() == 0) {
       // Clear list of objects
       AttributeRefListPtr aRefListOfMirrored = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(

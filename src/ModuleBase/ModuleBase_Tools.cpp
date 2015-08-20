@@ -254,10 +254,11 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
   }
 }
 
-double defaultDeviationCoefficient()
+void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
+                                    const Handle(Prs3d_Drawer)& theDrawer)
 {
-  // this value is chosen by performance check. Test case is an extrusion on sketch circle.
-  return 1.e-4; // default value is 1.e-3
+  if (!theShape.IsNull() && theShape.ShapeType() == TopAbs_EDGE)
+    theDrawer->SetDeviationCoefficient(1.e-4);
 }
 
 }
