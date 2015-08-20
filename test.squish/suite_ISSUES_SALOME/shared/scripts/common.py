@@ -242,6 +242,22 @@ def change_distance(point, value):
     type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":Distance.ConstraintValue_ModuleBase_ParamSpinBox"), value)
     clickButton(waitForObject(":Distance.property_panel_ok_QToolButton"))    
+    
+def parallel(point_1, point_2):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Parallel"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0], point_2[1], 0, Qt.LeftButton)
+    clickButton(waitForObject(":Parallel.property_panel_cancel_QToolButton_2"))
+    
+def perpendicular(point_1, point_2):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Perpendicular"))
+    
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0], point_2[1], 0, Qt.LeftButton) 
+    
+    clickButton(waitForObject(":Perpendicular.property_panel_cancel_QToolButton"))
         
 
 
