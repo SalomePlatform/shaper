@@ -107,6 +107,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
+                    ${CMAKE_SOURCE_DIR}/src/ExchangePlugin
                     ${CMAKE_SOURCE_DIR}/src/SketcherPrs
                     ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/PartSetPlugin
