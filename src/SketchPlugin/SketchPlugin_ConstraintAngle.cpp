@@ -18,6 +18,8 @@
 #include <SketcherPrs_Factory.h>
 #include <SketcherPrs_Tools.h>
 
+#include <math.h>
+
 const double tolerance = 1.e-7;
 #define PI 3.1415926535897932
 
