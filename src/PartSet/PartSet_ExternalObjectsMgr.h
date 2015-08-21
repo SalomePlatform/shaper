@@ -50,28 +50,23 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   ObjectPtr externalObject(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
                            const CompositeFeaturePtr& theSketch, const bool theTemporary = false);
 
-  //ObjectPtr externalObjectValidated(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
-  //                         const CompositeFeaturePtr& theSketch);
-
   // Removes the external presentation from the model
   /// \param theSketch a current sketch
   /// \param theFeature a current feature
-  /// \param theFeature a current workshop
+  /// \param theWorkshop a current workshop
   /// \param theTemporary if true, a temporary external object is removed overwise all ext objects
   void removeExternal(const CompositeFeaturePtr& theSketch,
                       const FeaturePtr& theFeature,
                       ModuleBase_IWorkshop* theWorkshop,
                       const bool theTemporary);
 
-  //void removeExternalVali+dated(const CompositeFeaturePtr& theSketch,
-  //                             const FeaturePtr& theFeature,
-  //                             ModuleBase_IWorkshop* theWorkshop);
-
-  void removeUnusedExternalObjects(const QObjectPtrList& theIgnoreObjects,
-                            const CompositeFeaturePtr& theSketch,
-                            const FeaturePtr& theFeature);
-
 protected:
+  /// Delete from the document the feature of the object. It deletes all objects, which refers to
+  /// the deleted one. The parameter feature is ignored even it refer to the deleted object.
+  /// \param theObject a removed object
+  /// \param theSketch a current sketch
+  /// \param theFeature a current feature
+  /// \param theWorkshop a current workshop
   void removeExternalObject(const ObjectPtr& theObject,
                             const CompositeFeaturePtr& theSketch,
                             const FeaturePtr& theFeature,
@@ -81,9 +76,6 @@ protected:
   static XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop);
 
 protected:
-  /// An external object
-  QObjectPtrList myExternalObjects;
-
   /// An external object
   ObjectPtr myExternalObjectValidated;
 

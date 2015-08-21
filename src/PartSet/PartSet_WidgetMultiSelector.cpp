@@ -43,38 +43,6 @@ PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
   delete myExternalObjectMgr;
 }
 
-bool PartSet_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
-                                               const bool theToValidate)
-{
-  bool aSucceed = ModuleBase_WidgetMultiSelector::setSelection(theValues, theToValidate);
-  if (aSucceed) {
-    // TODO(nds): unite with externalObject(), remove parameters
-    //myFeature->execute();
-
-    QObjectPtrList aListOfAttributeObjects;
-
-    AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
-    if (anAttribute->attributeType() == ModelAPI_AttributeSelectionList::typeId()) {
-      AttributeSelectionListPtr aSelectionListAttr = 
-                           std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
-      for (int i = 0; i < aSelectionListAttr->size(); i++) {
-        AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-        aListOfAttributeObjects.append(anAttr->context());
-      }
-    }
-    else if (anAttribute->attributeType() == ModelAPI_AttributeRefList::typeId()) {
-      AttributeRefListPtr aRefListAttr = 
-                                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
-      for (int i = 0; i < aRefListAttr->size(); i++) {
-        aListOfAttributeObjects.append(aRefListAttr->object(i));
-      }
-    }
-
-    myExternalObjectMgr->removeUnusedExternalObjects(aListOfAttributeObjects, sketch(), myFeature);
-  }
-  return aSucceed;
-}
-
 //********************************************************************
 bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
@@ -91,7 +59,7 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
 {
   ModuleBase_WidgetMultiSelector::restoreAttributeValue(theValid);
 
-  myExternalObjectMgr->removeExternal/*Validated*/(sketch(), myFeature, myWorkshop, true);
+  myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 }
 
 void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
@@ -112,11 +80,7 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
       if (aResult.get())
         aShape = aResult->shape();
     }
-    if (aShape.get() != NULL && !aShape->isNull()) {
-      //if (myIsInValidate)
-      //  theObject = myExternalObjectMgr->externalObjectValidated(theObject, aShape, sketch());
-      //else
+    if (aShape.get() != NULL && !aShape->isNull())
       theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
-    }
   }
 }
