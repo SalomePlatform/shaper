@@ -385,6 +385,34 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
       aStartEnd[2*i+j] = myStorage->getParameter(aPoint.param[j]).val;
   }
 
+  // Calculate length of the mirror line and create temporary constraint
+  double aLength = sqrt((aStartEnd[2] - aStartEnd[0]) * (aStartEnd[2] - aStartEnd[0]) +
+                        (aStartEnd[3] - aStartEnd[1]) * (aStartEnd[3] - aStartEnd[1]));
+  if (aLength < tolerance) {
+    if (myMirrorLineLength < 1.0)
+      myMirrorLineLength = 1.0;
+  } else
+    myMirrorLineLength = aLength;
+  std::list<Slvs_Constraint> aDist = myStorage->getConstraintsByType(SLVS_C_PT_PT_DISTANCE);
+  std::list<Slvs_Constraint>::const_iterator aDIt = aDist.begin();
+  for (; aDIt != aDist.end(); ++aDIt)
+    if ((aDIt->ptA == aMirrorLine.point[0] && aDIt->ptB == aMirrorLine.point[1]) ||
+        (aDIt->ptA == aMirrorLine.point[1] && aDIt->ptB == aMirrorLine.point[0]))
+      break; // length of mirror line is already set
+  if (aDIt == aDist.end()) {
+    // check the points of mirror line is not fixed
+    Slvs_hConstraint aFixed;
+    if (!myStorage->isPointFixed(aMirrorLine.point[0], aFixed, true) ||
+        !myStorage->isPointFixed(aMirrorLine.point[1], aFixed, true)) {
+      // Add length constraint
+      aMirror = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), SLVS_C_PT_PT_DISTANCE,
+          myGroup->getWorkplaneId(), aLength, aMirrorLine.point[0], aMirrorLine.point[1],
+          SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+      aMirror.h = myStorage->addConstraint(aMirror);
+      myStorage->addTemporaryConstraint(aMirror.h);
+    }
+  }
+
   // Search mirror between middle points on the arcs and recompute their coordinates
   std::map<Slvs_hEntity, Slvs_hEntity> aPointsOnCircles;
   std::list<Slvs_Constraint> aMirrorPonCirc;

@@ -19,7 +19,8 @@ class SketchSolver_ConstraintMirror : public SketchSolver_Constraint
 public:
   SketchSolver_ConstraintMirror(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
-      myNumberOfObjects(0)
+      myNumberOfObjects(0),
+      myMirrorLineLength(0.0)
   {}
 
   virtual int getType() const
@@ -70,7 +71,8 @@ private:
   void adjustArcPoints(const Slvs_Entity& theArc) const;
 
 private:
-  size_t myNumberOfObjects; ///< number of previously mirrored objects
+  size_t myNumberOfObjects;  ///< number of previously mirrored objects
+  double myMirrorLineLength; ///< length of mirror line (should be always greater than 0)
 };
 
 #endif
