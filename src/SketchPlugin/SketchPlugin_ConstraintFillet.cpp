@@ -225,6 +225,10 @@ void SketchPlugin_ConstraintFillet::execute()
     aRefListOfFillet->append(aNewFeatureB->lastResult());
     aRefListOfFillet->append(aNewArc->lastResult());
 
+    myProducedFeatures.push_back(aNewFeatureA);
+    myProducedFeatures.push_back(aNewFeatureB);
+    myProducedFeatures.push_back(aNewArc);
+
     // Create list of additional constraints:
     // 1. Coincidence of boundary points of features (copied lines/arcs) and fillet arc
     // 1.1. coincidence
@@ -239,6 +243,7 @@ void SketchPlugin_ConstraintFillet::execute()
     aRefAttr->setAttr(aNewFeature[aFeatInd]->attribute(aFeatAttributes[anAttrInd]));
     recalculateAttributes(aNewArc, SketchPlugin_Arc::START_ID(), aNewFeature[aFeatInd], aFeatAttributes[anAttrInd]);
     aConstraint->execute();
+    myProducedFeatures.push_back(aConstraint);
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
     // 1.2. coincidence
     aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
@@ -252,6 +257,7 @@ void SketchPlugin_ConstraintFillet::execute()
     aRefAttr->setAttr(aNewFeature[aFeatInd]->attribute(aFeatAttributes[anAttrInd]));
     recalculateAttributes(aNewArc, SketchPlugin_Arc::END_ID(), aNewFeature[aFeatInd], aFeatAttributes[anAttrInd]);
     aConstraint->execute();
+    myProducedFeatures.push_back(aConstraint);
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
     // 2. Fillet arc radius
     aConstraint = sketch()->addFeature(SketchPlugin_ConstraintRadius::ID());
@@ -264,6 +270,7 @@ void SketchPlugin_ConstraintFillet::execute()
         aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))->setValue(
         isStart[0] ? aStartEndPnt[0] : aStartEndPnt[1]);
     aConstraint->execute();
+    myProducedFeatures.push_back(aConstraint);
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
     // 3. Tangency of fillet arc and features
     for (int i = 0; i < aNbFeatures; i++) {
@@ -276,6 +283,7 @@ void SketchPlugin_ConstraintFillet::execute()
       bool isArc = aNewFeature[i]->getKind() == SketchPlugin_Arc::ID();
       aRefAttr->setObject(isArc ? aNewFeature[i]->lastResult() : aNewFeature[i]->firstResult());
       aConstraint->execute();
+      myProducedFeatures.push_back(aConstraint);
       ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
     }
     // 4. Coincidence of free boundaries of base and copied features
@@ -288,6 +296,7 @@ void SketchPlugin_ConstraintFillet::execute()
       aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
           aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
       aRefAttr->setAttr(aNewFeature[i]->attribute(aFeatAttributes[anAttrInd]));
+      myProducedFeatures.push_back(aConstraint);
     }
     // 5. Tangent points should be placed on the base features
     for (int i = 0; i < aNbFeatures; i++) {
@@ -299,10 +308,14 @@ void SketchPlugin_ConstraintFillet::execute()
       aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
           aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
       aRefAttr->setObject(aFeature[i]->lastResult());
+      myProducedFeatures.push_back(aConstraint);
     }
     // make base features auxiliary
     aFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
     aFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
+    myBaseObjects.clear();
+    myBaseObjects.push_back(aFeatureA);
+    myBaseObjects.push_back(aFeatureB);
   } else {
     // Update radius value
     int aNbSubs = sketch()->numberOfSubs();
@@ -334,6 +347,29 @@ void SketchPlugin_ConstraintFillet::execute()
   //aMsg = std::shared_ptr<Events_Message>(
   //              new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
   //Events_Loop::loop()->send(aMsg);
+}
+
+void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
+{
+  if (theID == SketchPlugin_Constraint::ENTITY_A() ||
+      theID == SketchPlugin_Constraint::ENTITY_B()) {
+    // clear the list of fillet entities
+    AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
+    aRefListOfFillet->clear();
+
+    // remove all produced objects and constraints
+    DocumentPtr aDoc = sketch()->document();
+    std::list<FeaturePtr>::iterator aCIt = myProducedFeatures.begin();
+    for (; aCIt != myProducedFeatures.end(); ++aCIt)
+      aDoc->removeFeature(*aCIt);
+    myProducedFeatures.clear();
+
+    // clear auxiliary flag on initial objects
+    for (aCIt = myBaseObjects.begin(); aCIt != myBaseObjects.end(); ++aCIt)
+      (*aCIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
+    myBaseObjects.clear();
+  }
 }
 
 AISObjectPtr SketchPlugin_ConstraintFillet::getAISObject(AISObjectPtr thePrevious)
