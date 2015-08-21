@@ -9,3 +9,10 @@
 ModelAPI_ResultCompSolid::~ModelAPI_ResultCompSolid()
 {
 }
+
+void ModelAPI_ResultCompSolid::setDisplayed(const bool theDisplay)
+{
+  ModelAPI_ResultBody::setDisplayed(theDisplay);
+  for (int i = 0; i < numberOfSubs(); i++)
+    subResult(i)->setDisplayed(theDisplay);
+}

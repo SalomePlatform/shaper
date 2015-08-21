@@ -225,7 +225,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
-  QString anInfoStr = anInfo.join(", ");
+  QString anInfoStr = anInfo.join(";\t");
   qDebug(QString("onFeatureRedisplayMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
@@ -256,7 +256,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       bool isVisibleObject = aDisplayer->isVisible(aObj);
       #ifdef DEBUG_FEATURE_REDISPLAY
         QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-        qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+        //qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
         /*FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
         if (aFeature.get()) {
           std::string aKind = aFeature->getKind();
@@ -298,7 +298,7 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
-  QString anInfoStr = anInfo.join(", ");
+  QString anInfoStr = anInfo.join(";\t");
   qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
@@ -315,8 +315,9 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     if (!aHide) {
       // setDisplayed has to be called in order to synchronize internal state of the object 
       // with list of displayed objects
-      if (displayObject(anObject)) {
+      if (myWorkshop->module()->canDisplayObject(anObject)) {
         anObject->setDisplayed(true);
+        isDisplayed = displayObject(*aIt);
       } else 
         anObject->setDisplayed(false);
     }
@@ -429,8 +430,9 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
 bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
 {
   XGUI_Workshop* aWorkshop = workshop();
-  if (ModelAPI_Tools::hasSubResults(std::dynamic_pointer_cast<ModelAPI_Result>(theObj)) ||
-      !aWorkshop->module()->canDisplayObject(theObj))
+  // do not display the object if it has sub objects. They should be displayed separately.
+  if (!aWorkshop->module()->canDisplayObject(theObj) ||
+      ModelAPI_Tools::hasSubResults(std::dynamic_pointer_cast<ModelAPI_Result>(theObj)))
     return false;
 
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();

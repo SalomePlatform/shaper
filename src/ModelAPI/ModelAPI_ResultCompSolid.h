@@ -33,6 +33,10 @@ public:
   /// Returns true if feature or reuslt belong to this composite feature as subs
   virtual bool isSub(ObjectPtr theObject) const = 0;
 
+  /// Set displayed flag to the result and all sub results
+  /// \param theDisplay a boolean value
+  MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
+
 protected:
 };
 

@@ -21,6 +21,7 @@
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Tools.h>
@@ -179,12 +180,19 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           action("SHADING_CMD")->setEnabled(true);
         }
         if (!hasFeature) {
-          if (aObject->isDisplayed()) {
+          bool aHasSubResults = ModelAPI_Tools::hasSubResults(
+                                            std::dynamic_pointer_cast<ModelAPI_Result>(aObject));
+          if (aHasSubResults) {
             action("HIDE_CMD")->setEnabled(true);
-          } else if (hasResult && (!hasParameter)) {
             action("SHOW_CMD")->setEnabled(true);
           }
-
+          else {
+            if (aObject->isDisplayed()) {
+              action("HIDE_CMD")->setEnabled(true);
+            } else if (hasResult && (!hasParameter)) {
+              action("SHOW_CMD")->setEnabled(true);
+            }
+          }
           if (!(hasParameter || hasFeature))
             action("SHOW_ONLY_CMD")->setEnabled(true);
         }

@@ -159,6 +159,8 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
       aFeatureStr.append("[disabled]");
     if (aRes->isConcealed())
       aFeatureStr.append("[concealed]");
+    if (ModelAPI_Tools::hasSubResults(aRes))
+      aFeatureStr.append("[hasSubResults]");
 
     aFeature = ModelAPI_Feature::feature(aRes);
   }
