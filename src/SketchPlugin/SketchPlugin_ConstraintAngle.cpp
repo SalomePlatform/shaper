@@ -24,6 +24,7 @@ const double tolerance = 1.e-7;
 
 SketchPlugin_ConstraintAngle::SketchPlugin_ConstraintAngle()
 {
+  myFlyoutUpdate = false;
 }
 
 void SketchPlugin_ConstraintAngle::initAttributes()
@@ -31,6 +32,7 @@ void SketchPlugin_ConstraintAngle::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
 }
 
 void SketchPlugin_ConstraintAngle::execute()
@@ -55,6 +57,11 @@ AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious
   if (!anAIS) {
     anAIS = SketcherPrs_Factory::angleConstraint(this, sketch()->coordinatePlane());
   }
+
+  // Set color from preferences
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
+                                                    SKETCH_DIMENSION_COLOR);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 
@@ -76,6 +83,10 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
       double anAngle = calculateAngle();
       aValueAttr->setValue(anAngle);
     }
+  } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
+    // Recalculate flyout point in local coordinates
+    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   }
 }
 
@@ -123,4 +134,17 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
 
   anAngle = aDirA->angle(aDirB) * 180.0 / PI;
   return anAngle;
+}
+
+void SketchPlugin_ConstraintAngle::move(double theDeltaX, double theDeltaY)
+{
+  std::shared_ptr<ModelAPI_Data> aData = data();
+  if (!aData->isValid())
+    return;
+
+  myFlyoutUpdate = true;
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
+  myFlyoutUpdate = false;
 }

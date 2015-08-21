@@ -47,11 +47,19 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
+  /// Moves the feature
+  /// \param theDeltaX the delta for X coordinate is moved
+  /// \param theDeltaY the delta for Y coordinate is moved
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
+
   /// Calculate current value of the angle
   double calculateAngle();
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintAngle();
+
+private:
+  bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
 };
 
 #endif

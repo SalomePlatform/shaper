@@ -74,10 +74,10 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::intersect(
   gp_Lin2d aPrjLine1 = ProjLib::Project(aPlane, *MY_LIN);
   gp_Lin2d aPrjLine2 = ProjLib::Project(aPlane, theLine->impl<gp_Lin>());
 
-  IntAna2d_AnaIntersection anInter(aPrjLine1, aPrjLine1);
+  IntAna2d_AnaIntersection anInter(aPrjLine1, aPrjLine2);
   if (!anInter.IsDone() || anInter.IsEmpty())
   return std::shared_ptr<GeomAPI_Pnt>();
-  const gp_Pnt2d& anIntPnt2d = anInter.Point(0).Value();
+  const gp_Pnt2d& anIntPnt2d = anInter.Point(1).Value();
   gp_Pnt aResult = ElSLib::Value(anIntPnt2d.X(), anIntPnt2d.Y(), aPlane);
 
   return std::shared_ptr<GeomAPI_Pnt>(

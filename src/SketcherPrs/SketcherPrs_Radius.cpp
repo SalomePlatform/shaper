@@ -53,8 +53,6 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   if (!aFlyoutAttr->isInitialized())
     return; // can not create a good presentation
 
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = myPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
-
   // Get circle
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
@@ -85,14 +83,6 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
     
   std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(myConstraint, myPlane);
-  //std::shared_ptr<GeomAPI_Pnt> anAnchor = aCircle.project(aFlyoutPnt);
-  //std::shared_ptr<GeomAPI_XYZ> anAnchorXYZ = anAnchor->xyz();
-  //anAnchorXYZ = anAnchorXYZ->decreased(aCenter->xyz());
-  //std::shared_ptr<GeomAPI_Dir> aDeltaDir(new GeomAPI_Dir(anAnchorXYZ));
-  //const double aDelta = 1e-3;
-  //anAnchor->setX(anAnchor->x() + aDelta * aDeltaDir->x());
-  //anAnchor->setY(anAnchor->y() + aDelta * aDeltaDir->y());
-  //anAnchor->setZ(anAnchor->z() + aDelta * aDeltaDir->z());
 
   SetMeasuredGeometry(aCircle.impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
   SetCustomValue(aRadius);

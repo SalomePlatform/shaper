@@ -17,6 +17,7 @@
 #include "SketcherPrs_LengthDimension.h"
 #include "SketcherPrs_Mirror.h"
 #include "SketcherPrs_Transformation.h"
+#include "SketcherPrs_Angle.h"
 
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
 AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
@@ -37,6 +38,7 @@ CONSTRAINT_PRS_IMPL(tangentConstraint, SketcherPrs_Tangent);
 CONSTRAINT_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
 CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
 CONSTRAINT_PRS_IMPL(mirrorConstraint, SketcherPrs_Mirror);
+CONSTRAINT_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
 
 
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theConstraint,
@@ -73,10 +75,4 @@ AISObjectPtr SketcherPrs_Factory::rotateConstraint(ModelAPI_Feature* theConstrai
   Handle(SketcherPrs_Transformation) aPrs = new SketcherPrs_Transformation(theConstraint, thePlane, false); 
   aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); 
   return aAISObj; 
-}
-
-AISObjectPtr SketcherPrs_Factory::angleConstraint(ModelAPI_Feature* theConstraint,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-{
-  return AISObjectPtr(new GeomAPI_AISObject());
 }

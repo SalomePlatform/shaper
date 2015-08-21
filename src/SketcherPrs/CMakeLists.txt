@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
 	SketcherPrs_LengthDimension.h
 	SketcherPrs_Mirror.h
 	SketcherPrs_Transformation.h
+	SketcherPrs_Angle.h
 )
 
 SET(PROJECT_SOURCES
@@ -37,6 +38,7 @@ SET(PROJECT_SOURCES
 	SketcherPrs_LengthDimension.cpp
 	SketcherPrs_Mirror.cpp
 	SketcherPrs_Transformation.cpp
+	SketcherPrs_Angle.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -55,36 +55,6 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   gp_Pnt aPnt1, aPnt2;
   if (!getPoints(aPnt1, aPnt2))
     return;
-  //DataPtr aData = myConstraint->data();
-
-  //AttributePtr aFlyOutAttribute = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-  //if (!aFlyOutAttribute->isInitialized()) {
-  //  return; // not possible to show length because points are not defined
-  //}
-  //std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
-  //  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFlyOutAttribute);
-  //std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = myPlane->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
-  //gp_Pnt aFlyPnt = aFlyoutPnt->impl<gp_Pnt>();
-
-  //double aDistance = aPnt1.Distance(aPnt2);
-
-  //double aFlyout = 0;
-  //double aDist = 0.0;
-  //if (aDistance < Precision::Confusion())
-  //  aDist = aPnt1.Distance(aFlyPnt);
-  //else {
-  //  gp_Lin aLine(aPnt1, gp_Vec(aPnt1, aPnt2));
-  //  aDist = aLine.Distance(aFlyPnt);
-  //}
-
-  //gp_XYZ aLineDir = aPnt2.XYZ().Subtracted(aPnt1.XYZ());
-  //gp_XYZ aFOutDir = aFlyPnt.XYZ().Subtracted(aPnt1.XYZ());
-  //gp_XYZ aNorm = myPlane->norm()->xyz()->impl<gp_XYZ>();
-  //if (aLineDir.Crossed(aFOutDir).Dot(aNorm) < 0)
-  //  aDist = -aDist;
-  //aFlyout = aDist;
-
-  //SetFlyout(aFlyout);
   SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
