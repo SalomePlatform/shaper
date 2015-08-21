@@ -330,7 +330,10 @@ QIntList ModuleBase_WidgetMultiSelector::getShapeTypes() const
   }
   else {
     for (int i = 0, aCount = myTypeCombo->count(); i < aCount; i++) {
-      aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->itemText(i)));
+      TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->itemText(i));
+      aShapeTypes.append(aType);
+      if (aType == TopAbs_SOLID)
+        aShapeTypes.append(TopAbs_COMPSOLID);
     }
   }
   return aShapeTypes;
