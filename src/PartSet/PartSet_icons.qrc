@@ -60,5 +60,6 @@
      <file>icons/movement.png</file>
      <file>icons/extrusion_cut.png</file>
      <file>icons/extrusion_fuse.png</file>
+     <file>icons/angle_constr.png</file>
  </qresource>
  </RCC>

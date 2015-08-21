@@ -38,14 +38,26 @@ void SketchPlugin_ConstraintAngle::initAttributes()
 void SketchPlugin_ConstraintAngle::execute()
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
+
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrA = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrB = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
+  if (!anAttrA->isInitialized() || !anAttrB->isInitialized())
+    return;
+
   AttributeDoublePtr anAttrValue = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aData->attribute(SketchPlugin_Constraint::VALUE()));
 
-  if(anAttrValue->isInitialized())
-    return;
-
-  double anAngle = calculateAngle();
-  anAttrValue->setValue(anAngle);
+  if (!anAttrValue->isInitialized()) {
+    double anAngle = calculateAngle();
+    anAttrValue->setValue(anAngle);
+  }
+  // the value should to be computed here, not in the getAISObject in order to change the model value
+  // inside the object transaction. This is important for creating a constraint by preselection.
+  // The display of the presentation in this case happens after the transaction commit
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  if(!aFlyOutAttr->isInitialized())
+    compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
 }
 
 AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious)
@@ -67,16 +79,16 @@ AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious
 
 void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
 {
-  if (theID == SketchPlugin_Constraint::ENTITY_A() || 
-      theID == SketchPlugin_Constraint::ENTITY_B()) {
-    std::shared_ptr<ModelAPI_Data> aData = data();
-    if (!aData)
-      return;
+  std::shared_ptr<ModelAPI_Data> aData = data();
+  if (!aData)
+    return;
   FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
   FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
-    if (!aLineA || !aLineB)
-      return;
+  if (!aLineA || !aLineB)
+    return;
 
+  if (theID == SketchPlugin_Constraint::ENTITY_A() || 
+      theID == SketchPlugin_Constraint::ENTITY_B()) {
     std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
         ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
     if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
@@ -85,6 +97,7 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
     }
   } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
     // Recalculate flyout point in local coordinates
+    // coordinates are calculated according to the center of shapes intersection
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   }
@@ -147,4 +160,46 @@ void SketchPlugin_ConstraintAngle::move(double theDeltaX, double theDeltaY)
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
   myFlyoutUpdate = false;
+}
+
+
+bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
+{
+  if (theAttributeId != SketchPlugin_Constraint::FLYOUT_VALUE_PNT())
+    return false;
+  if (!sketch())
+    return false;
+
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
+                           GeomDataAPI_Point2D>(attribute(theAttributeId));
+  if (fabs(aFlyOutAttr->x()) >= tolerance || fabs(aFlyOutAttr->y()) >= tolerance)
+    return false;
+
+  DataPtr aData = data();
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+
+  if ((aLineA.get() == NULL) || (aLineB.get() == NULL))
+    return false;
+
+  // Start and end points of lines
+  std::shared_ptr<GeomDataAPI_Point2D> aPointA1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineA->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aPointA2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineA->attribute(SketchPlugin_Line::END_ID()));
+
+  std::shared_ptr<GeomAPI_Pnt2d> aStartA = aPointA1->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aEndA   = aPointA2->pnt();
+  if (aStartA->distance(aEndA) < tolerance)
+    return false;
+
+  myFlyoutUpdate = true;
+  double aX = (aStartA->x() + aEndA->x()) / 2.;
+  double aY = (aStartA->y() + aEndA->y()) / 2.;
+
+  aFlyOutAttr->setValue(aX, aY);
+  myFlyoutUpdate = false;
+
+  return true;
 }
