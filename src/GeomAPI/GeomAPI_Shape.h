@@ -62,6 +62,10 @@ public:
   GEOMAPI_EXPORT 
   virtual bool isSolid() const;
 
+  /// Returns whether the shape is a compsolid
+  GEOMAPI_EXPORT
+  virtual bool isCompSolid() const;
+
   /// Returns the shape type
   GEOMAPI_EXPORT
   virtual ShapeType shapeType() const;

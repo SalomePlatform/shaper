@@ -160,7 +160,8 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
         aValid = theShape->isVertex();
       break;
       case Solid:
-        aValid = theShape->isSolid() || theShape->isCompoundOfSolids();
+        aValid = theShape->isSolid() || theShape->isCompSolid() ||
+                 theShape->isCompoundOfSolids();
         break;
       case Face:
         aValid = theShape->isFace();
