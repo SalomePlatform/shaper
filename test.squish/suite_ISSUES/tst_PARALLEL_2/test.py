@@ -10,13 +10,8 @@ def sketch():
     
     parallel_create((165, 190), (581, 197))
     parallel_create((285, 135), (469, 364))
+    #[check] Check that lines are parallel
     test.vp("VP1")
-    mouseDrag(waitForObject(":OpenParts*_AppElements_ViewPort"), 663, 348, -375, 114, 1, Qt.LeftButton)
-    test.vp("VP2")
-    mouseDrag(waitForObject(":OpenParts*_AppElements_ViewPort"), 301, 125, 284, 67, 1, Qt.LeftButton)
-    mouseDrag(waitForObject(":OpenParts*_AppElements_ViewPort"), 156, 249, -15, 184, 1, Qt.LeftButton)
-    test.vp("VP3")
-    mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), 336, 302, 0, Qt.LeftButton)
 
 def main():
     source(findFile("scripts", "common.py"))
