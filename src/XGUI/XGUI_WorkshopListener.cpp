@@ -57,6 +57,7 @@
 
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
+//#define DEBUG_RESULT_COMPSOLID
 
 XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop),
@@ -241,6 +242,17 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();
     }
+#ifdef DEBUG_RESULT_COMPSOLID
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aRes.get()) {
+      ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+      if (aCompSolidRes.get()) {
+          qDebug(QString("COMPSOLID, numberOfSubs = %1").arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
+      }
+      if (ModelAPI_Tools::compSolidOwner(aRes))
+        qDebug("COMPSOLID sub-object");
+    }
+#endif
     if (aHide) {
       aDisplayer->erase(aObj, false);
       #ifdef DEBUG_FEATURE_REDISPLAY
@@ -248,7 +260,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
         bool isVisibleObject = aDisplayer->isVisible(aObj);
 
         QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-        qDebug(QString("visible=%1 : erase  = %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
+        //qDebug(QString("visible=%1 : erase  = %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
       #endif
     }
     else {
@@ -306,6 +318,18 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr anObject = *aIt;
+
+#ifdef DEBUG_RESULT_COMPSOLID
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    if (aRes.get()) {
+      ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+      if (aCompSolidRes.get()) {
+          qDebug(QString("COMPSOLID, numberOfSubs = %1").arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
+      }
+      if (ModelAPI_Tools::compSolidOwner(aRes))
+        qDebug("COMPSOLID sub-object");
+    }
+#endif
     // the validity of the data should be checked here in order to avoid display of the objects,
     // which were created, then deleted, but flush for the creation event happens after that
     // we should not display disabled objects
@@ -429,6 +453,16 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
 //**************************************************************
 bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
 {
+#ifdef DEBUG_RESULT_COMPSOLID
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+  if (aRes.get() && (ModelAPI_Tools::hasSubResults(aRes) || ModelAPI_Tools::compSolidOwner(aRes))) {
+    ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+    if (aCompSolidRes.get()) {
+      qDebug("COMPSOLID: displayObject");
+    }
+  }
+#endif
+
   XGUI_Workshop* aWorkshop = workshop();
   // do not display the object if it has sub objects. They should be displayed separately.
   if (!aWorkshop->module()->canDisplayObject(theObj) ||

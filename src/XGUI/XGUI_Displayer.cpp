@@ -989,6 +989,6 @@ std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
     
     aContent.append(aPtrStr.str().c_str());
   }
-  return QString("myResult2AISObjectMap: size = %1\n%2").arg(myResult2AISObjectMap.size()).
+  return QString("myResult2AISObjectMap: size = %1\n%2\n").arg(myResult2AISObjectMap.size()).
                                             arg(aContent.join("\n")).toStdString().c_str();
 }
