@@ -17,7 +17,7 @@ def main():
     set_defaults()
     
     #[step] Open 'for_sketch_006.hdf'
-    open(DATA_PATH + "for_sketch_007.hdf")
+    open(DATA_PATH + "/for_sketch_007.hdf")
     
     #[step] Activate NewGeom
     clickButton(waitForObject(":SALOME 7.6.0.NewGeom_QToolButton"))
