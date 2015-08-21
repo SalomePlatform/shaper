@@ -174,12 +174,12 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
+        if (hasResult && myWorkshop->canBeShaded(aObject)) {
+          action("WIREFRAME_CMD")->setEnabled(true);
+          action("SHADING_CMD")->setEnabled(true);
+        }
         if (!hasFeature) {
           if (aObject->isDisplayed()) {
-            if (aDisplayer->canBeShaded(aObject)) {
-              action("WIREFRAME_CMD")->setEnabled(true);
-              action("SHADING_CMD")->setEnabled(true);
-            }
             action("HIDE_CMD")->setEnabled(true);
           } else if (hasResult && (!hasParameter)) {
             action("SHOW_CMD")->setEnabled(true);
@@ -198,7 +198,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         }
       }
     } else {
-      if (hasResult && (!hasParameter)) {
+      // parameter is commented because the actions are not in the list of result parameter actions
+      if (hasResult /*&& (!hasParameter)*/) {
         action("SHOW_CMD")->setEnabled(true);
         action("HIDE_CMD")->setEnabled(true);
         action("SHOW_ONLY_CMD")->setEnabled(true);

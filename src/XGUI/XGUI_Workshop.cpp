@@ -44,6 +44,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_Tools.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -1316,6 +1317,21 @@ bool XGUI_Workshop::canMoveFeature()
 }
 
 //**************************************************************
+bool XGUI_Workshop::canBeShaded(const ObjectPtr& theObject) const
+{
+  bool aCanBeShaded = myDisplayer->canBeShaded(theObject);
+  if (!aCanBeShaded) {
+    ResultCompSolidPtr aCompsolidResult =
+                std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
+    if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
+      for(int i = 0; i < aCompsolidResult->numberOfSubs() && !aCanBeShaded; i++)
+        aCanBeShaded = myDisplayer->canBeShaded(aCompsolidResult->subResult(i));
+    }
+  }
+  return aCanBeShaded;
+}
+
+//**************************************************************
 bool XGUI_Workshop::canChangeColor() const
 {
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
@@ -1399,11 +1415,8 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     if (aResult.get() != NULL) {
       ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          ResultPtr aSubResult = aCompsolidResult->subResult(i);
-          if (aSubResult.get())
-            setColor(aSubResult, aColorResult);
-        }
+        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++)
+          setColor(aCompsolidResult->subResult(i), aColorResult);
       }
       setColor(aResult, aColorResult);
     }
@@ -1507,6 +1520,14 @@ void XGUI_Workshop::setDisplayMode(const QObjectPtrList& theList, int theMode)
 {
   foreach(ObjectPtr aObj, theList) {
     myDisplayer->setDisplayMode(aObj, (XGUI_Displayer::DisplayMode)theMode, false);
+
+    ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aObj);
+    if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
+      for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+          myDisplayer->setDisplayMode(aCompsolidResult->subResult(i),
+                                      (XGUI_Displayer::DisplayMode)theMode, false);
+      }
+    }
   }
   if (theList.size() > 0)
     myDisplayer->updateViewer();

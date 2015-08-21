@@ -222,14 +222,6 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
   return TopAbs_SHAPE;
 }
 
-bool isSubResult(ObjectPtr theObject)
-{
-  bool aSubResult = false;
-
-  //ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-  return aSubResult;
-}
-
 void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter, bool& hasSubFeature)
 {
   hasResult = false;
@@ -241,10 +233,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
 
-    bool aSubResult = isSubResult(aResult);
-
-    /// results of compsolids are not processed in SHOW/HIDE/WIREFRAME operations
-    hasResult = (aResult.get() != NULL && !aSubResult);
+    hasResult = (aResult.get() != NULL);
     hasFeature = (aFeature.get() != NULL);
     hasParameter = (aConstruction.get() != NULL);
     if (hasFeature) 
