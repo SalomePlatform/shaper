@@ -109,11 +109,16 @@ bool Model_ResultCompSolid::isConcealed()
 
 void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape)
 {
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID EVENT_UPD = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   // iterate all sub-solids of compsolid to make sub-results synchronized with them
   TopoDS_Shape aThisShape;
   if (theThisShape.get()) aThisShape = theThisShape->impl<TopoDS_Shape>();
   if (!aThisShape.IsNull() && (aThisShape.ShapeType() == TopAbs_COMPSOLID ||
        aThisShape.ShapeType() == TopAbs_COMPOUND)) {
+    bool aWasEmpty = mySubs.empty();
     Model_Objects* anObjects = std::dynamic_pointer_cast<Model_Document>(document())->objects();
     unsigned int aSubIndex = 0;
     TopExp_Explorer aSolids(aThisShape, TopAbs_SOLID);
@@ -129,10 +134,6 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
       }
       if (!aSolidShape->isEqual(aSub->shape())) {
         aSub->store(aSolidShape);
-        static Events_Loop* aLoop = Events_Loop::loop();
-        static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-        static Events_ID EVENT_UPD = aLoop->eventByName(EVENT_OBJECT_UPDATED);
-        static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
@@ -144,11 +145,17 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
       anErased->setDisabled(anErased, true);
       mySubs.pop_back();
     }
-  } else { // erase all subs
+    if (aWasEmpty) { // erase all subs
+      // redisplay this because result with and without subs are displayed differently
+      aECreator->sendUpdated(data()->owner(), EVENT_DISP);
+    }
+  } else if (!mySubs.empty()) { // erase all subs
     while(!mySubs.empty()) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
       anErased->setDisabled(anErased, true);
       mySubs.pop_back();
     }
+    // redisplay this because result with and without subs are displayed differently
+    aECreator->sendUpdated(data()->owner(), EVENT_DISP);
   }
 }

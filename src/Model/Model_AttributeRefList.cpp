@@ -75,7 +75,7 @@ int Model_AttributeRefList::size(const bool theWithEmpty) const
 
 bool Model_AttributeRefList::isInitialized()
 {
-  if (size() == 0) { // empty list is not initialized list: sketch will be not valid after add/undo
+  if (size(false) == 0) { // empty list is not initialized list: sketch will be not valid after add/undo
     return false;
   }
   return ModelAPI_AttributeRefList::isInitialized();
@@ -128,8 +128,12 @@ ObjectPtr Model_AttributeRefList::object(const int theIndex, const bool theWithE
     for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
       if (theWithEmpty || !aLIter.Value().IsNull())
         anIndex++;
-      if (anIndex == theIndex)
+      if (anIndex == theIndex) {
+        if (aLIter.Value().IsNull()) { // null label => null sub
+          return ObjectPtr();
+        }
         return aDoc->objects()->object(aLIter.Value());
+      }
     }
   }
   return ObjectPtr();
