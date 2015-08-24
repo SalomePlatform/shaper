@@ -304,9 +304,6 @@ signals:
   /// Hide object Browser
   void hideObjectBrowser();
 
-  /// Reaction on command call
-  //void onFeatureTriggered();
-
   /// Close document
   void closeDocument();
 
@@ -319,10 +316,6 @@ signals:
   /// into the operation
   /// \param theOperation an operation
   void setPropertyPanel(ModuleBase_Operation* theOperation);
-
-  /// Connect to operation signals
-  /// \param theOperation an operation
-  void connectWithOperation(ModuleBase_Operation* theOperation);
 
 private:
   /// Display all results

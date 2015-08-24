@@ -118,3 +118,17 @@ bool XGUI_ModuleConnector::canStartOperation(QString theId)
   return myWorkshop->operationMgr()->canStartOperation(theId);
 }
 
+ModuleBase_Operation* XGUI_ModuleConnector::findStartedOperation(const QString& theId)
+{
+  return myWorkshop->operationMgr()->findOperation(theId);
+}
+
+bool XGUI_ModuleConnector::canStopOperation()
+{
+  return myWorkshop->operationMgr()->canStopOperation();
+}
+
+void XGUI_ModuleConnector::abortOperation(ModuleBase_Operation* theOperation)
+{
+  myWorkshop->operationMgr()->abortOperation(theOperation);
+}

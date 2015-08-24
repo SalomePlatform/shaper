@@ -38,7 +38,6 @@ ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   //        SLOT(onMouseDoubleClick(QMouseEvent*)));
 }
 
-
 void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
   if (!myWorkshop->canStartOperation(theCmdId))
@@ -137,12 +136,19 @@ void ModuleBase_IModule::onFeatureTriggered()
 {
   QAction* aCmd = dynamic_cast<QAction*>(sender());
   //Do nothing on uncheck
-  if (aCmd->isCheckable() && !aCmd->isChecked())
-    return;
-  launchOperation(aCmd->data().toString());
-  emit operationLaunched();
+  if (aCmd->isCheckable() && !aCmd->isChecked()) {
+    ModuleBase_Operation* anOperation = myWorkshop->findStartedOperation(aCmd->data().toString());
+    if (myWorkshop->canStopOperation())
+      myWorkshop->abortOperation(anOperation);
+    else {
+      aCmd->setChecked(true);
+    }
+  }
+  else {
+    launchOperation(aCmd->data().toString());
+    emit operationLaunched();
+  }
 }
-
 
 void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
 {

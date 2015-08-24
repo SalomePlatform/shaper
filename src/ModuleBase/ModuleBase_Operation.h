@@ -151,10 +151,6 @@ signals:
   /// The operation is postponed
   void postponed();  
 
-  /// The operation is triggered
-  /// \param theState a new triggered state
-  void triggered(bool theState);
-
   /// The operation is filled with existing preselection
   void activatedByPreselection(); 
 
@@ -187,12 +183,6 @@ signals:
   /// Public slot. Commits operation. This slot is not virtual and cannot be redefined.
   /// Redefine commitOperation method to change behavior of operation instead
   bool commit();
-
-  /// Alias for start/abort slots
-  /// Public slot. Aborts operation if false, else does nothing.
-  /// Provided for S/S compatibility with QAction's toggle(bool)
-  /// \param theState th flag to abort, if it is true, do nothing, overwise abort
-  void setRunning(bool theState);
 
   /// Changes the modified flag of the operation
   void onValuesChanged();

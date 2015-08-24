@@ -57,6 +57,19 @@ Q_OBJECT
   //! Returns true if the operation with id theId can be started
   virtual bool canStartOperation(QString theId);
 
+  //! Returns started operation by the operation identifier. The operation manager is called.
+  //! \param theId an operation id
+  //! \return an operation instance or NULL
+  virtual ModuleBase_Operation* findStartedOperation(const QString& theId);
+
+  //! Returns true if the operation with id theId can be stopped. The operation manager is called.
+  //! \return boolean result
+  virtual bool canStopOperation();
+
+  //! Aborts the operation. The operation manager is called.
+  //! \param theId an aborted operation
+  void abortOperation(ModuleBase_Operation* theOperation);
+
   //! Returns AIS opbject by data object
   virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const;
 

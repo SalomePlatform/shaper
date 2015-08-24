@@ -261,11 +261,6 @@ bool ModuleBase_Operation::commit()
   return false;
 }
 
-void ModuleBase_Operation::setRunning(bool theState)
-{
-  emit triggered(theState);
-}
-
 void ModuleBase_Operation::onValuesChanged()
 {
   myIsModified = true;

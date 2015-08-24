@@ -84,6 +84,12 @@ Q_OBJECT
   /// \param theId id of the operation which is going to start
   bool canStartOperation(QString theId);
 
+  /// Aborts the parameter operation if it is current, else abort operations from the stack
+  /// of operations until the operation is found. All operations upper the parameter one are
+  /// not aborted.
+  /// \param theOperation an aborted operation
+  void abortOperation(ModuleBase_Operation* theOperation);
+
   /// Blocking/unblocking enabling of Ok button in property panel.
   /// It is used when operation can not be validated even all attributes are valid
   void setLockValidating(bool toLock);
@@ -174,9 +180,6 @@ signals:
 
   /// Slot called on operation resume
   void onOperationResumed();
-
-  /// Slot called on operation triggered
-  void onOperationTriggered(bool theState);
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

@@ -377,7 +377,6 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   setNestedFeatures(theOperation);
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    connectWithOperation(theOperation);
     setPropertyPanel(theOperation);
     // filling the operation values by the current selection
     // if the operation can be commited after the controls filling, the method perform should
@@ -414,7 +413,6 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
   setNestedFeatures(theOperation);
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    // connectWithOperation(theOperation); already connected
     setPropertyPanel(theOperation);
   }
   updateCommandStatus();
@@ -500,28 +498,6 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
   myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
-}
-
-/*
- * Makes a signal/slot connections between Property Panel
- * and given operation. The given operation becomes a
- * current operation and previous operation if exists
- */
-void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
-{
-  QAction* aCommand = 0;
-  if (isSalomeMode()) {
-    aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
-  } else {
-    AppElements_MainMenu* aMenu = myMainWindow->menuObject();
-    FeaturePtr aFeature = theOperation->feature();
-    if(aFeature)
-      aCommand = aMenu->feature(QString::fromStdString(aFeature->getKind()));
-  }
-  //Abort operation on uncheck the command
-  if (aCommand) {
-    connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
-  }
 }
 
 /*
@@ -677,9 +653,12 @@ bool XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo(int theTimes)
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
+  if (operationMgr()->canStopOperation())
+    operationMgr()->abortOperation(operationMgr()->currentOperation());
+  else
+    return;
+
   SessionPtr aMgr = ModelAPI_Session::get();
-  if (aMgr->isOperation())
-    operationMgr()->onAbortOperation();
   for (int i = 0; i < theTimes; ++i) {
     aMgr->undo();
   }
@@ -690,6 +669,11 @@ void XGUI_Workshop::onUndo(int theTimes)
 //******************************************************
 void XGUI_Workshop::onRedo(int theTimes)
 {
+  if (operationMgr()->canStopOperation())
+    operationMgr()->abortOperation(operationMgr()->currentOperation());
+  else
+    return;
+
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
   // each created result. After a redisplay signal is flushed. So, the viewer update is blocked until
@@ -698,8 +682,6 @@ void XGUI_Workshop::onRedo(int theTimes)
 
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
-  if (aMgr->isOperation())
-    operationMgr()->onAbortOperation();
   for (int i = 0; i < theTimes; ++i) {
     aMgr->redo();
   }
@@ -974,17 +956,6 @@ void XGUI_Workshop::hideObjectBrowser()
 {
   myObjectBrowser->parentWidget()->hide();
 }
-
-//******************************************************
-//void XGUI_Workshop::onFeatureTriggered()
-//{
-//  QAction* aCmd = dynamic_cast<QAction*>(sender());
-//  if (aCmd) {
-//    QString aId = salomeConnector()->commandId(aCmd);
-//    if (!aId.isNull())
-//      myModule->launchOperation(aId);
-//  }
-//}
 
 //******************************************************
 void XGUI_Workshop::salomeViewerSelectionChanged()

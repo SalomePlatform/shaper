@@ -123,23 +123,28 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 
 bool XGUI_OperationMgr::abortAllOperations()
 {
-  if(!hasOperation()) {
-    return true;
-  } else if (operationsCount() == 1) {
-    onAbortOperation();
-    return true;
+  bool aResult = true;
+  if(!hasOperation())
+    return aResult;
+
+  if (operationsCount() == 1) {
+    if (canStopOperation()) {
+      abortOperation(currentOperation());
+    }
+    else
+      aResult = false;
   }
-  QString aMessage = tr("All active operations will be aborted.");
-  int anAnswer = QMessageBox::question(qApp->activeWindow(),
-                                       tr("Abort operation"),
-                                       aMessage,
-                                       QMessageBox::Ok | QMessageBox::Cancel,
-                                       QMessageBox::Cancel);
-  bool result = anAnswer == QMessageBox::Ok;
-  while(result && hasOperation()) {
-    currentOperation()->abort();
+  else {
+    aResult = QMessageBox::question(qApp->activeWindow(),
+                                    tr("Abort operation"),
+                                    tr("All active operations will be aborted."),
+                                    QMessageBox::Ok | QMessageBox::Cancel,
+                                    QMessageBox::Cancel) == QMessageBox::Ok;
+    while(aResult && hasOperation()) {
+      abortOperation(currentOperation());
+    }
   }
-  return result;
+  return aResult;
 }
 
 bool XGUI_OperationMgr::commitAllOperations()
@@ -150,7 +155,7 @@ bool XGUI_OperationMgr::commitAllOperations()
     if (isApplyEnabled()) {
       onCommitOperation();
     } else {
-      anOperation->abort();
+      abortOperation(anOperation);
     }
     FeaturePtr aFeature = anOperation->feature();
     CompositeFeaturePtr aComposite = 
@@ -249,7 +254,7 @@ bool XGUI_OperationMgr::canStartOperation(QString theId)
         if (myIsApplyEnabled)
           aCurrentOp->commit();
         else
-          aCurrentOp->abort();
+          abortOperation(aCurrentOp);
       } else {
         aCanStart = false;
       }
@@ -258,6 +263,23 @@ bool XGUI_OperationMgr::canStartOperation(QString theId)
   return aCanStart;
 }
 
+void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
+{
+  ModuleBase_Operation* aCurrentOperation = currentOperation();
+  if (theOperation == aCurrentOperation)
+    theOperation->abort();
+  else {
+    // it is possible to trigger upper operation(e.g. sketch, current is sketch line)
+    // all operation from the current to triggered should also be aborted
+    // operations over the parameter one are not aborted(e.g. extrusion cut, sketch abort)
+    while(hasOperation()) {
+      ModuleBase_Operation* aCurrentOperation = currentOperation();
+      aCurrentOperation->abort();
+      if(theOperation == aCurrentOperation)
+        break;
+    }
+  }
+}
 
 void XGUI_OperationMgr::onCommitOperation()
 {
@@ -269,7 +291,7 @@ void XGUI_OperationMgr::onCommitOperation()
 void XGUI_OperationMgr::onAbortOperation()
 {
   if (hasOperation() && canStopOperation()) {
-    currentOperation()->abort();
+    abortOperation(currentOperation());
   }
 }
 
@@ -336,26 +358,6 @@ void XGUI_OperationMgr::onOperationStopped()
     aResultOp->setIsModified(aResultOp->isModified() || isModified);
     resumeOperation(aResultOp);
     onValidateOperation();
-  }
-}
-
-void XGUI_OperationMgr::onOperationTriggered(bool theState)
-{
-  ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  if (aSenderOperation && !theState) {
-    ModuleBase_Operation* aCurrentOperation = currentOperation();
-    if (aSenderOperation == aCurrentOperation)
-      aCurrentOperation->abort();
-    else {
-      // it is possible to trigger upper operation(e.g. sketch, current is sketch line)
-      // all operation from the current to triggered should also be aborted
-      while(hasOperation()) {
-        ModuleBase_Operation* aCurrentOperation = currentOperation();
-        aCurrentOperation->abort();
-        if(aSenderOperation == aCurrentOperation)
-          break;
-      }
-    }
   }
 }
 
