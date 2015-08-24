@@ -577,22 +577,15 @@ bool SketchSolver_Group::isConsistent()
   bool aResult = myFeatureStorage->isConsistent();
   if (!aResult) {
     // remove invalid entities
+    std::set<ConstraintPtr> anInvalidConstraints;
     ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
-    while (aCIter != myConstraints.end()) {
-      std::list<ConstraintPtr> aConstraints = aCIter->second->constraints();
-      std::list<ConstraintPtr>::iterator anIt = aConstraints.begin();
-      for (; anIt != aConstraints.end(); anIt++)
-        if (!(*anIt)->data() || !(*anIt)->data()->isValid())
-          if (aCIter->second->remove(*anIt)) {
-            // the constraint is fully removed, detach it from the list
-            ConstraintConstraintMap::iterator aTmpIt = aCIter++;
-            myFeatureStorage->removeConstraint(aTmpIt->first);
-            myConstraints.erase(aTmpIt);
-            break;
-          }
-      if (anIt == aConstraints.end())
-        aCIter++;
+    for (; aCIter != myConstraints.end(); ++aCIter) {
+      if (!aCIter->first->data() || !aCIter->first->data()->isValid())
+        anInvalidConstraints.insert(aCIter->first);
     }
+    std::set<ConstraintPtr>::const_iterator aRemoveIt = anInvalidConstraints.begin();
+    for (; aRemoveIt != anInvalidConstraints.end(); ++aRemoveIt)
+      removeConstraint(*aRemoveIt);
   }
   return aResult;
 }
@@ -623,16 +616,38 @@ void SketchSolver_Group::removeTemporaryConstraints()
 // ============================================================================
 void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
 {
+  bool isFullyRemoved = true;
   myFeatureStorage->removeConstraint(theConstraint);
   ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
   for (; aCIter != myConstraints.end(); aCIter++)
     if (aCIter->second->hasConstraint(theConstraint)) {
       if (!aCIter->second->remove(theConstraint)) // the constraint is not fully removed
-        aCIter = myConstraints.end();
+        isFullyRemoved = false;
       break;
     }
-  if (aCIter != myConstraints.end())
+  if (isFullyRemoved)
     myConstraints.erase(aCIter);
+  else if (aCIter != myConstraints.end() &&
+           aCIter->first->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+    // Update multicoincidence
+    std::list<ConstraintPtr> aMultiCoinc;
+    SolverConstraintPtr aCoincidence = aCIter->second;
+    while (aCIter != myConstraints.end()) {
+      if (aCIter->second != aCoincidence) {
+        ++aCIter;
+        continue;
+      }
+      if (aCIter->first != theConstraint)
+        aMultiCoinc.push_back(aCIter->first);
+      aCIter->second->remove(aCIter->first);
+      ConstraintConstraintMap::iterator aRemoveIt = aCIter++;
+      myConstraints.erase(aRemoveIt);
+    }
+
+    std::list<ConstraintPtr>::iterator anIt = aMultiCoinc.begin();
+    for (; anIt != aMultiCoinc.end(); ++anIt)
+      changeConstraint(*anIt);
+  }
 }
 
 // ============================================================================
