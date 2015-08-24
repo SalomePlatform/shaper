@@ -2,7 +2,7 @@
 def main():
     #[project] NewGEOM
     #[Scenario] Sketch_007
-    #[Topic] Parallel lines
+    #[Topic] Perpendicular lines
     #[Tested functionality] 'Perpendicular' constraint
     #[Summary description]
     #[Expected results]
