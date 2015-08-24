@@ -221,6 +221,14 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelWgt->setFrameShape(myTreeView->frameShape());
   aLabelWgt->setFrameShadow(myTreeView->frameShadow());
 
+#ifndef ModuleDataModel
+  myDocModel = new XGUI_DataModel(this);
+  myTreeView->setModel(myDocModel);
+  QItemSelectionModel* aSelMod = myTreeView->selectionModel();
+  connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+          this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
+#endif
+
   connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
           SLOT(onLabelContextMenuRequested(const QPoint&)));
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
@@ -376,18 +384,17 @@ void XGUI_ObjectsBrowser::clearContent()
   myTreeView->clear(); 
 }
 
+#ifdef ModuleDataModel
 void XGUI_ObjectsBrowser::setDataModel(ModuleBase_IDocumentDataModel* theModel)
 {
-#ifdef ModuleDataModel
   myDocModel = theModel;
-#else
-  myDocModel = new XGUI_DataModel(this);
-#endif
+  //myDocModel = new XGUI_DataModel(this);
   myTreeView->setModel(myDocModel);
   QItemSelectionModel* aSelMod = myTreeView->selectionModel();
   connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
+#endif
 
 void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
                                        const QItemSelection& theDeselected)

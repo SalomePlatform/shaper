@@ -114,7 +114,9 @@ Q_OBJECT
   void clearContent();
 
   /// Set Data Model for the Object Browser
+#ifdef ModuleDataModel
   void setDataModel(ModuleBase_IDocumentDataModel* theModel);
+#endif
 
 public slots:
   //! Called on Edit command request
