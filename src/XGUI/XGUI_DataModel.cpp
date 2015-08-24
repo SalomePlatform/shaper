@@ -641,8 +641,28 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
       aObj = (ModelAPI_Object*) theIndex.internalPointer();
   }
   if (aObj) {
+    bool isCompositeSub = false;
+    if (theIndex.column() == 1) {
+      ObjectPtr aObjPtr = aObj->data()->owner();
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjPtr);
+      if (aFeature.get()) {
+        CompositeFeaturePtr aCompFea = ModelAPI_Tools::compositeOwner(aFeature);
+        if (aCompFea.get()) 
+          isCompositeSub = true;
+      } else {
+        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObjPtr);
+        if (aResult.get()) {
+          ResultCompSolidPtr aCompRes = ModelAPI_Tools::compSolidOwner(aResult);
+          if (aCompRes.get()) 
+            isCompositeSub = true;
+        }
+      }
+    }
+    // An object which is sub-object of a composite object can not be accessible in column 1
+    if (isCompositeSub)
+      return Qt::ItemFlags();
+
     aFlags |= Qt::ItemIsEditable;
-  
     if (!aObj->isDisabled())
       aFlags |= Qt::ItemIsEnabled;
   } else
