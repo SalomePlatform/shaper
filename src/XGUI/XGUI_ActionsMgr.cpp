@@ -236,6 +236,10 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
       case Accept:
       case AcceptAll:
         aResult = new QAction(QIcon(":pictures/button_ok.png"), "", theParent);
+        // the default value is disabled, some modifications should be performed in order
+        // to update enable state of this action.
+        // AcceptAll is blinked when sketch is started from enabled to disabled.
+        aResult->setEnabled(false);
         break;
       case Abort:
       case AbortAll: {

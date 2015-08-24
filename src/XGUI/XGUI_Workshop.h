@@ -258,10 +258,6 @@ signals:
    /// Update of commands status
   void updateCommandStatus();
 
-  // Update enable state of accept all button. It is enabled if the the parent operation is
-  // valid and there are modifications in sesstion(undo can be performed).
-  void updateCompositeActionState();
-
   /// update history list (undo/redo commands)
   void updateHistory();
 

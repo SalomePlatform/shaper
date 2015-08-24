@@ -188,6 +188,9 @@ void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
 {
   myIsApplyEnabled = theEnabled;
   emit validationStateChanged(theEnabled);
+
+  bool aParentValid = isParentOperationValid();
+  emit nestedStateChanged(aParentValid);
 }
 
 bool XGUI_OperationMgr::isApplyEnabled() const
@@ -298,13 +301,6 @@ void XGUI_OperationMgr::onAbortOperation()
 void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  
-  bool aParentValid = isParentOperationValid();
-  // in order to apply is enabled only if there are modifications in the model
-  // e.g. sketch can be applyed only if at least one nested element modification is finished
-  bool aCanUndo = ModelAPI_Session::get()->canUndo();
-  emit nestedStateChanged(aParentValid && aCanUndo);
-
   emit operationStarted(aSenderOperation);
 }
 
@@ -317,10 +313,6 @@ void XGUI_OperationMgr::onOperationAborted()
 void XGUI_OperationMgr::onOperationCommitted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  // in order to apply is enabled only if there are modifications in the model
-  // e.g. sketch can be applyed only if at least one nested element create is finished
-  bool aCanUndo = ModelAPI_Session::get()->canUndo();
-  emit nestedStateChanged(myOperations.count() >= 1 && aCanUndo);
   emit operationCommitted(aSenderOperation);
 }
 

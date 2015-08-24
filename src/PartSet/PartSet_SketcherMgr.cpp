@@ -532,10 +532,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // were changed here
     if (isModified) {
       aCurrentOperation->onValuesChanged();
-      ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
-      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
-      XGUI_Workshop* aWorkshop = aConnector->workshop();
-      aWorkshop->updateCompositeActionState();
     }
     Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations

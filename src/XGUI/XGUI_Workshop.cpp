@@ -663,7 +663,6 @@ void XGUI_Workshop::onUndo(int theTimes)
   for (int i = 0; i < theTimes; ++i) {
     aMgr->undo();
   }
-  updateCompositeActionState();
   updateCommandStatus();
 }
 
@@ -687,7 +686,6 @@ void XGUI_Workshop::onRedo(int theTimes)
   for (int i = 0; i < theTimes; ++i) {
     aMgr->redo();
   }
-  updateCompositeActionState();
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose
@@ -848,20 +846,6 @@ void XGUI_Workshop::updateCommandStatus()
   }
   myActionsMgr->update();
   emit commandStatusUpdated();
-}
-
-//******************************************************
-void XGUI_Workshop::updateCompositeActionState()
-{
-  // in order to apply is enabled only if there are modifications in the model
-  // e.g. sketch can be applyed only if at least one nested element create is finished
-  bool aCanUndo = ModelAPI_Session::get()->canUndo();
-  bool aParentValid = operationMgr()->isParentOperationValid();
-  bool aCurrentValid = operationMgr()->currentOperation() &&
-                       operationMgr()->currentOperation()->isValid();
-
-  QAction* aAcceptAllAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
-  aAcceptAllAct->setEnabled(aParentValid && (aCanUndo || aCurrentValid));
 }
 
 void XGUI_Workshop::updateHistory()
