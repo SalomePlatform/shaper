@@ -88,16 +88,22 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
       continue;
     }
     else if(aListOfShape.Size() == 1) {
-      aFreeShapes.Add(aListOfShape.First());
+      const TopoDS_Shape& aF = aListOfShape.First();
+      aFreeShapes.Add(aF);
       aListOfShape.Clear();
     } else {
+      NCollection_List<TopoDS_Shape> aTempList;
       NCollection_Map<TopoDS_Shape> aTempMap;
-      aTempMap.Add(aListOfShape.First());
-      aTempMap.Add(aListOfShape.Last());
-      aFreeShapes.Remove(aListOfShape.First());
-      aFreeShapes.Remove(aListOfShape.Last());
+      const TopoDS_Shape& aF = aListOfShape.First();
+      const TopoDS_Shape& aL = aListOfShape.Last();
+      aTempList.Append(aF);
+      aTempList.Append(aL);
+      aTempMap.Add(aF);
+      aTempMap.Add(aL);
+      aFreeShapes.Remove(aF);
+      aFreeShapes.Remove(aL);
       aListOfShape.Clear();
-      for(NCollection_Map<TopoDS_Shape>::Iterator aTempIter(aTempMap); aTempIter.More(); aTempIter.Next()) {
+      for(NCollection_List<TopoDS_Shape>::Iterator aTempIter(aTempList); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
         for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator anIter(aMapEF); anIter.More(); anIter.Next()) {
           BOPCol_ListOfShape& aTempListOfShape = anIter.ChangeValue();
@@ -107,12 +113,18 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
             aTempListOfShape.Clear();
           } else if(aTempListOfShape.Size() > 1) {
             if(aTempListOfShape.First() == aTempShape) {
-              aTempMap.Add(aTempListOfShape.Last());
-              aFreeShapes.Remove(aTempListOfShape.Last());
+              const TopoDS_Shape& aTL = aTempListOfShape.Last();
+              if(aTempMap.Add(aTL)) {
+                aTempList.Append(aTL);
+                aFreeShapes.Remove(aTL);
+              }
               aTempListOfShape.Clear();
             } else if(aTempListOfShape.Last() == aTempShape) {
-              aTempMap.Add(aTempListOfShape.First());
-              aFreeShapes.Remove(aTempListOfShape.First());
+              const TopoDS_Shape& aTF = aTempListOfShape.First();
+              if(aTempMap.Add(aTF)) {
+                aTempList.Append(aTF);
+                aFreeShapes.Remove(aTF);
+              }
               aTempListOfShape.Clear();
             }
           }
