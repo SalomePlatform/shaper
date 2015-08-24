@@ -12,7 +12,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Document.h>
 #include <Config_DataModelReader.h>
-#include <QAbstractItemModel>
+#include <ModuleBase_IDocumentDataModel.h>
 #include <Events_Listener.h>
 
 
@@ -26,7 +26,7 @@
  * - An index which contains internal pointer as ModelAPI_Object its the object
  * - An index which contains internal pointer as ModelAPI_Document is a folder which belongs to this document
  */
-class XGUI_EXPORT XGUI_DataModel : public QAbstractItemModel, public Events_Listener
+class XGUI_EXPORT XGUI_DataModel : public ModuleBase_IDocumentDataModel, public Events_Listener
 {
 Q_OBJECT
 public:

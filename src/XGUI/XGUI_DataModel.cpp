@@ -54,7 +54,7 @@ ModelAPI_Document* getSubDocument(void* theObj)
 
 
 // Constructor *************************************************
-XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)
+XGUI_DataModel::XGUI_DataModel(QObject* theParent) : ModuleBase_IDocumentDataModel(theParent)
 {
   myXMLReader.readAll();
 
