@@ -258,6 +258,37 @@ def perpendicular(point_1, point_2):
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0], point_2[1], 0, Qt.LeftButton) 
     
     clickButton(waitForObject(":Perpendicular.property_panel_cancel_QToolButton"))
+    
+def coincident(point_1, point_2):
+    mouseClick(waitForObjectItem(":SALOME 7.6.0 - [Study1]_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Coincident"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0], point_2[1], 0, Qt.LeftButton) 
+    clickButton(waitForObject(":Coincident.property_panel_cancel_QToolButton"))
+    
+def equal(point_1, point_2):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Equal"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0], point_2[1], 0, Qt.LeftButton) 
+    clickButton(waitForObject(":Equal.property_panel_cancel_QToolButton"))
+
+def vertical(point):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Vertical"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    clickButton(waitForObject(":Vertical.property_panel_cancel_QToolButton"))
+    
+def horizontal(point):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Horizontal"))
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    clickButton(waitForObject(":Horizontal.property_panel_cancel_QToolButton"))
+    
+def fit_all():
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    
+
         
 
 
