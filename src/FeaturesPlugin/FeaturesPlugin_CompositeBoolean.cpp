@@ -126,13 +126,11 @@ void FeaturesPlugin_CompositeBoolean::execute()
   ListOfShape aFreeFaces;
   std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aFacesList);
   GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
-  if(aShells.empty()) {
-    aShells = aFreeFaces;
-  } else {
-    aShells.merge(aFreeFaces);
+  for(ListOfShape::const_iterator anIter = aFreeFaces.cbegin(); anIter != aFreeFaces.cend(); anIter++) {
+    aShells.push_back(*anIter);
   }
 
-  // Pass shells/faces to soldis creation function.
+  // Pass shells/faces to solids creation function.
   ListOfShape aBooleanTools;
   std::list<std::shared_ptr<GeomAPI_Interface>> aSolidsAlgos;
   makeSolids(aShells, aBooleanTools, aSolidsAlgos);
