@@ -615,7 +615,24 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
     aDocToAdd = this;
   }
   if (aFeature) {
-    aDocToAdd->myObjs->addFeature(aFeature, aDocToAdd->currentFeature(false));
+    // searching for feature after which must be added the next feature: this is the current feature
+    // but also all sub-features of this feature
+    FeaturePtr aCurrent = aDocToAdd->currentFeature(false);
+    bool isModified = true;
+    for(CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCurrent);
+        aComp.get() && isModified; 
+        aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCurrent)) {
+      isModified =  false;
+      int aSubs = aComp->numberOfSubs(false);
+      for(int a = 0; a < aSubs; a++) {
+        FeaturePtr aSub = aComp->subFeature(a, false);
+        if (myObjs->isLater(aSub, aCurrent)) {
+          isModified =  true;
+          aCurrent = aSub;
+        }
+      }
+    }
+    aDocToAdd->myObjs->addFeature(aFeature, aCurrent);
     if (!aFeature->isAction()) {  // do not add action to the data model
       if (theMakeCurrent)  // after all this feature stays in the document, so make it current
         aDocToAdd->setCurrentFeature(aFeature, false);

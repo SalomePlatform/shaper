@@ -182,6 +182,8 @@ class Model_Objects
   FeaturePtr firstFeature();
   /// Returns to the last (from the history point of view) feature, any: invisible or disabled
   FeaturePtr lastFeature();
+  /// Returns true if theLater is in history of features creation later than theCurrent
+  bool isLater(FeaturePtr theLater, FeaturePtr theCurrent) const;
 
   /// Returns the result group identifier of the given feature (for this at least one result must 
   /// be created before)

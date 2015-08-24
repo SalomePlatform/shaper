@@ -1011,7 +1011,8 @@ FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theRever
     Handle(TDataStd_ReferenceArray) aRefs;
     if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
       for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) { // iterate all existing features
-        if (aRefs->Value(a).IsEqual(aFeatureLabel)) {
+        TDF_Label aCurLab = aRefs->Value(a);
+        if (aCurLab.IsEqual(aFeatureLabel)) {
           a += theReverse ? -1 : 1;
           if (a >= aRefs->Lower() && a <= aRefs->Upper())
             return feature(aRefs->Value(a));
@@ -1039,6 +1040,31 @@ FeaturePtr Model_Objects::lastFeature()
     return feature(aRefs->Value(aRefs->Upper()));
   }
   return FeaturePtr(); // no features at all
+}
+
+bool Model_Objects::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
+{
+  std::shared_ptr<Model_Data> aLaterD = std::static_pointer_cast<Model_Data>(theLater->data());
+  std::shared_ptr<Model_Data> aCurrentD = std::static_pointer_cast<Model_Data>(theCurrent->data());
+  if (aLaterD && aLaterD->isValid() && aCurrentD && aCurrentD->isValid()) {
+    TDF_Label aLaterL = aLaterD->label().Father();
+    TDF_Label aCurrentL = aCurrentD->label().Father();
+    int aLaterI = -1, aCurentI = -1; // not found yet state
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+      for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) { // iterate all existing features
+        TDF_Label aCurLab = aRefs->Value(a);
+        if (aCurLab.IsEqual(aLaterL)) {
+          aLaterI = a;
+        } else if (aCurLab.IsEqual(aCurrentL)) {
+          aCurentI = a;
+        } else continue;
+        if (aLaterI != -1 && aCurentI != -1) // both are found
+          return aLaterI > aCurentI;
+      }
+    }
+  }
+  return false; // not found, or something is wrong
 }
 
 std::list<std::shared_ptr<ModelAPI_Feature> > Model_Objects::allFeatures()
