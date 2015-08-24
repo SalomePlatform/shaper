@@ -37,7 +37,10 @@ ResultPartPtr getPartResult(ModelAPI_Object* theObj)
   if (aFeature) {
     ResultPtr aRes = aFeature->firstResult();
     if (aRes.get() && (aRes->groupName() == ModelAPI_ResultPart::group())) {
-      return std::dynamic_pointer_cast<ModelAPI_ResultPart>(aRes);
+      ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aRes);
+      // Use only original parts, not a placement results
+      if (aPartRes == aPartRes->original())
+      return aPartRes;
     }
   }
   return ResultPartPtr();
