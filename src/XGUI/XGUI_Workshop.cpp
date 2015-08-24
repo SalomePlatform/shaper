@@ -653,12 +653,13 @@ bool XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo(int theTimes)
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  if (operationMgr()->canStopOperation())
-    operationMgr()->abortOperation(operationMgr()->currentOperation());
-  else
-    return;
-
   SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isOperation()) {
+    /// this is important for nested operrations
+    /// when sketch opeation is active, this condition is false and 
+    /// the sketch operation is not aborted
+    operationMgr()->onAbortOperation();
+  }
   for (int i = 0; i < theTimes; ++i) {
     aMgr->undo();
   }
@@ -669,11 +670,6 @@ void XGUI_Workshop::onUndo(int theTimes)
 //******************************************************
 void XGUI_Workshop::onRedo(int theTimes)
 {
-  if (operationMgr()->canStopOperation())
-    operationMgr()->abortOperation(operationMgr()->currentOperation());
-  else
-    return;
-
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
   // each created result. After a redisplay signal is flushed. So, the viewer update is blocked until
@@ -682,6 +678,12 @@ void XGUI_Workshop::onRedo(int theTimes)
 
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isOperation()) {
+    /// this is important for nested operrations
+    /// when sketch opeation is active, this condition is false and 
+    /// the sketch operation is not aborted
+    operationMgr()->onAbortOperation();
+  }
   for (int i = 0; i < theTimes; ++i) {
     aMgr->redo();
   }
