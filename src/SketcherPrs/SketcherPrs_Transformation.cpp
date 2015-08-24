@@ -16,6 +16,7 @@
 
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
+#include <Prs3d_LineAspect.hxx>
 #include <Geom_CartesianPoint.hxx>
 #include <gp_Pnt.hxx>
 #include <StdPrs_Point.hxx>
@@ -75,8 +76,12 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
-  Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
+  //Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+  //aGroup->SetPrimitivesAspect(aLineAspect);
+
+  // drawListOfShapes uses myDrawer for attributes definition
+  Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);
+  myDrawer->SetLineAspect(aLnAspect);
 
   drawListOfShapes(anAttrB, thePrs);
   if (myConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
