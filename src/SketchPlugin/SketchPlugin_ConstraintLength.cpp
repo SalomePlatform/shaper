@@ -128,6 +128,9 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!anAIS) {
     anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane());
   }
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
+                                                    SKETCH_DIMENSION_COLOR);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 
@@ -204,16 +207,4 @@ void SketchPlugin_ConstraintLength::attributeChanged(const std::string& theID) {
     aFlyoutAttr->setValue(X, Y);
     myFlyoutUpdate = false;
   }
-}
-
-bool SketchPlugin_ConstraintLength::customisePresentation(ResultPtr theResult,
-                                    AISObjectPtr thePrs,
-                                    std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
-{
-  bool isCustomized = false;
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
-                                                    SKETCH_DIMENSION_COLOR);
-  isCustomized = thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
-
-  return isCustomized;
 }

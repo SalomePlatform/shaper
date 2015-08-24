@@ -27,7 +27,7 @@ class GeomDataAPI_Point2D;
  *  This constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase, public GeomAPI_ICustomPrs
+class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 {
  public:
   /// Distance constraint kind
@@ -69,10 +69,6 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase, publ
 
   /// Returns the current distance between the feature attributes
   double calculateCurrentDistance();
-
-    /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
