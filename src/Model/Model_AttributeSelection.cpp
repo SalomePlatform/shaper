@@ -745,7 +745,7 @@ bool Model_AttributeSelection::selectPart(
   // store the shape (in case part is not loaded it should be usefull
   TopoDS_Shape aShape;
   std::string aName = theContext->data()->name();
-  if (theSubShape->isNull()) {// the whole part shape is selected
+  if (!theSubShape.get() || theSubShape->isNull()) {// the whole part shape is selected
     aShape = theContext->shape()->impl<TopoDS_Shape>();
   } else {
     aShape = theSubShape->impl<TopoDS_Shape>();
