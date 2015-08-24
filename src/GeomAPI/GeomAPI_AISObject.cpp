@@ -71,8 +71,16 @@ void GeomAPI_AISObject::createShape(std::shared_ptr<GeomAPI_Shape> theShape)
       aShapeAIS->Set(aTDS);
       aShapeAIS->Redisplay(Standard_True);
     }
-  } else
-    setImpl(new Handle(AIS_InteractiveObject)(new AIS_Shape(aTDS)));
+  } else {
+    // Set default point as a '+' symbol
+    Handle(AIS_Shape) aShape = new AIS_Shape(aTDS);
+    Handle(Prs3d_Drawer) aDrawer = aShape->Attributes();
+    if (aDrawer->HasOwnPointAspect()) 
+      aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
+    else
+      aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
+    setImpl(new Handle(AIS_InteractiveObject)(aShape));
+  }
 }
 
 void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoint,
