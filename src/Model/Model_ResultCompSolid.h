@@ -62,6 +62,10 @@ public:
 
   /// The compsolid is concealed if at least one of the sub is concealed
   MODEL_EXPORT virtual bool isConcealed();
+
+  /// Sets all subs as concealed in the data tree (referenced by other objects)
+  MODEL_EXPORT virtual void setIsConcealed(const bool theValue);
+
 protected:
   /// Makes a body on the given feature
   Model_ResultCompSolid();

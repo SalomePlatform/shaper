@@ -108,6 +108,27 @@ bool Model_ResultCompSolid::isConcealed()
   return false;
 }
 
+void Model_ResultCompSolid::setIsConcealed(const bool theValue)
+{
+  ModelAPI_ResultCompSolid::setIsConcealed(theValue);
+  std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+  for(; aSubIter != mySubs.cend(); aSubIter++) {
+    if ((*aSubIter)->isConcealed() != theValue) {
+      (*aSubIter)->setIsConcealed(theValue);
+      if (theValue) { // hidden unit must be redisplayed (hidden)
+        ModelAPI_EventCreator::get()->sendDeleted(document(), (*aSubIter)->groupName());
+        // redisplay for the viewer (it must be disappeared also)
+        static Events_ID EVENT_DISP = 
+          Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, EVENT_DISP);
+      } else { // was not concealed become concealed => delete event
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+        ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, anEvent);
+      }
+    }
+  }
+}
+
 void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape)
 {
   static Events_Loop* aLoop = Events_Loop::loop();

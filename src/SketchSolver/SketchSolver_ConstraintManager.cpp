@@ -76,81 +76,81 @@ void SketchSolver_ConstraintManager::processEvent(
   if (myIsComputed)
     return;
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
-      || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
-      || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
-    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+    || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
+    || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
+      std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
+      std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
-    // Shows the message has at least one feature applicable for solver
-    bool hasProperFeature = false;
+      // Shows the message has at least one feature applicable for solver
+      bool hasProperFeature = false;
 
-    bool isMovedEvt = theMessage->eventID()
+      bool isMovedEvt = theMessage->eventID()
         == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
-    if (isMovedEvt) {
-      std::set<ObjectPtr>::iterator aFeatIter;
-      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-        std::shared_ptr<SketchPlugin_Feature> aSFeature = 
+      if (isMovedEvt) {
+        std::set<ObjectPtr>::iterator aFeatIter;
+        for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+          std::shared_ptr<SketchPlugin_Feature> aSFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (aSFeature) {
-          moveEntity(aSFeature);
-          hasProperFeature = true;
+          if (aSFeature) {
+            moveEntity(aSFeature);
+            hasProperFeature = true;
+          }
         }
-      }
-    } else {
-      std::set<ObjectPtr>::iterator aFeatIter;
-      // iterate sketchers fisrt to create all sketches before (on load may exist several sketches)
-      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFeatIter);
-        if (!aFeature)
-          continue;
-        const std::string& aFeatureKind = aFeature->getKind();
-        if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0) {
-          std::shared_ptr<ModelAPI_CompositeFeature> aSketch = std::dynamic_pointer_cast<
+      } else {
+        std::set<ObjectPtr>::iterator aFeatIter;
+        // iterate sketchers fisrt to create all sketches before (on load may exist several sketches)
+        for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+          FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFeatIter);
+          if (!aFeature)
+            continue;
+          const std::string& aFeatureKind = aFeature->getKind();
+          if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0) {
+            std::shared_ptr<ModelAPI_CompositeFeature> aSketch = std::dynamic_pointer_cast<
               ModelAPI_CompositeFeature>(aFeature);
-          hasProperFeature = changeWorkplane(aSketch) || hasProperFeature;
+            hasProperFeature = changeWorkplane(aSketch) || hasProperFeature;
+          }
+        }
+        // then get anything but not the sketch
+        std::set<ObjectPtr> aComplexConstraints;
+        // fillet and mirror an tangency constraints will be processed later
+        for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+          std::shared_ptr<SketchPlugin_Feature> aFeature = 
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+          if (!aFeature)
+            continue;
+          if (aFeature->getKind() == SketchPlugin_ConstraintFillet::ID())
+            continue; // skip Fillet features
+          if (SketchSolver_Group::isComplexConstraint(aFeature)) {
+            aComplexConstraints.insert(aFeature);
+            continue;
+          }
+          hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
+        }
+        // processing remain constraints
+        aFeatIter = aComplexConstraints.begin();
+        for (; aFeatIter != aComplexConstraints.end(); aFeatIter++) {
+          std::shared_ptr<SketchPlugin_Feature> aFeature = 
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+          if (!aFeature)
+            continue;
+          hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
         }
       }
-      // then get anything but not the sketch
-      std::set<ObjectPtr> aComplexConstraints;
-      // fillet and mirror an tangency constraints will be processed later
-      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-        std::shared_ptr<SketchPlugin_Feature> aFeature = 
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (!aFeature)
-          continue;
-        if (aFeature->getKind() == SketchPlugin_ConstraintFillet::ID())
-          continue; // skip Fillet features
-        if (SketchSolver_Group::isComplexConstraint(aFeature)) {
-          aComplexConstraints.insert(aFeature);
-          continue;
-        }
-        hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
-      }
-      // processing remain constraints
-      aFeatIter = aComplexConstraints.begin();
-      for (; aFeatIter != aComplexConstraints.end(); aFeatIter++) {
-        std::shared_ptr<SketchPlugin_Feature> aFeature = 
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (!aFeature)
-          continue;
-        hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
-      }
-    }
 
-    // Solve the set of constraints
-    if (hasProperFeature)
-      resolveConstraints(isMovedEvt); // send update for movement in any case
+      // Solve the set of constraints
+      if (hasProperFeature)
+        resolveConstraints(isMovedEvt); // send update for movement in any case
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+      std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
     // Find SketchPlugin_Sketch::ID() in groups. The constraint groups should be updated when an object removed from Sketch
     std::set<std::string>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
       if (aFGrIter->compare(ModelAPI_ResultConstruction::group()) == 0 ||
-          aFGrIter->compare(ModelAPI_Feature::group()) == 0)
+        aFGrIter->compare(ModelAPI_Feature::group()) == 0)
         break;
 
     if (aFGrIter != aFeatureGroups.end()) {
