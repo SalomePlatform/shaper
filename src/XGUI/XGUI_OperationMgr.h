@@ -138,8 +138,10 @@ signals:
   /// Signal is emitted after the apply enable state changed.
   void validationStateChanged(bool);
 
-  /// Signal is emitted after the apply enable state changed.
-  void nestedStateChanged(bool);
+  /// Signal is emitted after the model is modified. It is emitted for all active operations.
+  /// \param theFeatureKind a feature id
+  /// \param theState validity of the operation with the feature kind
+  void nestedStateChanged(const std::string& theFeatureKind, const bool theState);
 
   /// Signal is emitted after the current operation is filled with existing preselection.
   void operationActivatedByPreselection();
@@ -151,6 +153,10 @@ signals:
   /// Sets apply state to the value and emit signal about this state is changed
   /// \param theEnabled the state value
   void setApplyEnabled(const bool theEnabled);
+
+  /// Emits nestedStateChange for operations with an information about validity of the operation
+  /// \param theOperation the sent operation. If it is NULL, all operations in the stack are sent.
+  void updateApplyOfOperations(ModuleBase_Operation* theOperation = 0);
 
   /// Commits the current operatin if it is valid
   bool commitOperation();

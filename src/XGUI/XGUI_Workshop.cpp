@@ -906,10 +906,6 @@ void XGUI_Workshop::createDockWidgets()
           myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
   connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
           aOkAct,          SLOT(setEnabled(bool)));
-  QAction* aAcceptAllAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
-  connect(myOperationMgr,  SIGNAL(nestedStateChanged(bool)),
-          aAcceptAllAct,   SLOT(setEnabled(bool)));
-
 }
 
 //******************************************************

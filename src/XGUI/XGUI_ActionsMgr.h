@@ -80,10 +80,13 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   //! If there is no such action, it will be created.
   QAction* operationStateAction(OperationStateActionId theId, QObject* theParent = 0);
 
+  /// Return an action by the given id, if it was registered in the manager
+  QAction* action(const QString& theId);
+
   /// Return info (icon, text, etc) about the action by the given id, if it was registered in the manager
   ActionInfo actionInfoById(const QString& theId);
 
- public slots:
+public slots:
   //! Update workbench actions according to OperationMgr state:
   //! No active operations: all actions but nested are available
   //! There is active operation: current operation + it's nested

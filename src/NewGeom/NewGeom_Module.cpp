@@ -398,6 +398,10 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
   return aAction;
 }
 
+bool NewGeom_Module::isNestedFeature(const QAction* theAction)
+{
+  return dynamic_cast<const NewGeom_NestedButton*>(theAction);
+}
 
 QAction* NewGeom_Module::addNestedFeature(const QString& theWBName,
                                           const ActionInfo& theInfo,

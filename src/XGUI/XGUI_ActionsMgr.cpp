@@ -260,6 +260,15 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
   return aResult;
 }
 
+QAction* XGUI_ActionsMgr::action(const QString& theId)
+{
+  QAction* anAction;
+  if(myActions.contains(theId)) {
+    anAction = myActions.value(theId);
+  }
+  return anAction;
+}
+
 ActionInfo XGUI_ActionsMgr::actionInfoById(const QString& theId)
 {
   ActionInfo aResult;

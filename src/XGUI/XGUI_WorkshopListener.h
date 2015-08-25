@@ -44,6 +44,12 @@ signals:
   /// Emitted when error in applivation happens
   void errorOccurred(const QString&);
 
+protected slots:
+  /// Updates Apply All button state of the feature to the state if the feature has the button
+  /// \param theFeatureId an index of the feature, the action is searched, which state is to be changed
+  /// \param theState an action enable state
+  void onNestedStateChanged(const std::string& theFeatureId, const bool theState);
+
 protected:
   /// Procedure to process postponed events
   bool event(QEvent * theEvent);

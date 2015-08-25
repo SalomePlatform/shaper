@@ -26,7 +26,7 @@ class NewGeom_NestedButton : public QWidgetAction
   NewGeom_NestedButton(QObject *parent, const QList<QAction*>& theNestedActions);
   virtual ~NewGeom_NestedButton();
 
- public slots:
+ private slots:
   /// Shows/hides the additional buttons widget
   void showAdditionalButtons(bool);
   void actionStateChanged();

@@ -52,6 +52,12 @@ class XGUI_EXPORT XGUI_SalomeConnector
                                     const ActionInfo& theInfo,
                                     const QList<QAction*>& theNestedActions) = 0;
 
+  //! Returns true if the feature action is a nested action, in other words,
+  //! it is created by addNestedFeature().
+  //! \param theId - an action of a feature
+  //! returns boolean result
+  virtual bool isNestedFeature(const QAction* theAction) = 0;
+
   //! Creates a command in Edit menu of SALOME desktop
   //! \param theId - an id of the feature
   //! \param theTitle - a menu item string

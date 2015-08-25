@@ -61,6 +61,12 @@ Q_OBJECT
                                     const ActionInfo& theInfo,
                                     const QList<QAction*>& theNestedActions);
 
+  //! Returns true if the feature action is a nested action, in other words,
+  //! it is created by addNestedFeature().
+  //! \param theId - an action of a feature
+  //! returns boolean result
+  virtual bool isNestedFeature(const QAction* theAction);
+
   virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
                                      const QString& theTip, const QIcon& theIcon,
                                      const QKeySequence& theKeys, bool isCheckable,

@@ -44,6 +44,7 @@
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 #include <Config_SelectionFilterMessage.h>
+#include <Config_Keywords.h>
 
 #include <QApplication>
 #include <QMainWindow>
@@ -355,6 +356,25 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //}
 }
 
+void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId, const bool theState)
+{
+  XGUI_Workshop* aWorkshop = workshop();
+
+  //one button is used for all features, which can have nested actions, so it is obtained from
+  // the action manager
+  QAction* anAcceptAllAction = aWorkshop->actionsMgr()->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+  if (aWorkshop->isSalomeMode()) {
+    XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
+    XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
+    if (aSalomeConnector->isNestedFeature(anActionsMgr->action(theFeatureId.c_str())))
+      anAcceptAllAction->setEnabled(theState);
+  } else {
+    AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
+    if (aMenuBar->feature(theFeatureId.c_str())->button()->additionalButtonWidget())
+      anAcceptAllAction->setEnabled(theState);
+  }
+}
+
 bool XGUI_WorkshopListener::event(QEvent * theEvent)
 {
   PostponeMessageQtEvent* aPostponedEv = dynamic_cast<PostponeMessageQtEvent*>(theEvent);
@@ -389,12 +409,12 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     QString aNestedActions = QString::fromStdString(theMessage->actionsWhenNested());
     XGUI_OperationMgr* anOperationMgr = aWorkshop->operationMgr();
     XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
-    if (aNestedActions.contains("accept")) {
+    if (aNestedActions.contains(FEATURE_WHEN_NESTED_ACCEPT)) {
       QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
       connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(commitAllOperations()));
       aNestedActList << anAction;
     }
-    if (aNestedActions.contains("abort")) {
+    if (aNestedActions.contains(FEATURE_WHEN_NESTED_ABORT)) {
       QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, NULL);
       connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(abortAllOperations()));
       aNestedActList << anAction;
@@ -447,6 +467,9 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     aWorkshop->actionsMgr()->addCommand(aCommand);
     aWorkshop->module()->actionCreated(aCommand);
   }
+  XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
+  connect(anOperationMgr, SIGNAL(nestedStateChanged(const std::string&, const bool)),
+          this, SLOT(onNestedStateChanged(const std::string&, const bool)));
 }
 
 

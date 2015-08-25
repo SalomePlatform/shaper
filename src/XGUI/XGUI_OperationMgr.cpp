@@ -9,6 +9,7 @@
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
+#include "ModuleBase_OperationDescription.h"
 
 #include "ModelAPI_CompositeFeature.h"
 #include "ModelAPI_Session.h"
@@ -188,9 +189,19 @@ void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
 {
   myIsApplyEnabled = theEnabled;
   emit validationStateChanged(theEnabled);
+}
 
-  bool aParentValid = true;//isParentOperationValid();
-  emit nestedStateChanged(aParentValid);
+void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperation)
+{
+  if (theOperation)
+    emit nestedStateChanged(theOperation->getDescription()->operationId().toStdString(),
+                            theOperation->isValid());
+  else {
+    foreach(ModuleBase_Operation* anOperation, myOperations) {
+      emit nestedStateChanged(anOperation->getDescription()->operationId().toStdString(),
+                              anOperation->isValid());
+    }
+  }
 }
 
 bool XGUI_OperationMgr::isApplyEnabled() const
@@ -301,6 +312,7 @@ void XGUI_OperationMgr::onAbortOperation()
 void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  updateApplyOfOperations(aSenderOperation);
   emit operationStarted(aSenderOperation);
 }
 
@@ -312,6 +324,8 @@ void XGUI_OperationMgr::onOperationAborted()
 
 void XGUI_OperationMgr::onOperationCommitted()
 {
+  updateApplyOfOperations();
+
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
   emit operationCommitted(aSenderOperation);
 }
