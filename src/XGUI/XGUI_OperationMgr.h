@@ -154,10 +154,12 @@ signals:
   /// \param theEnabled the state value
   void setApplyEnabled(const bool theEnabled);
 
+public: // TEMPORARY, it should be protected and be performed automatically
   /// Emits nestedStateChange for operations with an information about validity of the operation
   /// \param theOperation the sent operation. If it is NULL, all operations in the stack are sent.
   void updateApplyOfOperations(ModuleBase_Operation* theOperation = 0);
 
+protected: // TEMPORARY
   /// Commits the current operatin if it is valid
   bool commitOperation();
 

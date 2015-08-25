@@ -663,6 +663,8 @@ void XGUI_Workshop::onUndo(int theTimes)
   for (int i = 0; i < theTimes; ++i) {
     aMgr->undo();
   }
+
+  operationMgr()->updateApplyOfOperations();
   updateCommandStatus();
 }
 
@@ -686,6 +688,7 @@ void XGUI_Workshop::onRedo(int theTimes)
   for (int i = 0; i < theTimes; ++i) {
     aMgr->redo();
   }
+  operationMgr()->updateApplyOfOperations();
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose
@@ -1038,6 +1041,7 @@ void XGUI_Workshop::deleteObjects()
   if (deleteFeatures(anObjects, anIgnoredFeatures, aDesktop, true)) {
     myDisplayer->updateViewer();
     aMgr->finishOperation();
+    operationMgr()->updateApplyOfOperations();
     updateCommandStatus();
   }
   else {

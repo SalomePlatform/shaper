@@ -627,6 +627,8 @@ bool PartSet_Module::deleteObjects()
     // 5. stop operation
     aWorkshop->displayer()->updateViewer();
     aMgr->finishOperation();
+    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
+    anOpMgr->updateApplyOfOperations();
   } else {
     bool isPartRemoved = false;
     // Delete part with help of PartSet plugin
