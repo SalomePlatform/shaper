@@ -20,12 +20,12 @@ def main():
     open(DATA_PATH + "/for_sketch_010.hdf")
     
     #[step] Activate NewGeom
-    clickButton(waitForObject(":SALOME 7.6.0.NewGeom_QToolButton"))
+    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
     
     #[step] Edit 'Sketch_1'
-    waitForObjectItem(":Object browser_XGUI_DataTree_2", "Sketch\\_1")
-    clickItem(":Object browser_XGUI_DataTree_2", "Sketch\\_1", 43, 12, 0, Qt.LeftButton)
-    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree_2"), "Sketch\\_1", 43, 12, 0)
+    waitForObjectItem(":Object browser_XGUI_DataTree", "Sketch\\_1")
+    clickItem(":Object browser_XGUI_DataTree", "Sketch\\_1", 43, 12, 0, Qt.LeftButton)
+    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Sketch\\_1", 43, 12, 0)
     activateItem(waitForObjectItem(":_QMenu", "Edit..."))
     
     #[step] Click '+OZ' button
@@ -41,7 +41,7 @@ def main():
     test.vp("VP1")
     
     #[step] Uncheck 'Show constraint' check-box
-    clickButton(waitForObject(":Sketch.Show constraints_QCheckBox_2"))
+    clickButton(waitForObject(":Sketch.Show constraints_QCheckBox"))
     
     #[check] Check that icon disappears
     test.vp("VP3") 

@@ -3,9 +3,11 @@ def main():
     
     startApplication("salome_run.sh")
     
-    create_new_document()
+    activate_newgeom()
     
-    clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
+    #[step] Create parameter 'aa = 4'
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Part"))
+    activateItem(waitForObjectItem(":Part_QMenu", "Parameter"))
     type(waitForObject(":Parameter_QLineEdit"), "aa")
     type(waitForObject(":Parameter_ExpressionEditor"), "4")
     clickButton(waitForObject(":Parameter.property_panel_ok_QToolButton"))
@@ -15,7 +17,8 @@ def main():
 
     clickButton(waitForObject(":SALOME*.New part_QToolButton"))
     
-    clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Part"))
+    activateItem(waitForObjectItem(":Part_QMenu", "Parameter"))
     type(waitForObject(":Parameter_QLineEdit"), "bb")
     type(waitForObject(":Parameter_ExpressionEditor"), "aa+1")
     clickButton(waitForObject(":Parameter.property_panel_ok_QToolButton"))

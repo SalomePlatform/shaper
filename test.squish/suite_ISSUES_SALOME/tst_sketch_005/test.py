@@ -15,16 +15,14 @@ def sketch():
     point_create((250, 50), 1)
     #[step] Fix positions of 2 points
     point_fixe((340, 205))
-    point_fixe((504, 229))
-    #[step] Fit all
-    clickButton(waitForObject(":SALOME 7.6.0 - [Study1].Fit All_QToolButton"))
+    point_fixe((504, 227))
     #[check] Check that 2 points have 'anchor' icons near themselves
     test.vp("VP1")
     #[step] Define distance between fixed and free points
-    distance((177, 81), (539, 506), (201, 320))
-    #[step] Change distance set
-    change_distance((249, 381), 200)
-    #[step] Check that distance has been modified, free point moved
+    distance((340, 205), (490, 381), (201, 320))
+    # [step] Change distance set
+    change_distance((275, 407), 200)
+    # [step] Check that distance has been modified, free point moved
     test.vp("VP3")
 
 def main():

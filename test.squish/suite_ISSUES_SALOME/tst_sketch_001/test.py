@@ -50,7 +50,7 @@ def sketch():
     #[step] Create arc via clicking inside viewer
     arc_create_in_view((203, 185), (51, 134), (104, 282), 1)
     #[step] CLick 'Fit all' button
-    clickButton(waitForObject(":SALOME 7.6.0 - [Study1].Fit All_QToolButton"))
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
     #[check] All objects have been created. Check that objects of both types are shown (main and auxiliary)
     test.vp("VP1")
     #[step] Finish sketching

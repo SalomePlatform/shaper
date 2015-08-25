@@ -3,7 +3,7 @@ def main():
     
     startApplication("salome_run.sh")
    
-    create_new_document()
+    activate_newgeom()
     
     clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
     type(waitForObject(":Parameter_QLineEdit"), "a")
@@ -15,8 +15,7 @@ def main():
     type(waitForObject(":_QExpandingLineEdit"), "b")
     type(waitForObject(":_QExpandingLineEdit"), "<Return>")
     
-    waitFor("object.exists(':Parameters (1).b = 3_QModelIndex')", 20000)
-    test.compare(findObject(":Parameters (1).b = 3_QModelIndex").text, "b = 3")
+    test.compare(waitForObjectItem(":Object browser_XGUI_DataTree", "Parameters (1).b = 3").text, "b = 3")
     
     openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Parameters (1).b = 3", 111, 5, 0)
     activateItem(waitForObjectItem(":_QMenu", "Edit..."))

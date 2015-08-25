@@ -3,7 +3,7 @@ def main():
     
     startApplication("salome_run.sh")
     
-    create_new_document()
+    activate_newgeom()
     
     clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
     type(waitForObject(":Parameter_QLineEdit"), "a")

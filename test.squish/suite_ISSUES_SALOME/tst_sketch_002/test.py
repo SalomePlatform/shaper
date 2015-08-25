@@ -16,10 +16,10 @@ def sketch():
     #[check] Check that lines are not parallel and there are no icons near lines
     test.vp("VP1")
     #[step] Make according lines parallel
-    parallel([(394, 151), (361, 199)])
-    parallel([(201, 137), (244, 182)])
-    parallel([(245, 278), (293, 250)])
-    parallel([(430, 286), (483, 300)])
+    parallel((394, 151), (361, 199))
+    parallel((201, 137), (244, 182))
+    parallel((245, 278), (292, 249))
+    parallel((430, 286), (482, 299))
     # [check] Check that lines are parallel and there are icons near lines
     test.vp("VP2")
 
@@ -45,7 +45,7 @@ def main():
     sketch_create(help_points("XY_plane"), lambda: sketch())
     #[step] Save study
     save("RESULTS_PATH + sketch_002")
-    if findObject(":Warning.Yes_QPushButton"):
+    if object.exists(":Warning.Yes_QPushButton"):
         clickButton(waitForObject(":Warning.Yes_QPushButton"))
     ##[step] Close application
     sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))

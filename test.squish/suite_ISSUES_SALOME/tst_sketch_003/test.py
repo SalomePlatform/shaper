@@ -43,7 +43,7 @@ def main():
     #[step] Type name of file
     #[step] Click 'Save' button    
     save("RESULTS_PATH + sketch_003")
-    if findObject(":Warning.Yes_QPushButton"):
+    if object.exists(":Warning.Yes_QPushButton"):
         clickButton(waitForObject(":Warning.Yes_QPushButton"))
     
     #[step] Close document
@@ -53,11 +53,10 @@ def main():
     #[step} Open just saved file  
     open("RESULTS_PATH + sketch_003.hdf")
     #[step] Activate NewGeom
-    clickButton(waitForObject(":SALOME 7.6.0.NewGeom_QToolButton"))
+    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
     
-
     #[step] Activate Part_1
-    waitForObjectItem(":Object browser_XGUI_DataTree_2", "Part\\_1")
+    waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1")
     clickItem(":Object browser_XGUI_DataTree_2", "Part\\_1", 50, 11, 0, Qt.LeftButton)
     openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree_2"), "Part\\_1", 50, 11, 0)
     activateItem(waitForObjectItem(":_QMenu", "Activate"))
