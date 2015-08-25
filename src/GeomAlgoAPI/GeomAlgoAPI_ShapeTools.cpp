@@ -8,15 +8,23 @@
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
+#include <gp_Pln.hxx>
+
 #include <BOPTools.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
+#include <BRep_Tool.hxx>
+#include <Geom_Plane.hxx>
 #include <GProp_GProps.hxx>
 #include <NCollection_Vector.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Shell.hxx>
+#include <TopoDS.hxx>
+
 
 //=================================================================================================
 double GeomAlgoAPI_ShapeTools::volume(std::shared_ptr<GeomAPI_Shape> theShape)
@@ -158,4 +166,26 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
     aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
     theFreeShapes.push_back(aGeomShape);
   }
+}
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape>& theFace)
+{
+  if (!theFace.get())
+    return std::shared_ptr<GeomAPI_Shape>();
+
+  TopoDS_Face aPlaneFace = TopoDS::Face(theFace->impl<TopoDS_Shape>());
+  if (aPlaneFace.IsNull())
+    return std::shared_ptr<GeomAPI_Shape>();
+
+  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aPlaneFace));
+  if (aPlane.IsNull())
+    return std::shared_ptr<GeomAPI_Shape>();
+
+  // make an infinity face on the plane
+  TopoDS_Shape anInfiniteFace = BRepBuilderAPI_MakeFace(aPlane->Pln()).Shape();
+
+  std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
+  aResult->setImpl(new TopoDS_Shape(anInfiniteFace));
+  return aResult;
 }

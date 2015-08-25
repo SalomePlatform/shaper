@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_IGESExport.h
     GeomAlgoAPI_Transform.h
     GeomAlgoAPI_ShapeTools.h
+    GeomAlgoAPI_Partition.h
 )
 
 SET(PROJECT_SOURCES
@@ -58,10 +59,12 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_IGESExport.cpp
     GeomAlgoAPI_Transform.cpp
     GeomAlgoAPI_ShapeTools.cpp
+    GeomAlgoAPI_Partition.cpp
 )
 
 SET(PROJECT_LIBRARIES
     GeomAPI
+    GeomAlgoImpl
     ModelAPI
     ${CAS_OCAF}
     ${CAS_SHAPE}
@@ -90,6 +93,7 @@ SET_SOURCE_FILES_PROPERTIES(GeomAlgoAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
 
 INCLUDE_DIRECTORIES(
   ../GeomAPI
+  ../GeomAlgoImpl
   ../ModelAPI
   ${CAS_INCLUDE_DIRS}
 )
@@ -103,6 +107,7 @@ SET(SWIG_SCRIPTS
 SET(SWIG_LINK_LIBRARIES
   GeomAPI
   GeomAlgoAPI
+  GeomAlgoImpl
   ${PYTHON_LIBRARIES}
 )
 

@@ -37,6 +37,11 @@ public:
                             const GeomAPI_Shape::ShapeType theType,
                             ListOfShape& theCombinedShapes,
                             ListOfShape& theFreeShapes);
+
+  /**
+   * Returns infinite plane received from theFace plane
+   */
+  static std::shared_ptr<GeomAPI_Shape> faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape>& theFace);
 };
 
 #endif
