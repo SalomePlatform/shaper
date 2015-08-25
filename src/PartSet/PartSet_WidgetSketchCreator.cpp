@@ -124,7 +124,9 @@ void PartSet_WidgetSketchCreator::onStarted()
     //connect(anOperation, SIGNAL(aborted()), aWorkshop->operationMgr(), SLOT(abortAllOperations()));
   } else {
     // Break current operation
-    QMessageBox::warning(this, tr("Extrusion Cut"),
+    std::string anOperationName = feature()->getKind();
+    QString aTitle = tr( anOperationName.c_str() );
+    QMessageBox::warning(this, aTitle,
         tr("There are no bodies found. Operation aborted."), QMessageBox::Ok);
     ModuleBase_Operation* aOp = myModule->workshop()->currentOperation();
     aOp->abort();
