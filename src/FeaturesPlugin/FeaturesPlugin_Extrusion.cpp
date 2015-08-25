@@ -86,7 +86,9 @@ void FeaturesPlugin_Extrusion::execute()
     for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
       std::shared_ptr<GeomAPI_Shape> aBaseShape;
       if (aFacesNum == -1) {
-        aFacesList.push_back(aFaceShape);
+        if (!aFaceShape->isNull()) {
+          aFacesList.push_back(aFaceShape);
+        }
         break;
       } else {
         aFaceShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));

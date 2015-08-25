@@ -68,7 +68,7 @@ int Model_ResultConstruction::facesNum()
       std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
       for(; aFIter != aFaces.end(); aFIter++) {
         std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
-        if (aFace.get())
+        if (aFace.get() && !aFace->isNull())
           myFaces.push_back(aFace);
       }
     }

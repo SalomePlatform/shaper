@@ -110,7 +110,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
             if (anUpdated->isPreviewNeeded() || myIsFinish) {
               ModelAPI_ExecState aState = anUpdated->data()->execState();
               static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-              if (aFactory->validate(anUpdated)) {
+              if (aFactory->validate(anUpdated) && aState != ModelAPI_StateInvalidArgument) {
                 #ifdef DEB_UPDATE
                   std::cout<<"Execute immideately "<<anUpdated->name()<<std::endl;
                 #endif
@@ -450,19 +450,25 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   list<AttributePtr>::iterator aRefsIter = aRefs.begin();
   for (; aRefsIter != aRefs.end(); aRefsIter++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aSel =
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
-    ObjectPtr aContext = aSel->context();
-    // update argument only if the referenced object is changed
-    if (aContext.get() && !aContext->isDisabled() && 
-      (myJustUpdated.find(aContext) != myJustUpdated.end() ||
-      aContext->data()->updateID() > theFeature->data()->updateID())) {
-        if (aState == ModelAPI_StateDone)
-          aState = ModelAPI_StateMustBeUpdated;
-        if (!aSel->update()) { // this must be done on execution since it may be long operation
-          if (!aFactory->isNotObligatory(theFeature->getKind(), theFeature->data()->id(aSel)) &&
-            aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
-            aState = ModelAPI_StateInvalidArgument;
-        }
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
+    bool isObligatory = !aFactory->isNotObligatory(
+            theFeature->getKind(), theFeature->data()->id(aSel)) &&
+            aFactory->isCase(theFeature, theFeature->data()->id(aSel));
+    if (aSel->isInvalid()) {
+      aState = ModelAPI_StateInvalidArgument;
+    } else {
+      ObjectPtr aContext = aSel->context();
+      // update argument only if the referenced object is changed
+      if (aContext.get() && !aContext->isDisabled() && 
+        (myJustUpdated.find(aContext) != myJustUpdated.end() ||
+        aContext->data()->updateID() > theFeature->data()->updateID())) {
+          if (aState == ModelAPI_StateDone)
+            aState = ModelAPI_StateMustBeUpdated;
+          if (!aSel->update()) { // this must be done on execution since it may be long operation
+            if (isObligatory)
+              aState = ModelAPI_StateInvalidArgument;
+          }
+      }
     }
   }
   aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
@@ -473,19 +479,24 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       std::shared_ptr<ModelAPI_AttributeSelection> aSelAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aSel->value(a));
       if (aSelAttr) {
-        ObjectPtr aContext = aSelAttr->context();
-        // update argument onlt if the referenced object is changed
-        if (aContext.get() && !aContext->isDisabled() &&
-            (myJustUpdated.find(aContext) != myJustUpdated.end() ||
-             aContext->data()->updateID() > theFeature->data()->updateID())) {
-            if (aState == ModelAPI_StateDone)
-              aState = ModelAPI_StateMustBeUpdated;
-            if (!aSelAttr->update()) {
-              if (!aFactory->isNotObligatory(
+        bool isObligatory = !aFactory->isNotObligatory(
                 theFeature->getKind(), theFeature->data()->id(aSel)) &&
-                aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
-                aState = ModelAPI_StateInvalidArgument;
-            }
+                aFactory->isCase(theFeature, theFeature->data()->id(aSel));
+        if (aSelAttr->isInvalid()) {
+          aState = ModelAPI_StateInvalidArgument;
+        } else {
+          ObjectPtr aContext = aSelAttr->context();
+          // update argument onlt if the referenced object is changed
+          if (aContext.get() && !aContext->isDisabled() &&
+              (myJustUpdated.find(aContext) != myJustUpdated.end() ||
+               aContext->data()->updateID() > theFeature->data()->updateID())) {
+              if (aState == ModelAPI_StateDone)
+                aState = ModelAPI_StateMustBeUpdated;
+              if (!aSelAttr->update()) {
+                if (isObligatory)
+                  aState = ModelAPI_StateInvalidArgument;
+              }
+          }
         }
       }
     }

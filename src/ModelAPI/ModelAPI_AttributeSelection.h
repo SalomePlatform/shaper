@@ -57,6 +57,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Selects sub-shape by the textual Name
   virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName) = 0;
 
+  /// Returns true if recomute of selection become impossible
+  virtual bool isInvalid() = 0;
+
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelection();
 

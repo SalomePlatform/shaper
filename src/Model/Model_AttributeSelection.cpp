@@ -68,6 +68,8 @@ Standard_GUID kSIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb29");
 Standard_GUID kCONSTUCTION_SIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb28");
 // reference to Part sub-object
 Standard_GUID kPART_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb27");
+// selection is invalid after recomputation
+Standard_GUID kINVALID_SELECTION("bce47fd7-80fa-4462-9d63-2f58acddd49d");
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -101,6 +103,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   TDF_Label aSelLab = selectionLabel();
   aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
   aSelLab.ForgetAttribute(kCONSTUCTION_SIMPLE_REF_ID);
+  aSelLab.ForgetAttribute(kINVALID_SELECTION);
 
   bool isDegeneratedEdge = false;
   // do not use the degenerated edge as a shape, a null context and shape is used in the case
@@ -157,8 +160,11 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
   }
 
   std::shared_ptr<GeomAPI_Shape> aResult;
+  TDF_Label aSelLab = selectionLabel();
+  if (aSelLab.IsAttribute(kINVALID_SELECTION))
+    return aResult;
+
   if (myRef.isInitialized()) {
-    TDF_Label aSelLab = selectionLabel();
     if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
       ResultPtr aContext = context();
       if (!aContext.get()) 
@@ -199,6 +205,11 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
     }
   }
   return aResult;
+}
+
+bool Model_AttributeSelection::isInvalid()
+{
+  return selectionLabel().IsAttribute(kINVALID_SELECTION) == Standard_True;
 }
 
 bool Model_AttributeSelection::isInitialized()
@@ -311,21 +322,33 @@ int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge)
   return 0; // unknown
 }
 
+/// Sets the invalid flag if flag is false, or removes it if "true"
+/// Returns theFlag
+static bool setInvalidIfFalse(TDF_Label& theLab, const bool theFlag) {
+  if (theFlag) {
+    theLab.ForgetAttribute(kINVALID_SELECTION);
+  } else {
+    TDataStd_UAttribute::Set(theLab, kINVALID_SELECTION);
+  }
+  return theFlag;
+}
+
 bool Model_AttributeSelection::update()
 {
-  ResultPtr aContext = context();
-  if (!aContext.get()) return false;
   TDF_Label aSelLab = selectionLabel();
+  ResultPtr aContext = context();
+  if (!aContext.get()) 
+    return setInvalidIfFalse(aSelLab, false);
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
-    return aContext->shape() && !aContext->shape()->isNull();
+    return setInvalidIfFalse(aSelLab, aContext->shape() && !aContext->shape()->isNull());
   }
   if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, not sub-shape
-    return aContext->shape() && !aContext->shape()->isNull();
+    return setInvalidIfFalse(aSelLab, aContext->shape() && !aContext->shape()->isNull());
   }
 
   if (aSelLab.IsAttribute(kPART_REF_ID)) { // it is reference to the part object
     std::shared_ptr<GeomAPI_Shape> aNoSelection;
-    return selectPart(aContext, aNoSelection, true);
+    return setInvalidIfFalse(aSelLab, selectPart(aContext, aNoSelection, true));
   }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
@@ -333,7 +356,7 @@ bool Model_AttributeSelection::update()
     TNaming_Selector aSelector(aSelLab);
     bool aResult = aSelector.Solve(scope()) == Standard_True;
     owner()->data()->sendAttributeUpdated(this);
-    return aResult;
+    return setInvalidIfFalse(aSelLab, aResult);
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
@@ -348,7 +371,7 @@ bool Model_AttributeSelection::update()
       // getting a type of selected shape
       Handle(TDataStd_Integer) aTypeAttr;
       if (!aLab.FindAttribute(TDataStd_Integer::GetID(), aTypeAttr)) {
-        return false;
+        return setInvalidIfFalse(aSelLab, false);
       }
       TopAbs_ShapeEnum aShapeType = (TopAbs_ShapeEnum)(aTypeAttr->Get());
       // selected indexes will be needed in each "if"
@@ -360,13 +383,13 @@ bool Model_AttributeSelection::update()
       CompositeFeaturePtr aComposite = 
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
       if (!aComposite.get() || aComposite->numberOfSubs() == 0) {
-        return false;
+        return setInvalidIfFalse(aSelLab, false);
       }
 
       if (aShapeType == TopAbs_FACE) { // compound is for the whole sketch selection
         // If this is a wire with plane defined thin it is a sketch-like object
         if (!aConstructionContext->facesNum()) // no faces, update can not work correctly
-          return false;
+          return setInvalidIfFalse(aSelLab, false);
         // if there is no edges indexes, any face can be used: take the first
         std::shared_ptr<GeomAPI_Shape> aNewSelected;
         if (aNoIndexes) {
@@ -446,7 +469,10 @@ bool Model_AttributeSelection::update()
         if (aNewSelected) { // store this new selection
           selectConstruction(aContext, aNewSelected);
           owner()->data()->sendAttributeUpdated(this);
-          return true;
+          return setInvalidIfFalse(aSelLab, true);
+        } else { // if the selection is not found, put the empty shape: it's better to have disappeared shape, than the old, the lost one
+          TNaming_Builder anEmptyBuilder(selectionLabel());
+          return setInvalidIfFalse(aSelLab, false);
         }
       } else if (aShapeType == TopAbs_EDGE) {
         // just reselect the edge by the id
@@ -464,7 +490,7 @@ bool Model_AttributeSelection::update()
               if (aRes && aRes->shape() && aRes->shape()->isEdge()) { // found!
                 selectConstruction(aContext, aRes->shape());
                 owner()->data()->sendAttributeUpdated(this);
-                return true;
+                return setInvalidIfFalse(aSelLab, true);
               }
             }
           }
@@ -493,7 +519,7 @@ bool Model_AttributeSelection::update()
                   if (aRes->shape()->isVertex() && aVertexNum == 0) { // found!
                     selectConstruction(aContext, aRes->shape());
                     owner()->data()->sendAttributeUpdated(this);
-                    return true;
+                    return setInvalidIfFalse(aSelLab, true);
                   } else if (aRes->shape()->isEdge() && aVertexNum > 0) {
                     const TopoDS_Shape& anEdge = aRes->shape()->impl<TopoDS_Shape>();
                     int aVIndex = 1;
@@ -503,7 +529,7 @@ bool Model_AttributeSelection::update()
                         aVertex->setImpl(new TopoDS_Shape(aVExp.Current()));
                         selectConstruction(aContext, aVertex);
                         owner()->data()->sendAttributeUpdated(this);
-                        return true;
+                        return setInvalidIfFalse(aSelLab, true);
                       }
                       aVIndex++;
                     }
@@ -516,10 +542,10 @@ bool Model_AttributeSelection::update()
     } else { // simple construction element: the selected is that needed
       selectConstruction(aContext, aContext->shape());
       owner()->data()->sendAttributeUpdated(this);
-      return true;
+      return setInvalidIfFalse(aSelLab, true);
     }
   }
-  return false; // unknown case
+  return setInvalidIfFalse(aSelLab, false); // unknown case
 }
 
 

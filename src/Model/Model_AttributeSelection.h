@@ -64,6 +64,10 @@ public:
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
 
+  /// Returns true if recomute of selection become impossible
+  MODEL_EXPORT virtual bool isInvalid();
+
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
