@@ -625,6 +625,9 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
         isFullyRemoved = false;
       break;
     }
+  if (aCIter == myConstraints.end())
+    return;
+
   if (isFullyRemoved)
     myConstraints.erase(aCIter);
   else if (aCIter != myConstraints.end() &&

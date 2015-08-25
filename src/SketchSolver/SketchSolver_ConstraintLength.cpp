@@ -37,6 +37,8 @@ void SketchSolver_ConstraintLength::process()
 void SketchSolver_ConstraintLength::adjustConstraint()
 {
   // No need to store the line, which length is constrained
-  myFeatureMap.clear();
+  // Upd: The line need to be stored to check that constraint
+  //      is changed/unchanged during modifications in GUI
+  //myFeatureMap.clear();
 }
 
