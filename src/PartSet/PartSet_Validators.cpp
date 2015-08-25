@@ -123,7 +123,9 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection) 
 
 bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelection) const
 {
+  // Coincident can be applied to points and to lines
   int aCount = shapesNbPoints(theSelection);
+  aCount += shapesNbLines(theSelection);
   return (aCount > 0) && (aCount < 3);
 }
 
