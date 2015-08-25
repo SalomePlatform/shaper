@@ -44,6 +44,7 @@ squishrunner_run() {
 }
 
 squishrunner_run ./test.squish/suite_ISSUES 'tst_BASE tst_DISTANCE tst_PARALLEL_1 tst_PARALLEL_2 tst_PERPENDICULAR_1 tst_RADIUS tst_c tst_common_1 tst_crash_1 tst_818 tst_532'
+squishrunner_run ./test.squish/suite_ISSUES_SALOME 'tst_sketch_001 tst_sketch_002 tst_sketch_003 tst_sketch_004 tst_sketch_005 tst_sketch_006 tst_sketch_007 tst_sketch_008 tst_sketch_009 tst_sketch_010 tst_sketch_011 tst_474 tst_532 tst_576 tst_679'
 
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
 for aut in linux_run.sh salome_run.sh; do
