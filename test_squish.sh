@@ -43,7 +43,7 @@ squishrunner_run() {
   if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
 }
 
-squishrunner_run ./test.squish/suite_ISSUES 'tst_BASE tst_DISTANCE tst_PARALLEL_1 tst_PARALLEL_2 tst_RADIUS tst_c tst_common_1 tst_crash_1 tst_818'
+squishrunner_run ./test.squish/suite_ISSUES 'tst_BASE tst_DISTANCE tst_PARALLEL_1 tst_PARALLEL_2 tst_PERPENDICULAR_1 tst_RADIUS tst_c tst_common_1 tst_crash_1 tst_818 tst_532'
 
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
 for aut in linux_run.sh salome_run.sh; do
