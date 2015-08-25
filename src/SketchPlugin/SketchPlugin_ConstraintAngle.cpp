@@ -23,6 +23,9 @@
 const double tolerance = 1.e-7;
 #define PI 3.1415926535897932
 
+/// \brief Calculate intersection point of two lines
+static std::shared_ptr<GeomAPI_Pnt2d> intersect(FeaturePtr theLine1, FeaturePtr theLine2);
+
 
 SketchPlugin_ConstraintAngle::SketchPlugin_ConstraintAngle()
 {
@@ -102,6 +105,22 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
     // coordinates are calculated according to the center of shapes intersection
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+
+    std::shared_ptr<ModelAPI_Data> aData = data();
+    std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
+    FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+    FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+
+    // Intersection of lines
+    std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
+    if (!anInter)
+      return;
+
+    myFlyoutUpdate = true;
+    std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutAttr->pnt()->xy()->decreased(anInter->xy());
+    if (aFlyoutDir->dot(aFlyoutDir) < tolerance * tolerance)
+      aFlyoutAttr->setValue(aFlyoutAttr->x() + tolerance, aFlyoutAttr->y());
+    myFlyoutUpdate = false;
   }
 }
 
@@ -113,6 +132,11 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
   FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
   FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+
+  // Intersection of lines
+  std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
+  if (!anInter)
+    return anAngle;
 
   // Start and end points of lines
   std::shared_ptr<GeomDataAPI_Point2D> aPointA1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -129,15 +153,6 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   std::shared_ptr<GeomAPI_Pnt2d> aEndA   = aPointA2->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aStartB = aPointB1->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aEndB   = aPointB2->pnt();
-  if (aStartA->distance(aEndA) < tolerance || aStartB->distance(aEndB) < tolerance)
-    return anAngle;
-
-  // Lines and their intersection point
-  std::shared_ptr<GeomAPI_Lin2d> aLA(new GeomAPI_Lin2d(aStartA, aEndA));
-  std::shared_ptr<GeomAPI_Lin2d> aLB(new GeomAPI_Lin2d(aStartB, aEndB));
-  std::shared_ptr<GeomAPI_Pnt2d> anInter = aLA->intersect(aLB);
-  if (!anInter)
-    return anAngle;
 
   // Directions of lines
   if (anInter->distance(aEndA) < tolerance)
@@ -204,4 +219,32 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
   myFlyoutUpdate = false;
 
   return true;
+}
+
+
+// ===============   Auxiliary functions   ==================================
+std::shared_ptr<GeomAPI_Pnt2d> intersect(FeaturePtr theLine1, FeaturePtr theLine2)
+{
+  // Start and end points of lines
+  std::shared_ptr<GeomDataAPI_Point2D> aPointA1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theLine1->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aPointA2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theLine1->attribute(SketchPlugin_Line::END_ID()));
+
+  std::shared_ptr<GeomDataAPI_Point2D> aPointB1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theLine2->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aPointB2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theLine2->attribute(SketchPlugin_Line::END_ID()));
+
+  std::shared_ptr<GeomAPI_Pnt2d> aStartA = aPointA1->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aEndA   = aPointA2->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aStartB = aPointB1->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aEndB   = aPointB2->pnt();
+  if (aStartA->distance(aEndA) < tolerance || aStartB->distance(aEndB) < tolerance)
+    std::shared_ptr<GeomAPI_Pnt2d>();
+
+  // Lines and their intersection point
+  std::shared_ptr<GeomAPI_Lin2d> aLA(new GeomAPI_Lin2d(aStartA, aEndA));
+  std::shared_ptr<GeomAPI_Lin2d> aLB(new GeomAPI_Lin2d(aStartB, aEndB));
+  return aLA->intersect(aLB);
 }

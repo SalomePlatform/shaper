@@ -6,6 +6,7 @@
 
 #include "SketchSolver_Builder.h"
 #include <SketchPlugin_ConstraintAngle.h>
+#include <SketchSolver_ConstraintAngle.h>
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>

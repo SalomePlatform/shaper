@@ -223,27 +223,4 @@ public:
   }
 };
 
-
-/** \class   SketchSolver_ConstraintAngle
- *  \ingroup Plugins
- *  \brief   Convert Agnle constraint to SolveSpace structure
- */
-class SketchSolver_ConstraintAngle : public SketchSolver_Constraint
-{
-public:
-  SketchSolver_ConstraintAngle(ConstraintPtr theConstraint) :
-      SketchSolver_Constraint(theConstraint)
-  {}
-
-  virtual int getType() const
-  { return SLVS_C_ANGLE; }
-
-  virtual void adjustConstraint()
-  {
-    Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
-    aConstraint.other = aConstraint.valA >= 0.0;
-    myStorage->updateConstraint(aConstraint);
-  }
-};
-
 #endif
