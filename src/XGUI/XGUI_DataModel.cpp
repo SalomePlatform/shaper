@@ -644,6 +644,9 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
       aObj = (ModelAPI_Object*) theIndex.internalPointer();
   }
   if (aObj) {
+    if (aObj->isDisabled())
+      return Qt::ItemFlags();
+
     bool isCompositeSub = false;
     if (theIndex.column() == 1) {
       ObjectPtr aObjPtr = aObj->data()->owner();
@@ -664,12 +667,9 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
     // An object which is sub-object of a composite object can not be accessible in column 1
     if (isCompositeSub)
       return Qt::ItemFlags();
+  }
 
-    aFlags |= Qt::ItemIsEditable;
-    if (!aObj->isDisabled())
-      aFlags |= Qt::ItemIsEnabled;
-  } else
-    aFlags |= Qt::ItemIsEnabled;
+  aFlags |= Qt::ItemIsEnabled;
   return aFlags;
 }
 

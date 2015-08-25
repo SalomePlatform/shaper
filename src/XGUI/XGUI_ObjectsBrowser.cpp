@@ -130,12 +130,15 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
 {
   if (theIndex.column() != 1)
     return;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  // When operation is opened then we can not change history
+  if (aMgr->isOperation())
+    return;
   ModuleBase_IDocumentDataModel* aModel = dataModel();
   if (aModel->flags(theIndex) == 0)
     return;
   ObjectPtr aObj = aModel->object(theIndex);
 
-  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->activeDocument();
   
   QModelIndex aOldIndex = aModel->lastHistoryIndex();
