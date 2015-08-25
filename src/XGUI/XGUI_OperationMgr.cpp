@@ -189,7 +189,7 @@ void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
   myIsApplyEnabled = theEnabled;
   emit validationStateChanged(theEnabled);
 
-  bool aParentValid = isParentOperationValid();
+  bool aParentValid = true;//isParentOperationValid();
   emit nestedStateChanged(aParentValid);
 }
 
