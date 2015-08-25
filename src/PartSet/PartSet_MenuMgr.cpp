@@ -291,6 +291,8 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
       } else {
         aPnt = PartSet_Tools::getPoint(aConstrFeature,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_B());
+        if (aPnt.get() == NULL)
+          return;
         aP = aPnt->impl<gp_Pnt>();
         if (aOrig->isEqual(aPnt)) {
           aToDelFeatures.append(aConstrFeature);
