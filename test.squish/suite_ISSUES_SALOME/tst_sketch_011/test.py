@@ -1,6 +1,4 @@
 
-
-
 def main():
     #[project] NewGEOM
     #[Scenario] Sketch_010
