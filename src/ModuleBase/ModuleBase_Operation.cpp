@@ -50,6 +50,26 @@ ModuleBase_Operation::~ModuleBase_Operation()
   delete myDescription;
 }
 
+const QStringList& ModuleBase_Operation::grantedOperationIds() const
+{
+  return myGrantedIds;
+}
+
+void ModuleBase_Operation::setGrantedOperationIds(const QStringList& theList)
+{
+  myGrantedIds = theList;
+}
+
+void ModuleBase_Operation::addGrantedOperationId(const QString& theId)
+{
+  myGrantedIds.append(theId);
+}
+
+void ModuleBase_Operation::removeGrantedOperationId(const QString& theId)
+{
+  myGrantedIds.removeAll(theId);
+}
+
 QString ModuleBase_Operation::id() const
 {
   return getDescription()->operationId();
@@ -65,39 +85,14 @@ bool ModuleBase_Operation::canBeCommitted() const
   return isValid();
 }
 
-
 void ModuleBase_Operation::start()
 {
   myIsModified = false;
-  /*
-  QString anId = getDescription()->operationId();
-  if (myIsEditing) {
-    anId = anId.append(EditSuffix());
-  }
-  ModelAPI_Session::get()->startOperation(anId.toStdString());
 
-  if (!myIsEditing) {
-    FeaturePtr aFeature = createFeature();
-    // if the feature is not created, there is no sense to start the operation
-    if (aFeature.get() == NULL) {
-      // it is necessary to abor the operation in the session and emit the aborted signal
-      // in order to update commands status in the workshop, to be exact the feature action
-      // to be unchecked
-      abort();
-      return;
-    }
-  }
-  /// Set current feature and remeber old current feature
-  if (myIsEditing) {
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->activeDocument();
-    myCurrentFeature = aDoc->currentFeature(true);
-    aDoc->setCurrentFeature(feature(), false);
-  }
+  ModelAPI_Session::get()->startOperation(id().toStdString());
 
   startOperation();
   emit started();
-*/
 }
 
 void ModuleBase_Operation::postpone()
@@ -114,75 +109,29 @@ void ModuleBase_Operation::resume()
 
 void ModuleBase_Operation::abort()
 {
-/*
   // the viewer update should be blocked in order to avoid the features blinking before they are
   // hidden
-  std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
-      new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
-  Events_Loop::loop()->send(aMsg);
+  //std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+  //    new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+  //Events_Loop::loop()->send(aMsg);
 
-  // the widgets of property panel should not process any events come from data mode
-  // after abort clicked. Some signal such as redisplay/create influence on content
-  // of the object browser and viewer context. Therefore it influence to the current
-  // selection and if the active widget listens it, the attribute value is errnoneous
-  // changed.
-  if (myPropertyPanel)
-    myPropertyPanel->cleanContent();
+  ModelAPI_Session::get()->abortOperation();
 
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (myIsEditing) {
-    DocumentPtr aDoc = aMgr->activeDocument();
-    bool aIsOp = aMgr->isOperation();
-    if (!aIsOp)
-      aMgr->startOperation();
-    aDoc->setCurrentFeature(myCurrentFeature, true);
-    if (!aIsOp)
-      aMgr->finishOperation();
-    myCurrentFeature = FeaturePtr();
-  }
-  abortOperation();
-
-  stopOperation();
-  // is is necessary to deactivate current widgets before the model operation is aborted
-  // because abort removes the feature and activated filters should not check it
-  propertyPanel()->cleanContent();
-
-  aMgr->abortOperation();
   emit stopped();
   // the viewer update should be unblocked in order to avoid the features blinking before they are
   // hidden
-  aMsg = std::shared_ptr<Events_Message>(
-                new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
-
-  Events_Loop::loop()->send(aMsg);
+  //aMsg = std::shared_ptr<Events_Message>(
+  //              new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+  //Events_Loop::loop()->send(aMsg);
 
   emit aborted();
-*/
 }
 
 bool ModuleBase_Operation::commit()
 {
-/*  if (canBeCommitted()) {
-    // the widgets of property panel should not process any events come from data mode
-    // after commit clicked. Some signal such as redisplay/create influence on content
-    // of the object browser and viewer context. Therefore it influence to the current
-    // selection and if the active widget listens it, the attribute value is errnoneous
-    // changed.
-    if (myPropertyPanel)
-      myPropertyPanel->cleanContent();
-
+  if (canBeCommitted()) {
     SessionPtr aMgr = ModelAPI_Session::get();
-    /// Set current feature and remeber old current feature
-    if (myIsEditing) {
-      DocumentPtr aDoc = aMgr->activeDocument();
-      bool aIsOp = aMgr->isOperation();
-      if (!aIsOp)
-        aMgr->startOperation();
-      aDoc->setCurrentFeature(myCurrentFeature, true);
-      if (!aIsOp)
-        aMgr->finishOperation();
-      myCurrentFeature = FeaturePtr();
-    }
+
     commitOperation();
     aMgr->finishOperation();
 
@@ -193,7 +142,6 @@ bool ModuleBase_Operation::commit()
     afterCommitOperation();
     return true;
   }
-*/
   return false;
 }
 
@@ -209,5 +157,5 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 
 bool ModuleBase_Operation::isGranted(QString theId) const
 {
-  return false;
+  return myGrantedIds.contains(theId);
 }

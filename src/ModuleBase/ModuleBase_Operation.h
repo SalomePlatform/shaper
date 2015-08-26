@@ -56,6 +56,21 @@ Q_OBJECT
   /// /returns the instance of the description class
   ModuleBase_OperationDescription* getDescription() const { return myDescription; }
 
+  /// Returns list of granted operation indices
+  const QStringList& grantedOperationIds() const;
+
+  /// Sets list of operation indices, which can be started without the current operation stop
+  /// \param theList an ids
+  void setGrantedOperationIds(const QStringList& theList);
+
+  /// Appends an operation index to be granted
+  /// \param theId an index
+  void addGrantedOperationId(const QString& theId);
+
+  /// Removes an operation index from the granted
+  /// \param theId an index
+  void removeGrantedOperationId(const QString& theId);
+
   /// Must return true if this operation can be launched as nested for any current operation
   /// and it is not necessary to check this operation on validity. By default 
   /// the operation is not granted.
@@ -167,6 +182,9 @@ private:
 
   /// Modified feature flag
   bool myIsModified;
+
+  /// List of operations IDs which are granted of the current operation
+  QStringList myGrantedIds;
 
   /// Access to property panel
   ModuleBase_IPropertyPanel* myPropertyPanel;

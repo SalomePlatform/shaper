@@ -348,8 +348,3 @@ void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* th
     theProp->activateNextWidget(NULL);
   }
 }
-
-bool ModuleBase_OperationFeature::isGranted(QString theId) const
-{
-  return myNestedFeatures.contains(theId);
-}

@@ -480,10 +480,10 @@ void XGUI_Workshop::setNestedFeatures(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
-  if (isSalomeMode()) 
-    aFOperation->setNestedFeatures(mySalomeConnector->nestedActions(theOperation->id()));
+  if (isSalomeMode())
+    aFOperation->setGrantedOperationIds(mySalomeConnector->nestedActions(theOperation->id()));
   else
-    aFOperation->setNestedFeatures(myActionsMgr->nestedCommands(theOperation->id()));
+    aFOperation->setGrantedOperationIds(myActionsMgr->nestedCommands(theOperation->id()));
 }
 
 void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)

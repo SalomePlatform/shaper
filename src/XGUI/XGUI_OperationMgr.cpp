@@ -117,9 +117,11 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   connect(theOperation, SIGNAL(committed()), SLOT(onOperationCommitted()));
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
-  connect(theOperation, SIGNAL(triggered(bool)), SLOT(onOperationTriggered(bool)));
-  connect(theOperation, SIGNAL(activatedByPreselection()),
-          SIGNAL(operationActivatedByPreselection()));
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                        (theOperation);
+  if (aFOperation)
+    connect(aFOperation, SIGNAL(activatedByPreselection()),
+            SIGNAL(operationActivatedByPreselection()));
 
   theOperation->start();
   onValidateOperation();
@@ -273,7 +275,7 @@ bool XGUI_OperationMgr::canStartOperation(QString theId)
   if (aCurrentOp) {
     if (!aCurrentOp->isGranted(theId)) {
       if (canStopOperation()) {
-        if (myIsApplyEnabled)
+        if (myIsApplyEnabled && aCurrentOp->isModified())
           aCurrentOp->commit();
         else
           abortOperation(aCurrentOp);

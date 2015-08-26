@@ -271,7 +271,7 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
 
 QAction* XGUI_ActionsMgr::action(const QString& theId)
 {
-  QAction* anAction;
+  QAction* anAction = 0;
   if(myActions.contains(theId)) {
     anAction = myActions.value(theId);
   }

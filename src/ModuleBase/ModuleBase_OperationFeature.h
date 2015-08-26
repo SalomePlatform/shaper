@@ -58,31 +58,15 @@ Q_OBJECT
   /// Destructor
   virtual ~ModuleBase_OperationFeature();
 
-  /**
-  * Must return true if this operation can be launched as nested for any current operation
-  * and it is not necessary to check this operation on validity. By default 
-  * the operation is not granted.
-  * The method has to be redefined for granted operations.
-  */
-  virtual bool isGranted(QString theId) const;
-
   /// Returns True id the current operation is launched in editing mode
   bool isEditOperation() const { return myIsEditing; }
-
-  /// Returns list of nested features
-  QStringList nestedFeatures() const { return myNestedFeatures; }
-
-  /// Sets list of nested features
-  void setNestedFeatures(const QStringList& theList) { myNestedFeatures = theList; }
 
   /// Returns the operation feature
   /// \return the feature
   FeaturePtr feature() const;
 
-  /**
-  * Must return True if the operation's feature is valid.
-  * Since IOperation does not have any feature returns false.
-  */
+  /// Must return True if the operation's feature is valid.
+  /// Since IOperation does not have any feature returns false.
   virtual bool isValid() const;
 
   /// Sets the operation feature
@@ -153,9 +137,6 @@ signals:
 
   /// Editing feature flag
   bool myIsEditing;
-
-  /// List of nested operations IDs
-  QStringList myNestedFeatures;
 
   /// List of pre-selected object 
   QList<ModuleBase_ViewerPrs> myPreSelection;

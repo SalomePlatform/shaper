@@ -65,6 +65,9 @@ XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop),
     myUpdatePrefs(false)
 {
+  XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
+  connect(anOperationMgr, SIGNAL(nestedStateChanged(const std::string&, const bool)),
+          this, SLOT(onNestedStateChanged(const std::string&, const bool)));
 }
 
 //******************************************************
@@ -378,7 +381,8 @@ void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId
       anAcceptAllAction->setEnabled(theState);
   } else {
     AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
-    if (aMenuBar->feature(theFeatureId.c_str())->button()->additionalButtonWidget())
+    AppElements_Command* aCommand = aMenuBar->feature(theFeatureId.c_str());
+    if (aCommand && aCommand->button()->additionalButtonWidget())
       anAcceptAllAction->setEnabled(theState);
   }
 }
@@ -475,9 +479,6 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     aWorkshop->actionsMgr()->addCommand(aCommand);
     aWorkshop->module()->actionCreated(aCommand);
   }
-  XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
-  connect(anOperationMgr, SIGNAL(nestedStateChanged(const std::string&, const bool)),
-          this, SLOT(onNestedStateChanged(const std::string&, const bool)));
 }
 
 

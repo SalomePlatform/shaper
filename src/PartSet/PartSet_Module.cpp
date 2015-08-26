@@ -25,6 +25,7 @@
 #include <PartSetPlugin_Duplicate.h>
 
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
@@ -621,23 +622,26 @@ bool PartSet_Module::deleteObjects()
     if (aSketchObjects.size() == 0)
       return true;
 
-    // the active nested sketch operation should be aborted unconditionally
-    if (isNestedOp)
-      anOperation->abort();
-
     // 3. start operation
     QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-    aMgr->startOperation(aDescription.toStdString());
+    ModuleBase_OperationAction* anAction = new ModuleBase_OperationAction(aDescription, this);
 
+    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
+    // the active nested sketch operation should be aborted unconditionally
+    if (isSketchOp)
+      anOperation->addGrantedOperationId(anAction->id());
+    if (!anOpMgr->canStartOperation(anAction->id()))
+      return true; // the objects are processed but can not be deleted
+    if (isSketchOp)
+      anOperation->removeGrantedOperationId(anAction->id());
+
+    anOpMgr->startOperation(anAction);
     // 4. delete features
     // sketch feature should be skipped, only sub-features can be removed
     // when sketch operation is active
     aWorkshop->deleteFeatures(aSketchObjects);
     // 5. stop operation
-    aWorkshop->displayer()->updateViewer();
-    aMgr->finishOperation();
-    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
-    anOpMgr->updateApplyOfOperations();
+    anOpMgr->commitOperation();
   } else {
     bool isPartRemoved = false;
     // Delete part with help of PartSet plugin
