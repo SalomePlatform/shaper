@@ -265,8 +265,8 @@ private:
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
   /// \param theOperation an operation which feature is to be displayed, it is nested create operation
   /// \param isToDisplay a flag about the display or erase the feature
-  void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay,
-                        const bool isFlushRedisplay = true);
+  void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
+                        const bool isToDisplay, const bool isFlushRedisplay = true);
 private:
   /// Gives a debug information about internal flags myIsMouseOverWindow and myIsResetCurrentValue
   /// \return a string value

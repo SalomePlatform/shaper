@@ -29,6 +29,7 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_Operation.h>
@@ -207,11 +208,13 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // not accept a signal about the result created. Nothing is shown until mouse is moved out/in view
   // port. If the isDisplayed flag is true, the presentable feature is displayed as soon as the
   // presentation becomes valid and redisplay happens
-  ModuleBase_Operation* aOperation = getCurrentOperation();
-  if (aOperation) {
-    FeaturePtr aFeature = aOperation->feature();
+  //ModuleBase_Operation* aOperation = getCurrentOperation();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (getCurrentOperation());
+  if (aFOperation) {
+    FeaturePtr aFeature = aFOperation->feature();
     if (aFeature.get() && aFeature->data()->isValid()) {
-      visualizeFeature(aOperation, canDisplayObject(aFeature), false);
+      visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature), false);
     }
   }
 }
@@ -254,8 +257,12 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   // hides the presentation of the current operation feature
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
-  FeaturePtr aFeature = getCurrentOperation()->feature();
-  visualizeFeature(aOperation, canDisplayObject(aFeature));
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (getCurrentOperation());
+  if (aFOperation) {
+    FeaturePtr aFeature = aFOperation->feature();
+    visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
+  }
 }
 
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
@@ -297,11 +304,14 @@ void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
   // visualize the current operation feature
   myIsResetCurrentValue = false;
   operationMgr()->onValidateOperation();
-  ModuleBase_Operation* aOperation = getCurrentOperation();
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
-  FeaturePtr aFeature = getCurrentOperation()->feature();
-  visualizeFeature(aOperation, canDisplayObject(aFeature));
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (getCurrentOperation());
+  if (aFOperation) {
+    FeaturePtr aFeature = aFOperation->feature();
+    visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
+  }
 }
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -320,9 +330,13 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!aViewer->canDragByMouse())
     return;
 
-  ModuleBase_Operation* aOperation = getCurrentOperation();
-  if (aOperation && aOperation->isEditOperation()) {
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (getCurrentOperation());
+  if (!aFOperation)
+    return;
+
+  if (aFOperation->isEditOperation()) {
+    ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
     ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
     // If the current widget is a selector, do nothing, it processes the mouse press
     if(aActiveWgt && aActiveWgt->isViewerSelector()) {
@@ -331,18 +345,18 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   }
 
   // Use only for sketch operations
-  if (aOperation && myCurrentSketch) {
+  if (myCurrentSketch) {
     if (!PartSet_Tools::sketchPlane(myCurrentSketch))
       return;
 
-    bool isSketcher = isSketchOperation(aOperation);
-    bool isSketchOpe = isNestedSketchOperation(aOperation);
+    bool isSketcher = isSketchOperation(aFOperation);
+    bool isSketchOpe = isNestedSketchOperation(aFOperation);
 
     // Avoid non-sketch operations
     if ((!isSketchOpe) && (!isSketcher))
       return;
 
-    bool isEditing = aOperation->isEditOperation();
+    bool isEditing = aFOperation->isEditOperation();
 
     // Ignore creation sketch operation
     if ((!isSketcher) && (!isEditing))
@@ -360,8 +374,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     if (myCurrentSelection.empty()) {
       if (isSketchOpe && (!isSketcher))
         // commit previous operation
-        if (!aOperation->commit())
-          aOperation->abort();
+        if (!aFOperation->commit())
+          aFOperation->abort();
       return;
     }
     // Init flyout point for radius rotation
@@ -385,7 +399,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       }
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
-      aOperation->commit();
+      aFOperation->commit();
 
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurrentPoint);
@@ -450,8 +464,12 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     }
     // the feature is to be erased here, but it is correct to call canDisplayObject because
     // there can be additional check (e.g. editor widget in distance constraint)
-    FeaturePtr aFeature = getCurrentOperation()->feature();
-    visualizeFeature(aOperation, canDisplayObject(aFeature));
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                             (getCurrentOperation());
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
+    }
   }
 
   myClickedPoint.clear();
@@ -549,13 +567,14 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
 
 void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  ModuleBase_Operation* aOperation = getCurrentOperation();
-  if (aOperation && aOperation->isEditOperation()) {
-    std::string aId = aOperation->id().toStdString();
-    if (isDistanceOperation(aOperation))
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (getCurrentOperation());
+  if (aFOperation && aFOperation->isEditOperation()) {
+    std::string aId = aFOperation->id().toStdString();
+    if (isDistanceOperation(aFOperation))
     {
       // Activate dimension value editing on double click
-      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
       QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
       // Find corresponded widget to activate value editing
       foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
@@ -700,7 +719,9 @@ bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOpera
 
 bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation)
 {
-  return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (theOperation);
+  return aFOperation && !aFOperation->isEditOperation() && isNestedSketchOperation(aFOperation);
 }
 
 bool PartSet_SketcherMgr::isEntity(const std::string& theId)
@@ -723,10 +744,15 @@ bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 {
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (getCurrentOperation());
+  if (!aFOperation)
+    return;
+
   myModule->onViewTransformed();
 
   // Display all sketcher sub-Objects
-  myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theOperation->feature());
+  myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFOperation->feature());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   // Hide sketcher result
@@ -755,7 +781,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
-  if (theOperation->isEditOperation()) {
+  if (aFOperation->isEditOperation()) {
     // If it is editing of sketch then it means that plane is already defined
     aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
     if (aPln.get())
@@ -766,11 +792,11 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   // all sketch objects should be activated in the sketch selection modes by edit operation start
   // in case of creation operation, there is an active widget, which activates own selection mode
-  if (theOperation->isEditOperation() && aHasPlane)
+  if (aFOperation->isEditOperation() && aHasPlane)
     aConnector->activateModuleSelectionModes();
 }
 
-void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
+void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation*/* theOperation*/)
 {
   myIsMouseOverWindow = false;
   myIsConstraintsShown = true;
@@ -848,11 +874,15 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
 {
   if (isNestedCreateOperation(theOperation)) {
-    FeaturePtr aFeature = theOperation->feature();
-    // it is necessary to check the the feature data validity because
-    // some kind of features are removed by an operation commit(the macro state of a feature)
-    if (aFeature.get() && aFeature->data()->isValid()) {
-      visualizeFeature(theOperation, true);
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                             (theOperation);
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      // it is necessary to check the the feature data validity because
+      // some kind of features are removed by an operation commit(the macro state of a feature)
+      if (aFeature.get() && aFeature->data()->isValid()) {
+        visualizeFeature(aFeature, aFOperation->isEditOperation(), true);
+      }
     }
   }
 }
@@ -906,9 +936,10 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   // 3. the method should not filter the objects, which are not related to the current operation.
   // The object is filtered just if it is a current operation feature or this feature result
   bool isObjectFound = false;
-  ModuleBase_Operation* anOperation = getCurrentOperation();
-  if (anOperation) {
-    FeaturePtr aFeature = anOperation->feature();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (getCurrentOperation());
+  if (aFOperation) {
+    FeaturePtr aFeature = aFOperation->feature();
     if (aFeature.get()) {
       std::list<ResultPtr> aResults = aFeature->results();
       if (theObject == aFeature)
@@ -1125,7 +1156,8 @@ ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
   return myModule->workshop()->currentOperation();
 }
 
-void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
+void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
+                                           const bool isEditOperation,
                                            const bool isToDisplay,
                                            const bool isFlushRedisplay)
 {
@@ -1133,7 +1165,7 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
   return;
   #endif
 
-  if (!theOperation || theOperation->isEditOperation())
+  if (isEditOperation || !theFeature.get())
     return;
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
@@ -1141,12 +1173,12 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
 
   // 1. change visibility of the object itself, here the presentable object is processed,
   // e.g. constraints features
-  FeaturePtr aFeature = theOperation->feature();
-  std::list<ResultPtr> aResults = aFeature->results();
+  //FeaturePtr aFeature = aFOperation->feature();
+  std::list<ResultPtr> aResults = theFeature->results();
   if (isToDisplay)
-    aFeature->setDisplayed(true);
+    theFeature->setDisplayed(true);
   else
-    aFeature->setDisplayed(false);
+    theFeature->setDisplayed(false);
 
   // change visibility of the object results, e.g. non-constraint features
   std::list<ResultPtr>::const_iterator aIt;

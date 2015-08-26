@@ -26,6 +26,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_OperationFeature.h>
 #include <Config_WidgetAPI.h>
 
 #include <QLabel>
@@ -118,9 +119,11 @@ void PartSet_WidgetSketchCreator::onStarted()
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
     FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
 
-    ModuleBase_Operation* anOperation = myModule->createOperation("Sketch");
-    anOperation->setFeature(aSketch);
-    myModule->sendOperation(anOperation);
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                             (myModule->createOperation("Sketch"));
+    if (aFOperation)
+      aFOperation->setFeature(aSketch);
+    myModule->sendOperation(aFOperation);
     //connect(anOperation, SIGNAL(aborted()), aWorkshop->operationMgr(), SLOT(abortAllOperations()));
   } else {
     // Break current operation

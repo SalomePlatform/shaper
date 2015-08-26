@@ -20,6 +20,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_SelectionValidator.h>
 
 
@@ -95,15 +96,16 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
 void XGUI_ActionsMgr::update()
 {
   FeaturePtr anActiveFeature = FeaturePtr();
-  if (myOperationMgr->hasOperation()) {
-    ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
-    anActiveFeature = anOperation->feature();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myOperationMgr->currentOperation());
+  if (aFOperation) {
+    anActiveFeature = aFOperation->feature();
     if(anActiveFeature.get()) {
       setAllEnabled(false);
       QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
       setActionEnabled(aFeatureId, true);
     }
-    setNestedStackEnabled(anOperation);
+    setNestedStackEnabled(aFOperation);
   } else {
     setAllEnabled(true);
     setNestedCommandsEnabled(false);
@@ -315,9 +317,10 @@ void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& t
 
 void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
 {
-  if(!theOperation || !theOperation->feature())
+  ModuleBase_OperationFeature* anOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if(!anOperation || !anOperation->feature())
     return;
-  FeaturePtr aFeature = theOperation->feature();
+  FeaturePtr aFeature = anOperation->feature();
   QString aFeatureId = QString::fromStdString(aFeature->getKind());
   setActionEnabled(aFeatureId, true);
   setNestedCommandsEnabled(true, aFeatureId);

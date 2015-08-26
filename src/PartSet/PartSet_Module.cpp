@@ -32,8 +32,9 @@
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Tools.h>
-#include <GeomValidators_ShapeType.h>
+#include <ModuleBase_OperationFeature.h>
 
+#include <GeomValidators_ShapeType.h>
 #include <GeomValidators_Face.h>
 #include <GeomValidators_ConstructionComposite.h>
 #include <GeomValidators_ZeroOffset.h>
@@ -246,7 +247,8 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
     mySketchMgr->commitNestedSketch(theOperation);
   }
 
-  if (theOperation->isEditOperation())
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFOperation || aFOperation->isEditOperation())
     return;
   // the selection is cleared after commit the create operation
   // in order to do not use the same selected objects in the restarted operation
@@ -256,13 +258,13 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
   aWorkshop->selector()->clearSelection();
 
   /// Restart sketcher operations automatically
-  FeaturePtr aFeature = theOperation->feature();
+  FeaturePtr aFeature = aFOperation->feature();
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
   if (aSPFeature && (myRestartingMode == RM_LastFeatureUsed ||
                      myRestartingMode == RM_EmptyFeatureUsed)) {
-    myLastOperationId = theOperation->id();
-    myLastFeature = myRestartingMode == RM_LastFeatureUsed ? theOperation->feature() : FeaturePtr();
+    myLastOperationId = aFOperation->id();
+    myLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
     
     launchOperation(myLastOperationId);
   }
@@ -290,7 +292,9 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     mySketchMgr->startNestedSketch(theOperation);
   }
 
-  myCustomPrs->activate(theOperation->feature());
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (aFOperation)
+    myCustomPrs->activate(aFOperation->feature());
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -371,7 +375,8 @@ bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
   if (isSketchOp || isNestedOp) {
     // in active sketch operation it is possible to activate operation object in selection
     // in the edit operation, e.g. points of the line can be moved when the line is edited
-    aCanActivate = aCanActivate || anOperation->isEditOperation();
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+    aCanActivate = aCanActivate || (aFOperation && aFOperation->isEditOperation());
   }
   return aCanActivate;
 }
@@ -401,17 +406,21 @@ bool PartSet_Module::isMouseOverWindow()
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
-  if (PartSet_SketcherMgr::isSketchOperation(theOperation) &&  (theOperation->isEditOperation())) {
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFOperation)
+    return;
+
+  ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+  if (PartSet_SketcherMgr::isSketchOperation(aFOperation) &&  (aFOperation->isEditOperation())) {
     // we have to manually activate the sketch label in edit mode
       aPanel->activateWidget(aPanel->modelWidgets().first());
       return;
   }
 
   // Restart last operation type 
-  if ((theOperation->id() == myLastOperationId) && myLastFeature) {
+  if ((aFOperation->id() == myLastOperationId) && myLastFeature) {
     ModuleBase_ModelWidget* aWgt = aPanel->activeWidget();
-    if (theOperation->id().toStdString() == SketchPlugin_Line::ID()) {
+    if (aFOperation->id().toStdString() == SketchPlugin_Line::ID()) {
       // Initialise new line with first point equal to end of previous
       PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
       if (aPnt2dWgt) {
@@ -420,7 +429,7 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
         if (aPoint) {
           aPnt2dWgt->setPoint(aPoint->x(), aPoint->y());
-          PartSet_Tools::setConstraints(mySketchMgr->activeSketch(), theOperation->feature(), 
+          PartSet_Tools::setConstraints(mySketchMgr->activeSketch(), aFOperation->feature(), 
             aWgt->attributeID(), aPoint->x(), aPoint->y());
           aPanel->activateNextWidget(aPnt2dWgt);
         }

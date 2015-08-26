@@ -7,6 +7,7 @@
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_ISelection.h"
 #include "ModuleBase_OperationDescription.h"
+#include "ModuleBase_OperationFeature.h"
 
 #include <Events_Loop.h>
 
@@ -43,11 +44,14 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId)
   if (!myWorkshop->canStartOperation(theCmdId))
     return;
 
-  ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
-  ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  // Initialise operation with preliminary selection
-  anOperation->initSelection(aSelection, myWorkshop->viewer());
-  sendOperation(anOperation);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                             (createOperation(theCmdId.toStdString()));
+  if (aFOperation) {
+    ModuleBase_ISelection* aSelection = myWorkshop->selection();
+    // Initialise operation with preliminary selection
+    aFOperation->initSelection(aSelection, myWorkshop->viewer());
+    sendOperation(aFOperation);
+  }
 }
 
 
@@ -62,22 +66,23 @@ void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation)
 
 ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& theFeatureId)
 {
-  return new ModuleBase_Operation(theFeatureId.c_str(), this);
+  return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);
 }
 
 ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& theFeatureId)
 {
-  ModuleBase_Operation* anOperation = getNewOperation(theFeatureId);
-
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                          (getNewOperation(theFeatureId));
   // If the operation is launched as sub-operation of another then we have to initialise
   // parent feature
-  ModuleBase_Operation* aCurOperation = myWorkshop->currentOperation();
+  ModuleBase_OperationFeature* aCurOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myWorkshop->currentOperation());
   if (aCurOperation) {
     FeaturePtr aFeature = aCurOperation->feature();
     CompositeFeaturePtr aCompFeature =
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
     if (aCompFeature) {
-      anOperation->setParentFeature(aCompFeature);
+      aFOperation->setParentFeature(aCompFeature);
     }
   }
 
@@ -87,10 +92,10 @@ ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& the
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(theFeatureId);
   std::string aDescription = aWdgReader.featureDescription(theFeatureId);
 
-  anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
-  anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  aFOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
+  aFOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
 
-  return anOperation;
+  return aFOperation;
 }
 
 void ModuleBase_IModule::createFeatures()
@@ -156,15 +161,19 @@ void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
   if (!myWorkshop->canStartOperation(aFeatureId.c_str()))
     return;
 
-  ModuleBase_Operation* anOperation = createOperation(aFeatureId);
-  anOperation->setFeature(theFeature);
-  sendOperation(anOperation);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (createOperation(aFeatureId));
+  if (aFOperation) {
+    aFOperation->setFeature(theFeature);
+    sendOperation(aFOperation);
+  }
 }
 
 bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
 {
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  return !aOperation || !aOperation->hasObject(theObject);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                     (myWorkshop->currentOperation());
+  return !aFOperation || !aFOperation->hasObject(theObject);
 }
 
 void ModuleBase_IModule::onOperationResumed(ModuleBase_Operation* theOperation) 

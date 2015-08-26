@@ -62,6 +62,7 @@
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_OperationFeature.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -376,24 +377,29 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
 {
   setNestedFeatures(theOperation);
 
-  if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    setPropertyPanel(theOperation);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                               (theOperation);
+  if (!aFOperation)
+    return;
+
+  if (aFOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
+    setPropertyPanel(aFOperation);
     // filling the operation values by the current selection
     // if the operation can be commited after the controls filling, the method perform should
     // be stopped. Otherwise unnecessary presentations can be shown(e.g. operation prs in sketch)
-    if (!theOperation->isEditOperation()) {
-      theOperation->activateByPreselection();
-      if (operationMgr()->currentOperation() != theOperation)
+    if (!aFOperation->isEditOperation()) {
+      aFOperation->activateByPreselection();
+      if (operationMgr()->currentOperation() != aFOperation)
         return;
     }
   }
   updateCommandStatus();
 
-  myModule->onOperationStarted(theOperation);
+  myModule->onOperationStarted(aFOperation);
 
   // the objects of the current operation should be deactivated
   QObjectPtrList anObjects;
-  FeaturePtr aFeature = theOperation->feature();
+  FeaturePtr aFeature = aFOperation->feature();
   anObjects.append(aFeature);
   std::list<ResultPtr> aResults = aFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
@@ -424,6 +430,11 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                        (theOperation);
+  if (!aFOperation)
+    return;
+
   ModuleBase_ISelection* aSel = mySelector->selection();
   QObjectPtrList aObj = aSel->selectedPresentations();
   //!< No need for property panel
@@ -431,12 +442,12 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
-  myModule->onOperationStopped(theOperation);
+  myModule->onOperationStopped(aFOperation);
 
   // the deactivated objects of the current operation should be activated back.
   // They were deactivated on operation start or an object redisplay
   QObjectPtrList anObjects;
-  FeaturePtr aFeature = theOperation->feature();
+  FeaturePtr aFeature = aFOperation->feature();
   if (myDisplayer->isVisible(aFeature) && !myDisplayer->isActive(aFeature))
     anObjects.append(aFeature);
   std::list<ResultPtr> aResults = aFeature->results();
@@ -465,16 +476,24 @@ void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
 
 void XGUI_Workshop::setNestedFeatures(ModuleBase_Operation* theOperation)
 {
-  if (this->isSalomeMode()) 
-    theOperation->setNestedFeatures(mySalomeConnector->nestedActions(theOperation->id()));
-  else 
-    theOperation->setNestedFeatures(myActionsMgr->nestedCommands(theOperation->id()));
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFOperation)
+    return;
+
+  if (isSalomeMode()) 
+    aFOperation->setNestedFeatures(mySalomeConnector->nestedActions(theOperation->id()));
+  else
+    aFOperation->setNestedFeatures(myActionsMgr->nestedCommands(theOperation->id()));
 }
 
 void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 {
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFOperation)
+    return;
+
   showPropertyPanel();
-  QString aXmlRepr = theOperation->getDescription()->xmlRepresentation();
+  QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
   ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
                                                                 myModuleConnector);
 
@@ -483,15 +502,15 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-    bool isStoreValue = !theOperation->isEditOperation() &&
+    bool isStoreValue = !aFOperation->isEditOperation() &&
                         !aWidget->getDefaultValue().empty() &&
                         !aWidget->isComputedDefault();
-    aWidget->setFeature(theOperation->feature(), isStoreValue);
+    aWidget->setFeature(aFOperation->feature(), isStoreValue);
     aWidget->enableFocusProcessing();
   }
   
   myPropertyPanel->setModelWidgets(aWidgets);
-  theOperation->setPropertyPanel(myPropertyPanel);
+  aFOperation->setPropertyPanel(myPropertyPanel);
 
   myModule->propertyPanelDefined(theOperation);
 
@@ -1530,9 +1549,9 @@ QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>
   std::list<std::string>::const_iterator it = theList.cbegin();
   for (; it != theList.cend(); it++) {
     QString anId = QString::fromStdString(*it);
-    bool isEditing = anId.endsWith(ModuleBase_Operation::EditSuffix());
+    bool isEditing = anId.endsWith(ModuleBase_OperationFeature::EditSuffix());
     if (isEditing) {
-      anId.chop(ModuleBase_Operation::EditSuffix().size());
+      anId.chop(ModuleBase_OperationFeature::EditSuffix().size());
     }
     ActionInfo anInfo;
     QAction* aContextMenuAct = myContextMenuMgr->actionByName(anId);

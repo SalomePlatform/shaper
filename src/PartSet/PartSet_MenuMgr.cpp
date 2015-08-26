@@ -22,6 +22,7 @@
 
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationFeature.h>
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
@@ -343,8 +344,11 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
   bool isUseTransaction = false;
   // 1. change auxiliary type of a created feature
   if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
-    PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
-    anObjects.append(anOperation->feature());
+      PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (anOperation);
+      if (aFOperation)
+        anObjects.append(aFOperation->feature());
   }
   else {
     isUseTransaction = true;
@@ -405,7 +409,9 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
   // 1. change auxiliary type of a created feature
   if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
     PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
-    anObjects.append(anOperation->feature());
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+    if (aFOperation)
+      anObjects.append(aFOperation->feature());
   }
   else {
     /// The operation should not be aborted here, because the method does not changed

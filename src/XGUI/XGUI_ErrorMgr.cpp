@@ -10,6 +10,7 @@
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_OperationFeature.h>
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Session.h>
@@ -45,14 +46,15 @@ const char* toString(ModelAPI_ExecState theExecState)
 void XGUI_ErrorMgr::onValidationStateChanged()
 {
   XGUI_OperationMgr* anOperationMgr = dynamic_cast<XGUI_OperationMgr*>(sender());
-  if (!anOperationMgr || !anOperationMgr->currentOperation())
+  if (!anOperationMgr)
     return;
-
-  if (!myPropertyPanel)
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                  (anOperationMgr->currentOperation());
+  if (!myPropertyPanel || !aFOperation)
     return;
 
   // get feature
-  FeaturePtr aFeature = anOperationMgr->currentOperation()->feature();
+  FeaturePtr aFeature = aFOperation->feature();
   if (!aFeature.get() || !aFeature->data()->isValid())
     return;
 

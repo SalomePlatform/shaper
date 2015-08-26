@@ -22,7 +22,9 @@ SET(PROJECT_HEADERS
   ModuleBase_IWorkshop.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
+  ModuleBase_OperationAction.h
   ModuleBase_OperationDescription.h	
+  ModuleBase_OperationFeature.h
   ModuleBase_PageBase.h
   ModuleBase_PageGroupBox.h
   ModuleBase_PageWidget.h	
@@ -71,7 +73,9 @@ SET(PROJECT_SOURCES
   ModuleBase_IWorkshop.cpp
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
-  ModuleBase_OperationDescription.cpp
+  ModuleBase_OperationAction.cpp
+  ModuleBase_OperationDescription.cpp	
+  ModuleBase_OperationFeature.cpp
   ModuleBase_PageBase.cpp
   ModuleBase_PageGroupBox.cpp
   ModuleBase_PageWidget.cpp

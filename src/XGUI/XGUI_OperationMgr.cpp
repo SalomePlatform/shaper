@@ -10,6 +10,7 @@
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
 #include "ModuleBase_OperationDescription.h"
+#include "ModuleBase_OperationFeature.h"
 
 #include "ModelAPI_CompositeFeature.h"
 #include "ModelAPI_Session.h"
@@ -74,9 +75,12 @@ QStringList XGUI_OperationMgr::operationList() const
 {
   QStringList result;
   foreach(ModuleBase_Operation* eachOperation, myOperations) {
-    FeaturePtr aFeature = eachOperation->feature();
-    if(aFeature) {
-      result << QString::fromStdString(aFeature->getKind());
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(eachOperation);
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      if(aFeature) {
+        result << QString::fromStdString(aFeature->getKind());
+      }
     }
   }
   return result;
@@ -158,12 +162,16 @@ bool XGUI_OperationMgr::commitAllOperations()
     } else {
       abortOperation(anOperation);
     }
-    FeaturePtr aFeature = anOperation->feature();
-    CompositeFeaturePtr aComposite = 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-    isCompositeCommitted = aComposite.get();
-    if (isCompositeCommitted)
-      break;
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                            (anOperation);
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      CompositeFeaturePtr aComposite = 
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+      isCompositeCommitted = aComposite.get();
+      if (isCompositeCommitted)
+        break;
+    }
   }
   return true;
 }

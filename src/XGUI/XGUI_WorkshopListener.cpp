@@ -37,6 +37,7 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_FilterFactory.h>
@@ -154,7 +155,9 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
 
     if (anOperationMgr->startOperation(anOperation)) {
-      workshop()->propertyPanel()->updateContentWidget(anOperation->feature());
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+      if (aFOperation)
+        workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
       if (!anOperation->getDescription()->hasXmlRepresentation()) {
         if (anOperation->commit())
           workshop()->updateCommandStatus();
@@ -196,18 +199,23 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
 }
 
 //******************************************************
-void XGUI_WorkshopListener::onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+void XGUI_WorkshopListener::onFeatureUpdatedMsg(
+                                     const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
   if (anOperationMgr->hasOperation()) {
-    FeaturePtr aCurrentFeature = anOperationMgr->currentOperation()->feature();
-    std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      ObjectPtr aNewFeature = (*aIt);
-      if (aNewFeature == aCurrentFeature) {
-        workshop()->propertyPanel()->updateContentWidget(aCurrentFeature);
-        break;
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                      (anOperationMgr->currentOperation());
+    if (aFOperation) {
+      FeaturePtr aCurrentFeature = aFOperation->feature();
+      std::set<ObjectPtr>::const_iterator aIt;
+      for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+        ObjectPtr aNewFeature = (*aIt);
+        if (aNewFeature == aCurrentFeature) {
+          workshop()->propertyPanel()->updateContentWidget(aCurrentFeature);
+          break;
+        }
       }
     }
   }
