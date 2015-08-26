@@ -49,6 +49,10 @@
 :End point.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.End point_QGroupBox' leftWidget=':End point.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :End point.Y _QLabel	{container=':Line.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :End point.Y _QLabel_2	{container=':Arc.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Equal.First object_QLabel	{container=':SALOME*.Equal_XGUI_PropertyPanel' text='First object' type='QLabel' unnamed='1' visible='1'}
+:Equal.First object_QLineEdit	{container=':SALOME*.Equal_XGUI_PropertyPanel' leftWidget=':Equal.First object_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:Equal.Second object_QLabel	{container=':SALOME*.Equal_XGUI_PropertyPanel' text='Second object' type='QLabel' unnamed='1' visible='1'}
+:Equal.Second object_QLineEdit	{container=':SALOME*.Equal_XGUI_PropertyPanel' leftWidget=':Equal.Second object_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :Equal.property_panel_cancel_QToolButton	{container=':SALOME*.Equal_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Equal_ModuleBase_PageWidget	{container=':SALOME*.Equal_XGUI_PropertyPanel' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
 :Exit.Ok_QPushButton	{text='Ok' type='QPushButton' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
@@ -96,6 +100,10 @@
 :Partition.Tool object_QLabel	{container=':SALOME*.Partition_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
 :Partition.Tool object_QListWidget	{aboveWidget=':Partition.Tool object_QLabel' container=':SALOME*.Partition_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :Partition.property_panel_ok_QToolButton	{container=':SALOME*.Partition_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Perpendicular.First line_QLabel	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' text='First line' type='QLabel' unnamed='1' visible='1'}
+:Perpendicular.First line_QLineEdit	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' leftWidget=':Perpendicular.First line_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:Perpendicular.Second line_QLabel	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' text='Second line' type='QLabel' unnamed='1' visible='1'}
+:Perpendicular.Second line_QLineEdit	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' leftWidget=':Perpendicular.Second line_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :Perpendicular.property_panel_cancel_QToolButton	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Perpendicular.property_panel_ok_QToolButton	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Perpendicular_ModuleBase_PageWidget	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' type='ModuleBase_PageWidget' unnamed='1' visible='1'}

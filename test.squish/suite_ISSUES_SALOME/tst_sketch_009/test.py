@@ -40,11 +40,14 @@ def main():
     #[check] Check that lines are equal
     test.vp("VP1")
     
-    #[step] Select 'Equal' icon in viewer near any objects
+    # [step] Select 'Equal' icon in viewer near any objects
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 451, 186, 0, Qt.LeftButton)
     
     #[check] Check that input panel 'Equal' appears
-    test.vp("VP2")
+    waitFor("object.exists(':Equal.First object_QLineEdit')", 20000)
+    test.compare(str(findObject(":Equal.First object_QLineEdit").text), "SketchLine_1")
+    waitFor("object.exists(':Equal.Second object_QLineEdit')", 20000)
+    test.compare(str(findObject(":Equal.Second object_QLineEdit").text), "SketchLine_2")
     
     #[step] Close application without saving
     close_application()

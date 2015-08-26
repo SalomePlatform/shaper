@@ -49,9 +49,12 @@ def main():
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 372, 263, 0, Qt.LeftButton)
     
     #[check] Check that Input panel 'Perpendicular' appears, there are the names of lines in text boxes
-    test.vp("VP2")
+    waitFor("object.exists(':Perpendicular.First line_QLineEdit')", 20000)
+    test.compare(str(findObject(":Perpendicular.First line_QLineEdit").text), "SketchLine_1")
+    waitFor("object.exists(':Perpendicular.Second line_QLineEdit')", 20000)
+    test.compare(str(findObject(":Perpendicular.Second line_QLineEdit").text), "SketchLine_2")
     
-    #[check] Check that lines are selected and highlighted in viewer
+    # [check] Check that lines are selected and highlighted in viewer
     test.vp("VP3")
     
     #[step] Confirm 'Perpendicular' operation
