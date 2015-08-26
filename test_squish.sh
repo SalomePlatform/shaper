@@ -17,7 +17,7 @@ source ${a_dir}/env_squish.sh
 for aut in linux_run.sh salome_run.sh; do
   squishserver --config addAUT ${aut} $(pwd)
 done
-squishserver --config setAUTTimeout 60
+squishserver --config setAUTTimeout 120
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
 squishserver --verbose --port=${SQUISHSERVER_PORT} 2>server.err &
 
