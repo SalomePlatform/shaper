@@ -128,7 +128,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           } else {
             // List of objects under a folder
             if (aRow != -1) {
-              int aFolderId = myXMLReader.subFolderId(aObjType);
+              int aFolderId = folderId(aObjType, aDoc.get());
               if (aFolderId != -1) {
                 insertRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
               }
@@ -179,7 +179,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             removeRow(aRow + aNbSubFolders, aDocRoot);
           } else {
             // List of objects under a folder
-            int aFolderId = myXMLReader.subFolderId(aGroup);
+            int aFolderId = folderId(aGroup, aDoc.get());
             if (aFolderId != -1) {
               removeRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
             }
@@ -474,7 +474,11 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
       if (aDoc) { 
         // It is a folder of sub-document
-        std::string aType = myXMLReader.subFolderType(aParentPos);
+        int aParentRow = aParentPos;
+        QIntList aMissedIdx = missedFolderIndexes(aDoc);
+        while (aMissedIdx.contains(aParentRow))
+          aParentRow++;
+        std::string aType = myXMLReader.subFolderType(aParentRow);
         if (theRow < aDoc->size(aType)) {
           ObjectPtr aObj = aDoc->object(aType, theRow);
           aIndex = objectIndex(aObj);
@@ -806,4 +810,37 @@ QModelIndex XGUI_DataModel::lastHistoryIndex() const
     else 
       return createIndex(foldersCount(aCurDoc.get()) - 1, 1, aCurDoc.get());
   }
+}
+
+//******************************************************
+int XGUI_DataModel::folderId(std::string theType, ModelAPI_Document* theDoc)
+{
+  SessionPtr aSession = ModelAPI_Session::get();
+  ModelAPI_Document* aDoc = theDoc;
+  if (aDoc == 0)
+    aDoc = aSession->moduleDocument().get();
+
+  bool aUseSubDoc = (aDoc != aSession->moduleDocument().get());
+
+  int aRes = -1;
+  if (aUseSubDoc) {
+    int aId = myXMLReader.subFolderId(theType);
+    aRes = aId;
+    for (int i = 0; i < aId; i++) {
+      if (!myXMLReader.subShowEmpty(i)) {
+        if (aDoc->size(myXMLReader.subFolderType(i)) == 0)
+          aRes--;
+      }
+    }
+  } else {
+    int aId = myXMLReader.rootFolderId(theType);
+    aRes = aId;
+    for (int i = 0; i < aId; i++) {
+      if (!myXMLReader.rootShowEmpty(i)) {
+        if (aDoc->size(myXMLReader.rootFolderType(i)) == 0)
+          aRes--;
+      }
+    }
+  }
+  return aRes;
 }

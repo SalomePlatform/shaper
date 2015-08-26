@@ -127,6 +127,11 @@ private:
   /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
   QIntList missedFolderIndexes(ModelAPI_Document* theDoc = 0) const;
 
+  /// Returns Id (row) of a folder taking into consideration folders which can not be shown non empty
+  /// \param theType Type of the folder
+  /// \param theDoc a document which contains this folder
+  int folderId(std::string theType, ModelAPI_Document* theDoc = 0);
+
   /// Returns list of folders types which can not be shown empty
   /// \param fromRoot - root document flag
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
