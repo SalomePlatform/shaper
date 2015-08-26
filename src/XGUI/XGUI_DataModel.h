@@ -9,6 +9,7 @@
 #define XGUI_DataModel_H
 
 #include "XGUI.h"
+#include <ModuleBase_Definitions.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Document.h>
 #include <Config_DataModelReader.h>
@@ -121,6 +122,10 @@ private:
   /// Returns number of folders in document. Considered folders which has to be shown only if they are not empty.
   /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
   int foldersCount(ModelAPI_Document* theDoc = 0) const;
+
+  /// Retrurns indexes of folders which can not be shown because they are empty
+  /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
+  QIntList missedFolderIndexes(ModelAPI_Document* theDoc = 0) const;
 
   /// Returns list of folders types which can not be shown empty
   /// \param fromRoot - root document flag

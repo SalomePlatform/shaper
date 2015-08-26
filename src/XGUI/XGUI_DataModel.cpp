@@ -27,7 +27,7 @@
 #include <QBrush>
 
 #define ACTIVE_COLOR QColor(0,72,140)
-#define PASSIVE_COLOR Qt::black
+//#define PASSIVE_COLOR Qt::black
 
 /// Returns ResultPart object if the given object is a Part feature
 /// Otherwise returns NULL
@@ -309,37 +309,30 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       case Qt::DecorationRole:
         return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
       case Qt::ForegroundRole:
-        if (aSession->activeDocument() == aRootDoc)
-          return QBrush(ACTIVE_COLOR);
-        else
-          return QBrush(PASSIVE_COLOR);
+        if ((flags(theIndex) & Qt::ItemIsEditable) == 0)
+          return QBrush(Qt::lightGray);
+        return ACTIVE_COLOR;
     }
   } else { // an object or sub-document
-    ModelAPI_Document* aSubDoc = getSubDocument(theIndex.internalPointer());
-
     if (theRole == Qt::ForegroundRole) {
-      bool aIsActive = false;
-      if (aSubDoc)
-        aIsActive = (aSession->activeDocument().get() == aSubDoc);
-      else {
-        ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
-        if (aObj->isDisabled())
-          return QBrush(Qt::lightGray);
-        aIsActive = (aSession->activeDocument() == aObj->document());
-      }
-      if (aIsActive)
-        return QBrush(ACTIVE_COLOR);
-      else
-        return QBrush(PASSIVE_COLOR);
+      if ((flags(theIndex) & Qt::ItemIsEditable) == 0)
+        return QBrush(Qt::lightGray);
+      return ACTIVE_COLOR;
     }
 
+    ModelAPI_Document* aSubDoc = getSubDocument(theIndex.internalPointer());
     if (aSubDoc) { // this is a folder of sub document
+      QIntList aMissedIdx = missedFolderIndexes(aSubDoc);
+      int aRow = theIndexRow;
+      while (aMissedIdx.contains(aRow)) 
+        aRow++;
+
       switch (theRole) {
         case Qt::DisplayRole:
-          return QString(myXMLReader.subFolderName(theIndexRow).c_str()) + 
+          return QString(myXMLReader.subFolderName(aRow).c_str()) + 
             QString(" (%1)").arg(rowCount(theIndex));
         case Qt::DecorationRole:
-          return QIcon(myXMLReader.subFolderIcon(theIndexRow).c_str());
+          return QIcon(myXMLReader.subFolderIcon(aRow).c_str());
       }
     } else {
       ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
@@ -390,14 +383,17 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
     // this is a folder under root
     int aParentPos = theParent.row();
     std::string aType = myXMLReader.rootFolderType(aParentPos);
-    //qDebug("### %s = %i\n", aType.c_str(), aRootDoc->size(aType));
     return aRootDoc->size(aType);
   } else {
     // It is an object which could have children
     ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
     if (aDoc) { 
       // a folder of sub-document
-      std::string aType = myXMLReader.subFolderType(theParent.row());
+      QIntList aMissedIdx = missedFolderIndexes(aDoc);
+      int aRow = theParent.row();
+      while (aMissedIdx.contains(aRow)) 
+        aRow++;
+      std::string aType = myXMLReader.subFolderType(aRow);
       return aDoc->size(aType);
     } else {
       ModelAPI_Object* aObj = (ModelAPI_Object*)theParent.internalPointer();
@@ -573,47 +569,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
 //******************************************************
 bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
 {
-  if (!theParent.isValid()) {
-    int aNbFolders = foldersCount();
-    if (aNbFolders > 0)
-      return true;
-    SessionPtr aSession = ModelAPI_Session::get();
-    DocumentPtr aRootDoc = aSession->moduleDocument();
-    return aRootDoc->size(myXMLReader.rootType()) > 0;
-  }
-  if (theParent.internalId() == -1) {
-    std::string aType = myXMLReader.rootFolderType(theParent.row());
-    if (!aType.empty()) {
-      SessionPtr aSession = ModelAPI_Session::get();
-      DocumentPtr aRootDoc = aSession->moduleDocument();
-      return aRootDoc->size(aType) > 0;
-    }
-  } else {
-    ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
-    if (aDoc) { 
-      // a folder of sub-document
-      std::string aType = myXMLReader.subFolderType(theParent.row());
-      return aDoc->size(aType) > 0;
-    } else {
-      // Check that it could be an object with children
-      ModelAPI_Object* aObj = (ModelAPI_Object*)theParent.internalPointer();
-
-      // Check for Part feature
-      ResultPartPtr aPartRes = getPartResult(aObj);
-      if (aPartRes.get())
-        return aPartRes->partDoc().get() != NULL;
-      else {
-        // Check for composite object
-        ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aObj);
-        if (aCompFeature) 
-          return aCompFeature->numberOfSubs(true) > 0;
-        ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aObj);
-        if (aCompRes) 
-          return aCompRes->numberOfSubs(true) > 0;
-      }
-    }
-  }
-  return false;
+  return rowCount(theParent) > 0;
 }
 
 //******************************************************
@@ -636,18 +592,35 @@ bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& the
 //******************************************************
 Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 {
-  Qt::ItemFlags aFlags = Qt::ItemIsSelectable;
-
+  qint64 aIt = theIndex.internalId();
   ModelAPI_Object* aObj = 0;
-  if (theIndex.internalId() != -1) {
-    if (!getSubDocument(theIndex.internalPointer()))
+  ModelAPI_Document* aDoc = 0;
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aActiveDoc = aSession->activeDocument();
+
+  Qt::ItemFlags aNullFlag;
+  Qt::ItemFlags aDefaultFlag = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  Qt::ItemFlags aEditingFlag = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+
+
+  if (aIt == -1) {
+    // Folders under root
+    DocumentPtr aRootDoc = aSession->moduleDocument();
+    if (aRootDoc != aActiveDoc)
+      return aDefaultFlag;
+  } else {
+    aDoc = getSubDocument(theIndex.internalPointer());
+    if (!aDoc)
       aObj = (ModelAPI_Object*) theIndex.internalPointer();
   }
-  if (aObj) {
-    if (aObj->isDisabled())
-      return Qt::ItemFlags();
 
+  if (aObj) {
+    // An object
+    if (aObj->isDisabled()) 
+      return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
+    
     bool isCompositeSub = false;
+    // An object which is sub-object of a composite object can not be accessible in column 1
     if (theIndex.column() == 1) {
       ObjectPtr aObjPtr = aObj->data()->owner();
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjPtr);
@@ -664,13 +637,24 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
         }
       }
     }
-    // An object which is sub-object of a composite object can not be accessible in column 1
     if (isCompositeSub)
-      return Qt::ItemFlags();
-  }
+      return Qt::ItemIsSelectable;
 
-  aFlags |= Qt::ItemIsEnabled;
-  return aFlags;
+    if (aObj->document() != aActiveDoc) {
+      // The object could be a root of sub-tree
+      ResultPartPtr aPartRes = getPartResult(aObj);
+      if (aPartRes.get()) {
+        if (aPartRes->partDoc() == aActiveDoc)
+          return aEditingFlag;
+      }
+      return aDefaultFlag;
+    }
+  } else if (aDoc) {
+    // A folder under sub-document
+    if (aActiveDoc.get() != aDoc)
+      return aDefaultFlag;
+  }
+  return aEditingFlag;
 }
 
 //******************************************************
@@ -687,8 +671,9 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDo
       aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
       if (aPartRes.get() && (aPartRes->partDoc().get() == theDoc)) {
         int aRow = i;
-        if (myXMLReader.rootType() == ModelAPI_Feature::group())
+        if (myXMLReader.rootType() == ModelAPI_Feature::group()) {
           aRow += foldersCount();
+        }
         return createIndex(aRow, 0, aObj.get());
       }
     }
@@ -748,6 +733,32 @@ int XGUI_DataModel::foldersCount(ModelAPI_Document* theDoc) const
   }
   return aNb;
 }
+
+
+//******************************************************
+QIntList XGUI_DataModel::missedFolderIndexes(ModelAPI_Document* theDoc) const
+{
+  QIntList aList;
+  SessionPtr aSession = ModelAPI_Session::get();
+  DocumentPtr aRootDoc = aSession->moduleDocument();
+  if ((theDoc == 0) || (theDoc == aRootDoc.get())) {
+    for (int i = 0; i < myXMLReader.rootFoldersNumber(); i++) {
+      if (!myXMLReader.rootShowEmpty(i)) {
+        if (aRootDoc->size(myXMLReader.rootFolderType(i)) == 0)
+          aList.append(i);
+      }
+    }
+  } else {
+    for (int i = 0; i < myXMLReader.subFoldersNumber(); i++) {
+      if (!myXMLReader.subShowEmpty(i)) {
+        if (theDoc->size(myXMLReader.subFolderType(i)) == 0)
+          aList.append(i);
+      }
+    }
+  }
+  return aList;
+}
+
 
 //******************************************************
 QStringList XGUI_DataModel::listOfShowNotEmptyFolders(bool fromRoot) const
