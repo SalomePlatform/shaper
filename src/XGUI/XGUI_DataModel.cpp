@@ -338,14 +338,24 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
       switch (theRole) {
       case Qt::DisplayRole:
-        if (aObj->groupName() == ModelAPI_ResultParameter::group()) {
-          ModelAPI_ResultParameter* aParam = dynamic_cast<ModelAPI_ResultParameter*>(aObj);
-          AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-          QString aVal = QString::number(aValueAttribute->value());
-          QString aTitle = QString(aObj->data()->name().c_str());
-          return aTitle + " = " + aVal;
+        {
+          if (aObj->groupName() == ModelAPI_ResultParameter::group()) {
+            ModelAPI_ResultParameter* aParam = dynamic_cast<ModelAPI_ResultParameter*>(aObj);
+            AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+            QString aVal = QString::number(aValueAttribute->value());
+            QString aTitle = QString(aObj->data()->name().c_str());
+            return aTitle + " = " + aVal;
+          }
+          QString aPrefix;
+          if (aObj->groupName() == myXMLReader.subType()) {
+            ResultPartPtr aPartRes = getPartResult(aObj);
+            if (aPartRes.get()) {
+              if (aPartRes->partDoc().get() == NULL)
+                aPrefix = "Not loaded ";
+            }
+          }
+          return aPrefix + aObj->data()->name().c_str();
         }
-        return aObj->data()->name().c_str();
       case Qt::DecorationRole:
         return ModuleBase_IconFactory::get()->getIcon(object(theIndex));
       }
@@ -401,6 +411,9 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
       ResultPartPtr aPartRes = getPartResult(aObj);
       if (aPartRes.get()) {
         DocumentPtr aSubDoc = aPartRes->partDoc();
+        if (!aSubDoc.get())
+          return 0;
+
         int aNbSubFolders = foldersCount(aSubDoc.get());
         int aNbSubItems = 0;
         std::string aSubType = myXMLReader.subType();
