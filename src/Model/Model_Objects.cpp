@@ -664,6 +664,8 @@ void Model_Objects::synchronizeFeatures(
     aLoop->flush(aCreateEvent);
     aLoop->flush(aDeleteEvent);
     aLoop->flush(anUpdateEvent);
+    aLoop->flush(aCreateEvent); // after update of features, there could be results created
+    aLoop->flush(aDeleteEvent); // or deleted
     aLoop->flush(aRedispEvent);
     aLoop->flush(aToHideEvent);
   }
