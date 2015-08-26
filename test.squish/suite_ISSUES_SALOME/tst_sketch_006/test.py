@@ -44,7 +44,10 @@ def main():
     #[step] Select 'Parallel' icon near the line
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 103, 255, 0, Qt.LeftButton)
     #[check] Check that Input panel 'Parallel' appears, there are the names of lines in text boxes
-    test.vp("VP2")
+    waitFor("object.exists(':Parallel.First line_QLineEdit')", 20000)
+    test.compare(str(findObject(":Parallel.First line_QLineEdit").text), "SketchLine_1")
+    waitFor("object.exists(':Parallel.Second line_QLineEdit')", 20000)
+    test.compare(str(findObject(":Parallel.Second line_QLineEdit").text), "SketchLine_2")
     #[check] Check that lines are selected and highlighted in viewer
     test.vp("VP3")
     #[step] Confirm 'Parallel' operation

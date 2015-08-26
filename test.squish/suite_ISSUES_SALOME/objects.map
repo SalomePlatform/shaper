@@ -81,6 +81,10 @@
 :Open File.Open_QPushButton	{text='Open' type='QPushButton' unnamed='1' visible='1' window=':Open File_SUIT_FileDlg'}
 :Open File.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Open File_SUIT_FileDlg'}
 :Open File_SUIT_FileDlg	{name='QFileDialog' type='SUIT_FileDlg' visible='1' windowTitle='Open File'}
+:Parallel.First line_QLabel	{container=':SALOME*.Parallel_XGUI_PropertyPanel' text='First line' type='QLabel' unnamed='1' visible='1'}
+:Parallel.First line_QLineEdit	{container=':SALOME*.Parallel_XGUI_PropertyPanel' leftWidget=':Parallel.First line_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:Parallel.Second line_QLabel	{container=':SALOME*.Parallel_XGUI_PropertyPanel' text='Second line' type='QLabel' unnamed='1' visible='1'}
+:Parallel.Second line_QLineEdit	{container=':SALOME*.Parallel_XGUI_PropertyPanel' leftWidget=':Parallel.Second line_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :Parallel.property_panel_cancel_QToolButton_2	{container=':SALOME*.Parallel_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Parallel.property_panel_ok_QToolButton	{container=':SALOME*.Parallel_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Parallel_ModuleBase_PageWidget	{container=':SALOME*.Parallel_XGUI_PropertyPanel' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
