@@ -47,12 +47,19 @@
 :Exit.Ok_QPushButton	{text='Ok' type='QPushButton' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
 :Exit.Shutdown servers_QCheckBox	{text='Shutdown servers' type='QCheckBox' unnamed='1' visible='1' window=':Exit_SalomeApp_ExitDlg'}
 :Exit_SalomeApp_ExitDlg	{type='SalomeApp_ExitDlg' unnamed='1' visible='1' windowTitle='Exit'}
+:Extrusion.From_ModuleBase_PageGroupBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Extrusion.Select a sketch face_QLabel	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
+:Extrusion.Select a sketch face_QListWidget	{aboveWidget=':Extrusion.Select a sketch face_QLabel' container=':SALOME*.Extrusion_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Extrusion.To_ModuleBase_PageGroupBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.from_size_ModuleBase_ParamSpinBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='from_size' type='ModuleBase_ParamSpinBox' visible='1'}
 :Extrusion.property_panel_ok_QToolButton	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Extrusion.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Extrusion.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :Extrusion.to_size_ModuleBase_ParamSpinBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='to_size' type='ModuleBase_ParamSpinBox' visible='1'}
+:Extrusion_QToolButton	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
 :Fixed.property_panel_cancel_QToolButton	{container=':SALOME*.Fixed_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:From.from_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :Horizontal.property_panel_cancel_QToolButton	{container=':SALOME*.Horizontal_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Line.Auxiliary_QCheckBox	{container=':SALOME*.Line_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Line.End point_QGroupBox	{container=':SALOME*.Line_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
@@ -144,6 +151,8 @@
 :Start point.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.Start point_QGroupBox' leftWidget=':Start point.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Start point.Y _QLabel	{container=':Line.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Start point.Y _QLabel_2	{container=':Arc.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:To.to_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:To_QLineEdit	{container=':Extrusion.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :Vertical.property_panel_cancel_QToolButton	{container=':SALOME*.Vertical_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Warning.Yes_QPushButton	{text='Yes' type='QPushButton' unnamed='1' visible='1' window=':Warning_QMessageBox'}
 :Warning_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Warning'}
