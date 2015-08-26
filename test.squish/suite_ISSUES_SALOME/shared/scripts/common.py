@@ -275,6 +275,51 @@ def horizontal(point):
 def fit_all():
     clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
     
+def boolean_cut(main_object, tool_object):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Features"))
+    mouseClick(waitForObjectItem(":_QMenu", "Boolean"))
+    
+    mouseClick(waitForObject(":Boolean.Type_QComboBox"), 57, 9, 0, Qt.LeftButton)
+    mouseClick(waitForObjectItem(":Boolean.Type_QComboBox", "Cut"), 26, 7, 0, Qt.LeftButton)
+    
+    mouseClick(waitForObject(":Boolean.Main objects_QListWidget"), 89, 62, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), main_object[0], main_object[1], 0, Qt.LeftButton)
+    
+    mouseClick(waitForObject(":Boolean.Tool object_QListWidget"), 98, 87, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), tool_object[0], tool_object[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
+    
+def boolean_fuse(main_object, tool_object):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Features"))
+    mouseClick(waitForObjectItem(":_QMenu", "Boolean"))
+    
+    mouseClick(waitForObject(":Boolean.Type_QComboBox"), 57, 9, 0, Qt.LeftButton)
+    mouseClick(waitForObjectItem(":Boolean.Type_QComboBox", "Fuse"), 26, 7, 0, Qt.LeftButton)
+    
+    mouseClick(waitForObject(":Boolean.Main objects_QListWidget"), 89, 62, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), main_object[0], main_object[1], 0, Qt.LeftButton)
+    
+    mouseClick(waitForObject(":Boolean.Tool object_QListWidget"), 98, 87, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), tool_object[0], tool_object[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
+    
+def boolean_common(main_object, tool_object):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Features"))
+    mouseClick(waitForObjectItem(":_QMenu", "Boolean"))
+    
+    mouseClick(waitForObject(":Boolean.Type_QComboBox"), 57, 9, 0, Qt.LeftButton)
+    mouseClick(waitForObjectItem(":Boolean.Type_QComboBox", "Common"), 26, 7, 0, Qt.LeftButton)
+    
+    mouseClick(waitForObject(":Boolean.Main objects_QListWidget"), 89, 62, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), main_object[0], main_object[1], 0, Qt.LeftButton)
+    
+    mouseClick(waitForObject(":Boolean.Tool object_QListWidget"), 98, 87, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), tool_object[0], tool_object[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
+    
 
         
 

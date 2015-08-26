@@ -11,6 +11,13 @@
 :Arc.Start point_QGroupBox	{container=':SALOME*.Arc_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
 :Arc.property_panel_cancel_QToolButton	{container=':SALOME*.Arc_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Arc.property_panel_ok_QToolButton	{container=':SALOME*.Arc_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Boolean.Main objects_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Main objects' type='QLabel' unnamed='1' visible='1'}
+:Boolean.Main objects_QListWidget	{aboveWidget=':Boolean.Main objects_QLabel' container=':SALOME*.Boolean_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Boolean.Tool object_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
+:Boolean.Tool object_QListWidget	{aboveWidget=':Boolean.Tool object_QLabel' container=':SALOME*.Boolean_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Boolean.Type_QComboBox	{container=':SALOME*.Boolean_XGUI_PropertyPanel' leftWidget=':Boolean.Type_QLabel' type='QComboBox' unnamed='1' visible='1'}
+:Boolean.Type_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Type' type='QLabel' unnamed='1' visible='1'}
+:Boolean.property_panel_ok_QToolButton	{container=':SALOME*.Boolean_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Center.X _ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Center.X _ModuleBase_ParamSpinBox_2	{container=':Arc.Center_QGroupBox' leftWidget=':Center.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Center.X _QLabel	{container=':Circle.Center_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
@@ -57,6 +64,8 @@
 :Extrusion.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
 :Extrusion.to_size_ModuleBase_ParamSpinBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='to_size' type='ModuleBase_ParamSpinBox' visible='1'}
 :Extrusion_QToolButton	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Fatal error.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Fatal error_QMessageBox'}
+:Fatal error_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Fatal error'}
 :Fixed.property_panel_cancel_QToolButton	{container=':SALOME*.Fixed_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :From.from_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
@@ -102,6 +111,7 @@
 :SALOME*.3D View Operations_OCCViewer_ViewPort3d	{aboveWidget=':SALOME*.3D View Operations_QtxToolBar' type='OCCViewer_ViewPort3d' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.3D View Operations_QtxToolBar	{name='OCCViewer3DViewOperations' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='3D View Operations'}
 :SALOME*.Arc_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Arc'}
+:SALOME*.Boolean_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Boolean'}
 :SALOME*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Circle'}
 :SALOME*.Close_QToolButton	{text='Close' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Coincident_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Coincident'}
