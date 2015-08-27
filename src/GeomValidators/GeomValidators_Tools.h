@@ -11,12 +11,18 @@
 #include "ModelAPI_Object.h"
 #include "ModelAPI_Attribute.h"
 
+#include "TopAbs_ShapeEnum.hxx"
+#include "TopoDS_Shape.hxx"
 
 namespace GeomValidators_Tools
 {
   // Returns the object from the attribute
   /// \param theObj an object 
   GEOMVALIDATORS_EXPORT ObjectPtr getObject(const AttributePtr& theAttribute);
+
+  // Returns the object from the attribute
+  /// \param theObj an object 
+  GEOMVALIDATORS_EXPORT TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape);
 
 };
 

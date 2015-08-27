@@ -13,8 +13,6 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Filter.h>
 
-#include <GeomValidators_ShapeType.h>
-
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>

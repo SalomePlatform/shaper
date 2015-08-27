@@ -11,6 +11,8 @@
 
 #include <ModelAPI_ResultConstruction.h>
 
+#include <GeomValidators_Tools.h>
+
 #include <TopoDS_Iterator.hxx>
 
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
@@ -64,6 +66,8 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
     if (theResult.get())
       aShape = theResult->shape();
   }
+  QIntList aShapeTypes = getShapeTypes();
+
   TopAbs_ShapeEnum aShapeType = TopAbs_SHAPE;
   if (aShape.get()) {
     // Check that the selection corresponds to selection type
@@ -72,25 +76,13 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
     // for compounds check sub-shapes: it may be compound of needed type:
     // Booleans may produce compounds of Solids
     if (aShapeType == TopAbs_COMPOUND) {
-      for(TopoDS_Iterator aSubs(aTopoShape); aSubs.More(); aSubs.Next()) {
-        if (!aSubs.Value().IsNull()) {
-          TopAbs_ShapeEnum aSubType = aSubs.Value().ShapeType();
-          if (aSubType == TopAbs_COMPOUND) { // compound of compound(s)
-            aShapeType = TopAbs_COMPOUND;
-            break;
-          }
-          if (aShapeType == TopAbs_COMPOUND) {
-            aShapeType = aSubType;
-          } else if (aShapeType != aSubType) { // compound of shapes of different types
-            aShapeType = TopAbs_COMPOUND;
-            break;
-          }
-        }
-      }
+      if (aShapeTypes.contains(aShapeType))
+        return true;
+
+      aShapeType = GeomValidators_Tools::getCompoundSubType(aTopoShape);
     }
   }
 
-  QIntList aShapeTypes = getShapeTypes();
   QIntList::const_iterator anIt = aShapeTypes.begin(), aLast = aShapeTypes.end();
   for (; anIt != aLast; anIt++) {
     if (aShapeType == *anIt)

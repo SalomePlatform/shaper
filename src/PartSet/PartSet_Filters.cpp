@@ -10,6 +10,8 @@
 #include "ModuleBase_IModule.h"
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Session.h>
 #include <FeaturesPlugin_Group.h>
 
 #include <AIS_InteractiveObject.hxx>
@@ -38,11 +40,20 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
       }
       ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
       if (aObj) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-        if (aFeature) {
-          aValid = aFeature->getKind() != FeaturesPlugin_Group::ID();
-        } else 
-          aValid = Standard_True;
+        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+        // result of parts belongs to PartSet document and can be selected only when PartSet is active
+        // in order to do not select the result of the active part.
+        if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group()) {
+          SessionPtr aMgr = ModelAPI_Session::get();
+          aValid = aMgr->activeDocument() == aMgr->moduleDocument();
+        }
+        else {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+          if (aFeature) {
+            aValid = aFeature->getKind() != FeaturesPlugin_Group::ID();
+          } else 
+            aValid = Standard_True;
+        }
       } else
         // This is not object controlled by the filter
         aValid = Standard_True;

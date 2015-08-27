@@ -15,8 +15,6 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Definitions.h>
 
-#include <GeomValidators_ShapeType.h>
-
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeSelectionList.h>
