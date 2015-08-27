@@ -89,6 +89,11 @@
 :Line.Start point_QGroupBox	{container=':SALOME*.Line_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
 :Line.property_panel_cancel_QToolButton	{container=':SALOME*.Line_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Line.property_panel_ok_QToolButton	{container=':SALOME*.Line_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Mirror.Mirror line_QLabel	{container=':SALOME*.Mirror_XGUI_PropertyPanel' text='Mirror line' type='QLabel' unnamed='1' visible='1'}
+:Mirror.Mirror line_QLineEdit	{container=':SALOME*.Mirror_XGUI_PropertyPanel' leftWidget=':Mirror.Mirror line_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:Mirror.Segments:_QLabel	{container=':SALOME*.Mirror_XGUI_PropertyPanel' text='Segments:' type='QLabel' unnamed='1' visible='1'}
+:Mirror.Segments:_QListWidget	{aboveWidget=':Mirror.Segments:_QLabel' container=':SALOME*.Mirror_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Mirror.property_panel_ok_QToolButton	{container=':SALOME*.Mirror_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :OK_QPushButton	{container=':Object browser_XGUI_DataTree' text='OK' type='QPushButton' unnamed='1' visible='1'}
 :Object browser_XGUI_DataTree	{container=':SALOME*.Object browser_QDockWidget' type='XGUI_DataTree' unnamed='1' visible='1'}
 :Open File.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Open File_SUIT_FileDlg'}
@@ -193,6 +198,7 @@
 :SALOME*.Length_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Length'}
 :SALOME*.Line_QToolButton	{text='Line' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Line_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Line'}
+:SALOME*.Mirror_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Mirror'}
 :SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Object browser_QDockWidget	{type='QDockWidget' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Object browser'}
