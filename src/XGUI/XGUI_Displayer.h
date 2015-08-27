@@ -67,10 +67,15 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Returns true if the Feature succesfully displayed
   void display(ObjectPtr theObject, bool theUpdateViewer = true);
 
-  /// Display the given AIS object. To hide this object use corresponde erase method
+  /// Display the given AIS object. This object is not added to the displayer internal map of objects
+  /// So, it can not be obtained from displayer. This is just a wrap method of OCC display in order
+  /// to perform the display with correct flags.
   /// \param theAIS AIOS object to display
+  /// \param toActivateInSelectionModes boolean value whether the presentation should be
+  /// activated in the current selection modes
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void displayAIS(AISObjectPtr theAIS, bool theUpdateViewer = true);
+  void displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
+                  bool theUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
    * \param theObject an object instance

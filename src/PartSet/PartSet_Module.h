@@ -145,6 +145,8 @@ public:
   /// Returns data model object for representation of data tree in Object browser
   virtual ModuleBase_IDocumentDataModel* dataModel() const { return myDataModel; }
 
+  virtual void closeDocument();
+
   /// Event Listener method
   /// \param theMessage an event message
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);

@@ -576,15 +576,18 @@ void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
     //aContext->ClearSelected();
     aContext->CloseAllContexts(false);
 
+    // From the moment when the AIS_DS_Displayed flag is used in the Display of AIS object,
+    // this code is obsolete. It is temporaty commented and should be removed after
+    // the test campaign.
     // Redisplay all object if they were displayed in localContext
-    Handle(AIS_InteractiveObject) aAISIO;
+    /*Handle(AIS_InteractiveObject) aAISIO;
     foreach (AISObjectPtr aAIS, myResult2AISObjectMap) {
       aAISIO = aAIS->impl<Handle(AIS_InteractiveObject)>();
       if (aContext->DisplayStatus(aAISIO) != AIS_DS_Displayed) {
         aContext->Display(aAISIO, false);
         aContext->SetDisplayMode(aAISIO, Shading, false);
       }
-    }
+    }*/
 
     // Append the filters from the local selection in the global selection context
     SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
@@ -709,20 +712,25 @@ Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
   return myAndFilter;
 }
 
-void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool theUpdateViewer)
+void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
+                                bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
-    aContext->Display(anAISIO, theUpdateViewer);
-    if (aContext->HasOpenedContext()) {
-      if (myActiveSelectionModes.size() == 0)
-        activateAIS(anAISIO, 0, theUpdateViewer);
-      else {
-        foreach(int aMode, myActiveSelectionModes) {
-          activateAIS(anAISIO, aMode, theUpdateViewer);
+    aContext->Display(anAISIO, 0/*wireframe*/, 0, theUpdateViewer, true, AIS_DS_Displayed);
+    aContext->Deactivate(anAISIO);
+    aContext->Load(anAISIO);
+    if (toActivateInSelectionModes) {
+      if (aContext->HasOpenedContext()) {
+        if (myActiveSelectionModes.size() == 0)
+          activateAIS(anAISIO, 0, theUpdateViewer);
+        else {
+          foreach(int aMode, myActiveSelectionModes) {
+            activateAIS(anAISIO, aMode, theUpdateViewer);
+          }
         }
       }
     }
@@ -735,7 +743,7 @@ void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
   if (aContext.IsNull())
     return;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
-  if (!anAISIO.IsNull()) {
+  if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
     aContext->Remove(anAISIO, theUpdateViewer);
   }
 }

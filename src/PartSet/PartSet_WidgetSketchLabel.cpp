@@ -365,9 +365,9 @@ void PartSet_WidgetSketchLabel::showPreviewPlanes()
     myXYPlane = createPreviewPlane(anOrigin, aXYDir, aB);
   }
   XGUI_Displayer* aDisp = workshop()->displayer();
-  aDisp->displayAIS(myYZPlane, false);
-  aDisp->displayAIS(myXZPlane, false);
-  aDisp->displayAIS(myXYPlane, false);
+  aDisp->displayAIS(myYZPlane, true, false);
+  aDisp->displayAIS(myXZPlane, true, false);
+  aDisp->displayAIS(myXYPlane, true, false);
   myPreviewDisplayed = true;
 }
 

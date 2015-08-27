@@ -1523,6 +1523,8 @@ void XGUI_Workshop::closeDocument()
   myDisplayer->eraseAll();
   objectBrowser()->clearContent();
 
+  module()->closeDocument();
+
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->closeAll();
 }

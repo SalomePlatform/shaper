@@ -405,6 +405,11 @@ bool PartSet_Module::isMouseOverWindow()
   return mySketchMgr->isMouseOverWindow();
 }
 
+void PartSet_Module::closeDocument()
+{
+  myCustomPrs->clearPrs();
+}
+
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);

@@ -20,6 +20,7 @@
 #include <GeomAPI_Shape.h>
 
 class ModuleBase_IWorkshop;
+class XGUI_Workshop;
 
 /**
 * Interface of a class which can provide specific customization of
@@ -32,7 +33,7 @@ public:
   PARTSET_EXPORT virtual ~PartSet_CustomPrs() {};
 
   /// Returns true if the presentation is active
-  bool isActive() const;
+  bool isActive();
 
   /// Initializes the presentation by the parameter object
   void activate(const FeaturePtr& theObject);
@@ -42,9 +43,16 @@ public:
   /// Modifies the given presentation in the custom way.
   void customize(const ObjectPtr& theObject);
 
+  void clearPrs();
+
+  void initPrs();
+
 private:
   /// Returns the AIS presentation
-  Handle(PartSet_OperationPrs) getPresentation() const;
+  Handle(PartSet_OperationPrs) getPresentation();
+
+  //! Returns workshop
+  XGUI_Workshop* workshop() const;
 
   /// Displays the internal presentation in the viewer of workshop
   void displayPresentation();

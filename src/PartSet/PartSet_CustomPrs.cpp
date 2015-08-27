@@ -28,18 +28,10 @@
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop)
 {
-  myOperationPrs = AISObjectPtr(new GeomAPI_AISObject());
-  myOperationPrs->setImpl(new Handle(AIS_InteractiveObject)(new PartSet_OperationPrs(theWorkshop)));
-
-  std::vector<int> aColor = Config_PropManager::color("Visualization", "operation_parameter_color",
-                                                      OPERATION_PARAMETER_COLOR);
-  myOperationPrs->setColor(aColor[0], aColor[1], aColor[2]);
-
-  myOperationPrs->setPointMarker(5, 2.);
-  myOperationPrs->setWidth(1);
+  initPrs();
 }
 
-bool PartSet_CustomPrs::isActive() const
+bool PartSet_CustomPrs::isActive()
 {
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -74,7 +66,9 @@ void PartSet_CustomPrs::displayPresentation()
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext->IsDisplayed(anOperationPrs)) {
     PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-    aContext->Display(anOperationPrs);
+
+    XGUI_Workshop* aWorkshop = workshop();
+    aWorkshop->displayer()->displayAIS(myOperationPrs, false/*load object in selection*/, true);
     aContext->SetZLayer(anOperationPrs, aModule->getVisualLayerId());
   }
   else
@@ -83,14 +77,14 @@ void PartSet_CustomPrs::displayPresentation()
 
 void PartSet_CustomPrs::erasePresentation()
 {
-  Handle(AIS_InteractiveObject) anOperationPrs = myOperationPrs->impl<Handle(AIS_InteractiveObject)>();
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext->IsDisplayed(anOperationPrs))
-    aContext->Remove(anOperationPrs);
+  XGUI_Workshop* aWorkshop = workshop();
+  aWorkshop->displayer()->eraseAIS(myOperationPrs, true);
 }
 
-Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation() const
+Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation()
 {
+  if (!myOperationPrs.get())
+    initPrs();
   Handle(AIS_InteractiveObject) anAISIO = myOperationPrs->impl<Handle(AIS_InteractiveObject)>();
   return Handle(PartSet_OperationPrs)::DownCast(anAISIO);
 }
@@ -109,4 +103,32 @@ void PartSet_CustomPrs::customize(const ObjectPtr& theObject)
     //if (aChanged)
     anOperationPrs->Redisplay();
   }
+}
+
+void PartSet_CustomPrs::clearPrs()
+{
+  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
+  if (!anOperationPrs.IsNull())
+    anOperationPrs.Nullify();
+
+  myOperationPrs = 0;
+}
+
+void PartSet_CustomPrs::initPrs()
+{
+  myOperationPrs = AISObjectPtr(new GeomAPI_AISObject());
+  myOperationPrs->setImpl(new Handle(AIS_InteractiveObject)(new PartSet_OperationPrs(myWorkshop)));
+
+  std::vector<int> aColor = Config_PropManager::color("Visualization", "operation_parameter_color",
+                                                      OPERATION_PARAMETER_COLOR);
+  myOperationPrs->setColor(aColor[0], aColor[1], aColor[2]);
+
+  myOperationPrs->setPointMarker(5, 2.);
+  myOperationPrs->setWidth(1);
+}
+
+XGUI_Workshop* PartSet_CustomPrs::workshop() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  return aConnector->workshop();
 }

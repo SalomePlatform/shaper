@@ -144,7 +144,7 @@ signals:
   /// If the operation works with feature which is sub-feature of another one
   /// then this variable has to be initialised by parent feature 
   /// before operation feature creating
-  CompositeFeaturePtr myParentFeature;  
+  CompositeFeaturePtr myParentFeature;
 
   /// Last current feature before editing operation. It is cashed when Edit operation is started
   /// in order to restore the document current feature on commit/abort this operation.
