@@ -23,7 +23,8 @@
 Model_ResultCompSolid::Model_ResultCompSolid()
 {
   myBuilder = new Model_BodyBuilder(this);
-  setIsConcealed(false);
+  myLastConcealed = false;
+  setIsConcealed(myLastConcealed);
   myIsDisabled = true; // by default it is not initialized and false to be after created
   updateSubs(shape()); // in case of open, etc.
 }
@@ -99,13 +100,20 @@ bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis
 
 bool Model_ResultCompSolid::isConcealed()
 {
-  if (ModelAPI_ResultCompSolid::isConcealed())
-    return true;
-  std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
-  for(; aSubIter != mySubs.cend(); aSubIter++)
-    if ((*aSubIter)->isConcealed())
-      return true;
-  return false;
+  bool aResult = false;;
+  if (ModelAPI_ResultCompSolid::isConcealed()) {
+    aResult = true;
+  } else {
+    std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+    for(; aSubIter != mySubs.cend(); aSubIter++)
+      if ((*aSubIter)->isConcealed())
+        aResult = true;
+  }
+  if (myLastConcealed != aResult) {
+    myLastConcealed = aResult;
+    setIsConcealed(aResult); // set for all subs the same result
+  }
+  return aResult;
 }
 
 void Model_ResultCompSolid::setIsConcealed(const bool theValue)
@@ -160,6 +168,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
       aSub->setDisabled(aSub, isDisabled());
+      aSub->setIsConcealed(myLastConcealed);
     }
     // erase left, unused results
     while(mySubs.size() > aSubIndex) {
