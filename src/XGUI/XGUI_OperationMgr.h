@@ -55,8 +55,10 @@ Q_OBJECT
   /// Returns true is operation manager has an operation with given Id.
   bool hasOperation(const QString& theId) const;
 
-  /// Returns true if the operation can be aborted
-  bool canStopOperation();
+  /// Returns true if the operation can be aborted. If the operation is modified,
+  /// the warning message box is shown.
+  /// \param theOperation an operation which is checked on stop
+  bool canStopOperation(ModuleBase_Operation* theOperation);
 
   /// Find and return operation by its Id.
   ModuleBase_Operation* findOperation(const QString& theId) const;
@@ -166,6 +168,13 @@ protected: // TEMPORARY
   /// Sets the current operation or NULL
   /// \param theOperation the started operation
   void resumeOperation(ModuleBase_Operation* theOperation);
+
+  /// Returns whether the parameter operation is granted in relation to the previous operation
+  /// in a stack of started operations. It is used in canStopOperation to avoid warning message
+  /// when granted operation is aborted, e.g. SketchLine in Sketch
+  /// \param theOperation the started operation
+  /// \return boolean result
+  bool isGrantedOperation(ModuleBase_Operation* theOperation);
 
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.

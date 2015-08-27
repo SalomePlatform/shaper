@@ -80,8 +80,9 @@ Q_OBJECT
   virtual ModuleBase_Operation* findStartedOperation(const QString& theId) = 0;
 
   //! Returns true if the operation with id theId can be stopped
+  //! \param theId a stopped operation
   //! \return boolean result
-  virtual bool canStopOperation() = 0;
+  virtual bool canStopOperation(ModuleBase_Operation* theOperation) = 0;
 
   //! Aborts the operation.
   //! \param theId an aborted operation

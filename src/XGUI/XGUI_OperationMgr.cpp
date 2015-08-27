@@ -135,8 +135,9 @@ bool XGUI_OperationMgr::abortAllOperations()
     return aResult;
 
   if (operationsCount() == 1) {
-    if (canStopOperation()) {
-      abortOperation(currentOperation());
+    ModuleBase_Operation* aCurrentOperation = currentOperation();
+    if (canStopOperation(aCurrentOperation)) {
+      abortOperation(aCurrentOperation);
     }
     else
       aResult = false;
@@ -237,13 +238,13 @@ bool XGUI_OperationMgr::isParentOperationValid() const
   return aPrevOp && aPrevOp->isValid();
 }
 
-bool XGUI_OperationMgr::canStopOperation()
+bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_Operation* anOperation = currentOperation();
-  if(operationsCount() > 1) //in case of nested (sketch) operation no confirmation needed
+  //in case of nested (sketch) operation no confirmation needed
+  if (isGrantedOperation(theOperation))
     return true;
-  if (anOperation && anOperation->isModified()) {
-    QString aMessage = tr("%1 operation will be aborted.").arg(anOperation->id());
+  if (theOperation && theOperation->isModified()) {
+    QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
     int anAnswer = QMessageBox::question(qApp->activeWindow(),
                                          tr("Abort operation"),
                                          aMessage,
@@ -268,13 +269,34 @@ void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
   theOperation->resume();
 }
 
+bool XGUI_OperationMgr::isGrantedOperation(ModuleBase_Operation* theOperation)
+{
+  bool isGranted = false;
+
+  QListIterator<ModuleBase_Operation*> anIt(myOperations);
+  anIt.toBack();
+  ModuleBase_Operation* aPreviousOperation = 0;
+  while (anIt.hasPrevious()) {
+    ModuleBase_Operation* anOp = anIt.previous();
+    if (anOp == theOperation) {
+      if (anIt.hasPrevious())
+        aPreviousOperation = anIt.previous();
+      break;
+    }
+  }
+  if (aPreviousOperation)
+    isGranted = aPreviousOperation->isGranted(theOperation->id());
+
+  return isGranted;
+}
+
 bool XGUI_OperationMgr::canStartOperation(QString theId)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
     if (!aCurrentOp->isGranted(theId)) {
-      if (canStopOperation()) {
+      if (canStopOperation(aCurrentOp)) {
         if (myIsApplyEnabled && aCurrentOp->isModified())
           aCurrentOp->commit();
         else
@@ -314,8 +336,9 @@ void XGUI_OperationMgr::onCommitOperation()
 
 void XGUI_OperationMgr::onAbortOperation()
 {
-  if (hasOperation() && canStopOperation()) {
-    abortOperation(currentOperation());
+  ModuleBase_Operation* aCurrentOperation = currentOperation();
+  if (aCurrentOperation && canStopOperation(aCurrentOperation)) {
+    abortOperation(aCurrentOperation);
   }
 }
 

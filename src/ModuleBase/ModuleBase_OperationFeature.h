@@ -146,8 +146,9 @@ signals:
   /// before operation feature creating
   CompositeFeaturePtr myParentFeature;  
 
-  /// Last current feature before editing operation
-  FeaturePtr myCurrentFeature;
+  /// Last current feature before editing operation. It is cashed when Edit operation is started
+  /// in order to restore the document current feature on commit/abort this operation.
+  FeaturePtr myPreviousCurrentFeature;
 };
 
 #endif

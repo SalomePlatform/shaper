@@ -145,7 +145,15 @@ void ModuleBase_OperationFeature::start()
   if (myIsEditing) {
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aDoc = aMgr->activeDocument();
-    myCurrentFeature = aDoc->currentFeature(true);
+    // the parameter of current feature should be false, we should use all feature, not only visible
+    // in order to correctly save the previous feature of the nested operation, where the
+    // features can be not visible in the tree. The problem case is Edit sketch entitity(line)
+    // in the Sketch, created in ExtrusionCut operation. The entity disappears by commit.
+    // When sketch entity operation started, the sketch should be cashed here as the current.
+    // Otherwise(the flag is true), the ExtrusionCut is cashed, when commit happens, the sketch
+    // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
+    // As a result the sketch disappears from the viewer. However after commit it is displayed back.
+    myPreviousCurrentFeature = aDoc->currentFeature(false);
     aDoc->setCurrentFeature(feature(), false);
   }
 
@@ -177,10 +185,10 @@ void ModuleBase_OperationFeature::abort()
     bool aIsOp = aMgr->isOperation();
     if (!aIsOp)
       aMgr->startOperation();
-    aDoc->setCurrentFeature(myCurrentFeature, true);
+    aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
     if (!aIsOp)
       aMgr->finishOperation();
-    myCurrentFeature = FeaturePtr();
+    myPreviousCurrentFeature = FeaturePtr();
   }
   abortOperation();
 
@@ -220,10 +228,10 @@ bool ModuleBase_OperationFeature::commit()
       bool aIsOp = aMgr->isOperation();
       if (!aIsOp)
         aMgr->startOperation();
-      aDoc->setCurrentFeature(myCurrentFeature, true);
+      aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
       if (!aIsOp)
         aMgr->finishOperation();
-      myCurrentFeature = FeaturePtr();
+      myPreviousCurrentFeature = FeaturePtr();
     }
     commitOperation();
     aMgr->finishOperation();
