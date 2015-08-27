@@ -336,6 +336,23 @@ def change_length(point, value):
     type(waitForObject(":Length.ConstraintValue_ModuleBase_ParamSpinBox"), value)
 
     clickButton(waitForObject(":Length.property_panel_ok_QToolButton"))
+    
+def radius(point, annotation_point):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Radius"))
+    
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), annotation_point[0], annotation_point[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Radius.property_panel_cancel_QToolButton"))
+    
+def change_radius(point, value):
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+
+    type(waitForObject(":Radius.ConstraintValue_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Radius.ConstraintValue_ModuleBase_ParamSpinBox"), value)
+
+    clickButton(waitForObject(":Radius.property_panel_ok_QToolButton"))
         
 
 

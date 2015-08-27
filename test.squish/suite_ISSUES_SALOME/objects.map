@@ -128,6 +128,10 @@
 :Point.property_panel_ok_QToolButton	{container=':SALOME*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.x_ModuleBase_ParamSpinBox	{container=':SALOME*.Point_XGUI_PropertyPanel' name='x' type='ModuleBase_ParamSpinBox' visible='1'}
 :Point_QFrame	{container=':SALOME*.Point_XGUI_PropertyPanel' type='QFrame' unnamed='1' visible='1'}
+:Radius.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
+:Radius.property_panel_cancel_QToolButton	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Radius.property_panel_ok_QToolButton	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Radius.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Revolution.From_ModuleBase_PageGroupBox	{container=':SALOME*.Revolution_XGUI_PropertyPanel' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Revolution.From_ModuleBase_PageGroupBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Revolution.From_ModuleBase_PageGroupBox_3	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
@@ -200,6 +204,7 @@
 :SALOME*.Perpendicular_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Perpendicular'}
 :SALOME*.Plane_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Plane'}
 :SALOME*.Point_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Point'}
+:SALOME*.Radius_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Radius'}
 :SALOME*.RevolutionCut_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='RevolutionCut'}
 :SALOME*.RevolutionFuse_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='RevolutionFuse'}
 :SALOME*.Revolution_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Revolution'}
