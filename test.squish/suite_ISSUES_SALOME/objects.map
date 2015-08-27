@@ -80,6 +80,10 @@
 :From_QLineEdit_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
 :From_QLineEdit_4	{container=':Revolution.From_ModuleBase_PageGroupBox_3' type='QLineEdit' unnamed='1' visible='1'}
 :Horizontal.property_panel_cancel_QToolButton	{container=':SALOME*.Horizontal_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Length.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Length_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
+:Length.property_panel_cancel_QToolButton	{container=':SALOME*.Length_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Length.property_panel_ok_QToolButton	{container=':SALOME*.Length_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Length.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Length_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Line.Auxiliary_QCheckBox	{container=':SALOME*.Line_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Line.End point_QGroupBox	{container=':SALOME*.Line_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
 :Line.Start point_QGroupBox	{container=':SALOME*.Line_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
@@ -182,6 +186,7 @@
 :SALOME*.Fit All_QToolButton	{text='Fit All' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Fixed_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Fixed'}
 :SALOME*.Horizontal_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Horizontal'}
+:SALOME*.Length_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Length'}
 :SALOME*.Line_QToolButton	{text='Line' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Line_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Line'}
 :SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}

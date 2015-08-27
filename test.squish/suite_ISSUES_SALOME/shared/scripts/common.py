@@ -320,7 +320,22 @@ def boolean_common(main_object, tool_object):
     
     clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
     
+def length(point, annotation_point):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Length"))
+    
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), annotation_point[0], annotation_point[1], 0, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Length.property_panel_cancel_QToolButton"))
+    
+def change_length(point, value):
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
 
+    type(waitForObject(":Length.ConstraintValue_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Length.ConstraintValue_ModuleBase_ParamSpinBox"), value)
+
+    clickButton(waitForObject(":Length.property_panel_ok_QToolButton"))
         
 
 
