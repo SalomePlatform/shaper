@@ -16,6 +16,7 @@
 
 class ModelAPI_Object;
 class ModelAPI_Feature;
+class ModelAPI_CompositeFeature;
 
 /**\class Model_Update
  * \ingroup DataModel
@@ -37,6 +38,18 @@ class Model_Update : public Events_Listener
   bool myIsFinish;
   /// Set of already processed features in the "processOperation" method
   std::set<std::shared_ptr<ModelAPI_Feature> > myProcessed;
+
+  /// internal structure that contains the updating iteration information:
+  /// which object and subobject is iterated, t ocontinue iteration
+  struct IterationItem {
+    /// the main object, subs of it are iterated
+    std::shared_ptr<ModelAPI_CompositeFeature> myMain;
+    /// the currently iterated sub-object
+    std::shared_ptr<ModelAPI_Feature> mySub;
+  };
+  /// List of iterated features: composite feature to the currently iterated sub.
+  /// The first element in the list has no "main": the root document is not feature.
+  std::list<IterationItem> myProcessIterator;
 
  public:
   /// Is called only once, on startup of the application
@@ -65,6 +78,12 @@ protected:
   /// Performs the feature execution
   /// \returns the status of execution
   void executeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// Iterates and updates features from theFeature by managing myProcessIterator.
+  /// Returns only after the iteration is finished.
+  /// \param theFeature is null for iteration of root document (which is not composite)
+  /// \returns false if this feature should not be updated: iteration was moved much upper
+  bool iterateUpdate(std::shared_ptr<ModelAPI_CompositeFeature> theFeature);
 };
 
 #endif

@@ -21,6 +21,10 @@ class Model_ResultCompSolid : public ModelAPI_ResultCompSolid
 {
   /// Sub-bodies if this is compsolid: zero base index to subs
   std::vector<std::shared_ptr<ModelAPI_ResultBody> > mySubs;
+  /// Flag that stores the previous state of "concealed": if it is changed,
+  /// The event must be generated to redisplay this and all subs.
+  bool myLastConcealed;
+
 
 public:
 
