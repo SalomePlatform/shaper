@@ -1,3 +1,4 @@
+:Abort operation.Cancel_QPushButton	{text='Cancel' type='QPushButton' unnamed='1' visible='1' window=':Abort operation_QMessageBox'}
 :Abort operation.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Abort operation_QMessageBox'}
 :Abort operation_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Abort operation'}
 :Activate module.New_QPushButton	{text='New' type='QPushButton' unnamed='1' visible='1' window=':Activate module_LightApp_ModuleDlg'}
@@ -72,7 +73,11 @@
 :Fatal error_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Fatal error'}
 :Fixed.property_panel_cancel_QToolButton	{container=':SALOME*.Fixed_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :From.from_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:From.from_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:From.from_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
+:From_QLineEdit_2	{container=':Revolution.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
+:From_QLineEdit_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
 :Horizontal.property_panel_cancel_QToolButton	{container=':SALOME*.Horizontal_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Line.Auxiliary_QCheckBox	{container=':SALOME*.Line_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Line.End point_QGroupBox	{container=':SALOME*.Line_XGUI_PropertyPanel' title='End point' type='QGroupBox' unnamed='1' visible='1'}
@@ -118,12 +123,40 @@
 :Point.property_panel_ok_QToolButton	{container=':SALOME*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.x_ModuleBase_ParamSpinBox	{container=':SALOME*.Point_XGUI_PropertyPanel' name='x' type='ModuleBase_ParamSpinBox' visible='1'}
 :Point_QFrame	{container=':SALOME*.Point_XGUI_PropertyPanel' type='QFrame' unnamed='1' visible='1'}
+:Revolution.From_ModuleBase_PageGroupBox	{container=':SALOME*.Revolution_XGUI_PropertyPanel' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Revolution.From_ModuleBase_PageGroupBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Revolution.Select a sketch face_QLabel	{container=':SALOME*.Revolution_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
+:Revolution.Select a sketch face_QListWidget	{aboveWidget=':Revolution.Select a sketch face_QLabel' container=':SALOME*.Revolution_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Revolution.To_ModuleBase_PageGroupBox	{container=':SALOME*.Revolution_XGUI_PropertyPanel' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Revolution.To_ModuleBase_PageGroupBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Revolution.from_angle_ModuleBase_ParamSpinBox	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='from_angle' type='ModuleBase_ParamSpinBox' visible='1'}
+:Revolution.from_angle_ModuleBase_ParamSpinBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='from_angle' type='ModuleBase_ParamSpinBox' visible='1'}
+:Revolution.property_panel_cancel_QToolButton	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Revolution.property_panel_ok_QToolButton	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Revolution.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Revolution.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Revolution.qt_spinbox_lineedit_QLineEdit_3	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Revolution.qt_spinbox_lineedit_QLineEdit_4	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Revolution.to_angle_ModuleBase_ParamSpinBox	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='to_angle' type='ModuleBase_ParamSpinBox' visible='1'}
+:Revolution.to_angle_ModuleBase_ParamSpinBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='to_angle' type='ModuleBase_ParamSpinBox' visible='1'}
+:RevolutionFuse.Revolution_ModuleBase_PageGroupBox	{container=':SALOME*.RevolutionFuse_XGUI_PropertyPanel' title='Revolution' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:RevolutionFuse.property_panel_ok_QToolButton	{container=':SALOME*.RevolutionFuse_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Revolution_QLineEdit	{container=':SALOME*.Revolution_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
+:Revolution_QLineEdit_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QLineEdit' unnamed='1' visible='1'}
+:Revolution_QToolButton	{container=':SALOME*.Revolution_XGUI_PropertyPanel' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Revolution_QToolButton_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' type='QToolButton' unnamed='1' visible='1'}
+:Revolution_QToolButton_3	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:SALOME*.+OX_QToolButton	{text='+OX' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.+OY_QToolButton	{text='+OY' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.+OZ_QToolButton	{text='+OZ' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.-OX_QToolButton	{text='-OX' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.-OY_QToolButton	{text='-OY' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.-OZ_QToolButton	{text='-OZ' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.3D View Operations_OCCViewer_ViewPort3d	{aboveWidget=':SALOME*.3D View Operations_QtxToolBar' type='OCCViewer_ViewPort3d' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.3D View Operations_QtxToolBar	{name='OCCViewer3DViewOperations' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='3D View Operations'}
 :SALOME*.Arc_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Arc'}
 :SALOME*.Boolean_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Boolean'}
+:SALOME*.Circle_QToolButton	{text='Circle' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Circle'}
 :SALOME*.Close_QToolButton	{text='Close' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Coincident_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Coincident'}
@@ -149,6 +182,8 @@
 :SALOME*.Perpendicular_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Perpendicular'}
 :SALOME*.Plane_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Plane'}
 :SALOME*.Point_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Point'}
+:SALOME*.RevolutionFuse_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='RevolutionFuse'}
+:SALOME*.Revolution_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Revolution'}
 :SALOME*.SketchPoint_QToolButton	{container=':SALOME*.Sketch_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QToolButton	{text='Sketch' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QtxToolBar	{name='Sketch' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
@@ -174,7 +209,11 @@
 :Start point.Y _QLabel	{container=':Line.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Start point.Y _QLabel_2	{container=':Arc.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:To.to_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:To.to_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To_QLineEdit	{container=':Extrusion.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
+:To_QLineEdit_2	{container=':Revolution.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
+:To_QLineEdit_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
 :Vertical.property_panel_cancel_QToolButton	{container=':SALOME*.Vertical_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Warning.Yes_QPushButton	{text='Yes' type='QPushButton' unnamed='1' visible='1' window=':Warning_QMessageBox'}
 :Warning_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Warning'}
