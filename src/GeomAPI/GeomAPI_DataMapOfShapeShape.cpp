@@ -7,12 +7,13 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <TopTools_DataMapOfShapeShape.hxx>
+#include <TopTools_DataMapIteratorOfDataMapOfShapeShape.hxx>
 #include <TopoDS_Shape.hxx>
 using namespace std;
 
 
 GeomAPI_DataMapOfShapeShape::GeomAPI_DataMapOfShapeShape()
-	:GeomAPI_Interface((void *)new TopTools_DataMapOfShapeShape){}
+: GeomAPI_Interface(new TopTools_DataMapOfShapeShape){}
 
 void GeomAPI_DataMapOfShapeShape::clear()
 {
@@ -28,8 +29,22 @@ bool GeomAPI_DataMapOfShapeShape::bind (std::shared_ptr<GeomAPI_Shape> theKey, s
 {
   bool flag(false);
   if(implPtr<TopTools_DataMapOfShapeShape>()->Bind(theKey->impl<TopoDS_Shape>(), theItem->impl<TopoDS_Shape>()))
-	flag = true;
+  flag = true;
   return flag;
+}
+
+void GeomAPI_DataMapOfShapeShape::merge(const GeomAPI_DataMapOfShapeShape& theDataMap)
+{
+  const TopTools_DataMapOfShapeShape& aDataMap = theDataMap.impl<TopTools_DataMapOfShapeShape>();
+  TopTools_DataMapOfShapeShape* myDataMap = implPtr<TopTools_DataMapOfShapeShape>();
+  for(TopTools_DataMapIteratorOfDataMapOfShapeShape anIt(aDataMap); anIt.More(); anIt.Next()) {
+    myDataMap->Bind(anIt.Key(), anIt.Value());
+  }
+}
+
+void GeomAPI_DataMapOfShapeShape::merge(const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMap)
+{
+  merge(*theDataMap.get());
 }
 
 bool GeomAPI_DataMapOfShapeShape::isBound (std::shared_ptr<GeomAPI_Shape> theKey)
@@ -46,12 +61,12 @@ const std::shared_ptr<GeomAPI_Shape> GeomAPI_DataMapOfShapeShape::find(std::shar
   aShape->setImpl(new TopoDS_Shape(impl<TopTools_DataMapOfShapeShape>().Find(theKey->impl<TopoDS_Shape>())));
   return aShape;
 }  
-  
+
 bool GeomAPI_DataMapOfShapeShape::unBind(std::shared_ptr<GeomAPI_Shape> theKey)
 {
   bool flag(false);
   if(implPtr<TopTools_DataMapOfShapeShape>()->UnBind(theKey->impl<TopoDS_Shape>()))
-	flag = true;
+  flag = true;
   return flag;
 }
 
@@ -59,6 +74,5 @@ bool GeomAPI_DataMapOfShapeShape::unBind(std::shared_ptr<GeomAPI_Shape> theKey)
  {
   if (!empty()) {
     implPtr<TopTools_DataMapOfShapeShape>()->Clear();
-    //delete myImpl;
   }
  }

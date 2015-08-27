@@ -87,10 +87,12 @@ private:
   std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
 
   /// Load Naming data structure of the feature to the document
-  void LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape>& theBaseObject,
+  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
                     const ListOfShape& theTools,
-                    const GeomAlgoAPI_Boolean& theAlgo);
+                    GeomAlgoAPI_MakeShape& theMakeShape,
+                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
 };
 
 #endif

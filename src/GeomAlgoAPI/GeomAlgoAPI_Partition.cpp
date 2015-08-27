@@ -28,10 +28,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Partition::make(const ListOfShape& th
 //=================================================================================================
 GeomAlgoAPI_Partition::GeomAlgoAPI_Partition(const ListOfShape& theObjects,
                                              const ListOfShape& theTools)
-: myDone(false),
-  myShape(new GeomAPI_Shape()),
-  myMap(new GeomAPI_DataMapOfShapeShape()),
-  myMkShape(new GeomAlgoAPI_MakeShape())
+: myDone(false)
 {
   build(theObjects, theTools);
 }
@@ -46,8 +43,8 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   }
 
   // Creating partition operation.
-  GEOMAlgo_Splitter * anOperation = new GEOMAlgo_Splitter;
-  myMkShape->setImpl(anOperation);
+  GEOMAlgo_Splitter* anOperation = new GEOMAlgo_Splitter;
+  myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation, GeomAlgoAPI_MakeShape::BOPAlgoBuilder));
 
   // Getting objects.
   TopTools_ListOfShape anObjects;
@@ -76,11 +73,13 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   }
 
   // fill data map to keep correct orientation of sub-shapes
+  myMap.reset(new GeomAPI_DataMapOfShapeShape());
   for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
     std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
     aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
     myMap->bind(aCurrentShape, aCurrentShape);
   }
+  myShape.reset(new GeomAPI_Shape());
   myShape->setImpl(new TopoDS_Shape(aResult));
 
 }

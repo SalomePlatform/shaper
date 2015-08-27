@@ -36,6 +36,12 @@ class GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   bool bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem);
 
+  /// Merges two maps
+  GEOMAPI_EXPORT void merge(const GeomAPI_DataMapOfShapeShape& theDataMap);
+
+  /// Merges two maps
+  GEOMAPI_EXPORT void merge(const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMap);
+
   /// Returns true if theKey is stored  in the map.
   GEOMAPI_EXPORT 
   bool isBound (std::shared_ptr<GeomAPI_Shape> theKey);

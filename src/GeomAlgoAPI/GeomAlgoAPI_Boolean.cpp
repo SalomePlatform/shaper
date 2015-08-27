@@ -53,10 +53,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(const ListOfShape
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType)
-: myDone(false),
-  myShape(new GeomAPI_Shape()),
-  myMap(new GeomAPI_DataMapOfShapeShape()),
-  myMkShape(new GeomAlgoAPI_MakeShape())
+: myDone(false)
 {
   build(theObjects, theTools, theOperationType);
 }
@@ -104,7 +101,7 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
       return;
     }
   }
-  myMkShape->setImpl(anOperation);
+  myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation));
   anOperation->SetArguments(anObjects);
   anOperation->SetTools(aTools);
 
@@ -121,11 +118,13 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   }
 
   // fill data map to keep correct orientation of sub-shapes
+  myMap.reset(new GeomAPI_DataMapOfShapeShape());
   for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
     std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
     aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
     myMap->bind(aCurrentShape, aCurrentShape);
   }
+  myShape.reset(new GeomAPI_Shape());
   myShape->setImpl(new TopoDS_Shape(aResult));
 
 }

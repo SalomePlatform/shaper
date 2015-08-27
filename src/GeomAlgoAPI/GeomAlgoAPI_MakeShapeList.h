@@ -37,6 +37,16 @@ public:
    */
   GEOMALGOAPI_EXPORT void init(const ListOfMakeShape& theMakeShapeList);
 
+  /** \brief Adds algo to the end of list.
+   *  \param[in] theMakeShape algo to be added.
+   */
+  GEOMALGOAPI_EXPORT void append(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
+
+  /** \brief Adds another one list of algos to the end of list.
+   *  \param[in] theMakeShapeList algo list to be added.
+   */
+  GEOMALGOAPI_EXPORT void append(const GeomAlgoAPI_MakeShapeList& theMakeShapeList);
+
   /// \return a shape built by the shape construction algorithms
   GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape> shape() const;
 

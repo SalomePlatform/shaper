@@ -46,6 +46,7 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
     return true;
   }
 
+  theError = "Not enough arguments";
   return false;
 }
 

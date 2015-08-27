@@ -19,10 +19,7 @@ GeomAlgoAPI_Movement::GeomAlgoAPI_Movement(std::shared_ptr<GeomAPI_Shape> theSou
                                            std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                            double                         theDistance,
                                            bool theSimpleTransform)
-: myDone(false),
-  myShape(new GeomAPI_Shape()),
-  myMap(new GeomAPI_DataMapOfShapeShape()),
-  myMkShape(new GeomAlgoAPI_MakeShape())
+: myDone(false)
 {
   build(theSourceShape, theAxis, theDistance, theSimpleTransform);
 }
@@ -61,6 +58,7 @@ void GeomAlgoAPI_Movement::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
     if(!aBuilder) {
       return;
     }
+    myMkShape.reset(new GeomAlgoAPI_MakeShape(aBuilder));
 
     myDone = aBuilder->IsDone() == Standard_True;
 
@@ -70,14 +68,15 @@ void GeomAlgoAPI_Movement::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
 
     aResult = aBuilder->Shape();
     // Fill data map to keep correct orientation of sub-shapes.
+    myMap.reset(new GeomAPI_DataMapOfShapeShape());
     for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More(); anExp.Next()) {
       std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
       myMap->bind(aCurrentShape, aCurrentShape);
     }
-    myMkShape->setImpl(aBuilder);
   }
 
+  myShape.reset(new GeomAPI_Shape());
   myShape->setImpl(new TopoDS_Shape(aResult));
 }
 

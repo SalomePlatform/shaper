@@ -19,10 +19,16 @@
 class GeomAlgoAPI_MakeShape : public GeomAPI_Interface
 {
 public:
-  /// Constructor
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape();
+  /// Algo type enum
+  enum AlgoType {
+    MakeShape,
+    MakePipe,
+    BOPAlgoBuilder
+  };
+
+public:
   /// Constructor by the already stored builder in the interface
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder, const AlgoType theAlgoType = MakeShape);
 
   /// Constructor by the builder and wire. Used for pipe builder.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder,
@@ -30,7 +36,7 @@ public:
                                            const std::shared_ptr<GeomAPI_Shape> theBaseShape);
 
   /// Returns a shape built by the shape construction algorithm
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>  shape() const;
+  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape> shape() const;
 
   /// Returns the list of shapes generated from the shape \a theShape
   GEOMALGOAPI_EXPORT virtual void generated(
@@ -43,8 +49,11 @@ public:
   /// Returns whether the shape is an edge
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
-  protected:
-  /// The resulting shape
+protected:
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(){};
+
+protected:
+  GeomAlgoAPI_MakeShape::AlgoType myAlgoType;
   std::shared_ptr<GeomAPI_Shape> myShape;
   std::shared_ptr<GeomAPI_Shape> myWire;
   std::shared_ptr<GeomAPI_Shape> myBaseShape;

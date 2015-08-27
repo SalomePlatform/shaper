@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Transform.h
     GeomAlgoAPI_ShapeTools.h
     GeomAlgoAPI_Partition.h
+    GeomAlgoAPI_PaveFiller.h
 )
 
 SET(PROJECT_SOURCES
@@ -60,6 +61,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Transform.cpp
     GeomAlgoAPI_ShapeTools.cpp
     GeomAlgoAPI_Partition.cpp
+    GeomAlgoAPI_PaveFiller.cpp
 )
 
 SET(PROJECT_LIBRARIES

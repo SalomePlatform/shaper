@@ -30,6 +30,21 @@ void GeomAlgoAPI_MakeShapeList::init(const ListOfMakeShape& theMakeShapeList)
 }
 
 //=================================================================================================
+void GeomAlgoAPI_MakeShapeList::append(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+{
+  myListOfMakeShape.push_back(theMakeShape);
+}
+
+//=================================================================================================
+void GeomAlgoAPI_MakeShapeList::append(const GeomAlgoAPI_MakeShapeList& theMakeShapeList)
+{
+  for(ListOfMakeShape::const_iterator anIt = theMakeShapeList.myListOfMakeShape.cbegin();
+    anIt != theMakeShapeList.myListOfMakeShape.cend(); anIt++) {
+    myListOfMakeShape.push_back(*anIt);
+  }
+}
+
+//=================================================================================================
 const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShapeList::shape() const
 {
   if(myListOfMakeShape.empty()) {
@@ -56,8 +71,8 @@ void GeomAlgoAPI_MakeShapeList::modified(const std::shared_ptr<GeomAPI_Shape> th
 bool GeomAlgoAPI_MakeShapeList::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
-    BRepBuilderAPI_MakeShape* aBuilder = (*aBuilderIt)->implPtr<BRepBuilderAPI_MakeShape>();
-    if(aBuilder && (aBuilder->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True)) {
+    std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape = *aBuilderIt;
+    if(aMakeShape->isDeleted(theShape)) {
       return true;
     }
   }
@@ -113,4 +128,3 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
     theHistory.push_back(aShape);
   }
 }
-

@@ -135,9 +135,7 @@ void FeaturesPlugin_Extrusion::execute()
   ListOfShape aFreeFaces;
   std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aFacesList);
   GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
-  for(ListOfShape::const_iterator anIter = aFreeFaces.cbegin(); anIter != aFreeFaces.cend(); anIter++) {
-    aShells.push_back(*anIter);
-  }
+  aShells.insert(aShells.end(), aFreeFaces.begin(), aFreeFaces.end());
 
   // Generating result for each shell and face.
   int aResultIndex = 0;

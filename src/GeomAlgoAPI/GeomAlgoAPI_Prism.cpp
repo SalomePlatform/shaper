@@ -157,7 +157,8 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
       aMaxFromDist = aPoints[i].Distance(aPntOnFromFace);
     }
   }
-  Standard_Real aPipeLength = aMaxToDist + aMaxFromDist;
+  // We added 1 just to be sure that pipe is long enough for boolean operation.
+  Standard_Real aPipeLength = aMaxToDist + aMaxFromDist + 1;
 
   // Making wire for pipe.
   std::shared_ptr<GeomAPI_Pnt> aCentreOfMass = GeomAlgoAPI_ShapeTools::centreOfMass(theBasis);

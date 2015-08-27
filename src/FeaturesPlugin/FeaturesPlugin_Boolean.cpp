@@ -15,15 +15,15 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAPI_ShapeExplorer.h>
 
-#define FACE 4
-#define _MODIFY_TAG 1
-#define _DELETED_TAG 2
-#define _SUBSOLIDS_TAG 3 /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+#include <algorithm>
 
 //=================================================================================================
 FeaturesPlugin_Boolean::FeaturesPlugin_Boolean()
@@ -75,22 +75,39 @@ void FeaturesPlugin_Boolean::execute()
   GeomAlgoAPI_Boolean::OperationType aType = (GeomAlgoAPI_Boolean::OperationType)aTypeAttr->value();
 
   ListOfShape anObjects, aTools;
+  std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
 
   // Getting objects.
   AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) {
       return;
     }
-    anObjects.push_back(anObject);
+    ResultPtr aContext = anObjectAttr->context();
+    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+    if(aResCompSolidPtr.get()) {
+      std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
+      std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
+      for(; anIt != aCompSolidsObjects.end(); anIt++) {
+        if(anIt->first->isEqual(aContextShape)) {
+          aCompSolidsObjects[anIt->first].push_back(anObject);
+          break;
+        }
+      }
+      if(anIt == aCompSolidsObjects.end()) {
+        aCompSolidsObjects[aContextShape].push_back(anObject);
+      }
+    } else {
+      anObjects.push_back(anObject);
+    }
   }
 
   // Getting tools.
   AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
   for(int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aToolAttr = aToolsSelList->value(aToolsIndex);
+    AttributeSelectionPtr aToolAttr = aToolsSelList->value(aToolsIndex);
     std::shared_ptr<GeomAPI_Shape> aTool = aToolAttr->value();
     if(!aTool.get()) {
       return;
@@ -103,13 +120,13 @@ void FeaturesPlugin_Boolean::execute()
   switch(aType) {
     case GeomAlgoAPI_Boolean::BOOL_CUT:
     case GeomAlgoAPI_Boolean::BOOL_COMMON:{
-      if(anObjects.empty() || aTools.empty()) {
+      if((anObjects.empty() && aCompSolidsObjects.empty()) || aTools.empty()) {
         std::string aFeatureError = "Not enough objects for boolean operation";
         setError(aFeatureError);
         return;
       }
 
-      // Cut each object with all tools
+      // For solids cut each object with all tools.
       for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
         ListOfShape aListWithObject;
@@ -135,7 +152,73 @@ void FeaturesPlugin_Boolean::execute()
 
         if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          LoadNamingDS(aResultBody, anObject, aTools, aBoolAlgo);
+          loadNamingDS(aResultBody, anObject, aBoolAlgo.shape(), aTools, *aBoolAlgo.makeShape(), *aBoolAlgo.mapOfShapes());
+          setResult(aResultBody, aResultIndex);
+          aResultIndex++;
+        }
+      }
+
+      // Compsolids handling
+      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
+        anIt != aCompSolidsObjects.end(); anIt++) {
+        std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
+        ListOfShape& aUsedInOperationSolids = anIt->second;
+
+        // Collecting solids from compsolids which will not be modified in boolean operation.
+        ListOfShape aNotUsedSolids;
+        for(GeomAPI_ShapeExplorer anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
+          std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
+          ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
+          for(; anIt != aUsedInOperationSolids.end(); anIt++) {
+            if(aSolidInCompSolid->isEqual(*anIt)) {
+              break;
+            }
+          }
+          if(anIt == aUsedInOperationSolids.end()) {
+            aNotUsedSolids.push_back(aSolidInCompSolid);
+          }
+        }
+
+        GeomAlgoAPI_Boolean aBoolAlgo(aUsedInOperationSolids, aTools, aType);
+
+        // Checking that the algorithm worked properly.
+        if(!aBoolAlgo.isDone()) {
+          static const std::string aFeatureError = "Boolean algorithm failed";
+          setError(aFeatureError);
+          return;
+        }
+        if(aBoolAlgo.shape()->isNull()) {
+          static const std::string aShapeError = "Resulting shape is Null";
+          setError(aShapeError);
+          return;
+        }
+        if(!aBoolAlgo.isValid()) {
+          std::string aFeatureError = "Warning: resulting shape is not valid";
+          setError(aFeatureError);
+          return;
+        }
+
+        GeomAlgoAPI_MakeShapeList aMakeShapeList;
+        aMakeShapeList.append(aBoolAlgo.makeShape());
+        GeomAPI_DataMapOfShapeShape aMapOfShapes;
+        aMapOfShapes.merge(aBoolAlgo.mapOfShapes());
+
+        // Add result to not used solids from compsolid.
+        ListOfShape aShapesToAdd = aNotUsedSolids;
+        aShapesToAdd.push_back(aBoolAlgo.shape());
+        GeomAlgoAPI_PaveFiller aFillerAlgo(aShapesToAdd, true);
+        if(!aFillerAlgo.isDone()) {
+          std::string aFeatureError = "PaveFiller algorithm failed";
+          setError(aFeatureError);
+          return;
+        }
+
+        aMakeShapeList.append(aFillerAlgo.makeShape());
+        aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
+
+        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo.shape()) > 1.e-7) {
+          std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
+          loadNamingDS(aResultBody, aCompSolid, aFillerAlgo.shape(), aTools, aMakeShapeList, aMapOfShapes);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -143,42 +226,117 @@ void FeaturesPlugin_Boolean::execute()
       break;
     }
     case GeomAlgoAPI_Boolean::BOOL_FUSE: {
-      if(anObjects.empty() && aTools.size() > 1) {
-        anObjects.push_back(aTools.back());
-        aTools.pop_back();
-      }else if(aTools.empty() && anObjects.size() > 1) {
-        aTools.push_back(anObjects.back());
-        anObjects.pop_back();
-      }
-
-      if(anObjects.empty() || aTools.empty()) {
+      if((anObjects.size() + aTools.size() + aCompSolidsObjects.size()) < 2) {
         std::string aFeatureError = "Not enough objects for boolean operation";
         setError(aFeatureError);
         return;
       }
 
+      // Collecting all solids which will be fused.
+      ListOfShape aSolidsToFuse;
+      aSolidsToFuse.insert(aSolidsToFuse.end(), anObjects.begin(), anObjects.end());
+      aSolidsToFuse.insert(aSolidsToFuse.end(), aTools.begin(), aTools.end());
+
+      // Collecting solids from compsolids which will not be modified in boolean operation.
+      ListOfShape aNotUsedSolids;
+      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
+        anIt != aCompSolidsObjects.end(); anIt++) {
+        std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
+        ListOfShape& aUsedInOperationSolids = anIt->second;
+        aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedInOperationSolids.begin(), aUsedInOperationSolids.end());
+
+        // Collect solids from compsolid which will not be modified in boolean operation.
+        for(GeomAPI_ShapeExplorer anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
+          std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
+          ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
+          for(; anIt != aUsedInOperationSolids.end(); anIt++) {
+            if(aSolidInCompSolid->isEqual(*anIt)) {
+              break;
+            }
+          }
+          if(anIt == aUsedInOperationSolids.end()) {
+            aNotUsedSolids.push_back(aSolidInCompSolid);
+          }
+        }
+      }
+
+      ListOfShape anOriginalSolids = aSolidsToFuse;
+      anOriginalSolids.insert(anOriginalSolids.end(), aNotUsedSolids.begin(), aNotUsedSolids.end());
+      GeomAlgoAPI_MakeShapeList aMakeShapeList;
+      GeomAPI_DataMapOfShapeShape aMapOfShapes;
+
+      // If we have compsolids then cut with not used solids all others.
+      if(!aNotUsedSolids.empty()) {
+        aSolidsToFuse.clear();
+        for(ListOfShape::iterator anIt = anOriginalSolids.begin(); anIt != anOriginalSolids.end(); anIt++) {
+          ListOfShape aOneObjectList;
+          aOneObjectList.push_back(*anIt);
+          GeomAlgoAPI_Boolean aCutAlgo(aOneObjectList, aNotUsedSolids, GeomAlgoAPI_Boolean::BOOL_CUT);
+
+          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo.shape()) > 1.e-7) {
+            aSolidsToFuse.push_back(aCutAlgo.shape());
+            aMakeShapeList.append(aCutAlgo.makeShape());
+            aMapOfShapes.merge(aCutAlgo.mapOfShapes());
+          }
+        }
+      }
+
+      anObjects.clear();
+      anObjects.push_back(aSolidsToFuse.back());
+      aSolidsToFuse.pop_back();
+      aTools = aSolidsToFuse;
+
       // Fuse all objects and all tools.
-      GeomAlgoAPI_Boolean aBoolAlgo(anObjects, aTools, aType);
+      GeomAlgoAPI_Boolean aFuseAlgo(anObjects, aTools, aType);
 
       // Checking that the algorithm worked properly.
-      if(!aBoolAlgo.isDone()) {
+      if(!aFuseAlgo.isDone()) {
         static const std::string aFeatureError = "Boolean algorithm failed";
         setError(aFeatureError);
         return;
       }
-      if(aBoolAlgo.shape()->isNull()) {
+      if(aFuseAlgo.shape()->isNull()) {
         static const std::string aShapeError = "Resulting shape is Null";
         setError(aShapeError);
         return;
       }
-      if(!aBoolAlgo.isValid()) {
+      if(!aFuseAlgo.isValid()) {
         std::string aFeatureError = "Warning: resulting shape is not valid";
         setError(aFeatureError);
         return;
       }
 
+      std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo.shape();
+      aMakeShapeList.append(aFuseAlgo.makeShape());
+      aMapOfShapes.merge(aFuseAlgo.mapOfShapes());
+
+      // Add result to not used solids from compsolid (if we have any).
+      if(!aNotUsedSolids.empty()) {
+        aNotUsedSolids.push_back(aShape);
+        GeomAlgoAPI_PaveFiller aFillerAlgo(aNotUsedSolids, true);
+        if(!aFillerAlgo.isDone()) {
+          std::string aFeatureError = "PaveFiller algorithm failed";
+          setError(aFeatureError);
+          return;
+        }
+        if(aFillerAlgo.shape()->isNull()) {
+          static const std::string aShapeError = "Resulting shape is Null";
+          setError(aShapeError);
+          return;
+        }
+        if(!aFillerAlgo.isValid()) {
+          std::string aFeatureError = "Warning: resulting shape is not valid";
+          setError(aFeatureError);
+          return;
+        }
+
+        aShape = aFillerAlgo.shape();
+        aMakeShapeList.append(aFillerAlgo.makeShape());
+        aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
+      }
+
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      LoadNamingDS(aResultBody, anObjects.front(), aTools, aBoolAlgo);
+      loadNamingDS(aResultBody, anOriginalSolids.front(), aShape, anOriginalSolids, aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
       break;
@@ -194,28 +352,34 @@ void FeaturesPlugin_Boolean::execute()
 }
 
 //=================================================================================================
-void FeaturesPlugin_Boolean::LoadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                          const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                          const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                          const std::shared_ptr<GeomAPI_Shape> theResultShape,
                                           const ListOfShape& theTools,
-                                          const GeomAlgoAPI_Boolean& theAlgo)
+                                          GeomAlgoAPI_MakeShape& theMakeShape,
+                                          GeomAPI_DataMapOfShapeShape& theMapOfShapes)
 {
   //load result
-  if(theBaseShape->isEqual(theAlgo.shape())) {
-    theResultBody->store(theAlgo.shape());
+  if(theBaseShape->isEqual(theResultShape)) {
+    theResultBody->store(theResultShape);
   } else {
-    theResultBody->storeModified(theBaseShape, theAlgo.shape(), _SUBSOLIDS_TAG);
+    const int aModifyTag = 1;
+    const int aDeletedTag = 2;
+    const int aSubsolidsTag = 3; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+
+    theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
     GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
 
     std::string aModName = "Modified";
-    theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), theBaseShape, FACE,
-                                               _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
-    theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), theBaseShape, FACE, _DELETED_TAG);
+    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
+                                               aModifyTag, aModName, theMapOfShapes);
+    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
 
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      theResultBody->loadAndOrientModifiedShapes(theAlgo.makeShape().get(), *anIter, FACE,
-                                                 _MODIFY_TAG, aModName, *theAlgo.mapOfShapes().get());
-      theResultBody->loadDeletedShapes(theAlgo.makeShape().get(), *anIter, FACE, _DELETED_TAG);
+      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
+                                                 aModifyTag, aModName, theMapOfShapes);
+      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
     }
   }
 }
