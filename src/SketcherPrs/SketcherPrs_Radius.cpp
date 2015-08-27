@@ -87,6 +87,9 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   SetMeasuredGeometry(aCircle.impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
   SetCustomValue(aRadius);
 
+  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
 

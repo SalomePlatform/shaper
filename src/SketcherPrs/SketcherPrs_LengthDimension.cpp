@@ -55,6 +55,9 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   gp_Pnt aPnt1, aPnt2;
   if (!getPoints(aPnt1, aPnt2))
     return;
+  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+
   SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);

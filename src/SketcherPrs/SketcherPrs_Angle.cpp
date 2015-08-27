@@ -106,6 +106,9 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   AttributeDoublePtr aVal = aData->real(SketchPlugin_Constraint::VALUE());
   SetCustomValue(aVal->value() * PI / 180.0);
 
+  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
 
