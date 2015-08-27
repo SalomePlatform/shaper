@@ -168,6 +168,47 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   }
 }
 
+bool Model_Update::iterateUpdate(std::shared_ptr<ModelAPI_CompositeFeature> theFeature)
+{
+  myProcessIterator.push_back(IterationItem());
+  IterationItem& aCurrent = *myProcessIterator.rbegin();
+  if (theFeature.get()) {
+    aCurrent.myMain = theFeature;
+    // two cycles: parameters must be processed first
+    for(int a = 0; a < theFeature->numberOfSubs(); a++) {
+      FeaturePtr aSub = theFeature->subFeature(a);
+      aCurrent.mySub = aSub;
+      if (aSub->getKind() == "Parameter")
+        updateFeature(aSub);
+    }
+    // number of subs can be changed in execution: like fillet
+    for(int a = 0; a < theFeature->numberOfSubs(); a++) {
+      FeaturePtr aSub = theFeature->subFeature(a);
+      aCurrent.mySub = aSub;
+      if (aSub->getKind() != "Parameter")
+       updateFeature(aSub);
+    }
+  } else {
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    Model_Objects* anObjs = std::dynamic_pointer_cast<Model_Document>(aRootDoc)->objects();
+    if (!anObjs)
+      return false;
+    aCurrent.mySub = anObjs->firstFeature();
+    for (; aCurrent.mySub.get(); aCurrent.mySub = anObjs->nextFeature(aCurrent.mySub)) {
+      if (aCurrent.mySub->getKind() == "Parameter")
+        updateFeature(aCurrent.mySub);
+    }
+    aCurrent.mySub = anObjs->firstFeature();
+    for (; aCurrent.mySub.get(); aCurrent.mySub = anObjs->nextFeature(aCurrent.mySub)) {
+      if (aCurrent.mySub->getKind() != "Parameter")
+        updateFeature(aCurrent.mySub);
+    }
+  }
+  // processing is finished, so, remove the iterated
+  myProcessIterator.pop_back();
+  return true; // iteration is finished correctly
+}
+
 void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
 {
   if (theFinish) {
@@ -202,23 +243,9 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
       isAutomaticChanged = true;
       myIsAutomatic = true;
     }
-
-    // iterate all features in the root document to update each
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-    Model_Objects* anObjs = std::dynamic_pointer_cast<Model_Document>(aRootDoc)->objects();
-    if (!anObjs) return;
-    // two cycles: parameters are first to process
-    FeaturePtr aFeatureIter = anObjs->firstFeature();
+    // init iteration from the root document
     myProcessed.clear(); // to avoid processing twice
-    for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
-      if (aFeatureIter->getKind() == "Parameter")
-        updateFeature(aFeatureIter);
-    }
-    aFeatureIter = anObjs->firstFeature();
-    for (; aFeatureIter.get(); aFeatureIter = anObjs->nextFeature(aFeatureIter)) {
-      if (aFeatureIter->getKind() != "Parameter")
-        updateFeature(aFeatureIter);
-    }
+    iterateUpdate(CompositeFeaturePtr());
 
     if (isAutomaticChanged) myIsAutomatic = false;
     myProcessed.clear(); // to avoid keeping features in memory
@@ -264,18 +291,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
 
   // composite feature must be executed after sub-features execution
   if (aCompos) {
-    // two cycles: parameters must be processed first
-    for(int a = 0; a < aCompos->numberOfSubs(); a++) {
-      FeaturePtr aSub = aCompos->subFeature(a);
-      if (aSub->getKind() == "Parameter")
-        updateFeature(aSub);
-    }
-    // number of subs can be changed in execution: like fillet
-    for(int a = 0; a < aCompos->numberOfSubs(); a++) {
-      FeaturePtr aSub = aCompos->subFeature(a);
-      if (aSub->getKind() != "Parameter")
-       updateFeature(aSub);
-    }
+    if (!iterateUpdate(aCompos))
+      return; // iteration was interrupted, so, interrupt the update of this feature (it will be done later)
     // reupdate arguments of composite feature: it may be changed during subs execution
     if (theFeature->data()->execState() != ModelAPI_StateMustBeUpdated)
       updateArguments(theFeature);
