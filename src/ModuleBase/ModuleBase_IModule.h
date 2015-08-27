@@ -146,7 +146,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Returns data model object for representation of data tree in Object browser
   virtual ModuleBase_IDocumentDataModel* dataModel() const = 0;
 
+  /// Performs functionality on closing document
   virtual void closeDocument() = 0;
+
+  /// Clears specific presentations in the viewer
+  virtual void clearViewer() = 0;
 
   /// Returns a list of modes, where the AIS objects should be activated
   /// \param theModes a list of modes

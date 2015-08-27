@@ -407,6 +407,11 @@ bool PartSet_Module::isMouseOverWindow()
 
 void PartSet_Module::closeDocument()
 {
+  clearViewer();
+}
+
+void PartSet_Module::clearViewer()
+{
   myCustomPrs->clearPrs();
 }
 

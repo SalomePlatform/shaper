@@ -145,7 +145,11 @@ public:
   /// Returns data model object for representation of data tree in Object browser
   virtual ModuleBase_IDocumentDataModel* dataModel() const { return myDataModel; }
 
+  /// Performs functionality on closing document
   virtual void closeDocument();
+
+  /// Clears specific presentations in the viewer
+  virtual void clearViewer();
 
   /// Event Listener method
   /// \param theMessage an event message

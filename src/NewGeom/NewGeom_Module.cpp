@@ -16,6 +16,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
 #include <ModuleBase_ActionInfo.h>
+#include <ModuleBase_IModule.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -289,6 +290,8 @@ void NewGeom_Module::onViewManagerRemoved(SUIT_ViewManager* theMgr)
         myProxyViewer->setSelector(0);
         delete mySelector;
         mySelector = 0;
+
+        myWorkshop->module()->clearViewer();
       }
     }
   }
