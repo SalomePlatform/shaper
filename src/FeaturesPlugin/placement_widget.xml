@@ -5,8 +5,9 @@
     label="Select a solid objects"
     icon=":icons/cut_shape.png"
     tooltip="Select a solid objects"
-    type_choice="Solids"
+    type_choice="Objects Solids"
     concealment="true" >
+    <validator id="GeomValidators_PartSet"/>
   </multi_selector>
   <shape_selector id="placement_start_face"
     label="Select an object" 

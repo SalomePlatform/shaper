@@ -192,7 +192,9 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
   myIsResetCurrentValue = false;
-  operationMgr()->onValidateOperation();
+  // it is important to validate operation here only if sketch entity create operation is active
+  // because at this operation we reacts to the mouse leave/enter view port
+  //operationMgr()->onValidateOperation();
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("onEnterViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -203,6 +205,8 @@ void PartSet_SketcherMgr::onEnterViewPort()
 
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
+    operationMgr()->onValidateOperation();
+
   // we need change displayed state of the current operation feature
   // if the feature is presentable, e.g. distance construction. It has no results, so workshop does
   // not accept a signal about the result created. Nothing is shown until mouse is moved out/in view

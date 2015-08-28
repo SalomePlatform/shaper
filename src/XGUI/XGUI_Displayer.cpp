@@ -354,7 +354,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   // Convert shape types to selection types
   QIntList aModes;
   foreach(int aType, theModes) {
-    if (aType > TopAbs_SHAPE) 
+    if (aType >= TopAbs_SHAPE) 
       aModes.append(aType);
     else
       aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
