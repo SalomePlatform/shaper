@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-//#define DEB_UPDATE
+#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -57,10 +57,11 @@ Model_Update::Model_Update()
 
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
                                    Config_Prop::Boolean, "false");
-  myIsAutomatic =
-    Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+  myIsAutomatic = true;
+  //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
   myIsFinish = false;
+  myModification = 0;
 }
 
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -74,11 +75,14 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
+#ifdef DEB_UPDATE
+  std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
+#endif
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
     bool aPropVal =
       Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
     if (aPropVal != myIsAutomatic) { // something is changed
-      myIsAutomatic = aPropVal;
+      // myIsAutomatic = aPropVal;
       if (myIsAutomatic) // higher level of automatization => to rebuild
         processOperation(false);
     }
@@ -100,31 +104,19 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       }
       // created objects are always must be up to date (python box feature)
       // and updated not in internal uptation chain
-      myJustUpdated.insert(*anObjIter);
+      myUpdated[*anObjIter] = myModification;
 
-      // something is updated during the execution: re-execute it (sketch update by parameters)
+      // something is updated during the execution: re-execute it (sketch update by parameters or
+      // Box macro that updates the upper features during the execution)
       if (myIsExecuted) { 
         FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
-        if (anUpdated.get() &&  anUpdated->data()->isValid() &&
-            myProcessed.find(anUpdated) != myProcessed.end()) {
-            if (anUpdated->isPreviewNeeded() || myIsFinish) {
-              ModelAPI_ExecState aState = anUpdated->data()->execState();
-              static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-              if (aFactory->validate(anUpdated) && aState != ModelAPI_StateInvalidArgument) {
-                #ifdef DEB_UPDATE
-                  std::cout<<"Execute immideately "<<anUpdated->name()<<std::endl;
-                #endif
-                executeFeature(anUpdated);
-              } else {
-                anUpdated->eraseResults();
-                redisplayWithResults(anUpdated, ModelAPI_StateInvalidArgument); // result also must be updated
-              }
-            }
-        }
+        if (anUpdated.get() &&  anUpdated->data()->isValid())
+          iterateUpdateBreak(anUpdated);
       }
       #ifdef DEB_UPDATE
+      if (myIsExecuted) std::cout<<"During execution ";
       if ((*anObjIter)->data() && (*anObjIter)->data()->isValid()) {
-        std::cout<<"Add updated "<<(*anObjIter)->groupName()<<" "
+        std::cout<<"add updated "<<(*anObjIter)->groupName()<<" "
           <<(*anObjIter)->data()->name()<<std::endl;
       }
       #endif
@@ -163,50 +155,57 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // in the end of transaction everything is updated, so clear the old objects (the only one
     // place where results are cleared)
     myIsParamUpdated = false;
-    myJustUpdated.clear();
+    myUpdated.clear();
+    myModification = 0;
     myWaitForFinish.clear();
   }
 }
 
 bool Model_Update::iterateUpdate(std::shared_ptr<ModelAPI_CompositeFeature> theFeature)
 {
-  myProcessIterator.push_back(IterationItem());
+  myProcessIterator.push_back(IterationItem(theFeature));
   IterationItem& aCurrent = *myProcessIterator.rbegin();
-  if (theFeature.get()) {
-    aCurrent.myMain = theFeature;
-    // two cycles: parameters must be processed first
-    for(int a = 0; a < theFeature->numberOfSubs(); a++) {
-      FeaturePtr aSub = theFeature->subFeature(a);
-      aCurrent.mySub = aSub;
-      if (aSub->getKind() == "Parameter")
-        updateFeature(aSub);
-    }
-    // number of subs can be changed in execution: like fillet
-    for(int a = 0; a < theFeature->numberOfSubs(); a++) {
-      FeaturePtr aSub = theFeature->subFeature(a);
-      aCurrent.mySub = aSub;
-      if (aSub->getKind() != "Parameter")
-       updateFeature(aSub);
-    }
-  } else {
-    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-    Model_Objects* anObjs = std::dynamic_pointer_cast<Model_Document>(aRootDoc)->objects();
-    if (!anObjs)
-      return false;
-    aCurrent.mySub = anObjs->firstFeature();
-    for (; aCurrent.mySub.get(); aCurrent.mySub = anObjs->nextFeature(aCurrent.mySub)) {
-      if (aCurrent.mySub->getKind() == "Parameter")
-        updateFeature(aCurrent.mySub);
-    }
-    aCurrent.mySub = anObjs->firstFeature();
-    for (; aCurrent.mySub.get(); aCurrent.mySub = anObjs->nextFeature(aCurrent.mySub)) {
-      if (aCurrent.mySub->getKind() != "Parameter")
-        updateFeature(aCurrent.mySub);
-    }
+  // two cycles: parameters must be processed first
+  for(aCurrent.startIteration(true); aCurrent.more(); aCurrent.next()) {
+    if (aCurrent.current()->getKind() == "Parameter")
+      updateFeature(aCurrent.current());
+  }
+  // number of subs can be changed in execution: like fillet
+  for(aCurrent.startIteration(false); aCurrent.more(); aCurrent.next()) {
+    FeaturePtr aSub = aCurrent.current();
+    if (aSub->getKind() != "Parameter")
+      updateFeature(aSub);
   }
   // processing is finished, so, remove the iterated
+  bool aResult = !aCurrent.isBreaked(); // iteration is finished correctly, not breaked
   myProcessIterator.pop_back();
-  return true; // iteration is finished correctly
+  return aResult;
+}
+
+void Model_Update::iterateUpdateBreak(std::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  // checking that this feature is before the current iterated one: otherwise break is not needed
+  std::list<IterationItem>::reverse_iterator aProcessed = myProcessIterator.rbegin();
+  for(; aProcessed != myProcessIterator.rend(); aProcessed++) {
+    if (aProcessed->isIterated(theFeature)) {
+      if (aProcessed->isEarlierThanCurrent(theFeature)) {
+        // break all lower level iterators
+        std::list<IterationItem>::reverse_iterator aBreaked = myProcessIterator.rbegin();
+        for(; aBreaked != aProcessed; aBreaked++) {
+          aBreaked->setBreaked();
+        }
+        // for the current breaked, set iteration to this feature precisely
+        aBreaked->setCurrentBefore(theFeature);
+        myModification++;
+      }
+      // the iterator that contains breaked is found, so, nothing else is needed
+      return;
+    }
+  }
+  // if this feature is not found in the list of the currently iterated, try to break the parent
+  FeaturePtr aParent = ModelAPI_Tools::compositeOwner(theFeature);
+  if (aParent.get())
+    iterateUpdateBreak(aParent);
 }
 
 void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
@@ -244,12 +243,11 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
       myIsAutomatic = true;
     }
     // init iteration from the root document
-    myProcessed.clear(); // to avoid processing twice
     iterateUpdate(CompositeFeaturePtr());
 
     if (isAutomaticChanged) myIsAutomatic = false;
-    myProcessed.clear(); // to avoid keeping features in memory
     myIsExecuted = false;
+    myModification++;
 
     // flush to update display
     static Events_Loop* aLoop = Events_Loop::loop();
@@ -266,19 +264,16 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (myProcessed.find(theFeature) != myProcessed.end())
-    return;
-  myProcessed.insert(theFeature);
   if (theFeature->isDisabled())
     return;
 
   #ifdef DEB_UPDATE
-    std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
+    //std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
   #endif
   CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
   // If automatice update is not needed and feature attributes were not updated right now,
   // do not execute it and do not update arguments.
-  if (!myIsAutomatic && myJustUpdated.find(theFeature) == myJustUpdated.end() && !aCompos.get()) {
+  if (!myIsAutomatic && myUpdated.find(theFeature) == myUpdated.end() && !aCompos.get()) {
     // execute will be performed later, but some features may have not-result 
     // presentations, so call update for them (like coincidence in the sketcher)
     static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -305,7 +300,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     return;
   }
 
-  bool aJustUpdated = myJustUpdated.find(theFeature) != myJustUpdated.end();
+  bool aJustUpdated = myUpdated.find(theFeature) != myUpdated.end();
 
   if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
     aJustUpdated = true;
@@ -349,7 +344,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
       theFeature->data()->execState(ModelAPI_StateDone);
       if (aJustUpdated) // store that it must be updated on finish
-        myJustUpdated.insert(theFeature);
+        myUpdated[theFeature] = myModification;
     }
   }
 }
@@ -365,7 +360,7 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
     if (!aRes->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
       aRes->data()->execState(theState);
       if (theState == ModelAPI_StateDone) // feature become "done", so execution changed results
-        myJustUpdated.insert(aRes);
+        myUpdated[aRes] = myModification;
     }
     if (theFeature->data()->updateID() > aRes->data()->updateID()) {
       aRes->data()->setUpdateID(theFeature->data()->updateID());
@@ -390,6 +385,22 @@ ModelAPI_ExecState stateByReference(ObjectPtr theTarget, const ModelAPI_ExecStat
     }
   }
   return theCurrent;
+}
+
+bool Model_Update::isOlder(std::shared_ptr<ModelAPI_Feature> theFeature, 
+                           std::shared_ptr<ModelAPI_Object> theArgument)
+{
+  int aFeatureID = theFeature->data()->updateID();
+  int anArgID = theArgument->data()->updateID();
+  if (aFeatureID < anArgID)
+    return true;
+  std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator anAIter = myUpdated.find(theArgument);
+  if (anAIter == myUpdated.end())
+    return false;
+  std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator aFIter = myUpdated.find(theFeature);
+  if (aFIter == myUpdated.end())
+    return true; // argument is updated, but feature is not updated at all
+  return aFIter->second < anAIter->second;
 }
 
 void Model_Update::updateArguments(FeaturePtr theFeature) {
@@ -474,8 +485,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       bool isObligatory = !aFactory->isNotObligatory(
         theFeature->getKind(), theFeature->data()->id(aSel)) &&
         aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-      if (myJustUpdated.find(aContext) != myJustUpdated.end() ||
-          aContext->data()->updateID() > theFeature->data()->updateID()) {
+      if (isOlder(theFeature, aContext)) {
         if (aState == ModelAPI_StateDone)
           aState = ModelAPI_StateMustBeUpdated;
         if (!aSel->update()) { // this must be done on execution since it may be long operation
@@ -501,8 +511,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
           bool isObligatory = !aFactory->isNotObligatory(
             theFeature->getKind(), theFeature->data()->id(aSel)) &&
             aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-          if ((myJustUpdated.find(aContext) != myJustUpdated.end() ||
-               aContext->data()->updateID() > theFeature->data()->updateID())) {
+          if (isOlder(theFeature, aContext)) {
             if (aState == ModelAPI_StateDone)
                 aState = ModelAPI_StateMustBeUpdated;
             if (!aSelAttr->update()) {
@@ -531,10 +540,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
                theFeature->firstResult()->groupName() == ModelAPI_ResultParameter::group()) {
           if (aState == ModelAPI_StateDone)
             aState = ModelAPI_StateMustBeUpdated;
-      } else if (myJustUpdated.find(*aRefObj) != myJustUpdated.end() || 
-             (aRefObj->get() && (*aRefObj)->data()->updateID() > theFeature->data()->updateID())) {
-          if (aState == ModelAPI_StateDone)
-            aState = ModelAPI_StateMustBeUpdated;
+      } else if (aRefObj->get() && isOlder(theFeature, *aRefObj)) {
+        if (aState == ModelAPI_StateDone)
+          aState = ModelAPI_StateMustBeUpdated;
       }
       aState = stateByReference(*aRefObj, aState);
     }
@@ -547,8 +555,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     for(int a = 0; a < aCompos->numberOfSubs(); a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
       if (aSub.get() && aState == ModelAPI_StateDone) {
-        if (myJustUpdated.find(aSub) != myJustUpdated.end() || 
-              (aSub->data()->updateID() > theFeature->data()->updateID())) {
+        if (isOlder(theFeature, aSub)) {
           aState = ModelAPI_StateMustBeUpdated;
         }
         // also check that all results of subs were updated: composite also depends on the results
@@ -556,8 +563,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
         std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aResults.begin();
         for(; aResIter != aResults.end(); aResIter++) {
           if (aResIter->get() && (*aResIter)->data()->isValid() && !(*aResIter)->isDisabled() &&
-                (myJustUpdated.find(*aResIter) != myJustUpdated.end() || 
-                  ((*aResIter)->data()->updateID() > theFeature->data()->updateID()))) {
+              isOlder(theFeature, *aResIter)) {
             aState = ModelAPI_StateMustBeUpdated;
           }
         }
@@ -577,7 +583,6 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   theFeature->data()->execState(ModelAPI_StateDone);
   try {
     theFeature->execute();
-    myJustUpdated.erase(theFeature);
     if (theFeature->data()->execState() != ModelAPI_StateDone) {
       aState = ModelAPI_StateExecFailed;
     } else {
@@ -594,4 +599,123 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   }
   theFeature->data()->setUpdateID(ModelAPI_Session::get()->transactionID());
   redisplayWithResults(theFeature, aState);
+}
+
+///////////////// Updated items iterator ////////////////////////
+Model_Update::IterationItem::IterationItem(std::shared_ptr<ModelAPI_CompositeFeature> theFeature)
+{
+  myBreaked = false;
+  myIsVirtual = false;
+  myMain = theFeature;
+  myObjects = NULL;
+  if (!myMain.get() && ModelAPI_Session::get()->hasModuleDocument()) { // no document => nothing to do
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    myObjects = std::dynamic_pointer_cast<Model_Document>(aRootDoc)->objects();
+  }
+  mySkipNext = false;
+}
+
+void Model_Update::IterationItem::next()
+{
+  if (mySkipNext) { // ignore one next
+    mySkipNext = false;
+    return;
+  }
+  if (!myBreaked) {
+    if (myMain.get()) {
+      myIndex++;
+      int aNumSubs = myMain->numberOfSubs();
+      if (myIndex == aNumSubs)
+        return;
+      // skip sub-objects, that are subs not only for this: sketch elements relatively to Part
+      for(FeaturePtr aSub = myMain->subFeature(myIndex); aSub.get();
+          aSub = myMain->subFeature(myIndex)) {
+        aSub = myMain->subFeature(myIndex);
+        CompositeFeaturePtr anOwner = ModelAPI_Tools::compositeOwner(aSub);
+        if (!anOwner.get() || anOwner == myMain) {
+          break;
+        }
+        myIndex++;
+        if (myIndex == aNumSubs)
+          break;
+      }
+    } else if (mySub.get()) {
+      mySub = myObjects->nextFeature(mySub);
+    }
+  }
+}
+
+bool Model_Update::IterationItem::more()
+{
+  if (myBreaked)
+    return false;
+  if (myMain.get())
+    return myIndex < myMain->numberOfSubs();
+  return mySub.get() != NULL;
+}
+
+FeaturePtr Model_Update::IterationItem::current()
+{
+  if (myMain.get())
+    return myMain->subFeature(myIndex);
+  return mySub;
+}
+
+void Model_Update::IterationItem::setBreaked()
+{
+  if (!myIsVirtual)
+    myBreaked = true;
+}
+
+void Model_Update::IterationItem::startIteration(const bool theVirtual)
+{
+  myIsVirtual = theVirtual;
+  if (myMain.get()) {
+    myIndex = 0;
+  } else if (myObjects) {
+    mySub = myObjects->firstFeature();
+  }
+}
+
+bool Model_Update::IterationItem::isIterated(FeaturePtr theFeature)
+{
+  if (myMain.get()) {
+    if (myMain->isSub(theFeature)) {
+      CompositeFeaturePtr anOwner = ModelAPI_Tools::compositeOwner(theFeature);
+      if (!anOwner.get() || anOwner == myMain)
+        return true;
+    }
+    return false;
+  }
+  // for the root document just check that this feature in this document and it is not sub
+  return myObjects->owner() == theFeature->document() && 
+         !ModelAPI_Tools::compositeOwner(theFeature).get();
+}
+
+bool Model_Update::IterationItem::isEarlierThanCurrent(FeaturePtr theFeature)
+{
+  if (myMain.get()) {
+    for(int a = 0; a < myIndex; a++) {
+      if (myMain->subFeature(a) == theFeature)
+        return true;
+    }
+  } else {
+    return !mySub.get() && !myObjects->isLater(theFeature, mySub);
+  }
+  return false;
+}
+
+void Model_Update::IterationItem::setCurrentBefore(FeaturePtr theFeature)
+{
+  if (myMain.get()) {
+    for(int a = 0; a < myIndex; a++) {
+      if (myMain->subFeature(a) == theFeature) {
+        myIndex = a;
+        break;
+      }
+    }
+  } else {
+    mySub = theFeature;
+  }
+  mySkipNext = true;
 }

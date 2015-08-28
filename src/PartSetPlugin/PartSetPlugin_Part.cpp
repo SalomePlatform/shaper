@@ -101,7 +101,7 @@ bool PartSetPlugin_Part::isSub(ObjectPtr theObject) const
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    return document() == aDoc;
+    return theObject->document() == aDoc;
   }
   return false;
 }
