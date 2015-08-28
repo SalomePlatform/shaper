@@ -10,8 +10,8 @@ source ${a_dir}/env_standalone.sh
 if [ -f GDB ]; then
   ${INSTALL_DIR}/bin/GeomApp &
   APP_PID=$!
-  echo "Connect GDB to PID ${APP_PID}"
-  gdb --command=commands.gdb - ${APP_PID}
+  echo "Connecting GDB to PID ${APP_PID}..."
+  gdb --command=./commands.gdb - ${APP_PID}
 else
   ${INSTALL_DIR}/bin/GeomApp
 fi
