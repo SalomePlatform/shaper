@@ -42,7 +42,7 @@ bool PartSet_WidgetFileSelector::storeValueCustom() const
     return false;
 
   DataPtr aData = myFeature->data();
-  AttributeStringPtr aStringAttr = aData->string(ExchangePlugin_ExportFeature::FILE_PATH_ID());
+  AttributeStringPtr aStringAttr = aData->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID());
   aStringAttr->setValue(filterToShortFormat(mySelectedFilter).toStdString());
 
   return ModuleBase_WidgetFileSelector::storeValueCustom();
