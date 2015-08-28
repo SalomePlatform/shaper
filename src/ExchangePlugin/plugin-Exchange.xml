@@ -1,9 +1,9 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <plugin>
-  <workbench id="Features" document="Part">
+  <workbench id="Part">
     <group id="Exchange">
-      <feature id="Import" title="Import" tooltip="Import a file" icon=":icons/import.png">
+      <feature id="Import" title="Import" tooltip="Import a file" icon=":icons/import.png" document="Part">
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES" />
         </file_selector>
@@ -12,7 +12,9 @@
         <export_file_selector id="file_path" type="save" title="Export file" path="">
           <validator id="ExchangePlugin_ExportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES-5.1,IGES|IGS:IGES-5.3" />
         </export_file_selector>
-        <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="Vertices Edges Faces Solids" /> 
+        <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="Vertices Edges Faces Solids Objects">
+          <validator id="GeomValidators_PartSet"/>
+        </multi_selector>
       </feature>
     </group>
   </workbench>

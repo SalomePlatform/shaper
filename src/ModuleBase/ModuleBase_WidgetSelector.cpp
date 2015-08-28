@@ -62,12 +62,18 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
   bool aValid = false;
 
   GeomShapePtr aShape = theShape;
+
+  QIntList aShapeTypes = getShapeTypes();
+  // when the SHAPE type is provided by XML, the hole result shape can be selected.
+  if (!aShape.get() && aShapeTypes.contains(TopAbs_SHAPE)) {
+    aValid = true;
+    return aValid;
+  }
+
   if (!aShape.get() && theResult.get()) {
     if (theResult.get())
       aShape = theResult->shape();
   }
-  QIntList aShapeTypes = getShapeTypes();
-
   TopAbs_ShapeEnum aShapeType = TopAbs_SHAPE;
   if (aShape.get()) {
     // Check that the selection corresponds to selection type
@@ -76,9 +82,6 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
     // for compounds check sub-shapes: it may be compound of needed type:
     // Booleans may produce compounds of Solids
     if (aShapeType == TopAbs_COMPOUND) {
-      if (aShapeTypes.contains(aShapeType))
-        return true;
-
       aShapeType = GeomValidators_Tools::getCompoundSubType(aTopoShape);
     }
   }
