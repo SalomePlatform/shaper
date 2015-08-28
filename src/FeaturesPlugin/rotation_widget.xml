@@ -6,6 +6,7 @@
     icon=":icons/cut_shape.png"
     tooltip="Select a solid objects"
     type_choice="Objects Solids"
+    use_choice="false"
     concealment="true">
     <validator id="GeomValidators_PartSet"/>
   </multi_selector>
