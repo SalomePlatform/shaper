@@ -6,15 +6,20 @@ echo "#!/bin/bash -ex" >> env_config.sh
 
 PLATFORM=""
 if [ -f PLATFORM ]; then
-PLATFORM="$(lsb_release -is)"
-RELEASE="$(lsb_release -rs)"
-if [ "${PLATFORM}" = 'CentOS' ]; then PLATFORM=-centos
-elif [ "${PLATFORM}" = 'Debian' ]; then
-  if [ "${RELEASE}" = '8.0' ]; then PLATFORM=-d8
-  else PLATFORM=-d6
+  PLATFORM="$(lsb_release -is)"
+  RELEASE="$(lsb_release -rs)"
+  if [ "${PLATFORM}" = 'CentOS' ]; then PLATFORM=-centos
+  elif [ "${PLATFORM}" = 'Debian' ]; then
+    if [ "${RELEASE}" = '8.0' ]; then PLATFORM=-d8
+    else PLATFORM=-d6
+    fi
   fi
 fi
+
+if [ -f DEBUG ]; then
+  PLATFORM=${PLATFORM}_d
 fi
+
 echo "export PLATFORM=${PLATFORM}" >> env_config.sh
 
 main() {
