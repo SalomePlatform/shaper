@@ -111,7 +111,7 @@ void PartSet_CustomPrs::clearPrs()
   if (!anOperationPrs.IsNull())
     anOperationPrs.Nullify();
 
-  myOperationPrs = 0;
+  myOperationPrs.reset();
 }
 
 void PartSet_CustomPrs::initPrs()
