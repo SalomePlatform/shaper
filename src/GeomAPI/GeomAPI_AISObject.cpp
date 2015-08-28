@@ -411,6 +411,8 @@ bool GeomAPI_AISObject::setTransparensy(double theVal)
       isChanged = aCurrentValue != theVal;
       if (isChanged)
         aContext->SetTransparency(anAIS, theVal, false);
+    } else {
+      anAIS->SetTransparency(theVal);
     }
   }
  return isChanged;
