@@ -220,9 +220,11 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
           break;
         }
       }
+        myWorkshop->module()->customizeObject(aCurrentFeature);
     }
   }
   anOperationMgr->onValidateOperation();
+
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
 }

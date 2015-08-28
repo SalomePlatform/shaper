@@ -954,7 +954,6 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   }
   bool isCustomized = aCustomPrs.get() &&
                       aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
-  myWorkshop->module()->customizeObject(theObject);
   return isCustomized;
 }
 

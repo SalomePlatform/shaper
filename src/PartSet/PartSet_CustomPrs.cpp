@@ -71,8 +71,10 @@ void PartSet_CustomPrs::displayPresentation()
     aWorkshop->displayer()->displayAIS(myOperationPrs, false/*load object in selection*/, true);
     aContext->SetZLayer(anOperationPrs, aModule->getVisualLayerId());
   }
-  else
+  else {
     anOperationPrs->Redisplay();
+    workshop()->displayer()->updateViewer();
+  }
 }
 
 void PartSet_CustomPrs::erasePresentation()
