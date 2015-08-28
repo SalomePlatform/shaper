@@ -119,6 +119,8 @@
 :Parameter_ExpressionEditor	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='ExpressionEditor' unnamed='1' visible='1'}
 :Parameter_QLineEdit	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
 :Part_QMenu	{title='Part' type='QMenu' unnamed='1' visible='1'}
+:Partition.Main objects_QLabel	{container=':SALOME*.Partition_XGUI_PropertyPanel' text='Main objects' type='QLabel' unnamed='1' visible='1'}
+:Partition.Main objects_QListWidget	{aboveWidget=':Partition.Main objects_QLabel' container=':SALOME*.Partition_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :Partition.Tool object_QLabel	{container=':SALOME*.Partition_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
 :Partition.Tool object_QListWidget	{aboveWidget=':Partition.Tool object_QLabel' container=':SALOME*.Partition_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :Partition.property_panel_ok_QToolButton	{container=':SALOME*.Partition_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
@@ -279,6 +281,7 @@
 :_QDialog	{type='QDialog' unnamed='1' visible='1'}
 :_QExpandingLineEdit	{columnIndex='0' container=':Object browser_XGUI_DataTree' rowIndex='0' type='QExpandingLineEdit' unnamed='1' visible='1'}
 :_QMenu	{type='QMenu' unnamed='1' visible='1'}
+:_QtxMenu	{type='QtxMenu' unnamed='1' visible='1'}
 :fileNameEdit_QLineEdit	{buddy=':Save File.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :fileNameEdit_QLineEdit_2	{buddy=':Open File.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :frame.stackedWidget_QStackedWidget	{container=':splitter.frame_QFrame' name='stackedWidget' type='QStackedWidget' visible='1'}
