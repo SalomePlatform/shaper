@@ -17,6 +17,11 @@ bool ModelAPI_ShapeValidator::isValid(const AttributePtr& theAttribute,
   AttributeSelectionPtr aSelectionAttribute = 
                      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   GeomShapePtr aShape = aSelectionAttribute->value();
+  if (!aShape.get()) {
+    ResultPtr aResult = aSelectionAttribute->context();
+    if (aResult.get())
+      aShape = aResult->shape();
+  }
 
   std::string aCurrentAttributeId = theAttribute->id();
   // get all feature attributes
@@ -28,11 +33,19 @@ bool ModelAPI_ShapeValidator::isValid(const AttributePtr& theAttribute,
       AttributePtr anAttribute = *anAttr;
       // take into concideration only other attributes
       if (anAttribute.get() != NULL && anAttribute->id() != aCurrentAttributeId) {
-        AttributeSelectionPtr aSelectionAttribute = 
+        aSelectionAttribute = 
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttribute);
         // the shape of the attribute should be not the same
-        if (aSelectionAttribute.get() != NULL && aShape->isEqual(aSelectionAttribute->value())) {
-          return false;
+        if (aSelectionAttribute.get() != NULL) {
+          GeomShapePtr anAttrShape = aSelectionAttribute->value();
+          if (!anAttrShape.get()) {
+            ResultPtr aResult = aSelectionAttribute->context();
+            if (aResult.get())
+              anAttrShape = aResult->shape();
+            }
+            if (aShape->isEqual(anAttrShape)) {
+            return false;
+          }
         }
       }
     }

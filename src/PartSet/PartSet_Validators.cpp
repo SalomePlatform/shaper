@@ -320,37 +320,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
       }
     }
   }
-  return !featureHasReferences(theAttribute);
-}
-
-bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr& theAttribute) const
-{
-  std::list<std::pair<std::string, std::list<ObjectPtr> > > allRefs;
-  if (theAttribute->owner().get() && theAttribute->owner()->data()->isValid())
-    theAttribute->owner()->data()->referencesToObjects(allRefs);
-  // collect object referenced by theAttribute
-  std::list<ObjectPtr>* anAttrObjs = 0;
-  std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefIter = allRefs.begin();
-  for(; aRefIter != allRefs.end(); aRefIter++) {
-    if (theAttribute->id() == aRefIter->first)
-      anAttrObjs = &(aRefIter->second);
-  }
-  if (!anAttrObjs || anAttrObjs->empty())
-    return false; // theAttribute does not references to anything
-  // check with all others
-  for(aRefIter = allRefs.begin(); aRefIter != allRefs.end(); aRefIter++) {
-    if (theAttribute->id() == aRefIter->first)
-      continue; // do not check with myself
-    std::list<ObjectPtr>::iterator aReferenced = aRefIter->second.begin();
-    for(; aReferenced != aRefIter->second.end(); aReferenced++) {
-      std::list<ObjectPtr>::iterator aReferencedByMe = anAttrObjs->begin();
-      for(; aReferencedByMe != anAttrObjs->end(); aReferencedByMe++) {
-        if (*aReferenced == *aReferencedByMe) // found same objects!
-          return true;
-      }
-    }
-  }
-  return false;
+  return true;
 }
 
 bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,

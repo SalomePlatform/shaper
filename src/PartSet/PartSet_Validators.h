@@ -122,12 +122,6 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;
-
-protected:
-  //! Checks whethe other feature attributes has a reference to the given attribute
-  //! \param theAttribute a source attribute to find object
-  //! \return a boolean value
-  bool featureHasReferences(const AttributePtr& theAttribute) const;
 };
 
 /**
