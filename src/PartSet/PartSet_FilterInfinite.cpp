@@ -53,7 +53,7 @@ Standard_Boolean PartSet_FilterInfinite::IsOk(const Handle(SelectMgr_EntityOwner
     }
   }
 #ifdef DEBUG_FILTERS
-  qDebug(QString("ModuleBase_ShapeDocumentFilter::IsOk = %1").arg(aValid).toStdString().c_str());
+  qDebug(QString("PartSet_FilterInfinite::IsOk = %1").arg(aValid).toStdString().c_str());
 #endif
   return aValid;
 }

@@ -1,21 +1,20 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomValidators_PartSet.h
+// File:        GeomValidators_Finite.h
 // Created:     27 Aug 2015
 // Author:      Natalia ERMOLAEVA
 
-#ifndef GeomValidators_PartSet_H
-#define GeomValidators_PartSet_H
+#ifndef GeomValidators_Finite_H
+#define GeomValidators_Finite_H
 
 #include <GeomValidators.h>
 #include <ModelAPI_AttributeValidator.h>
 
 /**
 * \ingroup Validators
-* A validator for partset document. When PartSet is active, the attribute can accept only
-* shape, which coincide to the shape of result.
+* A validator for finite objects. It returns false for construction infinite results.
 */
-class GeomValidators_PartSet : public ModelAPI_AttributeValidator
+class GeomValidators_Finite : public ModelAPI_AttributeValidator
 {
 public:
   //! returns true if attribute is valid

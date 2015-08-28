@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
     GeomValidators_BooleanArguments.h
     GeomValidators_ConstructionComposite.h
     GeomValidators_Face.h
+    GeomValidators_Finite.h
     GeomValidators_PartSet.h
     GeomValidators_Positive.h
     GeomValidators_ShapeType.h
@@ -19,6 +20,7 @@ SET(PROJECT_SOURCES
     GeomValidators_BooleanArguments.cpp
     GeomValidators_ConstructionComposite.cpp
     GeomValidators_Face.cpp
+    GeomValidators_Finite.cpp
     GeomValidators_PartSet.cpp
     GeomValidators_Positive.cpp
     GeomValidators_ShapeType.cpp
