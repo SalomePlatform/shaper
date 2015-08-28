@@ -5,10 +5,8 @@
     label="Main objects"
     icon=":icons/cut_shape.png"
     tooltip="Select a solid objects"
-    type_choice="Objects Solids"
-    use_choice="false"
+    type_choice=""
     concealment="true">
-    <validator id="GeomValidators_PartSet"/>
   </multi_selector>
   <shape_selector id="axis_object"
                   icon=":icons/axis.png"

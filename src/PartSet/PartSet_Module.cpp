@@ -36,7 +36,6 @@
 #include <ModuleBase_OperationFeature.h>
 
 #include <GeomValidators_ShapeType.h>
-#include <GeomValidators_PartSet.h>
 #include <GeomValidators_Finite.h>
 #include <GeomValidators_Face.h>
 #include <GeomValidators_ConstructionComposite.h>
@@ -209,8 +208,6 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
-
-  aFactory->registerValidator("GeomValidators_PartSet", new GeomValidators_PartSet);
 
   aFactory->registerValidator("GeomValidators_Finite", new GeomValidators_Finite);
 

@@ -77,14 +77,15 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();
-  QStringList aShapeTypes = aTypesStr.split(' ');
+  QStringList aShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
 
   myIsUseChoice = theData->getBooleanAttribute("use_choice", true);
 
-  myTypeCombo->addItems(aShapeTypes);
+  if (!aShapeTypes.empty())
+    myTypeCombo->addItems(aShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
   // if the xml definition contains one type, the controls to select a type should not be shown
-  if (aShapeTypes.size() == 1 || !myIsUseChoice) {
+  if (aShapeTypes.size() <= 1 || !myIsUseChoice) {
     aTypeLabel->setVisible(false);
     myTypeCombo->setVisible(false);
   }
@@ -94,7 +95,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                       : tr("Selected objects:"), this);
   aMainLay->addWidget(aListLabel, 1, 0);
   // if the xml definition contains one type, an information label should be shown near to the latest
-  if (aShapeTypes.size() == 1) {
+  if (aShapeTypes.size() <= 1) {
     QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
     if (!aLabelIcon.isEmpty()) {
       QLabel* aSelectedLabel = new QLabel("", this);

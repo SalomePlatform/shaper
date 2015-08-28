@@ -64,6 +64,10 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
   GeomShapePtr aShape = theShape;
 
   QIntList aShapeTypes = getShapeTypes();
+  if (aShapeTypes.empty()) {
+    aValid = true;
+    return aValid;
+  }
   // when the SHAPE type is provided by XML, the hole result shape can be selected.
   if (!aShape.get() && aShapeTypes.contains(TopAbs_SHAPE)) {
     aValid = true;
