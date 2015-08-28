@@ -80,6 +80,7 @@
     tooltip="Objects to Fuse"
     type_choice="Solids"
     concealment="true">
+    <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,ByAngles,to_angle,from_angle,to_object,to_offset,from_object,from_offset"/>
 </source>

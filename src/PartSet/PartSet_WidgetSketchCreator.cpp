@@ -198,11 +198,12 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
         ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
         AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
         std::string aValidatorID, anError;
-        if (aFactory->validate(anAttribute, aValidatorID, anError)) {
-          AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
-          aSelList->append(aRes, GeomShapePtr());
+        AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
+        aSelList->append(aRes, GeomShapePtr());
+        if (aFactory->validate(anAttribute, aValidatorID, anError))
           updateObject(aCompFeature);
-        }
+        else
+          aSelList->clear();
       }
     }
   }
