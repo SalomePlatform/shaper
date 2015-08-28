@@ -157,6 +157,8 @@ Q_OBJECT
   /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();
 
+  void onAbortAllOperations( bool& );
+
  protected:
    /// Create data model
   CAM_DataModel* createDataModel();

@@ -123,7 +123,10 @@ void NewGeom_Module::initialize(CAM_Application* theApp)
   myWorkshop->startApplication();
   LightApp_Application* anApp = dynamic_cast<LightApp_Application*>(theApp);
   if (anApp)
+  {
     connect(anApp, SIGNAL(preferenceResetToDefaults()), this, SLOT(onDefaultPreferences()));
+    connect(anApp, SIGNAL(abortAllOperations( bool& )), this, SLOT(onAbortAllOperations( bool& )));
+  }
 }
 
 //******************************************************
@@ -621,4 +624,9 @@ void NewGeom_Module::inspectSalomeModules()
   foreach(QString eachModule, aModuleNames) {
     Config_ModuleReader::addDependencyModule(eachModule.toStdString());
   }
+}
+
+void NewGeom_Module::onAbortAllOperations( bool& isNextOperationAllowed )
+{
+  isNextOperationAllowed = workshop()->operationMgr()->abortAllOperations();
 }
