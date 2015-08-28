@@ -38,6 +38,8 @@
 :Delete features.No_QPushButton	{text='No' type='QPushButton' unnamed='1' visible='1' window=':Delete features_QMessageBox'}
 :Delete features._QLabel	{name='qt_msgbox_label' type='QLabel' visible='1' window=':Delete features_QMessageBox'}
 :Delete features_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Delete features'}
+:Direction.End point_QGroupBox	{container=':Translation.Direction_ModuleBase_PageGroupBox' title='End point' type='QGroupBox' unnamed='1' visible='1'}
+:Direction.Start point_QGroupBox	{container=':Translation.Direction_ModuleBase_PageGroupBox' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
 :Distance.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
 :Distance.property_panel_cancel_QToolButton	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Distance.property_panel_ok_QToolButton	{container=':SALOME*.Distance_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
@@ -50,6 +52,7 @@
 :End point.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.End point_QGroupBox' leftWidget=':End point.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :End point.Y _QLabel	{container=':Line.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :End point.Y _QLabel_2	{container=':Arc.End point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:End point.qt_spinbox_lineedit_QLineEdit	{container=':Direction.End point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Equal.First object_QLabel	{container=':SALOME*.Equal_XGUI_PropertyPanel' text='First object' type='QLabel' unnamed='1' visible='1'}
 :Equal.First object_QLineEdit	{container=':SALOME*.Equal_XGUI_PropertyPanel' leftWidget=':Equal.First object_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :Equal.Second object_QLabel	{container=':SALOME*.Equal_XGUI_PropertyPanel' text='Second object' type='QLabel' unnamed='1' visible='1'}
@@ -222,6 +225,7 @@
 :SALOME*.Sketch_QToolButton	{text='Sketch' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QtxToolBar	{name='Sketch' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
 :SALOME*.Sketch_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
+:SALOME*.Translation_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Translation'}
 :SALOME*.Vertical_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Vertical'}
 :SALOME*_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QToolButton	{occurrence='19' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
@@ -242,6 +246,7 @@
 :Start point.Y _ModuleBase_ParamSpinBox_2	{container=':Arc.Start point_QGroupBox' leftWidget=':Start point.Y _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Start point.Y _QLabel	{container=':Line.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Start point.Y _QLabel_2	{container=':Arc.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
+:Start point.qt_spinbox_lineedit_QLineEdit	{container=':Direction.Start point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
@@ -249,6 +254,12 @@
 :To_QLineEdit_2	{container=':Revolution.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :To_QLineEdit_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
 :To_QLineEdit_4	{container=':Revolution.To_ModuleBase_PageGroupBox_3' type='QLineEdit' unnamed='1' visible='1'}
+:Translation.Direction_ModuleBase_PageGroupBox	{container=':SALOME*.Translation_XGUI_PropertyPanel' title='Direction' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Translation.MultiTranslationCopies_QSpinBox	{container=':SALOME*.Translation_XGUI_PropertyPanel' name='MultiTranslationCopies' type='QSpinBox' visible='1'}
+:Translation.Segments:_QLabel	{container=':SALOME*.Translation_XGUI_PropertyPanel' text='Segments:' type='QLabel' unnamed='1' visible='1'}
+:Translation.Segments:_QListWidget	{aboveWidget=':Translation.Segments:_QLabel' container=':SALOME*.Translation_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Translation.property_panel_ok_QToolButton	{container=':SALOME*.Translation_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Translation.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Translation_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='5' type='QLineEdit' visible='1'}
 :Vertical.property_panel_cancel_QToolButton	{container=':SALOME*.Vertical_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Warning.Yes_QPushButton	{text='Yes' type='QPushButton' unnamed='1' visible='1' window=':Warning_QMessageBox'}
 :Warning_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Warning'}
