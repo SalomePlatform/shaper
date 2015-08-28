@@ -12,6 +12,9 @@
 :Arc.Start point_QGroupBox	{container=':SALOME*.Arc_XGUI_PropertyPanel' title='Start point' type='QGroupBox' unnamed='1' visible='1'}
 :Arc.property_panel_cancel_QToolButton	{container=':SALOME*.Arc_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Arc.property_panel_ok_QToolButton	{container=':SALOME*.Arc_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Axis.property_panel_cancel_QToolButton	{container=':SALOME*.Axis_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:Axis.property_panel_ok_QToolButton	{container=':SALOME*.Axis_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Axis_QLineEdit	{container=':SALOME*.Axis_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
 :Boolean.Main objects_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Main objects' type='QLabel' unnamed='1' visible='1'}
 :Boolean.Main objects_QListWidget	{aboveWidget=':Boolean.Main objects_QLabel' container=':SALOME*.Boolean_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :Boolean.Tool object_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
@@ -131,7 +134,11 @@
 :Perpendicular.property_panel_cancel_QToolButton	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Perpendicular.property_panel_ok_QToolButton	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Perpendicular_ModuleBase_PageWidget	{container=':SALOME*.Perpendicular_XGUI_PropertyPanel' type='ModuleBase_PageWidget' unnamed='1' visible='1'}
+:Plane.Plane face_QLabel	{container=':SALOME*.Plane_XGUI_PropertyPanel' text='Plane face' type='QLabel' unnamed='1' visible='1'}
+:Plane.Plane face_QLineEdit	{container=':SALOME*.Plane_XGUI_PropertyPanel' leftWidget=':Plane.Plane face_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:Plane.distance_ModuleBase_ParamSpinBox	{container=':SALOME*.Plane_XGUI_PropertyPanel' name='distance' type='ModuleBase_ParamSpinBox' visible='1'}
 :Plane.property_panel_ok_QToolButton	{container=':SALOME*.Plane_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Plane.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Plane_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Point.Auxiliary_QCheckBox	{container=':SALOME*.Point_XGUI_PropertyPanel' text='Auxiliary' type='QCheckBox' unnamed='1' visible='1'}
 :Point.Point_QGroupBox	{container=':SALOME*.Point_XGUI_PropertyPanel' title='Point' type='QGroupBox' unnamed='1' visible='1'}
 :Point.X _ModuleBase_ParamSpinBox	{container=':Point.Point_QGroupBox' leftWidget=':Point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
@@ -140,7 +147,12 @@
 :Point.Y _QLabel	{container=':Point.Point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Point.property_panel_cancel_QToolButton	{container=':SALOME*.Point_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Point.property_panel_ok_QToolButton	{container=':SALOME*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Point.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Point_XGUI_PropertyPanel' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Point.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Point_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:Point.qt_spinbox_lineedit_QLineEdit_3	{container=':SALOME*.Point_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='3' type='QLineEdit' visible='1'}
 :Point.x_ModuleBase_ParamSpinBox	{container=':SALOME*.Point_XGUI_PropertyPanel' name='x' type='ModuleBase_ParamSpinBox' visible='1'}
+:Point.y_ModuleBase_ParamSpinBox	{container=':SALOME*.Point_XGUI_PropertyPanel' name='y' type='ModuleBase_ParamSpinBox' visible='1'}
+:Point.z_ModuleBase_ParamSpinBox	{container=':SALOME*.Point_XGUI_PropertyPanel' name='z' type='ModuleBase_ParamSpinBox' visible='1'}
 :Point_QFrame	{container=':SALOME*.Point_XGUI_PropertyPanel' type='QFrame' unnamed='1' visible='1'}
 :Radius.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
 :Radius.property_panel_cancel_QToolButton	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
@@ -198,6 +210,7 @@
 :SALOME*.3D View Operations_OCCViewer_ViewPort3d	{aboveWidget=':SALOME*.3D View Operations_QtxToolBar' type='OCCViewer_ViewPort3d' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.3D View Operations_QtxToolBar	{name='OCCViewer3DViewOperations' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='3D View Operations'}
 :SALOME*.Arc_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Arc'}
+:SALOME*.Axis_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Axis'}
 :SALOME*.Boolean_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Boolean'}
 :SALOME*.Circle_QToolButton	{text='Circle' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Circle'}

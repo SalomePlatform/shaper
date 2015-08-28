@@ -373,6 +373,41 @@ def partition(main_objects, tool_object):
     mouseClick(waitForObject(":Partition.Tool object_QListWidget"), 116, 69, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), tool_object[0], tool_object[1], 0, Qt.LeftButton)
     clickButton(waitForObject(":Partition.property_panel_ok_QToolButton"))
+    
+def plane(point, distance):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Construction"))
+    mouseClick(waitForObjectItem(":_QMenu", "Plane"))
+    
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+
+    type(waitForObject(":Plane.distance_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Plane.distance_ModuleBase_ParamSpinBox"), 100)
+
+    clickButton(waitForObject(":Plane.property_panel_ok_QToolButton"))
+    
+def point(x, y, z):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Construction"))
+    mouseClick(waitForObjectItem(":_QMenu", "Point"))
+    
+    type(waitForObject(":Point.x_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Point.x_ModuleBase_ParamSpinBox"), x)
+    
+    type(waitForObject(":Point.y_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Point.y_ModuleBase_ParamSpinBox"), y)
+    
+    type(waitForObject(":Point.z_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
+    type(waitForObject(":Point.z_ModuleBase_ParamSpinBox"), z)
+    
+    clickButton(waitForObject(":Point.property_panel_ok_QToolButton"))
+    
+def axis(point_1, point_2):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Construction"))
+    mouseClick(waitForObjectItem(":_QMenu", "Axis"))
+    
+    mouseDrag(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_1[0]-40, point_1[1]-40, 80, 80, 1, Qt.LeftButton)
+    mouseDrag(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0]-40, point_2[1]-40, 80, 80, 1, Qt.LeftButton)
+    
+    clickButton(waitForObject(":Axis.property_panel_ok_QToolButton"))
         
 
 
