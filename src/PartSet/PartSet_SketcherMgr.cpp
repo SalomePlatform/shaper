@@ -911,6 +911,28 @@ bool PartSet_SketcherMgr::canCommitOperation() const
   return aCanCommit;
 }
 
+bool PartSet_SketcherMgr::canEraseObject(const ObjectPtr& theObject) const
+{
+  bool aCanErase = true;
+  // when the sketch operation is active, results of sketch sub-feature can not be hidden
+  if (myCurrentSketch.get()) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get()) {
+      // Display sketcher objects
+      for (int i = 0; i < myCurrentSketch->numberOfSubs() && aCanErase; i++) {
+
+        FeaturePtr aFeature = myCurrentSketch->subFeature(i);
+        std::list<ResultPtr> aResults = aFeature->results();
+        std::list<ResultPtr>::const_iterator anIt;
+        for (anIt = aResults.begin(); anIt != aResults.end() && aCanErase; ++anIt) {
+          aCanErase = *anIt != aResult;
+        }
+      }
+    }
+  }
+  return aCanErase;
+}
+
 bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = true;

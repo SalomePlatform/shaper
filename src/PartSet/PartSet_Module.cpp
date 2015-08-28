@@ -363,6 +363,12 @@ bool PartSet_Module::canCommitOperation() const
   return mySketchMgr->canCommitOperation();
 }
 
+bool PartSet_Module::canEraseObject(const ObjectPtr& theObject) const
+{
+  // the sketch manager put the restriction to the objects erase
+  return mySketchMgr->canEraseObject(theObject);
+}
+
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects display

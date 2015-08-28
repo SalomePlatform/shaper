@@ -139,6 +139,11 @@ public:
   /// \return a boolean value
   bool canCommitOperation() const;
 
+  /// Returns whether the object can be erased at the bounds of the active operation.
+  /// Sketch sub-entities can not be erased during the sketch operation
+  /// \param theObject a model object
+  bool canEraseObject(const ObjectPtr& theObject) const;
+
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation

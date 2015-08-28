@@ -995,8 +995,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
   else if (theId == "HIDEALL_CMD") {
     QObjectPtrList aList = myDisplayer->displayedObjects();
-    foreach (ObjectPtr aObj, aList)
-      aObj->setDisplayed(false);
+    foreach (ObjectPtr aObj, aList) {
+      if (module()->canEraseObject(aObj))
+        aObj->setDisplayed(false);
+    }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
 }
@@ -1432,8 +1434,10 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 {
   // Hide all displayed objects
   QObjectPtrList aList = myDisplayer->displayedObjects();
-  foreach (ObjectPtr aObj, aList)
-    aObj->setDisplayed(false);
+  foreach (ObjectPtr aObj, aList) {
+    if (module()->canEraseObject(aObj))
+      aObj->setDisplayed(false);
+  }
 
   // Show only objects from the list
   foreach (ObjectPtr aObj, theList) {

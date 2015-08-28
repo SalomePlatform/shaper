@@ -130,6 +130,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \return a boolean value
   virtual bool canCommitOperation() const;
 
+  /// Returns whether the object can be erased. The default realization returns true.
+  /// \param theObject a model object
+  virtual bool canEraseObject(const ObjectPtr& theObject) const;
+
   /// Returns whether the object can be displayed. The default realization returns true.
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;

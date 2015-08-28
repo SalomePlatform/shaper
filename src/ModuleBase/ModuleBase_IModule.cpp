@@ -115,6 +115,11 @@ void ModuleBase_IModule::actionCreated(QAction* theFeature)
   connect(theFeature, SIGNAL(triggered(bool)), this, SLOT(onFeatureTriggered()));
 }
 
+bool ModuleBase_IModule::canEraseObject(const ObjectPtr& theObject) const
+{
+  return true;
+}
+
 bool ModuleBase_IModule::canDisplayObject(const ObjectPtr& theObject) const
 {
   return true;

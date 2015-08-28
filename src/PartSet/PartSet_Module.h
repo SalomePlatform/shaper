@@ -110,6 +110,11 @@ public:
   /// \return a boolean value
   virtual bool canCommitOperation() const;
 
+  /// Returns whether the object can be erased at the bounds of the active operation.
+  /// The sub-objects of the current operation can not be erased
+  /// \param theObject a model object
+  virtual bool canEraseObject(const ObjectPtr& theObject) const;
+
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation
