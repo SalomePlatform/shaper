@@ -19,6 +19,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Validator.h>
 
 #include <SketchPlugin_SketchEntity.h>
 #include <FeaturesPlugin_CompositeBoolean.h>
@@ -192,10 +193,16 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       ResultPtr aRes = aSelAttr->context();
       GeomShapePtr aShape = aSelAttr->value();
       if (aRes.get()) {
-        AttributeSelectionListPtr aSelList = 
-          aCompFeature->data()->selectionList(FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID());
-        aSelList->append(aRes, GeomShapePtr());
-        updateObject(aCompFeature);
+        std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
+        SessionPtr aMgr = ModelAPI_Session::get();
+        ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+        AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
+        std::string aValidatorID, anError;
+        if (aFactory->validate(anAttribute, aValidatorID, anError)) {
+          AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
+          aSelList->append(aRes, GeomShapePtr());
+          updateObject(aCompFeature);
+        }
       }
     }
   }
