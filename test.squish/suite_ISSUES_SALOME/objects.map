@@ -19,6 +19,7 @@
 :Boolean.Type_QComboBox	{container=':SALOME*.Boolean_XGUI_PropertyPanel' leftWidget=':Boolean.Type_QLabel' type='QComboBox' unnamed='1' visible='1'}
 :Boolean.Type_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Type' type='QLabel' unnamed='1' visible='1'}
 :Boolean.property_panel_ok_QToolButton	{container=':SALOME*.Boolean_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Center of rotation.qt_spinbox_lineedit_QLineEdit	{container=':Rotation.Center of rotation_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Center.X _ModuleBase_ParamSpinBox	{container=':Circle.Center_QGroupBox' leftWidget=':Center.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Center.X _ModuleBase_ParamSpinBox_2	{container=':Arc.Center_QGroupBox' leftWidget=':Center.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Center.X _QLabel	{container=':Circle.Center_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
@@ -178,6 +179,14 @@
 :Revolution_QToolButton_3	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
 :Revolution_QToolButton_4	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' type='QToolButton' unnamed='1' visible='1'}
 :Revolution_QToolButton_5	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Rotation.Center of rotation_QGroupBox	{container=':SALOME*.Rotation_XGUI_PropertyPanel' title='Center of rotation' type='QGroupBox' unnamed='1' visible='1'}
+:Rotation.MultiRotationAngle_ModuleBase_ParamSpinBox	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='MultiRotationAngle' type='ModuleBase_ParamSpinBox' visible='1'}
+:Rotation.MultiRotationCopies_QSpinBox	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='MultiRotationCopies' type='QSpinBox' visible='1'}
+:Rotation.Segments:_QLabel	{container=':SALOME*.Rotation_XGUI_PropertyPanel' text='Segments:' type='QLabel' unnamed='1' visible='1'}
+:Rotation.Segments:_QListWidget	{aboveWidget=':Rotation.Segments:_QLabel' container=':SALOME*.Rotation_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Rotation.property_panel_ok_QToolButton	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
+:Rotation.qt_spinbox_lineedit_QLineEdit	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='3' type='QLineEdit' visible='1'}
+:Rotation.qt_spinbox_lineedit_QLineEdit_2	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='qt_spinbox_lineedit' occurrence='4' type='QLineEdit' visible='1'}
 :SALOME*.+OX_QToolButton	{text='+OX' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.+OY_QToolButton	{text='+OY' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.+OZ_QToolButton	{text='+OZ' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
@@ -221,10 +230,12 @@
 :SALOME*.RevolutionCut_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='RevolutionCut'}
 :SALOME*.RevolutionFuse_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='RevolutionFuse'}
 :SALOME*.Revolution_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Revolution'}
+:SALOME*.Rotation_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Rotation'}
 :SALOME*.SketchPoint_QToolButton	{container=':SALOME*.Sketch_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QToolButton	{text='Sketch' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QtxToolBar	{name='Sketch' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
 :SALOME*.Sketch_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Sketch'}
+:SALOME*.Tangent_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Tangent'}
 :SALOME*.Translation_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Translation'}
 :SALOME*.Vertical_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Vertical'}
 :SALOME*_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
@@ -247,6 +258,7 @@
 :Start point.Y _QLabel	{container=':Line.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Start point.Y _QLabel_2	{container=':Arc.Start point_QGroupBox' text='Y ' type='QLabel' unnamed='1' visible='1'}
 :Start point.qt_spinbox_lineedit_QLineEdit	{container=':Direction.Start point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
+:Tangent.property_panel_cancel_QToolButton	{container=':SALOME*.Tangent_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}

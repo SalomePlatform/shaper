@@ -353,6 +353,15 @@ def change_radius(point, value):
     type(waitForObject(":Radius.ConstraintValue_ModuleBase_ParamSpinBox"), value)
 
     clickButton(waitForObject(":Radius.property_panel_ok_QToolButton"))
+    
+def tangent(point_1, point_2):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Tangent"))
+    
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_1[0], point_1[1], 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point_2[0], point_2[1], 0, Qt.LeftButton) 
+
+    clickButton(waitForObject(":Tangent.property_panel_cancel_QToolButton"))
         
 
 
