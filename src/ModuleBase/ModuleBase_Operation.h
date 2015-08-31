@@ -63,14 +63,6 @@ Q_OBJECT
   /// \param theList an ids
   void setGrantedOperationIds(const QStringList& theList);
 
-  /// Appends an operation index to be granted
-  /// \param theId an index
-  void addGrantedOperationId(const QString& theId);
-
-  /// Removes an operation index from the granted
-  /// \param theId an index
-  void removeGrantedOperationId(const QString& theId);
-
   /// Must return true if this operation can be launched as nested for any current operation
   /// and it is not necessary to check this operation on validity. By default 
   /// the operation is not granted.

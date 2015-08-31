@@ -63,6 +63,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationFeature.h>
+#include <ModuleBase_OperationAction.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -375,7 +376,7 @@ void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const boo
 //******************************************************
 void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
 {
-  setNestedFeatures(theOperation);
+  setGrantedFeatures(theOperation);
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                                (theOperation);
@@ -416,7 +417,7 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
 //******************************************************
 void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 {
-  setNestedFeatures(theOperation);
+  setGrantedFeatures(theOperation);
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     setPropertyPanel(theOperation);
@@ -430,6 +431,8 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
+  updateCommandStatus();
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                         (theOperation);
   if (!aFOperation)
@@ -438,7 +441,6 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   ModuleBase_ISelection* aSel = mySelector->selection();
   QObjectPtrList aObj = aSel->selectedPresentations();
   //!< No need for property panel
-  updateCommandStatus();
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
@@ -474,16 +476,19 @@ void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
   myModule->onOperationAborted(theOperation);
 }
 
-void XGUI_Workshop::setNestedFeatures(ModuleBase_Operation* theOperation)
+void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
 
+  QStringList aGrantedIds;
   if (isSalomeMode())
-    aFOperation->setGrantedOperationIds(mySalomeConnector->nestedActions(theOperation->id()));
+    aGrantedIds = mySalomeConnector->nestedActions(theOperation->id());
   else
-    aFOperation->setGrantedOperationIds(myActionsMgr->nestedCommands(theOperation->id()));
+    aGrantedIds = myActionsMgr->nestedCommands(theOperation->id());
+
+  aFOperation->setGrantedOperationIds(aGrantedIds);
 }
 
 void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
@@ -530,7 +535,7 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
   QApplication::restoreOverrideCursor();
 }
 
-bool XGUI_Workshop::isActiveOperationAborted()
+bool XGUI_Workshop::abortAllOperations()
 {
   return myOperationMgr->abortAllOperations();
 }
@@ -578,7 +583,7 @@ void XGUI_Workshop::onNew()
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  if(!isActiveOperationAborted())
+  if(!abortAllOperations())
     return;
   //save current file before close if modified
   SessionPtr aSession = ModelAPI_Session::get();
@@ -618,7 +623,7 @@ void XGUI_Workshop::onOpen()
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(!isActiveOperationAborted())
+  if(!abortAllOperations())
     return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
@@ -634,7 +639,7 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
-  if(!isActiveOperationAborted())
+  if(!abortAllOperations())
     return false;
   QFileDialog dialog(mainWindow());
   dialog.setWindowTitle(tr("Select directory to save files..."));
@@ -750,6 +755,15 @@ void XGUI_Workshop::onPreferences()
           myMainWindow->menuObject()->updateFromResources();
       }
     }
+    // redisplay objects visualized in the viewer
+    static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+    QObjectPtrList aDisplayed = displayer()->displayedObjects();
+    QObjectPtrList::const_iterator anIt = aDisplayed.begin(), aLast = aDisplayed.end();
+    for (; anIt != aLast; anIt++) {
+      aECreator->sendUpdated(*anIt, EVENT_DISP);
+    }
+    Events_Loop::loop()->flush(EVENT_DISP);
   }
 }
 
@@ -1013,7 +1027,7 @@ void XGUI_Workshop::deleteObjects()
     return;
   }
 
-  if (!isActiveOperationAborted())
+  if (!abortAllOperations())
     return;
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   // It is necessary to clear selection in order to avoid selection changed event during
@@ -1041,39 +1055,24 @@ void XGUI_Workshop::deleteObjects()
     aObjectNames << QString::fromStdString(aObj->data()->name());
   }
   aDescription = aDescription.arg(aObjectNames.join(", "));
+  ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
 
-  SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->startOperation(aDescription.toStdString());
-  // 2. close the documents of the removed parts if the result part is in a list of selected objects
-  // this is performed in the RemoveFeature of Part object.
-  /*foreach (ObjectPtr aObj, anObjects)
-  {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-    if (aPart) {
-      DocumentPtr aDoc = aObj->document();
-      if (aDoc == aMgr->activeDocument()) {
-        aDoc->close();
-      }
-    }
-  }*/
+  operationMgr()->startOperation(anOpAction);
   // 3. delete objects
   QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   std::set<FeaturePtr> anIgnoredFeatures;
   if (deleteFeatures(anObjects, anIgnoredFeatures, aDesktop, true)) {
-    myDisplayer->updateViewer();
-    aMgr->finishOperation();
-    operationMgr()->updateApplyOfOperations();
-    updateCommandStatus();
+    operationMgr()->commitOperation();
   }
   else {
-    aMgr->abortOperation();
+    operationMgr()->abortOperation(operationMgr()->currentOperation());
   }
 }
 
 //**************************************************************
 void XGUI_Workshop::moveObjects()
 {
-  if (!isActiveOperationAborted())
+  if (!abortAllOperations())
     return;
 
   SessionPtr aMgr = ModelAPI_Session::get();

@@ -290,12 +290,13 @@ bool XGUI_OperationMgr::isGrantedOperation(ModuleBase_Operation* theOperation)
   return isGranted;
 }
 
-bool XGUI_OperationMgr::canStartOperation(QString theId)
+bool XGUI_OperationMgr::canStartOperation(const QString& theId, const bool isAdditionallyGranted)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
-    if (!aCurrentOp->isGranted(theId)) {
+    bool aGranted = aCurrentOp->isGranted(theId) || isAdditionallyGranted;
+    if (!aGranted) {
       if (canStopOperation(aCurrentOp)) {
         if (myIsApplyEnabled && aCurrentOp->isModified())
           aCurrentOp->commit();

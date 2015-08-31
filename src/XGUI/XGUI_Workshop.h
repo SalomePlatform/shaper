@@ -214,7 +214,7 @@ Q_OBJECT
    * - operation aborted successfully
    * - there is no active operation
    */
-  bool isActiveOperationAborted();
+  bool abortAllOperations();
 
   //! Delete features. Delete the referenced features. There can be a question with a list of referenced
   //! objects.
@@ -304,9 +304,10 @@ signals:
   void closeDocument();
 
  protected:
-  /// Find the nested features and set them into the operation
+  /// Sets the granted operations for the parameter operation. Firtsly, it finds the nested features
+  /// and set them into the operation. Secondly, it asks the module about ids of granted operations.
   /// \param theOperation an operation
-  void setNestedFeatures(ModuleBase_Operation* theOperation);
+   void setGrantedFeatures(ModuleBase_Operation* theOperation);
 
   /// Update the property panel content by the XML description of the operation and set the panel
   /// into the operation

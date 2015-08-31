@@ -60,16 +60,6 @@ void ModuleBase_Operation::setGrantedOperationIds(const QStringList& theList)
   myGrantedIds = theList;
 }
 
-void ModuleBase_Operation::addGrantedOperationId(const QString& theId)
-{
-  myGrantedIds.append(theId);
-}
-
-void ModuleBase_Operation::removeGrantedOperationId(const QString& theId)
-{
-  myGrantedIds.removeAll(theId);
-}
-
 QString ModuleBase_Operation::id() const
 {
   return getDescription()->operationId();

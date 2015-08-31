@@ -22,6 +22,7 @@
 
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_OperationFeature.h>
 
 #include <XGUI_ModuleConnector.h>
@@ -29,6 +30,7 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_DataModel.h>
 #include <XGUI_ObjectsBrowser.h>
+#include <XGUI_OperationMgr.h>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -306,15 +308,21 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
     XGUI_Workshop* aWorkshop = aConnector->workshop();
     ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
-    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-      anOperation->abort();
 
-    SessionPtr aMgr = ModelAPI_Session::get();
+    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(
+                                   tr("Detach %1").arg(aLine->data()->name().c_str()), myModule);
+    bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
+    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
+    // the active nested sketch operation should be aborted unconditionally
+    // the Delete action should be additionally granted for the Sketch operation
+    // in order to do not abort/commit it
+    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+      return; // the objects are processed but can not be deleted
 
-    QString aName = tr("Detach %1").arg(aLine->data()->name().c_str());
-    aMgr->startOperation(aName.toStdString());
+    anOpMgr->startOperation(anOpAction);
     aWorkshop->deleteFeatures(aToDelFeatures);
-    aMgr->finishOperation();
+    
+    anOpMgr->commitOperation();
   }
   myCoinsideLines.clear();
 }
@@ -358,11 +366,18 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
   }
 
   QAction* anAction = action("AUXILIARY_CMD");
-  SessionPtr aMgr = ModelAPI_Session::get();
+  //SessionPtr aMgr = ModelAPI_Session::get();
+  ModuleBase_OperationAction* anOpAction = 0;
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
   if (isUseTransaction) {
-    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-      anOperation->abort();
-    aMgr->startOperation(anAction->text().toStdString());
+    anOpAction = new ModuleBase_OperationAction(anAction->text(), myModule);
+    bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
+
+    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+      return; // the objects are processed but can not be deleted
+
+    anOpMgr->startOperation(anOpAction);
   }
   myModule->sketchMgr()->storeSelection();
 
@@ -384,12 +399,8 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
       }
     }
   }
-  if (isUseTransaction) {
-    aMgr->finishOperation();
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-    XGUI_Workshop* aWorkshop = aConnector->workshop();
-    aWorkshop->updateCommandStatus();
-  }
+  if (isUseTransaction)
+    anOpMgr->commitOperation();
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   myModule->sketchMgr()->restoreSelection();

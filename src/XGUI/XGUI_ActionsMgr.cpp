@@ -173,14 +173,6 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   }
 }
 
-void XGUI_ActionsMgr::onAcceptAllToggled(bool theState)
-{
-  if (!theState) {
-    QAction* anAcceptAllAction = operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
-    anAcceptAllAction->setEnabled(theState);
-  }
-}
-
 QKeySequence XGUI_ActionsMgr::registerShortcut(const QKeySequence& theKeySequence)
 {
   if (theKeySequence.isEmpty()) {
@@ -246,9 +238,6 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
       case Accept:
       case AcceptAll:
         aResult = new QAction(QIcon(":pictures/button_ok.png"), "", theParent);
-        // the default value is disabled, so the next connect is used to restore this
-        // default state by untoggle this action
-        connect(this, SIGNAL(toggled(bool)), this, SLOT(onAcceptAllToggled(bool)));
         break;
       case Abort:
       case AbortAll: {

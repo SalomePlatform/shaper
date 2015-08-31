@@ -96,9 +96,6 @@ public slots:
   void updateCheckState();
   //! Updates actions according to current selection in the viewer
   void updateOnViewSelection();
-  //! Update the default enable state of the action by untoggle it. The default value is disabled.
-  //! \param theState the new state of the AcceptAll action
-  void onAcceptAllToggled(bool theState);
 
  protected:
   //! Sets all actions to isEnabled state.

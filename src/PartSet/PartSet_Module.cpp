@@ -604,7 +604,11 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
 
 bool PartSet_Module::deleteObjects()
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+
+  //SessionPtr aMgr = ModelAPI_Session::get();
   // 1. check whether the delete should be processed in the module
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
@@ -613,8 +617,6 @@ bool PartSet_Module::deleteObjects()
     // 2. find selected presentations
     // selected objects should be collected before the current operation abort because
     // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-    XGUI_Workshop* aWorkshop = aConnector->workshop();
     ModuleBase_ISelection* aSel = workshop()->selection();
     QObjectPtrList aSelectedObj = aSel->selectedPresentations();
     // if there are no selected objects in the viewer, that means that the selection in another
@@ -643,25 +645,24 @@ bool PartSet_Module::deleteObjects()
 
     // 3. start operation
     QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-    ModuleBase_OperationAction* anAction = new ModuleBase_OperationAction(aDescription, this);
+    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, this);
 
-    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
     // the active nested sketch operation should be aborted unconditionally
-    if (isSketchOp)
-      anOperation->addGrantedOperationId(anAction->id());
-    if (!anOpMgr->canStartOperation(anAction->id()))
+    // the Delete action should be additionally granted for the Sketch operation
+    // in order to do not abort/commit it
+    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
       return true; // the objects are processed but can not be deleted
-    if (isSketchOp)
-      anOperation->removeGrantedOperationId(anAction->id());
 
-    anOpMgr->startOperation(anAction);
+    anOpMgr->startOperation(anOpAction);
+
     // 4. delete features
     // sketch feature should be skipped, only sub-features can be removed
     // when sketch operation is active
     aWorkshop->deleteFeatures(aSketchObjects);
     // 5. stop operation
     anOpMgr->commitOperation();
-  } else {
+  }
+  else {
     bool isPartRemoved = false;
     // Delete part with help of PartSet plugin
     // TODO: the deleted objects has to be processed by multiselection
@@ -677,10 +678,17 @@ bool PartSet_Module::deleteObjects()
                        std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartResult);
           DocumentPtr aPartDoc = aPart->partDoc();
           if (aPartDoc.get()) {
-            aMgr->startOperation(PartSetPlugin_Remove::ID());
+            ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction
+                                              (PartSetPlugin_Remove::ID().c_str(), this);
+            if (!anOpMgr->canStartOperation(anOpAction->id()))
+              return true; // the objects are processed but can not be deleted
+
+            anOpMgr->startOperation(anOpAction);
+
             FeaturePtr aFeature = aPartDoc->addFeature(PartSetPlugin_Remove::ID());
             aFeature->execute();
-            aMgr->finishOperation();
+
+            anOpMgr->commitOperation();
             isPartRemoved = true;
           }
         }
