@@ -325,13 +325,22 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
       }
     }
     double aX, aY;
+    bool isProcessed = false;
     if (getPoint2d(aView, aShape, aX, aY)) {
       PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
-      emit vertexSelected();
-      emit focusOutWidget(this);
-      return;
+      isProcessed = true;
     } else if (aShape.ShapeType() == TopAbs_EDGE) {
       setConstraintWith(aObject);
+      isProcessed = true;
+    }
+    if (isProcessed) {
+      // it is important to perform updateObject() in order to the current value is 
+      // processed by Sketch Solver. Test case: line is created from a previous point
+      // to some distance, but in the area of the highlighting of the point. Constraint
+      // coincidence is created, after the solver is performed, the distance between the
+      // points of the line becomes less than the tolerance. Validator of the line returns
+      // false, the line will be aborted, but sketch stays valid.
+      updateObject(feature());
       emit vertexSelected();
       emit focusOutWidget(this);
       return;

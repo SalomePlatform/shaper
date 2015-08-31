@@ -7,10 +7,13 @@
 #include <GeomValidators_Different.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Pnt2d.h>
 
 #include <algorithm>
 #include <map>
 #include <list>
+
+const double tolerance = 1e-7;
 
 //=================================================================================================
 /* Help
@@ -22,8 +25,7 @@ To extend GeomValidators_Different validator with new attribute types:
 
 bool isEqual(const AttributePoint2DPtr& theLeft, const AttributePoint2DPtr& theRight)
 {
-  return theLeft->x() == theRight->x() &&
-         theLeft->y() == theRight->y();
+  return theLeft->pnt()->distance(theRight->pnt()) < tolerance;
 }
 
 bool isEqualAttributes(const AttributePtr& theLeft, const AttributePtr& theRight)

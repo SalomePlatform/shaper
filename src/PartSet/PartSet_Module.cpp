@@ -523,7 +523,13 @@ void PartSet_Module::onNoMoreWidgets()
     if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
       if (myRestartingMode != RM_Forbided)
         myRestartingMode = RM_LastFeatureUsed;
-      anOperation->commit();
+      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+      XGUI_Workshop* aWorkshop = aConnector->workshop();
+      XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+      if (anOpMgr->isApplyEnabled())
+        anOperation->commit();
+      else
+        anOperation->abort();
     }
   }
 }
