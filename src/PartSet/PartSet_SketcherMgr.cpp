@@ -227,7 +227,9 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 {
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
-  operationMgr()->onValidateOperation();
+  // it is important to validate operation here only if sketch entity create operation is active
+  // because at this operation we reacts to the mouse leave/enter view port
+  //operationMgr()->onValidateOperation();
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("onLeaveViewPort: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -242,6 +244,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   // the reset of the current widget should not happen
   if (myIsPopupMenuActive)
     return;
+
+  operationMgr()->onValidateOperation();
 
   // 2. if the mouse IS NOT over window, reset the active widget value and hide the presentation
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
