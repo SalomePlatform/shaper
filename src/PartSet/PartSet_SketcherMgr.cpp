@@ -800,7 +800,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     aConnector->activateModuleSelectionModes();
 }
 
-void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation*/* theOperation*/)
+void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* /* theOperation*/)
 {
   myIsMouseOverWindow = false;
   myIsConstraintsShown = true;

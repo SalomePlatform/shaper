@@ -84,6 +84,11 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void redisplay(ObjectPtr theObject, bool theUpdateViewer = true);
 
   /**
+   * Sends and flushes a signal to redisplay all visualized objects.
+   */
+  void redisplayObjects();
+
+  /**
    * Add presentations to current selection. It unhighlight and deselect the current selection.
    * The shape and result components are processed in the values. If the presentation shape is not
    * empty, select it, otherwise select the result.
@@ -113,6 +118,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Deactivates selection of sub-shapes
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool theUpdateViewer = true);
+
+  // Remove default selection filters of the module from the current viewer
+  void deactivateSelectionFilters();
 
   /// \brief Add selection filter
   /// \param theFilter a filter instance
@@ -163,9 +171,11 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \return corresponded object or NULL if it not found
   ObjectPtr getObject(const Handle(AIS_InteractiveObject)& theIO) const;
 
-  /// Deactivates the given object (not allow selection)
-  /// \param theObject object to deactivate
-  void deactivate(ObjectPtr theObject, const bool theUpdateViewer);
+  /// Deactivates the given objects (not allow selection)
+  /// \param theObjList - list of objects which has to be deactivated.
+  /// \param theUpdateViewer update viewer flag
+  void deactivateObjects(const QObjectPtrList& theObjList,
+                         const bool theUpdateViewer = true);
 
   /// Activates the given object (it can be selected)
   /// \param theObject object to activate
@@ -257,6 +267,10 @@ private:
   /// \param theModes - modes on which it has to be activated (can be empty)
   void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
                 const bool theUpdateViewer) const;
+
+  /// Deactivates the given object (not allow selection)
+  /// \param theObject object to deactivate
+  void deactivate(ObjectPtr theObject, const bool theUpdateViewer);
 
   /// Find a trihedron in a list of displayed presentations and deactivate it.
   void deactivateTrihedron() const;

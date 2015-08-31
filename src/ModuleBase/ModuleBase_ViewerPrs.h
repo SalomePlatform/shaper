@@ -20,80 +20,80 @@
  * \ingroup GUI
  * \brief Presentation. Provides container to have feature, shape and/or selection owner.
  */
-class MODULEBASE_EXPORT ModuleBase_ViewerPrs
+class ModuleBase_ViewerPrs
 {
  public:
   /// Constructor
-  ModuleBase_ViewerPrs();
+  MODULEBASE_EXPORT ModuleBase_ViewerPrs();
 
   /// Constructor
   /// \param theResult an object
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  ModuleBase_ViewerPrs(ObjectPtr theResult, const TopoDS_Shape& theShape,
+  MODULEBASE_EXPORT ModuleBase_ViewerPrs(ObjectPtr theResult, const TopoDS_Shape& theShape,
                        Handle_SelectMgr_EntityOwner theOwner);
 
   /// Destructor
-  virtual ~ModuleBase_ViewerPrs();
+  MODULEBASE_EXPORT virtual ~ModuleBase_ViewerPrs();
 
   /// Sets the object.
   /// \param theResult an object instance
-  void setObject(ObjectPtr theResult)
+  MODULEBASE_EXPORT void setObject(ObjectPtr theResult)
   {
     myResult = theResult;
   }
 
   /// Returns the feature.
   /// \return a feature instance
-  ObjectPtr object() const
+  MODULEBASE_EXPORT ObjectPtr object() const
   {
     return myResult;
   }
 
   /// Set the presentation owner
   /// \param theOwner an owner to set
-  void setOwner(Handle_SelectMgr_EntityOwner theOwner)
+  MODULEBASE_EXPORT void setOwner(Handle_SelectMgr_EntityOwner theOwner)
   {
     myOwner = theOwner;
   }
 
   /// Returns the presentation owner
   /// \return an owner
-  Handle_SelectMgr_EntityOwner owner() const
+  MODULEBASE_EXPORT Handle_SelectMgr_EntityOwner owner() const
   {
     return myOwner;
   }
 
   /// Sets the shape
   /// \param theShape a shape instance
-  void setShape(const TopoDS_Shape& theShape)
+  MODULEBASE_EXPORT void setShape(const TopoDS_Shape& theShape)
   {
     myShape = theShape;
   }
 
   /// Returns the shape
   /// \return a shape instance
-  const TopoDS_Shape& shape() const
+  MODULEBASE_EXPORT const TopoDS_Shape& shape() const
   {
     return myShape;
   }
 
   /// Set interactive object
   /// \param theIO an interactive object
-  void setInteractive(const Handle(AIS_InteractiveObject)& theIO)
+  MODULEBASE_EXPORT void setInteractive(const Handle(AIS_InteractiveObject)& theIO)
   {
     myInteractive = theIO;
   }
 
   /// Returns interactive object if it is installed
-  Handle(AIS_InteractiveObject) interactive() const
+  MODULEBASE_EXPORT Handle(AIS_InteractiveObject) interactive() const
   {
     return myInteractive;
   }
 
   /// Returns true if all presentation fields are empty
   /// \return boolean value
-  bool isEmpty() const
+  MODULEBASE_EXPORT bool isEmpty() const
   {
     return myShape.IsNull() &&
            myOwner.IsNull() && !myResult.get();
@@ -101,7 +101,7 @@ class MODULEBASE_EXPORT ModuleBase_ViewerPrs
 
   /// Returns True if the current object is equal to the given one
   /// \param thePrs an object to compare
-  bool operator==(const ModuleBase_ViewerPrs& thePrs)
+  MODULEBASE_EXPORT bool operator==(const ModuleBase_ViewerPrs& thePrs)
   {
     bool aResult = (myResult.get() == thePrs.object().get());
     bool aOwner = (myOwner.Access() == thePrs.owner().Access());

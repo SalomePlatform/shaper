@@ -46,6 +46,9 @@
 #include <TColStd_MapOfTransient.hxx>
 #include <TColStd_MapIteratorOfMapOfTransient.hxx>
 
+#include <Events_Loop.h>
+#include <ModelAPI_Events.h>
+
 #include <set>
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
@@ -301,6 +304,19 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
   }
 }
 
+void XGUI_Displayer::redisplayObjects()
+{
+  // redisplay objects visualized in the viewer
+  static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  QObjectPtrList aDisplayed = myWorkshop->displayer()->displayedObjects();
+  QObjectPtrList::const_iterator anIt = aDisplayed.begin(), aLast = aDisplayed.end();
+  for (; anIt != aLast; anIt++) {
+    aECreator->sendUpdated(*anIt, EVENT_DISP);
+  }
+  Events_Loop::loop()->flush(EVENT_DISP);
+}
+
 void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
 {
 #ifdef DEBUG_DEACTIVATE
@@ -324,6 +340,17 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
     if (theUpdateViewer)
       updateViewer();
   }
+}
+
+void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
+                                       const bool theUpdateViewer)
+{
+  QObjectPtrList::const_iterator anIt = theObjList.begin(), aLast = theObjList.end();
+  for (; anIt != aLast; anIt++) {
+    deactivate(*anIt, false);
+  }
+  if (theUpdateViewer)
+    updateViewer();
 }
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
@@ -781,6 +808,24 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
 
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
   return (XGUI_Displayer::DisplayMode) aAISIO->DisplayMode();
+}
+
+void XGUI_Displayer::deactivateSelectionFilters()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!myAndFilter.IsNull() && !aContext.IsNull()) {
+    bool aFound = false;
+    const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+    SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+    for (; anIt.More() && !aFound; anIt.Next()) {
+      Handle(SelectMgr_Filter) aFilter = anIt.Value();
+      aFound = aFilter == myAndFilter;
+    }
+    if (aFound) {
+      aContext->RemoveFilter(myAndFilter);
+      myAndFilter.Nullify();
+    }
+  }
 }
 
 void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)

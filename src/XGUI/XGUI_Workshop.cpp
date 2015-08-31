@@ -223,16 +223,29 @@ void XGUI_Workshop::activateModule()
 
   myActionsMgr->update();
 
+  // activate visualized objects in the viewer
+  XGUI_Displayer* aDisplayer = displayer();
+  QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
+  QIntList aModes;
+  module()->activeSelectionModes(aModes);
+  aDisplayer->activateObjects(aModes, aDisplayed);
 }
 
 void XGUI_Workshop::deactivateModule()
 {
   myModule->deactivateSelectionFilters();
 
+  // remove internal displayer filter
+  displayer()->deactivateSelectionFilters();
+
   disconnect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
     myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
   disconnect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
     myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
+
+  XGUI_Displayer* aDisplayer = displayer();
+  QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
+  aDisplayer->deactivateObjects(aDisplayed, true);
 }
 
 //******************************************************
@@ -368,8 +381,11 @@ void XGUI_Workshop::onStartWaiting()
 void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer)
 {
   if (!myModule->canActivateSelection(theObject)) {
-    if (myDisplayer->isActive(theObject))
-      myDisplayer->deactivate(theObject, theUpdateViewer);
+    if (myDisplayer->isActive(theObject)) {
+      QObjectPtrList anObjects;
+      anObjects.append(theObject);
+      myDisplayer->deactivateObjects(anObjects, theUpdateViewer);
+    }
   }
 }
 
@@ -755,15 +771,7 @@ void XGUI_Workshop::onPreferences()
           myMainWindow->menuObject()->updateFromResources();
       }
     }
-    // redisplay objects visualized in the viewer
-    static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-    QObjectPtrList aDisplayed = displayer()->displayedObjects();
-    QObjectPtrList::const_iterator anIt = aDisplayed.begin(), aLast = aDisplayed.end();
-    for (; anIt != aLast; anIt++) {
-      aECreator->sendUpdated(*anIt, EVENT_DISP);
-    }
-    Events_Loop::loop()->flush(EVENT_DISP);
+    displayer()->redisplayObjects();
   }
 }
 

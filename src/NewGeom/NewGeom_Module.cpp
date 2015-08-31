@@ -272,6 +272,7 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
 {
   if (!mySelector) {
     mySelector = createSelector(theMgr);
+    myWorkshop->module()->activateSelectionFilters();
   }
 }
 
@@ -314,6 +315,8 @@ void NewGeom_Module::onDefaultPreferences()
   LightApp_Preferences* pref = preferences();
   if (pref)
     pref->retrieve();
+
+  myWorkshop->displayer()->redisplayObjects();
 }
 
 //******************************************************
@@ -608,16 +611,7 @@ void NewGeom_Module::preferencesChanged(const QString& theSection, const QString
   }
   aProp->setValue(aValue);
 
-  // redisplay objects visualized in the viewer
-  static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-  QObjectPtrList aDisplayed = myWorkshop->displayer()->displayedObjects();
-  QObjectPtrList::const_iterator anIt = aDisplayed.begin(), aLast = aDisplayed.end();
-  for (; anIt != aLast; anIt++) {
-    aECreator->sendUpdated(*anIt, EVENT_DISP);
-  }
-  Events_Loop::loop()->flush(EVENT_DISP);
-
+  myWorkshop->displayer()->redisplayObjects();
 }
 
 void NewGeom_Module::inspectSalomeModules()
