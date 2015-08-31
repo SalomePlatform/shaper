@@ -59,7 +59,6 @@ def main():
     clickButton(waitForObject(":Extrusion.ExtrusionCut_AppElements_Button"))
     clickButton(waitForObject(":Basic_QToolButton"))
     clickButton(waitForObject(":Abort operation.OK_QPushButton"))
-    clickButton(waitForObject(":Application errors.Close_QPushButton"))
     clickButton(waitForObject(":Extrusion.ExtrusionFuse_AppElements_Button"))
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), 290, 316, 0, Qt.LeftButton)
     mouseClick(waitForObject(":Sketch.Basic_AppElements_MenuGroupPanel"), 143, 56, 0, Qt.LeftButton)
