@@ -153,6 +153,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
+  activateWindow();
   for (; anIt != aLast && !aNextWidget; anIt++) {
     if (isFoundWidget || !theWidget) {
       if ((*anIt)->focusTo()) {
