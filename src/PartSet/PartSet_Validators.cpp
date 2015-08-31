@@ -223,7 +223,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
               return false;
           }
           else { // the attribute reference
-            if (aRef->attr() == theAttribute)
+            if (aRef->attr() == anAttributeAttr)
               return false;
           }
         }
