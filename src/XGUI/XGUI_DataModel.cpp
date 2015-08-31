@@ -120,7 +120,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               // Appears first object in folder which can not be shown empty
               insertRow(myXMLReader.subFolderId(aObjType), aDocRoot);
           }
-          int aRow = aDoc->size(aObjType) - 1;
+          int aRow = aDoc->index(aObject);
           int aNbSubFolders = foldersCount(aDoc.get());
           if (aObjType == aSubType) {
             // List of objects under document root
@@ -130,7 +130,9 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             if (aRow != -1) {
               int aFolderId = folderId(aObjType, aDoc.get());
               if (aFolderId != -1) {
-                insertRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
+                QModelIndex aParentFolder = createIndex(aFolderId, 0, aDoc.get());
+                insertRow(aRow, aParentFolder);
+                emit dataChanged(aParentFolder, aParentFolder);
               }
             }
           }
