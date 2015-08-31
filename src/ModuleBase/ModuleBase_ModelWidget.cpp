@@ -150,9 +150,20 @@ bool ModuleBase_ModelWidget::restoreValue()
 
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
 {
+  // the viewer update should be blocked in order to avoid the temporary feature content
+  // when the solver processes the feature, the redisplay message can be flushed
+  // what caused the display in the viewer preliminary states of object
+  // e.g. fillet feature, angle value change
+  std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+      new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+  Events_Loop::loop()->send(aMsg);
+
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
+
+  // the viewer update should be unblocked
+  aMsg = std::shared_ptr<Events_Message>(
+                new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+  Events_Loop::loop()->send(aMsg);
 }
 
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
