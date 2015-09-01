@@ -24,6 +24,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -284,9 +285,25 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anAttrItr);
           for(int i = 0; i < aCurSelList->size(); i++) {
             std::shared_ptr<ModelAPI_AttributeSelection> aCurSel = aCurSelList->value(i);
+            ResultPtr aCurSelContext = aCurSel->context();
+            ResultCompSolidPtr aCurSelCompSolidPtr = ModelAPI_Tools::compSolidOwner(aCurSelContext);
+            std::shared_ptr<GeomAPI_Shape> aCurSelCompSolid;
+            if(aCurSelCompSolidPtr.get()) {
+              aCurSelCompSolid = aCurSelCompSolidPtr->shape();
+            }
             for(int j = 0; j < aRefSelList->size(); j++) {
               std::shared_ptr<ModelAPI_AttributeSelection> aRefSel = aRefSelList->value(j);
-              if(aCurSel->context() == aRefSel->context()) {
+              ResultPtr aRefSelContext = aRefSel->context();
+              ResultCompSolidPtr aRefSelCompSolidPtr = ModelAPI_Tools::compSolidOwner(aRefSelContext);
+              std::shared_ptr<GeomAPI_Shape> aRefSelCompSolid;
+              if(aRefSelCompSolidPtr.get()) {
+                aRefSelCompSolid = aRefSelCompSolidPtr->shape();
+              }
+              if((aCurSelCompSolid.get() && aCurSelCompSolid->isEqual(aRefSel->value()))
+                || (aRefSelCompSolid.get() && aRefSelCompSolid->isEqual(aCurSel->value()))) {
+                  return false;
+              }
+              if(aCurSelContext == aRefSelContext) {
                 if(aCurSel->value().get() == NULL || aRefSel->value().get() == NULL
                   || aCurSel->value()->isEqual(aRefSel->value())) {
                     return false;
