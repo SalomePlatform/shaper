@@ -141,9 +141,12 @@ MCOOKIE=$(mcookie)
 XAUTHORITY=$AUTHFILE xauth source - << EOF >>"$ERRORFILE" 2>&1
 add :$SERVERNUM $XAUTHPROTO $MCOOKIE
 EOF
-XAUTHORITY=$AUTHFILE vncserver ":$SERVERNUM" -noxstartup >>"$ERRORFILE" 2>&1 &
+XAUTHORITY=$AUTHFILE vncserver ":$SERVERNUM" >>"$ERRORFILE" 2>&1 &
 VNCPID=$!
 sleep "$STARTWAIT"
+if ! wait ${VNCPID}; then
+  exit 5
+fi
 
 # Start the command and save its exit status.
 set +e
