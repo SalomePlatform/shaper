@@ -369,8 +369,6 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
 
     theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
-    GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
-
     std::string aModName = "Modified";
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
                                                aModifyTag, aModName, theMapOfShapes);

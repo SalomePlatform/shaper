@@ -123,11 +123,8 @@ void FeaturesPlugin_Partition::execute()
 
     if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo.shape()) > 1.e-7) {
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-
       aResultBody->store(aPartitionAlgo.shape());
-
-//      LoadNamingDS(aResultBody, anObject, aTools, aPartitionAlgo);
-
+      loadNamingDS(aResultBody, anObject, aTools, aPartitionAlgo);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
     }
@@ -135,4 +132,36 @@ void FeaturesPlugin_Partition::execute()
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
+}
+
+//=================================================================================================
+void FeaturesPlugin_Partition::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                            const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                            const ListOfShape& theTools,
+                                            const GeomAlgoAPI_Partition& thePartitionAlgo)
+{
+  //load result
+  if(theBaseShape->isEqual(thePartitionAlgo.shape())) {
+    theResultBody->store(thePartitionAlgo.shape());
+  } else {
+    const int aModifyTag = 1;
+    const int aDeletedTag = 2;
+    const int aSubsolidsTag = 3; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+
+    theResultBody->storeModified(theBaseShape, thePartitionAlgo.shape(), aSubsolidsTag);
+
+    std::shared_ptr<GeomAlgoAPI_MakeShape> aMkShape = thePartitionAlgo.makeShape();
+    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = thePartitionAlgo.mapOfShapes();
+
+    std::string aModName = "Modified";
+    theResultBody->loadAndOrientModifiedShapes(aMkShape.get(), theBaseShape, GeomAPI_Shape::FACE,
+                                               aModifyTag, aModName, *aMapOfShapes.get());
+    theResultBody->loadDeletedShapes(aMkShape.get(), theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
+
+    for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
+      theResultBody->loadAndOrientModifiedShapes(aMkShape.get(), *anIter, GeomAPI_Shape::FACE,
+                                                 aModifyTag, aModName, *aMapOfShapes.get());
+      theResultBody->loadDeletedShapes(aMkShape.get(), *anIter, GeomAPI_Shape::FACE, aDeletedTag);
+    }
+  }
 }

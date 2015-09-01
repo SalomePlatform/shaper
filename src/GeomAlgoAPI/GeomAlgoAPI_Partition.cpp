@@ -47,14 +47,12 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation, GeomAlgoAPI_MakeShape::BOPAlgoBuilder));
 
   // Getting objects.
-  TopTools_ListOfShape anObjects;
   for (ListOfShape::const_iterator anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
     anOperation->AddArgument(aShape);
   }
 
   // Getting tools.
-  TopTools_ListOfShape aTools;
   for (ListOfShape::const_iterator aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++) {
     const TopoDS_Shape& aShape = (*aToolsIt)->impl<TopoDS_Shape>();
     anOperation->AddTool(aShape);
@@ -81,7 +79,6 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   }
   myShape.reset(new GeomAPI_Shape());
   myShape->setImpl(new TopoDS_Shape(aResult));
-
 }
 
 //=================================================================================================
