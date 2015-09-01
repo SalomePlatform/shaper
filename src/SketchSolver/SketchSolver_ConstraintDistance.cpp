@@ -91,9 +91,10 @@ void SketchSolver_ConstraintDistance::adjustConstraint()
     }
     std::shared_ptr<GeomAPI_XY> aLineVec = aPoints[2]->decreased(aPoints[1]);
     std::shared_ptr<GeomAPI_XY> aPtLineVec = aPoints[0]->decreased(aPoints[1]);
-    if (aPtLineVec->cross(aLineVec) * aConstraint.valA < 0.0) {
+    if (aPtLineVec->cross(aLineVec) * aConstraint.valA < 0.0 || myIsNegative) {
       aConstraint.valA *= -1.0;
       myStorage->updateConstraint(aConstraint);
+      myIsNegative = true;
     }
   }
 }

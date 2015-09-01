@@ -38,6 +38,7 @@ protected:
 private:
   int myType; ///< type of constraint (applicable: SLVS_C_PT_PT_DISTANCE, SLVS_C_PT_LINE_DISTANCE)
   double myPrevValue; ///< previous value of distance (for correct calculation of a distance sign)
+  bool myIsNegative;  ///< \c true, if the point if placed rightside of line direction (SLVS_C_PT_LINE_DISTANCE only)
 };
 
 #endif
