@@ -25,7 +25,7 @@
             step="1.0"
             default="0"
             icon=":icons/angle_up.png"
-            tooltip="Angle">
+            tooltip="To angle">
           </doublevalue>
         </groupbox>
         <groupbox>
@@ -36,7 +36,7 @@
             step="1.0"
             default="10"
             icon=":icons/angle_down.png"
-            tooltip="Angle">
+            tooltip="From angle">
           </doublevalue>
         </groupbox>
       </box>
@@ -45,7 +45,7 @@
           <shape_selector id="to_object"
                           icon=":icons/plane_inverted.png"
                           label="Plane face"
-                          tooltip="Select a planar face"
+                          tooltip="Bounding plane (select a planar face)"
                           shape_types="face"
                           default="&lt;sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
@@ -53,14 +53,14 @@
           <doublevalue  id="to_offset" label="Offset"
             min="0" step="1.0" default="0"
             icon=":icons/angle_up.png"
-            tooltip="Offset">
+            tooltip="Offset for bounding plane">
           </doublevalue>
         </groupbox>
         <groupbox title="From">
           <shape_selector id="from_object"
                           icon=":icons/plane.png"
                           label="Plane face"
-                          tooltip="Select a planar face"
+                          tooltip="Bounding plane (select a planar face)"
                           shape_types="face"
                           default="&lt;sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
@@ -68,7 +68,7 @@
           <doublevalue id="from_offset" label="Offset"
             min="0" step="1.0" default="0"
             icon=":icons/angle_down.png"
-            tooltip="Offset">
+            tooltip="Offset for bounding plane">
           </doublevalue>
         </groupbox>
       </box>
