@@ -19,7 +19,7 @@ for aut in linux_run.sh salome_run.sh; do
 done
 squishserver --config setAUTTimeout 120
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
-squishserver --verbose --port=${SQUISHSERVER_PORT} 2>server.err &
+squishserver --verbose --port=${SQUISHSERVER_PORT} 1>server.log 2>server.err &
 
 squishrunner --port=${SQUISHSERVER_PORT} --config setCursorAnimation off
 
@@ -30,7 +30,7 @@ squishrunner_run() {
   local cases="$2"
 
   echo "Running suite ${suite}"
-  if [ ${cases} != "" ]; then echo "Cases ${cases}"; fi
+  if [ "${cases}" != "" ]; then echo "Cases ${cases}"; fi
 
   set +e
   squishrunner --port=${SQUISHSERVER_PORT} --testsuite ${suite} ${cases} --reportgen stdout --exitCodeOnFail 1
