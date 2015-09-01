@@ -21,7 +21,6 @@
           <doublevalue
             id="to_angle"
             label="Angle"
-            min="0"
             step="1.0"
             default="0"
             icon=":icons/angle_up.png"
@@ -32,7 +31,6 @@
           <doublevalue
             id="from_angle"
             label="Angle"
-            min="0"
             step="1.0"
             default="10"
             icon=":icons/angle_down.png"
@@ -51,7 +49,7 @@
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
           <doublevalue  id="to_offset" label="Offset"
-            min="0" step="1.0" default="0"
+            step="1.0" default="0"
             icon=":icons/angle_up.png"
             tooltip="Offset for bounding plane">
           </doublevalue>
@@ -66,7 +64,7 @@
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
           <doublevalue id="from_offset" label="Offset"
-            min="0" step="1.0" default="0"
+            step="1.0" default="0"
             icon=":icons/angle_down.png"
             tooltip="Offset for bounding plane">
           </doublevalue>
