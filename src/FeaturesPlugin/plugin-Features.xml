@@ -17,10 +17,10 @@
       <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon=":icons/revol.png">
           <source path="revolution_widget.xml"/>
       </feature>
-      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revol.png">
+      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revol_cut.png">
         <source path="revolutioncut_widget.xml"/>
       </feature>
-      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon=":icons/revol.png">
+      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon=":icons/revol_fuse.png">
         <source path="revolutionfuse_widget.xml"/>
       </feature>
     </group>

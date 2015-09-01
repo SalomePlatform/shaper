@@ -19,6 +19,8 @@
      <file>icons/cut_shape.png</file>
      <file>icons/fusion.png</file>
      <file>icons/revol.png</file>
+     <file>icons/revol_cut.png</file>
+     <file>icons/revol_fuse.png</file>
      <file>icons/common.png</file>
      <file>icons/import.png</file>
      <file>icons/export.png</file>
