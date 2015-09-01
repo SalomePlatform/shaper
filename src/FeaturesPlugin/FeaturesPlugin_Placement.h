@@ -42,16 +42,16 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
   }
 
   /// attribute name of referenced object
-  inline static const std::string& START_FACE_ID()
+  inline static const std::string& START_SHAPE_ID()
   {
-    static const std::string MY_START_FACE_ID("placement_start_face");
-    return MY_START_FACE_ID;
+    static const std::string MY_START_SHAPE_ID("placement_start_shape");
+    return MY_START_SHAPE_ID;
   }
   /// attribute name of attractable face
-  inline static const std::string& END_FACE_ID()
+  inline static const std::string& END_SHAPE_ID()
   {
-    static const std::string MY_END_FACE_ID("placement_end_face");
-    return MY_END_FACE_ID;
+    static const std::string MY_END_SHAPE_ID("placement_end_shape");
+    return MY_END_SHAPE_ID;
   }
   /// attribute name of flag of reverse direction
   inline static const std::string& REVERSE_ID()

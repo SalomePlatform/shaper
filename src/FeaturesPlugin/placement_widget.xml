@@ -8,17 +8,17 @@
     type_choice=""
     concealment="true" >
   </multi_selector>
-  <shape_selector id="placement_start_face"
+  <shape_selector id="placement_start_shape"
     label="Select an object" 
     icon=":icons/placement_from.png"
-    tooltip="Select a start face"
-    shape_types="face"
+    tooltip="Select a start face, edge or vertex"
+    shape_types="face edge vertex"
   />
-  <shape_selector id="placement_end_face"
+  <shape_selector id="placement_end_shape"
     label="Select an object" 
     icon=":icons/placement_to.png"
-    tooltip="Select an end face"
-    shape_types="face" >
+    tooltip="Select an end face, edge or vertex"
+    shape_types="face edge vertex">
     <validator id="PartSet_DifferentObjects"/>
   </shape_selector>
   <boolvalue id="placement_reverse_direction"

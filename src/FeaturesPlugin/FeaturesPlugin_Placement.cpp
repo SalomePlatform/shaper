@@ -37,8 +37,8 @@ void FeaturesPlugin_Placement::initAttributes()
   // extrusion works with faces always
   aSelection->setSelectionType("SOLID");
 
-  data()->addAttribute(START_FACE_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(END_FACE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(START_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(END_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(REVERSE_ID(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(CENTERING_ID(), ModelAPI_AttributeBoolean::typeId());
 }
@@ -62,48 +62,69 @@ void FeaturesPlugin_Placement::execute()
     aContextes.push_back(anObjectAttr->context());
   }
 
-  // Verify the start face
-  AttributeSelectionPtr anObjRef = selection(START_FACE_ID());
+  // Verify the start shape
+  AttributeSelectionPtr anObjRef = selection(START_SHAPE_ID());
   if(!anObjRef) {
     return;
   }
-  std::shared_ptr<GeomAPI_Shape> aStartFace = anObjRef->value();
-  if(!aStartFace || !GeomAPI_Face(aStartFace).isPlanar()) {
-    static const std::string aSelectionError = "The start face selection is bad";
+  std::shared_ptr<GeomAPI_Shape> aStartShape = anObjRef->value();
+  if(!aStartShape) {
+    static const std::string aSelectionError = "The start shape selection is bad";
     setError(aSelectionError);
     return;
   }
 
 
-  std::shared_ptr<GeomAPI_Shape> aStartShape;
+  std::shared_ptr<GeomAPI_Shape> aStartShapeContext;
   ResultPtr aContextRes = anObjRef->context();
   if (aContextRes.get()) {
-    aStartShape = aContextRes->shape();
+    aStartShapeContext = aContextRes->shape();
   }
-  if(!aStartShape.get()) {
-    static const std::string aContextError = "The start face selection context is bad";
+  if(!aStartShapeContext.get()) {
+    static const std::string aContextError = "The start shape selection context is bad";
     setError(aContextError);
     return;
   }
 
-  // Verify the end face
-  anObjRef = selection(END_FACE_ID());
-  std::shared_ptr<GeomAPI_Shape> anEndFace = anObjRef->value();
-  if(!anEndFace || !GeomAPI_Face(anEndFace).isPlanar()) {
-    static const std::string aSelectionError = "The end face selection is bad";
+  // Verify the end shape
+  anObjRef = selection(END_SHAPE_ID());
+  std::shared_ptr<GeomAPI_Shape> anEndShape = anObjRef->value();
+  if(!anEndShape) {
+    static const std::string aSelectionError = "The end shape selection is bad";
     setError(aSelectionError);
     return;
   }
 
-  std::shared_ptr<GeomAPI_Shape> anEndShape;
+  std::shared_ptr<GeomAPI_Shape> anEndShapeContext;
   aContextRes = anObjRef->context();
   if(aContextRes.get()) {
-    anEndShape = aContextRes->shape();
+    anEndShapeContext = aContextRes->shape();
   }
-  if(!anEndShape.get()) {
-    static const std::string aContextError = "The end face selection context is bad";
+  if(!anEndShapeContext.get()) {
+    static const std::string aContextError = "The end shape selection context is bad";
     setError(aContextError);
     return;
+  }
+
+  // Verify planarity of faces and linearity of edges
+  std::shared_ptr<GeomAPI_Shape> aShapes[2] = {aStartShape, anEndShape};
+  for (int i = 0; i < 2; i++) {
+    if (aShapes[i]->isFace()) {
+      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShapes[i]));
+      if (!aFace->isPlanar()) {
+        static const std::string aPlanarityError = "One of selected faces is not planar";
+        setError(aPlanarityError);
+        return;
+      }
+    }
+    else if (aShapes[i]->isEdge()) {
+      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShapes[i]));
+      if (!anEdge->isLine()) {
+        static const std::string aLinearityError = "One of selected endges is not linear";
+        setError(aLinearityError);
+        return;
+      }
+    }
   }
 
   // Flags of the Placement
@@ -112,7 +133,7 @@ void FeaturesPlugin_Placement::execute()
 
   // Getting transformation.
   GeomAlgoAPI_Placement aPlacementAlgo(
-    aStartShape, anEndShape, aStartFace, anEndFace, isReverse, isCentering, true);
+    aStartShapeContext, anEndShapeContext, aStartShape, anEndShape, isReverse, isCentering, true);
   if(!aPlacementAlgo.isDone()) {
     static const std::string aFeatureError = "Placement algorithm failed";
     setError(aFeatureError);
