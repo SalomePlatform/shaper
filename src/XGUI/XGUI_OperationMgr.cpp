@@ -9,6 +9,7 @@
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
+#include <ModuleBase_IViewer.h>
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_OperationFeature.h"
 
@@ -412,6 +413,20 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       emit keyEnterReleased();
       commitOperation();
     }
+    case Qt::Key_N:
+    case Qt::Key_P: {
+      bool noModifiers = (theEvent->modifiers() == Qt::NoModifier);
+      if (noModifiers) {
+        ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+        Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+        Handle(V3d_View) aView = aViewer->activeView();
+        if ((theEvent->key() == Qt::Key_N))
+          aContext->HilightNextDetected(aView);
+        else if ((theEvent->key() == Qt::Key_P))
+          aContext->HilightPreviousDetected(aView);
+      }
+    }
+
     break;
     default:
       isAccepted = false;

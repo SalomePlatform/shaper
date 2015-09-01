@@ -174,10 +174,6 @@ void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow* theView, QMouseEv
 void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
   myView->setCurrentView(theView);
-  OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(theView);
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext->HasDetected()) // Set focus to provide key events in the view
-    aViewWnd->getViewPort()->setFocus(Qt::MouseFocusReason);
   emit mouseMove(myView, theEvent);
 }
 
@@ -197,16 +193,6 @@ bool NewGeom_SalomeViewer::canDragByMouse() const
 //**********************************************
 void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
 {
-  OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(theView);
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  Handle(V3d_View) aView = aViewWnd->getViewPort()->getView();
-
-  bool noModifiers = (theEvent->modifiers() == Qt::NoModifier);
-  if ((theEvent->key() == Qt::Key_N) && noModifiers) {
-    aContext->HilightNextDetected(aView);
-  } else if ((theEvent->key() == Qt::Key_P) && noModifiers) {
-    aContext->HilightPreviousDetected(aView);
-  }
   emit keyPress(myView, theEvent);
 }
 
