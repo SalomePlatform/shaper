@@ -67,11 +67,12 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
   /// \param theID identifier of changed attribute
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
-  /// Returns the current distance between the feature attributes
-  double calculateCurrentDistance();
-
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
+
+protected:
+  /// Returns the current distance between the feature attributes
+  double calculateCurrentDistance();
 
 private:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point

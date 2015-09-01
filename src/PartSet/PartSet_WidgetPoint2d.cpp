@@ -327,7 +327,30 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
     double aX, aY;
     bool isProcessed = false;
     if (getPoint2d(aView, aShape, aX, aY)) {
-      PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
+      bool aFeatureContainsPoint = false;
+  
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
+                                       std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
+      std::list<AttributePtr> anAttributes =
+                                    myFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+      std::list<AttributePtr>::iterator anIter = anAttributes.begin();
+      for(; anIter != anAttributes.end(); anIter++) {
+        AttributePoint2DPtr aPoint2DAttribute =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
+        if (aPoint2DAttribute.get()) {
+          aFeatureContainsPoint = aPoint2DAttribute->pnt()->isEqual(aPnt2d);
+        }
+      }
+      // when the point is selected, the coordinates of the point should be set into the attribute
+      setPoint(aX, aY);
+      // do not set a coincidence constraint in the attribute if the feature contains a point
+      // with the same coordinates. It is important for line creation in order to do not set
+      // the same constraints for the same points, oterwise the result line has zero length.
+      if (aFeatureContainsPoint)
+        return;
+      else {
+        PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
+      }
       isProcessed = true;
     } else if (aShape.ShapeType() == TopAbs_EDGE) {
       setConstraintWith(aObject);

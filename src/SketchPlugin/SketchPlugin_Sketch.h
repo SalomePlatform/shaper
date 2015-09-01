@@ -82,13 +82,6 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   {
   }
 
-  /// Return the distance between the feature and the point
-  /// \param thePoint the point
-  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
-  {
-    return 0;
-  }
-
   /// Converts a 2D sketch space point into point in 3D space
   /// \param theX an X coordinate
   /// \param theY an Y coordinate

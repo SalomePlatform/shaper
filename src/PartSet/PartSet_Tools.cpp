@@ -178,68 +178,6 @@ std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const
   return aPnt2d->to3D(aC->pnt(), aX->dir(), aY);
 }
 
-ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
-                                        FeaturePtr theSketch,
-                                        const QList<ModuleBase_ViewerPrs>& theSelected,
-                                        const QList<ModuleBase_ViewerPrs>& theHighlighted)
-{
-  // firstly it finds the feature in the list of highlight
-  ObjectPtr aDeltaObject  = nearestFeature(thePoint, theView, theSketch, theHighlighted);
-  if (!aDeltaObject)
-    // secondly it finds the feature in the list of selected objects
-    aDeltaObject  = nearestFeature(thePoint, theView, theSketch, theSelected);
-
-  return aDeltaObject;
-}
-
-ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
-                                        FeaturePtr theSketch,
-                                        const QList<ModuleBase_ViewerPrs>& thePresentations)
-{
-  ObjectPtr aDeltaObject;
-
-  CompositeFeaturePtr aSketch = 
-      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
-  // 1. find it in the selected list by the selected point
-  if (!aDeltaObject) {
-    double aX, anY;
-    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
-    PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
-
-    FeaturePtr aFeature;
-    double aMinDelta = -1;
-    ModuleBase_ViewerPrs aPrs;
-    foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
-      if (!aPrs.object())
-        continue;
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
-      std::shared_ptr<SketchPlugin_Feature> aSketchFeature = std::dynamic_pointer_cast<
-          SketchPlugin_Feature>(aFeature);
-      if (!aSketchFeature || !aSketch->isSub(aSketchFeature))
-        continue;
-
-      double aDelta = aSketchFeature->distanceToPoint(
-          std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
-      if (aMinDelta < 0 || aMinDelta > aDelta) {
-        aMinDelta = aDelta;
-        // TODO aDeltaObject = aPrs.result();
-      }
-    }
-  }
-  // 2. if the object is not found, returns the first selected sketch feature
-  if (!aDeltaObject && thePresentations.size() > 0) {
-    // there can be some highlighted objects, e.g. a result of boolean operation and a sketch point
-    foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
-      if (!aPrs.object())
-        continue;
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
-      if (aFeature && aSketch->isSub(aFeature))
-        aDeltaObject = aPrs.object();
-    }
-  }
-  return aDeltaObject;
-}
-
 std::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
 {
   return ModelAPI_Session::get()->moduleDocument();

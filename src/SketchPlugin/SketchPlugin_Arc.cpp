@@ -178,30 +178,6 @@ void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
   aPoint1->move(theDeltaX, theDeltaY);
 }
 
-double SketchPlugin_Arc::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
-{
-  double aDelta = 0;
-  std::shared_ptr<ModelAPI_Data> aData = data();
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-  aDelta = aPoint1->pnt()->distance(thePoint);
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Arc::START_ID()));
-  double aDistance = aPoint2->pnt()->distance(thePoint);
-  if (aDelta < aDistance)
-    aDelta = aDistance;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint3 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Arc::END_ID()));
-  aDistance = aPoint3->pnt()->distance(thePoint);
-  if (aDelta < aDistance)
-    aDelta = aDistance;
-
-  return aDelta;
-}
-
 bool SketchPlugin_Arc::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }

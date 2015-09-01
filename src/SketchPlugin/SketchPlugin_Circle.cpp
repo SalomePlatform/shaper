@@ -83,15 +83,6 @@ void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
   aPoint1->move(theDeltaX, theDeltaY);
 }
 
-double SketchPlugin_Circle::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CENTER_ID()));
-
-  return aPoint->pnt()->distance(thePoint);
-}
-
 bool SketchPlugin_Circle::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }

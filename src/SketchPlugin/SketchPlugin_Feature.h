@@ -18,7 +18,6 @@
 #include <Config_PropManager.h>
 
 class SketchPlugin_Sketch;
-class GeomAPI_Pnt2d;
 class Handle_AIS_InteractiveObject;
 
 /**\class SketchPlugin_Feature
@@ -45,10 +44,6 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) = 0;
-
-  /// Return the distance between the feature and the point
-  /// \param thePoint the point
-  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
 
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}

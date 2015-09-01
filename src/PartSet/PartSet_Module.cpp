@@ -526,10 +526,9 @@ void PartSet_Module::onNoMoreWidgets()
       XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
       XGUI_Workshop* aWorkshop = aConnector->workshop();
       XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+      // do nothing if the feature can not be applyed
       if (anOpMgr->isApplyEnabled())
         anOperation->commit();
-      else
-        anOperation->abort();
     }
   }
 }

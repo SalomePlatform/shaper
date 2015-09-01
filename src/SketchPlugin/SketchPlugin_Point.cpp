@@ -63,15 +63,6 @@ void SketchPlugin_Point::move(double theDeltaX, double theDeltaY)
   aPoint1->move(theDeltaX, theDeltaY);
 }
 
-double SketchPlugin_Point::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Point::COORD_ID()));
-
-  return aPoint->pnt()->distance(thePoint);
-}
-
 bool SketchPlugin_Point::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }

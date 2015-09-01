@@ -52,10 +52,6 @@ class SketchPlugin_Point : public SketchPlugin_SketchEntity
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
-  /// Return the distance between the feature and the point
-  /// \param thePoint the point
-  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
   /// Called on change of any argument-attribute of this object: for external point
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
