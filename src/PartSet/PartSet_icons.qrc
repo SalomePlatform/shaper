@@ -63,5 +63,8 @@
      <file>icons/extrusion_cut.png</file>
      <file>icons/extrusion_fuse.png</file>
      <file>icons/angle_constr.png</file>
+     <file>icons/angle_up_32x32.png</file>
+     <file>icons/angle_up_down_32x32.png</file>
+     <file>icons/dimension_up_down_32x32.png</file>
  </qresource>
  </RCC>

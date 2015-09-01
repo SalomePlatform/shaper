@@ -17,7 +17,7 @@
     <validator id="GeomValidators_ShapeType" parameters="line"/>
   </shape_selector>
   <toolbox id="CreationMethod">
-    <box id="ByAngles" title="By angles" icon=":icons/angle_up.png">
+    <box id="ByAngles" title="By angles" icon=":icons/angle_up_32x32.png">
       <groupbox>
         <doublevalue
           id="to_angle"
