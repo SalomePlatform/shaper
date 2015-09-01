@@ -11,6 +11,7 @@
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 #include <ModelAPI_Attribute.h>
 
 #include <ModuleBase_IWorkshop.h>
@@ -22,6 +23,8 @@
 
 #include <QMap>
 #include <QList>
+
+#include <list>
 
 DEFINE_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape)
 
@@ -93,7 +96,8 @@ private:
 private:
   ModuleBase_IWorkshop* myWorkshop;
   FeaturePtr myFeature; /// Reference to a feature object
-  QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes;
+  QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes; /// visualized shapes
+  std::list<ResultPtr> myFeatureResults; /// visualized feature results
 };
 
 

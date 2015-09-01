@@ -71,8 +71,14 @@ public:
 
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
+  /// Activate the operation presentation
   /// \param theOperation a started operation
   virtual void onOperationStarted(ModuleBase_Operation* theOperation);
+
+  /// Realizes some functionality by an operation resume
+  /// Activate the operation presentation
+  /// \param theOperation a resumed operation
+  virtual void onOperationResumed(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation commit
   /// Restarts sketcher operation automatically of it is necessary

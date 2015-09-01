@@ -301,6 +301,15 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     myCustomPrs->activate(aFOperation->feature());
 }
 
+void PartSet_Module::onOperationResumed(ModuleBase_Operation* theOperation)
+{
+  ModuleBase_IModule::onOperationResumed(theOperation);
+
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (aFOperation)
+    myCustomPrs->activate(aFOperation->feature());
+}
+
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   myCustomPrs->deactivate();

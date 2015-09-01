@@ -65,12 +65,19 @@ void PartSet_OperationPrs::updateShapes()
 {
   myFeatureShapes.clear();
   getFeatureShapes(myFeatureShapes);
+
+  myFeatureResults.clear();
+  if (myFeature)
+    myFeatureResults = myFeature->results();
 }
 
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  Quantity_Color aColor(1., 1., 0., Quantity_TOC_RGB); // yellow
+  SetColor(aColor);
+
   thePresentation->Clear();
   XGUI_Displayer* aDisplayer = workshop()->displayer();
 
@@ -93,6 +100,24 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
       StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
     }
+  }
+
+  aColor = Quantity_Color(0., 1., 0., Quantity_TOC_RGB); // green
+  SetColor(aColor);
+
+  std::list<ResultPtr>::const_iterator aRIt = myFeatureResults.begin(),
+                                       aRLast = myFeatureResults.end();
+  for (; aRIt != aRLast; aRIt++) {
+    ResultPtr aResult = *aRIt;
+    if (!isVisible(aDisplayer, aResult))
+      continue;
+    GeomShapePtr aGeomShape = aResult->shape();
+    if (!aGeomShape.get())
+      continue;
+    TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
+    // change deviation coefficient to provide more precise circle
+    ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
+    StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
   }
 }
 
