@@ -157,14 +157,14 @@ Q_OBJECT
   /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();
 
-  void onAbortAllOperations( bool& );
-
  protected:
    /// Create data model
   CAM_DataModel* createDataModel();
 
   /// Create popup menu manager
   virtual QtxPopupMgr* popupMgr();
+
+  virtual bool abortAllOperations();
 
  private:
    /// Create selector for OCC Viewer

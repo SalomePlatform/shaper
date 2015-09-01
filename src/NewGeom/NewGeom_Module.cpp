@@ -125,7 +125,6 @@ void NewGeom_Module::initialize(CAM_Application* theApp)
   if (anApp)
   {
     connect(anApp, SIGNAL(preferenceResetToDefaults()), this, SLOT(onDefaultPreferences()));
-    connect(anApp, SIGNAL(abortAllOperations( bool& )), this, SLOT(onAbortAllOperations( bool& )));
   }
 }
 
@@ -626,7 +625,7 @@ void NewGeom_Module::inspectSalomeModules()
   }
 }
 
-void NewGeom_Module::onAbortAllOperations( bool& isNextOperationAllowed )
+bool NewGeom_Module::abortAllOperations()
 {
-  isNextOperationAllowed = workshop()->operationMgr()->abortAllOperations();
+  return workshop()->operationMgr()->abortAllOperations();
 }
