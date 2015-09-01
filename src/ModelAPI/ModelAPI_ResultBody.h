@@ -40,7 +40,7 @@ public:
   /// default color for a result body
   inline static const std::string& DEFAULT_COLOR()
   {
-    static const std::string RESULT_BODY_COLOR("150,150,180");
+    static const std::string RESULT_BODY_COLOR("200,200,230");
     return RESULT_BODY_COLOR;
   }
 
