@@ -43,7 +43,7 @@
   </workbench>
   <workbench id="Part">
     <group id="Movement">
-      <feature id="Placement" title="Placement" tooltip="Perform moving of an object to specified position" icon=":icons/placement.png">
+      <feature id="Placement" title="Placement" tooltip="Place an objects relatively to another one" icon=":icons/placement.png">
         <source path="placement_widget.xml"/>
       </feature>
       <feature id="Translation" title="Translation" tooltip="Perform translation of an objects along the axis to specified distance" icon=":icons/movement.png">
