@@ -48,6 +48,9 @@ static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
 static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
 
+static const char * EVENT_SOLVER_FAILED = "SolverFailed";
+static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {

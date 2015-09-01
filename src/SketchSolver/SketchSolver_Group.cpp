@@ -67,6 +67,14 @@ private:
 Slvs_hGroup GroupIndexer::myGroupIndex = 0;
 
 
+static void sendMessage(const char* theMessageName)
+{
+  std::shared_ptr<Events_Message> aMessage = std::shared_ptr<Events_Message>(
+      new Events_Message(Events_Loop::eventByName(theMessageName)));
+  Events_Loop::loop()->send(aMessage);
+}
+
+
 
 // ========================================================
 // =========  SketchSolver_Group  ===============
@@ -74,7 +82,8 @@ Slvs_hGroup GroupIndexer::myGroupIndex = 0;
 
 SketchSolver_Group::SketchSolver_Group(
     std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane)
-    : myID(GroupIndexer::NEW_GROUP())
+    : myID(GroupIndexer::NEW_GROUP()),
+      myPrevSolved(true)
 {
   // Initialize workplane
   myWorkplaneID = SLVS_E_UNKNOWN;
@@ -466,6 +475,10 @@ bool SketchSolver_Group::resolveConstraints()
       }
     } catch (...) {
       Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
+      if (myPrevSolved) {
+        sendMessage(EVENT_SOLVER_FAILED);
+        myPrevSolved = false;
+      }
       return false;
     }
     if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
@@ -474,8 +487,17 @@ bool SketchSolver_Group::resolveConstraints()
       for (; aConstrIter != myConstraints.end(); aConstrIter++)
         aConstrIter->second->refresh();
       myFeatureStorage->blockEvents(false);
-    } else if (!myConstraints.empty())
+      if (!myPrevSolved) {
+        sendMessage(EVENT_SOLVER_REPAIRED);
+        myPrevSolved = true;
+      }
+    } else if (!myConstraints.empty()) {
       Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
+      if (myPrevSolved) {
+        sendMessage(EVENT_SOLVER_FAILED);
+        myPrevSolved = false;
+      }
+    }
 
     aResolved = true;
   }

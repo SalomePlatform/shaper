@@ -168,6 +168,8 @@ private:
   FeatureStoragePtr myFeatureStorage; ///< Container for the set of SketchPlugin features and their dependencies
 
   SketchSolver_Solver myConstrSolver;  ///< Solver for set of equations obtained by constraints
+
+  bool myPrevSolved; ///< Indicates that previous solving was done correctly
 };
 
 #endif
