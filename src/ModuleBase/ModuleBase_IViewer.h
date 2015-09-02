@@ -57,7 +57,9 @@ Q_OBJECT
   /// \param theX the X projection value
   /// \param theY the Y projection value
   /// \param theZ the Z projection value
-  virtual void setViewProjection(double theX, double theY, double theZ) = 0;
+  /// \param theTwist the twist angle in radians
+  virtual void setViewProjection( double theX, double theY, double theZ,
+                                  double theTwist ) = 0;
 
   /// Add selection filter to the viewer
   /// \param theFilter a selection filter

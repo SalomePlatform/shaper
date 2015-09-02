@@ -286,7 +286,7 @@ void NewGeom_SalomeViewer::fitAll()
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double theZ)
+void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double theZ, double theTwist)
 {
   if (!mySelector) 
     return;
@@ -297,6 +297,7 @@ void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double th
     Handle(V3d_View) aView3d = aVFrame->getViewPort()->getView();
     if (!aView3d.IsNull()) {
       aView3d->SetProj(theX, theY, theZ);
+      aView3d->SetTwist( theTwist );
       aView3d->FitAll(0.01, true);
       aView3d->SetZSize(0.);
     }

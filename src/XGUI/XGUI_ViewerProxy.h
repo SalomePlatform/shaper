@@ -48,7 +48,9 @@ Q_OBJECT
   /// \param theX the X projection value
   /// \param theY the Y projection value
   /// \param theZ the Z projection value
-  virtual void setViewProjection(double theX, double theY, double theZ);
+  /// \param theTwist the twist angle in radians
+  virtual void setViewProjection( double theX, double theY, double theZ,
+                                  double theTwist );
 
   //! Sets the view fitted all
   virtual void fitAll();

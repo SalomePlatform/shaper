@@ -47,11 +47,12 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
   }
 }
 
-void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ)
+void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ, double theTwist)
 {
   Handle(V3d_View) aView3d = activeView();
   if (!aView3d.IsNull()) {
     aView3d->SetProj(theX, theY, theZ);
+    aView3d->SetTwist( theTwist );
     aView3d->FitAll(0.01, true);
     aView3d->SetZSize(0.);
   }

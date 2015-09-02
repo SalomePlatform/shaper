@@ -152,6 +152,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
     std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
     gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
+    double aTwist = 0.0;
 
     // orienting projection
     if(aBaseShape.get() != NULL) {
@@ -168,7 +169,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
       }
     }
 
-    myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z());
+    myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
   }
   // 3. Clear text in the label
   myLabel->setText("");
