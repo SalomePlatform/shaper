@@ -56,9 +56,9 @@ def main():
     clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
     
     #[step] Activate Part_1
-    waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1")
-    clickItem(":Object browser_XGUI_DataTree", "Part\\_1", 50, 11, 0, Qt.LeftButton)
-    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Part\\_1", 50, 11, 0)
+    waitForObjectItem(":Object browser_XGUI_DataTree", "Not loaded Part\\_1")
+    clickItem(":Object browser_XGUI_DataTree", "Not loaded Part\\_1", 50, 11, 0, Qt.LeftButton)
+    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Not loaded Part\\_1", 50, 11, 0)
     activateItem(waitForObjectItem(":_QMenu", "Activate"))
     
     #[check] Check that file was loaded correct
