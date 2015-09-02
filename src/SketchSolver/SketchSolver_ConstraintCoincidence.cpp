@@ -2,6 +2,8 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Group.h>
 
+#include <SketchPlugin_Point.h>
+
 #include <map>
 
 void SketchSolver_ConstraintCoincidence::getAttributes(
@@ -169,9 +171,12 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
   Slvs_hEntity anEntity = SLVS_E_UNKNOWN;
   int anEntType;
   for (; anIter != anAttrList.end(); anIter++) {
+    Slvs_hEntity aPointID = SLVS_E_UNKNOWN;
     AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
     if (!aRefAttr)
       continue;
+
+    AttributePtr aPointAttr;
     if (aRefAttr->isObject()) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
       std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFeatFound = 
@@ -185,21 +190,29 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
         else
           myFeatureMap[aFeature] = anEntity;
       }
-    } else {
-      Slvs_hEntity anEntID = SLVS_E_UNKNOWN;
-      std::map<AttributePtr, Slvs_hEntity>::const_iterator anAttrFound =
-          myAttributeMap.find(aRefAttr->attr());
-      if (anAttrFound != myAttributeMap.end())
-        anEntID = anAttrFound->second;
-      else {
-        anEntID = myGroup->getAttributeId(aRefAttr->attr());
-        if (anEntID == SLVS_E_UNKNOWN)
-          anEntID = changeEntity(aRefAttr->attr(), anEntType);
-        else
-          myAttributeMap[aRefAttr->attr()] = anEntID;
+      // If the feature is a point, add it to the list of coincident points
+      if (aFeature->getKind() == SketchPlugin_Point::ID()) {
+        aPointID = anEntity;
+        anEntity = SLVS_E_UNKNOWN;
+        aPointAttr = aFeature->attribute(SketchPlugin_Point::COORD_ID());
       }
-      aPoints.push_back(anEntID);
-      myCoincidentPoints.insert(aRefAttr->attr());
+    } else {
+      aPointAttr = aRefAttr->attr();
+      std::map<AttributePtr, Slvs_hEntity>::const_iterator anAttrFound =
+          myAttributeMap.find(aPointAttr);
+      if (anAttrFound != myAttributeMap.end())
+        aPointID = anAttrFound->second;
+      else {
+        aPointID = myGroup->getAttributeId(aPointAttr);
+        if (aPointID == SLVS_E_UNKNOWN)
+          aPointID = changeEntity(aPointAttr, anEntType);
+      }
+    }
+
+    if (aPointAttr) { // the point is found
+      aPoints.push_back(aPointID);
+      myCoincidentPoints.insert(aPointAttr);
+      myAttributeMap[aPointAttr] = aPointID;
     }
   }
 
