@@ -225,7 +225,33 @@ void SketchSolver_Storage::removeUnusedEntities()
   }
 
   std::set<Slvs_hEntity>::const_iterator anEntIt = anUnusedEntities.begin();
-  for (; anEntIt != anUnusedEntities.end(); ++anEntIt) {
+  while (anEntIt != anUnusedEntities.end()) {
+    int aPos = Search(*anEntIt, myEntities);
+    if (aPos < 0 && aPos >= (int)myEntities.size())
+      continue;
+    Slvs_Entity anEntity = myEntities[aPos];
+    // Remove entity if and only if all its parameters unused
+    bool isUsed = false;
+    if (anEntity.distance != SLVS_E_UNKNOWN && 
+      anUnusedEntities.find(anEntity.distance) == anUnusedEntities.end())
+      isUsed = true;
+    for (int i = 0; i < 4 && !isUsed; i++)
+      if (anEntity.point[i] != SLVS_E_UNKNOWN &&
+          anUnusedEntities.find(anEntity.point[i]) == anUnusedEntities.end())
+        isUsed = true;
+    if (isUsed) {
+      anUnusedEntities.erase(anEntity.distance);
+      for (int i = 0; i < 4; i++)
+        if (anEntity.point[i] != SLVS_E_UNKNOWN)
+          anUnusedEntities.erase(anEntity.point[i]);
+      std::set<Slvs_hEntity>::iterator aRemoveIt = anEntIt++;
+      anUnusedEntities.erase(aRemoveIt);
+      continue;
+    }
+    ++anEntIt;
+  }
+
+  for (anEntIt = anUnusedEntities.begin(); anEntIt != anUnusedEntities.end(); ++anEntIt) {
     int aPos = Search(*anEntIt, myEntities);
     if (aPos >= 0 && aPos < (int)myEntities.size()) {
       // Remove entity and its parameters
