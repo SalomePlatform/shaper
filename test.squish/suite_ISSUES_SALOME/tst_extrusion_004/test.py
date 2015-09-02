@@ -38,10 +38,7 @@ def main():
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 243, 171, 0, Qt.LeftButton)
     
     #[step] Draw close contour, consisting from 4 lines
-    line_create_in_view((83, 152), (85, 346))
-    line_create_in_view((85, 346), (669, 344))
-    line_create_in_view((669, 344), (669, 162))
-    closing_line_create_in_view((669, 162), (83, 152))
+    lines_create_in_view([(83, 152), (85, 346), (669, 344), (669, 162), (83, 152)])
     
     #[step] Ok
     clickButton(waitForObject(":Sketch.property_panel_ok_QToolButton"))

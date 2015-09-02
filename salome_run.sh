@@ -17,6 +17,18 @@ source ${a_dir}/env_salome.sh
 
 set -x +e
 
-${a_dir}/salome_kill.sh
+SALOME_ARGS="-r ./test.squish/shared/testdata/SalomeApp.xml"
+SALOME_ARGS="${SALOME_ARGS} --port=${SALOME_PORT}"
+if [ -f GDB ]; then
+  echo "No --gdb-session"
+  #SALOME_ARGS="${SALOME_ARGS} --gdb-session"
+fi
+SALOME_ARGS="${SALOME_ARGS} --ns-port-log=$(pwd)/.salomeport"
 
-${KERNEL_ROOT_DIR}/bin/salome/runSalome.py --port=${SALOME_PORT} -r ./test.squish/shared/testdata/SalomeApp.xml 2>&1 >/dev/null
+${KERNEL_ROOT_DIR}/bin/salome/runSalome.py ${SALOME_ARGS} 2>&1 >/dev/null &
+SALOME_PID=$!
+wait ${SALOME_PID}
+
+echo "SALOME_PORT=$(cat $(pwd)/.salomeport)"
+
+${KERNEL_ROOT_DIR}/bin/salome/killSalomeWithPort.py ${SALOME_PORT}

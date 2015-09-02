@@ -87,6 +87,19 @@ def closing_line_create_in_view(start_point, end_point, aux=0):
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), start_point[0], start_point[1], 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), end_point[0], end_point[1], 0, Qt.LeftButton)
         
+def lines_create_in_view(points, aux=0):
+    mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    mouseClick(waitForObjectItem(":Sketch_QMenu", "Line"))
+    
+    if aux==1:       
+        clickButton(waitForObject(":Line.Auxiliary_QCheckBox"))
+    
+    for point in points:
+      mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), point[0], point[1], 0, Qt.LeftButton)
+
+def lines_close():
+    clickButton(waitForObject(":Line.property_panel_cancel_QToolButton"))        
+        
 def line_create(start_point, end_point, aux=0): #Set aux=1 to create auxiliary line
     mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
     mouseClick(waitForObjectItem(":Sketch_QMenu", "Line"))
