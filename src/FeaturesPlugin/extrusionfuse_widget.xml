@@ -11,16 +11,6 @@
       <box id="BySizes" title="By sizes" icon=":icons/dimension_up_down_32x32.png">
         <groupbox>
           <doublevalue
-            id="to_size"
-            label="Size"
-            step="1.0"
-            default="10"
-            icon=":icons/dimension_up.png"
-            tooltip="To size">
-          </doublevalue>
-        </groupbox>
-        <groupbox>
-          <doublevalue
             id="from_size"
             label="Size"
             step="1.0"
@@ -29,23 +19,18 @@
             tooltip="From size">
           </doublevalue>
         </groupbox>
-      </box>
-      <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted_32x32.png">
-        <groupbox title="To">
-          <shape_selector id="to_object"
-                          icon=":icons/plane_inverted.png"
-                          label="Plane face"
-                          tooltip="Bounding plane (select a planar face)"
-                          shape_types="face"
-                          default="&lt;base sketch&gt;">
-            <validator id="GeomValidators_Face" parameters="plane"/>
-          </shape_selector>
-          <doublevalue  id="to_offset"
-            label="Offset" step="1.0" default="0"
+        <groupbox>
+          <doublevalue
+            id="to_size"
+            label="Size"
+            step="1.0"
+            default="10"
             icon=":icons/dimension_up.png"
-            tooltip="Offset for bounding plane">
+            tooltip="To size">
           </doublevalue>
         </groupbox>
+      </box>
+      <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted_32x32.png">
         <groupbox title="From">
           <shape_selector id="from_object"
                           icon=":icons/plane.png"
@@ -58,6 +43,21 @@
           <doublevalue id="from_offset"
             label="Offset" step="1.0" default="0"
             icon=":icons/dimension_down.png"
+            tooltip="Offset for bounding plane">
+          </doublevalue>
+        </groupbox>
+        <groupbox title="To">
+          <shape_selector id="to_object"
+                          icon=":icons/plane_inverted.png"
+                          label="Plane face"
+                          tooltip="Bounding plane (select a planar face)"
+                          shape_types="face"
+                          default="&lt;base sketch&gt;">
+            <validator id="GeomValidators_Face" parameters="plane"/>
+          </shape_selector>
+          <doublevalue  id="to_offset"
+            label="Offset" step="1.0" default="0"
+            icon=":icons/dimension_up.png"
             tooltip="Offset for bounding plane">
           </doublevalue>
         </groupbox>
