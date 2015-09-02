@@ -164,11 +164,18 @@ void SketchSolver_ConstraintMultiTranslation::process()
         aNewConstr = myStorage->fixEntity(anEntity.point[0]);
       } else
         aNewConstr = myStorage->fixEntity(*aCpIt);
+      if (anEntity.type == SLVS_E_ARC_OF_CIRCLE)
+        aCircs.push_back(anEntity.h);
       mySlvsConstraints.insert(mySlvsConstraints.end(), aNewConstr.begin(), aNewConstr.end());
     }
 
-    if (!aCircs.empty())
+    if (!aCircs.empty()) {
+      if (anInitial.type == SLVS_E_CIRCLE)
+        aCircs.insert(aCircs.begin(), anInitial.distance);
+      else
+        aCircs.insert(aCircs.begin(), anInitial.h);
       myCircsAndCopies.push_back(aCircs);
+    }
   }
 
   adjustConstraint();
@@ -324,15 +331,43 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
     }
   }
 
+  std::list<Slvs_Constraint> aDiamConstr;
   for (aPointsIter = myCircsAndCopies.begin(); aPointsIter != myCircsAndCopies.end(); ++aPointsIter) {
     aCopyIter = aPointsIter->begin();
     const Slvs_Entity& anInitial = myStorage->getEntity(*aCopyIter);
-    const Slvs_Param& anInitRad = myStorage->getParameter(anInitial.param[0]);
-    for (++aCopyIter; aCopyIter != aPointsIter->end(); ++aCopyIter) {
-      const Slvs_Entity& aCopy = myStorage->getEntity(*aCopyIter);
-      Slvs_Param aCopyRad = myStorage->getParameter(aCopy.param[0]);
-      aCopyRad.val = anInitRad.val;
-      myStorage->updateParameter(aCopyRad);
+    if (anInitial.type == SLVS_E_DISTANCE) {
+      const Slvs_Param& anInitRad = myStorage->getParameter(anInitial.param[0]);
+      for (++aCopyIter; aCopyIter != aPointsIter->end(); ++aCopyIter) {
+        const Slvs_Entity& aCopy = myStorage->getEntity(*aCopyIter);
+        Slvs_Param aCopyRad = myStorage->getParameter(aCopy.param[0]);
+        aCopyRad.val = anInitRad.val;
+        myStorage->updateParameter(aCopyRad);
+      }
+    } else if (anInitial.type == SLVS_E_ARC_OF_CIRCLE) {
+      const Slvs_Entity& aCenterEnt = myStorage->getEntity(anInitial.point[0]);
+      const Slvs_Entity& aStartEnt = myStorage->getEntity(anInitial.point[1]);
+
+      if (aDiamConstr.empty())
+        aDiamConstr = myStorage->getConstraintsByType(SLVS_C_DIAMETER);
+      // Calculate diameter of initial arc
+      double aDiam = 0.0;
+      for (int i = 0; i < 2; i++) {
+        double d = myStorage->getParameter(aStartEnt.param[i]).val -
+                   myStorage->getParameter(aCenterEnt.param[i]).val;
+        aDiam += d * d;
+      }
+      aDiam = sqrt(aDiam) * 2.0;
+      // Update the Diameter constraints of copied arcs
+      for (++aCopyIter; aCopyIter != aPointsIter->end(); ++aCopyIter) {
+        std::list<Slvs_Constraint>::iterator aDCIt = aDiamConstr.begin();
+        for (; aDCIt != aDiamConstr.end(); ++aDCIt)
+          if (aDCIt->entityA == *aCopyIter) {
+            aDCIt->valA = aDiam;
+            myStorage->updateConstraint(*aDCIt);
+            aDiamConstr.erase(aDCIt);
+            break;
+          }
+      }
     }
   }
 
