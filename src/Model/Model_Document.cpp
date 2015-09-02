@@ -512,7 +512,7 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
       subDoc(*aSubIter)->undoInternal(theWithSubs, theSynchronize);
     }
   }
-  // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
+  // after undo of all sub-documents to avoid updates on not-modified data (issue 370)
   if (theSynchronize) {
     myObjs->synchronizeFeatures(aDeltaLabels, true, isRoot());
     // update the current features status

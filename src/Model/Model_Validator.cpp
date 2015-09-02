@@ -12,8 +12,8 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeValidator.h>
-#include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
+#include <Model_Data.h>
 
 #include <Events_Error.h>
 
@@ -150,9 +150,13 @@ void Model_ValidatorsFactory::addDefaultAttributeValidators(Validators& theValid
 
 bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
 {
-  ModelAPI_ExecState anExecState = theFeature->data()->execState();
-  theFeature->setError("", false);
-  theFeature->data()->execState(anExecState);
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theFeature->data());
+  if (aData.get() && aData->isValid()) {
+    if (aData->execState() == ModelAPI_StateDone)
+      aData->eraseErrorString(); // no error => erase the information string
+  } else {
+    return false; // feature is broken, already not presented in the data structure
+  }
 
   // check feature validators first
   Validators aValidators;
@@ -204,7 +208,6 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
   //}
   
   // check all attributes for validity
-  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   // Validity of data is checked by "Model_FeatureValidator" (kDefaultId)
   // if (!aData || !aData->isValid())
   //   return false;

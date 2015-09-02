@@ -102,24 +102,30 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
         myIsParamUpdated = true;
       }
-      // created objects are always must be up to date (python box feature)
-      // and updated not in internal uptation chain
-      myUpdated[*anObjIter] = myModification;
+      // on undo/redo, abort do not update persisten features
+      FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
+      if (std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures() ||
+          (anUpdated.get() && !anUpdated->isPersistentResult())) {
+        // created objects are always must be up to date (python box feature)
+        // and updated not in internal uptation chain
+        myUpdated[*anObjIter] = myModification;
 
-      // something is updated during the execution: re-execute it (sketch update by parameters or
-      // Box macro that updates the upper features during the execution)
-      if (myIsExecuted) { 
-        FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
-        if (anUpdated.get() &&  anUpdated->data()->isValid())
-          iterateUpdateBreak(anUpdated);
+        // something is updated during the execution: re-execute it (sketch update by parameters or
+        // Box macro that updates the upper features during the execution)
+        if (myIsExecuted) { 
+          FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
+          if (anUpdated.get() &&  anUpdated->data()->isValid())
+            iterateUpdateBreak(anUpdated);
+        }
+#ifdef DEB_UPDATE
+        if (myIsExecuted) std::cout<<"During execution ";
+        if ((*anObjIter)->data() && (*anObjIter)->data()->isValid()) {
+          std::cout<<"add updated "<<(*anObjIter)->groupName()<<" "
+            <<(*anObjIter)->data()->name()<<std::endl;
+        }
+#endif
       }
-      #ifdef DEB_UPDATE
-      if (myIsExecuted) std::cout<<"During execution ";
-      if ((*anObjIter)->data() && (*anObjIter)->data()->isValid()) {
-        std::cout<<"add updated "<<(*anObjIter)->groupName()<<" "
-          <<(*anObjIter)->data()->name()<<std::endl;
-      }
-      #endif
+
     }
     // this event is for solver update, not here, do not react immediately
     if (!isOnlyResults && !(theMessage->eventID() == kMovedEvent))
@@ -273,7 +279,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
   // If automatice update is not needed and feature attributes were not updated right now,
   // do not execute it and do not update arguments.
-  if (!myIsAutomatic && myUpdated.find(theFeature) == myUpdated.end() && !aCompos.get()) {
+  if (!myIsAutomatic && 
+       (myUpdated.find(theFeature) == myUpdated.end() || myUpdated[theFeature] != myModification)
+       && !aCompos.get()) {
     // execute will be performed later, but some features may have not-result 
     // presentations, so call update for them (like coincidence in the sketcher)
     static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -300,7 +308,8 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     return;
   }
 
-  bool aJustUpdated = myUpdated.find(theFeature) != myUpdated.end();
+  // only the currently updated features are executed
+  bool aJustUpdated = myUpdated.find(theFeature) != myUpdated.end() && myUpdated[theFeature] == myModification;
 
   if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
     aJustUpdated = true;
@@ -322,6 +331,10 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
       if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) { // it is done (in the tree)
         theFeature->data()->execState(ModelAPI_StateDone);
       }
+      // it will be not updated with new modifications: only the currently updated features are updated
+      //if (myUpdated.find(theFeature) != myUpdated.end()) {
+      //  myUpdated.erase(theFeature); // do not update this persistent feature even in the future
+      //}
     }
     return;
   }

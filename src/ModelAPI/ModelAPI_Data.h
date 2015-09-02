@@ -161,6 +161,12 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Returns the owner of htis data
   virtual std::shared_ptr<ModelAPI_Object> owner() = 0;
 
+  /// Returns true if the object is deleted, but some data is still keept in memory
+  virtual bool isDeleted() = 0;
+
+  /// Sets true if the object is deleted, but some data is still keept in memory
+  virtual void setIsDeleted(const bool theFlag) = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data();

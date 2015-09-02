@@ -42,6 +42,7 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
+#include <TColStd_HArray1OfByte.hxx>
 
 #include <string>
 
@@ -53,6 +54,8 @@
 static const int kFlagInHistory = 0;
 //                             1 - is displayed or not
 static const int kFlagDisplayed = 1;
+//                             2 - is deleted (for results) or not
+static const int kFlagDeleted = 2;
 
 // invalid data
 const static std::shared_ptr<ModelAPI_Data> kInvalid(new Model_Data());
@@ -67,9 +70,16 @@ void Model_Data::setLabel(TDF_Label theLab)
   // set or get the default flags
   if (!myLab.FindAttribute(TDataStd_BooleanArray::GetID(), myFlags)) {
     // set default values if not found
-    myFlags = TDataStd_BooleanArray::Set(myLab, 0, 1);
+    myFlags = TDataStd_BooleanArray::Set(myLab, 0, 2);
     myFlags->SetValue(kFlagInHistory, Standard_True); // is in history by default is true
     myFlags->SetValue(kFlagDisplayed, Standard_True); // is displayed by default is true
+    myFlags->SetValue(kFlagDeleted, Standard_False); // is deleted by default is false
+  } else if (myFlags->Length() != 3) { // for old formats support
+    Handle(TColStd_HArray1OfByte) aNewArray = new TColStd_HArray1OfByte(0, 2);
+    aNewArray->SetValue(0, myFlags->Upper() > 0 ? myFlags->Value(0) : Standard_True); 
+    aNewArray->SetValue(1, myFlags->Upper() > 1 ? myFlags->Value(1) : Standard_True); 
+    aNewArray->SetValue(1, myFlags->Upper() > 2 ? myFlags->Value(2) : Standard_False); 
+    myFlags->SetInternalArray(aNewArray);
   }
 }
 
@@ -317,6 +327,11 @@ void Model_Data::setError(const std::string& theError, bool theSend)
   TDataStd_AsciiString::Set(myLab, theError.c_str());
 }
 
+void Model_Data::eraseErrorString()
+{
+  myLab.ForgetAttribute(TDataStd_AsciiString::GetID());
+}
+
 std::string Model_Data::error() const
 {
   Handle(TDataStd_AsciiString) anErrorAttr;
@@ -393,7 +408,7 @@ void Model_Data::updateConcealmentFlag()
   // thus, no concealment references anymore => make not-concealed
   std::shared_ptr<ModelAPI_Result> aRes = 
     std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
-  if (aRes.get()) {
+  if (aRes.get() && aRes->isConcealed()) {
     aRes->setIsConcealed(false);
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
     ModelAPI_EventCreator::get()->sendUpdated(aRes, anEvent);
@@ -545,6 +560,16 @@ bool Model_Data::isInHistory()
 void Model_Data::setIsInHistory(const bool theFlag)
 {
   return myFlags->SetValue(kFlagInHistory, theFlag);
+}
+
+bool Model_Data::isDeleted()
+{
+  return myFlags->Value(kFlagDeleted) == Standard_True;
+}
+
+void Model_Data::setIsDeleted(const bool theFlag)
+{
+  return myFlags->SetValue(kFlagDeleted, theFlag);
 }
 
 bool Model_Data::isDisplayed()

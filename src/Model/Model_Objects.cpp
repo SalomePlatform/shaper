@@ -475,9 +475,10 @@ void Model_Objects::allResults(const std::string& theGroupID, std::list<ResultPt
         for (; aRIter != aResults.cend(); aRIter++) {
           ResultPtr aRes = *aRIter;
           if (aRes->groupName() != theGroupID) break; // feature have only same group results
-          if (aRes->isInHistory() && !aRes->isConcealed()) {
+          // iterate also concealed: ALL RESULTS (for translation parts undo/redo management)
+          //if (aRes->isInHistory() && !aRes->isConcealed()) {
             theResults.push_back(*aRIter);
-          }
+          //}
         }
       }
     }
@@ -931,7 +932,8 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
   while(aResIter != theFeature->results().cend()) {
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(*aResIter);
     if (aBody.get()) {
-      if (!aBody->data()->isValid()) { 
+      std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(aBody->data());
+      if (!aData.get() || !aData->isValid() || aData->isDeleted()) { 
         // found a disappeared result => remove it
         theFeature->eraseResultFromList(aBody);
         // start iterate from beginning because iterator is corrupted by removing
@@ -977,7 +979,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
             TCollection_AsciiString(aGroup->Get()).ToCString());
         }
       }
-      if (aNewBody) {
+      if (aNewBody && !aNewBody->data()->isDeleted()) {
         theFeature->setResult(aNewBody, aResIndex);
       }
     }

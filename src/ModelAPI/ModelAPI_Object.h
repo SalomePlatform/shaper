@@ -55,7 +55,7 @@ class ModelAPI_Object: public ModelAPI_Entity
   virtual void initAttributes() = 0;
 
   /// Returns the feature is disabled or not.
-  virtual bool isDisabled() const = 0;
+  virtual bool isDisabled() = 0;
 
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute

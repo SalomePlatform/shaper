@@ -170,6 +170,9 @@ class Model_Data : public ModelAPI_Data
   /// Registers error during the execution, causes the ExecutionFailed state
   MODEL_EXPORT virtual void setError(const std::string& theError, bool theSend = true);
 
+  /// Erases the error string if it is not empty
+  void eraseErrorString();
+
   /// Registers error during the execution, causes the ExecutionFailed state
   MODEL_EXPORT virtual std::string error() const;
 
@@ -210,6 +213,12 @@ protected:
 
   /// Defines the custom "is in history" behavior
   MODEL_EXPORT virtual void setIsInHistory(const bool theFlag);
+
+  /// Returns true if the object is deleted, but some data is still keept in memory
+  MODEL_EXPORT virtual bool isDeleted();
+
+  /// Sets true if the object is deleted, but some data is still keept in memory
+  MODEL_EXPORT virtual void setIsDeleted(const bool theFlag);
 
 private:
   /// Removes all information about back references

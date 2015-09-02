@@ -18,6 +18,7 @@ bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, cons
 {
   if (myIsDisabled != theFlag) {
     myIsDisabled = theFlag;
+    data()->setIsDeleted(theFlag); // store it in data model (t oget back on undo/redo, etc)
     // this must be before "updated" message send to have history updated for OB update
     document()->updateHistory(groupName()); // to update the history cash data in the document
     // generate related events
@@ -36,8 +37,11 @@ bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, cons
   return false;
 }
 
-bool ModelAPI_Result::isDisabled() const
+bool ModelAPI_Result::isDisabled()
 {
+  if (myIsDisabled != data()->isDeleted())
+    setDisabled(std::dynamic_pointer_cast<ModelAPI_Result>(
+      data()->owner()), data()->isDeleted()); // restore from the data model the correct value
   return myIsDisabled;
 }
 

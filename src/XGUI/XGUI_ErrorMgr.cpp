@@ -38,7 +38,7 @@ const char* toString(ModelAPI_ExecState theExecState)
   TO_STRING(ModelAPI_StateExecFailed)
   TO_STRING(ModelAPI_StateInvalidArgument)
   TO_STRING(ModelAPI_StateNothing)
-  default: "Unknown ExecState.";
+  default: return "Unknown ExecState.";
   }
 #undef TO_STRING
 }

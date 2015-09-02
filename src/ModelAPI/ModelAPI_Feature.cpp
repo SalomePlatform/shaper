@@ -194,7 +194,7 @@ bool ModelAPI_Feature::setDisabled(const bool theFlag)
   return false;
 }
 
-bool ModelAPI_Feature::isDisabled() const
+bool ModelAPI_Feature::isDisabled()
 {
   return myIsDisabled;
 }

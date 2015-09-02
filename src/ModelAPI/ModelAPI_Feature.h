@@ -124,7 +124,7 @@ class ModelAPI_Feature : public ModelAPI_Object
   MODELAPI_EXPORT virtual bool setDisabled(const bool theFlag);
 
   /// Returns the feature is disabled or not.
-  MODELAPI_EXPORT virtual bool isDisabled() const;
+  MODELAPI_EXPORT virtual bool isDisabled();
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Feature();
