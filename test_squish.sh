@@ -19,7 +19,7 @@ for aut in linux_run.sh salome_run.sh; do
 done
 squishserver --config setAUTTimeout 120
 squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
-squishserver --verbose --port=${SQUISHSERVER_PORT} 1>server.log 2>server.err &
+squishserver --verbose --port=${SQUISHSERVER_PORT} 1>log_squishserver 2>err_squishserver &
 
 squishrunner --port=${SQUISHSERVER_PORT} --config setCursorAnimation off
 

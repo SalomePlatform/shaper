@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 a_dir=$(dirname $0)
 
