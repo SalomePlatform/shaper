@@ -135,6 +135,15 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
       // to sub, so the whole result is selected
       aSelLab.ForgetAllAttributes(true);
       TDataStd_UAttribute::Set(aSelLab, kCONSTUCTION_SIMPLE_REF_ID);
+      // For correct naming selection, put the shape into the naming structure.
+      // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
+      TNaming_Builder aBuilder(aSelLab);
+      aBuilder.Generated(theContext->shape()->impl<TopoDS_Shape>());
+      std::shared_ptr<Model_Document> aMyDoc = 
+        std::dynamic_pointer_cast<Model_Document>(owner()->document());
+      std::string aName = theContext->data()->name();
+      aMyDoc->addNamingName(aSelLab, aName);
+      TDataStd_Name::Set(aSelLab, aName.c_str());
     } else {
       selectConstruction(theContext, theSubShape);
     }
