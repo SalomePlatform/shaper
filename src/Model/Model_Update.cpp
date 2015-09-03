@@ -380,6 +380,23 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
       aRes->data()->setUpdateID(theFeature->data()->updateID());
     }
     ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+    // iterate sub-bodies of compsolid
+    ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+    if (aComp.get()) {
+      int aNumSub = aComp->numberOfSubs();
+      for(int a = 0; a < aNumSub; a++) {
+        ResultPtr aSub = aComp->subResult(a);
+        if (!aSub->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
+          aSub->data()->execState(theState);
+          if (theState == ModelAPI_StateDone) // feature become "done", so execution changed results
+            myUpdated[aSub] = myModification;
+        }
+        if (theFeature->data()->updateID() > aSub->data()->updateID()) {
+          aSub->data()->setUpdateID(theFeature->data()->updateID());
+        }
+        ModelAPI_EventCreator::get()->sendUpdated(aSub, EVENT_DISP);
+      }
+    }
   }
   // to redisplay "presentable" feature (for ex. distance constraint)
   ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
