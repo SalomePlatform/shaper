@@ -37,7 +37,7 @@ std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeBoolean::addFeature(st
   if (aNew) {
     data()->reference(SKETCH_OBJECT_ID())->setValue(aNew);
   }
-   // set as current also after it becomes sub to set correctly enabled for other sketch subs
+  // set as current also after it becomes sub to set correctly enabled for other sketch subs
   document()->setCurrentFeature(aNew, false);
   return aNew;
 }
