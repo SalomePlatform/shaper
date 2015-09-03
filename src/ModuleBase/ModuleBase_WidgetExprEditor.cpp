@@ -36,7 +36,7 @@
 #include <string>
 
 ExpressionEditor::ExpressionEditor(QWidget* theParent)
-: QPlainTextEdit(theParent)
+: QPlainTextEdit(theParent), myCompletedAndSelected(false)
 {
   myCompleter = new QCompleter(this);
   myCompleter->setWidget(this);
