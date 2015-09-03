@@ -23,6 +23,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintEqual.h>
@@ -191,6 +193,9 @@ bool SketchSolver_Group::changeConstraint(
   if (!theConstraint)
     return false;
 
+  if (!checkFeatureValidity(theConstraint))
+    return false;
+
   bool isNewConstraint = myConstraints.find(theConstraint) == myConstraints.end();
   if (isNewConstraint) {
     // Add constraint to the current group
@@ -280,6 +285,9 @@ bool SketchSolver_Group::changeConstraint(
 
 bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
+  if (!checkFeatureValidity(theFeature))
+    return false;
+
   std::set<ConstraintPtr> aConstraints =
       myFeatureStorage->getConstraints(std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature));
   if (aConstraints.empty())
@@ -696,5 +704,21 @@ void SketchSolver_Group::setTemporary(SolverConstraintPtr theConstraint)
 {
   theConstraint->makeTemporary();
   myTempConstraints.insert(theConstraint);
+}
+
+
+// ============================================================================
+//  Function: checkFeatureValidity
+//  Class:    SketchSolver_Group
+//  Purpose:  verifies is the feature valid
+// ============================================================================
+bool SketchSolver_Group::checkFeatureValidity(FeaturePtr theFeature)
+{
+  if (!theFeature || !theFeature->data()->isValid())
+    return true;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  return aFactory->validate(theFeature);
 }
 

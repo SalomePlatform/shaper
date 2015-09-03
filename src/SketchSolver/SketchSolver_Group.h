@@ -157,6 +157,9 @@ private:
   /// \brief Append given constraint to th group of temporary constraints
   void setTemporary(SolverConstraintPtr theConstraint);
 
+  /// \brief Verifies is the feature valid
+  bool checkFeatureValidity(FeaturePtr theFeature);
+
 private:
   Slvs_hGroup myID; ///< Index of the group
   Slvs_hEntity myWorkplaneID; ///< Index of workplane, the group is based on
