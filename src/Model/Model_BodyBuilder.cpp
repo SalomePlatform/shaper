@@ -86,6 +86,8 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
       aBuilder.Delete(aPairsIter->first);
     } else if (anEvol == TNaming_PRIMITIVE) {
       aBuilder.Generated(aPairsIter->second);
+    } else if (anEvol == TNaming_SELECTED) {
+      aBuilder.Select(aPairsIter->first, aPairsIter->second);
     }
   }
   // recursive call for all sub-labels
@@ -213,6 +215,22 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
     }
   }
 }
+
+void  Model_BodyBuilder::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData) {
+    clean();   
+    if (!theShape.get())
+      return; // bad shape
+    TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+    if (aShape.IsNull())
+      return;  // null shape inside
+    TNaming_Builder aBuilder(aData->shapeLab());
+    aBuilder.Select(aShape, aShape);
+  }
+}
+
 void Model_BodyBuilder::clean()
 {
   std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();

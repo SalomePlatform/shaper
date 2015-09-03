@@ -103,7 +103,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
   // Getting faces to create solids.
   std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
                                                      reference(SKETCH_OBJECT_ID())->value());
-  if(!aSketchFeature) {
+  if(!aSketchFeature || aSketchFeature->results().empty()) {
     return;
   }
   ResultPtr aSketchRes = aSketchFeature->results().front();
@@ -218,11 +218,11 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
     theResultBody->store(theAlgo.shape());
   } else {
     const int aGenTag = 1;
-    const int aFromTag = 2;
-    const int aToTag = 3;
-    const int aModTag = 4;
-    const int aDelTag = 5;
-    const int aSubsolidsTag=6; /// sub solids will be placed at labels 6, 7, etc. if result is compound of solids
+    const int aModTag = 2;
+    const int aDelTag = 3;
+    const int aSubsolidsTag=4; /// sub solids will be placed at labels 6, 7, etc. if result is compound of solids
+    int aToTag = 5; // may be many labels, starting from this index
+    int aFromTag = 10000; // may be many labels, starting from this index or last aToTag index
     const std::string aGenName = "Generated";
     const std::string aModName = "Modified";
     const std::string aLatName = "LateralFace";
@@ -262,16 +262,17 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         if(aSubShapes->isBound(aToFace)) {
           aToFace = aSubShapes->find(aToFace);
         }
-        theResultBody->generated(aToFace, aToName, aToTag);
+        theResultBody->generated(aToFace, aToName, aToTag++);
       }
 
       //Insert from faces
+      if (aFromTag < aToTag) aFromTag = aToTag;
       for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
         std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
         if(aSubShapes->isBound(aFromFace)) {
           aFromFace = aSubShapes->find(aFromFace);
         }
-        theResultBody->generated(aFromFace, aFromName, aFromTag);
+        theResultBody->generated(aFromFace, aFromName, aFromTag++);
       }
     }
 

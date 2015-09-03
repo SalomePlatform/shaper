@@ -190,25 +190,25 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
 
   //Insert to faces
   const std::string aToName = "ToFace";
-  const int aToTag = 2;
+  int aToTag = 2;
   const ListOfShape& aToFaces = thePrismAlgo.toFaces();
   for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
     std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
     if(aSubShapes->isBound(aToFace)) {
       aToFace = aSubShapes->find(aToFace);
     }
-    theResultBody->generated(aToFace, aToName, aToTag);
+    theResultBody->generated(aToFace, aToName, aToTag++);
   }
 
   //Insert from faces
   const std::string aFromName = "FromFace";
-  const int aFromTag = 3;
+  int aFromTag = aToTag > 10000 ? aToTag : 10000;
   const ListOfShape& aFromFaces = thePrismAlgo.fromFaces();
   for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
     std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
     if(aSubShapes->isBound(aFromFace)) {
       aFromFace = aSubShapes->find(aFromFace);
     }
-    theResultBody->generated(aFromFace, aFromName, aFromTag);
+    theResultBody->generated(aFromFace, aFromName, aFromTag++);
   }
 }

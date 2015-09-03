@@ -41,6 +41,11 @@ void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& th
   myBuilder->storeModified(theOldShape, theNewShape, theDecomposeSolidsTag);
 }
 
+void ModelAPI_ResultBody::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  myBuilder->storeWithoutNaming(theShape);
+}
+
 std::shared_ptr<GeomAPI_Shape> ModelAPI_ResultBody::shape()
 {
   return myBuilder->shape();

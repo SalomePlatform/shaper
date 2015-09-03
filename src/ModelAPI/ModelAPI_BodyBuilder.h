@@ -38,6 +38,9 @@ public:
 	                          const std::shared_ptr<GeomAPI_Shape>& theNewShape,
                             const int theDecomposeSolidsTag = 0) = 0;
 
+  /// Stores the shape without naming support
+  virtual void storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
   /// Returns the shape-result produced by this feature
   virtual std::shared_ptr<GeomAPI_Shape> shape() = 0;
 

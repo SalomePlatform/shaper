@@ -55,6 +55,10 @@ public:
   MODELAPI_EXPORT virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
     const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theDecomposeSolidsTag = 0);
 
+  /// Stores the shape without naming support
+  MODELAPI_EXPORT virtual void storeWithoutNaming(
+    const std::shared_ptr<GeomAPI_Shape>& theShape);
+
   /// Returns the shape-result produced by this feature
   MODELAPI_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
