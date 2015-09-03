@@ -3,13 +3,13 @@
     <group id="Samples">
 
       <feature id="Box" title="Box" tooltip="Create a box parallel to xyz by extruding a rectangular" icon=":pictures/box_ico.png">
-        <doublevalue id="width"  label="dx: " min="0" step="1.0" default="50" tooltip="Sets the box width">
+        <doublevalue id="width"  label="width: " min="0" step="1.0" default="50" tooltip="Sets the box width">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>
-        <doublevalue id="length" label="dy: " min="0" step="1.0" default="50" tooltip="Sets the box length">
+        <doublevalue id="length" label="length: " min="0" step="1.0" default="50" tooltip="Sets the box length">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>
-        <doublevalue id="height" label="dz: " min="0" step="1.0" default="50" tooltip="Sets the box height">
+        <doublevalue id="height" label="height: " min="0" step="1.0" default="50" tooltip="Sets the box height">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>
       </feature>
