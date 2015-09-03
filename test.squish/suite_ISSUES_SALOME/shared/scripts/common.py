@@ -18,9 +18,10 @@ def activate_newgeom():
     
 def close_application():
     sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
-    waitForObject(":Exit.Shutdown servers_QCheckBox").setChecked(True)
+    #waitForObject(":Exit.Shutdown servers_QCheckBox").setChecked(True)
     clickButton(waitForObject(":Exit.Ok_QPushButton"))
     clickButton(waitForObject(":Close active study.Close w/o saving_QPushButton"))
+    snooze(10)
 
 def close_application_wo_saving():
     sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
