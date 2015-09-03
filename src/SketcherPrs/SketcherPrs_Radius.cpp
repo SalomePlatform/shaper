@@ -18,6 +18,8 @@
 #include <GeomAPI_XYZ.h>
 #include <ModelAPI_AttributeDouble.h>
 
+#include <gp_Circ.hxx>
+
 static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension);
@@ -38,7 +40,6 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   SetDimensionAspect(myAspect);
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
 }
-
 
 void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                  const Handle(Prs3d_Presentation)& thePresentation, 
@@ -62,6 +63,10 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   std::shared_ptr<ModelAPI_Feature> aCyrcFeature = ModelAPI_Feature::feature(anAttr->object());
   double aRadius = 1;
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
+  // it is possible that circle result becomes zero, in this case the presentation should disappear
+  // for example, it happens when circle radius is set to zero
+  if (!aCyrcFeature)
+    return;
   if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
@@ -84,7 +89,13 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
     
   std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(myConstraint, myPlane);
 
-  SetMeasuredGeometry(aCircle.impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
+  gp_Circ aCirc = aCircle.impl<gp_Circ>();
+  gp_Pnt anAncorPnt = anAnchor->impl<gp_Pnt>();
+  // anchor point should not coincide to the location point of the circle
+  // OCCT does not process this case.
+  if (anAncorPnt.Distance(aCirc.Location()) < 1e-7)
+    return;
+  SetMeasuredGeometry(aCirc, anAncorPnt);
   SetCustomValue(aRadius);
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
