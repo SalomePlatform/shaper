@@ -314,28 +314,36 @@ bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string th
 void Model_ValidatorsFactory::registerCase(std::string theFeature, std::string theAttribute,
     std::string theSwitchId, std::string theCaseId)
 {
-  std::map<std::string, std::map<std::string, std::pair<std::string, std::string> > >::iterator 
-    aFindFeature = myCases.find(theFeature);
+  std::map<std::string, std::map<std::string, std::pair<std::string, std::set<std::string> > > >
+    ::iterator aFindFeature = myCases.find(theFeature);
   if (aFindFeature == myCases.end()) {
-    myCases[theFeature] = std::map<std::string, std::pair<std::string, std::string> >();
+    myCases[theFeature] = std::map<std::string, std::pair<std::string, std::set<std::string> > >();
     aFindFeature = myCases.find(theFeature);
   }
-  (aFindFeature->second)[theAttribute] = std::pair<std::string, std::string>(theSwitchId, theCaseId);
+  std::map<std::string, std::pair<std::string, std::set<std::string> > >::iterator aFindAttrID =
+    aFindFeature->second.find(theAttribute);
+  if (aFindAttrID == aFindFeature->second.end()) {
+    aFindFeature->second[theAttribute] =
+      std::pair<std::string, std::set<std::string> >(theSwitchId, std::set<std::string>());
+    aFindAttrID = aFindFeature->second.find(theAttribute);
+  }
+  aFindAttrID->second.second.insert(theCaseId);
 }
 
-bool Model_ValidatorsFactory::isCase(
-  FeaturePtr theFeature, std::string theAttribute)
+bool Model_ValidatorsFactory::isCase(FeaturePtr theFeature, std::string theAttribute)
 {
-  std::map<std::string, std::map<std::string, std::pair<std::string, std::string> > >::iterator 
-    aFindFeature = myCases.find(theFeature->getKind());
+  std::map<std::string, std::map<std::string, std::pair<std::string, std::set<std::string> > > >
+    ::iterator aFindFeature = myCases.find(theFeature->getKind());
   if (aFindFeature != myCases.end()) {
-    std::map<std::string, std::pair<std::string, std::string> >::iterator
-      aFindAttr = aFindFeature->second.find(theAttribute);
-    if (aFindAttr != aFindFeature->second.end()) {
+    std::map<std::string, std::pair<std::string, std::set<std::string> > >::iterator
+      aFindAttrID = aFindFeature->second.find(theAttribute);
+    if (aFindAttrID != aFindFeature->second.end()) {
       // the the switch-attribute that contains the case value
-      AttributeStringPtr aSwitch = theFeature->string(aFindAttr->second.first);
+      AttributeStringPtr aSwitch = theFeature->string(aFindAttrID->second.first);
       if (aSwitch.get()) {
-        return aSwitch->value() == aFindAttr->second.second; // the second is the case identifier
+         // the second has the case identifier
+        return aFindAttrID->second.second.find(aSwitch->value()) != 
+               aFindAttrID->second.second.end();
       }
     }
   }

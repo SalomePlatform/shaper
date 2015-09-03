@@ -39,8 +39,9 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   std::map<std::string, std::set<std::string> > myConcealed;
   /// Stores the registered attributes must be checked only if the particular case is activated
   /// Map from feature kind to map of attribute IDs to pair 
-  // (switchId (ID of the attribute) and case Id (possible values of the switch attribute))
-  std::map<std::string, std::map<std::string, std::pair<std::string, std::string> > > myCases;
+  // (switchId (ID of the attribute) and case Ids (possible values of the switch attribute))
+  std::map<std::string, std::map<std::string,
+    std::pair<std::string, std::set<std::string> > > > myCases;
 
  public:
   /// Registers the instance of the validator by the ID
