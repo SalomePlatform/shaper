@@ -310,7 +310,13 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   }
 
   // only the currently updated features are executed
-  bool aJustUpdated = myUpdated.find(theFeature) != myUpdated.end() && myUpdated[theFeature] == myModification;
+  bool aJustUpdated = myUpdated.find(theFeature) != myUpdated.end();
+  if (aJustUpdated) {
+    // if preview is not needed, the created feature was not updated before, so, myModification is not actual for this
+    if (theFeature->isPreviewNeeded()) {
+      aJustUpdated = myUpdated[theFeature] == myModification;
+    }
+  }
 
   if (myIsAutomatic && theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
     aJustUpdated = true;
