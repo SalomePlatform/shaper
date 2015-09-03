@@ -33,6 +33,8 @@
 #include <Geom_Plane.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
+#include <IntAna_IntConicQuad.hxx>
+#include <IntAna_Quadric.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
@@ -175,20 +177,19 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
     }
 
     // Project points to bounding planes. Search max distance to them.
-    const TopoDS_Shape& aBndToShape = aBoundingToShape->impl<TopoDS_Shape>();
-    const TopoDS_Shape& aBndFromShape = aBoundingFromShape->impl<TopoDS_Shape>();
+    IntAna_Quadric aBndToQuadric(gp_Pln(aToPnt->impl<gp_Pnt>(), aToDir->impl<gp_Dir>()));
+    IntAna_Quadric aBndFromQuadric(gp_Pln(aFromPnt->impl<gp_Pnt>(), aFromDir->impl<gp_Dir>()));
     Standard_Real aMaxToDist = 0, aMaxFromDist = 0;
     gp_Vec aNormal(aBaseDir->impl<gp_Dir>());
     for(int i = 0; i < 8; i++) {
       gp_Lin aLine(aPoints[i], aNormal);
-      TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(aLine).Edge();
-      BRepExtrema_ExtCF aToExt(anEdge, TopoDS::Face(aBndToShape));
-      BRepExtrema_ExtCF aFromExt(anEdge, TopoDS::Face(aBndFromShape));
-      if(aToExt.NbExt() == 0 || aFromExt.NbExt() == 0) {
+      IntAna_IntConicQuad aToIntAna(aLine, aBndToQuadric);
+      IntAna_IntConicQuad aFromIntAna(aLine, aBndFromQuadric);
+      if(aToIntAna.NbPoints() == 0 || aFromIntAna.NbPoints() == 0) {
         return;
       }
-      const gp_Pnt& aPntOnToFace = aToExt.PointOnFace(1);
-      const gp_Pnt& aPntOnFromFace = aFromExt.PointOnFace(1);
+      const gp_Pnt& aPntOnToFace = aToIntAna.Point(1);
+      const gp_Pnt& aPntOnFromFace = aFromIntAna.Point(1);
       if(aPoints[i].Distance(aPntOnToFace) > aMaxToDist) {
         aMaxToDist = aPoints[i].Distance(aPntOnToFace);
       }
@@ -223,11 +224,10 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
 
     // Orienting bounding planes.
     gp_Lin aLine(aCentrePnt, aNormal);
-    TopoDS_Edge anEdge = BRepBuilderAPI_MakeEdge(aLine).Edge();
-    BRepExtrema_ExtCF aToExt(anEdge, TopoDS::Face(aBndToShape));
-    BRepExtrema_ExtCF aFromExt(anEdge, TopoDS::Face(aBndFromShape));
-    Standard_Real aToParameter = aToExt.ParameterOnEdge(1);
-    Standard_Real aFromParameter = aFromExt.ParameterOnEdge(1);
+    IntAna_IntConicQuad aToIntAna(aLine, aBndToQuadric);
+    IntAna_IntConicQuad aFromIntAna(aLine, aBndFromQuadric);
+    Standard_Real aToParameter = aToIntAna.ParamOnConic(1);
+    Standard_Real aFromParameter = aFromIntAna.ParamOnConic(1);
     if(aToParameter > aFromParameter) {
       gp_Vec aVec = aToDir->impl<gp_Dir>();
       if((aVec * aNormal) > 0) {
