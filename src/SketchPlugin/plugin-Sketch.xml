@@ -98,7 +98,9 @@
             <validator id="GeomValidators_ShapeType" parameters="circle"/>
         </shape_selector>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
-        <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed"/>
+        <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
         <validator id="PartSet_RadiusSelection"/>
       </feature>
 
