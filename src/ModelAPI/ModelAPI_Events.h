@@ -51,6 +51,9 @@ static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
 static const char * EVENT_SOLVER_FAILED = "SolverFailed";
 static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
 
+/// Event ID that order of objects in group is changed, so, tree must be fully rectreated (movement of feature)
+static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {
@@ -81,10 +84,36 @@ protected:
   virtual ~ModelAPI_ObjectDeletedMessage();
 
 public:
-  /// Returns the feature that has been updated
+  /// Returns the document that has been updated
   virtual std::shared_ptr<ModelAPI_Document> document() const = 0;
 
-  /// Returns the group where the feature was deleted
+  /// Returns the groups where the objects were deleted
+  virtual const std::set<std::string>& groups() const = 0;
+
+  /// Creates the new empty message of this kind
+  virtual std::shared_ptr<Events_MessageGroup> newEmpty() = 0;
+
+  /// Returns the identifier of the kind of a message
+  virtual const Events_ID messageId() = 0;
+
+  /// Appenad to this message the given one.
+  virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined) = 0;
+};
+
+/// Message that order changed (used for Object Browser update)
+class MODELAPI_EXPORT ModelAPI_OrderUpdatedMessage : public Events_MessageGroup
+{
+protected:
+  /// Creates an empty message
+  ModelAPI_OrderUpdatedMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  virtual ~ModelAPI_OrderUpdatedMessage();
+
+public:
+  /// Returns the document that has been updated
+  virtual std::shared_ptr<ModelAPI_Document> document() const = 0;
+
+  /// Returns the groups where the objects were reordered
   virtual const std::set<std::string>& groups() const = 0;
 
   /// Creates the new empty message of this kind
@@ -107,6 +136,9 @@ public:
   /// creates deleted message and sends to the loop
   virtual void sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                            const std::string& theGroup) const = 0;
+  /// creates reordered message and sends to the loop
+  virtual void sendReordered(const std::shared_ptr<ModelAPI_Document>& theDoc,
+                             const std::string& theGroup) const = 0;
 
   /// returns the creator instance
   static const ModelAPI_EventCreator* get();

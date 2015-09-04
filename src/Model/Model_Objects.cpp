@@ -301,6 +301,7 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   theMoved->data()->setUpdateID(0);
   static Events_ID EVENT_UPD = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
   ModelAPI_EventCreator::get()->sendUpdated(theMoved, EVENT_UPD);
+  ModelAPI_EventCreator::get()->sendReordered(theMoved->document(), theMoved->groupName());
 }
 
 void Model_Objects::clearHistory(ObjectPtr theObj)

@@ -34,6 +34,18 @@ ModelAPI_ObjectDeletedMessage::~ModelAPI_ObjectDeletedMessage()
 
 }
 
+ModelAPI_OrderUpdatedMessage::ModelAPI_OrderUpdatedMessage(const Events_ID theID,
+                                                             const void* theSender)
+    : Events_MessageGroup(theID, theSender)
+{
+
+}
+
+ModelAPI_OrderUpdatedMessage::~ModelAPI_OrderUpdatedMessage()
+{
+
+}
+
 ModelAPI_FeatureStateMessage::ModelAPI_FeatureStateMessage(const Events_ID theID,
                                                            const void* theSender)
  : Events_Message(theID, theSender)
