@@ -779,7 +779,7 @@ void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
     std::stringstream aNewName;
     aNewName<<theFeatureData->name();
     // if there are several results (issue #899: any number of result), add unique prefix starting from second
-    if (theResultIndex >= 0)
+    if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
       aNewName<<"_"<<theResultIndex + 1;
     theResult->data()->setName(aNewName.str());
   }
