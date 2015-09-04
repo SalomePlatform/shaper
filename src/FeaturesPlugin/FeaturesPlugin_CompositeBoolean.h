@@ -26,6 +26,13 @@ class FeaturesPlugin_CompositeBoolean : public ModelAPI_CompositeFeature
     return MY_SKETCH_OBJECT_ID;
   }
 
+  /// Attribute name of sketch feature.
+  inline static const std::string& SKETCH_SELECTION_ID()
+  {
+    static const std::string MY_SKETCH_SELECTION_ID("sketch_selection");
+    return MY_SKETCH_SELECTION_ID;
+  }
+
   /// Attribute name of objects for boolean operation.
   inline static const std::string& BOOLEAN_OBJECTS_ID()
   {
