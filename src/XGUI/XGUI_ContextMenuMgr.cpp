@@ -8,6 +8,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Selection.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_DataModel.h"
 
 #include <AppElements_MainWindow.h>
 
@@ -59,7 +60,7 @@ void XGUI_ContextMenuMgr::createActions()
   addAction("RENAME_CMD", aAction);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRename()));
 
-  aAction = new QAction(QIcon(":pictures/move.png"), tr("Move..."), this);
+  aAction = new QAction(QIcon(":pictures/move.png"), tr("Move down"), this);
   addAction("MOVE_CMD", aAction);
 
   aAction = new QAction(QIcon(":pictures/color.png"), tr("Color..."), this);
@@ -217,8 +218,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     }
     bool allActive = true;
     foreach( ObjectPtr aObject, aObjects )
-      if( aMgr->activeDocument() != aObject->document() )
-      {
+      if( aMgr->activeDocument() != aObject->document() )  {
         allActive = false;
         break;
       }
@@ -228,10 +228,20 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     }
   }
 
-  bool isPartSetDocActive = 
-    ModelAPI_Session::get()->activeDocument()==ModelAPI_Session::get()->moduleDocument();
-  if( !isPartSetDocActive )
-  {
+  // Show/Hide command has to be disabled for objects from non active document
+  XGUI_ObjectsBrowser* aOB = myWorkshop->objectBrowser();
+  XGUI_DataModel* aModel = aOB->dataModel();
+  bool aDeactivate = false;
+  foreach (ObjectPtr aObj, aObjects) {
+    Qt::ItemFlags aFlags = aModel->flags(aModel->objectIndex(aObj));
+    // Check is the object is accessible for editing
+    if ((aFlags & Qt::ItemIsEditable) == 0) {
+      aDeactivate = true;
+      break;
+    }
+  }
+  if (aDeactivate) {
+    // If at leas a one objec can not be edited then Show/Hide has to be disabled
     action("SHOW_CMD")->setEnabled(false);
     action("HIDE_CMD")->setEnabled(false);
     action("SHOW_ONLY_CMD")->setEnabled(false);
