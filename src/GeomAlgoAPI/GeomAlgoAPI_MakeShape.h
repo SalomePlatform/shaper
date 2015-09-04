@@ -36,7 +36,7 @@ public:
                                            const std::shared_ptr<GeomAPI_Shape> theBaseShape);
 
   /// Returns a shape built by the shape construction algorithm
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape> shape() const;
+  GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;
 
   /// Returns the list of shapes generated from the shape \a theShape
   GEOMALGOAPI_EXPORT virtual void generated(
@@ -46,7 +46,7 @@ public:
   GEOMALGOAPI_EXPORT virtual void modified(
     const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
 
-  /// Returns whether the shape is an edge
+  /// Returns whether the shape is deleted
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
 protected:

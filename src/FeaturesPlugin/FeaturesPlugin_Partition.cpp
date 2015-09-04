@@ -17,6 +17,7 @@
 #include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_Partition.h>
+#include <GeomAlgoAPI_MakeShapeCustom.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -59,7 +60,7 @@ std::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Partition::getShape(const std::str
 //=================================================================================================
 void FeaturesPlugin_Partition::execute()
 {
-  ListOfShape anObjects, aTools;
+  ListOfShape anObjects, aTools, aToolsForNaming;
 
   // Getting objects.
   AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Partition::OBJECT_LIST_ID());
@@ -72,22 +73,28 @@ void FeaturesPlugin_Partition::execute()
     anObjects.push_back(anObject);
   }
 
+  GeomAlgoAPI_MakeShapeList aMakeShapeList;
+
   // Getting tools.
   AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Partition::TOOL_LIST_ID());
   for (int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aToolAttr = aToolsSelList->value(aToolsIndex);
     std::shared_ptr<GeomAPI_Shape> aTool = aToolAttr->value();
-    if (!aTool.get()) {
+    if(!aTool.get()) {
       // it could be a construction plane
       ResultPtr aContext = aToolAttr->context();
-      if (aContext.get()) {
+      if(aContext.get()) {
         aTool = GeomAlgoAPI_ShapeTools::faceToInfinitePlane(aContext->shape());
+        std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(new GeomAlgoAPI_MakeShapeCustom);
+        aMkShCustom->addModified(aContext->shape(), aTool);
+        aMakeShapeList.append(aMkShCustom);
+        aTools.push_back(aTool);
+        aToolsForNaming.push_back(aContext->shape());
       }
+    } else {
+      aTools.push_back(aTool);
+      aToolsForNaming.push_back(aTool);
     }
-    if (!aTool.get()) {
-      return;
-    }
-    aTools.push_back(aTool);
   }
 
   int aResultIndex = 0;
@@ -123,8 +130,9 @@ void FeaturesPlugin_Partition::execute()
 
     if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo.shape()) > 1.e-7) {
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->store(aPartitionAlgo.shape());
-      loadNamingDS(aResultBody, anObject, aTools, aPartitionAlgo);
+      aMakeShapeList.append(aPartitionAlgo.makeShape());
+      GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo.mapOfShapes().get();
+      loadNamingDS(aResultBody, anObject, aToolsForNaming, aPartitionAlgo.shape(), aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
     }
@@ -138,30 +146,29 @@ void FeaturesPlugin_Partition::execute()
 void FeaturesPlugin_Partition::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                             const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                             const ListOfShape& theTools,
-                                            const GeomAlgoAPI_Partition& thePartitionAlgo)
+                                            const std::shared_ptr<GeomAPI_Shape> theResultShape,
+                                            GeomAlgoAPI_MakeShape& theMakeShape,
+                                            GeomAPI_DataMapOfShapeShape& theMapOfShapes)
 {
   //load result
-  if(theBaseShape->isEqual(thePartitionAlgo.shape())) {
-    theResultBody->store(thePartitionAlgo.shape());
+  if(theBaseShape->isEqual(theResultShape)) {
+    theResultBody->store(theResultShape);
   } else {
     const int aModifyTag = 1;
     const int aDeletedTag = 2;
     const int aSubsolidsTag = 3; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
 
-    theResultBody->storeModified(theBaseShape, thePartitionAlgo.shape(), aSubsolidsTag);
-
-    std::shared_ptr<GeomAlgoAPI_MakeShape> aMkShape = thePartitionAlgo.makeShape();
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = thePartitionAlgo.mapOfShapes();
+    theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
     std::string aModName = "Modified";
-    theResultBody->loadAndOrientModifiedShapes(aMkShape.get(), theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyTag, aModName, *aMapOfShapes.get());
-    theResultBody->loadDeletedShapes(aMkShape.get(), theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
+    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
+                                               aModifyTag, aModName, theMapOfShapes);
+    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
 
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      theResultBody->loadAndOrientModifiedShapes(aMkShape.get(), *anIter, GeomAPI_Shape::FACE,
-                                                 aModifyTag, aModName, *aMapOfShapes.get());
-      theResultBody->loadDeletedShapes(aMkShape.get(), *anIter, GeomAPI_Shape::FACE, aDeletedTag);
+      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
+                                                 aModifyTag, aModName, theMapOfShapes);
+      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
     }
   }
 }

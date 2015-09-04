@@ -8,6 +8,7 @@
   #include "GeomAPI_Circ.h"
   #include "GeomAPI_Circ2d.h"
   #include "GeomAPI_Curve.h"
+  #include "GeomAPI_DataMapOfShapeMapOfShapes.h"
   #include "GeomAPI_DataMapOfShapeShape.h"
   #include "GeomAPI_Dir.h"
   #include "GeomAPI_Dir2d.h"
@@ -48,6 +49,7 @@
 %shared_ptr(GeomAPI_Circ)
 %shared_ptr(GeomAPI_Circ2d)
 %shared_ptr(GeomAPI_Curve)
+%shared_ptr(GeomAPI_DataMapOfShapeMapOfShapes)
 %shared_ptr(GeomAPI_DataMapOfShapeShape)
 %shared_ptr(GeomAPI_Dir)
 %shared_ptr(GeomAPI_Dir2d)
@@ -79,6 +81,7 @@
 %include "GeomAPI_Circ.h"
 %include "GeomAPI_Circ2d.h"
 %include "GeomAPI_Curve.h"
+%include "GeomAPI_DataMapOfShapeMapOfShapes.h"
 %include "GeomAPI_DataMapOfShapeShape.h"
 %include "GeomAPI_Dir.h"
 %include "GeomAPI_Dir2d.h"

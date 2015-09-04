@@ -152,7 +152,7 @@ void FeaturesPlugin_Boolean::execute()
 
         if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, anObject, aBoolAlgo.shape(), aTools, *aBoolAlgo.makeShape(), *aBoolAlgo.mapOfShapes());
+          loadNamingDS(aResultBody, anObject, aTools, aBoolAlgo.shape(), *aBoolAlgo.makeShape(), *aBoolAlgo.mapOfShapes());
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -218,7 +218,7 @@ void FeaturesPlugin_Boolean::execute()
 
         if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, aCompSolid, aFillerAlgo.shape(), aTools, aMakeShapeList, aMapOfShapes);
+          loadNamingDS(aResultBody, aCompSolid, aTools, aFillerAlgo.shape(), aMakeShapeList, aMapOfShapes);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -336,7 +336,7 @@ void FeaturesPlugin_Boolean::execute()
       }
 
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aResultBody, anOriginalSolids.front(), aShape, anOriginalSolids, aMakeShapeList, aMapOfShapes);
+      loadNamingDS(aResultBody, anOriginalSolids.front(), anOriginalSolids, aShape, aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
       break;
@@ -354,8 +354,8 @@ void FeaturesPlugin_Boolean::execute()
 //=================================================================================================
 void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                           const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                          const std::shared_ptr<GeomAPI_Shape> theResultShape,
                                           const ListOfShape& theTools,
+                                          const std::shared_ptr<GeomAPI_Shape> theResultShape,
                                           GeomAlgoAPI_MakeShape& theMakeShape,
                                           GeomAPI_DataMapOfShapeShape& theMapOfShapes)
 {

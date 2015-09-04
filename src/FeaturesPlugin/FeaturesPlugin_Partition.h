@@ -63,7 +63,9 @@ private:
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                     const ListOfShape& theTools,
-                    const GeomAlgoAPI_Partition& thePartitionAlgo);
+                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
+                    GeomAlgoAPI_MakeShape& theMakeShape,
+                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
 
 };
 

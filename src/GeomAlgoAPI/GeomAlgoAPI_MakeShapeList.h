@@ -14,7 +14,7 @@
 
 /** \class GeomAlgoAPI_MakeShapeList
  *  \ingroup DataAlgo
- *  \brief Interface to the root class of all topological shapes constructions
+ *  \brief List of topological shapes constructions
  */
 class GeomAlgoAPI_MakeShapeList : public GeomAlgoAPI_MakeShape
 {
@@ -48,7 +48,7 @@ public:
   GEOMALGOAPI_EXPORT void append(const GeomAlgoAPI_MakeShapeList& theMakeShapeList);
 
   /// \return a shape built by the shape construction algorithms
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape> shape() const;
+  GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;
 
   /// \return the list of shapes generated from the shape \a theShape
   GEOMALGOAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
@@ -58,7 +58,7 @@ public:
   GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                            ListOfShape& theHistory);
 
-  /// Returns whether the shape is deleted
+  /// \return whether the shape is deleted
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
 private:

@@ -26,7 +26,8 @@ SET(PROJECT_HEADERS
     GeomAPI_PlanarEdges.h
     GeomAPI_AISObject.h
     GeomAPI_IPresentable.h
-    GeomAPI_Curve.h 
+    GeomAPI_Curve.h
+    GeomAPI_DataMapOfShapeMapOfShapes.h
     GeomAPI_DataMapOfShapeShape.h
     GeomAPI_ICustomPrs.h
     GeomAPI_Vertex.h
@@ -55,6 +56,7 @@ SET(PROJECT_SOURCES
     GeomAPI_PlanarEdges.cpp
     GeomAPI_AISObject.cpp
     GeomAPI_Curve.cpp
+    GeomAPI_DataMapOfShapeMapOfShapes.cpp
     GeomAPI_DataMapOfShapeShape.cpp
     GeomAPI_Vertex.cpp
     GeomAPI_ICustomPrs.cpp
