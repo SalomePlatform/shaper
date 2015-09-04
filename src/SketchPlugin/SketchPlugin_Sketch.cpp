@@ -58,6 +58,8 @@ void SketchPlugin_Sketch::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(
     getKind(), SketchPlugin_SketchEntity::EXTERNAL_ID());
   data()->addAttribute(SketchPlugin_Sketch::SOLVER_ERROR(), ModelAPI_AttributeString::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), SketchPlugin_Sketch::SOLVER_ERROR());
 }
 
 void SketchPlugin_Sketch::execute()
