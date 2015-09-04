@@ -101,14 +101,16 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         }
         // Insert new object
         int aRow = aRootDoc->size(aObjType) - 1;
-        if (aObjType == aRootType) {
-          insertRow(aRow + aNbFolders + 1);
-        } else {
-          int aFolderId = myXMLReader.rootFolderId(aObjType);
-          if (aFolderId != -1) {
-            insertRow(aRow, createIndex(aFolderId, 0, -1));
-          }
-        } 
+        if (aRow != -1) {
+          if (aObjType == aRootType) {
+            insertRow(aRow + aNbFolders + 1);
+          } else {
+            int aFolderId = myXMLReader.rootFolderId(aObjType);
+            if (aFolderId != -1) {
+              insertRow(aRow, createIndex(aFolderId, 0, -1));
+            }
+          } 
+        }
       } else {
         // Object created in sub-document
         QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
@@ -121,18 +123,20 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               insertRow(myXMLReader.subFolderId(aObjType), aDocRoot);
           }
           int aRow = aDoc->index(aObject);
-          int aNbSubFolders = foldersCount(aDoc.get());
-          if (aObjType == aSubType) {
-            // List of objects under document root
-            insertRow(aRow + aNbSubFolders, aDocRoot);
-          } else {
-            // List of objects under a folder
-            if (aRow != -1) {
-              int aFolderId = folderId(aObjType, aDoc.get());
-              if (aFolderId != -1) {
-                QModelIndex aParentFolder = createIndex(aFolderId, 0, aDoc.get());
-                insertRow(aRow, aParentFolder);
-                emit dataChanged(aParentFolder, aParentFolder);
+          if (aRow != -1) {
+            int aNbSubFolders = foldersCount(aDoc.get());
+            if (aObjType == aSubType) {
+              // List of objects under document root
+              insertRow(aRow + aNbSubFolders, aDocRoot);
+            } else {
+              // List of objects under a folder
+              if (aRow != -1) {
+                int aFolderId = folderId(aObjType, aDoc.get());
+                if (aFolderId != -1) {
+                  QModelIndex aParentFolder = createIndex(aFolderId, 0, aDoc.get());
+                  insertRow(aRow, aParentFolder);
+                  emit dataChanged(aParentFolder, aParentFolder);
+                }
               }
             }
           }
