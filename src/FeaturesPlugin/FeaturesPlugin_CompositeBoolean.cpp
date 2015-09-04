@@ -11,6 +11,8 @@
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Prism.h>
@@ -28,6 +30,9 @@ void FeaturesPlugin_CompositeBoolean::initAttributes()
   aSelection->setSelectionType("SOLID");
 
   initMakeSolidsAttributes();
+
+  data()->addAttribute(SKETCH_SELECTION_ID(), ModelAPI_AttributeSelection::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SKETCH_SELECTION_ID());
 }
 
 //=================================================================================================
@@ -114,6 +119,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
   if(!aConstruction.get()) {
     return;
   }
+  selection(SKETCH_SELECTION_ID())->setValue(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
   int aSketchFacesNum = aConstruction->facesNum();
   if(aSketchFacesNum == 0) {
     return;
