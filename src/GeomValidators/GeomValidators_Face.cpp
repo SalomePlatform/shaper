@@ -66,20 +66,20 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
             case GeomAbs_Plane:
               aValid = aGeomFace->isPlanar();
               if (!aValid)
-                theError = "The shape is not a plane."
+                theError = "The shape is not a plane.";
               break;
             case GeomAbs_Cylinder:
               aValid = aGeomFace->isCylindrical();
               if (!aValid)
-                theError = "The shape is not a cylinder."
+                theError = "The shape is not a cylinder.";
               break;
             default:
-              theError = "The shape is not an available face."
+              theError = "The shape is not an available face.";
               break;
         }
       }
     } else
-      theError = "The shape is not a face."
+      theError = "The shape is not a face.";
   }
   else
     aValid = true; // an empty face selected is valid.
