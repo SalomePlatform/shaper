@@ -210,7 +210,14 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
 
     emit objectDisplayed(theObject, theAIS);
     activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
- } 
+    // the fix from VPA for more suitable selection of sketcher lines
+    if(anAISIO->Width() > 1) {
+      for(int aModeIdx = 0; aModeIdx < myActiveSelectionModes.length(); ++aModeIdx) {
+        aContext->SetSelectionSensitivity(anAISIO,
+          myActiveSelectionModes.value(aModeIdx), anAISIO->Width() + 2);
+      }
+    }
+  } 
   if (theUpdateViewer)
     updateViewer();
 }
