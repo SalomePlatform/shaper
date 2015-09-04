@@ -143,14 +143,6 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
   // to keep the persistent sub-elements indexing, do not remove elements from list,
   // but substitute by nulls
   reflist(SketchPlugin_Sketch::FEATURES_ID())->substitute(theFeature, ObjectPtr());
-
-  std::map<int, std::shared_ptr<ModelAPI_Feature> >::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++) {
-    if (aSubIter->second == theFeature) {
-      mySubs.erase(aSubIter);
-      break;
-    }
-  }
 }
 
 int SketchPlugin_Sketch::numberOfSubs(bool forTree) const
@@ -166,12 +158,8 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(
   if (forTree)
     return FeaturePtr();
 
-  if (mySubs.find(theIndex) != mySubs.end())
-    return mySubs[theIndex];
-
   ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex, false);
   FeaturePtr aRes = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
-  mySubs[theIndex] = aRes;
   return aRes;
 }
 

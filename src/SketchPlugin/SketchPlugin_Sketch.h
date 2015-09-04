@@ -30,8 +30,6 @@
  */
 class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICustomPrs//, public GeomAPI_IPresentable
 {
-  /// Optimization: indexes of sketch sub-elements are persistent, so, no problems in synchronization.
-  std::map<int, std::shared_ptr<ModelAPI_Feature> > mySubs;
  public:
   /// Sketch feature kind
   inline static const std::string& ID()
