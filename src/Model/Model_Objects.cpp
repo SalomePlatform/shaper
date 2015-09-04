@@ -297,6 +297,8 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   aRefs->SetInternalArray(aNewArray);
   // update the feature and the history
   clearHistory(theMoved);
+  // make sure all (selection) attributes of moved feature will be updated
+  theMoved->data()->setUpdateID(0);
   static Events_ID EVENT_UPD = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
   ModelAPI_EventCreator::get()->sendUpdated(theMoved, EVENT_UPD);
 }
