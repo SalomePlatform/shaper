@@ -9,6 +9,7 @@
 
 #include "SketchPlugin.h"
 #include <ModelAPI_AttributeValidator.h>
+#include <ModelAPI_FeatureValidator.h>
 
 /**\class SketchPlugin_DistanceAttrValidator
  * \ingroup Validators
@@ -131,6 +132,26 @@ class SketchPlugin_CopyValidator : public ModelAPI_AttributeValidator
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;
+};
+
+/**\class SketchPlugin_SolverErrorValidator
+ * \ingroup Validators
+ * \brief Validator for the solver error.
+ *
+ * Simply checks that solver error attribute is empty. Returns the attribute value as an error.
+ */
+class SketchPlugin_SolverErrorValidator : public ModelAPI_FeatureValidator
+{
+ public:
+  //! returns true if there are no solver errors
+  //! \param theFeature the checked feature
+  //! \param theArguments arguments of the feature (not used)
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+
+  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

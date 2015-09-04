@@ -5,13 +5,15 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "SketchPlugin_Validators.h"
-#include "SketchPlugin_ConstraintDistance.h"
-#include "SketchPlugin_ConstraintCoincidence.h"
-#include "SketchPlugin_ConstraintRigid.h"
-#include "SketchPlugin_Line.h"
+
 #include "SketchPlugin_Arc.h"
 #include "SketchPlugin_Circle.h"
+#include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintDistance.h"
+#include "SketchPlugin_ConstraintRigid.h"
+#include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
+#include "SketchPlugin_Sketch.h"
 
 #include "SketcherPrs_Tools.h"
 
@@ -21,6 +23,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 
 #include <GeomValidators_ShapeType.h>
@@ -294,6 +297,25 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
       if (aSelObject == *anObjIter)
         return false;
   }
+  return true;
+}
+
+bool SketchPlugin_SolverErrorValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                const std::list<std::string>& theArguments,
+                                                std::string& theError) const
+{
+  AttributeStringPtr aAttributeString = theFeature->string(SketchPlugin_Sketch::SOLVER_ERROR());
+
+  if (!aAttributeString->value().empty()) {
+    theError = aAttributeString->value();
+    return false;
+  }
+
+  return true;
+}
+
+bool SketchPlugin_SolverErrorValidator::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
   return true;
 }
 

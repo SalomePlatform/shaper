@@ -61,6 +61,12 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
     static const std::string MY_FEATURES_ID("Features");
     return MY_FEATURES_ID;
   }
+  /// Sketch solver error
+  inline static const std::string& SOLVER_ERROR()
+  {
+    static const std::string MY_SOLVER_ERROR("SolverError");
+    return MY_SOLVER_ERROR;
+  }
 
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()

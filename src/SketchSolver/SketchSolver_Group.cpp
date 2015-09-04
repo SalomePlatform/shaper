@@ -20,6 +20,7 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -27,16 +28,17 @@
 #include <ModelAPI_Validator.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintLength.h>
-#include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
+#include <SketchPlugin_Sketch.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -482,11 +484,12 @@ bool SketchSolver_Group::resolveConstraints()
         }
       }
     } catch (...) {
-      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
+//      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       if (myPrevSolved) {
         sendMessage(EVENT_SOLVER_FAILED);
         myPrevSolved = false;
       }
+      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
       return false;
     }
     if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
@@ -499,12 +502,14 @@ bool SketchSolver_Group::resolveConstraints()
         sendMessage(EVENT_SOLVER_REPAIRED);
         myPrevSolved = true;
       }
+      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
     } else if (!myConstraints.empty()) {
-      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
+//      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
       if (myPrevSolved) {
         sendMessage(EVENT_SOLVER_FAILED);
         myPrevSolved = false;
       }
+      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
     }
 
     aResolved = true;

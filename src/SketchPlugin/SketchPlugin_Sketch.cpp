@@ -19,6 +19,7 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
@@ -56,6 +57,7 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SketchPlugin_SketchEntity::EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
     getKind(), SketchPlugin_SketchEntity::EXTERNAL_ID());
+  data()->addAttribute(SketchPlugin_Sketch::SOLVER_ERROR(), ModelAPI_AttributeString::typeId());
 }
 
 void SketchPlugin_Sketch::execute()

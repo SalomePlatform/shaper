@@ -68,6 +68,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_CoincidenceAttrValidator);
   aFactory->registerValidator("SketchPlugin_CopyValidator",
                               new SketchPlugin_CopyValidator);
+  aFactory->registerValidator("SketchPlugin_SolverErrorValidator",
+                              new SketchPlugin_SolverErrorValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

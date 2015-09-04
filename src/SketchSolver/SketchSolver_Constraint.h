@@ -51,7 +51,7 @@ public:
   /// \brief Returns the type of constraint
   virtual int getType() const = 0;
 
-  /// \brief The constraint is made temoparary
+  /// \brief The constraint is made temporary
   void makeTemporary() const;
 
   /// \brief Checks the constraint is used by current object
@@ -87,7 +87,7 @@ protected:
   /// \return \c true if some attributes are changed
   virtual bool checkAttributesChanged(ConstraintPtr theConstraint);
 
-  /// \brief This method is used in derived objects to check consistence of constraint.
+  /// \brief This method is used in derived objects to check consistency of constraint.
   ///        E.g. the distance between line and point may be signed.
   virtual void adjustConstraint()
   {}
