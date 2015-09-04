@@ -934,7 +934,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(*aResIter);
     if (aBody.get()) {
       std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(aBody->data());
-      if (!aData.get() || !aData->isValid() || aData->isDeleted()) { 
+      if (!aData.get() || !aData->isValid() || (!aBody->isDisabled() && aData->isDeleted())) { 
         // found a disappeared result => remove it
         theFeature->eraseResultFromList(aBody);
         // start iterate from beginning because iterator is corrupted by removing
