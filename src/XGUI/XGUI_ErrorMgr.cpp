@@ -92,7 +92,7 @@ void XGUI_ErrorMgr::onWidgetChanged()
   if (!aValidators->validate(anAttribute, aValidatorID, anErrorMsg)) {
     if (anErrorMsg.empty())
       anErrorMsg = "unknown error.";
-    anErrorMsg = "Attribute \"" + anAttributeID + "\" invalidated by \"" + aValidatorID + "\" with error: " + anErrorMsg;
+    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg;
   }
 
   QString anError = QString::fromStdString(anErrorMsg);

@@ -179,7 +179,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
         if (!aFValidator->isValid(theFeature, anArguments, anError)) {
           if (anError.empty())
             anError = "Unknown error.";
-          anError = "Feature invalidated by \"" + aValidatorID + "\" with error: " + anError;
+          anError = aValidatorID + ": " + anError;
           theFeature->setError(anError, false);
           theFeature->data()->execState(ModelAPI_StateInvalidArgument);
           return false;
@@ -223,7 +223,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
     if (!validate(anAttribute, aValidatorID, anError)) {
       if (anError.empty())
         anError = "Unknown error.";
-      anError = "Attribute \"" + anAttributeID + "\" invalidated by \"" + aValidatorID + "\" with error: " + anError;
+      anError = anAttributeID + " - " + aValidatorID + ": " + anError;
       theFeature->setError(anError, false);
       theFeature->data()->execState(ModelAPI_StateInvalidArgument);
       return false;
