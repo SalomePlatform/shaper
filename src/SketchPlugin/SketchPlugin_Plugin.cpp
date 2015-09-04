@@ -72,7 +72,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
   
-  Config_PropManager::registerProp("Visualization", "sketch_entity_color", "Sketch enity color",
+  Config_PropManager::registerProp("Visualization", "sketch_entity_color", "Sketch entity color",
                                    Config_Prop::Color, SKETCH_ENTITY_COLOR);
 
   Config_PropManager::registerProp("Visualization", "sketch_external_color", "Sketch external entity color",
