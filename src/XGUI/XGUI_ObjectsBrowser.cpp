@@ -141,8 +141,6 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
 
   DocumentPtr aDoc = aMgr->activeDocument();
   
-  QModelIndex aOldIndex = aModel->lastHistoryIndex();
-
   std::string aOpName = tr("History change").toStdString();
   if (aObj.get()) {
     if (aObj->document() != aDoc)
@@ -165,13 +163,10 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
   }
   QModelIndex aNewIndex = aModel->lastHistoryIndex();
   QModelIndex aParent = theIndex.parent();
-  int aStartRow = std::min(aOldIndex.row(), aNewIndex.row());
-  int aEndRow = std::max(aOldIndex.row(), aNewIndex.row());
-  for (int i = aStartRow; i <= aEndRow; i++) {
+  int aSize = aModel->rowCount(aParent);
+  for (int i = 0; i < aSize; i++) {
     update(aModel->index(i, 0, aParent));
   }
-  update(aOldIndex);
-  update(aNewIndex);
 }
 
 //********************************************************************

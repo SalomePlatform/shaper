@@ -192,8 +192,9 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           }
           // Check that some folders could disappear
           QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
+          int aSize = aDoc->size(aGroup);
           foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
-            if ((aNotEmptyFolder.toStdString() == aGroup) && (aDoc->size(aGroup) == 1))
+            if ((aNotEmptyFolder.toStdString() == aGroup) && (aSize == 0))
               // Appears first object in folder which can not be shown empty
               removeRow(myXMLReader.subFolderId(aGroup), aDocRoot);
           }
