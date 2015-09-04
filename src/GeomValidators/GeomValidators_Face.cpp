@@ -44,8 +44,13 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
 
   ObjectPtr anObject = GeomValidators_Tools::getObject(theAttribute);
   if (anObject.get() != NULL) {
-    AttributeSelectionPtr aSelectionAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                                                                 (theAttribute);
+    AttributeSelectionPtr aSelectionAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    if (aSelectionAttr.get() == NULL) {
+      theError = "Is not a selection attribute.";
+      return aValid;
+    }
+
     std::shared_ptr<GeomAPI_Shape> aGeomShape = aSelectionAttr->value();
     if (!aGeomShape.get()) {
       // if the shape is empty, apply the validator to the shape of result
@@ -60,15 +65,21 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
         switch(aFaceType) {
             case GeomAbs_Plane:
               aValid = aGeomFace->isPlanar();
+              if (!aValid)
+                theError = "The shape is not a plane."
               break;
             case GeomAbs_Cylinder:
               aValid = aGeomFace->isCylindrical();
+              if (!aValid)
+                theError = "The shape is not a cylinder."
               break;
             default:
+              theError = "The shape is not an available face."
               break;
         }
       }
-    }
+    } else
+      theError = "The shape is not a face."
   }
   else
     aValid = true; // an empty face selected is valid.

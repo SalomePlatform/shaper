@@ -13,8 +13,10 @@ bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttrib
   bool aValid = false;
   AttributeSelectionPtr aSelectionAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
                                                                 (theAttribute);
-  if (aSelectionAttr.get() == NULL)
+  if (aSelectionAttr.get() == NULL) {
+    theError = "Is not a selection attribute.";
     return aValid;
+  }
 
   ResultPtr aResult = aSelectionAttr->context();
   GeomShapePtr aShape = aSelectionAttr->value();
@@ -32,7 +34,7 @@ bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttrib
     }
     else {
       // an empty shape is used in attribute selection if the shape of the result is equal to
-      // the selected shape, so according to the upper condifition, the result is true
+      // the selected shape, so according to the upper condition, the result is true
       aValid = true;
     }
   }
@@ -40,7 +42,7 @@ bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttrib
     ResultConstructionPtr aConstr =
                             std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
     if (aConstr != NULL) {
-      // it provides selection only on compositie features, construction without composite
+      // it provides selection only on composite features, construction without composite
       // feature is not selectable
       FeaturePtr aFeature = ModelAPI_Feature::feature(aConstr);
       CompositeFeaturePtr aComposite = 

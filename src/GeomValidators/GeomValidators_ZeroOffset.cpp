@@ -17,6 +17,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
                                         std::string& theError) const
 {
   if(theArguments.size() != 8) {
+    theError = "Wrong number of arguments (expected 8).";
     return false;
   }
 
@@ -44,6 +45,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
 
   if(aSelectedMethod == aCreationMethod) {
     if(aToSize == -aFromSize) {
+      theError = "ToSize = -FromSize.";
       return false;
     } else {
       return true;
@@ -84,6 +86,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
 
   if(((!aFromShape && !aToShape) || ((aFromShape && aToShape) && aFromShape->isEqual(aToShape)))
     && (aFromSize == -aToSize)) {
+    theError = "FromSize = -ToSize and bounding planes are equal.";
     return false;
   }
 

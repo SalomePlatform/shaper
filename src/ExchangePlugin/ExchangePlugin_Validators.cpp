@@ -41,17 +41,23 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
                                              std::string& theError) const
 {
-  if (!theAttribute->isInitialized())
+  if (!theAttribute->isInitialized()) {
+    theError = "Is not initialized.";
     return false;
+  }
 
   const AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
-  if (!aStrAttr)
+  if (!aStrAttr) {
+    theError = "Is not a string attribute.";
     return false;
+  }
 
   std::string aFileName = aStrAttr->value();
-  if (aFileName.empty())
+  if (aFileName.empty()) {
+    theError = "File name is empty.";
     return false;
+  }
 
   std::list<std::string> aFormats;
   ExchangePlugin_FormatValidator::parseFormats(theArguments, aFormats);
@@ -67,5 +73,6 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
       }
     }
   }
+  theError = "File name does not end with any available format.";
   return false;
 }

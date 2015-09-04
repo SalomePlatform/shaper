@@ -15,6 +15,7 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
                                               std::string& theError) const
 {
   if(theArguments.size() != 3) {
+    theError = "Wrong number of arguments (expected 3).";
     return false;
   }
 

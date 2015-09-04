@@ -28,8 +28,10 @@ bool SketchPlugin_ExternalValidator::isValid(const AttributePtr& theAttribute,
   bool isParameterExternal = isExternalAttribute(aFeature->attribute(aFrontArgument));
 
   // it is not possible that both features, attribute and attribute in parameter, are external
-  if (isAttributeExternal && isParameterExternal)
+  if (isAttributeExternal && isParameterExternal) {
+    theError = "Both features, attribute and attribute in parameter, are external.";
     return false;
+  }
   return true;
 }
 

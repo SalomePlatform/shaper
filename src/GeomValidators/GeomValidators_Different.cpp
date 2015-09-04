@@ -69,8 +69,12 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
       std::list<AttributePtr>::const_iterator aNextIt = anAttributeIt; ++aNextIt;
       while (aNextIt != anAttributes.end()) {
         // if equal attribute is found then all attributes are not different
-        if (std::find_if(aNextIt, anAttributes.end(), IsEqual(*anAttributeIt)) != anAttributes.end()) 
+        std::list<AttributePtr>::const_iterator aFindIt =
+            std::find_if(aNextIt, anAttributes.end(), IsEqual(*anAttributeIt));
+        if (aFindIt != anAttributes.end()) {
+          theError = "Attributes " + anAttributeIt->id() + " and " + aFindIt->id() + " are equal." ;
           return false;
+        }
         ++anAttributeIt;
         ++aNextIt; 
       }
