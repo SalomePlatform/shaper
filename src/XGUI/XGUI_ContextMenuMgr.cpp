@@ -227,6 +227,16 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("DELETE_CMD")->setEnabled(true);
     }
   }
+
+  bool isPartSetDocActive = 
+    ModelAPI_Session::get()->activeDocument()==ModelAPI_Session::get()->moduleDocument();
+  if( !isPartSetDocActive )
+  {
+    action("SHOW_CMD")->setEnabled(false);
+    action("HIDE_CMD")->setEnabled(false);
+    action("SHOW_ONLY_CMD")->setEnabled(false);
+  }
+
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
 
