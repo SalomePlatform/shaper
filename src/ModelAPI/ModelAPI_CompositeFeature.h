@@ -28,7 +28,7 @@ public:
   virtual int numberOfSubs(bool forTree = false) const = 0;
 
   /// Returns the sub-feature by zero-base index
-  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false) const = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false) = 0;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   virtual int subFeatureId(const int theIndex) const = 0;

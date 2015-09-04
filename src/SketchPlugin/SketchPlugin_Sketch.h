@@ -30,6 +30,8 @@
  */
 class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICustomPrs//, public GeomAPI_IPresentable
 {
+  /// Optimization: indexes of sketch sub-elements are persistent, so, no problems in synchronization.
+  std::map<int, std::shared_ptr<ModelAPI_Feature> > mySubs;
  public:
   /// Sketch feature kind
   inline static const std::string& ID()
@@ -177,7 +179,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
 
   /// Returns the sub-feature by zero-base index
   SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
-    subFeature(const int theIndex, bool forTree = false) const;
+    subFeature(const int theIndex, bool forTree = false);
 
   /// Returns the sub-feature unique identifier in this composite feature by index
   SKETCHPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;

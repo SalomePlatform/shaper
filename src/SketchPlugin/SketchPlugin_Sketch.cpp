@@ -143,42 +143,36 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
   // to keep the persistent sub-elements indexing, do not remove elements from list,
   // but substitute by nulls
   reflist(SketchPlugin_Sketch::FEATURES_ID())->substitute(theFeature, ObjectPtr());
-  /*
-  list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
-  list<ObjectPtr>::iterator aSubIt = aSubs.begin(), aLastIt = aSubs.end();
-  bool isRemoved = false;
-  bool aHasEmtpyFeature = false;
-  for(; aSubIt != aLastIt && !isRemoved; aSubIt++) {
-    std::shared_ptr<ModelAPI_Feature> aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aSubIt);
-    if (aFeature.get() != NULL && aFeature == theFeature) {
-      data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(aFeature);
-      isRemoved = true;
+
+  std::map<int, std::shared_ptr<ModelAPI_Feature> >::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++) {
+    if (aSubIter->second == theFeature) {
+      mySubs.erase(aSubIter);
+      break;
     }
-    else if (aFeature.get() == NULL)
-      aHasEmtpyFeature = true;
   }
-  // if the object is not found in the sketch sub-elements, that means that the object is removed already.
-  // Find the first empty element and remove it
-  if (!isRemoved && aHasEmtpyFeature)
-    data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(ObjectPtr());
-  */
 }
 
 int SketchPlugin_Sketch::numberOfSubs(bool forTree) const
 {
   if (forTree)
     return 0;
-  return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size(false);
+  return data()->reflist(FEATURES_ID())->size(false);
 }
 
 std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(
-  const int theIndex, bool forTree) const
+  const int theIndex, bool forTree)
 {
   if (forTree)
     return FeaturePtr();
 
+  if (mySubs.find(theIndex) != mySubs.end())
+    return mySubs[theIndex];
+
   ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex, false);
-  return std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+  FeaturePtr aRes = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+  mySubs[theIndex] = aRes;
+  return aRes;
 }
 
 int SketchPlugin_Sketch::subFeatureId(const int theIndex) const

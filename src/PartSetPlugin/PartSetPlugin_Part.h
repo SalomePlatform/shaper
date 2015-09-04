@@ -56,7 +56,7 @@ class PartSetPlugin_Part : public ModelAPI_CompositeFeature
   virtual int numberOfSubs(bool forTree = false) const;
 
   /// Returns the sub-feature by zero-base index
-  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false) const;
+  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false);
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   virtual int subFeatureId(const int theIndex) const;

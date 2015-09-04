@@ -72,7 +72,7 @@ int PartSetPlugin_Part::numberOfSubs(bool forTree) const
   return 0;
 }
 
-std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::subFeature(const int theIndex, bool forTree) const
+std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::subFeature(const int theIndex, bool forTree)
 {
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {

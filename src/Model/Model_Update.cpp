@@ -589,7 +589,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   // composite feature must be executed after sub-features execution
   if (aCompos) {
     // number of subs can be changed in execution: like fillet
-    for(int a = 0; a < aCompos->numberOfSubs(); a++) {
+    int aNumSubs = aCompos->numberOfSubs();
+    for(int a = 0; a < aNumSubs; a++) {
       FeaturePtr aSub = aCompos->subFeature(a);
       if (aSub.get() && aState == ModelAPI_StateDone) {
         if (isOlder(theFeature, aSub)) {
@@ -605,6 +606,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
           }
         }
       }
+      if (a == aNumSubs - 1) // in case number of subs is changed, just recheck before end
+        aNumSubs = aCompos->numberOfSubs();
     }
   }
 

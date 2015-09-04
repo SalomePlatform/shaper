@@ -300,8 +300,19 @@ TDF_LabelMap& Model_AttributeSelection::scope()
     DocumentPtr aMyDoc = owner()->document();
     std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures = aMyDoc->allFeatures();
     std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFIter = allFeatures.begin();
+    bool aMePassed = false;
+    std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(owner());
     for(; aFIter != allFeatures.end(); aFIter++) {
-      if (*aFIter == owner()) break; // the left features are created later
+      if (*aFIter == owner()) {  // the left features are created later (except subs of composite)
+        aMePassed = true;
+        continue;
+      }
+      bool isInScope = !aMePassed;
+      if (!isInScope && aComposite.get()) { // try to add sub-elements of composite if this is composite
+        if (aComposite->isSub(*aFIter))
+          isInScope = true;
+      }
       if (aFIter->get() && (*aFIter)->data()->isValid()) {
         TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
           (*aFIter)->data())->label().Father();
