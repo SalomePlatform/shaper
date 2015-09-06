@@ -69,7 +69,8 @@ Model_Objects::~Model_Objects()
     static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Feature::group());
     ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
-    aFeature->eraseResults();
+    aFeature->removeResults(0, false);
+    //aFeature->eraseResults();
     aFeature->erase();
     myFeatures.UnBind(aFeaturesIter.Key());
   }
