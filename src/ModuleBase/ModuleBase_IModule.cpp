@@ -69,6 +69,11 @@ ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& the
   return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);
 }
 
+bool ModuleBase_IModule::customizeObject(ObjectPtr theObject, const bool theUpdateViewer)
+{
+  return false;
+}
+
 ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& theFeatureId)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>

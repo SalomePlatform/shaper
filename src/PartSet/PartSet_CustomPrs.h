@@ -23,8 +23,8 @@ class ModuleBase_IWorkshop;
 class XGUI_Workshop;
 
 /**
-* Interface of a class which can provide specific customization of
-* object presentation
+ * This is the module custom presentation, which manage an AIS presentation, that can be filled
+ * by a feature and visualized in the viewer additionally to usual workshop objects.
 */
 class PartSet_CustomPrs
 {
@@ -35,19 +35,32 @@ public:
   /// Returns true if the presentation is active
   bool isActive();
 
-  /// Initializes the presentation by the parameter object
-  void activate(const FeaturePtr& theObject);
+  /// Initializes the operation presentation by the parameter object and display the presentation
+  /// \param theObject an operation feature source to fill the presentation
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \returns true if the presentation is displayed
+  bool activate(const FeaturePtr& theObject, const bool theUpdateViewer);
 
-  void deactivate();
+  /// Initializes the operation presentation by empty object and erase the presentation
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \returns true if the presentation has been displayed and now it is erased
+  bool deactivate(const bool theUpdateViewer);
 
-  /// Modifies the given presentation in the custom way.
-  void customize(const ObjectPtr& theObject);
+  /// If the presentation is active[displayed], the shapes of the presentation is recomputed
+  /// and the presentation is redisplayed.
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \returns true if the presentation is redisplayed
+  bool redisplay(const ObjectPtr& theObject, const bool theUpdateViewer);
 
+  /// Nullify the operation presentation. For example, it can be useful when the viewer/context
+  /// is closed. If this is not performed and the presentation is assigned in another context,
+  /// it caused erroneus case because the presentation has linkage to the previous context.
   void clearPrs();
 
+private:
+  /// Creates the AIS operation presentation
   void initPrs();
 
-private:
   /// Returns the AIS presentation
   Handle(PartSet_OperationPrs) getPresentation();
 
@@ -55,11 +68,16 @@ private:
   XGUI_Workshop* workshop() const;
 
   /// Displays the internal presentation in the viewer of workshop
-  void displayPresentation();
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void displayPresentation(const bool theUpdateViewer);
+
   /// Erases the internal presentation from the viewer of workshop
-  void erasePresentation();
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void erasePresentation(const bool theUpdateViewer);
+
   /// Sets color, point size and width of the presentation
-  void customizePresentation();
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  void customizePresentation(const bool theUpdateViewer);
 
 private:
   ModuleBase_IWorkshop* myWorkshop; /// current workshop

@@ -59,6 +59,7 @@
 
 //#define DEBUG_FEATURE_CREATED
 //#define DEBUG_FEATURE_REDISPLAY
+//#define DEBUG_FEATURE_UPDATED
 //#define DEBUG_RESULT_COMPSOLID
 
 XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
@@ -205,6 +206,17 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
 void XGUI_WorkshopListener::onFeatureUpdatedMsg(
                                      const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
+#ifdef DEBUG_FEATURE_UPDATED
+  std::set<ObjectPtr> aObjects = theMsg->objects();
+  std::set<ObjectPtr>::const_iterator aIt;
+  QStringList anInfo;
+  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+    anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
+  }
+  QString anInfoStr = anInfo.join(";\t");
+  qDebug(QString("onFeatureUpdatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+  bool isModified = false;
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
   if (anOperationMgr->hasOperation()) {
@@ -220,13 +232,15 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
           break;
         }
       }
-        myWorkshop->module()->customizeObject(aCurrentFeature);
+      isModified = myWorkshop->module()->customizeObject(aCurrentFeature, false);
     }
   }
   anOperationMgr->onValidateOperation();
 
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
+  if (isModified)
+    workshop()->displayer()->updateViewer();
 }
 
 //******************************************************

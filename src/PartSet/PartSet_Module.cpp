@@ -298,7 +298,7 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation)
-    myCustomPrs->activate(aFOperation->feature());
+    myCustomPrs->activate(aFOperation->feature(), true);
 }
 
 void PartSet_Module::onOperationResumed(ModuleBase_Operation* theOperation)
@@ -307,18 +307,24 @@ void PartSet_Module::onOperationResumed(ModuleBase_Operation* theOperation)
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation)
-    myCustomPrs->activate(aFOperation->feature());
+    myCustomPrs->activate(aFOperation->feature(), true);
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  myCustomPrs->deactivate();
+  bool isModified = myCustomPrs->deactivate(false);
 
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
+  }
+
+  if (isModified) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+    aDisplayer->updateViewer();
   }
 }
 
@@ -752,10 +758,11 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
 
 void PartSet_Module::onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS)
 {
+  // this is obsolete
   // it should be recomputed in order to disappear in the viewer if the corresponded object
   // is erased
-  if (myCustomPrs->isActive())
-    myCustomPrs->customize(theObject);
+  //if (myCustomPrs->isActive())
+  //  myCustomPrs->redisplay(theObject, false);
 }
 
 void PartSet_Module::onViewTransformed(int theTrsfType)
@@ -812,10 +819,13 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
-void PartSet_Module::customizeObject(ObjectPtr theObject)
+bool PartSet_Module::customizeObject(ObjectPtr theObject, const bool theUpdateViewer)
 {
+  bool isRedisplayed = false;
   if (myCustomPrs->isActive())
-    myCustomPrs->customize(theObject);
+    isRedisplayed = myCustomPrs->redisplay(theObject, theUpdateViewer);
+
+  return isRedisplayed;
 }
 
 void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
