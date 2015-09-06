@@ -20,7 +20,8 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
-
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomValidators_Tools.h>
 
@@ -56,10 +57,10 @@ void PartSet_OperationPrs::setFeature(const FeaturePtr& theFeature)
   updateShapes();
 }
 
-bool PartSet_OperationPrs::dependOn(const ObjectPtr& theResult)
+/*bool PartSet_OperationPrs::dependOn(const ObjectPtr& theResult)
 {
   return myFeatureShapes.contains(theResult);
-}
+}*/
 
 void PartSet_OperationPrs::updateShapes()
 {
@@ -185,6 +186,8 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
   if (!myFeature.get())
     return;
 
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+
   QList<GeomShapePtr> aShapes;
   std::list<AttributePtr> anAttributes = myFeature->data()->attributes("");
   std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
@@ -192,6 +195,9 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
     AttributePtr anAttribute = *anIt;
     if (!isSelectionAttribute(anAttribute))
       continue;
+
+    if (!aValidators->isCase(myFeature, anAttribute->id()))
+      continue; // this attribute is not participated in the current case
 
     std::string anAttrType = anAttribute->attributeType();
 

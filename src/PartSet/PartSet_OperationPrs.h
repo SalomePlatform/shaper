@@ -55,7 +55,7 @@ public:
   void setFeature(const FeaturePtr& theFeature);
 
   /// Returns true if the presentation 
-  bool dependOn(const ObjectPtr& theObject);
+  //bool dependOn(const ObjectPtr& theObject);
 
   // Recompute internal list of shaped dependent on the current feature
   void updateShapes();
