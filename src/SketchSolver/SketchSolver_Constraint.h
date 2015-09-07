@@ -46,7 +46,7 @@ public:
   virtual bool remove(ConstraintPtr theConstraint = ConstraintPtr());
 
   /// \brief Update SketchPlugin attributes using the data obtained from SolveSpace entities
-  void refresh();
+  virtual void refresh();
 
   /// \brief Returns the type of constraint
   virtual int getType() const = 0;

@@ -136,6 +136,9 @@ void SketchSolver_ConstraintMulti::addFeature(FeaturePtr theFeature)
 
 void SketchSolver_ConstraintMulti::adjustConstraint()
 {
+  if (myAdjusted)
+    return; // constraint already adjusted, don't do it once again
+
   double aRelCoord[2]  = {0.0, 0.0}; // relative coordinates of point
   double anAbsCoord[2] = {0.0, 0.0}; // absolute coordinates of point
 
@@ -232,4 +235,5 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
   }
 
   myPointsJustUpdated.clear();
+  myAdjusted = true;
 }

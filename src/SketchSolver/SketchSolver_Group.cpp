@@ -285,6 +285,29 @@ bool SketchSolver_Group::changeConstraint(
 }
 
 
+void SketchSolver_Group::updateConstraints()
+{
+  std::set<SolverConstraintPtr> aPostponed; // postponed constraints Multi-Rotation and Multi-Translation
+
+  ConstraintConstraintMap::iterator anIt = myConstraints.begin();
+  for (; anIt != myConstraints.end(); ++anIt) {
+    if (myChangedConstraints.find(anIt->first) == myChangedConstraints.end())
+      continue;
+    if (anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
+        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
+      aPostponed.insert(anIt->second);
+    else
+      anIt->second->update();
+  }
+
+  // Update postponed constraints
+  std::set<SolverConstraintPtr>::iterator aSCIter = aPostponed.begin();
+  for (; aSCIter != aPostponed.end(); ++aSCIter)
+    (*aSCIter)->update();
+
+  myChangedConstraints.clear();
+}
+
 bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   if (!checkFeatureValidity(theFeature))
@@ -295,7 +318,6 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
   if (aConstraints.empty())
     return false;
   std::set<ConstraintPtr>::iterator aCIter = aConstraints.begin();
-  std::set<SolverConstraintPtr> aPostponed; // postponed constraints Multi-Rotation and Multi-Translation
   for (; aCIter != aConstraints.end(); aCIter++) {
     ConstraintConstraintMap::iterator aSolConIter = myConstraints.find(*aCIter);
     if (aSolConIter == myConstraints.end() || !aSolConIter->first->data() ||
@@ -303,20 +325,8 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
       continue;
     myFeatureStorage->changeFeature(theFeature, aSolConIter->first);
 
-    if (aSolConIter->first->getKind() == SketchPlugin_MultiRotation::ID() ||
-        aSolConIter->first->getKind() == SketchPlugin_MultiTranslation::ID()) {
-      aPostponed.insert(aSolConIter->second);
-      continue;
-    }
     aSolConIter->second->addFeature(theFeature);
-    aSolConIter->second->update();
-  }
-
-  // Update postponed constraints
-  std::set<SolverConstraintPtr>::iterator aSCIter = aPostponed.begin();
-  for (; aSCIter != aPostponed.end(); ++aSCIter) {
-    (*aSCIter)->addFeature(theFeature);
-    (*aSCIter)->update();
+    myChangedConstraints.insert(aSolConIter->first);
   }
   return true;
 }
@@ -454,6 +464,9 @@ bool SketchSolver_Group::updateWorkplane()
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
+  if (!myChangedConstraints.empty())
+    updateConstraints();
+
   bool aResolved = false;
   if (myStorage->isNeedToResolve() && !isEmpty()) {
     myConstrSolver.setGroupID(myID);

@@ -138,12 +138,16 @@ void SketchSolver_ConstraintMultiTranslation::process()
     }
   }
 
+  myAdjusted = false;
   processEntities(anEntitiesAndCopies);
   adjustConstraint();
 }
 
 void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
 {
+  if (myAdjusted)
+    return;
+
   Slvs_Entity aTranslationLine = myStorage->getEntity(myTranslationLine);
   Slvs_hConstraint aFixed; // temporary variable
   // Set the translation line unchanged during constraint recalculation

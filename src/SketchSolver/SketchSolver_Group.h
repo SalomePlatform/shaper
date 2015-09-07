@@ -160,12 +160,16 @@ private:
   /// \brief Verifies is the feature valid
   bool checkFeatureValidity(FeaturePtr theFeature);
 
+  /// \brief Update just changed constraints
+  void updateConstraints();
+
 private:
   Slvs_hGroup myID; ///< Index of the group
   Slvs_hEntity myWorkplaneID; ///< Index of workplane, the group is based on
   CompositeFeaturePtr mySketch; ///< Sketch is equivalent to workplane
   ConstraintConstraintMap myConstraints; ///< List of constraints
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
+  std::set<ConstraintPtr> myChangedConstraints; ///< List of just updated constraints
 
   StoragePtr myStorage; ///< Container for the set of SolveSpace constraints and their entities
   FeatureStoragePtr myFeatureStorage; ///< Container for the set of SketchPlugin features and their dependencies

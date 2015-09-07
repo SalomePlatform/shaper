@@ -126,15 +126,19 @@ void SketchSolver_ConstraintMultiRotation::process()
     mySlvsConstraints.push_back(aConstraint.h);
   }
 
+  myAdjusted = false;
   processEntities(anEntitiesAndCopies);
   adjustConstraint();
 }
 
 void SketchSolver_ConstraintMultiRotation::updateLocal()
 {
-  // update angle value
-  myAngle = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+  double aValue = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       myBaseConstraint->attribute(SketchPlugin_MultiRotation::ANGLE_ID()))->value();
+  if (fabs(myAngle - aValue) > tolerance)
+    myAdjusted = false;
+  // update angle value
+  myAngle = aValue;
 }
 
 void SketchSolver_ConstraintMultiRotation::adjustConstraint()
@@ -143,6 +147,8 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
     myStorage->setNeedToResolve(false);
     return;
   }
+  if (myAdjusted)
+    return;
 
   std::list<Slvs_Constraint> aCoincident = myStorage->getConstraintsByType(SLVS_C_POINTS_COINCIDENT);
   std::list<Slvs_Constraint>::const_iterator aCoIt;

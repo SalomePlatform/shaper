@@ -22,7 +22,8 @@ public:
   SketchSolver_ConstraintMulti(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
       myNumberOfObjects(0),
-      myNumberOfCopies(0)
+      myNumberOfCopies(0),
+      myAdjusted(false)
   {}
 
   virtual int getType() const
@@ -37,6 +38,14 @@ public:
 
   /// \brief Adds a feature to constraint and create its analogue in SolveSpace
   virtual void addFeature(FeaturePtr theFeature);
+
+  /// \brief Update SketchPlugin attributes using the data obtained from SolveSpace entities
+  virtual void refresh()
+  {
+    myAdjusted = false;
+    SketchSolver_Constraint::refresh();
+  }
+
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
@@ -78,6 +87,8 @@ protected:
 
   std::set<Slvs_hEntity> myPointsJustUpdated; ///< list of points touched by user
   std::set<Slvs_hEntity> myInitialPoints;     ///< list of points containing initial objects
+
+  bool myAdjusted; ///< the constraint is already adjusted (to not do it several times)
 };
 
 #endif
