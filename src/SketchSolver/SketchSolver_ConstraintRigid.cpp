@@ -47,10 +47,10 @@ void SketchSolver_ConstraintRigid::fixFeature()
     anEntID = myFeatureMap.begin()->second;
   else
     anEntID = myAttributeMap.begin()->second;
-  if (myStorage->isEntityFixed(anEntID, true)) {
-    myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
-    return;
-  }
+  //if (myStorage->isEntityFixed(anEntID, true)) {
+  //  myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
+  //  return;
+  //}
 
   std::string aKind;
   if (!myFeatureMap.empty())
