@@ -207,24 +207,33 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       }
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
-    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+    std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_OrderUpdatedMessage>(theMessage);
+    DocumentPtr aDoc = aUpdMsg->document();
+    std::string aGroup = aUpdMsg->group();
 
-    std::set<ObjectPtr>::const_iterator aIt;
-    std::string aObjType;
-    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-      ObjectPtr aObject = (*aIt);
-      // We do not show objects which not has to be shown in object browser
-      if (!aObject->isInHistory())
-        continue;
-      QModelIndex aIndex = objectIndex(aObject);
-      QModelIndex aParent = parent(aIndex);
-      int aChildNb = rowCount(aParent);
-      QModelIndex aStartIndex = index(0, 0, aParent);
-      QModelIndex aEndIndex = index(aChildNb - 1, 0, aParent);
-      emit dataChanged(aStartIndex, aEndIndex);
+    QModelIndex aParent;
+    int aSartId = 0;
+    if (aDoc == aRootDoc) {
+      // Update a group under root
+      if (aGroup == myXMLReader.rootType()) // Update objects under root
+        aSartId = foldersCount();
+      else // Update objects in folder under root 
+        aParent = createIndex(folderId(aGroup), 0, -1);
+    } else {
+      // Update a sub-document
+      if (aGroup == myXMLReader.subType()) {
+        // Update sub-document root
+        aParent = findDocumentRootIndex(aDoc.get());
+        aSartId = foldersCount(aDoc.get());
+      } else 
+        // update folder in sub-document
+        aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
     }
+    int aChildNb = rowCount(aParent);
+    // Rebuild all indexes
+    removeRows(aSartId, aChildNb - aSartId, aParent);
+    insertRows(aSartId, aChildNb - aSartId, aParent);
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
     if (aDoc != aRootDoc) {
