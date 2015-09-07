@@ -63,6 +63,10 @@ Model_Objects::~Model_Objects()
   // delete all features of this document
   Events_Loop* aLoop = Events_Loop::loop();
   // erase one by one to avoid access from the feature destructor itself from he map
+  // blocks the flush signals to avoid the temporary objects visualization in the viewer
+  // they should not be shown in order to do not lose highlight by erasing them
+  bool isActive = aLoop->activateFlushes(false);
+
   while(!myFeatures.IsEmpty()) {
     NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeaturesIter(myFeatures);
     FeaturePtr aFeature = aFeaturesIter.Value();
@@ -74,6 +78,7 @@ Model_Objects::~Model_Objects()
     aFeature->erase();
     myFeatures.UnBind(aFeaturesIter.Key());
   }
+  aLoop->activateFlushes(isActive);
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
