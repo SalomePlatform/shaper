@@ -18,7 +18,9 @@ class SketchSolver_ConstraintDistance : public SketchSolver_Constraint
 {
 public:
   SketchSolver_ConstraintDistance(ConstraintPtr theConstraint) :
-      SketchSolver_Constraint(theConstraint), myType(SLVS_C_UNKNOWN)
+      SketchSolver_Constraint(theConstraint),
+      myType(SLVS_C_UNKNOWN),
+      myIsNegative(false)
   {}
 
   /// \brief Update constraint
