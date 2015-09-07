@@ -26,6 +26,9 @@
 
 #include <sstream>
 
+const double tolerance = 1e-7;
+
+
 namespace ModuleBase_Tools {
 
 //******************************************************************
@@ -126,7 +129,7 @@ void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText)
 
 void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 {
-  if (theSpin->value() == theValue)
+  if (fabs(theSpin->value() - theValue) < tolerance)
     return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
@@ -135,8 +138,8 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 
 void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue)
 {
-  //if (theSpin->value() == theValue)
-  //  return;
+  if (fabs(theSpin->value() - theValue) < tolerance)
+    return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
   theSpin->blockSignals(isBlocked);
