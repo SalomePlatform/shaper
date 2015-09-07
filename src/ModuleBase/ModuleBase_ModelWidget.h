@@ -204,6 +204,10 @@ protected:
   /// The method called when widget is activated
   virtual void activateCustom() {};
 
+  /// Sends a message about block/unblock viewer updating
+  /// \param theValue a boolean value
+  static void blockUpdateViewer(const bool theValue);
+
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
   void onWidgetValuesChanged();

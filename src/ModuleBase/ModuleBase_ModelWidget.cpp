@@ -150,27 +150,22 @@ bool ModuleBase_ModelWidget::restoreValue()
 
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
 {
-  // the viewer update should be blocked in order to avoid the temporary feature content
-  // when the solver processes the feature, the redisplay message can be flushed
-  // what caused the display in the viewer preliminary states of object
-  // e.g. fillet feature, angle value change
-  std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
-      new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
-  Events_Loop::loop()->send(aMsg);
+  blockUpdateViewer(true);
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
-  // the viewer update should be unblocked
-  aMsg = std::shared_ptr<Events_Message>(
-                new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
-  Events_Loop::loop()->send(aMsg);
+  blockUpdateViewer(false);
 }
 
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
 {
+  blockUpdateViewer(true);
+
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
   Events_Loop::loop()->flush(anEvent);
+
+  blockUpdateViewer(false);
 }
 
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
@@ -195,4 +190,24 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 void ModuleBase_ModelWidget::onWidgetValuesChanged()
 {
   storeValue();
+}
+
+//**************************************************************
+void ModuleBase_ModelWidget::blockUpdateViewer(const bool theValue)
+{
+  // the viewer update should be blocked in order to avoid the temporary feature content
+  // when the solver processes the feature, the redisplay message can be flushed
+  // what caused the display in the viewer preliminary states of object
+  // e.g. fillet feature, angle value change
+  std::shared_ptr<Events_Message> aMsg;
+  if (theValue) {
+    aMsg = std::shared_ptr<Events_Message>(
+        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+  }
+  else {
+    // the viewer update should be unblocked
+    aMsg = std::shared_ptr<Events_Message>(
+        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+  }
+  Events_Loop::loop()->send(aMsg);
 }
