@@ -60,7 +60,7 @@ void XGUI_ContextMenuMgr::createActions()
   addAction("RENAME_CMD", aAction);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRename()));
 
-  aAction = new QAction(QIcon(":pictures/move.png"), tr("Move down"), this);
+  aAction = new QAction(QIcon(":pictures/move.png"), tr("Move to the end"), this);
   addAction("MOVE_CMD", aAction);
 
   aAction = new QAction(QIcon(":pictures/color.png"), tr("Color..."), this);
