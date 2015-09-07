@@ -275,6 +275,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
+  myIsResetCurrentValue = false;
+
   if (isNestedCreateOperation(getCurrentOperation()))
     return;
   // it is necessary to save current selection in order to restore it after the values are modifed
@@ -310,7 +312,7 @@ void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
     return;
 
   // visualize the current operation feature
-  myIsResetCurrentValue = false;
+  //myIsResetCurrentValue = false;
   operationMgr()->onValidateOperation();
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
