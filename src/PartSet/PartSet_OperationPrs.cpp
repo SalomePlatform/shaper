@@ -37,6 +37,8 @@ IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
   : ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr()), myWorkshop(theWorkshop)
 {
+  myShapeColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "1,1,0");
+  myResultColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "0,1,0");
 }
 
 bool PartSet_OperationPrs::canActivate(const FeaturePtr& theFeature)

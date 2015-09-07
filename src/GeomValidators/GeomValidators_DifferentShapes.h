@@ -1,11 +1,11 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModelAPI_ShapeValidator.h
+// File:        GeomValidators_DifferentShapes.h
 // Created:     2 Feb 2015
 // Author:      Natalia ERMOLAEVA
 
-#ifndef ModelAPI_ShapeValidator_H
-#define ModelAPI_ShapeValidator_H
+#ifndef GeomValidators_DifferentShapes_H
+#define GeomValidators_DifferentShapes_H
 
 #include <ModelAPI.h>
 
@@ -15,7 +15,7 @@
 /**
  * Generic validator for any attribute of a feature.
  */
-class ModelAPI_ShapeValidator : public ModelAPI_AttributeValidator
+class GeomValidators_DifferentShapes : public ModelAPI_AttributeValidator
 {
 public:
   /// returns True if the attribute is valid. It checks whether the feature of the attribute

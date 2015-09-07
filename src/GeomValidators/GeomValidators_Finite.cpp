@@ -25,6 +25,7 @@ bool GeomValidators_Finite::isValid(const AttributePtr& theAttribute,
         ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
         if (aConstruction.get() && aConstruction->isInfinite()) {
           aValid = false;
+          theError = "Infinite result is selected.";
         }
       }
     }

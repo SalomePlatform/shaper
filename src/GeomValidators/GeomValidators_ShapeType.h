@@ -40,7 +40,7 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
 
  public:
    GEOMVALIDATORS_EXPORT GeomValidators_ShapeType() {}
-  //! returns true if attribute is valid
+  //! Returns true if attribute has shape type listed in the parameter arguments
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
@@ -51,26 +51,26 @@ protected:
   /// \param theType a string value
   static TypeOfShape shapeType(const std::string& theType);
 
-  bool isValidArgument(const AttributePtr& theAttribute,
-                       const std::string& theArgument) const;
-
   /// Returns true if the attibute's object type satisfies the argument value
   /// \param theAttribute a checked attribute
   /// \param theArgument a parameter
   bool isValidAttribute(const AttributePtr& theAttribute,
-                        const TypeOfShape theShapeType) const;
+                        const TypeOfShape theShapeType,
+                        std::string& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
   /// \param theAttribute a checked object
   /// \param theShapeType a shape type
   bool isValidObject(const ObjectPtr& theObject,
-                     const TypeOfShape theShapeType) const;
+                     const TypeOfShape theShapeType,
+                     std::string& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
   /// \param theShape a checked shape
   /// \param theShapeType a shape type
   bool isValidShape(const GeomShapePtr theShape,
-                    const TypeOfShape theShapeType) const;
+                    const TypeOfShape theShapeType,
+                    std::string& theError) const;
 
 };
 

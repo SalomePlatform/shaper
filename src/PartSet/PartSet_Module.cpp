@@ -49,7 +49,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
-#include <ModelAPI_ShapeValidator.h>
+#include <GeomValidators_DifferentShapes.h>
 #include <ModelAPI_ResultBody.h>
 
 #include <GeomDataAPI_Point2D.h>
@@ -200,15 +200,12 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_TangentSelection", new PartSet_TangentSelection);
   aFactory->registerValidator("PartSet_FilletSelection", new PartSet_FilletSelection);
   aFactory->registerValidator("PartSet_AngleSelection", new PartSet_AngleSelection);
-
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
-  aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
-
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
 
+  aFactory->registerValidator("GeomValidators_DifferentShapes", new GeomValidators_DifferentShapes);
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
-
   aFactory->registerValidator("GeomValidators_Finite", new GeomValidators_Finite);
 
   aFactory->registerValidator("GeomValidators_ConstructionComposite",
@@ -222,9 +219,6 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("PartSet_SketchEntityValidator",
                               new PartSet_SketchEntityValidator);
-
-  aFactory->registerValidator("PartSet_SameTypeAttr",
-                              new PartSet_SameTypeAttrValidator);
 
   aFactory->registerValidator("GeomValidators_Different",
                               new GeomValidators_Different);

@@ -1,15 +1,15 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModelAPI_ShapeValidator.cpp
+// File:        GeomValidators_DifferentShapes.cpp
 // Created:     2 Feb 2015
 // Author:      Natalia ERMOLAEVA
 
-#include "ModelAPI_ShapeValidator.h"
+#include "GeomValidators_DifferentShapes.h"
 
 #include <ModelAPI_AttributeSelection.h>
 #include "ModelAPI_Object.h"
 
-bool ModelAPI_ShapeValidator::isValid(const AttributePtr& theAttribute,
+bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
                                       std::string& theError) const
 {
@@ -42,8 +42,9 @@ bool ModelAPI_ShapeValidator::isValid(const AttributePtr& theAttribute,
             ResultPtr aResult = aSelectionAttribute->context();
             if (aResult.get())
               anAttrShape = aResult->shape();
-            }
-            if (aShape->isEqual(anAttrShape)) {
+          }
+          if (aShape->isEqual(anAttrShape)) {
+            theError = "The feature uses equal shapes.";
             return false;
           }
         }

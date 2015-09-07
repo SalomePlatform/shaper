@@ -21,6 +21,8 @@
 #include <ViewerData_AISShape.hxx>
 #include <Standard_DefineHandle.hxx>
 
+#include <Quantity_Color.hxx>
+
 #include <QMap>
 #include <QList>
 
@@ -98,6 +100,9 @@ private:
   FeaturePtr myFeature; /// Reference to a feature object
   QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes; /// visualized shapes
   std::list<ResultPtr> myFeatureResults; /// visualized feature results
+
+  Quantity_Color myShapeColor; /// color of feature depended shapes
+  Quantity_Color myResultColor; /// color of feature result
 };
 
 

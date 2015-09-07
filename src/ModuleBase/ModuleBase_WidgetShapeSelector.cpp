@@ -35,7 +35,6 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeValidator.h>
-#include <ModelAPI_ShapeValidator.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Error.h>

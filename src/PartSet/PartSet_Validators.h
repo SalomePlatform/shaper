@@ -115,6 +115,13 @@ class PartSet_AngleSelection : public ModuleBase_SelectionValidator
 */
 class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
 {
+  //! Validator possible error types
+  enum ErrorType {
+    EqualObjects,
+    EqualAttributes,
+    EqualShapes,
+    EmptyShapes
+  };
  public:
   //! Returns true if the attribute is good for the feature attribute
   //! \param theAttribute an attribute
@@ -122,6 +129,14 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;
+private:
+  //! Returns error message for the error type
+  //! \param theType a type of error
+  //! \param thEqualObjectInfo an 
+  std::string errorMessage(const PartSet_DifferentObjectsValidator::ErrorType& theType,
+                           const std::string& thEqualObject, const std::string& theFirstAttribute,
+                           const std::string& theSecondAttribute) const;
+
 };
 
 /**
@@ -134,23 +149,6 @@ class PartSet_SketchEntityValidator : public ModelAPI_AttributeValidator
   //! Returns true if the attribute is good for the feature attribute
   //! \param theAttribute an attribute
   //! \param theArguments a list of arguments (names of attributes to check)
-  virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments,
-                       std::string& theError) const;
-};
-
-/**\class PartSet_SameTypeAttrValidator
- * \ingroup Validators
- * \brief Validator for the tangent constraint input.
- *
- * It just checks that distance is greater than zero.
- */
-class PartSet_SameTypeAttrValidator : public ModelAPI_AttributeValidator
-{
- public:
-  //! returns true if attribute is valid
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;

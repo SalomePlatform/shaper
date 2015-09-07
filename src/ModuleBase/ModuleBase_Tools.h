@@ -15,6 +15,8 @@
 #include <TopoDS_Shape.hxx>
 #include <Prs3d_Drawer.hxx>
 
+#include <Quantity_Color.hxx>
+
 #include <QPixmap>
 
 class QWidget;
@@ -108,6 +110,16 @@ It provides 1.e-4 for a shape withe Edge shape type
 */
 MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                                       const Handle(Prs3d_Drawer)& theDrawer);
+
+/*! Obtains the color from the property manager and converts it to the OCCT color
+\param theSection a property section
+\param theName a property item name
+\param theDefault a default color value
+\return quantity color
+*/
+MODULEBASE_EXPORT Quantity_Color color(const std::string& theSection,
+                                       const std::string& theName,
+                                       const std::string& theDefault);
 }
 
 #endif

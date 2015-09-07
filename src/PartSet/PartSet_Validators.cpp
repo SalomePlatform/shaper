@@ -192,6 +192,35 @@ bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection) 
   return (aCount > 0) && (aCount < 3);
 }
 
+std::string PartSet_DifferentObjectsValidator::errorMessage(
+                         const PartSet_DifferentObjectsValidator::ErrorType& theType,
+                         const std::string& thEqualObject, const std::string& theFirstAttribute,
+                         const std::string& theSecondAttribute) const
+{
+  std::string anError;
+  switch (theType) {
+    case EqualObjects:
+      anError = "The feature uses one " + thEqualObject + " object in " +
+                theFirstAttribute + " and " + theSecondAttribute + " attributes.";
+      break;
+    case EqualAttributes:
+      anError = "The feature uses reference to one " + thEqualObject + " attribute in " +
+                theFirstAttribute + " and " + theSecondAttribute + " attributes.";
+      break;
+    case EqualShapes:
+      anError = "The feature uses one shape in " +
+                theFirstAttribute + " and " + theSecondAttribute + " attributes.";
+      break;
+    case EmptyShapes:
+      anError = "The feature uses empty shapes in " +
+                theFirstAttribute + " and " + theSecondAttribute + " attributes.";
+      break;
+      break;
+    default:
+      break;
+  }
+  return anError;
+}
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments,
@@ -220,12 +249,19 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
           if (aRef->isObject() != isObject)
             continue;
           if (isObject) {
-            if (aRef->object() == anObject)
+            if (aRef->object() == anObject) {
+              theError = errorMessage(EqualObjects, anObject.get() ? anObject->data()->name() : "",
+                                      theAttribute->id(), aRef->id());
               return false;
+            }
           }
           else { // the attribute reference
-            if (aRef->attr() == anAttributeAttr)
+            if (aRef->attr() == anAttributeAttr) {
+              theError = errorMessage(EqualAttributes,
+                                      anAttributeAttr.get() ? anAttributeAttr->id() : "",
+                                      theAttribute->id(), aRef->id());
               return false;
+            }
           }
         }
       }
@@ -247,8 +283,10 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
           // check the object is already presented
           if (aRef->context() == aContext) {
             bool aHasShape = aShape.get() != NULL;
-            if (!aHasShape || aRef->value()->isEqual(aShape))
+            if (!aHasShape || aRef->value()->isEqual(aShape)) {
+              theError = errorMessage(EqualShapes, "", theAttribute->id(), aRef->id());
               return false;
+            }
           }
         }
       }
@@ -266,8 +304,11 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
           std::shared_ptr<ModelAPI_AttributeReference> aRef =
             std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*anAttr);
           // check the object is already presented
-          if (aRef->value() == anObject)
+          if (aRef->value() == anObject) {
+            theError = errorMessage(EqualObjects, anObject.get() ? anObject->data()->name() : "",
+                                    theAttribute->id(), aRef->id());
             return false;
+          }
         }
         return true;
       }
@@ -299,14 +340,22 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
               if(aRefSelCompSolidPtr.get()) {
                 aRefSelCompSolid = aRefSelCompSolidPtr->shape();
               }
-              if((aCurSelCompSolid.get() && aCurSelCompSolid->isEqual(aRefSel->value()))
+              if ((aCurSelCompSolid.get() && aCurSelCompSolid->isEqual(aRefSel->value()))
                 || (aRefSelCompSolid.get() && aRefSelCompSolid->isEqual(aCurSel->value()))) {
+                  theError = errorMessage(EqualShapes, "", theAttribute->id(),
+                                          aRefSel->id());
                   return false;
               }
               if(aCurSelContext == aRefSelContext) {
-                if(aCurSel->value().get() == NULL || aRefSel->value().get() == NULL
-                  || aCurSel->value()->isEqual(aRefSel->value())) {
-                    return false;
+                if (aCurSel->value().get() == NULL || aRefSel->value().get() == NULL) {
+                  theError = errorMessage(EmptyShapes, "", theAttribute->id(),
+                                          aRefSel->id());
+                  return false;
+                }
+                if (aCurSel->value()->isEqual(aRefSel->value())) {
+                  theError = errorMessage(EqualShapes, "", theAttribute->id(),
+                                          aRefSel->id());
+                  return false;
                 }
               }
             }
@@ -329,6 +378,9 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             ObjectPtr aCurSelObject = aCurSelList->object(i);
             for (int j = 0; j < aRefSelList->size(); j++) {
               if (aCurSelObject == aRefSelList->object(j)) {
+                theError = errorMessage(EqualObjects,
+                              aCurSelObject.get() ? aCurSelObject->data()->name() : "",
+                              theAttribute->id(), aCurSelList->id());
                 return false;
               }
             }
@@ -346,9 +398,13 @@ bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
 {
   bool isSketchEntities = true;
   std::set<std::string> anEntityKinds;
+  std::string anEntityKindsStr;
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
   for (; anIt != aLast; anIt++) {
     anEntityKinds.insert(*anIt);
+    if (!anEntityKindsStr.empty())
+      anEntityKindsStr += ", ";
+    anEntityKindsStr += *anIt;
   }
 
   std::string anAttributeType = theAttribute->attributeType();
@@ -402,43 +458,22 @@ bool PartSet_SketchEntityValidator::isValid(const AttributePtr& theAttribute,
       }
     }
   }
+  if (!isSketchEntities) {
+    theError = "It refers to feature, which kind is not in the list: " + anEntityKindsStr;
+  }
 
   return isSketchEntities;
-}
-
-
-
-bool PartSet_SameTypeAttrValidator::isValid(const AttributePtr& theAttribute, 
-                                            const std::list<std::string>& theArguments,
-                                            std::string& theError ) const
-{
-  // there is a check whether the feature contains a point and a linear edge or two point values
-  std::string aParamA = theArguments.front();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr)
-    return false;
-
-  bool isObject = aRefAttr->isObject();
-  ObjectPtr anObject = aRefAttr->object();
-  if (isObject && anObject) {
-    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
-
-    AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
-    ObjectPtr aOtherObject = aOtherAttr->object();
-    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
-    return aRefFea->getKind() == aOtherFea->getKind();
-  }
-  return false;
 }
 
 bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute, 
                                      const std::list<std::string>& theArguments,
                                      std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -446,9 +481,6 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
 
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr)
-    return false;
-
   QList<FeaturePtr> aCoinsideLines;
 
   bool isObject = aRefAttr->isObject();
@@ -482,17 +514,17 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
       }
     }
     // if there is no coincidence then it is not valid
-    if (aCoinList.size() == 0)
-      return false;
-
-    QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(), aLast = aCoinsideLines.end();
-    bool aValid = false;
-    for (; anIt != aLast && !aValid; anIt++) {
-      aValid = *anIt == aOtherFea;
+    if (aCoinList.size() > 0) {
+      QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(), aLast = aCoinsideLines.end();
+      bool aValid = false;
+      for (; anIt != aLast && !aValid; anIt++) {
+        aValid = *anIt == aOtherFea;
+      }
+      if (aValid)
+        return true;
     }
-    if (aValid)
-      return true;
   }
+  theError = "There is no a common coincident point.";
   return false;
 }
 

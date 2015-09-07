@@ -18,6 +18,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Error.h>
 
+#include <Config_PropManager.h>
+
 #include <QWidget>
 #include <QLayout>
 #include <QPainter>
@@ -254,6 +256,14 @@ void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
 {
   if (!theShape.IsNull() && theShape.ShapeType() == TopAbs_EDGE)
     theDrawer->SetDeviationCoefficient(1.e-4);
+}
+
+Quantity_Color color(const std::string& theSection,
+                     const std::string& theName,
+                     const std::string& theDefault)
+{
+  std::vector<int> aColor = Config_PropManager::color(theSection, theName, theDefault);
+  return Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB);
 }
 
 }

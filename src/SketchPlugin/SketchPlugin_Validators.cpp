@@ -35,15 +35,17 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr)
-    return false;
-
   bool isObject = aRefAttr->isObject();
   if (!isObject) {
     // an attribute is a point. A point value is valid always for the distance
@@ -59,81 +61,105 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
     std::string aCircleError;
     bool aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments, aCircleError);
     // the circle line is not a valid case
-    if (aShapeValid)
+    if (aShapeValid) {
+      theError = "Circle can not be used in distance constraint";
       return false;
+    }
       
     anArguments.clear();
     anArguments.push_back("line");
     std::string aLineError;
     aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments, aLineError);
     // if the attribute value is not a line, that means it is a vertex. A vertex is always valid
-    if (!aShapeValid)
-      return true;
-
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-    // If it is a line then we have to check that first attribute id not a line
-    std::shared_ptr<SketchPlugin_Feature> aSFeature =
-                            std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
-    SketchPlugin_Sketch* aSketch = aSFeature->sketch();
-    std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(aSketch);
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint = SketcherPrs_Tools::getFeaturePoint(
-                                                               aFeature->data(), aParamA, aPlane);
-    if (aPoint)
-      return true;
+    if (aShapeValid) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+      // If it is a line then we have to check that first attribute id not a line
+      std::shared_ptr<SketchPlugin_Feature> aSFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+      SketchPlugin_Sketch* aSketch = aSFeature->sketch();
+      std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(aSketch);
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint = SketcherPrs_Tools::getFeaturePoint(
+        aFeature->data(), aParamA, aPlane);
+      if (!aPoint.get()) {
+        theError = "One of parameters of distance constraint should be a point";
+        return false;
+      }
+    }
   }
-  return false;
+  return true;
 }
 
 bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments,
                                                 std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  FeaturePtr anAttributeFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr)
-    return false;
 
   bool isObject = aRefAttr->isObject();
   ObjectPtr anObject = aRefAttr->object();
-  if (isObject && anObject) {
+  if (isObject && anObject.get()) {
     FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
 
-    AttributeRefAttrPtr aOtherAttr = aFeature->data()->refattr(aParamA);
+    AttributeRefAttrPtr aOtherAttr = anAttributeFeature->data()->refattr(aParamA);
     ObjectPtr aOtherObject = aOtherAttr->object();
     FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
 
     if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Arc::ID())
+      if (aOtherFea->getKind() != SketchPlugin_Arc::ID()) {
+        theError = "It refers to a " + SketchPlugin_Line::ID() + ", but " + aParamA + " is not an "
+          + SketchPlugin_Arc::ID();
         return false;
-    } else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
+      }
+    }
+    else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
       if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Arc::ID())
+        aOtherFea->getKind() != SketchPlugin_Arc::ID()) {
+        theError = "It refers to an " + SketchPlugin_Arc::ID() + ", but " + aParamA + " is not a "
+          + SketchPlugin_Line::ID() + " or an " + SketchPlugin_Arc::ID();
         return false;
-    } else
+      }
+    }
+    else {
+      theError = "It refers to " + aRefFea->getKind() + "but should refer to " + SketchPlugin_Line::ID()
+        + " or " + SketchPlugin_Arc::ID();
       return false;
-
+    }
     return true;
   }
-  return false;
+  else {
+    theError = "It uses an empty object";
+    return false;
+  }
+
+  return true;
 }
 
 bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute, 
                                              const std::list<std::string>& theArguments,
                                              std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   std::shared_ptr<SketchPlugin_Feature> aFeature =
       std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
   if (!aFeature)
     return true;
 
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr)
-    return false;
 
   SketchPlugin_Sketch* aSketch = aFeature->sketch();
   int aNbFeatures = aSketch->numberOfSubs();
@@ -144,10 +170,19 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
     AttributeRefAttrPtr aRAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         aSubFeature->attribute(SketchPlugin_ConstraintRigid::ENTITY_A()));
     if (aRefAttr->isObject()) {
-      if (aRefAttr->object() == aRAttr->object())
+      if (aRefAttr->object() == aRAttr->object()) {
+        ObjectPtr anObject = aRefAttr->object();
+        std::string aName = anObject.get() ? anObject->data()->name() : "";
+        theError = "The object " + aName + " has been already fixed.";
         return false;
-    } else if (aRefAttr->attr() == aRAttr->attr())
+      }
+    }
+    else if (aRefAttr->attr() == aRAttr->attr()) {
+      AttributePtr anAttribute = aRefAttr->attr();
+      std::string aName = anAttribute.get() ? anAttribute->id() : "";
+      theError = "The attribute " + aName + " has been already fixed.";
       return false;
+    }
   }
   return true;
 }
@@ -156,24 +191,36 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
                                               const std::list<std::string>& theArguments,
                                               std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   std::string aParamA = theArguments.front();
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr[2];
   aRefAttr[0] = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr)
-    return false;
   aRefAttr[1] = aFeature->data()->refattr(aParamA);
 
-  if (!aRefAttr[0]->isObject() || !aRefAttr[1]->isObject())
+  if (!aRefAttr[0]->isObject() || !aRefAttr[1]->isObject()) {
+    theError = "Attributes can not be used in equal constraint";
     return false;
+  }
 
   int aType[2] = {0, 0}; // types of attributes: 0 - incorrect, 1 - line, 2 - circle, 3 - arc
   std::list<std::string> anArguments;
   for (int i = 0; i < 2; i++) {
     ObjectPtr anObject = aRefAttr[i]->object();
-    aFeature = ModelAPI_Feature::feature(anObject);
-    if (!aFeature)
+    if (!anObject.get()) {
+      theError = "An empty object is used.";
       return false;
+    }
+
+    aFeature = ModelAPI_Feature::feature(anObject);
+    if (!aFeature.get()) {
+      theError = "An empty feature is used.";
+      return false;
+    }
 
     if (aFeature->getKind() == SketchPlugin_Line::ID()) {
       aType[i] = 1;
@@ -187,13 +234,19 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
       aType[i] = 3;
       continue;
     }
+    theError = "The " + aFeature->getKind() + " feature kind of attribute is wrong. It should be " +
+               SketchPlugin_Line::ID() + " or " + SketchPlugin_Circle::ID() + " or " + 
+               SketchPlugin_Arc::ID();
     // wrong type of attribute
     return false;
   }
 
   if ((aType[0] == 1 && aType[1] == 2) ||
-      (aType[0] == 2 && aType[1] == 1))
+      (aType[0] == 2 && aType[1] == 1)) {
+    theError = "Feature with kinds " + SketchPlugin_Line::ID() + " and " +
+               SketchPlugin_Circle::ID() + "can not be equal.";
     return false;
+  }
   return true;
 }
 
@@ -201,11 +254,13 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const
 {
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeRefListPtr aSelAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
-  if (!aSelAttr)
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefList::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
     return false;
+  }
+
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefListPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
 
   AttributeRefListPtr aRefListOfMirrored = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aFeature->attribute(SketchPlugin_Constraint::ENTITY_C()));
@@ -213,10 +268,13 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
 
   for(int anInd = 0; anInd < aSelAttr->size(); anInd++) {
     ObjectPtr aSelObject = aSelAttr->object(anInd);
+    std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
     std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
     for (; aMirIter != aMirroredObjects.end(); aMirIter++)
-      if (aSelObject == *aMirIter)
+      if (aSelObject == *aMirIter) {
+        theError = "The object " + aName + " is a result of mirror";
         return false;
+      }
   }
   return true;
 }
@@ -226,6 +284,11 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
                                                     const std::list<std::string>& theArguments,
                                                     std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -233,20 +296,28 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
 
   FeaturePtr aConstraint = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttrA = aConstraint->data()->refattr(aParamA);
-  if (!aRefAttrA)
+  if (!aRefAttrA) {
+    theError = "The " + aParamA + " attribute " + " should be " + ModelAPI_AttributeRefAttr::typeId();
     return false;
+  }
 
   AttributeRefAttrPtr aRefAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttrB)
-    return false;
 
   // first attribute is a point, it may coincide with any object
   if (!aRefAttrA->isObject())
     return true;
   else {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrA->object());
-    if (!aFeature)
+    ObjectPtr anObject = aRefAttrA->object();
+    if (!anObject.get()) {
+      theError = aParamA + " attribute has an empty object";
       return false;
+    }
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrA->object());
+    if (!aFeature.get()) {
+      theError = aParamA + " attribute has an empty feature";
+      return false;
+    }
+
     if (aFeature->getKind() == SketchPlugin_Point::ID())
       return true;
   }
@@ -256,12 +327,14 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
     return true;
   else {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrB->object());
-    if (!aFeature)
+    if (!aFeature) {
+      theError = theAttribute->id() + " attribute has an empty object";
       return false;
+    }
     if (aFeature->getKind() == SketchPlugin_Point::ID())
       return true;
   }
-
+  theError = "There is no an attribute filled by a point";
   return false;
 }
 
@@ -270,11 +343,14 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
                                          const std::list<std::string>& theArguments,
                                          std::string& theError) const
 {
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefList::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefListPtr aSelAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
-  if (!aSelAttr)
-    return false;
 
   AttributeRefListPtr aRefListOfInitial = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
@@ -294,8 +370,11 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
       continue;
     anObjIter = aCopiedObjects.begin();
     for (; anObjIter != aCopiedObjects.end(); anObjIter++)
-      if (aSelObject == *anObjIter)
+      if (aSelObject == *anObjIter) {
+        std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
+        theError = "The object " + aName + " is a result of copy";
         return false;
+      }
   }
   return true;
 }

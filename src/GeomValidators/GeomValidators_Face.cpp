@@ -34,23 +34,20 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
                                   const std::list<std::string>& theArguments,
                                   std::string& theError) const
 {
-  bool aValid = false;
-
-  GeomAbs_SurfaceType aFaceType = GeomAbs_Plane;
-  if (theArguments.size() == 1) {
-    std::string anArgument = theArguments.front();
-    aFaceType = faceType(anArgument);
+  std::string anAttributeType = theAttribute->attributeType();
+  if (anAttributeType != ModelAPI_AttributeSelection::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
   }
 
+  bool aValid = true;
   ObjectPtr anObject = GeomValidators_Tools::getObject(theAttribute);
-  if (anObject.get() != NULL) {
+  if (!anObject.get()) {
+    aValid = true; // an empty face selected is valid.
+  }
+  else {
     AttributeSelectionPtr aSelectionAttr =
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-    if (aSelectionAttr.get() == NULL) {
-      theError = "Is not a selection attribute.";
-      return aValid;
-    }
-
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     std::shared_ptr<GeomAPI_Shape> aGeomShape = aSelectionAttr->value();
     if (!aGeomShape.get()) {
       // if the shape is empty, apply the validator to the shape of result
@@ -59,29 +56,42 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
     // it is necessary to check whether the shape is face in order to set in selection a value
     // with any type and check the type in this validator
     // It is realized to select any object in OB and filter it in this validator (sketch plane)
-    if (aGeomShape->isFace()) {
+    if (!aGeomShape->isFace()) {
+      aValid = false;
+      theError = "The shape is not a face.";
+    }
+    else {
       std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face(aGeomShape));
-      if (aGeomFace.get() != NULL) {
-        switch(aFaceType) {
-            case GeomAbs_Plane:
-              aValid = aGeomFace->isPlanar();
-              if (!aValid)
-                theError = "The shape is not a plane.";
-              break;
-            case GeomAbs_Cylinder:
-              aValid = aGeomFace->isCylindrical();
-              if (!aValid)
-                theError = "The shape is not a cylinder.";
-              break;
-            default:
-              theError = "The shape is not an available face.";
-              break;
+      if (!aGeomFace.get()) {
+        aValid = false;
+        theError = "The shape is not a face.";
+      }
+      else {
+        GeomAbs_SurfaceType aFaceType = GeomAbs_Plane;
+        if (theArguments.size() == 1)
+          aFaceType = faceType(theArguments.front());
+
+        switch (aFaceType) {
+          case GeomAbs_Plane: {
+            aValid = aGeomFace->isPlanar();
+            if (!aValid)
+              theError = "The shape is not a plane.";
+          }
+          break;
+          case GeomAbs_Cylinder:{
+            aValid = aGeomFace->isCylindrical();
+            if (!aValid)
+              theError = "The shape is not a cylinder.";
+          }
+          break;
+          default: {
+            aValid = false;
+            theError = "The shape is not an available face.";
+            break;
+          }
         }
       }
-    } else
-      theError = "The shape is not a face.";
+    }
   }
-  else
-    aValid = true; // an empty face selected is valid.
   return aValid;
 }

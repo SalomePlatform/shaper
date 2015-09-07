@@ -18,7 +18,7 @@
         shape_types="vertex">
         <validator id="GeomValidators_ConstructionComposite"/>
         <validator id="GeomValidators_ShapeType" parameters="vertex"/>
-        <validator id="PartSet_DifferentShapes"/>
+        <validator id="GeomValidators_DifferentShapes"/>
       </shape_selector>
     </box>
     <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face" icon=":icons/circle.png">
