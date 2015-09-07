@@ -631,7 +631,6 @@ void XGUI_Workshop::onOpen()
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
-  //displayAllResults();
   updateCommandStatus();
   QApplication::restoreOverrideCursor();
 }
@@ -1471,20 +1470,6 @@ void XGUI_Workshop::registerValidators() const
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 }
-
-//**************************************************************
-/*void XGUI_Workshop::displayAllResults()
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aRootDoc = aMgr->moduleDocument();
-  displayDocumentResults(aRootDoc);
-  for (int i = 0; i < aRootDoc->size(ModelAPI_ResultPart::group()); i++) {
-    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-    displayDocumentResults(aPart->partDoc());
-  }
-  myDisplayer->updateViewer();
-}*/
 
 //**************************************************************
 void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)

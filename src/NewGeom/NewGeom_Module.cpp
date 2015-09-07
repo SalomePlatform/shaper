@@ -173,9 +173,6 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
       myWorkshop->objectBrowser()->rebuildDataTree();
       myWorkshop->updateCommandStatus();
       myIsOpened = false;
-      // the display all results is not necessary anymore, it was commented in XGUI_Workshop,
-      // so it should be commented here
-      //QTimer::singleShot(1000, myWorkshop, SLOT(displayAllResults()));
     }
     else
       myWorkshop->updateCommandStatus();
