@@ -160,11 +160,13 @@ void findRandomColor(std::vector<int>& theValues)
 
 ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub)
 {
-  for (int a = theMain->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
-        theMain->object(ModelAPI_ResultPart::group(), a));
-    if (aPart && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value() == theSub) {
-      return aPart;
+  if (theMain != theSub) { // to optimize and avoid of crash on partset document close (don't touch the sub-document structure)
+    for (int a = theMain->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
+          theMain->object(ModelAPI_ResultPart::group(), a));
+      if (aPart && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value() == theSub) {
+        return aPart;
+      }
     }
   }
   return ResultPtr();
