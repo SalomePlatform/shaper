@@ -77,7 +77,7 @@ void SketchPlugin_Sketch::execute()
       data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   std::list<ObjectPtr> aFeatures = aRefList->list();
-  if (aFeatures.empty())
+  if (aFeatures.empty()) // actually, this must be avoided by the validators
     return;
 
   std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
@@ -113,8 +113,12 @@ void SketchPlugin_Sketch::execute()
     }
   }
 
-  if (aFeaturesPreview.empty())
+  if (aFeaturesPreview.empty()) {
+    // no good features for generation of preview => erase result if exists
+    if (firstResult().get() && !firstResult()->isDisabled())
+      removeResults(0, false);
     return;
+  }
 
   // Collect all edges as one big wire
   std::shared_ptr<GeomAPI_PlanarEdges> aBigWire(new GeomAPI_PlanarEdges);
