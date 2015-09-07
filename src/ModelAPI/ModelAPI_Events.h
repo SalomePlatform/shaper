@@ -101,7 +101,7 @@ public:
 };
 
 /// Message that order changed (used for Object Browser update)
-class MODELAPI_EXPORT ModelAPI_OrderUpdatedMessage : public Events_MessageGroup
+class MODELAPI_EXPORT ModelAPI_OrderUpdatedMessage : public Events_Message
 {
 protected:
   /// Creates an empty message
@@ -114,16 +114,10 @@ public:
   virtual std::shared_ptr<ModelAPI_Document> document() const = 0;
 
   /// Returns the groups where the objects were reordered
-  virtual const std::set<std::string>& groups() const = 0;
-
-  /// Creates the new empty message of this kind
-  virtual std::shared_ptr<Events_MessageGroup> newEmpty() = 0;
+  virtual const std::string& group() const = 0;
 
   /// Returns the identifier of the kind of a message
   virtual const Events_ID messageId() = 0;
-
-  /// Appenad to this message the given one.
-  virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined) = 0;
 };
 
 /// Allows to create ModelAPI messages

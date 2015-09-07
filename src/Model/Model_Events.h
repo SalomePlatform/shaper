@@ -91,7 +91,7 @@ class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
 class Model_OrderUpdatedMessage : public ModelAPI_OrderUpdatedMessage
 {
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document owner of the feature
-  std::set<std::string> myGroups;  ///< group identifiers that contained the deleted feature
+  std::string myGroup;  ///< group identifier that contained the deleted feature
 
   /// Use ModelAPI for creation of this event.
   Model_OrderUpdatedMessage(const std::shared_ptr<ModelAPI_Document>& theDoc,
@@ -106,19 +106,13 @@ class Model_OrderUpdatedMessage : public ModelAPI_OrderUpdatedMessage
   }
 
   /// Returns the group where the objects were reordered
-  virtual const std::set<std::string>& groups() const
+  virtual const std::string& group() const
   {
-    return myGroups;
+    return myGroup;
   }
-
-  /// Returns the new empty message of this type
-  virtual std::shared_ptr<Events_MessageGroup> newEmpty();
 
   /// Returns the identifier of this message
   virtual const Events_ID messageId();
-
-  /// Appends to this message the given one
-  virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined);
 };
 
 #endif

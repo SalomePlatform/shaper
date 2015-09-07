@@ -107,29 +107,12 @@ void Model_ObjectDeletedMessage::Join(const std::shared_ptr<Events_MessageGroup>
 Model_OrderUpdatedMessage::Model_OrderUpdatedMessage(
     const std::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
     : ModelAPI_OrderUpdatedMessage(messageId(), 0),
-      myDoc(theDoc)
+      myDoc(theDoc), myGroup(theGroup)
 {
-  if (!theGroup.empty())
-    myGroups.insert(theGroup);
-}
-
-std::shared_ptr<Events_MessageGroup> Model_OrderUpdatedMessage::newEmpty()
-{
-  return std::shared_ptr<Model_OrderUpdatedMessage>(new Model_OrderUpdatedMessage(myDoc, ""));
 }
 
 const Events_ID Model_OrderUpdatedMessage::messageId()
 {
   static Events_ID MY_ID = Events_Loop::eventByName(EVENT_ORDER_UPDATED);
   return MY_ID;
-}
-
-void Model_OrderUpdatedMessage::Join(const std::shared_ptr<Events_MessageGroup>& theJoined)
-{
-  std::shared_ptr<Model_OrderUpdatedMessage> aJoined = 
-    std::dynamic_pointer_cast<Model_OrderUpdatedMessage>(theJoined);
-  std::set<std::string>::iterator aGIter = aJoined->myGroups.begin();
-  for (; aGIter != aJoined->myGroups.end(); aGIter++) {
-    myGroups.insert(*aGIter);
-  }
 }
