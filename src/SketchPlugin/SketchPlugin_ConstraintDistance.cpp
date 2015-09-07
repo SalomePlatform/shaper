@@ -277,6 +277,9 @@ void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
     } else
       return;
 
+    if (aEndPnt->distance(aStartPnt) < tolerance)
+      return;
+
     std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
     std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutPnt->xy()->decreased(aStartPnt);
 
