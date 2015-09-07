@@ -80,7 +80,6 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
 {
-  erasePreviewPlanes();
 }
 
 bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
