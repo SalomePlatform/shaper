@@ -229,15 +229,14 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
   }
 
   // Show/Hide command has to be disabled for objects from non active document
-  XGUI_ObjectsBrowser* aOB = myWorkshop->objectBrowser();
-  XGUI_DataModel* aModel = aOB->dataModel();
   bool aDeactivate = false;
   foreach (ObjectPtr aObj, aObjects) {
-    Qt::ItemFlags aFlags = aModel->flags(aModel->objectIndex(aObj));
-    // Check is the object is accessible for editing
-    if ((aFlags & Qt::ItemIsEditable) == 0) {
-      aDeactivate = true;
-      break;
+    if (!aObj->document()->isActive()) {
+      if ((aObj->document() != ModelAPI_Session::get()->moduleDocument()) ||
+           aObj->groupName() == ModelAPI_ResultPart::group()) {
+        aDeactivate = true;
+        break;
+      }
     }
   }
   if (aDeactivate) {
