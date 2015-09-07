@@ -55,7 +55,4 @@ def main():
     #[step] Confirm edition of the sketch
     clickButton(waitForObject(":Sketch.property_panel_ok_QToolButton"))
     #[step] Close application
-    clickButton(waitForObject(":SALOME*.Close_QToolButton"))
-    clickButton(waitForObject(":Close active study.Close w/o saving_QPushButton"))
-    sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
-    clickButton(waitForObject(":Exit.Ok_QPushButton"))
+    close_application()

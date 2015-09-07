@@ -57,6 +57,7 @@ def sketch():
     
     
 def main():
+    source(findFile("scripts", "common.py"))
     
     # [project] NewGEOM
     # [Scenario] Sketch_001
@@ -65,7 +66,6 @@ def main():
     #[Summary description]
     #[Expected results] 
     
-    source(findFile("scripts", "common.py"))
     #[section] Application start
     #[step] Launch SALOME
     startApplication("salome_run.sh")

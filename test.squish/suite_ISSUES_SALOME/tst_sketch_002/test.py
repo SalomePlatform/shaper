@@ -48,6 +48,4 @@ def main():
     if object.exists(":Warning.Yes_QPushButton"):
         clickButton(waitForObject(":Warning.Yes_QPushButton"))
     ##[step] Close application
-    sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
-    clickButton(waitForObject(":Exit.Shutdown servers_QCheckBox"))
-    clickButton(waitForObject(":Exit.Ok_QPushButton"))
+    close_application()

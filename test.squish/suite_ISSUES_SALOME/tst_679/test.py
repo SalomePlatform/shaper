@@ -20,8 +20,8 @@ def main():
     type(waitForObject(":Point.x_ModuleBase_ParamSpinBox"), "b")
 
     waitFor("object.exists(':Point_QFrame')", 20000)
-    test.compare(str(findObject(":Point_QFrame").toolTip), "Attribute \"x\" invalidated by \"Model_AttributeValidator\" with error: name 'b' is not defined")
+    test.compare(str(findObject(":Point_QFrame").toolTip), "x - Model_AttributeValidator: name 'b' is not defined")
     waitFor("object.exists(':Point.x_ModuleBase_ParamSpinBox')", 20000)
-    test.compare(str(findObject(":Point.x_ModuleBase_ParamSpinBox").toolTip), "X coordinate\nErrors:\nAttribute \"x\" invalidated by \"Model_AttributeValidator\" with error: name 'b' is not defined")
+    test.compare(str(findObject(":Point.x_ModuleBase_ParamSpinBox").toolTip), "X coordinate\nErrors:\nx - Model_AttributeValidator: name 'b' is not defined")
 
     close_application()
