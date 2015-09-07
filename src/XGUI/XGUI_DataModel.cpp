@@ -220,6 +220,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         continue;
       QModelIndex aIndex = objectIndex(aObject);
       QModelIndex aParent = parent(aIndex);
+      int aChildNb = rowCount(aParent);
+      QModelIndex aStartIndex = index(0, 0, aParent);
+      QModelIndex aEndIndex = index(aChildNb - 1, 0, aParent);
+      emit dataChanged(aStartIndex, aEndIndex);
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
