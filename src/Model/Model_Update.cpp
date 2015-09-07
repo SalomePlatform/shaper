@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-//#define DEB_UPDATE
+#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -356,6 +356,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
         #endif
         executeFeature(theFeature);
       } else {
+        #ifdef DEB_UPDATE
+          std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
+        #endif
         theFeature->eraseResults();
         redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
       }
@@ -680,7 +683,14 @@ void Model_Update::IterationItem::next()
           break;
       }
     } else if (mySub.get()) {
-      mySub = myObjects->nextFeature(mySub);
+      while(mySub.get()) {
+        mySub = myObjects->nextFeature(mySub);
+        CompositeFeaturePtr anOwner = ModelAPI_Tools::compositeOwner(mySub);
+        // skip sub-objects, that are subs not only for this: sketch elements relatively to PartSet
+        if (!anOwner.get()) {
+          break;
+        }
+      }
     }
   }
 }
