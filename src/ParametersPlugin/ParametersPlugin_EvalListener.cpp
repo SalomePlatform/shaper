@@ -288,7 +288,9 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   std::shared_ptr<ModelAPI_ObjectRenamedMessage> aMessage =
       std::dynamic_pointer_cast<ModelAPI_ObjectRenamedMessage>(theMessage);
 
-  if (!aMessage.get() || aMessage->oldName().empty() || aMessage->newName().empty())
+  // Empty new name is not available too but it will be rejected by
+  // name validator in isValidAttribute.
+  if (!aMessage.get() || aMessage->oldName().empty())
     return;
 
   // check if the renamed object is a result parameter
