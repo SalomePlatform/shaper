@@ -26,7 +26,7 @@ ${KERNEL_ROOT_DIR}/bin/salome/runSalome.py ${SALOME_ARGS} >log_runSalome 2>err_r
 SALOME_PID=$!
 
 ATTEMPT=0
-while [[ -f .salomeport && ${ATTEMPT} -lt 5 ]]; do
+while [[ ! -f .salomeport && ${ATTEMPT} -lt 5 ]]; do
   sleep 5
   SALOME_PORT=$(cat .salomeport)
   ATTEMPT=$[${ATTEMPT}+1]
