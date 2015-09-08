@@ -47,5 +47,5 @@ INCLUDE_DIRECTORIES(
 )
 
 
-ADD_UNIT_TESTS(TestPointName.py
-              )
+ADD_UNIT_TESTS(TestAxisCreation.py
+               TestPointName.py)

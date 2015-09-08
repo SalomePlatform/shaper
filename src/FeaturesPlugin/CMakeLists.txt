@@ -85,6 +85,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolution.py
                TestRevolutionCut.py
                TestRevolutionFuse.py
+               TestPartition.py
                TestMovement.py
                TestRotation.py
                TestBoolean.py
