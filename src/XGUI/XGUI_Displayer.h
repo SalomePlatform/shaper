@@ -64,8 +64,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theObject an object to display
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  /// Returns true if the Feature succesfully displayed
-  void display(ObjectPtr theObject, bool theUpdateViewer = true);
+  /// \return true if the object visibility state is changed
+  bool display(ObjectPtr theObject, bool theUpdateViewer = true);
 
   /// Display the given AIS object. This object is not added to the displayer internal map of objects
   /// So, it can not be obtained from displayer. This is just a wrap method of OCC display in order
@@ -74,29 +74,25 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param toActivateInSelectionModes boolean value whether the presentation should be
   /// activated in the current selection modes
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
+  /// \return true if the object visibility state is changed
+  bool displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
                   bool theUpdateViewer = true);
 
-  /** Redisplay the shape if it was displayed
-   * \param theObject an object instance
-   * \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-   */
-  void redisplay(ObjectPtr theObject, bool theUpdateViewer = true);
+  /// Redisplay the shape if it was displayed
+  /// \param theObject an object instance
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \return true if the object visibility state is changed
+  bool redisplay(ObjectPtr theObject, bool theUpdateViewer = true);
 
-  /**
-   * Sends and flushes a signal to redisplay all visualized objects.
-   */
+  /// Sends and flushes a signal to redisplay all visualized objects.
   void redisplayObjects();
 
-  /**
-   * Add presentations to current selection. It unhighlight and deselect the current selection.
-   * The shape and result components are processed in the values. If the presentation shape is not
-   * empty, select it, otherwise select the result.
-   * \param theValues a list of presentation to be selected
-   * \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-   */
+  /// Add presentations to current selection. It unhighlight and deselect the current selection.
+  /// The shape and result components are processed in the values. If the presentation shape is not
+  /// empty, select it, otherwise select the result.
+  /// \param theValues a list of presentation to be selected
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   void setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool theUpdateViewer = true);
-
 
   /// Unselect all objects
   void clearSelected();
@@ -104,16 +100,19 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Erase the feature and a shape.
   /// \param theObject an object instance
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erase(ObjectPtr theObject, const bool theUpdateViewer = true);
+  /// \return true if the object visibility state is changed
+  bool erase(ObjectPtr theObject, const bool theUpdateViewer = true);
 
   /// Erase the given AIS object displayed by corresponded display method
   /// \param theAIS instance of AIS object
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer = true);
+  /// \return true if the object visibility state is changed
+  bool eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer = true);
 
   /// Erase all presentations
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void eraseAll(const bool theUpdateViewer = true);
+  /// \return true if the object visibility state is changed
+  bool eraseAll(const bool theUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -137,11 +136,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Remove all selection filters
   void removeFilters();
 
-  /**
-   * Sets a flag to the displayer whether the internal viewer can be updated by 
-   * the updateViewer method call. If it is not enabled, this method do nothing
-   * \param isEnabled a boolean value
-   */
+  /// Sets a flag to the displayer whether the internal viewer can be updated by 
+  /// the updateViewer method call. If it is not enabled, this method do nothing
+  /// \param isEnabled a boolean value
   bool enableUpdateViewer(const bool isEnabled);
 
   /// Updates the viewer
@@ -177,19 +174,10 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void deactivateObjects(const QObjectPtrList& theObjList,
                          const bool theUpdateViewer = true);
 
-  /// Activates the given object (it can be selected)
-  /// \param theObject object to activate
-  /// \param theModes - modes on which it has to be activated (can be empty)
-  //void activate(ObjectPtr theObject, const QIntList& theModes);
-
   /// Returns the modes of activation
   /// \param theObject the feature or NULL if it not visualized
   /// \param theModes - modes on which it is activated (can be empty)
   void getModesOfActivation(ObjectPtr theObject, QIntList& theModes);
-
-  /// Activates the given object with default modes
-  /// \param theObject object to activate
-  //void activate(ObjectPtr theObject);
 
   /// Returns true if the given object can be selected
   /// \param theObject object to check
@@ -257,8 +245,8 @@ signals:
   /// \param theAIS AIS presentation
   /// \param isShading flag to show in shading mode
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  /// \return true if the object is succesfully displayed
-  void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
+  /// \return true if the object visibility state is changed
+  bool display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
                bool theUpdateViewer = true);
 
 private:
@@ -278,12 +266,11 @@ private:
   /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();
 
-  /** Update the object presentable properties such as color, lines width and other
-   * If the object is result with the color attribute value set, it is used,
-   * otherwise the customize is applyed to the object's feature if it is a custom prs
-   * \param theObject an object instance
-   * \return the true state if there is changes and the presentation is customized
-   */
+  /// Update the object presentable properties such as color, lines width and other
+  /// If the object is result with the color attribute value set, it is used,
+  /// otherwise the customize is applyed to the object's feature if it is a custom prs
+  /// \param theObject an object instance
+  /// \return the true state if there is changes and the presentation is customized
   bool customizeObject(ObjectPtr theObject);
 
   /// Append the objects in the internal map. Checks whether the map already contains the object

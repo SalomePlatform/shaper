@@ -45,7 +45,11 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
 
-  bool isDone = setSelection(aSelected, false);
+  bool isDone = setSelection(aSelected, true/*false*/);
+  // "false" flag should be used here, it connects to the #26658 OCC bug, when the user click in 
+  // the same place repeatedly without mouse moved. In the case validation by filters is not
+  // perfromed, so an invalid object is selected. E.g. distance constraint, selection of a point.
+  // the 3rd click in the same point allow using this point.
   emit valuesChanged();
   // the updateObject method should be called to flush the updated sigal. The workshop listens it,
   // calls validators for the feature and, as a result, updates the Apply button state.

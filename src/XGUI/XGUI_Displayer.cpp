@@ -111,8 +111,9 @@ bool XGUI_Displayer::isVisible(ObjectPtr theObject) const
   return myResult2AISObjectMap.contains(theObject);
 }
 
-void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
+bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
 {
+  bool aDisplayed = false;
   if (isVisible(theObject)) {
 #ifdef DEBUG_COMPOSILID_DISPLAY
     ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
@@ -127,10 +128,9 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
     }
     else
 #endif
-      redisplay(theObject, theUpdateViewer);
+    aDisplayed = redisplay(theObject, theUpdateViewer);
   } else {
     AISObjectPtr anAIS;
-
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
     if (aPrs.get() != NULL) {
@@ -164,8 +164,9 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
       }
     }
     if (anAIS)
-      display(theObject, anAIS, isShading, theUpdateViewer);
+      aDisplayed = display(theObject, anAIS, isShading, theUpdateViewer);
   }
+  return aDisplayed;
 }
 
 bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
@@ -189,12 +190,14 @@ bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
   return false;
 }
 
-void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS, 
+bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS, 
                              bool isShading, bool theUpdateViewer)
 {
+  bool aDisplayed = false;
+
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
-    return;
+    return aDisplayed;
 
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
@@ -207,6 +210,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       anAISIO->Attributes()->SetFaceBoundaryDraw( Standard_True );
     anAISIO->SetDisplayMode(aDispMode);
     aContext->Display(anAISIO, aDispMode, 0, false, true, AIS_DS_Displayed); 
+    aDisplayed = true;
 
     emit objectDisplayed(theObject, theAIS);
     activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
@@ -220,22 +224,26 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   } 
   if (theUpdateViewer)
     updateViewer();
+
+  return aDisplayed;
 }
 
-void XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
+bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
 {
+  bool aErased = false;
   if (!isVisible(theObject))
-    return;
+    return aErased;
 
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
-    return;
+    return aErased;
   AISObjectPtr anObject = myResult2AISObjectMap[theObject];
   if (anObject) {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
       emit beforeObjectErase(theObject, anObject);
       aContext->Remove(anAIS, theUpdateViewer);
+      aErased = true;
     }
   }
   myResult2AISObjectMap.remove(theObject);
@@ -246,12 +254,14 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   qDebug(QString("erase object: %1").arg(aPtrStr.str().c_str()).toStdString().c_str());
   qDebug(getResult2AISObjectMapInfo().c_str());
 #endif
+  return aErased;
 }
 
-void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
+bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
 {
+  bool aRedisplayed = false;
   if (!isVisible(theObject))
-    return;
+    return aRedisplayed;
 
   AISObjectPtr aAISObj = getAISObject(theObject);
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
@@ -260,8 +270,8 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
   if (aPrs) {
     AISObjectPtr aAIS_Obj = aPrs->getAISObject(aAISObj);
     if (!aAIS_Obj) {
-      erase(theObject, theUpdateViewer);
-      return;
+      aRedisplayed = erase(theObject, theUpdateViewer);
+      return aRedisplayed;
     }
     if (aAIS_Obj != aAISObj) {
       appendResultObject(theObject, aAIS_Obj);
@@ -269,14 +279,11 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
     aAISIO = aAIS_Obj->impl<Handle(AIS_InteractiveObject)>();
   }
 
-  if (!aAISIO.IsNull()) {
-    Handle(AIS_InteractiveContext) aContext = AISContext();
-    if (aContext.IsNull())
-      return;
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aAISIO.IsNull() && !aContext.IsNull()) {
     // Check that the visualized shape is the same and the redisplay is not necessary
     // Redisplay of AIS object leads to this object selection compute and the selection 
     // in the browser is lost
-
     // this check is not necessary anymore because the selection store/restore is realized
     // before and after the values modification.
     // Moreother, this check avoids customize and redisplay presentation if the presentable
@@ -302,6 +309,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
     #endif
     if (!isEqualShapes || isCustomized) {
       aContext->Redisplay(aAISIO, false);
+      aRedisplayed = true;
       #ifdef DEBUG_FEATURE_REDISPLAY
         qDebug("  Redisplay happens");
       #endif
@@ -309,6 +317,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
         updateViewer();
     }
   }
+  return aRedisplayed;
 }
 
 void XGUI_Displayer::redisplayObjects()
@@ -516,8 +525,9 @@ void XGUI_Displayer::clearSelected()
   }
 }
 
-void XGUI_Displayer::eraseAll(const bool theUpdateViewer)
+bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 {
+  bool aErased = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
     foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
@@ -527,6 +537,7 @@ void XGUI_Displayer::eraseAll(const bool theUpdateViewer)
       if (!anIO.IsNull()) {
         emit beforeObjectErase(aObj, aAISObj);
         aContext->Remove(anIO, false);
+        aErased = true;
       }
     }
     if (theUpdateViewer)
@@ -537,6 +548,7 @@ void XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   qDebug("eraseAll");
   qDebug(getResult2AISObjectMapInfo().c_str());
 #endif
+  return aErased;
 }
 
 void XGUI_Displayer::deactivateTrihedron() const
@@ -746,15 +758,17 @@ Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
   return myAndFilter;
 }
 
-void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
+bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
                                 bool theUpdateViewer)
 {
+  bool aDisplayed = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
-    return;
+    return aDisplayed;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     aContext->Display(anAISIO, 0/*wireframe*/, 0, theUpdateViewer, true, AIS_DS_Displayed);
+    aDisplayed = true;
     aContext->Deactivate(anAISIO);
     aContext->Load(anAISIO);
     if (toActivateInSelectionModes) {
@@ -769,17 +783,21 @@ void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
       }
     }
   }
+  return aDisplayed;
 }
 
-void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
+bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
 {
+  bool aErased = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
-    return;
+    return aErased;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
     aContext->Remove(anAISIO, theUpdateViewer);
+    aErased = true;
   }
+  return aErased;
 }
 
 

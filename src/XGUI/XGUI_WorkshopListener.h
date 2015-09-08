@@ -72,6 +72,10 @@ protected:
   /// \return true if the object is displayed
   bool displayObject(ObjectPtr theObj);
 
+  /// Calls the module method of cusomize object for the feature of the current operation
+  /// \return true if the object is modified
+  bool customizeCurrentObject();
+
   /// Returns the workshop
   XGUI_Workshop* workshop() const;
 

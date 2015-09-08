@@ -12,6 +12,7 @@
 #include "XGUI_Displayer.h"
 
 #include "ModuleBase_Tools.h"
+#include "ModuleBase_IModule.h"
 
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Attribute.h>
@@ -78,6 +79,11 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  // when the feature can not be visualized in the module, the operation preview should not
+  // be visualized also
+  if (!myWorkshop->module()->canDisplayObject(myFeature))
+    return;
+
   Quantity_Color aColor(1., 1., 0., Quantity_TOC_RGB); // yellow
   SetColor(aColor);
 

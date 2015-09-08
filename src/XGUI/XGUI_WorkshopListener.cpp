@@ -216,7 +216,6 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
   QString anInfoStr = anInfo.join(";\t");
   qDebug(QString("onFeatureUpdatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
-  bool isModified = false;
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
   if (anOperationMgr->hasOperation()) {
@@ -232,15 +231,12 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
           break;
         }
       }
-      isModified = myWorkshop->module()->customizeObject(aCurrentFeature, false);
     }
   }
   anOperationMgr->onValidateOperation();
 
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
-  if (isModified)
-    workshop()->displayer()->updateViewer();
 }
 
 //******************************************************
@@ -260,6 +256,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
 
   XGUI_Workshop* aWorkshop = workshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  bool aRedisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
 
@@ -282,7 +279,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     }
 #endif
     if (aHide) {
-      aDisplayer->erase(aObj, false);
+      aRedisplayed = aDisplayer->erase(aObj, false) || aRedisplayed;
       #ifdef DEBUG_FEATURE_REDISPLAY
         // Redisplay the visible object or the object of the current operation
         bool isVisibleObject = aDisplayer->isVisible(aObj);
@@ -311,21 +308,24 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
         // of redisplay is called. This modification is made in order to have the line is updated
         // by creation of a horizontal constraint on the line by preselection
         if (ModelAPI_Tools::hasSubResults(std::dynamic_pointer_cast<ModelAPI_Result>(aObj))) {
-          aDisplayer->erase(aObj, false);
+          aRedisplayed = aDisplayer->erase(aObj, false) || aRedisplayed;
         }
         else {
-          aDisplayer->redisplay(aObj, false);
+          aRedisplayed = aDisplayer->redisplay(aObj, false) || aRedisplayed;
           // Deactivate object of current operation from selection
           aWorkshop->deactivateActiveObject(aObj, false);
         }
       } else { // display object if the current operation has it
         if (displayObject(aObj)) {
+          aRedisplayed = true;
           // Deactivate object of current operation from selection
           aWorkshop->deactivateActiveObject(aObj, false);
         }
       }
     }
   }
+  aRedisplayed = customizeCurrentObject() | aRedisplayed;
+  if (aRedisplayed)
   aDisplayer->updateViewer();
 }
 //******************************************************
@@ -343,7 +343,7 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
 #endif
 
   //bool aHasPart = false;
-  bool isDisplayed = false;
+  bool aDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr anObject = *aIt;
 
@@ -369,14 +369,16 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
       // with list of displayed objects
       if (myWorkshop->module()->canDisplayObject(anObject)) {
         anObject->setDisplayed(true);
-        isDisplayed = displayObject(*aIt);
+        aDisplayed = displayObject(*aIt);
       } else 
         anObject->setDisplayed(false);
     }
   }
+  aDisplayed = customizeCurrentObject() || aDisplayed;
+
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
-  if (isDisplayed)
+  if (aDisplayed)
     workshop()->displayer()->updateViewer();
   //if (aHasPart) { // TODO: Avoid activate last part on loading of document
   //  activateLastPart();
@@ -511,23 +513,40 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
   }
 #endif
 
+  bool aDisplayed = false;
   XGUI_Workshop* aWorkshop = workshop();
   // do not display the object if it has sub objects. They should be displayed separately.
   if (!aWorkshop->module()->canDisplayObject(theObj) ||
       ModelAPI_Tools::hasSubResults(std::dynamic_pointer_cast<ModelAPI_Result>(theObj)))
-    return false;
+    return aDisplayed;
 
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObj);
   if (aBody.get() != NULL) {
     int aNb = aDisplayer->objectsCount();
-    aDisplayer->display(theObj, false);
+    aDisplayed = aDisplayer->display(theObj, false);
     if (aNb == 0)
       myWorkshop->viewer()->fitAll();
   } else 
-    aDisplayer->display(theObj, false);
+    aDisplayed = aDisplayer->display(theObj, false);
 
-  return true;
+  return aDisplayed;
+}
+
+bool XGUI_WorkshopListener::customizeCurrentObject()
+{
+  bool aCustomized = false;
+  XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
+  if (anOperationMgr->hasOperation()) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                      (anOperationMgr->currentOperation());
+    if (aFOperation) {
+      FeaturePtr aCurrentFeature = aFOperation->feature();
+      if (aCurrentFeature.get())
+        aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature, false);
+    }
+  }
+  return aCustomized;
 }
 
 XGUI_Workshop* XGUI_WorkshopListener::workshop() const
