@@ -112,6 +112,13 @@ protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+  /// Returns true if the feature contains Point2D attribute with the same coordinates
+  /// The attribute of the widget is not processed.
+  /// \param theX the X coordinate
+  /// \param theY the Y coordinate
+  /// \return boolean result
+  bool isFeatureContainsPoint(const FeaturePtr& theFeature, double theX, double theY);
+
 private slots:
   /// Process value changed event
   void onValuesChanged();

@@ -263,8 +263,8 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
                      myRestartingMode == RM_EmptyFeatureUsed)) {
     myLastOperationId = aFOperation->id();
     myLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
-    
-    launchOperation(myLastOperationId);
+    if (!sketchMgr()->sketchSolverError())
+      launchOperation(myLastOperationId);
   }
   breakOperationSequence();
 }

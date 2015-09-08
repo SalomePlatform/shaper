@@ -11,9 +11,6 @@
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetSketchLabel.h"
 
-#include <ModuleBase_WidgetEditor.h>
-#include <ModuleBase_ModelWidget.h>
-
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
@@ -25,14 +22,16 @@
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_OperationMgr.h>
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelection.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewWindow.h>
+#include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationFeature.h>
-#include <ModuleBase_ISelection.h>
-#include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_WidgetEditor.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -70,6 +69,7 @@
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <QMouseEvent>
 #include <QApplication>
@@ -665,6 +665,17 @@ void PartSet_SketcherMgr::launchEditing()
       myModule->editFeature(aSPFeature);
     }
   }
+}
+
+bool PartSet_SketcherMgr::sketchSolverError()
+{
+  bool anError = false;
+  CompositeFeaturePtr aSketch = activeSketch();
+  if (aSketch.get()) {
+    AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
+    anError = !aAttributeString->value().empty();
+  }
+  return anError;
 }
 
 
