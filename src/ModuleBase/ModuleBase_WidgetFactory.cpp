@@ -25,6 +25,7 @@
 #include <ModuleBase_WidgetLineEdit.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetLabel.h>
+#include <ModuleBase_WidgetErrorLabel.h>
 #include <ModuleBase_WidgetToolbox.h>
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageGroupBox.h>
@@ -124,6 +125,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
 
   if (theType == WDG_INFO) {
     result = new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
+  } else if (theType == WDG_ERRORINFO) {
+    result = new ModuleBase_WidgetErrorLabel(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_DOUBLEVALUE) {
     result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_INTEGERVALUE) {
