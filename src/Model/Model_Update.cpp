@@ -202,7 +202,7 @@ void Model_Update::iterateUpdateBreak(std::shared_ptr<ModelAPI_Feature> theFeatu
         }
         // for the current breaked, set iteration to this feature precisely
         aBreaked->setCurrentBefore(theFeature);
-        myModification++;
+        //myModification++;
       }
       // the iterator that contains breaked is found, so, nothing else is needed
       return;
@@ -275,7 +275,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     return;
 
   #ifdef DEB_UPDATE
-    //std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
+    std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
   #endif
   CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
   // If automatice update is not needed and feature attributes were not updated right now,
