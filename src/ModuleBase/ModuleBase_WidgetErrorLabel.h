@@ -25,11 +25,16 @@ Q_OBJECT
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetErrorLabel(QWidget* theParent, const Config_WidgetAPI* theData,
-                            const std::string& theParentId);
+                            const std::string & theParentId);
 
   virtual ~ModuleBase_WidgetErrorLabel();
 
   virtual bool restoreValueCustom();
+
+  virtual bool focusTo();
+
+protected:
+  bool eventFilter(QObject* theObj, QEvent* theEvent);
 
 private:
   QString myDefaultStyle;
