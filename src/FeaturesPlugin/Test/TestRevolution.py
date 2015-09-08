@@ -127,3 +127,56 @@ assert (len(aRevolFt.results()) > 0)
 aRevolResult = modelAPI_ResultBody(aRevolFt.firstResult())
 assert (aRevolResult is not None)
 
+#=========================================================================
+# Create a first plane
+#=========================================================================
+aXOYPlane = modelAPI_Result(aDocument.objectByName("Construction", "XOY"))
+aSession.startOperation()
+aPlaneFeature = aPart.addFeature("Plane")
+aPlaneFeatureData = aPlaneFeature.data()
+assert(aPlaneFeatureData is not None)
+aPlaneFeatureData.string("CreationMethod").setValue("PlaneByFaceAndDistance")
+aPlaneFeatureData.selection("planeFace").setValue(aXOYPlane, None)
+aPlaneFeatureData.real("distance").setValue(50)
+aPlaneFeature.execute()
+aSession.finishOperation()
+aPlane1Result = aPlaneFeature.firstResult();
+
+#=========================================================================
+# Create a second plane
+#=========================================================================
+aSession.startOperation()
+aPlaneFeature = aPart.addFeature("Plane")
+aPlaneFeatureData = aPlaneFeature.data()
+assert(aPlaneFeatureData is not None)
+aPlaneFeatureData.string("CreationMethod").setValue("PlaneByFaceAndDistance")
+aPlaneFeatureData.selection("planeFace").setValue(aXOYPlane, None)
+aPlaneFeatureData.real("distance").setValue(-50)
+aPlaneFeature.execute()
+aSession.finishOperation()
+aPlane2Result = aPlaneFeature.firstResult();
+
+#=========================================================================
+# Test revol between bounding planes
+#=========================================================================
+aSession.startOperation()
+aRevolFt = aPart.addFeature("Revolution")
+assert (aRevolFt.getKind() == "Revolution")
+# selection type FACE=4
+aRevolFt.selectionList("base").append(
+    aCircleSketchResult, aCircleSketchFaces[0])
+aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
+aRevolFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
+aRevolFt.real("from_angle").setValue(0) #TODO: remove
+aRevolFt.real("to_angle").setValue(0) #TODO: remove
+aRevolFt.selection("to_object").setValue(aPlane1Result, None)
+aRevolFt.real("to_offset").setValue(0)
+aRevolFt.selection("from_object").setValue(aPlane2Result, None)
+aRevolFt.real("from_offset").setValue(0)
+aRevolFt.execute()
+aSession.finishOperation()
+
+# Check revol results
+assert (len(aRevolFt.results()) > 0)
+aRevolResult = modelAPI_ResultBody(aRevolFt.firstResult())
+assert (aRevolResult is not None)

@@ -75,11 +75,14 @@ void Model_Data::setLabel(TDF_Label theLab)
     myFlags->SetValue(kFlagDisplayed, Standard_True); // is displayed by default is true
     myFlags->SetValue(kFlagDeleted, Standard_False); // is deleted by default is false
   } else if (myFlags->Length() != 3) { // for old formats support
+    Standard_Boolean aFlag0 = myFlags->Upper() >= 0 ? myFlags->Value(0) : Standard_True;
+    Standard_Boolean aFlag1 = myFlags->Upper() >= 1 ? myFlags->Value(1) : Standard_True;
+    Standard_Boolean aFlag2 = myFlags->Upper() >= 2 ? myFlags->Value(2) : Standard_True;
     Handle(TColStd_HArray1OfByte) aNewArray = new TColStd_HArray1OfByte(0, 2);
-    aNewArray->SetValue(0, myFlags->Upper() > 0 ? myFlags->Value(0) : Standard_True); 
-    aNewArray->SetValue(1, myFlags->Upper() > 1 ? myFlags->Value(1) : Standard_True); 
-    aNewArray->SetValue(1, myFlags->Upper() > 2 ? myFlags->Value(2) : Standard_False); 
     myFlags->SetInternalArray(aNewArray);
+    myFlags->SetValue(0, aFlag0); 
+    myFlags->SetValue(1, aFlag1); 
+    myFlags->SetValue(2, aFlag2); 
   }
 }
 

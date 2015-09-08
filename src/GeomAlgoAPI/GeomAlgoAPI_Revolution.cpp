@@ -332,7 +332,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     aResult = aToCutBuilder->Shape();
 
     // If after cut we got more than one solids then take closest to the center of mass of the base face.
-    //aResult = findClosest(aResult, aBasisCentre);
+    aResult = findClosest(aResult, aBasisCentre);
 
     // Setting naming.
     for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {
@@ -474,7 +474,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBasi
     }
 
     // If after cut we got more than one solids then take closest to the center of mass of the base face.
-    //aResult = findClosest(aResult, aBasisCentr);
+    aResult = findClosest(aResult, aBasisCentr);
 
     // Setting naming.
     for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {

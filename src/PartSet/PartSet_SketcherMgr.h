@@ -170,6 +170,10 @@ public:
   /// Restores previously saved selection state
   void restoreSelection();
 
+  /// Return error state of the sketch feature, true if the error has happened
+  /// \return boolean value
+  bool sketchSolverError();
+
   /// Returns list of strings which contains id's of sketch operations
   static const QStringList& sketchOperationIdList();
 

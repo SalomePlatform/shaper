@@ -23,6 +23,7 @@ const static char* NODE_XMLPARENT = "libxml_parent";
 
 // Widgets
 const static char* WDG_INFO = "label";
+const static char* WDG_ERRORINFO = "error_label";
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 const static char* WDG_INTEGERVALUE = "integervalue";
 const static char* WDG_BOOLVALUE = "boolvalue";

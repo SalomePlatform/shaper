@@ -324,9 +324,10 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       }
     }
   }
-  aRedisplayed = customizeCurrentObject() | aRedisplayed;
-  if (aRedisplayed)
-  aDisplayer->updateViewer();
+  if (aRedisplayed) {
+    customizeCurrentObject();
+    aDisplayer->updateViewer();
+  }
 }
 //******************************************************
 void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
@@ -374,12 +375,13 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
         anObject->setDisplayed(false);
     }
   }
-  aDisplayed = customizeCurrentObject() || aDisplayed;
 
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
-  if (aDisplayed)
+  if (aDisplayed) {
+    customizeCurrentObject();
     workshop()->displayer()->updateViewer();
+  }
   //if (aHasPart) { // TODO: Avoid activate last part on loading of document
   //  activateLastPart();
   //}

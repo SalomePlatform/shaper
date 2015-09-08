@@ -311,89 +311,86 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
     TopoDS_Shape aShape = aShapes.First();
     ObjectPtr aObject = aObjects.front();
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
+    bool anExternal = false;
     if (aSelectedFeature.get() != NULL) {
       std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
       if ((!aSPFeature) && (!aShape.IsNull())) {
+        anExternal = true;
         ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
         if (!aFixedObject.get())
           aObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
-        setConstraintWith(aObject);
-        emit vertexSelected();
-        emit focusOutWidget(this);
-        return;
-      }
-    }
-    double aX, aY;
-    bool isProcessed = false;
-    if (getPoint2d(aView, aShape, aX, aY)) {
-      bool aFeatureContainsPoint = false;
-  
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
-                                       std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
-      std::list<AttributePtr> anAttributes =
-                                    myFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-      std::list<AttributePtr>::iterator anIter = anAttributes.begin();
-      for(; anIter != anAttributes.end(); anIter++) {
-        AttributePoint2DPtr aPoint2DAttribute =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
-        if (aPoint2DAttribute.get()) {
-          aFeatureContainsPoint = aPoint2DAttribute->pnt()->isEqual(aPnt2d);
+
+        double aX, aY;
+        if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
+          // do not create a constraint to the point, which already used by the feature
+          // if the feature contains the point, focus is not switched
+          setPoint(aX, aY);
+        }
+        else {
+          setConstraintWith(aObject);
+          emit vertexSelected();
+          emit focusOutWidget(this);
         }
       }
-      // when the point is selected, the coordinates of the point should be set into the attribute
-      setPoint(aX, aY);
-      // do not set a coincidence constraint in the attribute if the feature contains a point
-      // with the same coordinates. It is important for line creation in order to do not set
-      // the same constraints for the same points, oterwise the result line has zero length.
-      if (aFeatureContainsPoint)
-        return;
-      else {
-        PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
-      }
-      isProcessed = true;
-    } else if (aShape.ShapeType() == TopAbs_EDGE) {
-      setConstraintWith(aObject);
-      isProcessed = true;
     }
-    if (isProcessed) {
-      // it is important to perform updateObject() in order to the current value is 
-      // processed by Sketch Solver. Test case: line is created from a previous point
-      // to some distance, but in the area of the highlighting of the point. Constraint
-      // coincidence is created, after the solver is performed, the distance between the
-      // points of the line becomes less than the tolerance. Validator of the line returns
-      // false, the line will be aborted, but sketch stays valid.
-      updateObject(feature());
-      emit vertexSelected();
-      emit focusOutWidget(this);
-      return;
+    if (!anExternal) {
+      double aX, aY;
+      bool isProcessed = false;
+      if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
+        // when the point is selected, the coordinates of the point should be set into the attribute
+        // if the feature contains the point, focus is not switched
+        setPoint(aX, aY);
+      }
+      else {
+        // do not set a coincidence constraint in the attribute if the feature contains a point
+        // with the same coordinates. It is important for line creation in order to do not set
+        // the same constraints for the same points, oterwise the result line has zero length.
+        if (getPoint2d(aView, aShape, aX, aY))
+          PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
+        else if (aShape.ShapeType() == TopAbs_EDGE)
+          setConstraintWith(aObject);
+
+        // it is important to perform updateObject() in order to the current value is 
+        // processed by Sketch Solver. Test case: line is created from a previous point
+        // to some distance, but in the area of the highlighting of the point. Constraint
+        // coincidence is created, after the solver is performed, the distance between the
+        // points of the line becomes less than the tolerance. Validator of the line returns
+        // false, the line will be aborted, but sketch stays valid.
+        updateObject(feature());
+        emit vertexSelected();
+        emit focusOutWidget(this);
+      }
     }
   }
   // End of Bug dependent fragment
+  else {
+    // A case when point is taken from mouse event
+    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
+    double aX, anY;
+    PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
 
-  // A case when point is taken from mouse event
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
-  double aX, anY;
-  PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
-  if (!setPoint(aX, anY))
-    return;
+    // if the feature contains the point, focus is not switched
+    if (!setPoint(aX, anY) || isFeatureContainsPoint(myFeature, aX, anY))
+      return;
 
-  /// Start alternative code
-  //std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
-  //    GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));
-  //QList<FeaturePtr> aIgnore;
-  //aIgnore.append(feature());
+    /// Start alternative code
+    //std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
+    //    GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));
+    //QList<FeaturePtr> aIgnore;
+    //aIgnore.append(feature());
 
-  //double aTolerance = aView->Convert(7);
-  //std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
-  //  PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
-  //if (aAttrPnt.get() != NULL) {
-  //  aFeaturePoint->setValue(aAttrPnt->pnt());
-  //  PartSet_Tools::createConstraint(mySketch, aAttrPnt, aFeaturePoint);
-  //  emit vertexSelected();
-  //}
-  /// End alternative code
-  emit focusOutWidget(this);
+    //double aTolerance = aView->Convert(7);
+    //std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
+    //  PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
+    //if (aAttrPnt.get() != NULL) {
+    //  aFeaturePoint->setValue(aAttrPnt->pnt());
+    //  PartSet_Tools::createConstraint(mySketch, aAttrPnt, aFeaturePoint);
+    //  emit vertexSelected();
+    //}
+    /// End alternative code
+    emit focusOutWidget(this);
+  }
 }
 
 
@@ -417,6 +414,30 @@ double PartSet_WidgetPoint2D::x() const
 double PartSet_WidgetPoint2D::y() const
 {
   return myYSpin->value();
+}
+
+
+bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
+                                                   double theX, double theY)
+{
+  bool aPointIsFound = false;
+  AttributePtr aWidgetAttribute = myFeature->attribute(attributeID());
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
+                                    std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+  std::list<AttributePtr> anAttributes =
+                                myFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::list<AttributePtr>::iterator anIter = anAttributes.begin();
+  for(; anIter != anAttributes.end(); anIter++) {
+    AttributePoint2DPtr aPoint2DAttribute =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
+    if (aPoint2DAttribute == aWidgetAttribute)
+      continue;
+    if (aPoint2DAttribute.get()) {
+      aPointIsFound = aPoint2DAttribute->pnt()->isEqual(aPnt2d);
+    }
+  }
+  return aPointIsFound;
 }
 
 void PartSet_WidgetPoint2D::onValuesChanged()

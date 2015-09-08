@@ -51,7 +51,6 @@ protected:
     return true;
   }
 
-private:
   /// A label control
   QLabel* myLabel;
 };
