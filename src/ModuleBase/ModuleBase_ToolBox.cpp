@@ -23,7 +23,7 @@ ModuleBase_ToolBox::ModuleBase_ToolBox( QWidget* theParent )
   aMainLayout->addWidget( myButtonsFrame, 0 );
   aMainLayout->addWidget( myStack, 1 );
 
-  myButtonsGroup = new QButtonGroup();
+  myButtonsGroup = new QButtonGroup(this);
   myButtonsGroup->setExclusive( true );
   myButtonsLayout = new QHBoxLayout( myButtonsFrame );
   myButtonsLayout->setMargin( 0 );
