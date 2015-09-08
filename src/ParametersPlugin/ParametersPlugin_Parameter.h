@@ -40,11 +40,18 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
     return MY_EXPRESSION_ID;
   }
 
+  /// attribute name of extrusion size
+  inline static const std::string& EXPRESSION_ERROR_ID()
+  {
+    static const std::string MY_EXPRESSION_ERROR_ID("ExpressionError");
+    return MY_EXPRESSION_ERROR_ID;
+  }
+
   /// list of references to the arguments of this expression
   inline static const std::string& ARGUMENTS_ID()
   {
-    static const std::string MY_VARIABLE_ID("arguments");
-    return MY_VARIABLE_ID;
+    static const std::string MY_ARGUMENTS_ID("arguments");
+    return MY_ARGUMENTS_ID;
   }
 
   /// Returns the kind of a feature

@@ -206,7 +206,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
   //    }
   //  }
   //}
-  
+
   // check all attributes for validity
   // Validity of data is checked by "Model_FeatureValidator" (kDefaultId)
   // if (!aData || !aData->isValid())

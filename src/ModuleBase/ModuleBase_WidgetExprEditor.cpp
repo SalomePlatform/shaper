@@ -227,7 +227,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
 
   // Try to get the value
   QString aStateMsg;
-  std::string anErrorMessage = myFeature->error();
+  std::string anErrorMessage = myFeature->string("ExpressionError")->value();
   if (anErrorMessage.empty()) {
     ResultParameterPtr aParam =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(myFeature->firstResult());
@@ -240,7 +240,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
       }
     }
   } else {
-    aStateMsg = QString::fromStdString(anErrorMessage);
+    aStateMsg = "Error: " + QString::fromStdString(anErrorMessage);
   }
   myResultLabel->setText(aStateMsg);
   return true;

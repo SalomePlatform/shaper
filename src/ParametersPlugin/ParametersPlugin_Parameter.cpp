@@ -34,6 +34,11 @@ void ParametersPlugin_Parameter::initAttributes()
 {
   data()->addAttribute(VARIABLE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EXPRESSION_ID(), ModelAPI_AttributeString::typeId());
+
+  data()->addAttribute(EXPRESSION_ERROR_ID(), ModelAPI_AttributeString::typeId());
+  data()->string(EXPRESSION_ERROR_ID())->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXPRESSION_ERROR_ID());
+
   data()->addAttribute(ARGUMENTS_ID(), ModelAPI_AttributeRefList::typeId());
   data()->reflist(ARGUMENTS_ID())->setIsArgument(false);
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ARGUMENTS_ID());
@@ -63,26 +68,19 @@ void ParametersPlugin_Parameter::updateName()
 void ParametersPlugin_Parameter::updateExpression()
 {
   std::string anExpression = string(EXPRESSION_ID())->value();
-  if(anExpression.empty()) {
-    // clear error/result if the expression is empty
-    setError("", false);
-    return;
-  }
+
   std::string outErrorMessage;
   double aValue = evaluate(anExpression, outErrorMessage);
-  std::ostringstream sstream;
-  sstream << aValue;
-  std::string aParamValue = sstream.str();
-  // Error
+
+  data()->string(EXPRESSION_ERROR_ID())->setValue(outErrorMessage);
   if (!outErrorMessage.empty()) {
-    std::string aStateMsg("Error: " + outErrorMessage);
+    setError("Expression error.", false);
     data()->execState(ModelAPI_StateExecFailed);
-    setError(aStateMsg, false);
-  } else {
-    static const std::string anEmptyMsg(""); // it is checked in the validator by the empty message
-    setError(anEmptyMsg, false);
-    data()->execState(ModelAPI_StateDone);
+    return;
   }
+
+  setError("", false);
+  data()->execState(ModelAPI_StateDone);
 
   ResultParameterPtr aParam = document()->createParameter(data());
   AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
@@ -104,9 +102,11 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
   std::list<std::string>::iterator it = anExprParams.begin();
   std::list<ResultParameterPtr> aParamsList;
   for ( ; it != anExprParams.end(); it++) {
+    std::string& aVariableName = *it;
+
     double aValue;
     ResultParameterPtr aParamRes;
-    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes, document())) continue;
+    if (!ModelAPI_Tools::findVariable(aVariableName, aValue, aParamRes, document())) continue;
     aParamsList.push_back(aParamRes);
 
     std::ostringstream sstream;

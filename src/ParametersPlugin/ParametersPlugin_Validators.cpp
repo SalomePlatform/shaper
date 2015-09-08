@@ -7,6 +7,8 @@
 
 #include <ParametersPlugin_Validators.h>
 
+#include <ParametersPlugin_Parameter.h>
+
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultParameter.h>
@@ -93,16 +95,16 @@ bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttrib
   AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   bool isEmptyExpr = aStrAttr->value().empty();
-  if(isEmptyExpr) {
+  if (isEmptyExpr) {
     theError = "Expression is empty.";
     return false;
   }
 
-  if(!aParam.get()) {
+  if (!aParam.get()) {
     theError = "Result is empty.";
     return false;
   }
 
-  theError = aFeature->error();
-  return aFeature->error().empty();
+  theError = aFeature->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
+  return theError.empty();
 }

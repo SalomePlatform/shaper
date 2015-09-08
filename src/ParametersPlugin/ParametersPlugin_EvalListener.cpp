@@ -73,6 +73,7 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
   for ( ; it != anExprParams.end(); it++) {
     double aValue;
     ResultParameterPtr aParamRes;
+    // If variable does not exist python interpreter will generate an error. It is OK.
     if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes, theDocument)) continue;
 
     std::ostringstream sstream;
