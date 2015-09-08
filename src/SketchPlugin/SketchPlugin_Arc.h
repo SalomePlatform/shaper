@@ -27,6 +27,10 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   /// to avoid (if possible) additional modification of changed coordinate (issue #855)
   double myXEndBefore, myYEndBefore;
 
+  /// to define in which direction draw arc
+  bool myForwardDirection;
+  double myParamBefore;
+
  public:
   /// Arc feature kind
   inline static const std::string& ID()

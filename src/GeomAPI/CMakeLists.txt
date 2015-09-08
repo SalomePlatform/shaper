@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     GeomAPI_ICustomPrs.h
     GeomAPI_Vertex.h
     GeomAPI_Ax1.h
+    GeomAPI_Ax2.h
     GeomAPI_Ax3.h
     GeomAPI_Trsf.h
 )
@@ -61,6 +62,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Vertex.cpp
     GeomAPI_ICustomPrs.cpp
     GeomAPI_Ax1.cpp
+    GeomAPI_Ax2.cpp
     GeomAPI_Ax3.cpp
     GeomAPI_IPresentable.cpp
     GeomAPI_Trsf.cpp

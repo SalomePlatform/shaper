@@ -4,6 +4,7 @@
   #include "GeomAPI.h"
   #include "GeomAPI_AISObject.h"
   #include "GeomAPI_Ax1.h"
+  #include "GeomAPI_Ax2.h"
   #include "GeomAPI_Ax3.h"
   #include "GeomAPI_Circ.h"
   #include "GeomAPI_Circ2d.h"
@@ -45,6 +46,7 @@
 // shared pointers
 %shared_ptr(GeomAPI_AISObject)
 %shared_ptr(GeomAPI_Ax1)
+%shared_ptr(GeomAPI_Ax2)
 %shared_ptr(GeomAPI_Ax3)
 %shared_ptr(GeomAPI_Circ)
 %shared_ptr(GeomAPI_Circ2d)
@@ -77,6 +79,7 @@
 %include "GeomAPI_Shape.h"
 %include "GeomAPI_AISObject.h"
 %include "GeomAPI_Ax1.h"
+%include "GeomAPI_Ax2.h"
 %include "GeomAPI_Ax3.h"
 %include "GeomAPI_Circ.h"
 %include "GeomAPI_Circ2d.h"

@@ -12,6 +12,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 
+#include <GeomAPI_Ax2.h>
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Pnt2d.h>
@@ -24,6 +25,8 @@
 #include <math.h>
 
 const double tolerance = 1e-7;
+const double paramTolerance = 1.e-4;
+const double PI =3.141592653589793238463;
 
 SketchPlugin_Arc::SketchPlugin_Arc()
     : SketchPlugin_SketchEntity()
@@ -33,6 +36,9 @@ SketchPlugin_Arc::SketchPlugin_Arc()
   // default values
   myXEndBefore = 0;
   myYEndBefore = 0;
+
+  myForwardDirection = true;
+  myParamBefore = 0;
 }
 
 void SketchPlugin_Arc::initAttributes()
@@ -93,8 +99,28 @@ void SketchPlugin_Arc::execute()
     */
     std::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
 
-    std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(
-        aCenter, aStartPoint, aEndPoint, aNormal);
+    std::shared_ptr<GeomAPI_Dir> anXDir(new GeomAPI_Dir(aStartPoint->xyz()->decreased(aCenter->xyz())));
+    std::shared_ptr<GeomAPI_Ax2> anAx2(new GeomAPI_Ax2(aCenter, aNormal, anXDir));
+    std::shared_ptr<GeomAPI_Circ> aCirc(new GeomAPI_Circ(anAx2, aCenter->distance(aStartPoint)));
+    double aParameterNew = 0.0;
+    if(aCirc->parameter(aEndPoint, paramTolerance, aParameterNew)) {
+      if(0 < myParamBefore && myParamBefore <= PI / 2.0
+        && PI * 1.5 < aParameterNew && aParameterNew <= PI * 2.0) {
+          myForwardDirection = false;
+      } else if(PI * 1.5 < myParamBefore && myParamBefore <= PI * 2.0
+        && 0 < aParameterNew && aParameterNew <= PI / 2.0) {
+          myForwardDirection = true;
+      }
+    }
+    myParamBefore = aParameterNew;
+
+    std::shared_ptr<GeomAPI_Shape> aCircleShape;
+    if(myForwardDirection) {
+      aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
+    } else {
+      aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aEndPoint, aStartPoint, aNormal);
+    }
+
     if (aCircleShape) {
       std::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = document()->createConstruction(
           data(), 1);
