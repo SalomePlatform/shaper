@@ -88,7 +88,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     std::shared_ptr<GeomAPI_Dir> aDir = thePrs->plane()->dirX();
     aVec1 = gp_Vec(aDir->impl<gp_Dir>());
   }
-  gp_Vec aShift = aVec1.Crossed(thePrs->plane()->norm()->impl<gp_Dir>());
+  gp_Vec aShift = aVec1.Crossed(thePrs->plane()->normal()->impl<gp_Dir>());
   aShift.Normalize();
   aShift.Multiply(theStep * 0.8);
 

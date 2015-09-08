@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        FeaturesPlugin_Movement.cpp
+// File:        FeaturesPlugin_Translation.cpp
 // Created:     8 June 2015
 // Author:      Dmitry Bobylev
 
-#include <FeaturesPlugin_Movement.h>
+#include <FeaturesPlugin_Translation.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -17,30 +17,30 @@
 #include <GeomAPI_Lin.h>
 
 //=================================================================================================
-FeaturesPlugin_Movement::FeaturesPlugin_Movement()
+FeaturesPlugin_Translation::FeaturesPlugin_Translation()
 {
 }
 
 //=================================================================================================
-void FeaturesPlugin_Movement::initAttributes()
+void FeaturesPlugin_Translation::initAttributes()
 {
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Movement::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+    FeaturesPlugin_Translation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // revolution works with faces always
   aSelection->setSelectionType("SOLID");
 
-  data()->addAttribute(FeaturesPlugin_Movement::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(FeaturesPlugin_Movement::DISTANCE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(FeaturesPlugin_Translation::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Translation::DISTANCE_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
 //=================================================================================================
-void FeaturesPlugin_Movement::execute()
+void FeaturesPlugin_Translation::execute()
 {
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Movement::OBJECTS_LIST_ID());
+  AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
     return;
   }
@@ -57,7 +57,7 @@ void FeaturesPlugin_Movement::execute()
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Movement::AXIS_OBJECT_ID());
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
   } else if (anObjRef && !anObjRef->value() && anObjRef->context() && 
@@ -69,7 +69,7 @@ void FeaturesPlugin_Movement::execute()
   }
 
   // Getting distance.
-  double aDistance = real(FeaturesPlugin_Movement::DISTANCE_ID())->value();
+  double aDistance = real(FeaturesPlugin_Translation::DISTANCE_ID())->value();
 
   // Moving each object.
   int aResultIndex = 0;
@@ -78,7 +78,7 @@ void FeaturesPlugin_Movement::execute()
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
-    GeomAlgoAPI_Movement aMovementAlgo(aBaseShape, anAxis, aDistance, isPart);
+    GeomAlgoAPI_Translation aMovementAlgo(aBaseShape, anAxis, aDistance, isPart);
 
     // Checking that the algorithm worked properly.
     if(!aMovementAlgo.isDone()) {
@@ -115,7 +115,7 @@ void FeaturesPlugin_Movement::execute()
   removeResults(aResultIndex);
 }
 
-void FeaturesPlugin_Movement::LoadNamingDS(const GeomAlgoAPI_Movement& theMovementAlgo,
+void FeaturesPlugin_Translation::LoadNamingDS(const GeomAlgoAPI_Translation& theMovementAlgo,
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {

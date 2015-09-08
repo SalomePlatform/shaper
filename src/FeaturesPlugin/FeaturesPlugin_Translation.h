@@ -1,23 +1,23 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        FeaturesPlugin_Movement.h
+// File:        FeaturesPlugin_Translation.h
 // Created:     8 June 2015
 // Author:      Dmitry Bobylev
 
-#ifndef FeaturesPlugin_Movement_H_
-#define FeaturesPlugin_Movement_H_
+#ifndef FeaturesPlugin_Translation_H_
+#define FeaturesPlugin_Translation_H_
 
 #include <FeaturesPlugin.h>
 
 #include <ModelAPI_Feature.h>
 
-#include <GeomAlgoAPI_Movement.h>
+#include <GeomAlgoAPI_Translation.h>
 
-/** \class FeaturesPlugin_Movement
+/** \class FeaturesPlugin_Translation
  *  \ingroup Plugins
  *  \brief Feature for movement objects along the axis.
  */
-class FeaturesPlugin_Movement : public ModelAPI_Feature
+class FeaturesPlugin_Translation : public ModelAPI_Feature
 {
  public:
   /// Movement kind.
@@ -51,7 +51,7 @@ class FeaturesPlugin_Movement : public ModelAPI_Feature
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = FeaturesPlugin_Movement::ID();
+    static std::string MY_KIND = FeaturesPlugin_Translation::ID();
     return MY_KIND;
   }
 
@@ -62,10 +62,10 @@ class FeaturesPlugin_Movement : public ModelAPI_Feature
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
   /// Use plugin manager for features creation.
-  FeaturesPlugin_Movement();
+  FeaturesPlugin_Translation();
 
 private:
-  void LoadNamingDS(const GeomAlgoAPI_Movement& theMovementAlgo,
+  void LoadNamingDS(const GeomAlgoAPI_Translation& theMovementAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };

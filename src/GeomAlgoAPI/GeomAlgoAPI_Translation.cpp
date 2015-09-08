@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomAlgoAPI_Movement.cpp
+// File:        GeomAlgoAPI_Translation.cpp
 // Created:     8 June 2015
 // Author:      Dmitry Bobylev
 
-#include <GeomAlgoAPI_Movement.h>
+#include <GeomAlgoAPI_Translation.h>
 
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -15,7 +15,7 @@
 #include <TopExp_Explorer.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Movement::GeomAlgoAPI_Movement(std::shared_ptr<GeomAPI_Shape> theSourceShape,
+GeomAlgoAPI_Translation::GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                            std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                            double                         theDistance,
                                            bool theSimpleTransform)
@@ -25,7 +25,7 @@ GeomAlgoAPI_Movement::GeomAlgoAPI_Movement(std::shared_ptr<GeomAPI_Shape> theSou
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Movement::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
+void GeomAlgoAPI_Translation::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                  std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                  double                         theDistance,
                                  bool theSimpleTransform)
@@ -81,14 +81,14 @@ void GeomAlgoAPI_Movement::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
 }
 
 //=================================================================================================
-const bool GeomAlgoAPI_Movement::isValid() const
+const bool GeomAlgoAPI_Translation::isValid() const
 {
   BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
   return (aChecker.IsValid() == Standard_True);
 }
 
 //=================================================================================================
-const bool GeomAlgoAPI_Movement::hasVolume() const
+const bool GeomAlgoAPI_Translation::hasVolume() const
 {
   bool hasVolume(false);
   if(isValid() && (GeomAlgoAPI_ShapeTools::volume(myShape) > Precision::Confusion())) {
@@ -98,25 +98,25 @@ const bool GeomAlgoAPI_Movement::hasVolume() const
 }
 
 //=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Movement::shape() const
+const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Translation::shape() const
 {
   return myShape;
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Movement::mapOfShapes() const
+std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Translation::mapOfShapes() const
 {
   return myMap;
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Movement::makeShape() const
+std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Translation::makeShape() const
 {
   return myMkShape;
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Trsf> GeomAlgoAPI_Movement::transformation() const
+std::shared_ptr<GeomAPI_Trsf> GeomAlgoAPI_Translation::transformation() const
 {
   return myTrsf;
 }

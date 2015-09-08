@@ -7,7 +7,7 @@
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Group.h>
-#include <FeaturesPlugin_Movement.h>
+#include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Placement.h>
 #include <FeaturesPlugin_Revolution.h>
@@ -40,8 +40,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
    return FeaturePtr(new FeaturesPlugin_Revolution);
   } else if (theFeatureID == FeaturesPlugin_Rotation::ID()) {
     return FeaturePtr(new FeaturesPlugin_Rotation);
-  } else if (theFeatureID == FeaturesPlugin_Movement::ID()) {
-    return FeaturePtr(new FeaturesPlugin_Movement);
+  } else if (theFeatureID == FeaturesPlugin_Translation::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Translation);
   } else if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
     return FeaturePtr(new FeaturesPlugin_Boolean);
   } else if (theFeatureID == FeaturesPlugin_Group::ID()) {

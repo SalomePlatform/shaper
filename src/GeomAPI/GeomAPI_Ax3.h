@@ -58,11 +58,11 @@ public:
 
   /// Sets Z direction vector
   GEOMAPI_EXPORT 
-  void setNorm(const std::shared_ptr<GeomAPI_Dir>& theNorm);
+  void setNormal(const std::shared_ptr<GeomAPI_Dir>& theNorm);
 
   /// Returns Z direction vector
   GEOMAPI_EXPORT 
-  std::shared_ptr<GeomAPI_Dir> norm() const;
+  std::shared_ptr<GeomAPI_Dir> normal() const;
 
   /// Converts 2d coordinates from the plane to 3d space point
   /// \param theX X coordinate

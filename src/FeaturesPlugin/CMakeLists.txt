@@ -9,7 +9,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Extrusion.h
     FeaturesPlugin_Revolution.h
     FeaturesPlugin_Rotation.h
-    FeaturesPlugin_Movement.h
+    FeaturesPlugin_Translation.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_Group.h
     FeaturesPlugin_Partition.h
@@ -28,7 +28,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Extrusion.cpp
     FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Rotation.cpp
-    FeaturesPlugin_Movement.cpp
+    FeaturesPlugin_Translation.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
     FeaturesPlugin_Partition.cpp
@@ -86,7 +86,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolutionCut.py
                TestRevolutionFuse.py
                TestPartition.py
-               TestMovement.py
+               TestTranslation.py
                TestRotation.py
                TestBoolean.py
                TestMultiBoolean.py

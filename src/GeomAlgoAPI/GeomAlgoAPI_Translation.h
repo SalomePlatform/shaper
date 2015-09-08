@@ -1,11 +1,11 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomAlgoAPI_Movement.h
+// File:        GeomAlgoAPI_Translation.h
 // Created:     8 June 2015
 // Author:      Dmitry Bobylev
 
-#ifndef GeomAlgoAPI_Movement_H_
-#define GeomAlgoAPI_Movement_H_
+#ifndef GeomAlgoAPI_Translation_H_
+#define GeomAlgoAPI_Translation_H_
 
 #include <GeomAlgoAPI.h>
 #include <GeomAlgoAPI_MakeShape.h>
@@ -14,11 +14,11 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Trsf.h>
 
-/** \class GeomAlgoAPI_Movement
+/** \class GeomAlgoAPI_Translation
  *  \ingroup DataAlgo
  *  \brief Creates a copy of the object by moving it along the axis.
  */
-class GeomAlgoAPI_Movement : public GeomAPI_Interface
+class GeomAlgoAPI_Translation : public GeomAPI_Interface
 {
 public:
   /** \brief Creates an object which is obtained from current object by moving it along the axis.
@@ -27,7 +27,7 @@ public:
    *  \param[in] theDistance     movement distance.
    *  \param[in] theSimpleTransform makes just transformation of shape without changing of topology or geometry
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Movement(std::shared_ptr<GeomAPI_Shape> theSourceShape,
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                           double                         theDistance,
                                           bool theSimpleTransform = false);

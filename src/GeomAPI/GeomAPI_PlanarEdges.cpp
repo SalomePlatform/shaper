@@ -87,7 +87,7 @@ std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const
 std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const 
 {
   if (hasPlane())
-    return myPlane->norm();
+    return myPlane->normal();
   return std::shared_ptr<GeomAPI_Dir>();
 }
 

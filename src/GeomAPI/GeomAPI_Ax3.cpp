@@ -67,14 +67,14 @@ std::shared_ptr<GeomAPI_Dir> GeomAPI_Ax3::dirY() const
   return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
 }
 
-void GeomAPI_Ax3::setNorm(const std::shared_ptr<GeomAPI_Dir>& theNorm)
+void GeomAPI_Ax3::setNormal(const std::shared_ptr<GeomAPI_Dir>& theNorm)
 {
   gp_Ax1 aAx1 = MY_AX3->Axis();
   aAx1.SetDirection(theNorm->impl<gp_Dir>());
   MY_AX3->SetAxis(aAx1);
 }
 
-std::shared_ptr<GeomAPI_Dir> GeomAPI_Ax3::norm() const
+std::shared_ptr<GeomAPI_Dir> GeomAPI_Ax3::normal() const
 {
   gp_Dir aDir = MY_AX3->Axis().Direction();
   return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(),aDir.Y(),aDir.Z()));

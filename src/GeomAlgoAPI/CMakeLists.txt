@@ -13,12 +13,11 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_EdgeBuilder.h
     GeomAlgoAPI_PointBuilder.h
     GeomAlgoAPI_SketchBuilder.h
-    GeomAlgoAPI_Extrusion.h
     GeomAlgoAPI_Prism.h
     GeomAlgoAPI_Revolution.h
     GeomAlgoAPI_Boolean.h
     GeomAlgoAPI_Rotation.h
-    GeomAlgoAPI_Movement.h
+    GeomAlgoAPI_Translation.h
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_MakeShapeCustom.h
     GeomAlgoAPI_MakeShapeList.h
@@ -43,12 +42,11 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_EdgeBuilder.cpp
     GeomAlgoAPI_PointBuilder.cpp
     GeomAlgoAPI_SketchBuilder.cpp
-    GeomAlgoAPI_Extrusion.cpp
     GeomAlgoAPI_Prism.cpp
     GeomAlgoAPI_Revolution.cpp
     GeomAlgoAPI_Boolean.cpp
     GeomAlgoAPI_Rotation.cpp
-    GeomAlgoAPI_Movement.cpp
+    GeomAlgoAPI_Translation.cpp
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_MakeShapeCustom.cpp
     GeomAlgoAPI_MakeShapeList.cpp

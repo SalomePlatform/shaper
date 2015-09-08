@@ -83,7 +83,7 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
     aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
   }
   std::shared_ptr<GeomAPI_Pnt> aCenter = myPlane->to3D(aCenterAttr->x(), aCenterAttr->y());
-  std::shared_ptr<GeomAPI_Dir> aNormal = myPlane->norm();
+  std::shared_ptr<GeomAPI_Dir> aNormal = myPlane->normal();
 
   GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
     
