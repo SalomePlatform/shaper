@@ -78,32 +78,35 @@ void FeaturesPlugin_Translation::execute()
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
-    GeomAlgoAPI_Translation aMovementAlgo(aBaseShape, anAxis, aDistance, isPart);
-
-    // Checking that the algorithm worked properly.
-    if(!aMovementAlgo.isDone()) {
-      static const std::string aFeatureError = "Movement algorithm failed";
-      setError(aFeatureError);
-      break;
-    }
-    if(aMovementAlgo.shape()->isNull()) {
-      static const std::string aShapeError = "Resulting shape is Null";
-      setError(aShapeError);
-      break;
-    }
-    if(!aMovementAlgo.isValid()) {
-      std::string aFeatureError = "Warning: resulting shape is not valid";
-      setError(aFeatureError);
-      break;
-    }
 
     // Setting result.
     if (isPart) {
+      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
+      aTrsf->setTranslation(anAxis, aDistance);
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
       ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aMovementAlgo.transformation());
+      aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart);
     } else {
+      GeomAlgoAPI_Translation aMovementAlgo(aBaseShape, anAxis, aDistance);
+
+      // Checking that the algorithm worked properly.
+      if(!aMovementAlgo.isDone()) {
+        static const std::string aFeatureError = "Movement algorithm failed";
+        setError(aFeatureError);
+        break;
+      }
+      if(aMovementAlgo.shape()->isNull()) {
+        static const std::string aShapeError = "Resulting shape is Null";
+        setError(aShapeError);
+        break;
+      }
+      if(!aMovementAlgo.isValid()) {
+        std::string aFeatureError = "Warning: resulting shape is not valid";
+        setError(aFeatureError);
+        break;
+      }
+
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
       LoadNamingDS(aMovementAlgo, aResultBody, aBaseShape);
       setResult(aResultBody, aResultIndex);

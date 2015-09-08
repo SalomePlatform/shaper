@@ -78,32 +78,35 @@ void FeaturesPlugin_Rotation::execute()
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
-    GeomAlgoAPI_Rotation aRotationAlgo(aBaseShape, anAxis, anAngle, isPart);
-
-    // Checking that the algorithm worked properly.
-    if(!aRotationAlgo.isDone()) {
-      static const std::string aFeatureError = "Rotation algorithm failed";
-      setError(aFeatureError);
-      break;
-    }
-    if(aRotationAlgo.shape()->isNull()) {
-      static const std::string aShapeError = "Resulting shape is Null";
-      setError(aShapeError);
-      break;
-    }
-    if(!aRotationAlgo.isValid()) {
-      std::string aFeatureError = "Warning: resulting shape is not valid";
-      setError(aFeatureError);
-      break;
-    }
 
     // Setting result.
     if (isPart) {
+      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
+      aTrsf->setRotation(anAxis, anAngle);
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
       ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aRotationAlgo.transformation());
+      aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart);
     } else {
+      GeomAlgoAPI_Rotation aRotationAlgo(aBaseShape, anAxis, anAngle);
+
+      // Checking that the algorithm worked properly.
+      if(!aRotationAlgo.isDone()) {
+        static const std::string aFeatureError = "Rotation algorithm failed";
+        setError(aFeatureError);
+        break;
+      }
+      if(aRotationAlgo.shape()->isNull()) {
+        static const std::string aShapeError = "Resulting shape is Null";
+        setError(aShapeError);
+        break;
+      }
+      if(!aRotationAlgo.isValid()) {
+        std::string aFeatureError = "Warning: resulting shape is not valid";
+        setError(aFeatureError);
+        break;
+      }
+
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
       LoadNamingDS(aRotationAlgo, aResultBody, aBaseShape);
       setResult(aResultBody, aResultIndex);

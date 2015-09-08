@@ -25,12 +25,10 @@ public:
    *  \param[in] theSourceShape  a shape to be moved.
    *  \param[in] theAxis         movement axis.
    *  \param[in] theDistance     movement distance.
-   *  \param[in] theSimpleTransform makes just transformation of shape without changing of topology or geometry
    */
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                                          std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                          double                         theDistance,
-                                          bool theSimpleTransform = false);
+                                             std::shared_ptr<GeomAPI_Ax1>   theAxis,
+                                             double                         theDistance);
 
   /// \return true if algorithm succeed.
   GEOMALGOAPI_EXPORT const bool isDone() const
@@ -58,8 +56,7 @@ private:
   /// Builds resulting shape.
   void build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
              std::shared_ptr<GeomAPI_Ax1>   theAxis,
-             double                         theDistance,
-             bool theSimpleTransform);
+             double                         theDistance);
 
 private:
   /// Fields.
@@ -67,7 +64,7 @@ private:
   std::shared_ptr<GeomAPI_Shape> myShape;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
   std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
-  std::shared_ptr<GeomAPI_Trsf> myTrsf; ///< transformation of the shape in case theSimpleTransform
+  std::shared_ptr<GeomAPI_Trsf> myTrsf;
 };
 
 #endif

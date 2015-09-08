@@ -16,19 +16,17 @@
 
 //=================================================================================================
 GeomAlgoAPI_Translation::GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                                           std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                           double                         theDistance,
-                                           bool theSimpleTransform)
+                                                 std::shared_ptr<GeomAPI_Ax1>   theAxis,
+                                                 double                         theDistance)
 : myDone(false)
 {
-  build(theSourceShape, theAxis, theDistance, theSimpleTransform);
+  build(theSourceShape, theAxis, theDistance);
 }
 
 //=================================================================================================
 void GeomAlgoAPI_Translation::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                                 std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                 double                         theDistance,
-                                 bool theSimpleTransform)
+                                    std::shared_ptr<GeomAPI_Ax1>   theAxis,
+                                    double                         theDistance)
 {
   if(!theSourceShape || !theAxis) {
     return;
@@ -41,39 +39,30 @@ void GeomAlgoAPI_Translation::build(std::shared_ptr<GeomAPI_Shape> theSourceShap
     return;
   }
 
-  gp_Trsf aTrsf;
-  aTrsf.SetTranslation(gp_Vec(anAxis.Direction()) * theDistance);
+  gp_Trsf* aTrsf = new gp_Trsf();
+  aTrsf->SetTranslation(gp_Vec(anAxis.Direction()) * theDistance);
+  myTrsf.reset(new GeomAPI_Trsf(aTrsf));
 
-  TopoDS_Shape aResult;
   // Transform the shape with copying it.
-  if (theSimpleTransform) {
-    TopLoc_Location aDelta(aTrsf);
-    aResult = aSourceShape.Moved(aDelta);
-    // store the accumulated information about the result and this delta
-    //myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf * aSourceShape.Location().Transformation())));
-    myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf)));
-    myDone = true; // is OK for sure
-  } else {
-    BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
-    if(!aBuilder) {
-      return;
-    }
-    myMkShape.reset(new GeomAlgoAPI_MakeShape(aBuilder));
+  BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, *aTrsf, true);
+  if(!aBuilder) {
+    return;
+  }
+  myMkShape.reset(new GeomAlgoAPI_MakeShape(aBuilder));
 
-    myDone = aBuilder->IsDone() == Standard_True;
+  myDone = aBuilder->IsDone() == Standard_True;
 
-    if(!myDone) {
-      return;
-    }
+  if(!myDone) {
+    return;
+  }
 
-    aResult = aBuilder->Shape();
-    // Fill data map to keep correct orientation of sub-shapes.
-    myMap.reset(new GeomAPI_DataMapOfShapeShape());
-    for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More(); anExp.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-      aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
-      myMap->bind(aCurrentShape, aCurrentShape);
-    }
+  TopoDS_Shape aResult = aBuilder->Shape();
+  // Fill data map to keep correct orientation of sub-shapes.
+  myMap.reset(new GeomAPI_DataMapOfShapeShape());
+  for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More(); anExp.Next()) {
+    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+    aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
+    myMap->bind(aCurrentShape, aCurrentShape);
   }
 
   myShape.reset(new GeomAPI_Shape());
