@@ -9,6 +9,8 @@ if [ -f GCOV ]; then
   source env_lcov.sh
   CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Debug"
   CMAKE_ARGS="${CMAKE_ARGS} -DUSE_TEST_COVERAGE=ON"
+elif [ -f DEBUG ]; then
+  CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Debug"
 else
   CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release"
 fi
