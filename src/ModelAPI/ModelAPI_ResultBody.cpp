@@ -6,6 +6,8 @@
 
 #include "ModelAPI_ResultBody.h"
 #include <ModelAPI_BodyBuilder.h>
+#include <Events_Loop.h>
+#include <ModelAPI_Events.h>
 
 ModelAPI_ResultBody::ModelAPI_ResultBody()
 : myBuilder(0)
@@ -26,12 +28,22 @@ std::string ModelAPI_ResultBody::groupName()
 void ModelAPI_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
   myBuilder->store(theShape);
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  aECreator->sendUpdated(data()->owner(), aRedispEvent);
 }
 
 void ModelAPI_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
 	                          const std::shared_ptr<GeomAPI_Shape>& theToShape)
 {
   myBuilder->storeGenerated(theFromShape, theToShape);
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  aECreator->sendUpdated(data()->owner(), aRedispEvent);
 }
 
 void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
@@ -39,11 +51,21 @@ void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& th
                             const int theDecomposeSolidsTag)
 {
   myBuilder->storeModified(theOldShape, theNewShape, theDecomposeSolidsTag);
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  aECreator->sendUpdated(data()->owner(), aRedispEvent);
 }
 
 void ModelAPI_ResultBody::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
   myBuilder->storeWithoutNaming(theShape);
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  aECreator->sendUpdated(data()->owner(), aRedispEvent);
 }
 
 std::shared_ptr<GeomAPI_Shape> ModelAPI_ResultBody::shape()
