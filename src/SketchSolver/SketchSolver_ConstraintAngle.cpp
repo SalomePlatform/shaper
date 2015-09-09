@@ -18,12 +18,12 @@ void SketchSolver_ConstraintAngle::getAttributes(
 
 void SketchSolver_ConstraintAngle::adjustConstraint()
 {
+  static const double aTol = 1000. * tolerance;
   Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
 
   bool isFixed[2][2];
   std::shared_ptr<GeomAPI_Pnt2d> aPoints[2][2]; // start and end points of lines
   Slvs_hConstraint aFixedConstraint;
-  double aLineDir[2][2] = { {0.0, 0.0}, {0.0, 0.0} };
   Slvs_hEntity anEnt[2] = {aConstraint.entityA, aConstraint.entityB};
   for (int i = 0; i < 2; i++) {
     const Slvs_Entity& aLine = myStorage->getEntity(anEnt[i]);
@@ -31,30 +31,13 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
     for (int j = 0; j < 2; j++, aCoef += 2.0) {
       const Slvs_Entity& aPoint = myStorage->getEntity(aLine.point[j]);
       double aCoords[2];
-      for (int k = 0; k < 2; k++) {
+      for (int k = 0; k < 2; k++)
         aCoords[k] = myStorage->getParameter(aPoint.param[k]).val;
-        aLineDir[i][k] += aCoef * aCoords[k];
-      }
       isFixed[i][j] = myStorage->isPointFixed(aPoint.h, aFixedConstraint, true);
       aPoints[i][j] = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCoords[0], aCoords[1]));
     }
   }
-  double aDot = aLineDir[0][0] * aLineDir[1][0] + aLineDir[0][1] * aLineDir[1][1];
 
-  aConstraint.other = aDot * (90.0 - fabs(aConstraint.valA)) < 0.0;
-  if ((90.0 - fabs(aConstraint.valA)) * (90.0 - fabs(myAngle)) < 0.0)
-    aConstraint.other = !aConstraint.other;
-  myStorage->updateConstraint(aConstraint);
-
-  if (fabs(myAngle - aConstraint.valA) < tolerance)
-    return; // the angle was not changed, no need to recalculate positions of lines
-  myAngle = aConstraint.valA;
-
-  if (isFixed[0][0] && isFixed[0][1] && isFixed[1][0] && isFixed[1][1])
-    return; // both lines are fixed => no need to update them
-
-  // Recalculate positions of lines to avoid conflicting constraints
-  // while changing angle value several times
   std::shared_ptr<GeomAPI_Lin2d> aLine[2] = {
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[0][0], aPoints[0][1])),
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[1][0], aPoints[1][1]))
@@ -75,6 +58,23 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
       aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
           aPoints[i][0]->xy()->decreased(anIntersection->xy())));
 
+  aConstraint.other = false;
+  for (int i = 0; i < 2; i++)
+    if (aLine[i]->direction()->dot(aDir[i]) < 0.0)
+      aConstraint.other = !aConstraint.other;
+  myStorage->updateConstraint(aConstraint);
+
+  bool isChanged = fabs(myAngle - aConstraint.valA) > aTol;
+  // myAngle should be updated even if the angle of constraint is changed too little
+  myAngle = aConstraint.valA;
+  if (!isChanged)
+    return; // the angle was not changed, no need to recalculate positions of lines
+
+  if (isFixed[0][0] && isFixed[0][1] && isFixed[1][0] && isFixed[1][1])
+    return; // both lines are fixed => no need to update them
+
+  // Recalculate positions of lines to avoid conflicting constraints
+  // while changing angle value several times
   double cosA = cos(myAngle * PI / 180.0);
   double sinA = sin(myAngle * PI / 180.0);
   if (aDir[0]->cross(aDir[1]) < 0.0)
