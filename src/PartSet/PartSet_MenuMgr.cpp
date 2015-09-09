@@ -79,10 +79,6 @@ void PartSet_MenuMgr::createActions()
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePart(bool)));
   myActions["ACTIVATE_PART_CMD"] = aAction;
 
-  aAction = new QAction(QIcon(":icons/deactivate.png"), tr("Deactivate"), this);
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePartSet(bool)));
-  myActions["DEACTIVATE_PART_CMD"] = aAction;
-
   // Activate PartSet
   aAction = new QAction(QIcon(":icons/activate.png"), tr("Activate"), this);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePartSet(bool)));

@@ -867,6 +867,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
   int aSelected = aObjects.size();
   SessionPtr aMgr = ModelAPI_Session::get();
+  QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
   if (aSelected == 1) {
     bool hasResult = false;
     bool hasFeature = false;
@@ -887,10 +888,10 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
         }
         if (aPart.get()) // this may be null is Part feature is disabled
           aPartDoc = aPart->partDoc();
-        if (aMgr->activeDocument() == aPartDoc)
-          theMenu->addAction(myMenuMgr->action("DEACTIVATE_PART_CMD"));
-        else
-          theMenu->addAction(myMenuMgr->action("ACTIVATE_PART_CMD"));
+          
+        theMenu->addAction(aActivatePartAction);
+        aActivatePartAction->setEnabled((aMgr->activeDocument() != aPartDoc));
+
       } else if (aObject->document() == aMgr->activeDocument()) {
         if (hasParameter || hasFeature)
           theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
@@ -898,9 +899,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
 
       ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
       if( aResult.get() )
-      {
         theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
-      }
     } else {  // If feature is 0 the it means that selected root object (document)
       if (aMgr->activeDocument() != aMgr->moduleDocument())
         theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
@@ -912,10 +911,10 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       if (aMgr->activeDocument() != aMgr->moduleDocument())
         theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
   }
-  bool aCanDeactivate = (myWorkshop->currentOperation() == 0);
-  myMenuMgr->action("ACTIVATE_PARTSET_CMD")->setEnabled(aCanDeactivate);
-  myMenuMgr->action("DEACTIVATE_PART_CMD")->setEnabled(aCanDeactivate);
-  myMenuMgr->action("ACTIVATE_PART_CMD")->setEnabled(aCanDeactivate);
+  bool aNotDeactivate = (myWorkshop->currentOperation() == 0);
+  myMenuMgr->action("ACTIVATE_PARTSET_CMD")->setEnabled(aNotDeactivate);
+  if (!aNotDeactivate)
+    aActivatePartAction->setEnabled(false);
 }
 
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
