@@ -180,6 +180,6 @@ void XGUI_ErrorMgr::onWidgetChanged()
       aTTip += "Errors:\n" + anError;
     }
     aWidget->setToolTip(aTTip);
-    aWidget->setStyleSheet(anError.isEmpty() ? "" : "background-color:pink;");
+    //aWidget->setStyleSheet(anError.isEmpty() ? "" : "background-color:pink;");
   }
 }
