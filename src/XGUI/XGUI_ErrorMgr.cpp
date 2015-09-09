@@ -17,9 +17,21 @@
 #include <ModelAPI_Validator.h>
 
 #include <QLabel>
+#include <QAction>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QDialog>
+#include <QCursor>
+#include <QHBoxLayout>
+#include <QLabel>
+
+const QString INVALID_VALUE = "invalid_action";
+
 
 XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent /*= 0*/)
-  : ModuleBase_IErrorMgr(theParent)
+  : ModuleBase_IErrorMgr(theParent),
+    myErrorDialog(0),
+    myErrorLabel(0)
 {
 
 }
@@ -27,6 +39,55 @@ XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent /*= 0*/)
 XGUI_ErrorMgr::~XGUI_ErrorMgr()
 {
 
+}
+
+bool XGUI_ErrorMgr::canProcessClick(QAction* theAction, const FeaturePtr& theFeature)
+{
+  QString aData = theAction->data().toString();
+
+  bool isActionEnabled = theAction->data() != INVALID_VALUE;
+
+  QString anError = getFeatureError(theFeature);
+  if (!isActionEnabled && !anError.isEmpty()) {
+    if (!myErrorDialog) {
+      myErrorDialog = new QDialog(QApplication::desktop(), Qt::Popup);
+      QHBoxLayout* aLay = new QHBoxLayout(myErrorDialog);
+      aLay->setContentsMargins(0, 0, 0, 0);
+
+      QFrame* aMarginWidget = new QFrame(myErrorDialog);
+      aMarginWidget->setFrameStyle(QFrame::Panel | QFrame::Raised);
+
+      aLay->addWidget(aMarginWidget);
+      QHBoxLayout* aMarginLay = new QHBoxLayout(aMarginWidget);
+      aMarginLay->setContentsMargins(4, 4, 4, 4);
+
+      myErrorLabel = new QLabel(aMarginWidget);
+      aMarginLay->addWidget(myErrorLabel);
+    }
+    myErrorLabel->setText(anError);
+    myErrorDialog->move(QCursor::pos());
+    myErrorDialog->show();
+  }
+  return isActionEnabled;
+}
+
+void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theFeature,
+                                      const bool theEnabled)
+{
+  bool isActionEnabled = theAction->data() != INVALID_VALUE;
+  if (theEnabled  == isActionEnabled)
+    return;
+
+  theAction->setIcon(theEnabled ? QIcon(":pictures/button_ok.png"): QIcon(":pictures/button_ok_error.png"));
+  QWidget* aWidget = myPropertyPanel->headerWidget();
+  if (theEnabled) {
+    theAction->setData("");
+    aWidget->setToolTip("");
+  }
+  else {
+    theAction->setData(INVALID_VALUE);
+    aWidget->setToolTip(getFeatureError(theFeature));
+  }
 }
 
 const char* toString(ModelAPI_ExecState theExecState) 
@@ -43,7 +104,7 @@ const char* toString(ModelAPI_ExecState theExecState)
 #undef TO_STRING
 }
 
-void XGUI_ErrorMgr::onValidationStateChanged()
+/*void XGUI_ErrorMgr::onValidationStateChanged()
 {
   XGUI_OperationMgr* anOperationMgr = dynamic_cast<XGUI_OperationMgr*>(sender());
   if (!anOperationMgr)
@@ -53,25 +114,33 @@ void XGUI_ErrorMgr::onValidationStateChanged()
   if (!myPropertyPanel || !aFOperation)
     return;
 
-  // get feature
   FeaturePtr aFeature = aFOperation->feature();
-  if (!aFeature.get() || !aFeature->data()->isValid())
-    return;
-
-  // set error indication
-  QString anError = QString::fromStdString(aFeature->error());
-  if (anError.isEmpty()) {
-    bool isDone = ( aFeature->data()->execState() == ModelAPI_StateDone
-                 || aFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
-    if (!isDone)
-      anError = toString(aFeature->data()->execState());
-  }
+  QString anError = getFeatureError(aFeature);
 
   QWidget* aWidget = myPropertyPanel->headerWidget();
   if (aWidget) {
     aWidget->setToolTip(anError);
     aWidget->setStyleSheet(anError.isEmpty() ? "" : "background-color:pink;");
   }
+}*/
+
+QString XGUI_ErrorMgr::getFeatureError(const FeaturePtr& theFeature) const
+{
+  QString anError;
+  // get feature
+  if (!theFeature.get() || !theFeature->data()->isValid())
+    return anError;
+
+  // set error indication
+  anError = QString::fromStdString(theFeature->error());
+  if (anError.isEmpty()) {
+    bool isDone = ( theFeature->data()->execState() == ModelAPI_StateDone
+                 || theFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
+    if (!isDone)
+      anError = toString(theFeature->data()->execState());
+  }
+
+  return anError;
 }
 
 void XGUI_ErrorMgr::onWidgetChanged()

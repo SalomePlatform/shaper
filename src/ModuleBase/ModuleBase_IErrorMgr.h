@@ -30,7 +30,7 @@ public:
 
 public slots:
   /// SLOT, that is called after the operation is validated and feature validation errors have changed.
-  virtual void onValidationStateChanged() = 0;
+  //virtual void onValidationStateChanged() = 0;
 
 protected slots:
   /// Process values changed event for processing feature attribute validation errors.

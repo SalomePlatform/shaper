@@ -3,6 +3,7 @@
 #include "XGUI_WorkshopListener.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_ErrorMgr.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ActionsMgr.h"
@@ -394,16 +395,20 @@ void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId
   //one button is used for all features, which can have nested actions, so it is obtained from
   // the action manager
   QAction* anAcceptAllAction = aWorkshop->actionsMgr()->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+  bool aActionToBeUpdated = false;
   if (aWorkshop->isSalomeMode()) {
     XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
     XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
     if (aSalomeConnector->isNestedFeature(anActionsMgr->action(theFeatureId.c_str())))
-      anAcceptAllAction->setEnabled(theState);
+      aActionToBeUpdated = true;
   } else {
     AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
     AppElements_Command* aCommand = aMenuBar->feature(theFeatureId.c_str());
     if (aCommand && aCommand->button()->additionalButtonWidget())
-      anAcceptAllAction->setEnabled(theState);
+      aActionToBeUpdated = true;
+  }
+  if (aActionToBeUpdated) {
+    anAcceptAllAction->setEnabled(theState);
   }
 }
 

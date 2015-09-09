@@ -182,6 +182,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   //XGUI_Displayer* aDisp = workshop()->displayer();
   //aDisp->closeLocalContexts();
   emit planeSelected(plane());
+  emit valuesChanged();
   // after the plane is selected in the sketch, the sketch selection should be activated
   // it can not be performed in the sketch label widget because, we don't need to switch off
   // the selection by any label deactivation, but need to switch it off by stop the sketch

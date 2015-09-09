@@ -92,6 +92,12 @@ Q_OBJECT
     return myOperationMgr;
   }
 
+  //! ! Returns error manager.
+  XGUI_ErrorMgr* errorMgr() const
+  {
+    return myErrorMgr;
+  }
+
   //! ! Returns an actions manager
   XGUI_ActionsMgr* actionsMgr() const
   {
@@ -356,6 +362,19 @@ private:
 
   /// Set waiting cursor
   void onStartWaiting();
+
+  /// Called by Ok button clicked in the property panel. Asks the error manager whether
+  /// the operation can be commited and do it if it returns true.
+  void onAcceptActionClicked();
+
+  /// Listens the corresponded signal from operation manager and send it with the Ok
+  /// action to operation manager.
+  /// \param theEnabled an enabled state for the action
+  void onValidationStateChanged(bool theEnabled);
+
+  //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
+  //        aOkAct,          SLOT(setEnabled(bool)));
+
 
  private:
    /// Init menu

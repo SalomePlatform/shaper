@@ -157,8 +157,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onOperationCommitted(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
           SLOT(onOperationAborted(ModuleBase_Operation*)));
-  connect(myOperationMgr, SIGNAL(validationStateChanged(bool)), 
-          myErrorMgr, SLOT(onValidationStateChanged()));
+  //connect(myOperationMgr, SIGNAL(validationStateChanged(bool)), 
+  //        myErrorMgr, SLOT(onValidationStateChanged()));
 
   if (myMainWindow)
     connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
@@ -373,6 +373,35 @@ void XGUI_Workshop::onStartWaiting()
 {
   if (Events_LongOp::isPerformed()) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onAcceptActionClicked()
+{
+  QAction* anAction = dynamic_cast<QAction*>(sender());
+  XGUI_OperationMgr* anOperationMgr = operationMgr();
+  if (anOperationMgr) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                    (anOperationMgr->currentOperation());
+    if (aFOperation) {
+      if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
+        myOperationMgr->onCommitOperation();
+    }
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onValidationStateChanged(bool theEnabled)
+{
+  XGUI_OperationMgr* anOperationMgr = operationMgr();
+  if (anOperationMgr) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                    (anOperationMgr->currentOperation());
+    if (aFOperation) {
+      QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+      myErrorMgr->updateActionState(anAction, aFOperation->feature(), theEnabled);
+    }
   }
 }
 
@@ -941,14 +970,15 @@ void XGUI_Workshop::createDockWidgets()
   myPropertyPanel->installEventFilter(myOperationMgr);
 
   QAction* aOkAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
-  connect(aOkAct, SIGNAL(triggered()), myOperationMgr, SLOT(onCommitOperation()));
+  connect(aOkAct, SIGNAL(triggered()), this, SLOT(onAcceptActionClicked()));
+
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
   connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
   connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
-          aOkAct,          SLOT(setEnabled(bool)));
+          this, SLOT(onValidationStateChanged(bool)));
 }
 
 //******************************************************
