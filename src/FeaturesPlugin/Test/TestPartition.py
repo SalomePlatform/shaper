@@ -76,14 +76,26 @@ anExtrusionResult = modelAPI_ResultBody(anExtrusionFt.firstResult())
 assert (anExtrusionResult is not None)
 
 #=========================================================================
+# Create plane
+#=========================================================================
+aSession.startOperation()
+aPlaneFeature = aPart.addFeature("Plane")
+aPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aPlaneFeature.real("A").setValue(0.)
+aPlaneFeature.real("B").setValue(1.)
+aPlaneFeature.real("C").setValue(0.)
+aPlaneFeature.real("D").setValue(1.)
+aSession.finishOperation()
+aPlaneResult = aPlaneFeature.firstResult()
+
+#=========================================================================
 # Create a partition
 #=========================================================================
-aXOZPlane = modelAPI_Result(aDocument.objectByName("Construction", "XOZ"))
 aSession.startOperation()
 aPartitionFt = aPart.addFeature("Partition")
 assert (aPartitionFt.getKind() == "Partition")
 aPartitionFt.selectionList("main_objects").append(anExtrusionResult, anExtrusionResult.shape())
-aPartitionFt.selectionList("tool_objects").append(aXOZPlane, None)
+aPartitionFt.selectionList("tool_objects").append(aPlaneResult, None)
 aPartitionFt.execute()
 aSession.finishOperation()
 

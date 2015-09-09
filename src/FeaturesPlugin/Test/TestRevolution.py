@@ -128,33 +128,31 @@ aRevolResult = modelAPI_ResultBody(aRevolFt.firstResult())
 assert (aRevolResult is not None)
 
 #=========================================================================
-# Create a first plane
+# Create bounding planes
 #=========================================================================
-aXOYPlane = modelAPI_Result(aDocument.objectByName("Construction", "XOY"))
+# Create from plane
 aSession.startOperation()
-aPlaneFeature = aPart.addFeature("Plane")
-aPlaneFeatureData = aPlaneFeature.data()
-assert(aPlaneFeatureData is not None)
-aPlaneFeatureData.string("CreationMethod").setValue("PlaneByFaceAndDistance")
-aPlaneFeatureData.selection("planeFace").setValue(aXOYPlane, None)
-aPlaneFeatureData.real("distance").setValue(50)
-aPlaneFeature.execute()
+aFromPlaneFeature = aPart.addFeature("Plane")
+aFromPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aFromPlaneFeature.real("A").setValue(0.)
+aFromPlaneFeature.real("B").setValue(0.)
+aFromPlaneFeature.real("C").setValue(1.)
+aFromPlaneFeature.real("D").setValue(50.)
 aSession.finishOperation()
-aPlane1Result = aPlaneFeature.firstResult();
+aFromResult = aFromPlaneFeature.firstResult()
+aFromShape = modelAPI_ResultConstruction(aFromResult).shape()
 
-#=========================================================================
-# Create a second plane
-#=========================================================================
+# Create to plane
 aSession.startOperation()
-aPlaneFeature = aPart.addFeature("Plane")
-aPlaneFeatureData = aPlaneFeature.data()
-assert(aPlaneFeatureData is not None)
-aPlaneFeatureData.string("CreationMethod").setValue("PlaneByFaceAndDistance")
-aPlaneFeatureData.selection("planeFace").setValue(aXOYPlane, None)
-aPlaneFeatureData.real("distance").setValue(-50)
-aPlaneFeature.execute()
+aToPlaneFeature = aPart.addFeature("Plane")
+aToPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aToPlaneFeature.real("A").setValue(0.)
+aToPlaneFeature.real("B").setValue(0.)
+aToPlaneFeature.real("C").setValue(1.)
+aToPlaneFeature.real("D").setValue(-50.)
 aSession.finishOperation()
-aPlane2Result = aPlaneFeature.firstResult();
+aToResult = aToPlaneFeature.firstResult()
+aToShape = modelAPI_ResultConstruction(aToResult).shape()
 
 #=========================================================================
 # Test revol between bounding planes
@@ -169,9 +167,9 @@ aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 aRevolFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 aRevolFt.real("from_angle").setValue(0) #TODO: remove
 aRevolFt.real("to_angle").setValue(0) #TODO: remove
-aRevolFt.selection("to_object").setValue(aPlane1Result, None)
+aRevolFt.selection("to_object").setValue(aToResult, None)
 aRevolFt.real("to_offset").setValue(0)
-aRevolFt.selection("from_object").setValue(aPlane2Result, None)
+aRevolFt.selection("from_object").setValue(aFromResult, None)
 aRevolFt.real("from_offset").setValue(0)
 aRevolFt.execute()
 aSession.finishOperation()
