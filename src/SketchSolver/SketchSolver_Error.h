@@ -20,7 +20,7 @@ class SketchSolver_Error
   /// The value parameter for the constraint
   inline static const std::string& CONSTRAINTS()
   {
-    static const std::string MY_ERROR_VALUE("Conflicting constraints");
+    static const std::string MY_ERROR_VALUE("The constraint is conflicting with others. To fix this, you can either undo your operation or remove a conflicting constraint.");
     return MY_ERROR_VALUE;
   }
   /// Constraints should use objects instead of features as attributes
