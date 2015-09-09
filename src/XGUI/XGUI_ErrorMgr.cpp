@@ -75,19 +75,21 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theF
                                       const bool theEnabled)
 {
   bool isActionEnabled = theAction->data() != INVALID_VALUE;
-  if (theEnabled  == isActionEnabled)
-    return;
+  if (theEnabled  != isActionEnabled) {
+    // update enable state of the button
+    theAction->setIcon(theEnabled ? QIcon(":pictures/button_ok.png"): QIcon(":pictures/button_ok_error.png"));
+    if (theEnabled)
+      theAction->setData("");
+    else
+      theAction->setData(INVALID_VALUE);
+  }
 
-  theAction->setIcon(theEnabled ? QIcon(":pictures/button_ok.png"): QIcon(":pictures/button_ok_error.png"));
+  // update controls error information
   QWidget* aWidget = myPropertyPanel->headerWidget();
-  if (theEnabled) {
-    theAction->setData("");
+  if (theEnabled)
     aWidget->setToolTip("");
-  }
-  else {
-    theAction->setData(INVALID_VALUE);
+  else
     aWidget->setToolTip(getFeatureError(theFeature));
-  }
 }
 
 const char* toString(ModelAPI_ExecState theExecState) 
