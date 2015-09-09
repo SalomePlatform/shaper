@@ -83,11 +83,13 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theF
     else
       theAction->setData(INVALID_VALUE);
   }
-
-  // update controls error information
-  QWidget* aWidget = myPropertyPanel->headerWidget();
-  if (aWidget)
-    aWidget->setToolTip(getFeatureError(theFeature));
+  // some operations have no property panel, so it is important to check that it is not null
+  if (myPropertyPanel) {
+    // update controls error information
+    QWidget* aWidget = myPropertyPanel->headerWidget();
+    if (aWidget)
+      aWidget->setToolTip(getFeatureError(theFeature));
+  }
 }
 
 const char* toString(ModelAPI_ExecState theExecState) 
