@@ -14,14 +14,14 @@
 
 /**
 * \ingroup GUI
-* An extension and customozation of QDoubleSpinBox class
+* An extension and customization of QDoubleSpinBox class
 */
 class MODULEBASE_EXPORT ModuleBase_DoubleSpinBox : public QDoubleSpinBox
 {
 Q_OBJECT
 
  public:
-  explicit ModuleBase_DoubleSpinBox( QWidget* theParent = 0, int thePrecision = 15 );
+  explicit ModuleBase_DoubleSpinBox( QWidget* theParent = 0, int thePrecision = 12 );
   virtual ~ModuleBase_DoubleSpinBox();
 
   /// Returns true if the control is clear
