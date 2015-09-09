@@ -85,9 +85,9 @@ void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
  */
 double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
 {
-  if (!hasVariable(theText)) {
+  if (!hasVariable(theText))
     return ModuleBase_DoubleSpinBox::valueFromText(theText);
-  }
+
   // small hack: return length of the string to initiate valuesChanged signal
   return qHash(theText);
 }
@@ -178,18 +178,19 @@ bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
   //  QRegExp varNameMask(aDigitPattern.arg(","));
   //  aHasDigit = varNameMask.exactMatch(theText);
   //}
-  bool aHasDigit = false;
-  theText.toDouble(&aHasDigit);
-  if (aHasDigit) {
-    QLocale aLoc; // create default locale
-    QChar aDecPnt = aLoc.decimalPoint();
-    if (aDecPnt == '.') 
-      aHasDigit = theText.contains(aDecPnt) || (!theText.contains(','));
-    else if (aDecPnt == ',') 
-      aHasDigit = theText.contains(aDecPnt) || (!theText.contains('.'));
-  }
-  return !aHasDigit;
+  bool isDouble = false;
+  QLocale::c().toDouble(theText, &isDouble);
 
+//  theText.toDouble(&isDouble);
+//  if (isDouble) {
+//    QLocale aLoc; // create default locale
+//    QChar aDecPnt = aLoc.decimalPoint();
+//    if (aDecPnt == '.')
+//      isDouble = theText.contains(aDecPnt) || (!theText.contains(','));
+//    else if (aDecPnt == ',')
+//      isDouble = theText.contains(aDecPnt) || (!theText.contains('.'));
+//  }
+  return !isDouble;
 }
 
 /*!

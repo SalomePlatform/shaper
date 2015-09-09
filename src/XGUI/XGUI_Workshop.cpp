@@ -431,7 +431,7 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   if (aFOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     setPropertyPanel(aFOperation);
     // filling the operation values by the current selection
-    // if the operation can be commited after the controls filling, the method perform should
+    // if the operation can be committed after the controls filling, the method perform should
     // be stopped. Otherwise unnecessary presentations can be shown(e.g. operation prs in sketch)
     if (!aFOperation->isEditOperation()) {
       aFOperation->activateByPreselection();

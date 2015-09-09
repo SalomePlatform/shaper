@@ -160,7 +160,7 @@ bool PartSet_WidgetPoint2D::storeValueCustom() const
     return false;
   std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
-  
+
   PartSet_WidgetPoint2D* that = (PartSet_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
   bool isImmutable = aPoint->setImmutable(true);

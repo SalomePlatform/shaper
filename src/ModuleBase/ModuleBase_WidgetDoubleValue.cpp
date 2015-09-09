@@ -115,16 +115,16 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
-  if (!mySpinBox->hasVariable()) {
-    // it is important to set the empty text value to the attribute before set the value
-    // because setValue tries to calculate the attrubyte bakye according to the
-    // attribute current text
-    aReal->setText("");
-    aReal->setValue(mySpinBox->value());
-  } else {
+  if (mySpinBox->hasVariable()) {
     // Here is a text of a real value or an expression.
     std::string aText = mySpinBox->text().toStdString();
     aReal->setText(aText);
+  } else {
+    // it is important to set the empty text value to the attribute before set the value
+    // because setValue tries to calculate the attribute value according to the
+    // attribute current text
+    aReal->setText("");
+    aReal->setValue(mySpinBox->value());
   }
   updateObject(myFeature);
   return true;

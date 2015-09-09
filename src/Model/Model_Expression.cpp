@@ -71,6 +71,8 @@ void Model_Expression::setText(const std::string& theValue)
 {
   if (text() != theValue)
     myText->Set(TCollection_ExtendedString(theValue.c_str()));
+
+  setError(text().empty() ? "" : "Not a double value.");
 }
 
 std::string Model_Expression::text() const 

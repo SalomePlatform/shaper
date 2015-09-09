@@ -36,7 +36,7 @@ const double PSEUDO_ZERO = 1.e-20;
  \endcode
 
  Another useful feature is possibility to use scientific notation (e.g. 1.234e+18)
- for the widegt text. To enable this, negative precision should be specified either
+ for the widget text. To enable this, negative precision should be specified either
  through a constructor or using setPrecision() method.
 
  Note that "decimals" property of QDoubleSpinBox is almost completely substituted
@@ -240,6 +240,7 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
   // Otherwise, expect myPrecision digits after the decimal point.
   int decs = myPrecision < 0 ? qAbs(myPrecision) - 1 : myPrecision;
 
+  v.setLocale(this->locale());
   v.setDecimals(decs);
   v.setBottom(minimum());
   v.setTop(maximum());
