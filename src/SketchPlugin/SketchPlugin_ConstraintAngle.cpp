@@ -163,7 +163,7 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   std::shared_ptr<GeomAPI_Dir2d> aDirB(new GeomAPI_Dir2d(aEndB->xy()->decreased(anInter->xy())));
 
   anAngle = aDirA->angle(aDirB) * 180.0 / PI;
-  return anAngle;
+  return fabs(anAngle);
 }
 
 void SketchPlugin_ConstraintAngle::move(double theDeltaX, double theDeltaY)
