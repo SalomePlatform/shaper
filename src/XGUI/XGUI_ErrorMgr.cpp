@@ -86,9 +86,7 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theF
 
   // update controls error information
   QWidget* aWidget = myPropertyPanel->headerWidget();
-  if (theEnabled)
-    aWidget->setToolTip("");
-  else
+  if (aWidget)
     aWidget->setToolTip(getFeatureError(theFeature));
 }
 
