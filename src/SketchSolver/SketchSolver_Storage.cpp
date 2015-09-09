@@ -59,7 +59,8 @@ Slvs_hParam SketchSolver_Storage::updateParameter(const Slvs_Param& theParam)
     // parameter already used, rewrite it
     int aPos = Search(theParam.h, myParameters);
     if (aPos >= 0 && aPos < (int)myParameters.size()) {
-      myNeedToResolve = myNeedToResolve || IsNotEqual(myParameters[aPos], theParam);
+      if (IsNotEqual(myParameters[aPos], theParam))
+        myUpdatedParameters.insert(theParam.h);
       myParameters[aPos] = theParam;
       return theParam.h;
     }
@@ -274,6 +275,21 @@ void SketchSolver_Storage::removeUnusedEntities()
 
   if (!anUnusedEntities.empty())
     myNeedToResolve = true;
+}
+
+bool SketchSolver_Storage::isUsedByConstraints(const Slvs_hEntity& theEntityID) const
+{
+  std::vector<Slvs_Constraint>::const_iterator aCIt = myConstraints.begin();
+  for (; aCIt != myConstraints.end(); ++aCIt) {
+    Slvs_hEntity aSubs[6] = {
+        aCIt->entityA, aCIt->entityB,
+        aCIt->entityC, aCIt->entityD,
+        aCIt->ptA,     aCIt->ptB};
+    for (int i = 0; i < 6; i++)
+      if (aSubs[i] != SLVS_E_UNKNOWN && aSubs[i] == theEntityID)
+        return true;
+  }
+  return false;
 }
 
 const Slvs_Entity& SketchSolver_Storage::getEntity(const Slvs_hEntity& theEntityID) const
@@ -1065,6 +1081,48 @@ bool SketchSolver_Storage::isUsedInEqual(
     }
   return false;
 }
+
+bool SketchSolver_Storage::isNeedToResolve()
+{
+  if (myConstraints.empty())
+    return false;
+
+  if (!myNeedToResolve) {
+    // Verify the updated parameters are used in constraints
+    std::set<Slvs_hEntity> aPoints;
+    std::vector<Slvs_Entity>::const_iterator anEntIt = myEntities.begin();
+    for (; anEntIt != myEntities.end(); ++anEntIt) {
+      for (int i = 0; i < 4 && anEntIt->param[i] != SLVS_E_UNKNOWN; ++i)
+        if (myUpdatedParameters.find(anEntIt->param[i]) != myUpdatedParameters.end()) {
+          aPoints.insert(anEntIt->h);
+          break;
+        }
+    }
+    std::set<Slvs_hEntity> anEntities = aPoints;
+    for (anEntIt = myEntities.begin(); anEntIt != myEntities.end(); ++anEntIt) {
+      for (int i = 0; i < 4 && anEntIt->point[i] != SLVS_E_UNKNOWN; ++i)
+        if (aPoints.find(anEntIt->point[i]) != aPoints.end()) {
+          anEntities.insert(anEntIt->h);
+          break;
+        }
+    }
+
+    std::vector<Slvs_Constraint>::const_iterator aCIt = myConstraints.begin();
+    for (; aCIt != myConstraints.end() && !myNeedToResolve; ++aCIt) {
+      Slvs_hEntity anAttrs[6] =
+        {aCIt->ptA, aCIt->ptB, aCIt->entityA, aCIt->entityB, aCIt->entityC, aCIt->entityD};
+      for (int i = 0; i < 6; i++)
+        if (anAttrs[i] != SLVS_E_UNKNOWN && anEntities.find(anAttrs[i]) != anEntities.end()) {
+          myNeedToResolve = true;
+          break;
+        }
+    }
+  }
+
+  myUpdatedParameters.clear();
+  return myNeedToResolve;
+}
+
 
 
 

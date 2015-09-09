@@ -93,5 +93,19 @@ void SketchSolver_ConstraintMovement::getAttributes(
          theIsFullyMoved = false;
      }
   }
+
+  // Leave only points which are used in constraints
+  if (myStorage->isUsedByConstraints(anEntityID))
+    return;
+  std::vector<Slvs_hEntity>::iterator anIt = theAttributes.begin();
+  while (anIt != theAttributes.end()) {
+    if (myStorage->isUsedByConstraints(*anIt))
+      ++anIt;
+    else {
+      int aShift = anIt - theAttributes.begin();
+      theAttributes.erase(anIt);
+      anIt = theAttributes.begin() + aShift;
+    }
+  }
 }
 

@@ -67,6 +67,8 @@ public:
   Slvs_hEntity copyEntity(const Slvs_hEntity& theCopied);
   /// \brief Copy one entity to another
   void copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo);
+  /// \brief Check the entity is used in constraints
+  bool isUsedByConstraints(const Slvs_hEntity& theEntityID) const;
 
   /// \brief Verifies the current point or another coincident one is fixed
   /// \param[in]  thePointID  entity to be checked fixed
@@ -121,8 +123,7 @@ public:
   { return (int)myTemporaryConstraints.size(); }
 
   /// \brief Shows the sketch should be resolved
-  bool isNeedToResolve() const
-  { return myNeedToResolve && !myConstraints.empty(); }
+  bool isNeedToResolve();
 
   /// \brief Shows the storage has the same constraint twice
   bool hasDuplicatedConstraint() const
@@ -203,6 +204,7 @@ private:
   std::set<Slvs_hParam> myRemovedParameters; ///< list of just removed parameters (cleared when returning to applicant)
   std::set<Slvs_hEntity> myRemovedEntities; ///< list of just removed entities (cleared when returning to applicant)
   std::set<Slvs_hConstraint> myRemovedConstraints; ///< list of just removed constraints (cleared when returning to applicant)
+  std::set<Slvs_hParam> myUpdatedParameters; ///< list of just updated parameters (cleared when isNeedToResolve() called)
 };
 
 typedef std::shared_ptr<SketchSolver_Storage> StoragePtr;
