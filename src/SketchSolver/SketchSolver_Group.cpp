@@ -28,13 +28,20 @@
 #include <ModelAPI_Validator.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
-#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_ConstraintParallel.h>
+#include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
@@ -545,18 +552,19 @@ void SketchSolver_Group::mergeGroups(const SketchSolver_Group& theGroup)
   if (!myFeatureStorage)
     myFeatureStorage = FeatureStoragePtr(new SketchSolver_FeatureStorage);
 
-  std::vector<ConstraintPtr> aComplexConstraints;
+  std::set<ObjectPtr> aConstraints;
   ConstraintConstraintMap::const_iterator aConstrIter = theGroup.myConstraints.begin();
-  // append simple constraints
   for (; aConstrIter != theGroup.myConstraints.end(); aConstrIter++)
-    if (isComplexConstraint(aConstrIter->first))
-      aComplexConstraints.push_back(aConstrIter->first);
-    else
-      changeConstraint(aConstrIter->first);
-  // append complex constraints
-  std::vector<ConstraintPtr>::iterator aComplexIter = aComplexConstraints.begin();
-  for (; aComplexIter != aComplexConstraints.end(); aComplexIter++)
-      changeConstraint(*aComplexIter);
+    aConstraints.insert(aConstrIter->first);
+
+  std::list<FeaturePtr> aSortedConstraints = selectApplicableFeatures(aConstraints);
+  std::list<FeaturePtr>::iterator aSCIter = aSortedConstraints.begin();
+  for (; aSCIter != aSortedConstraints.end(); ++aSCIter) {
+    ConstraintPtr aConstr = std::dynamic_pointer_cast<SketchPlugin_Constraint>(*aSCIter);
+    if (!aConstr)
+      continue;
+    changeConstraint(aConstr);
+  }
 }
 
 // ============================================================================
@@ -738,5 +746,79 @@ bool SketchSolver_Group::checkFeatureValidity(FeaturePtr theFeature)
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   return aFactory->validate(theFeature);
+}
+
+
+
+
+
+// ===========   Auxiliary functions   ========================================
+static double featureToVal(FeaturePtr theFeature)
+{
+  if (theFeature->getKind() == SketchPlugin_Sketch::ID())
+    return 0.0; // sketch
+  ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
+  if (!aConstraint)
+    return 1.0; // features (arc, circle, line, point)
+
+  const std::string& anID = aConstraint->getKind();
+  if (anID == SketchPlugin_ConstraintCoincidence::ID())
+    return 2.0;
+  if (anID == SketchPlugin_ConstraintDistance::ID() ||
+      anID == SketchPlugin_ConstraintLength::ID() ||
+      anID == SketchPlugin_ConstraintRadius::ID() ||
+      anID == SketchPlugin_ConstraintAngle::ID())
+    return 3.0;
+  if (anID == SketchPlugin_ConstraintHorizontal::ID() ||
+      anID == SketchPlugin_ConstraintVertical::ID() ||
+      anID == SketchPlugin_ConstraintParallel::ID() ||
+      anID == SketchPlugin_ConstraintPerpendicular::ID())
+    return 4.0;
+  if (anID == SketchPlugin_ConstraintEqual::ID())
+    return 5.0;
+  if (anID == SketchPlugin_ConstraintTangent::ID() ||
+      anID == SketchPlugin_ConstraintMirror::ID())
+    return 6.0;
+  if (anID == SketchPlugin_ConstraintRigid::ID())
+    return 7.0;
+  if (anID == SketchPlugin_MultiRotation::ID() ||
+      anID == SketchPlugin_MultiTranslation::ID())
+    return 8.0;
+
+  // all other constraints are placed between Equal and Tangent constraints
+  return 5.5;
+}
+
+static bool operator< (FeaturePtr theFeature1, FeaturePtr theFeature2)
+{
+  return featureToVal(theFeature1) < featureToVal(theFeature2);
+}
+
+std::list<FeaturePtr> SketchSolver_Group::selectApplicableFeatures(const std::set<ObjectPtr>& theObjects)
+{
+  std::list<FeaturePtr> aResult;
+  std::list<FeaturePtr>::iterator aResIt;
+
+  std::set<ObjectPtr>::const_iterator anObjIter = theObjects.begin();
+  for (; anObjIter != theObjects.end(); ++anObjIter) {
+    // Operate sketch itself and SketchPlugin features only.
+    // Also, the Fillet need to be skipped, because there are several separated constraints composing it.
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
+    if (!aFeature)
+      continue;
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if ((aFeature->getKind() != SketchPlugin_Sketch::ID() && !aSketchFeature) ||
+        aFeature->getKind() == SketchPlugin_ConstraintFillet::ID())
+      continue;
+
+    // Find the place where to insert a feature
+    for (aResIt = aResult.begin(); aResIt != aResult.end(); ++aResIt)
+      if (aFeature < *aResIt)
+        break;
+    aResult.insert(aResIt, aFeature);
+  }
+
+  return aResult;
 }
 

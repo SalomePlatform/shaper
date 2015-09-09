@@ -133,6 +133,12 @@ class SketchSolver_Group
    */
   bool resolveConstraints();
 
+  /** \brief Collect all features applicable for the sketch
+   *  \param theObjects  list of features
+   *  \return list of bolted and sorted features
+   */
+  static std::list<FeaturePtr> selectApplicableFeatures(const std::set<ObjectPtr>& theObjects);
+
 protected:
   /** \brief Removes constraints from the group
    *  \param[in] theConstraint constraint to be removed
