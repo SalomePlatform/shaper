@@ -9,6 +9,7 @@
 
 SketchSolver_Solver::SketchSolver_Solver()
 {
+  myGroupID = 0;
   // Nullify all elements of the set of equations
   myEquationsSystem.param = 0;
   myEquationsSystem.params = 0;
