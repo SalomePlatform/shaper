@@ -34,7 +34,6 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketcherPrs_Tools.h>
 
-#include <BRepClass3d_SolidClassifier.hxx>
 #include <Precision.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
@@ -155,20 +154,10 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
     double aTwist = 0.0;
 
-    // orienting projection
-    if(aBaseShape.get() != NULL) {
-      std::shared_ptr<GeomAPI_Pnt> aCenterPnt = GeomAlgoAPI_ShapeTools::centreOfMass(aGShape);
-      gp_Pnt aPnt = aCenterPnt->impl<gp_Pnt>();
-      aPnt.Translate(aDir->impl<gp_Dir>().XYZ() * (10 * Precision::Confusion()));
-
-      BRepClass3d_SolidClassifier aClassifier;
-      aClassifier.Load(aBaseShape->impl<TopoDS_Shape>());
-      aClassifier.Perform(aPnt, Precision::Confusion());
-
-      if(aClassifier.State() == TopAbs_IN) {
-        aXYZ.Reverse();
-      }
-    }
+    // orienting projection is not needed: it is done in GeomAlgoAPI_FaceBuilder::plane
+    /*if (aGShape->impl<TopoDS_Shape>().Orientation() == TopAbs_REVERSED) {
+      aXYZ.Reverse();
+    }*/
 
     myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
   }
