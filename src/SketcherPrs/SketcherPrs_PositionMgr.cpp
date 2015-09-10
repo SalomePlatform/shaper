@@ -132,6 +132,12 @@ void SketcherPrs_PositionMgr::deleteConstraint(const SketcherPrs_SymbolPrs* theP
       aPosMap.erase(aPosMap.find(thePrs));
       if (aPosMap.size() == 0)
         aToDel.push_back(aIt->first);
+      else {
+        PositionsMap::iterator aIt;
+        int i = 0;
+        for (aIt = aPosMap.begin(); aIt != aPosMap.end(); aIt++, i++)
+          aIt->second = i;
+      }
     }
   }
   std::list<ObjectPtr>::const_iterator aListIt;
