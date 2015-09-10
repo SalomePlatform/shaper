@@ -21,7 +21,7 @@ class MODULEBASE_EXPORT ModuleBase_DoubleSpinBox : public QDoubleSpinBox
 Q_OBJECT
 
  public:
-  explicit ModuleBase_DoubleSpinBox( QWidget* theParent = 0, int thePrecision = -12 );
+  explicit ModuleBase_DoubleSpinBox( QWidget* theParent = 0, int thePrecision = 12 );
   virtual ~ModuleBase_DoubleSpinBox();
 
   /// Returns true if the control is clear
