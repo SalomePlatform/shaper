@@ -42,7 +42,7 @@
           </shape_selector>
           <doublevalue id="from_offset"
             label="Offset" step="1.0" default="0"
-            icon=":icons/dimension_down.png"
+            icon=":icons/dimension_up_down.png"
             tooltip="Offset for bounding plane">
           </doublevalue>
         </groupbox>
@@ -57,7 +57,7 @@
           </shape_selector>
           <doublevalue  id="to_offset"
             label="Offset" step="1.0" default="0"
-            icon=":icons/dimension_up.png"
+            icon=":icons/dimension_up_down.png"
             tooltip="Offset for bounding plane">
           </doublevalue>
         </groupbox>

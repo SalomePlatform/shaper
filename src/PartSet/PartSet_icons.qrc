@@ -65,7 +65,9 @@
      <file>icons/extrusion_fuse.png</file>
      <file>icons/angle_constr.png</file>
      <file>icons/angle_up_32x32.png</file>
+     <file>icons/angle_up_down.png</file>
      <file>icons/angle_up_down_32x32.png</file>
+     <file>icons/dimension_up_down.png</file>
      <file>icons/dimension_up_down_32x32.png</file>
      <file>icons/by_two_points_32x32.png</file>
      <file>icons/cylindrical_face_32x32.png</file>
