@@ -1295,8 +1295,12 @@ bool XGUI_Workshop::canMoveFeature()
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
   QObjectPtrList aValidatedObjects;
   foreach (ObjectPtr aObject, aObjects) {
-    if (myModule->canApplyAction(aObject, anActionId))
-      aValidatedObjects.append(aObject);
+    if (!myModule->canApplyAction(aObject, anActionId))
+      continue;
+    // To be moved feature should be in active document
+    if (aObject->document() != ModelAPI_Session::get()->activeDocument())
+      continue;
+    aValidatedObjects.append(aObject);
   }
   if (aValidatedObjects.size() != aObjects.size())
     aObjects = aValidatedObjects;
