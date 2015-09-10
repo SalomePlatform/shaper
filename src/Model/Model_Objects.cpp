@@ -184,14 +184,14 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
   // check the feature: it must have no depended objects on it
   // the dependencies can be in the feature results
   std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
-  for(; aResIter != theFeature->results().cend(); aResIter++) {
+  for (; aResIter != theFeature->results().cend(); aResIter++) {
     ResultPtr aResult = (*aResIter);
     std::shared_ptr<Model_Data> aData = 
-      std::dynamic_pointer_cast<Model_Data>(aResult->data());
+        std::dynamic_pointer_cast<Model_Data>(aResult->data());
     if (aData.get() != NULL) {
       const std::set<AttributePtr>& aRefs = aData->refsToMe();
       std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin(), aRefLast = aRefs.end();
-      for(; aRefIt != aRefLast; aRefIt++) {
+      for (; aRefIt != aRefLast; aRefIt++) {
         FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
         if (aFeature.get() != NULL)
           theRefs.insert(aFeature);
@@ -204,7 +204,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
   if (aData && !aData->refsToMe().empty()) {
     const std::set<AttributePtr>& aRefs = aData->refsToMe();
     std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin(), aRefLast = aRefs.end();
-    for(; aRefIt != aRefLast; aRefIt++) {
+    for (; aRefIt != aRefLast; aRefIt++) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
       if (aFeature.get() != NULL)
         theRefs.insert(aFeature);

@@ -1329,7 +1329,7 @@ bool XGUI_Workshop::canMoveFeature()
         std::set_intersection(aRefFeatures.begin(), aRefFeatures.end(),
                               aPlacedFeatures.begin(), aPlacedFeatures.end(),
                               std::inserter(aIntersectionFeatures, aIntersectionFeatures.begin()));
-        // 4. Return false if any reference feature is placed before curent feature
+        // 4. Return false if any reference feature is placed before current feature
         if (!aIntersectionFeatures.empty())
           aCanMove = false;
       }

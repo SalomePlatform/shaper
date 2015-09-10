@@ -60,7 +60,7 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
       myCleared(false)
 {
   // VSR 01/07/2010: Disable thousands separator for spin box
-  // (to avoid incosistency of double-2-string and string-2-double conversion)
+  // (to avoid inconsistency of double-2-string and string-2-double conversion)
   QLocale loc;
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
@@ -271,7 +271,7 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
     }
   }
 
-  // Treat values ouside (min; max) range as Invalid
+  // Treat values outside (min; max) range as Invalid
   // This check is enabled by assigning "strict_validity_check" dynamic property
   // with value "true" to the spin box instance.
   if (state == QValidator::Intermediate) {
