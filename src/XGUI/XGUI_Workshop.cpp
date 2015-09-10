@@ -1139,8 +1139,14 @@ void XGUI_Workshop::moveObjects()
   aMgr->startOperation(aDescription.toStdString());
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  DocumentPtr anActiveDocument = aMgr->activeDocument();
+  // It is necessary to clear selection in order to avoid selection changed event during
+  // moving and negative consequences connected with processing of already moved items
+  mySelector->clearSelection();
+  // check whether the object can be moved. There should not be parts which are not loaded
+  if (!XGUI_Tools::canRemoveOrRename(myMainWindow, anObjects))
+    return;
 
+  DocumentPtr anActiveDocument = aMgr->activeDocument();
   FeaturePtr aCurrentFeature = anActiveDocument->currentFeature(true);
   foreach (ObjectPtr aObject, anObjects) {
     if (!myModule->canApplyAction(aObject, anActionId))
@@ -1281,20 +1287,46 @@ bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes
 }
 
 //**************************************************************
+// Returns the list of all features for theDocument and all features of
+// all nested parts.
+std::list<FeaturePtr> allFeatures(const DocumentPtr& theDocument)
+{
+  std::list<FeaturePtr> aResultList;
+  std::list<FeaturePtr> anAllFeatures = theDocument->allFeatures();
+  foreach (const FeaturePtr& aFeature, anAllFeatures) {
+    // The order of appending features of the part and the part itself is important
+
+    // Append features from a part feature
+    foreach (const ResultPtr& aResult, aFeature->results()) {
+      ResultPartPtr aResultPart =
+          std::dynamic_pointer_cast<ModelAPI_ResultPart>(aResult);
+      if (aResultPart.get() && aResultPart->partDoc().get()) {
+        // Recursion
+        std::list<FeaturePtr> anAllFeatures = allFeatures(aResultPart->partDoc());
+        aResultList.insert(aResultList.end(), anAllFeatures.begin(), anAllFeatures.end());
+      }
+    }
+
+    aResultList.push_back(aFeature);
+  }
+  return aResultList;
+}
+
+//**************************************************************
 // Returns the list of features placed between theObject and the current feature
 // in the same document. Excludes theObject, includes the current feature.
 std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
 {
   std::list<FeaturePtr> aResult;
   DocumentPtr aDocument = theObject->document();
-  std::list<FeaturePtr> anAllFeatures = aDocument->allFeatures();
+  std::list<FeaturePtr> anAllFeatures = allFeatures(aDocument);
   // find the object iterator
   std::list<FeaturePtr>::iterator aObjectIt = std::find(anAllFeatures.begin(), anAllFeatures.end(), theObject);
-  if (aObjectIt == anAllFeatures.end()) 
+  if (aObjectIt == anAllFeatures.end())
     return aResult;
   // find the current feature iterator
   std::list<FeaturePtr>::iterator aCurrentIt = std::find(anAllFeatures.begin(), anAllFeatures.end(), aDocument->currentFeature(true));
-  if (aCurrentIt == anAllFeatures.end()) 
+  if (aCurrentIt == anAllFeatures.end())
     return aResult;
   // check the right order
   if (std::distance(aObjectIt, anAllFeatures.end()) <= std::distance(aCurrentIt, anAllFeatures.end()))
