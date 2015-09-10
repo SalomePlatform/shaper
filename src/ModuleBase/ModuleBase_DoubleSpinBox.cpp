@@ -71,7 +71,7 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
   // Use precision equal to default Qt decimals
   // it's necessary to set decimals before the range setting,
   // by default Qt rounds boundaries to 2 decimals at setRange
-  setDecimals(thePrecision);
+  setDecimals(qAbs(myPrecision));
 
   connect(lineEdit(), SIGNAL(textChanged( const QString& )), this,
           SLOT(onTextChanged( const QString& )));
@@ -119,8 +119,8 @@ void ModuleBase_DoubleSpinBox::setCleared(const bool on)
  */
 void ModuleBase_DoubleSpinBox::setPrecision(const int prec)
 {
-  int newPrec = qMax(prec, 0);
-  int oldPrec = qMax(myPrecision, 0);
+  int newPrec = qAbs(prec);
+  int oldPrec = qAbs(myPrecision);
   myPrecision = prec;
   if (newPrec != oldPrec)
     update();
@@ -128,7 +128,7 @@ void ModuleBase_DoubleSpinBox::setPrecision(const int prec)
 
 /*!
  \brief Get precision value of the spin box
- \return current prevision value
+ \return current precision value
  \sa setPrecision()
  */
 int ModuleBase_DoubleSpinBox::getPrecision() const
