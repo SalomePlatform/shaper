@@ -33,8 +33,10 @@ SketchSolver_Solver::~SketchSolver_Solver()
 {
   if (myEquationsSystem.constraint)
     delete[] myEquationsSystem.constraint;
+  myEquationsSystem.constraint = 0;
   if (myEquationsSystem.failed)
     delete[] myEquationsSystem.failed;
+  myEquationsSystem.failed = 0;
 }
 
 void SketchSolver_Solver::setParameters(Slvs_Param* theParameters, int theSize)
@@ -61,15 +63,20 @@ void SketchSolver_Solver::setConstraints(Slvs_Constraint* theConstraints, int th
   if (!myEquationsSystem.constraint) {
     myEquationsSystem.constraint = new Slvs_Constraint[theSize];
     myEquationsSystem.constraints = theSize;
+    myEquationsSystem.failed = new Slvs_hConstraint[theSize];
   }
   else if (myEquationsSystem.constraints != theSize) {
     if (theSize > myEquationsSystem.constraints) {
       delete[] myEquationsSystem.constraint;
       myEquationsSystem.constraint = new Slvs_Constraint[theSize];
+      if (myEquationsSystem.failed)
+        delete[] myEquationsSystem.failed;
+      myEquationsSystem.failed = new Slvs_hConstraint[theSize];
     }
     myEquationsSystem.constraints = theSize;
   }
   memcpy(myEquationsSystem.constraint, theConstraints, theSize * sizeof(Slvs_Constraint));
+  memset(myEquationsSystem.failed, SLVS_C_UNKNOWN, theSize * sizeof(Slvs_hConstraint));
 }
 
 

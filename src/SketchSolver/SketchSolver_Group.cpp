@@ -521,8 +521,8 @@ bool SketchSolver_Group::resolveConstraints()
       if (!myPrevSolved) {
         sendMessage(EVENT_SOLVER_REPAIRED);
         myPrevSolved = true;
+        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
       }
-      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
     } else if (!myConstraints.empty()) {
 //      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
       if (myPrevSolved) {
