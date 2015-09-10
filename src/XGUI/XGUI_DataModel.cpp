@@ -26,7 +26,8 @@
 #include <QIcon>
 #include <QBrush>
 
-#define ACTIVE_COLOR QColor(0,72,140)
+#define ACTIVE_COLOR Qt::black
+//#define ACTIVE_COLOR QColor(0,72,140)
 //#define PASSIVE_COLOR Qt::black
 
 /// Returns ResultPart object if the given object is a Part feature

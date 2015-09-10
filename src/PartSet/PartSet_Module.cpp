@@ -836,10 +836,10 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
   XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
   if (aOB) {
-    QLineEdit* aLabel = aOB->activeDocLabel();
-    QPalette aPalet = aLabel->palette();
-    aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
-    aLabel->setPalette(aPalet);
+    //QLineEdit* aLabel = aOB->activeDocLabel();
+    //QPalette aPalet = aLabel->palette();
+    //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
+    //aLabel->setPalette(aPalet);
     aOB->treeView()->setExpandsOnDoubleClick(false);
 #ifdef ModuleDataModel
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
