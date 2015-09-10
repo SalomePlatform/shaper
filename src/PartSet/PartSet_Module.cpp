@@ -125,7 +125,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
+#ifdef ModuleDataModel
   myDataModel = new PartSet_DocumentDataModel(this);
+#endif
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -841,9 +843,9 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
     //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     //aLabel->setPalette(aPalet);
     aOB->treeView()->setExpandsOnDoubleClick(false);
-#ifdef ModuleDataModel
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
+#ifdef ModuleDataModel
     connect(aOB, SIGNAL(headerMouseDblClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
@@ -1005,7 +1007,18 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   }
   if (theIndex.column() != 0) // Use only first column
     return;
+#ifdef ModuleDataModel
   ObjectPtr aObj = myDataModel->object(theIndex);
+#else
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
+  // De not use non editable Indexes
+  if ((aDataModel->flags(theIndex) & Qt::ItemIsSelectable) == 0)
+    return;
+  ObjectPtr aObj = aDataModel->object(theIndex);
+#endif
+
   ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
   if (!aPart.get()) { // Probably this is Feature
     FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
@@ -1015,7 +1028,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   }
   if (aPart.get()) { // if this is a part
     if (aPart->partDoc() == aMgr->activeDocument()) {
-      aMgr->setActiveDocument(aMgr->moduleDocument());
+      myMenuMgr->activatePartSet();
     } else {
       aPart->activate();
     }

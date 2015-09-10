@@ -46,6 +46,9 @@ public:
   /// \param theStdActions - a map of standard actions
   void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
 
+  /// Activates a PartSet document
+  void activatePartSet() const;
+
 public slots:
   /// Processes the context menu action click
   /// \param isChecked a state of toggle if the action is checkable

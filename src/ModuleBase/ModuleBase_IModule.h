@@ -147,8 +147,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };
 
+#ifdef ModuleDataModel
   /// Returns data model object for representation of data tree in Object browser
   virtual ModuleBase_IDocumentDataModel* dataModel() const = 0;
+#endif
 
   /// Performs functionality on closing document
   virtual void closeDocument() = 0;

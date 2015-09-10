@@ -477,16 +477,17 @@ void PartSet_MenuMgr::onActivatePartSet(bool)
 {
   if (myModule->workshop()->currentOperation())
     return;
+  activatePartSet();
+}
+
+void PartSet_MenuMgr::activatePartSet() const
+{
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isNewTransaction = !aMgr->isOperation();
   // activation may cause changes in current features in document, so it must be in transaction
-  if (isNewTransaction) {
-    aMgr->startOperation("Activation");
-  }
+  if (isNewTransaction) aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
-  if (isNewTransaction) {
-    aMgr->finishOperation();
-  }
+  if (isNewTransaction) aMgr->finishOperation();
 }
 
 void PartSet_MenuMgr::onEdit(bool)
