@@ -397,15 +397,15 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
             QString aTitle = QString(aObj->data()->name().c_str());
             return aTitle + " = " + aVal;
           }
-          QString aPrefix;
+          QString aSuffix;
           if (aObj->groupName() == myXMLReader.subType()) {
             ResultPartPtr aPartRes = getPartResult(aObj);
             if (aPartRes.get()) {
               if (aPartRes->partDoc().get() == NULL)
-                aPrefix = "Not loaded ";
+                aSuffix = " (Not loaded)";
             }
           }
-          return aPrefix + aObj->data()->name().c_str();
+          return aObj->data()->name().c_str() + aSuffix;
         }
       case Qt::DecorationRole:
         return ModuleBase_IconFactory::get()->getIcon(object(theIndex));
