@@ -69,7 +69,7 @@
           label="Offset"
           step="1.0"
           default="0"
-          icon=":icons/angle_down.png"
+          icon=":icons/angle_up_down.png"
           tooltip="Offset for bounding plane">
         </doublevalue>
       </groupbox>
@@ -87,7 +87,7 @@
           label="Offset"
           step="1.0"
           default="0"
-          icon=":icons/angle_up.png"
+          icon=":icons/angle_up_down.png"
           tooltip="Offset for bounding plane">
         </doublevalue>
       </groupbox>

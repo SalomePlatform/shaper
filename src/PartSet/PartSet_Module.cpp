@@ -880,6 +880,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   int aSelected = aObjects.size();
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
+  QAction* aActivatePartSetAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
   if (aSelected == 1) {
     bool hasResult = false;
     bool hasFeature = false;
@@ -913,20 +914,21 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       if( aResult.get() )
         theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
     } else {  // If feature is 0 the it means that selected root object (document)
-      if (aMgr->activeDocument() != aMgr->moduleDocument())
-        theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
+      theMenu->addAction(aActivatePartSetAction);
+      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
     }
   } else if (aSelected == 0) {
     // if there is no selection then it means that upper label is selected
     QModelIndexList aIndexes = myWorkshop->selection()->selectedIndexes();
     if (aIndexes.size() == 0) // it means that selection happens in top label outside of tree view
-      if (aMgr->activeDocument() != aMgr->moduleDocument())
-        theMenu->addAction(myMenuMgr->action("ACTIVATE_PARTSET_CMD"));
+      theMenu->addAction(aActivatePartSetAction);
+      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
   }
   bool aNotDeactivate = (myWorkshop->currentOperation() == 0);
-  myMenuMgr->action("ACTIVATE_PARTSET_CMD")->setEnabled(aNotDeactivate);
-  if (!aNotDeactivate)
+  if (!aNotDeactivate) {
     aActivatePartAction->setEnabled(false);
+    aActivatePartSetAction->setEnabled(false);
+  }
 }
 
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
