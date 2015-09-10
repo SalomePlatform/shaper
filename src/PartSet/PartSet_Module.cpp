@@ -734,6 +734,16 @@ void PartSet_Module::onFeatureTriggered()
   ModuleBase_IModule::onFeatureTriggered();
 }
 
+void PartSet_Module::launchOperation(const QString& theCmdId)
+{
+  if (PartSet_SketcherMgr::constraintsIdList().contains(theCmdId)) {
+    // Show constraints if a constraint was anOperation
+    mySketchMgr->onShowConstraintsToggle(true);
+  }
+  ModuleBase_IModule::launchOperation(theCmdId);
+}
+
+
 void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) 
 {
   Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();

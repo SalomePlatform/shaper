@@ -877,10 +877,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* /* theOperation*/)
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
-  if (constraintsIdList().contains(theOperation->id())) {
-    // Show constraints if a constraint was created
-    onShowConstraintsToggle(true);
-  }
   connectToPropertyPanel(true);
 }
 

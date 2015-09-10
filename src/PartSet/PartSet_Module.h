@@ -69,6 +69,10 @@ public:
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
 
+  /// Creates an operation and send it to loop
+  /// \param theCmdId the operation name
+  virtual void launchOperation(const QString& theCmdId);
+
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
   /// Activate the operation presentation

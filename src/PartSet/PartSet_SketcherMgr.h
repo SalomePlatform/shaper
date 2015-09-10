@@ -188,6 +188,9 @@ public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
+  /// Toggle show constraints
+  void onShowConstraintsToggle(bool);
+
 private slots:
   /// Process the enter mouse to the view port. If the current operation is a create of
   /// a nested sketch feature, it updates internal flags to display the feature on mouse move
@@ -211,8 +214,6 @@ private slots:
 
   void onBeforeContextMenu();
   void onAfterContextMenu();
-
-  void onShowConstraintsToggle(bool);
 
 private:
   /// Launches the operation from current highlighting
