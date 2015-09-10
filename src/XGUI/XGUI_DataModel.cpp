@@ -65,6 +65,7 @@ XGUI_DataModel::XGUI_DataModel(QObject* theParent) : ModuleBase_IDocumentDataMod
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_ORDER_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 }
@@ -206,6 +207,19 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           Events_Error::send("Problem with Data Model definition of sub-document");
 #endif
       }
+    }
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+
+    std::set<ObjectPtr>::const_iterator aIt;
+    std::string aObjType;
+    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+      ObjectPtr aObject = (*aIt);
+      QModelIndex aIndex = objectIndex(aObject);
+      if (aIndex.isValid())
+        emit dataChanged(aIndex, aIndex);
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
