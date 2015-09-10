@@ -302,7 +302,11 @@ static Handle(TDataStd_IntegerArray) stateArray(TDF_Label& theLab)
 void Model_Data::execState(const ModelAPI_ExecState theState)
 {
   if (theState != ModelAPI_StateNothing) {
-    stateArray(myLab)->SetValue(STATE_INDEX_STATE, (int)theState);
+    if (stateArray(myLab)->Value(STATE_INDEX_STATE) != (int)theState) {
+      stateArray(myLab)->SetValue(STATE_INDEX_STATE, (int)theState);
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED);
+      ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
+    }
   }
 }
 
@@ -328,6 +332,8 @@ void Model_Data::setError(const std::string& theError, bool theSend)
     Events_Error::send(theError);
   }
   TDataStd_AsciiString::Set(myLab, theError.c_str());
+  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED);
+  ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
 }
 
 void Model_Data::eraseErrorString()
