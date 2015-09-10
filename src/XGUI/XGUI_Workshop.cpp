@@ -495,14 +495,16 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   // They were deactivated on operation start or an object redisplay
   QObjectPtrList anObjects;
   FeaturePtr aFeature = aFOperation->feature();
-  if (myDisplayer->isVisible(aFeature) && !myDisplayer->isActive(aFeature))
-    anObjects.append(aFeature);
-  std::list<ResultPtr> aResults = aFeature->results();
-  std::list<ResultPtr>::const_iterator aIt;
-  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    ResultPtr anObject = *aIt;
-    if (myDisplayer->isVisible(anObject) && !myDisplayer->isActive(anObject)) {
-      anObjects.append(anObject);
+  if (aFeature.get()) { // feature may be not created (plugin load fail)
+    if (myDisplayer->isVisible(aFeature) && !myDisplayer->isActive(aFeature))
+      anObjects.append(aFeature);
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+      ResultPtr anObject = *aIt;
+      if (myDisplayer->isVisible(anObject) && !myDisplayer->isActive(anObject)) {
+        anObjects.append(anObject);
+      }
     }
   }
   QIntList aModes;

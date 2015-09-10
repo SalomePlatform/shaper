@@ -195,7 +195,9 @@ void ModuleBase_OperationFeature::abort()
   stopOperation();
   // is is necessary to deactivate current widgets before the model operation is aborted
   // because abort removes the feature and activated filters should not check it
-  propertyPanel()->cleanContent();
+  if (aPropertyPanel) { // feature may be not created (plugin load fail)
+    aPropertyPanel->cleanContent();
+  }
 
   aMgr->abortOperation();
   emit stopped();

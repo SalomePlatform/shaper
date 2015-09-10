@@ -19,7 +19,6 @@ from GeomAPI import GeomAPI_Shape  as Shape
 # Swigged interfaces to Modeling Algorithms
 
 from GeomAlgoAPI import GeomAlgoAPI_Boolean   as Boolean
-from GeomAlgoAPI import GeomAlgoAPI_Extrusion as Extrusion
 
 
 # Emulation of interfaces not yet swigged
