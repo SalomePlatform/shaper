@@ -104,12 +104,12 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlus
   while( aNextIter != myResults.end()) {
     aGroup = (*aNextIter)->groupName();
     // remove previously erased results: to enable later if needed only actual (of history change)
-    if (theSinceIndex == 0 && (*aNextIter)->isDisabled()) {
-      aNextIter = myResults.erase(aNextIter);
-    } else {
+    //if (theSinceIndex == 0 && (*aNextIter)->isDisabled()) {
+    //  aNextIter = myResults.erase(aNextIter);
+    //} else {
       (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
       aNextIter++;
-    }
+    //}
   }
   if (!aGroup.empty() && theFlush) {
     // flush visualisation changes
