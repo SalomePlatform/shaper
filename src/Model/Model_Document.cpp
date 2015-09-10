@@ -68,6 +68,8 @@ Model_Document::Model_Document(const std::string theID, const std::string theKin
   // in transaction for nesting correct working
   myDoc->NewCommand();
   TDataStd_Integer::Set(myDoc->Main().Father(), 0);
+  // this to avoid creation of integer attribute outside the transaction after undo
+  transactionID();
   myDoc->CommitCommand();
 }
 
@@ -278,6 +280,7 @@ void Model_Document::close(const bool theForever)
 
   // close all only if it is really asked, otherwise it can be undoed/redoed
   if (theForever) {
+    // flush everything to avoid messages with bad objects
     delete myObjs;
     myObjs = 0;
     if (myDoc->CanClose() == CDM_CCS_OK)

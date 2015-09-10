@@ -79,6 +79,7 @@ Model_Objects::~Model_Objects()
     myFeatures.UnBind(aFeaturesIter.Key());
   }
   aLoop->activateFlushes(isActive);
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
@@ -611,6 +612,16 @@ void Model_Objects::synchronizeFeatures(
       aKeptFeatures.insert(aFeature);
       if (anUpdatedMap.Contains(aFeatureLabel)) {
         ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
+        if (aFeature->getKind() == "Parameter") { // if parameters are changed, update the results (issue 937)
+          const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+          for (; aRIter != aResults.cend(); aRIter++) {
+            std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+            if (aRes->data()->isValid() && !aRes->isDisabled()) {
+              ModelAPI_EventCreator::get()->sendUpdated(aRes, anUpdateEvent);
+            }
+          }
+        }
       }
     }
   }
