@@ -63,6 +63,9 @@ private:
   /// Input control of the widget
   QLineEdit* myTextLine;
 
+  /// To check if we need to use body for composite feature or not
+  bool myUseBody;
+
 };
 
 #endif

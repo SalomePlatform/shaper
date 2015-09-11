@@ -7,6 +7,8 @@
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_Module.h"
 
+#include <Config_Keywords.h>
+
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
@@ -39,7 +41,7 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
                                                          PartSet_Module* theModule,
                                                          const Config_WidgetAPI* theData,
                                                          const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId), myModule(theModule)
+: ModuleBase_ModelWidget(theParent, theData, theParentId), myModule(theModule), myUseBody(true)
 {
   QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
@@ -56,6 +58,11 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
   myTextLine->setReadOnly(true);
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
+
+  QString aUseBody = QString::fromStdString(theData->getProperty(USE_BODY));
+  if(!aUseBody.isEmpty()) {
+    myUseBody = QVariant(aUseBody).toBool();
+  }
 
   aLayout->addRow(myLabel, myTextLine);
 }
@@ -104,13 +111,15 @@ void PartSet_WidgetSketchCreator::onStarted()
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_Displayer* aDisp = aWorkshop->displayer();
   QObjectPtrList aObjList = aDisp->displayedObjects();
-  bool aHasBody = false;
+  bool aHasBody = !myUseBody;
   ResultBodyPtr aBody;
-  foreach(ObjectPtr aObj, aObjList) {
-    aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
-    if (aBody.get() != NULL) {
-      aHasBody = true;
-      break;
+  if(!aHasBody) {
+    foreach(ObjectPtr aObj, aObjList) {
+      aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
+      if (aBody.get() != NULL) {
+        aHasBody = true;
+        break;
+      }
     }
   }
 
@@ -184,26 +193,28 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
     }
     aSketchFeature->setDisplayed(false);
 
-    // Add Selected body were created the sketcher to list of selected objects
-    DataPtr aData = aSketchFeature->data();
-    AttributeSelectionPtr aSelAttr = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-    if (aSelAttr.get()) {
-      ResultPtr aRes = aSelAttr->context();
-      GeomShapePtr aShape = aSelAttr->value();
-      if (aRes.get()) {
-        std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
-        SessionPtr aMgr = ModelAPI_Session::get();
-        ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-        AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
-        std::string aValidatorID, anError;
-        AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
-        aSelList->append(aRes, GeomShapePtr());
-        if (aFactory->validate(anAttribute, aValidatorID, anError))
-          updateObject(aCompFeature);
-        else
-          aSelList->clear();
+    if(myUseBody) {
+      // Add Selected body were created the sketcher to list of selected objects
+      DataPtr aData = aSketchFeature->data();
+      AttributeSelectionPtr aSelAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+      if (aSelAttr.get()) {
+        ResultPtr aRes = aSelAttr->context();
+        GeomShapePtr aShape = aSelAttr->value();
+        if (aRes.get()) {
+          std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
+          SessionPtr aMgr = ModelAPI_Session::get();
+          ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+          AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
+          std::string aValidatorID, anError;
+          AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
+          aSelList->append(aRes, GeomShapePtr());
+          if (aFactory->validate(anAttribute, aValidatorID, anError))
+            updateObject(aCompFeature);
+          else
+            aSelList->clear();
+        }
       }
     }
   }

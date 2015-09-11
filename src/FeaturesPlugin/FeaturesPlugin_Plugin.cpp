@@ -4,6 +4,7 @@
 
 #include <FeaturesPlugin_Boolean.h>
 #include <FeaturesPlugin_Extrusion.h>
+#include <FeaturesPlugin_ExtrusionSketch.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Group.h>
@@ -11,6 +12,7 @@
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Placement.h>
 #include <FeaturesPlugin_Revolution.h>
+#include <FeaturesPlugin_RevolutionSketch.h>
 #include <FeaturesPlugin_RevolutionCut.h>
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
@@ -58,6 +60,10 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_RevolutionCut);
   } else if (theFeatureID == FeaturesPlugin_RevolutionFuse::ID()) {
     return FeaturePtr(new FeaturesPlugin_RevolutionFuse);
+  } else if (theFeatureID == FeaturesPlugin_ExtrusionSketch::ID()) {
+    return FeaturePtr(new FeaturesPlugin_ExtrusionSketch);
+  } else if (theFeatureID == FeaturesPlugin_RevolutionSketch::ID()) {
+    return FeaturePtr(new FeaturesPlugin_RevolutionSketch);
   }
   // feature of such kind is not found
   return FeaturePtr();
