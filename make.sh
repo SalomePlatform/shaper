@@ -20,5 +20,7 @@ CMAKE_ARGS="${CMAKE_ARGS} ${SOURCES_DIR}"
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 
+set -e
+
 cmake -G "Unix Makefiles" ${CMAKE_ARGS}
 make -j$(nproc) install

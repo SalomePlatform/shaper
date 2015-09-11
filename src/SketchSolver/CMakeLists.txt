@@ -1,7 +1,7 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 INCLUDE(Common)
-INCLUDE(FindSolveSpace)
+FIND_PACKAGE(SolveSpace REQUIRED)
 
 SET(PROJECT_HEADERS
     SketchSolver.h
@@ -52,7 +52,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
-    ${SLVS_LIBRARIES}
+    ${SolveSpace_LIBRARIES}
     Config
     Events
     ModelAPI
@@ -60,6 +60,7 @@ SET(PROJECT_LIBRARIES
 )
 
 INCLUDE_DIRECTORIES(
+    ${SolveSpace_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/src/Config
     ${PROJECT_SOURCE_DIR}/src/SketchPlugin
     ${PROJECT_SOURCE_DIR}/src/ModelAPI
