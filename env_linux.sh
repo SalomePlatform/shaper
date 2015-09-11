@@ -6,7 +6,7 @@ source ${INST_ROOT}/env_products.sh
 set -u
 
 #------ SolveSpace ------
-export SOLVESPACE_ROOT_DIR=${NEWGEOM_PDIR}/solvespace-2.0
+export SOLVESPACE_ROOT_DIR=${NEWGEOM_PDIR}/solvespace-2.1
 export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 
