@@ -82,10 +82,15 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   TopoDS_Edge aEdge2 = TopoDS::Edge(aTEdge2);
   SetMeasuredGeometry(aEdge1, aEdge2);
 
-  gp_Pnt aCenter = CenterPoint();
+  const gp_Pnt& aCenter = CenterPoint();
+  const gp_Pnt& aFirst = FirstPoint();
+  const gp_Pnt& aSecond = SecondPoint();
 
-  gp_Pnt aFLyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
-  double aDist = aCenter.Distance(aFLyPnt);
+  gp_Dir aBisector((aFirst.XYZ() + aSecond.XYZ()) * 0.5 - aCenter.XYZ());
+
+  gp_Pnt aFlyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
+  gp_XYZ aFlyDir = aFlyPnt.XYZ() - aCenter.XYZ();
+  double aDist = aFlyDir.Dot(aBisector.XYZ());
   SetFlyout(aDist);
 
   // Angle value is in degrees
