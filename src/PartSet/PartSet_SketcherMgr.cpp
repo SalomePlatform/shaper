@@ -694,8 +694,17 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
                                                                         (getCurrentOperation());
     if (aFOperation) {
       FeaturePtr aFeature = aFOperation->feature();
-      if (aFeature.get() && aFeature == theFeature && isNestedCreateOperation(aFOperation))
-        anError = "Please input value in Property Panel. It is not initialized.";
+      if (aFeature.get() && aFeature == theFeature && isNestedCreateOperation(aFOperation)) {
+        QString anAttributeName = "";
+        ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+        ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
+        if (anActiveWgt) {
+          AttributePtr anAttr = aFeature->attribute(anActiveWgt->attributeID());
+          if (anAttr.get())
+            anAttributeName = anAttr->id().c_str();
+        }
+        anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
+      }
     }
   }
   return anError;
