@@ -119,7 +119,7 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
         </shape_selector>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
-        <doublevalue_editor label="Value" tooltip="Angle" id="ConstraintValue" default="computed" />
+        <doublevalue_editor label="Value" tooltip="Angle" id="ConstraintValue" default="computed" min="0" max="180" />
         <validator id="PartSet_AngleSelection"/>
       </feature>
 
