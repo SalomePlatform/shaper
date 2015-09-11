@@ -59,7 +59,13 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
     QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
     updateActionState(anOkAction, theFeature);
   }
-  //update AcceptAll action
+}
+
+void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
+{
+  QString anError = myWorkshop->module()->getFeatureError(theFeature);
+
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   if (workshop()->isFeatureOfNested(theFeature)) {
     QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
     bool anEnabled = anError.isEmpty();

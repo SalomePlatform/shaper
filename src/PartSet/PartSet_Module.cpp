@@ -152,8 +152,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
 
   mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
   mySelectionFilters.Append(new PartSet_FilterInfinite(myWorkshop));
@@ -1019,23 +1017,6 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     foreach(ObjectPtr aObj, aObjects)
       aDisplayer->redisplay(aObj, false);
     aDisplayer->updateViewer();
-  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_FAILED) ||
-             theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
-    CompositeFeaturePtr aSketch = sketchMgr()->activeSketch();
-    if (aSketch.get()) {
-      if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
-         // it should be moved out, validating is called to update error string of the sketch feature
-        if (sketchMgr()->activeSketch().get()) {
-          SessionPtr aMgr = ModelAPI_Session::get();
-          ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-          bool aValid = aFactory->validate(sketchMgr()->activeSketch());
-        }
-      }
-
-      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-      XGUI_Workshop* aWorkshop = aConnector->workshop();
-      aWorkshop->errorMgr()->updateActions(aSketch);
-    }
   }
 }
 

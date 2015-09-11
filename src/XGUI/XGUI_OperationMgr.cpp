@@ -220,7 +220,7 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
   if (theOperation) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation)
-      anErrorMgr->updateActions(aFOperation->feature());
+      anErrorMgr->updateAcceptAllAction(aFOperation->feature());
     //emit nestedStateChanged(theOperation->getDescription()->operationId().toStdString(),
     //                        theOperation->isValid());
   }

@@ -28,6 +28,10 @@ public:
 
   void updateActions(const FeaturePtr& theFeature);
 
+  /// Update enable state of AcceptAll action if the feature uses it
+  /// \param theFeature a feature
+  void updateAcceptAllAction(const FeaturePtr& theFeature);
+
   /// Return true if the feature has no error. If there is an error and the action
   /// is not valid, the dialog with the error information is shown.
   /// \param theAction an action, which is checked on validity

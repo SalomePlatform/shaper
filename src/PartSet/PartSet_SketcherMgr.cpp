@@ -688,13 +688,6 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
   if (aSketch.get() && aSketch == theFeature) {
     AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
     anError = aAttributeString->value().c_str();
-    if (anError.isEmpty()) {
-      if (isNestedCreateOperation(getCurrentOperation()) &&
-          aSketch->numberOfSubs() == 1) {
-        AttributePtr aFeaturesAttr = aSketch->attribute(SketchPlugin_Sketch::FEATURES_ID());
-        anError = std::string("Attribute \"" + aFeaturesAttr->id() + "\" is not initialized.").c_str();
-      }
-    }
   }
   else if (myIsResetCurrentValue) { // this flag do not allow commit of the current operation
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
