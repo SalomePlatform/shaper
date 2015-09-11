@@ -438,11 +438,13 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       if (noModifiers) {
         ModuleBase_IViewer* aViewer = myWorkshop->viewer();
         Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-        Handle(V3d_View) aView = aViewer->activeView();
-        if ((theEvent->key() == Qt::Key_N))
-          aContext->HilightNextDetected(aView);
-        else if ((theEvent->key() == Qt::Key_P))
-          aContext->HilightPreviousDetected(aView);
+        if (!aContext.IsNull()) {
+          Handle(V3d_View) aView = aViewer->activeView();
+          if ((theEvent->key() == Qt::Key_N))
+            aContext->HilightNextDetected(aView);
+          else if ((theEvent->key() == Qt::Key_P))
+            aContext->HilightPreviousDetected(aView);
+        }
       }
     }
 

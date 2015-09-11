@@ -101,14 +101,17 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
     if (!isActivated)
       activateFilters(true);
 
-    const SelectMgr_ListOfFilter& aFilters = myWorkshop->viewer()->AISContext()->Filters();
-    SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
-    for (; anIt.More() && aValid; anIt.Next()) {
-      Handle(SelectMgr_Filter) aFilter = anIt.Value();
-      aValid = aFilter->IsOk(anOwner);
+    Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+    if (!aContext.IsNull()) {
+      const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+      SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+      for (; anIt.More() && aValid; anIt.Next()) {
+        Handle(SelectMgr_Filter) aFilter = anIt.Value();
+        aValid = aFilter->IsOk(anOwner);
+      }
+      if (!isActivated)
+        activateFilters(false);
     }
-    if (!isActivated)
-      activateFilters(false);
   }
 
   // removes created owner

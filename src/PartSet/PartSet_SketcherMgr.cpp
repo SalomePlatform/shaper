@@ -372,8 +372,11 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     if ((!isSketcher) && (!isEditing))
       return;
 
+    Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+    if (aContext.IsNull())
+      return;
     // MoveTo in order to highlight current object
-    aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+    aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
 
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
@@ -438,13 +441,15 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
         if (myDragDone) {
           //aOp->commit();
           myCurrentSelection.clear();
+          /*Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+          if (!aContext.IsNull()) {
           // Reselect edited object
-          /*aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+          aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
           if (theEvent->modifiers() & Qt::ShiftModifier)
-            aViewer->AISContext()->ShiftSelect();
+            aContext->ShiftSelect();
           else
-            aViewer->AISContext()->Select();
-            */
+            aContext->Select();
+          */
         }
       }
     }
@@ -909,6 +914,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* /* theOperation*/)
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
   connectToPropertyPanel(true);
+  QApplication::setOverrideCursor(QCursor(QIcon(":pictures/button_plus.png").pixmap(20,20)));
 }
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
@@ -917,6 +923,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   myIsResetCurrentValue = false;
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
+  QApplication::restoreOverrideCursor();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -1093,6 +1100,8 @@ void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
   Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+  if (aContext.IsNull())
+    return;
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
@@ -1141,6 +1150,9 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
   Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+  if (aContext.IsNull())
+    return;
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
