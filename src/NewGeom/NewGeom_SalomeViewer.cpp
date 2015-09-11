@@ -300,6 +300,7 @@ void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double th
       aView3d->SetTwist( theTwist );
       aView3d->FitAll(0.01, true);
       aView3d->SetZSize(0.);
+      aView3d->DepthFitAll();
     }
   }
 }
