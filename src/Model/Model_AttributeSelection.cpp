@@ -328,7 +328,7 @@ TDF_LabelMap& Model_AttributeSelection::scope()
         if (aComposite->isSub(*aFIter))
           isInScope = true;
       }
-      if (aFIter->get() && (*aFIter)->data()->isValid()) {
+      if (isInScope && aFIter->get() && (*aFIter)->data()->isValid()) {
         TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
           (*aFIter)->data())->label().Father();
         TDF_ChildIDIterator aNSIter(aFeatureLab, TNaming_NamedShape::GetID(), 1);
