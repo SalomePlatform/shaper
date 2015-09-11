@@ -133,6 +133,16 @@ void Events_Loop::flush(const Events_ID& theID)
   }
 }
 
+void Events_Loop::eraseMessages(const Events_ID& theID)
+{
+  std::map<char*, std::shared_ptr<Events_Message> >::iterator aMyGroup =
+    myGroups.find(theID.eventText());
+  if (aMyGroup != myGroups.end()) {
+    myGroups.erase(aMyGroup);
+  }
+}
+
+
 bool Events_Loop::activateFlushes(const bool theActivate)
 {
   bool isActive = myFlushActive;

@@ -66,6 +66,9 @@ class Events_Loop
   //! Initializes sending of a group-message by the given ID
   EVENTS_EXPORT void flush(const Events_ID& theID);
 
+  //! Removes messages with the given ID: they are not needed anymore (UPDATE on close)
+  EVENTS_EXPORT void eraseMessages(const Events_ID& theID);
+
   //! Allows to disable flushes: needed in synchronization of document mechanism 
   //! (to synchronize all and only then flush create, update, etc in correct order)
   //! \param theActivate a state about flushe is active. If false, the flush is disabled

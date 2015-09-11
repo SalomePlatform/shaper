@@ -79,7 +79,10 @@ Model_Objects::~Model_Objects()
     myFeatures.UnBind(aFeaturesIter.Key());
   }
   aLoop->activateFlushes(isActive);
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  // erase update, because features are destroyed and update should not performed for them anywhere
+  aLoop->eraseMessages(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->eraseMessages(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  // deleted and redisplayed is correctly performed: they know that features are destroyed
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
