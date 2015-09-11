@@ -36,7 +36,7 @@ bool PartSet_CustomPrs::isActive()
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
 
-  return aContext->IsDisplayed(anOperationPrs);
+  return !aContext.IsNull() && aContext->IsDisplayed(anOperationPrs);
 }
 
 bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature, const bool theUpdateViewer)
@@ -62,7 +62,7 @@ bool PartSet_CustomPrs::deactivate(const bool theUpdateViewer)
   anOperationPrs->setFeature(FeaturePtr());
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext->IsDisplayed(anOperationPrs)) {
+  if (!aContext.IsNull() && aContext->IsDisplayed(anOperationPrs)) {
     erasePresentation(theUpdateViewer);
     isModified = true;
   }
@@ -76,7 +76,7 @@ void PartSet_CustomPrs::displayPresentation(const bool theUpdateViewer)
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext->IsDisplayed(anOperationPrs)) {
+  if (!aContext.IsNull() && !aContext->IsDisplayed(anOperationPrs)) {
     PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
 
     XGUI_Workshop* aWorkshop = workshop();
@@ -111,7 +111,7 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject, const bool theUpda
   // [it should be hiddend] or the new AIS depend on it [it should be visualized]
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext->IsDisplayed(anOperationPrs)) {
+  if (!aContext.IsNull() && aContext->IsDisplayed(anOperationPrs)) {
     // if there are performance poblems, to improve them, the necessity of redisplay can be checked
     //bool aChanged = anOperationPrs->dependOn(theObject);
     anOperationPrs->updateShapes();
