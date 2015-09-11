@@ -174,6 +174,13 @@ public:
   /// \return boolean value
   bool sketchSolverError();
 
+  //! Returns the feature error if the current state of the feature in the sketch is not correct
+  //! If the feature is correct, it returns an empty value
+  //! Incorrect states: the feature is sketch, the solver error value
+  //! The feature value is reset, this is the flag of sketch mgr
+  //! \return string value
+  QString getFeatureError(const FeaturePtr& theFeature);
+
   /// Returns list of strings which contains id's of sketch operations
   static const QStringList& sketchOperationIdList();
 

@@ -48,15 +48,15 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Creates a feature (command) in SALOME desktop
   //! \param theWBName - name of toolbar (workbench)
   //! \param theInfo - information about action (icon, text, etc)
-  virtual QAction* addNestedFeature(const QString& theWBName,
+  virtual QAction* addFeatureOfNested(const QString& theWBName,
                                     const ActionInfo& theInfo,
                                     const QList<QAction*>& theNestedActions) = 0;
 
   //! Returns true if the feature action is a nested action, in other words,
-  //! it is created by addNestedFeature().
+  //! it is created by addFeatureOfNested().
   //! \param theId - an action of a feature
   //! returns boolean result
-  virtual bool isNestedFeature(const QAction* theAction) = 0;
+  virtual bool isFeatureOfNested(const QAction* theAction) = 0;
 
   //! Creates a command in Edit menu of SALOME desktop
   //! \param theId - an id of the feature

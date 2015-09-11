@@ -18,6 +18,7 @@
 class QKeyEvent;
 
 class ModuleBase_IWorkshop;
+class XGUI_Workshop;
 
 /**\class XGUI_OperationMgr
  * \ingroup GUI
@@ -139,12 +140,12 @@ signals:
   void operationAborted(ModuleBase_Operation* theOperation);
 
   /// Signal is emitted after the apply enable state changed.
-  void validationStateChanged(bool);
+  //void validationStateChanged(bool);
 
   /// Signal is emitted after the model is modified. It is emitted for all active operations.
   /// \param theFeatureKind a feature id
   /// \param theState validity of the operation with the feature kind
-  void nestedStateChanged(const std::string& theFeatureKind, const bool theState);
+  //void nestedStateChanged(const std::string& theFeatureKind, const bool theState);
 
   /// Signal is emitted after the current operation is filled with existing preselection.
   void operationActivatedByPreselection();
@@ -198,6 +199,9 @@ protected: // TEMPORARY
 
   /// Slot called on operation resume
   void onOperationResumed();
+
+private:
+  XGUI_Workshop* workshop() const;
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

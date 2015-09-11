@@ -131,7 +131,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
-  myErrorMgr = new XGUI_ErrorMgr(this);
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
   connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,
           SLOT(onContextMenuCommand(const QString&, bool)));
@@ -145,6 +144,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   ModuleBase_IWorkshop* aWorkshop = moduleConnector();
   myOperationMgr->setWorkshop(aWorkshop);
 
+  myErrorMgr = new XGUI_ErrorMgr(this, aWorkshop);
   myEventsListener = new XGUI_WorkshopListener(aWorkshop);
 
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
@@ -392,7 +392,7 @@ void XGUI_Workshop::onAcceptActionClicked()
 }
 
 //******************************************************
-void XGUI_Workshop::onValidationStateChanged(bool theEnabled)
+/*void XGUI_Workshop::onValidationStateChanged(bool theEnabled)
 {
   XGUI_OperationMgr* anOperationMgr = operationMgr();
   if (anOperationMgr) {
@@ -403,7 +403,7 @@ void XGUI_Workshop::onValidationStateChanged(bool theEnabled)
       myErrorMgr->updateActionState(anAction, aFOperation->feature(), theEnabled);
     }
   }
-}
+}*/
 
 
 //******************************************************
@@ -416,6 +416,24 @@ void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const boo
       myDisplayer->deactivateObjects(anObjects, theUpdateViewer);
     }
   }
+}
+
+//******************************************************
+bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
+{
+  bool aHasNested = false;
+  std::string aFeatureKind = theFeature->getKind();
+  if (isSalomeMode()) {
+    XGUI_SalomeConnector* aSalomeConnector = salomeConnector();
+    if (aSalomeConnector->isFeatureOfNested(actionsMgr()->action(aFeatureKind.c_str())))
+      aHasNested = true;
+  } else {
+    AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
+    AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
+    if (aCommand && aCommand->button()->additionalButtonWidget())
+      aHasNested = true;
+  }
+  return aHasNested;
 }
 
 //******************************************************
@@ -979,8 +997,8 @@ void XGUI_Workshop::createDockWidgets()
   connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
-  connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
-          this, SLOT(onValidationStateChanged(bool)));
+  //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
+  //        this, SLOT(onValidationStateChanged(bool)));
 }
 
 //******************************************************

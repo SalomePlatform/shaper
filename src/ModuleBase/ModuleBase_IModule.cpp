@@ -64,6 +64,43 @@ void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
+const char* toString(ModelAPI_ExecState theExecState) 
+{
+#define TO_STRING(__NAME__) case __NAME__: return #__NAME__;
+  switch (theExecState) {
+  TO_STRING(ModelAPI_StateDone)
+  TO_STRING(ModelAPI_StateMustBeUpdated)
+  TO_STRING(ModelAPI_StateExecFailed)
+  TO_STRING(ModelAPI_StateInvalidArgument)
+  TO_STRING(ModelAPI_StateNothing)
+  default: return "Unknown ExecState.";
+  }
+#undef TO_STRING
+}
+
+QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
+{
+  QString anError;
+  if (!theFeature.get() || !theFeature->data()->isValid() || theFeature->isAction())
+    return anError;
+
+  // to be removed later, this error should be got from the feature
+  if (theFeature->data()->execState() == ModelAPI_StateDone ||
+      theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
+    return anError;
+
+  // set error indication
+  anError = QString::fromStdString(theFeature->error());
+  if (anError.isEmpty()) {
+    bool isDone = ( theFeature->data()->execState() == ModelAPI_StateDone
+                 || theFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
+    if (!isDone)
+      anError = toString(theFeature->data()->execState());
+  }
+
+  return anError;
+}
+
 ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& theFeatureId)
 {
   return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);

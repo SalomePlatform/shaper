@@ -194,6 +194,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theStdActions - a map of standard actions
   virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions) {}
 
+  //! Returns the feature error if the current state of the feature in the module is not correct
+  //! If the feature is correct, it returns an empty value
+  //! \return string value
+  virtual QString getFeatureError(const FeaturePtr& theFeature);
+
 signals:
   void operationLaunched();
 

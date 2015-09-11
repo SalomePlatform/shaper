@@ -199,6 +199,11 @@ public:
   /// \param theStdActions - a map of standard actions
   virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
 
+  //! Returns the feature error if the current state of the feature in the module is not correct
+  //! If the feature is correct, it returns an empty value
+  //! \return string value
+  virtual QString getFeatureError(const FeaturePtr& theFeature);
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

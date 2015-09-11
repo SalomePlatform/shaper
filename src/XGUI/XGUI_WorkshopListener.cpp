@@ -68,8 +68,8 @@ XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
     myUpdatePrefs(false)
 {
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
-  connect(anOperationMgr, SIGNAL(nestedStateChanged(const std::string&, const bool)),
-          this, SLOT(onNestedStateChanged(const std::string&, const bool)));
+  //connect(anOperationMgr, SIGNAL(nestedStateChanged(const std::string&, const bool)),
+  //        this, SLOT(onNestedStateChanged(const std::string&, const bool)));
 }
 
 //******************************************************
@@ -91,6 +91,7 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED));
 
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
@@ -187,6 +188,14 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     XGUI_Displayer* aDisplayer = workshop()->displayer();
     aDisplayer->enableUpdateViewer(true);
     aDisplayer->updateViewer();
+  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+    std::set<ObjectPtr>::const_iterator aIt;
+    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+       workshop()->errorMgr()->updateActions(ModelAPI_Feature::feature(*aIt));
+    }
   } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);
@@ -234,7 +243,7 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
       }
     }
   }
-  anOperationMgr->onValidateOperation();
+  //anOperationMgr->onValidateOperation();
 
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
@@ -388,18 +397,17 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //}
 }
 
-void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId, const bool theState)
+/*void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId, const bool theState)
 {
   XGUI_Workshop* aWorkshop = workshop();
 
   //one button is used for all features, which can have nested actions, so it is obtained from
   // the action manager
-  QAction* anAcceptAllAction = aWorkshop->actionsMgr()->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
-  bool aActionToBeUpdated = false;
+  //bool aActionToBeUpdated = aWorkshop->isFeatureOfNested(theFeatureId);
   if (aWorkshop->isSalomeMode()) {
     XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
     XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
-    if (aSalomeConnector->isNestedFeature(anActionsMgr->action(theFeatureId.c_str())))
+    if (aSalomeConnector->isFeatureOfNested(anActionsMgr->action(theFeatureId.c_str())))
       aActionToBeUpdated = true;
   } else {
     AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
@@ -408,9 +416,10 @@ void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId
       aActionToBeUpdated = true;
   }
   if (aActionToBeUpdated) {
+    QAction* anAcceptAllAction = aWorkshop->actionsMgr()->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
     anAcceptAllAction->setEnabled(theState);
   }
-}
+}*/
 
 bool XGUI_WorkshopListener::event(QEvent * theEvent)
 {
@@ -462,7 +471,7 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
     QAction* aAction;
     if (isColumnButton) {
-      aAction = aSalomeConnector->addNestedFeature(aWchName, aFeatureInfo, aNestedActList);
+      aAction = aSalomeConnector->addFeatureOfNested(aWchName, aFeatureInfo, aNestedActList);
     } else {
       //Issue #650: in the SALOME mode the tooltip should be same as text
       aFeatureInfo.toolTip = aFeatureInfo.text;

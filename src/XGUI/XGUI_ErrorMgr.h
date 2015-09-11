@@ -12,6 +12,8 @@
 #include <ModuleBase_IErrorMgr.h>
 #include <ModelAPI_Feature.h>
 
+class XGUI_Workshop;
+class ModuleBase_IWorkshop;
 class QAction;
 class QDialog;
 class QLabel;
@@ -20,16 +22,11 @@ class XGUI_EXPORT XGUI_ErrorMgr : public ModuleBase_IErrorMgr
 {
   Q_OBJECT
 public:
-  XGUI_ErrorMgr(QObject* theParent = 0);
+  XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop);
   /// Virtual destructor
   virtual ~XGUI_ErrorMgr();
 
-  /// It updates the action state according to the given parameter
-  /// \param theAction an action to be changed
-  /// \param theFeature an feature that corresponds to the action
-  /// \param theEnabled an enable state
-  void updateActionState(QAction* theAction, const FeaturePtr& theFeature,
-                         const bool theEnabled);
+  void updateActions(const FeaturePtr& theFeature);
 
   /// Return true if the feature has no error. If there is an error and the action
   /// is not valid, the dialog with the error information is shown.
@@ -46,12 +43,21 @@ protected slots:
   virtual void onWidgetChanged();
 
 private:
+  /// It updates the action state according to the given parameter
+  /// \param theAction an action to be changed
+  /// \param theFeature an feature that corresponds to the action
+  void updateActionState(QAction* theAction, const FeaturePtr& theFeature);
+
   /// Returns the feature error message
   /// \param theFeature a feature
   /// \return the error message
-  QString getFeatureError(const FeaturePtr& theFeature) const;
+  //QString getFeatureError(const FeaturePtr& theFeature) const;
+
+  /// Returns casted workshop
+  XGUI_Workshop* workshop() const;
 
 private:
+  ModuleBase_IWorkshop* myWorkshop;
   QDialog* myErrorDialog; /// contains the error message
   QLabel* myErrorLabel; /// contains an error information
 };

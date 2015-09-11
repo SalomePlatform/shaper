@@ -7,8 +7,13 @@
 #include "XGUI_ErrorMgr.h"
 
 #include "XGUI_OperationMgr.h"
+#include "XGUI_ModuleConnector.h"
+#include "XGUI_Workshop.h"
+#include "XGUI_ActionsMgr.h"
 
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IModule.h>
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_OperationFeature.h>
 
@@ -28,10 +33,11 @@
 const QString INVALID_VALUE = "invalid_action";
 
 
-XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent /*= 0*/)
+XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop)
   : ModuleBase_IErrorMgr(theParent),
     myErrorDialog(0),
-    myErrorLabel(0)
+    myErrorLabel(0),
+    myWorkshop(theWorkshop)
 {
 
 }
@@ -41,13 +47,31 @@ XGUI_ErrorMgr::~XGUI_ErrorMgr()
 
 }
 
+void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
+{
+  QString anError = myWorkshop->module()->getFeatureError(theFeature);
+
+  //update Ok Action and header of property panel if the current operation started for the feature
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                      (workshop()->operationMgr()->currentOperation());
+  if (aFOperation && aFOperation->feature() == theFeature) {
+    QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+    updateActionState(anOkAction, theFeature);
+  }
+  //update AcceptAll action
+  if (workshop()->isFeatureOfNested(theFeature)) {
+    QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+    bool anEnabled = anError.isEmpty();
+    anAcceptAllAction->setEnabled(anEnabled);
+    anAcceptAllAction->setToolTip(anError);
+  }
+}
+
 bool XGUI_ErrorMgr::canProcessClick(QAction* theAction, const FeaturePtr& theFeature)
 {
-  QString aData = theAction->data().toString();
-
-  bool isActionEnabled = theAction->data() != INVALID_VALUE;
-
-  QString anError = getFeatureError(theFeature);
+  QString anError = myWorkshop->module()->getFeatureError(theFeature);
+  bool isActionEnabled = anError.isEmpty();
   if (!isActionEnabled && !anError.isEmpty()) {
     if (!myErrorDialog) {
       myErrorDialog = new QDialog(QApplication::desktop(), Qt::Popup);
@@ -71,14 +95,17 @@ bool XGUI_ErrorMgr::canProcessClick(QAction* theAction, const FeaturePtr& theFea
   return isActionEnabled;
 }
 
-void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theFeature,
-                                      const bool theEnabled)
+void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theFeature/*,
+                                      const bool theEnabled*/)
 {
+  QString anError = myWorkshop->module()->getFeatureError(theFeature);
+  bool anEnabled = anError.isEmpty();
+
   bool isActionEnabled = theAction->data() != INVALID_VALUE;
-  if (theEnabled  != isActionEnabled) {
+  if (anEnabled  != isActionEnabled) {
     // update enable state of the button
-    theAction->setIcon(theEnabled ? QIcon(":pictures/button_ok.png"): QIcon(":pictures/button_ok_error.png"));
-    if (theEnabled)
+    theAction->setIcon(anEnabled ? QIcon(":pictures/button_ok.png"): QIcon(":pictures/button_ok_error.png"));
+    if (anEnabled)
       theAction->setData("");
     else
       theAction->setData(INVALID_VALUE);
@@ -88,11 +115,11 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theF
     // update controls error information
     QWidget* aWidget = myPropertyPanel->headerWidget();
     if (aWidget)
-      aWidget->setToolTip(getFeatureError(theFeature));
+      aWidget->setToolTip(anError);
   }
 }
 
-const char* toString(ModelAPI_ExecState theExecState) 
+/*const char* toString(ModelAPI_ExecState theExecState) 
 {
 #define TO_STRING(__NAME__) case __NAME__: return #__NAME__;
   switch (theExecState) {
@@ -104,7 +131,7 @@ const char* toString(ModelAPI_ExecState theExecState)
   default: return "Unknown ExecState.";
   }
 #undef TO_STRING
-}
+}*/
 
 /*void XGUI_ErrorMgr::onValidationStateChanged()
 {
@@ -126,7 +153,7 @@ const char* toString(ModelAPI_ExecState theExecState)
   }
 }*/
 
-QString XGUI_ErrorMgr::getFeatureError(const FeaturePtr& theFeature) const
+/*QString XGUI_ErrorMgr::getFeatureError(const FeaturePtr& theFeature) const
 {
   QString anError;
   // get feature
@@ -143,7 +170,7 @@ QString XGUI_ErrorMgr::getFeatureError(const FeaturePtr& theFeature) const
   }
 
   return anError;
-}
+}*/
 
 void XGUI_ErrorMgr::onWidgetChanged()
 {
@@ -184,4 +211,10 @@ void XGUI_ErrorMgr::onWidgetChanged()
     aWidget->setToolTip(aTTip);
     //aWidget->setStyleSheet(anError.isEmpty() ? "" : "background-color:pink;");
   }
+}
+
+XGUI_Workshop* XGUI_ErrorMgr::workshop() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  return aConnector->workshop();
 }

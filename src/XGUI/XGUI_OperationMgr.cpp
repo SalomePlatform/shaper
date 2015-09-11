@@ -5,6 +5,9 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "XGUI_OperationMgr.h"
+#include "XGUI_ModuleConnector.h"
+#include "XGUI_Workshop.h"
+#include "XGUI_ErrorMgr.h"
 
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_IWorkshop.h"
@@ -184,10 +187,13 @@ void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
     return;
-  ModuleBase_Operation* anOperation = currentOperation();
-  if(anOperation) {
-    bool aCanCommit = myWorkshop->module()->canCommitOperation();
-    setApplyEnabled(!myIsValidationLock && aCanCommit && anOperation->isValid());
+  //ModuleBase_Operation* anOperation = currentOperation();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                          (currentOperation());
+  if(aFOperation && aFOperation->feature().get()) {
+    //bool aCanCommit = myWorkshop->module()->canCommitOperation();
+    //setApplyEnabled(!myIsValidationLock && aCanCommit && anOperation->isValid());
+    setApplyEnabled(myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty());
   }
 }
 
@@ -200,18 +206,30 @@ void XGUI_OperationMgr::setLockValidating(bool toLock)
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
 {
   myIsApplyEnabled = theEnabled;
-  emit validationStateChanged(theEnabled);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                          (currentOperation());
+  if (aFOperation) {
+    workshop()->errorMgr()->updateActions(aFOperation->feature());
+  }
+  //emit validationStateChanged(theEnabled);
 }
 
 void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperation)
 {
-  if (theOperation)
-    emit nestedStateChanged(theOperation->getDescription()->operationId().toStdString(),
-                            theOperation->isValid());
+  XGUI_ErrorMgr* anErrorMgr = workshop()->errorMgr();
+  if (theOperation) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (aFOperation)
+      anErrorMgr->updateActions(aFOperation->feature());
+    //emit nestedStateChanged(theOperation->getDescription()->operationId().toStdString(),
+    //                        theOperation->isValid());
+  }
   else {
     foreach(ModuleBase_Operation* anOperation, myOperations) {
-      emit nestedStateChanged(anOperation->getDescription()->operationId().toStdString(),
-                              anOperation->isValid());
+      if (anOperation)
+        updateApplyOfOperations(anOperation);
+      //emit nestedStateChanged(anOperation->getDescription()->operationId().toStdString(),
+      //                        anOperation->isValid());
     }
   }
 }
@@ -359,6 +377,7 @@ void XGUI_OperationMgr::onOperationAborted()
 
 void XGUI_OperationMgr::onOperationCommitted()
 {
+  // apply state for all features from the stack of operations should be updated
   updateApplyOfOperations();
 
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
@@ -436,5 +455,11 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   //  anOperation->keyReleased(theEvent->key());
   //}
   return isAccepted;
+}
+
+XGUI_Workshop* XGUI_OperationMgr::workshop() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  return aConnector->workshop();
 }
 

@@ -241,6 +241,10 @@ Q_OBJECT
   /// \param theUpdateViewer a boolean flag to update viewer immediately
   void deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer);
 
+  /// Returns true if the action of the feature is created to contain Accept/Cancel button
+  /// \param theFeature a feature
+  bool isFeatureOfNested(const FeaturePtr& theFeature);
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
@@ -370,7 +374,7 @@ private:
   /// Listens the corresponded signal from operation manager and send it with the Ok
   /// action to operation manager.
   /// \param theEnabled an enabled state for the action
-  void onValidationStateChanged(bool theEnabled);
+  //void onValidationStateChanged(bool theEnabled);
 
   //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
   //        aOkAct,          SLOT(setEnabled(bool)));

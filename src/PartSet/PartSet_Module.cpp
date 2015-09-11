@@ -51,6 +51,7 @@
 #include <ModelAPI_Session.h>
 #include <GeomValidators_DifferentShapes.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -66,6 +67,7 @@
 #include <XGUI_ObjectsBrowser.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_DataModel.h>
+#include <XGUI_ErrorMgr.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -150,6 +152,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
 
   mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
   mySelectionFilters.Append(new PartSet_FilterInfinite(myWorkshop));
@@ -412,6 +416,26 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
   myMenuMgr->updateViewerMenu(theStdActions);
 }
 
+QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
+{
+  QString anError = ModuleBase_IModule::getFeatureError(theFeature);
+
+  if (anError.isEmpty())
+    anError = sketchMgr()->getFeatureError(theFeature);
+
+  if (anError.isEmpty()) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
+    
+    if (anOpMgr->isValidationLocked()) {
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                             (anOpMgr->currentOperation());
+      if (!aFOperation || theFeature == aFOperation->feature())
+        anError = "Validation is locked by the current operation";
+    }
+  }
+  return anError;
+}
 
 void PartSet_Module::activeSelectionModes(QIntList& theModes)
 {
@@ -995,6 +1019,23 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     foreach(ObjectPtr aObj, aObjects)
       aDisplayer->redisplay(aObj, false);
     aDisplayer->updateViewer();
+  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_FAILED) ||
+             theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
+    CompositeFeaturePtr aSketch = sketchMgr()->activeSketch();
+    if (aSketch.get()) {
+      if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
+         // it should be moved out, validating is called to update error string of the sketch feature
+        if (sketchMgr()->activeSketch().get()) {
+          SessionPtr aMgr = ModelAPI_Session::get();
+          ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+          bool aValid = aFactory->validate(sketchMgr()->activeSketch());
+        }
+      }
+
+      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+      XGUI_Workshop* aWorkshop = aConnector->workshop();
+      aWorkshop->errorMgr()->updateActions(aSketch);
+    }
   }
 }
 

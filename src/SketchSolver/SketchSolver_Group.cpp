@@ -505,11 +505,12 @@ bool SketchSolver_Group::resolveConstraints()
       }
     } catch (...) {
 //      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
+      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
       if (myPrevSolved) {
+        // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_FAILED);
         myPrevSolved = false;
       }
-      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
       return false;
     }
     if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
@@ -519,17 +520,19 @@ bool SketchSolver_Group::resolveConstraints()
         aConstrIter->second->refresh();
       myFeatureStorage->blockEvents(false);
       if (!myPrevSolved) {
+        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
+        // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_REPAIRED);
         myPrevSolved = true;
-        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
       }
     } else if (!myConstraints.empty()) {
 //      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
+      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
       if (myPrevSolved) {
+        // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_FAILED);
         myPrevSolved = false;
       }
-      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
     }
 
     aResolved = true;

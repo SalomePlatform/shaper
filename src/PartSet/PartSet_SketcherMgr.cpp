@@ -678,6 +678,35 @@ bool PartSet_SketcherMgr::sketchSolverError()
   return anError;
 }
 
+QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
+{
+  QString anError = "";
+  if (!theFeature.get() || !theFeature->data()->isValid())
+    return anError;
+
+  CompositeFeaturePtr aSketch = activeSketch();
+  if (aSketch.get() && aSketch == theFeature) {
+    AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
+    anError = aAttributeString->value().c_str();
+    if (anError.isEmpty()) {
+      if (isNestedCreateOperation(getCurrentOperation()) &&
+          aSketch->numberOfSubs() == 1) {
+        AttributePtr aFeaturesAttr = aSketch->attribute(SketchPlugin_Sketch::FEATURES_ID());
+        anError = std::string("Attribute \"" + aFeaturesAttr->id() + "\" is not initialized.").c_str();
+      }
+    }
+  }
+  else if (myIsResetCurrentValue) { // this flag do not allow commit of the current operation
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                        (getCurrentOperation());
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      if (aFeature.get() && aFeature == theFeature && isNestedCreateOperation(aFOperation))
+        anError = "Please input value in Property Panel. It is not initialized.";
+    }
+  }
+  return anError;
+}
 
 const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
 {

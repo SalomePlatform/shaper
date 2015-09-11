@@ -57,7 +57,7 @@ Q_OBJECT
   virtual QAction* addFeature(const QString& theWBName,
                               const ActionInfo& theInfo);
 
-  virtual QAction* addNestedFeature(const QString& theWBName,
+  virtual QAction* addFeatureOfNested(const QString& theWBName,
                                     const ActionInfo& theInfo,
                                     const QList<QAction*>& theNestedActions);
 
@@ -65,7 +65,7 @@ Q_OBJECT
   //! it is created by addNestedFeature().
   //! \param theId - an action of a feature
   //! returns boolean result
-  virtual bool isNestedFeature(const QAction* theAction);
+  virtual bool isFeatureOfNested(const QAction* theAction);
 
   virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
                                      const QString& theTip, const QIcon& theIcon,
