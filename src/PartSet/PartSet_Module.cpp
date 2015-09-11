@@ -122,7 +122,7 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   : ModuleBase_IModule(theWshop),
-  myRestartingMode(RM_None), myVisualLayerId(0)
+  myRestartingMode(RM_None), myVisualLayerId(0), myHasConstraintShown(true)
 {
   new PartSet_IconFactory();
 
@@ -324,6 +324,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     aDisplayer->updateViewer();
   }
+  mySketchMgr->onShowConstraintsToggle(myHasConstraintShown);
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const
@@ -762,6 +763,7 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   if (PartSet_SketcherMgr::constraintsIdList().contains(theCmdId)) {
     // Show constraints if a constraint was anOperation
+    myHasConstraintShown = mySketchMgr->isConstraintsShown();
     mySketchMgr->onShowConstraintsToggle(true);
   }
   ModuleBase_IModule::launchOperation(theCmdId);

@@ -286,6 +286,7 @@ protected slots:
   PartSet_CustomPrs* myCustomPrs;
   int myVisualLayerId;
 
+  bool myHasConstraintShown;
 #ifdef ModuleDataModel
   PartSet_DocumentDataModel* myDataModel;
 #endif
