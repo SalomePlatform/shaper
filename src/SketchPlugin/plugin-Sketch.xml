@@ -108,12 +108,12 @@
 
       <!--  SketchConstraintAngle  -->
       <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon=":icons/angle_constr.png">
-        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
+        <shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </shape_selector>
-        <shape_selector id="ConstraintEntityB" label="Line" tooltip="Select an line" shape_types="edge" >
+        <shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
