@@ -15,6 +15,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Tools.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <Events_Error.h>
@@ -316,8 +317,16 @@ TDF_LabelMap& Model_AttributeSelection::scope()
     std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures = aMyDoc->allFeatures();
     std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFIter = allFeatures.begin();
     bool aMePassed = false;
-    std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
+    CompositeFeaturePtr aComposite = 
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(owner());
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    CompositeFeaturePtr aCompositeOwner, aCompositeOwnerOwner;
+    if (aFeature.get()) {
+      aCompositeOwner = ModelAPI_Tools::compositeOwner(aFeature);
+      if (aCompositeOwner.get()) {
+         aCompositeOwnerOwner = ModelAPI_Tools::compositeOwner(aCompositeOwner);
+      }
+    }
     for(; aFIter != allFeatures.end(); aFIter++) {
       if (*aFIter == owner()) {  // the left features are created later (except subs of composite)
         aMePassed = true;
@@ -328,6 +337,10 @@ TDF_LabelMap& Model_AttributeSelection::scope()
         if (aComposite->isSub(*aFIter))
           isInScope = true;
       }
+      // remove the composite-owner of this feature (sketch in extrusion-cut)
+      if (isInScope && (aCompositeOwner == *aFIter || aCompositeOwnerOwner == *aFIter))
+        isInScope = false;
+
       if (isInScope && aFIter->get() && (*aFIter)->data()->isValid()) {
         TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
           (*aFIter)->data())->label().Father();
