@@ -1,35 +1,35 @@
 # - Try to  find SolveSpace
 # Once done this will define
 #
-#  SolveSpace_FOUND - system has SolveSpace
-#  SolveSpace_INCLUDE_DIRS - the SolveSpace include directory
-#  SolveSpace_LIBRARIES - Link these to use SolveSpace
+#  SOLVESPACE_FOUND - system has SolveSpace
+#  SOLVESPACE_INCLUDE_DIRS - the SolveSpace include directory
+#  SOLVESPACE_LIBRARIES - Link these to use SolveSpace
 
 #=============================================================================
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 #=============================================================================
 
-SET(_SolveSpace_PATHS $ENV{SOLVESPACE_ROOT_DIR})
+SET(_SOLVESPACE_PATHS $ENV{SOLVESPACE_ROOT_DIR})
 
-FIND_PATH(SolveSpace_INCLUDE_DIR NAMES slvs.h
-          PATHS ${_SolveSpace_PATHS}
+IF(NOT SOLVESPACE_FIND_QUIETLY)
+    MESSAGE(STATUS "Try to find SolveSpace at ${_SOLVESPACE_PATHS}...")
+ENDIF()
+
+FIND_PATH(SOLVESPACE_INCLUDE_DIR NAMES slvs.h
+          PATHS ${_SOLVESPACE_PATHS}
           PATH_SUFFIXES include)
 
-FIND_LIBRARY(SolveSpace_LIBRARY NAMES slvs
-             PATHS ${_SolveSpace_PATHS}
+FIND_LIBRARY(SOLVESPACE_LIBRARY NAMES slvs
+             PATHS ${_SOLVESPACE_PATHS}
              PATH_SUFFIXES lib)
 
-SET(SolveSpace_INCLUDE_DIRS ${SolveSpace_INCLUDE_DIR})
-SET(SolveSpace_LIBRARIES ${SolveSpace_LIBRARY})
+SET(SOLVESPACE_INCLUDE_DIRS ${SOLVESPACE_INCLUDE_DIR})
+SET(SOLVESPACE_LIBRARIES ${SOLVESPACE_LIBRARY})
 
-INCLUDE(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set SolveSpace_FOUND to TRUE
+# handle the QUIETLY and REQUIRED arguments and set SOLVESPACE_FOUND to TRUE
 # if all listed variables are TRUE
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SolveSpace DEFAULT_MSG
-                                  SolveSpace_LIBRARY SolveSpace_INCLUDE_DIR)
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SolveSpace
+                                  REQUIRED_VARS SOLVESPACE_LIBRARY SOLVESPACE_INCLUDE_DIR)
 
-MARK_AS_ADVANCED(SolveSpace_LIBRARY SolveSpace_INCLUDE_DIR)
-
-IF(NOT SolveSpace_FIND_QUIET)
-    MESSAGE(STATUS "SolveSpace found at ${_SolveSpace_PATHS}")
-ENDIF()
+MARK_AS_ADVANCED(SOLVESPACE_LIBRARY SOLVESPACE_INCLUDE_DIR)
