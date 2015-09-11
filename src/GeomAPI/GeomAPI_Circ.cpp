@@ -90,5 +90,5 @@ const bool GeomAPI_Circ::parameter(const std::shared_ptr<GeomAPI_Pnt> thePoint,
                                    double& theParameter) const
 {
   Handle(Geom_Circle) aCurve = new Geom_Circle(*MY_CIRC);
-  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt>(), theTolerance, theParameter);
+  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt>(), theTolerance, theParameter) == Standard_True;
 }

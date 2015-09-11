@@ -74,6 +74,8 @@ bool GeomAPI_DataMapOfShapeMapOfShapes::find(const std::shared_ptr<GeomAPI_Shape
     aShape->setImpl(new TopoDS_Shape(anIt.Value()));
     theItems.push_back(aShape);
   }
+
+  return true;
 }
 
 //=================================================================================================
