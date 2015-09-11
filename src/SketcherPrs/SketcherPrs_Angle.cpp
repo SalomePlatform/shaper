@@ -82,21 +82,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   TopoDS_Edge aEdge2 = TopoDS::Edge(aTEdge2);
   SetMeasuredGeometry(aEdge1, aEdge2);
 
-  // Compute intersection point
-  TopoDS_Vertex aV1, aV2;
-  TopExp::Vertices(aEdge1, aV1, aV2);
-  gp_Pnt aPnt1 = BRep_Tool::Pnt(aV1);
-  gp_Pnt aPnt2 = BRep_Tool::Pnt(aV2);
-  std::shared_ptr<GeomAPI_Lin> aL1(new GeomAPI_Lin(aPnt1.X(), aPnt1.Y(), aPnt1.Z(),
-                                                   aPnt2.X(), aPnt2.Y(), aPnt2.Z()));
-  TopExp::Vertices(aEdge2, aV1, aV2);
-  aPnt1 = BRep_Tool::Pnt(aV1);
-  aPnt2 = BRep_Tool::Pnt(aV2);
-  std::shared_ptr<GeomAPI_Lin> aL2(new GeomAPI_Lin(aPnt1.X(), aPnt1.Y(), aPnt1.Z(),
-                                                   aPnt2.X(), aPnt2.Y(), aPnt2.Z()));
-
-  std::shared_ptr<GeomAPI_Pnt> aInter = aL1->intersect(aL2);
-  gp_Pnt aCenter = aInter->impl<gp_Pnt>();
+  gp_Pnt aCenter = CenterPoint();
 
   gp_Pnt aFLyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
   double aDist = aCenter.Distance(aFLyPnt);

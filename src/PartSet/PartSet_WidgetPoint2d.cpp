@@ -29,6 +29,10 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Point.h>
 
 #include <QGroupBox>
 #include <QGridLayout>
@@ -46,6 +50,7 @@
 
 const double MaxCoordinate = 1e12;
 
+static QStringList MyFeaturesForCoincedence;
 
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
                                              ModuleBase_IWorkshop* theWorkshop,
@@ -53,6 +58,12 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
                                              const std::string& theParentId)
  : ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop)
 {
+  if (MyFeaturesForCoincedence.isEmpty()) {
+    MyFeaturesForCoincedence << SketchPlugin_Line::ID().c_str()
+      << SketchPlugin_Arc::ID().c_str()
+      << SketchPlugin_Point::ID().c_str()
+      << SketchPlugin_Circle::ID().c_str();
+  }
   myLockApplyMgr = new PartSet_LockApplyMgr(theParent, myWorkshop);
 
   // the control should accept the focus, so the boolen flag is corrected to be true
@@ -348,9 +359,10 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         // the same constraints for the same points, oterwise the result line has zero length.
         if (getPoint2d(aView, aShape, aX, aY))
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
-        else if (aShape.ShapeType() == TopAbs_EDGE)
-          setConstraintWith(aObject);
-
+        else if (aShape.ShapeType() == TopAbs_EDGE) {
+          if (MyFeaturesForCoincedence.contains(myFeature->getKind().c_str()))
+            setConstraintWith(aObject);
+        }
         // it is important to perform updateObject() in order to the current value is 
         // processed by Sketch Solver. Test case: line is created from a previous point
         // to some distance, but in the area of the highlighting of the point. Constraint
