@@ -192,9 +192,20 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
-    std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-       workshop()->errorMgr()->updateActions(ModelAPI_Feature::feature(*aIt));
+
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                              (workshop()->operationMgr()->currentOperation());
+    bool aFeatureChanged = false;
+    if(aFOperation ) {
+      FeaturePtr aFeature = aFOperation->feature();
+      if (aFeature.get()) {
+        std::set<ObjectPtr>::const_iterator aIt;
+        for (aIt = aObjects.begin(); aIt != aObjects.end() && !aFeatureChanged; ++aIt) {
+          aFeatureChanged = ModelAPI_Feature::feature(*aIt) == aFeature;
+        }
+      }
+      if (aFeatureChanged)
+        workshop()->operationMgr()->onValidateOperation();
     }
   } else {
     //Show error dialog if error message received.
