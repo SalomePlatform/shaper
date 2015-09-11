@@ -762,13 +762,21 @@ static double featureToVal(FeaturePtr theFeature)
     return 1.0; // features (arc, circle, line, point)
 
   const std::string& anID = aConstraint->getKind();
-  if (anID == SketchPlugin_ConstraintCoincidence::ID())
-    return 2.0;
+  if (anID == SketchPlugin_ConstraintCoincidence::ID()) {
+    AttributeRefAttrPtr anAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    AttributeRefAttrPtr anAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+    if (anAttrA && anAttrB && (anAttrA->isObject() || anAttrB->isObject()))
+      return 2.0; // point-on-line and point-on-circle should go before points coincidence constraint
+    return 2.5;
+  }
   if (anID == SketchPlugin_ConstraintDistance::ID() ||
       anID == SketchPlugin_ConstraintLength::ID() ||
-      anID == SketchPlugin_ConstraintRadius::ID() ||
-      anID == SketchPlugin_ConstraintAngle::ID())
+      anID == SketchPlugin_ConstraintRadius::ID())
     return 3.0;
+  if (anID == SketchPlugin_ConstraintAngle::ID())
+    return 3.5;
   if (anID == SketchPlugin_ConstraintHorizontal::ID() ||
       anID == SketchPlugin_ConstraintVertical::ID() ||
       anID == SketchPlugin_ConstraintParallel::ID() ||
@@ -789,7 +797,7 @@ static double featureToVal(FeaturePtr theFeature)
   return 5.5;
 }
 
-static bool operator< (FeaturePtr theFeature1, FeaturePtr theFeature2)
+static bool isLess(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
   return featureToVal(theFeature1) < featureToVal(theFeature2);
 }
@@ -814,7 +822,7 @@ std::list<FeaturePtr> SketchSolver_Group::selectApplicableFeatures(const std::se
 
     // Find the place where to insert a feature
     for (aResIt = aResult.begin(); aResIt != aResult.end(); ++aResIt)
-      if (aFeature < *aResIt)
+      if (isLess(aFeature, *aResIt))
         break;
     aResult.insert(aResIt, aFeature);
   }
