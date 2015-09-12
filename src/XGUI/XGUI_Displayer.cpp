@@ -830,18 +830,19 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
 void XGUI_Displayer::deactivateSelectionFilters()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull() && !myAndFilter.IsNull()) {
+  if (!myAndFilter.IsNull()) {
     bool aFound = false;
-    const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
-    SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
-    for (; anIt.More() && !aFound; anIt.Next()) {
-      Handle(SelectMgr_Filter) aFilter = anIt.Value();
-      aFound = aFilter == myAndFilter;
+    if (!aContext.IsNull()) {
+      const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+      SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+      for (; anIt.More() && !aFound; anIt.Next()) {
+        Handle(SelectMgr_Filter) aFilter = anIt.Value();
+        aFound = aFilter == myAndFilter;
+      }
+      if (aFound)
+        aContext->RemoveFilter(myAndFilter);
     }
-    if (aFound) {
-      aContext->RemoveFilter(myAndFilter);
-      myAndFilter.Nullify();
-    }
+    myAndFilter.Nullify();
   }
 }
 

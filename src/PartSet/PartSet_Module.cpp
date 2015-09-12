@@ -456,6 +456,11 @@ void PartSet_Module::closeDocument()
 void PartSet_Module::clearViewer()
 {
   myCustomPrs->clearPrs();
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  aDisplayer->deactivateSelectionFilters();
 }
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
@@ -1087,5 +1092,18 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
     }
     if (!aFound)
       aViewer->AddZLayer(myVisualLayerId);
+  }
+  // if there is an active operation with validated widget,
+  // the filters of this widget should be activated in the created view
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (aOperation) {
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+    if (anActiveWidget) {
+      ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
+                                                                             (anActiveWidget);
+      if (aWidgetValidated)
+        aWidgetValidated->activateFilters(true);
+    }
   }
 }

@@ -66,6 +66,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   //! Returns data object by AIS
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  /// It obtains selection filters from the workshop and activates them in the active viewer
+  /// \param theWorkshop an active workshop
+  /// \param toActivate a flag about activation or deactivation the filters
+  void activateFilters(const bool toActivate);
+
 protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -94,11 +99,6 @@ protected:
   /// Returns true if the workshop validator filter has been already activated
   /// \return boolean value
   bool isFilterActivated() const;
-
-  /// It obtains selection filters from the workshop and activates them in the active viewer
-  /// \param theWorkshop an active workshop
-  /// \param toActivate a flag about activation or deactivation the filters
-  void activateFilters(const bool toActivate);
 
   /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
