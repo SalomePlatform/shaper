@@ -197,6 +197,12 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
   }
 }
 
+void XGUI_PropertyPanel::setFocusOnOkButton()
+{
+  QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+  anOkBtn->setFocus();
+}
+
 void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)
 {
   QToolButton* anCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);

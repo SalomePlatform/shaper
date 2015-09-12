@@ -48,6 +48,9 @@ public:
   /// \return State of editing mode flag
   bool isEditingMode() const { return myIsEditing; }
 
+  /// Set focus on the Ok button
+  virtual void setFocusOnOkButton() = 0;
+
   /// Set Enable/Disable state of Cancel button
   /// \param theEnabled Enable/Disable state of Cancel button
   virtual void setCancelEnabled(bool theEnabled) = 0;

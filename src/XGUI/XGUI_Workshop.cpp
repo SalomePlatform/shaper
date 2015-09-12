@@ -1009,6 +1009,13 @@ void XGUI_Workshop::showPropertyPanel()
   aViewAct->setEnabled(true);
   myPropertyPanel->show();
   myPropertyPanel->raise();
+
+  // The next code is necessary to made the property panel the active window
+  // in order to operation manager could process key events of the panel.
+  // otherwise they are ignored. It happens only if the same(activateWindow) is
+  // not happend by property panel activation(e.g. resume operaion of Sketch)
+  myPropertyPanel->activateWindow();
+  myPropertyPanel->setFocus();
 }
 
 //******************************************************
@@ -1018,6 +1025,17 @@ void XGUI_Workshop::hidePropertyPanel()
   ///<! Do not allow to show empty property panel
   aViewAct->setEnabled(false);
   myPropertyPanel->hide();
+
+  // the property panel is active window of the desktop, when it is
+  // hidden, it is undefined which window becomes active. By this reason
+  // it is defined to perform the desktop as the active window.
+  // in SALOME mode, workstack made the PyConsole the active window,
+  // set the focus on it. As a result, shortcuts of the application, like
+  // are processed by this console. For example Undo actions.
+  // It is possible that this code is to be moved to NewGeom package
+  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+  aDesktop->activateWindow();
+  aDesktop->setFocus();
 }
 
 //******************************************************

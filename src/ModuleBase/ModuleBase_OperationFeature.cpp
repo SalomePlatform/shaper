@@ -352,4 +352,9 @@ void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* th
     // 4. activate the first obligatory widget
     theProp->activateNextWidget(NULL);
   }
+  else {
+    // set focus on Ok button in order to operation manager could process Enter press
+    if (theProp)
+      theProp->setFocusOnOkButton();
+  }
 }

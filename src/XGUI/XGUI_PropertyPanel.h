@@ -77,6 +77,9 @@ Q_OBJECT
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget();
 
+  /// Set focus on the Ok button
+  virtual void setFocusOnOkButton();
+
   /// Set Enable/Disable state of Cancel button
   /// \param theEnabled Enable/Disable state of Cancel button
   virtual void setCancelEnabled(bool theEnabled);
