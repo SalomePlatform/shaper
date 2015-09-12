@@ -64,10 +64,7 @@ Handle(AIS_InteractiveObject) XGUI_Selection::getIO(const ModuleBase_ViewerPrs& 
 void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresentations) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext.IsNull())
-    return;
-
-  if (aContext->HasOpenedContext()) {
+  if (!aContext.IsNull() && aContext->HasOpenedContext()) {
     QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrs aPrs;
@@ -132,11 +129,13 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
 
 QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
 {
-  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
   QList<ModuleBase_ViewerPrs> aPresentations;
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext.IsNull())
+    return aPresentations;
+
+  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     ModuleBase_ViewerPrs aPrs;
     Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
@@ -195,10 +194,13 @@ QModelIndexList XGUI_Selection::selectedIndexes() const
 //**************************************************************
 void XGUI_Selection::selectedAISObjects(AIS_ListOfInteractive& theList) const
 {
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   theList.Clear();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
-    theList.Append(aContext->SelectedInteractive());
+
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (!aContext.IsNull()) {
+    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
+      theList.Append(aContext->SelectedInteractive());
+  }
 }
 
 //**************************************************************
@@ -221,6 +223,9 @@ void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList,
 {
   theList.Clear();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext.IsNull())
+    return;
+
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     TopoDS_Shape aShape = aContext->SelectedShape();
     if (!aShape.IsNull()) {
@@ -240,9 +245,10 @@ void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList,
 void XGUI_Selection::selectedOwners(SelectMgr_IndexedMapOfOwner& theSelectedOwners) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    theSelectedOwners.Add(aContext->SelectedOwner());
+  if (!aContext.IsNull()) {
+    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+      theSelectedOwners.Add(aContext->SelectedOwner());
+    }
   }
 }
 
@@ -251,8 +257,7 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
                                   SelectMgr_IndexedMapOfOwner& theOwners) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-
-  if (theObject.IsNull() || aContext.IsNull())
+  if (aContext.IsNull() || theObject.IsNull())
     return;
 
   TColStd_ListOfInteger aModes;

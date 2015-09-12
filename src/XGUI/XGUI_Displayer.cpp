@@ -237,6 +237,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return aErased;
+
   AISObjectPtr anObject = myResult2AISObjectMap[theObject];
   if (anObject) {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
@@ -280,7 +281,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
   }
 
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aAISIO.IsNull() && !aContext.IsNull()) {
+  if (!aContext.IsNull() && !aAISIO.IsNull()) {
     // Check that the visualized shape is the same and the redisplay is not necessary
     // Redisplay of AIS object leads to this object selection compute and the selection 
     // in the browser is lost
@@ -342,11 +343,8 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
     arg(anInfoStr).
     toStdString().c_str());
 #endif
-  if (isVisible(theObject)) {
-    Handle(AIS_InteractiveContext) aContext = AISContext();
-    if (aContext.IsNull())
-      return;
-
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull() && isVisible(theObject)) {
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
 
@@ -371,11 +369,8 @@ void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
 {
-  if (!isVisible(theObject))
-    return;
-
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
+  if (aContext.IsNull() || !isVisible(theObject))
     return;
 
   AISObjectPtr aAISObj = getAISObject(theObject);
@@ -425,10 +420,8 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   }
   myActiveSelectionModes = aNewModes;
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
-    return;
   // Open local context if there is no one
-  if (!aContext->HasOpenedContext()) 
+  if (aContext.IsNull() || !aContext->HasOpenedContext()) 
     return;
 
   //aContext->UseDisplayedObjects();
@@ -457,9 +450,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
 bool XGUI_Displayer::isActive(ObjectPtr theObject) const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
-    return false;
-  if (!isVisible(theObject))
+  if (aContext.IsNull() || !isVisible(theObject))
     return false;
     
   AISObjectPtr anObj = myResult2AISObjectMap[theObject];
@@ -519,7 +510,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
 void XGUI_Displayer::clearSelected()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext) {
+  if (!aContext.IsNull()) {
     aContext->UnhilightCurrents(false);
     aContext->ClearSelected();
   }
@@ -554,14 +545,15 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 void XGUI_Displayer::deactivateTrihedron() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-
-  AIS_ListOfInteractive aList;
-  aContext->DisplayedObjects(aList, true);
-  AIS_ListIteratorOfListOfInteractive aIt;
-  for (aIt.Initialize(aList); aIt.More(); aIt.Next()) {
-    Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aIt.Value());
-    if (!aTrihedron.IsNull()) {
-      aContext->Deactivate(aTrihedron);
+  if (!aContext.IsNull()) {
+    AIS_ListOfInteractive aList;
+    aContext->DisplayedObjects(aList, true);
+    AIS_ListIteratorOfListOfInteractive aIt;
+    for (aIt.Initialize(aList); aIt.More(); aIt.Next()) {
+      Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aIt.Value());
+      if (!aTrihedron.IsNull()) {
+        aContext->Deactivate(aTrihedron);
+      }
     }
   }
 }
@@ -569,10 +561,8 @@ void XGUI_Displayer::deactivateTrihedron() const
 void XGUI_Displayer::openLocalContext()
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext.IsNull())
-    return;
   // Open local context if there is no one
-  if (!aContext->HasOpenedContext()) {
+  if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
     // Preserve selected objects
     //AIS_ListOfInteractive aAisList;
     //for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent())
@@ -608,7 +598,7 @@ void XGUI_Displayer::openLocalContext()
 void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if ( (!aContext.IsNull()) && (aContext->HasOpenedContext()) ) {
+  if (!aContext.IsNull() && aContext->HasOpenedContext()) {
     // Preserve selected objects
     //AIS_ListOfInteractive aAisList;
     //for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
@@ -712,34 +702,38 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
                                  const int theMode, const bool theUpdateViewer) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  aContext->Activate(theIO, theMode, theUpdateViewer);
+  if (!aContext.IsNull()) {
+    aContext->Activate(theIO, theMode, theUpdateViewer);
 
 #ifdef DEBUG_ACTIVATE_AIS
-  ObjectPtr anObject = getObject(theIO);
-  anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
-  qDebug(QString("activateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
+    ObjectPtr anObject = getObject(theIO);
+    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
+    qDebug(QString("activateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
 #endif
+  }
 }
 
 void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (theMode == -1)
-    aContext->Deactivate(theIO);
-  else
-    aContext->Deactivate(theIO, theMode);
+  if (!aContext.IsNull()) {
+    if (theMode == -1)
+      aContext->Deactivate(theIO);
+    else
+      aContext->Deactivate(theIO, theMode);
 
 #ifdef DEBUG_DEACTIVATE_AIS
-  ObjectPtr anObject = getObject(theIO);
-  anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
-  qDebug(QString("deactivateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
+    ObjectPtr anObject = getObject(theIO);
+    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
+    qDebug(QString("deactivateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
 #endif
+  }
 }
 
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if ((!aContext.IsNull()) && (!aContext->HasOpenedContext())) {
+  if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
     aContext->OpenLocalContext();
     deactivateTrihedron();
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
@@ -751,7 +745,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (myAndFilter.IsNull() && !aContext.IsNull()) {
+  if (!aContext.IsNull() && myAndFilter.IsNull()) {
     myAndFilter = new SelectMgr_AndFilter();
     aContext->AddFilter(myAndFilter);
   }
@@ -763,10 +757,8 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
 {
   bool aDisplayed = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
-    return aDisplayed;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
-  if (!anAISIO.IsNull()) {
+  if (!aContext.IsNull() && !anAISIO.IsNull()) {
     aContext->Display(anAISIO, 0/*wireframe*/, 0, theUpdateViewer, true, AIS_DS_Displayed);
     aDisplayed = true;
     aContext->Deactivate(anAISIO);
@@ -790,12 +782,12 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
 {
   bool aErased = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
-    return aErased;
-  Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
-  if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
-    aContext->Remove(anAISIO, theUpdateViewer);
-    aErased = true;
+  if (!aContext.IsNull()) {
+    Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
+    if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
+      aContext->Remove(anAISIO, theUpdateViewer);
+      aErased = true;
+    }
   }
   return aErased;
 }
@@ -838,7 +830,7 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
 void XGUI_Displayer::deactivateSelectionFilters()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!myAndFilter.IsNull() && !aContext.IsNull()) {
+  if (!aContext.IsNull() && !myAndFilter.IsNull()) {
     bool aFound = false;
     const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
     SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
@@ -859,12 +851,14 @@ void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
   if (aContext.IsNull() || hasSelectionFilter(theFilter))
     return;
 
-  Handle(SelectMgr_CompositionFilter) aCompFilter = GetFilter();
-  aCompFilter->Add(theFilter);
+  Handle(SelectMgr_CompositionFilter) aCompositeFilter = GetFilter();
+  if (!aCompositeFilter.IsNull()) {
+    aCompositeFilter->Add(theFilter);
 #ifdef DEBUG_SELECTION_FILTERS
-  int aCount = GetFilter()->StoredFilters().Extent();
-  qDebug(QString("addSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
+    int aCount = aCompositeFilter->StoredFilters().Extent();
+    qDebug(QString("addSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
 #endif
+  }
 }
 
 void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
@@ -872,13 +866,15 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
+
   Handle(SelectMgr_AndFilter) aCompositeFilter = GetFilter();
-  if (aCompositeFilter->IsIn(theFilter))
+  if (!aCompositeFilter.IsNull() && aCompositeFilter->IsIn(theFilter)) {
     aCompositeFilter->Remove(theFilter);
 #ifdef DEBUG_SELECTION_FILTERS
-  int aCount = GetFilter()->StoredFilters().Extent();
-  qDebug(QString("removeSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
+    int aCount = aCompositeFilter->StoredFilters().Extent();
+    qDebug(QString("removeSelectionFilter: filters.count() = %1").arg(aCount).toStdString().c_str());
 #endif
+  }
 }
 
 bool XGUI_Displayer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
@@ -894,11 +890,13 @@ bool XGUI_Displayer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
     if (theFilter.Access() == aIt.Value().Access())
       aFilterFound = true;
   }
-  Handle(SelectMgr_CompositionFilter) aCompFilter = GetFilter();
-  const SelectMgr_ListOfFilter& aStoredFilters = aCompFilter->StoredFilters();
-  for (aIt.Initialize(aStoredFilters); aIt.More() && !aFilterFound; aIt.Next()) {
-    if (theFilter.Access() == aIt.Value().Access())
-      aFilterFound = true;
+  Handle(SelectMgr_CompositionFilter) aCompositeFilter = GetFilter();
+  if (!aCompositeFilter.IsNull()) {
+    const SelectMgr_ListOfFilter& aStoredFilters = aCompositeFilter->StoredFilters();
+    for (aIt.Initialize(aStoredFilters); aIt.More() && !aFilterFound; aIt.Next()) {
+      if (theFilter.Access() == aIt.Value().Access())
+        aFilterFound = true;
+    }
   }
   return aFilterFound;
 }
@@ -908,7 +906,10 @@ void XGUI_Displayer::removeFilters()
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
-  GetFilter()->Clear();
+
+  Handle(SelectMgr_CompositionFilter) aCompositeFilter = GetFilter();
+  if (!aCompositeFilter.IsNull())
+    aCompositeFilter->Clear();
 }
 
 void XGUI_Displayer::showOnly(const QObjectPtrList& theList)

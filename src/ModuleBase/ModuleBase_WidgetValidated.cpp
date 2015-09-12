@@ -109,9 +109,9 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
         Handle(SelectMgr_Filter) aFilter = anIt.Value();
         aValid = aFilter->IsOk(anOwner);
       }
-      if (!isActivated)
-        activateFilters(false);
     }
+    if (!isActivated)
+      activateFilters(false);
   }
 
   // removes created owner

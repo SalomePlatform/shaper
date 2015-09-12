@@ -191,8 +191,11 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
   aResMgr->setValue("Study", "store_positions", false);
 
   // Synchronize displayed objects
-  if (mySelector && mySelector->viewer()) {
-    Handle(AIS_InteractiveContext) aContext = mySelector->viewer()->getAISContext();
+  Handle(AIS_InteractiveContext) aContext;
+  if (mySelector && mySelector->viewer())
+    aContext = mySelector->viewer()->getAISContext();
+
+  if (!aContext.IsNull()) {
     XGUI_Displayer* aDisp = myWorkshop->displayer();
     QObjectPtrList aObjList = aDisp->displayedObjects();
 

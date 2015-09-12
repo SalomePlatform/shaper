@@ -373,11 +373,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
 
     Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-    if (aContext.IsNull())
-      return;
-    // MoveTo in order to highlight current object
-    aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-
+    if (!aContext.IsNull()) {
+      // MoveTo in order to highlight current object
+      aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+    }
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
 
@@ -1100,36 +1099,36 @@ void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
   Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-  if (aContext.IsNull())
-    return;
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  if (!aContext.IsNull()) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
+    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
-  std::list<ResultPtr> aResults = theFeature->results();
-  std::list<ResultPtr>::const_iterator aIt;
-  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
-  {
-    ResultPtr aResult = *aIt;
-    AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
-    if (aAISObj.get() == NULL)
-      continue;
-    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
+    std::list<ResultPtr> aResults = theFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
     {
-      Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
-      if (anOwner->Selectable() != anAISIO)
+      ResultPtr aResult = *aIt;
+      AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
+      if (aAISObj.get() == NULL)
         continue;
-      getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
-                             aSelectedAttributes, aSelectedResults);
-    }
-    for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-      Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
-      if (anOwner.IsNull())
-        continue;
-      if (anOwner->Selectable() != anAISIO)
-        continue;
-      getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
-                             aSelectedAttributes, aSelectedResults);
+      Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+      for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
+      {
+        Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
+        if (anOwner->Selectable() != anAISIO)
+          continue;
+        getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
+                               aSelectedAttributes, aSelectedResults);
+      }
+      for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
+        Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
+        if (anOwner.IsNull())
+          continue;
+        if (anOwner->Selectable() != anAISIO)
+          continue;
+        getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
+                               aSelectedAttributes, aSelectedResults);
+      }
     }
   }
   theSelection[theFeature] = std::make_pair(aSelectedAttributes, aSelectedResults);
@@ -1139,7 +1138,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
                                              const FeaturePtr& theSketch,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const FeatureToSelectionMap& theSelection,
-                                             SelectMgr_IndexedMapOfOwner& anOwnersToSelect)
+                                             SelectMgr_IndexedMapOfOwner& theOwnersToSelect)
 {
   if (theFeature.get() == NULL)
     return;
@@ -1149,9 +1148,6 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   std::set<ResultPtr> aSelectedResults = anIt.value().second;
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
-  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-  if (aContext.IsNull())
-    return;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
@@ -1166,7 +1162,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
     for  (Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++) {
       Handle(SelectMgr_EntityOwner) anOwner = aSelectedOwners(i);
       if (!anOwner.IsNull())
-        anOwnersToSelect.Add(anOwner);
+        theOwnersToSelect.Add(anOwner);
     }
   }
 
@@ -1193,14 +1189,14 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
         AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
         if (aPntAttr.get() != NULL &&
             aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end()) {
-          anOwnersToSelect.Add(anOwner);
+          theOwnersToSelect.Add(anOwner);
         }
       }
       else if (aShapeType == TopAbs_EDGE) {
         bool aFound = aSelectedResults.find(aResult) != aSelectedResults.end();
         if (aSelectedResults.find(aResult) != aSelectedResults.end() &&
-            anOwnersToSelect.FindIndex(anOwner) <= 0)
-          anOwnersToSelect.Add(anOwner);
+            theOwnersToSelect.FindIndex(anOwner) <= 0)
+          theOwnersToSelect.Add(anOwner);
       }
     }
   }

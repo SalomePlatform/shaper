@@ -50,12 +50,14 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
   selection()->selectedOwners(aSelectedOwners);
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  for  (Standard_Integer i = 1, n = theSelectedOwners.Extent(); i <= n; i++)  {
-    Handle(SelectMgr_EntityOwner) anOwner = theSelectedOwners(i);
-    if (aSelectedOwners.FindIndex(anOwner) > 0)
-      continue;
+  if (!aContext.IsNull()) {
+    for  (Standard_Integer i = 1, n = theSelectedOwners.Extent(); i <= n; i++)  {
+      Handle(SelectMgr_EntityOwner) anOwner = theSelectedOwners(i);
+      if (aSelectedOwners.FindIndex(anOwner) > 0)
+        continue;
 
-    aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
+      aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
+    }
   }
 }
 
@@ -63,6 +65,9 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 void XGUI_SelectionMgr::updateSelectedOwners(bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext.IsNull())
+    return;
+
   const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
 
   SelectMgr_IndexedMapOfOwner anOwnersToDeselect;
@@ -99,11 +104,13 @@ void XGUI_SelectionMgr::onViewerSelection()
 {
   QObjectPtrList aFeatures;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
-    if (aResult)
-      aFeatures.append(aResult);
+  if (!aContext.IsNull()) {
+    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+      Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+      ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
+      if (aResult)
+        aFeatures.append(aResult);
+    }
   }
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);

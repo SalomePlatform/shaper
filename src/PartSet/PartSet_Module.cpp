@@ -801,17 +801,16 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   // if the operation is panning or rotate or panglobal then do nothing
   if ((theTrsfType == 1) || (theTrsfType == 3) || (theTrsfType == 4))
     return;
-
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+  if (aContext.IsNull())
+    return;
+
   //Handle(V3d_View) aView = aViewer->activeView();
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-  if (aContext.IsNull())
-    return;
-
   Handle(V3d_Viewer) aV3dViewer = aContext->CurrentViewer();
   Handle(V3d_View) aView;
   double aScale = 0;
@@ -1068,7 +1067,11 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
 {
   // z layer is created for all started operations in order to visualize operation AIS presentation
   // over the object
-  Handle(V3d_Viewer) aViewer = myWorkshop->viewer()->AISContext()->CurrentViewer();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext.IsNull())
+    return;
+
+  Handle(V3d_Viewer) aViewer = aContext->CurrentViewer();
   if (myVisualLayerId == 0) {
     if (myVisualLayerId == 0)
       aViewer->AddZLayer(myVisualLayerId);
