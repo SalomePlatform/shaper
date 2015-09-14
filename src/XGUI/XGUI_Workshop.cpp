@@ -564,13 +564,26 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   showPropertyPanel();
   QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
-  ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
-                                                                myModuleConnector);
+  ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
 
   myPropertyPanel->cleanContent();
   aFactory.createWidget(myPropertyPanel->contentWidget());
 
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+
+  // check compatibility of feature and widgets
+  FeaturePtr aFeature = aFOperation->feature();
+  foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+    if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
+      std::string anErrorMsg = "The feature '" + aFeature->getKind() + "' has no attribute '"
+          + aWidget->attributeID() + "' used by widget '"
+          + aWidget->metaObject()->className() + "'.";
+      Events_Error::send(anErrorMsg);
+      myPropertyPanel->cleanContent();
+      return;
+    }
+  }
+
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     bool isStoreValue = !aFOperation->isEditOperation() &&
                         !aWidget->getDefaultValue().empty() &&

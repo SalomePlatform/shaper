@@ -69,6 +69,8 @@ class Config_ModuleReader : public Config_XMLReader
   std::string addPlugin(const std::string& aPluginLibrary,
                         const std::string& aPluginScript,
                         const std::string& aPluginConf);
+  /// Save feature in myFeaturesInFiles. Generates an error if the feature name is already registered.
+  void addFeature(const std::string& theFeatureName, const std::string& thePluginConfig);
 
  private:
   std::map<std::string, std::string> myFeaturesInFiles; ///< a feature name is key, a file is value

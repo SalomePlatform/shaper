@@ -65,13 +65,28 @@ std::string Config_ModuleReader::getModuleName()
   return getProperty(aRoot, PLUGINS_MODULE);
 }
 
+
+void Config_ModuleReader::addFeature(const std::string& theFeatureName,
+                                     const std::string& thePluginConfig)
+{
+  if (myFeaturesInFiles.count(theFeatureName)) {
+    std::string anErrorMsg = "Can not register feature '" + theFeatureName + "' in plugin '"
+        + thePluginConfig + "'. There is a feature with the same ID.";
+    Events_Error::send(anErrorMsg);
+    return;
+  }
+
+  myFeaturesInFiles[theFeatureName] = thePluginConfig;
+}
+
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_PLUGIN, NULL)) {
     if (!hasRequiredModules(theNode))
       return;
     std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
-    if (!aPluginConf.empty()) myPluginFiles.insert(aPluginConf);
+    if (!aPluginConf.empty())
+      myPluginFiles.insert(aPluginConf);
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
     std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);
@@ -79,7 +94,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf);
     std::list<std::string>::iterator it = aFeatures.begin();
     for (; it != aFeatures.end(); it++) {
-      myFeaturesInFiles[*it] = aPluginConf;
+      addFeature(*it, aPluginConf);
     }
   }
 }
