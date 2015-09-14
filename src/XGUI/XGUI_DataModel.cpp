@@ -162,20 +162,27 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       if (aDoc == aRootDoc) {  // If root objects
         int aRow = aRootDoc->size(aGroup);
         if (aGroup == aRootType) {
+          // Process root folder
           removeRow(aRow + aNbFolders);
+          rebuildBranch(aNbFolders, aRow);
         } else {
+          // Process root sub-folder
           int aFolderId = myXMLReader.rootFolderId(aGroup);
           if (aFolderId != -1) {
             QModelIndex aFolderIndex = createIndex(aFolderId, 0, -1);
             removeRow(aRow, aFolderIndex);
+            //rebuildBranch(0, aRow);
           }
         }
         // Check that some folders could erased
         QStringList aNotEmptyFolders = listOfShowNotEmptyFolders();
         foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
-          if ((aNotEmptyFolder.toStdString() == aGroup) && (aRootDoc->size(aGroup) == 0))
+          if ((aNotEmptyFolder.toStdString() == aGroup) && (aRootDoc->size(aGroup) == 0)) {
             // Appears first object in folder which can not be shown empty
             removeRow(myXMLReader.rootFolderId(aGroup));
+            //rebuildBranch(0, aNbFolders + aDoc->size(myXMLReader.rootType()));
+            break;
+          }
         }
       } else {
         // Remove row for sub-document
@@ -186,20 +193,26 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           if (aGroup == aSubType) {
             // List of objects under document root
             removeRow(aRow + aNbSubFolders, aDocRoot);
+            rebuildBranch(aNbSubFolders, aRow, aDocRoot);
           } else {
             // List of objects under a folder
             int aFolderId = folderId(aGroup, aDoc.get());
             if (aFolderId != -1) {
-              removeRow(aRow, createIndex(aFolderId, 0, aDoc.get()));
+              QModelIndex aFolderRoot = createIndex(aFolderId, 0, aDoc.get());
+              removeRow(aRow, aFolderRoot);
+              //rebuildBranch(0, aRow, aFolderRoot);
             }
           }
           // Check that some folders could disappear
           QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
           int aSize = aDoc->size(aGroup);
           foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
-            if ((aNotEmptyFolder.toStdString() == aGroup) && (aSize == 0))
+            if ((aNotEmptyFolder.toStdString() == aGroup) && (aSize == 0)) {
               // Appears first object in folder which can not be shown empty
               removeRow(myXMLReader.subFolderId(aGroup), aDocRoot);
+              //rebuildBranch(0, aNbSubFolders + aDoc->size(myXMLReader.subType()), aDocRoot);
+              break;
+            }
           }
         } 
 #ifdef _DEBUG
@@ -228,11 +241,11 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     std::string aGroup = aUpdMsg->group();
 
     QModelIndex aParent;
-    int aSartId = 0;
+    int aStartId = 0;
     if (aDoc == aRootDoc) {
       // Update a group under root
       if (aGroup == myXMLReader.rootType()) // Update objects under root
-        aSartId = foldersCount();
+        aStartId = foldersCount();
       else // Update objects in folder under root 
         aParent = createIndex(folderId(aGroup), 0, -1);
     } else {
@@ -240,15 +253,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       if (aGroup == myXMLReader.subType()) {
         // Update sub-document root
         aParent = findDocumentRootIndex(aDoc.get());
-        aSartId = foldersCount(aDoc.get());
+        aStartId = foldersCount(aDoc.get());
       } else 
         // update folder in sub-document
         aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
     }
     int aChildNb = rowCount(aParent);
-    // Rebuild all indexes
-    removeRows(aSartId, aChildNb - aSartId, aParent);
-    insertRows(aSartId, aChildNb - aSartId, aParent);
+    rebuildBranch(aStartId, aChildNb - aStartId);
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
     if (aDoc != aRootDoc) {
@@ -894,4 +905,13 @@ int XGUI_DataModel::folderId(std::string theType, ModelAPI_Document* theDoc)
     }
   }
   return aRes;
+}
+
+//******************************************************
+void XGUI_DataModel::rebuildBranch(int theRow, int theCount, const QModelIndex& theParent)
+{
+  if (theCount > 0) {
+    removeRows(theRow, theCount, theParent);
+    insertRows(theRow, theCount, theParent);
+  }
 }

@@ -132,6 +132,13 @@ private:
   /// \param theDoc a document which contains this folder
   int folderId(std::string theType, ModelAPI_Document* theDoc = 0);
 
+  /// Removes a row from branch of tree
+  /// \param theStart - start row to update indexes
+  /// \param theSize - number of indexes in the folder
+  /// \param theParent - index of parent folder
+  void rebuildBranch(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
+
+
   /// Returns list of folders types which can not be shown empty
   /// \param fromRoot - root document flag
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
