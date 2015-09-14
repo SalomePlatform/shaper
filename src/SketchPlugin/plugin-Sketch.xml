@@ -327,7 +327,8 @@
         <sketch-2dpoint_selector
             id="MultiRotationCenter"
             title="Center of rotation"
-            tooltip="Center of rotation"/>
+            tooltip="Center of rotation"
+            default="0"/>
         <point2dangle id="MultiRotationAngle"
                          first_point="MultiRotationCenter"
                          label="Angle"
