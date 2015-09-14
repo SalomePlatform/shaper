@@ -209,7 +209,7 @@ bool SketchSolver_Group::changeConstraint(
   if (myWorkplaneID == SLVS_E_UNKNOWN)
     return false;
 
-  if (!theConstraint)
+  if (!theConstraint || !theConstraint->data())
     return false;
 
   if (!checkFeatureValidity(theConstraint))
@@ -298,6 +298,34 @@ bool SketchSolver_Group::changeConstraint(
     myFeatureStorage = FeatureStoragePtr(new SketchSolver_FeatureStorage);
   myFeatureStorage->changeConstraint(theConstraint);
 
+  // Check the attributes of constraint are given by parametric expression
+  std::list<AttributePtr> anAttributes =
+      theConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+  std::list<AttributePtr>::iterator anAttrIt = anAttributes.begin();
+  for (; anAttrIt != anAttributes.end(); ++anAttrIt) {
+    AttributeRefAttrPtr aRefAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
+    if (!aRefAttr || aRefAttr->isObject())
+      continue;
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+    if (!aPoint || (aPoint->textX().empty() && aPoint->textY().empty()))
+      continue;
+
+    std::map<AttributePtr, SolverConstraintPtr>::iterator aFound =
+        myParametricConstraints.find(aRefAttr->attr());
+    if (aFound == myParametricConstraints.end()) {
+      SolverConstraintPtr aConstraint =
+          SketchSolver_Builder::getInstance()->createParametricConstraint(aRefAttr->attr());
+      if (!aConstraint)
+        continue;
+      aConstraint->setGroup(this);
+      aConstraint->setStorage(myStorage);
+      myParametricConstraints[aRefAttr->attr()] = aConstraint;
+    } else
+      aFound->second->update();
+  }
+
   return true;
 }
 
@@ -344,6 +372,20 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
 
     aSolConIter->second->addFeature(theFeature);
     myChangedConstraints.insert(aSolConIter->first);
+  }
+
+  // Search attributes of the feature in the set of parametric constraints and update them
+  std::list<AttributePtr> anAttrList =
+      theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+  std::list<AttributePtr>::iterator anAttrIt = anAttrList.begin();
+  for (; anAttrIt != anAttrList.end(); ++anAttrIt) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
+    if (!aRefAttr || aRefAttr->isObject())
+      continue;
+    std::map<AttributePtr, SolverConstraintPtr>::iterator aFound =
+        myParametricConstraints.find(aRefAttr->attr());
+    if (aFound != myParametricConstraints.end())
+      aFound->second->update();
   }
   return true;
 }
@@ -525,8 +567,13 @@ bool SketchSolver_Group::resolveConstraints()
     }
     if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
       myFeatureStorage->blockEvents(true);
+      // First refresh parametric constraints to satisfy parameters
+      std::map<AttributePtr, SolverConstraintPtr>::iterator aParIter = myParametricConstraints.begin();
+      for (; aParIter != myParametricConstraints.end(); ++aParIter)
+        aParIter->second->refresh();
+      // Update all other constraints
       ConstraintConstraintMap::iterator aConstrIter = myConstraints.begin();
-      for (; aConstrIter != myConstraints.end(); aConstrIter++)
+      for (; aConstrIter != myConstraints.end(); ++aConstrIter)
         aConstrIter->second->refresh();
       myFeatureStorage->blockEvents(false);
       if (!myPrevSolved) {

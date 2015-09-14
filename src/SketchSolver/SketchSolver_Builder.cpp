@@ -18,6 +18,7 @@
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_ConstraintMultiTranslation.h>
 #include <SketchSolver_ConstraintMovement.h>
+#include <SketchSolver_ConstraintParametric.h>
 #include <SketchSolver_Error.h>
 
 #include <GeomAPI_Edge.h>
@@ -149,6 +150,11 @@ SolverConstraintPtr SketchSolver_Builder::createMovementConstraint(FeaturePtr th
   if (!aData || !aData->isValid())
     return SolverConstraintPtr();
   return SolverConstraintPtr(new SketchSolver_ConstraintMovement(theFixedFeature));
+}
+
+SolverConstraintPtr SketchSolver_Builder::createParametricConstraint(AttributePtr theAttribute)
+{
+  return SolverConstraintPtr(new SketchSolver_ConstraintParametric(theAttribute));
 }
 
 

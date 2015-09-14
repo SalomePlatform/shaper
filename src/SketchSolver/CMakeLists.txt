@@ -21,6 +21,7 @@ SET(PROJECT_HEADERS
     SketchSolver_ConstraintMultiRotation.h
     SketchSolver_ConstraintMultiTranslation.h
     SketchSolver_ConstraintMovement.h
+    SketchSolver_ConstraintParametric.h
     SketchSolver_Builder.h
     SketchSolver_Group.h
     SketchSolver_ConstraintManager.h
@@ -43,6 +44,7 @@ SET(PROJECT_SOURCES
     SketchSolver_ConstraintMulti.cpp
     SketchSolver_ConstraintMultiRotation.cpp
     SketchSolver_ConstraintMultiTranslation.cpp
+    SketchSolver_ConstraintParametric.cpp
     SketchSolver_ConstraintMovement.cpp
     SketchSolver_Builder.cpp
     SketchSolver_Group.cpp

@@ -175,6 +175,7 @@ private:
   CompositeFeaturePtr mySketch; ///< Sketch is equivalent to workplane
   ConstraintConstraintMap myConstraints; ///< List of constraints
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
+  std::map<AttributePtr, SolverConstraintPtr> myParametricConstraints; ///< List of parametric constraints
   std::set<ConstraintPtr> myChangedConstraints; ///< List of just updated constraints
 
   StoragePtr myStorage; ///< Container for the set of SolveSpace constraints and their entities
