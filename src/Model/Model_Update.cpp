@@ -217,6 +217,7 @@ void Model_Update::iterateUpdateBreak(std::shared_ptr<ModelAPI_Feature> theFeatu
 void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
 {
   if (theFinish) {
+    /*
     // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
     std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
     for(aFIter = myWaitForFinish.begin(); aFIter != myWaitForFinish.end(); aFIter++)
@@ -234,7 +235,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
           }
         }
       }
-    }
+    }*/
   }
   // perform update of everything if needed
   if (!myIsExecuted) {
@@ -298,7 +299,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     if (!iterateUpdate(aCompos))
       return; // iteration was interrupted, so, interrupt the update of this feature (it will be done later)
     // reupdate arguments of composite feature: it may be changed during subs execution
-    if (theFeature->data()->execState() != ModelAPI_StateMustBeUpdated)
+
+    // issue 955: extrusion fuse sketch naming must be updated after the sketch update 
+    // so, comment this: if (theFeature->data()->execState() != ModelAPI_StateMustBeUpdated)
       updateArguments(theFeature);
   }
   // this checking must be after the composite feature sub-elements processing:
