@@ -38,12 +38,14 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.startOperation()
 anExtrusionSketchFt.string("CreationMethod").setValue("BySizes")
 anExtrusionSketchFt.real("to_size").setValue(10)
 anExtrusionSketchFt.real("from_size").setValue(10)
 anExtrusionSketchFt.real("to_offset").setValue(0) #TODO: remove
 anExtrusionSketchFt.real("from_offset").setValue(0) #TODO: remove
 anExtrusionSketchFt.execute()
+aSession.finishOperation()
 aSession.finishOperation()
 
 #=========================================================================
@@ -102,6 +104,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.startOperation()
 anExtrusionSketchFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 anExtrusionSketchFt.real("to_size").setValue(0) #TODO: remove
 anExtrusionSketchFt.real("from_size").setValue(0) #TODO: remove
@@ -110,6 +113,7 @@ anExtrusionSketchFt.real("to_offset").setValue(0)
 anExtrusionSketchFt.selection("from_object").setValue(aFromResult, aFromShape)
 anExtrusionSketchFt.real("from_offset").setValue(0)
 anExtrusionSketchFt.execute()
+aSession.finishOperation()
 aSession.finishOperation()
 
 #=========================================================================

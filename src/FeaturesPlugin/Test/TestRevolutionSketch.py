@@ -62,6 +62,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.startOperation()
 anRevolutionSketchFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 anRevolutionSketchFt.string("CreationMethod").setValue("ByAngles")
 anRevolutionSketchFt.real("to_angle").setValue(50)
@@ -69,6 +70,7 @@ anRevolutionSketchFt.real("from_angle").setValue(50)
 anRevolutionSketchFt.real("to_offset").setValue(0) #TODO: remove
 anRevolutionSketchFt.real("from_offset").setValue(0) #TODO: remove
 anRevolutionSketchFt.execute()
+aSession.finishOperation()
 aSession.finishOperation()
 
 #=========================================================================
@@ -128,6 +130,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.startOperation()
 anRevolutionSketchFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 anRevolutionSketchFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 anRevolutionSketchFt.real("to_angle").setValue(0) #TODO: remove
@@ -137,6 +140,7 @@ anRevolutionSketchFt.real("to_offset").setValue(0)
 anRevolutionSketchFt.selection("from_object").setValue(aFromResult, aFromShape)
 anRevolutionSketchFt.real("from_offset").setValue(0)
 anRevolutionSketchFt.execute()
+aSession.finishOperation()
 aSession.finishOperation()
 
 #=========================================================================

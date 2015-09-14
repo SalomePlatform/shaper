@@ -149,6 +149,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.startOperation()
 anRevolutionFuseFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 anRevolutionFuseFt.string("CreationMethod").setValue("ByAngles")
 anRevolutionFuseFt.real("to_angle").setValue(50)
@@ -157,6 +158,7 @@ anRevolutionFuseFt.real("to_offset").setValue(0) #TODO: remove
 anRevolutionFuseFt.real("from_offset").setValue(0) #TODO: remove
 anRevolutionFuseFt.selectionList("boolean_objects").append(anExtrusionResult, anExtrusionResult.shape())
 anRevolutionFuseFt.execute()
+aSession.finishOperation()
 aSession.finishOperation()
 
 #=========================================================================

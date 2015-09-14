@@ -121,6 +121,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.startOperation()
 anExtrusionCutFt.string("CreationMethod").setValue("BySizes")
 anExtrusionCutFt.real("to_size").setValue(10)
 anExtrusionCutFt.real("from_size").setValue(10)
@@ -128,6 +129,7 @@ anExtrusionCutFt.real("to_offset").setValue(0) #TODO: remove
 anExtrusionCutFt.real("from_offset").setValue(0) #TODO: remove
 anExtrusionCutFt.selectionList("boolean_objects").append(anExtrusionResult, anExtrusionResult.shape())
 anExtrusionCutFt.execute()
+aSession.finishOperation()
 aSession.finishOperation()
 
 #=========================================================================
