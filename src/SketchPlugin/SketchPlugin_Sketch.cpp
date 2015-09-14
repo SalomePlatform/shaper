@@ -9,11 +9,8 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
-#include <GeomAPI_AISObject.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_PlanarEdges.h>
-
-#include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_PointBuilder.h>
