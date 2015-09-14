@@ -217,7 +217,6 @@ void Model_Update::iterateUpdateBreak(std::shared_ptr<ModelAPI_Feature> theFeatu
 void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
 {
   if (theFinish) {
-    /*
     // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
     std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
     for(aFIter = myWaitForFinish.begin(); aFIter != myWaitForFinish.end(); aFIter++)
@@ -235,7 +234,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
           }
         }
       }
-    }*/
+    }
   }
   // perform update of everything if needed
   if (!myIsExecuted) {
