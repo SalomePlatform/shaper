@@ -147,11 +147,12 @@ Slvs_hEntity SketchSolver_Group::getFeatureId(FeaturePtr theFeature) const
   Slvs_hEntity aResult = SLVS_E_UNKNOWN;
   if (!myFeatureStorage)
     return aResult;
+  // Obtain regular constraints interacting with the feature and find its ID
   std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theFeature);
   if (aConstraints.empty())
     return aResult;
   std::set<ConstraintPtr>::iterator aConstrIter = aConstraints.begin();
-  for (; aConstrIter != aConstraints.end(); aConstrIter++) {
+  for (; aConstrIter != aConstraints.end(); ++aConstrIter) {
     ConstraintConstraintMap::const_iterator aCIter = myConstraints.find(*aConstrIter);
     if (aCIter == myConstraints.end())
       continue;
@@ -159,7 +160,11 @@ Slvs_hEntity SketchSolver_Group::getFeatureId(FeaturePtr theFeature) const
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
   }
-  return SLVS_E_UNKNOWN;
+  // The feature is not found, check it in the temporary constraints
+  std::set<SolverConstraintPtr>::iterator aTmpCIter = myTempConstraints.begin();
+  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
+    aResult = (*aTmpCIter)->getId(theFeature);
+  return aResult;
 }
 
 // ============================================================================
@@ -172,6 +177,7 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
   Slvs_hEntity aResult = SLVS_E_UNKNOWN;
   if (!myFeatureStorage)
     return aResult;
+  // Obtain regular constraints interacting with the attribute and find its ID
   std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theAttribute);
   if (aConstraints.empty())
     return aResult;
@@ -184,7 +190,11 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
   }
-  return SLVS_E_UNKNOWN;
+  // The attribute is not found, check it in the temporary constraints
+  std::set<SolverConstraintPtr>::iterator aTmpCIter = myTempConstraints.begin();
+  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
+    aResult = (*aTmpCIter)->getId(theAttribute);
+  return aResult;
 }
 
 // ============================================================================
