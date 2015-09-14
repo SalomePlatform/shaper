@@ -115,7 +115,7 @@ void ModuleBase_ModelWidget::activate()
       if (isComputedDefault()) {
         if (myFeature->compute(myAttributeID)) {
           restoreValue();
-        }      
+        }
       }
       else {
         storeValue();
@@ -180,7 +180,7 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
     if (getControls().contains(aWidget)) {
       emit focusInWidget(this);
     }
-  } 
+  }
   // pass the event on to the parent class
 
   return QObject::eventFilter(theObject, theEvent);

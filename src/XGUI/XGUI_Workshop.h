@@ -149,7 +149,7 @@ Q_OBJECT
     return myViewerProxy;
   }
 
-  /// Returns the module connectory
+  /// Returns the module connector
   /// \returns the instance of connector
   XGUI_ModuleConnector* moduleConnector() const
   {
@@ -190,7 +190,7 @@ Q_OBJECT
   //! Show the given features in 3d Viewer
   void showOnlyObjects(const QObjectPtrList& theList);
 
-  /// Set display mode for the given onjects
+  /// Set display mode for the given objects
   /// \param theList a list of displayed objects
   /// \param theMode a mode to set (see \ref XGUI_Displayer)
   void setDisplayMode(const QObjectPtrList& theList, int theMode);
@@ -201,10 +201,10 @@ Q_OBJECT
     return myModule;
   }
 
-  /// Returns current directory whic contains data files
+  /// Returns current directory which contains data files
   QString currentDataDir() const { return myCurrentDir; }
 
-  /// Returns current directory whic contains data files
+  /// Returns current directory which contains data files
   void setCurrentDataDir(const QString& theDir) { myCurrentDir = theDir; }
 
   /**
@@ -215,7 +215,7 @@ Q_OBJECT
   void saveDocument(const QString& theName, std::list<std::string>& theFileNames);
 
   /**
-   * If there is an active (uncommited) operation shows a prompt to abort it
+   * If there is an active (uncommitted) operation shows a prompt to abort it
    * and performs abortion if user agreed. Returns true if
    * - operation aborted successfully
    * - there is no active operation
@@ -249,7 +249,7 @@ signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
 
-  /// Emitted when error in applivation happens
+  /// Emitted when error in application happens
   void errorOccurred(const QString&);
 
   //! the signal about the workshop actions states are updated.
@@ -271,7 +271,7 @@ signals:
   /// update history list (undo/redo commands)
   void updateHistory();
 
-  /// Create a new dokument
+  /// Create a new document
   void onNew();
 
   /// Open document from file
@@ -314,7 +314,7 @@ signals:
   void closeDocument();
 
  protected:
-  /// Sets the granted operations for the parameter operation. Firtsly, it finds the nested features
+  /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
   /// and set them into the operation. Secondly, it asks the module about ids of granted operations.
   /// \param theOperation an operation
    void setGrantedFeatures(ModuleBase_Operation* theOperation);
@@ -328,7 +328,7 @@ private:
   /// Display all results
   //void displayAllResults();
 
-  /// Displau results from document
+  /// Display results from document
   /// \param theDoc a document
   void displayDocumentResults(DocumentPtr theDoc);
 
@@ -347,12 +347,12 @@ private:
   virtual void onOperationResumed(ModuleBase_Operation* theOperation);
 
   /// SLOT, that is called after the operation is stopped. Update workshop state, e.g.
-  /// hides the property panel and udpate the command status.
+  /// hides the property panel and update the command status.
   /// \param theOpertion a stopped operation
   virtual void onOperationStopped(ModuleBase_Operation* theOperation);
 
   /// SLOT, that is called after the operation is committed.
-  /// \param theOpertion a commmitted operation
+  /// \param theOpertion a committed operation
   virtual void onOperationCommitted(ModuleBase_Operation* theOperation);
 
   /// SLOT, that is called after the operation is aborted.
@@ -368,7 +368,7 @@ private:
   void onStartWaiting();
 
   /// Called by Ok button clicked in the property panel. Asks the error manager whether
-  /// the operation can be commited and do it if it returns true.
+  /// the operation can be committed and do it if it returns true.
   void onAcceptActionClicked();
 
   /// Listens the corresponded signal from operation manager and send it with the Ok

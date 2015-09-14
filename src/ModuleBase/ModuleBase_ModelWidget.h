@@ -215,13 +215,13 @@ protected slots:
  protected:
 
   /// The attribute name of the model feature
-  std::string myAttributeID; 
+  std::string myAttributeID;
 
   /// Name of parent
-  std::string myParentId;    
+  std::string myParentId;
 
   /// A feature which is processing by active operation
-  FeaturePtr myFeature;      
+  FeaturePtr myFeature;
 
   /// Flag which shows that current operation is in editing mode
   bool myIsEditing; 
@@ -232,10 +232,10 @@ protected slots:
 
 private:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
-  bool myIsComputedDefault; 
-                        
+  bool myIsComputedDefault;
+
   /// the default value, which is defined in the XML for this attribute    
-  std::string myDefaultValue; 
+  std::string myDefaultValue;
 
   /// the reset state. If it is false, the reset method of the widget is not performed
   bool myUseReset;

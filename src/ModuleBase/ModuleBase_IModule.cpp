@@ -115,7 +115,7 @@ ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& the
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                           (getNewOperation(theFeatureId));
-  // If the operation is launched as sub-operation of another then we have to initialise
+  // If the operation is launched as sub-operation of another then we have to initialize
   // parent feature
   ModuleBase_OperationFeature* aCurOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                          (myWorkshop->currentOperation());

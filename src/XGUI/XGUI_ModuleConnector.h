@@ -17,7 +17,7 @@ class XGUI_Displayer;
 
 /**
  * \ingroup GUI
- * Implementation of IWorkshop interface which provides access to Workshop sevices at module level
+ * Implementation of IWorkshop interface which provides access to Workshop services at module level
  */
 class XGUI_EXPORT XGUI_ModuleConnector : public ModuleBase_IWorkshop
 {
@@ -71,7 +71,7 @@ Q_OBJECT
   //! \param theId an aborted operation
   void abortOperation(ModuleBase_Operation* theOperation);
 
-  //! Returns AIS opbject by data object
+  //! Returns AIS object by data object
   virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const;
 
   //! Returns data object by AIS

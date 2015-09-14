@@ -35,7 +35,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
  public:
 
    /// Constructor
-   /// \param theParent instance of workshop intrface
+   /// \param theParent instance of workshop interface
    ModuleBase_IModule(ModuleBase_IWorkshop* theParent);
 
   virtual ~ModuleBase_IModule() {}
@@ -82,13 +82,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theOperation a started operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
-  /// Add menu atems for viewer into the given menu
+  /// Add menu items for viewer into the given menu
   /// \param theMenu a popup menu to be shown in the viewer
   /// \param theStdActions a map of standard actions
   /// \return true if items are added and there is no necessity to provide standard menu
   virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const { return false; }
 
-  /// Add menu atems for object browser into the given menu
+  /// Add menu items for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const {};
 
@@ -98,7 +98,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Creates custom widgets for property panel
   /// \param theType a type of widget
   /// \param theParent the parent object
-  /// \param theWidgetApi the widget configuation. The attribute of the model widget is obtained from
+  /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   /// \param theModelWidgets list of widget objects
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
@@ -120,10 +120,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! Returns True if there are available Redos and there is not an active operation
   virtual bool canRedo() const;
 
-  /// Returnas true if the action can be applyed to the object
+  /// Returns true if the action can be applyed to the object
   /// \param theObject a checked object
   /// \param theActionId an identifier of action, to be found in the menu manager like "DELETE_CMD"
-  /// \return the a booean result
+  /// \return the a boolean result
   virtual bool canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const = 0;
 
   /// Returns True if the current operation can be committed. By default it is true.
@@ -166,12 +166,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   * If the object is result with the color attribute value set, it is used,
   * otherwise the customize is applyed to the object's feature if it is a custom prs
   * \param theObject an object instance
-  * \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  * \param theUpdateViewer the parameter whether the viewer should be update immediately
   * \returns true if the object is modified
   */
   virtual bool customizeObject(ObjectPtr theObject, const bool theUpdateViewer);
 
-  /// This method is called on object browser creation for customisation of module specific features
+  /// This method is called on object browser creation for customization of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser) {}
 
@@ -208,7 +208,7 @@ public slots:
   /// Called on call of command corresponded to a feature
   virtual void onFeatureTriggered();
 
-  /// Slolt called on object display
+  /// Slot called on object display
   /// \param theObject a data object
   /// \param theAIS a presentation object
   virtual void onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) {}

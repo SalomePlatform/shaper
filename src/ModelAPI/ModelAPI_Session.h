@@ -47,7 +47,7 @@ class MODELAPI_EXPORT ModelAPI_Session
   //! Starts a new operation (opens a transaction)
   //! \param theId of operation for history (optional)
   //! \param theAttachedToNested if it is true, it means that this transaction is attached to the nested 
-  //!          where it is located and will be commited on the next commit with the nested
+  //!          where it is located and will be committed on the next commit with the nested
   virtual void startOperation(
     const std::string& theId = "", const bool theAttachedToNested = false) = 0;
   //! Finishes the previously started operation (closes the transaction)

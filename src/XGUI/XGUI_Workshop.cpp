@@ -591,7 +591,7 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
     aWidget->setFeature(aFOperation->feature(), isStoreValue);
     aWidget->enableFocusProcessing();
   }
-  
+
   myPropertyPanel->setModelWidgets(aWidgets);
   aFOperation->setPropertyPanel(myPropertyPanel);
 
