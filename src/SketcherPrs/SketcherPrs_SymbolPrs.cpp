@@ -392,6 +392,11 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
 
 void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace) const
 {
+  // do not update presentation for invalid or already removed objects: the presentation
+  // should be removed soon
+  if (!myConstraint->data().get() || !myConstraint->data()->isValid())
+    return;
+
   const OpenGl_AspectMarker* anAspectMarker = theWorkspace->AspectMarker(Standard_True);
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
   Handle(OpenGl_View) aView = theWorkspace->ActiveView();
