@@ -179,8 +179,6 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
     return aResult;
   // Obtain regular constraints interacting with the attribute and find its ID
   std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theAttribute);
-  if (aConstraints.empty())
-    return aResult;
   std::set<ConstraintPtr>::iterator aConstrIter = aConstraints.begin();
   for (; aConstrIter != aConstraints.end(); aConstrIter++) {
     ConstraintConstraintMap::const_iterator aCIter = myConstraints.find(*aConstrIter);
@@ -191,9 +189,14 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
       return aResult;
   }
   // The attribute is not found, check it in the temporary constraints
-  std::set<SolverConstraintPtr>::iterator aTmpCIter = myTempConstraints.begin();
+  std::set<SolverConstraintPtr>::const_iterator aTmpCIter = myTempConstraints.begin();
   for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
     aResult = (*aTmpCIter)->getId(theAttribute);
+  // Last chance to find attribute in parametric constraints
+  std::map<AttributePtr, SolverConstraintPtr>::const_iterator aParIter =
+      myParametricConstraints.find(theAttribute);
+  if (aParIter != myParametricConstraints.end())
+    aResult = aParIter->second->getId(theAttribute);
   return aResult;
 }
 
@@ -376,16 +379,27 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
 
   // Search attributes of the feature in the set of parametric constraints and update them
   std::list<AttributePtr> anAttrList =
-      theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+      theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
   std::list<AttributePtr>::iterator anAttrIt = anAttrList.begin();
   for (; anAttrIt != anAttrList.end(); ++anAttrIt) {
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
-    if (!aRefAttr || aRefAttr->isObject())
-      continue;
     std::map<AttributePtr, SolverConstraintPtr>::iterator aFound =
-        myParametricConstraints.find(aRefAttr->attr());
+        myParametricConstraints.find(*anAttrIt);
     if (aFound != myParametricConstraints.end())
       aFound->second->update();
+    else {
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anAttrIt);
+      if (aPoint && (!aPoint->textX().empty() || !aPoint->textY().empty())) {
+        // Create new parametric constraint
+        SolverConstraintPtr aConstraint =
+            SketchSolver_Builder::getInstance()->createParametricConstraint(*anAttrIt);
+        if (!aConstraint)
+          continue;
+        aConstraint->setGroup(this);
+        aConstraint->setStorage(myStorage);
+        myParametricConstraints[*anAttrIt] = aConstraint;
+      }
+    }
   }
   return true;
 }
@@ -714,7 +728,11 @@ bool SketchSolver_Group::isConsistent()
 // ============================================================================
 void SketchSolver_Group::removeTemporaryConstraints()
 {
+  std::set<SolverConstraintPtr>::iterator aTmpIt = myTempConstraints.begin();
+  for (; aTmpIt != myTempConstraints.end(); ++aTmpIt)
+    (*aTmpIt)->remove();
   myTempConstraints.clear();
+
   while (myStorage->numberTemporary())
     myStorage->deleteTemporaryConstraint();
   // Clean lists of removed entities in the storage

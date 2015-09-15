@@ -45,6 +45,11 @@ protected:
   virtual void adjustConstraint();
 
 private:
+  /// \brief Create SolveSpace line with given coordinates
+  /// \return created line
+  Slvs_Entity createLine(double theStartX, double theStartY, double theEndX, double theEndY);
+
+private:
   AttributePtr myBaseAttribute; ///< attribute given by expression
   Slvs_hEntity myHorizLineID;   ///< identifier of horizontal line, containing the point
   Slvs_hEntity myVertLineID;    ///< identifier of vertical line, containing the point

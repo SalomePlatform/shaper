@@ -35,22 +35,15 @@ void SketchSolver_ConstraintParametric::process()
     return;
   if (!aPoint->textX().empty()) {
     // Create vertical line with fixed boundary point
-    Slvs_Param aParX = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), aPoint->x());
-    Slvs_Param aParY = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), -10000.0);
-    aParX.h = myStorage->addParameter(aParX);
-    aParY.h = myStorage->addParameter(aParY);
-    Slvs_Entity aStartPoint = Slvs_MakePoint2d(SLVS_E_UNKNOWN, myGroup->getId(),
-        myGroup->getWorkplaneId(), aParX.h, aParY.h);
-    aStartPoint.h = myStorage->addEntity(aStartPoint);
-    Slvs_Entity aLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
-        myGroup->getWorkplaneId(), aStartPoint.h, anAttrID);
-    aLine.h = myStorage->addEntity(aLine);
-
-    // Fix start point
-    fixPoint(aStartPoint.h);
-    // Add vertical constraint
-    Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
+    Slvs_Entity aLine = createLine(aPoint->x(), -100.0, aPoint->x(), 100.0);
+    fixPoint(aLine.point[0]);
+    Slvs_Constraint aVertConstr = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
         SLVS_C_VERTICAL, myGroup->getWorkplaneId(), 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
+        aLine.h, SLVS_E_UNKNOWN);
+    myStorage->addConstraint(aVertConstr);
+    // Place point on line
+    Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
+        SLVS_C_PT_ON_LINE, myGroup->getWorkplaneId(), 0.0, anAttrID, SLVS_E_UNKNOWN,
         aLine.h, SLVS_E_UNKNOWN);
     aConstraint.h = myStorage->addConstraint(aConstraint);
     mySlvsConstraints.push_back(aConstraint.h);
@@ -58,23 +51,16 @@ void SketchSolver_ConstraintParametric::process()
     myX = aPoint->x();
   }
   if (!aPoint->textY().empty()) {
-    // Create horizontal line with fixed boundary point
-    Slvs_Param aParX = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), -10000.0);
-    Slvs_Param aParY = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), aPoint->y());
-    aParX.h = myStorage->addParameter(aParX);
-    aParY.h = myStorage->addParameter(aParY);
-    Slvs_Entity aStartPoint = Slvs_MakePoint2d(SLVS_E_UNKNOWN, myGroup->getId(),
-        myGroup->getWorkplaneId(), aParX.h, aParY.h);
-    aStartPoint.h = myStorage->addEntity(aStartPoint);
-    Slvs_Entity aLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
-        myGroup->getWorkplaneId(), aStartPoint.h, anAttrID);
-    aLine.h = myStorage->addEntity(aLine);
-
-    // Fix start point
-    fixPoint(aStartPoint.h);
-    // Add horizontal constraint
-    Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
+    // Create horizontal line with fixed boundary points
+    Slvs_Entity aLine = createLine(-100.0, aPoint->y(), 100.0, aPoint->y());
+    fixPoint(aLine.point[0]);
+    Slvs_Constraint aHorizConstr = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
         SLVS_C_HORIZONTAL, myGroup->getWorkplaneId(), 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN,
+        aLine.h, SLVS_E_UNKNOWN);
+    myStorage->addConstraint(aHorizConstr);
+    // Place point on line
+    Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
+        SLVS_C_PT_ON_LINE, myGroup->getWorkplaneId(), 0.0, anAttrID, SLVS_E_UNKNOWN,
         aLine.h, SLVS_E_UNKNOWN);
     aConstraint.h = myStorage->addConstraint(aConstraint);
     mySlvsConstraints.push_back(aConstraint.h);
@@ -163,4 +149,33 @@ void SketchSolver_ConstraintParametric::adjustConstraint()
     myStorage->updateParameter(aParY);
     myY = aParY.val;
   }
+}
+
+
+Slvs_Entity SketchSolver_ConstraintParametric::createLine(
+    double theStartX, double theStartY, double theEndX, double theEndY)
+{
+  // Start point
+  Slvs_Param aParX = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), theStartX);
+  Slvs_Param aParY = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), theStartY);
+  aParX.h = myStorage->addParameter(aParX);
+  aParY.h = myStorage->addParameter(aParY);
+  Slvs_Entity aStartPoint = Slvs_MakePoint2d(SLVS_E_UNKNOWN, myGroup->getId(),
+    myGroup->getWorkplaneId(), aParX.h, aParY.h);
+  aStartPoint.h = myStorage->addEntity(aStartPoint);
+
+  // End point
+  aParX = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), theEndX);
+  aParY = Slvs_MakeParam(SLVS_E_UNKNOWN, myGroup->getId(), theEndY);
+  aParX.h = myStorage->addParameter(aParX);
+  aParY.h = myStorage->addParameter(aParY);
+  Slvs_Entity aEndPoint = Slvs_MakePoint2d(SLVS_E_UNKNOWN, myGroup->getId(),
+    myGroup->getWorkplaneId(), aParX.h, aParY.h);
+  aEndPoint.h = myStorage->addEntity(aEndPoint);
+
+  // Line
+  Slvs_Entity aLine = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroup->getId(),
+    myGroup->getWorkplaneId(), aStartPoint.h, aEndPoint.h);
+  aLine.h = myStorage->addEntity(aLine);
+  return aLine;
 }
