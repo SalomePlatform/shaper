@@ -304,9 +304,10 @@ void Model_Data::execState(const ModelAPI_ExecState theState)
   if (theState != ModelAPI_StateNothing) {
     if (stateArray(myLab)->Value(STATE_INDEX_STATE) != (int)theState) {
       stateArray(myLab)->SetValue(STATE_INDEX_STATE, (int)theState);
-      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED);
-      ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
     }
+    // send signal even if the new value corresponds to the one in data model: undo issue 980
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED);
+    ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
   }
 }
 
