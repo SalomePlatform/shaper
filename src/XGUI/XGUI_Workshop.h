@@ -245,6 +245,15 @@ Q_OBJECT
   /// \param theFeature a feature
   bool isFeatureOfNested(const FeaturePtr& theFeature);
 
+  /// Has to be called in order to display objects with visibility status = true
+  void synchronizeViewer();
+
+  /// Has to be called in order to display objects from a cpecifed group with visibility status = true
+  /// \param theDoc the document for objects synchronisation
+  /// \param theGroup the group name
+  /// \param theUpdateViewer update viewer flag
+  void synchronizeGroupInViewer(const DocumentPtr& theDoc, const std::string& theGroup, bool theUpdateViewer);
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();

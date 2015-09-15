@@ -275,6 +275,7 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
   if (!mySelector) {
     mySelector = createSelector(theMgr);
     myWorkshop->module()->activateSelectionFilters();
+    myWorkshop->synchronizeViewer();
   }
 }
 

@@ -1682,3 +1682,29 @@ QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>
   }
   return aResult;
 }
+
+void XGUI_Workshop::synchronizeViewer()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+
+  synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
+  synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
+  synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
+  synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+}
+
+void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc, 
+                                             const std::string& theGroup, 
+                                             bool theUpdateViewer)
+{
+  ObjectPtr aObj;
+  int aSize = theDoc->size(theGroup);
+  for (int i = 0; i < aSize; i++) {
+    aObj = theDoc->object(theGroup, i);
+    if (aObj->isDisplayed())
+      myDisplayer->display(aObj, false);
+  }
+  if (theUpdateViewer)
+    myDisplayer->updateViewer();
+}
