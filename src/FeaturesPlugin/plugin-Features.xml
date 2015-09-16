@@ -53,7 +53,7 @@
         <source path="placement_widget.xml"/>
       </feature>
       <feature id="Translation" title="Translation" tooltip="Perform translation of an objects along the axis to specified distance" icon=":icons/movement.png">
-        <source path="movement_widget.xml"/>
+        <source path="translation_widget.xml"/>
       </feature>
       <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon=":icons/rotation.png">
         <source path="rotation_widget.xml"/>

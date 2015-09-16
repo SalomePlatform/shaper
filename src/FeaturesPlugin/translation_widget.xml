@@ -21,7 +21,7 @@
     label="Distance"
     step="1.0"
     default="0"
-    icon=":icons/radius.png"
+    icon=":icons/dimension_v.png"
     tooltip="Distance">
   </doublevalue>
 </source>

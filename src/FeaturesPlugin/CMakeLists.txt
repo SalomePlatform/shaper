@@ -59,7 +59,7 @@ SET(XML_RESOURCES
   revolutioncut_widget.xml
   revolutionfuse_widget.xml
   rotation_widget.xml
-  movement_widget.xml
+  translation_widget.xml
   boolean_widget.xml
   group_widget.xml
   partition_widget.xml
