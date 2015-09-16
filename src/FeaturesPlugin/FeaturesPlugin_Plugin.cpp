@@ -16,6 +16,7 @@
 #include <FeaturesPlugin_RevolutionCut.h>
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
+#include <FeaturesPlugin_ValidatorTransform.h>
 
 #include <ModelAPI_Session.h>
 
@@ -30,6 +31,11 @@ static FeaturesPlugin_Plugin* MY_FEATURES_INSTANCE = new FeaturesPlugin_Plugin()
 
 FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  aFactory->registerValidator("FeaturesPlugin_ValidatorTransform",
+                              new FeaturesPlugin_ValidatorTransform);  
+
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
 }

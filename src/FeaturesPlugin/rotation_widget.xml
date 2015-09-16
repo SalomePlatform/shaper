@@ -8,6 +8,7 @@
     type_choice=""
     use_choice="false"
     concealment="true">
+    <validator id="FeaturesPlugin_ValidatorTransform"/>
   </multi_selector>
   <shape_selector id="axis_object"
                   icon=":icons/axis.png"

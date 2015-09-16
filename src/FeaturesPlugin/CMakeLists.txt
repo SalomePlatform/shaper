@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_RevolutionBoolean.h
     FeaturesPlugin_RevolutionCut.h
     FeaturesPlugin_RevolutionFuse.h
+    FeaturesPlugin_ValidatorTransform.h
 )
 
 SET(PROJECT_SOURCES
@@ -46,6 +47,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_RevolutionBoolean.cpp
     FeaturesPlugin_RevolutionCut.cpp
     FeaturesPlugin_RevolutionFuse.cpp
+    FeaturesPlugin_ValidatorTransform.cpp
 )
 
 SET(XML_RESOURCES
