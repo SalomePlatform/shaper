@@ -339,6 +339,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           setPoint(aX, aY);
         }
         else {
+          if (getPoint2d(aView, aShape, aX, aY))
+            setPoint(aX, aY);
           setConstraintWith(aObject);
           emit vertexSelected();
           emit focusOutWidget(this);
@@ -357,8 +359,10 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         // do not set a coincidence constraint in the attribute if the feature contains a point
         // with the same coordinates. It is important for line creation in order to do not set
         // the same constraints for the same points, oterwise the result line has zero length.
-        if (getPoint2d(aView, aShape, aX, aY))
+        if (getPoint2d(aView, aShape, aX, aY)) {
+          setPoint(aX, aY);
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
+        }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
           if (MyFeaturesForCoincedence.contains(myFeature->getKind().c_str()))
             setConstraintWith(aObject);
