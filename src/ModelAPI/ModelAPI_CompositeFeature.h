@@ -39,6 +39,10 @@ public:
   /// This method to inform that sub-feature is removed and must be removed from the internal data
   /// structures of the owner (the remove from the document will be done outside just after)
   virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+
+  /// Exchanges IDs of two given features: needed for more correct naming in some cases (issue 769)
+  MODELAPI_EXPORT virtual void exchangeIDs(std::shared_ptr<ModelAPI_Feature> theFeature1,
+    std::shared_ptr<ModelAPI_Feature> theFeature2);
 };
 
 //! Pointer on the composite feature object

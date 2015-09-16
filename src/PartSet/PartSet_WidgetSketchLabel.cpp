@@ -337,6 +337,7 @@ void PartSet_WidgetSketchLabel::showPreviewPlanes()
     // Create Preview
     std::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
     std::shared_ptr<GeomAPI_Dir> aYZDir(new GeomAPI_Dir(1, 0, 0));
+    // -1, not 1 for correct internal sketch coords (issue 898)
     std::shared_ptr<GeomAPI_Dir> aXZDir(new GeomAPI_Dir(0, -1, 0));
     std::shared_ptr<GeomAPI_Dir> aXYDir(new GeomAPI_Dir(0, 0, 1));
 

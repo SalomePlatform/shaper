@@ -319,3 +319,9 @@ std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::plane(SketchPlugin_Sketch* the
 
   return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(anOrigin->pnt(), aDirX->dir(), aNorm->dir()));
 }
+
+void SketchPlugin_Sketch::exchangeIDs(
+  std::shared_ptr<ModelAPI_Feature> theFeature1, std::shared_ptr<ModelAPI_Feature> theFeature2)
+{
+  reflist(SketchPlugin_Sketch::FEATURES_ID())->exchange(theFeature1, theFeature2);
+}

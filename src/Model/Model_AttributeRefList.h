@@ -50,6 +50,9 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   /// Substitutes the feature by another one. Does nothing if such object is not found.
   MODEL_EXPORT virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew);
 
+  /// Substitutes the object by another one and back. So, features wil become exchanged in the list
+  MODEL_EXPORT virtual void exchange(const ObjectPtr& theObject1, const ObjectPtr& theObject2);
+
   /// Removes the last element in the list.
   MODEL_EXPORT virtual void removeLast();
 

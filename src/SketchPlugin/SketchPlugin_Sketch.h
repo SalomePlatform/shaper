@@ -196,6 +196,11 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
 
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
+  /// Exchanges IDs of two given features: needed for fillet feature better naming (issue 769)
+  SKETCHPLUGIN_EXPORT virtual void exchangeIDs(std::shared_ptr<ModelAPI_Feature> theFeature1,
+    std::shared_ptr<ModelAPI_Feature> theFeature2);
+
+
   /// \brief Create a result for the point in the attribute if the attribute is initialized
   /// \param theAttributeID an attribute string
   /// \param theIndex an index of the result

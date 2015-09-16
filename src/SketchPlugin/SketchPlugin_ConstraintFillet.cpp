@@ -316,6 +316,9 @@ void SketchPlugin_ConstraintFillet::execute()
     myBaseObjects.clear();
     myBaseObjects.push_back(aFeatureA);
     myBaseObjects.push_back(aFeatureB);
+    // exchange the naming IDs of newly created and old line that become auxiliary
+    sketch()->exchangeIDs(aFeatureA, aNewFeatureA);
+    sketch()->exchangeIDs(aFeatureB, aNewFeatureB);
   } else {
     // Update radius value
     int aNbSubs = sketch()->numberOfSubs();

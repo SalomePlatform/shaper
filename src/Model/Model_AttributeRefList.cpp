@@ -164,6 +164,37 @@ void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const Objec
   }
 }
 
+void Model_AttributeRefList::exchange(const ObjectPtr& theObject1, const ObjectPtr& theObject2)
+{
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
+  if (aDoc) {
+    std::shared_ptr<Model_Data> aData1 = std::dynamic_pointer_cast<Model_Data>(theObject1->data());
+    if (aData1.get() && aData1->isValid()) {
+      TDF_Label aLab1 = aData1->label().Father();
+      if (theObject2.get() && theObject2->data()->isValid()) { // the new may be null
+        std::shared_ptr<Model_Data> aData2 = 
+          std::dynamic_pointer_cast<Model_Data>(theObject2->data());
+        if (aData2.get() && aData2->isValid()) {
+          TDF_Label aLab2 = aData2->label().Father();
+          // do the substitution: use the temporary label, as usually in exchange
+          TDF_Label aTmpLab = aLab1.Root();
+          if (myRef->InsertAfter(aTmpLab, aLab1)) {
+            myRef->Remove(aLab1);
+          }
+          if (myRef->InsertAfter(aLab1, aLab2)) {
+            myRef->Remove(aLab2);
+          }
+          if (myRef->InsertAfter(aLab2, aTmpLab)) {
+            myRef->Remove(aTmpLab);
+          }
+          owner()->data()->sendAttributeUpdated(this);
+        }
+      }
+    }
+  }
+}
+
 void Model_AttributeRefList::removeLast()
 {
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(

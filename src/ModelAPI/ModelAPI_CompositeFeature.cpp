@@ -10,3 +10,9 @@ ModelAPI_CompositeFeature::~ModelAPI_CompositeFeature()
 {
 
 }
+
+void ModelAPI_CompositeFeature::exchangeIDs(
+  std::shared_ptr<ModelAPI_Feature> theFeature1, std::shared_ptr<ModelAPI_Feature> theFeature2)
+{
+  // by default nothing is in the implementation
+}
