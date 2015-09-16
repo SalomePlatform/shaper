@@ -23,6 +23,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 #include <GeomValidators_Tools.h>
 
@@ -171,6 +172,22 @@ void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
   if (theObject.get()) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get()) {
+      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
+      if (aCompsolidResult.get()) {
+        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+          ResultPtr aSubResult = aCompsolidResult->subResult(i);
+          if (aSubResult.get()) {
+            GeomShapePtr aShape;
+            addValue(aSubResult, aShape, theFeature, theObjectShapes);
+          }
+        }
+        return;
+      }
+    }
+
+
     GeomShapePtr aShape = theShape;
     if (!aShape.get()) {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
