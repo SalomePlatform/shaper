@@ -216,6 +216,7 @@ void Model_Update::iterateUpdateBreak(std::shared_ptr<ModelAPI_Feature> theFeatu
 
 void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
 {
+  /* cancel hardcode due to issue 948
   if (theFinish) {
     // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
     std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
@@ -235,7 +236,7 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
         }
       }
     }
-  }
+  } */
   // perform update of everything if needed
   if (!myIsExecuted) {
     #ifdef DEB_UPDATE
@@ -273,6 +274,11 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
 
   if (theFeature->isDisabled())
     return;
+
+  // to optimize with NDS: how to update sketch state if sketch is not executed on apply of sub-element
+  //CompositeFeaturePtr aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  //if (aMain.get() && aMain->isSub(theFeature->document()->currentFeature(false))) // do no update the composite that contains the current
+  //  return;
 
   #ifdef DEB_UPDATE
     std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
