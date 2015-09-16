@@ -3,6 +3,7 @@
 #include <SketchSolver_Group.h>
 
 #include <SketchPlugin_Point.h>
+#include <GeomDataAPI_Point2D.h>
 
 #include <map>
 
@@ -187,8 +188,18 @@ void SketchSolver_ConstraintCoincidence::addConstraint(ConstraintPtr theConstrai
         anEntity = myGroup->getFeatureId(aFeature);
         if (anEntity == SLVS_E_UNKNOWN)
           anEntity = changeEntity(aFeature, anEntType);
-        else
+        else {
           myFeatureMap[aFeature] = anEntity;
+          // Obtain relations between attributes of the feature and SolveSpace entities
+          std::list<AttributePtr> anAttrList =
+              aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+          std::list<AttributePtr>::iterator anIt = anAttrList.begin();
+          for (; anIt != anAttrList.end(); ++anIt) {
+            Slvs_hEntity anAttrID = myGroup->getAttributeId(*anIt);
+            if (anAttrID != SLVS_E_UNKNOWN)
+              myAttributeMap[*anIt] = anAttrID;
+          }
+        }
       }
       // If the feature is a point, add it to the list of coincident points
       if (aFeature->getKind() == SketchPlugin_Point::ID()) {
