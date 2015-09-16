@@ -634,11 +634,9 @@ void Model_AttributeSelection::selectBody(
   }
   TopoDS_Shape aNewShape = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
   /// fix for issue 411: result modified shapes must not participate in this selection mechanism
-  /*
   FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   if (aFeatureOwner.get())
     aFeatureOwner->eraseResults();
-    */
   if (!aContext.IsNull()) {
     aSel.Select(aNewShape, aContext); 
   }
