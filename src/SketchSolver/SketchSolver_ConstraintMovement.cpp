@@ -2,8 +2,6 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Group.h>
 
-#include <GeomDataAPI_Point2D.h>
-
 SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(FeaturePtr theFeature)
   : SketchSolver_ConstraintRigid(theFeature)
 {
@@ -42,6 +40,7 @@ void SketchSolver_ConstraintMovement::getAttributes(
     std::vector<Slvs_hEntity>& theAttributes,
     bool& theIsFullyMoved)
 {
+  bool isComplexFeature = false;
   theValue = 0.0;
   theIsFullyMoved = true;
   int aType = SLVS_E_UNKNOWN; // type of created entity
@@ -56,15 +55,17 @@ void SketchSolver_ConstraintMovement::getAttributes(
 
     // Check the entity is complex
     Slvs_Entity anEntity = myStorage->getEntity(anEntityID);
-    if (anEntity.point[0] != SLVS_E_UNKNOWN) {
-      for (int i = 0; i < 4 && anEntity.point[i]; i++)
-        theAttributes.push_back(anEntity.point[i]);
-    } else // simple entity
+    if (anEntity.point[0] != SLVS_E_UNKNOWN)
+      isComplexFeature = true;
+    else // simple entity
       theAttributes.push_back(anEntityID);
   }
   else {
      myFeatureMap[myBaseFeature] = anEntityID;
+     isComplexFeature = true;
+  }
 
+  if (isComplexFeature) {
      std::list<AttributePtr> aPoints =
         myBaseFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
      std::list<AttributePtr>::iterator anIt = aPoints.begin();
@@ -72,16 +73,12 @@ void SketchSolver_ConstraintMovement::getAttributes(
        Slvs_hEntity anAttr = myGroup->getAttributeId(*anIt);
 
        // Check the attribute changes coordinates
-       Slvs_Entity anAttrEnt = myStorage->getEntity(anAttr);
-       double aDeltaX = myStorage->getParameter(anAttrEnt.param[0]).val;
-       double aDeltaY = myStorage->getParameter(anAttrEnt.param[1]).val;
        std::shared_ptr<GeomDataAPI_Point2D> aPt =
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-       aDeltaX -= aPt->x();
-       aDeltaY -= aPt->y();
-       if (aDeltaX * aDeltaX + aDeltaY * aDeltaY >= tolerance * tolerance) {
+       if (isMoved(aPt, anAttr)) {
          theAttributes.push_back(anAttr);
          // update point coordinates
+         Slvs_Entity anAttrEnt = myStorage->getEntity(anAttr);
          double aNewPos[2] = {aPt->x(), aPt->y()};
          for (int i = 0; i < 2; i++) {
            Slvs_Param aParam = myStorage->getParameter(anAttrEnt.param[i]);
@@ -109,3 +106,13 @@ void SketchSolver_ConstraintMovement::getAttributes(
   }
 }
 
+bool SketchSolver_ConstraintMovement::isMoved(
+    std::shared_ptr<GeomDataAPI_Point2D> thePoint, Slvs_hEntity theEntity)
+{
+  Slvs_Entity anAttrEnt = myStorage->getEntity(theEntity);
+  double aDeltaX = myStorage->getParameter(anAttrEnt.param[0]).val;
+  double aDeltaY = myStorage->getParameter(anAttrEnt.param[1]).val;
+  aDeltaX -= thePoint->x();
+  aDeltaY -= thePoint->y();
+  return aDeltaX * aDeltaX + aDeltaY * aDeltaY >= tolerance * tolerance;
+}

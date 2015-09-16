@@ -15,8 +15,20 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
   if (!myErrorMsg.empty() || theAttributes[0] == SLVS_E_UNKNOWN)
     return;
 
-  if (theAttributes[1] != SLVS_E_UNKNOWN)
+  if (theAttributes[1] != SLVS_E_UNKNOWN) {
     myType = SLVS_C_POINTS_COINCIDENT;
+
+    // set coordinates of slave (second) point equal to the master (first) point
+    Slvs_Entity aFirst  = myStorage->getEntity(theAttributes[0]);
+    Slvs_Entity aSecond = myStorage->getEntity(theAttributes[1]);
+    for (int i = 0; i < 4; i++)
+      if (aFirst.param[i] != SLVS_E_UNKNOWN && aSecond.param[i] != SLVS_E_UNKNOWN) {
+        Slvs_Param aPar1 = myStorage->getParameter(aFirst.param[i]);
+        Slvs_Param aPar2 = myStorage->getParameter(aSecond.param[i]);
+        aPar2.val = aPar1.val;
+        myStorage->updateParameter(aPar2);
+      }
+  }
   else if (theAttributes[2] != SLVS_E_UNKNOWN) {
     // check the type of entity (line or circle)
     Slvs_Entity anEnt = myStorage->getEntity(theAttributes[2]);

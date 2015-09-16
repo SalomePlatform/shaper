@@ -10,6 +10,8 @@
 #include "SketchSolver.h"
 #include <SketchSolver_ConstraintRigid.h>
 
+#include <GeomDataAPI_Point2D.h>
+
 /** \class   SketchSolver_ConstraintMovement
  *  \ingroup Plugins
  *  \brief   Stores data of Rigid (Fixed) constraint for the moved feature only
@@ -35,6 +37,10 @@ protected:
   /// \param[out] theAttributes   list of attributes to be filled
   /// \param[out] theIsFullyMoved shows that the feature is moved, in other case only one point of the feature is shifted
   virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes, bool& theIsFullyMoved);
+
+private:
+  /// \brief Check the coordinates of point are differ than coordinates of correponding SolveSpace entity
+  bool isMoved(std::shared_ptr<GeomDataAPI_Point2D> thePoint, Slvs_hEntity theEntity);
 };
 
 #endif
