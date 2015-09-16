@@ -444,12 +444,12 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
   std::list<AttributePtr> anAttributes =
                                 myFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
   std::list<AttributePtr>::iterator anIter = anAttributes.begin();
-  for(; anIter != anAttributes.end(); anIter++) {
+  for(; anIter != anAttributes.end() && !aPointIsFound; anIter++) {
     AttributePoint2DPtr aPoint2DAttribute =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
     if (aPoint2DAttribute == aWidgetAttribute)
       continue;
-    if (aPoint2DAttribute.get()) {
+    if (aPoint2DAttribute.get() && aPoint2DAttribute->isInitialized()) {
       aPointIsFound = aPoint2DAttribute->pnt()->isEqual(aPnt2d);
     }
   }
