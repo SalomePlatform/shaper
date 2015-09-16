@@ -46,17 +46,29 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
   if (!anIntersection)
     return;
   double aDist[2][2];
-  for (int i = 0; i < 2; i++)
+  for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++)
       aDist[i][j] = anIntersection->distance(aPoints[i][j]);
+    if (aDist[i][0] > tolerance && aDist[i][1] > tolerance &&
+        aDist[i][0] + aDist[i][1] < aPoints[i][0]->distance(aPoints[i][1]) + 2.0 * tolerance) {
+      // the intersection point is an inner point of the line,
+      // we change the sign of distance till start point to calculate correct coordinates
+      // after rotation
+      aDist[i][0] *= -1.0;
+    }
+  }
   std::shared_ptr<GeomAPI_Dir2d> aDir[2];
   for (int i = 0; i < 2; i++)
-    if (aDist[i][1] > aDist[i][0])
+    if (aDist[i][1] > fabs(aDist[i][0]))
       aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
           aPoints[i][1]->xy()->decreased(anIntersection->xy())));
-    else
+    else {
       aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
           aPoints[i][0]->xy()->decreased(anIntersection->xy())));
+      // main direction is opposite => change signs
+      aDist[i][0] *= -1.0;
+      aDist[i][1] *= -1.0;
+    }
 
   aConstraint.other = false;
   for (int i = 0; i < 2; i++)

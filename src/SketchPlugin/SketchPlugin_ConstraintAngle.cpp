@@ -160,24 +160,14 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   };
 
   // Directions of lines
-  if (aDist[0][1] < tolerance)
+  if (aDist[0][0] > aDist[0][1])
     aEndA = aStartA;
-  if (aDist[1][1] < tolerance)
+  if (aDist[1][0] > aDist[1][1])
     aEndB = aStartB;
   std::shared_ptr<GeomAPI_Dir2d> aDirA(new GeomAPI_Dir2d(aEndA->xy()->decreased(anInter->xy())));
   std::shared_ptr<GeomAPI_Dir2d> aDirB(new GeomAPI_Dir2d(aEndB->xy()->decreased(anInter->xy())));
 
   anAngle = fabs(aDirA->angle(aDirB)) * 180.0 / PI;
-
-  // If the lines intersected inside one of them, the angle selected is less than 90 degrees
-  if ((aDist[0][0] >= tolerance && aDist[0][1] >= tolerance &&
-      aDist[0][0] + aDist[0][1] < aStartA->distance(aEndA) + 2.0 * tolerance) ||
-      (aDist[1][0] >= tolerance && aDist[1][1] >= tolerance &&
-      aDist[1][0] + aDist[1][1] < aStartB->distance(aEndB) + 2.0 * tolerance)) {
-    if (anAngle > 90.0)
-      anAngle = 180.0 - anAngle;
-  }
-
   return anAngle;
 }
 
