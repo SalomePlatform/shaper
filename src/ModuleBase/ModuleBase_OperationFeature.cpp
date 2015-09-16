@@ -78,6 +78,7 @@ void ModuleBase_OperationFeature::startOperation()
   if (!aFeature.get() || !isEditOperation())
     return;
 
+  myVisualizedObjects.clear();
   // store hidden result features
   std::list<ResultPtr> aResults = aFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
@@ -89,7 +90,7 @@ void ModuleBase_OperationFeature::startOperation()
     }
   }
   if (!aFeature->isDisplayed()) {
-    myVisualizedObjects.insert(*aIt);
+    myVisualizedObjects.insert(aFeature);
     aFeature->setDisplayed(true);
   }
   Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
