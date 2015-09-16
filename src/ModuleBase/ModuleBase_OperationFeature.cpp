@@ -72,6 +72,51 @@ bool ModuleBase_OperationFeature::isValid() const
   return aValid && isDone;
 }
 
+void ModuleBase_OperationFeature::startOperation()
+{
+  FeaturePtr aFeature = feature();
+  if (!aFeature.get() || !isEditOperation())
+    return;
+
+  // store hidden result features
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+    ObjectPtr anObject = *aIt;
+    if (anObject.get() && !anObject->isDisplayed()) {
+      myVisualizedObjects.insert(*aIt);
+      anObject->setDisplayed(true);
+    }
+  }
+  if (!aFeature->isDisplayed()) {
+    myVisualizedObjects.insert(*aIt);
+    aFeature->setDisplayed(true);
+  }
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+}
+
+void ModuleBase_OperationFeature::stopOperation()
+{
+  FeaturePtr aFeature = feature();
+  if (!aFeature.get() || !isEditOperation())
+    return;
+
+  // store hidden result features
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+    ObjectPtr anObject = *aIt;
+    if (anObject.get() && myVisualizedObjects.find(anObject) != myVisualizedObjects.end()) {
+      anObject->setDisplayed(false);
+    }
+  }
+  if (myVisualizedObjects.find(aFeature) != myVisualizedObjects.end()) {
+    aFeature->setDisplayed(false);
+  }
+  if (myVisualizedObjects.size() > 0)
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+}
+
 FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage)
 {
   if (myParentFeature.get()) {
@@ -117,6 +162,11 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
     }
   }
   return false;
+}
+
+bool ModuleBase_OperationFeature::isDisplayedOnStart(ObjectPtr theObject)
+{
+  return myVisualizedObjects.find(theObject) != myVisualizedObjects.end();
 }
 
 void ModuleBase_OperationFeature::start()

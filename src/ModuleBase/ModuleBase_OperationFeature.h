@@ -14,11 +14,14 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <ModelAPI_Object.h>
 #include <ModelAPI_CompositeFeature.h>
 
 #include <QObject>
 #include <QString>
 #include <QStringList>
+
+#include <set>
 
 class ModuleBase_ModelWidget;
 class ModuleBase_ISelection;
@@ -75,6 +78,11 @@ Q_OBJECT
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
 
+  /// Returns true if the object is displayed when the operation was started
+  /// \param theObject a feature or result of the operation feature
+  /// \return boolean value whether the object display state was changed
+  virtual bool isDisplayedOnStart(ObjectPtr theObject);
+
   /// Initialisation of operation with preliminary selection
   /// \param theSelection an instance of Selection class
   /// \param theViewer a viewer to have the viewer the eye position
@@ -123,6 +131,12 @@ signals:
   bool commit();
 
  protected:
+  /// Displays the feature/results if it is hidden. It will be hided in stopOperation
+  virtual void startOperation();
+
+  /// Hide feature/results if they were hided on start
+  virtual void stopOperation();
+
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
@@ -134,6 +148,10 @@ signals:
  protected:
    /// The operation feature to be handled
   FeaturePtr myFeature;
+
+  /// a list of hidden objects, whic are diplayed by operation start
+  /// and should be hidden by operation stop
+  std::set<ObjectPtr> myVisualizedObjects;
 
   /// Editing feature flag
   bool myIsEditing;

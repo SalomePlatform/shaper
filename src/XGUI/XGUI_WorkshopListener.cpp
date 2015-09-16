@@ -63,6 +63,10 @@
 //#define DEBUG_FEATURE_UPDATED
 //#define DEBUG_RESULT_COMPSOLID
 
+#ifdef DEBUG_FEATURE_REDISPLAY
+const std::string DebugFeatureKind = "Extrusion";
+#endif
+
 XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop),
     myUpdatePrefs(false)
@@ -277,6 +281,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
 
   XGUI_Workshop* aWorkshop = workshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  bool aFirstVisualizedBody = false;
+
   bool aRedisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
@@ -299,6 +305,17 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
         qDebug("COMPSOLID sub-object");
     }
 #endif
+    #ifdef DEBUG_FEATURE_REDISPLAY
+      QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+      if (aFeature.get()) {
+        std::string aKind = aFeature->getKind();
+        if (aKind == DebugFeatureKind) {
+          qDebug(QString("visible=%1, hide=%2 : display= %2").arg(aDisplayer->isVisible(aObj))
+                                            .arg(aHide).arg(anObjInfo).toStdString().c_str());
+        }
+      }
+    #endif
     if (aHide) {
       aRedisplayed = aDisplayer->erase(aObj, false) || aRedisplayed;
       #ifdef DEBUG_FEATURE_REDISPLAY
@@ -315,12 +332,6 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       #ifdef DEBUG_FEATURE_REDISPLAY
         QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
         //qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
-        /*FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-        if (aFeature.get()) {
-          std::string aKind = aFeature->getKind();
-          if (aKind == "SketchMultiRotation")
-            bool aValue = true;
-        }*/
       #endif
 
       if (isVisibleObject)  { // redisplay visible object
@@ -337,7 +348,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
           aWorkshop->deactivateActiveObject(aObj, false);
         }
       } else { // display object if the current operation has it
-        if (displayObject(aObj)) {
+        if (displayObject(aObj, aFirstVisualizedBody)) {
           aRedisplayed = true;
           // Deactivate object of current operation from selection
           aWorkshop->deactivateActiveObject(aObj, false);
@@ -346,6 +357,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     }
   }
   if (aRedisplayed) {
+    if (aFirstVisualizedBody)
+      myWorkshop->viewer()->fitAll();
     customizeCurrentObject();
     aDisplayer->updateViewer();
   }
@@ -363,6 +376,8 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   QString anInfoStr = anInfo.join(";\t");
   qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
+
+  bool aFirstVisualizedBody = false;
 
   //bool aHasPart = false;
   bool aDisplayed = false;
@@ -391,7 +406,7 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
       // with list of displayed objects
       if (myWorkshop->module()->canDisplayObject(anObject)) {
         anObject->setDisplayed(true);
-        aDisplayed = displayObject(*aIt);
+        aDisplayed = displayObject(*aIt, aFirstVisualizedBody);
       } else 
         anObject->setDisplayed(false);
     }
@@ -400,6 +415,8 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
   if (aDisplayed) {
+    if (aFirstVisualizedBody)
+      myWorkshop->viewer()->fitAll();
     customizeCurrentObject();
     workshop()->displayer()->updateViewer();
   }
@@ -528,7 +545,7 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
 
 
 //**************************************************************
-bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
+bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisualizedBody)
 {
 #ifdef DEBUG_RESULT_COMPSOLID
   ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
@@ -553,7 +570,7 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
     int aNb = aDisplayer->objectsCount();
     aDisplayed = aDisplayer->display(theObj, false);
     if (aNb == 0)
-      myWorkshop->viewer()->fitAll();
+      theFirstVisualizedBody = true;
   } else 
     aDisplayed = aDisplayer->display(theObj, false);
 

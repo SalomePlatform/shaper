@@ -69,8 +69,10 @@ protected:
   /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
   /// Asks the module whether the object can be displayed
   /// \param theObj an object
+  /// \param theFirstVisualizedBody an output state whether there are not object displayed in the view
+  /// and the displayed object is a body
   /// \return true if the object is displayed
-  bool displayObject(ObjectPtr theObj);
+  bool displayObject(ObjectPtr theObj, bool& theFirstVisualizedBody);
 
   /// Calls the module method of cusomize object for the feature of the current operation
   /// \return true if the object is modified

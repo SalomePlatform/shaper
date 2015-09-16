@@ -852,7 +852,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     aConnector->activateModuleSelectionModes();
 }
 
-void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* /* theOperation*/)
+void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverWindow = false;
   myIsConstraintsShown = true;
@@ -893,13 +893,19 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* /* theOperation*/)
     std::list<ResultPtr>::const_iterator aIt;
     Events_Loop* aLoop = Events_Loop::loop();
     static Events_ID aDispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (theOperation);
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      (*aIt)->setDisplayed(true);
-      // this display event is needed because sketch already may have "displayed" state,
-      // but not displayed while it is still active (issue 613, abort of existing sketch)
-      ModelAPI_EventCreator::get()->sendUpdated(*aIt, aDispEvent);
+      if (!aFOperation->isDisplayedOnStart(*aIt)) {
+        (*aIt)->setDisplayed(true);
+        // this display event is needed because sketch already may have "displayed" state,
+        // but not displayed while it is still active (issue 613, abort of existing sketch)
+        ModelAPI_EventCreator::get()->sendUpdated(*aIt, aDispEvent);
+      }
     }
-    myCurrentSketch->setDisplayed(true);
+    if (!aFOperation->isDisplayedOnStart(myCurrentSketch))
+      myCurrentSketch->setDisplayed(true);
     
     myCurrentSketch = CompositeFeaturePtr();
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
@@ -1022,7 +1028,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
         isObjectFound = true;
       else {
         std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
-        for (; anIt != aLast; anIt++) {
+        for (; anIt != aLast && !isObjectFound; anIt++) {
           isObjectFound = *anIt == theObject;
         }
       }
