@@ -127,8 +127,17 @@ void PartSet_WidgetSketchCreator::onStarted()
     // Launch Sketch operation
     CompositeFeaturePtr aCompFeature = 
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-    FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
 
+    /// add sketch feature without current feature change.
+    /// it is important to do not change the current feature in order to
+    /// after sketch edition, the extrusion cut feature becomes current
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->activeDocument();
+    FeaturePtr aPreviousCurrentFeature = aDoc->currentFeature(false);
+    FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
+    aDoc->setCurrentFeature(aPreviousCurrentFeature, false);
+
+    // start edit operation for the sketch
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                              (myModule->createOperation("Sketch"));
     if (aFOperation)
