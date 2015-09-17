@@ -1236,7 +1236,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
     bool canReplaceParameters = true;
     foreach (ObjectPtr aObj, theList) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-      if (aFeature->getKind() != "Parameter") {
+      if (!std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult()).get()) { // the feature is not a parameter
         canReplaceParameters = false;
         break;
       }
@@ -1250,7 +1250,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
 
     QString aText;
     if (canReplaceParameters) {
-      aText = QString(tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\n%2Or parameters could be replaced with its values.\nWould you like to continue?"))
+      aText = QString(tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\n%2Or parameters could be replaced by their values.\nWould you like to continue?"))
           .arg(aDirectNames).arg(aIndirectNames.isEmpty() ? QString() : QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames));
       QPushButton *aReplaceButton = aMessageBox.addButton(tr("Replace"), QMessageBox::ActionRole);
     } else {
