@@ -110,9 +110,9 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     if (!myTrsf.get()) { // disable of base result part
       DocumentPtr aDoc = Model_ResultPart::partDoc();
       if (aDoc.get() && aDoc->isOpened()) {
+        std::shared_ptr<Model_Document> anIntDoc = std::dynamic_pointer_cast<Model_Document>(aDoc);
         // make the current feature the last in any case: to update shapes defore deactivation too
-        FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aDoc->object(
-          ModelAPI_Feature::group(), aDoc->size(ModelAPI_Feature::group()) - 1));
+        FeaturePtr aLastFeature = anIntDoc->lastFeature();
         aDoc->setCurrentFeature(aLastFeature, false);
         if (theFlag) { // disable, so make all features disabled too
           // update the shape just before the deactivation: it will be used outside of part
