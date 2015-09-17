@@ -107,6 +107,7 @@ protected:
 
   /// On operation start/end/abort the "Just" fileds must be cleared and processed in the right way
   /// \param theTotalUpdate force to updates everything that has been changed in this operation
+  /// \param theFinish is true for start, close or abort transaction: all objects must be processed
   void processOperation(const bool theTotalUpdate, const bool theFinish = false);
 
   /// Performs the feature execution

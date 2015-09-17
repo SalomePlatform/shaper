@@ -123,23 +123,23 @@ public:
   //! To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
 
-  //! Creates a construction cresults
+  //! Creates a construction cresult
   virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-  //! Creates a body results
+  //! Creates a body result
   virtual std::shared_ptr<ModelAPI_ResultBody> createBody(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-  //! Creates a part results
+  //! Creates a part result
   virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   //! Copies a part result, keeping the reference to the origin
   virtual std::shared_ptr<ModelAPI_ResultPart> copyPart(
       const std::shared_ptr<ModelAPI_ResultPart>& theOrigin,
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-  //! Creates a group results
+  //! Creates a group result
   virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
-
+  //! Creates a parameter result
   virtual std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 

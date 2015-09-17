@@ -32,21 +32,24 @@ class ModelAPI_ResultParameter : public ModelAPI_Result
     static std::string MY_GROUP = "Parameters";
     return MY_GROUP;
   }
-
+  /// The computed value attribute Id
   inline static const std::string& VALUE()
   {
     static const std::string MY_VALUE_ID("Value");
     return MY_VALUE_ID;
   }
 
+  /// The computational error attribute Id
   inline static const std::string& STATE()
   {
     static const std::string MY_VALUE_ID("State");
     return MY_VALUE_ID;
   }
 
+  /// The generic initialization of attributes
   virtual void initAttributes() = 0;
 
+  /// Destructor
   MODELAPI_EXPORT ~ModelAPI_ResultParameter();
 
 };

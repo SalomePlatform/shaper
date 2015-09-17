@@ -20,6 +20,7 @@ class ModelAPI_Object;
 
 /**\class ModelAPI_BodyBuilder
 * \ingroup DataModel
+ * \brief Extra API for the ResultBody that allows to work with naming.
 */
 class ModelAPI_BodyBuilder
 {
@@ -108,9 +109,10 @@ protected:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> document() const;
 
 protected:
+  /// Deafult constructor accessible only from Model_Object
   MODELAPI_EXPORT ModelAPI_BodyBuilder(ModelAPI_Object* theOwner);
 
-  ModelAPI_Object* myOwner;
+  ModelAPI_Object* myOwner; ///< the owner object this builder belongs to
 };
 
 //! Pointer on feature object

@@ -17,9 +17,10 @@
 class ModelAPI_AttributeValidator : public ModelAPI_Validator
 {
 public:
-  //! returns true if attribute is valid
+  //! \returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
+  //! \param theError the error string message if validation fails
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const = 0;

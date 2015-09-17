@@ -52,7 +52,7 @@ class ModelAPI_Result : public ModelAPI_Object
   /// Returns the result is disabled or not.
   MODELAPI_EXPORT virtual bool isDisabled();
 
-  // Returns the parameters of color definition in the resources config manager
+  /// Returns the parameters of color definition in the resources config manager
   virtual void colorConfigInfo(std::string& theSection, std::string& theName,
     std::string& theDefault) {}
 

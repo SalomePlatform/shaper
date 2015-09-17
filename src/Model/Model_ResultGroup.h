@@ -23,7 +23,7 @@ public:
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
 
-  // Retuns the parameters of color definition in the resources config manager
+  /// Retuns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
                                             std::string& theDefault);
 

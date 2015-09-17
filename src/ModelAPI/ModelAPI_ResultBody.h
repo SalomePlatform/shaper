@@ -112,9 +112,10 @@ public:
     const std::string& theName,int&  theTag);
 
 protected:
+  /// Default constructor accessible only from Model_Objects
   MODELAPI_EXPORT ModelAPI_ResultBody();
 
-  ModelAPI_BodyBuilder* myBuilder; /// provide the body processing in naming shape
+  ModelAPI_BodyBuilder* myBuilder; ///< provides the body processing in naming shape
 };
 
 //! Pointer on feature object

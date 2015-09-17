@@ -29,6 +29,7 @@ class MODELAPI_EXPORT ModelAPI_FeatureValidator : public ModelAPI_Validator
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
   /// \param theArguments list of string, feature attribute names: dependent attributes
+  /// \param theError the error string message if validation fails
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const = 0;

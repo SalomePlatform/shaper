@@ -18,7 +18,7 @@ class TNaming_Builder;
 
 /**\class Model_BodyBuilder
  * \ingroup DataModel
- * \brief The body (shape) result of a feature.
+ * \brief Extra API for the ResultBody that allows to work with naming.
  */
 class Model_BodyBuilder : public ModelAPI_BodyBuilder
 {

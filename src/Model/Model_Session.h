@@ -49,6 +49,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void closeAll();
 
   //! Starts a new operation (opens a transaction)
+  //! \param theId string-identifier of the started transaction
   //! \param theAttachedToNested if it is true, it means that this transaction is attached to the nested 
   //!          where it is located and will be committed on the next commit with the nested
   MODEL_EXPORT virtual void startOperation(
