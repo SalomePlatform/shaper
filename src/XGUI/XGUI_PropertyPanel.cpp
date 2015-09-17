@@ -84,8 +84,12 @@ void XGUI_PropertyPanel::cleanContent()
   if (myActiveWidget)
     myActiveWidget->deactivate();
 
-  // as the widgets are deleted later, it is important that the signals
-  // of these widgets are not processed. An example of the error is issue 986.
+  /// as the widgets are deleted later, it is important that the signals
+  /// of these widgets are not processed. An example of the error is issue 986.
+  /// In the given case, the property panel is firstly filled by new widgets
+  /// of restarted operation and after that the mouse release signal come from
+  /// the widget of the previous operation (Point2d widget about mouse is released
+  /// and focus is out of this widget)
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(),
                                                  aLast = myWidgets.end();
   for (; anIt != aLast; anIt++) {
