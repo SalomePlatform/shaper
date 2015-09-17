@@ -169,6 +169,9 @@ private:
   /// \brief Update just changed constraints
   void updateConstraints();
 
+  /// \brief Update Multi-Translation/-Rotation constraints due to multi coincidence appears/disappears
+  void notifyMultiConstraints();
+
 private:
   Slvs_hGroup myID; ///< Index of the group
   Slvs_hEntity myWorkplaneID; ///< Index of workplane, the group is based on

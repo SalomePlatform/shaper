@@ -146,6 +146,8 @@ private:
   void addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
   /// \brief Remove point from lists of coincidence
   void removeCoincidentPoint(const Slvs_hEntity& thePoint);
+  /// \brief Remove point-point coincidence
+  void removeCoincidence(const Slvs_Constraint& theCoincidence);
 
 public:
   /// \brief Check two points are coincident

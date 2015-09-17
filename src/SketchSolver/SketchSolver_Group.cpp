@@ -9,6 +9,7 @@
 #include <SketchSolver_Builder.h>
 #include <SketchSolver_Constraint.h>
 #include <SketchSolver_ConstraintCoincidence.h>
+#include <SketchSolver_ConstraintMulti.h>
 #include <SketchSolver_Error.h>
 
 #include <Events_Error.h>
@@ -235,8 +236,9 @@ bool SketchSolver_Group::changeConstraint(
 
     // Additional verification of coincidence of several points
     if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+      bool hasMultiCoincidence = false;
       ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
-      for (; aCIter != myConstraints.end(); aCIter++) {
+      for (; aCIter != myConstraints.end(); ++aCIter) {
         std::shared_ptr<SketchSolver_ConstraintCoincidence> aCoincidence =
           std::dynamic_pointer_cast<SketchSolver_ConstraintCoincidence>(aCIter->second);
         if (!aCoincidence)
@@ -251,8 +253,12 @@ bool SketchSolver_Group::changeConstraint(
             if (anIt->second == aCIter->second)
               anIt->second = aCoinc2;
           aCIter->second = aCoinc2;
+          hasMultiCoincidence = true;
         }
       }
+
+      if (hasMultiCoincidence)
+        notifyMultiConstraints();
     }
     myConstraints[theConstraint] = aConstraint;
   }
@@ -784,6 +790,8 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
     std::list<ConstraintPtr>::iterator anIt = aMultiCoinc.begin();
     for (; anIt != aMultiCoinc.end(); ++anIt)
       changeConstraint(*anIt);
+
+    notifyMultiConstraints();
   }
 }
 
@@ -826,6 +834,23 @@ bool SketchSolver_Group::checkFeatureValidity(FeaturePtr theFeature)
   return aFactory->validate(theFeature);
 }
 
+// ============================================================================
+//  Function: notifyMultiConstraints
+//  Class:    SketchSolver_Group
+//  Purpose:  Update Multi-Translation/-Rotation constraints due to multi coincidence appears/disappears
+// ============================================================================
+void SketchSolver_Group::notifyMultiConstraints()
+{
+  ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); ++aCIter) {
+    if (aCIter->first->getKind() == SketchPlugin_MultiRotation::ID() ||
+        aCIter->first->getKind() == SketchPlugin_MultiTranslation::ID()) {
+      std::shared_ptr<SketchSolver_ConstraintMulti> aMulti = 
+          std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIter->second);
+      aMulti->checkCoincidence();
+    }
+  }
+}
 
 
 

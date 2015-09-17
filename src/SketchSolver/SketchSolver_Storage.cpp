@@ -372,13 +372,17 @@ bool SketchSolver_Storage::isPointFixed(
     }
 
   // Search the Rigid constraint
+  theFixed = SLVS_C_UNKNOWN;
   std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
   for (; aConstrIter != myConstraints.end(); aConstrIter++)
     if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
         aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
       theFixed = aConstrIter->h;
-      return true;
+      if (aConstrIter->ptA == thePointID)
+        return true;
     }
+  if (theFixed != SLVS_C_UNKNOWN)
+    return true;
 
   if (theAccurate) {
     // Try to find the fixed entity which uses such point or its coincidence
@@ -580,6 +584,9 @@ bool SketchSolver_Storage::removeConstraint(const Slvs_hConstraint& theConstrain
     myConstrMaxID = myConstraints.empty() ? SLVS_E_UNKNOWN : myConstraints.back().h;
     myNeedToResolve = true;
     myRemovedConstraints.insert(theConstraintID);
+    if (aConstraint.type == SLVS_C_POINTS_COINCIDENT)
+      removeCoincidence(aConstraint);
+
     // Remove all entities
     Slvs_hEntity anEntities[6] = {aConstraint.ptA, aConstraint.ptB,
         aConstraint.entityA, aConstraint.entityB,
@@ -771,6 +778,35 @@ void SketchSolver_Storage::removeCoincidentPoint(const Slvs_hEntity& thePoint)
         myCoincidentPoints.erase(aCIter);
       break;
     }
+}
+
+void SketchSolver_Storage::removeCoincidence(const Slvs_Constraint& theCoincidence)
+{
+  // Find set of coincident points
+  std::vector< std::set<Slvs_hEntity> >::iterator aCIt = myCoincidentPoints.begin();
+  for (; aCIt != myCoincidentPoints.end(); ++aCIt)
+    if (aCIt->find(theCoincidence.ptA) != aCIt->end() ||
+        aCIt->find(theCoincidence.ptB) != aCIt->end())
+      break;
+  if (aCIt == myCoincidentPoints.end())
+    return;
+
+  // Leave only the points which are still coincident
+  std::set<Slvs_hEntity> aRemainCoincidence;
+  std::vector<Slvs_Constraint>::const_iterator aConstrIt = myConstraints.begin();
+  for (; aConstrIt != myConstraints.end(); ++aConstrIt) {
+    if (aConstrIt->type != SLVS_C_POINTS_COINCIDENT)
+      continue;
+    if (aCIt->find(aConstrIt->ptA) != aCIt->end() ||
+        aCIt->find(aConstrIt->ptB) != aCIt->end()) {
+      aRemainCoincidence.insert(aConstrIt->ptA);
+      aRemainCoincidence.insert(aConstrIt->ptB);
+    }
+  }
+  if (aRemainCoincidence.size() <= 1)
+    myCoincidentPoints.erase(aCIt);
+  else
+    aCIt->swap(aRemainCoincidence);
 }
 
 bool SketchSolver_Storage::isCoincident(

@@ -46,6 +46,9 @@ public:
     SketchSolver_Constraint::refresh();
   }
 
+  /// \brief Verifies, the coincidence between points of copied entities appears or disappears,
+  ///        and removes or adds fixing of corresponding points.
+  void checkCoincidence();
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints

@@ -237,3 +237,70 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
   myPointsJustUpdated.clear();
   myAdjusted = true;
 }
+
+void SketchSolver_ConstraintMulti::checkCoincidence()
+{
+  std::vector< std::vector<Slvs_hEntity> > aFilteredPoints; // points are filtered by their positions
+
+  std::vector< std::vector<Slvs_hEntity> >::const_iterator aPCIt = myPointsAndCopies.begin();
+  std::vector<Slvs_hEntity>::const_iterator aCIt;
+  for (; aPCIt != myPointsAndCopies.end(); ++aPCIt) {
+    aCIt = aPCIt->begin();
+    // Skip first element, focus the copies only
+    for (++aCIt; aCIt != aPCIt->end(); ++aCIt) {
+      std::vector< std::vector<Slvs_hEntity> >::iterator aFilterIt = aFilteredPoints.begin();
+      for (; aFilterIt != aFilteredPoints.end(); ++aFilterIt)
+        if (myStorage->isEqual(*aCIt, aFilterIt->front())) {
+          aFilterIt->push_back(*aCIt);
+          break;
+        }
+      if (aFilterIt == aFilteredPoints.end()) {
+        std::vector<Slvs_hEntity> aNewFilter(1, *aCIt);
+        aFilteredPoints.push_back(aNewFilter);
+      }
+    }
+  }
+
+  // Check the coicidence of filtered points and remove extra fixation.
+  // Also check separated points which are not fixed.
+  std::vector< std::vector<Slvs_hEntity> >::iterator aFPIt = aFilteredPoints.begin();
+  for (; aFPIt != aFilteredPoints.end(); ++aFPIt) {
+    if (aFPIt->size() <= 1)
+      continue;
+    std::vector<Slvs_hEntity>::iterator anIt1, anIt2;
+    for (anIt1 = aFPIt->begin(); anIt1 != aFPIt->end(); ++anIt1) {
+      for (anIt2 = anIt1 + 1; anIt2 != aFPIt->end(); ++anIt2) {
+        Slvs_hConstraint aFixed1, aFixed2;
+        bool isFixed1 = myStorage->isPointFixed(*anIt1, aFixed1);
+        bool isFixed2 = myStorage->isPointFixed(*anIt2, aFixed2);
+        if (myStorage->isCoincident(*anIt1, *anIt2)) {
+          if (!isFixed1 && isFixed2) {
+            Slvs_hEntity aTmp = *anIt1;
+            *anIt1 = *anIt2;
+            *anIt2 = aTmp;
+          } else if (isFixed1 && isFixed2) {
+            // remove fixing of the second point
+            myStorage->removeConstraint(aFixed2);
+            std::vector<Slvs_hConstraint>::iterator aRemoveIt = mySlvsConstraints.begin();
+            for (; aRemoveIt != mySlvsConstraints.end(); ++aRemoveIt)
+              if (*aRemoveIt == aFixed2) {
+                mySlvsConstraints.erase(aRemoveIt);
+                break;
+              }
+          }
+        } else {
+          bool isFixed[2] = {isFixed1, isFixed2};
+          Slvs_hEntity aPoint[2] = {*anIt1, *anIt2};
+          for (int i = 0; i < 2; i++)
+            if (!isFixed[i]) {
+              Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
+                  SLVS_C_WHERE_DRAGGED, myGroup->getWorkplaneId(), 0.0,
+                  aPoint[i], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+              aConstraint.h = myStorage->addConstraint(aConstraint);
+              mySlvsConstraints.push_back(aConstraint.h);
+            }
+        }
+      }
+    }
+  }
+}
