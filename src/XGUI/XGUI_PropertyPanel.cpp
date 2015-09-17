@@ -83,6 +83,17 @@ void XGUI_PropertyPanel::cleanContent()
 {
   if (myActiveWidget)
     myActiveWidget->deactivate();
+
+  // as the widgets are deleted later, it is important that the signals
+  // of these widgets are not processed. An example of the error is issue 986.
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(),
+                                                 aLast = myWidgets.end();
+  for (; anIt != aLast; anIt++) {
+    QWidget* aWidget = *anIt;
+    if (aWidget)
+      aWidget->blockSignals(true);
+  }
+
   myWidgets.clear();
   myPanelPage->clearPage();
   myActiveWidget = NULL;
