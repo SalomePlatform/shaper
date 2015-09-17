@@ -204,7 +204,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
   // the dependencies can be in the feature itself
   std::shared_ptr<Model_Data> aData = 
       std::dynamic_pointer_cast<Model_Data>(theFeature->data());
-  if (aData && !aData->refsToMe().empty()) {
+  if (aData.get() && !aData->refsToMe().empty()) {
     const std::set<AttributePtr>& aRefs = aData->refsToMe();
     std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin(), aRefLast = aRefs.end();
     for (; aRefIt != aRefLast; aRefIt++) {
@@ -223,7 +223,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
 void Model_Objects::removeFeature(FeaturePtr theFeature)
 {
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theFeature->data());
-  if (aData && aData->isValid()) {
+  if (aData.get() && aData->isValid()) {
     // checking that the sub-element of composite feature is removed: if yes, inform the owner
     std::set<std::shared_ptr<ModelAPI_Feature> > aRefs;
     refsToFeature(theFeature, aRefs, false);
@@ -315,7 +315,7 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 
 void Model_Objects::clearHistory(ObjectPtr theObj)
 {
-  if (theObj) {
+  if (theObj.get()) {
     const std::string aGroup = theObj->groupName();
     std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(aGroup);
     if (aHIter != myHistory.end())
@@ -393,7 +393,7 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
 {
   // try feature by label
   FeaturePtr aFeature = feature(theLabel);
-  if (aFeature)
+  if (aFeature.get())
     return feature(theLabel);
   TDF_Label aFeatureLabel = theLabel.Father().Father();  // let's suppose it is result
   aFeature = feature(aFeatureLabel);
@@ -403,13 +403,13 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
     aFeature = feature(aFeatureLabel);
     isSubResult = true;
   }
-  if (aFeature) {
+  if (aFeature.get()) {
     const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
     std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
     for (; aRIter != aResults.cend(); aRIter++) {
       if (isSubResult) {
         ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-        if (aCompRes) {
+        if (aCompRes.get()) {
           int aNumSubs = aCompRes->numberOfSubs();
           for(int a = 0; a < aNumSubs; a++) {
             ResultPtr aSub = aCompRes->subResult(a);
@@ -551,7 +551,7 @@ void Model_Objects::initData(ObjectPtr theObj, TDF_Label theLab, const int theTa
   theObj->setDoc(myDoc);
   theObj->setData(aData);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
-  if (aFeature) {
+  if (aFeature.get()) {
     setUniqueName(aFeature);  // must be before "initAttributes" because duplicate part uses name
   }
   theObj->initAttributes();
@@ -595,7 +595,7 @@ void Model_Objects::synchronizeFeatures(
       aFeature = std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get())->createFeature(
         TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
         .ToCString(), anOwner);
-      if (!aFeature) {  // somethig is wrong, most probably, the opened document has invalid structure
+      if (!aFeature.get()) {  // somethig is wrong, most probably, the opened document has invalid structure
         Events_Error::send("Invalid type of object in the document");
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
@@ -705,7 +705,7 @@ void Model_Objects::synchronizeBackRefs()
     FeaturePtr aFeature = aFeatures.Value();
     std::shared_ptr<Model_Data> aFData = 
       std::dynamic_pointer_cast<Model_Data>(aFeature->data());
-    if (aFData) {
+    if (aFData.get()) {
       aFData->eraseBackReferences();
     }
     const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
@@ -740,7 +740,7 @@ void Model_Objects::synchronizeBackRefs()
     FeaturePtr aFeature = aFeatures.Value();
     std::shared_ptr<Model_Data> aFData = 
       std::dynamic_pointer_cast<Model_Data>(aFeature->data());
-    if (aFData) {
+    if (aFData.get()) {
       std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
       aFData->referencesToObjects(aRefs);
       std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator 
@@ -815,10 +815,10 @@ std::shared_ptr<ModelAPI_ResultConstruction> Model_Objects::createConstruction(
   TDataStd_Comment::Set(aLab, ModelAPI_ResultConstruction::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   std::shared_ptr<ModelAPI_ResultConstruction> aResult;
-  if (anOldObject) {
+  if (anOldObject.get()) {
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anOldObject);
   }
-  if (!aResult) {
+  if (!aResult.get()) {
     aResult = std::shared_ptr<ModelAPI_ResultConstruction>(new Model_ResultConstruction);
     storeResult(theFeatureData, aResult, theIndex);
   }
@@ -840,10 +840,10 @@ std::shared_ptr<ModelAPI_ResultBody> Model_Objects::createBody(
     anOldObject = object(aLab);
   }
   std::shared_ptr<ModelAPI_ResultBody> aResult;
-  if (anOldObject) {
+  if (anOldObject.get()) {
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anOldObject);
   }
-  if (!aResult) {
+  if (!aResult.get()) {
     // create compsolid anyway; if it is compsolid, it will create sub-bodies internally
     if (aResultOwner.get()) {
       aResult = std::shared_ptr<ModelAPI_ResultBody>(new Model_ResultBody);
@@ -862,10 +862,10 @@ std::shared_ptr<ModelAPI_ResultPart> Model_Objects::createPart(
   TDataStd_Comment::Set(aLab, ModelAPI_ResultPart::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   std::shared_ptr<ModelAPI_ResultPart> aResult;
-  if (anOldObject) {
+  if (anOldObject.get()) {
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(anOldObject);
   }
-  if (!aResult) {
+  if (!aResult.get()) {
     aResult = std::shared_ptr<ModelAPI_ResultPart>(new Model_ResultPart);
     storeResult(theFeatureData, aResult, theIndex);
   }
@@ -888,10 +888,10 @@ std::shared_ptr<ModelAPI_ResultGroup> Model_Objects::createGroup(
   TDataStd_Comment::Set(aLab, ModelAPI_ResultGroup::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   std::shared_ptr<ModelAPI_ResultGroup> aResult;
-  if (anOldObject) {
+  if (anOldObject.get()) {
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(anOldObject);
   }
-  if (!aResult) {
+  if (!aResult.get()) {
     aResult = std::shared_ptr<ModelAPI_ResultGroup>(new Model_ResultGroup(theFeatureData));
     storeResult(theFeatureData, aResult, theIndex);
   }
@@ -905,10 +905,10 @@ std::shared_ptr<ModelAPI_ResultParameter> Model_Objects::createParameter(
   TDataStd_Comment::Set(aLab, ModelAPI_ResultParameter::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   std::shared_ptr<ModelAPI_ResultParameter> aResult;
-  if (anOldObject) {
+  if (anOldObject.get()) {
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(anOldObject);
   }
-  if (!aResult) {
+  if (!aResult.get()) {
     aResult = std::shared_ptr<ModelAPI_ResultParameter>(new Model_ResultParameter);
     storeResult(theFeatureData, aResult, theIndex);
   }
@@ -919,7 +919,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::feature(
     const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theResult->data());
-  if (aData) {
+  if (aData.get()) {
     TDF_Label aFeatureLab = aData->label().Father().Father().Father();
     FeaturePtr aFeature = feature(aFeatureLab);
     if (!aFeature.get() && aFeatureLab.Depth() > 1) { // this may be sub-result of result
@@ -1034,7 +1034,7 @@ ResultPtr Model_Objects::findByName(const std::string theName)
 FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theReverse)
 {
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
-  if (aData && aData->isValid()) {
+  if (aData.get() && aData->isValid()) {
     TDF_Label aFeatureLabel = aData->label().Father();
     Handle(TDataStd_ReferenceArray) aRefs;
     if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
@@ -1074,7 +1074,7 @@ bool Model_Objects::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
 {
   std::shared_ptr<Model_Data> aLaterD = std::static_pointer_cast<Model_Data>(theLater->data());
   std::shared_ptr<Model_Data> aCurrentD = std::static_pointer_cast<Model_Data>(theCurrent->data());
-  if (aLaterD && aLaterD->isValid() && aCurrentD && aCurrentD->isValid()) {
+  if (aLaterD.get() && aLaterD->isValid() && aCurrentD.get() && aCurrentD->isValid()) {
     TDF_Label aLaterL = aLaterD->label().Father();
     TDF_Label aCurrentL = aCurrentD->label().Father();
     int aLaterI = -1, aCurentI = -1; // not found yet state
