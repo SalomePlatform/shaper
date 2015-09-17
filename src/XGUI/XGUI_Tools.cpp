@@ -174,11 +174,16 @@ bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 
 //**************************************************************
 void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
-                                 std::set<FeaturePtr>& theDirectRefFeatures, std::set<FeaturePtr>& theIndirectRefFeatures)
+                                 std::set<FeaturePtr>& theDirectRefFeatures, 
+                                 std::set<FeaturePtr>& theIndirectRefFeatures,
+                                 std::set<FeaturePtr>& theAlreadyProcessed)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (!aFeature.get())
     return;
+  if (theAlreadyProcessed.find(aFeature) != theAlreadyProcessed.end())
+    return;
+  theAlreadyProcessed.insert(aFeature);
 
   // 1. find references in the current document
   std::set<FeaturePtr> aRefFeatures;
@@ -249,12 +254,13 @@ void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectP
 
   // Run recursion. It is possible recursive dependency, like the following: plane, extrusion uses plane,
   // axis is built on extrusion. Delete of a plane should check the dependency from the axis also.
-  std::set<FeaturePtr> aRecursiveRefFeatures;
   std::set<FeaturePtr>::const_iterator aFeatureIt = theDirectRefFeatures.begin();
   for (; aFeatureIt != theDirectRefFeatures.end(); ++aFeatureIt) {
-    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, aRecursiveRefFeatures, aRecursiveRefFeatures);
-  } 
-  theIndirectRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
+    std::set<FeaturePtr> aRecursiveRefFeatures;
+    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, 
+      aRecursiveRefFeatures, aRecursiveRefFeatures, theAlreadyProcessed);
+    theIndirectRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
+  }
 }
 
 }

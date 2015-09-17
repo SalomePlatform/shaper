@@ -115,12 +115,14 @@ bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& 
  which has the object as a sub object.
  \param theSourceObject an object, which references are searched
  \param theObject an intermediate recursive object, should be set in the source object
+ \param theAlreadyProcessed set of processed elements, used for optimization (do not reanalyse processed)
  \return a boolean value
  */
 void XGUI_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
                                              const ObjectPtr& theObject,
                                              std::set<FeaturePtr>& theDirectRefFeatures,
-                                             std::set<FeaturePtr>& theIndirectRefFeatures);
+                                             std::set<FeaturePtr>& theIndirectRefFeatures,
+                                             std::set<FeaturePtr>& theAlreadyProcessed);
 };
 
 #endif

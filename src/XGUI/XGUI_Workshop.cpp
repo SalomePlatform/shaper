@@ -1211,7 +1211,9 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
   // 1. find all referenced features
   std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
   foreach (ObjectPtr aDeletedObj, theList) {
-    XGUI_Tools::refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, aDirectRefFeatures, aIndirectRefFeatures);
+    std::set<FeaturePtr> alreadyProcessed;
+    XGUI_Tools::refsToFeatureInAllDocuments(
+      aDeletedObj, aDeletedObj, aDirectRefFeatures, aIndirectRefFeatures, alreadyProcessed);
     std::set<FeaturePtr> aDifference;
     std::set_difference(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end(), 
                         aDirectRefFeatures.begin(), aDirectRefFeatures.end(), 

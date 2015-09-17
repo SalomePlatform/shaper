@@ -746,7 +746,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
 }
 
 void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
-  const bool theVisible)
+  const bool theVisible, const bool theFlushUpdates)
 {
   // blocks the flush signals to avoid each objects visualization in the viewer
   // they should not be shown once after all modifications are performed
@@ -841,9 +841,11 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   // unblock  the flush signals and up them after this
   aLoop->activateFlushes(isActive);
 
-  aLoop->flush(aCreateEvent);
-  aLoop->flush(aRedispEvent);
-  aLoop->flush(aDeleteEvent);
+  if (theFlushUpdates) {
+    aLoop->flush(aCreateEvent);
+    aLoop->flush(aRedispEvent);
+    aLoop->flush(aDeleteEvent);
+  }
 }
 
 void Model_Document::setCurrentFeatureUp()
@@ -853,7 +855,8 @@ void Model_Document::setCurrentFeatureUp()
   FeaturePtr aCurrent = currentFeature(false);
   if (aCurrent.get()) { // if not, do nothing because null is the upper
     FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
-    setCurrentFeature(aPrev, false);
+    // do not flush: it is called only on remove, it will be flushed in the end of transaction
+    setCurrentFeature(aPrev, false, false);
   }
 }
 

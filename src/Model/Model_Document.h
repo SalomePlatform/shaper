@@ -135,7 +135,7 @@ class Model_Document : public ModelAPI_Document
   //! \param theCurrent the selected feature as current: blow it everythin become disabled
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
   MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
-    const bool theVisible);
+    const bool theVisible, const bool theFlushUpdates = true);
 
   //! Makes the current feature one feature upper
   MODEL_EXPORT virtual void setCurrentFeatureUp();
