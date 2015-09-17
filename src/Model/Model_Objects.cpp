@@ -142,7 +142,6 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     // event: feature is added
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);
-    theFeature->setDisabled(false); // by default created feature is enabled
     updateHistory(ModelAPI_Feature::group());
   } else { // make feature has not-null data anyway
     theFeature->setData(Model_Data::invalidData());
@@ -601,12 +600,12 @@ void Model_Objects::synchronizeFeatures(
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
       }
+      aFeature->init();
       // this must be before "setData" to redo the sketch line correctly
       myFeatures.Bind(aFeatureLabel, aFeature);
       aNewFeatures.insert(aFeature);
       initData(aFeature, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
       updateHistory(aFeature);
-      aFeature->setDisabled(false); // by default created feature is enabled (this allows to recreate the results before "setCurrent" is called)
 
       // event: model is updated
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, aCreateEvent);
@@ -796,6 +795,7 @@ void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
                                  std::shared_ptr<ModelAPI_Result> theResult,
                                  const int theResultIndex)
 {
+  theResult->init();
   theResult->setDoc(myDoc);
   initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) {  // if was not initialized, generate event and set a name

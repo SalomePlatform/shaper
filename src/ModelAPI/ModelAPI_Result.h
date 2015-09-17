@@ -68,6 +68,13 @@ class ModelAPI_Result : public ModelAPI_Object
   /// On change of attribute of the result update presentation of this result:
   /// for the current moment there are only presentation attributes assigned to results
   MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
+
+protected:
+  /// This method is called just after creation of the object: it must initialize
+  /// all fields, normally initialized in the constructor
+  MODELAPI_EXPORT virtual void init();
+
+friend class Model_Objects;
 };
 
 //! Pointer on feature object

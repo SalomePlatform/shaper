@@ -24,8 +24,6 @@ Model_ResultCompSolid::Model_ResultCompSolid()
 {
   myBuilder = new Model_BodyBuilder(this);
   myLastConcealed = false;
-  setIsConcealed(myLastConcealed);
-  myIsDisabled = true; // by default it is not initialized and false to be after created
   updateSubs(shape()); // in case of open, etc.
 }
 

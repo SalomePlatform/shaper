@@ -607,6 +607,7 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
   FeaturePtr aFeature = aSession->createFeature(theID, this);
   if (!aFeature)
     return aFeature;
+  aFeature->init();
   Model_Document* aDocToAdd;
   if (!aFeature->documentToAdd().empty()) { // use the customized document to add
     if (aFeature->documentToAdd() != kind()) { // the root document by default

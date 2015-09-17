@@ -203,3 +203,8 @@ bool ModelAPI_Feature::isPreviewNeeded() const
 {
   return true;
 }
+
+void ModelAPI_Feature::init()
+{
+  myIsDisabled = false;
+}

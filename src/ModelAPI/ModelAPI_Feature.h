@@ -195,7 +195,13 @@ class ModelAPI_Feature : public ModelAPI_Object
   {
     return data()->attribute(theID);
   }
- // -----------------------------------------------------------------------------------------------
+  protected:
+  /// This method is called just after creation of the object: it must initialize
+  /// all fields, normally initialized in the constructor
+  MODELAPI_EXPORT virtual void init();
+
+  friend class Model_Document;
+  friend class Model_Objects;
 };
 
 //! Pointer on feature object

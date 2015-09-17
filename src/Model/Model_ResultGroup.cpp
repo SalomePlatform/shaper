@@ -14,8 +14,6 @@
 
 Model_ResultGroup::Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData)
 {
-  myIsDisabled = true; // by default it is not initialized and false to be after created
-  setIsConcealed(false);
   myOwnerData = theOwnerData;
 }
 

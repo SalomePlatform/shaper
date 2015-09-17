@@ -50,9 +50,7 @@ std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 
 Model_ResultPart::Model_ResultPart()
 {
-  myIsDisabled = true; // by default it is not initialized and false to be after created
   myIsInLoad = false;
-  setIsConcealed(false);
 }
 
 void Model_ResultPart::activate()

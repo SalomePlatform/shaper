@@ -16,9 +16,6 @@
 Model_ResultBody::Model_ResultBody()
 {
   myBuilder = new Model_BodyBuilder(this);
-
-  myIsDisabled = true; // by default it is not initialized and false to be after created
-  setIsConcealed(false);
 }
 
 void Model_ResultBody::initAttributes()

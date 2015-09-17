@@ -77,6 +77,10 @@ class ModelAPI_Object: public ModelAPI_Entity
   MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
 
  protected:
+  /// This method is called just after creation of the object: it must initialize
+  /// all fields, normally initialized in the constructor
+  MODELAPI_EXPORT virtual void init() = 0;
+
   /// Sets the data manager of an object (document does)
   MODELAPI_EXPORT virtual void setData(std::shared_ptr<ModelAPI_Data> theData);
 

@@ -72,3 +72,9 @@ void ModelAPI_Result::attributeChanged(const std::string& theID)
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   aECreator->sendUpdated(data()->attribute(theID)->owner(), EVENT_DISP);
 }
+
+void ModelAPI_Result::init()
+{
+  myIsDisabled = true; // by default it is not initialized and false to be after created
+  myIsConcealed = false;
+}

@@ -21,6 +21,4 @@ void Model_ResultParameter::initAttributes()
 
 Model_ResultParameter::Model_ResultParameter()
 {
-  myIsDisabled = true; // by default it is not initialized and false to be after created
-  setIsConcealed(false);
 }
