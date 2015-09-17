@@ -769,7 +769,7 @@ void Model_Objects::synchronizeBackRefs()
   }
   std::list<std::pair<ResultPtr, bool> >::iterator aCIter = aConcealed.begin();
   for(; aCIter != aConcealed.end(); aCIter++) {
-    if (aCIter->first->isConcealed() != aCIter->second) { // somethign is changed => produce event
+    if (aCIter->first->isConcealed() != aCIter->second) { // something is changed => produce event
       if (aCIter->second) { // was concealed become not => creation event
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
         ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, anEvent);

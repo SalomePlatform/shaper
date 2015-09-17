@@ -43,7 +43,7 @@ class ModelAPI_Result : public ModelAPI_Object
   /// Enables/disables the result. The disabled result does not participate in any calculation
   /// and visualization: like it was removed. But it keeps the general parameters: colors, 
   /// visibility, etc.
-  /// \param theThis pointer to this object, needed to generate all events if it is neccessary
+  /// \param theThis pointer to this object, needed to generate all events if it is necessary
   /// \param theFlag makes disabled if it is true
   /// \returns true if state is really changed
   MODELAPI_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
