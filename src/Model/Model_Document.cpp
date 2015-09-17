@@ -105,6 +105,7 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
   }
   TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
   PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
+  Handle(TDocStd_Document) aLoaded;
   try {
     aStatus = anApp->Open(aPath, aLoaded);
   } catch (Standard_Failure) {
