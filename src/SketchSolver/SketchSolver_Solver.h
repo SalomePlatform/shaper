@@ -75,6 +75,11 @@ class SketchSolver_Solver
    */
   void setDraggedParameters(const Slvs_hParam* theDragged);
 
+  /** \brief Set or unset the flag which allows to find all failed constraints
+   */
+  void calculateFailedConstraints(bool theSic)
+  { myEquationsSystem.calculateFaileds = theSic ? 1 : 0; }
+
   /** \brief Solve the set of equations
    *  \return identifier whether solution succeeded
    */

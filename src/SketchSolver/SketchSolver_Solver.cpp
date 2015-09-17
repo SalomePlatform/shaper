@@ -27,7 +27,7 @@ SketchSolver_Solver::SketchSolver_Solver()
 
   // If the set of constraints is inconsistent,
   // the failed field will contain wrong constraints
-  myEquationsSystem.calculateFaileds = 1;
+  myEquationsSystem.calculateFaileds = 0;
 }
 
 SketchSolver_Solver::~SketchSolver_Solver()

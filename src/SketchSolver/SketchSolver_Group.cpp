@@ -549,6 +549,7 @@ bool SketchSolver_Group::resolveConstraints()
   bool aResolved = false;
   if (myStorage->isNeedToResolve() && !isEmpty()) {
     myConstrSolver.setGroupID(myID);
+    myConstrSolver.calculateFailedConstraints(false);
     myStorage->initializeSolver(myConstrSolver);
 
     int aResult = SLVS_RESULT_OKAY;
@@ -572,6 +573,7 @@ bool SketchSolver_Group::resolveConstraints()
             isLastChance = true;
           } else
             aNbTemp = myStorage->deleteTemporaryConstraint();
+          myConstrSolver.calculateFailedConstraints(true); // something failed => need to find it
           myStorage->initializeSolver(myConstrSolver);
         }
       }
