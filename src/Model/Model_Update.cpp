@@ -278,8 +278,13 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     return;
 
   // do not execute the composite that contains the current
-  //CompositeFeaturePtr aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
-  //bool isPostponedMain = aMain.get() && aMain->isSub(theFeature->document()->currentFeature(false));
+  bool isPostponedMain = false;
+  CompositeFeaturePtr aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  if (theFeature->getKind() == "ExtrusionSketch" && aMain.get()) {
+    CompositeFeaturePtr aCurrentOwner = 
+      ModelAPI_Tools::compositeOwner(theFeature->document()->currentFeature(false));
+    isPostponedMain = aCurrentOwner.get() && aMain->isSub(aCurrentOwner);
+  }
 
   #ifdef DEB_UPDATE
     std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
@@ -360,12 +365,12 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     if (aJustUpdated) {
       ModelAPI_ExecState aState = theFeature->data()->execState();
       if (aFactory->validate(theFeature)) {
-        //if (!isPostponedMain) {
+        if (!isPostponedMain) {
           #ifdef DEB_UPDATE
             std::cout<<"Execute Feature "<<theFeature->name()<<std::endl;
           #endif
           executeFeature(theFeature);
-        //}
+        }
       } else {
         #ifdef DEB_UPDATE
           std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
