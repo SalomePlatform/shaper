@@ -55,8 +55,9 @@ Model_Update::Model_Update()
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   aLoop->registerListener(this, kOpStartEvent);
 
+  /* not needed now with history line
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
-                                   Config_Prop::Boolean, "false");
+                                   Config_Prop::Boolean, "false");*/
   myIsAutomatic = true;
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
@@ -79,13 +80,14 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
 #endif
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
-    bool aPropVal =
+    /*bool aPropVal =
       Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
     if (aPropVal != myIsAutomatic) { // something is changed
       // myIsAutomatic = aPropVal;
       if (myIsAutomatic) // higher level of automatization => to rebuild
         processOperation(false);
-    }
+    }*/
+    return;
   } else if (theMessage->eventID() == kRebuildEvent) { // the rebuild command
     processOperation(true);
   } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent ||
@@ -275,10 +277,9 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   if (theFeature->isDisabled())
     return;
 
-  // to optimize with NDS: how to update sketch state if sketch is not executed on apply of sub-element
+  // do not execute the composite that contains the current
   //CompositeFeaturePtr aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
-  //if (aMain.get() && aMain->isSub(theFeature->document()->currentFeature(false))) // do no update the composite that contains the current
-  //  return;
+  //bool isPostponedMain = aMain.get() && aMain->isSub(theFeature->document()->currentFeature(false));
 
   #ifdef DEB_UPDATE
     std::cout<<"Update Feature "<<theFeature->name()<<std::endl;
@@ -359,10 +360,12 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
     if (aJustUpdated) {
       ModelAPI_ExecState aState = theFeature->data()->execState();
       if (aFactory->validate(theFeature)) {
-        #ifdef DEB_UPDATE
-          std::cout<<"Execute Feature "<<theFeature->name()<<std::endl;
-        #endif
-        executeFeature(theFeature);
+        //if (!isPostponedMain) {
+          #ifdef DEB_UPDATE
+            std::cout<<"Execute Feature "<<theFeature->name()<<std::endl;
+          #endif
+          executeFeature(theFeature);
+        //}
       } else {
         #ifdef DEB_UPDATE
           std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
@@ -374,8 +377,10 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   } else { // preview is not needed => make state Done
     if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
       theFeature->data()->execState(ModelAPI_StateDone);
-      if (aJustUpdated) // store that it must be updated on finish
+      if (aJustUpdated) {// store that it must be updated on finish
         myUpdated[theFeature] = myModification;
+        aFactory->validate(theFeature); // need to be validated to update the "Apply" state if not previewed
+      }
     }
   }
 }
