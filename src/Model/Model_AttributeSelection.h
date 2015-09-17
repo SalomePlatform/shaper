@@ -85,7 +85,7 @@ protected:
   /// \param theContext the result - owner of the selection
   /// \param theSubShape selected shape
   /// \param theUpdate flag that shows that it must be just update, theShape is null
-  /// \param returns true if eveything is selected correctly
+  /// \returns true if eveything is selected correctly
   virtual bool selectPart(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theUpdate = false);

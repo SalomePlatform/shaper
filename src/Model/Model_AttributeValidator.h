@@ -22,6 +22,7 @@ class Model_AttributeValidator : public ModelAPI_AttributeValidator
 public:
   /// \param theAttribute the checked attribute
   /// \param theArguments arguments of the attribute
+  /// \param theError erros message produced by validator to the user if it fails
   /// \returns true if attribute is valid
   MODEL_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                     const std::list<std::string>& theArguments,

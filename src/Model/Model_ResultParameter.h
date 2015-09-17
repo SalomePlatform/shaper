@@ -15,7 +15,7 @@
 
 /**\class Model_ResultParameter
  * \ingroup DataModel
- * \brief
+ * \brief Result of parameter expression. Contains only double value computed result attribute.
  */
 class Model_ResultParameter : public ModelAPI_ResultParameter
 {

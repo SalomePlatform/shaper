@@ -31,6 +31,7 @@ public:
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
   /// \param theArguments the arguments in the configuration file for this validator
+  /// \param theError erros message produced by validator to the user if it fails
   /// \returns true if feature is valid
   MODEL_EXPORT virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                     const std::list<std::string>& theArguments,

@@ -95,23 +95,23 @@ class Model_Objects
   //! Returns the feature by zero-based index: features in the history or not
   std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
 
-  /// Creates a construction results
+  /// Creates a construction result
   std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  /// Creates a body results
+  /// Creates a body result
   std::shared_ptr<ModelAPI_ResultBody> createBody(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  /// Creates a part results
+  /// Creates a part result
   std::shared_ptr<ModelAPI_ResultPart> createPart(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  /// Copies a part results, keeping the reference to origin
+  /// Copies a part result, keeping the reference to origin
   std::shared_ptr<ModelAPI_ResultPart> copyPart(
       const std::shared_ptr<ModelAPI_ResultPart>& theOrigin,
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  /// Creates a group results
+  /// Creates a group result
   std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-
+  /// Creates a parameter result
   std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 
@@ -175,7 +175,8 @@ class Model_Objects
   /// Creates the history: up to date with the current state
   void createHistory(const std::string& theGroupID);
 
-  /// Returns to the next (from the history point of view) feature, any: invisible or disabled
+  /// Returns the next (from the history point of view) feature, any: invisible or disabled
+  /// \param theCurrent previous to the resulting feature
   /// \param theReverse if it is true, iterates in reverced order (next becomes previous)
   FeaturePtr nextFeature(FeaturePtr theCurrent, const bool theReverse = false);
   /// Returns to the first (from the history point of view) feature, any: invisible or disabled

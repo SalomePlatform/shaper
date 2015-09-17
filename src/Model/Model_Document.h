@@ -134,6 +134,7 @@ class Model_Document : public ModelAPI_Document
   //! will be appended after this one.
   //! \param theCurrent the selected feature as current: blow it everythin become disabled
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
+  //! \param theFlushUpdates if it is true method calls flushes for creation/redisplay/delete messages
   MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
     const bool theVisible, const bool theFlushUpdates = true);
 
@@ -164,10 +165,10 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> copyPart(
     const std::shared_ptr<ModelAPI_ResultPart>& theOrigin,
     const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-  /// Creates a group results
+  /// Creates a group result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
-
+  /// Creates a parameter result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 

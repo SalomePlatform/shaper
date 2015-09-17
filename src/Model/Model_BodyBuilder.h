@@ -110,6 +110,7 @@ public:
   MODEL_EXPORT virtual void evolutionToSelection(const bool theFlag);
 
 protected:
+  /// Default constructor accessible only by Model_Objects
   Model_BodyBuilder(ModelAPI_Object* theOwner);
 
   /// Removes the stored builders
