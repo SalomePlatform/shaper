@@ -756,8 +756,8 @@ void XGUI_Workshop::onUndo(int theTimes)
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation()) {
-    /// this is important for nested operrations
-    /// when sketch opeation is active, this condition is false and 
+    /// this is important for nested operations
+    /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
     operationMgr()->onAbortOperation();
   }
@@ -781,8 +781,8 @@ void XGUI_Workshop::onRedo(int theTimes)
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation()) {
-    /// this is important for nested operrations
-    /// when sketch opeation is active, this condition is false and 
+    /// this is important for nested operations
+    /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
     operationMgr()->onAbortOperation();
   }
@@ -1026,7 +1026,7 @@ void XGUI_Workshop::showPropertyPanel()
   // The next code is necessary to made the property panel the active window
   // in order to operation manager could process key events of the panel.
   // otherwise they are ignored. It happens only if the same(activateWindow) is
-  // not happend by property panel activation(e.g. resume operaion of Sketch)
+  // not happened by property panel activation(e.g. resume operation of Sketch)
   myPropertyPanel->activateWindow();
   myPropertyPanel->setFocus();
 }
@@ -1119,7 +1119,7 @@ void XGUI_Workshop::deleteObjects()
     return;
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   // It is necessary to clear selection in order to avoid selection changed event during
-  // deleteion and negative consequences connected with processing of already deleted items
+  // deletion and negative consequences connected with processing of already deleted items
   mySelector->clearSelection();
   // check whether the object can be deleted. There should not be parts which are not loaded
   if (!XGUI_Tools::canRemoveOrRename(myMainWindow, anObjects))
