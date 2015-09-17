@@ -1218,50 +1218,83 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
                         std::inserter(aDifference, aDifference.begin()));
     aIndirectRefFeatures = aDifference;
   }
+
+  bool doDeleteReferences = true;
+
   // 2. warn about the references remove, break the delete operation if the user chose it
   if (theAskAboutDeleteReferences && !aDirectRefFeatures.empty()) {
     QStringList aDirectRefNames;
-    foreach(const FeaturePtr& aFeature, aDirectRefFeatures)
+    foreach (const FeaturePtr& aFeature, aDirectRefFeatures)
       aDirectRefNames.append(aFeature->name().c_str());
     QString aDirectNames = aDirectRefNames.join(", ");
 
     QStringList aIndirectRefNames;
-    foreach(const FeaturePtr& aFeature, aIndirectRefFeatures)
+    foreach (const FeaturePtr& aFeature, aIndirectRefFeatures)
       aIndirectRefNames.append(aFeature->name().c_str());
     QString aIndirectNames = aIndirectRefNames.join(", ");
 
-    QMessageBox::StandardButton aRes = QMessageBox::warning(
-        theParent, tr("Delete features"),
-        QString(tr("Selected features are used in the following features: %1.\
- These features will be deleted.\n%2Would you like to continue?")).arg(aDirectNames)
-            .arg(aIndirectNames.isEmpty() ? QString() : QString("Also these features will be deleted: %1.\n").arg(aIndirectNames)),
-        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-    if (aRes != QMessageBox::Yes)
+    bool canReplaceParameters = true;
+    foreach (ObjectPtr aObj, theList) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+      if (aFeature->getKind() != "Parameter") {
+        canReplaceParameters = false;
+        break;
+      }
+    }
+
+    QMessageBox aMessageBox(theParent);
+    aMessageBox.setWindowTitle(tr("Delete features"));
+    aMessageBox.setIcon(QMessageBox::Warning);
+    aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+    aMessageBox.setDefaultButton(QMessageBox::No);
+
+    QString aText;
+    if (canReplaceParameters) {
+      aText = QString(tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\n%2Or parameters could be replaced with its values.\nWould you like to continue?"))
+          .arg(aDirectNames).arg(aIndirectNames.isEmpty() ? QString() : QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames));
+      QPushButton *aReplaceButton = aMessageBox.addButton(tr("Replace"), QMessageBox::ActionRole);
+    } else {
+      aText = QString(tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n%2Would you like to continue?"))
+          .arg(aDirectNames).arg(aIndirectNames.isEmpty() ? QString() : QString(tr("Also these features will be deleted: %1.\n")).arg(aIndirectNames));
+    }
+    aMessageBox.setText(aText);
+    aMessageBox.exec();
+    QMessageBox::ButtonRole aButtonRole = aMessageBox.buttonRole(aMessageBox.clickedButton());
+
+    if (aButtonRole == QMessageBox::NoRole)
       return false;
+
+    if (aButtonRole == QMessageBox::ActionRole) {
+      foreach (ObjectPtr aObj, theList)
+        ModelAPI_ReplaceParameterMessage::send(aObj, this);
+      doDeleteReferences = false;
+    }
   }
 
   // 3. remove referenced features
-  std::set<FeaturePtr> aFeaturesToDelete = aDirectRefFeatures;
-  aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
-  std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin(),
-                                       aLast = aFeaturesToDelete.end();
+  if (doDeleteReferences) {
+    std::set<FeaturePtr> aFeaturesToDelete = aDirectRefFeatures;
+    aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
+    std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin(),
+                                         aLast = aFeaturesToDelete.end();
 #ifdef DEBUG_DELETE
-  QStringList anInfo;
+    QStringList anInfo;
 #endif
-  for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = (*anIt);
-    DocumentPtr aDoc = aFeature->document();
-    if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
-      aDoc->removeFeature(aFeature);
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = (*anIt);
+      DocumentPtr aDoc = aFeature->document();
+      if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
+        aDoc->removeFeature(aFeature);
 #ifdef DEBUG_DELETE
-      anInfo.append(ModuleBase_Tools::objectInfo(aFeature).toStdString().c_str());
+        anInfo.append(ModuleBase_Tools::objectInfo(aFeature).toStdString().c_str());
 #endif
+      }
     }
-  }
 #ifdef DEBUG_DELETE
-  qDebug(QString("remove references:%1").arg(anInfo.join("; ")).toStdString().c_str());
-  anInfo.clear();
+    qDebug(QString("remove references:%1").arg(anInfo.join("; ")).toStdString().c_str());
+    anInfo.clear();
 #endif
+  }
 
   QString anActionId = "DELETE_CMD";
   QString anId = QString::fromStdString(anActionId.toStdString().c_str());

@@ -195,3 +195,34 @@ void ModelAPI_ObjectRenamedMessage::setNewName(const std::string& theNewName)
 {
   myNewName = theNewName;
 }
+
+ModelAPI_ReplaceParameterMessage::ModelAPI_ReplaceParameterMessage(const Events_ID theID,
+                                                                   const void* theSender)
+: Events_Message(theID, theSender)
+{
+
+}
+
+ModelAPI_ReplaceParameterMessage::~ModelAPI_ReplaceParameterMessage()
+{
+
+}
+
+void ModelAPI_ReplaceParameterMessage::send(ObjectPtr theObject,
+                                            const void* theSender)
+{
+  std::shared_ptr<ModelAPI_ReplaceParameterMessage> aMessage(
+      new ModelAPI_ReplaceParameterMessage(eventId(), theSender));
+  aMessage->setObject(theObject);
+  Events_Loop::loop()->send(aMessage);
+}
+
+ObjectPtr ModelAPI_ReplaceParameterMessage::object() const
+{
+  return myObject;
+}
+
+void ModelAPI_ReplaceParameterMessage::setObject(ObjectPtr theObject)
+{
+  myObject = theObject;
+}

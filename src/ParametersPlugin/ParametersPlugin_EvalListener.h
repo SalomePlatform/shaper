@@ -13,6 +13,7 @@
 
 class ModelAPI_Attribute;
 class ModelAPI_Document;
+class ModelAPI_ResultParameter;
 class ParametersPlugin_Parameter;
 class ParametersPlugin_PyInterp;
 
@@ -30,6 +31,7 @@ class ParametersPlugin_EvalListener : public Events_Listener
 
   void processEvaluationEvent(const std::shared_ptr<Events_Message>& theMessage);
   void processObjectRenamedEvent(const std::shared_ptr<Events_Message>& theMessage);
+  void processReplaceParameterEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   std::string renameInPythonExpression(const std::string& theExpression,
                                        const std::string& theOldName,
@@ -40,6 +42,8 @@ class ParametersPlugin_EvalListener : public Events_Listener
   void renameInAttribute(std::shared_ptr<ModelAPI_Attribute> theAttribute,
                          const std::string& theOldName,
                          const std::string& theNewName);
+  void renameInDependants(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
+                          const std::string& theNewName);
 
  private:
   std::shared_ptr<ParametersPlugin_PyInterp> myInterp;

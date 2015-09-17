@@ -29,13 +29,35 @@
 #include <set>
 #include <sstream>
 
+//------------------------------------------------------------------------------
+// Tools
+
+std::string toStdString(double theValue)
+{
+  std::ostringstream sstream;
+  sstream << theValue;
+  return sstream.str();
+}
+
+std::set<std::string> toSet(const std::list<std::string>& theContainer)
+{
+  return std::set<std::string>(theContainer.begin(), theContainer.end());
+}
+
+//------------------------------------------------------------------------------
+
 ParametersPlugin_EvalListener::ParametersPlugin_EvalListener()
 {
   Events_Loop* aLoop = Events_Loop::loop();
-  const Events_ID kEvaluationEvent = ModelAPI_AttributeEvalMessage::eventId();
-  aLoop->registerListener(this, kEvaluationEvent, NULL, true);
-  const Events_ID kObjectRenamedEvent = ModelAPI_ObjectRenamedMessage::eventId();
-  aLoop->registerListener(this, kObjectRenamedEvent, NULL, true);
+
+  Events_ID anEvents_IDs[] = {
+      ModelAPI_AttributeEvalMessage::eventId(),
+      ModelAPI_ObjectRenamedMessage::eventId(),
+      ModelAPI_ReplaceParameterMessage::eventId()
+  };
+
+  for (int i = 0; i < sizeof(anEvents_IDs)/sizeof(anEvents_IDs[0]); ++i)
+    aLoop->registerListener(this, anEvents_IDs[i], NULL, true);
 
   myInterp = std::shared_ptr<ParametersPlugin_PyInterp>(new ParametersPlugin_PyInterp());
   myInterp->initialize();
@@ -53,10 +75,14 @@ void ParametersPlugin_EvalListener::processEvent(
 
   const Events_ID kEvaluationEvent = ModelAPI_AttributeEvalMessage::eventId();
   const Events_ID kObjectRenamedEvent = ModelAPI_ObjectRenamedMessage::eventId();
+  const Events_ID kReplaceParameterEvent = ModelAPI_ReplaceParameterMessage::eventId();
+
   if (theMessage->eventID() == kEvaluationEvent) {
     processEvaluationEvent(theMessage);
   } else if (theMessage->eventID() == kObjectRenamedEvent) {
     processObjectRenamedEvent(theMessage);
+  } else if (theMessage->eventID() == kReplaceParameterEvent) {
+    processReplaceParameterEvent(theMessage);
   } else {
     Events_Error::send(std::string("ParametersPlugin python interpreter, unhandled message caught: ")
                        + theMessage->eventID().eventText());
@@ -76,20 +102,12 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
     // If variable does not exist python interpreter will generate an error. It is OK.
     if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes, theDocument)) continue;
 
-    std::ostringstream sstream;
-    sstream << aValue;
-    std::string aParamValue = sstream.str();
-    aContext.push_back(*it + "=" + aParamValue);
+    aContext.push_back(*it + "=" + toStdString(aValue));
   }
   myInterp->extendLocalContext(aContext);
   double result = myInterp->evaluate(theExpression, theError);
   myInterp->clearLocalContext();
   return result;
-}
-
-std::set<std::string> toSet(const std::list<std::string>& theContainer)
-{
-  return std::set<std::string>(theContainer.begin(), theContainer.end());
 }
 
 void ParametersPlugin_EvalListener::processEvaluationEvent(
@@ -261,6 +279,37 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   }
 }
 
+void ParametersPlugin_EvalListener::renameInDependants(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
+                                                       const std::string& theNewName)
+{
+  // get parameter feature for the result
+  std::shared_ptr<ParametersPlugin_Parameter> aParameter =
+      std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+          ModelAPI_Feature::feature(theResultParameter));
+  if (!aParameter.get())
+    return;
+
+  std::string anOldName = aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
+
+  std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
+      theResultParameter->data()->refsToMe();
+  std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
+      anAttributes.cbegin();
+  for (; anAttributeIt != anAttributes.cend(); ++anAttributeIt) {
+    const AttributePtr& anAttribute = *anAttributeIt;
+    if (anAttribute->attributeType() == ModelAPI_AttributeRefList::typeId()) {
+      std::shared_ptr<ParametersPlugin_Parameter> aParameter =
+          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+              anAttribute->owner());
+      if (aParameter.get())
+        // Rename
+        renameInParameter(aParameter, anOldName, theNewName);
+    } else
+        // Rename
+        renameInAttribute(anAttribute, anOldName, theNewName);
+  }
+}
+
 bool isValidAttribute(const AttributePtr& theAttribute)
 {
   std::string aValidator, anError;
@@ -317,24 +366,30 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     return;
   }
 
-  std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes = 
-      aResultParameter->data()->refsToMe();
-  std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
-      anAttributes.cbegin();
-  for (; anAttributeIt != anAttributes.cend(); ++anAttributeIt) {
-    const AttributePtr& anAttribute = *anAttributeIt;
-    AttributeRefListPtr anAttributeRefList =
-        std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
-    if (anAttributeRefList.get()) {
-      std::shared_ptr<ParametersPlugin_Parameter> aParameter =
-          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
-              anAttributeRefList->owner());
-      if (aParameter.get())
-        // Rename
-        renameInParameter(aParameter, aMessage->oldName(), aMessage->newName());
-    } else
-        // Rename
-        renameInAttribute(anAttribute, aMessage->oldName(), aMessage->newName());
-  }
+  renameInDependants(aResultParameter, aMessage->newName());
 }
 
+void ParametersPlugin_EvalListener::processReplaceParameterEvent(
+    const std::shared_ptr<Events_Message>& theMessage)
+{
+  std::shared_ptr<ModelAPI_ReplaceParameterMessage> aMessage =
+      std::dynamic_pointer_cast<ModelAPI_ReplaceParameterMessage>(theMessage);
+
+  // get parameter feature for the object
+  std::shared_ptr<ParametersPlugin_Parameter> aParameter =
+      std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+          ModelAPI_Feature::feature(aMessage->object()));
+  if (!aParameter.get())
+    return;
+
+  ResultParameterPtr aResultParameter =
+      std::dynamic_pointer_cast<ModelAPI_ResultParameter>(
+          aParameter->firstResult());
+  if (!aResultParameter.get())
+    return;
+
+  double aRealValue = aResultParameter->data()->real(ModelAPI_ResultParameter::VALUE())->value();
+  std::string aValue = toStdString(aRealValue);
+
+  renameInDependants(aResultParameter, aValue);
+}

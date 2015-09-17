@@ -273,4 +273,33 @@ class ModelAPI_ObjectRenamedMessage : public Events_Message
   MODELAPI_EXPORT void setNewName(const std::string& theNewName);
 };
 
+/// Message that the parameter should be replaced with its value
+class ModelAPI_ReplaceParameterMessage : public Events_Message
+{
+  ObjectPtr myObject;
+
+ public:
+  /// Static. Returns EventID of the message.
+  MODELAPI_EXPORT static Events_ID& eventId()
+  {
+    static const char * MY_EVENT_ID("ReplaceParameter");
+    static Events_ID anId = Events_Loop::eventByName(MY_EVENT_ID);
+    return anId;
+  }
+
+  /// Useful method that creates and sends the AttributeEvalMessage event
+  MODELAPI_EXPORT static void send(ObjectPtr theObject,
+                                   const void* theSender);
+
+  /// Creates an empty message
+  MODELAPI_EXPORT ModelAPI_ReplaceParameterMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  MODELAPI_EXPORT virtual ~ModelAPI_ReplaceParameterMessage();
+
+  /// Returns an object
+  MODELAPI_EXPORT ObjectPtr object() const;
+  /// Sets an object
+  MODELAPI_EXPORT void setObject(ObjectPtr theObject);
+};
+
 #endif
