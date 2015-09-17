@@ -42,6 +42,7 @@
 #include <GeomValidators_ZeroOffset.h>
 #include <GeomValidators_BooleanArguments.h>
 #include <GeomValidators_Different.h>
+#include <GeomValidators_PartitionArguments.h>
 
 
 #include <ModelAPI_Object.h>
@@ -226,6 +227,9 @@ void PartSet_Module::registerValidators()
 
   aFactory->registerValidator("GeomValidators_Different",
                               new GeomValidators_Different);
+
+  aFactory->registerValidator("GeomValidators_PartitionArguments",
+                              new GeomValidators_PartitionArguments);
 }
 
 void PartSet_Module::registerFilters()

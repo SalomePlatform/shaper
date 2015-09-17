@@ -24,4 +24,5 @@
     label="Combine results"
     default="true"
     tooltip="If True combines all results to one. If False builds separate result for each object."/>
+  <validator id="GeomValidators_PartitionArguments" parameters="main_objects,tool_objects,partition_combine"/>
 </source>
