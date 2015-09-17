@@ -112,6 +112,11 @@ public:
   virtual int numInternalFeatures() = 0;
   //! Returns the feature by zero-based index: features in the history or not
   virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex) = 0;
+  //! Performs synchronization of transactions with the module document:
+  //! If some document is not active (by undo of activation) but in memory,
+  //! on activation the transactions must be synchronised because all redos performed 
+  //! wihtout this participation
+  virtual void synchronizeTransactions() = 0;
 
 
   //! To virtually destroy the fields of successors

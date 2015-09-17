@@ -1000,6 +1000,26 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::internalFeature(const int theI
   return myObjs->internalFeature(theIndex);
 }
 
+void Model_Document::synchronizeTransactions()
+{
+  Model_Document* aRoot = 
+    std::dynamic_pointer_cast<Model_Document>(ModelAPI_Session::get()->moduleDocument()).get();
+  if (aRoot == this)
+    return; // don't need to synchronise root with root
+
+  std::shared_ptr<Model_Session> aSession = 
+    std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+  while(myRedos.size() > aRoot->myRedos.size()) { // remove redos in this
+    aSession->setCheckTransactions(false);
+    redo();
+    aSession->setCheckTransactions(true);
+  }
+  /* this case can not be reproduced in any known case for the current moment, so, just comment
+  while(myRedos.size() < aRoot->myRedos.size()) { // add more redos in this
+    undoInternal(false, true);
+  }*/
+}
+
 // Feature that is used for selection in the Part document by the external request
 class Model_SelectionInPartFeature : public ModelAPI_Feature {
 public:

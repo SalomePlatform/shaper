@@ -144,6 +144,12 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual int numInternalFeatures();
   //! Returns the feature by zero-based index: features in the history or not
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
+  //! Performs synchronization of transactions with the module document:
+  //! If some document is not active (by undo of activation) but in memory,
+  //! on activation the transactions must be synchronised because all redos performed 
+  //! wihtout this participation
+  MODEL_EXPORT virtual void synchronizeTransactions();
+
 
   /// Creates a construction cresults
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(

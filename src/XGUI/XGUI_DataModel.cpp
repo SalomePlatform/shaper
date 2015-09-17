@@ -88,7 +88,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     std::string aObjType;
     for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
       ObjectPtr aObject = (*aIt);
-      // We do not show objects which not has to be shown in object browser
+      // We do not show objects which does not need to be shown in object browser
       if (!aObject->isInHistory())
         continue;
 

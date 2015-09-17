@@ -69,6 +69,7 @@ void Model_ResultPart::activate()
     std::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
     myIsInLoad = false;
     if (aDoc) {
+      aDoc->synchronizeTransactions();
       aDocRef->setValue(aDoc);
     }
   }
