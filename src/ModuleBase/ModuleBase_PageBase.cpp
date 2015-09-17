@@ -40,10 +40,12 @@ void ModuleBase_PageBase::addPageWidget(ModuleBase_PageBase* thePage)
 
 void ModuleBase_PageBase::clearPage()
 {
+  myWidgetList.clear();
+
   QLayoutItem *aChild;
   while ((aChild = pageLayout()->takeAt(0)) != 0) {
     if(aChild->widget()) {
-      aChild->widget()->deleteLater();
+      delete aChild->widget();
     } else {
       delete aChild;
     }
@@ -62,7 +64,6 @@ void ModuleBase_PageBase::clearPage()
     for( int i=0; i<r; i++ )
       aLayout->setRowStretch( i, 0 );
   }
-  myWidgetList.clear();
 }
 
 

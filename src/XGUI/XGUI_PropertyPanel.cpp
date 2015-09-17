@@ -96,8 +96,6 @@ void XGUI_PropertyPanel::cleanContent()
     QWidget* aWidget = *anIt;
     if (aWidget) {
       aWidget->blockSignals(true);
-      aWidget->setParent(0);
-      aWidget->deleteLater();
     }
   }
 
