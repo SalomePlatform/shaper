@@ -96,9 +96,15 @@ aPartitionFt = aPart.addFeature("Partition")
 assert (aPartitionFt.getKind() == "Partition")
 aPartitionFt.selectionList("main_objects").append(anExtrusionResult, anExtrusionResult.shape())
 aPartitionFt.selectionList("tool_objects").append(aPlaneResult, None)
+aPartitionFt.boolean("partition_combine").setValue(True)
 aPartitionFt.execute()
 aSession.finishOperation()
 
+#=========================================================================
+# Test results
+#=========================================================================
+aFactory = ModelAPI_Session.get().validators()
+assert (aFactory.validate(aPartitionFt))
 assert (len(aPartitionFt.results()) > 0)
 aPartitionResult = modelAPI_ResultBody(aPartitionFt.firstResult())
 assert (aPartitionResult is not None)
