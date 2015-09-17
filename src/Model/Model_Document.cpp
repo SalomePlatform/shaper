@@ -106,7 +106,7 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
   TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
   PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
   try {
-    aStatus = anApp->Open(aPath, myDoc);
+    aStatus = anApp->Open(aPath, aLoaded);
   } catch (Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     Events_Error::send(
@@ -168,6 +168,7 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     }
   }
   if (!isError) {
+    myDoc = aLoaded;
     myDoc->SetUndoLimit(UNDO_LIMIT);
     // to avoid the problem that feature is created in the current, not this, document
     std::shared_ptr<Model_Session> aSession = 
@@ -1024,7 +1025,7 @@ void Model_Document::synchronizeTransactions()
   }*/
 }
 
-// Feature that is used for selection in the Part document by the external request
+/// Feature that is used for selection in the Part document by the external request
 class Model_SelectionInPartFeature : public ModelAPI_Feature {
 public:
   /// Nothing to do in constructor

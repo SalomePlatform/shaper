@@ -78,6 +78,7 @@ Model_Objects::~Model_Objects()
     aFeature->erase();
     myFeatures.UnBind(aFeaturesIter.Key());
   }
+  myHistory.clear();
   aLoop->activateFlushes(isActive);
   // erase update, because features are destroyed and update should not performed for them anywhere
   aLoop->eraseMessages(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
