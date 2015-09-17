@@ -725,7 +725,7 @@ void SketchSolver_Storage::initializeSolver(SketchSolver_Solver& theSolver)
     for (; anIt != aConstraints.end(); anIt++)
       if (anIt->h == myFixed) {
         aFixedPoint = anIt->ptA;
-//        aConstraints.erase(anIt);
+        aConstraints.erase(anIt);
         break;
       }
     // set dragged parameters
