@@ -94,8 +94,11 @@ void XGUI_PropertyPanel::cleanContent()
                                                  aLast = myWidgets.end();
   for (; anIt != aLast; anIt++) {
     QWidget* aWidget = *anIt;
-    if (aWidget)
+    if (aWidget) {
       aWidget->blockSignals(true);
+      aWidget->setParent(0);
+      aWidget->deleteLater();
+    }
   }
 
   myWidgets.clear();
