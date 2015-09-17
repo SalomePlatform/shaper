@@ -40,7 +40,7 @@ GeomAlgoAPI_Partition::GeomAlgoAPI_Partition(const ListOfShape& theObjects,
 void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
                                   const ListOfShape& theTools)
 {
-  if (theObjects.empty() || theTools.empty()) {
+  if (theObjects.empty()) {
     return;
   }
 

@@ -10,14 +10,18 @@
     <validator id="PartSet_DifferentObjects"/>
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
-  <multi_selector id="tool_objects" 
-    label="Tool object" 
-    icon=":icons/cut_tool.png" 
+  <multi_selector id="tool_objects"
+    label="Tool object"
+    icon=":icons/cut_tool.png"
     tooltip="Select a tool face or solid"
     type_choice="Faces Solids"
     use_choice="false"
-    concealment="true" >
+    concealment="true">
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="solid,plane"/>
+    <validator id="GeomValidators_ShapeType" parameters="solid,plane,empty"/>
   </multi_selector>
+  <boolvalue id="partition_combine"
+    label="Combine results"
+    default="true"
+    tooltip="If True combines all results to one. If False builds separate result for each object."/>
 </source>

@@ -40,6 +40,13 @@ public:
     return MY_TOOL_LIST_ID;
   }
 
+  /// attribute name of combine flag
+  inline static const std::string& COMBINE_ID()
+  {
+    static const std::string MY_COMBINE_ID("partition_combine");
+    return MY_COMBINE_ID;
+  }
+
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
