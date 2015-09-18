@@ -168,12 +168,12 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
         break;
     }
   }
+  std::shared_ptr<Model_Session> aSession = 
+    std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
   if (!isError) {
     myDoc = aLoaded;
     myDoc->SetUndoLimit(UNDO_LIMIT);
     // to avoid the problem that feature is created in the current, not this, document
-    std::shared_ptr<Model_Session> aSession = 
-      std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
     aSession->setActiveDocument(anApp->getDocument(myID), false);
     aSession->setCheckTransactions(false);
     if (myObjs)
@@ -187,11 +187,7 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     // this is done in Part result "activate", so no needed here. Causes not-blue active part.
     // aSession->setActiveDocument(anApp->getDocument(myID), true);
   } else { // open failed, but new documnet was created to work with it: inform the model
-    static std::shared_ptr<Events_Message> aMsg(
-        new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
-    Events_Loop::loop()->send(aMsg);
-    TDF_LabelList anEmpty;
-    myObjs->synchronizeFeatures(anEmpty, true, true);
+    aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
   } 
   return !isError;
 }

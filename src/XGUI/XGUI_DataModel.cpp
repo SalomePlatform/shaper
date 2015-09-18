@@ -266,10 +266,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
       if (aDocRoot.isValid())
         emit dataChanged(aDocRoot, aDocRoot);
-#ifdef _DEBUG
-      else
-        Events_Error::send("Problem with Data Model definition of sub-document");
-#endif
+      else 
+        // We have got a new document
+        rebuildDataTree();
+//#ifdef _DEBUG
+//      else
+//        Events_Error::send("Problem with Data Model definition of sub-document");
+//#endif
     }
   } 
 }
@@ -283,7 +286,8 @@ void XGUI_DataModel::clear()
 //******************************************************
 void XGUI_DataModel::rebuildDataTree()
 {
-
+  beginResetModel();
+  endResetModel();
 }
 
 //******************************************************
