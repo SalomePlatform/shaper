@@ -38,11 +38,21 @@ public:
                        std::string& theError) const;
 };
 
+/**
+ * \class ExchangePlugin_ImportFormatValidator
+ * \ingroup Validators
+ * \brief Validator for the import format.
+ */
 class ExchangePlugin_ImportFormatValidator : public ExchangePlugin_FormatValidator
 {
 
 };
 
+/**
+ * \class ExchangePlugin_ExportFormatValidator
+ * \ingroup Validators
+ * \brief Validator for the export format.
+ */
 class ExchangePlugin_ExportFormatValidator : public ExchangePlugin_FormatValidator
 {
 

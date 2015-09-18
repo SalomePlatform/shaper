@@ -14,7 +14,7 @@
 /**
  * \class ExchangePlugin_Plugin
  * \ingroup Plugins
- * \brief The main class for management the import and export operations as plugin.
+ * \brief The main class for management import and export operations as plugin.
  */
 class EXCHANGEPLUGIN_EXPORT ExchangePlugin_Plugin : public ModelAPI_Plugin
 {

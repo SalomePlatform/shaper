@@ -29,9 +29,9 @@ class PARAMETERSPLUGIN_EXPORT ParametersPlugin_PyInterp : public PyInterp_Interp
   /// Returns a list of positions for theName in theExpression.
   std::list<std::pair<int, int> > positions(const std::string& theExpression,
                                             const std::string& theName);
-  /// Compiles theExpression and returns a list of parameters from theExpression.
+  /// Compiles theExpression and returns a list of parameters used in theExpression.
   std::list<std::string> compile(const std::string& theExpression);
-  /// Extends local context with the list of parameters with values.
+  /// Extends local context with the list of parameters.
   void extendLocalContext(const std::list<std::string>& theParameters);
   /// Clears local context.
   void clearLocalContext();

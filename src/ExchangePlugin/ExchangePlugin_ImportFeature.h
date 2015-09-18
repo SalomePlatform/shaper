@@ -18,7 +18,7 @@
  * \ingroup Plugins
  * \brief Feature for import shapes from the external files in CAD formats.
  *
- * The set of supported formats is defined in the configuration file.
+ * The list of supported formats is defined in the configuration file.
  */
 class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 {
@@ -29,15 +29,15 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
     static const std::string MY_IMPORT_ID("Import");
     return MY_IMPORT_ID;
   }
-  /// attribute name of referenced face
+  /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
     static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
-  /// default constructor
+  /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature();
-  /// default destructor
+  /// Default destructor
   EXCHANGEPLUGIN_EXPORT virtual ~ExchangePlugin_ImportFeature();
 
   /// Returns the unique kind of a feature

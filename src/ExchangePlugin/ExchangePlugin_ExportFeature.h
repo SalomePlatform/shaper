@@ -18,7 +18,7 @@
  * \ingroup Plugins
  * \brief Feature for export shapes to the external files in CAD formats.
  *
- * The set of supported formats is defined in the configuration file.
+ * The list of supported formats is defined in the configuration file.
  */
 class ExchangePlugin_ExportFeature : public ModelAPI_Feature
 {
@@ -47,9 +47,9 @@ public:
     static const std::string MY_SELECTION_LIST_ID("selection_list");
     return MY_SELECTION_LIST_ID;
   }
-  /// default constructor
+  /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ExportFeature();
-  /// default destructor
+  /// Default destructor
   EXCHANGEPLUGIN_EXPORT virtual ~ExchangePlugin_ExportFeature();
 
   /// Request for initialization of data model of the feature: adding all attributes

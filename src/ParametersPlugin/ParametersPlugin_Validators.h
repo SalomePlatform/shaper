@@ -26,18 +26,20 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
   PARAMETERSPLUGIN_EXPORT ParametersPlugin_VariableValidator();
   PARAMETERSPLUGIN_EXPORT virtual ~ParametersPlugin_VariableValidator();
 
-  //! returns true if attribute is valid
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
-  //! \param theError the error string message if validation fails
+  /**
+   * \brief Returns true if attribute has a valid parameter name.
+   * \param theAttribute the checked attribute
+   * \param theArguments arguments of the attribute
+   * \param theError the error string message if validation fails
+   */
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const;
 
  protected:
-  /// Returns true if theString is a variable name.
+  /// Returns true if theString is a valid variable name.
   PARAMETERSPLUGIN_EXPORT bool isVariable(const std::string& theString) const;
-  /// Returns true if theString is unique parameter name for theAttribute context.
+  /// Returns true if theString is unique parameter name in the document of theAttribute.
   PARAMETERSPLUGIN_EXPORT bool isUnique(const AttributePtr& theAttribute,
                                         const std::string& theString) const;
 };
@@ -53,10 +55,12 @@ class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator
   PARAMETERSPLUGIN_EXPORT ParametersPlugin_ExpressionValidator();
   PARAMETERSPLUGIN_EXPORT virtual ~ParametersPlugin_ExpressionValidator();
 
-  //! returns true if attribute is valid
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
-  //! \param theError the error string message if validation fails
+  /**
+   * \brief Returns true if attribute has a valid parameter expression.
+   * \param theAttribute the checked attribute
+   * \param theArguments arguments of the attribute
+   * \param theError the error string message if validation fails
+   */
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const;

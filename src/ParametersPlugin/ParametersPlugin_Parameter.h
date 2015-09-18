@@ -65,14 +65,16 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   /// Pre-execution is not needed for parameter
   PARAMETERSPLUGIN_EXPORT virtual bool isPreviewNeeded() const;
 
-  /// Creates a new part document if needed
+  /// Creates a parameter in document
   PARAMETERSPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes
   PARAMETERSPLUGIN_EXPORT virtual void initAttributes();
 
-  PARAMETERSPLUGIN_EXPORT virtual bool isInHistory(); //false
+  /// Reimplemented from ModelAPI_Feature::isInHistory(). Returns false.
+  PARAMETERSPLUGIN_EXPORT virtual bool isInHistory();
 
+  /// Reimplemented from ModelAPI_Feature::isInHistory().
   PARAMETERSPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Use plugin manager for features creation
@@ -81,9 +83,9 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
  protected:
   /// Evaluates theExpression and returns its value.
   double evaluate(const std::string& theExpression, std::string& theError);
-  /// Update name of the parameter
+  /// Updates name of the parameter
   void updateName();
-  /// Update expression of the parameter
+  /// Updates expression of the parameter
   void updateExpression();
 
  private:

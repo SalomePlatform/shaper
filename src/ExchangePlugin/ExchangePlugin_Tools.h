@@ -14,8 +14,7 @@
 
 /**
  * \class ExchangePlugin_Tools
- * \ingroup Plugins
- * \brief Internal tools for the plugin.
+ * \brief Internal tools for the ExchangePlugin.
  */
 class EXCHANGEPLUGIN_EXPORT ExchangePlugin_Tools {
 public:
