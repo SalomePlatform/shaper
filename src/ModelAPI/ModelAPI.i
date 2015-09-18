@@ -39,6 +39,7 @@
   #include "ModelAPI_ResultParameter.h"
   #include "ModelAPI_ResultGroup.h"
   #include "ModelAPI_Tools.h"
+  #include "ModelAPI_ResultCompSolid.h"
   
   #include <memory>
   #include <string>
@@ -98,6 +99,7 @@
 %shared_ptr(ModelAPI_ResultPart)
 %shared_ptr(ModelAPI_ResultGroup)
 %shared_ptr(ModelAPI_ResultParameter)
+%shared_ptr(ModelAPI_ResultCompSolid)
 
 // all supported interfaces
 %include "ModelAPI_Entity.h"
@@ -129,6 +131,7 @@
 %include "ModelAPI_ResultGroup.h"
 %include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
+%include "ModelAPI_ResultCompSolid.h"
 
 // std::list -> [] 
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
@@ -147,6 +150,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_ResultPart) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_Result>;
 %template(modelAPI_ResultParameter) shared_ptr_cast<ModelAPI_ResultParameter, ModelAPI_Result>;
 %template(modelAPI_ResultGroup) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_ResultGroup>;
+%template(modelAPI_ResultCompSolid) shared_ptr_cast<ModelAPI_ResultCompSolid, ModelAPI_ResultBody>;
 
 // Attribute casts
 %template(modelAPI_AttributeDocRef)        shared_ptr_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
