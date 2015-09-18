@@ -1011,8 +1011,6 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       }
     }
 #else
-    // Problem with MPV: At first time on creation it doesn't work because Part feature
-    // creation event will be sent after
     if (aActivePartIndex.isValid())
       aTreeView->setExpanded(aActivePartIndex, false);
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
@@ -1026,8 +1024,14 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     // Update displayed objects in order to update active color
     XGUI_Displayer* aDisplayer = aWorkshop->displayer();
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
-    foreach(ObjectPtr aObj, aObjects)
-      aDisplayer->redisplay(aObj, false);
+    bool aHidden;
+    foreach(ObjectPtr aObj, aObjects) {
+      //TODO: replace by redisplay event.
+      aHidden = !aObj->data() || !aObj->data()->isValid() || 
+        aObj->isDisabled() || (!aObj->isDisplayed());
+      if (!aHidden)
+        aDisplayer->redisplay(aObj, false);
+    }
     aDisplayer->updateViewer();
   }
 }
