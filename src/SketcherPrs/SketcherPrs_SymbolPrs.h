@@ -46,7 +46,7 @@ public:
 
   //! Method which clear all selected owners belonging
   //! to this selectable object ( for fast presentation draw )
-  Standard_EXPORT virtual void ClearSelected();
+  //Standard_EXPORT virtual void ClearSelected();
 
 
   //! Method which draws selected owners ( for fast presentation draw )

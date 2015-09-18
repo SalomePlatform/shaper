@@ -268,13 +268,13 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   return Handle(Image_AlienPixMap)();
 }
 
-void SketcherPrs_SymbolPrs::ClearSelected()
-{
-  Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( NULL );  
-  if( !aSelectionPrs.IsNull() ) {
-    aSelectionPrs->Clear(); 
-  }
-}
+//void SketcherPrs_SymbolPrs::ClearSelected()
+//{
+//  Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( NULL );  
+//  if( !aSelectionPrs.IsNull() ) {
+//    aSelectionPrs->Clear(); 
+//  }
+//}
 
 void SketcherPrs_SymbolPrs::prepareAspect()
 {
