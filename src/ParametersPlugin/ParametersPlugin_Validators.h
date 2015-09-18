@@ -15,6 +15,11 @@
 
 #include <memory>
 
+/**
+ * \class ParametersPlugin_VariableValidator
+ * \ingroup Validators
+ * \brief Validator for the variable name of parameter.
+ */
 class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
 {
  public:
@@ -24,16 +29,24 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
   //! returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
+  //! \param theError the error string message if validation fails
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const;
 
  protected:
+  /// Returns true if theString is a variable name.
   PARAMETERSPLUGIN_EXPORT bool isVariable(const std::string& theString) const;
-  PARAMETERSPLUGIN_EXPORT bool isUnique(const AttributePtr& theAttribute, 
+  /// Returns true if theString is unique parameter name for theAttribute context.
+  PARAMETERSPLUGIN_EXPORT bool isUnique(const AttributePtr& theAttribute,
                                         const std::string& theString) const;
 };
 
+/**
+ * \class ParametersPlugin_ExpressionValidator
+ * \ingroup Validators
+ * \brief Validator for the expression of parameter.
+ */
 class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator
 {
  public:
@@ -43,6 +56,7 @@ class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator
   //! returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
+  //! \param theError the error string message if validation fails
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const;

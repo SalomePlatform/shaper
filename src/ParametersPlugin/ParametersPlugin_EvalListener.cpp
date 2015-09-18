@@ -279,7 +279,7 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   }
 }
 
-void ParametersPlugin_EvalListener::renameInDependants(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
+void ParametersPlugin_EvalListener::renameInDependents(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
                                                        const std::string& theOldName,
                                                        const std::string& theNewName)
 {
@@ -358,7 +358,7 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     return;
   }
 
-  renameInDependants(aResultParameter, aMessage->oldName(), aMessage->newName());
+  renameInDependents(aResultParameter, aMessage->oldName(), aMessage->newName());
 }
 
 void ParametersPlugin_EvalListener::processReplaceParameterEvent(
@@ -383,5 +383,5 @@ void ParametersPlugin_EvalListener::processReplaceParameterEvent(
   double aRealValue = aResultParameter->data()->real(ModelAPI_ResultParameter::VALUE())->value();
   std::string aValue = toStdString(aRealValue);
 
-  renameInDependants(aResultParameter, aResultParameter->data()->name(), aValue);
+  renameInDependents(aResultParameter, aResultParameter->data()->name(), aValue);
 }

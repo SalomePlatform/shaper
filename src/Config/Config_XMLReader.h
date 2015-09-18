@@ -92,7 +92,9 @@ class Config_XMLReader
   std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
   /// Restores an attribute from internal map.
   std::string restoreAttribute(const char* theNodeName, const char* theNodeAttribute);
+  /// Cleanups attribute from cache
   bool cleanupAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  /// Cleanups attribute from cache
   bool cleanupAttribute(const char* theNodeName, const char* theNodeAttribute);
 
  protected:

@@ -13,7 +13,8 @@
 
 #include <map>
 
-/**\class ExchangePlugin_ExportFeature
+/**
+ * \class ExchangePlugin_ExportFeature
  * \ingroup Plugins
  * \brief Feature for export shapes to the external files in CAD formats.
  *
@@ -22,6 +23,7 @@
 class ExchangePlugin_ExportFeature : public ModelAPI_Feature
 {
 public:
+  /// Feature kind
   inline static const std::string& ID()
   {
     static const std::string MY_EXPORT_ID("Export");

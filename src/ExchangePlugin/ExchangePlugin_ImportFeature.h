@@ -13,7 +13,8 @@
 
 #include <map>
 
-  /**\class ExchangePlugin_ImportFeature
+/**
+ * \class ExchangePlugin_ImportFeature
  * \ingroup Plugins
  * \brief Feature for import shapes from the external files in CAD formats.
  *
@@ -22,7 +23,7 @@
 class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 {
  public:
-  /// Extrusion kind
+  /// Feature kind
   inline static const std::string& ID()
   {
     static const std::string MY_IMPORT_ID("Import");

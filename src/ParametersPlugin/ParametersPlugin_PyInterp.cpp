@@ -93,7 +93,7 @@ std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& the
   // co_names should be tuple, but can be changed in modern versions of python (>2.7.3)
   if(!PyTuple_Check(aCodeObj->co_names))
     return aResult;
-  
+
   int params_size = PyTuple_Size(aCodeObj->co_names);
   if (params_size > 0) {
     for (int i = 0; i < params_size; i++) {

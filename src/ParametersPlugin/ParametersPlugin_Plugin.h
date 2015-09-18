@@ -9,8 +9,10 @@
 #include <ModelAPI_Plugin.h>
 #include <ModelAPI_Feature.h>
 
-/**\class ParametersPlugin_Plugin
- * TODO: Add documentation
+/**
+ * \class ParametersPlugin_Plugin
+ * \ingroup Plugins
+ * \brief The main class for management of parameter evaluation operations as plugin.
  */
 class ParametersPlugin_Plugin : public ModelAPI_Plugin
 {
@@ -21,6 +23,7 @@ class ParametersPlugin_Plugin : public ModelAPI_Plugin
  public:
   ParametersPlugin_Plugin();
 
+ private:
   std::shared_ptr<ParametersPlugin_EvalListener> myEvalListener;
 };
 

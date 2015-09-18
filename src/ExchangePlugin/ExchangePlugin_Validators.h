@@ -10,7 +10,8 @@
 #include "ExchangePlugin.h"
 #include <ModelAPI_AttributeValidator.h>
 
-/**\class ExchangePlugin_ImportFormatValidator
+/**
+ * \class ExchangePlugin_FormatValidator
  * \ingroup Validators
  * \brief Validator for the imported formats checking
  *

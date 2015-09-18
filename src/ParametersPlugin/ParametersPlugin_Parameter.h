@@ -14,39 +14,40 @@
 
 class ParametersPlugin_PyInterp;
 
+/**
+ * \class ParametersPlugin_Parameter
+ * \ingroup Plugins
+ * \brief Feature for parameter.
+ */
 class ParametersPlugin_Parameter : public ModelAPI_Feature
 {
  public:
   virtual ~ParametersPlugin_Parameter();
 
-  /// Extrusion kind
+  /// Feature kind
   inline static const std::string& ID()
   {
     static const std::string MY_PARAMETER_ID("Parameter");
     return MY_PARAMETER_ID;
   }
-  /// attribute name of references sketch entities list, it should contain a sketch result or
-  /// a pair a sketch result to sketch face
+  /// attribute of parameter name
   inline static const std::string& VARIABLE_ID()
   {
     static const std::string MY_VARIABLE_ID("variable");
     return MY_VARIABLE_ID;
   }
-
-  /// attribute name of extrusion size
+  /// attribute of parameter expression
   inline static const std::string& EXPRESSION_ID()
   {
     static const std::string MY_EXPRESSION_ID("expression");
     return MY_EXPRESSION_ID;
   }
-
-  /// attribute name of extrusion size
+  /// attribute of parameter expression error
   inline static const std::string& EXPRESSION_ERROR_ID()
   {
     static const std::string MY_EXPRESSION_ERROR_ID("ExpressionError");
     return MY_EXPRESSION_ERROR_ID;
   }
-
   /// list of references to the arguments of this expression
   inline static const std::string& ARGUMENTS_ID()
   {
@@ -78,8 +79,11 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   ParametersPlugin_Parameter();
 
  protected:
+  /// Evaluates theExpression and returns its value.
   double evaluate(const std::string& theExpression, std::string& theError);
+  /// Update name of the parameter
   void updateName();
+  /// Update expression of the parameter
   void updateExpression();
 
  private:

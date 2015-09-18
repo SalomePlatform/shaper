@@ -54,7 +54,7 @@ bool ParametersPlugin_VariableValidator::isVariable(const std::string& theString
   return true;
 }
 
-bool ParametersPlugin_VariableValidator::isUnique(const AttributePtr& theAttribute, 
+bool ParametersPlugin_VariableValidator::isUnique(const AttributePtr& theAttribute,
                                                   const std::string& theString) const
 {
   DocumentPtr aDocument = theAttribute->owner()->document();

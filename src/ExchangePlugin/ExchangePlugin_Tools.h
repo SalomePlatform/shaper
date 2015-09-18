@@ -12,7 +12,8 @@
 #include <list>
 #include <string>
 
-/**\class ExchangePlugin_Tools
+/**
+ * \class ExchangePlugin_Tools
  * \ingroup Plugins
  * \brief Internal tools for the plugin.
  */
