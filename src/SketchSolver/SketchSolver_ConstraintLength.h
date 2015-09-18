@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintLength : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintLength(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}

@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintFillet : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintFillet(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}

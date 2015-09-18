@@ -145,9 +145,7 @@ protected:
    */
   void removeConstraint(ConstraintPtr theConstraint);
 
-  /** \brief Remove all temporary constraint after computation finished
-   *  \param[in] theRemoved  indexes of constraints to be removed. If empty, all temporary constraints should be deleted
-   */
+  /// \brief Remove all temporary constraint after computation finished
   void removeTemporaryConstraints();
 
 private:

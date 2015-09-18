@@ -28,6 +28,7 @@ class SketchSolver_Constraint
 protected:
   /// Default constructor
   SketchSolver_Constraint() {}
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_Constraint(ConstraintPtr theConstraint);
 
 public:
@@ -144,6 +145,7 @@ typedef std::shared_ptr<SketchSolver_Constraint> SolverConstraintPtr;
 class SketchSolver_ConstraintParallel : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintParallel(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}
@@ -160,6 +162,7 @@ public:
 class SketchSolver_ConstraintPerpendicular : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintPerpendicular(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}
@@ -176,6 +179,7 @@ public:
 class SketchSolver_ConstraintHorizontal : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintHorizontal(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}
@@ -192,6 +196,7 @@ public:
 class SketchSolver_ConstraintVertical : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintVertical(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}
@@ -208,6 +213,7 @@ public:
 class SketchSolver_ConstraintRadius : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintRadius(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}

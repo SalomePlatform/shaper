@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintMultiTranslation : public SketchSolver_ConstraintMulti
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintMultiTranslation(ConstraintPtr theConstraint) :
       SketchSolver_ConstraintMulti(theConstraint),
       myTranslationLine(SLVS_E_UNKNOWN)

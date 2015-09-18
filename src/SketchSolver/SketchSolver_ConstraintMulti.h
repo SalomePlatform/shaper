@@ -19,6 +19,7 @@
 class SketchSolver_ConstraintMulti : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintMulti(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
       myNumberOfObjects(0),

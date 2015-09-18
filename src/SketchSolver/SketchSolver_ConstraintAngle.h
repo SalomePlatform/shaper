@@ -16,6 +16,7 @@
 class SketchSolver_ConstraintAngle : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintAngle(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
       myAngle(0.0)

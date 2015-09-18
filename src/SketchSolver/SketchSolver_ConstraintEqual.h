@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintEqual : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintEqual(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}

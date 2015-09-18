@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintMirror : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintMirror(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
       myNumberOfObjects(0),

@@ -18,6 +18,7 @@
 class SketchSolver_ConstraintCoincidence : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintCoincidence(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
       myType(SLVS_C_UNKNOWN)

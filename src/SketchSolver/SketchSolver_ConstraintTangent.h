@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintTangent : public SketchSolver_Constraint
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintTangent(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint)
   {}

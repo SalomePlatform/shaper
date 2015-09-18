@@ -17,6 +17,7 @@
 class SketchSolver_ConstraintMultiRotation : public SketchSolver_ConstraintMulti
 {
 public:
+  /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintMultiRotation(ConstraintPtr theConstraint) :
       SketchSolver_ConstraintMulti(theConstraint)
   {}
