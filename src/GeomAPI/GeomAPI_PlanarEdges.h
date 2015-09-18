@@ -57,7 +57,6 @@ class GeomAPI_PlanarEdges : public GeomAPI_Shape
   /// Set working plane
   /// \param theOrigin origin of the plane axis
   /// \param theDirX X direction of the plane axis
-  /// \param theDirY Y direction of the plane axis
   /// \param theNorm normal direction of the plane axis
   GEOMAPI_EXPORT void setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                const std::shared_ptr<GeomAPI_Dir>& theDirX,

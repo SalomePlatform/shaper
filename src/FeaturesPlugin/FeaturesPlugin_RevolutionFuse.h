@@ -11,6 +11,8 @@
 
 /** \class FeaturesPlugin_RevolutionFuse
  *  \ingroup Plugins
+ *  \brief This feature allows to create sketch, revol faces from this sketch and
+ *         fuse result with other objects in a single operation.
  */
 class FeaturesPlugin_RevolutionFuse : public FeaturesPlugin_RevolutionBoolean
 {

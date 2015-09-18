@@ -11,6 +11,7 @@
 
 /** \class FeaturesPlugin_ExtrusionBoolean
  *  \ingroup Plugins
+ *  \brief Interface for the composite extrusion feature.
  */
 class FeaturesPlugin_ExtrusionBoolean : public FeaturesPlugin_CompositeBoolean
 {

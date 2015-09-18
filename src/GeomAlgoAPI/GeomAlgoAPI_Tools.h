@@ -13,6 +13,10 @@
 
 namespace GeomAlgoAPI_Tools {
 
+/** \class Localizer
+ *  \ingroup DataAlgo
+ *  \brief Localizer tool.
+ */
 class Localizer
 {
 public:
@@ -22,6 +26,10 @@ private:
   std::string myCurLocale;
 };
 
+/** \class File_Tools
+ *  \ingroup DataAlgo
+ *  \brief File tool.
+ */
 class File_Tools {
 public:
   /**

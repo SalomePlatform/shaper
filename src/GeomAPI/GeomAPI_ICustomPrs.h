@@ -12,12 +12,14 @@
 #include "GeomAPI_AISObject.h"
 
 #include <vector>
-/**
-* Interface of a class which can provide specific customization of
-* object presentation
-*/ 
+
 class ModelAPI_Result;
 
+/** \class GeomAPI_ICustomPrs
+ *  \ingroup DataModel
+ *  \brief Interface of a class which can provide specific customization of
+ *         object presentation
+ */
 class GeomAPI_ICustomPrs
 {
 public:

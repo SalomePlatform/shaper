@@ -15,6 +15,7 @@
 
 /** \class FeaturesPlugin_CompositeBoolean
  *  \ingroup Plugins
+ *  \brief Interface for the composite boolean feature.
  */
 class FeaturesPlugin_CompositeBoolean : public ModelAPI_CompositeFeature
 {
@@ -79,6 +80,7 @@ protected:
                           ListOfShape& theResults,
                           std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos) = 0;
 
+  /// Results naming.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
                     const ListOfShape& theShells,
@@ -87,6 +89,7 @@ protected:
                     const GeomAlgoAPI_Boolean& theAlgo);
 
 protected:
+  /// Type of boolean operation.
   GeomAlgoAPI_Boolean::OperationType myBooleanOperationType;
 };
 

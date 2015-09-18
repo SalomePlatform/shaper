@@ -11,6 +11,8 @@
 
 /** \class FeaturesPlugin_RevolutionCut
  *  \ingroup Plugins
+ *  \brief This feature allows to create sketch, revol faces from this sketch and
+ *         cut result from other objects in a single operation.
  */
 class FeaturesPlugin_RevolutionCut : public FeaturesPlugin_RevolutionBoolean
 {

@@ -15,6 +15,7 @@
 
 /** \class FeaturesPlugin_CompositeSketch
  *  \ingroup Plugins
+ *  \brief Interface for the composite sketch feature.
  */
 class FeaturesPlugin_CompositeSketch : public ModelAPI_CompositeFeature
 {
@@ -75,6 +76,7 @@ protected:
                          std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
                          std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theDataMap) = 0;
 
+  /// Results naming.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
                     const std::shared_ptr<GeomAPI_Shape>& theResult,

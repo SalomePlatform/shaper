@@ -26,7 +26,6 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_SketchBuilder
   /** \brief Creates list of faces and unclosed wires on basis of the features of the sketch
    *  \param[in]  theOrigin      origin point of the sketch
    *  \param[in]  theDirX        x-direction of the sketch
-   *  \param[in]  theDirY        y-direction of the sketch
    *  \param[in]  theNorm        normal of the sketch
    *  \param[in]  theFeatures    initial features of the sketch
    *  \param[out] theResultFaces faces based on closed wires
@@ -46,7 +45,6 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_SketchBuilder
   /** \brief Creates list of faces and unclosed wires on basis of the features of the sketch
    *  \param[in]  theOrigin      origin point of the sketch
    *  \param[in]  theDirX        x-direction of the sketch
-   *  \param[in]  theDirY        y-direction of the sketch
    *  \param[in]  theNorm        normal of the sketch
    *  \param[in]  theWire        a wire which contains all edges
    *  \param[out] theResultFaces faces based on closed wires

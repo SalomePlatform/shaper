@@ -11,6 +11,8 @@
 
 /** \class FeaturesPlugin_ExtrusionSketch
  *  \ingroup Plugins
+ *  \brief This feature allows to create sketch and extrude faces from this sketch
+ *         in a single operation.
  */
 class FeaturesPlugin_ExtrusionSketch : public FeaturesPlugin_CompositeSketch
 {

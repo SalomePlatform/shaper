@@ -24,8 +24,9 @@ public:
   /** \brief Constructs an explorer to search on theShape, for shapes of type toFind,
    *  that are not part of a shape toAvoid. If the shape toAvoid is equal to GeomAPI_SHape::SHAPE,
    *  or if it is the same as, or less complex than the shape toFind it has no effect on the search.
-      \param[in] toFind shape type to find.
-      \param[in] toAvoid shape type to avoid.
+   *  \param[in] theShape shape to explore.
+   *  \param[in] toFind shape type to find.
+   *  \param[in] toAvoid shape type to avoid.
    */
   GEOMAPI_EXPORT
   GeomAPI_ShapeExplorer(const std::shared_ptr<GeomAPI_Shape>& theShape,
@@ -35,8 +36,9 @@ public:
   /** \brief Resets this explorer. It is initialized to search on theShape, for shapes of type toFind,
    *  that are not part of a shape toAvoid. If the shape toAvoid is equal to GeomAPI_SHape::SHAPE,
    *  or if it is the same as, or less complex than the shape toFind it has no effect on the search.
-      \param[in] toFind shape type to find.
-      \param[in] toAvoid shape type to avoid.
+   *  \param[in] theShape shape to explore.
+   *  \param[in] toFind shape type to find.
+   *  \param[in] toAvoid shape type to avoid.
    */
   GEOMAPI_EXPORT
   void init(const std::shared_ptr<GeomAPI_Shape>& theShape,
