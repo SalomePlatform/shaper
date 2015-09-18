@@ -8,6 +8,11 @@ def help_points(name):
 def set_defaults():
     waitForObject(":OpenParts*_AppElements_MainWindow").resize(1024, 768)
 
+def close_application():
+    sendEvent("QCloseEvent", waitForObject(":OpenParts*_AppElements_MainWindow"))
+    if object.exists(":Save current file.Discard_QPushButton"):
+        clickButton(waitForObject(":Save current file.Discard_QPushButton"))
+
 def parameter_create(name, expression):
     clickButton(waitForObject(":Parameters.Parameter_AppElements_Button"))
     type(waitForObject(":Parameter_QLineEdit"), name)
@@ -101,7 +106,6 @@ def distance_create(point_1, point_2, annotaion_point, distance):
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_1[0], point_1[1], 0, Qt.LeftButton)
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), point_2[0], point_2[1], 0, Qt.LeftButton)
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), annotaion_point[0], annotaion_point[1], 0, Qt.LeftButton) # move annotation
-
 
     type(waitForObject(":_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":_ModuleBase_ParamSpinBox"), distance)

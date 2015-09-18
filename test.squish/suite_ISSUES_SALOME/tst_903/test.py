@@ -37,8 +37,7 @@ def main():
     waitFor("object.exists(':Parameter_QFrame')", 20000)
     test.compare(str(findObject(":Parameter_QFrame").toolTip), "expression - Parameters_ExpressionValidator: name 'b' is not defined")
 
-    #[step] Check that apply button is disabled
-    waitFor("object.exists(':Parameter.property_panel_ok_QToolButton')", 20000)
-    test.compare(findObject(":Parameter.property_panel_ok_QToolButton").enabled, False)
+    #[step] Check that apply button is red [vp VP_APPLY_RED]
+    test.vp("VP_APPLY_RED")
 
     close_application()

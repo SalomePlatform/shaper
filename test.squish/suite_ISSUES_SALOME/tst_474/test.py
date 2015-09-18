@@ -26,13 +26,18 @@ def main():
     # check the new parameter
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1.Parameters (1).bb = 5")
 
-    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Parts (1).Part\\_1", 10, 10, 0)
-    activateItem(waitForObjectItem(":_QMenu", "Deactivate"))
+    openContextMenu(waitForObject(":Object browser_QLineEdit"), 10, 10, 0)
+    activateItem(waitForObjectItem(":_QMenu", "Activate"))
     
     openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Parameters (1).aa = 4", 10, 10, 0)
     activateItem(waitForObjectItem(":_QMenu", "Delete"))
     waitFor("object.exists(':Delete features._QLabel')", 20000)
-    test.compare(str(findObject(":Delete features._QLabel").text), "Selected features are used in the following features: bb. These features will be deleted.\nWould you like to continue?")
+    
+    an_expected = """Selected parameters are used in the following features: bb.
+These features will be deleted.
+Or parameters could be replaced by their values.
+Would you like to continue?"""     
+    test.compare(str(findObject(":Delete features._QLabel").text), an_expected)
     clickButton(waitForObject(":Delete features.No_QPushButton"))
 
     # nothing is deleted

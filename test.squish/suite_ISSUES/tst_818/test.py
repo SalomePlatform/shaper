@@ -1,3 +1,5 @@
+import re
+
 def main():
     source(findFile("scripts", "common.py"))
     
@@ -21,7 +23,13 @@ def main():
     
     #[check] Message box with "Selected features are used in the following features: SketchLine_1. These features will be deleted.\nAlso these features will be deleted: Sketch_1.\nWould you like to continue?" should appear
     waitFor("object.exists(':Delete features.Label_QLabel')", 20000)
-    test.compare(str(findObject(":Delete features.Label_QLabel").text), "Selected features are used in the following features: SketchLine_1. These features will be deleted.\nAlso these features will be deleted: Sketch_1.\nWould you like to continue?")
+
+    an_expected = """Selected parameters are used in the following features: SketchLine_1.
+These features will be deleted.
+(Also these features will be deleted: Sketch_1)
+Or parameters could be replaced by their values.
+Would you like to continue?"""    
+    test.compare(str(findObject(":Delete features.Label_QLabel").text), an_expected)
 
     #[step] Click 'Yes' and close application
     clickButton(waitForObject(":Delete features.Yes_QPushButton"))
