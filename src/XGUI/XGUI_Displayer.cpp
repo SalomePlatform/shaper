@@ -96,7 +96,7 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 }
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myWorkshop(theWorkshop)
+  : myWorkshop(theWorkshop), myEnableUpdateViewer(true)
 {
   enableUpdateViewer(true);
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs());
