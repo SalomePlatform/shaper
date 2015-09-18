@@ -21,6 +21,7 @@ public:
   /** \brief Returns true if feature and/or attributes are valid.
    *  \param[in] theFeature the validated feature.
    *  \param[in] theArguments the arguments in the configuration file for this validator.
+   *  \param[out] theError error message.
    *  \returns true if feature is valid.
    */
   GEOMVALIDATORS_EXPORT virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,

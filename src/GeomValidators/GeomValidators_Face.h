@@ -21,8 +21,9 @@ class GeomValidators_Face : public ModelAPI_AttributeValidator
  public:
    GEOMVALIDATORS_EXPORT GeomValidators_Face() {}
   //! returns true if attribute is valid
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
+  //! \param[in] theAttribute the checked attribute
+  //! \param[in] theArguments arguments of the attribute
+  //! \param[out] theError error message.
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
                                              std::string& theError) const;

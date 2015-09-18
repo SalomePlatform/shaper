@@ -37,10 +37,16 @@ bool isEqualAttributes(const AttributePtr& theLeft, const AttributePtr& theRight
   return false;
 }
 
+/** \class IsEqual
+ *  \ingroup Validators
+ *  \brief Auxiliary class used in std::find_if
+ */
 class IsEqual {
   AttributePtr myAttribute;
 public:
+  /// Constructor
   IsEqual(const AttributePtr& theAttribute) : myAttribute(theAttribute) {}
+  /// \return true in case if AttributePtr is equal with myAttribute
   bool operator()(const AttributePtr& theAttribute) {
     return isEqualAttributes(myAttribute, theAttribute);
   }

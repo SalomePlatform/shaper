@@ -20,8 +20,9 @@ class GeomValidators_DifferentShapes : public ModelAPI_AttributeValidator
 public:
   /// returns True if the attribute is valid. It checks whether the feature of the attribute
   /// does not contain a selection attribute filled with the same shape
-  /// \param theAttribute an attribute to check
-  /// \param theArguments a filter parameters
+  /// \param[in] theAttribute an attribute to check
+  /// \param[in] theArguments a filter parameters
+  /// \param[out] theError error message.
   MODELAPI_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                        const std::list<std::string>& theArguments,
                                        std::string& theError) const;

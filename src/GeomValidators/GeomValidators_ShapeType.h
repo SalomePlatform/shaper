@@ -23,7 +23,7 @@
 class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
 {
  public:
-  //  the edge type
+  /// Type of shape
   enum TypeOfShape
   {
     Empty,
@@ -41,8 +41,9 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
  public:
    GEOMVALIDATORS_EXPORT GeomValidators_ShapeType() {}
   //! Returns true if attribute has shape type listed in the parameter arguments
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
+  //! \param[in] theAttribute the checked attribute
+  //! \param[in] theArguments arguments of the attribute
+  //! \param[out] theError error message.
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
                                              std::string& theError) const;
@@ -52,22 +53,25 @@ protected:
   static TypeOfShape shapeType(const std::string& theType);
 
   /// Returns true if the attibute's object type satisfies the argument value
-  /// \param theAttribute a checked attribute
-  /// \param theArgument a parameter
+  /// \param[in] theAttribute a checked attribute
+  /// \param[in] theShapeType a type of shape
+  /// \param[out] theError error message.
   bool isValidAttribute(const AttributePtr& theAttribute,
                         const TypeOfShape theShapeType,
                         std::string& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
-  /// \param theAttribute a checked object
-  /// \param theShapeType a shape type
+  /// \param[in] theObject a checked object
+  /// \param[in] theShapeType a shape type
+  /// \param[out] theError error message.
   bool isValidObject(const ObjectPtr& theObject,
                      const TypeOfShape theShapeType,
                      std::string& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
-  /// \param theShape a checked shape
-  /// \param theShapeType a shape type
+  /// \param[in] theShape a checked shape
+  /// \param[in] theShapeType a shape type
+  /// \param[out] theError error message.
   bool isValidShape(const GeomShapePtr theShape,
                     const TypeOfShape theShapeType,
                     std::string& theError) const;
