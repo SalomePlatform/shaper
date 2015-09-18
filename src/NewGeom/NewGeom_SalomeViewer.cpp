@@ -396,5 +396,6 @@ void NewGeom_SalomeViewer::Zfitall()
   if (aView) {
     OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
     aWnd->getViewPort()->getView()->ZFitAll();
+    aWnd->getViewPort()->getView()->DepthFitAll();
   }
 }

@@ -330,7 +330,9 @@ void XGUI_ViewerProxy::Zfitall()
   } else {
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     AppElements_ViewWindow* aView = aViewer->activeViewWindow();
-    if (aView)
+    if (aView) {
       aView->v3dView()->ZFitAll();
+      aView->v3dView()->DepthFitAll();
+    }
   }
 }
