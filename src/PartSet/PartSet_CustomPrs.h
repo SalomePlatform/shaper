@@ -80,6 +80,7 @@ private:
   void customizePresentation(const bool theUpdateViewer);
 
 private:
+  bool myIsActive;
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
   AISObjectPtr myOperationPrs; /// the AIS presentation, which is displayed/erased in the viewer
 };

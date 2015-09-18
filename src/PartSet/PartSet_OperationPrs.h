@@ -62,6 +62,9 @@ public:
   // Recompute internal list of shaped dependent on the current feature
   void updateShapes();
 
+  /// Returns true if the feature contains shapes or results
+  bool hasShapes();
+
   DEFINE_STANDARD_RTTI(PartSet_OperationPrs)
 
 protected:

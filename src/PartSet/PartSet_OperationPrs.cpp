@@ -76,10 +76,17 @@ void PartSet_OperationPrs::updateShapes()
     myFeatureResults = myFeature->results();
 }
 
+bool PartSet_OperationPrs::hasShapes()
+{
+  return !myFeatureShapes.empty() || !myFeatureResults.empty();
+}
+
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  if (!hasShapes())
+    return;
   // when the feature can not be visualized in the module, the operation preview should not
   // be visualized also
   if (!myWorkshop->module()->canDisplayObject(myFeature))
