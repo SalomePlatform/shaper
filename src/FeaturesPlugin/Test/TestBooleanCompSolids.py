@@ -100,6 +100,23 @@ aSession.startOperation()
 aBooleanFt = aPart.addFeature("Boolean")
 aBooleanFt.selectionList("main_objects").append(modelAPI_ResultCompSolid(extrudedObjects[0]).subResult(1), None)
 aBooleanFt.selectionList("tool_objects").append(extrudedObjects[1], None)
+aBooleanType = 0
+aBooleanFt.integer("bool_type").setValue(aBooleanType)
+aBooleanFt.execute()
+aSession.finishOperation()
+
+assert (len(aBooleanFt.results()) > 0)
+aBooleanResult = modelAPI_ResultBody(aBooleanFt.firstResult())
+assert (aBooleanResult is not None)
+aSession.undo()
+
+#=========================================================================
+# Fuse
+#=========================================================================
+aSession.startOperation()
+aBooleanFt = aPart.addFeature("Boolean")
+aBooleanFt.selectionList("main_objects").append(modelAPI_ResultCompSolid(extrudedObjects[0]).subResult(1), None)
+aBooleanFt.selectionList("tool_objects").append(extrudedObjects[1], None)
 aBooleanType = 1
 aBooleanFt.integer("bool_type").setValue(aBooleanType)
 aBooleanFt.execute()

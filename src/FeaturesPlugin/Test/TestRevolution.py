@@ -178,3 +178,29 @@ aSession.finishOperation()
 assert (len(aRevolFt.results()) > 0)
 aRevolResult = modelAPI_ResultBody(aRevolFt.firstResult())
 assert (aRevolResult is not None)
+aSession.undo()
+
+#=========================================================================
+# Test revol between bounding plane
+#=========================================================================
+aSession.startOperation()
+aRevolFt = aPart.addFeature("Revolution")
+assert (aRevolFt.getKind() == "Revolution")
+# selection type FACE=4
+aRevolFt.selectionList("base").append(
+    aCircleSketchResult, aCircleSketchFaces[0])
+aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
+aRevolFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
+aRevolFt.real("from_angle").setValue(0) #TODO: remove
+aRevolFt.real("to_angle").setValue(0) #TODO: remove
+aRevolFt.selection("to_object").setValue(aToResult, None)
+aRevolFt.real("to_offset").setValue(0)
+aRevolFt.selection("from_object").setValue(None, None)
+aRevolFt.real("from_offset").setValue(0)
+aRevolFt.execute()
+aSession.finishOperation()
+
+# Check revol results
+assert (len(aRevolFt.results()) > 0)
+aRevolResult = modelAPI_ResultBody(aRevolFt.firstResult())
+assert (aRevolResult is not None)
