@@ -289,7 +289,11 @@ void SketchSolver_ConstraintMulti::checkCoincidence()
               }
           }
         } else {
-          bool isFixed[2] = {isFixed1, isFixed2};
+          bool isFixed[2] = {
+              myStorage->isPointFixed(*anIt1, aFixed1, true),
+              myStorage->isPointFixed(*anIt2, aFixed2, true)
+          };
+
           Slvs_hEntity aPoint[2] = {*anIt1, *anIt2};
           for (int i = 0; i < 2; i++)
             if (!isFixed[i]) {
