@@ -44,11 +44,14 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
                                           const std::string& theY,
                                           const std::string& theZ) = 0;
 
-  /// Returns the text values
+  /// Returns the text value for X
   GEOMDATAAPI_EXPORT virtual std::string textX() = 0;
+  /// Returns the text value for Y
   GEOMDATAAPI_EXPORT virtual std::string textY() = 0;
+  /// Returns the text value for Z
   GEOMDATAAPI_EXPORT virtual std::string textZ() = 0;
 
+  /// Point component (x,y,z)
   enum PointComponent { C_X = 0,
                         C_Y = 1,
                         C_Z = 2,

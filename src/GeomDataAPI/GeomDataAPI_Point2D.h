@@ -41,10 +41,12 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
                                           const std::string& theY) = 0;
 
-  /// Returns the text values
+  /// Returns the text value for X
   GEOMDATAAPI_EXPORT virtual std::string textX() = 0;
+  /// Returns the text value for Y
   GEOMDATAAPI_EXPORT virtual std::string textY() = 0;
 
+  /// Point component (x,y)
   enum PointComponent { C_X = 0,
                         C_Y = 1,
   };
