@@ -186,7 +186,13 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
     // this is done in Part result "activate", so no needed here. Causes not-blue active part.
     // aSession->setActiveDocument(anApp->getDocument(myID), true);
-  }
+  } else { // open failed, but new documnet was created to work with it: inform the model
+    static std::shared_ptr<Events_Message> aMsg(
+        new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
+    Events_Loop::loop()->send(aMsg);
+    TDF_LabelList anEmpty;
+    myObjs->synchronizeFeatures(anEmpty, true, true);
+  } 
   return !isError;
 }
 
