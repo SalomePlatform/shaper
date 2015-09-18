@@ -11,6 +11,8 @@
 
 /** \class FeaturesPlugin_ExtrusionCut
  *  \ingroup Plugins
+ *  \brief This feature allows to create sketch, extrude faces from this sketch and
+ *         cut result from other objects in a single operation.
  */
 class FeaturesPlugin_ExtrusionCut : public FeaturesPlugin_ExtrusionBoolean
 {

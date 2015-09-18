@@ -53,10 +53,10 @@ protected:
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(){};
 
 protected:
-  GeomAlgoAPI_MakeShape::AlgoType myAlgoType;
-  std::shared_ptr<GeomAPI_Shape> myShape;
-  std::shared_ptr<GeomAPI_Shape> myWire;
-  std::shared_ptr<GeomAPI_Shape> myBaseShape;
+  GeomAlgoAPI_MakeShape::AlgoType myAlgoType; ///< Type of make shape algo.
+  std::shared_ptr<GeomAPI_Shape> myShape; ///< Resulting shape.
+  std::shared_ptr<GeomAPI_Shape> myWire; ///< Wire for pipe algo.
+  std::shared_ptr<GeomAPI_Shape> myBaseShape; ///< Base shape of algo.
 };
 
 typedef std::list<std::shared_ptr<GeomAlgoAPI_MakeShape> > ListOfMakeShape;

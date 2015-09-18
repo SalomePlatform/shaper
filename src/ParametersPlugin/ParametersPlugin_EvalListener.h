@@ -43,6 +43,7 @@ class ParametersPlugin_EvalListener : public Events_Listener
                          const std::string& theOldName,
                          const std::string& theNewName);
   void renameInDependants(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
+                          const std::string& theOldName,
                           const std::string& theNewName);
 
  private:

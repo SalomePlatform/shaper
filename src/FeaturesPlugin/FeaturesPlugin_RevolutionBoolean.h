@@ -11,6 +11,7 @@
 
 /** \class FeaturesPlugin_RevolutionBoolean
  *  \ingroup Plugins
+ *  \brief Interface for the composite revolution feature.
  */
 class FeaturesPlugin_RevolutionBoolean : public FeaturesPlugin_CompositeBoolean
 {

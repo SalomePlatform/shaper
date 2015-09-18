@@ -15,7 +15,7 @@
 
 /** \class GeomAlgoAPI_ShapeTools
  *  \ingroup DataAlgo
- *  \brief
+ *  \brief Useful tools for working with shapes.
  */
 class GEOMALGOAPI_EXPORT GeomAlgoAPI_ShapeTools
 {
@@ -30,8 +30,8 @@ public:
   /** \brief Combines faces with common edges to shells, or solids to compsolids.
    *  \param[in] theCompound compound of shapes.
    *  \param[in] theType type of combine.
-   *  \param[out] theShells resulting shells.
-   *  \param[out] theFreeFaces faces that does not have common edges.
+   *  \param[out] theCombinedShapes resulting shapes.
+   *  \param[out] theFreeShapes shapes that does not have common subshapes.
    */
   static void combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
                             const GeomAPI_Shape::ShapeType theType,

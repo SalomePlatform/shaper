@@ -11,6 +11,8 @@
 
 /** \class FeaturesPlugin_ExtrusionFuse
  *  \ingroup Plugins
+ *  \brief This feature allows to create sketch, extrude faces from this sketch and
+ *         fuse result with other objects in a single operation.
  */
 class FeaturesPlugin_ExtrusionFuse : public FeaturesPlugin_ExtrusionBoolean
 {

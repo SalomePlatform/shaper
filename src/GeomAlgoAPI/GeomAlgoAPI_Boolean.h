@@ -23,10 +23,11 @@
 class GeomAlgoAPI_Boolean : public GeomAPI_Interface
 {
 public:
+  /// Type of booelan operation
   enum OperationType{
-    BOOL_CUT,
-    BOOL_FUSE,
-    BOOL_COMMON
+    BOOL_CUT, ///< Cut objects
+    BOOL_FUSE, ///< Fuse objects
+    BOOL_COMMON ///< Take common part of objects
   };
 
  public:

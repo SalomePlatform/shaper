@@ -51,8 +51,9 @@ class GeomAPI_Circ : public GeomAPI_Interface
    *         at a distance less than the tolerance value. Return FALSE if the point
    *         is beyond the tolerance limit or if computation fails.
    *         Max Tolerance value is currently limited to 1.e-4
-   *  \param[in] theOrigin point of origin.
-   *  \param[in] theDir direction of axis.
+   *  \param[in] thePoint point of origin.
+   *  \param[in] theTolerance tolerance of computation.
+   *  \param[out] theParameter resulting parameter.
    */
   GEOMAPI_EXPORT const bool parameter(const std::shared_ptr<GeomAPI_Pnt> thePoint,
                                       const double theTolerance,

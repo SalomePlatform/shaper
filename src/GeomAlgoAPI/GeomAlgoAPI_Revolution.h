@@ -34,6 +34,7 @@ class GeomAlgoAPI_Revolution : public GeomAPI_Interface
 public:
   /** \brief Creates revolution for the given shape.
    *  \param[in] theBasis face for revolution.
+   *  \param[in] theAxis axis for revolution.
    *  \param[in] theToAngle to angle.
    *  \param[in] theFromAngle from angle.
    */
@@ -44,6 +45,7 @@ public:
 
   /** \brief Creates revolution for the given shape.
    *  \param[in] theBasis face for revolution.
+   *  \param[in] theAxis axis for revolution.
    *  \param[in] theToShape to bounding shape. Can be empty. In this case offset will be applied to the basis.
    *  \param[in] theToAngle to angle.
    *  \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.

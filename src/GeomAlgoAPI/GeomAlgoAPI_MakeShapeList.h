@@ -68,7 +68,7 @@ private:
 
 
 protected:
-  ListOfMakeShape myListOfMakeShape;
+  ListOfMakeShape myListOfMakeShape; ///< List of make shape algos.
 };
 
 #endif

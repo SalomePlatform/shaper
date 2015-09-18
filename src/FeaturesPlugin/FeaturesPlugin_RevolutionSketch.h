@@ -11,6 +11,8 @@
 
 /** \class FeaturesPlugin_RevolutionSketch
  *  \ingroup Plugins
+ *  \brief This feature allows to create sketch and revol faces from this sketch 
+ *         in a single operation.
  */
 class FeaturesPlugin_RevolutionSketch : public FeaturesPlugin_CompositeSketch
 {
