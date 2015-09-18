@@ -82,6 +82,8 @@ class SketcherPrs_VertexBuffer : public OpenGl_VertexBuffer
 public:
 
   //! Create uninitialized VBO..
+  //! \param theAttribs attributes
+  //! \param theStride a flag
   SketcherPrs_VertexBuffer (const Graphic3d_Attribute* theAttribs,
                         const Standard_Integer     theStride)
   : Stride (theStride), NbAttributes(1)
@@ -97,6 +99,7 @@ public:
     memcpy (Attribs, theAttribs.AttributesArray(), sizeof(Graphic3d_Attribute) * NbAttributes);
   }
 
+  /// Returns True if color attribute is defined
   virtual bool HasColorAttribute() const
   {
     for (Standard_Integer anAttribIter = 0; anAttribIter < NbAttributes; ++anAttribIter) {
@@ -108,6 +111,7 @@ public:
     return false;
   }
 
+  /// Returns True if normal attribute is defined
   virtual bool HasNormalAttribute() const
   {
     for (Standard_Integer anAttribIter = 0; anAttribIter < NbAttributes; ++anAttribIter) {
@@ -119,6 +123,8 @@ public:
     return false;
   }
 
+  /// Bind position of the attribute
+  /// \param theGlCtx OpenGl context
   virtual void BindPositionAttribute (const Handle(OpenGl_Context)& theGlCtx) const
   {
     if (!OpenGl_VertexBuffer::IsValid()) {
@@ -142,6 +148,8 @@ public:
     }
   }
 
+  /// Bind all attributes
+  /// \param theGlCtx OpenGl context
   virtual void BindAllAttributes (const Handle(OpenGl_Context)& theGlCtx) const
   {
     if (!OpenGl_VertexBuffer::IsValid())
@@ -162,6 +170,8 @@ public:
     }
   }
 
+  /// Unbind all attributes
+  /// \param theGlCtx OpenGl context
   virtual void UnbindAllAttributes (const Handle(OpenGl_Context)& theGlCtx) const
   {
     if (!OpenGl_VertexBuffer::IsValid())
@@ -176,8 +186,13 @@ public:
 
 public:
 
+  /// Array of attributes
   Graphic3d_Attribute Attribs[1];
+
+  /// A flag
   Standard_Integer    Stride;
+
+  /// Number of attributes
   Standard_Integer NbAttributes;
 };
 
@@ -186,15 +201,21 @@ public:
 class SketcherPrs_Element: public OpenGl_Element
 {
 public:
+  /// Constructor
+  /// \param theObj a presentation
   SketcherPrs_Element(const Handle(SketcherPrs_SymbolPrs)& theObj) : 
   OpenGl_Element(), myObj(theObj) {}
 
+  /// Render the current presentation
+  /// \param theWorkspace OpenGL workspace
   virtual void Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   {
     if (!myObj.IsNull())
       myObj->Render(theWorkspace);
   }
 
+  /// Releases OpenGL resources
+  /// \param theContext OpenGL context
   virtual void Release (OpenGl_Context* theContext) 
   {
     if (!myObj.IsNull())
@@ -267,14 +288,6 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   myIconsMap[iconName()] = Handle(Image_AlienPixMap)();
   return Handle(Image_AlienPixMap)();
 }
-
-//void SketcherPrs_SymbolPrs::ClearSelected()
-//{
-//  Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( NULL );  
-//  if( !aSelectionPrs.IsNull() ) {
-//    aSelectionPrs->Clear(); 
-//  }
-//}
 
 void SketcherPrs_SymbolPrs::prepareAspect()
 {

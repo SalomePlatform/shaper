@@ -22,16 +22,19 @@ class SketcherPrs_SensitivePoint : public Select3D_SensitiveEntity
 {
 public: 
   //! Constructs a sensitive point object defined by the
-  //! owner OwnerId and the point Point.
+  //! \param OwnerId an Id of the Owner.
+  //! \param theId and Id of its point
   Standard_EXPORT SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& OwnerId, int theId);
   
+  /// Returns number of sub-elements
   Standard_EXPORT virtual Standard_Integer NbSubElements() Standard_OVERRIDE;
 
   //! Update location of the point
-  //! \param aLocation a new location
   Standard_EXPORT virtual Handle(Select3D_SensitiveEntity) GetConnected() Standard_OVERRIDE;
 
   //! Checks whether the point overlaps current selecting volume
+  //! \param theMgr selection manager
+  //! \param thePickResult returns pick result
   Standard_EXPORT virtual Standard_Boolean Matches (SelectBasics_SelectingVolumeManager& theMgr,
                                                     SelectBasics_PickResult& thePickResult) Standard_OVERRIDE;
 
@@ -46,6 +49,7 @@ public:
   //! transformation is set, it will be applied
   Standard_EXPORT virtual Select3D_BndBox3d BoundingBox() Standard_OVERRIDE;
 
+  /// Clear sub-elements
   Standard_EXPORT virtual void Clear() Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTI(SketcherPrs_SensitivePoint)

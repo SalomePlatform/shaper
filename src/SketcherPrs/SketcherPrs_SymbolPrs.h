@@ -44,11 +44,6 @@ public:
   
   virtual ~SketcherPrs_SymbolPrs();
 
-  //! Method which clear all selected owners belonging
-  //! to this selectable object ( for fast presentation draw )
-  //Standard_EXPORT virtual void ClearSelected();
-
-
   //! Method which draws selected owners ( for fast presentation draw )
   Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
                                                const SelectMgr_SequenceOfOwner& theOwners);
@@ -75,6 +70,8 @@ public:
   /// \param theContext is an OpenGL context
   void Release (OpenGl_Context* theContext);
 
+  /// Add a bounding box of the presentation to common bounding box
+  /// \param theBndBox the common bounding box to update
   Standard_EXPORT virtual void BoundingBox (Bnd_Box& theBndBox) Standard_OVERRIDE;
 
   DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)

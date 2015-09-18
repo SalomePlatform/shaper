@@ -25,12 +25,17 @@ class SketcherPrs_Coincident: public AIS_InteractiveObject
 {
 public:
   /// Constructor
-  /// \param theResult a result object
+  /// \param theConstraint a constraint object
+  /// \param thePlane plane of a sketch
   Standard_EXPORT SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
+  /// Defines color for the presentation
+  /// \param aColor a color object
   Standard_EXPORT virtual void SetColor(const Quantity_Color& aColor);
   
+  /// Defines color for the presentation
+  /// \param aColor a color name
   Standard_EXPORT virtual void SetColor(const Quantity_NameOfColor aColor);
    
   DEFINE_STANDARD_RTTI(SketcherPrs_Coincident)

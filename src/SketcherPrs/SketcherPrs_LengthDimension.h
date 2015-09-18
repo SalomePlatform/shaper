@@ -30,8 +30,6 @@ public:
   Standard_EXPORT SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
-  std::string constraintType() const;
-
   DEFINE_STANDARD_RTTI(SketcherPrs_LengthDimension)
 protected:
   /// Redefinition of virtual function

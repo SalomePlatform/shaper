@@ -16,6 +16,14 @@ class QLineEdit;
 class PartSet_Module;
 class ModuleBase_Operation;
 
+
+/**
+* \ingroup Modules
+* A widget which allow creation of a sketch in another operation.
+* It creates sketch on aqctivation of this widget. If sketch object is already created then
+* it will transfer a focus to next widget. It is supposed that the widget will be placed as 
+* a first widget in property panel
+*/
 class PARTSET_EXPORT PartSet_WidgetSketchCreator : public ModuleBase_ModelWidget
 {
 Q_OBJECT
