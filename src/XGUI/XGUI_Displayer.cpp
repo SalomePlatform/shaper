@@ -974,6 +974,7 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   }
   if (isDeactivated) {
     // the selection from the previous activation modes should be cleared manually (#26172)
+    theIO->ClearSelected();
     aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
     if (theUpdateViewer)
       updateViewer();
