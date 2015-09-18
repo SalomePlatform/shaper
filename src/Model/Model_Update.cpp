@@ -551,7 +551,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
             aState = ModelAPI_StateInvalidArgument;
         }
       } else if (aSel->isInvalid()) { // not needed to update, but invalid (stated previously)
-        aState = ModelAPI_StateInvalidArgument;
+        if (isObligatory)
+          aState = ModelAPI_StateInvalidArgument;
       }
     }
   }
@@ -577,7 +578,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
                 aState = ModelAPI_StateInvalidArgument;
             }
           } else if (aSelAttr->isInvalid()) {
-            aState = ModelAPI_StateInvalidArgument;
+            if (isObligatory)
+              aState = ModelAPI_StateInvalidArgument;
           }
         }
       }
