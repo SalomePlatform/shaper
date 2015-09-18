@@ -919,7 +919,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
   connectToPropertyPanel(true);
-  QApplication::setOverrideCursor(QCursor(QIcon(":pictures/button_plus.png").pixmap(20,20)));
+  if (isNestedCreateOperation(theOperation))
+    QApplication::setOverrideCursor(QCursor(QIcon(":pictures/button_plus.png").pixmap(20,20)));
 }
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
@@ -928,7 +929,8 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
   myIsResetCurrentValue = false;
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
-  QApplication::restoreOverrideCursor();
+  if (isNestedCreateOperation(theOp))
+    QApplication::restoreOverrideCursor();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
