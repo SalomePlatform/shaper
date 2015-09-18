@@ -202,6 +202,8 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
 
 
   /// \brief Create a result for the point in the attribute if the attribute is initialized
+  /// \param theFeature a source feature
+  /// \param theSketch a sketch intance
   /// \param theAttributeID an attribute string
   /// \param theIndex an index of the result
   static void createPoint2DResult(ModelAPI_Feature* theFeature,
@@ -211,8 +213,9 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   /// Add new feature and fill the data of the feature by the data of the parameter feature.
   /// The name of the created feature stays unique.
   /// \param theFeature a source feature
+  /// \param theSketch a sketch intance
   /// \return a created feature
-  static FeaturePtr addUniqueNamedCopiedFeature(FeaturePtr aFeature,
+  static FeaturePtr addUniqueNamedCopiedFeature(FeaturePtr theFeature,
                                                 SketchPlugin_Sketch* theSketch);
 
   /// Creates a plane of the sketch.

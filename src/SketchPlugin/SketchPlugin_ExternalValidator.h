@@ -10,7 +10,7 @@
 #include <SketchPlugin.h>
 #include <ModelAPI_AttributeValidator.h>
 
-/**\class SketchPlugin_ResultPointValidator
+/**\class SketchPlugin_ExternalValidator
  * \ingroup Validators
  * \brief Validator for the points selection
  *
@@ -23,6 +23,7 @@ public:
   /// among attributes listed in the arguments
   /// \param theAttribute an attribute to check
   /// \param theArguments a filter parameters
+  /// \param theError error message
   SKETCHPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                            const std::list<std::string>& theArguments,
                                            std::string& theError) const;
