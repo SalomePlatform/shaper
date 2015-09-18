@@ -13,6 +13,10 @@
 
 class ModuleBase_PageBase;
 
+/**
+* \ingroup GUI
+* This is an abstract interface to be used for not model container widget such as switch or tool box.
+*/
 class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidget
 {
   Q_OBJECT

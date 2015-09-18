@@ -14,6 +14,10 @@
 class ModuleBase_PageBase;
 class ModuleBase_ToolBox;
 
+/**
+* \ingroup GUI
+* Implements a model widget for switch as a container widget. It can be defined in XML with "toolbox" keyword
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContainer
 {
   Q_OBJECT
@@ -23,7 +27,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   virtual ~ModuleBase_WidgetToolbox();
 
   /// Defines if it is supported to set the value in this widget
-  /// It returns false because this is an info widget
+  /// \return false because this is an info widget
   virtual bool canSetValue() const { return false; };
 
   /// Overrides ModuleBase_PagedContainer
