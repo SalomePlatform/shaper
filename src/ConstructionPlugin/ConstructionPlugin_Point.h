@@ -22,6 +22,7 @@ class ConstructionPlugin_Point : public ModelAPI_Feature, public GeomAPI_ICustom
   /// Returns the kind of a feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind();
 
+  /// Point kind
   inline static const std::string& ID()
   {
     static const std::string CONSTRUCTION_POINT_KIND("Point");

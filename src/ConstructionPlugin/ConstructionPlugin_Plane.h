@@ -104,7 +104,10 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
  protected:
+  /// Creates a new plane by copy of face plane with translation along the normal
+  /// to the specified distance.
   std::shared_ptr<GeomAPI_Shape> createPlaneByFaceAndDistance();
+  /// Creates a new plane by general equation.
   std::shared_ptr<GeomAPI_Shape> createPlaneByGeneralEquation();
 };
 

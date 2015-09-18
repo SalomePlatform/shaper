@@ -58,6 +58,7 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return CYLINDRICAL_FACE_ATTR;
   }
 
+  /// Returns a minimal length for axis
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
   /// Creates a new part document if needed
@@ -77,7 +78,9 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
  protected:
+  /// Creates a new axis by two defined points
   void createAxisByTwoPoints();
+  /// Creates a new axis as copy of cylindrical face axis
   void createAxisByCylindricalFace();
 };
 
