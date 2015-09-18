@@ -280,17 +280,9 @@ void ParametersPlugin_EvalListener::renameInAttribute(
 }
 
 void ParametersPlugin_EvalListener::renameInDependants(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
+                                                       const std::string& theOldName,
                                                        const std::string& theNewName)
 {
-  // get parameter feature for the result
-  std::shared_ptr<ParametersPlugin_Parameter> aParameter =
-      std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
-          ModelAPI_Feature::feature(theResultParameter));
-  if (!aParameter.get())
-    return;
-
-  std::string anOldName = aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
-
   std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
       theResultParameter->data()->refsToMe();
   std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
@@ -303,10 +295,10 @@ void ParametersPlugin_EvalListener::renameInDependants(std::shared_ptr<ModelAPI_
               anAttribute->owner());
       if (aParameter.get())
         // Rename
-        renameInParameter(aParameter, anOldName, theNewName);
+        renameInParameter(aParameter, theOldName, theNewName);
     } else
         // Rename
-        renameInAttribute(anAttribute, anOldName, theNewName);
+        renameInAttribute(anAttribute, theOldName, theNewName);
   }
 }
 
@@ -366,7 +358,7 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     return;
   }
 
-  renameInDependants(aResultParameter, aMessage->newName());
+  renameInDependants(aResultParameter, aMessage->oldName(), aMessage->newName());
 }
 
 void ParametersPlugin_EvalListener::processReplaceParameterEvent(
@@ -391,5 +383,5 @@ void ParametersPlugin_EvalListener::processReplaceParameterEvent(
   double aRealValue = aResultParameter->data()->real(ModelAPI_ResultParameter::VALUE())->value();
   std::string aValue = toStdString(aRealValue);
 
-  renameInDependants(aResultParameter, aValue);
+  renameInDependants(aResultParameter, aResultParameter->data()->name(), aValue);
 }
