@@ -114,5 +114,9 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintEqual.py
                TestConstraintTangent.py
                TestConstraintMirror.py
+               TestConstraintAngle.py
+               TestMultiRotation.py
+               TestMultiTranslation.py
+               TestFillet.py
                TestHighload.py
                TestSnowflake.py)
