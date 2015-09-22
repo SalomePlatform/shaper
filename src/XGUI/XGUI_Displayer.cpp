@@ -363,8 +363,9 @@ void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
   for (; anIt != aLast; anIt++) {
     deactivate(*anIt, false);
   }
-  if (theUpdateViewer)
-    updateViewer();
+  //VSV It seems that there is no necessity to update viewer on deactivation
+  //if (theUpdateViewer)
+  //  updateViewer();
 }
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
@@ -439,12 +440,15 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   }
 
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
+  bool isActivationChanged = false;
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    activate(anAISIO, myActiveSelectionModes, false);
+    if (activate(anAISIO, myActiveSelectionModes, false))
+      isActivationChanged = true;
   }
-  if (theUpdateViewer)
-    updateViewer();
+  // VSV It seems that there is no necessity to update viewer on activation
+  //if (theUpdateViewer && isActivationChanged)
+  //  updateViewer();
 }
 
 bool XGUI_Displayer::isActive(ObjectPtr theObject) const
@@ -691,6 +695,7 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
 
 void XGUI_Displayer::updateViewer() const
 {
+  static int ai = 0;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull() && myEnableUpdateViewer) {
     myWorkshop->viewer()->Zfitall();
@@ -940,14 +945,15 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
   return ::canBeShaded(anAIS);
 }
 
-void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
+bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
                               const QIntList& theModes,
                               const bool theUpdateViewer) const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull() || theIO.IsNull())
-    return;
-
+    return false;
+  
+  bool isActivationChanged = false;
   // deactivate object in all modes, which are not in the list of activation
   // It seems that after the IO deactivation the selected state of the IO's owners
   // is modified in OCC(version: 6.8.0) and the selection of the object later is lost.
@@ -976,8 +982,10 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     // the selection from the previous activation modes should be cleared manually (#26172)
     theIO->ClearSelected();
     aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
-    if (theUpdateViewer)
-      updateViewer();
+    // For performance issues
+    //if (theUpdateViewer)
+    //  updateViewer();
+    isActivationChanged = true;
   }
 
   // loading the interactive object allowing the decomposition
@@ -999,10 +1007,12 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
         //aContext->Load(anAISIO, aMode, true);
         if (!aModesActivatedForIO.contains(aMode)) {
           activateAIS(theIO, aMode, theUpdateViewer);
+          isActivationChanged = true;
         }
       }
     }
   }
+  return isActivationChanged;
 }
 
 bool XGUI_Displayer::customizeObject(ObjectPtr theObject)

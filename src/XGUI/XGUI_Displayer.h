@@ -253,7 +253,8 @@ private:
   /// Activates the interactive object in the local context.
   /// \param theIO an interactive object
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
+  /// \return a flag is object activated or not
+  bool activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
                 const bool theUpdateViewer) const;
 
   /// Deactivates the given object (not allow selection)

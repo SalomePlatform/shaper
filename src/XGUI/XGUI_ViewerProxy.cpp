@@ -55,7 +55,8 @@ void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ, 
     aView3d->SetTwist( theTwist );
     aView3d->FitAll(0.01, true);
     aView3d->SetZSize(0.);
-    aView3d->DepthFitAll();
+    if (aView3d->Depth() < 0.1)
+      aView3d->DepthFitAll();
   }
 }
 
@@ -331,8 +332,10 @@ void XGUI_ViewerProxy::Zfitall()
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     AppElements_ViewWindow* aView = aViewer->activeViewWindow();
     if (aView) {
-      aView->v3dView()->ZFitAll();
-      aView->v3dView()->DepthFitAll();
+      Handle(V3d_View) aView3d = aView->v3dView();
+      aView3d->ZFitAll();
+      if (aView3d->Depth() < 0.1)
+        aView3d->DepthFitAll();
     }
   }
 }

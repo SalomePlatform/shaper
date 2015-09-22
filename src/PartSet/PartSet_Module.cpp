@@ -323,11 +323,12 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     mySketchMgr->stopNestedSketch(theOperation);
   }
 
-  if (isModified) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-    aDisplayer->updateViewer();
-  }
+  //VSV: Viewer is updated on feature update and redisplay
+  //if (isModified) {
+  //  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  //  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  //  aDisplayer->updateViewer();
+  //}
   mySketchMgr->onShowConstraintsToggle(myHasConstraintShown);
 }
 

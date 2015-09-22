@@ -159,13 +159,13 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
 
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
 {
-  blockUpdateViewer(true);
+  //blockUpdateViewer(true);
 
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
   Events_Loop::loop()->flush(anEvent);
 
-  blockUpdateViewer(false);
+  //blockUpdateViewer(false);
 }
 
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)

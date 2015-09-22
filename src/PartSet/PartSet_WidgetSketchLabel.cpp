@@ -181,7 +181,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // 6. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = workshop()->actionsMgr();
   anActMgr->update();
-  myWorkshop->viewer()->update();
+  //VSV myWorkshop->viewer()->update();
 }
 
 std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
@@ -289,7 +289,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
   connect(workshop()->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateFilters(true);
 
-  aDisp->updateViewer();
+  //VSV aDisp->updateViewer();
 }
 
 void PartSet_WidgetSketchLabel::deactivate()

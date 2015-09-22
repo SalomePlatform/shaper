@@ -301,7 +301,8 @@ void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double th
       aView3d->SetTwist( theTwist );
       aView3d->FitAll(0.01, true);
       aView3d->SetZSize(0.);
-      aView3d->DepthFitAll();
+      if (aView3d->Depth() < 0.1)
+        aView3d->DepthFitAll();
     }
   }
 }
@@ -395,7 +396,9 @@ void NewGeom_SalomeViewer::Zfitall()
   OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
   if (aView) {
     OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
-    aWnd->getViewPort()->getView()->ZFitAll();
-    aWnd->getViewPort()->getView()->DepthFitAll();
+    Handle(V3d_View) aView3d = aWnd->getViewPort()->getView();
+    aView3d->ZFitAll();
+    if (aView3d->Depth() < 0.1)
+      aView3d->DepthFitAll();
   }
 }

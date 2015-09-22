@@ -357,10 +357,12 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     }
   }
   if (aRedisplayed) {
+    customizeCurrentObject();
+    //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
-    customizeCurrentObject();
-    aDisplayer->updateViewer();
+    else 
+      aDisplayer->updateViewer();
   }
 }
 //******************************************************
@@ -415,10 +417,12 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
   if (aDisplayed) {
+    customizeCurrentObject();
+    //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
-    customizeCurrentObject();
-    workshop()->displayer()->updateViewer();
+    else
+      workshop()->displayer()->updateViewer();
   }
   //if (aHasPart) { // TODO: Avoid activate last part on loading of document
   //  activateLastPart();
