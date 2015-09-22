@@ -29,6 +29,8 @@ class XGUI_Workshop;
 class PartSet_CustomPrs
 {
 public:
+  /// Constructor
+  /// \param theWorkshop a reference to workshop
   PARTSET_EXPORT PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop);
   PARTSET_EXPORT virtual ~PartSet_CustomPrs() {};
 
@@ -48,6 +50,7 @@ public:
 
   /// If the presentation is active[displayed], the shapes of the presentation is recomputed
   /// and the presentation is redisplayed.
+  /// \param theObject an object to redisplay
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is redisplayed
   bool redisplay(const ObjectPtr& theObject, const bool theUpdateViewer);

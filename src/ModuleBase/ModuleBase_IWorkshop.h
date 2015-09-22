@@ -80,22 +80,25 @@ Q_OBJECT
   virtual ModuleBase_Operation* findStartedOperation(const QString& theId) = 0;
 
   //! Returns true if the operation with id theId can be stopped
-  //! \param theId a stopped operation
+  //! \param theOperation a stopped operation
   //! \return boolean result
   virtual bool canStopOperation(ModuleBase_Operation* theOperation) = 0;
 
   //! Aborts the operation.
-  //! \param theId an aborted operation
+  //! \param theOperation an aborted operation
   virtual void abortOperation(ModuleBase_Operation* theOperation) = 0;
 
   //! Returns AIS object by data object
+  //! \param theObject a data object
   virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const = 0;
 
   //! Returns data object by AIS
+  //! \param theAIS a presentation
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;
 
   //! Select features clearing previous selection. 
   //! If the list is empty then selection will be cleared
+  //! \param theValues a list of presentations
   virtual void setSelected(const QList<ModuleBase_ViewerPrs>& theValues) = 0;
 
 signals:

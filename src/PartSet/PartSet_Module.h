@@ -4,7 +4,6 @@
 #define PartSet_Module_H
 
 #include "PartSet.h"
-#include "PartSet_DocumentDataModel.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -21,6 +20,7 @@
 #include <QMap>
 #include <QMenu>
 #include <QObject>
+#include <QModelIndex>
 
 #include <string>
 
@@ -155,12 +155,8 @@ public:
   /// \return true if items are added and there is no necessity to provide standard menu
   bool isMouseOverWindow();
 
+  /// Returns sketch manager object
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
-
-#ifdef ModuleDataModel
-  /// Returns data model object for representation of data tree in Object browser
-  virtual ModuleBase_IDocumentDataModel* dataModel() const { return myDataModel; }
-#endif
 
   /// Performs functionality on closing document
   virtual void closeDocument();
@@ -287,9 +283,6 @@ protected slots:
   int myVisualLayerId;
 
   bool myHasConstraintShown;
-#ifdef ModuleDataModel
-  PartSet_DocumentDataModel* myDataModel;
-#endif
 
   QModelIndex aActivePartIndex;
 };

@@ -35,10 +35,14 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent
+  /// \param theWorkshop a reference to workshop
   XGUI_OperationMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop);
+
   /// Destructor
   virtual ~XGUI_OperationMgr();
 
+  /// Set reference to workshop
+  /// \param theWorkshop reference to workshop
   void setWorkshop(ModuleBase_IWorkshop* theWorkshop)
   { myWorkshop = theWorkshop; };
 
@@ -138,14 +142,6 @@ signals:
 
   /// Emitted when current operation is aborted
   void operationAborted(ModuleBase_Operation* theOperation);
-
-  /// Signal is emitted after the apply enable state changed.
-  //void validationStateChanged(bool);
-
-  /// Signal is emitted after the model is modified. It is emitted for all active operations.
-  /// \param theFeatureKind a feature id
-  /// \param theState validity of the operation with the feature kind
-  //void nestedStateChanged(const std::string& theFeatureKind, const bool theState);
 
   /// Signal is emitted after the current operation is filled with existing preselection.
   void operationActivatedByPreselection();

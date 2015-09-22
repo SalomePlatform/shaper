@@ -128,9 +128,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
-#ifdef ModuleDataModel
-  myDataModel = new PartSet_DocumentDataModel(this);
-#endif
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -880,12 +877,6 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
     aOB->treeView()->setExpandsOnDoubleClick(false);
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
-#ifdef ModuleDataModel
-    connect(aOB, SIGNAL(headerMouseDblClicked(const QModelIndex&)), 
-      SLOT(onTreeViewDoubleClick(const QModelIndex&)));
-    connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
-      myDataModel, SLOT(onMouseDoubleClick(const QModelIndex&)));
-#endif
   }
 }
 
@@ -987,38 +978,13 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-#ifdef ModuleDataModel
-    QModelIndex aOldIndex = myDataModel->activePartTree();
-    DocumentPtr aDoc = aMgr->moduleDocument();
-    if (aActiveDoc == aDoc) {
-      if (aOldIndex.isValid())
-        aTreeView->setExpanded(aOldIndex, false);
-      myDataModel->deactivatePart();
-      aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
-    } else {
-      std::string aGrpName = ModelAPI_ResultPart::group();
-      for (int i = 0; i < aDoc->size(aGrpName); i++) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
-        if (aPart->partDoc() == aActiveDoc) {
-          QModelIndex aIndex = myDataModel->partIndex(aPart);
-          if (myDataModel->activatePart(aIndex)) {
-            if (aOldIndex.isValid())
-              aTreeView->setExpanded(aOldIndex, false);
-            aTreeView->setExpanded(myDataModel->activePartTree(), true);
-            aPalet.setColor(QPalette::Text, Qt::black);
-          }
-          break;
-        }
-      }
-    }
-#else
     if (aActivePartIndex.isValid())
       aTreeView->setExpanded(aActivePartIndex, false);
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
     aActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
     if (aActivePartIndex.isValid())
       aTreeView->setExpanded(aActivePartIndex, true);
-#endif
+
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
 
@@ -1048,9 +1014,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   }
   if (theIndex.column() != 0) // Use only first column
     return;
-#ifdef ModuleDataModel
-  ObjectPtr aObj = myDataModel->object(theIndex);
-#else
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
@@ -1058,7 +1022,6 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   if ((aDataModel->flags(theIndex) & Qt::ItemIsSelectable) == 0)
     return;
   ObjectPtr aObj = aDataModel->object(theIndex);
-#endif
 
   ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
   if (!aPart.get()) { // Probably this is Feature

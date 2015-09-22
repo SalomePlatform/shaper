@@ -23,27 +23,51 @@ class QWidget;
 class QStringListModel;
 class QCompleter;
 
+/**
+* \ingroup GUI
+* A multi-line text editor which lets to input formula and provides a list of completion strings
+*/
 class ExpressionEditor: public QPlainTextEdit
 {
   Q_OBJECT
-
  public:
+   /// Constructor
+   /// \param theParent a parent widget
   explicit ExpressionEditor(QWidget* theParent = 0);
   virtual ~ExpressionEditor();
 
+  /// Set list of completion strings
   void setCompletionList(QStringList&);
 
+  /// Set a text which will be shown when the listr is empty
   void setPlaceHolderText( const QString& );
+
+  /// Returns placeholder list
   QString placeHolderText() const;
 
  public slots:
-  void insertCompletion(const QString&, bool isSingleWord = false);
+  /// Insert additional string for completion
+  /// \param theCompletion a string to insert
+  /// \param isSingleWord a flag shows that inserted string is single word or not
+  void insertCompletion(const QString& theCompletion, bool isSingleWord = false);
+
+  /// Perform completion
   void performCompletion();
 
  protected:
+  /// Perform completion by prefix
+  /// \param theCompletionPrefix a prefix for looking for completion
   void performCompletion(const QString& theCompletionPrefix);
+
+  /// Redefinition of virtual method
+  /// \param theEvent a key press event
   virtual void keyPressEvent(QKeyEvent* theEvent);
+
+  /// Key events processing
+  /// theEvent a key event
   bool handledCompletedAndSelected(QKeyEvent* theEvent);
+
+  /// Redefinition of virtual method
   virtual void paintEvent( QPaintEvent* );
 
  private:
@@ -55,7 +79,7 @@ class ExpressionEditor: public QPlainTextEdit
 
 /**
 * \ingroup GUI
-* TODO(sbh) add doc
+* A Widget which provides an input of an expression
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWidget
 {
@@ -65,12 +89,14 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// \param theParent the parent object
   /// \param theData the widget configuration.
   /// \param theParentId is Id of a parent of the current attribute
+  /// \param thePlaceHolder a placeholder string
   ModuleBase_WidgetExprEditor( QWidget* theParent,
                                const Config_WidgetAPI* theData,
                                const std::string& theParentId,
                                const std::string& thePlaceHolder );
   virtual ~ModuleBase_WidgetExprEditor();
 
+  /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 
  public slots:
@@ -82,6 +108,7 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom() const;
 
+  /// Redefinition of virtual method
   virtual bool restoreValueCustom();
 
 private:

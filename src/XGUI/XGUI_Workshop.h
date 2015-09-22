@@ -62,10 +62,10 @@ Q_OBJECT
   //! Starting of the application
   void startApplication();
 
-  // Activates the module controls. Should be called after module creation
+  /// Activates the module controls. Should be called after module creation
   void activateModule();
 
-  // Deactivates the module controls. Should be called after module creation
+  /// Deactivates the module controls. Should be called after module creation
   void deactivateModule();
 
   //! Returns main window (Desktop) of the application

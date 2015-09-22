@@ -56,6 +56,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped widget values
+  /// \param theToValidate a validation flag
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
@@ -114,6 +115,7 @@ protected:
 
   /// Returns true if the feature contains Point2D attribute with the same coordinates
   /// The attribute of the widget is not processed.
+  /// \param theFeature a feature
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   /// \return boolean result

@@ -49,7 +49,10 @@ Q_OBJECT
   /// Connect to viewer from workshop. Has to called at creation of viewer.
   void connectViewer();
 
+  /// Add menu items for Object browser pop-up
   void addObjBrowserMenu(QMenu*) const;
+
+  /// Add menu items for Viewer pop-up
   void addViewerMenu(QMenu*) const;
 
   /// Returns a list of object group names of the action

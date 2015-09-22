@@ -40,8 +40,10 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent object
+  /// \param theWorkshop a reference to workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
+  /// \param toShowConstraints a current show constraints state
   PartSet_WidgetSketchLabel(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                             const Config_WidgetAPI* theData,
                             const std::string& theParentId, bool toShowConstraints);
@@ -53,6 +55,7 @@ Q_OBJECT
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to do nothing if the plane of the sketch has been already set.
   /// \param theValues the wrapped selection values
+  /// \param theToValidate a validation flag
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
@@ -71,12 +74,15 @@ Q_OBJECT
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
+  /// Set show constraints state
+  /// \param theOn a flag show constraints or not
   void showConstraints(bool theOn);
 
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
+  /// A show constraint toggled signal
   void showConstraintToggled(bool);
 
 protected:
@@ -92,7 +98,7 @@ protected:
   virtual void restoreAttributeValue(const bool theValid);
 
   /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
+  /// \param thePrs a selected owner
   virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Saves the internal parameters to the given feature

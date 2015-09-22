@@ -164,7 +164,7 @@ public:
 
   /// Saves the current selection in the viewer into an internal container
   /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
-  /// \param theHighlightedUse a boolean flag
+  /// \param theHighlightedOnly a boolean flag
   void storeSelection(const bool theHighlightedOnly = false);
 
   /// Restores previously saved selection state

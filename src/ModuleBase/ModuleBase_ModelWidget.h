@@ -80,7 +80,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
-  /// \param toValidate the boolean value whether the value should be checked by filters
+  /// \param theToValidate the boolean value whether the value should be checked by filters
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate)
   {
@@ -137,6 +137,7 @@ Q_OBJECT
   }
 
   /// Set feature which is processing by active operation
+  /// \param theFeature a feature object
   /// \param theToStoreValue a value about necessity to store the widget value to the feature
   void setFeature(const FeaturePtr& theFeature, const bool theToStoreValue = false);
 

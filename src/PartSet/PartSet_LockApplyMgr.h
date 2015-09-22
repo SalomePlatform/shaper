@@ -25,21 +25,27 @@ class PARTSET_EXPORT PartSet_LockApplyMgr : public QObject
 
 public:
   /// Constructor
-  /// \param theExternal the external state
-  /// \param theDefaultValue the default value for the external object using
+  /// \param theParent a parent object
+  /// \param theWorkshop a reference to workshop
   PartSet_LockApplyMgr(QObject* theParent,
                        ModuleBase_IWorkshop* theWorkshop);
 
   virtual ~PartSet_LockApplyMgr() {}
 
+  /// Activates the object
   void activate();
+
+  /// Deactivates the object
   void deactivate();
+
+  /// Unlocks validation in operations manager
   void valuesChanged();
 
 protected slots:
-  // Set lock validating in the operation manager. Set apply is disabled
+  /// Set lock validating in the operation manager. Set apply is disabled
   void onLockValidating();
-  // Set unlock validating in the operation manager. Call method to update the apply state.
+
+  /// Set unlock validating in the operation manager. Call method to update the apply state.
   void onUnlockValidating();
 
 private:

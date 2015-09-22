@@ -18,14 +18,24 @@ class QAction;
 class QDialog;
 class QLabel;
 
+/**
+ * \class XGUI_ErrorMgr
+ * \ingroup GUI
+ * \brief Class of Errors manager object
+ */
 class XGUI_EXPORT XGUI_ErrorMgr : public ModuleBase_IErrorMgr
 {
   Q_OBJECT
 public:
+  /// Constructor
+  /// \param theParent a parent object
+  /// \param theWorkshop a workshop object
   XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop);
   /// Virtual destructor
   virtual ~XGUI_ErrorMgr();
 
+  /// Update actions for the given feature
+  /// \param theFeature a feature
   void updateActions(const FeaturePtr& theFeature);
 
   /// Update enable state of AcceptAll action if the feature uses it

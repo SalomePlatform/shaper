@@ -90,10 +90,16 @@ private slots:
   void onValuesChanged();
 
 protected:
+  /// A reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
-  PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
+  
+  /// A manager to lock/unlock Apply button in PP
+  PartSet_LockApplyMgr* myLockApplyMgr;
 
+  /// A name of the first point
   std::string myFirstPntName;
+
+  /// Reference to sketch
   CompositeFeaturePtr mySketch;
 };
 

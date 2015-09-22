@@ -10,7 +10,6 @@
 #include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_IDocumentDataModel.h>
 
 #include <QLayout>
 #include <QLabel>
@@ -44,7 +43,7 @@ public:
   {
     QLineEdit* aEditor = dynamic_cast<QLineEdit*>(editor);
     if (aEditor) {
-      ModuleBase_IDocumentDataModel* aModel = myTreedView->dataModel();
+      XGUI_DataModel* aModel = myTreedView->dataModel();
       ObjectPtr aObj = aModel->object(index);
       if (aObj.get() != NULL) {
         aEditor->setText(aObj->data()->name().c_str());
@@ -69,19 +68,17 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
 
   setItemDelegateForColumn(0, new XGUI_TreeViewItemDelegate(this));
 
-#ifndef ModuleDataModel
   connect(this, SIGNAL(doubleClicked(const QModelIndex&)), 
     SLOT(onDoubleClick(const QModelIndex&)));
-#endif
 }
 
 XGUI_DataTree::~XGUI_DataTree()
 {
 }
 
-ModuleBase_IDocumentDataModel* XGUI_DataTree::dataModel() const
+XGUI_DataModel* XGUI_DataTree::dataModel() const
 {
-  return static_cast<ModuleBase_IDocumentDataModel*>(model());
+  return static_cast<XGUI_DataModel*>(model());
 }
 
 void XGUI_DataTree::contextMenuEvent(QContextMenuEvent* theEvent)
@@ -95,7 +92,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   if (aEditor) {
     QString aName = aEditor->text();
     QModelIndexList aIndexList = selectionModel()->selectedIndexes();
-    ModuleBase_IDocumentDataModel* aModel = dataModel();
+    XGUI_DataModel* aModel = dataModel();
     ObjectPtr aObj = aModel->object(aIndexList.first());
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->startOperation("Rename");
@@ -112,8 +109,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
 
 void XGUI_DataTree::clear() 
 {
-  ModuleBase_IDocumentDataModel* aModel = dataModel();
-  aModel->clear();
+  dataModel()->clear();
   reset();
 }
 
@@ -134,7 +130,7 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
   // When operation is opened then we can not change history
   if (aMgr->isOperation())
     return;
-  ModuleBase_IDocumentDataModel* aModel = dataModel();
+  XGUI_DataModel* aModel = dataModel();
   if (aModel->flags(theIndex) == 0)
     return;
   ObjectPtr aObj = aModel->object(theIndex);
@@ -219,13 +215,11 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelWgt->setFrameShape(myTreeView->frameShape());
   aLabelWgt->setFrameShadow(myTreeView->frameShadow());
 
-#ifndef ModuleDataModel
   myDocModel = new XGUI_DataModel(this);
   myTreeView->setModel(myDocModel);
   QItemSelectionModel* aSelMod = myTreeView->selectionModel();
   connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
-#endif
 
   connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
           SLOT(onLabelContextMenuRequested(const QPoint&)));
@@ -382,18 +376,6 @@ void XGUI_ObjectsBrowser::clearContent()
   myTreeView->clear(); 
 }
 
-#ifdef ModuleDataModel
-void XGUI_ObjectsBrowser::setDataModel(ModuleBase_IDocumentDataModel* theModel)
-{
-  myDocModel = theModel;
-  //myDocModel = new XGUI_DataModel(this);
-  myTreeView->setModel(myDocModel);
-  QItemSelectionModel* aSelMod = myTreeView->selectionModel();
-  connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-          this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
-}
-#endif
-
 void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
                                        const QItemSelection& theDeselected)
 {
@@ -404,11 +386,7 @@ QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes)
 {
   QObjectPtrList aList;
   QModelIndexList aIndexes = selectedIndexes();
-#ifdef ModuleDataModel
-  ModuleBase_IDocumentDataModel* aModel = dataModel();
-#else
   XGUI_DataModel* aModel = dataModel();
-#endif
   QModelIndexList::const_iterator aIt;
   for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
     if ((*aIt).column() == 0) {

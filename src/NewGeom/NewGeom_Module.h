@@ -57,13 +57,17 @@ Q_OBJECT
   virtual QAction* addFeature(const QString& theWBName,
                               const ActionInfo& theInfo);
 
+  /// Add a nested feature
+  /// \param theWBName a workbench name
+  /// \param theInfo the action  parameters
+  /// \param theNestedActions a list of nested actions
   virtual QAction* addFeatureOfNested(const QString& theWBName,
                                     const ActionInfo& theInfo,
                                     const QList<QAction*>& theNestedActions);
 
   //! Returns true if the feature action is a nested action, in other words,
   //! it is created by addNestedFeature().
-  //! \param theId - an action of a feature
+  //! \param theAction - an action of a feature
   //! returns boolean result
   virtual bool isFeatureOfNested(const QAction* theAction);
 
@@ -76,6 +80,9 @@ Q_OBJECT
   virtual void addDesktopMenuSeparator(const char* theMenuSourceText,
                                        const int theMenuPosition = 10);
 
+  /// Add an action to a tool bar
+  /// \param theAction an ation to add
+  /// \param theToolBarTitle a name of tool bar
   virtual bool addActionInToolbar( QAction* theAction, const QString& theToolBarTitle );
     
   virtual QMainWindow* desktop() const;
@@ -164,6 +171,7 @@ Q_OBJECT
   /// Create popup menu manager
   virtual QtxPopupMgr* popupMgr();
 
+  /// Abort all operations
   virtual bool abortAllOperations();
 
  private:

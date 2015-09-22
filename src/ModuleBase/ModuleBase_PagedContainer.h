@@ -21,30 +21,54 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
 {
   Q_OBJECT
  public:
+   /// A constructor
+   /// \param theParent a parent widget
+   /// \param theData a data of the widget
+   /// \param theParentId an Id of the parent object
   ModuleBase_PagedContainer(QWidget* theParent, const Config_WidgetAPI* theData,
                            const std::string& theParentId);
   virtual ~ModuleBase_PagedContainer();
 
+  /// Add a new page
+  /// \param theWidget a page object
+  /// \param theName a name of the page
+  /// \param theCaseId an Id of the page
+  /// \param theIcon aqn Icon of the page
   virtual int addPage( ModuleBase_PageBase* theWidget,
                        const QString& theName,
                        const QString& theCaseId,
                        const QPixmap& theIcon );
 
-  // ModuleBase_ModelWidget
+  /// Redefinition of virtual function
   virtual QList<QWidget*> getControls() const;
+
+  /// Redefinition of virtual function
   virtual bool focusTo();
+
+  /// Redefinition of virtual function
   virtual void setHighlighted(bool isHighlighted);
+
+  /// Redefinition of virtual function
   virtual void enableFocusProcessing();
 
  protected:
+   /// Returns index of current page
   virtual int currentPageIndex() const = 0;
+
+  /// Set current page by index
   virtual void setCurrentPageIndex(int ) = 0;
-  // ModuleBase_ModelWidget
+
+  /// Redefinition of virtual function
   virtual void activateCustom();
+
+  /// Redefinition of virtual function
   virtual bool storeValueCustom() const;
+
+  /// Redefinition of virtual function
   virtual bool restoreValueCustom();
 
  protected slots:
+   /// A slot called on page change
   void onPageChanged();
 
  private:

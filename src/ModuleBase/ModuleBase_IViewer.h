@@ -79,6 +79,8 @@ Q_OBJECT
   /// Update current viewer
   virtual void update() = 0;
 
+  /// Returns a scale factor of the given view
+  /// \param theView a view object
   const double Scale(const Handle(V3d_View)& theView)
   {
     if (!myWindowScale.contains(theView))
@@ -86,13 +88,16 @@ Q_OBJECT
     return myWindowScale[theView];
   }
 
+  /// Remember a scale factor for the view object
+  /// \param theView a view object
+  /// \param theVal a scale factor
   void SetScale(const Handle(V3d_View)& theView, const double theVal) { myWindowScale[theView] = theVal; }
 
   /// Method returns True if the viewer can process editing objects 
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const { return true; }
 
-  // Fit all along Z (perpendicular to display)
+  /// Fit all along Z (perpendicular to display)
   virtual void Zfitall() = 0;
 
 signals:
@@ -140,6 +145,7 @@ signals:
   void viewTransformed(int theTransformation);
 
   protected:
+    /// A map for storing a scale factors dependent on view object
     QMap<Handle(V3d_View), double> myWindowScale;
 };
 

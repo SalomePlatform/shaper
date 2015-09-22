@@ -71,22 +71,6 @@ class PARTSET_EXPORT PartSet_Tools
   /// Returns pointer to the root document.
   static std::shared_ptr<ModelAPI_Document> document();
 
-  /// Find an attribute which corresponds to a given pont coordinates
-  /// \param theSketch the sketch feature
-  /// \param theX X coordinate
-  /// \param theY Y coordinate
-  /// \param theTolerance tolerance
-  /// \param theIgnore list of features which has to be ignored
-  //static std::shared_ptr<GeomDataAPI_Point2D> findAttributePoint(CompositeFeaturePtr theSketch, 
-  //  double theX, double theY, double theTolerance, const QList<FeaturePtr>& theIgnore = QList<FeaturePtr>());
-
-  /// Returns a point attribute of the feature by the coordinates if it is
-  /// \param theFeature the feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  //static std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
-  //                                                              double theX, double theY);
-
   /// \brief Save the double to the feature. If the attribute is double, it is filled.
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
@@ -201,12 +185,14 @@ class PARTSET_EXPORT PartSet_Tools
   /**
   * Finds an attribute value in attribute reference attribute value
   * \param theAttribute - an attribure reference filled with an attribute
+  * \param theWorkshop a reference to workshop
   * \return a geometry shape
   */
   static GeomShapePtr findShapeBy2DPoint(const AttributePtr& theAttribute,
                                          ModuleBase_IWorkshop* theWorkshop);
 
-  /* Returns point of coincidence feature
+  /**
+  * Returns point of coincidence feature
   * \param theFeature the coincidence feature
   * \param theAttribute the attribute name
   */

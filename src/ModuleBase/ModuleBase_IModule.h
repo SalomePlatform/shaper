@@ -23,7 +23,6 @@ class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
-class ModuleBase_IDocumentDataModel;
 
 /**
  * \ingroup GUI
@@ -40,10 +39,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   virtual ~ModuleBase_IModule() {}
 
-  // Add default selection filters of the module to the current viewer
+  /// Add default selection filters of the module to the current viewer
   virtual void activateSelectionFilters() {};
 
-  // Remove default selection filters of the module from the current viewer
+  /// Remove default selection filters of the module from the current viewer
   virtual void deactivateSelectionFilters() {};
 
   /// Reads description of features from XML file 
@@ -79,7 +78,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual void onOperationAborted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation start
-  /// \param theOperation a started operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
   /// Add menu items for viewer into the given menu
@@ -92,15 +90,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const {};
 
-  /// Called when it is necessary to update a command state (enable or disable it)
-  //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
-
   /// Creates custom widgets for property panel
   /// \param theType a type of widget
   /// \param theParent the parent object
   /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  /// \param theModelWidgets list of widget objects
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                       Config_WidgetAPI* theWidgetApi, std::string theParentId)
   {
@@ -146,11 +140,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Reacts to the delete action in module
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };
-
-#ifdef ModuleDataModel
-  /// Returns data model object for representation of data tree in Object browser
-  virtual ModuleBase_IDocumentDataModel* dataModel() const = 0;
-#endif
 
   /// Performs functionality on closing document
   virtual void closeDocument() = 0;
@@ -200,8 +189,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual QString getFeatureError(const FeaturePtr& theFeature);
 
 signals:
+  /// Signal which is emitted when operation is launched
   void operationLaunched();
 
+  /// Segnal emitted when an operation is resumed
+  /// \param theOp a resumed operation
   void operationResumed(ModuleBase_Operation* theOp);
 
 public slots:

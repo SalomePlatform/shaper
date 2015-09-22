@@ -16,8 +16,6 @@ class ModuleBase_IDocumentDataModel;
 class QLineEdit;
 class XGUI_DataModel;
 
-//#define ModuleDataModel
-
 /**
 * \ingroup GUI
 * Implementation of Data Tree object for Object Browser
@@ -33,7 +31,7 @@ Q_OBJECT
   virtual ~XGUI_DataTree();
 
   /// Returns current data model
-  ModuleBase_IDocumentDataModel* dataModel() const;
+  XGUI_DataModel* dataModel() const;
 
 signals:
   //! Emited on context menu request
@@ -47,6 +45,7 @@ public slots:
   /// Commit modified data (used for renaming of objects)
   virtual void commitData(QWidget* theEditor);
 
+  /// A slot which is called on mouse double click
   void onDoubleClick(const QModelIndex&);
 
  protected:
@@ -72,17 +71,10 @@ Q_OBJECT
   virtual ~XGUI_ObjectsBrowser();
 
   //! Returns Model which provides access to data objects
-#ifdef ModuleDataModel
-  ModuleBase_IDocumentDataModel* dataModel() const
-  {
-    return myDocModel;
-  }
-#else
   XGUI_DataModel* dataModel() const
   {
     return myDocModel;
   }
-#endif
 
   //! Returns list of currently selected objects
   //! \param theIndexes - output list of corresponded indexes (can be NULL)
@@ -112,11 +104,6 @@ Q_OBJECT
 
   /// Resets the object browser into initial state
   void clearContent();
-
-  /// Set Data Model for the Object Browser
-#ifdef ModuleDataModel
-  void setDataModel(ModuleBase_IDocumentDataModel* theModel);
-#endif
 
 public slots:
   //! Called on Edit command request
@@ -152,11 +139,7 @@ signals:
   void closeDocNameEditing(bool toSave);
 
   //! Internal model
-#ifdef ModuleDataModel
-  ModuleBase_IDocumentDataModel* myDocModel;
-#else
   XGUI_DataModel* myDocModel;
-#endif
   QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 };

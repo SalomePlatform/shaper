@@ -115,6 +115,7 @@ Q_OBJECT
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
+  /// A header widget
   QWidget* myHeaderWidget;
 
  private:

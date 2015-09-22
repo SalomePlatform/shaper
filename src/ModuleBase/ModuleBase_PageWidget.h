@@ -18,6 +18,7 @@ class ModuleBase_ModelWidget;
 class QGridLayout;
 
 /*!
+ * \ingroup GUI
  * Represent a property panel's list of ModuleBase_ModelWidgets.
  */
 class MODULEBASE_EXPORT ModuleBase_PageWidget : public QFrame, public ModuleBase_PageBase

@@ -11,7 +11,6 @@ SET(PROJECT_HEADERS
   ModuleBase_Filter.h
   ModuleBase_FilterFactory.h
   ModuleBase_FilterValidated.h
-  ModuleBase_IDocumentDataModel.h
   ModuleBase_IErrorMgr.h
   ModuleBase_IModule.h
   ModuleBase_IPrefMgr.h
@@ -63,7 +62,6 @@ SET(PROJECT_SOURCES
   ModuleBase_Filter.cpp
   ModuleBase_FilterFactory.cpp
   ModuleBase_FilterValidated.cpp
-  ModuleBase_IDocumentDataModel.cpp
   ModuleBase_IErrorMgr.cpp
   ModuleBase_IModule.cpp
   ModuleBase_IPrefMgr.cpp

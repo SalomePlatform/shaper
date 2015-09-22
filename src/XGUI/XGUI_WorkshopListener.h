@@ -28,9 +28,8 @@ class XGUI_EXPORT XGUI_WorkshopListener : public QObject, public Events_Listener
 {
   Q_OBJECT
 public:
-  /// Constructor
-  /// \param theConnector a Salome connector object. 
-  /// Used only if the workshop is launched in Salome environment
+  /// Constructor. Used only if the workshop is launched in Salome environment
+  /// \param theWorkshop a reference to workshop. 
    XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop);
   virtual ~XGUI_WorkshopListener();
 
@@ -43,12 +42,6 @@ public:
 signals:
   /// Emitted when error in applivation happens
   void errorOccurred(const QString&);
-
-protected slots:
-  /// Updates Apply All button state of the feature to the state if the feature has the button
-  /// \param theFeatureId an index of the feature, the action is searched, which state is to be changed
-  /// \param theState an action enable state
-  //void onNestedStateChanged(const std::string& theFeatureId, const bool theState);
 
 protected:
   /// Procedure to process postponed events

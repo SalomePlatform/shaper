@@ -26,11 +26,7 @@ SET(PROJECT_HEADERS
 	PartSet_FilterInfinite.h
 	PartSet_SketcherMgr.h
 	PartSet_MenuMgr.h
-	PartSet_DocumentDataModel.h
-	PartSet_PartDataModel.h
-	PartSet_DataTreeModel.h
 	PartSet_WidgetSketchCreator.h
-	PartSet_TopDataModel.h
 	PartSet_IconFactory.h
 )
 
@@ -54,11 +50,7 @@ SET(PROJECT_SOURCES
 	PartSet_FilterInfinite.cpp
 	PartSet_SketcherMgr.cpp
 	PartSet_MenuMgr.cpp
-	PartSet_DocumentDataModel.cpp
-	PartSet_PartDataModel.cpp
-	PartSet_DataTreeModel.cpp
 	PartSet_WidgetSketchCreator.cpp
-	PartSet_TopDataModel.cpp
 	PartSet_IconFactory.cpp
 )
 
