@@ -12,6 +12,7 @@
 
 #include <SketchPlugin_Constraint.h>
 
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 
 #include <string>
@@ -223,8 +224,10 @@ public:
 
   virtual void adjustConstraint()
   {
+    AttributeDoublePtr aValueAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        myBaseConstraint->attribute(SketchPlugin_Constraint::VALUE()));
     Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
-    aConstraint.valA *= 2.0;
+    aConstraint.valA = 2.0 * aValueAttr->value();
     myStorage->updateConstraint(aConstraint);
   }
 };
