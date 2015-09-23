@@ -8,37 +8,43 @@ import geom
 
 
 class BoxFeature(modeler.Feature):
-
+  """An example of Box feature implementation"""
 
 # Initializations
 
   def __init__(self):
+    """Constructor"""
     modeler.Feature.__init__(self)
 
   @staticmethod
   def ID():
+    """Return Id of the feature"""
     return "Box"
 
   @staticmethod
   def WIDTH_ID():
+    """Returns ID of Width parameter"""
     return "width"
 
   @staticmethod
   def LENGTH_ID():
+    """Returns ID of Length parameter"""
     return "length"
 
   @staticmethod
   def HEIGHT_ID():
+    """Returns ID of Height parameter"""
     return "height"
 
   def getKind(self):
+    """Returns ID of еру ауфегку"""
     return BoxFeature.ID()
 
 	
 # Creation of the box at default size
 
   def initAttributes(self):
-
+    """Initialise attributes of the feature"""
     # Creating the input arguments of the feature
     self.addRealInput( self.WIDTH_ID() )
     self.addRealInput( self.LENGTH_ID() )
@@ -48,6 +54,7 @@ class BoxFeature(modeler.Feature):
     mypart = modeler.activeDocument()
     xoy    = modeler.defaultPlane("XOY")
 
+    ### A base of the geometry
     self.base = modeler.addSketch( mypart, xoy )
 
     p1 = geom.Pnt2d( 0, 0 )
@@ -62,16 +69,20 @@ class BoxFeature(modeler.Feature):
     self.base.setPerpendicular( line[0].result(), line[3].result() )
 
     # Setting the size of the base with default values
+    ### Width
     self.width  = self.base.setLength( line[0].result(), 50 )   # Keeps the constraint for edition
+    ### Length
     self.length = self.base.setLength( line[3].result(), 50 )   # Keeps the constraint for edition
 
     # Creating the extrusion (the box) at default size
+    ### A box result
     self.box = modeler.addExtrusion( mypart, self.base.selectFace(), 50 )
 
 	
 # Edition of the box at user size
 
   def execute(self):
+    """Compute the feature result"""
     # Retrieving the user inputs
     width  = self.getRealInput( self.WIDTH_ID() )
     length = self.getRealInput( self.LENGTH_ID() )
@@ -86,5 +97,6 @@ class BoxFeature(modeler.Feature):
     #self.addResult( self.box.result() )
   
   def isMacro(self):
+    """Returns True"""
     # Box feature is macro: removes itself on the creation transaction finish
     return True

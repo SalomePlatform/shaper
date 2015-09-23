@@ -11,6 +11,7 @@ class Box(modeler.Interface):
   """Executes the macro-feature Box.
   """
   def __init__(self, part, dx, dy, dz):
+    """Constructor"""
     modeler.Interface.__init__(self, part, MY.ID())
 
     self.setRealInput( MY.WIDTH_ID(), dx )

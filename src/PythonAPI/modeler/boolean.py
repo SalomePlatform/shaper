@@ -10,6 +10,8 @@ from GeomAlgoAPI import *
 class Boolean():
   """Abstract root class of Boolean Features."""
   def __init__(self, part, object, tool, type):
+    """Constructor"""
+    ### Create a feature
     self.my = part.addFeature("Boolean")
     self.my.data().reference("main_object").setValue(object)
     self.my.data().reference("tool_object").setValue(tool)
@@ -22,27 +24,30 @@ class Boolean():
 
 
 class Addition(Boolean):
+  """Inserts an addition to the given Part and executes the operation.
+  This operation adds tool to the given object.
+  """
 
   def __init__(self, part, object, tool):
-    """Inserts an addition to the given Part and executes the operation.
-    This operation adds tool to the given object.
-    """
+    """Constructor"""
     Boolean.__init__(self, part, object, tool, GeomAlgoAPI_Boolean.BOOL_FUSE)
 
 
 class Subtraction(Boolean):
+  """Inserts a subtraction to the given Part and executes the operation.
+  This operation subtracts tool to the given object.
+  """
 
   def __init__(self, part, object, tool):
-    """Inserts a subtraction to the given Part and executes the operation.
-    This operation subtracts tool to the given object.
-    """
+    """Constructor"""
     Boolean.__init__(self, part, object, tool, GeomAlgoAPI_Boolean.BOOL_CUT)
 
 
 class Intersection(Boolean):
+  """Inserts an intersection to the given Part and executes the operation.
+  This operation intersects tool to the given object.
+  """
 
   def __init__(self, part, object, tool):
-    """Inserts an intersection to the given Part and executes the operation.
-    This operation intersects tool to the given object.
-    """
+    """Constructor"""
     Boolean.__init__(self, part, object, tool, GeomAlgoAPI_Boolean.BOOL_COMMON)

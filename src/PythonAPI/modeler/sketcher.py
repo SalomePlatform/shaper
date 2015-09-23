@@ -9,6 +9,7 @@ from GeomAlgoAPI import *
 
 
 class Sketch():
+  """ A class of Sketcher"""
 
   def __init__(self, doc, plane):
     """Initializes a 2D Sketch on the given plane and adds the Sketch to the given Part or Partset.
@@ -16,8 +17,10 @@ class Sketch():
 	- a 3D axis system (geom.Ax3),
 	- an existing face identified by its topological name.
     """
+    ### Create a feature object
     self.my = featureToCompositeFeature( doc.addFeature("Sketch") )
-    self.selection = None         # Entities used for building the result shape
+    ### Entities used for building the result shape
+    self.selection = None         
 #   self.resultype ="Face"        # Type of Sketch result
     if isinstance(plane, str):
       self.__sketchOnFace(doc, plane)
@@ -174,22 +177,30 @@ class Sketch():
 # Class definitions of Sketch features
 
 class Point():
+  """A class which represents a Point object"""
 
   def __init__(self, sketch, x, y):
+    """Constructor"""
+    ### Create the feature
     self.my = sketch.addFeature("SketchPoint")
     geomDataAPI_Point2D( self.my.data().attribute("PointCoordindates") ).setValue(x, y)
     self.my.execute()
 
   def pointData (self):
+    """Returns points attribute"""
     return geomDataAPI_Point2D( self.my.data().attribute("PointCoordindates") )
 
   def result (self):
+    """Returns result object"""
     return self.my.firstResult()
 
 
 class Line():
+  """A class which represents a Line object"""
 
   def __init__(self, sketch, *args):
+    """Constructor"""
+    ### Create the feature
     self.my = sketch.addFeature("SketchLine")
     if   len(args) == 4:
       self.__createByCoordinates(*args)
@@ -201,43 +212,54 @@ class Line():
       raise Exception("cannot create the Line")
 
   def __createByCoordinates(self, x1, y1, x2, y2):
+    """Initialise the feature by coordinates"""
     geomDataAPI_Point2D( self.my.data().attribute("StartPoint") ).setValue(x1, y1)
     geomDataAPI_Point2D( self.my.data().attribute("EndPoint") ).setValue(x2, y2)
     self.my.execute()
 
   def __createByPoints(self, p1, p2):
+    """Initialise the feature by point objects"""
     geomDataAPI_Point2D( self.my.data().attribute("StartPoint") ).setValue(p1.x(), p1.y())
     geomDataAPI_Point2D( self.my.data().attribute("EndPoint") ).setValue(p2.x(), p2.y())
     self.my.execute()
 
   def __createByName(self, sketch, name):
+    """Initialise the feature by name of edge"""
     self.my.data().selection("External").selectSubShape("EDGE", name)
     self.my.execute()
     rigid = sketch.addFeature("SketchConstraintRigid")
     rigid.refattr("ConstraintEntityA").setObject( self.my.firstResult() )
 
   def startPointData (self):
+    """Returns start point"""
     return geomDataAPI_Point2D( self.my.data().attribute("StartPoint") )
 
   def endPointData (self):
+    """Returns end point"""
     return geomDataAPI_Point2D( self.my.data().attribute("EndPoint") )
 
   def result (self):
+    """Returns result"""
     return self.my.firstResult()
 
 
 class Circle():
+  """A class which represents a Circle object"""
 
   def __init__(self, sketch, x, y, r):
+    """Constructor"""
+    ### Create the feature
     self.my = sketch.addFeature("SketchCircle")
     geomDataAPI_Point2D( self.my.data().attribute("CircleCenter") ).setValue(x, y)
     self.my.data().real("CircleRadius").setValue(r)
     self.my.execute()
 
   def centerData (self):
+    """Returns center point"""
     return geomDataAPI_Point2D( self.my.data().attribute("CircleCenter") )
 
   def result (self):
+    """Returns result"""
     return self.my.lastResult()   # Returns the circular line attribute
 
 

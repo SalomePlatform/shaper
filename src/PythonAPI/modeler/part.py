@@ -7,9 +7,11 @@ import modeler     # Required by the temporary implementation of result member f
 
 
 class Part():
-
+  """Class for Part feature"""
+  
   def __init__ (self, partset):
     """Adds a new Part to the given Partset and activates the Part."""
+    ### Create the feature
     self.my = partset.addFeature("Part")
     self.my.execute()
 
