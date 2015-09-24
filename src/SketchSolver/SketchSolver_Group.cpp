@@ -674,9 +674,9 @@ void SketchSolver_Group::splitGroup(std::vector<SketchSolver_Group*>& theCuts)
   std::vector<ConstraintPtr>::iterator aUnuseIt = anUnusedConstraints.begin();
   while (aUnuseIt != anUnusedConstraints.end()) {
     if (aNewFeatStorage->isInteract(*aUnuseIt)) {
-      size_t aShift = aUnuseIt - anUnusedConstraints.begin();
+      aNewFeatStorage->changeConstraint(*aUnuseIt);
       anUnusedConstraints.erase(aUnuseIt);
-      aUnuseIt = anUnusedConstraints.begin() + aShift;
+      aUnuseIt = anUnusedConstraints.begin();
       continue;
     }
     aUnuseIt++;
@@ -700,6 +700,9 @@ void SketchSolver_Group::splitGroup(std::vector<SketchSolver_Group*>& theCuts)
       theCuts.push_back(aGroup);
     }
   }
+
+  // Update feature storage
+  myFeatureStorage = aNewFeatStorage;
 }
 
 // ============================================================================
