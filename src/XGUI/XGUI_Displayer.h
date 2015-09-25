@@ -141,6 +141,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param isEnabled a boolean value
   bool enableUpdateViewer(const bool isEnabled);
 
+  bool isUpdateEnabled() const { return myEnableUpdateViewer; }
+
   /// Updates the viewer
   void updateViewer() const;
 
@@ -307,7 +309,10 @@ private:
   QIntList myActiveSelectionModes;
 
   /// the enable update viewer flag
-  bool myEnableUpdateViewer;  
+  bool myEnableUpdateViewer; 
+
+  /// A flag that update was requested but not done
+  mutable bool myNeedUpdate;
 };
 
 #endif

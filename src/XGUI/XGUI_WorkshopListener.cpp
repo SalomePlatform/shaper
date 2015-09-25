@@ -191,7 +191,6 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     // the viewer's update context is unblocked, the viewer's update works
     XGUI_Displayer* aDisplayer = workshop()->displayer();
     aDisplayer->enableUpdateViewer(true);
-    aDisplayer->updateViewer();
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);

@@ -96,7 +96,7 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 }
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myWorkshop(theWorkshop), myEnableUpdateViewer(true)
+  : myWorkshop(theWorkshop), myEnableUpdateViewer(true), myNeedUpdate(false)
 {
   enableUpdateViewer(true);
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs());
@@ -689,7 +689,10 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
   bool aWasEnabled = myEnableUpdateViewer;
 
   myEnableUpdateViewer = isEnabled;
-
+  if (myNeedUpdate && myEnableUpdateViewer) {
+    updateViewer();
+    myNeedUpdate = false;
+  }
   return aWasEnabled;
 }
 
@@ -700,6 +703,8 @@ void XGUI_Displayer::updateViewer() const
   if (!aContext.IsNull() && myEnableUpdateViewer) {
     myWorkshop->viewer()->Zfitall();
     aContext->UpdateCurrentViewer();
+  } else {
+    myNeedUpdate = true;
   }
 }
 
