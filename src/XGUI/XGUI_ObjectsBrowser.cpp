@@ -288,7 +288,12 @@ void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
   QModelIndexList aIndexes;
   QObjectPtrList aSelectedData = selectedObjects(&aIndexes);
   bool toEnable = false;
+
   if (aSelectedData.size() == 1) {
+    QModelIndex aSelected = myTreeView->indexAt(theEvent->pos());
+    if (!aIndexes.contains(aSelected))
+      return; // menu is called on non selected item
+
     Qt::ItemFlags aFlags = dataModel()->flags(aIndexes.first());
     toEnable = ((aFlags & Qt::ItemIsEditable) != 0);
   }
