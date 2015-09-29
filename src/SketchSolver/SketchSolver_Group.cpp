@@ -149,14 +149,8 @@ Slvs_hEntity SketchSolver_Group::getFeatureId(FeaturePtr theFeature) const
   if (!myFeatureStorage)
     return aResult;
   // Obtain regular constraints interacting with the feature and find its ID
-  std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theFeature);
-  if (aConstraints.empty())
-    return aResult;
-  std::set<ConstraintPtr>::iterator aConstrIter = aConstraints.begin();
-  for (; aConstrIter != aConstraints.end(); ++aConstrIter) {
-    ConstraintConstraintMap::const_iterator aCIter = myConstraints.find(*aConstrIter);
-    if (aCIter == myConstraints.end())
-      continue;
+  ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); ++aCIter) {
     aResult = aCIter->second->getId(theFeature);
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
@@ -179,12 +173,8 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
   if (!myFeatureStorage)
     return aResult;
   // Obtain regular constraints interacting with the attribute and find its ID
-  std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theAttribute);
-  std::set<ConstraintPtr>::iterator aConstrIter = aConstraints.begin();
-  for (; aConstrIter != aConstraints.end(); aConstrIter++) {
-    ConstraintConstraintMap::const_iterator aCIter = myConstraints.find(*aConstrIter);
-    if (aCIter == myConstraints.end())
-      continue;
+  ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); ++aCIter) {
     aResult = aCIter->second->getId(theAttribute);
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
@@ -772,6 +762,9 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
     }
   if (aCIter == myConstraints.end())
     return;
+
+  // Remove entities not used by constraints
+  myStorage->removeUnusedEntities();
 
   if (isFullyRemoved)
     myConstraints.erase(aCIter);
