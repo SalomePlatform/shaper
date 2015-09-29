@@ -304,23 +304,32 @@ bool SketchSolver_Group::changeConstraint(
   for (; anAttrIt != anAttributes.end(); ++anAttrIt) {
     AttributeRefAttrPtr aRefAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
-    if (!aRefAttr || aRefAttr->isObject())
+    if (!aRefAttr)
       continue;
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint;
+    if (aRefAttr->isObject()) {
+      FeaturePtr aFeat = ModelAPI_Feature::feature(aRefAttr->object());
+      if (aFeat->getKind() != SketchPlugin_Point::ID())
+        continue;
+      aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeat->attribute(SketchPlugin_Point::COORD_ID()));
+    } else
+      aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+
     if (!aPoint || (aPoint->textX().empty() && aPoint->textY().empty()))
       continue;
 
     std::map<AttributePtr, SolverConstraintPtr>::iterator aFound =
-        myParametricConstraints.find(aRefAttr->attr());
+        myParametricConstraints.find(aPoint);
     if (aFound == myParametricConstraints.end()) {
       SolverConstraintPtr aConstraint =
-          SketchSolver_Builder::getInstance()->createParametricConstraint(aRefAttr->attr());
+          SketchSolver_Builder::getInstance()->createParametricConstraint(aPoint);
       if (!aConstraint)
         continue;
       aConstraint->setGroup(this);
       aConstraint->setStorage(myStorage);
-      myParametricConstraints[aRefAttr->attr()] = aConstraint;
+      myParametricConstraints[aPoint] = aConstraint;
     } else
       aFound->second->update();
   }
