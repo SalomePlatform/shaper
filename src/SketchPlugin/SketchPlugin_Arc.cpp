@@ -59,6 +59,10 @@ void SketchPlugin_Arc::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 
   data()->addAttribute(INVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
+  AttributeBooleanPtr isInversed =
+      std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
+  if (!isInversed->isInitialized())
+    isInversed->setValue(false);
 
   // get the initial values
   if (anEndAttr->isInitialized()) {
@@ -106,7 +110,8 @@ void SketchPlugin_Arc::execute()
       anEndAttr->setValue(aProjection);
     */
     std::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
-    AttributeBooleanPtr isInversed = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
+    AttributeBooleanPtr isInversed =
+        std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
 
     std::shared_ptr<GeomAPI_Dir> anXDir(new GeomAPI_Dir(aStartPoint->xyz()->decreased(aCenter->xyz())));
     std::shared_ptr<GeomAPI_Ax2> anAx2(new GeomAPI_Ax2(aCenter, aNormal, anXDir));
