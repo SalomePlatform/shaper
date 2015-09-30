@@ -138,6 +138,15 @@ bool SketchSolver_Group::isInteract(
   return myFeatureStorage->isInteract(std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature));
 }
 
+// check the entity is really exists
+static void checkEntity(StoragePtr theStorage, Slvs_hEntity& theEntity)
+{
+  if (theEntity == SLVS_E_UNKNOWN)
+    return;
+  Slvs_Entity anEnt = theStorage->getEntity(theEntity);
+  theEntity = anEnt.h;
+}
+
 // ============================================================================
 //  Function: getFeatureId
 //  Class:    SketchSolver_Group
@@ -152,13 +161,16 @@ Slvs_hEntity SketchSolver_Group::getFeatureId(FeaturePtr theFeature) const
   ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
   for (; aCIter != myConstraints.end(); ++aCIter) {
     aResult = aCIter->second->getId(theFeature);
+    checkEntity(myStorage, aResult);
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
   }
   // The feature is not found, check it in the temporary constraints
   std::set<SolverConstraintPtr>::iterator aTmpCIter = myTempConstraints.begin();
-  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
+  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter) {
     aResult = (*aTmpCIter)->getId(theFeature);
+    checkEntity(myStorage, aResult);
+  }
   return aResult;
 }
 
@@ -176,18 +188,23 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
   ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
   for (; aCIter != myConstraints.end(); ++aCIter) {
     aResult = aCIter->second->getId(theAttribute);
+    checkEntity(myStorage, aResult);
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
   }
   // The attribute is not found, check it in the temporary constraints
   std::set<SolverConstraintPtr>::const_iterator aTmpCIter = myTempConstraints.begin();
-  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
+  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter) {
     aResult = (*aTmpCIter)->getId(theAttribute);
+    checkEntity(myStorage, aResult);
+  }
   // Last chance to find attribute in parametric constraints
   std::map<AttributePtr, SolverConstraintPtr>::const_iterator aParIter =
       myParametricConstraints.find(theAttribute);
-  if (aParIter != myParametricConstraints.end())
+  if (aParIter != myParametricConstraints.end()) {
     aResult = aParIter->second->getId(theAttribute);
+    checkEntity(myStorage, aResult);
+  }
   return aResult;
 }
 
