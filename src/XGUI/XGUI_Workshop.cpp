@@ -1550,10 +1550,11 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     if (aResult.get() != NULL) {
       ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++)
-          setColor(aCompsolidResult->subResult(i), aColorResult);
+        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+          setColor(aCompsolidResult->subResult(i), !isRandomColor ? aColorResult : aDlg->getRandomColor());
+        }
       }
-      setColor(aResult, aColorResult);
+      setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
     }
   }
   if (!aWasOperation)

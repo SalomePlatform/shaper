@@ -64,15 +64,21 @@ void XGUI_ColorDialog::setColor(const std::vector<int>& theValue)
 
 std::vector<int> XGUI_ColorDialog::getColor() const
 {
+  QColor aColorResult = myColorButton->color();
+
+  std::vector<int> aValues;
+  aValues.push_back(aColorResult.red());
+  aValues.push_back(aColorResult.green());
+  aValues.push_back(aColorResult.blue());
+
+  return aValues;
+}
+
+std::vector<int> XGUI_ColorDialog::getRandomColor() const
+{
   std::vector<int> aValues;
   if (isRandomColor()) {
     ModelAPI_Tools::findRandomColor(aValues);
-  }
-  else {
-    QColor aColorResult = myColorButton->color();
-    aValues.push_back(aColorResult.red());
-    aValues.push_back(aColorResult.green());
-    aValues.push_back(aColorResult.blue());
   }
   return aValues;
 }

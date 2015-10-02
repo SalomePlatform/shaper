@@ -410,6 +410,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(mySeparator);
       aActions.append(action("DELETE_CMD"));
       //aActions.append(action("MOVE_CMD"));
+      aActions.append(action("COLOR_CMD"));
   }
   theMenu->addActions(aActions);
 
