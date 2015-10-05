@@ -920,7 +920,7 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
   connectToPropertyPanel(true);
   if (isNestedCreateOperation(theOperation))
-    QApplication::setOverrideCursor(QCursor(QIcon(":pictures/button_plus.png").pixmap(20,20)));
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
 }
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
