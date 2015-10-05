@@ -439,8 +439,10 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
     std::string aName = aObject->groupName();
     if (myViewerMenu.contains(aName))
       aActions = myViewerMenu[aName];
+    aActions.append(action("COLOR_CMD"));
   } else if (aSelected > 1) {
     aActions.append(action("HIDE_CMD"));
+    aActions.append(action("COLOR_CMD"));
   }
   theMenu->addActions(aActions);
 
