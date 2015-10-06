@@ -23,6 +23,8 @@
 
 #include <QMouseEvent>
 
+//#define APPLY_BY_ENTER_OR_TAB
+
 PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              ModuleBase_IWorkshop* theWorkshop,
                                                              const Config_WidgetAPI* theData,
@@ -34,11 +36,14 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
   myFirstPntName = theData->getProperty("first_point");
 
   // Reconnect to local slot
+#ifdef APPLY_BY_ENTER_OR_TAB
   // Apply widget value change by enter/tab event.
-  //disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
-  //connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
   disconnect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
   connect(mySpinBox, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+#else
+  disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
+#endif
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
