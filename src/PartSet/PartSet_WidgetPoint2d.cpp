@@ -88,7 +88,9 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-    connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
+    // Apply widget value change by enter/tab event.
+    //connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
+    connect(myXSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -101,7 +103,9 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-    connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
+    // Apply widget value change by enter/tab event.
+    //connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
+    connect(myYSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);

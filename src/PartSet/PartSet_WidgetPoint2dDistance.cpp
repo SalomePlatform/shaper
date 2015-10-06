@@ -34,8 +34,11 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
   myFirstPntName = theData->getProperty("first_point");
 
   // Reconnect to local slot
-  disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
-  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
+  // Apply widget value change by enter/tab event.
+  //disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+  //connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
+  disconnect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()

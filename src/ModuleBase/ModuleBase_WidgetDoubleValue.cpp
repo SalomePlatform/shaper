@@ -85,7 +85,9 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   mySpinBox->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
-  connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesChanged()));
+  // Apply widget value change by enter/tab event.
+  //connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
