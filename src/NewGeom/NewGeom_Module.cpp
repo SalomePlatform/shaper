@@ -312,12 +312,10 @@ QtxPopupMgr* NewGeom_Module::popupMgr()
 //******************************************************
 void NewGeom_Module::onDefaultPreferences()
 {
-  ModuleBase_Preferences::resetConfig();
-  ModuleBase_Preferences::updateResourcesByConfig();
-
-  LightApp_Preferences* pref = preferences();
-  if (pref)
-    pref->retrieve();
+  // reset main resources
+  ModuleBase_Preferences::resetResourcePreferences(preferences());
+  // reset plugin's resources
+  ModuleBase_Preferences::resetConfigPropPreferences(preferences());
 
   myWorkshop->displayer()->redisplayObjects();
 }

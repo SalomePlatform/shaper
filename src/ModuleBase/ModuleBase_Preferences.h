@@ -49,12 +49,6 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   /// Updates Config_PropManager properties by module from SUIT_ResourceMgr
   static void updateConfigByResources();
 
-  /// Updates SUIT_ResourceMgr values by Config_PropManager properties
-  static void updateResourcesByConfig();
-
-  /// Set default values to the Config_PropManager properties
-  static void resetConfig();
-
   /// Loads properties defined by module to Config_PropManager
   static void loadCustomProps();
 
@@ -63,7 +57,18 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   /// \param thePage an id of a page
   static void createEditContent(ModuleBase_IPrefMgr* thePref, int thePage);
 
+  /// Retrieve preferences of resource manage to default state
+  static void resetResourcePreferences(SUIT_PreferenceMgr* thePref);
+
+  static void resetConfigPropPreferences(SUIT_PreferenceMgr* thePref);
+
 private:
+  /// Updates SUIT_ResourceMgr values by Config_PropManager properties
+  static void updateResourcesByConfig();
+
+  /// Set default values to the Config_PropManager properties
+  static void resetConfig();
+
   /// Creates content of preferences editing widget
   static void createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId);
 

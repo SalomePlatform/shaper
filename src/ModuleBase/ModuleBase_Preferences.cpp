@@ -103,6 +103,37 @@ void ModuleBase_Preferences::createEditContent(ModuleBase_IPrefMgr* thePref, int
   createCustomPage(thePref, thePage);
 }
 
+void ModuleBase_Preferences::resetResourcePreferences(SUIT_PreferenceMgr* thePref)
+{
+  if (!thePref)
+    return;
+
+  QtxResourceMgr::WorkingMode aPrev =
+    thePref->resourceMgr()->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
+  thePref->retrieve();
+  thePref->resourceMgr()->setWorkingMode(aPrev);
+}
+
+void ModuleBase_Preferences::resetConfigPropPreferences(SUIT_PreferenceMgr* thePref)
+{
+  resetConfig();
+  updateResourcesByConfig();
+
+  // retrieve the reset resource values to the preferences items
+  Config_Properties aProps = Config_PropManager::getProperties();
+  Config_Properties::iterator aIt;
+  QStringList aValues;
+  QStringList aSections;
+  for (aIt = aProps.begin(); aIt != aProps.end(); ++aIt) {
+    Config_Prop* aProp = (*aIt);
+    aValues.append(QString(aProp->name().c_str()));
+    if (!aSections.contains(aProp->section().c_str()))
+      aSections.append(aProp->section().c_str());
+    QtxPreferenceItem* anItem = thePref->findItem(QString(aProp->title().c_str()), true);
+    if (anItem)
+      anItem->retrieve();
+  }
+}
 
 void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId)
 {
@@ -289,18 +320,17 @@ void ModuleBase_PreferencesDlg::modified(ModuleBase_Prefs& theModified) const
 
 void ModuleBase_PreferencesDlg::onDefault()
 {
-  // reset main resources
-//#ifdef SALOME_750 // until SALOME 7.5.0 is released
-  QtxResourceMgr::WorkingMode aPrev =
-      myPreferences->resourceMgr()->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
-  myPreferences->retrieve();
-  myPreferences->resourceMgr()->setWorkingMode(aPrev);
-//#endif
-  // reset plugin's resources
-  ModuleBase_Preferences::resetConfig();
-  ModuleBase_Preferences::updateResourcesByConfig();
-
-  myPreferences->retrieve();
+  // reset main resources. It throwns all resource manager items to the
+  // initial/default state. If there is no a default state of the item,
+  // it will be filled with an empty value. It concernerned to plugin
+  // config items, like visualization color. The main xml do not contains
+  // default values for them. So, it is important to reset the config
+  // properties after reseting the resources preferences.
+  ModuleBase_Preferences::resetResourcePreferences(myPreferences);
+  // reset plugin's resources. It fills the config resources with the default
+  // values, stores result in the resource manager and retrieve the preferences
+  // items with these values.
+  ModuleBase_Preferences::resetConfigPropPreferences(myPreferences);
 }
 
 //**********************************************************
