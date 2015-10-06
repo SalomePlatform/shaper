@@ -28,7 +28,7 @@ void FeaturesPlugin_Group::initAttributes()
 
 void FeaturesPlugin_Group::execute()
 {
-  if (results().empty()) { // just create result if not exists
+  if (results().empty() || firstResult()->isDisabled()) { // just create result if not exists
     ResultPtr aGroup = document()->createGroup(data());
     setResult(aGroup);
   }
