@@ -208,6 +208,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
     return;
 
   QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
+
   operationMgr()->onValidateOperation();
 
   // we need change displayed state of the current operation feature
