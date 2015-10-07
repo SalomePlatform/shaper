@@ -177,8 +177,14 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
         if (hasResult && myWorkshop->canBeShaded(aObject)) {
-          action("WIREFRAME_CMD")->setEnabled(true);
-          action("SHADING_CMD")->setEnabled(true);
+          XGUI_Displayer::DisplayMode aMode = aDisplayer->displayMode(aObject);
+          if (aMode != XGUI_Displayer::NoMode) {
+            action("WIREFRAME_CMD")->setEnabled(aMode == XGUI_Displayer::Shading);
+            action("SHADING_CMD")->setEnabled(aMode == XGUI_Displayer::Wireframe);
+          } else {
+            action("WIREFRAME_CMD")->setEnabled(true);
+            action("SHADING_CMD")->setEnabled(true);
+          }
         }
         if (!hasFeature) {
           bool aHasSubResults = ModelAPI_Tools::hasSubResults(
@@ -278,8 +284,15 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     }
     if (isVisible) {
       if (canBeShaded) {
-        action("WIREFRAME_CMD")->setEnabled(true);
-        action("SHADING_CMD")->setEnabled(true);
+        XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+        XGUI_Displayer::DisplayMode aMode = aDisplayer->displayMode(aObject);
+        if (aMode != XGUI_Displayer::NoMode) {
+          action("WIREFRAME_CMD")->setEnabled(aMode == XGUI_Displayer::Shading);
+          action("SHADING_CMD")->setEnabled(aMode == XGUI_Displayer::Wireframe);
+        } else {
+          action("WIREFRAME_CMD")->setEnabled(true);
+          action("SHADING_CMD")->setEnabled(true);
+        }
       }
       action("SHOW_ONLY_CMD")->setEnabled(true);
       action("HIDE_CMD")->setEnabled(true);
