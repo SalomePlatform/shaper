@@ -502,7 +502,6 @@ void XGUI_OperationMgr::onOperationStopped()
 #include <ModuleBase_ModelWidget.h>
 bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
-  qDebug("XGUI_OperationMgr::onKeyReleased");
   QObject* aSender = sender();
 
   // Let the manager decide what to do with the given key combination.
@@ -514,8 +513,7 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       ModuleBase_Operation* aOperation = currentOperation();
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
       ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-      if (aActiveWgt && !aActiveWgt->isEventProcessed(theEvent)) {
-        qDebug("XGUI_OperationMgr::onKeyReleased accept Enter");
+      if (!aActiveWgt || !aActiveWgt->isEventProcessed(theEvent)) {
         ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
         if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
           emit keyEnterReleased();
