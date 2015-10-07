@@ -152,7 +152,7 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-    myIsResetCurrentValue(false), myIsMouseOverWindow(false),
+    myIsResetCurrentValue(false), myIsCurrentValueUnderModification(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
     myIsPopupMenuActive(false), myIsConstraintsShown(true)
 {
@@ -192,6 +192,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
   myIsResetCurrentValue = false;
+  myIsCurrentValueUnderModification = false;
   // it is important to validate operation here only if sketch entity create operation is active
   // because at this operation we reacts to the mouse leave/enter view port
   //operationMgr()->onValidateOperation();
@@ -278,9 +279,20 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   }
 }
 
+void PartSet_SketcherMgr::onValuesModied()
+{
+  myIsCurrentValueUnderModification = true;
+  // update Apply enable state
+  //myIsResetCurrentValue = false;
+  //if (!isNestedCreateOperation(getCurrentOperation()))
+  //  return;
+  operationMgr()->onValidateOperation();
+}
+
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
   myIsResetCurrentValue = false;
+  myIsCurrentValueUnderModification = false;
 
   if (isNestedCreateOperation(getCurrentOperation()))
     return;
@@ -705,7 +717,8 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
     AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
     anError = aAttributeString->value().c_str();
   }
-  else if (myIsResetCurrentValue) { // this flag do not allow commit of the current operation
+  else if (myIsResetCurrentValue || myIsCurrentValueUnderModification) {
+    // this flags do not allow commit of the current operation
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                         (getCurrentOperation());
     if (aFOperation) {
@@ -719,7 +732,11 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
           if (anAttr.get())
             anAttributeName = anAttr->id().c_str();
         }
-        anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
+        if (myIsResetCurrentValue)
+          anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
+        else if (myIsCurrentValueUnderModification) {
+          anError = "Attribute \"" + anAttributeName + "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
+        }
       }
     }
   }
@@ -939,6 +956,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
   connectToPropertyPanel(false);
   myIsResetCurrentValue = false;
+  myIsCurrentValueUnderModification = false;
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
   if (isNestedCreateOperation(theOp))
@@ -971,15 +989,16 @@ bool PartSet_SketcherMgr::canRedo() const
   return isNestedCreateOperation(getCurrentOperation());
 }
 
-bool PartSet_SketcherMgr::canCommitOperation() const
+/*bool PartSet_SketcherMgr::canCommitOperation() const
 {
   bool aCanCommit = true;
 
-  if (isNestedCreateOperation(getCurrentOperation()) && myIsResetCurrentValue)
+  if (isNestedCreateOperation(getCurrentOperation()) &&
+      (myIsResetCurrentValue || myIsCurrentValueUnderModification))
     aCanCommit = false;
 
   return aCanCommit;
-}
+}*/
 
 bool PartSet_SketcherMgr::canEraseObject(const ObjectPtr& theObject) const
 {
@@ -1077,7 +1096,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 
 bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 {
-  return myIsMouseOverWindow || !myIsResetCurrentValue;
+  return myIsMouseOverWindow || (!myIsResetCurrentValue && !myIsCurrentValueUnderModification);
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("canDisplayCurrentCreatedFeature: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -1234,6 +1253,8 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
       if (isToConnect) {
         connect(aWidget, SIGNAL(beforeValuesChanged()),
                 this, SLOT(onBeforeValuesChangedInPropertyPanel()));
+        connect(aWidget, SIGNAL(valuesModified()),
+                this, SLOT(onValuesModied()));
         connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
         connect(aWidget, SIGNAL(afterValuesChanged()),
                 this, SLOT(onAfterValuesChangedInPropertyPanel()));

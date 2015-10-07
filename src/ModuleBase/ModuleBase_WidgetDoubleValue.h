@@ -44,6 +44,9 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// Returns true if the event is processed.
+  virtual bool isEventProcessed(QKeyEvent* theEvent);
+
  public slots:
  // Delayed value chnged: when user starts typing something,
  // it gives him a 0,5 second to finish typing, when sends valueChnaged() signal

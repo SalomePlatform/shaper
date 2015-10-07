@@ -23,7 +23,7 @@
 
 #include <QMouseEvent>
 
-//#define APPLY_BY_ENTER_OR_TAB
+#define APPLY_BY_ENTER_OR_TAB
 
 PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              ModuleBase_IWorkshop* theWorkshop,
@@ -40,6 +40,7 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
   // Apply widget value change by enter/tab event.
   disconnect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
   connect(mySpinBox, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesModified()));
 #else
   disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
@@ -139,3 +140,7 @@ void PartSet_WidgetPoint2dDistance::onValuesChanged()
   emit valuesChanged();
 }
 
+bool PartSet_WidgetPoint2dDistance::isEventProcessed(QKeyEvent* theEvent)
+{
+  return mySpinBox->isEventProcessed(theEvent);
+}

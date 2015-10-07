@@ -34,7 +34,7 @@
 #include <iostream>
 #endif
 
-//#define APPLY_BY_ENTER_OR_TAB
+#define APPLY_BY_ENTER_OR_TAB
 
 ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData,
@@ -90,6 +90,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
 #ifdef APPLY_BY_ENTER_OR_TAB
   // Apply widget value change by enter/tab event.
   connect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(valuesModified()));
 #else
   connect(mySpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(valuesChanged()));
 #endif

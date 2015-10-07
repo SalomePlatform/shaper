@@ -31,7 +31,7 @@
 #include <iostream>
 #endif
 
-//#define APPLY_BY_ENTER_OR_TAB
+#define APPLY_BY_ENTER_OR_TAB
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData,
@@ -91,6 +91,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
 #ifdef APPLY_BY_ENTER_OR_TAB
   // Apply widget value change by enter/tab event.
   connect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+
 #else
   connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesChanged()));
 #endif
@@ -156,4 +158,9 @@ QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
   QList<QWidget*> aList;
   aList.append(mySpinBox);
   return aList;
+}
+
+bool ModuleBase_WidgetDoubleValue::isEventProcessed(QKeyEvent* theEvent)
+{
+  return mySpinBox->isEventProcessed(theEvent);
 }

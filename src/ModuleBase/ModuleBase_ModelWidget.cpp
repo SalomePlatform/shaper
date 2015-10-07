@@ -148,6 +148,14 @@ bool ModuleBase_ModelWidget::restoreValue()
   return isDone;
 }
 
+void ModuleBase_ModelWidget::storeValueByApply()
+{
+  // do not emit signal about update the currenty feature object
+  // in order to do not perform additional redisplay in the viewer.
+  // It should happens by finish operation of the apply action
+  storeValueCustom();
+}
+
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
 {
   blockUpdateViewer(true);
@@ -166,6 +174,11 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
   Events_Loop::loop()->flush(anEvent);
 
   //blockUpdateViewer(false);
+}
+
+bool ModuleBase_ModelWidget::isEventProcessed(QKeyEvent* theEvent)
+{
+  return false;
 }
 
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)

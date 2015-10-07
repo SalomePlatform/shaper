@@ -118,7 +118,7 @@ public:
 
   /// Returns True if the current operation can be committed. Asks the sketch manager.
   /// \return a boolean value
-  virtual bool canCommitOperation() const;
+  //virtual bool canCommitOperation() const;
 
   /// Returns whether the object can be erased at the bounds of the active operation.
   /// The sub-objects of the current operation can not be erased

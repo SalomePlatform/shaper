@@ -376,10 +376,10 @@ bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& t
   return aValid;
 }
 
-bool PartSet_Module::canCommitOperation() const
+/*bool PartSet_Module::canCommitOperation() const
 {
   return mySketchMgr->canCommitOperation();
-}
+}*/
 
 bool PartSet_Module::canEraseObject(const ObjectPtr& theObject) const
 {

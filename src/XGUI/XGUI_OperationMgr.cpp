@@ -498,16 +498,34 @@ void XGUI_OperationMgr::onOperationStopped()
   }
 }
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
 bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
+  qDebug("XGUI_OperationMgr::onKeyReleased");
+  QObject* aSender = sender();
+
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = true;
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      emit keyEnterReleased();
-      commitOperation();
+      ModuleBase_Operation* aOperation = currentOperation();
+      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+      if (aActiveWgt && !aActiveWgt->isEventProcessed(theEvent)) {
+        qDebug("XGUI_OperationMgr::onKeyReleased accept Enter");
+        ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+        if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
+          emit keyEnterReleased();
+          commitOperation();
+        }
+        else
+          isAccepted = false;
+      }
+      //else
+      //  isAccepted = false;
     }
     case Qt::Key_N:
     case Qt::Key_P: {

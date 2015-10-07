@@ -91,6 +91,10 @@ Q_OBJECT
   /// \return True in success
   bool restoreValue();
 
+  /// Saves the internal parameters to the given feature. Emits signals before and after store
+  /// \return True in success
+  void storeValueByApply();
+
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
@@ -147,6 +151,9 @@ Q_OBJECT
   /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }
 
+  /// Returns true if the event is processed.
+  virtual bool isEventProcessed(QKeyEvent* theEvent);
+
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object
   static void updateObject(ObjectPtr theObj);
@@ -160,6 +167,8 @@ signals:
   void beforeValuesChanged();
   /// The signal about widget values changed
   void valuesChanged();
+  /// The signal about widget values modified
+  void valuesModified();
   /// The signal about widget values are to be changed
   void afterValuesChanged();
 

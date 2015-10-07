@@ -52,7 +52,7 @@ const double MaxCoordinate = 1e12;
 
 static QStringList MyFeaturesForCoincedence;
 
-//#define APPLY_BY_ENTER_OR_TAB
+#define APPLY_BY_ENTER_OR_TAB
 
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
                                              ModuleBase_IWorkshop* theWorkshop,
@@ -93,6 +93,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 #ifdef APPLY_BY_ENTER_OR_TAB
     // Apply widget value change by enter/tab event.
     connect(myXSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+    connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
 #else
     connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
 #endif
@@ -111,6 +112,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 #ifdef APPLY_BY_ENTER_OR_TAB
     // Apply widget value change by enter/tab event.
     connect(myYSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+    connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
 #else
     connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
 #endif
@@ -472,4 +474,9 @@ void PartSet_WidgetPoint2D::onValuesChanged()
 {
   myLockApplyMgr->valuesChanged();
   emit valuesChanged();
+}
+
+bool PartSet_WidgetPoint2D::isEventProcessed(QKeyEvent* theEvent)
+{
+  return myXSpin->isEventProcessed(theEvent) || myXSpin->isEventProcessed(theEvent);
 }

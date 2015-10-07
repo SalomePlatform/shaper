@@ -59,6 +59,9 @@ Q_OBJECT
   /// Set sketch instance
   void setSketch(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
 
+  /// Returns true if the event is processed.
+  virtual bool isEventProcessed(QKeyEvent* theEvent);
+
 public slots:
    /// Process of mouse move
    /// \param theWnd a pointer to a window

@@ -122,7 +122,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Returns True if the current operation can be committed. By default it is true.
   /// \return a boolean value
-  virtual bool canCommitOperation() const;
+  //virtual bool canCommitOperation() const;
 
   /// Returns whether the object can be erased. The default realization returns true.
   /// \param theObject a model object

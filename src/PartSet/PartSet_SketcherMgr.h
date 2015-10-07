@@ -137,7 +137,7 @@ public:
 
   /// Returns False only if the sketch creating feature can not be visualized.
   /// \return a boolean value
-  bool canCommitOperation() const;
+  //bool canCommitOperation() const;
 
   /// Returns whether the object can be erased at the bounds of the active operation.
   /// Sketch sub-entities can not be erased during the sketch operation
@@ -205,6 +205,9 @@ private slots:
   /// Process the leave mouse of the view port. If the current operation is a create of
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
+
+  /// Updates the flag of reset state
+  void onValuesModied();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
   /// Listens to the signal about values are to be changed in the property panel
@@ -298,6 +301,7 @@ private:
   bool myIsDragging;
   bool myDragDone;
   bool myIsResetCurrentValue; /// the state that value in the property panel is reset
+  bool myIsCurrentValueUnderModification; /// the value is modified in PP but it is not applyed in the model
   bool myIsMouseOverWindow; /// the state that the mouse over the view
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   bool myIsPopupMenuActive; /// the state of the popup menu is shown

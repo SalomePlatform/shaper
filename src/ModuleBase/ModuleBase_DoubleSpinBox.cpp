@@ -57,7 +57,8 @@ const double PSEUDO_ZERO = 1.e-20;
  */
 ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
     : QDoubleSpinBox(theParent),
-      myCleared(false)
+      myCleared(false),
+      myIsModified(false)
 {
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid inconsistency of double-2-string and string-2-double conversion)
@@ -75,6 +76,9 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
 
   connect(lineEdit(), SIGNAL(textChanged( const QString& )), this,
           SLOT(onTextChanged( const QString& )));
+
+  connect(this, SIGNAL(valueChanged(const QString&)), this, SLOT(onValueChanged(const QString&)));
+  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 }
 
 /*!
@@ -196,6 +200,31 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
   return res;
 }
 
+#include <QKeyEvent>
+void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
+{
+  myProcessedEvent = 0;
+
+  bool anIsModified = myIsModified;
+  QDoubleSpinBox::keyPressEvent(theEvent);
+
+  switch (theEvent->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return: {
+      if (anIsModified)
+        myProcessedEvent = theEvent;
+      /*qDebug("ModuleBase_DoubleSpinBox::keyPressEvent");
+      if (anIsModified) // we should not perform this event outside
+        theEvent->setAccepted(true);
+      else
+        theEvent->setAccepted(false);*/
+    }
+    break;
+    default:
+      break;
+  }
+}
+
 /*!
  \brief Perform \a steps increment/decrement steps.
 
@@ -306,4 +335,20 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
 void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 {
   myCleared = false;
+  myIsModified = true;
+}
+
+void ModuleBase_DoubleSpinBox::onValueChanged(const QString& theValue)
+{
+  myIsModified = true;
+}
+
+void ModuleBase_DoubleSpinBox::onEditingFinished()
+{
+  myIsModified = false;
+}
+
+bool ModuleBase_DoubleSpinBox::isEventProcessed(QKeyEvent* theEvent)
+{
+  return myProcessedEvent && myProcessedEvent == theEvent;
 }

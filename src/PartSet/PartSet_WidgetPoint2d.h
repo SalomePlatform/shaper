@@ -87,6 +87,9 @@ Q_OBJECT
   /// Returns coordinate Y currently defined in the control
   double y() const;
 
+  /// Returns true if the event is processed.
+  virtual bool isEventProcessed(QKeyEvent* theEvent);
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();

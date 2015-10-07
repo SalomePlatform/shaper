@@ -11,6 +11,7 @@
 #include <QDoubleSpinBox>
 #include <QValidator>
 
+class QKeyEvent;
 
 /**
 * \ingroup GUI
@@ -48,13 +49,18 @@ Q_OBJECT
   /// Validate current value
   virtual QValidator::State validate(QString&, int&) const;
 
+  virtual bool isEventProcessed(QKeyEvent* theEvent);
+
  protected slots:
    /// Called on text changed
   virtual void onTextChanged(const QString&);
+  void onValueChanged(const QString& theValue);
+  void onEditingFinished();
 
  protected:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
+  virtual void keyPressEvent(QKeyEvent* theEvent);
 
  private:
    /// Is clear flag
@@ -62,6 +68,10 @@ Q_OBJECT
 
   /// Precision value
   int myPrecision;
+  /// Boolean value whether the spin box content is modified
+  bool myIsModified;
+
+  QKeyEvent* myProcessedEvent;
 };
 
 #endif
