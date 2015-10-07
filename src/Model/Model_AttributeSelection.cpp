@@ -488,7 +488,7 @@ bool Model_AttributeSelection::update()
               }
             }
           }
-          double aBestFound = 0; // best percentage of found edges
+          int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
           int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
           for(int aFaceIndex = 0; aFaceIndex < aConstructionContext->facesNum(); aFaceIndex++) {
             int aFound = 0, aNotFound = 0, aSameOrientation = 0;
@@ -517,12 +517,9 @@ bool Model_AttributeSelection::update()
               }
             }
             if (aFound + aNotFound != 0) {
-              double aSum = aFound + aNotFound;
-               // aSameOrientation: if edges are same, take where orientation is better
-              double aPercentage = double(aFound) / double(aFound + aNotFound);
-              if (aPercentage > aBestFound || 
-                  (aPercentage == aBestFound && aSameOrientation > aBestOrient)) {
-                aBestFound = aPercentage;
+              if (aFound > aBestFound || 
+                  (aFound == aBestFound && aSameOrientation > aBestOrient)) {
+                aBestFound = aFound;
                 aBestOrient = aSameOrientation;
                 aNewSelected = aConstructionContext->face(aFaceIndex);
               }
