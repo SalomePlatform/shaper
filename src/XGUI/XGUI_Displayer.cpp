@@ -698,7 +698,6 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
 
 void XGUI_Displayer::updateViewer() const
 {
-  static int ai = 0;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull() && myEnableUpdateViewer) {
     myWorkshop->viewer()->Zfitall();
