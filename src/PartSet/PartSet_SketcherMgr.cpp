@@ -205,7 +205,9 @@ void PartSet_SketcherMgr::onEnterViewPort()
 
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
-    operationMgr()->onValidateOperation();
+
+  QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
+  operationMgr()->onValidateOperation();
 
   // we need change displayed state of the current operation feature
   // if the feature is presentable, e.g. distance construction. It has no results, so workshop does
@@ -240,6 +242,9 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
+
+  QApplication::restoreOverrideCursor();
+
   // the method should be performed if the popup menu is called,
   // the reset of the current widget should not happen
   if (myIsPopupMenuActive)
@@ -919,7 +924,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
   connectToPropertyPanel(true);
-  if (isNestedCreateOperation(theOperation))
+  if (isNestedCreateOperation(theOperation) && myIsMouseOverWindow)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
 }
 
