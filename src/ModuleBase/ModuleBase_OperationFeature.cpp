@@ -114,6 +114,7 @@ void ModuleBase_OperationFeature::stopOperation()
   if (myVisualizedObjects.find(aFeature) != myVisualizedObjects.end()) {
     aFeature->setDisplayed(false);
   }
+  aFeature->setStable(true);
   if (myVisualizedObjects.size() > 0)
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
@@ -146,6 +147,7 @@ FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage
 void ModuleBase_OperationFeature::setFeature(FeaturePtr theFeature)
 {
   myFeature = theFeature;
+  myFeature->setStable(false);
   myIsEditing = true;
 }
 
