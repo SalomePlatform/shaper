@@ -96,6 +96,8 @@ Q_OBJECT
   /// \return Currently installed property panel
   //ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
+  void setCurrentFeature(const FeaturePtr& theFeature);
+
   /// Activates widgets by preselection if it is accepted. Emits signal if the activation is correct
   virtual void activateByPreselection();
 
@@ -136,6 +138,9 @@ signals:
 
   /// Hide feature/results if they were hided on start
   virtual void stopOperation();
+
+  /// Virtual method called after operation resume (see resume() method for more description)
+  virtual void resumeOperation();
 
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed

@@ -26,6 +26,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -117,6 +118,16 @@ void ModuleBase_OperationFeature::stopOperation()
   aFeature->setStable(true);
   if (myVisualizedObjects.size() > 0)
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+}
+
+void ModuleBase_OperationFeature::resumeOperation()
+{
+  ModuleBase_Operation::resumeOperation();
+  //if (!myIsEditing)
+    setCurrentFeature(feature());
+  //SessionPtr aMgr = ModelAPI_Session::get();
+  //DocumentPtr aDoc = aMgr->activeDocument();
+  //aDoc->setCurrentFeature(feature(), false);
 }
 
 FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage)
@@ -238,7 +249,7 @@ void ModuleBase_OperationFeature::abort()
     bool aIsOp = aMgr->isOperation();
     if (!aIsOp)
       aMgr->startOperation();
-    aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
+    aDoc->setCurrentFeature(myPreviousCurrentFeature, false);//true);
     if (!aIsOp)
       aMgr->finishOperation();
     myPreviousCurrentFeature = FeaturePtr();
@@ -273,15 +284,24 @@ bool ModuleBase_OperationFeature::commit()
 
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
+
     if (myIsEditing) {
-      DocumentPtr aDoc = aMgr->activeDocument();
+      setCurrentFeature(myPreviousCurrentFeature);
+      /*DocumentPtr aDoc = aMgr->activeDocument();
       bool aIsOp = aMgr->isOperation();
       if (!aIsOp)
         aMgr->startOperation();
       aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
       if (!aIsOp)
-        aMgr->finishOperation();
+        aMgr->finishOperation();*/
       myPreviousCurrentFeature = FeaturePtr();
+    }
+    else {
+      /*CompositeFeaturePtr aCompositeFeature = ModelAPI_Tools::compositeOwner(feature());
+      if (aCompositeFeature.get())
+        setCurrentFeature(aCompositeFeature);//myPreviousCurrentFeature);
+      //else
+      //  setCurrentFeature(feature());*/
     }
     commitOperation();
     aMgr->finishOperation();
@@ -294,6 +314,18 @@ bool ModuleBase_OperationFeature::commit()
     return true;
   }
   return false;
+}
+
+void ModuleBase_OperationFeature::setCurrentFeature(const FeaturePtr& theFeature)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+  bool aIsOp = aMgr->isOperation();
+  if (!aIsOp)
+    aMgr->startOperation();
+  aDoc->setCurrentFeature(theFeature, false);//true);
+  if (!aIsOp)
+    aMgr->finishOperation();
 }
 
 void ModuleBase_OperationFeature::activateByPreselection()
