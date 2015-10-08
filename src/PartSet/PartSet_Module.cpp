@@ -907,6 +907,8 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
   QAction* aActivatePartSetAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
+
+  ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {
     bool hasResult = false;
     bool hasFeature = false;
@@ -917,13 +919,13 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     ObjectPtr aObject = aObjects.first();
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-      FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
       bool isPart = aPart.get() || 
-        (aPartFeature.get() && (aPartFeature->getKind() == PartSetPlugin_Part::ID()));
+        (aFeature.get() && (aFeature->getKind() == PartSetPlugin_Part::ID()));
       if (isPart) {
         DocumentPtr aPartDoc;
         if (!aPart.get()) {
-          aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
+          aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFeature->firstResult());
         }
         if (aPart.get()) // this may be null is Part feature is disabled
           aPartDoc = aPart->partDoc();
@@ -932,8 +934,14 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
         aActivatePartAction->setEnabled((aMgr->activeDocument() != aPartDoc));
 
       } else if (aObject->document() == aMgr->activeDocument()) {
-        if (hasParameter || hasFeature)
+        if (hasParameter || hasFeature) {
+          myMenuMgr->action("EDIT_CMD")->setEnabled(true);
           theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
+          if (aCurrentOp && aFeature.get()) {
+            if (aCurrentOp->id().toStdString() == aFeature->getKind())
+              myMenuMgr->action("EDIT_CMD")->setEnabled(false);
+          }
+        }
       }
 
       ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
@@ -950,7 +958,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       theMenu->addAction(aActivatePartSetAction);
       aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
   }
-  bool aNotDeactivate = (myWorkshop->currentOperation() == 0);
+  bool aNotDeactivate = (aCurrentOp == 0);
   if (!aNotDeactivate) {
     aActivatePartAction->setEnabled(false);
     aActivatePartSetAction->setEnabled(false);
