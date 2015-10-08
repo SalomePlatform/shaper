@@ -166,23 +166,18 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
     activateWidget(NULL);
     return;
   }
-  ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
   activateWindow();
-  for (; anIt != aLast && !aNextWidget; anIt++) {
+  for (; anIt != aLast; anIt++) {
     if (isFoundWidget || !theWidget) {
       if ((*anIt)->focusTo()) {
-        aNextWidget = *anIt;
+        return;
       }
     }
     isFoundWidget = (*anIt) == theWidget;
   }
-  // Normaly focusTo is enough to activate widget
-  // here is a special case on mouse click in the viewer
-  if(aNextWidget == NULL) {
-    activateWidget(aNextWidget);
-  }
+  activateWidget(NULL);
 }
 
 void XGUI_PropertyPanel::activateNextWidget()
