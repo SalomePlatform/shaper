@@ -759,20 +759,16 @@ void Model_Document::setCurrentFeature(
 
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   CompositeFeaturePtr aMain; // main feature that may nest the new current
+  std::set<FeaturePtr> anOwners; // composites that contain theCurrent (with any level of nesting)
   if (theCurrent.get()) {
     aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theCurrent);
-    if (!aMain.get()) {
-      // if feature nests into compisite feature, make the composite feature as current
-      const std::set<AttributePtr>& aRefsToMe = theCurrent->data()->refsToMe();
-      std::set<AttributePtr>::const_iterator aRefToMe = aRefsToMe.begin();
-      for(; aRefToMe != aRefsToMe.end(); aRefToMe++) {
-        CompositeFeaturePtr aComposite = 
-          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*aRefToMe)->owner());
-        if (aComposite.get() && aComposite->isSub(theCurrent)) {
-          aMain = aComposite;
-          break;
-        }
+    CompositeFeaturePtr anOwner = ModelAPI_Tools::compositeOwner(theCurrent);
+    while(anOwner.get()) {
+      if (!aMain.get()) {
+        aMain = anOwner;
       }
+      anOwners.insert(anOwner);
+      anOwner = ModelAPI_Tools::compositeOwner(anOwner);
     }
   }
 
@@ -817,8 +813,13 @@ void Model_Document::setCurrentFeature(
     if (anIter == theCurrent) aPassed = true;
 
     bool aDisabledFlag = !aPassed;
-    if (aMain.get() && aMain->isSub(anIter)) // sub-elements of not-disabled feature are not disabled
-      aDisabledFlag = false;
+    if (aMain.get()) {
+      if (aMain->isSub(anIter)) // sub-elements of not-disabled feature are not disabled
+        aDisabledFlag = false;
+      else if (anOwners.find(anIter) != anOwners.end()) // disable the higher-level feature is the nested is the current
+        aDisabledFlag = true;
+    }
+
     if (anIter->getKind() == "Parameter") {// parameters are always out of the history of features, but not parameters
       if (theCurrent.get() && theCurrent->getKind() != "Parameter")
         aDisabledFlag = false;

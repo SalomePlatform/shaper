@@ -754,6 +754,7 @@ void Model_Objects::synchronizeBackRefs()
               std::dynamic_pointer_cast<Model_Data>((*aRefTo)->data());
             aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
             // update enable/disable status: the nested status must be equal to the composite
+            /* MPV: not sub-elements of sketch may be enabled during editition of sketch
             CompositeFeaturePtr aComp = 
               std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
             if (aComp.get()) {
@@ -762,6 +763,7 @@ void Model_Objects::synchronizeBackRefs()
                 aReferenced->setDisabled(aComp->isDisabled());
               }
             }
+            */
           }
         }
       }

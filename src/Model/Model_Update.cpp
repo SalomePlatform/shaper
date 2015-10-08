@@ -274,8 +274,13 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (theFeature->isDisabled())
+  if (theFeature->isDisabled()) {
+    // possibly sub-elements are not disabled?
+    CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+    if (aCompos)
+      iterateUpdate(aCompos);
     return;
+  }
 
   // do not execute the composite that contains the current
   bool isPostponedMain = false;
