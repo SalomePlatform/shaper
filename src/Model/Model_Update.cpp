@@ -676,12 +676,37 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
 
 void Model_Update::updateStability(void* theSender)
 {
-  ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theSender);
-  if (aSender && aSender->document()) {
-    Model_Objects* aDocObjects = 
-      std::dynamic_pointer_cast<Model_Document>(aSender->document())->objects();
-    if (aDocObjects) {
-      aDocObjects->synchronizeBackRefs();
+  if (theSender) {
+    ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theSender);
+    if (aSender && aSender->document()) {
+      FeaturePtr aFeatureSender = 
+        std::dynamic_pointer_cast<ModelAPI_Feature>(aSender->data()->owner());
+      if (aFeatureSender.get()) {
+        Model_Objects* aDocObjects = 
+          std::dynamic_pointer_cast<Model_Document>(aSender->document())->objects();
+        if (aDocObjects) {
+          //aDocObjects->synchronizeBackRefs();
+          // remove or add all concealment refs from this feature
+          std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+          aSender->data()->referencesToObjects(aRefs);
+          std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefIt = aRefs.begin();
+          for(; aRefIt != aRefs.end(); aRefIt++) {
+            std::list<ObjectPtr>& aRefFeaturesList = aRefIt->second;
+            std::list<ObjectPtr>::iterator aReferenced = aRefFeaturesList.begin();
+            for(; aReferenced != aRefFeaturesList.end(); aReferenced++) {
+              if (aReferenced->get() && (*aReferenced)->data()->isValid()) {
+                std::shared_ptr<Model_Data> aData = 
+                  std::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
+                if (aFeatureSender->isStable()) {
+                  aData->addBackReference(aFeatureSender, aRefIt->first);
+                } else {
+                  aData->removeBackReference(aFeatureSender, aRefIt->first);
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

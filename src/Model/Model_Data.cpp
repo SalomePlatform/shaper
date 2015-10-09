@@ -382,12 +382,11 @@ void Model_Data::removeBackReference(FeaturePtr theFeature, std::string theAttrI
 void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID, 
    const bool theApplyConcealment)
 {
-  // do not add the same attribute twice
+  // it is possible to add the same attribute twice: may be last time the owner was not Stable...
   AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
-  if (myRefsToMe.find(anAttribute) != myRefsToMe.end())
-    return;
+  if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
+    myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
 
-  myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
   if (theApplyConcealment &&  theFeature->isStable() && 
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
     std::shared_ptr<ModelAPI_Result> aRes = 
