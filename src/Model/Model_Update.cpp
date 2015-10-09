@@ -677,6 +677,7 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
 void Model_Update::updateStability(void* theSender)
 {
   if (theSender) {
+    bool added = false; // object may be was crated
     ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theSender);
     if (aSender && aSender->document()) {
       FeaturePtr aFeatureSender = 
@@ -701,12 +702,18 @@ void Model_Update::updateStability(void* theSender)
                   aData->addBackReference(aFeatureSender, aRefIt->first);
                 } else {
                   aData->removeBackReference(aFeatureSender, aRefIt->first);
+                  added = true; // remove of concealment may be caused creation of some result
                 }
               }
             }
           }
         }
       }
+    }
+    if (added) {
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static Events_ID kEventCreated = aLoop->eventByName(EVENT_OBJECT_CREATED);
+      aLoop->flush(kEventCreated);
     }
   }
 }

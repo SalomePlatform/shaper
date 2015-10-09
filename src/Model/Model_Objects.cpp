@@ -696,91 +696,82 @@ void Model_Objects::synchronizeFeatures(
   anOwner->executeFeatures() = true;
 }
 
+/// synchronises back references for the given object basing on the collected data
+void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& theNewRefs,
+  ObjectPtr theObject) 
+{
+  if (!theObject.get() || !theObject->data()->isValid())
+    return; // invalid
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
+  // iterate new list to compare with curent
+  std::set<AttributePtr>::iterator aNewIter = theNewRefs.begin();
+  for(; aNewIter != theNewRefs.end(); aNewIter++) {
+    if (aData->refsToMe().find(*aNewIter) == aData->refsToMe().end()) {
+      FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aNewIter)->owner());
+      aData->addBackReference(aRefFeat, (*aNewIter)->id());
+    }
+  }
+  if (theNewRefs.size() != aData->refsToMe().size()) { // some back ref must be removed
+    std::set<AttributePtr>::iterator aCurrentIter = aData->refsToMe().begin();
+    while(aCurrentIter != aData->refsToMe().end()) {
+      if (theNewRefs.find(*aCurrentIter) == theNewRefs.end()) {
+        aData->removeBackReference(*aCurrentIter);
+        aCurrentIter = aData->refsToMe().begin(); // reinitialize iteration after delete
+      } else aCurrentIter++;
+    }
+  }
+  aData->updateConcealmentFlag();
+}
+
 void Model_Objects::synchronizeBackRefs()
 {
-  // keeps the concealed flags of result to catch the change and create created/deleted events
-  std::list<std::pair<ResultPtr, bool> > aConcealed;
-  // first cycle: erase all data about back-references
+  // collect all back references in the separated container: to update everything at once,
+  // without additional Concealment switchin on and off: only the final modification
+
+  // referenced (slave) objects to referencing attirbutes
+  std::map<ObjectPtr, std::set<AttributePtr> > allRefs;
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeatures(myFeatures);
   for(; aFeatures.More(); aFeatures.Next()) {
     FeaturePtr aFeature = aFeatures.Value();
-    std::shared_ptr<Model_Data> aFData = 
-      std::dynamic_pointer_cast<Model_Data>(aFeature->data());
-    if (aFData.get()) {
-      aFData->eraseBackReferences();
-    }
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-    for (; aRIter != aResults.cend(); aRIter++) {
-      std::shared_ptr<Model_Data> aResData = 
-        std::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
-      if (aResData.get()) {
-        aConcealed.push_back(std::pair<ResultPtr, bool>(*aRIter, (*aRIter)->isConcealed()));
-        aResData->eraseBackReferences();
-      }
-      // iterate sub-bodies of compsolid
-      ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-      if (aComp.get()) {
-        int aNumSub = aComp->numberOfSubs();
-        for(int a = 0; a < aNumSub; a++) {
-          ResultPtr aSub = aComp->subResult(a);
-          std::shared_ptr<Model_Data> aResData = 
-            std::dynamic_pointer_cast<Model_Data>(aSub->data());
-          if (aResData.get()) {
-            aConcealed.push_back(std::pair<ResultPtr, bool>(aSub, aSub->isConcealed()));
-            aResData->eraseBackReferences();
-          }
-        }
-      }
-    }
-  }
-
-  // second cycle: set new back-references: only features may have reference, iterate only them
-  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
-  for(aFeatures.Initialize(myFeatures); aFeatures.More(); aFeatures.Next()) {
-    FeaturePtr aFeature = aFeatures.Value();
-    std::shared_ptr<Model_Data> aFData = 
-      std::dynamic_pointer_cast<Model_Data>(aFeature->data());
+    std::shared_ptr<Model_Data> aFData = std::dynamic_pointer_cast<Model_Data>(aFeature->data());
     if (aFData.get()) {
       std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
       aFData->referencesToObjects(aRefs);
-      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator 
-        aRefsIter = aRefs.begin();
-      for(; aRefsIter != aRefs.end(); aRefsIter++) {
-        std::list<ObjectPtr>::iterator aRefTo = aRefsIter->second.begin();
-        for(; aRefTo != aRefsIter->second.end(); aRefTo++) {
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefsIt = aRefs.begin();
+      for(; aRefsIt != aRefs.end(); aRefsIt++) {
+        std::list<ObjectPtr>::iterator aRefTo = aRefsIt->second.begin();
+        for(; aRefTo != aRefsIt->second.end(); aRefTo++) {
           if (*aRefTo) {
-            std::shared_ptr<Model_Data> aRefData = 
-              std::dynamic_pointer_cast<Model_Data>((*aRefTo)->data());
-            aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
-            // update enable/disable status: the nested status must be equal to the composite
-            /* MPV: not sub-elements of sketch may be enabled during editition of sketch
-            CompositeFeaturePtr aComp = 
-              std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-            if (aComp.get()) {
-              FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(*aRefTo);
-              if (aReferenced.get()) {
-                aReferenced->setDisabled(aComp->isDisabled());
-              }
+            std::map<ObjectPtr, std::set<AttributePtr> >::iterator aFound = allRefs.find(*aRefTo);
+            if (aFound == allRefs.end()) {
+              allRefs[*aRefTo] = std::set<AttributePtr>();
+              aFound = allRefs.find(*aRefTo);
             }
-            */
+            aFound->second.insert(aFeature->data()->attribute(aRefsIt->first));
           }
         }
       }
     }
   }
-  std::list<std::pair<ResultPtr, bool> >::iterator aCIter = aConcealed.begin();
-  for(; aCIter != aConcealed.end(); aCIter++) {
-    if (aCIter->first->isConcealed() != aCIter->second) { // something is changed => produce event
-      if (aCIter->second) { // was concealed become not => creation event
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-        ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, anEvent);
-      } else { // was not concealed become concealed => delete event
-        ModelAPI_EventCreator::get()->sendDeleted(myDoc, aCIter->first->groupName());
-        // redisplay for the viewer (it must be disappeared also)
-        static Events_ID EVENT_DISP = 
-          Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-        ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, EVENT_DISP);
+  // second iteration: just compare back-references with existing in features and results
+  for(aFeatures.Initialize(myFeatures); aFeatures.More(); aFeatures.Next()) {
+    FeaturePtr aFeature = aFeatures.Value();
+    static std::set<AttributePtr> anEmpty;
+    std::map<ObjectPtr, std::set<AttributePtr> >::iterator aFound = allRefs.find(aFeature);
+    if (aFound == allRefs.end()) { // not found => erase all back references
+      synchronizeBackRefsForObject(anEmpty, aFeature);
+    } else {
+      synchronizeBackRefsForObject(aFound->second, aFeature);
+    }
+    // also for results
+    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+    for(; aRes != aResults.cend(); aRes++) {
+      aFound = allRefs.find(*aRes);
+      if (aFound == allRefs.end()) { // not found => erase all back references
+        synchronizeBackRefsForObject(anEmpty, *aRes);
+      } else {
+        synchronizeBackRefsForObject(aFound->second, *aRes);
       }
     }
   }
