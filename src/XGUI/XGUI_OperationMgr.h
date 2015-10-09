@@ -10,6 +10,7 @@
 #include "XGUI.h"
 
 #include <ModuleBase_Operation.h>
+#include "ModelAPI_Feature.h"
 
 #include <QList>
 #include <QObject>
@@ -174,6 +175,10 @@ protected: // TEMPORARY
   /// \return boolean result
   bool isGrantedOperation(ModuleBase_Operation* theOperation);
 
+  /// Sets the feature as a current in the document
+  /// \param theFeature a feature
+  void setCurrentFeature(const FeaturePtr& theFeature);
+
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
   /// \param theEvent the mouse event
@@ -184,13 +189,24 @@ protected: // TEMPORARY
   /// If there is a suspended operation, restart it.
   void onOperationStopped();
 
-  /// Slot called on operation start
+  /// Slot called before operation started. Stores the previous current feature, set the feature
+  /// of the operation as a current in the document. The previous current feature should be restored
+  /// by the operation abort/commit
+  void onBeforeOperationStarted();
+
+  /// Slot called after operation started
   void onOperationStarted();
 
-  /// Slot called on operation abort
+  /// Slot called before operation aborted. Restore the previous current operation
+  void onBeforeOperationAborted();
+
+  /// Slot called after operation aborted
   void onOperationAborted();
 
-  /// Slot called on operation commit
+  /// Slot called before operation committed. Restore the previous current operation
+  void onBeforeOperationCommitted();
+
+  /// Slot called after operation committed
   void onOperationCommitted();
 
   /// Slot called on operation resume
@@ -206,7 +222,6 @@ private:
 
   /// Current workshop
   ModuleBase_IWorkshop* myWorkshop;
-
 
   /// Lock/Unlock access to Ok button in property panel
   bool myIsValidationLock;

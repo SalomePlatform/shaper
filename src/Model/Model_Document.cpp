@@ -739,8 +739,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
     TDF_Label aLab = aRef->Get();
     FeaturePtr aResult = myObjs->feature(aLab);
     if (theVisible) { // get nearest visible (in history) going up
-      while(aResult.get() &&  // sub-composites are never in history
-             (!aResult->isInHistory() || ModelAPI_Tools::compositeOwner(aResult).get())) {
+      while(aResult.get() &&  !aResult->isInHistory()) {
         aResult = myObjs->nextFeature(aResult, true);
       }
     }

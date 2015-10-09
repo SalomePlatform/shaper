@@ -122,16 +122,6 @@ void ModuleBase_OperationFeature::stopOperation()
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
-void ModuleBase_OperationFeature::resumeOperation()
-{
-  ModuleBase_Operation::resumeOperation();
-  //if (!myIsEditing)
-    setCurrentFeature(feature());
-  //SessionPtr aMgr = ModelAPI_Session::get();
-  //DocumentPtr aDoc = aMgr->activeDocument();
-  //aDoc->setCurrentFeature(feature(), false);
-}
-
 FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage)
 {
   if (myParentFeature.get()) {
@@ -193,6 +183,7 @@ void ModuleBase_OperationFeature::start()
   }
   ModelAPI_Session::get()->startOperation(anId.toStdString());
 
+  emit beforeStarted();
   startOperation();
 
   if (!myIsEditing) {
@@ -206,22 +197,6 @@ void ModuleBase_OperationFeature::start()
       return;
     }
   }
-  /// Set current feature and remeber old current feature
-  if (myIsEditing) {
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->activeDocument();
-    // the parameter of current feature should be false, we should use all feature, not only visible
-    // in order to correctly save the previous feature of the nested operation, where the
-    // features can be not visible in the tree. The problem case is Edit sketch entitity(line)
-    // in the Sketch, created in ExtrusionCut operation. The entity disappears by commit.
-    // When sketch entity operation started, the sketch should be cashed here as the current.
-    // Otherwise(the flag is true), the ExtrusionCut is cashed, when commit happens, the sketch
-    // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
-    // As a result the sketch disappears from the viewer. However after commit it is displayed back.
-    myPreviousCurrentFeature = aDoc->currentFeature(false);
-    aDoc->setCurrentFeature(feature(), false);
-  }
-
   //Already called startOperation();
   emit started();
 
@@ -229,6 +204,8 @@ void ModuleBase_OperationFeature::start()
 
 void ModuleBase_OperationFeature::abort()
 {
+  emit beforeAborted();
+
   // the viewer update should be blocked in order to avoid the features blinking before they are
   // hidden
   std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
@@ -246,21 +223,10 @@ void ModuleBase_OperationFeature::abort()
 
   myFeature->setStable(true);
 
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (myIsEditing) {
-    DocumentPtr aDoc = aMgr->activeDocument();
-    bool aIsOp = aMgr->isOperation();
-    if (!aIsOp)
-      aMgr->startOperation();
-    aDoc->setCurrentFeature(myPreviousCurrentFeature, false);//true);
-    if (!aIsOp)
-      aMgr->finishOperation();
-    myPreviousCurrentFeature = FeaturePtr();
-  }
   abortOperation();
-
   stopOperation();
 
+  SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->abortOperation();
   emit stopped();
   // the viewer update should be unblocked in order to avoid the features blinking before they are
@@ -290,24 +256,7 @@ bool ModuleBase_OperationFeature::commit()
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
 
-    if (myIsEditing) {
-      setCurrentFeature(myPreviousCurrentFeature);
-      /*DocumentPtr aDoc = aMgr->activeDocument();
-      bool aIsOp = aMgr->isOperation();
-      if (!aIsOp)
-        aMgr->startOperation();
-      aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
-      if (!aIsOp)
-        aMgr->finishOperation();*/
-      myPreviousCurrentFeature = FeaturePtr();
-    }
-    else {
-      /*CompositeFeaturePtr aCompositeFeature = ModelAPI_Tools::compositeOwner(feature());
-      if (aCompositeFeature.get())
-        setCurrentFeature(aCompositeFeature);//myPreviousCurrentFeature);
-      //else
-      //  setCurrentFeature(feature());*/
-    }
+    emit beforeCommitted();
     commitOperation();
     aMgr->finishOperation();
 
@@ -319,18 +268,6 @@ bool ModuleBase_OperationFeature::commit()
     return true;
   }
   return false;
-}
-
-void ModuleBase_OperationFeature::setCurrentFeature(const FeaturePtr& theFeature)
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aDoc = aMgr->activeDocument();
-  bool aIsOp = aMgr->isOperation();
-  if (!aIsOp)
-    aMgr->startOperation();
-  aDoc->setCurrentFeature(theFeature, false);//true);
-  if (!aIsOp)
-    aMgr->finishOperation();
 }
 
 void ModuleBase_OperationFeature::activateByPreselection()
@@ -387,6 +324,16 @@ void ModuleBase_OperationFeature::setParentFeature(CompositeFeaturePtr theParent
 CompositeFeaturePtr ModuleBase_OperationFeature::parentFeature() const
 {
   return myParentFeature;
+}
+
+void ModuleBase_OperationFeature::setPreviousCurrentFeature(const FeaturePtr& theFeature)
+{
+  myPreviousCurrentFeature = theFeature;
+}
+
+FeaturePtr ModuleBase_OperationFeature::previousCurrentFeature()
+{
+  return myPreviousCurrentFeature;
 }
 
 void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelection,
