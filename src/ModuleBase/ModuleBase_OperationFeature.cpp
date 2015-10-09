@@ -79,6 +79,9 @@ void ModuleBase_OperationFeature::startOperation()
   if (!aFeature.get() || !isEditOperation())
     return;
 
+  if (aFeature.get() && isEditOperation())
+    aFeature->setStable(false);
+
   myVisualizedObjects.clear();
   // store hidden result features
   std::list<ResultPtr> aResults = aFeature->results();
@@ -115,7 +118,6 @@ void ModuleBase_OperationFeature::stopOperation()
   if (myVisualizedObjects.find(aFeature) != myVisualizedObjects.end()) {
     aFeature->setDisplayed(false);
   }
-  aFeature->setStable(true);
   if (myVisualizedObjects.size() > 0)
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
@@ -158,7 +160,6 @@ FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage
 void ModuleBase_OperationFeature::setFeature(FeaturePtr theFeature)
 {
   myFeature = theFeature;
-  myFeature->setStable(false);
   myIsEditing = true;
 }
 
@@ -221,7 +222,7 @@ void ModuleBase_OperationFeature::start()
     aDoc->setCurrentFeature(feature(), false);
   }
 
-  startOperation();
+  //Already called startOperation();
   emit started();
 
 }
@@ -242,6 +243,8 @@ void ModuleBase_OperationFeature::abort()
   ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();
   if (aPropertyPanel)
     aPropertyPanel->cleanContent();
+
+  myFeature->setStable(true);
 
   SessionPtr aMgr = ModelAPI_Session::get();
   if (myIsEditing) {
@@ -281,6 +284,8 @@ bool ModuleBase_OperationFeature::commit()
     ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();
     if (aPropertyPanel)
       aPropertyPanel->cleanContent();
+    
+    myFeature->setStable(true);
 
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
