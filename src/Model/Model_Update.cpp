@@ -54,6 +54,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kOpAbortEvent);
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   aLoop->registerListener(this, kOpStartEvent);
+  static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
+  aLoop->registerListener(this, kStabilityEvent);
 
   /* not needed now with history line
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
@@ -76,9 +78,12 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
+  static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
 #endif
+  if (theMessage->eventID() == kStabilityEvent)
+    updateStability(theMessage->sender());
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
     /*bool aPropVal =
       Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
@@ -667,6 +672,18 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   }
   theFeature->data()->setUpdateID(ModelAPI_Session::get()->transactionID());
   redisplayWithResults(theFeature, aState);
+}
+
+void Model_Update::updateStability(void* theSender)
+{
+  ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theSender);
+  if (aSender && aSender->document()) {
+    Model_Objects* aDocObjects = 
+      std::dynamic_pointer_cast<Model_Document>(aSender->document())->objects();
+    if (aDocObjects) {
+      aDocObjects->synchronizeBackRefs();
+    }
+  }
 }
 
 ///////////////// Updated items iterator ////////////////////////

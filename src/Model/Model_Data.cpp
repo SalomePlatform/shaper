@@ -388,7 +388,7 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
     return;
 
   myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
-  if (theApplyConcealment && 
+  if (theApplyConcealment &&  theFeature->isStable() && 
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
     std::shared_ptr<ModelAPI_Result> aRes = 
       std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
