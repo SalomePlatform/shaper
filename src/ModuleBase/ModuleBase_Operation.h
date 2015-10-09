@@ -91,12 +91,15 @@ Q_OBJECT
 
 signals:
   /// The operation is started
+  void beforeStarted();
   void started();
 
   /// The operation is aborted
+  void beforeAborted();
   void aborted();
 
   /// The operation is committed
+  void beforeCommitted();
   void committed();
 
   /// The operation is aborted or committed
