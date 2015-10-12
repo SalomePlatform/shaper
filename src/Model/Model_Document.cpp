@@ -341,6 +341,19 @@ bool Model_Document::finishOperation()
   bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
   static std::shared_ptr<Model_Session> aSession = 
     std::static_pointer_cast<Model_Session>(Model_Session::get());
+  // do it before flashes to enable and recompute nesting features correctly
+  if (myNestedNum.empty() || (isNestedClosed && myNestedNum.size() == 1)) {
+    // if all nested operations are closed, make current the higher level objects (to perform 
+    // it in the python scripts correctly): sketch become current after creation ofsub-elements
+    FeaturePtr aCurrent = currentFeature(false);
+    CompositeFeaturePtr aMain, aNext = ModelAPI_Tools::compositeOwner(aCurrent);
+    while(aNext.get()) {
+      aMain = aNext;
+      aNext = ModelAPI_Tools::compositeOwner(aMain);
+    }
+    if (aMain.get() && aMain != aCurrent)
+      setCurrentFeature(aMain, false);
+  }
   myObjs->synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
