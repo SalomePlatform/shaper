@@ -260,7 +260,7 @@ bool XGUI_OperationMgr::isParentOperationValid() const
 bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
 {
   //in case of nested (sketch) operation no confirmation needed
-  if (isGrantedOperation(theOperation))
+  if (isGrantedOperation(theOperation->id()))
     return true;
   if (theOperation && theOperation->isModified()) {
     QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
@@ -288,7 +288,7 @@ void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
   theOperation->resume();
 }
 
-bool XGUI_OperationMgr::isGrantedOperation(ModuleBase_Operation* theOperation)
+bool XGUI_OperationMgr::isGrantedOperation(const QString& theId)
 {
   bool isGranted = false;
 
@@ -297,14 +297,14 @@ bool XGUI_OperationMgr::isGrantedOperation(ModuleBase_Operation* theOperation)
   ModuleBase_Operation* aPreviousOperation = 0;
   while (anIt.hasPrevious()) {
     ModuleBase_Operation* anOp = anIt.previous();
-    if (anOp == theOperation) {
+    if (anOp->id() == theId) {
       if (anIt.hasPrevious())
         aPreviousOperation = anIt.previous();
       break;
     }
   }
   if (aPreviousOperation)
-    isGranted = aPreviousOperation->isGranted(theOperation->id());
+    isGranted = aPreviousOperation->isGranted(theId);
 
   return isGranted;
 }
@@ -315,8 +315,20 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId, const bool isAdd
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
     bool aGranted = aCurrentOp->isGranted(theId) || isAdditionallyGranted;
-    if (!aGranted) {
-      if (canStopOperation(aCurrentOp)) {
+    // the started operation is granted for the current one,
+    // e.g. current - Sketch, started - Line
+    if (aGranted) {
+      aCanStart = true;
+    }
+    else {
+      if (!isGrantedOperation(theId)) {
+        // the operation is not granted in the current list of operations
+        // e.g. Edit Parameter when Sketch, Line in Sketch is active.
+        aCanStart = abortAllOperations();
+      }
+      else if (canStopOperation(aCurrentOp)) {
+        // the started operation is granted in the parrent operation,
+        // e.g. current - Line in Sketch, started Circle 
         if (myIsApplyEnabled && aCurrentOp->isModified())
           aCurrentOp->commit();
         else

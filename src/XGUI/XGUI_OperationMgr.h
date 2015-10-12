@@ -170,9 +170,9 @@ protected: // TEMPORARY
   /// Returns whether the parameter operation is granted in relation to the previous operation
   /// in a stack of started operations. It is used in canStopOperation to avoid warning message
   /// when granted operation is aborted, e.g. SketchLine in Sketch
-  /// \param theOperation the started operation
+  /// \param theId id of the operation which is checked
   /// \return boolean result
-  bool isGrantedOperation(ModuleBase_Operation* theOperation);
+  bool isGrantedOperation(const QString& theId);
 
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
