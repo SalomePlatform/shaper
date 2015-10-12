@@ -994,7 +994,7 @@ void XGUI_Workshop::createDockWidgets()
   QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
-  myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
+  myPropertyPanel = new XGUI_PropertyPanel(aDesktop, myOperationMgr);
   myPropertyPanel->setupActions(myActionsMgr);
   myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);

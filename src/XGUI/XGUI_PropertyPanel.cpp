@@ -9,6 +9,7 @@
 
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ActionsMgr.h>
+#include <XGUI_OperationMgr.h>
 //#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_Tools.h>
@@ -31,11 +32,12 @@
 #include <iostream>
 #endif
 
-XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
+XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
     : ModuleBase_IPropertyPanel(theParent), 
     myActiveWidget(NULL),
     myPreselectionWidget(NULL),
-    myPanelPage(NULL)
+    myPanelPage(NULL),
+    myOperationMgr(theMgr)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -255,4 +257,18 @@ ModuleBase_ModelWidget* XGUI_PropertyPanel::preselectionWidget() const
 void XGUI_PropertyPanel::setPreselectionWidget(ModuleBase_ModelWidget* theWidget)
 {
   myPreselectionWidget = theWidget;
+}
+
+
+void XGUI_PropertyPanel::closeEvent(QCloseEvent* theEvent)
+{
+  ModuleBase_Operation* aOp = myOperationMgr->currentOperation();
+  if (aOp) {
+    if (myOperationMgr->canStopOperation(aOp)) {
+      myOperationMgr->abortOperation(aOp);
+      theEvent->accept();
+    } else 
+      theEvent->ignore();
+  } else
+    ModuleBase_IPropertyPanel::closeEvent(theEvent);
 }
