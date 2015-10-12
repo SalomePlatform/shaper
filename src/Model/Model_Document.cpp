@@ -968,6 +968,17 @@ void Model_Document::setActive(const bool theFlag)
         std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
         for(; aRes != aResList.end(); aRes++) {
           ModelAPI_EventCreator::get()->sendUpdated(*aRes, aRedispEvent);
+          // #issue 1048: sub-compsolids also
+          ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRes);
+          if (aCompRes.get()) {
+            int aNumSubs = aCompRes->numberOfSubs();
+            for(int a = 0; a < aNumSubs; a++) {
+              ResultPtr aSub = aCompRes->subResult(a);
+              if (aSub.get()) {
+                ModelAPI_EventCreator::get()->sendUpdated(aSub, aRedispEvent);
+              }
+            }
+          }
         }
       }
     }
