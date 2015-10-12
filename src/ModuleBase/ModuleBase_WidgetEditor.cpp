@@ -45,7 +45,7 @@ ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 
 void editedValue(double& outValue, QString& outText)
 {
-  QDialog aDlg(QApplication::desktop(), Qt::Popup/* | Qt::FramelessWindowHint*/);
+  QDialog aDlg(QApplication::desktop(), Qt::FramelessWindowHint);
   QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
   aLay->setContentsMargins(2, 2, 2, 2);
 
