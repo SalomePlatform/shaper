@@ -107,6 +107,14 @@ Q_OBJECT
   /// \return Installed parent feature (can be NULL)
   CompositeFeaturePtr parentFeature() const;
 
+  /// Stores the previous to the operation current feature
+  /// \set theFeature a feature
+  void setPreviousCurrentFeature(const FeaturePtr& theFeature);
+
+  /// Returns the previous to the operation current feature
+  /// \return theFeature a feature
+  FeaturePtr previousCurrentFeature();
+
 signals:
   /// The operation is filled with existing preselection
   void activatedByPreselection(); 

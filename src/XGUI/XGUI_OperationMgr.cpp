@@ -116,9 +116,14 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
     currentOperation()->postpone();
   myOperations.append(theOperation);
 
+  connect(theOperation, SIGNAL(beforeStarted()), SLOT(onBeforeOperationStarted()));
+  connect(theOperation, SIGNAL(beforeAborted()), SLOT(onBeforeOperationAborted()));
+  connect(theOperation, SIGNAL(beforeCommitted()), SLOT(onBeforeOperationCommitted()));
+
   connect(theOperation, SIGNAL(started()), SLOT(onOperationStarted()));
   connect(theOperation, SIGNAL(aborted()), SLOT(onOperationAborted()));
   connect(theOperation, SIGNAL(committed()), SLOT(onOperationCommitted()));
+
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -309,6 +314,18 @@ bool XGUI_OperationMgr::isGrantedOperation(const QString& theId)
   return isGranted;
 }
 
+void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+  bool aIsOp = aMgr->isOperation();
+  if (!aIsOp)
+    aMgr->startOperation();
+  aDoc->setCurrentFeature(theFeature, false);
+  if (!aIsOp)
+    aMgr->finishOperation();
+}
+
 bool XGUI_OperationMgr::canStartOperation(const QString& theId, const bool isAdditionallyGranted)
 {
   bool aCanStart = true;
@@ -374,6 +391,32 @@ void XGUI_OperationMgr::onAbortOperation()
   }
 }
 
+void XGUI_OperationMgr::onBeforeOperationStarted()
+{
+  ModuleBase_Operation* aCurrentOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  if (!aCurrentOperation)
+    return;
+
+  /// Set current feature and remeber old current feature
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
+  if (aFOperation) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->activeDocument();
+    // the parameter of current feature should be false, we should use all feature, not only visible
+    // in order to correctly save the previous feature of the nested operation, where the
+    // features can be not visible in the tree. The problem case is Edit sketch entitity(line)
+    // in the Sketch, created in ExtrusionCut operation. The entity disappears by commit.
+    // When sketch entity operation started, the sketch should be cashed here as the current.
+    // Otherwise(the flag is true), the ExtrusionCut is cashed, when commit happens, the sketch
+    // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
+    // As a result the sketch disappears from the viewer. However after commit it is displayed back.
+    aFOperation->setPreviousCurrentFeature(aDoc->currentFeature(false));
+    if (aFOperation->isEditOperation()) // it should be performed by the feature edit only
+      // in create operation, the current feature is changed by addFeature()
+      aDoc->setCurrentFeature(aFOperation->feature(), false);
+  }
+}
+
 void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
@@ -381,10 +424,38 @@ void XGUI_OperationMgr::onOperationStarted()
   emit operationStarted(aSenderOperation);
 }
 
+void XGUI_OperationMgr::onBeforeOperationAborted()
+{
+  onBeforeOperationCommitted();
+}
+
 void XGUI_OperationMgr::onOperationAborted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
   emit operationAborted(aSenderOperation);
+}
+
+void XGUI_OperationMgr::onBeforeOperationCommitted()
+{
+  ModuleBase_Operation* aCurrentOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  if (!aCurrentOperation)
+    return;
+
+  /// Restore the previous current feature
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
+  if (aFOperation) {
+    if (aFOperation->isEditOperation()) {
+      /// Restore the previous current feature
+      setCurrentFeature(aFOperation->previousCurrentFeature());
+    }
+    else { // create operation
+      // the Top created feature should stays the current. In nested operations, like Line in the Sketch or
+      // Sketch in ExtrusionCut, a previous feature should be restored on commit. It is performed here
+      // in order to perform it in the current transaction without opening a new one.
+      if (myOperations.front() != aFOperation)
+        setCurrentFeature(aFOperation->previousCurrentFeature());
+    }
+  }
 }
 
 void XGUI_OperationMgr::onOperationCommitted()

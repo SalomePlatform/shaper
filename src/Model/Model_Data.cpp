@@ -368,13 +368,20 @@ void Model_Data::eraseBackReferences()
 void Model_Data::removeBackReference(FeaturePtr theFeature, std::string theAttrID)
 {
   AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
-  if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
+  removeBackReference(anAttribute);
+}
+
+void Model_Data::removeBackReference(AttributePtr theAttr)
+{
+  if (myRefsToMe.find(theAttr) == myRefsToMe.end())
     return;
 
-  myRefsToMe.erase(anAttribute);
+  myRefsToMe.erase(theAttr);
 
   // remove concealment immideately: on deselection it must be posible to reselect in GUI the same
-  if (ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
+  FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttr->owner());
+  if (aFeatureOwner.get() &&
+    ModelAPI_Session::get()->validators()->isConcealed(aFeatureOwner->getKind(), theAttr->id())) {
     updateConcealmentFlag();
   }
 }
@@ -382,13 +389,12 @@ void Model_Data::removeBackReference(FeaturePtr theFeature, std::string theAttrI
 void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID, 
    const bool theApplyConcealment)
 {
-  // do not add the same attribute twice
+  // it is possible to add the same attribute twice: may be last time the owner was not Stable...
   AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
-  if (myRefsToMe.find(anAttribute) != myRefsToMe.end())
-    return;
+  if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
+    myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
 
-  myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
-  if (theApplyConcealment && 
+  if (theApplyConcealment &&  theFeature->isStable() && 
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
     std::shared_ptr<ModelAPI_Result> aRes = 
       std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
@@ -407,10 +413,15 @@ void Model_Data::updateConcealmentFlag()
   for(; aRefsIter != myRefsToMe.end(); aRefsIter++) {
     if (aRefsIter->get()) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefsIter)->owner());
-      if (aFeature.get() && !aFeature->isDisabled()) {
+      if (aFeature.get() && !aFeature->isDisabled() && aFeature->isStable()) {
         if (ModelAPI_Session::get()->validators()->isConcealed(
               aFeature->getKind(), (*aRefsIter)->id())) {
-          return; // it is still concealed, nothing to do
+          std::shared_ptr<ModelAPI_Result> aRes = 
+            std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+          if (aRes.get()) {
+            aRes->setIsConcealed(true); // set concealed
+          }
+          return;
         }
       }
     }
@@ -418,11 +429,8 @@ void Model_Data::updateConcealmentFlag()
   // thus, no concealment references anymore => make not-concealed
   std::shared_ptr<ModelAPI_Result> aRes = 
     std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
-  if (aRes.get() && aRes->isConcealed()) {
+  if (aRes.get()) {
     aRes->setIsConcealed(false);
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-    ModelAPI_EventCreator::get()->sendUpdated(aRes, anEvent);
-    Events_Loop::loop()->flush(anEvent);
   }
 }
 
