@@ -695,7 +695,10 @@ void Model_Update::updateStability(void* theSender)
             std::list<ObjectPtr>& aRefFeaturesList = aRefIt->second;
             std::list<ObjectPtr>::iterator aReferenced = aRefFeaturesList.begin();
             for(; aReferenced != aRefFeaturesList.end(); aReferenced++) {
-              if (aReferenced->get() && (*aReferenced)->data()->isValid()) {
+               // stability is only on results: feature to feature reference mean nested 
+              // features, that will remove nesting references
+              if (aReferenced->get() && (*aReferenced)->data()->isValid() && 
+                (*aReferenced)->groupName() != ModelAPI_Feature::group()) {
                 std::shared_ptr<Model_Data> aData = 
                   std::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
                 if (aFeatureSender->isStable()) {
