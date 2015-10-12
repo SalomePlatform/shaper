@@ -276,6 +276,16 @@ bool XGUI_ViewerProxy::isMultiSelectionEnabled() const
 }
 
 //***************************************
+bool XGUI_ViewerProxy::enableDrawMode(bool isEnabled)
+{
+  if (myWorkshop->isSalomeMode()) {
+    return myWorkshop->salomeConnector()->viewer()->enableDrawMode(isEnabled);
+  } else {
+    return myWorkshop->mainWindow()->viewer()->enableDrawMode(isEnabled);
+  }
+}
+
+//***************************************
 void XGUI_ViewerProxy::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   myWorkshop->displayer()->addSelectionFilter(theFilter);

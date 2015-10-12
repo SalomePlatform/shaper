@@ -50,6 +50,9 @@ Q_OBJECT
   //! Returns true if multiselection is enabled
   virtual bool isMultiSelectionEnabled() const = 0;
 
+  //! Enable or disable draw mode in the viewer
+  virtual bool enableDrawMode(bool isEnabled) = 0;
+
   //! Perfroms the fit all for the active view
   virtual void fitAll() = 0;
 

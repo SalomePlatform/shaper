@@ -257,6 +257,7 @@ bool NewGeom_SalomeViewer::isSelectionEnabled() const
 {
   if (mySelector)
     return mySelector->viewer()->isSelectionEnabled();
+  return false;
 }
 
 //**********************************************
@@ -271,6 +272,15 @@ bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
 {
   if (mySelector)
     return mySelector->viewer()->isMultiSelectionEnabled();
+  return false;
+}
+
+//**********************************************
+bool NewGeom_SalomeViewer::enableDrawMode(bool isEnabled)
+{
+  // TODO: Has to be replaced when SALOME patch become avialable
+  if (mySelector)
+    return mySelector->viewer()->enableDrawMode(isEnabled);
   return false;
 }
 

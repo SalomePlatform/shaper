@@ -294,7 +294,7 @@ private:
 private:
   PartSet_Module* myModule;
 
-  bool myPreviousSelectionEnabled; // the previous selection enabled state in the viewer
+  bool myPreviousDrawModeEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
   bool myIsResetCurrentValue; /// the state that value in the property panel is reset

@@ -159,7 +159,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
 
-  myPreviousSelectionEnabled = true;//aViewer->isSelectionEnabled();
+  myPreviousDrawModeEnabled = true;//aViewer->isSelectionEnabled();
 
   connect(aViewer, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*)));
@@ -341,7 +341,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-  myPreviousSelectionEnabled = aViewer->isSelectionEnabled();
   if (!aViewer->canDragByMouse())
     return;
 
@@ -402,6 +401,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
+      // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
+      myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       launchEditing();
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
@@ -421,6 +422,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
+      // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
+      myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
 
       // This is necessary in order to finalize previous operation
       QApplication::processEvents();
@@ -458,7 +461,9 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       }
     }
   }
-  aWorkshop->viewer()->enableSelection(myPreviousSelectionEnabled);
+      // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
+  aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
+  //aWorkshop->viewer()->enableSelection(myPreviousDrawModeEnabled);
   myIsDragging = false;
 }
 
@@ -498,8 +503,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // 2. the enable selection in the viewer should be temporary switched off in order to ignore
     // mouse press signal in the viewer(it call Select for AIS context and the dragged objects are
     // deselected). This flag should be restored in the slot, processed the mouse release signal.
-    ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
-    aViewer->enableSelection(false);
+
+    // TODO: Has to be commented out when SALOME patch on draw mode become avialable
+    //ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
+    //aViewer->enableSelection(false);
 
     ModuleBase_Operation* aCurrentOperation = getCurrentOperation();
     if (!aCurrentOperation)
