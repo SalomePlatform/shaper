@@ -80,6 +80,7 @@
 :Features.Boolean_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Features_AppElements_Workbench' name='Boolean' type='AppElements_MenuGroupPanel' visible='1'}
 :Features.Extrusion_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Features_AppElements_Workbench' name='Extrusion' type='AppElements_MenuGroupPanel' visible='1'}
 :Features_QScrollArea	{container=':qt_tabwidget_stackedwidget.Features_AppElements_Workbench' type='QScrollArea' unnamed='1' visible='1'}
+:File_QtxMenu	{title='File' type='QtxMenu' unnamed='1' visible='1'}
 :General.Default_AppElements_MenuGroupPanel	{container=':OpenParts*.General_AppElements_DockWidget' name='Default' type='AppElements_MenuGroupPanel' visible='1'}
 :General.General_AppElementsDockTitleLabel	{container=':OpenParts*.General_AppElements_DockWidget' text='General' type='AppElementsDockTitleLabel' unnamed='1' visible='1'}
 :General.Sketch_QTabWidget	{container=':OpenParts*.General_AppElements_DockWidget' leftWidget=':General.Default_AppElements_MenuGroupPanel' text='Sketch' type='QTabWidget' unnamed='1' visible='1'}
@@ -101,6 +102,8 @@
 :Object browser_QLabel	{container=':OpenParts*.Object browser_QDockWidget' type='QLabel' unnamed='1' visible='1'}
 :Object browser_QLineEdit	{container=':OpenParts*.Object browser_QDockWidget' type='QLineEdit' unnamed='1' visible='1'}
 :Object browser_XGUI_DataTree	{container=':OpenParts*.Object browser_QDockWidget' type='XGUI_DataTree' unnamed='1' visible='1'}
+:Open File.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Open File_SUIT_FileDlg'}
+:Open File_SUIT_FileDlg	{name='QFileDialog' type='SUIT_FileDlg' visible='1' windowTitle='Open File'}
 :OpenParts*.Back_QToolButton	{text='Back' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
 :OpenParts*.Bottom_QToolButton	{text='Bottom' type='QToolButton' unnamed='1' visible='1' window=':OpenParts*_AppElements_MainWindow'}
 :OpenParts*.Circle_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':OpenParts*_AppElements_MainWindow' windowTitle='Circle'}
@@ -170,6 +173,8 @@
 :Point.property_panel_ok_QToolButton	{container=':OpenParts*.Point_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :Point.qt_spinbox_lineedit_QLineEdit_2	{container=':Point.Point_QGroupBox' name='qt_spinbox_lineedit' occurrence='2' type='QLineEdit' visible='1'}
+:PoseidonGUI v1.6.4_LUIDesktop_TabDesktop	{type='LUIDesktop_TabDesktop' unnamed='1' visible='1' windowTitle='PoseidonGUI v1.6.4'}
+:PoseidonGUI v1.6.4_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':PoseidonGUI v1.6.4_LUIDesktop_TabDesktop'}
 :Save current file.Discard_QPushButton	{text~='Close without Saving|Discard' type='QPushButton' unnamed='1' visible='1' window=':Save current file_QMessageBox'}
 :Save current file_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Save current file'}
 :Sketch.Basic_AppElements_MenuGroupPanel	{container=':qt_tabwidget_stackedwidget.Sketch_AppElements_Workbench' name='Basic' type='AppElements_MenuGroupPanel' visible='1'}
@@ -194,6 +199,7 @@
 :_ModuleBase_ParamSpinBox	{type='ModuleBase_ParamSpinBox' unnamed='1' visible='1' window=':_QDialog'}
 :_QDialog	{type='QDialog' unnamed='1' visible='1'}
 :_QMenu	{type='QMenu' unnamed='1' visible='1'}
+:fileNameEdit_QLineEdit	{buddy=':Open File.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :qt_tabwidget_stackedwidget.Construction_AppElements_Workbench	{container=':General.qt_tabwidget_stackedwidget_QStackedWidget' name='Construction' type='AppElements_Workbench' visible='1'}
 :qt_tabwidget_stackedwidget.Features_AppElements_Workbench	{container=':General.qt_tabwidget_stackedwidget_QStackedWidget' name='Features' type='AppElements_Workbench' visible='1'}
 :qt_tabwidget_stackedwidget.Part_AppElements_Workbench	{container=':General.qt_tabwidget_stackedwidget_QStackedWidget' name='Part' type='AppElements_Workbench' visible='1'}
