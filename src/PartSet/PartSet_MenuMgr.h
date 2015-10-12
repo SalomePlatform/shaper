@@ -15,6 +15,7 @@
 #include <QList>
 #include <QColor>
 
+class ModuleBase_Operation;
 class PartSet_Module;
 class QAction;
 class QMenu;
@@ -48,6 +49,9 @@ public:
 
   /// Activates a PartSet document
   void activatePartSet() const;
+
+  /// Returns list of granted operation indices
+  virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
 public slots:
   /// Processes the context menu action click

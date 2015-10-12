@@ -200,6 +200,9 @@ public:
   //! \return string value
   virtual QString getFeatureError(const FeaturePtr& theFeature);
 
+  /// Returns list of granted operation indices
+  virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

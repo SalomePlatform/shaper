@@ -90,8 +90,7 @@ Q_OBJECT
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theId id of the operation which is going to start
-  /// \param isAdditionallyGranted a boolean flag whether the id operation is granted in the previous one
-  bool canStartOperation(const QString& theId, const bool isAdditionallyGranted = false);
+  bool canStartOperation(const QString& theId);
 
   /// Aborts the parameter operation if it is current, else abort operations from the stack
   /// of operations until the operation is found. All operations upper the parameter one are

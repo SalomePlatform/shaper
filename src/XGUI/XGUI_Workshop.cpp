@@ -553,6 +553,10 @@ void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
   else
     aGrantedIds = myActionsMgr->nestedCommands(theOperation->id());
 
+  ModuleBase_IModule* aModule = module();
+  if (aModule)
+    aModule->grantedOperationIds(theOperation, aGrantedIds);
+
   aFOperation->setGrantedOperationIds(aGrantedIds);
 }
 

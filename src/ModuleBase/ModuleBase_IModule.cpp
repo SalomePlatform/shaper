@@ -101,6 +101,11 @@ QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
   return anError;
 }
 
+void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,
+                                             QStringList& theIds) const
+{
+}
+
 ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& theFeatureId)
 {
   return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);

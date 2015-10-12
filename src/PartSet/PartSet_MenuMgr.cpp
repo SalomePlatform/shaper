@@ -312,7 +312,7 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
     // in order to do not abort/commit it
-    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+    if (!anOpMgr->canStartOperation(tr("Detach")))
       return; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -370,7 +370,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
     anOpAction = new ModuleBase_OperationAction(anAction->text(), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
 
-    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+    if (!anOpMgr->canStartOperation(anOpAction->id()))
       return; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -488,6 +488,15 @@ void PartSet_MenuMgr::activatePartSet() const
   if (isNewTransaction) aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
   if (isNewTransaction) aMgr->finishOperation();
+}
+
+void PartSet_MenuMgr::grantedOperationIds(ModuleBase_Operation* theOperation,
+                                          QStringList& theIds) const
+{
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
+    theIds.append(tr("Detach"));
+    theIds.append(tr("Auxiliary"));
+  }
 }
 
 void PartSet_MenuMgr::onEdit(bool)

@@ -302,15 +302,9 @@ bool XGUI_OperationMgr::isGrantedOperation(const QString& theId)
   ModuleBase_Operation* aPreviousOperation = 0;
   while (anIt.hasPrevious()) {
     ModuleBase_Operation* anOp = anIt.previous();
-    if (anOp->id() == theId) {
-      if (anIt.hasPrevious())
-        aPreviousOperation = anIt.previous();
-      break;
-    }
+    if (anOp)
+      isGranted = anOp->isGranted(theId);
   }
-  if (aPreviousOperation)
-    isGranted = aPreviousOperation->isGranted(theId);
-
   return isGranted;
 }
 
@@ -326,12 +320,12 @@ void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
     aMgr->finishOperation();
 }
 
-bool XGUI_OperationMgr::canStartOperation(const QString& theId, const bool isAdditionallyGranted)
+bool XGUI_OperationMgr::canStartOperation(const QString& theId)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
-    bool aGranted = aCurrentOp->isGranted(theId) || isAdditionallyGranted;
+    bool aGranted = aCurrentOp->isGranted(theId);
     // the started operation is granted for the current one,
     // e.g. current - Sketch, started - Line
     if (aGranted) {

@@ -438,6 +438,19 @@ QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
   return anError;
 }
 
+void PartSet_Module::grantedOperationIds(ModuleBase_Operation* theOperation,
+                                         QStringList& theIds) const
+{
+  myMenuMgr->grantedOperationIds(theOperation, theIds);
+
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+
+    theIds.append(aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text());
+  }
+}
+
 void PartSet_Module::activeSelectionModes(QIntList& theModes)
 {
   theModes.clear();
@@ -696,7 +709,7 @@ bool PartSet_Module::deleteObjects()
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
     // in order to do not abort/commit it
-    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+    if (!anOpMgr->canStartOperation(anOpAction->id()))
       return true; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);

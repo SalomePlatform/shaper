@@ -188,6 +188,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! \return string value
   virtual QString getFeatureError(const FeaturePtr& theFeature);
 
+  /// Returns list of granted operation indices
+  virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
+
 signals:
   /// Signal which is emitted when operation is launched
   void operationLaunched();
