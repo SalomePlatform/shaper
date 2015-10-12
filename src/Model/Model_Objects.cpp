@@ -445,8 +445,8 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
     const std::string& theGroupID, const std::string& theName)
 {
   createHistory(theGroupID);
-  std::vector<ObjectPtr>& allObjs = myHistory[theGroupID];
-  std::vector<ObjectPtr>::iterator anObjIter = allObjs.begin();
+  std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
+  std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
   for(; anObjIter != allObjs.end(); anObjIter++) {
     if ((*anObjIter)->data()->name() == theName)
       return *anObjIter;
