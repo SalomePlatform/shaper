@@ -275,7 +275,7 @@ void ModuleBase_OperationFeature::activateByPreselection()
   if (myPreSelection.empty())
     return;
 
-  ModuleBase_ISelection::filterPreselectionOnEqualPoints(myPreSelection);
+  ModuleBase_ISelection::filterSelectionOnEqualPoints(myPreSelection);
 
   ModuleBase_ModelWidget* aFilledWgt = 0;
   ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();

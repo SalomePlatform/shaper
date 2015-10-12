@@ -39,7 +39,7 @@
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
   QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-  ModuleBase_ISelection::filterPreselectionOnEqualPoints(aList);
+  ModuleBase_ISelection::filterSelectionOnEqualPoints(aList);
 
   int aCount = 0;
   foreach (ModuleBase_ViewerPrs aPrs, aList) {

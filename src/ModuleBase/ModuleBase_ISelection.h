@@ -110,7 +110,7 @@ class ModuleBase_ISelection
 
   /// Removes selection items where owners have equal vertices. The first
   /// owner with the qual vertex stays in the list.
-  static MODULEBASE_EXPORT void filterPreselectionOnEqualPoints
+  static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
                                               (QList<ModuleBase_ViewerPrs>& theSelected);
 private:
   /// Returns true if the presentations have an owner with a vertex and these vertices are equal.

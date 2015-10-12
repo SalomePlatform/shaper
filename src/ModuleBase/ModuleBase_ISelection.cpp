@@ -84,7 +84,7 @@ QList<ModuleBase_ViewerPrs> ModuleBase_ISelection::getViewerPrs(const QObjectPtr
 }
 
 //********************************************************************
-void ModuleBase_ISelection::filterPreselectionOnEqualPoints
+void ModuleBase_ISelection::filterSelectionOnEqualPoints
                                               (QList<ModuleBase_ViewerPrs>& theSelected)
 {
   QList<ModuleBase_ViewerPrs> aCandidatesToRemove;
