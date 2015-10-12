@@ -58,6 +58,10 @@ class GeomAPI_Pnt : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   double distance(const std::shared_ptr<GeomAPI_Pnt>& theOther) const;
 
+  /// Returns whether the distance between two points is less then precision confusion
+  GEOMAPI_EXPORT 
+  bool isEqual(const std::shared_ptr<GeomAPI_Pnt>& theOther) const;
+
   /// Projects a point to the plane defined by the origin and 2 axes vectors in this plane
   GEOMAPI_EXPORT 
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,

@@ -39,6 +39,8 @@
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
   QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+  ModuleBase_ISelection::filterPreselectionOnEqualPoints(aList);
+
   int aCount = 0;
   foreach (ModuleBase_ViewerPrs aPrs, aList) {
     const TopoDS_Shape& aShape = aPrs.shape();

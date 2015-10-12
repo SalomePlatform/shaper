@@ -2,6 +2,12 @@
 
 #include "ModuleBase_ISelection.h"
 
+#include <StdSelect_BRepOwner.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
+#include <GeomAPI_Pnt.h>
+
 //********************************************************************
 void ModuleBase_ISelection::appendSelected(const QList<ModuleBase_ViewerPrs> theValues,
                                            QList<ModuleBase_ViewerPrs>& theValuesTo)
@@ -75,4 +81,61 @@ QList<ModuleBase_ViewerPrs> ModuleBase_ISelection::getViewerPrs(const QObjectPtr
     }
   }
   return aSelectedPrs;
+}
+
+//********************************************************************
+void ModuleBase_ISelection::filterPreselectionOnEqualPoints
+                                              (QList<ModuleBase_ViewerPrs>& theSelected)
+{
+  QList<ModuleBase_ViewerPrs> aCandidatesToRemove;
+  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(),
+                                              aLast = theSelected.end();
+  QList<ModuleBase_ViewerPrs>::const_iterator aSubIt;
+  for (; anIt != aLast; anIt++) {
+    aSubIt = anIt;
+    aSubIt++;
+    for (; aSubIt != aLast; aSubIt++) {
+      if (isEqualVertices(*anIt, *aSubIt)) {
+        aCandidatesToRemove.append(*aSubIt);
+        break;
+      }
+    }
+  }
+  QList<ModuleBase_ViewerPrs>::const_iterator aRemIt = aCandidatesToRemove.begin(),
+                                              aRemLast = aCandidatesToRemove.end();
+  for (; aRemIt != aRemLast; aRemIt++) {
+    theSelected.removeAll(*aRemIt);
+  }
+}
+
+bool ModuleBase_ISelection::isEqualVertices(const ModuleBase_ViewerPrs thePrs1,
+                                            const ModuleBase_ViewerPrs thePrs2)
+{
+  bool isEqual = false;
+  Handle(StdSelect_BRepOwner) anOwner1 = Handle(StdSelect_BRepOwner)::DownCast(thePrs1.owner());
+  Handle(StdSelect_BRepOwner) anOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs2.owner());
+
+  if (!anOwner1.IsNull() && anOwner1->HasShape() &&
+      !anOwner2.IsNull() && anOwner2->HasShape()) {
+    const TopoDS_Shape& aShape1 = anOwner1->Shape();
+    const TopoDS_Shape& aShape2 = anOwner2->Shape();
+    //TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+    if (aShape1.ShapeType() == TopAbs_VERTEX &&
+        aShape2.ShapeType() == TopAbs_VERTEX) {
+      const TopoDS_Vertex& aVertex1 = TopoDS::Vertex(aShape1);
+      const TopoDS_Vertex& aVertex2 = TopoDS::Vertex(aShape2);
+      if (!aVertex1.IsNull() && !aVertex2.IsNull())  {
+        gp_Pnt aPoint1 = BRep_Tool::Pnt(aVertex1);
+        gp_Pnt aPoint2 = BRep_Tool::Pnt(aVertex2);
+
+        std::shared_ptr<GeomAPI_Pnt> aPnt1 = std::shared_ptr<GeomAPI_Pnt>
+                        (new GeomAPI_Pnt(aPoint1.X(), aPoint1.Y(), aPoint1.Z()));
+        std::shared_ptr<GeomAPI_Pnt> aPnt2 = std::shared_ptr<GeomAPI_Pnt>
+                        (new GeomAPI_Pnt(aPoint2.X(), aPoint2.Y(), aPoint2.Z()));
+        isEqual = aPnt1->isEqual(aPnt2);
+      }
+    }
+  }
+
+  return isEqual;
 }
