@@ -140,34 +140,23 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   if (aIdList.isEmpty())
     return;
 
+  ModuleBase_Operation* theOperation = myOperationMgr->currentOperation();
   //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   // only viewer selection is processed
-  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    // it seems that this code is not nesessary anymore. It leads to incorrect case:
-    // sketch operation start, click in any place in the viewer. The result is all nested
-    // entities are enabled(but the sketch plane is not selected yet). Any sketch operation
-    // can be started but will be incorrect on preview build before it uses the sketch unset plane.
-    /*foreach(QString aFeatureId, aIdList) {
-      foreach(QString aId, nestedCommands(aFeatureId)) {
-        setActionEnabled(aId, true);
-      }
-    }*/
-  } else { 
-    SessionPtr aMgr = ModelAPI_Session::get();
-    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-    foreach(QString aFeatureId, aIdList) {
-      foreach(QString aId, nestedCommands(aFeatureId)) {
-        ModelAPI_ValidatorsFactory::Validators aValidators;
-        aFactory->validators(aId.toStdString(), aValidators);
-        ModelAPI_ValidatorsFactory::Validators::iterator aValidatorIt = aValidators.begin();
-        for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
-          const ModuleBase_SelectionValidator* aSelValidator =
-              dynamic_cast<const ModuleBase_SelectionValidator*>(aFactory->validator(aValidatorIt->first));
-          if (!aSelValidator)
-            continue;
-          setActionEnabled(aId, aSelValidator->isValid(aSelection, aValidatorIt->second));
-        }
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  foreach(QString aFeatureId, aIdList) {
+    foreach(QString aId, nestedCommands(aFeatureId)) {
+      ModelAPI_ValidatorsFactory::Validators aValidators;
+      aFactory->validators(aId.toStdString(), aValidators);
+      ModelAPI_ValidatorsFactory::Validators::iterator aValidatorIt = aValidators.begin();
+      for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
+        const ModuleBase_SelectionValidator* aSelValidator =
+            dynamic_cast<const ModuleBase_SelectionValidator*>(aFactory->validator(aValidatorIt->first));
+        if (!aSelValidator)
+          continue;
+        setActionEnabled(aId, aSelValidator->isValid(aSelection, theOperation));
       }
     }
   }

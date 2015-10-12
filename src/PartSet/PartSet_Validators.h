@@ -21,48 +21,48 @@
 //! A class to validate a selection for Distance constraint operation
 class PartSet_DistanceSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Length constraint operation
 class PartSet_LengthSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_PerpendicularSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Parallel constraint operation
 class PartSet_ParallelSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Radius constraint operation
 class PartSet_RadiusSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Rigid constraint operation
 class PartSet_RigidSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 
@@ -70,40 +70,40 @@ class PartSet_RigidSelection : public ModuleBase_SelectionValidator
 //! A class to validate a selection for coincedence constraint operation
 class PartSet_CoincidentSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Horizontal and Vertical constraints operation
 class PartSet_HVDirSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Tangential constraints operation
 class PartSet_TangentSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Fillet constraints operation
 class PartSet_FilletSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 //! \ingroup Validators
 //! A class to validate a selection for Angle constraints operation
 class PartSet_AngleSelection : public ModuleBase_SelectionValidator
 {
- protected:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 ////////////// Attribute validators ////////////////

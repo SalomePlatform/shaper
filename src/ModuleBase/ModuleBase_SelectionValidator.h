@@ -9,6 +9,7 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_ISelection.h"
+#include "ModuleBase_Operation.h"
 
 #include <ModelAPI_Validator.h>
 
@@ -21,17 +22,11 @@
 */
 class ModuleBase_SelectionValidator : public ModelAPI_Validator
 {
- public:
+public:
    /// Returns True if selection is valid
    /// \param theSelection selection instance
-   /// \param theArguments list of arguments
-  virtual MODULEBASE_EXPORT bool isValid(const ModuleBase_ISelection* theSelection,
-                       const std::list<std::string>& theArguments) const;
-
- protected:
-   /// Returns True if selection is valid
-   /// \param theSelection selection instance
-  virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
+   /// \param theOperation - current operation (can be 0)
+  virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const = 0;
 };
 
 #endif

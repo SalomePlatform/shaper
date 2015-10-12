@@ -82,7 +82,6 @@ SET(PROJECT_SOURCES
   ModuleBase_ParamSpinBox.cpp
   ModuleBase_Preferences.cpp
   ModuleBase_ResultPrs.cpp
-  ModuleBase_SelectionValidator.cpp
   ModuleBase_ToolBox.cpp
   ModuleBase_Tools.cpp
   ModuleBase_ViewerFilters.cpp

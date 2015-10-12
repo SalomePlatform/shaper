@@ -16,6 +16,7 @@
 #include <GeomValidators_Tools.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_OperationFeature.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -72,126 +73,274 @@ int shapesNbLines(const ModuleBase_ISelection* theSelection)
   return aCount;
 }
 
-bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
 
-bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection) const
+std::shared_ptr<GeomAPI_Pln> sketcherPlane(ModuleBase_Operation* theOperation)
 {
-  int aCount = shapesNbLines(theSelection);
-  return (aCount == 1);
-}
-
-bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
-
-bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
-
-bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-  ModuleBase_ViewerPrs aPrs;
-  int aCount = 0;
-  foreach (ModuleBase_ViewerPrs aPrs, aList) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      if (aShape.ShapeType() == TopAbs_EDGE) {
-        TopoDS_Edge aEdge = TopoDS::Edge(aShape);
-        Standard_Real aStart, aEnd;
-        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
-        GeomAdaptor_Curve aAdaptor(aCurve);
-        if (aAdaptor.GetType() == GeomAbs_Circle)
-          aCount++;
-      }
+  std::shared_ptr<GeomAPI_Pln> aEmptyPln;
+  if (theOperation) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (aFeatureOp) {
+      CompositeFeaturePtr aFeature = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeatureOp->feature());
+      if (aFeature && (aFeature->getKind() == SketchPlugin_Sketch::ID()))
+        return PartSet_Tools::sketchPlane(aFeature);
     }
   }
-  return (aCount == 1);
+  return aEmptyPln; 
 }
 
-bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-  return (aList.count() == 1);
-}
-
-
-bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  // Coincident can be applied to points and to lines
-  int aCount = shapesNbPoints(theSelection);
-  aCount += shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
-
-bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbLines(theSelection);
-  return (aCount == 1);
-}
-
-bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
-}
-
-bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection) const
-{
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-  if ((aList.size() == 0) || (aList.size() > 2))
-    return false;
-
-  ModuleBase_ViewerPrs aPrs = aList.first();
-  const TopoDS_Shape& aShape = aPrs.shape();
-  if (aShape.IsNull())
-    return false;
-
-  if (aShape.ShapeType() != TopAbs_EDGE)
-    return false;
-
-  std::shared_ptr<GeomAPI_Shape> aShapePtr(new GeomAPI_Shape);
-  aShapePtr->setImpl(new TopoDS_Shape(aShape));
-  GeomAPI_Edge aEdge1(aShapePtr);
-
-  if (aEdge1.isLine() || aEdge1.isArc()) {
-    if (aList.size() == 2) {
-      // Check second selection
-      aPrs = aList.last();
-      const TopoDS_Shape& aShape2 = aPrs.shape();
-      if (aShape2.IsNull())
-        return false;
-
-      if (aShape2.ShapeType() != TopAbs_EDGE)
-        return false;
-
-      std::shared_ptr<GeomAPI_Shape> aShapePtr2(new GeomAPI_Shape);
-      aShapePtr2->setImpl(new TopoDS_Shape(aShape2));
-      GeomAPI_Edge aEdge2(aShapePtr2);
-      if (aEdge1.isLine() && aEdge2.isArc())
-        return true;
-      else if (aEdge1.isArc() && aEdge2.isLine())
-        return true;
-      else
-        return false;
-    } else
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
       return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
   }
-  return false;
 }
 
-bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection) const
+bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
-  int aCount = shapesNbLines(theSelection);
-  return (aCount > 0) && (aCount < 3);
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount == 1);
+  }
+}
+
+bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
+  }
+}
+
+bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
+  }
+}
+
+bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+    ModuleBase_ViewerPrs aPrs;
+    int aCount = 0;
+    foreach (ModuleBase_ViewerPrs aPrs, aList) {
+      const TopoDS_Shape& aShape = aPrs.shape();
+      if (!aShape.IsNull()) {
+        if (aShape.ShapeType() == TopAbs_EDGE) {
+          TopoDS_Edge aEdge = TopoDS::Edge(aShape);
+          Standard_Real aStart, aEnd;
+          Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
+          GeomAdaptor_Curve aAdaptor(aCurve);
+          if (aAdaptor.GetType() == GeomAbs_Circle)
+            aCount++;
+        }
+      }
+    }
+    return (aCount == 1);
+  }
+}
+
+bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+    return (aList.count() == 1);
+  }
+}
+
+
+bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    // Coincident can be applied to points and to lines
+    int aCount = shapesNbPoints(theSelection);
+    aCount += shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
+  }
+}
+
+bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount == 1);
+  }
+}
+
+bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
+  }
+}
+
+bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+    if ((aList.size() == 0) || (aList.size() > 2))
+      return false;
+
+    ModuleBase_ViewerPrs aPrs = aList.first();
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (aShape.IsNull())
+      return false;
+
+    if (aShape.ShapeType() != TopAbs_EDGE)
+      return false;
+
+    std::shared_ptr<GeomAPI_Shape> aShapePtr(new GeomAPI_Shape);
+    aShapePtr->setImpl(new TopoDS_Shape(aShape));
+    GeomAPI_Edge aEdge1(aShapePtr);
+
+    if (aEdge1.isLine() || aEdge1.isArc()) {
+      if (aList.size() == 2) {
+        // Check second selection
+        aPrs = aList.last();
+        const TopoDS_Shape& aShape2 = aPrs.shape();
+        if (aShape2.IsNull())
+          return false;
+
+        if (aShape2.ShapeType() != TopAbs_EDGE)
+          return false;
+
+        std::shared_ptr<GeomAPI_Shape> aShapePtr2(new GeomAPI_Shape);
+        aShapePtr2->setImpl(new TopoDS_Shape(aShape2));
+        GeomAPI_Edge aEdge2(aShapePtr2);
+        if (aEdge1.isLine() && aEdge2.isArc())
+          return true;
+        else if (aEdge1.isArc() && aEdge2.isLine())
+          return true;
+        else
+          return false;
+      } else
+        return true;
+    }
+    return false;
+  }
+}
+
+bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (!aFeatureOp->isEditOperation()) {
+      return true;
+    }
+    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+    if (aPlane.get())
+      return true;
+    else 
+      return false;
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
+  }
 }
 
 std::string PartSet_DifferentObjectsValidator::errorMessage(
