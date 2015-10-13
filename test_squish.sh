@@ -40,7 +40,7 @@ TESTCASES="${TESTCASES} --testcase tst_common_1"
 TESTCASES="${TESTCASES} --testcase tst_crash_1"
 TESTCASES="${TESTCASES} --testcase tst_DISTANCE"
 TESTCASES="${TESTCASES} --testcase tst_RADIUS"
-squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_ISSUES ${TESTCASES}
+squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_STANDALONE ${TESTCASES}
 EXIT_CODE=$?
 if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
 
@@ -50,21 +50,51 @@ TESTCASES="${TESTCASES} --testcase tst_474"
 #TESTCASES="${TESTCASES} --testcase tst_576"
 #TESTCASES="${TESTCASES} --testcase tst_679"
 #TESTCASES="${TESTCASES} --testcase tst_903"
+squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_ISSUES_SALOME ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_boolean_001"
 #TESTCASES="${TESTCASES} --testcase tst_boolean_002"
 #TESTCASES="${TESTCASES} --testcase tst_boolean_003"
+#squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_BOOLEAN ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_construction_001"
+#squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_CONSTRUCTION ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_001"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_002"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_003"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_004"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_006"
+#squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_EXTRUSION ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_partition_001"
+#squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_PARTITION ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_revolution_001"
 #TESTCASES="${TESTCASES} --testcase tst_revolution_003"
 #TESTCASES="${TESTCASES} --testcase tst_revolution_004"
 #TESTCASES="${TESTCASES} --testcase tst_revolution_005"
 #TESTCASES="${TESTCASES} --testcase tst_revolution_006"
+#squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_REVOLUTION ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_sketch_001"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_002"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_003"
@@ -83,7 +113,7 @@ TESTCASES="${TESTCASES} --testcase tst_474"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_016"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_017"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_018"
-squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_ISSUES_SALOME ${TESTCASES}
+#squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_SKETCH ${TESTCASES}
 EXIT_CODE=$?
 if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
 
