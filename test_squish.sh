@@ -1,72 +1,96 @@
 #!/bin/bash
 
-a_dir=$(dirname $0)
+# This sctipt uses:
+# SOURCES_DIR - where test.squish is placed
+# AUT_DIR - where linux_run.sh, salome_run.sh are placed
+# SQUISH_PORT - the port for squishserver
+# PATH - should contain squishserver, squishrunner
 
-set -e
+export TEST_DATA_DIR=${SOURCES_DIR}/test.squish/shared/testdata
+export SQUISH_GRABWINDOW_CLASSES=AppElements_ViewPort,OCCViewer_ViewPort3d
 
-if [ "$#" = 1 ]; then
-  SQUISHSERVER_PORT=$1
-elif [ -z ${SQUISHSERVER_PORT} ]; then
-  SQUISHSERVER_PORT=4320
-fi
-
-export TEST_DATA_DIR=$(cd ${a_dir}; pwd)/test.squish/shared/testdata
-
-source ${a_dir}/env_squish.sh
-
+# config squishserver
 for aut in linux_run.sh salome_run.sh; do
-  squishserver --config addAUT ${aut} $(pwd)
+  squishserver --config addAUT ${aut} ${AUT_DIR}
 done
 squishserver --config setAUTTimeout 120
-squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
-squishserver --verbose --port=${SQUISHSERVER_PORT} 1>log_squishserver 2>err_squishserver &
+# stop previous version
+squishserver --verbose --port=${SQUISH_PORT} --stop
+# start squishserver
+squishserver --verbose --port=${SQUISH_PORT} 1>log_squishserver 2>err_squishserver &
 
-squishrunner --port=${SQUISHSERVER_PORT} --config setCursorAnimation off
+# config squishrunner
+squishrunner --port=${SQUISH_PORT} --config setCursorAnimation off
+# start squishrunner
+SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --port=${SQUISH_PORT}"
+#SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --reportgen stdout"
+#SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --exitCodeOnFail 1"
 
 RETVAL=0
 
-squishrunner_run() {
-  local suite=$1
-  local cases="$2"
+TESTCASES=""
+TESTCASES="${TESTCASES} --testcase tst_BASE"
+TESTCASES="${TESTCASES} --testcase tst_PARALLEL_1"
+TESTCASES="${TESTCASES} --testcase tst_PARALLEL_2"
+TESTCASES="${TESTCASES} --testcase tst_PERPENDICULAR_1"
+#TESTCASES="${TESTCASES} --testcase tst_532"
+TESTCASES="${TESTCASES} --testcase tst_818"
+TESTCASES="${TESTCASES} --testcase tst_c"
+TESTCASES="${TESTCASES} --testcase tst_common_1"
+TESTCASES="${TESTCASES} --testcase tst_crash_1"
+TESTCASES="${TESTCASES} --testcase tst_DISTANCE"
+TESTCASES="${TESTCASES} --testcase tst_RADIUS"
+squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_ISSUES ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
 
-  echo "Running suite ${suite}"
-  if [ "${cases}" != "" ]; then echo "Cases ${cases}"; fi
+TESTCASES=""
+TESTCASES="${TESTCASES} --testcase tst_474"
+#TESTCASES="${TESTCASES} --testcase tst_532"
+#TESTCASES="${TESTCASES} --testcase tst_576"
+#TESTCASES="${TESTCASES} --testcase tst_679"
+#TESTCASES="${TESTCASES} --testcase tst_903"
+#TESTCASES="${TESTCASES} --testcase tst_boolean_001"
+#TESTCASES="${TESTCASES} --testcase tst_boolean_002"
+#TESTCASES="${TESTCASES} --testcase tst_boolean_003"
+#TESTCASES="${TESTCASES} --testcase tst_construction_001"
+#TESTCASES="${TESTCASES} --testcase tst_extrusion_001"
+#TESTCASES="${TESTCASES} --testcase tst_extrusion_002"
+#TESTCASES="${TESTCASES} --testcase tst_extrusion_003"
+#TESTCASES="${TESTCASES} --testcase tst_extrusion_004"
+#TESTCASES="${TESTCASES} --testcase tst_extrusion_006"
+#TESTCASES="${TESTCASES} --testcase tst_partition_001"
+#TESTCASES="${TESTCASES} --testcase tst_revolution_001"
+#TESTCASES="${TESTCASES} --testcase tst_revolution_003"
+#TESTCASES="${TESTCASES} --testcase tst_revolution_004"
+#TESTCASES="${TESTCASES} --testcase tst_revolution_005"
+#TESTCASES="${TESTCASES} --testcase tst_revolution_006"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_001"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_002"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_003"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_004"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_005"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_006"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_007"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_008"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_009"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_010"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_011"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_012"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_013"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_014"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_015"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_016"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_017"
+#TESTCASES="${TESTCASES} --testcase tst_sketch_018"
+squishrunner ${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_ISSUES_SALOME ${TESTCASES}
+EXIT_CODE=$?
+if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
 
-  set +e
-  squishrunner --port=${SQUISHSERVER_PORT} --testsuite ${suite} ${cases} --reportgen stdout --exitCodeOnFail 1
-  EXIT_CODE=$?
-  set -e
-  if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
-}
-
-squishrunner_batch() {
-  local suite=$1
-  local tests=$2
-
-  set +x
-  local tests_arg=
-  for test in ${tests}; do
-    tests_arg="${tests_arg} --testcase ${test}"
-  done
-  set -x
-
-  echo ${tests_arg}
-  squishrunner_run ${suite} "${tests_arg}"
-}
-
-#squishrunner_batch ./test.squish/suite_ISSUES 'tst_BASE tst_DISTANCE tst_PARALLEL_1 tst_PARALLEL_2 tst_PERPENDICULAR_1 tst_RADIUS tst_c tst_common_1 tst_crash_1 tst_818 tst_532'
-#squishrunner_batch ./test.squish/suite_ISSUES_SALOME 'tst_sketch_001 tst_sketch_002 tst_sketch_003 tst_sketch_004 tst_sketch_005 tst_sketch_006 tst_sketch_007 tst_sketch_008 tst_sketch_009 tst_sketch_010 tst_sketch_011 tst_474 tst_532 tst_576 tst_679'
-
-for suite in ./test.squish/suite_*; do
-  squishrunner_run ${suite}
-done
-
-
-
-
-squishserver --verbose --port=${SQUISHSERVER_PORT} --stop
+# stop squishserver
+squishserver --verbose --port=${SQUISH_PORT} --stop
 for aut in linux_run.sh salome_run.sh; do
-  squishserver --config removeAUT ${aut} $(pwd)
+  squishserver --config removeAUT ${aut} ${AUT_DIR}
 done
 
 exit ${RETVAL}
