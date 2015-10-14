@@ -24,11 +24,23 @@ squishserver ${SERVEROPTIONS_ARGS} --verbose 1>log_squishserver 2>err_squishserv
 # config squishrunner
 squishrunner --port=${SQUISH_PORT} --config setCursorAnimation off
 # start squishrunner
-SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --resultdir ${SOURCES_DIR}/test.squish_results"
-SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --reportgen xmljunit"
-SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --exitCodeOnFail 1"
 
 RETVAL=0
+
+squishrunner-run() {
+  local TESTSUITE=$1
+  local TESTCASES="$2"
+
+  local SQUISHRUNNER_ARGS=""
+  SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --testsuite ${SOURCES_DIR}/test.squish/${TESTSUITE}"
+  SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --resultdir ${SOURCES_DIR}/test.squish_results/${TESTSUITE}"
+  SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --reportgen xmljunit,${SOURCES_DIR}/test.squish_results/${TESTSUITE}_results.xml"
+  SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} ${TESTCASES}"
+  SQUISHRUNNER_ARGS="${SQUISHRUNNER_ARGS} --exitCodeOnFail 1"
+  squishrunner ${SERVEROPTIONS_ARGS} ${SQUISHRUNNER_ARGS}
+  EXIT_CODE=$?
+  if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+}
 
 TESTCASES=""
 TESTCASES="${TESTCASES} --testcase tst_BASE"
@@ -42,33 +54,25 @@ TESTCASES="${TESTCASES} --testcase tst_common_1"
 TESTCASES="${TESTCASES} --testcase tst_crash_1"
 TESTCASES="${TESTCASES} --testcase tst_DISTANCE"
 TESTCASES="${TESTCASES} --testcase tst_RADIUS"
-squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_STANDALONE ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+squishrunner-run suite_STANDALONE "${TESTCASES}"
 
 TESTCASES=""
 TESTCASES="${TESTCASES} --testcase tst_474"
-TESTCASES="${TESTCASES} --testcase tst_532"
-TESTCASES="${TESTCASES} --testcase tst_576"
-TESTCASES="${TESTCASES} --testcase tst_679"
-TESTCASES="${TESTCASES} --testcase tst_903"
-squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_ISSUES_SALOME ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#TESTCASES="${TESTCASES} --testcase tst_532"
+#TESTCASES="${TESTCASES} --testcase tst_576"
+#TESTCASES="${TESTCASES} --testcase tst_679"
+#TESTCASES="${TESTCASES} --testcase tst_903"
+squishrunner-run suite_ISSUES_SALOME "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_boolean_001"
 #TESTCASES="${TESTCASES} --testcase tst_boolean_002"
 #TESTCASES="${TESTCASES} --testcase tst_boolean_003"
-#squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_BOOLEAN ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#squishrunner-run suite_FEATURE_BOOLEAN "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_construction_001"
-#squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_CONSTRUCTION ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#squishrunner-run suite_FEATURE_CONSTRUCTION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_001"
@@ -76,15 +80,11 @@ TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_003"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_004"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_006"
-#squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_EXTRUSION ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#squishrunner-run suite_FEATURE_EXTRUSION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_partition_001"
-#squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_PARTITION ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#squishrunner-run suite_FEATURE_PARTITION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_revolution_001"
@@ -92,9 +92,7 @@ TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_revolution_004"
 #TESTCASES="${TESTCASES} --testcase tst_revolution_005"
 #TESTCASES="${TESTCASES} --testcase tst_revolution_006"
-#squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_REVOLUTION ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#squishrunner-run suite_FEATURE_REVOLUTION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_sketch_001"
@@ -115,9 +113,7 @@ TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_sketch_016"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_017"
 #TESTCASES="${TESTCASES} --testcase tst_sketch_018"
-#squishrunner ${SERVEROPTIONS_ARGS} --testsuite ${SOURCES_DIR}/test.squish/suite_FEATURE_SKETCH ${TESTCASES} ${SQUISHRUNNER_ARGS}
-EXIT_CODE=$?
-if [ ${EXIT_CODE} = '1' ]; then RETVAL=1; fi
+#squishrunner-run suite_FEATURE_SKETCH "${TESTCASES}"
 
 # stop squishserver
 squishserver ${SERVEROPTIONS_ARGS} --verbose --stop
