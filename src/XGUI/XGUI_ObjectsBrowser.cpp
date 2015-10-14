@@ -176,6 +176,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLayout->setSpacing(0);
 
   QFrame* aLabelWgt = new QFrame(this);
+  //QWidget* aLabelWgt = new QWidget(this);
   aLabelWgt->setAutoFillBackground(true);
   QPalette aPalet = aLabelWgt->palette();
   aPalet.setColor(QPalette::Window, Qt::white);
@@ -210,6 +211,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelLay->setStretch(1, 1);
 
   myTreeView = new XGUI_DataTree(this);
+  //myTreeView->setFrameShape(QFrame::NoFrame);
   aLayout->addWidget(myTreeView);
 
   aLabelWgt->setFrameShape(myTreeView->frameShape());

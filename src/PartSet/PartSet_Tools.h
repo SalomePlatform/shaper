@@ -207,6 +207,12 @@ class PARTSET_EXPORT PartSet_Tools
   */
   static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                std::string theAttr);
+
+  /**
+  * Returns point of a coincedence
+  * \param theStartCoin the coincedence feature
+  */
+  static std::shared_ptr<GeomAPI_Pnt2d> getCoincedencePoint(FeaturePtr theStartCoin);
 };
 
 #endif
