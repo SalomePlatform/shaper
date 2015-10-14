@@ -3,7 +3,7 @@
 # Path to sources
 export SOURCES_DIR=$(pwd)
 # Path to build directory
-export BUILD_DIR=$(cd ../build && pwd)
+export BUILD_DIR=$(cd .. && pwd)/build
 # Path to linux_run.sh & salome_run.sh
 export AUT_DIR=$(pwd)
 
@@ -20,4 +20,4 @@ source env_config.sh
 # Path to solvespace-2
 export NEWGEOM_PDIR=/dn48/newgeom/common/products
 # Path to install directory
-export NEWGEOM_ROOT_DIR=$(cd ../install && pwd)
+export NEWGEOM_ROOT_DIR=$(cd .. && pwd)/install
