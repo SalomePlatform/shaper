@@ -278,7 +278,7 @@ bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
 //**********************************************
 bool NewGeom_SalomeViewer::enableDrawMode(bool isEnabled)
 {
-  // TODO: Has to be replaced when SALOME patch become avialable
+  // TODO: Has to be replaced when SALOME patch become available
   if (mySelector)
     return mySelector->viewer()->enableDrawMode(isEnabled);
   return false;

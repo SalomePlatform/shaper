@@ -1484,7 +1484,7 @@ bool XGUI_Workshop::canChangeColor() const
   return hasResults(aObjects, aTypes);
 }
 
-void setColor(ResultPtr theResult, std::vector<int>& theColor)
+void setColor(ResultPtr theResult, const std::vector<int>& theColor)
 {
   if (!theResult.get())
     return;
