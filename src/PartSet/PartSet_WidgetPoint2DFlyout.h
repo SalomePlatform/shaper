@@ -8,7 +8,7 @@
 #define PartSet_WidgetPoint2DFlyout_H
 
 #include "PartSet.h"
-#include <PartSet_WidgetPoint2D.h>
+#include <PartSet_WidgetPoint2d.h>
 
 class XGUI_Workshop;
 

@@ -119,18 +119,22 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(aWidget, SIGNAL(keyReleased(QKeyEvent*)),
             this,    SIGNAL(keyReleased(QKeyEvent*)));
   }
-  ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
-  if (aLastWidget) {
-    QList<QWidget*> aControls = aLastWidget->getControls();
-    if (!aControls.empty()) {
-      QWidget* aLastControl = aControls.last();
 
-      QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-      QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
-
-      setTabOrder(aLastControl, anOkBtn);
-      setTabOrder(anOkBtn, aCancelBtn);
+  QWidget* aLastControl = 0;
+  QList<QWidget*> aControls;
+  for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)  {
+    aControls = myWidgets[i]->getControls();
+    for (int j = aControls.size()-1; j >= 0 && !aLastControl; j--)  {
+      if (aControls[j]->focusPolicy() != Qt::NoFocus)
+        aLastControl = aControls[j];
     }
+  }
+  if (aLastControl) {
+    QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+
+    setTabOrder(aLastControl, anOkBtn);
+    setTabOrder(anOkBtn, aCancelBtn);
   }
 }
 
