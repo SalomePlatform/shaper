@@ -177,7 +177,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
         return;
       }
     }
-    isFoundWidget = (*anIt) == theWidget;
+    isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
   activateWidget(NULL);
 }
@@ -207,6 +207,7 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     emit widgetActivated(theWidget);
   } else if (!isEditingMode()) {
     emit noMoreWidgets();
+    setFocusOnOkButton();
   }
 }
 

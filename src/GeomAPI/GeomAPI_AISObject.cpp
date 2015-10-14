@@ -141,6 +141,21 @@ void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoin
   }
 }
 
+bool GeomAPI_AISObject::isEmptyDistanceGeometry()
+{
+  bool anEmpty = false;
+
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
+    if (!aDimAIS.IsNull()) {
+      anEmpty = !aDimAIS->IsValid();
+    }
+  }
+
+  return anEmpty;
+}
+
 void GeomAPI_AISObject::createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
                                      std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
                                      double theRadius)

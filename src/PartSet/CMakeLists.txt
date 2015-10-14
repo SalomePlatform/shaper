@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetEditor.h
 	PartSet_WidgetMultiSelector.h
 	PartSet_WidgetPoint2dDistance.h
+	PartSet_WidgetPoint2DFlyout.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_WidgetFileSelector.h
 	PartSet_Filters.h
@@ -43,6 +44,7 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dAngle.cpp
 	PartSet_WidgetPoint2dDistance.cpp
+	PartSet_WidgetPoint2DFlyout.cpp
 	PartSet_WidgetShapeSelector.cpp
 	PartSet_WidgetFileSelector.cpp
 	PartSet_Filters.cpp

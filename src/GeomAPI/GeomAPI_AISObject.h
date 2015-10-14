@@ -49,6 +49,14 @@ class GeomAPI_AISObject : public GeomAPI_Interface
                       std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
                       std::shared_ptr<GeomAPI_Pln> thePlane, double theDistance);
 
+  /**
+   * Returns validity of the AIS distance. It is invalid if set measured geometry is not valid,
+   * e.g. the distance points are equal.
+   * \return a boolean result
+   */
+  GEOMAPI_EXPORT 
+  bool isEmptyDistanceGeometry();
+
   /** \brief Creates AIS_RadiusDimension object
    *  \param[in] theCircle      the radius is created for this circle
    *  \param[in] theFlyoutPoint the flyout of dimension

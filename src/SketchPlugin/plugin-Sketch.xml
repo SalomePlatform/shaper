@@ -70,7 +70,7 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
         </sketch_shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         
         <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>
@@ -85,7 +85,7 @@
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
         </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -99,7 +99,7 @@
             shape_types="edge">
             <validator id="GeomValidators_ShapeType" parameters="circle"/>
         </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -118,7 +118,7 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
         </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Angle" id="ConstraintValue" default="computed" min="0" max="180" />
         <validator id="PartSet_AngleSelection"/>
       </feature>

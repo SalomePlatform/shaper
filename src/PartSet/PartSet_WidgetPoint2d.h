@@ -138,7 +138,10 @@ private slots:
    /// \theObject a result object
    void setConstraintWith(const ObjectPtr& theObject);
 
+protected:
   ModuleBase_IWorkshop* myWorkshop;
+
+private:
   PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
