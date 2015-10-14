@@ -1,8 +1,14 @@
 #!/bin/bash
 
-a_dir=$(dirname $0)
+for path in TOOLS_DIR; do
+  if [[ -z "${!path}" ]]; then 
+    echo "${path} not found."; exit 1
+  else
+    echo "Found ${path}: ${!path}"
+  fi
+done
 
-source ${a_dir}/env_linux.sh
+source ${TOOLS_DIR}/env_linux.sh
 
 export LD_LIBRARY_PATH=${KERNEL_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
-export LightAppConfig=${INSTALL_DIR}/share/salome/resources/newgeom:${GUI_ROOT_DIR}/share/salome/resources/gui
+export LightAppConfig=${NEWGEOM_ROOT_DIR}/share/salome/resources/newgeom:${GUI_ROOT_DIR}/share/salome/resources/gui

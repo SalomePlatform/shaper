@@ -1,7 +1,20 @@
 #!/bin/bash
 
+# This script uses:
+#
+# INST_ROOT - path of SALOME (env_products.sh)
+# NEWGEOM_PDIR - path of PRODUCTS for NEWGEOM (SolveSpace, lcov)
+# NEWGEOM_ROOT_DIR - path of NEWGEOM installation
+
+for path in INST_ROOT NEWGEOM_PDIR NEWGEOM_ROOT_DIR; do
+  if [[ -z ${!path+x} ]]; then
+    echo "${path} not found."; exit 1
+  else
+    echo "Found ${path}: ${!path}"
+  fi
+done
+
 set +u
-echo "Export SALOME from ${INST_ROOT}..."
 source ${INST_ROOT}/env_products.sh
 set -u
 
@@ -25,7 +38,6 @@ export PATH=${CASROOT}:${PATH}
 ##
 
 #------ NewGEOM ------
-export NEWGEOM_ROOT_DIR=${INSTALL_DIR}
 export PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/plugins:${PATH}
 export PYTHONPATH=${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${NEWGEOM_ROOT_DIR}/addons:${NEWGEOM_ROOT_DIR}/pythonAPI:${PYTHONPATH}
 export LD_LIBRARY_PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
