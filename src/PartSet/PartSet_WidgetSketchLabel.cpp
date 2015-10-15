@@ -159,7 +159,11 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
       aXYZ.Reverse();
     }*/
 
-    myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
+    // Rotate view if the sketcher plane is selected only from preview planes
+    // Preview planes are created only if there is no any shape
+    if (myYZPlane.get()) {
+      myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
+    }
   }
   // 3. Clear text in the label
   myLabel->setText("");
@@ -288,8 +292,6 @@ void PartSet_WidgetSketchLabel::activateCustom()
 
   connect(workshop()->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateFilters(true);
-
-  //VSV aDisp->updateViewer();
 }
 
 void PartSet_WidgetSketchLabel::deactivate()
