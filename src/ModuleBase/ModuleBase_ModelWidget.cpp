@@ -27,7 +27,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const std::string& theParentId)
     : QWidget(theParent),
       myParentId(theParentId),
-      myIsEditing(false)
+      myIsEditing(false),
+      myState(Stored)
 {
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
@@ -36,6 +37,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myIsObligatory = theData->getBooleanAttribute(ATTR_OBLIGATORY, true);
 
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
+  connect(this, SIGNAL(valuesModified()), this, SLOT(onWidgetValuesModified()));
 }
 
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
@@ -132,11 +134,22 @@ void ModuleBase_ModelWidget::setDefaultValue(const std::string& theValue)
 
 bool ModuleBase_ModelWidget::storeValue()
 {
+  setValueState(Stored);
+
   emit beforeValuesChanged();
   bool isDone = storeValueCustom();
   emit afterValuesChanged();
 
   return isDone;
+}
+
+void ModuleBase_ModelWidget::setValueState(const ValueState& theState)
+{
+  if (myState == theState)
+    return;
+
+  myState = theState;
+  emit valueStateChanged();
 }
 
 bool ModuleBase_ModelWidget::restoreValue()
@@ -203,6 +216,12 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 void ModuleBase_ModelWidget::onWidgetValuesChanged()
 {
   storeValue();
+}
+
+//**************************************************************
+void ModuleBase_ModelWidget::onWidgetValuesModified()
+{
+  setValueState(Modified);
 }
 
 //**************************************************************

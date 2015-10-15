@@ -164,7 +164,7 @@ bool PartSet_WidgetSketchCreator::focusTo()
   if (aCompFeature->numberOfSubs() == 0)
     return ModuleBase_ModelWidget::focusTo(); 
 
-  connect(myModule, SIGNAL(operationResumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
+  connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
   SessionPtr aMgr = ModelAPI_Session::get();
   // Open transaction that is general for the previous nested one: it will be closed on nested commit
   bool aIsOp = aMgr->isOperation();

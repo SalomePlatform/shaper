@@ -460,7 +460,7 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   }
   updateCommandStatus();
 
-  myModule->onOperationStarted(aFOperation);
+  myModule->operationStarted(aFOperation);
 
   // the objects of the current operation should be deactivated
   QObjectPtrList anObjects;
@@ -488,7 +488,7 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
   }
   updateCommandStatus();
 
-  myModule->onOperationResumed(theOperation);
+  myModule->operationResumed(theOperation);
 }
 
 
@@ -508,7 +508,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
-  myModule->onOperationStopped(aFOperation);
+  myModule->operationStopped(aFOperation);
 
   // the deactivated objects of the current operation should be activated back.
   // They were deactivated on operation start or an object redisplay
@@ -534,12 +534,12 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 
 void XGUI_Workshop::onOperationCommitted(ModuleBase_Operation* theOperation)
 {
-  myModule->onOperationCommitted(theOperation);
+  myModule->operationCommitted(theOperation);
 }
 
 void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
 {
-  myModule->onOperationAborted(theOperation);
+  myModule->operationAborted(theOperation);
 }
 
 void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)

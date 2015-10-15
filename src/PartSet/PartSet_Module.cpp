@@ -246,7 +246,7 @@ void PartSet_Module::registerProperties()
                                    Config_Prop::Integer, SKETCH_WIDTH);
 }
 
-void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation) 
+void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
 {
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
@@ -283,12 +283,12 @@ void PartSet_Module::breakOperationSequence()
   myRestartingMode = RM_None;
 }
 
-void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   breakOperationSequence();
 }
 
-void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->startSketch(theOperation);
@@ -302,16 +302,16 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     myCustomPrs->activate(aFOperation->feature(), true);
 }
 
-void PartSet_Module::onOperationResumed(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_IModule::onOperationResumed(theOperation);
+  ModuleBase_IModule::operationResumed(theOperation);
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation)
     myCustomPrs->activate(aFOperation->feature(), true);
 }
 
-void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   bool isModified = myCustomPrs->deactivate(false);
 

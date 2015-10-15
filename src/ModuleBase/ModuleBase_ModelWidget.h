@@ -33,7 +33,12 @@ class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QWidget
 {
 Q_OBJECT
  public:
-  /// Constructor
+   /// State of the widget
+   enum ValueState { Stored, /// modification is finished and applyed to the model
+                     Modified /// modification has not been finished and set to the model yet
+                   };
+
+   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
@@ -69,6 +74,10 @@ Q_OBJECT
   /// Returns this parameter value in the xml file
   /// \return the boolean result
   bool isUseReset() const { return myUseReset; }
+
+  /// Returns this widget value state
+  /// \return the enumeration result
+  ValueState getValueState() const { return myState; }
 
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
@@ -189,6 +198,9 @@ signals:
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
+  /// The signal about value state modification
+  void valueStateChanged();
+
 protected:
   /// Sets default value of widget. Normally, widget should fetch this value
   /// from the xml. However, some widgets derived widgets could define it
@@ -199,6 +211,10 @@ protected:
   {
     myAttributeID = theAttribute;
   }
+
+  /// Sets the current value state. If the value is changed, the signal is emitted
+  /// \param theState a new state
+  void setValueState(const ValueState& theState);
 
   /// Saves the internal parameters to the given feature. Emits signals before and after store
   /// \return True in success
@@ -222,6 +238,9 @@ protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
   void onWidgetValuesChanged();
 
+  /// Changes widget state.
+  void onWidgetValuesModified();
+
  protected:
 
   /// The attribute name of the model feature
@@ -239,6 +258,9 @@ protected slots:
   /// Flag which shows whether current widget is obligatory
   /// The non-obligatory widgets should not accept the focus in the property panel
   bool myIsObligatory;
+
+  /// The widget value state
+  ValueState myState;
 
 private:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)

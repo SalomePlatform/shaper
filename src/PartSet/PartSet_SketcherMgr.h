@@ -206,8 +206,8 @@ private slots:
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
 
-  /// Updates the flag of reset state
-  void onValuesModied();
+  /// Validates the operation. Apply button is disabled if the widget value is in Modified state
+  void onValueStateChanged();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
   /// Listens to the signal about values are to be changed in the property panel
@@ -281,6 +281,9 @@ private:
   /// \return an operation
   ModuleBase_Operation* getCurrentOperation() const;
 
+  /// Get the active widget in the property panel
+  ModuleBase_ModelWidget* getActiveWidget() const;
+
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
   /// \param theOperation an operation which feature is to be displayed, it is nested create operation
@@ -301,7 +304,7 @@ private:
   bool myIsDragging;
   bool myDragDone;
   bool myIsResetCurrentValue; /// the state that value in the property panel is reset
-  bool myIsCurrentValueUnderModification; /// the value is modified in PP but it is not applyed in the model
+  //bool myIsCurrentValueUnderModification; /// the value is modified in PP but it is not applyed in the model
   bool myIsMouseOverWindow; /// the state that the mouse over the view
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   bool myIsPopupMenuActive; /// the state of the popup menu is shown

@@ -77,27 +77,27 @@ public:
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
   /// Activate the operation presentation
   /// \param theOperation a started operation
-  virtual void onOperationStarted(ModuleBase_Operation* theOperation);
+  virtual void operationStarted(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation resume
   /// Activate the operation presentation
   /// \param theOperation a resumed operation
-  virtual void onOperationResumed(ModuleBase_Operation* theOperation);
+  virtual void operationResumed(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation commit
   /// Restarts sketcher operation automatically of it is necessary
   /// \param theOperation a committed operation
-  virtual void onOperationCommitted(ModuleBase_Operation* theOperation);
+  virtual void operationCommitted(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation abort
   /// Hides all sketcher sub-Objects, displays sketcher result and removes selection filters
   /// \param theOperation an aborted operation
-  virtual void onOperationAborted(ModuleBase_Operation* theOperation);
+  virtual void operationAborted(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation stop
   /// Hides all sketcher sub-Objects, displays sketcher result and removes selection filters
   /// \param theOperation a stopped operation
-  virtual void onOperationStopped(ModuleBase_Operation* theOperation);
+  virtual void operationStopped(ModuleBase_Operation* theOperation);
 
   /// Returns current operation
   virtual ModuleBase_Operation* currentOperation() const;

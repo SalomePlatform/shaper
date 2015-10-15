@@ -228,7 +228,7 @@ bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
   return !aFOperation || !aFOperation->hasObject(theObject);
 }
 
-void ModuleBase_IModule::onOperationResumed(ModuleBase_Operation* theOperation) 
+void ModuleBase_IModule::operationResumed(ModuleBase_Operation* theOperation) 
 {
-  emit operationResumed(theOperation);
+  emit resumed(theOperation);
 }

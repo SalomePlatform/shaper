@@ -152,7 +152,7 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-    myIsResetCurrentValue(false), myIsCurrentValueUnderModification(false), myIsMouseOverWindow(false),
+    myIsResetCurrentValue(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
     myIsPopupMenuActive(false), myIsConstraintsShown(true)
 {
@@ -192,7 +192,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
   // redisplayed before this update, the feature presentation jumps from reset value to current.
   myIsMouseOverWindow = true;
   myIsResetCurrentValue = false;
-  myIsCurrentValueUnderModification = false;
+  //myIsCurrentValueUnderModification = false;
   // it is important to validate operation here only if sketch entity create operation is active
   // because at this operation we reacts to the mouse leave/enter view port
   //operationMgr()->onValidateOperation();
@@ -261,10 +261,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   // disable the viewer update in order to avoid visualization of redisplayed feature in viewer
   // obtained after reset value
   bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
-  ModuleBase_Operation* aOperation = getCurrentOperation();
-  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-  ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-  if (aActiveWgt && aActiveWgt->reset()) {
+  ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+  if (anActiveWidget && anActiveWidget->reset()) {
     myIsResetCurrentValue = true;
   }
   aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
@@ -280,20 +278,23 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   }
 }
 
-void PartSet_SketcherMgr::onValuesModied()
+void PartSet_SketcherMgr::onValueStateChanged()
 {
-  myIsCurrentValueUnderModification = true;
+  ///myIsCurrentValueUnderModification = true;
   // update Apply enable state
   //myIsResetCurrentValue = false;
   //if (!isNestedCreateOperation(getCurrentOperation()))
   //  return;
-  operationMgr()->onValidateOperation();
+
+  ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+  if (anActiveWidget && anActiveWidget->getValueState() != ModuleBase_ModelWidget::Stored)
+    operationMgr()->onValidateOperation();
 }
 
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
   myIsResetCurrentValue = false;
-  myIsCurrentValueUnderModification = false;
+  //myIsCurrentValueUnderModification = false;
 
   if (isNestedCreateOperation(getCurrentOperation()))
     return;
@@ -363,10 +364,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     return;
 
   if (aFOperation->isEditOperation()) {
-    ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-    ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
     // If the current widget is a selector, do nothing, it processes the mouse press
-    if(aActiveWgt && aActiveWgt->isViewerSelector()) {
+    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+    if(anActiveWidget && anActiveWidget->isViewerSelector()) {
       return;
     }
   }
@@ -485,17 +485,15 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
   if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
     myIsMouseOverViewProcessed = true;
     // 1. perform the widget mouse move functionality and display the presentation
-    ModuleBase_Operation* aOperation = getCurrentOperation();
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    ModuleBase_ModelWidget* anActiveWdg = aPanel->activeWidget();
     // the mouse move should be processed in the widget, if it can in order to visualize correct
     // presentation. These widgets correct the feature attribute according to the mouse position
-    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWdg);
+    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWidget);
     if (aPoint2DWdg) {
       aPoint2DWdg->onMouseMove(theWnd, theEvent);
     }
     PartSet_WidgetPoint2dDistance* aDistanceWdg = dynamic_cast<PartSet_WidgetPoint2dDistance*>
-                                                                (anActiveWdg);
+                                                                (anActiveWidget);
     if (aDistanceWdg) {
       aDistanceWdg->onMouseMove(theWnd, theEvent);
     }
@@ -718,7 +716,7 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
     AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
     anError = aAttributeString->value().c_str();
   }
-  else if (myIsResetCurrentValue || myIsCurrentValueUnderModification) {
+  else if (myIsResetCurrentValue /*|| myIsCurrentValueUnderModification*/) {
     // this flags do not allow commit of the current operation
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                         (getCurrentOperation());
@@ -726,18 +724,27 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
       FeaturePtr aFeature = aFOperation->feature();
       if (aFeature.get() && aFeature == theFeature && isNestedCreateOperation(aFOperation)) {
         QString anAttributeName = "";
-        ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-        ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
-        if (anActiveWgt) {
-          AttributePtr anAttr = aFeature->attribute(anActiveWgt->attributeID());
+        ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+        if (anActiveWidget) {
+          AttributePtr anAttr = aFeature->attribute(anActiveWidget->attributeID());
           if (anAttr.get())
             anAttributeName = anAttr->id().c_str();
         }
         if (myIsResetCurrentValue)
           anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
-        else if (myIsCurrentValueUnderModification) {
-          anError = "Attribute \"" + anAttributeName + "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
-        }
+        //else if (myIsCurrentValueUnderModification) {
+        //  anError = "Attribute \"" + anAttributeName + "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
+        //}
+      }
+    }
+  }
+  else {
+    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+    if (anActiveWidget && anActiveWidget->getValueState() != ModuleBase_ModelWidget::Stored) {
+      AttributePtr anAttr = anActiveWidget->feature()->attribute(anActiveWidget->attributeID());
+      if (anAttr.get()) {
+        QString anAttributeName = anAttr->id().c_str();
+        anError = "Attribute \"" + anAttributeName + "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
       }
     }
   }
@@ -957,7 +964,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
   connectToPropertyPanel(false);
   myIsResetCurrentValue = false;
-  myIsCurrentValueUnderModification = false;
+  //myIsCurrentValueUnderModification = false;
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
   if (isNestedCreateOperation(theOp))
@@ -1079,10 +1086,8 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   // c. widget editor control
   #ifndef DEBUG_DO_NOT_BY_ENTER
   if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
-    ModuleBase_Operation* aOperation = getCurrentOperation();
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    ModuleBase_ModelWidget* anActiveWdg = aPanel ? aPanel->activeWidget() : 0;
-    ModuleBase_WidgetEditor* anEditorWdg = anActiveWdg ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWdg) : 0;
+    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+    ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
     // the active widget editor should not influence here. The presentation should be visible always
     // when this widget is active.
     if (!anEditorWdg && !myIsPopupMenuActive) {
@@ -1097,7 +1102,14 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 
 bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 {
-  return myIsMouseOverWindow || (!myIsResetCurrentValue && !myIsCurrentValueUnderModification);
+  bool aCanDisplay = myIsMouseOverWindow;
+  if (!aCanDisplay) {
+    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+    bool isValueStored = anActiveWidget && anActiveWidget->getValueState() == ModuleBase_ModelWidget::Stored;
+    aCanDisplay = !myIsResetCurrentValue && isValueStored;
+  }
+  return aCanDisplay;
+  //return myIsMouseOverWindow || (!myIsResetCurrentValue && !myIsCurrentValueUnderModification);
 #ifdef DEBUG_MOUSE_OVER_WINDOW_FLAGS
   qDebug(QString("canDisplayCurrentCreatedFeature: %1").arg(mouseOverWindowFlagsInfo()).toStdString().c_str());
 #endif
@@ -1254,8 +1266,8 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
       if (isToConnect) {
         connect(aWidget, SIGNAL(beforeValuesChanged()),
                 this, SLOT(onBeforeValuesChangedInPropertyPanel()));
-        connect(aWidget, SIGNAL(valuesModified()),
-                this, SLOT(onValuesModied()));
+        connect(aWidget, SIGNAL(valueStateChanged()),
+                this, SLOT(onValueStateChanged()));
         connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
         connect(aWidget, SIGNAL(afterValuesChanged()),
                 this, SLOT(onAfterValuesChangedInPropertyPanel()));
@@ -1274,6 +1286,19 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
 ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 {
   return myModule->workshop()->currentOperation();
+}
+
+//**************************************************************
+ModuleBase_ModelWidget* PartSet_SketcherMgr::getActiveWidget() const
+{
+  ModuleBase_ModelWidget* aWidget = 0;
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+  if (anOperation) {
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+    if (aPanel)
+      aWidget = aPanel->activeWidget();
+  }
+  return aWidget;
 }
 
 void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
