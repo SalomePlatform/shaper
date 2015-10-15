@@ -9,7 +9,7 @@ from roots     import *
 # Built-in features
 
 from part      import Part            as addPart
-from sketcher.sketch  import Sketch   as addSketch
+from sketcher.sketch  import addSketch
 from extrusion import Extrusion       as addExtrusion
 from boolean   import Addition        as addAddition
 from boolean   import Subtraction     as addSubtraction
