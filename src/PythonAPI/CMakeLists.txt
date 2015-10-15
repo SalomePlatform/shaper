@@ -3,7 +3,7 @@
 
 SET(CMAKE_AUTOMOC ON)
 
-INSTALL(DIRECTORY extension geom modeler DESTINATION pythonAPI)
+INSTALL(DIRECTORY extension geom modeler DESTINATION PythonAPI)
 
 # --------- Unit tests -----------
 INCLUDE(UnitTest)

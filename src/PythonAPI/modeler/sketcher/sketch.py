@@ -6,15 +6,18 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 from ModelAPI    import *
 from GeomDataAPI import *
 from GeomAlgoAPI import *
+from modeler.sketcher.point import Point
+from modeler.sketcher.line import Line
+from modeler.sketcher.circle import Circle
 
 
 class Sketch():
 
   def __init__(self, doc, plane):
     """Initializes a 2D Sketch on the given plane and adds the Sketch to the given Part or Partset.
-	The plane can be defined either by:
-	- a 3D axis system (geom.Ax3),
-	- an existing face identified by its topological name.
+    The plane can be defined either by:
+    - a 3D axis system (geom.Ax3),
+    - an existing face identified by its topological name.
     """
     self.my = featureToCompositeFeature( doc.addFeature("Sketch") )
     self.selection = None         # Entities used for building the result shape
@@ -69,7 +72,7 @@ class Sketch():
     The end of consecutive segments are defined as coincident.
     """
     pg = self.addPolyline(*coords)
-	# Closing the poly-line supposed being defined by at least 3 points
+    # Closing the poly-line supposed being defined by at least 3 points
     c0 = coords[0]
     cn = coords[len(coords)-1]
     ln = self.addLine(cn, c0)
@@ -144,8 +147,8 @@ class Sketch():
 
   def selectFace (self, *args):
     """Selects the geometrical entities of this Sketch on which the result Face must be built.
-	When no entity is given, the face is based on all existing geometry of this Sketch.
-	"""
+    When no entity is given, the face is based on all existing geometry of this Sketch.
+    """
     #self.resultype ="Face"
     if   len(args) == 0:
       self.selection = modelAPI_ResultConstruction( self.my.firstResult() ).shape()
@@ -169,75 +172,3 @@ class Sketch():
   def result (self):
     """Returns the result data of this Feature."""
     return self.my.firstResult()
-
-
-# Class definitions of Sketch features
-
-class Point():
-
-  def __init__(self, sketch, x, y):
-    self.my = sketch.addFeature("SketchPoint")
-    geomDataAPI_Point2D( self.my.data().attribute("PointCoordindates") ).setValue(x, y)
-    self.my.execute()
-
-  def pointData (self):
-    return geomDataAPI_Point2D( self.my.data().attribute("PointCoordindates") )
-
-  def result (self):
-    return self.my.firstResult()
-
-
-class Line():
-
-  def __init__(self, sketch, *args):
-    self.my = sketch.addFeature("SketchLine")
-    if   len(args) == 4:
-      self.__createByCoordinates(*args)
-    elif len(args) == 2:
-      self.__createByPoints(*args)
-    elif len(args) == 1:
-	  self.__createByName(sketch, *args)
-    else:
-      raise Exception("cannot create the Line")
-
-  def __createByCoordinates(self, x1, y1, x2, y2):
-    geomDataAPI_Point2D( self.my.data().attribute("StartPoint") ).setValue(x1, y1)
-    geomDataAPI_Point2D( self.my.data().attribute("EndPoint") ).setValue(x2, y2)
-    self.my.execute()
-
-  def __createByPoints(self, p1, p2):
-    geomDataAPI_Point2D( self.my.data().attribute("StartPoint") ).setValue(p1.x(), p1.y())
-    geomDataAPI_Point2D( self.my.data().attribute("EndPoint") ).setValue(p2.x(), p2.y())
-    self.my.execute()
-
-  def __createByName(self, sketch, name):
-    self.my.data().selection("External").selectSubShape("EDGE", name)
-    self.my.execute()
-    rigid = sketch.addFeature("SketchConstraintRigid")
-    rigid.refattr("ConstraintEntityA").setObject( self.my.firstResult() )
-
-  def startPointData (self):
-    return geomDataAPI_Point2D( self.my.data().attribute("StartPoint") )
-
-  def endPointData (self):
-    return geomDataAPI_Point2D( self.my.data().attribute("EndPoint") )
-
-  def result (self):
-    return self.my.firstResult()
-
-
-class Circle():
-
-  def __init__(self, sketch, x, y, r):
-    self.my = sketch.addFeature("SketchCircle")
-    geomDataAPI_Point2D( self.my.data().attribute("CircleCenter") ).setValue(x, y)
-    self.my.data().real("CircleRadius").setValue(r)
-    self.my.execute()
-
-  def centerData (self):
-    return geomDataAPI_Point2D( self.my.data().attribute("CircleCenter") )
-
-  def result (self):
-    return self.my.lastResult()   # Returns the circular line attribute
-
-

@@ -8,9 +8,9 @@ from roots     import *
 
 # Built-in features
 
-from part      import Part         as addPart
-from sketcher  import Sketch       as addSketch
-from extrusion import Extrusion    as addExtrusion
-from boolean   import Addition     as addAddition
-from boolean   import Subtraction  as addSubtraction
-from boolean   import Intersection as addIntersection
+from part      import Part            as addPart
+from sketcher.sketch  import Sketch   as addSketch
+from extrusion import Extrusion       as addExtrusion
+from boolean   import Addition        as addAddition
+from boolean   import Subtraction     as addSubtraction
+from boolean   import Intersection    as addIntersection
