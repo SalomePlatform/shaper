@@ -57,12 +57,18 @@ TESTCASES="${TESTCASES} --testcase tst_RADIUS"
 squishrunner-run suite_STANDALONE "${TESTCASES}"
 
 TESTCASES=""
+TESTCASES="${TESTCASES} --testcase tst_679"
+squishrunner-run suite_ERROR_NOTIFICATION "${TESTCASES}"
+
+TESTCASES=""
 TESTCASES="${TESTCASES} --testcase tst_474"
+TESTCASES="${TESTCASES} --testcase tst_576"
+squishrunner-run suite_FEATURE_PARAMETERS "${TESTCASES}"
+
+TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_532"
-#TESTCASES="${TESTCASES} --testcase tst_576"
-#TESTCASES="${TESTCASES} --testcase tst_679"
 #TESTCASES="${TESTCASES} --testcase tst_903"
-squishrunner-run suite_ISSUES_SALOME "${TESTCASES}"
+#squishrunner-run suite_ISSUES_SALOME "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_boolean_001"

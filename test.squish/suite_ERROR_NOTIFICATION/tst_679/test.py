@@ -1,3 +1,5 @@
+#[tested functionality] 1. Add parameter 2. Use wrong parameter name 3. Error notification in header 3. Error notification in widget
+
 def main():
     source(findFile("scripts", "common.py"))
     
@@ -21,7 +23,8 @@ def main():
 
     waitFor("object.exists(':Point_QFrame')", 20000)
     
-    test.compare(str(findObject(":Point_QFrame").toolTip), "x - Model_AttributeValidator: name 'b' is not defined")
+    test.compare(str(findObject(":Point_QFrame").toolTip), "ModelAPI_StateInvalidArgument")
+    
     waitFor("object.exists(':Point.x_ModuleBase_ParamSpinBox')", 20000)
     test.compare(str(findObject(":Point.x_ModuleBase_ParamSpinBox").toolTip), "X coordinate\nErrors:\nx - Model_AttributeValidator: name 'b' is not defined")
 

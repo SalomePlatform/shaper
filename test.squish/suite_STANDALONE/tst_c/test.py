@@ -15,15 +15,21 @@ def main():
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), 531, 537, 0, Qt.LeftButton)
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), 241, 169, 0, Qt.LeftButton)
     clickButton(waitForObject(":Sketch.property_panel_ok_QToolButton"))
-
+    
+    test.vp("VP_SKETCH")
+    
     clickTab(waitForObject(":General.qt_tabwidget_tabbar_QTabBar"), "Features")
-#    mouseDrag(waitForObject(":Features_QScrollArea"), 31, 1, -2, -2, 1, Qt.LeftButton)
     clickButton(waitForObject(":Extrusion.Extrusion_AppElements_Button"))
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), 216, 270, 0, Qt.LeftButton)
     clickButton(waitForObject(":Extrusion.property_panel_ok_QToolButton"))
  
+    test.vp("VP_EXTRUSION")
+    
     clickButton(waitForObject(":Extrusion.ExtrusionFuse_AppElements_Button"))
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), 290, 316, 0, Qt.LeftButton)
+
+    clickButton(waitForObject(":OpenParts*.Fit all_QToolButton"))
+    test.vp("VP_EXTRUSIONFUSE")
 
     mouseClick(waitForObject(":Sketch.Basic_AppElements_MenuGroupPanel"), 143, 56, 0, Qt.LeftButton)
     clickButton(waitForObject(":Basic.Circle_AppElements_Button"))

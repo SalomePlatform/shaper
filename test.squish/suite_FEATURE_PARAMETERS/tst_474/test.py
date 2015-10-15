@@ -1,3 +1,5 @@
+#[tested functionality] 1. Add parameter 2. Calculate parameter 3. Delete parameter
+
 def main():
     source(findFile("scripts", "common.py"))
     
