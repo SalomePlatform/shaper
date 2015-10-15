@@ -4,7 +4,10 @@ from TestSketcher import SketcherTestCase
 
 class SketcherAddLineTestCase(SketcherTestCase):    
     def runTest(self):
-        self.sketch.addLine(0, 0, 0, 1)
+        line = self.sketch.addLine(0, 0, 0, 1)
+        self.assertEqual(line.startPointData().x(), line.endPointData().x())        
+        self.assertNotEqual(line.startPointData().y(), line.endPointData().y())
+        
     
 if __name__ == "__main__":
     unittest.main()

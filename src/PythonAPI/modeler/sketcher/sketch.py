@@ -6,15 +6,16 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 from ModelAPI    import *
 from GeomDataAPI import *
 from GeomAlgoAPI import *
-from modeler.sketcher.point import Point
-from modeler.sketcher.line import Line
+import modeler.sketcher.point as sk_point
+import modeler.sketcher.line as sk_line
 from modeler.sketcher.circle import Circle
 
 def addSketch(doc, plane):
-    """Add a Sketch feature to the Part or PartSet.
+    """Add a Sketch feature to the Part or PartSet and return an interface
+    on it.
     
-    A Sketch object is instanciated with the built feature
-    it provides an interface for manipulating the feature data.
+    A Sketch object is instanciated with a feature as input parameter
+    it provides an interface for manipulation of the feature data.
     :return: interface on the feature
     :rtype: Sketch object"""
     feature = featureToCompositeFeature( doc.addFeature("Sketch") )
@@ -29,8 +30,8 @@ class Sketch():
         - an existing face identified by its topological name.
         """
         self._feature = feature
-        self._selection = None       # Entities used for building the result shape
-        #   self.resultype ="Face"  # Type of Sketch result
+        self._selection = None     # Entities used for building the result shape
+        #   self.resultype ="Face" # Type of Sketch result
         if isinstance(plane, str):
             self.__sketchOnFace(plane)
         else:
@@ -58,14 +59,17 @@ class Sketch():
 
     def addPoint (self, *args):
         """Adds a point to this Sketch."""
-        return Point(self._feature, *args)
+        point_interface = sk_point.addPoint(self._feature, *args)
+        return point_interface
 
     def addLine (self, *args):
         """Adds a line to this Sketch."""
-        return Line(self._feature, *args)
+        line_interface = sk_line.addLine(self._feature, *args)
+        return line_interface
 
     def addPolyline (self, *coords):
         """Adds a poly-line to this Sketch.
+        
         The end of consecutive segments are defined as coincident.
         """
         c0 = coords[0]
@@ -76,7 +80,7 @@ class Sketch():
         # Adding and connecting next lines
         for c2 in coords[2:]:
             line_2 = self.addLine(c1, c2)
-            self.setCoincident( line_1.endPointData(), line_2.startPointData() )
+            self.setCoincident(line_1.endPointData(), line_2.startPointData())
             polyline.append(line_2)
             c1 = c2
             line_1 = line_2
@@ -169,12 +173,16 @@ class Sketch():
 # Getters
 
     def selectFace (self, *args):
-        """Selects the geometrical entities of this Sketch on which the result Face must be built.
-        When no entity is given, the face is based on all existing geometry of this Sketch.
+        """Select the geometrical entities of this Sketch on which 
+        the result Face must be built.
+        
+        When no entity is given, the face is based on all existing 
+        geometry of this Sketch.
         """
         #self.resultype ="Face"
         if   len(args) == 0:
-            self._selection = modelAPI_ResultConstruction( self._feature.firstResult() ).shape()
+            self._selection = modelAPI_ResultConstruction( 
+                self._feature.firstResult()).shape()
         elif len(args) == 1:
             self._selection = args[0].shape()
         else:
