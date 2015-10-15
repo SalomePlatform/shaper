@@ -100,6 +100,8 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+  // The value of vertical aligment is sometimes changed
+  myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

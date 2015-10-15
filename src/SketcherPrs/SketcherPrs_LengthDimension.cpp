@@ -55,11 +55,14 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   gp_Pnt aPnt1, aPnt2;
   if (!getPoints(aPnt1, aPnt2))
     return;
-  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
-  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
 
+  double aD = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
   SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
+  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+  // The value of vertical aligment is sometimes changed
+  myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
 
