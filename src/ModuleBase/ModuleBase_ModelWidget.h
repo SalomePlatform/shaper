@@ -35,8 +35,8 @@ Q_OBJECT
  public:
    /// State of the widget
    enum ValueState { Stored, /// modification is finished and applyed to the model
-                     Modified /// modification has not been finished and set to the model yet
-                   };
+                     Modified, /// modification has not been finished and set to the model yet
+                     Reset };
 
    /// Constructor
   /// \param theParent the parent object
@@ -49,9 +49,10 @@ Q_OBJECT
   {
   }
 
-  /// Fills the widget with default values
+  /// Fills the widget with default values. It calls the resetCustom method and change
+  /// the widget state to Reset if the reset is performed.
   /// \return true if the widget current value is reset
-  virtual bool reset() { return false; };
+  bool reset();
 
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theObject a model feature to be checked
@@ -226,6 +227,10 @@ protected:
 
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom() = 0;
+
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom() { return false; };
 
   /// The method called when widget is activated
   virtual void activateCustom() {};

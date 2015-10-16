@@ -50,9 +50,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
 
-  /// Fills the widget with default values
-  virtual bool reset();
-
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped widget values
@@ -112,6 +109,10 @@ protected:
   virtual bool storeValueCustom() const;
 
   virtual bool restoreValueCustom();
+
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom();
 
   /// The methiod called when widget is activated
   virtual void activateCustom();

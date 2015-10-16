@@ -102,7 +102,7 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 {
 }
 
-bool ModuleBase_WidgetDoubleValue::reset()
+bool ModuleBase_WidgetDoubleValue::resetCustom()
 {
   bool aDone = false;
   if (!isUseReset() || isComputedDefault() || mySpinBox->hasVariable()) {

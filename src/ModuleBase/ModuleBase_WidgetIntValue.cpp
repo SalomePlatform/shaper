@@ -100,7 +100,7 @@ ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()
 {
 }
 
-bool ModuleBase_WidgetIntValue::reset()
+bool ModuleBase_WidgetIntValue::resetCustom()
 {
   bool aDone = false;
   if (!isUseReset() || isComputedDefault()) {

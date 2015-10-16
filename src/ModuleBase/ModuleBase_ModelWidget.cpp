@@ -40,6 +40,15 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   connect(this, SIGNAL(valuesModified()), this, SLOT(onWidgetValuesModified()));
 }
 
+bool ModuleBase_ModelWidget::reset()
+{
+  bool aResult = resetCustom();
+  if (aResult)
+    setValueState(Reset);
+
+  return aResult;
+}
+
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 {
   return theObject->data()->attribute(attributeID())->isInitialized();

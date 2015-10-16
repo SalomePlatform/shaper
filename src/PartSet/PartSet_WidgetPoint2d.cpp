@@ -123,7 +123,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   setLayout(aLayout);
 }
 
-bool PartSet_WidgetPoint2D::reset()
+bool PartSet_WidgetPoint2D::resetCustom()
 {
   bool aDone = false;
   if (!isUseReset() || isComputedDefault() || myXSpin->hasVariable() || myYSpin->hasVariable()) {
