@@ -90,7 +90,7 @@ TESTCASES="${TESTCASES} --testcase tst_extrusion_001"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_003"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_004"
 #TESTCASES="${TESTCASES} --testcase tst_extrusion_006"
-squishrunner-run suite_FEATURE_EXTRUSION "${TESTCASES}"
+#squishrunner-run suite_FEATURE_EXTRUSION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_partition_001"

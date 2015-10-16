@@ -32,11 +32,11 @@ def main():
     mouseClick(waitForObjectItem(":_QMenu", "Extrusion"))
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 347, 228, 0, Qt.LeftButton)
 
-    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
-    type(waitForObject(":Extrusion.to_size_ModuleBase_ParamSpinBox"), 50)
+    type(waitForObject(getSpinBoxRealName("to_size")), "<Ctrl+A>")
+    type(waitForObject(getSpinBoxRealName("to_size")), 50)
 
-    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
-    type(waitForObject(":Extrusion.from_size_ModuleBase_ParamSpinBox"), 10)
+    type(waitForObject(getSpinBoxRealName("from_size")), "<Ctrl+A>")
+    type(waitForObject(getSpinBoxRealName("from_size")), 10)
     
     #[check] Check that preview is updated
     test.vp("VP3")

@@ -28,9 +28,13 @@ def main():
     activateItem(waitForObjectItem(":_QMenu", "Activate"))
     
     #[step] Fit all
+    test.vp("VP_AFTER_LOAD")
     fit_all()
+    test.vp("VP_FITALL")
     partition([(291, 188)], (178, 205))
+    test.vp("VP_PARTITION_1")
     partition([(275, 173), (255, 323)], (272, 94))
+    test.vp("VP_PARTITION_2")
     
     #[step] Hide one of parts obtained in the viewer: select it, call context menu - Hide
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 291, 198, 0, Qt.LeftButton)
@@ -38,7 +42,7 @@ def main():
     activateItem(waitForObjectItem(":_QtxMenu", "Hide"))
     
     #[check] Check that partition has been executed successfully
-    test.vp("VP1")
+    test.vp("VP_HIDE")
 
     # [step] Close application without saving
     close_application()

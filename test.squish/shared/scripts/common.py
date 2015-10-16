@@ -18,6 +18,14 @@ def findMenuItem(menuObject, item):
     return None
 
 #---------------------------------------------------------------------------------------------
+# Tools for Property Panel
+def getPropertyPanelRealName():
+    return "{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop'}"
+
+def getSpinBoxRealName(name):
+    return "{container=%s name='%s' type='ModuleBase_ParamSpinBox' visible='1'}" % (getPropertyPanelRealName(), name)
+
+#---------------------------------------------------------------------------------------------
 def set_defaults():
     waitForObject(":SALOME*_STD_TabDesktop").resize(1024, 768)
     
