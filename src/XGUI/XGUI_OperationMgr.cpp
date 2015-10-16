@@ -192,14 +192,10 @@ void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
     return;
-  //ModuleBase_Operation* anOperation = currentOperation();
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                           (currentOperation());
-  if(aFOperation && aFOperation->feature().get()) {
-    //bool aCanCommit = myWorkshop->module()->canCommitOperation();
-    //setApplyEnabled(!myIsValidationLock && aCanCommit && anOperation->isValid());
+  if(aFOperation && aFOperation->feature().get())
     setApplyEnabled(myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty());
-  }
 }
 
 void XGUI_OperationMgr::setLockValidating(bool toLock)

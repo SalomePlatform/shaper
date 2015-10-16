@@ -184,11 +184,6 @@ bool ModuleBase_IModule::canRedo() const
   return aMgr->hasModuleDocument() && aMgr->canRedo() && !aMgr->isOperation();
 }
 
-/*/bool ModuleBase_IModule::canCommitOperation() const
-{
-  return true;
-}*/
-
 void ModuleBase_IModule::onFeatureTriggered()
 {
   QAction* aCmd = dynamic_cast<QAction*>(sender());
