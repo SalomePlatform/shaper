@@ -12,7 +12,8 @@ def checkPartActivatedState(scenario):
                 "Constructions (4).YOZ",
                 "Constructions (4).XOZ",
                 "Constructions (4).XOY",
-                "Parts (1)"]
+                "Parts (1)",
+                "Parts (1).Part\\_1"]
     for element in allPartSetElements:
         test.compare(DISABLE_COLOR, waitForObjectItem(":Object browser_XGUI_DataTree", element).foregroundColor, "%s is disabled after: %s" % (element, scenario))
 
@@ -26,14 +27,6 @@ def checkPartActivatedState(scenario):
     
     #[step] Check that Part tree is unfolded
     test.compare(False, waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1").collapsed, "Part is unfolded after: %s" % scenario)
-
-#     #[step] Check that PartSet elements are folded
-#     partSetElements = [
-#                 "Parameters (0)", 
-#                 "Constructions (4)", 
-#                 "Parts (1)"]
-#     for element in partSetElements:
-#         test.compare(True, waitForObjectItem(":Object browser_XGUI_DataTree", element).collapsed, "%s is folded after: %s" % (element, scenario))
 
 def checkPartDeactivatedState(scenario):
     #[step] Check that Part id disabled and folded 
@@ -54,7 +47,8 @@ def checkPartDeactivatedState(scenario):
                 "Constructions (4).YOZ",
                 "Constructions (4).XOZ",
                 "Constructions (4).XOY",
-                "Parts (1)"]
+                "Parts (1)",
+                "Parts (1).Part\\_1"]
     for element in allPartSetElements:
         test.compare(ENABLE_COLOR, waitForObjectItem(":Object browser_XGUI_DataTree", element).foregroundColor, "%s is enabled after: %s" % (element, scenario))
 
