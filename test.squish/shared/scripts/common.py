@@ -9,6 +9,15 @@ g_points = {"XY_plane": (332, 250), "XZ_plane": (355, 207)} # one of the constru
 def help_points(name):
     return g_points[name] 
 
+#---------------------------------------------------------------------------------------------
+# Tools
+def findMenuItem(menuObject, item):
+    for child in object.children(menuObject):
+        if child.text == item:
+            return child    
+    return None
+
+#---------------------------------------------------------------------------------------------
 def set_defaults():
     waitForObject(":SALOME*_STD_TabDesktop").resize(1024, 768)
     

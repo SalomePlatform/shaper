@@ -52,12 +52,6 @@ def checkPartDeactivatedState(scenario):
     for element in allPartSetElements:
         test.compare(ENABLE_COLOR, waitForObjectItem(":Object browser_XGUI_DataTree", element).foregroundColor, "%s is enabled after: %s" % (element, scenario))
 
-def findMenuItem(menuObject, item):
-    for child in object.children(menuObject):
-        if child.text == item:
-            return child    
-    return None
-
 def main():
     source(findFile("scripts", "common.py"))
     
