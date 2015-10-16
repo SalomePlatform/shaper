@@ -257,6 +257,11 @@ protected slots:
   /// Register properties of this module
   virtual void registerProperties();
 
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param theWidget a property contol widget
+  /// \param isToConnect a boolean value whether connect or disconnect
+  virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
+
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();

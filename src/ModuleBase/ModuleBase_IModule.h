@@ -191,6 +191,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param theWidget a property contol widget
+  /// \param isToConnect a boolean value whether connect or disconnect
+  virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect) {};
+
 signals:
   /// Signal which is emitted when operation is launched
   void operationLaunched();

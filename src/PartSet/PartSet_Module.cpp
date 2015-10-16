@@ -246,6 +246,11 @@ void PartSet_Module::registerProperties()
                                    Config_Prop::Integer, SKETCH_WIDTH);
 }
 
+void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
+{
+  mySketchMgr->connectToPropertyPanel(theWidget, isToConnect);
+}
+
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
 {
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {

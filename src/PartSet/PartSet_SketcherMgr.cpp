@@ -265,13 +265,6 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   }
 }
 
-void PartSet_SketcherMgr::onValueStateChanged()
-{
-  ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-  if (anActiveWidget && anActiveWidget->getValueState() != ModuleBase_ModelWidget::Stored)
-    operationMgr()->onValidateOperation();
-}
-
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
   if (isNestedCreateOperation(getCurrentOperation()))
@@ -918,14 +911,12 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
-  connectToPropertyPanel(true);
   if (isNestedCreateOperation(theOperation) && myIsMouseOverWindow)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
 }
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
-  connectToPropertyPanel(false);
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
   if (isNestedCreateOperation(theOp))
@@ -1200,32 +1191,21 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   }
 }
 
-void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
+void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
 {
-  ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
-  if (aPropertyPanel) {
-    const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
-    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-      if (isToConnect) {
-        connect(aWidget, SIGNAL(beforeValuesChanged()),
+  if (isToConnect) {
+    connect(theWidget, SIGNAL(beforeValuesChanged()),
+            this, SLOT(onBeforeValuesChangedInPropertyPanel()));
+    connect(theWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+    connect(theWidget, SIGNAL(afterValuesChanged()),
+            this, SLOT(onAfterValuesChangedInPropertyPanel()));
+  }
+  else {
+    disconnect(theWidget, SIGNAL(beforeValuesChanged()),
                 this, SLOT(onBeforeValuesChangedInPropertyPanel()));
-        connect(aWidget, SIGNAL(valueStateChanged()),
-                this, SLOT(onValueStateChanged()));
-        connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
-        connect(aWidget, SIGNAL(afterValuesChanged()),
+    disconnect(theWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+    disconnect(theWidget, SIGNAL(afterValuesChanged()),
                 this, SLOT(onAfterValuesChangedInPropertyPanel()));
-      }
-      else {
-        disconnect(aWidget, SIGNAL(beforeValuesChanged()),
-                   this, SLOT(onBeforeValuesChangedInPropertyPanel()));
-        disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
-        disconnect(aWidget, SIGNAL(afterValuesChanged()),
-                   this, SLOT(onAfterValuesChangedInPropertyPanel()));
-      }
-    }
   }
 }
 

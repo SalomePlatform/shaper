@@ -191,6 +191,11 @@ public:
   /// \param theModes a list of modes
   static void sketchSelectionModes(QIntList& theModes);
 
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param theWidget a property contol widget
+  /// \param isToConnect a boolean value whether connect or disconnect
+  void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
@@ -205,9 +210,6 @@ private slots:
   /// Process the leave mouse of the view port. If the current operation is a create of
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
-
-  /// Validates the operation. Apply button is disabled if the widget value is in Modified state
-  void onValueStateChanged();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
   /// Listens to the signal about values are to be changed in the property panel
@@ -268,10 +270,6 @@ private:
                                   ModuleBase_IWorkshop* theWorkshop,
                                   const FeatureToSelectionMap& theSelection,
                                   SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
-
-  /// Connects or disconnects to the value changed signal of the property panel widgets
-  /// \param isToConnect a boolean value whether connect or disconnect
-  void connectToPropertyPanel(const bool isToConnect);
 
   /// Returns true if the created feature is visible
   /// \param 
