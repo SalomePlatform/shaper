@@ -61,6 +61,10 @@ TESTCASES="${TESTCASES} --testcase tst_679"
 squishrunner-run suite_ERROR_NOTIFICATION "${TESTCASES}"
 
 TESTCASES=""
+TESTCASES="${TESTCASES} --testcase tst_ACTIVE_DOC_MANAGEMENT"
+squishrunner-run suite_OBJECT_BROWSER "${TESTCASES}"
+
+TESTCASES=""
 TESTCASES="${TESTCASES} --testcase tst_474"
 TESTCASES="${TESTCASES} --testcase tst_576"
 TESTCASES="${TESTCASES} --testcase tst_903"
