@@ -63,11 +63,11 @@ squishrunner-run suite_ERROR_NOTIFICATION "${TESTCASES}"
 TESTCASES=""
 TESTCASES="${TESTCASES} --testcase tst_474"
 TESTCASES="${TESTCASES} --testcase tst_576"
+TESTCASES="${TESTCASES} --testcase tst_903"
 squishrunner-run suite_FEATURE_PARAMETERS "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_532"
-#TESTCASES="${TESTCASES} --testcase tst_903"
 #squishrunner-run suite_ISSUES_SALOME "${TESTCASES}"
 
 TESTCASES=""

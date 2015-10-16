@@ -1,3 +1,8 @@
+#[tested functionality] Add parameter
+#[tested functionality] Use wrong parameter name
+#[tested functionality] Error notification in header
+#[tested functionality] Error notification in widget
+
 def main():
     source(findFile("scripts", "common.py"))
     
