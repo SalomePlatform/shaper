@@ -118,11 +118,11 @@ void SketchPlugin_Arc::execute()
     std::shared_ptr<GeomAPI_Circ> aCirc(new GeomAPI_Circ(anAx2, aCenter->distance(aStartPoint)));
     double aParameterNew = 0.0;
     if(aCirc->parameter(aEndPoint, paramTolerance, aParameterNew)) {
-      if(0 < myParamBefore && myParamBefore <= PI / 2.0
-        && PI * 1.5 < aParameterNew && aParameterNew <= PI * 2.0) {
+      if(0 <= myParamBefore && myParamBefore <= PI / 2.0
+        && PI * 1.5 <= aParameterNew && aParameterNew <= PI * 2.0) {
           isInversed->setValue(true);
-      } else if(PI * 1.5 < myParamBefore && myParamBefore <= PI * 2.0
-        && 0 < aParameterNew && aParameterNew <= PI / 2.0) {
+      } else if(PI * 1.5 <= myParamBefore && myParamBefore <= PI * 2.0
+        && 0 <= aParameterNew && aParameterNew <= PI / 2.0) {
           isInversed->setValue(false);
       }
     }
