@@ -49,7 +49,16 @@ Q_OBJECT
   /// Validate current value
   virtual QValidator::State validate(QString&, int&) const;
 
-  virtual bool isEventProcessed(QKeyEvent* theEvent);
+  // Returns true if the current value is modified by has not been applyed yet
+  virtual bool isModified() const;
+
+  // Clears modified state
+  void clearModified();
+
+signals:
+  /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
+  void focusNextPrev();
+  void valueStored();
 
  protected slots:
    /// Called on text changed
@@ -62,6 +71,11 @@ Q_OBJECT
   QString removeTrailingZeroes(const QString&) const;
   virtual void keyPressEvent(QKeyEvent* theEvent);
 
+  /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
+  /// Emits a signal about focus change
+  /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
+  virtual bool focusNextPrevChild(bool theIsNext);
+
  private:
    /// Is clear flag
   bool myCleared;
@@ -70,8 +84,6 @@ Q_OBJECT
   int myPrecision;
   /// Boolean value whether the spin box content is modified
   bool myIsModified;
-
-  QKeyEvent* myProcessedEvent;
 };
 
 #endif

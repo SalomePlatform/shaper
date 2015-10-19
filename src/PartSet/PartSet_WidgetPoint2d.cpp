@@ -92,8 +92,11 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
 #ifdef APPLY_BY_ENTER_OR_TAB
     // Apply widget value change by enter/tab event.
-    connect(myXSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+    //connect(myXSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+    //connect(myXSpin, SIGNAL(focusNextPrev()), this, SLOT(onValuesChanged()));
+    connect(myXSpin, SIGNAL(valueStored()), this, SLOT(onValuesChanged()));
     connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+    connect(myXSpin, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
 #else
     connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
 #endif
@@ -111,8 +114,10 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
 #ifdef APPLY_BY_ENTER_OR_TAB
     // Apply widget value change by enter/tab event.
-    connect(myYSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+    //connect(myYSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
+    connect(myYSpin, SIGNAL(valueStored()), this, SLOT(onValuesChanged()));
     connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+    connect(myYSpin, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
 #else
     connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
 #endif
@@ -476,7 +481,18 @@ void PartSet_WidgetPoint2D::onValuesChanged()
   emit valuesChanged();
 }
 
-bool PartSet_WidgetPoint2D::isEventProcessed(QKeyEvent* theEvent)
+bool PartSet_WidgetPoint2D::processEnter()
 {
-  return myXSpin->isEventProcessed(theEvent) || myXSpin->isEventProcessed(theEvent);
+  bool isModified = myXSpin->isModified() || myYSpin->isModified();
+  if (isModified) {
+    bool isXModified = myXSpin->isModified();
+    emit valuesChanged();
+    myXSpin->clearModified();
+    myYSpin->clearModified();
+    if (isXModified)
+      myXSpin->selectAll();
+    else
+      myYSpin->selectAll();
+  }
+  return isModified;
 }

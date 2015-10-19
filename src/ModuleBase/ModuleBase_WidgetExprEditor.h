@@ -45,6 +45,12 @@ class ExpressionEditor: public QPlainTextEdit
   /// Returns placeholder list
   QString placeHolderText() const;
 
+  // Returns true if the current value is modified by has not been applyed yet
+  bool isModified() const;
+
+  // Clears modified state
+  void clearModified();
+
  public slots:
   /// Insert additional string for completion
   /// \param theCompletion a string to insert
@@ -53,6 +59,16 @@ class ExpressionEditor: public QPlainTextEdit
 
   /// Perform completion
   void performCompletion();
+
+  /// A slot for processing text changed event
+  void onTextChanged();
+
+signals:
+  void editingFinished();
+  void valueModified();
+  /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
+  void valueStored();
+  void focusNextPrev();
 
  protected:
   /// Perform completion by prefix
@@ -70,11 +86,19 @@ class ExpressionEditor: public QPlainTextEdit
   /// Redefinition of virtual method
   virtual void paintEvent( QPaintEvent* );
 
+  /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
+  /// Emits a signal about focus change
+  /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
+  virtual bool focusNextPrevChild(bool theIsNext);
+
  private:
   QStringListModel* myCompleterModel;
   QCompleter* myCompleter;
   bool myCompletedAndSelected;
   QString myPlaceHolderText;
+
+  /// Boolean value whether the spin box content is modified
+  bool myIsModified;
 };
 
 /**
@@ -99,8 +123,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 
- public slots:
-   /// A slot for processing text changed event
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
+protected slots:
+  /// A slot for processing text changed event
   void onTextChanged();
 
 protected:

@@ -38,7 +38,8 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
   // Reconnect to local slot
 #ifdef APPLY_BY_ENTER_OR_TAB
   // Apply widget value change by enter/tab event.
-  disconnect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  //disconnect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  disconnect(mySpinBox, SIGNAL(valueStored()), this, SIGNAL(valuesChanged()));
   connect(mySpinBox, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesModified()));
 #else
@@ -140,7 +141,13 @@ void PartSet_WidgetPoint2dDistance::onValuesChanged()
   emit valuesChanged();
 }
 
-bool PartSet_WidgetPoint2dDistance::isEventProcessed(QKeyEvent* theEvent)
+bool PartSet_WidgetPoint2dDistance::processEnter()
 {
-  return mySpinBox->isEventProcessed(theEvent);
+  bool isModified = mySpinBox->isModified();
+  if (isModified) {
+    emit valuesChanged();
+    mySpinBox->clearModified();
+    mySpinBox->selectAll();
+  }
+  return isModified;
 }

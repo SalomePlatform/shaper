@@ -90,8 +90,10 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   aControlLay->addRow(myLabel, mySpinBox);
 #ifdef APPLY_BY_ENTER_OR_TAB
   // Apply widget value change by enter/tab event.
-  connect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  //connect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueStored()), this, SIGNAL(valuesChanged()));
   connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+  connect(mySpinBox, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
 
 #else
   connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesChanged()));
@@ -160,7 +162,13 @@ QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
   return aList;
 }
 
-bool ModuleBase_WidgetDoubleValue::isEventProcessed(QKeyEvent* theEvent)
+bool ModuleBase_WidgetDoubleValue::processEnter()
 {
-  return mySpinBox->isEventProcessed(theEvent);
+  bool isModified = mySpinBox->isModified();
+  if (isModified) {
+    emit valuesChanged();
+    mySpinBox->clearModified();
+    mySpinBox->selectAll();
+  }
+  return isModified;
 }

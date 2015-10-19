@@ -136,6 +136,28 @@ void ModuleBase_ModelWidget::activate()
   activateCustom();
 }
 
+QWidget* ModuleBase_ModelWidget::getControlAcceptingFocus(const bool isFirst)
+{
+  QWidget* aControl = 0;
+
+  QList<QWidget*> aControls = getControls();
+  int aSize = aControls.size();
+
+  if (isFirst) {
+    for (int i = 0; i < aSize && !aControl; i++)  {
+      if (aControls[i]->focusPolicy() != Qt::NoFocus)
+        aControl = aControls[i];
+    }
+  }
+  else {
+    for (int i = aSize - 1; i >= 0 && !aControl; i--)  {
+      if (aControls[i]->focusPolicy() != Qt::NoFocus)
+        aControl = aControls[i];
+    }
+  }
+  return aControl;
+}
+
 void ModuleBase_ModelWidget::setDefaultValue(const std::string& theValue)
 {
   myDefaultValue = theValue;
@@ -198,7 +220,7 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
   //blockUpdateViewer(false);
 }
 
-bool ModuleBase_ModelWidget::isEventProcessed(QKeyEvent* theEvent)
+bool ModuleBase_ModelWidget::processEnter()
 {
   return false;
 }

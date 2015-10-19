@@ -42,7 +42,7 @@ Q_OBJECT
   virtual QList<QWidget*> getControls() const;
 
   /// Returns true if the event is processed.
-  virtual bool isEventProcessed(QKeyEvent* theEvent);
+  virtual bool processEnter();
 
  public slots:
  // Delayed value chnged: when user starts typing something,

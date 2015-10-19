@@ -120,6 +120,11 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;
 
+  /// Returns the first or the last control that can accept the focus
+  /// \param isFirst if true, the first controls is returned or the last one
+  /// \return a control from a list of controls
+  QWidget* getControlAcceptingFocus(const bool isFirst);
+
   /// FocusIn events processing
   virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
 
@@ -162,7 +167,7 @@ Q_OBJECT
   bool isEditingMode() const { return myIsEditing; }
 
   /// Returns true if the event is processed.
-  virtual bool isEventProcessed(QKeyEvent* theEvent);
+  virtual bool processEnter();
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object
@@ -201,6 +206,9 @@ signals:
 
   /// The signal about value state modification
   void valueStateChanged();
+
+  void focusNextPrev();
+  void valueStored();
 
 protected:
   /// Sets default value of widget. Normally, widget should fetch this value

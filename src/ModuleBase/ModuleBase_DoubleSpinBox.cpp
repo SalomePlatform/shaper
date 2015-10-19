@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QDoubleValidator>
 #include <QVariant>
+#include <QKeyEvent>
 
 #include <limits>
 
@@ -78,7 +79,7 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
           SLOT(onTextChanged( const QString& )));
 
   connect(this, SIGNAL(valueChanged(const QString&)), this, SLOT(onValueChanged(const QString&)));
-  connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+  //connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 }
 
 /*!
@@ -200,29 +201,28 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
   return res;
 }
 
-#include <QKeyEvent>
 void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
 {
-  myProcessedEvent = 0;
-
-  bool anIsModified = myIsModified;
-  QDoubleSpinBox::keyPressEvent(theEvent);
-
   switch (theEvent->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return: {
-      if (anIsModified)
-        myProcessedEvent = theEvent;
-      /*qDebug("ModuleBase_DoubleSpinBox::keyPressEvent");
-      if (anIsModified) // we should not perform this event outside
-        theEvent->setAccepted(true);
-      else
-        theEvent->setAccepted(false);*/
+      // do not react to the Enter key, the property panel processes it
+      return;
     }
     break;
     default:
       break;
   }
+  QDoubleSpinBox::keyPressEvent(theEvent);
+}
+
+bool ModuleBase_DoubleSpinBox::focusNextPrevChild(bool theIsNext)
+{
+  myIsModified = false;
+
+  emit valueStored();
+  emit focusNextPrev();
+  return QDoubleSpinBox::focusNextPrevChild(theIsNext);
 }
 
 /*!
@@ -345,10 +345,15 @@ void ModuleBase_DoubleSpinBox::onValueChanged(const QString& theValue)
 
 void ModuleBase_DoubleSpinBox::onEditingFinished()
 {
-  myIsModified = false;
+  //myIsModified = false;
 }
 
-bool ModuleBase_DoubleSpinBox::isEventProcessed(QKeyEvent* theEvent)
+bool ModuleBase_DoubleSpinBox::isModified() const
 {
-  return myProcessedEvent && myProcessedEvent == theEvent;
+  return myIsModified;
+}
+
+void ModuleBase_DoubleSpinBox::clearModified()
+{
+  myIsModified = false;
 }

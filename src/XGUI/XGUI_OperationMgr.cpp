@@ -9,6 +9,8 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_ErrorMgr.h"
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
@@ -494,10 +496,10 @@ void XGUI_OperationMgr::onOperationStopped()
   }
 }
 
-#include <ModuleBase_IPropertyPanel.h>
-#include <ModuleBase_ModelWidget.h>
 bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
+  qDebug("XGUI_OperationMgr::onKeyReleased");
+
   QObject* aSender = sender();
 
   // Let the manager decide what to do with the given key combination.
@@ -506,10 +508,11 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
+      qDebug("XGUI_OperationMgr::onKeyReleased: Key_Return");
       ModuleBase_Operation* aOperation = currentOperation();
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
       ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-      if (!aActiveWgt || !aActiveWgt->isEventProcessed(theEvent)) {
+      if (!aActiveWgt || !aActiveWgt->processEnter()) {
         ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
         if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
           emit keyEnterReleased();
