@@ -33,13 +33,13 @@ class Line():
         self._feature.data().selection("External").selectSubShape("EDGE", name)
         self._feature.execute()
         rigid = sketch.addFeature("SketchConstraintRigid")
-        rigid.refattr("ConstraintEntityA").setObject( self._feature.firstResult() )
+        rigid.refattr("ConstraintEntityA").setObject(self._feature.firstResult())
 
-    def startPointData (self):
+    def startPointData(self):
         return self._start_point
 
-    def endPointData (self):
+    def endPointData(self):
         return self._end_point
 
-    def result (self):
+    def result(self):
         return self._feature.firstResult()
