@@ -14,3 +14,7 @@ from extrusion import Extrusion       as addExtrusion
 from boolean   import Addition        as addAddition
 from boolean   import Subtraction     as addSubtraction
 from boolean   import Intersection    as addIntersection
+
+# Custom exceptions
+
+from errors import WrongNumberOfArguments

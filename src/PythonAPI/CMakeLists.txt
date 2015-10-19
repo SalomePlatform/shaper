@@ -10,7 +10,9 @@ INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
   TestModeler.py
+  TestSketcherAddPoint.py
   TestSketcherAddLine.py
+  TestSketcherAddArc.py
   TestSketcherAddCircle.py
   TestSketcherSetCoincident.py
   TestSketcherSetParallel.py

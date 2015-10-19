@@ -9,6 +9,7 @@ from GeomAlgoAPI import *
 from modeler.sketcher.point import Point
 from modeler.sketcher.line import Line
 from modeler.sketcher.circle import Circle
+from modeler.sketcher.arc import Arc
 
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface
@@ -71,6 +72,11 @@ class Sketch():
         """Add a circle to this Sketch."""
         circle_feature = self._feature.addFeature("SketchCircle")
         return Circle(circle_feature, *args)
+    
+    def addArc (self, *args):
+        """Add an arc to this Sketch."""
+        arc_feature = self._feature.addFeature("SketchArc")
+        return Arc(arc_feature, *args)
 
     def addPolyline (self, *coords):
         """Adds a poly-line to this Sketch.
