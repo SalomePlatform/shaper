@@ -73,6 +73,11 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
 }
 
 //*************************************************************************************
+/// Find an attribute of the given object which corresponds to a vetrex 
+/// defined by a shape
+/// \param theObject an object
+/// \param theShape a vertex
+/// \param thePlane a projection plane (sketcher plane)
 std::shared_ptr<GeomDataAPI_Point2D> findGeomPoint(ObjectPtr theObject, 
                                     const TopoDS_Shape& theShape, 
                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
@@ -129,10 +134,12 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
       ObjectPtr anObject = anAttr->object();
       aFeature = ModelAPI_Feature::feature(anObject);
       if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID()) {
+        // Attribute refers to a point
         aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                      aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
       }
       else {
+        // if the attribute refers on another object
         ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
         if (aRes.get()) {
           GeomShapePtr aShape = aRes->shape();
@@ -144,6 +151,7 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
       }
     }
     else if (anAttr->attr()) {
+      // If attribute is a point
       aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
     }
   }
@@ -231,13 +239,13 @@ std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstrain
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
   std::shared_ptr<GeomAPI_Pnt2d> aCenter;
-  if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+  if (aFeature->getKind() == SketchPlugin_Arc::ID()) { // arc
     aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
-  } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
+  } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
     aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->pnt();
-  } else
+  } else 
     return std::shared_ptr<GeomAPI_Pnt>();
 
   std::shared_ptr<GeomAPI_Pnt2d> anOrigin(new GeomAPI_Pnt2d(0.0, 0.0));

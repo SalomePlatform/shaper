@@ -41,6 +41,7 @@ SketcherPrs_Rigid::SketcherPrs_Rigid(ModelAPI_Feature* theConstraint,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
+  // Set default points array
   myPntArray = new Graphic3d_ArrayOfPoints(1);
   myPntArray->AddVertex(0., 0., 0.);
 }  
@@ -52,6 +53,7 @@ bool SketcherPrs_Rigid::updatePoints(double theStep) const
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
   AttributePtr aRefAttr = anAttr->attr();
   if (anAttr->isObject()) {
+    // The constraint attached to an object
     ObjectPtr aObj = anAttr->object();
     if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
       return false;
@@ -60,6 +62,7 @@ bool SketcherPrs_Rigid::updatePoints(double theStep) const
     gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(1, aP1);
   } else {
+    // The constraint attached to a point
     std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_A());
     if (aPnt.get() == NULL)
       return false;
@@ -76,14 +79,17 @@ void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quan
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
   std::shared_ptr<GeomAPI_Shape> aShape;
   if (aFeature.get()) {
+    // If constraint attached to a feature
     const std::list<ResultPtr>& aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
+    // Find a shape
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
       aShape = (*aIt)->shape();
       if (aShape->isEdge())
         break;
     }
   } else {
+    // Else it is a result
     aShape = SketcherPrs_Tools::getShape(aObj);
   }
   if (aShape.get() == NULL)

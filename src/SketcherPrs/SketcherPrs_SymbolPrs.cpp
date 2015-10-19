@@ -257,6 +257,7 @@ SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
 SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
 {
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+  // Empty memory in position manager
   aMgr->deleteConstraint(this);
 }
 
@@ -269,6 +270,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   if (myIconsMap.count(iconName()) == 1) {
     return myIconsMap[iconName()];
   }
+  // Load icon for the presentation
   char* aEnv = getenv("NEWGEOM_ROOT_DIR");
   if (aEnv != NULL) {
     TCollection_AsciiString aFile(aEnv);
@@ -282,6 +284,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
       return aPixMap;
     }
   }
+  // The icon for constraint is not found
   static const char aMsg[] = "Error! constraint images are not found";
   cout<<aMsg<<endl;
   Events_Error::send(aMsg);
@@ -291,6 +294,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
 
 void SketcherPrs_SymbolPrs::prepareAspect()
 {
+  // Create an aspect with the icon
   if (myAspect.IsNull()) {
     Handle(Image_AlienPixMap) aIcon = icon();
     if (aIcon.IsNull()) 
@@ -311,6 +315,7 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, std
   std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
   std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
 
+  // Draw line by two points
   Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments(2, 1);
   aLines->AddVertex(aPnt1->impl<gp_Pnt>());
   aLines->AddVertex(aPnt2->impl<gp_Pnt>());
@@ -348,6 +353,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  // Create an icon
   prepareAspect();
 
   Handle(AIS_InteractiveContext) aCtx = GetContext();
@@ -357,6 +363,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
     aDriver->UserDrawCallback() = SymbolPrsCallBack;
   }
 
+  // Update points with default shift value
   if (!updatePoints(20)) {
     return;
   }
@@ -366,6 +373,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
     myOwner = new SelectMgr_EntityOwner(this);
   }
 
+  // Create sensitive point for each symbol
   mySPoints.Clear();
   for (int i = 1; i <= aNbVertex; i++) {
     Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, i);
@@ -375,6 +383,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePresentation);
   aGroup->SetPrimitivesAspect(myAspect);
 
+  // Recompute boundary box of the group
   Graphic3d_BndBox4f& aBnd = aGroup->ChangeBoundingBox();
   gp_Pnt aVert;
   aBnd.Clear();
@@ -383,6 +392,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
     aBnd.Add (Graphic3d_Vec4((float)aVert.X(), (float)aVert.Y(), (float)aVert.Z(), 1.0f));
   }
 
+  // Pint the group with custom procedure (see Render)
   aGroup->UserDraw(this, true);
 
   // Disable frustum culling for this object by marking it as mutable
@@ -415,6 +425,7 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   Handle(OpenGl_View) aView = theWorkspace->ActiveView();
   
   double aScale = aView->Camera()->Scale();
+  // Update points coordinate taking the viewer scale into account
   if (!updatePoints(MyDist * aScale))
     return;
 
@@ -424,6 +435,7 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
     myVboAttribs = new SketcherPrs_VertexBuffer(*aAttribs);
   }
 
+  // Update drawing attributes
   if (!myVboAttribs->init(aCtx, 0, aAttribs->NbElements, aAttribs->Data(), GL_NONE, aAttribs->Stride)) {
     myVboAttribs->Release (aCtx.operator->());
     myVboAttribs.Nullify();
@@ -445,6 +457,7 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
     if (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT)
       aLineColor = theWorkspace->HighlightColor;
 
+    // Set lighting of the symbol
     if (toHilight)
       aCtx->core11fwd->glDisable (GL_LIGHTING);
     else
@@ -483,6 +496,7 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
 
 void SketcherPrs_SymbolPrs::Release (OpenGl_Context* theContext)
 {
+  // Release OpenGl resources
   if (!myVboAttribs.IsNull()) {
     if (theContext) {
       theContext->DelayedRelease (myVboAttribs);
@@ -495,16 +509,20 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
                                       const Handle(Prs3d_Presentation)& thePrs) const
 {
   if (theShape->isEdge()) {
+    // The shape is edge
     std::shared_ptr<GeomAPI_Curve> aCurve = 
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(theShape));
     if (aCurve->isLine()) {
+      // The shape is line
       GeomAdaptor_Curve aCurv(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
       StdPrs_Curve::Add(thePrs, aCurv, myDrawer);
     } else {
+      // The shape is circle or arc
       GeomAdaptor_Curve aAdaptor(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
       StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
     }
   } else if (theShape->isVertex()) {
+    // draw vertex
     std::shared_ptr<GeomAPI_Vertex> aVertex = 
       std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(theShape));
     std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
@@ -532,8 +550,7 @@ void SketcherPrs_SymbolPrs::drawListOfShapes(const std::shared_ptr<ModelAPI_Attr
 void SketcherPrs_SymbolPrs::BoundingBox (Bnd_Box& theBndBox)
 {
   Select3D_BndBox3d aTmpBox;
-  for (Select3D_EntitySequenceIter aPntIter (mySPoints); aPntIter.More(); aPntIter.Next())
-  {
+  for (Select3D_EntitySequenceIter aPntIter (mySPoints); aPntIter.More(); aPntIter.Next()) {
     const Handle(Select3D_SensitiveEntity)& anEnt = aPntIter.Value();
     aTmpBox.Combine (anEnt->BoundingBox());
   }

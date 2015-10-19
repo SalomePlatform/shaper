@@ -43,6 +43,7 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  // Get point of the presentation
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, 
                                                                     SketchPlugin_Constraint::ENTITY_A());
   if (aPnt.get() == NULL)
@@ -57,6 +58,9 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   if (aPtA.IsNull()) {
     aPtA = new Graphic3d_AspectMarker3d ();
   }
+  // Create the presentation as a combination of standard point markers
+
+  // The external yellow contour
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2.);
   aPtA->SetColor(Quantity_NOC_YELLOW);
@@ -67,12 +71,14 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   aPntArray->AddVertex (aPoint->x(), aPoint->y(), aPoint->z());
   aGroup->AddPrimitiveArray (aPntArray);
 
+  // Make a black mid ring
   aPtA->SetType(Aspect_TOM_RING1);
   aPtA->SetScale(1.);
   aPtA->SetColor(Quantity_NOC_BLACK);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
+  // Make an internal ring
   aPtA->SetType(Aspect_TOM_POINT);
   aPtA->SetScale(5.);
   aGroup->SetPrimitivesAspect(aPtA);
@@ -83,11 +89,7 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
 void SketcherPrs_Coincident::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
-//  if ((aMode == 0) || (aMode == SketcherPrs_Tools::Sel_Constraint)) {
-//    Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this, 10);
-//    Handle(Select3D_SensitivePoint) aSp = new Select3D_SensitivePoint(aOwn, myPoint);
-//    aSelection->Add(aSp);
-//  }
+  // There is no selection of coincident - a point is selected instead of coincidence
 }
 
 void SketcherPrs_Coincident::SetColor(const Quantity_NameOfColor aCol)

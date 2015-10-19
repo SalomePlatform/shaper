@@ -24,6 +24,7 @@ SketcherPrs_Perpendicular::SketcherPrs_Perpendicular(ModelAPI_Feature* theConstr
                                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
+  // Create default array
   myPntArray = new Graphic3d_ArrayOfPoints(2);
   myPntArray->AddVertex(0., 0., 0.);
   myPntArray->AddVertex(0., 0., 0.);
@@ -39,6 +40,7 @@ bool SketcherPrs_Perpendicular::updatePoints(double theStep) const
   if (SketcherPrs_Tools::getShape(aObj2).get() == NULL)
     return false;
 
+  // Compute position of symbols
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
   gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
@@ -55,6 +57,7 @@ void SketcherPrs_Perpendicular::drawLines(const Handle(Prs3d_Presentation)& theP
   Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
+  // Draw constrained lines
   addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
   addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
 }

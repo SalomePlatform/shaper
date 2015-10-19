@@ -38,6 +38,7 @@ SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theCons
 bool SketcherPrs_Transformation::updatePoints(double theStep) const 
 {
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  // Get transformated objects list
   std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return false;
@@ -58,6 +59,7 @@ bool SketcherPrs_Transformation::updatePoints(double theStep) const
   int i;
   ObjectPtr aObj;
   gp_Pnt aP1;
+  // Compute points of symbols
   for (i = 0; i < aNbB; i++) {
     aObj = anAttrB->object(i);
     aP1 = aMgr->getPosition(aObj, this, theStep);
@@ -85,24 +87,29 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
 
   drawListOfShapes(anAttrB, thePrs);
   if (myConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
+    // If it is translation
     std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID()));
     std::shared_ptr<GeomDataAPI_Point2D> aEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID()));
   
     if (aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized()) {
+      // Add start point
       std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aStart->x(), aStart->y());
       Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
       StdPrs_Point::Add(thePrs, aPoint, myDrawer);
 
+      // Add end point
       aPnt = myPlane->to3D(aEnd->x(), aEnd->y());
       aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
       StdPrs_Point::Add(thePrs, aPoint, myDrawer);
     }
   } else if (myConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
+    // if it is rotation
     std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aData->attribute(SketchPlugin_MultiRotation::CENTER_ID()));
     if (aCenter.get() && aCenter->isInitialized()) {
+      // Show center of rotation
       std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aCenter->x(), aCenter->y());
       Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
       StdPrs_Point::Add(thePrs, aPoint, myDrawer);
