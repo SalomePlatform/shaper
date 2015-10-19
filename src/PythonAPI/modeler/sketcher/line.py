@@ -1,11 +1,6 @@
 from GeomDataAPI import geomDataAPI_Point2D
 
-def addLine(sketch, *args):
-    sketch_feature = sketch.addFeature("SketchLine")
-    return LineInterface(sketch_feature, *args)
-    
-    
-class LineInterface():
+class Line():
     """Interface for editing of a sketch line feature."""
     def __init__(self, line_feature, *args):
         self._feature = line_feature

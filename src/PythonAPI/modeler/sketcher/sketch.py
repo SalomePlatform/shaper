@@ -6,9 +6,9 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 from ModelAPI    import *
 from GeomDataAPI import *
 from GeomAlgoAPI import *
-import modeler.sketcher.point as sk_point
-import modeler.sketcher.line as sk_line
-import modeler.sketcher.circle as sk_circle
+from modeler.sketcher.point import Point
+from modeler.sketcher.line import Line
+from modeler.sketcher.circle import Circle
 
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface
@@ -18,7 +18,7 @@ def addSketch(doc, plane):
     it provides an interface for manipulation of the feature data.
     :return: interface on the feature
     :rtype: Sketch object"""
-    feature = featureToCompositeFeature( doc.addFeature("Sketch") )
+    feature = featureToCompositeFeature(doc.addFeature("Sketch"))
     return Sketch(feature, plane)
 
 class Sketch():
@@ -58,14 +58,19 @@ class Sketch():
 # Creation of Geometries
 
     def addPoint (self, *args):
-        """Adds a point to this Sketch."""
-        point_interface = sk_point.addPoint(self._feature, *args)
-        return point_interface
+        """Add a point to this Sketch."""
+        point_feature = self._feature.addFeature("SketchPoint")
+        return Point(point_feature, *args)
 
     def addLine (self, *args):
-        """Adds a line to this Sketch."""
-        line_interface = sk_line.addLine(self._feature, *args)
-        return line_interface
+        """Add a line to this Sketch."""
+        line_feature = self._feature.addFeature("SketchLine")
+        return Line(line_feature, *args)
+    
+    def addCircle (self, *args):
+        """Add a circle to this Sketch."""
+        circle_feature = self._feature.addFeature("SketchCircle")
+        return Circle(circle_feature, *args)
 
     def addPolyline (self, *coords):
         """Adds a poly-line to this Sketch.
@@ -88,22 +93,22 @@ class Sketch():
 
     def addPolygon (self, *coords):
         """Add a polygon to this Sketch.
+        
         The end of consecutive segments are defined as coincident.
         """
         pg = self.addPolyline(*coords)
         # Closing the poly-line supposed being defined by at least 3 points
         c0 = coords[0]
-        cn = coords[len(coords)-1]
+        cn = coords[len(coords) - 1]
         ln = self.addLine(cn, c0)
-        self.setCoincident( pg[len(coords)-2].endPointData(), ln.startPointData() )
-        self.setCoincident( ln.endPointData(), pg[0].startPointData() )
+        self.setCoincident(
+            pg[len(coords) - 2].endPointData(), ln.startPointData()
+            )
+        self.setCoincident(
+            ln.endPointData(), pg[0].startPointData()
+            )
         pg.append(ln)
         return pg
-
-    def addCircle (self, *args):
-        """Adds a circle to this Sketch."""
-        circle_interface = sk_circle.addCircle(self._feature, *args)
-        return circle_interface
 
 
     # Creation of Geometrical and Dimensional Constraints

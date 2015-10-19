@@ -2,17 +2,7 @@
 
 from GeomDataAPI import geomDataAPI_Point2D
 
-def addPoint(sketch, x, y):
-    """Add a sketch point feature to the sketch.
-    
-    :return: Interface object on this feature
-    :rtype: sketcher.Point
-    """
-    sketch_point_feature = sketch.addFeature("SketchPoint")
-    return PointInterface(sketch_feature, x, y)
-
-
-class PointInterface():
+class Point():
     """Interface on point feature for data manipulation."""
     def __init__(self, point_feature, x, y):
         self._point_feature = point_feature

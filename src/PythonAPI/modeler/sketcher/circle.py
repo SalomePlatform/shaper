@@ -2,11 +2,7 @@
 
 from GeomDataAPI import geomDataAPI_Point2D
 
-def addCircle(sketch, x, y, r):
-    feature = sketch.addFeature("SketchCircle")
-    return CircleInterface(feature, x, y, r)
-
-class CircleInterface():
+class Circle():
     def __init__(self, circle_feature, x, y, r):
         self._feature = circle_feature
         self._center = geomDataAPI_Point2D(
