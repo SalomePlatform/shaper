@@ -8,7 +8,7 @@ from GeomDataAPI import *
 from GeomAlgoAPI import *
 import modeler.sketcher.point as sk_point
 import modeler.sketcher.line as sk_line
-from modeler.sketcher.circle import Circle
+import modeler.sketcher.circle as sk_circle
 
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface
@@ -102,7 +102,8 @@ class Sketch():
 
     def addCircle (self, *args):
         """Adds a circle to this Sketch."""
-        return Circle(self._feature, *args)
+        circle_interface = sk_circle.addCircle(self._feature, *args)
+        return circle_interface
 
 
     # Creation of Geometrical and Dimensional Constraints
