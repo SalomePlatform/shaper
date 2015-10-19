@@ -285,12 +285,33 @@ bool Model_ResultPart::updateInPart(const int theIndex)
   return false; // something is wrong
 }
 
-std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(const std::string& theName)
+std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
+  const std::string& theName, const std::string& theType, int& theIndex)
 {
-  /// TODO: not implemented yet
-  return std::shared_ptr<GeomAPI_Shape>();
+  theIndex = 0; // not found yet
+  std::shared_ptr<GeomAPI_Shape> aResult;
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
+  if (!aDoc.get()) // the part document is not presented for the moment
+    return aResult;
+
+  AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+  aSelAttr->append(theName, theType);
+  theIndex = aSelAttr->size();
+  aResult = aSelAttr->value(theIndex - 1)->value();
+  return aResult;
 }
 
+std::shared_ptr<GeomAPI_Shape> Model_ResultPart::selectionValue(const int theIndex)
+{
+  std::shared_ptr<GeomAPI_Shape> aResult;
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
+  if (!aDoc.get()) // the part document is not presented for the moment
+    return aResult;
+
+  AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+  aResult = aSelAttr->value(theIndex - 1)->value();
+  return aResult;
+}
 
 void Model_ResultPart::colorConfigInfo(std::string& theSection, std::string& theName,
   std::string& theDefault)

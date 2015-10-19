@@ -445,11 +445,37 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
     const std::string& theGroupID, const std::string& theName)
 {
   createHistory(theGroupID);
-  std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
-  std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
-  for(; anObjIter != allObjs.end(); anObjIter++) {
-    if ((*anObjIter)->data()->name() == theName)
-      return *anObjIter;
+  if (theGroupID == ModelAPI_Feature::group()) { // searching among features (in history or not)
+    std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
+    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
+    for(; anObjIter != allObjs.end(); anObjIter++) {
+      if ((*anObjIter)->data()->name() == theName)
+        return *anObjIter;
+    }
+  } else { // searching among results (concealed or not)
+    std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
+    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
+    for(; anObjIter != allObjs.end(); anObjIter++) {
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = (*anObjIter)->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
+      for (; aRIter != aResults.cend(); aRIter++) {
+        if (aRIter->get() && (*aRIter)->groupName() == theGroupID) {
+          if ((*aRIter)->data()->name() == theName)
+            return *aRIter;
+          ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
+          if (aCompRes.get()) {
+            int aNumSubs = aCompRes->numberOfSubs();
+            for(int a = 0; a < aNumSubs; a++) {
+              ResultPtr aSub = aCompRes->subResult(a);
+              if (aSub.get() && aSub->groupName() == theGroupID) {
+                if (aSub->data()->name() == theName)
+                  return aSub;
+              }
+            }
+          }
+        }
+      }
+    }
   }
   // not found
   return ObjectPtr();

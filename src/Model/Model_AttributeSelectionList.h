@@ -36,8 +36,8 @@ public:
     const bool theTemporarily = false);
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape
-  /// The type of shape is taken from the current selection type
-  MODEL_EXPORT virtual void append(std::string theNamingName);
+  /// The type of shape is taken from the current selection type if the given is empty
+  MODEL_EXPORT virtual void append(const std::string theNamingName, const std::string& theType="");
 
   /// Removes the last element in the list
   MODEL_EXPORT virtual void removeLast();

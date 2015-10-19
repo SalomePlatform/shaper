@@ -29,8 +29,8 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
                       const bool theTemporarily = false) = 0;
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape
-  /// The type of shape is taken from the current selection type
-  virtual void append(std::string theNamingName) = 0;
+  /// The type of shape is taken from the current selection type if the given is empty
+  virtual void append(const std::string theNamingName, const std::string& theType = "") = 0;
 
   /// Removes the last element in the list
   virtual void removeLast() = 0;

@@ -124,4 +124,5 @@ INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION swig)
 
 ADD_UNIT_TESTS(TestConstants.py
                TestUndoRedo.py
-               TestDocument.py)
+               TestDocument.py
+               Test1064.py)
