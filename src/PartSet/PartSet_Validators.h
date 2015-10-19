@@ -17,6 +17,7 @@
  * Selector validators
  */
 
+
 //! \ingroup Validators
 //! A class to validate a selection for Distance constraint operation
 class PartSet_DistanceSelection : public ModuleBase_SelectionValidator
@@ -101,6 +102,14 @@ public:
 //! \ingroup Validators
 //! A class to validate a selection for Angle constraints operation
 class PartSet_AngleSelection : public ModuleBase_SelectionValidator
+{
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
+};
+
+//! \ingroup Validators
+//! A class to validate a selection for Equal constraints operation
+class PartSet_EqualSelection : public ModuleBase_SelectionValidator
 {
 public:
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;

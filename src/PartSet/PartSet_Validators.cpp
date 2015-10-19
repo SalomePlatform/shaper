@@ -89,18 +89,24 @@ std::shared_ptr<GeomAPI_Pln> sketcherPlane(ModuleBase_Operation* theOperation)
   return aEmptyPln; 
 }
 
+
+bool isEmptySelectionValid(ModuleBase_Operation* theOperation)
+{
+  ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFeatureOp->isEditOperation()) {
+    return true;
+  }
+  std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+  if (aPlane.get())
+    return true;
+  else 
+    return false;
+}
+
 bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
     return (aCount > 0) && (aCount < 3);
@@ -110,15 +116,7 @@ bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelectio
 bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbLines(theSelection);
     return (aCount == 1);
@@ -128,15 +126,7 @@ bool PartSet_LengthSelection::isValid(const ModuleBase_ISelection* theSelection,
 bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbLines(theSelection);
     return (aCount > 0) && (aCount < 3);
@@ -146,15 +136,7 @@ bool PartSet_PerpendicularSelection::isValid(const ModuleBase_ISelection* theSel
 bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbLines(theSelection);
     return (aCount > 0) && (aCount < 3);
@@ -164,15 +146,7 @@ bool PartSet_ParallelSelection::isValid(const ModuleBase_ISelection* theSelectio
 bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     ModuleBase_ViewerPrs aPrs;
@@ -197,15 +171,7 @@ bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection,
 bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     return (aList.count() == 1);
@@ -216,15 +182,7 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection, 
 bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     // Coincident can be applied to points and to lines
     int aCount = shapesNbPoints(theSelection);
@@ -236,15 +194,7 @@ bool PartSet_CoincidentSelection::isValid(const ModuleBase_ISelection* theSelect
 bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbLines(theSelection);
     return (aCount == 1);
@@ -254,15 +204,7 @@ bool PartSet_HVDirSelection::isValid(const ModuleBase_ISelection* theSelection, 
 bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbLines(theSelection);
     return (aCount > 0) && (aCount < 3);
@@ -272,15 +214,7 @@ bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection,
 bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     if ((aList.size() == 0) || (aList.size() > 2))
@@ -328,20 +262,51 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
 bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-    if (!aFeatureOp->isEditOperation()) {
-      return true;
-    }
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-    if (aPlane.get())
-      return true;
-    else 
-      return false;
+    return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbLines(theSelection);
     return (aCount > 0) && (aCount < 3);
   }
 }
+
+bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    return isEmptySelectionValid(theOperation);
+  } else {
+    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+    ModuleBase_ViewerPrs aPrs;
+    int aCount = 0;
+    int aType = 0;
+    foreach (ModuleBase_ViewerPrs aPrs, aList) {
+      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+      aShape->setImpl(new TopoDS_Shape(aPrs.shape()));
+      if (aShape->isEdge()) {
+        aCount++;
+        GeomAPI_Edge aEdge(aShape);
+        if (aEdge.isLine()) {
+          if (aCount == 1)
+            aType = 1;
+          else if (aType != 1)
+            return false;
+        } else if (aEdge.isCircle()) {
+          if (aCount == 1)
+            aType = 2;
+          else if (aType != 2)
+            return false;
+        } else if (aEdge.isArc()) {
+          if (aCount == 1)
+            aType = 3;
+          else if (aType != 3)
+            return false;
+        }
+      } else
+        return false;
+    }
+    return (aCount > 0) && (aCount < 3);
+  }
+}
+
 
 std::string PartSet_DifferentObjectsValidator::errorMessage(
                          const PartSet_DifferentObjectsValidator::ErrorType& theType,

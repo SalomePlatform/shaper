@@ -95,25 +95,30 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
 
 void XGUI_ActionsMgr::update()
 {
-  FeaturePtr anActiveFeature = FeaturePtr();
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                         (myOperationMgr->currentOperation());
-  if (aFOperation) {
-    anActiveFeature = aFOperation->feature();
-    if(anActiveFeature.get()) {
-      setAllEnabled(false);
-      QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
-      setActionEnabled(aFeatureId, true);
-    }
-    setNestedStackEnabled(aFOperation);
+  XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() > 0) {
+    updateOnViewSelection();
   } else {
-    setAllEnabled(true);
-    setNestedCommandsEnabled(false);
+    FeaturePtr anActiveFeature = FeaturePtr();
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                           (myOperationMgr->currentOperation());
+    if (aFOperation) {
+      anActiveFeature = aFOperation->feature();
+      if(anActiveFeature.get()) {
+        setAllEnabled(false);
+        QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
+        setActionEnabled(aFeatureId, true);
+      }
+      setNestedStackEnabled(aFOperation);
+    } else {
+      setAllEnabled(true);
+      setNestedCommandsEnabled(false);
+    }
+    // TODO(SBH): Get defaults state of actions from XML and remove the following method
+    updateByDocumentKind();
+    updateCheckState();
+    updateByPlugins(anActiveFeature);
   }
-  // TODO(SBH): Get defaults state of actions from XML and remove the following method
-  updateByDocumentKind();
-  updateCheckState();
-  updateByPlugins(anActiveFeature);
 }
 
 void XGUI_ActionsMgr::updateCheckState()
@@ -154,9 +159,8 @@ void XGUI_ActionsMgr::updateOnViewSelection()
       for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
         const ModuleBase_SelectionValidator* aSelValidator =
             dynamic_cast<const ModuleBase_SelectionValidator*>(aFactory->validator(aValidatorIt->first));
-        if (!aSelValidator)
-          continue;
-        setActionEnabled(aId, aSelValidator->isValid(aSelection, theOperation));
+        if (aSelValidator)
+          setActionEnabled(aId, aSelValidator->isValid(aSelection, theOperation));
       }
     }
   }
