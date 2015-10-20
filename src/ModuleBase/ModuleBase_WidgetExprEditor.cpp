@@ -137,6 +137,7 @@ void ExpressionEditor::keyPressEvent(QKeyEvent* theEvent)
     switch (theEvent->key()) {
       case Qt::Key_Enter:
       case Qt::Key_Return:
+        emit keyReleased(theEvent);
         // do not react to the Enter key, the property panel processes it
         return;
       break;
@@ -252,6 +253,10 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
   //connect(myEditor, SIGNAL(editingFinished()), this, SLOT(onTextChanged()));
   connect(myEditor, SIGNAL(valueStored()), this, SLOT(onTextChanged()));
   connect(myEditor, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
+
+  connect(myEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
+    /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theEvent key release event
 }
 
 ModuleBase_WidgetExprEditor::~ModuleBase_WidgetExprEditor()

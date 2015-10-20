@@ -70,6 +70,10 @@ signals:
   void valueStored();
   void focusNextPrev();
 
+  /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theEvent key release event
+  void keyReleased(QKeyEvent* theEvent);
+
  protected:
   /// Perform completion by prefix
   /// \param theCompletionPrefix a prefix for looking for completion
