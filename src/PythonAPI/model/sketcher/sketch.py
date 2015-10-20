@@ -160,6 +160,24 @@ class Sketch():
         self._feature.execute()
         return constraint
     
+    def setRadius(self, circle, radius):
+        """Set the radius of the given circle and add the corresponding 
+        constraint to this Sketch."""
+        constraint = self._feature.addFeature("SketchConstraintRadius")
+        constraint.data().refattr("ConstraintEntityA").setObject(circle)
+        constraint.data().real("ConstraintValue").setValue(radius)
+        return constraint
+    
+    def setEqual(self, object_1, object_2):
+        """Set the radii of two circles or the length of two lines equal.
+        
+        The corresponding constraint is added to the sketch"""
+        constraint = self._feature.addFeature("SketchConstraintEqual")
+        constraint.data().refattr("ConstraintEntityA").setObject(object_1)
+        constraint.data().refattr("ConstraintEntityB").setObject(object_2)
+        self._feature.execute()
+        return constraint
+    
     def setAngle(self, line_1, line_2, angle):
         """Set the angle between the given 2 lines and add the corresponding 
         constraint to the sketch."""
@@ -168,14 +186,6 @@ class Sketch():
         constraint.data().refattr("ConstraintEntityB").setObject(line_2)
         constraint.data().real("ConstraintValue").setValue(angle)
         self._feature.execute()
-        return constraint
-
-    def setRadius(self, circle, radius):
-        """Set the radius of the given circle and add the corresponding 
-        constraint to this Sketch."""
-        constraint = self._feature.addFeature("SketchConstraintRadius")
-        constraint.data().refattr("ConstraintEntityA").setObject(circle)
-        constraint.data().real("ConstraintValue").setValue(radius)
         return constraint
 
     #-------------------------------------------------------------
