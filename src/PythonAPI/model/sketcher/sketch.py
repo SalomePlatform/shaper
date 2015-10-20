@@ -187,6 +187,16 @@ class Sketch():
         constraint.data().real("ConstraintValue").setValue(angle)
         self._feature.execute()
         return constraint
+    
+    def setFillet(self, line_1, line_2, radius):
+        """Set a fillet constraint between the 3 given lines with the given 
+        filleting radius."""
+        constraint = self._feature.addFeature("SketchConstraintFillet")
+        constraint.data().refattr("ConstraintEntityA").setObject(line_1)
+        constraint.data().refattr("ConstraintEntityB").setObject(line_2)
+        constraint.data().real("ConstraintValue").setValue(radius)
+        self._feature.execute()
+        return constraint
 
     #-------------------------------------------------------------
     #
@@ -242,8 +252,11 @@ class Sketch():
         pg.append(ln)
         return pg
 
-
+    #-------------------------------------------------------------
+    #
     # Getters
+    #
+    #-------------------------------------------------------------
 
     def selectFace(self, *args):
         """Select the geometrical entities of this Sketch on which 
@@ -252,8 +265,7 @@ class Sketch():
         When no entity is given, the face is based on all existing 
         geometry of this Sketch.
         """
-        #self.resultype ="Face"
-        if   len(args) == 0:
+        if len(args) == 0:
             self._selection = modelAPI_ResultConstruction( 
                 self._feature.firstResult()).shape()
         elif len(args) == 1:
