@@ -3,9 +3,9 @@ Author: Daniel Brunier-Coulin with contribution by Mikhail Ponikarov
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
-from ModelAPI    import *
-from GeomDataAPI import *
-from GeomAlgoAPI import *
+from ModelAPI    import modelAPI_ResultConstruction, featureToCompositeFeature
+from GeomDataAPI import geomDataAPI_Point, geomDataAPI_Dir
+from GeomAlgoAPI import GeomAlgoAPI_SketchBuilder
 from model.sketcher.point import Point
 from model.sketcher.line import Line
 from model.sketcher.circle import Circle
@@ -57,8 +57,11 @@ class Sketch():
     def __sketchOnFace(self, plane):
         self._feature.data().selection("External").selectSubShape("FACE", plane)
 
-
+    #-------------------------------------------------------------
+    #
     # Creation of Geometries
+    #
+    #-------------------------------------------------------------
 
     def addPoint(self, *args):
         """Add a point to this Sketch."""
@@ -79,8 +82,12 @@ class Sketch():
         """Add an arc to this Sketch."""
         arc_feature = self._feature.addFeature("SketchArc")
         return Arc(arc_feature, *args)
-
+  
+    #-------------------------------------------------------------
+    #
     # Creation of Geometrical and Dimensional Constraints
+    #
+    #-------------------------------------------------------------
 
     def setCoincident(self, p1, p2):
         """Set coincident the two given points and add the corresponding 
@@ -151,15 +158,21 @@ class Sketch():
         constraint.data().real("ConstraintValue").setValue(radius)
         return constraint
 
-
+    #-------------------------------------------------------------
+    #
     # Edition of Dimensional Constraints
+    #
+    #-------------------------------------------------------------
 
     def setValue(self, constraint, value):
         """Modify the value of the given dimensional constraint."""
         constraint.data().real("ConstraintValue").setValue(value)
      
-     
+    #-------------------------------------------------------------
+    #
     # Macro functions combining geometry creation and constraints
+    #
+    #-------------------------------------------------------------
      
     def addPolyline(self, *coords):
         """Add a poly-line to this Sketch.
@@ -220,14 +233,16 @@ class Sketch():
         return self
 
     def buildShape(self):
-        """Builds the result Shape of this Sketch according to the selected geometrical entities."""
+        """Build the result Shape of this Sketch according to the 
+        selected geometrical entities."""
         o  = geomDataAPI_Point( self._feature.data().attribute("Origin") ).pnt()
         dx = geomDataAPI_Dir( self._feature.data().attribute("DirX") ).dir()
         n  = geomDataAPI_Dir( self._feature.data().attribute("Norm") ).dir()
 
-        faces = ShapeList()      # The faces are kept otherwise they are destroyed at exit
+        # The faces are kept otherwise they are destroyed at exit
+        faces = ShapeList()
         GeomAlgoAPI_SketchBuilder.createFaces(o, dx, n, self._selection, faces)
-    #TODO: Deal with several faces 
+        #TODO: Deal with several faces 
         return faces[0]
 
     def result(self):
