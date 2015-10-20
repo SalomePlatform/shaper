@@ -1,7 +1,7 @@
 """Sketch circle feature interface."""
 
 from GeomDataAPI import geomDataAPI_Point2D
-from modeler.errors import WrongNumberOfArguments
+from model.errors import WrongNumberOfArguments
 
 class Arc():
     """Interface for editing a sketch arc feature."""

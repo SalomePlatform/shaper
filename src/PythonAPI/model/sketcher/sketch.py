@@ -6,10 +6,10 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 from ModelAPI    import *
 from GeomDataAPI import *
 from GeomAlgoAPI import *
-from modeler.sketcher.point import Point
-from modeler.sketcher.line import Line
-from modeler.sketcher.circle import Circle
-from modeler.sketcher.arc import Arc
+from model.sketcher.point import Point
+from model.sketcher.line import Line
+from model.sketcher.circle import Circle
+from model.sketcher.arc import Arc
 
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface

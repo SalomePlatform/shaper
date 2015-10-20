@@ -1,5 +1,5 @@
 import unittest
-import modeler
+import model
 from TestSketcher import SketcherTestCase
 
 class SketcherSetCoincident(SketcherTestCase):   

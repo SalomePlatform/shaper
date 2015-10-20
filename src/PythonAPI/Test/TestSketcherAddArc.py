@@ -1,8 +1,8 @@
 import unittest
 
-import modeler
+import model
 import geom
-from modeler import WrongNumberOfArguments
+from model import WrongNumberOfArguments
 
 from TestSketcher import SketcherTestCase
 

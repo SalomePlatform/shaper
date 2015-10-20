@@ -2,23 +2,23 @@
 # Author: Daniel Brunier-Coulin
 # -----------------------------
 
-import modeler
+import model
 import extension
 
 
 # Initialisation
 
-modeler.begin()
-mypartset = modeler.moduleDocument()
+model.begin()
+mypartset = model.moduleDocument()
 
 
 # Creating a new Part
 
-mypart = modeler.addPart(mypartset).document()
+mypart = model.addPart(mypartset).document()
 
 
 # Creating the base of the box
 
 extension.addBox( mypart, 10, 20, 30 )
-modeler.end()
+model.end()
 

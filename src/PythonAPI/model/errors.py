@@ -1,10 +1,10 @@
 # Package exceptions
 
-class ModelerError(Exception):
+class ModelError(Exception):
     """Base class for exceptions in this package."""
     pass
 
-class WrongNumberOfArguments(ModelerError):
+class WrongNumberOfArguments(ModelError):
     """Exception raised when a wrong number of arguments is given."""
     pass
 

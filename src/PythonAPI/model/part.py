@@ -3,7 +3,7 @@ Author: Daniel Brunier-Coulin
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
-import modeler     # Required by the temporary implementation of result member function
+import model     # Required by the temporary implementation of result member function
 
 
 class Part():
@@ -16,4 +16,4 @@ class Part():
   def document (self):
     """Returns the Part document created by this feature."""
     #TODO: Get the document referenced by this feature
-    return modeler.activeDocument()
+    return model.activeDocument()
