@@ -3,7 +3,7 @@ Author: Daniel Brunier-Coulin with contribution by Mikhail Ponikarov
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
-from ModelAPI    import modelAPI_ResultConstruction, featureToCompositeFeature
+from ModelAPI import modelAPI_ResultConstruction, featureToCompositeFeature
 from GeomDataAPI import geomDataAPI_Point, geomDataAPI_Dir
 from GeomAlgoAPI import GeomAlgoAPI_SketchBuilder
 from model.sketcher.point import Point
@@ -18,7 +18,7 @@ def addSketch(doc, plane):
     A Sketch object is instanciated with a feature as input parameter
     it provides an interface for manipulation of the feature data.
     :return: interface on the feature
-    :rtype: Sketch object"""
+    :rtype: Sketch"""
     feature = featureToCompositeFeature(doc.addFeature("Sketch"))
     return Sketch(feature, plane)
 
@@ -41,21 +41,23 @@ class Sketch():
             self.__sketchOnPlane(plane)
 
     def __sketchOnPlane(self, plane):
-        o  = plane.location()
-        d  = plane.direction()
-        dx = plane.xDirection()
+        """Create the sketch on a plane."""
+        origin = plane.location()
+        normal = plane.direction()
+        x_direction = plane.xDirection()
         geomDataAPI_Point( 
             self._feature.data().attribute("Origin") 
-            ).setValue( o.x(), o.y(), o.z() )
+            ).setValue(origin.x(), origin.y(), origin.z())
         geomDataAPI_Dir( 
             self._feature.data().attribute("DirX") 
-            ).setValue( dx.x(), dx.y(), dx.z() )
+            ).setValue(x_direction.x(), x_direction.y(), x_direction.z())
         geomDataAPI_Dir( 
             self._feature.data().attribute("Norm") 
-            ).setValue( d.x(),  d.y(),  d.z()  )
+            ).setValue(normal.x(), normal.y(), normal.z() )
 
-    def __sketchOnFace(self, plane):
-        self._feature.data().selection("External").selectSubShape("FACE", plane)
+    def __sketchOnFace(self, name):
+        """Initialize the sketch on a face given by its name."""
+        self._feature.data().selection("External").selectSubShape("FACE", name)
 
     #-------------------------------------------------------------
     #
@@ -71,7 +73,15 @@ class Sketch():
     def addLine(self, *args):
         """Add a line to this Sketch."""
         line_feature = self._feature.addFeature("SketchLine")
-        return Line(line_feature, *args)
+        line_interface = Line(line_feature, *args)
+        # if the line is created by name add a rigid constraint
+        # to the created line
+        if len(args) == 1 and isinstance(args[0], str):
+            constraint = sketch.addFeature("SketchConstraintRigid")
+            constraint.refattr("ConstraintEntityA").setObject(
+                line_feature.firstResult()
+                )
+        return line_interface
     
     def addCircle(self, *args):
         """Add a circle to this Sketch."""
@@ -147,6 +157,16 @@ class Sketch():
         constraint = self._feature.addFeature("SketchConstraintLength")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
+        self._feature.execute()
+        return constraint
+    
+    def setAngle(self, line_1, line_2, angle):
+        """Set the angle between the given 2 lines and add the corresponding 
+        constraint to the sketch."""
+        constraint = self._feature.addFeature("SketchConstraintAngle")
+        constraint.data().refattr("ConstraintEntityA").setObject(line_1)
+        constraint.data().refattr("ConstraintEntityB").setObject(line_2)
+        constraint.data().real("ConstraintValue").setValue(angle)
         self._feature.execute()
         return constraint
 

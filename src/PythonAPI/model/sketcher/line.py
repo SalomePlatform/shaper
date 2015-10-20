@@ -15,7 +15,7 @@ class Line():
         elif len(args) == 2:
             self.__createByPoints(*args)
         elif len(args) == 1:
-            self.__createByName(sketch, *args)
+            self.__createByName(*args)
         else:
             raise Exception("cannot create the Line")
 
@@ -29,11 +29,9 @@ class Line():
         self._end_point.setValue(p2.x(), p2.y())
         self._feature.execute()
 
-    def __createByName(self, sketch, name):
+    def __createByName(self, name):
         self._feature.data().selection("External").selectSubShape("EDGE", name)
         self._feature.execute()
-        rigid = sketch.addFeature("SketchConstraintRigid")
-        rigid.refattr("ConstraintEntityA").setObject(self._feature.firstResult())
 
     def startPointData(self):
         return self._start_point
