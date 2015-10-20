@@ -40,7 +40,7 @@ class Sketch():
         else:
             self.__sketchOnPlane(plane)
 
-    def __sketchOnPlane (self, plane):
+    def __sketchOnPlane(self, plane):
         o  = plane.location()
         d  = plane.direction()
         dx = plane.xDirection()
@@ -54,35 +54,35 @@ class Sketch():
             self._feature.data().attribute("Norm") 
             ).setValue( d.x(),  d.y(),  d.z()  )
 
-    def __sketchOnFace (self, plane):
+    def __sketchOnFace(self, plane):
         self._feature.data().selection("External").selectSubShape("FACE", plane)
 
 
     # Creation of Geometries
 
-    def addPoint (self, *args):
+    def addPoint(self, *args):
         """Add a point to this Sketch."""
         point_feature = self._feature.addFeature("SketchPoint")
         return Point(point_feature, *args)
 
-    def addLine (self, *args):
+    def addLine(self, *args):
         """Add a line to this Sketch."""
         line_feature = self._feature.addFeature("SketchLine")
         return Line(line_feature, *args)
     
-    def addCircle (self, *args):
+    def addCircle(self, *args):
         """Add a circle to this Sketch."""
         circle_feature = self._feature.addFeature("SketchCircle")
         return Circle(circle_feature, *args)
     
-    def addArc (self, *args):
+    def addArc(self, *args):
         """Add an arc to this Sketch."""
         arc_feature = self._feature.addFeature("SketchArc")
         return Arc(arc_feature, *args)
 
     # Creation of Geometrical and Dimensional Constraints
 
-    def setCoincident (self, p1, p2):
+    def setCoincident(self, p1, p2):
         """Set coincident the two given points and add the corresponding 
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintCoincidence")
@@ -90,7 +90,7 @@ class Sketch():
         constraint.data().refattr("ConstraintEntityB").setAttr(p2)
         return constraint
 
-    def setParallel (self, l1, l2):
+    def setParallel(self, l1, l2):
         """Set parallel the two given lines and add the corresponding 
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintParallel")
@@ -98,15 +98,29 @@ class Sketch():
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
         return constraint
 
-    def setPerpendicular (self, l1, l2):
+    def setPerpendicular(self, l1, l2):
         """Set perpendicular the two given lines and add the corresponding 
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintPerpendicular")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
         return constraint
+    
+    def setHorizontal(self, line):
+        """Set horizontal the given line and add the corresponding 
+        constraint to this Sketch."""
+        constraint = self._feature.addFeature("SketchConstraintHorizontal")
+        constraint.data().refattr("ConstraintEntityA").setObject(line)
+        return constraint
+    
+    def setVertical(self, line):
+        """Set vertical the given line and add the corresponding 
+        constraint to this Sketch."""
+        constraint = self._feature.addFeature("SketchConstraintVertical")
+        constraint.data().refattr("ConstraintEntityA").setObject(line)
+        return constraint
 
-    def setDistance (self, point, line, length):
+    def setDistance(self, point, line, length):
         """Set the distance between the given point and line, and add
         the corresponding constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintDistance")
@@ -120,7 +134,7 @@ class Sketch():
         self._feature.execute()
         return constraint
 
-    def setLength (self, line, length):
+    def setLength(self, line, length):
         """Set the length of the given line and add the corresponding 
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintLength")
@@ -129,7 +143,7 @@ class Sketch():
         self._feature.execute()
         return constraint
 
-    def setRadius (self, circle, radius):
+    def setRadius(self, circle, radius):
         """Set the radius of the given circle and add the corresponding 
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintRadius")
@@ -140,14 +154,14 @@ class Sketch():
 
     # Edition of Dimensional Constraints
 
-    def setValue (self, constraint, value):
+    def setValue(self, constraint, value):
         """Modify the value of the given dimensional constraint."""
         constraint.data().real("ConstraintValue").setValue(value)
      
      
     # Macro functions combining geometry creation and constraints
      
-    def addPolyline (self, *coords):
+    def addPolyline(self, *coords):
         """Add a poly-line to this Sketch.
         
         The end of consecutive segments are defined as coincident.
@@ -166,7 +180,7 @@ class Sketch():
             line_1 = line_2
         return polyline
 
-    def addPolygon (self, *coords):
+    def addPolygon(self, *coords):
         """Add a polygon to this Sketch.
         
         The end of consecutive segments are defined as coincident.
@@ -188,7 +202,7 @@ class Sketch():
 
     # Getters
 
-    def selectFace (self, *args):
+    def selectFace(self, *args):
         """Select the geometrical entities of this Sketch on which 
         the result Face must be built.
         
@@ -205,7 +219,7 @@ class Sketch():
             raise Exception("not yet implemented")
         return self
 
-    def buildShape (self):
+    def buildShape(self):
         """Builds the result Shape of this Sketch according to the selected geometrical entities."""
         o  = geomDataAPI_Point( self._feature.data().attribute("Origin") ).pnt()
         dx = geomDataAPI_Dir( self._feature.data().attribute("DirX") ).dir()
@@ -216,6 +230,6 @@ class Sketch():
     #TODO: Deal with several faces 
         return faces[0]
 
-    def result (self):
+    def result(self):
         """Returns the result data of this Feature."""
         return self._feature.firstResult()

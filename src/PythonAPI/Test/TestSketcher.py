@@ -1,6 +1,9 @@
 import unittest
 import model
 
+# Delta value for almost equal comparisons
+DELTA = 1e-10
+
 class SketcherTestCase(unittest.TestCase):
     def setUp(self):
         model.begin()

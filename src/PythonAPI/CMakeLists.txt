@@ -17,5 +17,7 @@ ADD_UNIT_TESTS(
   TestSketcherSetCoincident.py
   TestSketcherSetParallel.py
   TestSketcherSetPerpendicular.py
+  TestSketcherSetHorizontal.py
+  TestSketcherSetVertical.py
   TestSketcherSetRadius.py
   ) 
