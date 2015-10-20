@@ -5,6 +5,7 @@ from TestSketcher import SketcherTestCase
 class SketcherAddPoint(SketcherTestCase):    
     def runTest(self):
         point = self.sketch.addPoint(0, 1)
+        model.do()
         self.assertEqual(point.pointData().x(), 0.0)        
         self.assertEqual(point.pointData().y(), 1.0)
         

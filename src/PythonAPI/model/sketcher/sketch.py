@@ -25,13 +25,15 @@ def addSketch(doc, plane):
 class Sketch():
     """Interface on a Sketch feature."""
     def __init__(self, feature, plane):
-        """Initialize a 2D Sketch on the given plane
+        """Initialize a 2D Sketch on the given plane.
+        
         The plane can be defined either by:
         - a 3D axis system (geom.Ax3),
         - an existing face identified by its topological name.
         """
         self._feature = feature
-        self._selection = None     # Entities used for building the result shape
+        # Entities used for building the result shape
+        self._selection = None
         #   self.resultype ="Face" # Type of Sketch result
         if isinstance(plane, str):
             self.__sketchOnFace(plane)
@@ -56,7 +58,7 @@ class Sketch():
         self._feature.data().selection("External").selectSubShape("FACE", plane)
 
 
-# Creation of Geometries
+    # Creation of Geometries
 
     def addPoint (self, *args):
         """Add a point to this Sketch."""
@@ -77,45 +79,6 @@ class Sketch():
         """Add an arc to this Sketch."""
         arc_feature = self._feature.addFeature("SketchArc")
         return Arc(arc_feature, *args)
-
-    def addPolyline (self, *coords):
-        """Adds a poly-line to this Sketch.
-        
-        The end of consecutive segments are defined as coincident.
-        """
-        c0 = coords[0]
-        c1 = coords[1]
-        polyline = []
-        line_1 = self.addLine(c0, c1)
-        polyline.append(line_1)
-        # Adding and connecting next lines
-        for c2 in coords[2:]:
-            line_2 = self.addLine(c1, c2)
-            self.setCoincident(line_1.endPointData(), line_2.startPointData())
-            polyline.append(line_2)
-            c1 = c2
-            line_1 = line_2
-        return polyline
-
-    def addPolygon (self, *coords):
-        """Add a polygon to this Sketch.
-        
-        The end of consecutive segments are defined as coincident.
-        """
-        pg = self.addPolyline(*coords)
-        # Closing the poly-line supposed being defined by at least 3 points
-        c0 = coords[0]
-        cn = coords[len(coords) - 1]
-        ln = self.addLine(cn, c0)
-        self.setCoincident(
-            pg[len(coords) - 2].endPointData(), ln.startPointData()
-            )
-        self.setCoincident(
-            ln.endPointData(), pg[0].startPointData()
-            )
-        pg.append(ln)
-        return pg
-
 
     # Creation of Geometrical and Dimensional Constraints
 
@@ -180,9 +143,50 @@ class Sketch():
     def setValue (self, constraint, value):
         """Modify the value of the given dimensional constraint."""
         constraint.data().real("ConstraintValue").setValue(value)
+     
+     
+    # Macro functions combining geometry creation and constraints
+     
+    def addPolyline (self, *coords):
+        """Add a poly-line to this Sketch.
+        
+        The end of consecutive segments are defined as coincident.
+        """
+        c0 = coords[0]
+        c1 = coords[1]
+        polyline = []
+        line_1 = self.addLine(c0, c1)
+        polyline.append(line_1)
+        # Adding and connecting next lines
+        for c2 in coords[2:]:
+            line_2 = self.addLine(c1, c2)
+            self.setCoincident(line_1.endPointData(), line_2.startPointData())
+            polyline.append(line_2)
+            c1 = c2
+            line_1 = line_2
+        return polyline
+
+    def addPolygon (self, *coords):
+        """Add a polygon to this Sketch.
+        
+        The end of consecutive segments are defined as coincident.
+        """
+        pg = self.addPolyline(*coords)
+        # Closing the poly-line supposed being defined by at least 3 points
+        c0 = coords[0]
+        cn = coords[len(coords) - 1]
+        ln = self.addLine(cn, c0)
+        self.setCoincident(
+            pg[len(coords) - 2].endPointData(), ln.startPointData()
+            )
+        self.setCoincident(
+            ln.endPointData(), pg[0].startPointData()
+            )
+        pg.append(ln)
+        return pg
 
 
-# Getters
+    # Getters
 
     def selectFace (self, *args):
         """Select the geometrical entities of this Sketch on which 

@@ -9,6 +9,7 @@ from TestSketcher import SketcherTestCase
 class SketcherAddArc(SketcherTestCase):    
     def test_arc_by_coords(self):
         arc = self.sketch.addArc(0, 1, 0, 0, 1, 1)
+        model.do()
         self.assertEqual(arc.startPointData().x(), 0)        
         self.assertEqual(arc.startPointData().y(), 0)
     
@@ -17,6 +18,7 @@ class SketcherAddArc(SketcherTestCase):
         start = geom.Pnt2d(0, 0)
         end = geom.Pnt2d(0, 1)
         arc = self.sketch.addArc(center, start, end)
+        model.do()
         self.assertEqual(arc.startPointData().x(), 0)        
         self.assertEqual(arc.startPointData().y(), 0)
     
