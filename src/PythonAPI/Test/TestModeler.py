@@ -1,18 +1,18 @@
 import unittest
-import modeler
+import model
 
-class ModelerTestCase(unittest.TestCase):
+class ModelTestCase(unittest.TestCase):
     def setUp(self):
-        modeler.begin()
-        partset = modeler.moduleDocument()
-        self.part = modeler.addPart(partset).document()
+        model.begin()
+        partset = model.moduleDocument()
+        self.part = model.addPart(partset).document()
 
     def tearDown(self):
-        modeler.end()
+        model.end()
 
     def test_add_sketch(self):
-        plane = modeler.defaultPlane("XOY")
-        modeler.addSketch(self.part, plane)
+        plane = model.defaultPlane("XOY")
+        model.addSketch(self.part, plane)
 
 if __name__ == "__main__":
     unittest.main()

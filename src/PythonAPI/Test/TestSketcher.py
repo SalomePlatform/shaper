@@ -1,13 +1,13 @@
 import unittest
-import modeler
+import model
 
 class SketcherTestCase(unittest.TestCase):
     def setUp(self):
-        modeler.begin()
-        partset = modeler.moduleDocument()
-        part = modeler.addPart(partset).document()
-        plane = modeler.defaultPlane("XOY")
-        self.sketch = modeler.addSketch(part, plane)
+        model.begin()
+        partset = model.moduleDocument()
+        part = model.addPart(partset).document()
+        plane = model.defaultPlane("XOY")
+        self.sketch = model.addSketch(part, plane)
 
     def tearDown(self):
-        modeler.end()
+        model.end()
