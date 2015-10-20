@@ -241,21 +241,21 @@ void XGUI_PropertyPanel::activateNextWidget()
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
-  setActiveWidget(theWidget);
-
-  if (myActiveWidget) {
-    emit widgetActivated(myActiveWidget);
-  } else if (!isEditingMode()) {
-    emit noMoreWidgets();
-    setFocusOnOkButton();
+  if (setActiveWidget(theWidget)) {
+    if (myActiveWidget) {
+      emit widgetActivated(myActiveWidget);
+    } else if (!isEditingMode()) {
+      emit noMoreWidgets();
+      setFocusOnOkButton();
+    }
   }
 }
 
-void XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
+bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
   if (theWidget == myActiveWidget) {
-    return;
+    return false;
   }
   if(myActiveWidget) {
     myActiveWidget->deactivate();
@@ -267,7 +267,7 @@ void XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
-    setFocusOnOkButton();
+  return true;
 }
 
 void XGUI_PropertyPanel::setFocusOnOkButton()

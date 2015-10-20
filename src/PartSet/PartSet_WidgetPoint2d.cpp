@@ -486,7 +486,7 @@ bool PartSet_WidgetPoint2D::processEnter()
   bool isModified = myXSpin->isModified() || myYSpin->isModified();
   if (isModified) {
     bool isXModified = myXSpin->isModified();
-    emit valuesChanged();
+    onValuesChanged();
     myXSpin->clearModified();
     myYSpin->clearModified();
     if (isXModified)

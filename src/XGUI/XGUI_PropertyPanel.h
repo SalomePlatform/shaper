@@ -123,7 +123,7 @@ public slots:
 protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget
-  void setActiveWidget(ModuleBase_ModelWidget* theWidget);
+  bool setActiveWidget(ModuleBase_ModelWidget* theWidget);
 
   /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
   /// Emits a signal about focus change
