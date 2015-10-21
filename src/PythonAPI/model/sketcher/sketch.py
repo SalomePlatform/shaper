@@ -5,7 +5,7 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 from ModelAPI import modelAPI_ResultConstruction, featureToCompositeFeature
 from GeomDataAPI import geomDataAPI_Point, geomDataAPI_Dir
-from GeomAlgoAPI import GeomAlgoAPI_SketchBuilder
+from GeomAlgoAPI import GeomAlgoAPI_SketchBuilder, ShapeList
 from model.sketcher.point import Point
 from model.sketcher.line import Line
 from model.sketcher.circle import Circle
