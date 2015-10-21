@@ -43,29 +43,31 @@ ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
 }
 
-void editedValue(double& outValue, QString& outText)
+void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 {
   QDialog aDlg(QApplication::desktop(), Qt::FramelessWindowHint);
   QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
   aLay->setContentsMargins(2, 2, 2, 2);
 
-  ModuleBase_ParamSpinBox* aEditor = new ModuleBase_ParamSpinBox(&aDlg);
-  aEditor->setMinimum(0);
-  aEditor->setMaximum(DBL_MAX);
+  ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(&aDlg);
+  anEditor->enableKeyPressEvent(true);
+
+  anEditor->setMinimum(0);
+  anEditor->setMaximum(DBL_MAX);
   if (outText.isEmpty())
-    aEditor->setValue(outValue);
+    anEditor->setValue(outValue);
   else
-    aEditor->setText(outText);
+    anEditor->setText(outText);
 
-  aLay->addWidget(aEditor);
+  aLay->addWidget(anEditor);
 
-  aEditor->setFocus();
-  aEditor->selectAll();
-  QObject::connect(aEditor, SIGNAL(editingFinished()), &aDlg, SLOT(accept()));
+  anEditor->setFocus();
+  anEditor->selectAll();
+  QObject::connect(anEditor, SIGNAL(editingFinished()), &aDlg, SLOT(accept()));
 
   aDlg.move(QCursor::pos());
   aDlg.exec();
-  outText = aEditor->text();
+  outText = anEditor->text();
   bool isDouble;
   double aValue = outText.toDouble(&isDouble);
   if (isDouble) {

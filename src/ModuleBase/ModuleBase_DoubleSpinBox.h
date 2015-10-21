@@ -49,11 +49,16 @@ Q_OBJECT
   /// Validate current value
   virtual QValidator::State validate(QString&, int&) const;
 
-  // Returns true if the current value is modified by has not been applyed yet
+  /// Returns true if the current value is modified by has not been applyed yet
   virtual bool isModified() const;
 
-  // Clears modified state
+  /// Clears modified state
   void clearModified();
+
+  /// Change enable/disable internal state to emit key press event
+  /// \param theEnable if true, the signal is emitted
+  /// \return the previous value
+  bool enableKeyPressEvent(const bool& theEnable);
 
 signals:
   /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
@@ -77,6 +82,9 @@ signals:
   virtual bool focusNextPrevChild(bool theIsNext);
 
  private:
+  // boolen flag whether the key event is emitted. The default value is false
+  bool myIsEmitKeyPressEvent;
+
    /// Is clear flag
   bool myCleared;
 

@@ -59,7 +59,8 @@ const double PSEUDO_ZERO = 1.e-20;
 ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
     : QDoubleSpinBox(theParent),
       myCleared(false),
-      myIsModified(false)
+      myIsModified(false),
+      myIsEmitKeyPressEvent(false)
 {
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid inconsistency of double-2-string and string-2-double conversion)
@@ -207,7 +208,8 @@ void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
     case Qt::Key_Enter:
     case Qt::Key_Return: {
       // do not react to the Enter key, the property panel processes it
-      return;
+      if (!myIsEmitKeyPressEvent)
+        return;
     }
     break;
     default:
@@ -356,4 +358,12 @@ bool ModuleBase_DoubleSpinBox::isModified() const
 void ModuleBase_DoubleSpinBox::clearModified()
 {
   myIsModified = false;
+}
+
+bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
+{
+  bool aPreviousValue = myIsEmitKeyPressEvent;
+  myIsEmitKeyPressEvent = theEnable;
+
+  return aPreviousValue;
 }
