@@ -263,6 +263,10 @@ ModuleBase_WidgetExprEditor::~ModuleBase_WidgetExprEditor()
 {
 }
 
+void ModuleBase_WidgetExprEditor::initializeValueByActivate()
+{
+}
+
 bool ModuleBase_WidgetExprEditor::storeValueCustom() const
 {
   // A rare case when plugin was not loaded. 
@@ -270,6 +274,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
     return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
+
   QString aWidgetValue = myEditor->toPlainText();
   aStringAttr->setValue(aWidgetValue.toStdString());
   updateObject(myFeature);

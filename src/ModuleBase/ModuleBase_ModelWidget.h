@@ -225,6 +225,10 @@ protected:
   /// \param theState a new state
   void setValueState(const ValueState& theState);
 
+  /// Compute the feature default value and fill the controls with it
+  /// or store the control value to the feature
+  virtual void initializeValueByActivate();
+
   /// Saves the internal parameters to the given feature. Emits signals before and after store
   /// \return True in success
   bool storeValue();

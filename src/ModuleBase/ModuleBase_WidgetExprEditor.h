@@ -135,6 +135,9 @@ protected slots:
   void onTextChanged();
 
 protected:
+  /// Do not initialize value on the widget activation
+  virtual void initializeValueByActivate();
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;

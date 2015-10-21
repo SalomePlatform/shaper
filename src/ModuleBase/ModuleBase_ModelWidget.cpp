@@ -122,18 +122,22 @@ void ModuleBase_ModelWidget::activate()
   // It should happens in the creation mode only because all fields are filled in the edition mode
   if (!isEditingMode()) {
     AttributePtr anAttribute = myFeature->data()->attribute(myAttributeID);
-    if (anAttribute.get() != NULL && !anAttribute->isInitialized()) {
-      if (isComputedDefault()) {
-        if (myFeature->compute(myAttributeID)) {
-          restoreValue();
-        }
-      }
-      else {
-        storeValue();
-      }
-    }
+    if (anAttribute.get() != NULL && !anAttribute->isInitialized())
+      initializeValueByActivate();
   }
   activateCustom();
+}
+
+void ModuleBase_ModelWidget::initializeValueByActivate()
+{
+  if (isComputedDefault()) {
+    if (myFeature->compute(myAttributeID)) {
+      restoreValue();
+    }
+  }
+  else {
+    storeValue();
+  }
 }
 
 QWidget* ModuleBase_ModelWidget::getControlAcceptingFocus(const bool isFirst)
