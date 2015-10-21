@@ -59,6 +59,8 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
 
+  myLabel->setToolTip(aToolTip);
+
   QString aUseBody = QString::fromStdString(theData->getProperty(USE_BODY));
   if(!aUseBody.isEmpty()) {
     myUseBody = QVariant(aUseBody).toBool();

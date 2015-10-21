@@ -84,6 +84,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
+  myLabel->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
 #ifdef APPLY_BY_ENTER_OR_TAB

@@ -87,6 +87,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine->installEventFilter(this);
 
   aLayout->addRow(myLabel, myTextLine);
+  myLabel->setToolTip(aToolTip);
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
