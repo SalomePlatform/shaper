@@ -3,39 +3,62 @@ Author: Daniel Brunier-Coulin
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
-from ModelAPI import *
+import ModelAPI
+
+from .tools import get_value, convert_to_underscore
 
 
-class Feature(ModelAPI_Feature):
-  """Base class of user-defined Python features."""
+class Feature(ModelAPI.ModelAPI_Feature):
+    """Base class of user-defined Python features."""
 
-  def __init__(self):
-    ModelAPI_Feature.__init__(self)
+    def __init__(self):
+        ModelAPI.ModelAPI_Feature.__init__(self)
 
-  def addRealInput (self, inputid):
-    self.data().addAttribute(inputid, ModelAPI_AttributeDouble_typeId())
+    def addRealInput (self, inputid):
+        self.data().addAttribute(inputid,
+                                 ModelAPI.ModelAPI_AttributeDouble_typeId())
 
-  def getRealInput (self, inputid):
-    return self.data().real(inputid).value()
+    def getRealInput (self, inputid):
+        return self.data().real(inputid).value()
 
-  def addResult (self, result):
-    shape = result.shape()
-    body  = self.document().createBody( self.data() )
-    body.store(shape)
-    self.setResult(body)
+    def addResult (self, result):
+        shape = result.shape()
+        body = self.document().createBody(self.data())
+        body.store(shape)
+        self.setResult(body)
 
 
 class Interface():
-  """Base class of hight level Python interfaces to features."""
+    """Base class of hight level Python interfaces to features."""
 
-  def __init__(self, container, fid):
-    self.my = container.addFeature(fid)
+    def __init__(self, feature):
+        self._feature = feature
 
-  def setRealInput (self, inputid, value):
-    self.my.data().real(inputid).setValue(value)
+    def __getattr__(self, name):
+        """Process missing attributes.
 
-  def areInputValid (self):
-    return ModelAPI_Session.get().validators().validate(self.my)
+        Add get*() methods for access feature attributes.
+        Redirect missing attributes to the feature.
+        """
+        if name.startswith("get"):
+            possible_names = [
+                "_" + name[3:],
+                "_" + convert_to_underscore(name[3:]),
+                ]
+            for possible_name in possible_names:
+                if hasattr(self, possible_name):
+                    def getter():
+                        return get_value(getattr(self, possible_name))
+                    return getter
 
-  def execute (self):
-    self.my.execute()
+        return self._feature.__getattribute__(name)
+
+    def setRealInput (self, inputid, value):
+        self._feature.data().real(inputid).setValue(value)
+
+    def areInputValid (self):
+        validators = ModelAPI.ModelAPI_Session.get().validators()
+        return validators.validate(self._feature)
+
+    def execute (self):
+        self._feature.execute()
