@@ -8,6 +8,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Tools.h>
+#include <Events_Error.h>
 
 #include <ModuleBase_Tools.h>
 
@@ -88,23 +89,23 @@ void XGUI_DataTree::contextMenuEvent(QContextMenuEvent* theEvent)
 
 void XGUI_DataTree::commitData(QWidget* theEditor)
 {
-  QLineEdit* aEditor = dynamic_cast<QLineEdit*>(theEditor);
-  if (aEditor) {
-    QString aName = aEditor->text();
-    QModelIndexList aIndexList = selectionModel()->selectedIndexes();
-    XGUI_DataModel* aModel = dataModel();
-    ObjectPtr aObj = aModel->object(aIndexList.first());
-    SessionPtr aMgr = ModelAPI_Session::get();
-    aMgr->startOperation("Rename");
+  static int aEntrance = 0;
+  if (aEntrance == 0) {
+    // We have to check number of enter and exit of this function because it can be called recursively by Qt
+    // in order to avoid double modifying of a data
+    aEntrance = 1;
+    QLineEdit* aEditor = dynamic_cast<QLineEdit*>(theEditor);
+    if (aEditor) {
+      QString aName = aEditor->text();
+      QModelIndexList aIndexList = selectionModel()->selectedIndexes();
+      XGUI_DataModel* aModel = dataModel();
+      ObjectPtr aObj = aModel->object(aIndexList.first());
 
-    if (!XGUI_Tools::canRename(this, aObj, aName)) {
-      aMgr->abortOperation();
-      return;
+      if (XGUI_Tools::canRename(aObj, aName))
+        aObj->data()->setName(qPrintable(aName));
     }
-
-    aObj->data()->setName(qPrintable(aName));
-    aMgr->finishOperation();
   }
+  aEntrance = 0;
 }
 
 void XGUI_DataTree::clear() 

@@ -80,11 +80,10 @@ bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aLi
 
 /*! 
  Check possibility to rename object
- \param theParent a parent widget
  \param theObject an object to rename
  \param theName a name
  */
-bool canRename(QWidget* theParent, const ObjectPtr& theObject, const QString& theName);
+bool canRename(const ObjectPtr& theObject, const QString& theName);
 
 /*!
  Returns true if there are no parts in the document, which are not activated

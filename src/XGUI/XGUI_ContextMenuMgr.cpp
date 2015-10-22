@@ -9,6 +9,8 @@
 #include "XGUI_Selection.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_DataModel.h"
+#include "XGUI_OperationMgr.h"
+#include "XGUI_Tools.h"
 
 #include <AppElements_MainWindow.h>
 
@@ -26,6 +28,7 @@
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_OperationAction.h>
 
 #include <QAction>
 #include <QContextMenuEvent>
@@ -492,5 +495,9 @@ QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)
 
 void XGUI_ContextMenuMgr::onRename()
 {
+  ModuleBase_OperationAction* anAction = new ModuleBase_OperationAction("Rename", this);
+  XGUI_OperationMgr* anOpMgr = myWorkshop->operationMgr();
+  anOpMgr->startOperation(anAction);
   myWorkshop->objectBrowser()->onEditItem();
+  anOpMgr->commitOperation();
 }
