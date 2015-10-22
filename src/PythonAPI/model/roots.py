@@ -5,6 +5,7 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import ModelAPI
 
+from .tools import get_value, convert_to_underscore
 
 
 class Feature(ModelAPI.ModelAPI_Feature):
@@ -36,8 +37,20 @@ class Interface():
     def __getattr__(self, name):
         """Process missing attributes.
 
+        Add get*() methods for access feature attributes.
         Redirect missing attributes to the feature.
         """
+        if name.startswith("get"):
+            possible_names = [
+                "_" + name[3:],
+                "_" + convert_to_underscore(name[3:]),
+                ]
+            for possible_name in possible_names:
+                if hasattr(self, possible_name):
+                    def getter():
+                        return get_value(getattr(self, possible_name))
+                    return getter
+
         return self._feature.__getattribute__(name)
 
     def setRealInput (self, inputid, value):
