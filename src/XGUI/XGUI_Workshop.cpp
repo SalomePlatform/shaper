@@ -1503,6 +1503,7 @@ void setColor(ResultPtr theResult, const std::vector<int>& theColor)
 //**************************************************************
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
+
   AttributeIntArrayPtr aColorAttr;
   // 1. find the current color of the object. This is a color of AIS presentation
   // The objects are iterated until a first valid color is found 
@@ -1529,6 +1530,8 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   if (aColor.size() != 3)
     return;
 
+  if (!abortAllOperations())
+  return; 
   // 2. show the dialog to change the value
   XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(mainWindow());
   aDlg->setColor(aColor);
@@ -1541,11 +1544,8 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 
   // 3. abort the previous operation and start a new one
   SessionPtr aMgr = ModelAPI_Session::get();
-  bool aWasOperation = aMgr->isOperation(); // keep this value
-  if (!aWasOperation) {
-    QString aDescription = contextMenuMgr()->action("COLOR_CMD")->text();
-    aMgr->startOperation(aDescription.toStdString());
-  }
+  QString aDescription = contextMenuMgr()->action("COLOR_CMD")->text();
+  aMgr->startOperation(aDescription.toStdString());
 
   // 4. set the value to all results
   std::vector<int> aColorResult = aDlg->getColor();
@@ -1561,8 +1561,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
       setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
     }
   }
-  if (!aWasOperation)
-    aMgr->finishOperation();
+  aMgr->finishOperation();
   updateCommandStatus();
 }
 
