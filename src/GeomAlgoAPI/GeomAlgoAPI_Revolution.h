@@ -33,25 +33,25 @@ class GeomAlgoAPI_Revolution : public GeomAPI_Interface
 {
 public:
   /** \brief Creates revolution for the given shape.
-   *  \param[in] theBasis face for revolution.
+   *  \param[in] theBaseShape face for revolution.
    *  \param[in] theAxis axis for revolution.
    *  \param[in] theToAngle to angle.
    *  \param[in] theFromAngle from angle.
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                             std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                             double                         theToAngle,
                                             double                         theFromAngle);
 
   /** \brief Creates revolution for the given shape.
-   *  \param[in] theBasis face for revolution.
+   *  \param[in] theBaseShape face for revolution.
    *  \param[in] theAxis axis for revolution.
    *  \param[in] theToShape to bounding shape. Can be empty. In this case offset will be applied to the basis.
    *  \param[in] theToAngle to angle.
    *  \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.
    *  \param[in] theFromAngle from angle.
    */
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBasis,
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                             std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                             std::shared_ptr<GeomAPI_Shape> theToShape,
                                             double                         theToAngle,
@@ -102,7 +102,7 @@ private:
   TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint);
 
   /// Builds resulting shape.
-  void build(const std::shared_ptr<GeomAPI_Shape>& theBasis,
+  void build(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
              const std::shared_ptr<GeomAPI_Ax1>&   theAxis,
              const std::shared_ptr<GeomAPI_Shape>& theToShape,
              double                                theToAngle,

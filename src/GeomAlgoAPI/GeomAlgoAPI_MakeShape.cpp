@@ -77,6 +77,9 @@ void GeomAlgoAPI_MakeShape::generated(const std::shared_ptr<GeomAPI_Shape> theSh
         return;
       }
       const TopoDS_Shape& aGeneratedShape = aMakePipe->Generated(aSpine, aProfile);
+      if(aGeneratedShape.IsNull()) {
+        continue;
+      }
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(aGeneratedShape));
       theHistory.push_back(aShape);
@@ -91,6 +94,9 @@ void GeomAlgoAPI_MakeShape::generated(const std::shared_ptr<GeomAPI_Shape> theSh
       aList = aBOPBuilder->Generated(theShape->impl<TopoDS_Shape>());
     }
     for(TopTools_ListIteratorOfListOfShape anIt(aList); anIt.More(); anIt.Next()) {
+      if(anIt.Value().IsNull()) {
+        continue;
+      }
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
       theHistory.push_back(aShape);
@@ -111,6 +117,9 @@ void GeomAlgoAPI_MakeShape::modified(const std::shared_ptr<GeomAPI_Shape> theSha
     aList = aBOPBuilder->Modified(theShape->impl<TopoDS_Shape>());
   }
   for(TopTools_ListIteratorOfListOfShape anIt(aList); anIt.More(); anIt.Next()) {
+    if(anIt.Value().IsNull()) {
+      continue;
+    }
     std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(anIt.Value()));
     theHistory.push_back(aShape);

@@ -48,8 +48,9 @@ void GeomAlgoAPI_MakeShapeCustom::generated(const std::shared_ptr<GeomAPI_Shape>
                                             ListOfShape& theHistory)
 {
   ListOfShape aGenerated;
-  myGenerated.find(theShape, aGenerated);
-  theHistory.insert(theHistory.end(), aGenerated.begin(), aGenerated.end());
+  if(myGenerated.find(theShape, aGenerated)) {
+    theHistory.insert(theHistory.end(), aGenerated.begin(), aGenerated.end());
+  }
 }
 
 //=================================================================================================
@@ -57,8 +58,9 @@ void GeomAlgoAPI_MakeShapeCustom::modified(const std::shared_ptr<GeomAPI_Shape> 
                                            ListOfShape& theHistory)
 {
   ListOfShape aModified;
-  myModified.find(theShape, aModified);
-  theHistory.insert(theHistory.end(), aModified.begin(), aModified.end());
+  if(myModified.find(theShape, aModified)) {
+    theHistory.insert(theHistory.end(), aModified.begin(), aModified.end());
+  }
 }
 
 //=================================================================================================
