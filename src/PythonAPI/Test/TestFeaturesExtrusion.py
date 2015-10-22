@@ -79,6 +79,10 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
 
 class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
 
+    def test_extrusion_feature_calls(self):
+        # call method of the feature
+        self.assertEqual(self.extrusion.getKind(), "Extrusion")
+
     def test_extrusion_set_sizes(self):
         self.extrusion.setSize(15, 20)
 

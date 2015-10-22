@@ -33,7 +33,12 @@ class Interface():
     def __init__(self, feature):
         self._feature = feature
 
+    def __getattr__(self, name):
+        """Process missing attributes.
 
+        Redirect missing attributes to the feature.
+        """
+        return self._feature.__getattribute__(name)
 
     def setRealInput (self, inputid, value):
         self._feature.data().real(inputid).setValue(value)
