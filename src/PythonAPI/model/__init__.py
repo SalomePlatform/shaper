@@ -18,3 +18,4 @@ from boolean   import Intersection    as addIntersection
 # Custom exceptions
 
 from errors import WrongNumberOfArguments
+from errors import FeatureInputInvalid

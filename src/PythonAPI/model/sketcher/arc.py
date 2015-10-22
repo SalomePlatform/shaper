@@ -2,11 +2,14 @@
 
 from GeomDataAPI import geomDataAPI_Point2D
 from model.errors import WrongNumberOfArguments
+from model.roots import Interface
 
-class Arc():
-    """Interface for editing a sketch arc feature."""
-    def __init__(self, arc_feature, *args):
-        self._feature = arc_feature
+class Arc(Interface):
+    """Interface to a sketch arc feature."""
+    def __init__(self, feature, *args):
+        Interface.__init__(self, feature)
+        assert(self._feature.getKind() == "SketchArc")
+        
         self._center = geomDataAPI_Point2D(
             self._feature.data().attribute("ArcCenter")
             )

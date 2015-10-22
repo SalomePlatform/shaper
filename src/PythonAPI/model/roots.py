@@ -29,7 +29,7 @@ class Feature(ModelAPI.ModelAPI_Feature):
 
 
 class Interface():
-    """Base class of hight level Python interfaces to features."""
+    """Base class of high level Python interfaces to features."""
 
     def __init__(self, feature):
         self._feature = feature
@@ -53,12 +53,12 @@ class Interface():
 
         return self._feature.__getattribute__(name)
 
-    def setRealInput (self, inputid, value):
+    def setRealInput(self, inputid, value):
         self._feature.data().real(inputid).setValue(value)
 
-    def areInputValid (self):
+    def areInputValid(self):
         validators = ModelAPI.ModelAPI_Session.get().validators()
         return validators.validate(self._feature)
 
-    def execute (self):
+    def execute(self):
         self._feature.execute()

@@ -10,6 +10,7 @@ from model.sketcher.point import Point
 from model.sketcher.line import Line
 from model.sketcher.circle import Circle
 from model.sketcher.arc import Arc
+from model.roots import Interface
 
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface
@@ -22,7 +23,7 @@ def addSketch(doc, plane):
     feature = featureToCompositeFeature(doc.addFeature("Sketch"))
     return Sketch(feature, plane)
 
-class Sketch():
+class Sketch(Interface):
     """Interface on a Sketch feature."""
     def __init__(self, feature, plane):
         """Initialize a 2D Sketch on the given plane.
@@ -31,7 +32,9 @@ class Sketch():
         - a 3D axis system (geom.Ax3),
         - an existing face identified by its topological name.
         """
-        self._feature = feature
+        Interface.__init__(self, feature)
+        assert(self._feature.getKind() == "Sketch")
+        
         # Entities used for building the result shape
         self._selection = None
         #   self.resultype ="Face" # Type of Sketch result
