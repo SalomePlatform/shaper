@@ -12,6 +12,7 @@ INCLUDE(UnitTest)
 ADD_UNIT_TESTS(
   TestShaper.py
   TestModel.py
+
   TestSketcherAddPoint.py
   TestSketcherAddLine.py
   TestSketcherAddArc.py
@@ -26,4 +27,6 @@ ADD_UNIT_TESTS(
   TestSketcherSetAngle.py
   TestSketcherSetEqual.py
   TestSketcherSetFillet.py
-  ) 
+
+  TestFeaturesExtrusion.py
+  )

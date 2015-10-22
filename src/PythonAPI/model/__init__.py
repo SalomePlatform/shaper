@@ -10,7 +10,7 @@ from roots     import *
 
 from part      import Part            as addPart
 from sketcher.sketch  import addSketch
-from extrusion import Extrusion       as addExtrusion
+from extrusion import addExtrusion
 from boolean   import Addition        as addAddition
 from boolean   import Subtraction     as addSubtraction
 from boolean   import Intersection    as addIntersection
