@@ -495,9 +495,10 @@ QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)
 
 void XGUI_ContextMenuMgr::onRename()
 {
-  ModuleBase_OperationAction* anAction = new ModuleBase_OperationAction("Rename", this);
-  XGUI_OperationMgr* anOpMgr = myWorkshop->operationMgr();
-  anOpMgr->startOperation(anAction);
+  QObjectPtrList anObjects = myWorkshop->selector()->selection()->selectedObjects();
+  if (!myWorkshop->abortAllOperations())
+    return; 
+  // restore selection in case if dialog box was shown
+  myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
   myWorkshop->objectBrowser()->onEditItem();
-  anOpMgr->commitOperation();
 }

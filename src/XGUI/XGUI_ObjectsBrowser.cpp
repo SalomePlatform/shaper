@@ -101,8 +101,12 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
       XGUI_DataModel* aModel = dataModel();
       ObjectPtr aObj = aModel->object(aIndexList.first());
 
-      if (XGUI_Tools::canRename(aObj, aName))
+      if (XGUI_Tools::canRename(aObj, aName)) {
+        SessionPtr aMgr = ModelAPI_Session::get();
+        aMgr->startOperation("Rename");
         aObj->data()->setName(qPrintable(aName));
+        aMgr->finishOperation();
+      }
     }
   }
   aEntrance = 0;
