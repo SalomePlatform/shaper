@@ -188,6 +188,15 @@ class Sketch():
         self._feature.execute()
         return constraint
     
+    def setTangent(self, object_1, object_2):
+        """Set a tangential continuity between two objects 
+        at their coincidence point."""
+        constraint = self._feature.addFeature("SketchConstraintTangent")
+        constraint.data().refattr("ConstraintEntityA").setObject(object_1)
+        constraint.data().refattr("ConstraintEntityB").setObject(object_2)
+        self._feature.execute()
+        return constraint
+    
     def setFillet(self, line_1, line_2, radius):
         """Set a fillet constraint between the 3 given lines with the given 
         filleting radius."""
