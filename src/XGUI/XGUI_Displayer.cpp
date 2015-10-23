@@ -11,7 +11,9 @@
 #include "XGUI_Selection.h"
 #include "XGUI_CustomPrs.h"
 
+#ifndef HAVE_SALOME
 #include <AppElements_Viewer.h>
+#endif
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
@@ -35,6 +37,7 @@
 #include <AIS_DimensionSelectionMode.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_Dimension.hxx>
+#include <AIS_Trihedron.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>

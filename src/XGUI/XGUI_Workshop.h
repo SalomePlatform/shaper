@@ -16,9 +16,11 @@
 #include <QKeySequence>
 #include <QIcon>
 
+#ifndef HAVE_SALOME
 class AppElements_MainWindow;
 class AppElements_Command;
 class AppElements_Workbench;
+#endif
 
 class XGUI_ActionsMgr;
 class XGUI_ContextMenuMgr;
@@ -68,11 +70,16 @@ Q_OBJECT
   /// Deactivates the module controls. Should be called after module creation
   void deactivateModule();
 
+#ifndef HAVE_SALOME
   //! Returns main window (Desktop) of the application
   AppElements_MainWindow* mainWindow() const
   {
     return myMainWindow;
   }
+
+  //! Creates and adds a new workbench (menu group) with the given name and returns it
+  AppElements_Workbench* addWorkbench(const QString& theName);
+#endif
 
   //! Returns selection manager object
   XGUI_SelectionMgr* selector() const
@@ -115,9 +122,6 @@ Q_OBJECT
   {
     return myContextMenuMgr;
   }
-
-  //! Creates and adds a new workbench (menu group) with the given name and returns it
-  AppElements_Workbench* addWorkbench(const QString& theName);
 
   //! Returns an object which provides interface to Salome Module (LightApp_Module)
   XGUI_SalomeConnector* salomeConnector() const
@@ -280,20 +284,11 @@ signals:
   /// update history list (undo/redo commands)
   void updateHistory();
 
-  /// Create a new document
-  void onNew();
-
-  /// Open document from file
-  void onOpen();
-
   /// Save current document
   bool onSave();
 
   /// Save current document to a file selected by user
   bool onSaveAs();
-
-  /// Exit application
-  void onExit();
 
   /// Undo last command
   void onUndo(int times = 1);
@@ -303,9 +298,6 @@ signals:
 
   /// Rebuild data tree
   void onRebuild();
-
-  /// Open preferences dialog box
-  void onPreferences();
 
   /// Show property panel
   void showPropertyPanel();
@@ -321,6 +313,20 @@ signals:
 
   /// Close document
   void closeDocument();
+
+  /// Open document from file
+  void onOpen();
+
+  /// Create a new document
+  void onNew();
+
+#ifndef HAVE_SALOME
+  /// Exit application
+  void onExit();
+
+  /// Open preferences dialog box
+  void onPreferences();
+#endif
 
  protected:
   /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
@@ -425,7 +431,10 @@ private:
   QList<ActionInfo> processHistoryList(const std::list<std::string>&) const;
 
 private:
+#ifndef HAVE_SALOME
   AppElements_MainWindow* myMainWindow;
+#endif
+
   ModuleBase_IModule* myModule;
   XGUI_ErrorMgr* myErrorMgr;
   XGUI_ObjectsBrowser* myObjectBrowser;

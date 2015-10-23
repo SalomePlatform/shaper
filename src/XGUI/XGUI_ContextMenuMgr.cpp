@@ -12,7 +12,9 @@
 #include "XGUI_OperationMgr.h"
 #include "XGUI_Tools.h"
 
+#ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
+#endif
 
 //#include "PartSetPlugin_Part.h"
 
@@ -34,6 +36,7 @@
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMdiArea>
+#include <QMainWindow>
 
 
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent)
@@ -49,10 +52,13 @@ XGUI_ContextMenuMgr::~XGUI_ContextMenuMgr()
 
 void XGUI_ContextMenuMgr::createActions()
 {
-  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+#ifdef HAVE_SALOME
+  QMainWindow* aDesktop = myWorkshop->salomeConnector()->desktop();
+#else
   QMainWindow* aDesktop = myWorkshop->mainWindow();
-  if (!aDesktop)
-    aDesktop = myWorkshop->salomeConnector()->desktop();
+#endif
+
+  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
   aDesktop->addAction(aAction);
 
   addAction("DELETE_CMD", aAction);
@@ -462,14 +468,14 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
   }
   theMenu->addActions(aActions);
 
-  if (!myWorkshop->isSalomeMode()) {
-    theMenu->addSeparator();
-    QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
-    if (aMDI->actions().size() > 0) {
-      QMenu* aSubMenu = theMenu->addMenu(tr("Windows"));
-      aSubMenu->addActions(aMDI->actions());
-    }
+#ifndef HAVE_SALOME
+  theMenu->addSeparator();
+  QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
+  if (aMDI->actions().size() > 0) {
+    QMenu* aSubMenu = theMenu->addMenu(tr("Windows"));
+    aSubMenu->addActions(aMDI->actions());
   }
+#endif
 }
 
 QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)

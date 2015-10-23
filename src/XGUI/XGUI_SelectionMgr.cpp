@@ -9,7 +9,9 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_Selection.h"
 
+#ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
+#endif
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Session.h>

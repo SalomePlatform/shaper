@@ -5,7 +5,10 @@
 
 #include "XGUI.h"
 #include <ModuleBase_IViewer.h>
-#include <AppElements_ViewWindow.h>
+
+#ifndef HAVE_SALOME
+  #include <AppElements_ViewWindow.h>
+#endif
 
 class XGUI_Workshop;
 /**
@@ -98,9 +101,11 @@ protected:
   bool eventFilter(QObject *theObject, QEvent *theEvent);
 
 private slots:
+  void onViewCreated(ModuleBase_IViewWindow* theWnd);
+
+#ifndef HAVE_SALOME
   void onTryCloseView(AppElements_ViewWindow*);
   void onDeleteView(AppElements_ViewWindow*);
-  void onViewCreated(ModuleBase_IViewWindow* theWnd);
   void onViewCreated(AppElements_ViewWindow*);
   void onActivated(AppElements_ViewWindow*);
 
@@ -113,6 +118,7 @@ private slots:
   void onKeyRelease(AppElements_ViewWindow*, QKeyEvent*);
 
   void onViewTransformed(AppElements_ViewWindow::OperationType);
+#endif
 
  private:
   XGUI_Workshop* myWorkshop;

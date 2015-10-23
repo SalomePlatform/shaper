@@ -23,6 +23,7 @@
 #include <XGUI_HistoryMenu.h>
 #include <XGUI_QtEvents.h>
 
+#ifndef HAVE_SALOME
 #include <AppElements_Button.h>
 #include <AppElements_Command.h>
 #include <AppElements_MainMenu.h>
@@ -30,6 +31,7 @@
 #include <AppElements_MenuGroupPanel.h>
 #include <AppElements_Viewer.h>
 #include <AppElements_Workbench.h>
+#endif
 
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeIntArray.h>
@@ -78,6 +80,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMdiSubWindow>
+#include <QMainWindow>
 #include <QPushButton>
 #include <QDockWidget>
 #include <QLayout>
@@ -112,16 +115,16 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myObjectBrowser(0),
       myDisplayer(0)
 {
-  myMainWindow = mySalomeConnector ? 0 : new AppElements_MainWindow();
+#ifndef HAVE_SALOME
+  myMainWindow = new AppElements_MainWindow();
 
-  if (myMainWindow) {
-    SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
-    bool aCloc = aResMgr->booleanValue("language", "locale", true);
-    if (aCloc)
-      QLocale::setDefault( QLocale::c() );
-    else 
-      QLocale::setDefault( QLocale::system() );
-  }
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+  bool aCloc = aResMgr->booleanValue("language", "locale", true);
+  if (aCloc)
+    QLocale::setDefault( QLocale::c() );
+  else 
+    QLocale::setDefault( QLocale::system() );
+#endif
 
   myDisplayer = new XGUI_Displayer(this);
 
@@ -160,8 +163,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   //connect(myOperationMgr, SIGNAL(validationStateChanged(bool)), 
   //        myErrorMgr, SLOT(onValidationStateChanged()));
 
-  if (myMainWindow)
-    connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
+#ifndef HAVE_SALOME
+  connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
+#endif
+
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
   connect(myEventsListener, SIGNAL(errorOccurred(const QString&)),
           myErrorDlg, SLOT(addError(const QString&)));
@@ -202,10 +207,11 @@ void XGUI_Workshop::startApplication()
   // by Config_PropManger to restore user-defined path to plugins
   ModuleBase_Preferences::loadCustomProps();
   createModule();
-  if (myMainWindow) {
-    myMainWindow->show();
-    updateCommandStatus();
-  }
+
+#ifndef HAVE_SALOME
+  myMainWindow->show();
+  updateCommandStatus();
+#endif
   
   onNew();
 
@@ -253,48 +259,47 @@ void XGUI_Workshop::initMenu()
 {
   myContextMenuMgr->createActions();
 
-  if (isSalomeMode()) {
-    // Create only Undo, Redo commands
-    QAction* aAction = salomeConnector()->addDesktopCommand("UNDO_CMD", tr("Undo"),
-                                                         tr("Undo last command"),
-                                                         QIcon(":pictures/undo.png"),
-                                                         QKeySequence::Undo, false, "MEN_DESK_EDIT");
-    QString aToolBarTitle = tr( "INF_DESK_TOOLBAR_STANDARD" );
-    salomeConnector()->addActionInToolbar( aAction,aToolBarTitle  );
+#ifdef HAVE_SALOME
+  // Create only Undo, Redo commands
+  QAction* aAction = salomeConnector()->addDesktopCommand("UNDO_CMD", tr("Undo"),
+                                                        tr("Undo last command"),
+                                                        QIcon(":pictures/undo.png"),
+                                                        QKeySequence::Undo, false, "MEN_DESK_EDIT");
+  QString aToolBarTitle = tr( "INF_DESK_TOOLBAR_STANDARD" );
+  salomeConnector()->addActionInToolbar( aAction,aToolBarTitle  );
 
-    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
-    addHistoryMenu(aAction, SIGNAL(updateUndoHistory(const QList<ActionInfo>&)), SLOT(onUndo(int)));
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
+  addHistoryMenu(aAction, SIGNAL(updateUndoHistory(const QList<ActionInfo>&)), SLOT(onUndo(int)));
 
-    aAction = salomeConnector()->addDesktopCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
-                                                QIcon(":pictures/redo.png"), QKeySequence::Redo,
-                                                false, "MEN_DESK_EDIT");
-    salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
+  aAction = salomeConnector()->addDesktopCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
+                                              QIcon(":pictures/redo.png"), QKeySequence::Redo,
+                                              false, "MEN_DESK_EDIT");
+  salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
 
-    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
-    addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
+  addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
 
-    salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
-    aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
-                                                QIcon(":pictures/rebuild.png"), QKeySequence(),
-                                                false, "MEN_DESK_EDIT");
-    salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
+  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
+  aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+                                              QIcon(":pictures/rebuild.png"), QKeySequence(),
+                                              false, "MEN_DESK_EDIT");
+  salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
 
-    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
-    salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
+  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
-    aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current document into a NewGeom file"),
-                                                QIcon(), QKeySequence(),
-                                                false, "MEN_DESK_FILE");
-    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
+  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current document into a NewGeom file"),
+                                              QIcon(), QKeySequence(),
+                                              false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
 
-    aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import NewGeom..."), tr("Import a NewGeom file"),
-                                                QIcon(), QKeySequence(),
-                                                false, "MEN_DESK_FILE");
-    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
-    salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
+  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import NewGeom..."), tr("Import a NewGeom file"),
+                                              QIcon(), QKeySequence(),
+                                              false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
+  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
 
-    return;
-  }
+#else
   // File commands group
   AppElements_MenuGroupPanel* aGroup = myMainWindow->menuObject()->generalPage();
 
@@ -336,10 +341,6 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/open.png"), QKeySequence::Open);
   aCommand->connectTo(this, SLOT(onOpen()));
 
-  //aCommand = aGroup->addFeature("NEW_CMD", tr("New"), tr("Create a new document"),
-  //                              QIcon(":pictures/new.png"), QKeySequence::New);
-  //aCommand->connectTo(this, SLOT(onNew()));
-
   aCommand = aGroup->addFeature("PREF_CMD", tr("Preferences"), tr("Edit preferences"),
                                 QIcon(":pictures/preferences.png"), QKeySequence::Preferences);
   aCommand->connectTo(this, SLOT(onPreferences()));
@@ -347,25 +348,25 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
-  //FIXME: SBH's test action. Can be used for some GUI tests.
-//  #ifdef _DEBUG
-//    aCommand = aGroup->addFeature("TEST_CMD", "Test!", "Private debug button",
-//                                  QIcon(":pictures/close.png"), QKeySequence(), true);
-//    aCommand->connectTo(myMainWindow, SLOT(dockPythonConsole()));
-//  #endif
+#endif
 }
 
-//******************************************************
+#ifndef HAVE_SALOME
 AppElements_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 {
   AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
   return aMenuBar->addWorkbench(theName);
 }
+#endif
 
 //******************************************************
 QMainWindow* XGUI_Workshop::desktop() const
 {
-  return isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+#ifdef HAVE_SALOME
+  return salomeConnector()->desktop();
+#else
+  return myMainWindow;
+#endif
 }
 
 //******************************************************
@@ -423,16 +424,16 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
 {
   bool aHasNested = false;
   std::string aFeatureKind = theFeature->getKind();
-  if (isSalomeMode()) {
+#ifdef HAVE_SALOME
     XGUI_SalomeConnector* aSalomeConnector = salomeConnector();
     if (aSalomeConnector->isFeatureOfNested(actionsMgr()->action(aFeatureKind.c_str())))
       aHasNested = true;
-  } else {
+#else 
     AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
     AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
     if (aCommand && aCommand->button()->additionalButtonWidget())
       aHasNested = true;
-  }
+#endif
   return aHasNested;
 }
 
@@ -623,6 +624,66 @@ bool XGUI_Workshop::abortAllOperations()
 }
 
 //******************************************************
+void XGUI_Workshop::onOpen()
+{
+  if(!abortAllOperations())
+    return;
+  //save current file before close if modified
+  SessionPtr aSession = ModelAPI_Session::get();
+  if (aSession->isModified()) {
+    //TODO(sbh): re-launch the app?
+    int anAnswer = QMessageBox::question(
+        desktop(), tr("Save current file"),
+        tr("The document is modified, save before opening another?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (anAnswer == QMessageBox::Save) {
+      onSave();
+    } else if (anAnswer == QMessageBox::Cancel) {
+      return;
+    }
+    myCurrentDir = "";
+  }
+
+  //show file dialog, check if readable and open
+  myCurrentDir = QFileDialog::getExistingDirectory(desktop(), tr("Select directory"));
+  if (myCurrentDir.isEmpty())
+    return;
+  QFileInfo aFileInfo(myCurrentDir);
+  if (!aFileInfo.exists() || !aFileInfo.isReadable()) {
+    QMessageBox::critical(desktop(), tr("Warning"), tr("Unable to open the file."));
+    myCurrentDir = "";
+    return;
+  }
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  aSession->closeAll();
+  aSession->load(myCurrentDir.toLatin1().constData());
+  myObjectBrowser->rebuildDataTree();
+  updateCommandStatus();
+  QApplication::restoreOverrideCursor();
+}
+
+//******************************************************
+void XGUI_Workshop::onNew()
+{
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  if (objectBrowser() == 0) {
+    createDockWidgets();
+    mySelector->connectViewers();
+  }
+  myViewerProxy->connectToViewer();
+  showObjectBrowser();
+#ifndef HAVE_SALOME
+  myMainWindow->showPythonConsole();
+  QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
+  aWnd->showMaximized();
+  updateCommandStatus();
+#endif
+  myContextMenuMgr->connectViewer();
+  QApplication::restoreOverrideCursor();
+}
+
+#ifndef HAVE_SALOME
+//******************************************************
 void XGUI_Workshop::onExit()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -643,63 +704,25 @@ void XGUI_Workshop::onExit()
 }
 
 //******************************************************
-void XGUI_Workshop::onNew()
+void XGUI_Workshop::onPreferences()
 {
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  if (objectBrowser() == 0) {
-    createDockWidgets();
-    mySelector->connectViewers();
-  }
-  myViewerProxy->connectToViewer();
-  showObjectBrowser();
-  if (!isSalomeMode()) {
-    myMainWindow->showPythonConsole();
-    QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
-    aWnd->showMaximized();
-    updateCommandStatus();
-  }
-  myContextMenuMgr->connectViewer();
-  QApplication::restoreOverrideCursor();
-}
-
-//******************************************************
-void XGUI_Workshop::onOpen()
-{
-  if(!abortAllOperations())
-    return;
-  //save current file before close if modified
-  SessionPtr aSession = ModelAPI_Session::get();
-  if (aSession->isModified()) {
-    //TODO(sbh): re-launch the app?
-    int anAnswer = QMessageBox::question(
-        myMainWindow, tr("Save current file"),
-        tr("The document is modified, save before opening another?"),
-        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
-    if (anAnswer == QMessageBox::Save) {
-      onSave();
-    } else if (anAnswer == QMessageBox::Cancel) {
-      return;
+  ModuleBase_Prefs aModif;
+  ModuleBase_Preferences::editPreferences(aModif);
+  if (aModif.size() > 0) {
+    QString aSection;
+    foreach (ModuleBase_Pref aPref, aModif)
+    {
+      aSection = aPref.first;
+      if (aSection == ModuleBase_Preferences::VIEWER_SECTION) {
+        myMainWindow->viewer()->updateFromResources();
+      } else if (aSection == ModuleBase_Preferences::MENU_SECTION) {
+        myMainWindow->menuObject()->updateFromResources();
+      }
     }
-    myCurrentDir = "";
+    displayer()->redisplayObjects();
   }
-
-  //show file dialog, check if readable and open
-  myCurrentDir = QFileDialog::getExistingDirectory(mainWindow(), tr("Select directory"));
-  if (myCurrentDir.isEmpty())
-    return;
-  QFileInfo aFileInfo(myCurrentDir);
-  if (!aFileInfo.exists() || !aFileInfo.isReadable()) {
-    QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to open the file."));
-    myCurrentDir = "";
-    return;
-  }
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  aSession->closeAll();
-  aSession->load(myCurrentDir.toLatin1().constData());
-  myObjectBrowser->rebuildDataTree();
-  updateCommandStatus();
-  QApplication::restoreOverrideCursor();
 }
+#endif
 
 //******************************************************
 bool XGUI_Workshop::onSave()
@@ -712,8 +735,9 @@ bool XGUI_Workshop::onSave()
   std::list<std::string> aFiles;
   saveDocument(myCurrentDir, aFiles);
   updateCommandStatus();
-  if (!isSalomeMode())
+#ifndef HAVE_SALOME
     myMainWindow->setModifiedState(false);
+#endif
   return true;
 }
 
@@ -722,7 +746,7 @@ bool XGUI_Workshop::onSaveAs()
 {
   if(!abortAllOperations())
     return false;
-  QFileDialog dialog(mainWindow());
+  QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
   dialog.setFileMode(QFileDialog::Directory);
   dialog.setFilter(tr("Directories (*)"));
@@ -737,7 +761,7 @@ bool XGUI_Workshop::onSaveAs()
   QDir aDir(aTempDir);
   if (aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty()) {
     int answer = QMessageBox::question(
-        myMainWindow,
+        desktop(),
         //: Title of the dialog which asks user if he wants to save study in existing non-empty folder
         tr("Save"),
         tr("The directory already contains some files, save anyway?"),
@@ -747,10 +771,10 @@ bool XGUI_Workshop::onSaveAs()
     }
   }
   myCurrentDir = aTempDir;
-  if (!isSalomeMode()) {
+#ifndef HAVE_SALOME
     myMainWindow->setCurrentDir(myCurrentDir, false);
     myMainWindow->setModifiedState(false);
-  }
+#endif
   return onSave();
 }
 
@@ -819,28 +843,6 @@ void XGUI_Workshop::onRebuild()
 }
 
 //******************************************************
-void XGUI_Workshop::onPreferences()
-{
-  ModuleBase_Prefs aModif;
-  ModuleBase_Preferences::editPreferences(aModif);
-  if (aModif.size() > 0) {
-    QString aSection;
-    foreach (ModuleBase_Pref aPref, aModif)
-    {
-      aSection = aPref.first;
-      if (aSection == ModuleBase_Preferences::VIEWER_SECTION) {
-        if (!isSalomeMode())
-          myMainWindow->viewer()->updateFromResources();
-      } else if (aSection == ModuleBase_Preferences::MENU_SECTION) {
-        if (!isSalomeMode())
-          myMainWindow->menuObject()->updateFromResources();
-      }
-    }
-    displayer()->redisplayObjects();
-  }
-}
-
-//******************************************************
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName = QString::fromStdString(library(theModule.toStdString()));
@@ -890,7 +892,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
   ModuleBase_IModule* aModule = crtInst ? crtInst(myModuleConnector) : 0;
 
   if (!err.isEmpty()) {
-    if (mainWindow()) {
+    if (desktop()) {
       Events_Error::send(err.toStdString());
     } else {
       qWarning(qPrintable(err));
@@ -922,13 +924,13 @@ bool XGUI_Workshop::createModule()
 void XGUI_Workshop::updateCommandStatus()
 {
   QList<QAction*> aCommands;
-  if (isSalomeMode()) {  // update commands in SALOME mode
+#ifdef HAVE_SALOME
     aCommands = salomeConnector()->commandList();
-  } else {
+#else
     AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
     foreach (AppElements_Command* aCmd, aMenuBar->features())
       aCommands.append(aCmd);
-  }
+#endif
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->hasModuleDocument()) {
     foreach(QAction* aCmd, aCommands) {
@@ -991,7 +993,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
  */
 void XGUI_Workshop::createDockWidgets()
 {
-  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+  QMainWindow* aDesktop = desktop();
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop, myOperationMgr);
@@ -1047,7 +1049,7 @@ void XGUI_Workshop::hidePropertyPanel()
   // set the focus on it. As a result, shortcuts of the application, like
   // are processed by this console. For example Undo actions.
   // It is possible that this code is to be moved to NewGeom package
-  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+  QMainWindow* aDesktop = desktop();
   aDesktop->activateWindow();
   aDesktop->setFocus();
 }
@@ -1123,7 +1125,7 @@ void XGUI_Workshop::deleteObjects()
   // deletion and negative consequences connected with processing of already deleted items
   mySelector->clearSelection();
   // check whether the object can be deleted. There should not be parts which are not loaded
-  if (!XGUI_Tools::canRemoveOrRename(myMainWindow, anObjects))
+  if (!XGUI_Tools::canRemoveOrRename(desktop(), anObjects))
     return;
 
   bool hasResult = false;
@@ -1148,9 +1150,8 @@ void XGUI_Workshop::deleteObjects()
 
   operationMgr()->startOperation(anOpAction);
   // 3. delete objects
-  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   std::set<FeaturePtr> anIgnoredFeatures;
-  if (deleteFeatures(anObjects, anIgnoredFeatures, aDesktop, true)) {
+  if (deleteFeatures(anObjects, anIgnoredFeatures, desktop(), true)) {
     operationMgr()->commitOperation();
   }
   else {
@@ -1175,7 +1176,7 @@ void XGUI_Workshop::moveObjects()
   // moving and negative consequences connected with processing of already moved items
   mySelector->clearSelection();
   // check whether the object can be moved. There should not be parts which are not loaded
-  if (!XGUI_Tools::canRemoveOrRename(myMainWindow, anObjects))
+  if (!XGUI_Tools::canRemoveOrRename(desktop(), anObjects))
     return;
 
   DocumentPtr anActiveDocument = aMgr->activeDocument();
@@ -1533,7 +1534,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   if (!abortAllOperations())
   return; 
   // 2. show the dialog to change the value
-  XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(mainWindow());
+  XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(desktop());
   aDlg->setColor(aColor);
   aDlg->move(QCursor::pos());
   bool isDone = aDlg->exec() == QDialog::Accepted;
