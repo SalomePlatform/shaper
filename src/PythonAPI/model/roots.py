@@ -33,12 +33,15 @@ class Interface():
 
     def __init__(self, feature):
         self._feature = feature
+        self._attribute_white_list = [
+            "getKind",
+            ]
 
     def __getattr__(self, name):
         """Process missing attributes.
 
         Add get*() methods for access feature attributes.
-        Redirect missing attributes to the feature.
+        Redirect some missing attributes to the feature.
         """
         if name.startswith("get"):
             possible_names = [
@@ -51,7 +54,14 @@ class Interface():
                         return getattr(self, possible_name)
                     return getter
 
-        return self._feature.__getattribute__(name)
+        if name in self._attribute_white_list:
+            return getattr(self._feature, name)
+
+        return object.__getattribute__(self, name)
+
+    def feature(self):
+        """Return ModelAPI_Feature."""
+        return self._feature
 
     def setRealInput(self, inputid, value):
         self._feature.data().real(inputid).setValue(value)
