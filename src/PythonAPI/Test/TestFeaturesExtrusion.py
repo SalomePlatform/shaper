@@ -53,13 +53,13 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
                                        sketch.selectFace(circle.result()),
                                        10, 0)
 
-        self.assertEqual(extrusion.getCreationMethod(), "BySizes")
-        self.assertEqual(extrusion.getToSize(), 10)
-        self.assertEqual(extrusion.getFromSize(), 0)
+        self.assertEqual(extrusion.getCreationMethod().value(), "BySizes")
+        self.assertEqual(extrusion.getToSize().value(), 10)
+        self.assertEqual(extrusion.getFromSize().value(), 0)
         self.assertEqual(extrusion.getToObject().context(), None)
-        self.assertEqual(extrusion.getToOffset(), 0)
+        self.assertEqual(extrusion.getToOffset().value(), 0)
         self.assertEqual(extrusion.getFromObject().context(), None)
-        self.assertEqual(extrusion.getFromOffset(), 0)
+        self.assertEqual(extrusion.getFromOffset().value(), 0)
 
     def test_add_extrusion_by_face_and_planes(self):
         # base
@@ -84,15 +84,15 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
                                        to_sketch, 15,
                                        from_sketch, 20)
 
-        self.assertEqual(extrusion.getCreationMethod(), "ByPlanesAndOffsets")
-        self.assertEqual(extrusion.getToSize(), 0)
-        self.assertEqual(extrusion.getFromSize(), 0)
+        self.assertEqual(extrusion.getCreationMethod().value(), "ByPlanesAndOffsets")
+        self.assertEqual(extrusion.getToSize().value(), 0)
+        self.assertEqual(extrusion.getFromSize().value(), 0)
 #         self.assertEqual(extrusion.getToObject().context(),
 #                          to_sketch.result())
-        self.assertEqual(extrusion.getToOffset(), 15)
+        self.assertEqual(extrusion.getToOffset().value(), 15)
 #         self.assertEqual(extrusion.getFromObject().context(),
 #                          from_sketch.result())
-        self.assertEqual(extrusion.getFromOffset(), 20)
+        self.assertEqual(extrusion.getFromOffset().value(), 20)
 
 
 class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
@@ -106,25 +106,29 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
         self.assertTrue(isinstance(self.extrusion.getBase(),
                                    ModelAPI.ModelAPI_AttributeSelectionList))
         self.assertTrue(isinstance(self.extrusion.getCreationMethod(),
-                                   basestring))
-        self.assertTrue(isinstance(self.extrusion.getToSize(), float))
-        self.assertTrue(isinstance(self.extrusion.getFromSize(), float))
+                                   ModelAPI.ModelAPI_AttributeString))
+        self.assertTrue(isinstance(self.extrusion.getToSize(),
+                                   ModelAPI.ModelAPI_AttributeDouble))
+        self.assertTrue(isinstance(self.extrusion.getFromSize(),
+                                   ModelAPI.ModelAPI_AttributeDouble))
         self.assertTrue(isinstance(self.extrusion.getToObject(),
                                    ModelAPI.ModelAPI_AttributeSelection))
-        self.assertTrue(isinstance(self.extrusion.getToOffset(), float))
+        self.assertTrue(isinstance(self.extrusion.getToOffset(),
+                                   ModelAPI.ModelAPI_AttributeDouble))
         self.assertTrue(isinstance(self.extrusion.getFromObject(),
                                    ModelAPI.ModelAPI_AttributeSelection))
-        self.assertTrue(isinstance(self.extrusion.getFromOffset(), float))
+        self.assertTrue(isinstance(self.extrusion.getFromOffset(),
+                                   ModelAPI.ModelAPI_AttributeDouble))
 
     def test_extrusion_set_sizes(self):
         self.extrusion.setSize(15, 20)
-        self.assertEqual(self.extrusion.getCreationMethod(), "BySizes")
-        self.assertEqual(self.extrusion.getToSize(), 15)
-        self.assertEqual(self.extrusion.getFromSize(), 20)
+        self.assertEqual(self.extrusion.getCreationMethod().value(), "BySizes")
+        self.assertEqual(self.extrusion.getToSize().value(), 15)
+        self.assertEqual(self.extrusion.getFromSize().value(), 20)
         self.assertEqual(self.extrusion.getToObject().context(), None)
-        self.assertEqual(self.extrusion.getToOffset(), 0)
+        self.assertEqual(self.extrusion.getToOffset().value(), 0)
         self.assertEqual(self.extrusion.getFromObject().context(), None)
-        self.assertEqual(self.extrusion.getFromOffset(), 0)
+        self.assertEqual(self.extrusion.getFromOffset().value(), 0)
 
     def test_extrusion_set_planes_and_offsets(self):
         # base
