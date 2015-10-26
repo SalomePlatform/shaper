@@ -11,6 +11,7 @@ from roots     import *
 from part      import Part            as addPart
 from sketcher.sketch  import addSketch
 from extrusion import addExtrusion
+from revolution import addRevolution
 from boolean   import Addition        as addAddition
 from boolean   import Subtraction     as addSubtraction
 from boolean   import Intersection    as addIntersection
