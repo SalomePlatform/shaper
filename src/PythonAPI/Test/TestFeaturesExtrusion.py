@@ -127,7 +127,7 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
                                    ModelAPI.ModelAPI_AttributeDouble))
 
     def test_extrusion_set_sizes(self):
-        self.extrusion.setSize(15, 20)
+        self.extrusion.setSizes(15, 20)
         self.assertEqual(self.extrusion.getCreationMethod().value(), "BySizes")
         self.assertEqual(self.extrusion.getToSize().value(), 15)
         self.assertEqual(self.extrusion.getFromSize().value(), 20)

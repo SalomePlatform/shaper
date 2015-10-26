@@ -116,7 +116,7 @@ class Extrusion(Interface):
         self.__execute()
         pass
 
-    def setSize(self, *args):
+    def setSizes(self, *args):
         """Modify the to_size, from_size attributes of the feature.
 
         See __init__.
