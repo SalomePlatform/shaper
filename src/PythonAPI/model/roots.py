@@ -5,7 +5,7 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import ModelAPI
 
-from .tools import get_value, convert_to_underscore
+from model import tools
 
 
 class Feature(ModelAPI.ModelAPI_Feature):
@@ -46,7 +46,7 @@ class Interface():
         if name.startswith("get"):
             possible_names = [
                 "_" + name[3:],
-                "_" + convert_to_underscore(name[3:]),
+                "_" + tools.convert_to_underscore(name[3:]),
                 ]
             for possible_name in possible_names:
                 if hasattr(self, possible_name):
@@ -62,6 +62,10 @@ class Interface():
     def feature(self):
         """Return ModelAPI_Feature."""
         return self._feature
+
+    def _fill_attribute(self, attribute, value, *args):
+        """Fill ModelAPI_Attribute* with value."""
+        tools.fill_attribute(attribute, value, *args)
 
     def setRealInput(self, inputid, value):
         self._feature.data().real(inputid).setValue(value)
