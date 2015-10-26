@@ -78,7 +78,8 @@ signals:
   void widgetActivated(ModuleBase_ModelWidget* theWidget);
 
   /// Emited when there is no next widget
-  void noMoreWidgets();
+  /// \param thePreviousAttributeID an attribute key of the previous active widget
+  void noMoreWidgets(const std::string& thePreviousAttributeID);
 
 public slots:
   /// Activate the next widget in the property panel

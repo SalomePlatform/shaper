@@ -253,7 +253,7 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
   }
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (!aFOperation || aFOperation->isEditOperation())
+  if (!aFOperation)
     return;
   // the selection is cleared after commit the create operation
   // in order to do not use the same selected objects in the restarted operation
@@ -270,10 +270,34 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
                      myRestartingMode == RM_EmptyFeatureUsed)) {
     myLastOperationId = aFOperation->id();
     myLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
-    if (!sketchMgr()->sketchSolverError())
-      launchOperation(myLastOperationId);
+    if (!sketchMgr()->sketchSolverError()) {
+      if (!aFOperation->isEditOperation()) {
+        FeaturePtr anOperationFeature = aFOperation->feature();
+        if (anOperationFeature.get() != NULL) {
+          editFeature(anOperationFeature);
+          // 4. activate the first obligatory widget
+          if (!myPreviousAttributeID.empty()) {
+            ModuleBase_Operation* anEditOperation = currentOperation();
+            if (anEditOperation) {
+              ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+              ModuleBase_ModelWidget* aPreviousAttributeWidget = 0;
+              QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+              for (int i = 0, aNb = aWidgets.size(); i < aNb && !aPreviousAttributeWidget; i++) {
+                if (aWidgets[i]->attributeID() == myPreviousAttributeID)
+                  aPreviousAttributeWidget = aWidgets[i];
+              }
+              if (aPreviousAttributeWidget)
+                aPreviousAttributeWidget->focusTo();
+            }
+          }
+        }
+      }
+      else {
+        launchOperation(myLastOperationId);
+        breakOperationSequence();
+      }
+    }
   }
-  breakOperationSequence();
 }
 
 void PartSet_Module::breakOperationSequence()
@@ -557,7 +581,10 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
 
 void PartSet_Module::onEnterReleased()
 {
-  myRestartingMode = RM_EmptyFeatureUsed;
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                  (currentOperation());
+  if (!aFOperation->isEditOperation())
+    myRestartingMode = RM_EmptyFeatureUsed;
 }
 
 void PartSet_Module::onOperationActivatedByPreselection()
@@ -572,13 +599,15 @@ void PartSet_Module::onOperationActivatedByPreselection()
   }
 }
 
-void PartSet_Module::onNoMoreWidgets()
+void PartSet_Module::onNoMoreWidgets(const std::string& thePreviousAttributeID)
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   if (anOperation) {
     if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
-      if (myRestartingMode != RM_Forbided)
+      if (myRestartingMode != RM_Forbided) {
         myRestartingMode = RM_LastFeatureUsed;
+        myPreviousAttributeID = thePreviousAttributeID;
+      }
       XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
       XGUI_Workshop* aWorkshop = aConnector->workshop();
       XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();

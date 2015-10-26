@@ -197,7 +197,9 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
   if (theWidget == myActiveWidget) {
     return;
   }
+  std::string aPreviosAttributeID;
   if(myActiveWidget) {
+    aPreviosAttributeID = myActiveWidget->attributeID();
     myActiveWidget->deactivate();
     myActiveWidget->setHighlighted(false);
   }
@@ -210,8 +212,8 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
   if (myActiveWidget) {
     emit widgetActivated(theWidget);
   } else if (!isEditingMode()) {
-    emit noMoreWidgets();
-    setFocusOnOkButton();
+    emit noMoreWidgets(aPreviosAttributeID);
+    //setFocusOnOkButton();
   }
 }
 

@@ -206,7 +206,7 @@ public:
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
-  void onNoMoreWidgets();
+  void onNoMoreWidgets(const std::string& thePreviousAttributeID);
 
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -273,6 +273,8 @@ protected slots:
  private:
    QString myLastOperationId;
    FeaturePtr myLastFeature;
+
+   std::string myPreviousAttributeID;
 
    // Automatical restarting mode flag
    RestartingMode myRestartingMode;
