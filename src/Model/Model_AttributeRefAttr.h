@@ -22,7 +22,7 @@
 class Model_AttributeRefAttr : public ModelAPI_AttributeRefAttr
 {
   Handle_TDF_Reference myRef;  ///< reference to the feature label
-  ///< ID of the referenced attirbute (empty if this is a reference to a feature)
+  ///< ID of the referenced attribute (empty if this is a reference to a feature)
   Handle_TDataStd_Comment myID;
  public:
   /// Returns true if this attribute references to a object (not to the attribute)

@@ -82,7 +82,7 @@ class ModelAPI_Feature : public ModelAPI_Object
                                  const int theIndex);
   /// removes the result from the feature
   MODELAPI_EXPORT void removeResult(const std::shared_ptr<ModelAPI_Result>& theResult);
-  /// removes all results starting from the gived index (zero-based)
+  /// removes all results starting from the given index (zero-based)
   /// \param theSinceIndex - index of the deleted result and all after also will be deleted
   /// \param theFlush - if it is false, REDISPLAY message is not flushed
   MODELAPI_EXPORT void removeResults(const int theSinceIndex, const bool theFlush = true);

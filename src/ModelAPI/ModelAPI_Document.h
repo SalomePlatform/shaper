@@ -123,7 +123,7 @@ public:
   //! To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
 
-  //! Creates a construction cresult
+  //! Creates a construction result
   virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   //! Creates a body result
