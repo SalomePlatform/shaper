@@ -1,6 +1,8 @@
 import unittest
-import model
+
 import ModelAPI
+
+import model
 
 #-----------------------------------------------------------------------------
 # Fixtures

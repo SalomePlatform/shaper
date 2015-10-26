@@ -7,7 +7,7 @@ class Line(Interface):
     def __init__(self, feature, *args):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "SketchLine")
-        
+
         # Initialize attributes
         self._start_point = geomDataAPI_Point2D(
             self._feature.data().attribute("StartPoint")

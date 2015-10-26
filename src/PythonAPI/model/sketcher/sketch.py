@@ -6,6 +6,7 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 from ModelAPI import modelAPI_ResultConstruction, featureToCompositeFeature
 from GeomDataAPI import geomDataAPI_Point, geomDataAPI_Dir
 from GeomAlgoAPI import GeomAlgoAPI_SketchBuilder, ShapeList
+
 from model.sketcher.point import Point
 from model.sketcher.line import Line
 from model.sketcher.circle import Circle
@@ -15,7 +16,7 @@ from model.roots import Interface
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface
     on it.
-    
+
     A Sketch object is instanciated with a feature as input parameter
     it provides an interface for manipulation of the feature data.
     :return: interface on the feature
@@ -27,14 +28,14 @@ class Sketch(Interface):
     """Interface on a Sketch feature."""
     def __init__(self, feature, plane):
         """Initialize a 2D Sketch on the given plane.
-        
+
         The plane can be defined either by:
         - a 3D axis system (geom.Ax3),
         - an existing face identified by its topological name.
         """
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Sketch")
-        
+
         # Entities used for building the result shape
         self._selection = None
         #   self.resultype ="Face" # Type of Sketch result
@@ -85,17 +86,17 @@ class Sketch(Interface):
                 line_feature.firstResult()
                 )
         return line_interface
-    
+
     def addCircle(self, *args):
         """Add a circle to this Sketch."""
         circle_feature = self._feature.addFeature("SketchCircle")
         return Circle(circle_feature, *args)
-    
+
     def addArc(self, *args):
         """Add an arc to this Sketch."""
         arc_feature = self._feature.addFeature("SketchArc")
         return Arc(arc_feature, *args)
-  
+
     #-------------------------------------------------------------
     #
     # Creation of Geometrical and Dimensional Constraints
@@ -103,7 +104,7 @@ class Sketch(Interface):
     #-------------------------------------------------------------
 
     def setCoincident(self, p1, p2):
-        """Set coincident the two given points and add the corresponding 
+        """Set coincident the two given points and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintCoincidence")
         constraint.data().refattr("ConstraintEntityA").setAttr(p1)
@@ -111,7 +112,7 @@ class Sketch(Interface):
         return constraint
 
     def setParallel(self, l1, l2):
-        """Set parallel the two given lines and add the corresponding 
+        """Set parallel the two given lines and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintParallel")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
@@ -119,22 +120,22 @@ class Sketch(Interface):
         return constraint
 
     def setPerpendicular(self, l1, l2):
-        """Set perpendicular the two given lines and add the corresponding 
+        """Set perpendicular the two given lines and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintPerpendicular")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
         return constraint
-    
+
     def setHorizontal(self, line):
-        """Set horizontal the given line and add the corresponding 
+        """Set horizontal the given line and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintHorizontal")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         return constraint
-    
+
     def setVertical(self, line):
-        """Set vertical the given line and add the corresponding 
+        """Set vertical the given line and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintVertical")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
@@ -145,9 +146,9 @@ class Sketch(Interface):
         the corresponding constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintDistance")
         if isinstance(line, str):
-            # Add the edge identified by the given topological name 
+            # Add the edge identified by the given topological name
             # to this Sketch
-            line = self.addLine(line).result()   
+            line = self.addLine(line).result()
         constraint.data().refattr("ConstraintEntityA").setAttr(point)
         constraint.data().refattr("ConstraintEntityB").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
@@ -155,34 +156,34 @@ class Sketch(Interface):
         return constraint
 
     def setLength(self, line, length):
-        """Set the length of the given line and add the corresponding 
+        """Set the length of the given line and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintLength")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
         self._feature.execute()
         return constraint
-    
+
     def setRadius(self, circle, radius):
-        """Set the radius of the given circle and add the corresponding 
+        """Set the radius of the given circle and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintRadius")
         constraint.data().refattr("ConstraintEntityA").setObject(circle)
         constraint.data().real("ConstraintValue").setValue(radius)
         return constraint
-    
+
     def setEqual(self, object_1, object_2):
         """Set the radii of two circles or the length of two lines equal.
-        
+
         The corresponding constraint is added to the sketch"""
         constraint = self._feature.addFeature("SketchConstraintEqual")
         constraint.data().refattr("ConstraintEntityA").setObject(object_1)
         constraint.data().refattr("ConstraintEntityB").setObject(object_2)
         self._feature.execute()
         return constraint
-    
+
     def setAngle(self, line_1, line_2, angle):
-        """Set the angle between the given 2 lines and add the corresponding 
+        """Set the angle between the given 2 lines and add the corresponding
         constraint to the sketch."""
         constraint = self._feature.addFeature("SketchConstraintAngle")
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)
@@ -190,18 +191,18 @@ class Sketch(Interface):
         constraint.data().real("ConstraintValue").setValue(angle)
         self._feature.execute()
         return constraint
-    
+
     def setTangent(self, object_1, object_2):
-        """Set a tangential continuity between two objects 
+        """Set a tangential continuity between two objects
         at their coincidence point."""
         constraint = self._feature.addFeature("SketchConstraintTangent")
         constraint.data().refattr("ConstraintEntityA").setObject(object_1)
         constraint.data().refattr("ConstraintEntityB").setObject(object_2)
         self._feature.execute()
         return constraint
-    
+
     def setFillet(self, line_1, line_2, radius):
-        """Set a fillet constraint between the 3 given lines with the given 
+        """Set a fillet constraint between the 3 given lines with the given
         filleting radius."""
         constraint = self._feature.addFeature("SketchConstraintFillet")
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)
@@ -219,16 +220,16 @@ class Sketch(Interface):
     def setValue(self, constraint, value):
         """Modify the value of the given dimensional constraint."""
         constraint.data().real("ConstraintValue").setValue(value)
-     
+
     #-------------------------------------------------------------
     #
     # Macro functions combining geometry creation and constraints
     #
     #-------------------------------------------------------------
-     
+
     def addPolyline(self, *coords):
         """Add a poly-line to this Sketch.
-        
+
         The end of consecutive segments are defined as coincident.
         """
         c0 = coords[0]
@@ -247,7 +248,7 @@ class Sketch(Interface):
 
     def addPolygon(self, *coords):
         """Add a polygon to this Sketch.
-        
+
         The end of consecutive segments are defined as coincident.
         """
         pg = self.addPolyline(*coords)

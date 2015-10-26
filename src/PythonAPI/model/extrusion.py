@@ -61,9 +61,11 @@ class Extrusion(Interface):
         if len(args) == 4:
             self.__createByPlanesAndOffsets(*args)
         elif len(args) == 2:
-            self.__createBySize(*args)
+            self.__createBySizes(*args)
         else:
-            raise Exception("cannot create the Extrusion")
+            raise AssertionError(
+                "Extrusion takes 4 or 6 arguments (%s given)." % (len(args) + 2)
+                )
 
         self.__execute()
         pass
@@ -100,7 +102,7 @@ class Extrusion(Interface):
         self._from_offset.setValue(0)
         pass
 
-    def __createBySize(self, to_size, from_size):
+    def __createBySizes(self, to_size, from_size):
         self.__clear()
         self._CreationMethod.setValue("BySizes")
         self._to_size.setValue(to_size)
@@ -119,9 +121,10 @@ class Extrusion(Interface):
 
     def __execute(self):
         if self.areInputValid():
-          self.execute()
+            self.execute()
         else:
-          raise Exception("cannot execute Extrusion")
+            raise Exception("Cannot execute Extrusion: %s" %
+                            self._feature.error())
 
     def setBase(self, base):
         """Modify base attribute of the feature.
@@ -137,7 +140,7 @@ class Extrusion(Interface):
 
         See __init__.
         """
-        self.__createBySize(*args)
+        self.__createBySizes(*args)
         self.__execute()
         pass
 

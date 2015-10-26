@@ -10,8 +10,8 @@ class Part():
 
   def __init__ (self, partset):
     """Adds a new Part to the given Partset and activates the Part."""
-    self.my = partset.addFeature("Part")
-    self.my.execute()
+    self._feature = partset.addFeature("Part")
+    self._feature.execute()
 
   def document (self):
     """Returns the Part document created by this feature."""

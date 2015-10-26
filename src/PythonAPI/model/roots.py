@@ -34,7 +34,7 @@ class Interface():
     def __init__(self, feature):
         self._feature = feature
         self._attribute_white_list = [
-            "getKind",
+            "getKind", "results", "firstResult", "lastResult",
             ]
 
     def __getattr__(self, name):
@@ -57,7 +57,7 @@ class Interface():
         if name in self._attribute_white_list:
             return getattr(self._feature, name)
 
-        return object.__getattribute__(self, name)
+        raise AttributeError()
 
     def feature(self):
         """Return ModelAPI_Feature."""
