@@ -48,19 +48,10 @@ class Selection:
         assert(len(args) > 1 and len(args) < 4)
         assert(isinstance(args[0], basestring) or
                isinstance(args[0], ModelAPI.ModelAPI_Result))
-#                 "args[0] should be str or ModelAPI_Result (%s given)." %
-#                 type(args[0]))
         if isinstance(args[0], basestring):
             assert(isinstance(args[1], basestring))
-#             ,
-#                    "args[1] should be str (%s given)." %
-#                    type(args[1]))
         elif isinstance(args[0], ModelAPI.ModelAPI_Result) or args[0] is None:
             assert(isinstance(args[1], GeomAPI.GeomAPI_Shape))
-
-#                    ,
-#                    "args[1] should be GeomAPI_Shape (%s given)." %
-#                    type(args[1]))
         self.args = args
 
 
