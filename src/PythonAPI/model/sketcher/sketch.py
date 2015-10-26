@@ -12,6 +12,8 @@ from model.sketcher.line import Line
 from model.sketcher.circle import Circle
 from model.sketcher.arc import Arc
 from model.roots import Interface
+from model.tools import Selection
+
 
 def addSketch(doc, plane):
     """Add a Sketch feature to the Part or PartSet and return an interface
@@ -283,6 +285,7 @@ class Sketch(Interface):
                 self._feature.firstResult()).shape()
         elif len(args) == 1:
             self._selection = args[0].shape()
+            return Selection(self.result(), self.buildShape())
         else:
             raise Exception("not yet implemented")
         return self

@@ -63,9 +63,9 @@ class Interface():
         """Return ModelAPI_Feature."""
         return self._feature
 
-    def _fill_attribute(self, attribute, value, *args):
+    def _fill_attribute(self, attribute, value):
         """Fill ModelAPI_Attribute* with value."""
-        tools.fill_attribute(attribute, value, *args)
+        tools.fill_attribute(attribute, value)
 
     def setRealInput(self, inputid, value):
         self._feature.data().real(inputid).setValue(value)

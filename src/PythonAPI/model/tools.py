@@ -55,15 +55,16 @@ class Selection:
 #             ,
 #                    "args[1] should be str (%s given)." %
 #                    type(args[1]))
-        elif isinstance(args[0], ModelAPI.ModelAPI_Result):
+        elif isinstance(args[0], ModelAPI.ModelAPI_Result) or args[0] is None:
             assert(isinstance(args[1], GeomAPI.GeomAPI_Shape))
+
 #                    ,
 #                    "args[1] should be GeomAPI_Shape (%s given)." %
 #                    type(args[1]))
         self.args = args
 
 
-def fill_attribute(attribute, value, *args):
+def fill_attribute(attribute, value):
     """Set value to attribure.
 
     This function processes complex cases.
@@ -78,9 +79,6 @@ def fill_attribute(attribute, value, *args):
 
         assert(isinstance(value, collections.Iterable))
         for item in value:
-            attribute.append(item.result(), item.buildShape())
-            continue
-
             assert(isinstance(item, Selection))
             attribute.append(*item.args)
 
@@ -88,9 +86,6 @@ def fill_attribute(attribute, value, *args):
         if value is None:
             attribute.setValue(None, None)
             return
-
-        attribute.setValue(value.result(), value.buildShape())
-        return
 
         assert(isinstance(value, Selection))
         attribute.setValue(*value.args)
