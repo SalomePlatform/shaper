@@ -5,7 +5,6 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
 from .roots import Interface
-from .sketcher.sketch import Sketch
 
 
 def addExtrusion(part, *args):
@@ -71,52 +70,34 @@ class Extrusion(Interface):
         pass
 
     def __setBase(self, base):
-        """Initialize base attribute of the feature.
-
-        Expected arguments:
-        base -- could be object of this types:
-        - string - topology name of object
-        - Sketch - sketch object
-        - iterable - list or tuple with string and/or Sketch objects
-        """
-        self._base.clear()
-        if isinstance(base, basestring):
-            self._base.append(base)
-        elif isinstance(base, Sketch):
-            self._base.append(base.result(), base.buildShape())
-        else:
-            for item in base:
-                if isinstance(item, basestring):
-                    self._base.append(item)
-                else:
-                    self._base.append(item.result(), item.buildShape())
+        self._fill_attribute(self._base, base)
         pass
 
     def __clear(self):
         self._CreationMethod.setValue("BySizes")
-        self._to_size.setValue(0)
-        self._from_size.setValue(0)
-        self._to_object.setValue(None, None)
-        self._to_offset.setValue(0)
-        self._from_object.setValue(None, None)
-        self._from_offset.setValue(0)
+        self._fill_attribute(self._to_size, 0)
+        self._fill_attribute(self._from_size, 0)
+        self._fill_attribute(self._to_object, None)
+        self._fill_attribute(self._to_offset, 0)
+        self._fill_attribute(self._from_object, None)
+        self._fill_attribute(self._from_offset, 0)
         pass
 
     def __createBySizes(self, to_size, from_size):
         self.__clear()
         self._CreationMethod.setValue("BySizes")
-        self._to_size.setValue(to_size)
-        self._from_size.setValue(from_size)
+        self._fill_attribute(self._to_size, to_size)
+        self._fill_attribute(self._from_size, from_size)
         pass
 
     def __createByPlanesAndOffsets(self, to_object, to_offset,
                                    from_object, from_offset):
         self.__clear()
         self._CreationMethod.setValue("ByPlanesAndOffsets")
-        self._to_object.setValue(to_object.result(), to_object.buildShape())
-        self._to_offset.setValue(to_offset)
-        self._from_object.setValue(from_object.result(), from_object.buildShape())
-        self._from_offset.setValue(from_offset)
+        self._fill_attribute(self._to_object, to_object)
+        self._fill_attribute(self._to_offset, to_offset)
+        self._fill_attribute(self._from_object, from_object)
+        self._fill_attribute(self._from_offset, from_offset)
         pass
 
     def __execute(self):

@@ -78,6 +78,9 @@ def fill_attribute(attribute, value, *args):
 
         assert(isinstance(value, collections.Iterable))
         for item in value:
+            attribute.append(item.result(), item.buildShape())
+            continue
+
             assert(isinstance(item, Selection))
             attribute.append(*item.args)
 
@@ -85,6 +88,9 @@ def fill_attribute(attribute, value, *args):
         if value is None:
             attribute.setValue(None, None)
             return
+
+        attribute.setValue(value.result(), value.buildShape())
+        return
 
         assert(isinstance(value, Selection))
         attribute.setValue(*value.args)

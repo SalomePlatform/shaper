@@ -28,8 +28,9 @@ class FeaturesExtrusionFixture(FeaturesAddExtrusionFixture):
         # Create extrusion
         sketch = model.addSketch(self.part, model.defaultPlane("XOY"))
         circle = sketch.addCircle(0, 0, 10)
-        self.extrusion = model.addExtrusion(self.part,
-                                            sketch.selectFace(circle.result()),
+
+        base = [sketch.selectFace(circle.result())]
+        self.extrusion = model.addExtrusion(self.part, base,
                                             10, 0)
         model.do()
 
@@ -51,8 +52,9 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
     def test_add_extrusion_by_face_and_size(self):
         sketch = model.addSketch(self.part, model.defaultPlane("XOY"))
         circle = sketch.addCircle(0, 0, 10)
-        extrusion = model.addExtrusion(self.part,
-                                       sketch.selectFace(circle.result()),
+
+        base = [sketch.selectFace(circle.result())]
+        extrusion = model.addExtrusion(self.part, base,
                                        10, 0)
 
         self.assertEqual(extrusion.getCreationMethod().value(), "BySizes")
@@ -81,8 +83,8 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
         from_circle = from_sketch.addCircle(0, 0, 10)
         from_sketch.selectFace(from_circle.result())
 
-        extrusion = model.addExtrusion(self.part,
-                                       base_sketch,
+        base = [base_sketch]
+        extrusion = model.addExtrusion(self.part, base,
                                        to_sketch, 15,
                                        from_sketch, 20)
 
