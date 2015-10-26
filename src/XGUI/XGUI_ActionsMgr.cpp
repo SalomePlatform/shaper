@@ -118,9 +118,9 @@ void XGUI_ActionsMgr::update()
     }
     // TODO(SBH): Get defaults state of actions from XML and remove the following method
     updateByDocumentKind();
-    updateCheckState();
     updateByPlugins(anActiveFeature);
   }
+  updateCheckState();
 }
 
 void XGUI_ActionsMgr::updateCheckState()
