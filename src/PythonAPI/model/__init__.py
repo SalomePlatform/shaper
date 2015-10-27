@@ -8,12 +8,12 @@ from roots     import *
 
 # Built-in features
 
-from part      import Part            as addPart
 from sketcher.sketch  import addSketch
 from construction import *
 from exchange import *
 from features import *
 from parameter import *
+from partset import *
 
 # Custom exceptions
 
