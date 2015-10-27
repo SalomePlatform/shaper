@@ -29,4 +29,5 @@ ADD_UNIT_TESTS(
   TestSketcherSetFillet.py
 
   TestFeaturesExtrusion.py
+  TestFeaturesRevolution.py
   )

@@ -1,38 +1,38 @@
-"""Revolution Interface
-Author: Sergey Pokhodenko
+"""Extrusion Interface
+Author: Daniel Brunier-Coulin with contribution by Mikhail Ponikarov
+        and Sergey Pokhodenko
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
-from .roots import Interface
+from model.roots import Interface
 
 
-def addRevolution(part, *args):
-    """Add an Revolution feature to the Part and return Revolution.
+def addExtrusion(part, *args):
+    """Add an Extrusion feature to the Part and return Extrusion.
 
-    Pass all args to Revolution __init__ function.
+    Pass all args to Extrusion __init__ function.
     """
     assert(len(args) > 0 and args[0] is not None)
-    feature = part.addFeature("Revolution")
-    return Revolution(feature, *args)
+    feature = part.addFeature("Extrusion")
+    return Extrusion(feature, *args)
 
 
-class Revolution(Interface):
-    """Interface on an Revolution feature."""
+class Extrusion(Interface):
+    """Interface on an Extrusion feature."""
 
-    def __init__(self, feature, base=None, axis_object=None, *args):
-        """Initialize an Revolution feature with given parameters.
+    def __init__(self, feature, base=None, *args):
+        """Initialize an Extrusion feature with given parameters.
 
         Expected arguments for all modes:
-        feature -- an Revolution feature
+        feature -- an Extrusion feature
 
         Expected arguments for initializing the feature:
         base -- name, sketch or list of names and sketches.
         If base is None then don't change the feature.
-        axis_object -- name, edge for axis
 
-        For ByAngles mode (expect 2 arguments):
-        to_angle -- upper angle
-        from_angle -- lower angle
+        For BySize mode (expect 2 arguments):
+        to_size -- upper size
+        from_size -- lower size
 
         For ByPlanesAndOffsets mode (expect 4 arguments):
         to_object -- upper object (plane)
@@ -41,13 +41,12 @@ class Revolution(Interface):
         from_offset -- offset from lower object
         """
         Interface.__init__(self, feature)
-        assert(self._feature.getKind() == "Revolution")
+        assert(self._feature.getKind() == "Extrusion")
 
         self._base = self._feature.data().selectionList("base")
-        self._axis_object = self._feature.data().selection("axis_object")
         self._CreationMethod = self._feature.string("CreationMethod")
-        self._to_angle = self._feature.data().real("to_angle")
-        self._from_angle = self._feature.data().real("from_angle")
+        self._to_size = self._feature.data().real("to_size")
+        self._from_size = self._feature.data().real("from_size")
         self._to_object = self._feature.data().selection("to_object")
         self._to_offset = self._feature.data().real("to_offset")
         self._from_object = self._feature.data().selection("from_object")
@@ -57,16 +56,14 @@ class Revolution(Interface):
             return
 
         self.__setBase(base)
-        self.__setAxisObject(axis_object)
 
         if len(args) == 4:
             self.__createByPlanesAndOffsets(*args)
         elif len(args) == 2:
-            self.__createByAngles(*args)
+            self.__createBySizes(*args)
         else:
             raise AssertionError(
-                "Revolution takes 5 or 7 arguments (%s given)" %
-                (len(args) + 3)
+                "Extrusion takes 4 or 6 arguments (%s given)." % (len(args) + 2)
                 )
 
         self.__execute()
@@ -76,25 +73,21 @@ class Revolution(Interface):
         self._fill_attribute(self._base, base)
         pass
 
-    def __setAxisObject(self, axis_object):
-        self._fill_attribute(self._axis_object, axis_object)
-        pass
-
     def __clear(self):
-        self._CreationMethod.setValue("ByAngles")
-        self._fill_attribute(self._to_angle, 0)
-        self._fill_attribute(self._from_angle, 0)
+        self._CreationMethod.setValue("BySizes")
+        self._fill_attribute(self._to_size, 0)
+        self._fill_attribute(self._from_size, 0)
         self._fill_attribute(self._to_object, None)
         self._fill_attribute(self._to_offset, 0)
         self._fill_attribute(self._from_object, None)
         self._fill_attribute(self._from_offset, 0)
         pass
 
-    def __createByAngles(self, to_angle, from_angle):
+    def __createBySizes(self, to_size, from_size):
         self.__clear()
-        self._CreationMethod.setValue("ByAngles")
-        self._fill_attribute(self._to_angle, to_angle)
-        self._fill_attribute(self._from_angle, from_angle)
+        self._CreationMethod.setValue("BySizes")
+        self._fill_attribute(self._to_size, to_size)
+        self._fill_attribute(self._from_size, from_size)
         pass
 
     def __createByPlanesAndOffsets(self, to_object, to_offset,
@@ -111,7 +104,7 @@ class Revolution(Interface):
         if self.areInputValid():
             self.execute()
         else:
-            raise Exception("Cannot execute Revolution: %s" %
+            raise Exception("Cannot execute Extrusion: %s" %
                             self._feature.error())
 
     def setBase(self, base):
@@ -123,21 +116,12 @@ class Revolution(Interface):
         self.__execute()
         pass
 
-    def setAxisObject(self, axis_object):
-        """Modify axis_object attribute of the feature.
+    def setSizes(self, *args):
+        """Modify the to_size, from_size attributes of the feature.
 
         See __init__.
         """
-        self.__setAxisObject(axis_object)
-        self.__execute()
-        pass
-
-    def setAngles(self, *args):
-        """Modify the to_angle, from_angle attributes of the feature.
-
-        See __init__.
-        """
-        self.__createByAngles(*args)
+        self.__createBySizes(*args)
         self.__execute()
         pass
 
