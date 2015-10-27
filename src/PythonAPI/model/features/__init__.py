@@ -16,3 +16,4 @@ from revolution_boolean import addRevolutionCut, addRevolutionFuse
 from revolution_sketch import addRevolutionSketch
 
 from placement import addPlacement
+from rotation import addRotation
