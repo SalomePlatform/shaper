@@ -14,3 +14,5 @@ from extrusion_sketch import addExtrusionSketch
 from revolution import addRevolution
 from revolution_boolean import addRevolutionCut, addRevolutionFuse
 from revolution_sketch import addRevolutionSketch
+
+from placement import addPlacement
