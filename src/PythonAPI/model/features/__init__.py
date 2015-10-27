@@ -17,3 +17,4 @@ from revolution_sketch import addRevolutionSketch
 
 from placement import addPlacement
 from rotation import addRotation
+from translation import addTranslation
