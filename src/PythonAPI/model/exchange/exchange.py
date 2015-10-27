@@ -48,7 +48,7 @@ class Import(Interface):
         pass
 
 
-def addExport(part, *args):
+def exportToFile(part, *args):
     """Add an Export feature to the Part and return Export.
 
     Pass all args to Export __init__ function.

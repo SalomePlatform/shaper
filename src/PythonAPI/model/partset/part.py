@@ -40,5 +40,3 @@ class Part(Interface):
         """Returns the Part document created by this feature."""
         result_part = ModelAPI.modelAPI_ResultPart(self._feature.firstResult())
         return result_part.partDoc()
-
-
