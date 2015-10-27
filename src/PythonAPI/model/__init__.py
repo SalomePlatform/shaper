@@ -12,6 +12,7 @@ from part      import Part            as addPart
 from sketcher.sketch  import addSketch
 from construction import *
 from features import *
+from parameter import *
 
 # Custom exceptions
 
