@@ -7,3 +7,4 @@ from boolean   import Intersection    as addIntersection
 
 from extrusion import addExtrusion
 from revolution import addRevolution
+from partition import addPartition
