@@ -10,7 +10,8 @@ from roots     import *
 
 from part      import Part            as addPart
 from sketcher.sketch  import addSketch
-from features  import *
+from construction import *
+from features import *
 
 # Custom exceptions
 
