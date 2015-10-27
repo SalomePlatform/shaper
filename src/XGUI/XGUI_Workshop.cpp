@@ -1016,6 +1016,8 @@ void XGUI_Workshop::createDockWidgets()
           myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
   //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
   //        this, SLOT(onValidationStateChanged(bool)));
+  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+          myModule, SLOT(onInternalActivateFirstWidgetSelection()));
 }
 
 //******************************************************

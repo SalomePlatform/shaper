@@ -124,7 +124,8 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   : ModuleBase_IModule(theWshop),
-  myRestartingMode(RM_None), myVisualLayerId(0), myHasConstraintShown(true)
+  myRestartingMode(RM_None), myVisualLayerId(0), myHasConstraintShown(true),
+  myIsInternalEditOperation(false)
 {
   new PartSet_IconFactory();
 
@@ -275,7 +276,10 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
         FeaturePtr anOperationFeature = aFOperation->feature();
         if (anOperationFeature.get() != NULL) {
           editFeature(anOperationFeature);
-          // 4. activate the first obligatory widget
+          myIsInternalEditOperation = true;
+          onInternalActivateFirstWidgetSelection();
+
+          // activate the last active widget in the Property Panel
           if (!myPreviousAttributeID.empty()) {
             ModuleBase_Operation* anEditOperation = currentOperation();
             if (anEditOperation) {
@@ -286,13 +290,16 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
                 if (aWidgets[i]->attributeID() == myPreviousAttributeID)
                   aPreviousAttributeWidget = aWidgets[i];
               }
-              if (aPreviousAttributeWidget)
+              // If the current widget is a selector, do nothing, it processes the mouse press
+              if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector())
                 aPreviousAttributeWidget->focusTo();
             }
           }
         }
       }
       else {
+        // the flag should be reset before start to do not react to the widget deactivate
+        myIsInternalEditOperation = false;
         launchOperation(myLastOperationId);
         breakOperationSequence();
       }
@@ -309,6 +316,7 @@ void PartSet_Module::breakOperationSequence()
 
 void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 {
+  myIsInternalEditOperation = false;
   breakOperationSequence();
 }
 
@@ -583,7 +591,7 @@ void PartSet_Module::onEnterReleased()
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                   (currentOperation());
-  if (!aFOperation->isEditOperation())
+  if (/*!aFOperation->isEditOperation() || */myIsInternalEditOperation)
     myRestartingMode = RM_EmptyFeatureUsed;
 }
 
@@ -615,6 +623,20 @@ void PartSet_Module::onNoMoreWidgets(const std::string& thePreviousAttributeID)
       if (anOpMgr->isApplyEnabled())
         anOperation->commit();
     }
+  }
+}
+
+void PartSet_Module::onInternalActivateFirstWidgetSelection()
+{
+  if (!myIsInternalEditOperation)
+    return;
+
+  ModuleBase_ModelWidget* aFirstWidget = activeWidget();
+  ModuleBase_IPropertyPanel* aPanel = currentOperation()->propertyPanel();
+  if (aFirstWidget != aPanel->activeWidget()) {
+    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
+    if (aWSelector)
+      aWSelector->activateSelectionAndFilters(true);
   }
 }
 
@@ -697,6 +719,31 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   return aWgt;
 }
 
+ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
+{
+  ModuleBase_ModelWidget* anActiveWidget = 0;
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (aOperation) {
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    anActiveWidget = aPanel->activeWidget();
+    if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector())) {
+      // finds the first widget which can accept a value
+      QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+      ModuleBase_ModelWidget* aFirstWidget = 0;
+      ModuleBase_ModelWidget* aWgt;
+      QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
+      for (aWIt = aWidgets.begin(); aWIt != aWidgets.end() && !aFirstWidget; ++aWIt) {
+        aWgt = (*aWIt);
+        if (aWgt->canSetValue())
+          aFirstWidget = aWgt;
+      }
+      if (aFirstWidget)
+        anActiveWidget = aFirstWidget;
+    }
+  }
+
+  return anActiveWidget;
+}
 
 bool PartSet_Module::deleteObjects()
 {
@@ -1127,13 +1174,11 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
   // the filters of this widget should be activated in the created view
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   if (aOperation) {
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+    ModuleBase_ModelWidget* anActiveWidget = activeWidget();
     if (anActiveWidget) {
-      ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
-                                                                             (anActiveWidget);
-      if (aWidgetValidated)
-        aWidgetValidated->activateFilters(true);
+      ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(anActiveWidget);
+      if (aWSelector)
+        aWSelector->activateSelectionAndFilters(true);
     }
   }
 }

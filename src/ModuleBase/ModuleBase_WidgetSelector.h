@@ -42,6 +42,9 @@ Q_OBJECT
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return true; }
 
+  /// Activate or deactivate selection and selection filters
+  void activateSelectionAndFilters(bool toActivate);
+
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
@@ -53,10 +56,6 @@ Q_OBJECT
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
-
-protected:
-  /// Activate or deactivate selection
-  void activateSelection(bool toActivate);
 
  private slots:
    /// Slot which is called on selection event

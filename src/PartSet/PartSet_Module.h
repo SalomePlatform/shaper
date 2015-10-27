@@ -66,6 +66,10 @@ public:
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi, std::string theParentId);
 
+  /// Returns the active widget, by default it is the property panel active widget
+  /// If the internal edit operation is started, this is the first widget of the operation
+  virtual ModuleBase_ModelWidget* activeWidget() const;
+
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
 
@@ -203,10 +207,14 @@ public:
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
+  bool isInternalEditOperation() { return myIsInternalEditOperation; }
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
   void onNoMoreWidgets(const std::string& thePreviousAttributeID);
+
+  void onInternalActivateFirstWidgetSelection();
 
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -271,13 +279,15 @@ protected slots:
   virtual bool deleteObjects();
 
  private:
-   QString myLastOperationId;
-   FeaturePtr myLastFeature;
+  QString myLastOperationId;
+  FeaturePtr myLastFeature;
 
-   std::string myPreviousAttributeID;
+  std::string myPreviousAttributeID;
 
-   // Automatical restarting mode flag
-   RestartingMode myRestartingMode;
+  // Automatical restarting mode flag
+  RestartingMode myRestartingMode;
+
+  bool myIsInternalEditOperation;
 
   SelectMgr_ListOfFilter mySelectionFilters;
 

@@ -304,8 +304,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
-  activateSelection(true);
-  activateFilters(true);
+  activateSelectionAndFilters(true);
   QList<ModuleBase_ViewerPrs> anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
   // To clear mySelection, myListControl and storeValue()
@@ -354,14 +353,12 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      activateSelection(false);
-      activateFilters(false);
+      activateSelectionAndFilters(false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
 
-      activateSelection(true);
-      activateFilters(true);
+      activateSelectionAndFilters(true);
       break;
     }
   }

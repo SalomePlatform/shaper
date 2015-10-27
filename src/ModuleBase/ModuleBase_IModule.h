@@ -101,6 +101,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
     return 0;
   }
 
+  /// Returns the active widget, by default it is the property panel active widget
+  virtual ModuleBase_ModelWidget* activeWidget() const = 0;
+
   /// Returns current workshop
   ModuleBase_IWorkshop* workshop() const { return myWorkshop; }
 

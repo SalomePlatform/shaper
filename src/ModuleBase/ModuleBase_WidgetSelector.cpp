@@ -111,7 +111,7 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::activateSelection(bool toActivate)
+void ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
 {
   updateSelectionName();
 
@@ -120,6 +120,7 @@ void ModuleBase_WidgetSelector::activateSelection(bool toActivate)
   } else {
     myWorkshop->deactivateSubShapesSelection();
   }
+  activateFilters(toActivate);
 }
 
 //********************************************************************
@@ -128,12 +129,10 @@ void ModuleBase_WidgetSelector::activateCustom()
   connect(myWorkshop, SIGNAL(selectionChanged()), this,
           SLOT(onSelectionChanged()), Qt::UniqueConnection);
   
-  activateSelection(true);
+  activateSelectionAndFilters(true);
 
   // Restore selection in the viewer by the attribute selection list
   myWorkshop->setSelected(getAttributeSelection());
-
-  activateFilters(true);
 }
 
 //********************************************************************
@@ -167,7 +166,7 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrs& t
 void ModuleBase_WidgetSelector::deactivate()
 {
   disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  activateSelection(false);
-  activateFilters(false);
+  activateSelectionAndFilters(false);
+  ModuleBase_ModelWidget::deactivate();
 }
 
