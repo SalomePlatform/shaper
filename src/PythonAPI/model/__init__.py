@@ -11,6 +11,7 @@ from roots     import *
 from part      import Part            as addPart
 from sketcher.sketch  import addSketch
 from construction import *
+from exchange import *
 from features import *
 from parameter import *
 
