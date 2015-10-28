@@ -11,10 +11,43 @@
 
 #include <QWidget>
 #include <QTreeView>
+#include <QLineEdit>
 
 class ModuleBase_IDocumentDataModel;
-class QLineEdit;
 class XGUI_DataModel;
+
+/**
+* \ingroup GUI
+* Implementation of root label in Object Browser
+*/
+class XGUI_ActiveDocLbl: public QLineEdit
+{
+Q_OBJECT
+ public:
+   /// Constructor
+   /// \param theParent a parent widget
+   XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent );
+
+   void setTreeView(QTreeView* theView);
+
+   QTreeView* treePalette() const { return myTreeView;}
+
+   virtual bool event(QEvent* theEvent);
+
+public slots:
+  void unselect();
+
+protected:
+  virtual void mouseReleaseEvent( QMouseEvent* e);
+
+private:
+  QString myPreSelectionStyle;
+  QString myNeutralStyle;
+  QString mySelectionStyle;
+
+  QTreeView* myTreeView;
+  bool myIsSelected;
+};
 
 /**
 * \ingroup GUI
@@ -119,10 +152,6 @@ signals:
   //! Segnal is emitted when user cliks by mouse in header label of object browser
   void headerMouseDblClicked(const QModelIndex&);
 
- protected:
-   /// Redefinition of virtual method
-  virtual bool eventFilter(QObject* obj, QEvent* theEvent);
-
  private slots:
   /// Show context menu
   /// \param theEvent a context menu event
@@ -136,11 +165,10 @@ signals:
   void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
  private:
-  void closeDocNameEditing(bool toSave);
 
   //! Internal model
   XGUI_DataModel* myDocModel;
-  QLineEdit* myActiveDocLbl;
+  XGUI_ActiveDocLbl* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 };
 

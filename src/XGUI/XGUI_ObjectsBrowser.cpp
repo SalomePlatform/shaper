@@ -14,7 +14,6 @@
 
 #include <QLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
@@ -173,6 +172,79 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
 //********************************************************************
 //********************************************************************
 //********************************************************************
+XGUI_ActiveDocLbl::XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent )
+  : QLineEdit(theText, theParent), 
+  myPreSelectionStyle(""), 
+  myNeutralStyle(""), 
+  mySelectionStyle(""),
+  myIsSelected(false)
+{
+}
+
+void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
+{
+  myTreeView = theView;
+  QPalette aPalet = myTreeView->palette();
+  QColor aHighlight = aPalet.highlight().color();
+
+  myPreSelectionStyle = "QLineEdit {background-color: ";
+  myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " + aHighlight.lighter(170).name() + ");"; 
+  myPreSelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
+
+  QString aName = aPalet.color(QPalette::Base).name();
+  myNeutralStyle = "QLineEdit { border: 1px solid " + aName + " }";
+
+  mySelectionStyle = "QLineEdit {background-color: ";
+  mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 " + aHighlight.lighter(170).name();
+  mySelectionStyle += ", stop:1 " + aHighlight.lighter().name() + ");"; 
+  mySelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
+
+  connect(myTreeView->selectionModel(), 
+    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+    SLOT(unselect()));
+}
+
+
+bool XGUI_ActiveDocLbl::event(QEvent* theEvent)
+{
+  switch (theEvent->type()) {
+    case QEvent::Enter:
+      if (!myIsSelected)
+        setStyleSheet(myPreSelectionStyle);
+      break;
+    case QEvent::Leave:
+      if (!myIsSelected)
+        setStyleSheet(myNeutralStyle);
+      break;
+  }
+  return QLineEdit::event(theEvent);
+}
+
+static bool MYClearing = false;
+void XGUI_ActiveDocLbl::mouseReleaseEvent( QMouseEvent* e)
+{
+  MYClearing = true;
+  myIsSelected = true;
+  setStyleSheet(mySelectionStyle);
+  // We can not block signals because on 
+  // clear selection the View state will not be updated
+  myTreeView->clearSelection();
+  QLineEdit::mouseReleaseEvent(e);
+  MYClearing = false;
+}
+
+void XGUI_ActiveDocLbl::unselect()
+{
+  if (!MYClearing) {
+    myIsSelected = false;
+    setStyleSheet(myNeutralStyle);
+  }
+}
+
+
+//********************************************************************
+//********************************************************************
+//********************************************************************
 XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
     : QWidget(theParent), myDocModel(0)
 {
@@ -180,12 +252,8 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->setSpacing(0);
 
-  QFrame* aLabelWgt = new QFrame(this);
-  //QWidget* aLabelWgt = new QWidget(this);
+  QWidget* aLabelWgt = new QWidget(this);
   aLabelWgt->setAutoFillBackground(true);
-  QPalette aPalet = aLabelWgt->palette();
-  aPalet.setColor(QPalette::Window, Qt::white);
-  aLabelWgt->setPalette(aPalet);
 
   aLayout->addWidget(aLabelWgt);
   QHBoxLayout* aLabelLay = new QHBoxLayout(aLabelWgt);
@@ -195,35 +263,40 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   QLabel* aLbl = new QLabel(aLabelWgt);
   aLbl->setPixmap(QPixmap(":pictures/assembly.png"));
   aLbl->setMargin(2);
-
-  aLbl->setAutoFillBackground(true);
+  // Do not paint background of the label (in order to show icon)
+  aLbl->setAutoFillBackground(false); 
 
   aLabelLay->addWidget(aLbl);
 
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->moduleDocument();
-  // TODO: Find a name of the root document
 
-  myActiveDocLbl = new QLineEdit(tr("Part set"), aLabelWgt);
+  myActiveDocLbl = new XGUI_ActiveDocLbl(tr("Part set"), aLabelWgt);
   myActiveDocLbl->setReadOnly(true);
   myActiveDocLbl->setFrame(false);
-  //myActiveDocLbl->setMargin(2);
   myActiveDocLbl->setContextMenuPolicy(Qt::CustomContextMenu);
-
-  myActiveDocLbl->installEventFilter(this);
 
   aLabelLay->addWidget(myActiveDocLbl);
   aLabelLay->setStretch(1, 1);
 
   myTreeView = new XGUI_DataTree(this);
-  //myTreeView->setFrameShape(QFrame::NoFrame);
+  myTreeView->setFrameShape(QFrame::NoFrame);
   aLayout->addWidget(myTreeView);
 
-  aLabelWgt->setFrameShape(myTreeView->frameShape());
-  aLabelWgt->setFrameShadow(myTreeView->frameShadow());
+  QPalette aTreePalet = myTreeView->palette();
+  QColor aTreeBack = aTreePalet.color(QPalette::Base);
+
+  QPalette aPalet;
+  aPalet.setColor(QPalette::Base, aTreeBack);
+  aPalet.setColor(QPalette::Window, aTreeBack);
+  aLabelWgt->setPalette(aPalet);
 
   myDocModel = new XGUI_DataModel(this);
   myTreeView->setModel(myDocModel);
+
+  // It has to be done after setting of model
+  myActiveDocLbl->setTreeView(myTreeView);
+
   QItemSelectionModel* aSelMod = myTreeView->selectionModel();
   connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
@@ -239,55 +312,6 @@ XGUI_ObjectsBrowser::~XGUI_ObjectsBrowser()
 {
 }
 
-//***************************************************
-bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
-{
-  if (obj == myActiveDocLbl) {
-    if (!myActiveDocLbl->isReadOnly()) {
-      // End of editing by mouse click
-      if (theEvent->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent* aEvent = (QMouseEvent*) theEvent;
-        QPoint aPnt = mapFromGlobal(aEvent->globalPos());
-        if (childAt(aPnt) != myActiveDocLbl) {
-          closeDocNameEditing(true);
-        }
-      } else if (theEvent->type() == QEvent::KeyRelease) {
-        QKeyEvent* aEvent = (QKeyEvent*) theEvent;
-        switch (aEvent->key()) {
-          case Qt::Key_Return:
-          case Qt::Key_Enter:  // Accept current input
-            closeDocNameEditing(true);
-            break;
-          case Qt::Key_Escape:  // Cancel the input
-            closeDocNameEditing(false);
-            break;
-        }
-      }
-    } else {
-      if (theEvent->type() == QEvent::MouseButtonDblClick) {
-        emit headerMouseDblClicked(QModelIndex());
-        return true;
-      }  
-    }
-  }
-  return QWidget::eventFilter(obj, theEvent);
-}
-
-//***************************************************
-void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
-{
-  myActiveDocLbl->deselect();
-  myActiveDocLbl->clearFocus();
-  myActiveDocLbl->releaseMouse();
-  myActiveDocLbl->setReadOnly(true);
-  if (toSave) {
-    // TODO: Save the name of root document
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->moduleDocument();
-  } else {
-    myActiveDocLbl->setText(myActiveDocLbl->property("OldText").toString());
-  }
-}
 
 //***************************************************
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
@@ -351,12 +375,6 @@ void XGUI_ObjectsBrowser::onEditItem()
       return;
     }
   }
-  //Selection happens in Upper label
-  myActiveDocLbl->setReadOnly(false);
-  myActiveDocLbl->setFocus();
-  myActiveDocLbl->selectAll();
-  myActiveDocLbl->grabMouse();
-  myActiveDocLbl->setProperty("OldText", myActiveDocLbl->text());
 }
 
 //***************************************************
