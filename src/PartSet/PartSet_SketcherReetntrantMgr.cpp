@@ -37,6 +37,8 @@ PartSet_SketcherReetntrantMgr::~PartSet_SketcherReetntrantMgr()
 ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::activeWidget() const
 {
   ModuleBase_ModelWidget* aWidget = 0;
+  if (!isActiveMgr())
+    return aWidget;
 
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   if (aOperation) {
@@ -63,6 +65,9 @@ ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::activeWidget() const
 bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* theOperation)
 {
   bool aProcessed = false;
+  if (!isActiveMgr())
+    return aProcessed;
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return aProcessed;
@@ -122,6 +127,9 @@ bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* the
 
 void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOperation)
 {
+  if (!isActiveMgr())
+    return;
+
   if (myIsInternalEditOperation) {
     // abort the created feature, which is currently edited
     SessionPtr aMgr = ModelAPI_Session::get();
@@ -135,38 +143,46 @@ void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOp
 
 bool PartSet_SketcherReetntrantMgr::processMouseMoved()
 {
-  bool isProcessed = false;
+  bool aProcessed = false;
+  if (!isActiveMgr())
+    return aProcessed;
+
   if  (myIsInternalEditOperation) {
     PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
     if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
     ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
       //if (operationMgr()->isApplyEnabled())
       anOperation->commit();
-      isProcessed = true;
+      aProcessed = true;
     }
   }
-  return isProcessed;
+  return aProcessed;
 }
 
 bool PartSet_SketcherReetntrantMgr::processMousePressed()
 {
-  return myIsInternalEditOperation;
+  return isActiveMgr() && myIsInternalEditOperation;
 }
 
 bool PartSet_SketcherReetntrantMgr::processMouseReleased()
 {
-  bool isProcessed = false;
+  bool aProcessed = false;
+  if (!isActiveMgr())
+    return aProcessed;
+
   if (myIsInternalEditOperation) {
     ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
     //if (operationMgr()->isApplyEnabled())
     anOperation->commit();
-    isProcessed = true;
+    aProcessed = true;
   }
-  return isProcessed;
+  return aProcessed;
 }
 
 void PartSet_SketcherReetntrantMgr::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
+  if (!isActiveMgr())
+    return;
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
@@ -174,12 +190,10 @@ void PartSet_SketcherReetntrantMgr::propertyPanelDefined(ModuleBase_Operation* t
   ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
   if (PartSet_SketcherMgr::isSketchOperation(aFOperation) &&  (aFOperation->isEditOperation())) {
     // we have to manually activate the sketch label in edit mode
-      aPanel->activateWidget(aPanel->modelWidgets().first());
-      return;
+    aPanel->activateWidget(aPanel->modelWidgets().first());
   }
-
-  // Restart last operation type 
-  if ((aFOperation->id() == myLastOperationId.c_str()) && myLastFeature) {
+  else if ((aFOperation->id() == myLastOperationId.c_str()) && myLastFeature) {
+    // Restart last operation type 
     ModuleBase_ModelWidget* aWgt = aPanel->activeWidget();
     PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
     if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
@@ -193,6 +207,9 @@ void PartSet_SketcherReetntrantMgr::propertyPanelDefined(ModuleBase_Operation* t
 
 void PartSet_SketcherReetntrantMgr::noMoreWidgets(const std::string& thePreviousAttributeID)
 {
+  if (!isActiveMgr())
+    return;
+
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   if (anOperation) {
     if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
@@ -211,6 +228,9 @@ void PartSet_SketcherReetntrantMgr::noMoreWidgets(const std::string& thePrevious
 
 void PartSet_SketcherReetntrantMgr::vertexSelected()
 {
+  if (!isActiveMgr())
+    return;
+
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   if (aOperation->id().toStdString() == SketchPlugin_Line::ID()) {
     /// If last line finished on vertex the lines creation sequence has to be break
@@ -233,6 +253,9 @@ void PartSet_SketcherReetntrantMgr::vertexSelected()
 
 void PartSet_SketcherReetntrantMgr::enterReleased()
 {
+  if (!isActiveMgr())
+    return;
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                       (myWorkshop->currentOperation());
   if (/*!aFOperation->isEditOperation() || */myIsInternalEditOperation)
@@ -241,11 +264,14 @@ void PartSet_SketcherReetntrantMgr::enterReleased()
 
 bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
 {
-  return myRestartingMode == RM_None;
+  return !isActiveMgr() || myRestartingMode == RM_None;
 }
 
 void PartSet_SketcherReetntrantMgr::onInternalActivateFirstWidgetSelection()
 {
+  if (!isActiveMgr())
+    return;
+
   if (!myIsInternalEditOperation)
     return;
 
@@ -259,6 +285,14 @@ void PartSet_SketcherReetntrantMgr::onInternalActivateFirstWidgetSelection()
   }
 }
 
+bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
+{
+  PartSet_SketcherMgr* aSketcherMgr = module()->sketchMgr();
+  ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
+  return PartSet_SketcherMgr::isSketchOperation(aCurrentOperation) ||
+         PartSet_SketcherMgr::isNestedSketchOperation(aCurrentOperation);
+}
+
 void PartSet_SketcherReetntrantMgr::breakOperationSequence()
 {
   myLastOperationId = "";
@@ -266,13 +300,13 @@ void PartSet_SketcherReetntrantMgr::breakOperationSequence()
   myRestartingMode = RM_None;
 }
 
-XGUI_Workshop* PartSet_SketcherReetntrantMgr::workshop()
+XGUI_Workshop* PartSet_SketcherReetntrantMgr::workshop() const
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   return aConnector->workshop();
 }
 
-PartSet_Module* PartSet_SketcherReetntrantMgr::module()
+PartSet_Module* PartSet_SketcherReetntrantMgr::module() const
 {
   return dynamic_cast<PartSet_Module*>(myWorkshop->module());
 }

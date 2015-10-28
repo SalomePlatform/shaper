@@ -97,14 +97,17 @@ public slots:
   void onInternalActivateFirstWidgetSelection();
 
 private:
+  /// Returns true if the current operation is a sketch or a nested sketch operation
+  bool isActiveMgr() const;
+
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
 
   /// Returns the workshop
-  XGUI_Workshop* workshop();
+  XGUI_Workshop* workshop() const;
 
   /// Returns the workshop module
-  PartSet_Module* module();
+  PartSet_Module* module() const;
 
 private:
   ModuleBase_IWorkshop* myWorkshop; /// the workshop
