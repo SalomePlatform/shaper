@@ -141,7 +141,8 @@ void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOp
   breakOperationSequence();
 }
 
-bool PartSet_SketcherReetntrantMgr::processMouseMoved()
+bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow*/* theWnd*/,
+                                                      QMouseEvent*/* theEvent*/)
 {
   bool aProcessed = false;
   if (!isActiveMgr())
@@ -159,12 +160,14 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved()
   return aProcessed;
 }
 
-bool PartSet_SketcherReetntrantMgr::processMousePressed()
+bool PartSet_SketcherReetntrantMgr::processMousePressed(ModuleBase_IViewWindow*/* theWnd*/,
+                                                        QMouseEvent*/* theEvent*/)
 {
   return isActiveMgr() && myIsInternalEditOperation;
 }
 
-bool PartSet_SketcherReetntrantMgr::processMouseReleased()
+bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow* theWnd,
+                                                         QMouseEvent* theEvent)
 {
   bool aProcessed = false;
   if (!isActiveMgr())
@@ -175,7 +178,14 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased()
     //if (operationMgr()->isApplyEnabled())
     anOperation->commit();
     aProcessed = true;
+
+    // fill the widget by the mouse event point
+    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
+    if (aPoint2DWdg) {
+      aPoint2DWdg->onMouseRelease(theWnd, theEvent);
+    }
   }
+
   return aProcessed;
 }
 

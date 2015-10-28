@@ -101,7 +101,6 @@ public slots:
   /// \param theEvent a mouse event
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
-protected slots:
   /// Process mouse release event
   /// \param theWnd a view window
   /// \param theEvent a mouse event

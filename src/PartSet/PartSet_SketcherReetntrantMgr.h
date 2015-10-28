@@ -14,6 +14,9 @@
 class ModuleBase_IWorkshop;
 class ModuleBase_Operation;
 class ModuleBase_ModelWidget;
+class ModuleBase_IViewWindow;
+
+class QMouseEvent;
 
 class XGUI_Workshop;
 class PartSet_Module;
@@ -63,17 +66,17 @@ public:
   /// It happens if the current operation is an internal edit operation and the first
   /// control can be filled by the mouse move event. The operation is committed.
   /// \return true if operation is committed.
-  bool processMouseMoved();
+  bool processMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// Return true if the manager processes the mouse press event
   /// \return true if the current operation is an internal edit operation.
-  bool processMousePressed();
+  bool processMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// Return true if the manager processes the mouse enter event
   /// It happens if the current operation is an internal edit operation.
   /// The operation is committed.
   /// \return true if operation is committed.
-  bool processMouseReleased();
+  bool processMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// Activates the operation widgets relatively the internal reentrant flags
   void propertyPanelDefined(ModuleBase_Operation* theOperation);

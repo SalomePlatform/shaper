@@ -337,7 +337,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
-  if (myModule->sketchReentranceMgr()->processMousePressed())
+  if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
     return;
 
   // Clear dragging mode
@@ -438,7 +438,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myModule->sketchReentranceMgr()->processMouseReleased())
+  if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent))
     return;
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
@@ -476,7 +476,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myModule->sketchReentranceMgr()->processMouseMoved())
+  if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
 
   if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
