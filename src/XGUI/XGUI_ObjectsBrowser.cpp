@@ -301,8 +301,8 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
-  connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
-          SLOT(onLabelContextMenuRequested(const QPoint&)));
+  //connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+  //        SLOT(onLabelContextMenuRequested(const QPoint&)));
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SLOT(onContextMenuRequested(QContextMenuEvent*)));
 }

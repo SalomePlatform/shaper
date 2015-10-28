@@ -263,6 +263,8 @@ protected slots:
 
    void onTreeViewDoubleClick(const QModelIndex&);
 
+   void onActiveDocPopup(const QPoint&);
+
  private:
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();

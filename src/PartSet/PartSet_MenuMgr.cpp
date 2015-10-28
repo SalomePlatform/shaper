@@ -29,7 +29,6 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_DataModel.h>
-#include <XGUI_ObjectsBrowser.h>
 #include <XGUI_OperationMgr.h>
 
 #include <Events_Loop.h>

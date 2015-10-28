@@ -891,7 +891,9 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
   XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
   if (aOB) {
-    //QLineEdit* aLabel = aOB->activeDocLabel();
+    QLineEdit* aLabel = aOB->activeDocLabel();
+    connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)), 
+          SLOT(onActiveDocPopup(const QPoint&)));
     //QPalette aPalet = aLabel->palette();
     //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     //aLabel->setPalette(aPalet);
@@ -900,6 +902,23 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
   }
 }
+
+void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  QLineEdit* aHeader = aWorkshop->objectBrowser()->activeDocLabel();
+
+  aActivatePartAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
+
+  QMenu aMenu;
+  aMenu.addAction(aActivatePartAction);
+  aMenu.exec(aHeader->mapToGlobal(thePnt));
+}
+
 
 ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
 {
@@ -927,7 +946,6 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   int aSelected = aObjects.size();
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
-  QAction* aActivatePartSetAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
 
   ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {
@@ -968,21 +986,11 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
       if( aResult.get() )
         theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
-    } else {  // If feature is 0 the it means that selected root object (document)
-      theMenu->addAction(aActivatePartSetAction);
-      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
     }
-  } else if (aSelected == 0) {
-    // if there is no selection then it means that upper label is selected
-    QModelIndexList aIndexes = myWorkshop->selection()->selectedIndexes();
-    if (aIndexes.size() == 0) // it means that selection happens in top label outside of tree view
-      theMenu->addAction(aActivatePartSetAction);
-      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
   }
   bool aNotDeactivate = (aCurrentOp == 0);
   if (!aNotDeactivate) {
     aActivatePartAction->setEnabled(false);
-    aActivatePartSetAction->setEnabled(false);
   }
 }
 
