@@ -14,6 +14,7 @@
 #include "PartSet_WidgetFileSelector.h"
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_SketcherMgr.h"
+#include "PartSet_SketcherReetntrantMgr.h"
 #include "PartSet_MenuMgr.h"
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
@@ -73,10 +74,6 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
-#include <SketchPlugin_Line.h>
-#include <SketchPlugin_Arc.h>
-#include <SketchPlugin_Circle.h>
-#include <SketchPlugin_Point.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
@@ -123,13 +120,13 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 }
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
-  : ModuleBase_IModule(theWshop),
-  myRestartingMode(RM_None), myVisualLayerId(0), myHasConstraintShown(true),
-  myIsInternalEditOperation(false)
+: ModuleBase_IModule(theWshop),
+  myVisualLayerId(0), myHasConstraintShown(true)
 {
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
+  mySketchReentrantMgr = new PartSet_SketcherReetntrantMgr(theWshop);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -253,82 +250,21 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
     mySketchMgr->commitNestedSketch(theOperation);
   }
 
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (!aFOperation)
-    return;
-  // the clear selection is obsolete because during restart of the creation operation
-  // we would like to use selected object, e.g. a line in a parallel constraint
-
-  // the selection is cleared after commit the create operation
-  // in order to do not use the same selected objects in the restarted operation
-  // for common behaviour, the selection is cleared even if the operation is not restarted
-  /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  aWorkshop->selector()->clearSelection();*/
-
   /// Restart sketcher operations automatically
-  FeaturePtr aFeature = aFOperation->feature();
-  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  if (aSPFeature && (myRestartingMode == RM_LastFeatureUsed ||
-                     myRestartingMode == RM_EmptyFeatureUsed)) {
-    myLastOperationId = aFOperation->id();
-    myLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
-    if (!sketchMgr()->sketchSolverError()) {
-      if (!aFOperation->isEditOperation()) {
-        FeaturePtr anOperationFeature = aFOperation->feature();
-        if (anOperationFeature.get() != NULL) {
-          editFeature(anOperationFeature);
-          myIsInternalEditOperation = true;
-          onInternalActivateFirstWidgetSelection();
-
-          // activate the last active widget in the Property Panel
-          if (!myPreviousAttributeID.empty()) {
-            ModuleBase_Operation* anEditOperation = currentOperation();
-            if (anEditOperation) {
-              ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-              ModuleBase_ModelWidget* aPreviousAttributeWidget = 0;
-              QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-              for (int i = 0, aNb = aWidgets.size(); i < aNb && !aPreviousAttributeWidget; i++) {
-                if (aWidgets[i]->attributeID() == myPreviousAttributeID)
-                  aPreviousAttributeWidget = aWidgets[i];
-              }
-              // If the current widget is a selector, do nothing, it processes the mouse press
-              if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector())
-                aPreviousAttributeWidget->focusTo();
-            }
-          }
-        }
-      }
-      else {
-        // the flag should be reset before start to do not react to the widget deactivate
-        myIsInternalEditOperation = false;
-        launchOperation(myLastOperationId);
-        breakOperationSequence();
-      }
-    }
+  if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
+    // the selection is cleared after commit the create operation
+    // in order to do not use the same selected objects in the restarted operation
+    // for common behaviour, the selection is cleared even if the operation is not restarted
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+    aWorkshop->selector()->clearSelection();
   }
-}
-
-void PartSet_Module::breakOperationSequence()
-{
-  myLastOperationId = "";
-  myLastFeature = FeaturePtr();
-  myRestartingMode = RM_None;
 }
 
 void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 {
-  if (myIsInternalEditOperation) {
-    // abort the created feature, which is currently edited
-    SessionPtr aMgr = ModelAPI_Session::get();
-    if (aMgr->hasModuleDocument() && aMgr->canUndo()) {
-      aMgr->undo();
-    }
-  }
-
-  myIsInternalEditOperation = false;
-  breakOperationSequence();
+  /// Restart sketcher operations automatically
+  mySketchReentrantMgr->operationAborted(theOperation);
 }
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
@@ -525,36 +461,7 @@ void PartSet_Module::clearViewer()
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (!aFOperation)
-    return;
-
-  ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-  if (PartSet_SketcherMgr::isSketchOperation(aFOperation) &&  (aFOperation->isEditOperation())) {
-    // we have to manually activate the sketch label in edit mode
-      aPanel->activateWidget(aPanel->modelWidgets().first());
-      return;
-  }
-
-  // Restart last operation type 
-  if ((aFOperation->id() == myLastOperationId) && myLastFeature) {
-    ModuleBase_ModelWidget* aWgt = aPanel->activeWidget();
-    if (aFOperation->id().toStdString() == SketchPlugin_Line::ID()) {
-      // Initialise new line with first point equal to end of previous
-      PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-      if (aPnt2dWgt) {
-        std::shared_ptr<ModelAPI_Data> aData = myLastFeature->data();
-        std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
-        if (aPoint) {
-          aPnt2dWgt->setPoint(aPoint->x(), aPoint->y());
-          PartSet_Tools::setConstraints(mySketchMgr->activeSketch(), aFOperation->feature(), 
-            aWgt->attributeID(), aPoint->x(), aPoint->y());
-          aPanel->activateNextWidget(aPnt2dWgt);
-        }
-      }
-    }
-  }
+  mySketchReentrantMgr->propertyPanelDefined(theOperation);
 }
 
 
@@ -600,15 +507,12 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
 
 void PartSet_Module::onEnterReleased()
 {
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                  (currentOperation());
-  if (/*!aFOperation->isEditOperation() || */myIsInternalEditOperation)
-    myRestartingMode = RM_EmptyFeatureUsed;
+  mySketchReentrantMgr->enterReleased();
 }
 
 void PartSet_Module::onOperationActivatedByPreselection()
 {
-  if (myRestartingMode != RM_None)
+  if (!mySketchReentrantMgr->canBeCommittedByPreselection())
     return;
 
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -623,57 +527,12 @@ void PartSet_Module::onOperationActivatedByPreselection()
 
 void PartSet_Module::onNoMoreWidgets(const std::string& thePreviousAttributeID)
 {
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (anOperation) {
-    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
-      if (myRestartingMode != RM_Forbided) {
-        myRestartingMode = RM_LastFeatureUsed;
-        myPreviousAttributeID = thePreviousAttributeID;
-      }
-      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-      XGUI_Workshop* aWorkshop = aConnector->workshop();
-      XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-      // do nothing if the feature can not be applyed
-      if (anOpMgr->isApplyEnabled())
-        anOperation->commit();
-    }
-  }
-}
-
-void PartSet_Module::onInternalActivateFirstWidgetSelection()
-{
-  if (!myIsInternalEditOperation)
-    return;
-
-  ModuleBase_ModelWidget* aFirstWidget = activeWidget();
-  ModuleBase_IPropertyPanel* aPanel = currentOperation()->propertyPanel();
-  if (aFirstWidget != aPanel->activeWidget()) {
-    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
-    if (aWSelector)
-      aWSelector->activateSelectionAndFilters(true);
-  }
+  mySketchReentrantMgr->noMoreWidgets(thePreviousAttributeID);
 }
 
 void PartSet_Module::onVertexSelected()
 {
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation->id().toStdString() == SketchPlugin_Line::ID()) {
-    /// If last line finished on vertex the lines creation sequence has to be break
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-    const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-    bool aFoundWidget = false;
-    bool aFoundObligatory = false;
-    for (; anIt != aLast && !aFoundObligatory; anIt++) {
-      if (!aFoundWidget)
-        aFoundWidget = *anIt == anActiveWidget;
-      else
-        aFoundObligatory = (*anIt)->isObligatory();
-    }
-    if (!aFoundObligatory)
-      myRestartingMode = RM_Forbided;
-  }
+  mySketchReentrantMgr->vertexSelected();
 }
 
 ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
@@ -736,26 +595,15 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
 ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
 {
   ModuleBase_ModelWidget* anActiveWidget = 0;
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation) {
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    anActiveWidget = aPanel->activeWidget();
-    if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector())) {
-      // finds the first widget which can accept a value
-      QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-      ModuleBase_ModelWidget* aFirstWidget = 0;
-      ModuleBase_ModelWidget* aWgt;
-      QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-      for (aWIt = aWidgets.begin(); aWIt != aWidgets.end() && !aFirstWidget; ++aWIt) {
-        aWgt = (*aWIt);
-        if (aWgt->canSetValue())
-          aFirstWidget = aWgt;
-      }
-      if (aFirstWidget)
-        anActiveWidget = aFirstWidget;
+
+  anActiveWidget = mySketchReentrantMgr->activeWidget();
+  if (!anActiveWidget) {
+    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+    if (aOperation) {
+      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      anActiveWidget = aPanel->activeWidget();
     }
   }
-
   return anActiveWidget;
 }
 

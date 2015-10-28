@@ -5,6 +5,7 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "PartSet_SketcherMgr.h"
+#include "PartSet_SketcherReetntrantMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
@@ -336,7 +337,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
-  if (myModule->isInternalEditOperation()) // it should be processed by mouse release
+  if (myModule->sketchReentranceMgr()->processMousePressed())
     return;
 
   // Clear dragging mode
@@ -437,12 +438,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myModule->isInternalEditOperation()) {
-    ModuleBase_Operation* anOperation = getCurrentOperation();
-    //if (operationMgr()->isApplyEnabled())
-    anOperation->commit();
+  if (myModule->sketchReentranceMgr()->processMouseReleased())
     return;
-  }
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
@@ -479,15 +476,8 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myModule->isInternalEditOperation()) {
-    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(myModule->activeWidget());
-    if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
-      ModuleBase_Operation* anOperation = getCurrentOperation();
-      //if (operationMgr()->isApplyEnabled())
-      anOperation->commit();
-      return;
-    }
-  }
+  if (myModule->sketchReentranceMgr()->processMouseMoved())
+    return;
 
   if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
     myIsMouseOverViewProcessed = true;

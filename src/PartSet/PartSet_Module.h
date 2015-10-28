@@ -31,6 +31,7 @@ class ModuleBase_IViewWindow;
 class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
+class PartSet_SketcherReetntrantMgr;
 
 class QAction;
 
@@ -162,6 +163,9 @@ public:
   /// Returns sketch manager object
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
 
+  /// Returns sketch reentrant manager
+  PartSet_SketcherReetntrantMgr* sketchReentranceMgr() { return mySketchReentrantMgr; }
+
   /// Performs functionality on closing document
   virtual void closeDocument();
 
@@ -207,14 +211,10 @@ public:
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
-  bool isInternalEditOperation() { return myIsInternalEditOperation; }
-
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
   void onNoMoreWidgets(const std::string& thePreviousAttributeID);
-
-  void onInternalActivateFirstWidgetSelection();
 
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -272,26 +272,15 @@ protected slots:
    void onTreeViewDoubleClick(const QModelIndex&);
 
  private:
-  /// Breaks sequense of automatically resterted operations
-  void breakOperationSequence();
 
   //! Delete features
   virtual bool deleteObjects();
 
  private:
-  QString myLastOperationId;
-  FeaturePtr myLastFeature;
-
-  std::string myPreviousAttributeID;
-
-  // Automatical restarting mode flag
-  RestartingMode myRestartingMode;
-
-  bool myIsInternalEditOperation;
-
   SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
+  PartSet_SketcherReetntrantMgr* mySketchReentrantMgr;
   PartSet_MenuMgr* myMenuMgr;
   /// A default custom presentation, which is used for references objects of started operation
   PartSet_CustomPrs* myCustomPrs;
