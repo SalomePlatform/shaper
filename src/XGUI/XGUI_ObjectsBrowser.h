@@ -40,6 +40,8 @@ public slots:
 protected:
   virtual void mouseReleaseEvent( QMouseEvent* e);
 
+  bool eventFilter(QObject* theObj, QEvent* theEvent);
+
 private:
   QString myPreSelectionStyle;
   QString myNeutralStyle;

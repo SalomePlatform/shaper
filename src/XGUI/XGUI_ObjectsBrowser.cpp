@@ -199,9 +199,7 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   mySelectionStyle += ", stop:1 " + aHighlight.lighter().name() + ");"; 
   mySelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
 
-  connect(myTreeView->selectionModel(), 
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-    SLOT(unselect()));
+  myTreeView->viewport()->installEventFilter(this);
 }
 
 
@@ -218,6 +216,15 @@ bool XGUI_ActiveDocLbl::event(QEvent* theEvent)
       break;
   }
   return QLineEdit::event(theEvent);
+}
+
+bool XGUI_ActiveDocLbl::eventFilter(QObject* theObj, QEvent* theEvent)
+{
+  if (theObj == myTreeView->viewport()) {
+    if (theEvent->type() == QEvent::MouseButtonRelease)
+      unselect();
+  }
+  return QLineEdit::eventFilter(theObj, theEvent);
 }
 
 static bool MYClearing = false;
@@ -301,8 +308,6 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
-  //connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
-  //        SLOT(onLabelContextMenuRequested(const QPoint&)));
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SLOT(onContextMenuRequested(QContextMenuEvent*)));
 }
