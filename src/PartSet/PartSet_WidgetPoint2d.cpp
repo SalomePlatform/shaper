@@ -266,6 +266,16 @@ void PartSet_WidgetPoint2D::activateCustom()
   myLockApplyMgr->activate();
 }
 
+bool PartSet_WidgetPoint2D::canBeActivatedByMove()
+{
+  bool aCanBeActivated = false;
+  if (feature()->getKind() == SketchPlugin_Line::ID() &&
+      attributeID() == SketchPlugin_Line::START_ID())
+    aCanBeActivated = true;
+
+  return aCanBeActivated;
+}
+
 void PartSet_WidgetPoint2D::deactivate()
 {
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();

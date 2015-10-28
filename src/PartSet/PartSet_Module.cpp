@@ -256,12 +256,15 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
+  // the clear selection is obsolete because during restart of the creation operation
+  // we would like to use selected object, e.g. a line in a parallel constraint
+
   // the selection is cleared after commit the create operation
   // in order to do not use the same selected objects in the restarted operation
   // for common behaviour, the selection is cleared even if the operation is not restarted
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
-  aWorkshop->selector()->clearSelection();
+  aWorkshop->selector()->clearSelection();*/
 
   /// Restart sketcher operations automatically
   FeaturePtr aFeature = aFOperation->feature();
@@ -316,6 +319,14 @@ void PartSet_Module::breakOperationSequence()
 
 void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 {
+  if (myIsInternalEditOperation) {
+    // abort the created feature, which is currently edited
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (aMgr->hasModuleDocument() && aMgr->canUndo()) {
+      aMgr->undo();
+    }
+  }
+
   myIsInternalEditOperation = false;
   breakOperationSequence();
 }
@@ -597,6 +608,9 @@ void PartSet_Module::onEnterReleased()
 
 void PartSet_Module::onOperationActivatedByPreselection()
 {
+  if (myRestartingMode != RM_None)
+    return;
+
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
     // Set final definitions if they are necessary

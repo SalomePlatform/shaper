@@ -336,6 +336,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
+  if (myModule->isInternalEditOperation()) // it should be processed by mouse release
+    return;
+
   // Clear dragging mode
   myIsDragging = false;
 
@@ -434,6 +437,13 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myModule->isInternalEditOperation()) {
+    ModuleBase_Operation* anOperation = getCurrentOperation();
+    //if (operationMgr()->isApplyEnabled())
+    anOperation->commit();
+    return;
+  }
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
@@ -469,6 +479,16 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myModule->isInternalEditOperation()) {
+    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(myModule->activeWidget());
+    if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
+      ModuleBase_Operation* anOperation = getCurrentOperation();
+      //if (operationMgr()->isApplyEnabled())
+      anOperation->commit();
+      return;
+    }
+  }
+
   if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
     myIsMouseOverViewProcessed = true;
     // 1. perform the widget mouse move functionality and display the presentation

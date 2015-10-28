@@ -66,6 +66,10 @@ Q_OBJECT
 
   //bool initFromPrevious(ObjectPtr theObject);
 
+  /// Defines if the widget can be activated by mouse move.
+  /// By default it returns false
+  virtual bool canBeActivatedByMove();
+
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
