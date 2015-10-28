@@ -36,22 +36,11 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_OperationFeature.h>
 
-#include <GeomValidators_ShapeType.h>
-#include <GeomValidators_Finite.h>
-#include <GeomValidators_Face.h>
-#include <GeomValidators_ConstructionComposite.h>
-#include <GeomValidators_ZeroOffset.h>
-#include <GeomValidators_BooleanArguments.h>
-#include <GeomValidators_Different.h>
-#include <GeomValidators_PartitionArguments.h>
-
-
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
-#include <GeomValidators_DifferentShapes.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeString.h>
 
@@ -206,29 +195,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_EqualSelection", new PartSet_EqualSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
-
-  aFactory->registerValidator("GeomValidators_DifferentShapes", new GeomValidators_DifferentShapes);
-  aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
-  aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
-  aFactory->registerValidator("GeomValidators_Finite", new GeomValidators_Finite);
-
-  aFactory->registerValidator("GeomValidators_ConstructionComposite",
-                              new GeomValidators_ConstructionComposite);
-
-  aFactory->registerValidator("GeomValidators_ZeroOffset",
-                              new GeomValidators_ZeroOffset);
-
-  aFactory->registerValidator("GeomValidators_BooleanArguments",
-                              new GeomValidators_BooleanArguments);
-
-  aFactory->registerValidator("PartSet_SketchEntityValidator",
-                              new PartSet_SketchEntityValidator);
-
-  aFactory->registerValidator("GeomValidators_Different",
-                              new GeomValidators_Different);
-
-  aFactory->registerValidator("GeomValidators_PartitionArguments",
-                              new GeomValidators_PartitionArguments);
+  aFactory->registerValidator("PartSet_SketchEntityValidator", new PartSet_SketchEntityValidator);
 }
 
 void PartSet_Module::registerFilters()

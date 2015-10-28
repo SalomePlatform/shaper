@@ -107,7 +107,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/GeomValidators
                     ${CMAKE_SOURCE_DIR}/src/AppElements
                     ${CAS_INCLUDE_DIRS}
-					${SUIT_INCLUDE}
+                    ${SUIT_INCLUDE}
 )
 
 ADD_DEFINITIONS(-DPARTSET_EXPORTS ${CAS_DEFINITIONS})
