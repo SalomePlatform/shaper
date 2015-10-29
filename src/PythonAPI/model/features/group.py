@@ -24,6 +24,8 @@ class Group(Interface):
 
         self._group_list = self._feature.data().selectionList("group_list")
 
+        assert(self._group_list)
+
         assert(len(args) == 1)
         self.setGroupList(args[0])
         pass

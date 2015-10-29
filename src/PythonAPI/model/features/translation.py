@@ -26,6 +26,10 @@ class Translation(Interface):
         self._axis_object = self._feature.data().selection("axis_object")
         self._distance = self._feature.data().real("distance")
 
+        assert(self._main_objects)
+        assert(self._axis_object)
+        assert(self._distance)
+
         assert(len(args) == 3)
         self.setMainObjects(args[0])
         self.setAxisObject(args[1])

@@ -38,6 +38,10 @@ class Partition(Interface):
         self._tool_objects = self._feature.data().selectionList("tool_objects")
         self._partition_combine = self._feature.data().boolean("partition_combine")
 
+        assert(self._main_objects)
+        assert(self._tool_objects)
+        assert(self._partition_combine)
+
         if main_objects is None:
             return
 

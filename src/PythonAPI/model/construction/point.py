@@ -34,6 +34,10 @@ class Point(Interface):
         self._y = self._feature.data().real("y")
         self._z = self._feature.data().real("z")
 
+        assert(self._x)
+        assert(self._y)
+        assert(self._z)
+
         if not args:
             return
 

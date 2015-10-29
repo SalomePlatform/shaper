@@ -32,6 +32,8 @@ class Import(Interface):
 
         self._file_path = self._feature.data().string("file_path")
 
+        assert(self._file_path)
+
         if not args:
             return
 
@@ -77,6 +79,10 @@ class Export(Interface):
         self._file_path = self._feature.data().string("file_path")
         self._file_format = self._feature.data().string("file_format")
         self._objects = self._feature.data().selectionList("selection_list")
+
+        assert(self._file_path)
+        assert(self._file_format)
+        assert(self._objects)
 
         if not args:
             return

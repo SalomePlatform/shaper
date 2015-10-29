@@ -42,6 +42,14 @@ class Plane(Interface):
         self._c = self._feature.data().real("C")
         self._d = self._feature.data().real("D")
 
+        assert(self._CreationMethod)
+        assert(self._plane_face)
+        assert(self._distance)
+        assert(self._a)
+        assert(self._b)
+        assert(self._c)
+        assert(self._d)
+
         if not args:
             return
 

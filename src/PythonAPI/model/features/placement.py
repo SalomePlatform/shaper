@@ -28,6 +28,12 @@ class Placement(Interface):
         self._reverse_direction = self._feature.data().boolean("placement_reverse_direction")
         self._centering = self._feature.data().boolean("placement_centering")
 
+        assert(self._objects_list)
+        assert(self._start_shape)
+        assert(self._end_shape)
+        assert(self._reverse_direction)
+        assert(self._centering)
+
         assert(len(args) == 5)
         self.setObjectList(args[0])
         self.setStartShape(args[1])

@@ -31,9 +31,11 @@ class Parameter(Interface):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Parameter")
 
-        self._CreationMethod = self._feature.data().string("CreationMethod")
         self._variable = self._feature.data().selection("variable")
         self._expression = self._feature.data().real("expression")
+
+        assert(self._variable)
+        assert(self._expression)
 
         if not args:
             return

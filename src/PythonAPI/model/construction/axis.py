@@ -39,6 +39,11 @@ class Axis(Interface):
         self._SecondPoint = self._feature.data().selection("SecondPoint")
         self._CylindricalFace = self._feature.data().selection("CylindricalFace")
 
+        assert(self._CreationMethod)
+        assert(self._FirstPoint)
+        assert(self._SecondPoint)
+        assert(self._CylindricalFace)
+
         if not args:
             return
 

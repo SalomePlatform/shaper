@@ -30,6 +30,15 @@ class RevolutionSketch(CompositeSketch):
         self._from_object = self._feature.data().selection("from_object")
         self._from_offset = self._feature.data().real("from_offset")
 
+        assert(self._axis_object)
+        assert(self._CreationMethod)
+        assert(self._to_angle)
+        assert(self._from_angle)
+        assert(self._to_object)
+        assert(self._to_offset)
+        assert(self._from_object)
+        assert(self._from_offset)
+
         if not args:
             return
 
