@@ -81,9 +81,6 @@ public:
   /// Activates the operation widgets relatively the internal reentrant flags
   void propertyPanelDefined(ModuleBase_Operation* theOperation);
 
-  /// It is called by no more widget signal emitted by property panel
-  /// Set a specific flag to restart the sketcher operation
-  void noMoreWidgets(const std::string& thePreviousAttributeID);
 
   /// Processing of vertex selected, if the feature is line, save flags to stop reentrant operation
   void vertexSelected();
@@ -96,8 +93,17 @@ public:
   /// Returns false if the reentrant mode of the operation is not empty.
   bool canBeCommittedByPreselection();
 
-public slots:
-  void onInternalActivateFirstWidgetSelection();
+private slots:
+  /// SLOT, that is called by a widget activating in the property panel
+  /// If the 'internal' edit operation is started, it activates the first control selection
+  void onWidgetActivated();
+
+  /// SLOT, that is called by no more widget signal emitted by property panel
+  /// Set a specific flag to restart the sketcher operation
+  void onNoMoreWidgets(const std::string& thePreviousAttributeID);
+
+  /// Processing of vertex selected
+  void onVertexSelected();
 
 private:
   /// Returns true if the current operation is a sketch or a nested sketch operation

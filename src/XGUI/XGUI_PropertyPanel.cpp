@@ -209,11 +209,9 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
-  if (myActiveWidget) {
-    emit widgetActivated(theWidget);
-  } else if (!isEditingMode()) {
+  emit widgetActivated(theWidget);
+  if (!myActiveWidget && !isEditingMode()) {
     emit noMoreWidgets(aPreviosAttributeID);
-    //setFocusOnOkButton();
   }
 }
 

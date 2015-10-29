@@ -89,7 +89,7 @@ bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* the
 
           myIsInternalEditOperation = true;
           // activate selection filters of the first widget in the viewer
-          onInternalActivateFirstWidgetSelection();
+          onWidgetActivated();
 
           // activate the last active widget in the Property Panel
           if (!myPreviousAttributeID.empty()) {
@@ -135,6 +135,8 @@ void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOp
     SessionPtr aMgr = ModelAPI_Session::get();
     if (aMgr->hasModuleDocument() && aMgr->canUndo()) {
       aMgr->undo();
+      workshop()->operationMgr()->updateApplyOfOperations();
+      workshop()->updateCommandStatus();
     }
   }
   myIsInternalEditOperation = false;
@@ -152,7 +154,6 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow*/* 
     PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
     if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
     ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-      //if (operationMgr()->isApplyEnabled())
       anOperation->commit();
       aProcessed = true;
     }
@@ -175,14 +176,17 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
 
   if (myIsInternalEditOperation) {
     ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-    //if (operationMgr()->isApplyEnabled())
-    anOperation->commit();
-    aProcessed = true;
 
-    // fill the widget by the mouse event point
-    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
-    if (aPoint2DWdg) {
-      aPoint2DWdg->onMouseRelease(theWnd, theEvent);
+    ModuleBase_ModelWidget* anActiveWidget = anOperation->propertyPanel()->activeWidget();
+    if (!anActiveWidget || !anActiveWidget->isViewerSelector()) {
+      anOperation->commit();
+      aProcessed = true;
+
+      // fill the widget by the mouse event point
+      PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
+      if (aPoint2DWdg) {
+        aPoint2DWdg->onMouseRelease(theWnd, theEvent);
+      }
     }
   }
 
@@ -215,7 +219,7 @@ void PartSet_SketcherReetntrantMgr::propertyPanelDefined(ModuleBase_Operation* t
   }
 }
 
-void PartSet_SketcherReetntrantMgr::noMoreWidgets(const std::string& thePreviousAttributeID)
+void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePreviousAttributeID)
 {
   if (!isActiveMgr())
     return;
@@ -236,7 +240,7 @@ void PartSet_SketcherReetntrantMgr::noMoreWidgets(const std::string& thePrevious
   }
 }
 
-void PartSet_SketcherReetntrantMgr::vertexSelected()
+void PartSet_SketcherReetntrantMgr::onVertexSelected()
 {
   if (!isActiveMgr())
     return;
@@ -277,7 +281,7 @@ bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
   return !isActiveMgr() || myRestartingMode == RM_None;
 }
 
-void PartSet_SketcherReetntrantMgr::onInternalActivateFirstWidgetSelection()
+void PartSet_SketcherReetntrantMgr::onWidgetActivated()
 {
   if (!isActiveMgr())
     return;

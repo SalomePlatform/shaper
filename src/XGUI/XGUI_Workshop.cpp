@@ -1010,14 +1010,10 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
-  connect(myPropertyPanel, SIGNAL(noMoreWidgets(const std::string&)),
-          myModule, SLOT(onNoMoreWidgets(const std::string&)));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
   //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
   //        this, SLOT(onValidationStateChanged(bool)));
-  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
-          myModule, SLOT(onInternalActivateFirstWidgetSelection()));
 }
 
 //******************************************************

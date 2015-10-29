@@ -212,10 +212,6 @@ public:
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
 public slots:
-  /// SLOT, that is called by no more widget signal emitted by property panel
-  /// Set a specific flag to restart the sketcher operation
-  void onNoMoreWidgets(const std::string& thePreviousAttributeID);
-
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
   /// the operation should be always aborted.
@@ -266,9 +262,6 @@ protected slots:
   virtual void registerProperties();
 
  private slots:
-   /// Processing of vertex selected
-   void onVertexSelected();
-
    void onTreeViewDoubleClick(const QModelIndex&);
 
  private:

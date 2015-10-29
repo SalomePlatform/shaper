@@ -632,6 +632,12 @@ void PartSet_SketcherMgr::onApplicationStarted()
   if (aPropertyPanel) {
     connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
             this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
+
+    PartSet_SketcherReetntrantMgr* aReentranceMgr = myModule->sketchReentranceMgr();
+    connect(aPropertyPanel, SIGNAL(noMoreWidgets(const std::string&)),
+            aReentranceMgr, SLOT(onNoMoreWidgets(const std::string&)));
+    connect(aPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+            aReentranceMgr, SLOT(onWidgetActivated()));
   }
 
   XGUI_ViewerProxy* aViewerProxy = aWorkshop->viewer();

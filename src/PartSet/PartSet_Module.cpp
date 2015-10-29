@@ -525,16 +525,6 @@ void PartSet_Module::onOperationActivatedByPreselection()
   }
 }
 
-void PartSet_Module::onNoMoreWidgets(const std::string& thePreviousAttributeID)
-{
-  mySketchReentrantMgr->noMoreWidgets(thePreviousAttributeID);
-}
-
-void PartSet_Module::onVertexSelected()
-{
-  mySketchReentrantMgr->vertexSelected();
-}
-
 ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
                                             Config_WidgetAPI* theWidgetApi, std::string theParentId)
 {
@@ -554,13 +544,13 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, aWorkshop,
                                                                  theWidgetApi, theParentId);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
-    connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
+    connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
   } else if (theType == "sketch-2dpoint_flyout_selector") {
     PartSet_WidgetPoint2DFlyout* aPointWgt = new PartSet_WidgetPoint2DFlyout(theParent, aWorkshop,
                                                                  theWidgetApi, theParentId);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
-    connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
+    connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
   } else if (theType == "point2ddistance") {
     PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent,
