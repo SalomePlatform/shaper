@@ -10,6 +10,7 @@ All features are available via model.add*() functions. Exceptions are:
 
 from services  import *
 from roots     import *
+from tools import Selection
 
 # Built-in features
 
