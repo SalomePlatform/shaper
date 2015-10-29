@@ -7,42 +7,60 @@ from ModelAPI    import *
 from GeomAlgoAPI import *
 
 
-class Boolean():
-  """Abstract root class of Boolean Features."""
-  def __init__(self, part, object, tool, type):
-    self.my = part.addFeature("Boolean")
-    self.my.data().reference("main_object").setValue(object)
-    self.my.data().reference("tool_object").setValue(tool)
-    self.my.data().integer("bool_type").setValue(type)
-
-    if ModelAPI_Session.get().validators().validate(self.my):
-      self.my.execute()
-    else:
-      raise Exception("cannot make the Boolean")
+from model.roots import Interface
 
 
-class Addition(Boolean):
-
-  def __init__(self, part, object, tool):
+def addAddition(part, object, tool):
     """Inserts an addition to the given Part and executes the operation.
     This operation adds tool to the given object.
     """
-    Boolean.__init__(self, part, object, tool, GeomAlgoAPI_Boolean.BOOL_FUSE)
+    feature = part.addFeature("Boolean")
+    return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_FUSE)
 
 
-class Subtraction(Boolean):
-
-  def __init__(self, part, object, tool):
+def addSubtraction(part, object, tool):
     """Inserts a subtraction to the given Part and executes the operation.
     This operation subtracts tool to the given object.
     """
-    Boolean.__init__(self, part, object, tool, GeomAlgoAPI_Boolean.BOOL_CUT)
+    feature = part.addFeature("Boolean")
+    return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_CUT)
 
 
-class Intersection(Boolean):
-
-  def __init__(self, part, object, tool):
+def addIntersection(part, object, tool):
     """Inserts an intersection to the given Part and executes the operation.
     This operation intersects tool to the given object.
     """
-    Boolean.__init__(self, part, object, tool, GeomAlgoAPI_Boolean.BOOL_COMMON)
+    feature = part.addFeature("Boolean")
+    return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_COMMON)
+
+
+class Boolean(Interface):
+    """Abstract root class of Boolean Features."""
+    def __init__(self, feature, main_objects, tool_objects, bool_type):
+        Interface.__init__(self, feature)
+        assert(self._feature.getKind() == "Boolean")
+
+        self._main_objects = self._feature.selectionList("main_objects")
+        self._tool_objects = self._feature.selectionList("tool_objects")
+        self._bool_type = self._feature.integer("bool_type")
+
+        assert(self._main_objects)
+        assert(self._tool_objects)
+        assert(self._bool_type)
+
+        self.setMainObjects(main_objects)
+        self.setToolObjects(tool_objects)
+        self.setBoolType(bool_type)
+        pass
+
+    def setMainObjects(self, main_objects):
+        self._fill_attribute(self._main_objects, main_objects)
+        pass
+
+    def setToolObjects(self, tool_objects):
+        self._fill_attribute(self._tool_objects, tool_objects)
+        pass
+
+    def setBoolType(self, bool_type):
+        self._fill_attribute(self._bool_type, bool_type)
+        pass
