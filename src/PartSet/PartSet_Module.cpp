@@ -132,7 +132,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   XGUI_Workshop* aWorkshop = aConnector->workshop();
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  connect(anOpMgr, SIGNAL(keyEnterReleased()), this, SLOT(onEnterReleased()));
   connect(anOpMgr, SIGNAL(operationActivatedByPreselection()),
           this, SLOT(onOperationActivatedByPreselection()));
 
@@ -269,6 +268,9 @@ void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
+  /// Restart sketcher operations automatically
+  mySketchReentrantMgr->operationStarted(theOperation);
+
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->startSketch(theOperation);
   }
@@ -461,7 +463,14 @@ void PartSet_Module::clearViewer()
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
-  mySketchReentrantMgr->propertyPanelDefined(theOperation);
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFOperation)
+    return;
+
+  ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+  // we have to manually activate the sketch label in edit mode
+  if (PartSet_SketcherMgr::isSketchOperation(aFOperation) &&  (aFOperation->isEditOperation()))
+    aPanel->activateWidget(aPanel->modelWidgets().first());
 }
 
 
@@ -503,11 +512,6 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
   anOpMgr->onKeyReleased(theEvent);
-}
-
-void PartSet_Module::onEnterReleased()
-{
-  mySketchReentrantMgr->enterReleased();
 }
 
 void PartSet_Module::onOperationActivatedByPreselection()
@@ -586,7 +590,7 @@ ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
 {
   ModuleBase_ModelWidget* anActiveWidget = 0;
 
-  anActiveWidget = mySketchReentrantMgr->activeWidget();
+  anActiveWidget = mySketchReentrantMgr->internalActiveWidget();
   if (!anActiveWidget) {
     ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
     if (aOperation) {

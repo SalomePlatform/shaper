@@ -240,10 +240,6 @@ protected slots:
   /// \param theEvent the key event
   void onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
-  /// SLOT, that is called by enter key released
-  /// Set a specific type of restarting the current operation
-  void onEnterReleased();
-
   /// SLOT, that is called by the current operation filling with the preselection.
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();

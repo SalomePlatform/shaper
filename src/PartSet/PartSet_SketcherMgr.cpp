@@ -628,17 +628,21 @@ void PartSet_SketcherMgr::onApplicationStarted()
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
+  PartSet_SketcherReetntrantMgr* aReentranceMgr = myModule->sketchReentranceMgr();
+
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
   if (aPropertyPanel) {
     connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
             this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
 
-    PartSet_SketcherReetntrantMgr* aReentranceMgr = myModule->sketchReentranceMgr();
     connect(aPropertyPanel, SIGNAL(noMoreWidgets(const std::string&)),
             aReentranceMgr, SLOT(onNoMoreWidgets(const std::string&)));
     connect(aPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
             aReentranceMgr, SLOT(onWidgetActivated()));
   }
+
+  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+  connect(anOpMgr, SIGNAL(keyEnterReleased()), aReentranceMgr, SLOT(onEnterReleased()));
 
   XGUI_ViewerProxy* aViewerProxy = aWorkshop->viewer();
   connect(aViewerProxy, SIGNAL(enterViewPort()), this, SLOT(onEnterViewPort()));

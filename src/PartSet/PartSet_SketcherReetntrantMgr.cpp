@@ -23,10 +23,9 @@
 PartSet_SketcherReetntrantMgr::PartSet_SketcherReetntrantMgr(ModuleBase_IWorkshop* theWorkshop)
 : QObject(theWorkshop),
   myWorkshop(theWorkshop),
-  myIsInternalEditOperation(false),
-  myLastOperationId(""),
-  myPreviousAttributeID(""),
-  myRestartingMode(RM_None)
+  myRestartingMode(RM_None),
+  myIsFlagsBlocked(false),
+  myIsInternalEditOperation(false)
 {
 }
 
@@ -34,7 +33,7 @@ PartSet_SketcherReetntrantMgr::~PartSet_SketcherReetntrantMgr()
 {
 }
 
-ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::activeWidget() const
+ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() const
 {
   ModuleBase_ModelWidget* aWidget = 0;
   if (!isActiveMgr())
@@ -68,61 +67,18 @@ bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* the
   if (!isActiveMgr())
     return aProcessed;
 
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (!aFOperation)
-    return aProcessed;
-
-  FeaturePtr aFeature = aFOperation->feature();
-  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  if (aSPFeature && (myRestartingMode == RM_LastFeatureUsed ||
-                     myRestartingMode == RM_EmptyFeatureUsed)) {
-    myLastOperationId = aFOperation->id().toStdString();
-    myLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
-    PartSet_Module* aModule = module();
-    if (!aModule->sketchMgr()->sketchSolverError()) {
-      if (!aFOperation->isEditOperation()) {
-        FeaturePtr anOperationFeature = aFOperation->feature();
-        if (anOperationFeature.get() != NULL) {
-          aModule->editFeature(anOperationFeature);
-          aProcessed = true;
-
-          myIsInternalEditOperation = true;
-          // activate selection filters of the first widget in the viewer
-          onWidgetActivated();
-
-          // activate the last active widget in the Property Panel
-          if (!myPreviousAttributeID.empty()) {
-            ModuleBase_Operation* anEditOperation = aModule->currentOperation();
-            if (anEditOperation) {
-              ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-              ModuleBase_ModelWidget* aPreviousAttributeWidget = 0;
-              QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-              for (int i = 0, aNb = aWidgets.size(); i < aNb && !aPreviousAttributeWidget; i++) {
-                if (aWidgets[i]->attributeID() == myPreviousAttributeID)
-                  aPreviousAttributeWidget = aWidgets[i];
-              }
-              // If the current widget is a selector, do nothing, it processes the mouse press
-              if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector())
-                aPreviousAttributeWidget->focusTo();
-            }
-          }
-        }
-      }
-      else {
-        // the flag should be reset before start to do not react to the widget deactivate
-        myIsInternalEditOperation = false;
-        aModule->launchOperation(myLastOperationId.c_str());
-        breakOperationSequence();
-        aProcessed = true;
-      }
-    }
-  }
-
-  if (!aProcessed)
-    breakOperationSequence();
+  aProcessed = myIsInternalEditOperation;
+  resetFlags();
 
   return aProcessed;
+}
+
+void PartSet_SketcherReetntrantMgr::operationStarted(ModuleBase_Operation* theOperation)
+{
+  if (!isActiveMgr())
+    return;
+
+  resetFlags();
 }
 
 void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOperation)
@@ -130,21 +86,11 @@ void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOp
   if (!isActiveMgr())
     return;
 
-  if (myIsInternalEditOperation) {
-    // abort the created feature, which is currently edited
-    SessionPtr aMgr = ModelAPI_Session::get();
-    if (aMgr->hasModuleDocument() && aMgr->canUndo()) {
-      aMgr->undo();
-      workshop()->operationMgr()->updateApplyOfOperations();
-      workshop()->updateCommandStatus();
-    }
-  }
-  myIsInternalEditOperation = false;
-  breakOperationSequence();
+  resetFlags();
 }
 
-bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow*/* theWnd*/,
-                                                      QMouseEvent*/* theEvent*/)
+bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /* theWnd*/,
+                                                      QMouseEvent* /* theEvent*/)
 {
   bool aProcessed = false;
   if (!isActiveMgr())
@@ -153,16 +99,29 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow*/* 
   if  (myIsInternalEditOperation) {
     PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
     if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
-    ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-      anOperation->commit();
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myWorkshop->currentOperation());
+      FeaturePtr aLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
+      restartOperation();
       aProcessed = true;
+
+      if (aLastFeature) {
+        ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
+        PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(aPanel->activeWidget());
+        if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
+          QList<ModuleBase_ViewerPrs> aSelection;
+          aSelection.append(ModuleBase_ViewerPrs(aLastFeature, TopoDS_Shape(), NULL));
+          if (aPoint2DWdg->setSelection(aSelection, true))
+            aPanel->activateNextWidget(aPoint2DWdg);
+        }
+      }
     }
   }
   return aProcessed;
 }
 
-bool PartSet_SketcherReetntrantMgr::processMousePressed(ModuleBase_IViewWindow*/* theWnd*/,
-                                                        QMouseEvent*/* theEvent*/)
+bool PartSet_SketcherReetntrantMgr::processMousePressed(ModuleBase_IViewWindow* /* theWnd*/,
+                                                        QMouseEvent* /* theEvent*/)
 {
   return isActiveMgr() && myIsInternalEditOperation;
 }
@@ -179,7 +138,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
 
     ModuleBase_ModelWidget* anActiveWidget = anOperation->propertyPanel()->activeWidget();
     if (!anActiveWidget || !anActiveWidget->isViewerSelector()) {
-      anOperation->commit();
+      restartOperation();
       aProcessed = true;
 
       // fill the widget by the mouse event point
@@ -193,29 +152,20 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
   return aProcessed;
 }
 
-void PartSet_SketcherReetntrantMgr::propertyPanelDefined(ModuleBase_Operation* theOperation)
+void PartSet_SketcherReetntrantMgr::onWidgetActivated()
 {
   if (!isActiveMgr())
     return;
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (!aFOperation)
+  if (!myIsInternalEditOperation)
     return;
 
-  ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-  if (PartSet_SketcherMgr::isSketchOperation(aFOperation) &&  (aFOperation->isEditOperation())) {
-    // we have to manually activate the sketch label in edit mode
-    aPanel->activateWidget(aPanel->modelWidgets().first());
-  }
-  else if ((aFOperation->id() == myLastOperationId.c_str()) && myLastFeature) {
-    // Restart last operation type 
-    ModuleBase_ModelWidget* aWgt = aPanel->activeWidget();
-    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
-    if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
-      QList<ModuleBase_ViewerPrs> aSelection;
-      aSelection.append(ModuleBase_ViewerPrs(myLastFeature, TopoDS_Shape(), NULL));
-      if (aPoint2DWdg->setSelection(aSelection, true))
-        aPanel->activateNextWidget(aPoint2DWdg);
-    }
+  PartSet_Module* aModule = module();
+  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
+  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
+  if (aFirstWidget != aPanel->activeWidget()) {
+    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
+    if (aWSelector)
+      aWSelector->activateSelectionAndFilters(true);
   }
 }
 
@@ -223,19 +173,21 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
 {
   if (!isActiveMgr())
     return;
+  XGUI_OperationMgr* anOpMgr = workshop()->operationMgr();
+  if (!anOpMgr->isApplyEnabled())
+    return;
 
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (anOperation) {
-    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                       (myWorkshop->currentOperation());
+  if (aFOperation) {
+    if (PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+      XGUI_OperationMgr* anOpMgr = workshop()->operationMgr();
       if (myRestartingMode != RM_Forbided) {
         myRestartingMode = RM_LastFeatureUsed;
-        myPreviousAttributeID = thePreviousAttributeID;
+        startInternalEdit(thePreviousAttributeID);
       }
-      XGUI_Workshop* aWorkshop = workshop();
-      XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-      // do nothing if the feature can not be applyed
-      if (anOpMgr->isApplyEnabled())
-        anOperation->commit();
+      else
+        aFOperation->commit();
     }
   }
 }
@@ -265,38 +217,20 @@ void PartSet_SketcherReetntrantMgr::onVertexSelected()
   }
 }
 
-void PartSet_SketcherReetntrantMgr::enterReleased()
+void PartSet_SketcherReetntrantMgr::onEnterReleased()
 {
   if (!isActiveMgr())
     return;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                       (myWorkshop->currentOperation());
-  if (/*!aFOperation->isEditOperation() || */myIsInternalEditOperation)
+  if (myIsInternalEditOperation)
     myRestartingMode = RM_EmptyFeatureUsed;
 }
 
 bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
 {
   return !isActiveMgr() || myRestartingMode == RM_None;
-}
-
-void PartSet_SketcherReetntrantMgr::onWidgetActivated()
-{
-  if (!isActiveMgr())
-    return;
-
-  if (!myIsInternalEditOperation)
-    return;
-
-  PartSet_Module* aModule = module();
-  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
-  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
-  if (aFirstWidget != aPanel->activeWidget()) {
-    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
-    if (aWSelector)
-      aWSelector->activateSelectionAndFilters(true);
-  }
 }
 
 bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
@@ -307,11 +241,59 @@ bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
          PartSet_SketcherMgr::isNestedSketchOperation(aCurrentOperation);
 }
 
-void PartSet_SketcherReetntrantMgr::breakOperationSequence()
+void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
 {
-  myLastOperationId = "";
-  myLastFeature = FeaturePtr();
-  myRestartingMode = RM_None;
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                     (myWorkshop->currentOperation());
+
+  aFOperation->setEditOperation();
+  FeaturePtr anOperationFeature = aFOperation->feature();
+  if (anOperationFeature.get() != NULL) {
+
+    myIsInternalEditOperation = true;
+    // activate selection filters of the first widget in the viewer
+    onWidgetActivated();
+
+    // activate the last active widget in the Property Panel
+    if (!thePreviousAttributeID.empty()) {
+      ModuleBase_Operation* anEditOperation = module()->currentOperation();
+      if (anEditOperation) {
+        ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+        ModuleBase_ModelWidget* aPreviousAttributeWidget = 0;
+        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+        for (int i = 0, aNb = aWidgets.size(); i < aNb && !aPreviousAttributeWidget; i++) {
+          if (aWidgets[i]->attributeID() == thePreviousAttributeID)
+            aPreviousAttributeWidget = aWidgets[i];
+        }
+        // If the current widget is a selector, do nothing, it processes the mouse press
+        if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector())
+          aPreviousAttributeWidget->focusTo();
+      }
+    }
+  }
+}
+
+void PartSet_SketcherReetntrantMgr::restartOperation()
+{
+  if (myIsInternalEditOperation) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(
+                                                                  myWorkshop->currentOperation());
+    if (aFOperation) {
+      myIsFlagsBlocked = true;
+      aFOperation->commit();
+      module()->launchOperation(aFOperation->id());
+      myIsFlagsBlocked = false;
+      resetFlags();
+    }
+  }
+}
+
+void PartSet_SketcherReetntrantMgr::resetFlags()
+{
+  if (!myIsFlagsBlocked) {
+    myIsInternalEditOperation = false;
+    myRestartingMode = RM_None;
+  }
 }
 
 XGUI_Workshop* PartSet_SketcherReetntrantMgr::workshop() const

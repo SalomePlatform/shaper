@@ -49,6 +49,15 @@ ModuleBase_OperationFeature::~ModuleBase_OperationFeature()
   clearPreselection();
 }
 
+void ModuleBase_OperationFeature::setEditOperation()
+{
+  if (isEditOperation())
+    return;
+
+  myIsEditing = true;
+  propertyPanel()->setEditingMode(isEditOperation());
+}
+
 FeaturePtr ModuleBase_OperationFeature::feature() const
 {
   return myFeature;
