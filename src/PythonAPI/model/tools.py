@@ -8,6 +8,7 @@ import collections
 
 import ModelAPI
 import GeomAPI
+import GeomDataAPI
 
 # from .sketcher.sketch import Sketch
 
@@ -63,15 +64,43 @@ def fill_attribute(attribute, value):
     strings and [result + shape]...
     ModelAPI_AttributeDouble can accept float and string
     """
-    if isinstance(attribute, ModelAPI.ModelAPI_AttributeSelectionList):
+    if (isinstance(attribute, ModelAPI.ModelAPI_AttributeBoolean) or
+        isinstance(attribute, ModelAPI.ModelAPI_AttributeDocRef) or
+        isinstance(attribute, ModelAPI.ModelAPI_AttributeInteger) or
+        isinstance(attribute, ModelAPI.ModelAPI_AttributeReference) or
+        isinstance(attribute, ModelAPI.ModelAPI_AttributeString)
+        ):
+        attribute.setValue(value)
+
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeDouble):
+        if isinstance(value, basestring):
+            attribute.setText(value)
+        else:
+            attribute.setValue(value)
+
+# TODO: ModelAPI_AttributeIntArray should be added to SWIG
+#     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeIntArray):
+#         attrubute.setSize(len(value))
+#         for i in range(len(value)):
+#             attrubute.setValue(i, value[i])
+
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeRefAttr):
+        assert(isinstance(value, ModelAPI.ModelAPI_Attribute) or
+               isinstance(value, ModelAPI.ModelAPI_Object))
+        if isinstance(value, ModelAPI.ModelAPI_Attribute):
+            attrubute.setAttr(value)
+        elif isinstance(value, ModelAPI.ModelAPI_Object):
+            attrubute.setObject(value)
+
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeRefList):
         attribute.clear()
         if not value:
             return
 
         assert(isinstance(value, collections.Iterable))
         for item in value:
-            assert(isinstance(item, Selection))
-            attribute.append(*item.args)
+            assert(isinstance(item, ModelAPI.ModelAPI_Object))
+            attribute.append(item)
 
     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeSelection):
         if value is None:
@@ -81,11 +110,22 @@ def fill_attribute(attribute, value):
         assert(isinstance(value, Selection))
         attribute.setValue(*value.args)
 
-    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeDouble):
-        if isinstance(value, basestring):
-            attribute.setText(value)
-        else:
-            attribute.setValue(value)
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeSelectionList):
+        attribute.clear()
+        if not value:
+            return
+
+        assert(isinstance(value, collections.Iterable))
+        for item in value:
+            assert(isinstance(item, Selection))
+            attribute.append(*item.args)
+
+    elif (isinstance(attribute, GeomDataAPI.GeomDataAPI_Dir) or
+          isinstance(attribute, GeomDataAPI.GeomDataAPI_Point) or
+          isinstance(attribute, GeomDataAPI.GeomDataAPI_Point2D)
+          ):
+        assert(isinstance(value, collections.Iterable))
+        attribute.setValue(*value)
 
     else:
         raise AssertionError("Wrong attribute type: %s" % type(attribute))
