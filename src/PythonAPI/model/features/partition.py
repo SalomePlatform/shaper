@@ -48,16 +48,7 @@ class Partition(Interface):
         self._fill_attribute(self._main_objects, main_objects)
         self._fill_attribute(self._tool_objects, tool_objects)
         self._fill_attribute(self._partition_combine, partition_combine)
-
-        self.__execute()
         pass
-
-    def __execute(self):
-        if self.areInputValid():
-            self.execute()
-        else:
-            raise Exception("Cannot execute Partition: %s" %
-                            self._feature.error())
 
     def setMainObjects(self, main_objects):
         """Modify base attribute of the feature.
@@ -65,7 +56,6 @@ class Partition(Interface):
         See __init__.
         """
         self._fill_attribute(self._main_objects, main_objects)
-        self.__execute()
         pass
 
     def setToolObjects(self, tool_objects):
@@ -74,7 +64,6 @@ class Partition(Interface):
         See __init__.
         """
         self._fill_attribute(self._tool_objects, tool_objects)
-        self.__execute()
         pass
 
     def setPartitionCombine(self, partition_combine):
@@ -83,5 +72,4 @@ class Partition(Interface):
         See __init__.
         """
         self._fill_attribute(self._partition_combine, partition_combine)
-        self.__execute()
         pass
