@@ -78,11 +78,10 @@ def fill_attribute(attribute, value):
         else:
             attribute.setValue(value)
 
-# TODO: ModelAPI_AttributeIntArray should be added to SWIG
-#     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeIntArray):
-#         attrubute.setSize(len(value))
-#         for i in range(len(value)):
-#             attrubute.setValue(i, value[i])
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeIntArray):
+        attrubute.setSize(len(value))
+        for i in range(len(value)):
+            attrubute.setValue(i, value[i])
 
     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeRefAttr):
         assert(isinstance(value, ModelAPI.ModelAPI_Attribute) or
