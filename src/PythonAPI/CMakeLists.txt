@@ -30,4 +30,6 @@ ADD_UNIT_TESTS(
 
   TestFeaturesExtrusion.py
   TestFeaturesRevolution.py
+
+  TestMakeBrick1.py
   )
