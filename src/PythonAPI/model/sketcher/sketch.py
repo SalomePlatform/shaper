@@ -54,9 +54,6 @@ class Sketch(Interface):
         assert(self._norm)
         assert(self._external)
 
-        # Entities used for building the result shape
-        self._selection = None
-
         if not args:
             return
 
@@ -310,17 +307,17 @@ class Sketch(Interface):
         geometry of this Sketch.
         """
         if len(args) == 0:
-            self._selection = modelAPI_ResultConstruction(
+            wire = modelAPI_ResultConstruction(
                 self._feature.firstResult()
                 ).shape()
         elif len(args) == 1:
-            self._selection = args[0].shape()
+            wire = args[0].shape()
         else:
             raise Exception("not yet implemented")
         # TODO: simple version now, should be a list of selected faces
-        return [Selection(self.result(), self.buildShape())]
+        return [Selection(self.result(), self.buildShape(wire))]
 
-    def buildShape(self):
+    def buildShape(self, wire):
         """Build the result Shape of this Sketch according to the
         selected geometrical entities."""
         o = self._origin.pnt()
@@ -329,7 +326,7 @@ class Sketch(Interface):
 
         # The faces are kept otherwise they are destroyed at exit
         faces = ShapeList()
-        GeomAlgoAPI_SketchBuilder.createFaces(o, dx, n, self._selection, faces)
+        GeomAlgoAPI_SketchBuilder.createFaces(o, dx, n, wire, faces)
         # TODO: Deal with several faces
         return faces[0]
 
