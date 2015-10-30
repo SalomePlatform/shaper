@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QLineEdit>
+#include <QWindowsVistaStyle>
 
 class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
@@ -53,6 +54,27 @@ private:
 
 /**
 * \ingroup GUI
+* Implementation of XGUI_DataTree custom style
+*/
+class XGUI_TreeViewStyle : public QWindowsVistaStyle
+{
+  Q_OBJECT
+public:
+  XGUI_TreeViewStyle() : QWindowsVistaStyle() {}
+
+  void drawPrimitive(PrimitiveElement theElement, const QStyleOption* theOption,
+                     QPainter* thePainter, const QWidget* theWidget = 0) const;
+
+  void setIndex(const QModelIndex& theIndex) { myIndex = theIndex; }
+  QModelIndex index() const { return myIndex; }
+
+private:
+  QModelIndex myIndex;
+};
+
+
+/**
+* \ingroup GUI
 * Implementation of Data Tree object for Object Browser
 */
 class XGUI_DataTree : public QTreeView
@@ -90,6 +112,11 @@ public slots:
    /// Redefinition of virtual method
   virtual void resizeEvent(QResizeEvent* theEvent);
 
+  virtual void drawRow(QPainter* thePainter,
+                        const QStyleOptionViewItem& theOptions,
+                        const QModelIndex& theIndex) const;
+private:
+  XGUI_TreeViewStyle* myStyle;
 };
 
 /**\class XGUI_ObjectsBrowser
