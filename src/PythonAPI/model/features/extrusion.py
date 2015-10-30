@@ -64,10 +64,11 @@ class Extrusion(Interface):
         if not args:
             return
 
-        self.setBase(args[0])
-
+        assert(len(args) in (2, 3, 5))
+        base = args[0]
         args = args[1:]
-        assert(len(args) in (1, 2, 4))
+
+        self.setBase(base)
 
         if len(args) == 4:
             self.setPlanesAndOffsets(*args)

@@ -36,7 +36,7 @@ def addIntersection(part, object, tool):
 
 class Boolean(Interface):
     """Abstract root class of Boolean Features."""
-    def __init__(self, feature, main_objects, tool_objects, bool_type):
+    def __init__(self, feature, *args):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Boolean")
 
@@ -48,9 +48,17 @@ class Boolean(Interface):
         assert(self._tool_objects)
         assert(self._bool_type)
 
+        if not args:
+            return
+
+        assert(len(args) == 3)
+        main_objects, tool_objects, bool_type = args
+
         self.setMainObjects(main_objects)
         self.setToolObjects(tool_objects)
         self.setBoolType(bool_type)
+
+        self._execute()
         pass
 
     def setMainObjects(self, main_objects):

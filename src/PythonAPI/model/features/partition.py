@@ -19,8 +19,7 @@ def addPartition(part, *args):
 class Partition(Interface):
     """Interface on an Partition feature."""
 
-    def __init__(self, feature, main_objects=None,
-                 tool_objects=None, partition_combine=None):
+    def __init__(self, feature, *args):
         """Initialize an Partition feature with given parameters.
 
         Expected arguments:
@@ -42,12 +41,17 @@ class Partition(Interface):
         assert(self._tool_objects)
         assert(self._partition_combine)
 
-        if main_objects is None:
+        if not args:
             return
 
-        self._fill_attribute(self._main_objects, main_objects)
-        self._fill_attribute(self._tool_objects, tool_objects)
-        self._fill_attribute(self._partition_combine, partition_combine)
+        assert(len(args) == 3)
+        main_objects, tool_objects, partition_combine = args
+
+        self.setMainObjects(main_objects)
+        self.setToolObjects(tool_objects)
+        self.setPartitionCombine(partition_combine)
+
+        self._execute()
         pass
 
     def setMainObjects(self, main_objects):

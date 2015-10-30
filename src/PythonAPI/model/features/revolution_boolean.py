@@ -28,7 +28,8 @@ def addRevolutionFuse(part, *args):
 class RevolutionBoolean(CompositeBoolean):
 
     def __init__(self, feature, *args):
-        CompositeBoolean.__init__(self, feature, *args)
+        CompositeBoolean.__init__(self, feature, *args[:3])
+        args = args[3:]
 
         self._axis_object = self._feature.data().selection("axis_object")
         self._CreationMethod = self._feature.string("CreationMethod")
@@ -51,12 +52,18 @@ class RevolutionBoolean(CompositeBoolean):
         if not args:
             return
 
-        self.setAxisObject(args[0])
+        assert(len(args) in (3, 5))
+        axis_object = args[0]
+        args = args[1:]
+
+        self.setAxisObject(axis_object)
 
         if len(args) == 4:
-            self.setPlanesAndOffsets(*args[1:])
+            self.setPlanesAndOffsets(*args)
         elif len(args) == 2:
-            self.setAngles(*args[1:])
+            self.setAngles(*args)
+
+        self._execute()
         pass
 
     def __clear(self):

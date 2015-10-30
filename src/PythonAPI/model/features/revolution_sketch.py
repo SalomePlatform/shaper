@@ -19,7 +19,8 @@ def addRevolutionSketch(part, *args):
 class RevolutionSketch(CompositeSketch):
 
     def __init__(self, feature, *args):
-        CompositeSketch.__init__(self, feature, *args)
+        CompositeSketch.__init__(self, feature, *args[:2])
+        args = args[2:]
 
         self._axis_object = self._feature.data().selection("axis_object")
         self._CreationMethod = self._feature.string("CreationMethod")
@@ -42,12 +43,18 @@ class RevolutionSketch(CompositeSketch):
         if not args:
             return
 
-        self.setAxisObject(args[0])
+        assert(len(args) in (3, 5))
+        axis_object = args[0]
+        args = args[1:]
+
+        self.setAxisObject(axis_object)
 
         if len(args) == 4:
-            self.setPlanesAndOffsets(*args[1:])
+            self.setPlanesAndOffsets(*args)
         elif len(args) == 2:
-            self.setAngles(*args[1:])
+            self.setAngles(*args)
+
+        self._execute()
         pass
 
     def __clear(self):

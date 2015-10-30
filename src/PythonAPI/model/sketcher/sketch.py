@@ -67,6 +67,7 @@ class Sketch(Interface):
             self.__sketchOnFace(plane)
         else:
             self.__sketchOnPlane(plane)
+        pass
 
     def __sketchOnPlane(self, plane):
         """Create the sketch on a plane."""

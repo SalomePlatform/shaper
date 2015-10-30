@@ -43,6 +43,8 @@ class Parameter(Interface):
         assert(len(args) == 2)
         self.setName(args[0])
         self.setExpression(args[1])
+
+        self._execute()
         pass
 
     def setName(self, name):

@@ -19,7 +19,7 @@ def addRevolution(part, *args):
 class Revolution(Interface):
     """Interface on an Revolution feature."""
 
-    def __init__(self, feature, base=None, axis_object=None, *args):
+    def __init__(self, feature, *args):
         """Initialize an Revolution feature with given parameters.
 
         Expected arguments for all modes:
@@ -63,29 +63,23 @@ class Revolution(Interface):
         assert(self._from_object)
         assert(self._from_offset)
 
-        if base is None:
+        if not args:
             return
 
-        self.__setBase(base)
-        self.__setAxisObject(axis_object)
+        assert(len(args) in (4, 6))
+
+        base, axis_object = args[:2]
+        args = args[2:]
+
+        self.setBase(base)
+        self.setAxisObject(axis_object)
 
         if len(args) == 4:
-            self.__createByPlanesAndOffsets(*args)
+            self.setPlanesAndOffsets(*args)
         elif len(args) == 2:
-            self.__createByAngles(*args)
-        else:
-            raise AssertionError(
-                "Revolution takes 5 or 7 arguments (%s given)" %
-                (len(args) + 3)
-                )
-        pass
+            self.setAngles(*args)
 
-    def __setBase(self, base):
-        self._fill_attribute(self._base, base)
-        pass
-
-    def __setAxisObject(self, axis_object):
-        self._fill_attribute(self._axis_object, axis_object)
+        self._execute()
         pass
 
     def __clear(self):
@@ -98,29 +92,12 @@ class Revolution(Interface):
         self._fill_attribute(self._from_offset, 0)
         pass
 
-    def __createByAngles(self, to_angle, from_angle):
-        self.__clear()
-        self._CreationMethod.setValue("ByAngles")
-        self._fill_attribute(self._to_angle, to_angle)
-        self._fill_attribute(self._from_angle, from_angle)
-        pass
-
-    def __createByPlanesAndOffsets(self, to_object, to_offset,
-                                   from_object, from_offset):
-        self.__clear()
-        self._CreationMethod.setValue("ByPlanesAndOffsets")
-        self._fill_attribute(self._to_object, to_object)
-        self._fill_attribute(self._to_offset, to_offset)
-        self._fill_attribute(self._from_object, from_object)
-        self._fill_attribute(self._from_offset, from_offset)
-        pass
-
     def setBase(self, base):
         """Modify base attribute of the feature.
 
         See __init__.
         """
-        self.__setBase(base)
+        self._fill_attribute(self._base, base)
         pass
 
     def setAxisObject(self, axis_object):
@@ -128,21 +105,30 @@ class Revolution(Interface):
 
         See __init__.
         """
-        self.__setAxisObject(axis_object)
+        self._fill_attribute(self._axis_object, axis_object)
         pass
 
-    def setAngles(self, *args):
+    def setAngles(self, to_angle, from_angle):
         """Modify the to_angle, from_angle attributes of the feature.
 
         See __init__.
         """
-        self.__createByAngles(*args)
+        self.__clear()
+        self._CreationMethod.setValue("ByAngles")
+        self._fill_attribute(self._to_angle, to_angle)
+        self._fill_attribute(self._from_angle, from_angle)
         pass
 
-    def setPlanesAndOffsets(self, *args):
+    def setPlanesAndOffsets(self, to_object, to_offset,
+                            from_object, from_offset):
         """Modify planes and offsets attributes of the feature.
 
         See __init__.
         """
-        self.__createByPlanesAndOffsets(*args)
+        self.__clear()
+        self._CreationMethod.setValue("ByPlanesAndOffsets")
+        self._fill_attribute(self._to_object, to_object)
+        self._fill_attribute(self._to_offset, to_offset)
+        self._fill_attribute(self._from_object, from_object)
+        self._fill_attribute(self._from_offset, from_offset)
         pass

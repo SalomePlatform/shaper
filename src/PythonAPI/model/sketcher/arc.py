@@ -9,7 +9,7 @@ class Arc(Interface):
     def __init__(self, feature, *args):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "SketchArc")
-        
+
         self._center = geomDataAPI_Point2D(
             self._feature.data().attribute("ArcCenter")
             )
@@ -31,11 +31,11 @@ class Arc(Interface):
     def centerData(self):
         """Return the center point data."""
         return self._center
-    
+
     def startPointData(self):
         """Return the start point data."""
         return self._start_point
-    
+
     def endPointData(self):
         """Return the end point data."""
         return self._end_point
@@ -43,30 +43,25 @@ class Arc(Interface):
     def result(self):
         """Return the arc circular line attribute."""
         return self._feature.lastResult()
-    
+
     ########
     #
     # Private methods
     #
     ########
-    
-    def __createByCoordinates(self, center_x, center_y, 
-                              start_x, start_y, 
+
+    def __createByCoordinates(self, center_x, center_y,
+                              start_x, start_y,
                               end_x, end_y):
         """Create an arc by point coordinates."""
         self._center.setValue(center_x, center_y)
         self._start_point.setValue(start_x, start_y)
         self._end_point.setValue(end_x, end_y)
         self._feature.execute()
-        
+
     def __createByPoints(self, center, start, end):
         """Create an arc with point objects."""
         self._center.setValue(center.x(), center.y())
         self._start_point.setValue(start.x(), start.y())
         self._end_point.setValue(end.x(), end.y())
         self._feature.execute()
-        
-        
-        
-        
-        

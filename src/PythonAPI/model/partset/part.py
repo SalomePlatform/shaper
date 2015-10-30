@@ -34,6 +34,8 @@ class Part(Interface):
         """Adds a new Part to the given Partset and activates the Part."""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Part")
+
+        self._execute()
         pass
 
     def document(self):

@@ -19,7 +19,8 @@ def addExtrusionSketch(part, *args):
 class ExtrusionSketch(CompositeSketch):
 
     def __init__(self, feature, *args):
-        CompositeSketch.__init__(self, feature, *args)
+        CompositeSketch.__init__(self, feature, *args[:2])
+        args = args[2:]
 
         self._CreationMethod = self._feature.string("CreationMethod")
         self._to_size = self._feature.data().real("to_size")
@@ -40,11 +41,13 @@ class ExtrusionSketch(CompositeSketch):
         if not args:
             return
 
-        assert(len(args) == 4 or len(args) == 2)
+        assert(len(args) in (2, 4))
         if len(args) == 4:
             self.setPlanesAndOffsets(*args)
         elif len(args) == 2:
             self.setSizes(*args)
+
+        self._execute()
         pass
 
     def __clear(self):

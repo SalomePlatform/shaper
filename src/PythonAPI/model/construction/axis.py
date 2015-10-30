@@ -47,11 +47,13 @@ class Axis(Interface):
         if not args:
             return
 
-        assert(len(args) == 2 or len(args) == 1)
+        assert(len(args) in (1, 2))
         if len(args) == 2:
             self.setPoints(*args)
         elif len(args) == 1:
             self.setCylindricalFace(*args)
+
+        self._execute()
         pass
 
     def __clear(self):

@@ -26,8 +26,13 @@ class Group(Interface):
 
         assert(self._group_list)
 
+        if not args:
+            return
+
         assert(len(args) == 1)
         self.setGroupList(args[0])
+
+        self._execute()
         pass
 
     def setGroupList(self, main_objects):

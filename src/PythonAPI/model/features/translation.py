@@ -30,10 +30,15 @@ class Translation(Interface):
         assert(self._axis_object)
         assert(self._distance)
 
+        if not args:
+            return
+
         assert(len(args) == 3)
         self.setMainObjects(args[0])
         self.setAxisObject(args[1])
         self.setDistance(args[2])
+
+        self._execute()
         pass
 
     def setMainObjects(self, main_objects):

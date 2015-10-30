@@ -41,7 +41,10 @@ class Point(Interface):
         if not args:
             return
 
+        assert(len(args) == 3)
         self.setPoint(*args)
+
+        self._execute()
         pass
 
     def setPoint(self, x, y, z):

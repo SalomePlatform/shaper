@@ -28,7 +28,8 @@ def addExtrusionFuse(part, *args):
 class ExtrusionBoolean(CompositeBoolean):
 
     def __init__(self, feature, *args):
-        CompositeBoolean.__init__(self, feature, *args)
+        CompositeBoolean.__init__(self, feature, *args[:3])
+        args = args[3:]
 
         self._CreationMethod = self._feature.string("CreationMethod")
         self._to_size = self._feature.data().real("to_size")
@@ -49,11 +50,13 @@ class ExtrusionBoolean(CompositeBoolean):
         if not args:
             return
 
-        assert(len(args) == 4 or len(args) == 2)
+        assert(len(args) in (2, 4))
         if len(args) == 4:
             self.setPlanesAndOffsets(*args)
         elif len(args) == 2:
             self.setSizes(*args)
+
+        self._execute()
         pass
 
     def __clear(self):

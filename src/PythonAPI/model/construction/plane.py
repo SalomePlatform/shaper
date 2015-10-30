@@ -53,11 +53,13 @@ class Plane(Interface):
         if not args:
             return
 
-        assert(len(args) == 2 or len(args) == 4)
+        assert(len(args) in (2, 4))
         if len(args) == 2:
             self.setFaceAndDistance(*args)
         elif len(args) == 4:
             self.setGeneralEquation(*args)
+
+        self._execute()
         pass
 
     def __clear(self):

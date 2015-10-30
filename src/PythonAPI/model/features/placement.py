@@ -34,12 +34,17 @@ class Placement(Interface):
         assert(self._reverse_direction)
         assert(self._centering)
 
+        if not args:
+            return
+
         assert(len(args) == 5)
         self.setObjectList(args[0])
         self.setStartShape(args[1])
         self.setEndShape(args[2])
         self.setReverseDirection(args[3])
         self.setCentering(args[4])
+
+        self._execute()
         pass
 
     def setObjectList(self, objects_list):
