@@ -32,4 +32,6 @@ ADD_UNIT_TESTS(
   TestFeaturesRevolution.py
 
   TestMakeBrick1.py
+  TestMakeBrick2.py
+#  TestMakeBrick3.py
   )
