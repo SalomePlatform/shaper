@@ -34,6 +34,7 @@ class Interface():
     def __init__(self, feature):
         self._feature = feature
         self._attribute_white_list = [
+            "execute",
             "getKind", "results", "firstResult", "lastResult",
             ]
 
@@ -74,5 +75,10 @@ class Interface():
         validators = ModelAPI.ModelAPI_Session.get().validators()
         return validators.validate(self._feature)
 
-    def execute(self):
-        self._feature.execute()
+    def _execute(self):
+        if self.areInputValid():
+            self._feature.execute()
+        else:
+            raise RuntimeError("Can not execute %s: %s" %
+                               (self._feature.getKind(), self._feature.error())
+                               )
