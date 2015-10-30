@@ -124,6 +124,7 @@ class Sketch(Interface):
     def setCoincident(self, p1, p2):
         """Set coincident the two given points and add the corresponding
         constraint to this Sketch."""
+        assert(p1 and p2)
         constraint = self._feature.addFeature("SketchConstraintCoincidence")
         constraint.data().refattr("ConstraintEntityA").setAttr(p1)
         constraint.data().refattr("ConstraintEntityB").setAttr(p2)
@@ -133,6 +134,7 @@ class Sketch(Interface):
     def setParallel(self, l1, l2):
         """Set parallel the two given lines and add the corresponding
         constraint to this Sketch."""
+        assert(l1 and l2)
         constraint = self._feature.addFeature("SketchConstraintParallel")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
@@ -142,6 +144,7 @@ class Sketch(Interface):
     def setPerpendicular(self, l1, l2):
         """Set perpendicular the two given lines and add the corresponding
         constraint to this Sketch."""
+        assert(l1 and l2)
         constraint = self._feature.addFeature("SketchConstraintPerpendicular")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
@@ -167,11 +170,13 @@ class Sketch(Interface):
     def setDistance(self, point, line, length):
         """Set the distance between the given point and line, and add
         the corresponding constraint to this Sketch."""
+        assert(point and line)
         constraint = self._feature.addFeature("SketchConstraintDistance")
-        if isinstance(line, str):
+        if isinstance(line, basestring):
             # Add the edge identified by the given topological name
             # to this Sketch
             line = self.addLine(line).result()
+            assert(line)
         constraint.data().refattr("ConstraintEntityA").setAttr(point)
         constraint.data().refattr("ConstraintEntityB").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
@@ -181,6 +186,7 @@ class Sketch(Interface):
     def setLength(self, line, length):
         """Set the length of the given line and add the corresponding
         constraint to this Sketch."""
+        assert(line)
         constraint = self._feature.addFeature("SketchConstraintLength")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
