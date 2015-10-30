@@ -78,8 +78,6 @@ class Revolution(Interface):
                 "Revolution takes 5 or 7 arguments (%s given)" %
                 (len(args) + 3)
                 )
-
-        self.__execute()
         pass
 
     def __setBase(self, base):
@@ -117,20 +115,12 @@ class Revolution(Interface):
         self._fill_attribute(self._from_offset, from_offset)
         pass
 
-    def __execute(self):
-        if self.areInputValid():
-            self.execute()
-        else:
-            raise Exception("Cannot execute Revolution: %s" %
-                            self._feature.error())
-
     def setBase(self, base):
         """Modify base attribute of the feature.
 
         See __init__.
         """
         self.__setBase(base)
-        self.__execute()
         pass
 
     def setAxisObject(self, axis_object):
@@ -139,7 +129,6 @@ class Revolution(Interface):
         See __init__.
         """
         self.__setAxisObject(axis_object)
-        self.__execute()
         pass
 
     def setAngles(self, *args):
@@ -148,7 +137,6 @@ class Revolution(Interface):
         See __init__.
         """
         self.__createByAngles(*args)
-        self.__execute()
         pass
 
     def setPlanesAndOffsets(self, *args):
@@ -157,5 +145,4 @@ class Revolution(Interface):
         See __init__.
         """
         self.__createByPlanesAndOffsets(*args)
-        self.__execute()
         pass
