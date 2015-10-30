@@ -22,8 +22,6 @@
 
 #include <QMouseEvent>
 
-#define APPLY_BY_ENTER_OR_TAB
-
 PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              ModuleBase_IWorkshop* theWorkshop,
                                                              const Config_WidgetAPI* theData,
@@ -31,18 +29,6 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
  : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId), myWorkshop(theWorkshop)
 {
   myFirstPntName = theData->getProperty("first_point");
-
-  // Reconnect to local slot
-#ifdef APPLY_BY_ENTER_OR_TAB
-  // Apply widget value change by enter/tab event.
-  //disconnect(mySpinBox, SIGNAL(editingFinished()), this, SIGNAL(valuesChanged()));
-  disconnect(mySpinBox, SIGNAL(valueStored()), this, SIGNAL(valuesChanged()));
-  connect(mySpinBox, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
-  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesModified()));
-#else
-  disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
-  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
-#endif
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
@@ -130,11 +116,6 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
   setPoint(feature(), aPnt);
   blockValueState(isBlocked);
   setValueState(ModifiedInViewer);
-}
-
-void PartSet_WidgetPoint2dDistance::onValuesChanged()
-{
-  emit valuesChanged();
 }
 
 bool PartSet_WidgetPoint2dDistance::processEnter()

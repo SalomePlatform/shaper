@@ -64,7 +64,6 @@ class ExpressionEditor: public QPlainTextEdit
   void onTextChanged();
 
 signals:
-  void editingFinished();
   void valueModified();
   /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
   void valueStored();

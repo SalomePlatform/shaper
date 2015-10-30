@@ -214,8 +214,6 @@ void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
 
 bool ExpressionEditor::focusNextPrevChild(bool theIsNext)
 {
-  if (myIsModified)
-    emit editingFinished();
   emit valueStored();
   emit focusNextPrev();
   return QPlainTextEdit::focusNextPrevChild(theIsNext);
@@ -250,7 +248,6 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
   this->setLayout(aMainLay);
 
   connect(myEditor, SIGNAL(valueModified()), this, SIGNAL(valuesModified()));
-  //connect(myEditor, SIGNAL(editingFinished()), this, SLOT(onTextChanged()));
   connect(myEditor, SIGNAL(valueStored()), this, SLOT(onTextChanged()));
   connect(myEditor, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
 

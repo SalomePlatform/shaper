@@ -51,8 +51,6 @@ const double MaxCoordinate = 1e12;
 
 static QStringList MyFeaturesForCoincedence;
 
-#define APPLY_BY_ENTER_OR_TAB
-
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const Config_WidgetAPI* theData,
@@ -88,16 +86,10 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-#ifdef APPLY_BY_ENTER_OR_TAB
     // Apply widget value change by enter/tab event.
-    //connect(myXSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
-    //connect(myXSpin, SIGNAL(focusNextPrev()), this, SLOT(onValuesChanged()));
     connect(myXSpin, SIGNAL(valueStored()), this, SLOT(onValuesChanged()));
     connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
     connect(myXSpin, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
-#else
-    connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
-#endif
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -110,15 +102,10 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-#ifdef APPLY_BY_ENTER_OR_TAB
     // Apply widget value change by enter/tab event.
-    //connect(myYSpin, SIGNAL(editingFinished()), this, SLOT(onValuesChanged()));
     connect(myYSpin, SIGNAL(valueStored()), this, SLOT(onValuesChanged()));
     connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
     connect(myYSpin, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
-#else
-    connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
-#endif
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);

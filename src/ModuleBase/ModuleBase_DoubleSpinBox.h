@@ -69,7 +69,6 @@ signals:
    /// Called on text changed
   virtual void onTextChanged(const QString&);
   void onValueChanged(const QString& theValue);
-  void onEditingFinished();
 
  protected:
    /// Removes extra trailing zero symbols

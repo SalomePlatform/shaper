@@ -38,8 +38,6 @@
 #include <QDebug>
 #endif
 
-#define APPLY_BY_ENTER_OR_TAB
-
 ModuleBase_OperationFeature::ModuleBase_OperationFeature(const QString& theId, QObject* theParent)
 : ModuleBase_Operation(theId, theParent),
   myIsEditing(false)

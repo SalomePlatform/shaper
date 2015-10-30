@@ -80,7 +80,6 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
           SLOT(onTextChanged( const QString& )));
 
   connect(this, SIGNAL(valueChanged(const QString&)), this, SLOT(onValueChanged(const QString&)));
-  //connect(this, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
 }
 
 /*!
@@ -343,11 +342,6 @@ void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 void ModuleBase_DoubleSpinBox::onValueChanged(const QString& theValue)
 {
   myIsModified = true;
-}
-
-void ModuleBase_DoubleSpinBox::onEditingFinished()
-{
-  //myIsModified = false;
 }
 
 bool ModuleBase_DoubleSpinBox::isModified() const

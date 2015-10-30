@@ -87,10 +87,6 @@ protected:
   virtual double computeValue(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
                               const std::shared_ptr<GeomAPI_Pnt2d>& theCurrentPnt);
 
-private slots:
-  /// Process values changed event
-  void onValuesChanged();
-
 protected:
   /// A reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
