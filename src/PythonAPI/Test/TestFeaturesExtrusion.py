@@ -30,7 +30,7 @@ class FeaturesExtrusionFixture(FeaturesAddExtrusionFixture):
         circle = sketch.addCircle(0, 0, 10)
         model.do()
 
-        base = [sketch.selectFace(circle.result())]
+        base = sketch.selectFace(circle.result())
         self.extrusion = model.addExtrusion(self.part, base, 10, 0)
         model.do()
 
@@ -54,7 +54,7 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
         circle = sketch.addCircle(0, 0, 10)
         model.do()
 
-        base = [sketch.selectFace(circle.result())]
+        base = sketch.selectFace(circle.result())
         extrusion = model.addExtrusion(self.part, base, 10, 0)
         model.do()
 
@@ -83,9 +83,9 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
 
         model.do()
 
-        base = [base_sketch.selectFace(base_circle.result())]
-        to_object = to_sketch.selectFace(to_circle.result())
-        from_object = from_sketch.selectFace(from_circle.result())
+        base = base_sketch.selectFace(base_circle.result())
+        to_object = to_sketch.selectFace(to_circle.result())[0]
+        from_object = from_sketch.selectFace(from_circle.result())[0]
         extrusion = model.addExtrusion(self.part, base,
                                        to_object, 15,
                                        from_object, 20)
@@ -150,8 +150,8 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
 
         model.do()
 
-        to_object = to_sketch.selectFace(to_circle.result())
-        from_object = from_sketch.selectFace(from_circle.result())
+        to_object = to_sketch.selectFace(to_circle.result())[0]
+        from_object = from_sketch.selectFace(from_circle.result())[0]
         self.extrusion.setPlanesAndOffsets(to_object, 15, from_object, 20)
 
 

@@ -36,7 +36,7 @@ class FeaturesRevolutionFixture(FeaturesAddRevolutionFixture):
 
         model.do()
 
-        base = [base_sketch.selectFace(circle.lastResult())]
+        base = base_sketch.selectFace(circle.lastResult())
         axis_object = Selection(axis_sketch.firstResult(),
                                 line.firstResult().shape())
 
@@ -70,7 +70,7 @@ class FeaturesAddRevolutionTestCase(FeaturesAddRevolutionFixture):
 
         model.do()
 
-        base = [base_sketch.selectFace(circle.lastResult())]
+        base = base_sketch.selectFace(circle.lastResult())
         axis_object = Selection(axis_sketch.firstResult(),
                                 line.firstResult().shape())
 
@@ -105,11 +105,11 @@ class FeaturesAddRevolutionTestCase(FeaturesAddRevolutionFixture):
 
         model.do()
 
-        base = [base_sketch.selectFace(base_circle.result())]
+        base = base_sketch.selectFace(base_circle.result())
         axis_object = Selection(axis_sketch.firstResult(),
                                 line.firstResult().shape())
-        to_obejct = to_sketch.selectFace(to_circle.result())
-        from_object = from_sketch.selectFace(from_circle.result())
+        to_obejct = to_sketch.selectFace(to_circle.result())[0]
+        from_object = from_sketch.selectFace(from_circle.result())[0]
 
         revolution = model.addRevolution(self.part, base, axis_object,
                                          to_obejct, 15,
@@ -183,11 +183,11 @@ class FeaturesRevolutionTestCase(FeaturesRevolutionFixture):
 
         model.do()
 
-        base = [base_sketch.selectFace(base_circle.result())]
+        base = base_sketch.selectFace(base_circle.result())
         axis_object = Selection(axis_sketch.firstResult(),
                                 line.firstResult().shape())
-        to_obejct = to_sketch.selectFace(to_circle.result())
-        from_object = from_sketch.selectFace(from_circle.result())
+        to_obejct = to_sketch.selectFace(to_circle.result())[0]
+        from_object = from_sketch.selectFace(from_circle.result())[0]
 
         self.revolution.setPlanesAndOffsets(to_obejct, 15, from_object, 20)
 
