@@ -83,7 +83,7 @@ class Sketch(Interface):
         # if the line is created by name add a rigid constraint
         # to the created line
         if len(args) == 1 and isinstance(args[0], str):
-            constraint = sketch.addFeature("SketchConstraintRigid")
+            constraint = self._feature.addFeature("SketchConstraintRigid")
             constraint.refattr("ConstraintEntityA").setObject(
                 line_feature.firstResult()
                 )
