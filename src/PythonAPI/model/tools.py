@@ -19,20 +19,6 @@ def convert_to_underscore(name):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
-def get_value(attribute):
-    """Return simple type value from ModelAPI attribute if possible.
-
-    ModelAPI_AttributeDouble -> double
-    ModelAPI_AttributeString -> str
-    """
-    if (isinstance(attribute, ModelAPI.ModelAPI_AttributeDouble) or
-            isinstance(attribute, ModelAPI.ModelAPI_AttributeString)):
-        return attribute.value()
-
-    print type(attribute)
-    return attribute
-
-
 class Selection:
     """Class for storing selection."""
 
