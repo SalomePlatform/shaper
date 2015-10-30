@@ -299,8 +299,9 @@ signals:
   /// Rebuild data tree
   void onRebuild();
 
-  /// Validates the operation. Apply button is disabled if the widget value is in Modified state
-  void onValueStateChanged();
+  /// Validates the operation to change the "Apply" button state.
+  /// \param thePreviousState the previous state of the widget
+  void onWidgetStateChanged(int thePreviousState);
 
   /// Show property panel
   void showPropertyPanel();

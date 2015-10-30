@@ -16,6 +16,7 @@
 
 #include <ModuleBase_ViewerFilters.h>
 #include <ModuleBase_Definitions.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <GeomAPI_Pln.h>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
@@ -196,6 +197,10 @@ public:
   /// \param isToConnect a boolean value whether connect or disconnect
   void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
 
+  /// Visualize the operation feature if the previous state is modified value in property panel
+  /// \thePrevState the previous widget value state
+  void widgetStateChanged(int thePreviousState);
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
@@ -212,8 +217,6 @@ private slots:
   void onLeaveViewPort();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
-  /// Listens to the signal about values are to be changed in the property panel
-  void onValuesChangedInPropertyPanel();
   /// Listens to the signal about the modification of the values have been done in the property panel
   void onAfterValuesChangedInPropertyPanel();
 
@@ -288,6 +291,7 @@ private:
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
                         const bool isToDisplay, const bool isFlushRedisplay = true);
+
 private:
   XGUI_OperationMgr* operationMgr() const;
 

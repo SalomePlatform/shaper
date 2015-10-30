@@ -296,22 +296,6 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
   aDisplayer->updateViewer();
 }
 
-void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
-{
-  if (!isNestedCreateOperation(getCurrentOperation()))
-    return;
-
-  operationMgr()->onValidateOperation();
-  // the feature is to be erased here, but it is correct to call canDisplayObject because
-  // there can be additional check (e.g. editor widget in distance constraint)
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                           (getCurrentOperation());
-  if (aFOperation) {
-    FeaturePtr aFeature = aFOperation->feature();
-    visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
-  }
-}
-
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   get2dPoint(theWnd, theEvent, myClickedPoint);
@@ -1200,16 +1184,28 @@ void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidg
   if (isToConnect) {
     connect(theWidget, SIGNAL(beforeValuesChanged()),
             this, SLOT(onBeforeValuesChangedInPropertyPanel()));
-    connect(theWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
     connect(theWidget, SIGNAL(afterValuesChanged()),
             this, SLOT(onAfterValuesChangedInPropertyPanel()));
   }
   else {
     disconnect(theWidget, SIGNAL(beforeValuesChanged()),
                 this, SLOT(onBeforeValuesChangedInPropertyPanel()));
-    disconnect(theWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
     disconnect(theWidget, SIGNAL(afterValuesChanged()),
                 this, SLOT(onAfterValuesChangedInPropertyPanel()));
+  }
+}
+
+void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (getCurrentOperation());
+  if (aFOperation) {
+    if (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
+        PartSet_SketcherMgr::isNestedSketchOperation(aFOperation) &&
+        thePreviousState == ModuleBase_ModelWidget::ModifiedInPP) {
+      FeaturePtr aFeature = aFOperation->feature();
+      visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
+    }
   }
 }
 

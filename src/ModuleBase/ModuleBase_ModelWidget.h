@@ -102,10 +102,6 @@ Q_OBJECT
   /// \return True in success
   bool restoreValue();
 
-  /// Saves the internal parameters to the given feature. Emits signals before and after store
-  /// \return True in success
-  void storeValueByApply();
-
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
@@ -206,7 +202,7 @@ signals:
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
   /// The signal about value state modification
-  void valueStateChanged();
+  void valueStateChanged(int theState);
 
   void focusNextPrev();
   void valueStored();

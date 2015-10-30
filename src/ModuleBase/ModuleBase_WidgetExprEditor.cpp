@@ -214,8 +214,8 @@ void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
 
 bool ExpressionEditor::focusNextPrevChild(bool theIsNext)
 {
-  emit valueStored();
-  emit focusNextPrev();
+  //emit valueStored();
+  //emit focusNextPrev();
   return QPlainTextEdit::focusNextPrevChild(theIsNext);
 }
 
@@ -248,8 +248,8 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
   this->setLayout(aMainLay);
 
   connect(myEditor, SIGNAL(valueModified()), this, SIGNAL(valuesModified()));
-  connect(myEditor, SIGNAL(valueStored()), this, SLOT(onTextChanged()));
-  connect(myEditor, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
+  //connect(myEditor, SIGNAL(valueStored()), this, SLOT(onTextChanged()));
+  //connect(myEditor, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
 
   connect(myEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
     /// The signal about key release on the control, that corresponds to the attribute

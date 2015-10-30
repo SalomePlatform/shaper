@@ -187,12 +187,12 @@ bool ModuleBase_ModelWidget::storeValue()
   return isDone;
 }
 
-ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState(const ValueState& theState)
+ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState(const ModuleBase_ModelWidget::ValueState& theState)
 {
   ValueState aState = myState;
   if (myState != theState && !myIsValueStateBlocked) {
     myState = theState;
-    emit valueStateChanged();
+    emit valueStateChanged(aState);
   }
   return aState;
 }
@@ -211,14 +211,6 @@ bool ModuleBase_ModelWidget::restoreValue()
   emit afterValuesRestored();
 
   return isDone;
-}
-
-void ModuleBase_ModelWidget::storeValueByApply()
-{
-  // do not emit signal about update the currenty feature object
-  // in order to do not perform additional redisplay in the viewer.
-  // It should happens by finish operation of the apply action
-  storeValueCustom();
 }
 
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
@@ -258,6 +250,17 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
     if (getControls().contains(aWidget)) {
       emit focusInWidget(this);
     }
+  }
+  else if (theEvent->type() == QEvent::FocusOut) {
+    QFocusEvent* aFocusEvent = dynamic_cast<QFocusEvent*>(theEvent);
+
+    Qt::FocusReason aReason = aFocusEvent->reason();
+    bool aMouseOrKey = aReason == Qt::MouseFocusReason ||
+                        aReason == Qt::TabFocusReason ||
+                        aReason == Qt::BacktabFocusReason ||
+                        aReason == Qt::OtherFocusReason; // to process widget->setFocus()
+    if (aMouseOrKey && getControls().contains(aWidget) && getValueState() == ModifiedInPP)
+      storeValue();
   }
   // pass the event on to the parent class
 

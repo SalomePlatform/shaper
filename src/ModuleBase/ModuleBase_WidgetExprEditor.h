@@ -66,8 +66,8 @@ class ExpressionEditor: public QPlainTextEdit
 signals:
   void valueModified();
   /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
-  void valueStored();
-  void focusNextPrev();
+  //void valueStored();
+  //void focusNextPrev();
 
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event

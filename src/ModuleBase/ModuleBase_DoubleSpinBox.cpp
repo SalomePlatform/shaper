@@ -219,9 +219,9 @@ void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
 
 bool ModuleBase_DoubleSpinBox::focusNextPrevChild(bool theIsNext)
 {
-  myIsModified = false;
+  //myIsModified = false;
 
-  emit valueStored();
+  //emit valueStored();
   emit focusNextPrev();
   return QDoubleSpinBox::focusNextPrevChild(theIsNext);
 }

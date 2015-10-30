@@ -196,6 +196,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param isToConnect a boolean value whether connect or disconnect
   virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect) {};
 
+  /// Validates the operation to change the "Apply" button state.
+  /// \param thePreviousState the previous state of the widget
+  virtual void widgetStateChanged(int thePreviousState) {};
+
 signals:
   /// Signal which is emitted when operation is launched
   void operationLaunched();
