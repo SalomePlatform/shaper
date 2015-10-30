@@ -217,15 +217,6 @@ void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
   QDoubleSpinBox::keyPressEvent(theEvent);
 }
 
-bool ModuleBase_DoubleSpinBox::focusNextPrevChild(bool theIsNext)
-{
-  //myIsModified = false;
-
-  //emit valueStored();
-  emit focusNextPrev();
-  return QDoubleSpinBox::focusNextPrevChild(theIsNext);
-}
-
 /*!
  \brief Perform \a steps increment/decrement steps.
 

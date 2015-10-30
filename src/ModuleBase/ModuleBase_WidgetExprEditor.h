@@ -64,10 +64,8 @@ class ExpressionEditor: public QPlainTextEdit
   void onTextChanged();
 
 signals:
+  /// The signal about text change in the text editor
   void valueModified();
-  /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
-  //void valueStored();
-  //void focusNextPrev();
 
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
@@ -89,12 +87,7 @@ signals:
   /// Redefinition of virtual method
   virtual void paintEvent( QPaintEvent* );
 
-  /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
-  /// Emits a signal about focus change
-  /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
-  virtual bool focusNextPrevChild(bool theIsNext);
-
- private:
+private:
   QStringListModel* myCompleterModel;
   QCompleter* myCompleter;
   bool myCompletedAndSelected;

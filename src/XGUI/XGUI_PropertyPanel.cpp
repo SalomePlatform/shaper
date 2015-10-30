@@ -118,8 +118,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
             this,    SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
     connect(aWidget, SIGNAL(keyReleased(QKeyEvent*)),
             this,    SIGNAL(keyReleased(QKeyEvent*)));
-    //connect(aWidget, SIGNAL(focusNextPrev()),
-    //        this, SLOT(onFocusNextPrev()));
   }
 }
 
@@ -168,11 +166,6 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
     isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
   activateWidget(NULL);
-}
-
-void XGUI_PropertyPanel::onFocusNextPrev()
-{
-  setActiveWidget(NULL);
 }
 
 bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
@@ -246,7 +239,7 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
       emit widgetActivated(myActiveWidget);
     } else if (!isEditingMode()) {
       emit noMoreWidgets();
-      setFocusOnOkButton();
+      //setFocusOnOkButton();
     }
   }
 }

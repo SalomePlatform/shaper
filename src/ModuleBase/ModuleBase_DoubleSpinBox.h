@@ -60,11 +60,6 @@ Q_OBJECT
   /// \return the previous value
   bool enableKeyPressEvent(const bool& theEnable);
 
-signals:
-  /// A signal that is emitted by the "Tab" key event. It is emitted before the key is processed.
-  void focusNextPrev();
-  void valueStored();
-
  protected slots:
    /// Called on text changed
   virtual void onTextChanged(const QString&);
@@ -74,11 +69,6 @@ signals:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
   virtual void keyPressEvent(QKeyEvent* theEvent);
-
-  /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
-  /// Emits a signal about focus change
-  /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
-  virtual bool focusNextPrevChild(bool theIsNext);
 
  private:
   // boolen flag whether the key event is emitted. The default value is false

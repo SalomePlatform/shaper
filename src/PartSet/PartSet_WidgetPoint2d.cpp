@@ -86,10 +86,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-    // Apply widget value change by enter/tab event.
-    connect(myXSpin, SIGNAL(valueStored()), this, SLOT(onValuesChanged()));
     connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
-    connect(myXSpin, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -102,10 +99,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-    // Apply widget value change by enter/tab event.
-    connect(myYSpin, SIGNAL(valueStored()), this, SLOT(onValuesChanged()));
     connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
-    connect(myYSpin, SIGNAL(focusNextPrev()), this, SIGNAL(focusNextPrev()));
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -461,17 +455,18 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
   return aPointIsFound;
 }
 
-void PartSet_WidgetPoint2D::onValuesChanged()
+/*void PartSet_WidgetPoint2D::onValuesChanged()
 {
   emit valuesChanged();
-}
+}*/
 
 bool PartSet_WidgetPoint2D::processEnter()
 {
   bool isModified = myXSpin->isModified() || myYSpin->isModified();
   if (isModified) {
     bool isXModified = myXSpin->isModified();
-    onValuesChanged();
+    emit valuesChanged();
+    //onValuesChanged();
     myXSpin->clearModified();
     myYSpin->clearModified();
     if (isXModified)

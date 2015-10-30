@@ -204,9 +204,6 @@ signals:
   /// The signal about value state modification
   void valueStateChanged(int theState);
 
-  void focusNextPrev();
-  void valueStored();
-
 protected:
   /// Sets default value of widget. Normally, widget should fetch this value
   /// from the xml. However, some widgets derived widgets could define it

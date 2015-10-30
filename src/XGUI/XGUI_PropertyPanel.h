@@ -118,8 +118,6 @@ public slots:
   */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
-  void onFocusNextPrev();
-
 protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget

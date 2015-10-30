@@ -124,9 +124,9 @@ protected:
   /// \return boolean result
   bool isFeatureContainsPoint(const FeaturePtr& theFeature, double theX, double theY);
 
-private slots:
+//private slots:
   /// Process value changed event
-  void onValuesChanged();
+  //void onValuesChanged();
 
  private:
    /// Returns point 2d from selected vertex
