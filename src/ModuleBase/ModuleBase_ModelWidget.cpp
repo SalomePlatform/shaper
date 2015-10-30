@@ -28,7 +28,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
     : QWidget(theParent),
       myParentId(theParentId),
       myIsEditing(false),
-      myState(Stored)
+      myState(Stored),
+      myIsValueStateBlocked(false)
 {
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
@@ -128,6 +129,12 @@ void ModuleBase_ModelWidget::activate()
   activateCustom();
 }
 
+void ModuleBase_ModelWidget::deactivate()
+{
+  myIsValueStateBlocked = false;
+  myState = Stored;
+}
+
 void ModuleBase_ModelWidget::initializeValueByActivate()
 {
   if (isComputedDefault()) {
@@ -178,13 +185,21 @@ bool ModuleBase_ModelWidget::storeValue()
   return isDone;
 }
 
-void ModuleBase_ModelWidget::setValueState(const ValueState& theState)
+ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState(const ValueState& theState)
 {
-  if (myState == theState)
-    return;
+  ValueState aState = myState;
+  if (myState != theState && !myIsValueStateBlocked) {
+    myState = theState;
+    emit valueStateChanged();
+  }
+  return aState;
+}
 
-  myState = theState;
-  emit valueStateChanged();
+bool ModuleBase_ModelWidget::blockValueState(const bool theBlocked)
+{
+  bool isBlocked = myIsValueStateBlocked;
+  myIsValueStateBlocked = theBlocked;
+  return isBlocked;
 }
 
 bool ModuleBase_ModelWidget::restoreValue()
@@ -256,7 +271,7 @@ void ModuleBase_ModelWidget::onWidgetValuesChanged()
 //**************************************************************
 void ModuleBase_ModelWidget::onWidgetValuesModified()
 {
-  setValueState(Modified);
+  setValueState(ModifiedInPP);
 }
 
 //**************************************************************

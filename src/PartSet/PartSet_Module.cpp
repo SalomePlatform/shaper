@@ -422,21 +422,9 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
 QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
 {
   QString anError = ModuleBase_IModule::getFeatureError(theFeature);
-
   if (anError.isEmpty())
     anError = sketchMgr()->getFeatureError(theFeature);
 
-  if (anError.isEmpty()) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
-    
-    if (anOpMgr->isValidationLocked()) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                             (anOpMgr->currentOperation());
-      if (!aFOperation || theFeature == aFOperation->feature())
-        anError = "Validation is locked by the current operation";
-    }
-  }
   return anError;
 }
 

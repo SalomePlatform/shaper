@@ -27,8 +27,7 @@
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myIsValidationLock(false), myIsApplyEnabled(false),
-  myWorkshop(theWorkshop)
+: QObject(theParent), myIsApplyEnabled(false), myWorkshop(theWorkshop)
 {
 }
 
@@ -198,12 +197,6 @@ void XGUI_OperationMgr::onValidateOperation()
                                                                           (currentOperation());
   if(aFOperation && aFOperation->feature().get())
     setApplyEnabled(myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty());
-}
-
-void XGUI_OperationMgr::setLockValidating(bool toLock)
-{
-  myIsValidationLock = toLock;
-  onValidateOperation();
 }
 
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)

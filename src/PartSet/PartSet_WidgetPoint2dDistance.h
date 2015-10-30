@@ -12,7 +12,6 @@
 
 #include <ModelAPI_CompositeFeature.h>
 
-class PartSet_LockApplyMgr;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
 class ModuleBase_IViewWindow;
@@ -96,9 +95,6 @@ protected:
   /// A reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
   
-  /// A manager to lock/unlock Apply button in PP
-  PartSet_LockApplyMgr* myLockApplyMgr;
-
   /// A name of the first point
   std::string myFirstPntName;
 

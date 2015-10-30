@@ -98,13 +98,6 @@ Q_OBJECT
   /// \param theOperation an aborted operation
   void abortOperation(ModuleBase_Operation* theOperation);
 
-  /// Blocking/unblocking enabling of Ok button in property panel.
-  /// It is used when operation can not be validated even all attributes are valid
-  void setLockValidating(bool toLock);
-
-  /// Returns state of validation locking
-  bool isValidationLocked() const { return myIsValidationLock; }
-
   /// Returns enable apply state 
   /// \return theEnabled a boolean value
   bool isApplyEnabled() const;
@@ -222,8 +215,6 @@ private:
   /// Current workshop
   ModuleBase_IWorkshop* myWorkshop;
 
-  /// Lock/Unlock access to Ok button in property panel
-  bool myIsValidationLock;
   /// Lock/Unlock access to Ok button in property panel
   bool myIsApplyEnabled;
 };

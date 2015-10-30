@@ -694,9 +694,13 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
         if (anAttr.get()) {
           QString anAttributeName = anAttr->id().c_str();
           switch (aState) {
-            case ModuleBase_ModelWidget::Modified:
+            case ModuleBase_ModelWidget::ModifiedInPP:
               anError = "Attribute \"" + anAttributeName +
                         "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
+              break;
+            case ModuleBase_ModelWidget::ModifiedInViewer:
+              anError = "Attribute \"" + anAttributeName +
+                        "\" is locked by modification value in the viewer.";
               break;
             case ModuleBase_ModelWidget::Reset:
               anError = "Attribute \"" + anAttributeName + "\" is not initialized.";

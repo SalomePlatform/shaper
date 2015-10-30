@@ -874,7 +874,7 @@ void XGUI_Workshop::onValueStateChanged()
     if (aPanel)
       anActiveWidget = aPanel->activeWidget();
   }
-  if (anActiveWidget && anActiveWidget->getValueState() != ModuleBase_ModelWidget::Stored)
+  if (anActiveWidget)
     operationMgr()->onValidateOperation();
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {

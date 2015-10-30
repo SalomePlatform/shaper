@@ -7,7 +7,6 @@
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
-#include <PartSet_LockApplyMgr.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -66,7 +65,6 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
       << SketchPlugin_Point::ID().c_str()
       << SketchPlugin_Circle::ID().c_str();
   }
-  myLockApplyMgr = new PartSet_LockApplyMgr(theParent, myWorkshop);
 
   // the control should accept the focus, so the boolen flag is corrected to be true
   myIsObligatory = true;
@@ -269,12 +267,11 @@ void PartSet_WidgetPoint2D::activateCustom()
   aModes << TopAbs_VERTEX;
   aModes << TopAbs_EDGE;
   myWorkshop->activateSubShapesSelection(aModes);
-
-  myLockApplyMgr->activate();
 }
 
 void PartSet_WidgetPoint2D::deactivate()
 {
+  ModuleBase_ModelWidget::deactivate();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
   disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
@@ -282,8 +279,6 @@ void PartSet_WidgetPoint2D::deactivate()
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
 
   myWorkshop->deactivateSubShapesSelection();
-
-  myLockApplyMgr->deactivate();
 }
 
 bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 
@@ -438,7 +433,11 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
 
   double aX, anY;
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, anY);
+  // we need to block the value state change 
+  bool isBlocked = blockValueState(true);
   setPoint(aX, anY);
+  blockValueState(isBlocked);
+  setValueState(ModifiedInViewer);
 }
 
 double PartSet_WidgetPoint2D::x() const
@@ -477,7 +476,6 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
 
 void PartSet_WidgetPoint2D::onValuesChanged()
 {
-  myLockApplyMgr->valuesChanged();
   emit valuesChanged();
 }
 

@@ -35,8 +35,9 @@ Q_OBJECT
  public:
    /// State of the widget
    enum ValueState { Stored, /// modification is finished and applyed to the model
-                     Modified, /// modification has not been finished and set to the model yet
-                     Reset };
+                     ModifiedInPP, /// modification has not been finished and set to the model yet
+                     ModifiedInViewer, /// modification performed by viewer events
+                     Reset }; /// the value is reset
 
    /// Constructor
   /// \param theParent the parent object
@@ -114,7 +115,7 @@ Q_OBJECT
   void activate();
 
   /// The method called when widget is deactivated
-  virtual void deactivate() {}
+  virtual void deactivate();
 
   /// Returns list of widget controls
   /// \return a control list
@@ -222,8 +223,15 @@ protected:
   }
 
   /// Sets the current value state. If the value is changed, the signal is emitted
+  /// If the current value state is Blocked, this method do nothing
   /// \param theState a new state
-  void setValueState(const ValueState& theState);
+  /// \return the previous value state
+  ValueState setValueState(const ValueState& theState);
+
+  /// Blocks the value state change.
+  /// \param theBlocked a block state
+  /// \return the previous value
+  bool blockValueState(const bool theBlocked);
 
   /// Compute the feature default value and fill the controls with it
   /// or store the control value to the feature
@@ -288,6 +296,8 @@ private:
 
   /// the reset state. If it is false, the reset method of the widget is not performed
   bool myUseReset;
+  /// blocked flag of modification of the value state
+  bool myIsValueStateBlocked;
 };
 
 #endif
