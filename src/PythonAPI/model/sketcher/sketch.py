@@ -28,7 +28,7 @@ def addSketch(doc, plane):
 
 class Sketch(Interface):
     """Interface on a Sketch feature."""
-    def __init__(self, feature, plane):
+    def __init__(self, feature, *args):
         """Initialize a 2D Sketch on the given plane.
 
         The plane can be defined either by:
@@ -38,8 +38,30 @@ class Sketch(Interface):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Sketch")
 
+        self._origin = geomDataAPI_Point(
+            self._feature.data().attribute("Origin")
+            )
+        self._dir_x = geomDataAPI_Dir(
+            self._feature.data().attribute("DirX")
+            )
+        self._norm = geomDataAPI_Dir(
+            self._feature.data().attribute("Norm")
+            )
+        self._external = self._feature.data().selection("External")
+
+        assert(self._origin)
+        assert(self._dir_x)
+        assert(self._norm)
+        assert(self._external)
+
         # Entities used for building the result shape
         self._selection = None
+
+        if not args:
+            return
+
+        plane = args[0]
+
         #   self.resultype ="Face" # Type of Sketch result
         if isinstance(plane, str):
             self.__sketchOnFace(plane)
@@ -51,19 +73,13 @@ class Sketch(Interface):
         origin = plane.location()
         normal = plane.direction()
         x_direction = plane.xDirection()
-        geomDataAPI_Point( 
-            self._feature.data().attribute("Origin") 
-            ).setValue(origin.x(), origin.y(), origin.z())
-        geomDataAPI_Dir( 
-            self._feature.data().attribute("DirX") 
-            ).setValue(x_direction.x(), x_direction.y(), x_direction.z())
-        geomDataAPI_Dir( 
-            self._feature.data().attribute("Norm") 
-            ).setValue(normal.x(), normal.y(), normal.z() )
+        self._origin.setValue(origin.x(), origin.y(), origin.z())
+        self._norm.setValue(normal.x(), normal.y(), normal.z())
+        self._dir_x.setValue(x_direction.x(), x_direction.y(), x_direction.z())
 
     def __sketchOnFace(self, name):
         """Initialize the sketch on a face given by its name."""
-        self._feature.data().selection("External").selectSubShape("FACE", name)
+        self._external.selectSubShape("FACE", name)
 
     #-------------------------------------------------------------
     #
@@ -296,19 +312,18 @@ class Sketch(Interface):
             raise Exception("not yet implemented")
         # TODO: simple version now, should be a list of selected faces
         return [Selection(self.result(), self.buildShape())]
-#         return self
 
     def buildShape(self):
-        """Build the result Shape of this Sketch according to the 
+        """Build the result Shape of this Sketch according to the
         selected geometrical entities."""
-        o  = geomDataAPI_Point( self._feature.data().attribute("Origin") ).pnt()
-        dx = geomDataAPI_Dir( self._feature.data().attribute("DirX") ).dir()
-        n  = geomDataAPI_Dir( self._feature.data().attribute("Norm") ).dir()
+        o = self._origin.pnt()
+        dx = self._dir_x.dir()
+        n = self._norm.dir()
 
         # The faces are kept otherwise they are destroyed at exit
         faces = ShapeList()
         GeomAlgoAPI_SketchBuilder.createFaces(o, dx, n, self._selection, faces)
-        #TODO: Deal with several faces 
+        # TODO: Deal with several faces
         return faces[0]
 
     def result(self):
