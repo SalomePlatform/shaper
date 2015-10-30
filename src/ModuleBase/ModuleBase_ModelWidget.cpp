@@ -132,6 +132,8 @@ void ModuleBase_ModelWidget::activate()
 void ModuleBase_ModelWidget::deactivate()
 {
   myIsValueStateBlocked = false;
+  if (myState == ModifiedInPP)
+    storeValue();
   myState = Stored;
 }
 
