@@ -274,21 +274,23 @@ class Sketch(Interface):
     #-------------------------------------------------------------
 
     def selectFace(self, *args):
-        """Select the geometrical entities of this Sketch on which 
+        """Select the geometrical entities of this Sketch on which
         the result Face must be built.
-        
-        When no entity is given, the face is based on all existing 
+
+        When no entity is given, the face is based on all existing
         geometry of this Sketch.
         """
         if len(args) == 0:
-            self._selection = modelAPI_ResultConstruction( 
-                self._feature.firstResult()).shape()
+            self._selection = modelAPI_ResultConstruction(
+                self._feature.firstResult()
+                ).shape()
         elif len(args) == 1:
             self._selection = args[0].shape()
-            return Selection(self.result(), self.buildShape())
         else:
             raise Exception("not yet implemented")
-        return self
+        # TODO: simple version now, should be a list of selected faces
+        return [Selection(self.result(), self.buildShape())]
+#         return self
 
     def buildShape(self):
         """Build the result Shape of this Sketch according to the 
