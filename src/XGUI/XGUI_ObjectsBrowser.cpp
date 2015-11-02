@@ -21,6 +21,13 @@
 #include <QStyledItemDelegate>
 #include <QMessageBox>
 
+#ifdef WIN32
+#ifdef HAVE_SALOME
+#include <QWindowsStyle>
+#endif
+#endif
+
+
 /// Width of second column (minimum acceptable = 27)
 #define SECOND_COL_WIDTH 30
 
@@ -61,11 +68,13 @@ private:
 XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
 {
-#if (!defined HAVE_SALOME) && (defined WIN32)
+#ifdef WIN32
+#ifdef HAVE_SALOME
+  setStyle(new QWindowsStyle());
+#else
   myStyle = new XGUI_TreeViewStyle();
   setStyle(myStyle);
-#else
-  setStyle(new QWindowsStyle());
+#endif
 #endif
 
   setHeaderHidden(true);
@@ -234,6 +243,7 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
 
   QString aName = aPalet.color(QPalette::Base).name();
   myNeutralStyle = "QLineEdit { border: 1px solid " + aName + " }";
+
 
 #if (!defined HAVE_SALOME) && (defined WIN32)
   mySelectionStyle = "QLineEdit {background-color: ";
