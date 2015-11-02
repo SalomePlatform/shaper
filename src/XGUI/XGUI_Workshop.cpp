@@ -862,9 +862,6 @@ void XGUI_Workshop::onRebuild()
 }
 
 //******************************************************
-}
-
-//******************************************************
 void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
 {
   ModuleBase_ModelWidget* anActiveWidget = 0;
@@ -878,6 +875,8 @@ void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
     operationMgr()->onValidateOperation();
 
   myModule->widgetStateChanged(thePreviousState);
+}
+
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName = QString::fromStdString(library(theModule.toStdString()));
