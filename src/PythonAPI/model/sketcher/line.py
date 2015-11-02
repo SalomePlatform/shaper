@@ -16,14 +16,12 @@ class Line(Interface):
             self._feature.data().attribute("EndPoint")
             )
 
-        assert(self._start_point)
-        assert(self._end_point)
-
-        if not args:
-            return
-
-        assert(len(args) in (1, 2, 4))
-
+        # Check that input arguments are not None
+        if args is None:
+            raise WrongNumberOfArguments(
+                "No argument given, at least one argument needed"
+                )
+        
         # Set attribute values and execute
         if len(args) == 4:
             self.__createByCoordinates(*args)
@@ -31,24 +29,39 @@ class Line(Interface):
             self.__createByPoints(*args)
         elif len(args) == 1:
             self.__createByName(*args)
-
+        else:
+            raise WrongNumberOfArguments(
+                "Arc takes 1, 2 or 4 arguments (%s given)" % len(args)
+                )
         self._execute()
-        pass
 
     def __createByCoordinates(self, x1, y1, x2, y2):
-        self._start_point.setValue(x1, y1)
-        self._end_point.setValue(x2, y2)
-        pass
+        self.setStartPoint(x1, y1)
+        self.setEndPoint(x2, y2)
 
     def __createByPoints(self, p1, p2):
-        self._start_point.setValue(p1.x(), p1.y())
-        self._end_point.setValue(p2.x(), p2.y())
-        pass
+        self.setStartPoint(p1.x(), p1.y())
+        self.setEndPoint(p2.x(), p2.y())
 
     def __createByName(self, name):
         self._feature.data().selection("External").selectSubShape("EDGE", name)
-        pass
+    
+    #######
+    #
+    # Set methods
+    #
+    #######
+    
+    def setStartPoint(self, x, y):
+        """Set the start point of the line."""
+        self._start_point.setValue(x, y)
+        
+    def setEndPoint(self, x, y):
+        """Set the end point of the line."""
+        self._end_point.setValue(x, y)
 
+    # TODO : methods below will be removed. 
+    # Kept until all tests have been updated
     def startPointData(self):
         return self._start_point
 

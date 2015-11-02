@@ -14,15 +14,12 @@ class Point(Interface):
         self._point_data = geomDataAPI_Point2D(
             self._feature.data().attribute("PointCoordinates")
             )
+        self.setValue(x, y)
+        self._execute()
+
+    def setValue(self, x, y):
+        """Set point coordinates."""
         self._point_data.setValue(x, y)
-        
-        # Control input and execute
-        if self.areInputValid():
-            self.execute()
-        else:
-            raise FeatureInputInvalid(
-                "cannot create the Sketch Point, the input is invalid"
-                )
 
     def pointData (self):
         """Return the point data."""

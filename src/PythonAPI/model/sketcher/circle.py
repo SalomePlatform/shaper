@@ -5,7 +5,7 @@ from model.roots import Interface
 
 class Circle(Interface):
     """Interface for circle feature data manipulation."""
-    def __init__(self, feature, x, y, r):
+    def __init__(self, feature, x, y, radius):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "SketchCircle")
         
@@ -13,10 +13,18 @@ class Circle(Interface):
             self._feature.data().attribute("CircleCenter")
             )
         self._radius = self._feature.data().real("CircleRadius")
-        self._center.setValue(x, y)
-        self._radius.setValue(r)
+        self.setCenter(x, y)
+        self.setRadius(radius)
         self.execute()
 
+    def setCenter(self, x, y):
+        """Set the center of the circle."""
+        self._center.setValue(x, y)
+        
+    def setRadius(self, radius):
+        """Set the radius of the circle."""
+        self._radius.setValue(radius)
+        
     def centerData(self):
         """Return center data."""
         return self._center

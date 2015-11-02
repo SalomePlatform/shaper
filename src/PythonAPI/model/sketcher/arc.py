@@ -27,6 +27,33 @@ class Arc(Interface):
             raise WrongNumberOfArguments(
                 "Arc takes 3 or 6 arguments (%s given)" % len(args)
                 )
+        self._execute()
+        
+    ########
+    #
+    # Set methods
+    #
+    ########
+    
+    def setCenter(self, x, y):
+        """Set arc center."""
+        self._center.setValue(x, y)
+        
+    def setStartPoint(self, x, y):
+        """Set start point."""
+        self._start_point.setValue(x, y)
+        
+    def setEndPoint(self, x, y):
+        """Set end point value."""
+        self._end_point.setValue(x, y)
+        
+    
+    ########
+    #
+    # Getters
+    #
+    ########
+
 
     def centerData(self):
         """Return the center point data."""
@@ -44,24 +71,24 @@ class Arc(Interface):
         """Return the arc circular line attribute."""
         return self._feature.lastResult()
 
+
     ########
     #
     # Private methods
     #
     ########
 
+
     def __createByCoordinates(self, center_x, center_y,
                               start_x, start_y,
                               end_x, end_y):
         """Create an arc by point coordinates."""
-        self._center.setValue(center_x, center_y)
-        self._start_point.setValue(start_x, start_y)
-        self._end_point.setValue(end_x, end_y)
-        self._feature.execute()
+        self.setCenter(center_x, center_y)
+        self.setStartPoint(start_x, start_y)
+        self.setEndPoint(end_x, end_y)
 
     def __createByPoints(self, center, start, end):
         """Create an arc with point objects."""
-        self._center.setValue(center.x(), center.y())
-        self._start_point.setValue(start.x(), start.y())
-        self._end_point.setValue(end.x(), end.y())
-        self._feature.execute()
+        self.setCenter(center.x(), center.y())
+        self.setStartPoint(start.x(), start.y())
+        self.setEndPoint(end.x(), end.y())

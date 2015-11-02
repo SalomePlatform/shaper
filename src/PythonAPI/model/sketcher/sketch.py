@@ -1,5 +1,6 @@
 """Sketch Feature Interface
 Author: Daniel Brunier-Coulin with contribution by Mikhail Ponikarov
+        finalized by Renaud Nedelec and Sergey Pokhodenko
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
