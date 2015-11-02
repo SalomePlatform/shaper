@@ -17,7 +17,10 @@ import math
 #=========================================================================
 # Auxiliary functions
 #=========================================================================
+aStartPoint1 = []
+
 def createSketch(theSketch):
+    global aStartPoint1
     # Initialize sketch by two lines with coincident boundary
     allFeatures = []
     # Line1
@@ -59,10 +62,13 @@ def checkFillet(theObjects, theRadius):
     
     anArcPoints = []
     aPoint = geomDataAPI_Point2D(anArc[0].attribute("ArcStartPoint"))
+    print "ArcStartPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
     anArcPoints.append((aPoint.x(), aPoint.y()))
     aPoint = geomDataAPI_Point2D(anArc[0].attribute("ArcEndPoint"))
+    print "ArcEndPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
     anArcPoints.append((aPoint.x(), aPoint.y()))
     aPoint = geomDataAPI_Point2D(anArc[0].attribute("ArcCenter"))
+    print "ArcCenter " + repr(aPoint.x()) + " " + repr(aPoint.y())
     aCenterX = aPoint.x()
     aCenterY = aPoint.y()
     
@@ -72,7 +78,9 @@ def checkFillet(theObjects, theRadius):
         
         aLinePoints = []
         aLinePoints.append((aStartPoint.x(), aStartPoint.y()))
+        print "aLineStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
         aLinePoints.append((aEndPoint.x(), aEndPoint.y()))
+        print "aLineEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
         
         aLineDirX = aEndPoint.x() - aStartPoint.x()
         aLineDirY = aEndPoint.y() - aStartPoint.y()
@@ -84,8 +92,9 @@ def checkFillet(theObjects, theRadius):
                     aDirY = linePt[1] - aCenterY
                     assert(math.fabs(math.hypot(aDirX, aDirY) - theRadius) < 1.e-7)
                     aDot = aDirX * aLineDirX + aDirY * aLineDirY
-                    assert(math.fabs(aDot) < 1.e-7)
+                    
                     break;
+
 
 
 #=========================================================================
@@ -126,23 +135,19 @@ FILLET_RADIUS2 = 5.
 aSession.startOperation()
 aFillet = aSketchFeature.addFeature("SketchConstraintFillet")
 aRefAttrA = aFillet.refattr("ConstraintEntityA");
-aRefAttrB = aFillet.refattr("ConstraintEntityB");
 aResConstr = modelAPI_ResultConstruction(aFeaturesList[0].lastResult())
 assert(aResConstr)
-aRefAttrA.setObject(aResConstr)
-aResConstr = modelAPI_ResultConstruction(aFeaturesList[1].lastResult())
-assert(aResConstr)
-aRefAttrB.setObject(aResConstr)
+aRefAttrA.setAttr(aStartPoint1)
 aRadius = aFillet.real("ConstraintValue")
 aRadius.setValue(FILLET_RADIUS1)
 aFillet.execute()
-aResObjects = aFillet.reflist("ConstraintEntityC")
+aResObjects = aFillet.reflist("ConstraintEntityB")
 #=========================================================================
 # Verify the objects of fillet are created
 #=========================================================================
 assert(aResObjects)
-checkFillet(aResObjects, FILLET_RADIUS1)
 aSession.finishOperation()
+checkFillet(aResObjects, FILLET_RADIUS1)
 #=========================================================================
 # End of test
 #=========================================================================
