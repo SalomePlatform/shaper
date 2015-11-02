@@ -301,7 +301,7 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
   // as a name for the feature, the generated unique name is set
   aNewFeature->data()->setName(aUniqueFeatureName);
   // text expressions could block setValue of some attributes
-  clearExpressions(aNewFeature);
+  SketchPlugin_Tools::clearExpressions(aNewFeature);
 
   return aNewFeature;
 }

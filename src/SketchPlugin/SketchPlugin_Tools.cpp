@@ -9,6 +9,10 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketcherPrs_Tools.h>
+
+namespace SketchPlugin_Tools {
 
 void clearExpressions(AttributeDoublePtr theAttribute)
 {
@@ -55,3 +59,42 @@ void clearExpressions(FeaturePtr theFeature)
     clearExpressions(*anAttributeIt);
   }
 }
+
+std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(FeaturePtr theStartCoin)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), 
+                                                                    SketchPlugin_Constraint::ENTITY_A());
+  if (aPnt.get() == NULL)
+    aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), SketchPlugin_Constraint::ENTITY_B());
+  return aPnt;
+}
+
+void findCoincidences(FeaturePtr theStartCoin,
+                      std::string theAttr,
+                      std::set<FeaturePtr>& theList)
+{
+  AttributeRefAttrPtr aPnt = theStartCoin->refattr(theAttr);
+  if (!aPnt) return;
+  FeaturePtr aObj = ModelAPI_Feature::feature(aPnt->object());
+  if (theList.find(aObj) == theList.end()) {
+    std::shared_ptr<GeomAPI_Pnt2d> aOrig = getCoincidencePoint(theStartCoin);
+    if (aOrig.get() == NULL)
+      return;
+    theList.insert(aObj);
+    const std::set<AttributePtr>& aRefsList = aObj->data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aIt;
+    for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+        std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(aConstrFeature);
+        if (aPnt.get() && aOrig->isEqual(aPnt)) {
+          findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(), theList);
+          findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(), theList);
+        }
+      }
+    }
+  }
+}
+
+} // namespace SketchPlugin_Tools
