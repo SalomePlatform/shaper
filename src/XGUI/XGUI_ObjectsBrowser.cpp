@@ -61,8 +61,13 @@ private:
 XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
 {
+#if (!defined HAVE_SALOME) && (defined WIN32)
   myStyle = new XGUI_TreeViewStyle();
   setStyle(myStyle);
+#else
+  setStyle(new QWindowsStyle());
+#endif
+
   setHeaderHidden(true);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -171,6 +176,7 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
   }
 }
 
+#if (!defined HAVE_SALOME) && (defined WIN32)
 void XGUI_DataTree::drawRow(QPainter* thePainter,
                             const QStyleOptionViewItem& theOptions,
                             const QModelIndex& theIndex) const
@@ -200,6 +206,7 @@ void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
   }
   QWindowsVistaStyle::drawPrimitive(theElement, theOption, thePainter, theWidget);
 }
+#endif
 
 
 //********************************************************************
@@ -219,6 +226,7 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   myTreeView = theView;
   QPalette aPalet = myTreeView->palette();
   QColor aHighlight = aPalet.highlight().color();
+  QColor aHighlightText = aPalet.highlightedText().color();
 
   myPreSelectionStyle = "QLineEdit {background-color: ";
   myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " + aHighlight.lighter(170).name() + ");"; 
@@ -227,15 +235,21 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   QString aName = aPalet.color(QPalette::Base).name();
   myNeutralStyle = "QLineEdit { border: 1px solid " + aName + " }";
 
+#if (!defined HAVE_SALOME) && (defined WIN32)
   mySelectionStyle = "QLineEdit {background-color: ";
-  mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 " + aHighlight.lighter(170).name();
-  mySelectionStyle += ", stop:1 " + aHighlight.lighter().name() + ");"; 
-  mySelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
+  mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(236, 245, 255)";
+  mySelectionStyle += ", stop:1 rgb(208, 229, 255));"; 
+  mySelectionStyle += "border: 1px solid rgb(132, 172, 221); border-radius: 2px }";
+#else
+  mySelectionStyle = "QLineEdit {background-color: " + aHighlight.name();
+  mySelectionStyle += "; color : " + aHighlightText.name() + "}";
+#endif
 
   myTreeView->viewport()->installEventFilter(this);
 }
 
 
+#if (!defined HAVE_SALOME) && (defined WIN32)
 bool XGUI_ActiveDocLbl::event(QEvent* theEvent)
 {
   switch (theEvent->type()) {
@@ -250,6 +264,7 @@ bool XGUI_ActiveDocLbl::event(QEvent* theEvent)
   }
   return QLineEdit::event(theEvent);
 }
+#endif
 
 bool XGUI_ActiveDocLbl::eventFilter(QObject* theObj, QEvent* theEvent)
 {

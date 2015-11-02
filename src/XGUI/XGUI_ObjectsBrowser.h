@@ -12,7 +12,6 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QLineEdit>
-#include <QWindowsVistaStyle>
 
 class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
@@ -33,7 +32,9 @@ Q_OBJECT
 
    QTreeView* treePalette() const { return myTreeView;}
 
+#if (!defined HAVE_SALOME) && (defined WIN32)
    virtual bool event(QEvent* theEvent);
+#endif
 
 public slots:
   void unselect();
@@ -52,6 +53,9 @@ private:
   bool myIsSelected;
 };
 
+
+#if (!defined HAVE_SALOME) && (defined WIN32)
+#include <QWindowsVistaStyle>
 /**
 * \ingroup GUI
 * Implementation of XGUI_DataTree custom style
@@ -71,7 +75,7 @@ public:
 private:
   QModelIndex myIndex;
 };
-
+#endif
 
 /**
 * \ingroup GUI
@@ -112,11 +116,13 @@ public slots:
    /// Redefinition of virtual method
   virtual void resizeEvent(QResizeEvent* theEvent);
 
+#if (!defined HAVE_SALOME) && (defined WIN32)
   virtual void drawRow(QPainter* thePainter,
                         const QStyleOptionViewItem& theOptions,
                         const QModelIndex& theIndex) const;
 private:
   XGUI_TreeViewStyle* myStyle;
+#endif
 };
 
 /**\class XGUI_ObjectsBrowser
