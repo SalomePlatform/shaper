@@ -16,17 +16,16 @@ def addPoint(part, *args):
 
 
 class Point(Interface):
-    """Interface on an Point feature."""
+    """Interface class for Point feature.
+
+    Point(feature) -> feature interface without initialization
+    Point(feature, x, y, z) ->
+        feature interface initialized from arguments:
+        - x, y, z -- coordinates for the point
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Point feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- a Point feature
-
-        Expected arguments for initializing the feature:
-        x, y, z -- x, y, z coordinates for the point.
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Point")
 

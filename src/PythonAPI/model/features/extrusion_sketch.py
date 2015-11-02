@@ -17,8 +17,30 @@ def addExtrusionSketch(part, *args):
 
 
 class ExtrusionSketch(CompositeSketch):
+    """Interface class for ExtrusionSketch feature.
 
+    ExtrusionSketch(feature) -> feature interface without initialization
+    ExtrusionSketch(feature,
+                    sketch, sketch_selection,
+                    to_size, from_size) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - to_size
+        - from_size
+    ExtrusionSketch(feature,
+                    sketch, sketch_selection,
+                    to_object, to_offset, from_object, from_offset) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - to_object
+        - to_offset
+        - from_object
+        - from_offset
+    """
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         CompositeSketch.__init__(self, feature, *args[:2])
         args = args[2:]
 

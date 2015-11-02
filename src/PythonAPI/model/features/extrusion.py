@@ -18,28 +18,29 @@ def addExtrusion(part, *args):
 
 
 class Extrusion(Interface):
-    """Interface on an Extrusion feature."""
+    """Interface class for Extrusion feature.
+
+    Extrusion(feature) -> feature interface without initialization
+    Extrusion(feature, base, size) ->
+        feature interface initialized from arguments:
+        - base -- name, sketch or list of names and sketches
+        - size -- if positive -> to_size, if negative -> from_size
+    Extrusion(feature, base, to_size, from_size) ->
+        feature interface initialized from arguments:
+        - base -- name, sketch or list of names and sketches
+        - to_size -- upper size
+        - from_size -- lower size
+    Extrusion(feature, base, to_object, to_offset, from_object, from_offset) ->
+        feature interface initialized from arguments:
+        - base -- name, sketch or list of names and sketches
+        - to_object -- upper object (plane)
+        - to_offset -- offset from upper object
+        - from_object -- lower object (plane)
+        - from_offset -- offset from lower object
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Extrusion feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- an Extrusion feature
-
-        Expected arguments for initializing the feature:
-        base -- name, sketch or list of names and sketches.
-        If base is None then don't change the feature.
-
-        For BySize mode (expect 2 arguments):
-        to_size -- upper size
-        from_size -- lower size
-
-        For ByPlanesAndOffsets mode (expect 4 arguments):
-        to_object -- upper object (plane)
-        to_offset -- offset from upper object
-        from_object -- lower object (plane)
-        from_offset -- offset from lower object
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Extrusion")
 
@@ -104,7 +105,7 @@ class Extrusion(Interface):
         See __init__.
         """
         self.__clear()
-        self._CreationMethod.setValue("BySizes")
+        self._fill_attribute(self._CreationMethod, "BySizes")
         self._fill_attribute(self._to_size, to_size)
         self._fill_attribute(self._from_size, from_size)
         pass
@@ -139,4 +140,5 @@ class Extrusion(Interface):
         pass
 
     def result(self):
+        """F.result() -> list of Selection objects"""
         return [Selection(result, result.shape()) for result in (self.firstResult(),)]

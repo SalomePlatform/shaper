@@ -20,10 +20,20 @@ def convert_to_underscore(name):
 
 
 class Selection:
-    """Class for storing selection."""
+    """Class for selection.
+
+    Selection() -> empty selection
+    Selection(name, type) -> selection initialized with arguments:
+        - name -- topological name
+        - type -- type of the object
+    Selection(context, shape) -> selection initialized with arguments:
+        - context -- ModelAPI_Result object
+        - shape -- GeomAPI_Shape shape
+    """
 
     def __init__(self, *args):
-        """Initialize selection."""
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
+
         if not args:
             self.args = (None, None)
             return

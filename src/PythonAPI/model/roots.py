@@ -12,16 +12,20 @@ class Feature(ModelAPI.ModelAPI_Feature):
     """Base class of user-defined Python features."""
 
     def __init__(self):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         ModelAPI.ModelAPI_Feature.__init__(self)
 
-    def addRealInput (self, inputid):
+    def addRealInput(self, inputid):
+        """F.addRealInput(str) -- add real attribute"""
         self.data().addAttribute(inputid,
                                  ModelAPI.ModelAPI_AttributeDouble_typeId())
 
-    def getRealInput (self, inputid):
+    def getRealInput(self, inputid):
+        """F.getRealInput(str) -- get real value of the attribute"""
         return self.data().real(inputid).value()
 
-    def addResult (self, result):
+    def addResult(self, result):
+        """F.addResult(ModelAPI_Result) -- add ModelAPI_Result shape as a result"""
         shape = result.shape()
         body = self.document().createBody(self.data())
         body.store(shape)
@@ -32,6 +36,7 @@ class Interface():
     """Base class of high level Python interfaces to features."""
 
     def __init__(self, feature):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         self._feature = feature
         self._attribute_white_list = [
             "execute",
@@ -69,13 +74,19 @@ class Interface():
         tools.fill_attribute(attribute, value)
 
     def setRealInput(self, inputid, value):
+        """I.setRealInput(str, float) -- set real value to the attribute"""
         self._feature.data().real(inputid).setValue(value)
 
     def areInputValid(self):
+        """I.areInputValid() -> True or False validation result"""
         validators = ModelAPI.ModelAPI_Session.get().validators()
         return validators.validate(self._feature)
 
     def _execute(self):
+        """I._execute() -- validate and execute the feature.
+
+        Raises RuntimeError if validation fails.
+        """
         if self.areInputValid():
             self._feature.execute()
         else:

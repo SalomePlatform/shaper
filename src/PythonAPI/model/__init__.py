@@ -15,6 +15,7 @@ from tools import Selection
 # Built-in features
 
 from sketcher.sketch  import addSketch
+from connection import *
 from construction import *
 from exchange import *
 from features import *

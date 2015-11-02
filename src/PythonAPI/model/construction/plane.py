@@ -16,21 +16,20 @@ def addPlane(part, *args):
 
 
 class Plane(Interface):
-    """Interface on a Plane feature."""
+    """Interface class for Plane feature.
+
+    Plane(feature) -> feature interface without initialization
+    Plane(feature, face, distance) ->
+        feature interface initialized from arguments:
+        - face -- planeFace
+        - distance -- distance
+    Plane(feature, a, b, c, d) ->
+        feature interface initialized from arguments:
+        - A, B, C, D -- GeneralEquation parameters
+    """
 
     def __init__(self, feature, *args):
-        """Initialize a Plane feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- a Plane feature
-
-        For PlaneByFaceAndDistance mode (expect 2 arguments):
-        face -- planeFace
-        distance -- distance
-
-        For PlaneByGeneralEquation mode (expect 4 arguments):
-        A, B, C, D -- GeneralEquation parameters
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Plane")
 

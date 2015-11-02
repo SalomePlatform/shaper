@@ -26,8 +26,37 @@ def addRevolutionFuse(part, *args):
 
 
 class RevolutionBoolean(CompositeBoolean):
+    """Interface class for RevolutionBoolean features.
+
+    Supported features:
+    - RevolutionCut
+    - RevolutionFuse
+
+    RevolutionBoolean(feature) -> feature interface without initialization
+    RevolutionBoolean(feature,
+                      sketch, sketch_selection, boolean_objects,
+                      to_angle, from_angle) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - boolean_objects
+        - to_angle
+        - from_angle
+    RevolutionBoolean(feature,
+                      sketch, sketch_selection, boolean_objects,
+                      to_object, to_offset, from_object, from_offset) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - boolean_objects
+        - to_object
+        - to_offset
+        - from_object
+        - from_offset
+    """
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         CompositeBoolean.__init__(self, feature, *args[:3])
         args = args[3:]
 

@@ -35,8 +35,15 @@ def addIntersection(part, object, tool):
 
 
 class Boolean(Interface):
-    """Abstract root class of Boolean Features."""
+    """Interface class for Boolean features.
+
+    Boolean(feature) -> feature interface without initialization
+    Boolean(feature, main_objects, tool_objects, bool_type) ->
+        feature interface initialized from arguments
+    """
+
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Boolean")
 
@@ -62,13 +69,22 @@ class Boolean(Interface):
         pass
 
     def setMainObjects(self, main_objects):
+        """F.setMainObjects(iterable) -- modify main_objects attribute"""
         self._fill_attribute(self._main_objects, main_objects)
         pass
 
     def setToolObjects(self, tool_objects):
+        """F.setToolObjects(iterable) -- modify tool_objects attribute"""
         self._fill_attribute(self._tool_objects, tool_objects)
         pass
 
     def setBoolType(self, bool_type):
+        """F.setBoolType(integer) -- modify bool_type attribute.
+
+        Available types:
+        - GeomAlgoAPI_Boolean.BOOL_FUSE
+        - GeomAlgoAPI_Boolean.BOOL_CUT
+        - GeomAlgoAPI_Boolean.BOOL_COMMON
+        """
         self._fill_attribute(self._bool_type, bool_type)
         pass

@@ -17,8 +17,21 @@ def addPlacement(part, *args):
 
 
 class Placement(Interface):
+    """Interface class for Placement feature.
+
+    Placement(feature) -> feature interface without initialization
+    Placement(feature, objects_list, start_shape, end_shape,
+              reverse_direction, centering) ->
+        feature interface initialized from arguments:
+        - objects_list
+        - start_shape
+        - end_shape
+        - reverse_direction
+        - centering
+    """
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Placement")
 

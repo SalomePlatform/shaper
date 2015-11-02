@@ -16,17 +16,16 @@ def addImport(part, *args):
 
 
 class Import(Interface):
-    """Interface on an Import feature."""
+    """Interface class for Import feature.
+
+    Import(feature) -> feature interface without initialization
+    Import(feature, file_path) ->
+        feature interface initialized from arguments:
+        - file_path -- path to the imported file
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Import feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- an Import feature
-
-        For initialization (expect 1 argument):
-        file_path -- path to the imported file
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Import")
 
@@ -62,19 +61,18 @@ def exportToFile(part, *args):
 
 
 class Export(Interface):
-    """Interface on an Export feature."""
+    """Interface class for Export feature.
+
+    Export(feature) -> feature interface without initialization
+    Export(feature, file_path, file_format, selection_list) ->
+        feature interface initialized from arguments:
+        - file_path -- path to the exported file
+        - file_format -- format of to the exported file
+        - selection_list -- objects to export
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Export feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- an Export feature
-
-        For initialization (expect 3 argument):
-        file_path -- path to the exported file
-        file_format -- format of to the exported file
-        objects -- objects to export
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Export")
 

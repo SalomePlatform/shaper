@@ -17,8 +17,18 @@ def addTranslation(part, *args):
 
 
 class Translation(Interface):
+    """Interface class for Translation features.
+
+    Translation(feature) -> feature interface without initialization
+    Translation(feature, main_objects, axis_object, distance) ->
+        feature interface initialized from arguments:
+        - main_objects
+        - axis_object
+        - distance
+    """
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Translation")
 

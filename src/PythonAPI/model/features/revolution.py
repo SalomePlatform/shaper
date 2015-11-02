@@ -17,29 +17,28 @@ def addRevolution(part, *args):
 
 
 class Revolution(Interface):
-    """Interface on an Revolution feature."""
+    """Interface class for Revolution features.
+
+    Revolution(feature) -> feature interface without initialization
+    Revolution(feature, base, axis_object, to_angle, from_angle) ->
+        feature interface initialized from arguments:
+        - base -- name, sketch or list of names and sketches
+        - axis_object -- name, edge for axis
+        - to_angle -- upper angle
+        - from_angle -- lower angle
+    Revolution(feature, base, axis_object,
+               to_object, to_offset, from_object, from_offset) ->
+        feature interface initialized from arguments:
+        - base -- name, sketch or list of names and sketches
+        - axis_object -- name, edge for axis
+        - to_object -- upper object (plane)
+        - to_offset -- offset from upper object
+        - from_object -- lower object (plane)
+        - from_offset -- offset from lower object
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Revolution feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- an Revolution feature
-
-        Expected arguments for initializing the feature:
-        base -- name, sketch or list of names and sketches.
-        If base is None then don't change the feature.
-        axis_object -- name, edge for axis
-
-        For ByAngles mode (expect 2 arguments):
-        to_angle -- upper angle
-        from_angle -- lower angle
-
-        For ByPlanesAndOffsets mode (expect 4 arguments):
-        to_object -- upper object (plane)
-        to_offset -- offset from upper object
-        from_object -- lower object (plane)
-        from_offset -- offset from lower object
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Revolution")
 

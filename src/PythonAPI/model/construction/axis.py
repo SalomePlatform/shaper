@@ -16,21 +16,20 @@ def addAxis(part, *args):
 
 
 class Axis(Interface):
-    """Interface on an Axis feature."""
+    """Interface class for Axis feature.
+
+    Axis(feature) -> feature interface without initialization
+    Axis(feature, p1, p2) ->
+        feature interface initialized from arguments:
+        - p1 -- FirstPoint
+        - p2 -- SecondPoint
+    Axis(feature, face) ->
+        feature interface initialized from arguments:
+        - face -- CylindricalFace
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Axis feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- a Axis feature
-
-        For AxisByPointsCase mode (expect 2 arguments):
-        p1 -- FirstPoint
-        p2 -- SecondPoint
-
-        For AxisByCylindricalFaceCase mode (expect 1 argument):
-        face -- CylindricalFace
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Axis")
 
