@@ -27,7 +27,7 @@ def addSketch(doc, plane):
     return Sketch(feature, plane)
 
 class Sketch(Interface):
-    """Interface on a Sketch feature."""
+    """Interface class for Sketch feature."""
     def __init__(self, feature, *args):
         """Initialize a 2D Sketch on the given plane.
 

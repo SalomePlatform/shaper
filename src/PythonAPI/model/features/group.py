@@ -17,8 +17,16 @@ def addGroup(part, *args):
 
 
 class Group(Interface):
+    """Interface class for Group feature.
+
+    Group(feature) -> feature interface without initialization
+    Group(feature, group_list) ->
+        feature interface initialized from arguments:
+        - group_list
+    """
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Group")
 

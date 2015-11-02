@@ -17,8 +17,31 @@ def addRevolutionSketch(part, *args):
 
 
 class RevolutionSketch(CompositeSketch):
+    """Interface class for RevolutionSketch features.
+
+    RevolutionSketch(feature) -> feature interface without initialization
+    RevolutionSketch(feature,
+                     sketch, sketch_selection,
+                     to_angle, from_angle) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - to_angle
+        - from_angle
+    RevolutionSketch(feature,
+                     sketch, sketch_selection,
+                     to_object, to_offset, from_object, from_offset) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - to_object
+        - to_offset
+        - from_object
+        - from_offset
+    """
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         CompositeSketch.__init__(self, feature, *args[:2])
         args = args[2:]
 

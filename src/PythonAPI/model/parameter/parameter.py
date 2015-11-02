@@ -16,18 +16,17 @@ def addParameter(part, *args):
 
 
 class Parameter(Interface):
-    """Interface on a Parameter feature."""
+    """Interface class for Parameter feature.
+
+    Parameter(feature) -> feature interface without initialization
+    Parameter(feature, variable, expression) ->
+        feature interface initialized from arguments:
+        - variable -- variable name
+        - expression -- Python expression
+    """
 
     def __init__(self, feature, *args):
-        """Initialize a Parameter feature with given parameters.
-
-        Expected arguments for all modes:
-        feature -- a Parameter feature
-
-        For initialization (expect 2 arguments):
-        name -- variable name
-        expression -- Python expression
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Parameter")
 

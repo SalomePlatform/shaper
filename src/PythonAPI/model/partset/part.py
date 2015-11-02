@@ -29,9 +29,13 @@ def removePart(part):
 
 
 class Part(Interface):
+    """Interface class for Part feature.
+
+    Part(feature) -> feature interface without initialization
+    """
 
     def __init__(self, feature):
-        """Adds a new Part to the given Partset and activates the Part."""
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Part")
 

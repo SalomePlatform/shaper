@@ -17,19 +17,18 @@ def addPartition(part, *args):
 
 
 class Partition(Interface):
-    """Interface on an Partition feature."""
+    """Interface class for Partition feature.
+
+    Partition(feature) -> feature interface without initialization
+    Partition(feature, main_objects, tool_objects, partition_combine) ->
+        feature interface initialized from arguments:
+        - main_objects -- list of solids
+        - tool_objects -- list of solids
+        - partition_combine -- boolean value
+    """
 
     def __init__(self, feature, *args):
-        """Initialize an Partition feature with given parameters.
-
-        Expected arguments:
-        feature -- an Partition feature
-
-        Expected arguments for initializing the feature:
-        main_objects -- list of solids.
-        tool_objects -- list of solids.
-        partition_combine -- boolean value.
-        """
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Partition")
 

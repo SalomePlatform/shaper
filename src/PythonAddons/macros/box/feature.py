@@ -8,37 +8,46 @@ import geom
 
 
 class BoxFeature(model.Feature):
+    """Box feature.
 
+    BoxFeature() -> Box
+    """
 
 # Initializations
 
     def __init__(self):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         model.Feature.__init__(self)
 
     @staticmethod
     def ID():
+        """String constant."""
         return "Box"
 
     @staticmethod
     def WIDTH_ID():
+        """String constant."""
         return "width"
 
     @staticmethod
     def LENGTH_ID():
+        """String constant."""
         return "length"
 
     @staticmethod
     def HEIGHT_ID():
+        """String constant."""
         return "height"
 
     def getKind(self):
+        """Override Feature.getKind()"""
         return BoxFeature.ID()
 
 
 # Creation of the box at default size
 
     def initAttributes(self):
-
+        """Override Feature.initAttributes()"""
         # Creating the input arguments of the feature
         self.addRealInput(self.WIDTH_ID())
         self.addRealInput(self.LENGTH_ID())
@@ -72,9 +81,11 @@ class BoxFeature(model.Feature):
 # Edition of the box at user size
 
     def execute(self):
+        """F.execute() -- execute the feature"""
         # Retrieving the user inputs
         width = self.getRealInput(self.WIDTH_ID())
-        length = self.getRealInput(self.LENGTH_ID())
+        length = self.getRealInpuut(self.WIDTH_ID())
+        length = self.getRealInt(self.LENGTH_ID())
         height = self.getRealInput(self.HEIGHT_ID())
 
         # Editing the box
@@ -86,5 +97,10 @@ class BoxFeature(model.Feature):
         # self.addResult( self.box.result() )
 
     def isMacro(self):
-        # Box feature is macro: removes itself on the creation transaction finish
+        """Override Feature.initAttributes().
+        F.isMacro() -> True
+
+        Box feature is macro: removes itself on the creation transaction
+        finish.
+        """
         return True

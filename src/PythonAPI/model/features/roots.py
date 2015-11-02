@@ -3,8 +3,18 @@ from model.roots import Interface
 
 
 class CompositeBoolean(Interface):
+    """Interface class for CompositeBoolean features.
+
+    CompositeBoolean(feature) -> feature interface without initialization
+    CompositeBoolean(feature, sketch, sketch_selection, boolean_objects) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+        - boolean_objects
+    """
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
 
         self._sketch = self._feature.reference("sketch")
@@ -27,21 +37,34 @@ class CompositeBoolean(Interface):
         pass
 
     def setSketch(self, sketch):
+        """Modify sketch attribute"""
         self._fill_attribute(self._sketch, sketch)
         pass
 
     def setSketchSelection(self, sketch_selection):
+        """Modify sketch_selection attribute"""
         self._fill_attribute(self._sketch_selection, sketch_selection)
         pass
 
     def setBooleanObjects(self, boolean_objects):
+        """Modify boolean_objects attribute"""
         self._fill_attribute(self._boolean_objects, boolean_objects)
         pass
 
 
 class CompositeSketch(Interface):
+    """Interface class for CompositeSketch features.
+
+    CompositeSketch(feature) -> feature interface without initialization
+    CompositeSketch(feature, sketch, sketch_selection) ->
+        feature interface initialized from arguments:
+        - sketch
+        - sketch_selection
+    """
+
 
     def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         Interface.__init__(self, feature)
 
         self._sketch = self._feature.reference("sketch")
@@ -61,9 +84,11 @@ class CompositeSketch(Interface):
         pass
 
     def setSketch(self, sketch):
+        """Modify sketch attribute"""
         self._fill_attribute(self._sketch, sketch)
         pass
 
     def setSketchSelection(self, sketch_selection):
+        """Modify sketch_selection attribute"""
         self._fill_attribute(self._sketch_selection, sketch_selection)
         pass
