@@ -408,8 +408,16 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   }
 
   AttributeRefAttrPtr aBase = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (aBase->isObject()) {
+  if(aBase->isObject()) {
     return false;
+  }
+
+  // If we alredy have some result then all ok
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributePtr aBaseLinesAttribute = aFeature->attribute(SketchPlugin_Constraint::ENTITY_C());
+  AttributeRefListPtr aRefListOfBaseLines = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aBaseLinesAttribute);
+  if(aRefListOfBaseLines->list().size() == 2) {
+    return true;
   }
 
   AttributePtr anAttrBase = aBase->attr();
@@ -452,8 +460,44 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   SketchPlugin_Tools::findCoincidences(aCoincident,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
                                        aCoinsideLines);
+  if(aCoinsideLines.size() < 2) {
+    return false;
+  }
+
+  // Remove auxilary lines
+  if(aCoinsideLines.size() > 2) {
+    std::set<FeaturePtr> aNewLines;
+    for(std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin(); anIt != aCoinsideLines.end(); ++anIt) {
+      if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
+        aNewLines.insert(*anIt);
+      }
+    }
+    aCoinsideLines = aNewLines;
+  }
+
   if(aCoinsideLines.size() != 2) {
     return false;
+  }
+
+  // Check that lines not collinear
+  std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin();
+  FeaturePtr aFirstFeature = *anIt++;
+  FeaturePtr aSecondFeature = *anIt;
+  if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
+    std::string aStartAttr = SketchPlugin_Line::START_ID();
+    std::string anEndAttr = SketchPlugin_Line::END_ID();
+    std::shared_ptr<GeomAPI_Pnt2d> aFirstStartPnt, aFirstEndPnt, aSecondStartPnt, aSecondEndPnt;
+    aFirstStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(aStartAttr))->pnt();
+    aFirstEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
+    aSecondStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(aStartAttr))->pnt();
+    aSecondEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(anEndAttr))->pnt();
+    double aCheck1 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondStartPnt->y() - aFirstStartPnt->y()) -
+      (aSecondStartPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
+    double aCheck2 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondEndPnt->y() - aFirstStartPnt->y()) -
+      (aSecondEndPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
+    if(aCheck1 < 1.e-7 && aCheck2 < 1.e-7) {
+      return false;
+    }
   }
 
   return true;
