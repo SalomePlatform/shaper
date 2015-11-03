@@ -11,6 +11,7 @@ def addImport(part, *args):
 
     Pass all args to Import __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Import")
     return Import(feature, *args)
 
@@ -56,6 +57,7 @@ def exportToFile(part, *args):
 
     Pass all args to Export __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Export")
     return Export(feature, *args)
 

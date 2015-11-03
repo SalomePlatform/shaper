@@ -11,6 +11,7 @@ def addParameter(part, *args):
 
     Pass all args to Parameter __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Parameter")
     return Parameter(feature, *args)
 
@@ -30,8 +31,8 @@ class Parameter(Interface):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Parameter")
 
-        self._variable = self._feature.data().selection("variable")
-        self._expression = self._feature.data().real("expression")
+        self._variable = self._feature.data().string("variable")
+        self._expression = self._feature.data().string("expression")
 
         assert(self._variable)
         assert(self._expression)

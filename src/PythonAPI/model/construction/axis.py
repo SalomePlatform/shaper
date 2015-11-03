@@ -11,6 +11,7 @@ def addAxis(part, *args):
 
     Pass all args to Axis __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Axis")
     return Axis(feature, *args)
 

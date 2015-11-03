@@ -10,26 +10,32 @@ from GeomAlgoAPI import *
 from model.roots import Interface
 
 
-def addAddition(part, object, tool):
+def addAddition(part, *args):
     """Inserts an addition to the given Part and executes the operation.
     This operation adds tool to the given object.
     """
+    assert(args)
+    object, tool = args
     feature = part.addFeature("Boolean")
     return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_FUSE)
 
 
-def addSubtraction(part, object, tool):
+def addSubtraction(part, *args):
     """Inserts a subtraction to the given Part and executes the operation.
     This operation subtracts tool to the given object.
     """
+    assert(args)
+    object, tool = args
     feature = part.addFeature("Boolean")
     return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_CUT)
 
 
-def addIntersection(part, object, tool):
+def addIntersection(part, *args):
     """Inserts an intersection to the given Part and executes the operation.
     This operation intersects tool to the given object.
     """
+    assert(args)
+    object, tool = args
     feature = part.addFeature("Boolean")
     return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_COMMON)
 

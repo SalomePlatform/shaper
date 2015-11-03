@@ -11,6 +11,7 @@ def addPlane(part, *args):
 
     Pass all args to Plane __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Plane")
     return Plane(feature, *args)
 

@@ -11,6 +11,7 @@ def addPoint(part, *args):
 
     Pass all args to Point __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Point")
     return Point(feature, *args)
 
