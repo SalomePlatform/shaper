@@ -299,12 +299,12 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
+    return;
+
   get2dPoint(theWnd, theEvent, myClickedPoint);
 
   if (!(theEvent->buttons() & Qt::LeftButton))
-    return;
-
-  if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
     return;
 
   // Clear dragging mode

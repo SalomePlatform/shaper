@@ -261,10 +261,19 @@ bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
 
 bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
 {
-  PartSet_SketcherMgr* aSketcherMgr = module()->sketchMgr();
   ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
-  return PartSet_SketcherMgr::isSketchOperation(aCurrentOperation) ||
-         PartSet_SketcherMgr::isNestedSketchOperation(aCurrentOperation);
+
+  bool anActive = PartSet_SketcherMgr::isSketchOperation(aCurrentOperation);
+  if (!anActive) {
+    anActive = PartSet_SketcherMgr::isNestedSketchOperation(aCurrentOperation);
+    if (anActive) { // the manager is not active when the current operation is a usual Edit
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                       (myWorkshop->currentOperation());
+      if (aFOperation->isEditOperation())
+        anActive = myIsInternalEditOperation;
+    }
+  }
+  return anActive;
 }
 
 void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
