@@ -8,7 +8,7 @@ import geom
 
 
 class BoxFeature(model.Feature):
-    """Box feature.
+    """An example of Box feature implementation.
 
     BoxFeature() -> Box
     """
@@ -21,22 +21,22 @@ class BoxFeature(model.Feature):
 
     @staticmethod
     def ID():
-        """String constant."""
+        """Return Id of the feature."""
         return "Box"
 
     @staticmethod
     def WIDTH_ID():
-        """String constant."""
+        """Returns ID of Width parameter."""
         return "width"
 
     @staticmethod
     def LENGTH_ID():
-        """String constant."""
+        """Returns ID of Length parameter."""
         return "length"
 
     @staticmethod
     def HEIGHT_ID():
-        """String constant."""
+        """Returns ID of Height parameter."""
         return "height"
 
     def getKind(self):
@@ -57,6 +57,7 @@ class BoxFeature(model.Feature):
         mypart = model.activeDocument()
         xoy = model.defaultPlane("XOY")
 
+        # A base of the geometry
         self.base = model.addSketch(mypart, xoy)
 
         p1 = geom.Pnt2d(0, 0)
@@ -71,12 +72,14 @@ class BoxFeature(model.Feature):
         self.base.setPerpendicular(line[0].result(), line[3].result())
 
         # Setting the size of the base with default values
+        # Width
         self.width = self.base.setLength(line[0].result(), 50)  # Keeps the constraint for edition
+        # Length
         self.length = self.base.setLength(line[3].result(), 50)  # Keeps the constraint for edition
 
         # Creating the extrusion (the box) at default size
+        # A box result
         self.box = model.addExtrusion(mypart, self.base.selectFace(), 50)
-
 
 # Edition of the box at user size
 

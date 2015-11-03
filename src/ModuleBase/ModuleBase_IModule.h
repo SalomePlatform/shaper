@@ -23,7 +23,6 @@ class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
-class ModuleBase_IDocumentDataModel;
 
 /**
  * \ingroup GUI
@@ -40,10 +39,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   virtual ~ModuleBase_IModule() {}
 
-  // Add default selection filters of the module to the current viewer
+  /// Add default selection filters of the module to the current viewer
   virtual void activateSelectionFilters() {};
 
-  // Remove default selection filters of the module from the current viewer
+  /// Remove default selection filters of the module from the current viewer
   virtual void deactivateSelectionFilters() {};
 
   /// Reads description of features from XML file 
@@ -62,24 +61,23 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Realizes some functionality by an operation start
   /// \param theOperation a started operation
-  virtual void onOperationStarted(ModuleBase_Operation* theOperation) {}
+  virtual void operationStarted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation resume
   /// By default it emits operationResumed signal
   /// \param theOperation a resumed operation
-  virtual void onOperationResumed(ModuleBase_Operation* theOperation);
+  virtual void operationResumed(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation stop
-  virtual void onOperationStopped(ModuleBase_Operation* theOperation) {}
+  virtual void operationStopped(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation commit
-  virtual void onOperationCommitted(ModuleBase_Operation* theOperation) {}
+  virtual void operationCommitted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation abort
-  virtual void onOperationAborted(ModuleBase_Operation* theOperation) {}
+  virtual void operationAborted(ModuleBase_Operation* theOperation) {}
 
   /// Realizes some functionality by an operation start
-  /// \param theOperation a started operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
   /// Add menu items for viewer into the given menu
@@ -92,15 +90,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const {};
 
-  /// Called when it is necessary to update a command state (enable or disable it)
-  //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
-
   /// Creates custom widgets for property panel
   /// \param theType a type of widget
   /// \param theParent the parent object
   /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
-  /// \param theModelWidgets list of widget objects
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                       Config_WidgetAPI* theWidgetApi, std::string theParentId)
   {
@@ -128,7 +122,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Returns True if the current operation can be committed. By default it is true.
   /// \return a boolean value
-  virtual bool canCommitOperation() const;
+  //virtual bool canCommitOperation() const;
 
   /// Returns whether the object can be erased. The default realization returns true.
   /// \param theObject a model object
@@ -146,11 +140,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Reacts to the delete action in module
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };
-
-#ifdef ModuleDataModel
-  /// Returns data model object for representation of data tree in Object browser
-  virtual ModuleBase_IDocumentDataModel* dataModel() const = 0;
-#endif
 
   /// Performs functionality on closing document
   virtual void closeDocument() = 0;
@@ -199,10 +188,25 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! \return string value
   virtual QString getFeatureError(const FeaturePtr& theFeature);
 
+  /// Returns list of granted operation indices
+  virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
+
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param theWidget a property contol widget
+  /// \param isToConnect a boolean value whether connect or disconnect
+  virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect) {};
+
+  /// Validates the operation to change the "Apply" button state.
+  /// \param thePreviousState the previous state of the widget
+  virtual void widgetStateChanged(int thePreviousState) {};
+
 signals:
+  /// Signal which is emitted when operation is launched
   void operationLaunched();
 
-  void operationResumed(ModuleBase_Operation* theOp);
+  /// Segnal emitted when an operation is resumed
+  /// \param theOp a resumed operation
+  void resumed(ModuleBase_Operation* theOp);
 
 public slots:
   /// Called on call of command corresponded to a feature

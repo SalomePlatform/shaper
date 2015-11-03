@@ -36,6 +36,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
  public:
   /// Constructor
   /// \param theParent the parent object
+  /// \param theWorkshop a reference to workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetValidated(QWidget* theParent,
@@ -45,8 +46,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   virtual ~ModuleBase_WidgetValidated();
 
   /// Checks whether all active viewer filters validate the presentation
-  /// \param theWorkshop an active workshop
-  /// \param theValue a selected presentation in the view
+  /// \param thePrs a selected presentation in the view
   /// \return a boolean value
   bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
 
@@ -60,6 +60,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// The method is called by the current operation to process the operation preselection.
   /// It is redefined to check the value validity and if it is, fill the attribute with by value
   /// \param theValues the wrapped selection values
+  /// \param theToValidate a flag on validation of the values
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
@@ -67,7 +68,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
   /// It obtains selection filters from the workshop and activates them in the active viewer
-  /// \param theWorkshop an active workshop
   /// \param toActivate a flag about activation or deactivation the filters
   void activateFilters(const bool toActivate);
 
@@ -84,12 +84,12 @@ protected:
   virtual void restoreAttributeValue(const bool theValid);
 
   /// Checks the widget validity. By default, it returns true.
-  /// \param theValue a selected presentation in the view
+  /// \param thePrs a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
+  /// \param thePrs a selected owner
   virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs) = 0;
 
   /// Checks the current attibute in all attribute validators
@@ -110,7 +110,7 @@ protected:
   /// \param theValid a valid state
   void storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid);
 
-  // Removes all presentations from internal maps.
+  /// Removes all presentations from internal maps.
   void clearValidState();
 
   /// Returns a list of selected presentations in the viewer and object browser
@@ -124,8 +124,11 @@ protected:
   void filterPresentations(QList<ModuleBase_ViewerPrs>& theValues);
 
 protected:
-  ModuleBase_IWorkshop* myWorkshop;  /// Reference to workshop
-  bool myIsInValidate; // the widget is in validation mode: store is performed, restore is not
+  /// Reference to workshop
+  ModuleBase_IWorkshop* myWorkshop; 
+
+  /// The widget is in validation mode: store is performed, restore is not
+  bool myIsInValidate; 
 
 private:
   ObjectPtr myPresentedObject; /// back up of the filtered object

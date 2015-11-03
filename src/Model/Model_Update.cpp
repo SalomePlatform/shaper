@@ -54,6 +54,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kOpAbortEvent);
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   aLoop->registerListener(this, kOpStartEvent);
+  static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
+  aLoop->registerListener(this, kStabilityEvent);
 
   /* not needed now with history line
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
@@ -76,9 +78,12 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
+  static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
 #endif
+  if (theMessage->eventID() == kStabilityEvent)
+    updateStability(theMessage->sender());
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
     /*bool aPropVal =
       Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
@@ -274,8 +279,13 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
-  if (theFeature->isDisabled())
+  if (theFeature->isDisabled()) {
+    // possibly sub-elements are not disabled?
+    CompositeFeaturePtr aCompos = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+    if (aCompos)
+      iterateUpdate(aCompos);
     return;
+  }
 
   // do not execute the composite that contains the current
   bool isPostponedMain = false;
@@ -662,6 +672,53 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   }
   theFeature->data()->setUpdateID(ModelAPI_Session::get()->transactionID());
   redisplayWithResults(theFeature, aState);
+}
+
+void Model_Update::updateStability(void* theSender)
+{
+  if (theSender) {
+    bool added = false; // object may be was crated
+    ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theSender);
+    if (aSender && aSender->document()) {
+      FeaturePtr aFeatureSender = 
+        std::dynamic_pointer_cast<ModelAPI_Feature>(aSender->data()->owner());
+      if (aFeatureSender.get()) {
+        Model_Objects* aDocObjects = 
+          std::dynamic_pointer_cast<Model_Document>(aSender->document())->objects();
+        if (aDocObjects) {
+          //aDocObjects->synchronizeBackRefs();
+          // remove or add all concealment refs from this feature
+          std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+          aSender->data()->referencesToObjects(aRefs);
+          std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefIt = aRefs.begin();
+          for(; aRefIt != aRefs.end(); aRefIt++) {
+            std::list<ObjectPtr>& aRefFeaturesList = aRefIt->second;
+            std::list<ObjectPtr>::iterator aReferenced = aRefFeaturesList.begin();
+            for(; aReferenced != aRefFeaturesList.end(); aReferenced++) {
+               // stability is only on results: feature to feature reference mean nested 
+              // features, that will remove nesting references
+              if (aReferenced->get() && (*aReferenced)->data()->isValid() && 
+                (*aReferenced)->groupName() != ModelAPI_Feature::group()) {
+                std::shared_ptr<Model_Data> aData = 
+                  std::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
+                if (aFeatureSender->isStable()) {
+                  aData->addBackReference(aFeatureSender, aRefIt->first);
+                } else {
+                  aData->removeBackReference(aFeatureSender, aRefIt->first);
+                  added = true; // remove of concealment may be caused creation of some result
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (added) {
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static Events_ID kEventCreated = aLoop->eventByName(EVENT_OBJECT_CREATED);
+      aLoop->flush(kEventCreated);
+    }
+  }
 }
 
 ///////////////// Updated items iterator ////////////////////////

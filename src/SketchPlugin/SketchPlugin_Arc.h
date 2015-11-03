@@ -28,7 +28,6 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   double myXEndBefore, myYEndBefore;
 
   /// to define in which direction draw arc
-  bool myForwardDirection;
   double myParamBefore;
 
  public:

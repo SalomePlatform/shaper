@@ -56,6 +56,9 @@ static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
 /// Event ID that order of objects in group is changed, so, tree must be fully rectreated (movement of feature)
 static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
 
+/// Event ID that informs that some object has changed the stability
+static const char * EVENT_STABILITY_CHANGED = "StabilityChanged";
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {

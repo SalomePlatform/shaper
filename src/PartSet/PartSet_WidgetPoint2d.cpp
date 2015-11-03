@@ -7,7 +7,6 @@
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
-#include <PartSet_LockApplyMgr.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -64,7 +63,6 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
       << SketchPlugin_Point::ID().c_str()
       << SketchPlugin_Circle::ID().c_str();
   }
-  myLockApplyMgr = new PartSet_LockApplyMgr(theParent, myWorkshop);
 
   // the control should accept the focus, so the boolen flag is corrected to be true
   myIsObligatory = true;
@@ -88,7 +86,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-    connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
+    connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -101,7 +99,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-    connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SLOT(onValuesChanged()));
+    connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -109,7 +107,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   setLayout(aLayout);
 }
 
-bool PartSet_WidgetPoint2D::reset()
+bool PartSet_WidgetPoint2D::resetCustom()
 {
   bool aDone = false;
   if (!isUseReset() || isComputedDefault() || myXSpin->hasVariable() || myYSpin->hasVariable()) {
@@ -250,12 +248,11 @@ void PartSet_WidgetPoint2D::activateCustom()
   aModes << TopAbs_VERTEX;
   aModes << TopAbs_EDGE;
   myWorkshop->activateSubShapesSelection(aModes);
-
-  myLockApplyMgr->activate();
 }
 
 void PartSet_WidgetPoint2D::deactivate()
 {
+  ModuleBase_ModelWidget::deactivate();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
   disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
@@ -263,8 +260,6 @@ void PartSet_WidgetPoint2D::deactivate()
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
 
   myWorkshop->deactivateSubShapesSelection();
-
-  myLockApplyMgr->deactivate();
 }
 
 bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 
@@ -419,7 +414,11 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
 
   double aX, anY;
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, anY);
+  // we need to block the value state change 
+  bool isBlocked = blockValueState(true);
   setPoint(aX, anY);
+  blockValueState(isBlocked);
+  setValueState(ModifiedInViewer);
 }
 
 double PartSet_WidgetPoint2D::x() const
@@ -456,8 +455,24 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
   return aPointIsFound;
 }
 
-void PartSet_WidgetPoint2D::onValuesChanged()
+/*void PartSet_WidgetPoint2D::onValuesChanged()
 {
-  myLockApplyMgr->valuesChanged();
   emit valuesChanged();
+}*/
+
+bool PartSet_WidgetPoint2D::processEnter()
+{
+  bool isModified = myXSpin->isModified() || myYSpin->isModified();
+  if (isModified) {
+    bool isXModified = myXSpin->isModified();
+    emit valuesChanged();
+    //onValuesChanged();
+    myXSpin->clearModified();
+    myYSpin->clearModified();
+    if (isXModified)
+      myXSpin->selectAll();
+    else
+      myYSpin->selectAll();
+  }
+  return isModified;
 }

@@ -200,7 +200,6 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
         return aResult; // empty result
     }
     if (aSelLab.IsAttribute(kPART_REF_ID)) {
-      /* TODO: implement used text here
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(context());
       if (!aPart.get() || !aPart->isActivated())
         return std::shared_ptr<GeomAPI_Shape>(); // postponed naming needed
@@ -208,11 +207,12 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
         return aPart->selectionValue(anIndex->Get());
       }
+      /*
       Handle(TDataStd_Name) aName;
       if (!selectionLabel().FindAttribute(TDataStd_Name::GetID(), aName)) {
         return std::shared_ptr<GeomAPI_Shape>(); // something is wrong
       }
-      return aPart->shapeInPart(TCollection_AsciiString(aName).ToCString());
+      return aPart->shapeInPart(TCollection_AsciiString(aName->Get()).ToCString());
       */
     }
 
@@ -488,7 +488,7 @@ bool Model_AttributeSelection::update()
               }
             }
           }
-          double aBestFound = 0; // best percentage of found edges
+          int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
           int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
           for(int aFaceIndex = 0; aFaceIndex < aConstructionContext->facesNum(); aFaceIndex++) {
             int aFound = 0, aNotFound = 0, aSameOrientation = 0;
@@ -517,12 +517,9 @@ bool Model_AttributeSelection::update()
               }
             }
             if (aFound + aNotFound != 0) {
-              double aSum = aFound + aNotFound;
-               // aSameOrientation: if edges are same, take where orientation is better
-              double aPercentage = double(aFound) / double(aFound + aNotFound);
-              if (aPercentage > aBestFound || 
-                  (aPercentage == aBestFound && aSameOrientation > aBestOrient)) {
-                aBestFound = aPercentage;
+              if (aFound > aBestFound || 
+                  (aFound == aBestFound && aSameOrientation > aBestOrient)) {
+                aBestFound = aFound;
                 aBestOrient = aSameOrientation;
                 aNewSelected = aConstructionContext->face(aFaceIndex);
               }
@@ -875,6 +872,24 @@ void Model_AttributeSelection::selectSubShape(
   const std::string& theType, const std::string& theSubShapeName)
 {
   if(theSubShapeName.empty() || theType.empty()) return;
+
+  // check this is Part-name: 2 delimiters in the name
+  std::size_t aPartEnd = theSubShapeName.find('/');
+  if (aPartEnd != string::npos && aPartEnd != theSubShapeName.rfind('/')) {
+    std::string aPartName = theSubShapeName.substr(0, aPartEnd);
+    ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
+    if (aFound.get()) { // found such part, so asking it for the name
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
+      string aNameInPart = theSubShapeName.substr(aPartEnd + 1);
+      int anIndex;
+      std::shared_ptr<GeomAPI_Shape> aSelected = aPart->shapeInPart(aNameInPart, theType, anIndex);
+      if (aSelected.get()) {
+        setValue(aPart, aSelected);
+        TDataStd_Integer::Set(selectionLabel(), anIndex);
+        return;
+      }
+    }
+  }
 
   Model_SelectionNaming aSelNaming(selectionLabel());
   std::shared_ptr<Model_Document> aDoc = 

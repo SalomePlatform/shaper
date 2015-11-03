@@ -10,7 +10,9 @@
 #include "ModuleBase.h"
 #include "ModuleBase_Definitions.h"
 
+#include <ModelAPI_Attribute.h>
 #include <ModelAPI_Feature.h>
+
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Prs3d_Drawer.hxx>
@@ -120,6 +122,16 @@ MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theSha
 MODULEBASE_EXPORT Quantity_Color color(const std::string& theSection,
                                        const std::string& theName,
                                        const std::string& theDefault);
+
+
+// Returns the object from the attribute
+/// \param theObj an object
+MODULEBASE_EXPORT ObjectPtr getObject(const AttributePtr& theAttribute);
+
+// Returns the object from the attribute
+/// \param theObj an object
+MODULEBASE_EXPORT TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape);
+
 }
 
 #endif

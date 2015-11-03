@@ -36,7 +36,7 @@
 #include <string>
 
 ExpressionEditor::ExpressionEditor(QWidget* theParent)
-: QPlainTextEdit(theParent), myCompletedAndSelected(false)
+: QPlainTextEdit(theParent), myCompletedAndSelected(false), myIsModified(false)
 {
   myCompleter = new QCompleter(this);
   myCompleter->setWidget(this);
@@ -52,6 +52,10 @@ ExpressionEditor::ExpressionEditor(QWidget* theParent)
           this,        SLOT(insertCompletion(const QString&)));
   (void) new QShortcut(QKeySequence(tr("Ctrl+Space", "Complete")),
                        this, SLOT(performCompletion()));
+
+  connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+
+  setTabChangesFocus(true);
 }
 
 ExpressionEditor::~ExpressionEditor()
@@ -110,6 +114,8 @@ void ExpressionEditor::performCompletion(const QString& theCompletionPrefix)
 
 void ExpressionEditor::keyPressEvent(QKeyEvent* theEvent)
 {
+  bool anIsModified = myIsModified;
+
   if (myCompletedAndSelected && handledCompletedAndSelected(theEvent))
     return;
   myCompletedAndSelected = false;
@@ -117,13 +123,25 @@ void ExpressionEditor::keyPressEvent(QKeyEvent* theEvent)
     switch (theEvent->key()) {
       case Qt::Key_Up:
       case Qt::Key_Down:
+      case Qt::Key_Escape:
       case Qt::Key_Enter:
       case Qt::Key_Return:
-      case Qt::Key_Escape:
         theEvent->ignore();
-        return;
+      return;
       default:
         myCompleter->popup()->hide();
+        break;
+    }
+  }
+  else {
+    switch (theEvent->key()) {
+      case Qt::Key_Enter:
+      case Qt::Key_Return:
+        emit keyReleased(theEvent);
+        // do not react to the Enter key, the property panel processes it
+        return;
+      break;
+      default:
         break;
     }
   }
@@ -155,6 +173,16 @@ QString ExpressionEditor::placeHolderText() const
   return myPlaceHolderText;
 }
 
+bool ExpressionEditor::isModified() const
+{
+  return myIsModified;
+}
+
+void ExpressionEditor::clearModified()
+{
+  myIsModified = false;
+}
+
 void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
 {
   QPlainTextEdit::paintEvent( theEvent );
@@ -184,6 +212,11 @@ void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
   }
 }
 
+void ExpressionEditor::onTextChanged()
+{
+  myIsModified = true;
+  emit valueModified();
+}
 
 
 ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
@@ -207,10 +240,15 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
   aMainLay->addWidget(myEditor);
   this->setLayout(aMainLay);
 
-  connect(myEditor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+  connect(myEditor, SIGNAL(valueModified()), this, SIGNAL(valuesModified()));
+  connect(myEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
 }
 
 ModuleBase_WidgetExprEditor::~ModuleBase_WidgetExprEditor()
+{
+}
+
+void ModuleBase_WidgetExprEditor::initializeValueByActivate()
 {
 }
 
@@ -221,6 +259,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom() const
     return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
+
   QString aWidgetValue = myEditor->toPlainText();
   aStringAttr->setValue(aWidgetValue.toStdString());
   updateObject(myFeature);
@@ -273,7 +312,18 @@ QList<QWidget*> ModuleBase_WidgetExprEditor::getControls() const
   return result;
 }
 
+bool ModuleBase_WidgetExprEditor::processEnter()
+{
+  bool isModified = myEditor->isModified();
+  if (isModified) {
+    emit valuesChanged();
+    myEditor->clearModified();
+    myEditor->selectAll();
+  }
+  return isModified;
+}
+
 void ModuleBase_WidgetExprEditor::onTextChanged()
 {
-  storeValue();
+  emit valuesChanged();
 }

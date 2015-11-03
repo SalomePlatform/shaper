@@ -41,6 +41,16 @@
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="ArcCenter,ArcStartPoint,ArcEndPoint"/>
       </feature>
+      <!--  SketchConstraintFillet  -->
+      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
+        <sketch_shape_selector id="ConstraintEntityA"
+            label="Point" tooltip="Select point for fillet (should be shared by two entities only)" shape_types="vertex">
+          <validator id="SketchPlugin_FilletVertexValidator"/>
+        </sketch_shape_selector>
+        <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" min="0" default="1" use_reset="false">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue>
+      </feature>
     </group>
       
     <group id="Constraints">
@@ -70,7 +80,7 @@
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
         </sketch_shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         
         <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>
@@ -85,7 +95,7 @@
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
         </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -99,7 +109,7 @@
             shape_types="edge">
             <validator id="GeomValidators_ShapeType" parameters="circle"/>
         </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -118,7 +128,7 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
         </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Angle" id="ConstraintValue" default="computed" min="0" max="180" />
         <validator id="PartSet_AngleSelection"/>
       </feature>
@@ -222,6 +232,7 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
         </sketch_shape_selector>
+        <validator id="PartSet_EqualSelection"/>
       </feature>
       
     <!--  SketchConstraintTangent  -->
@@ -244,26 +255,6 @@
     </group>
     
     <group id="Edit">
-      <!--  SketchConstraintFillet  -->
-      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
-        <sketch_shape_selector id="ConstraintEntityA" 
-            label="First object" tooltip="Select line or arc" shape_types="edge">
-          <validator id="PartSet_DifferentObjects"/>
-          <validator id="PartSet_CoincidentAttr" parameters="ConstraintEntityB"/>
-        </sketch_shape_selector>
-
-        <sketch_shape_selector id="ConstraintEntityB"
-            label="Second object" tooltip="Select line or arc" shape_types="edge">
-          <validator id="PartSet_DifferentObjects"/>
-          <validator id="PartSet_CoincidentAttr" parameters="ConstraintEntityA"/>
-        </sketch_shape_selector>
-
-        <doublevalue label="Value" tooltip="Fillet radius" id="ConstraintValue" min="0" default="1" use_reset="false">
-          <validator id="GeomValidators_Positive"/>
-        </doublevalue>
-        <validator id="PartSet_FilletSelection"/>
-      </feature>
-      
       <!--  SketchConstraintMirror  -->
       <feature
         id="SketchConstraintMirror"

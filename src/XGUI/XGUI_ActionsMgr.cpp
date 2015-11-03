@@ -4,7 +4,9 @@
  * XGUI_ActionsMgr.cpp
  */
 
+#ifndef HAVE_SALOME
 #include <AppElements_Command.h>
+#endif
 
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_Workshop.h>
@@ -61,13 +63,13 @@ void XGUI_ActionsMgr::addCommand(QAction* theCmd)
     return;
   }
   myActions.insert(aId, theCmd);
-  AppElements_Command* aXCmd = dynamic_cast<AppElements_Command*>(theCmd);
-  if (aXCmd) {
-    myNestedActions[aId] = aXCmd->nestedCommands();
-  } else {
+#ifdef HAVE_SALOME
     XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
     myNestedActions[aId] = aWorkshop->salomeConnector()->nestedActions(aId);
-  }
+#else
+  AppElements_Command* aXCmd = dynamic_cast<AppElements_Command*>(theCmd);
+  myNestedActions[aId] = aXCmd->nestedCommands();
+#endif
 }
 
 void XGUI_ActionsMgr::addNestedCommands(const QString& theId, const QStringList& theCommands)
@@ -95,25 +97,30 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
 
 void XGUI_ActionsMgr::update()
 {
-  FeaturePtr anActiveFeature = FeaturePtr();
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                         (myOperationMgr->currentOperation());
-  if (aFOperation) {
-    anActiveFeature = aFOperation->feature();
-    if(anActiveFeature.get()) {
-      setAllEnabled(false);
-      QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
-      setActionEnabled(aFeatureId, true);
-    }
-    setNestedStackEnabled(aFOperation);
+  XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() > 0) {
+    updateOnViewSelection();
   } else {
-    setAllEnabled(true);
-    setNestedCommandsEnabled(false);
+    FeaturePtr anActiveFeature = FeaturePtr();
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                           (myOperationMgr->currentOperation());
+    if (aFOperation) {
+      anActiveFeature = aFOperation->feature();
+      if(anActiveFeature.get()) {
+        setAllEnabled(false);
+        QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
+        setActionEnabled(aFeatureId, true);
+      }
+      setNestedStackEnabled(aFOperation);
+    } else {
+      setAllEnabled(true);
+      setNestedCommandsEnabled(false);
+    }
+    // TODO(SBH): Get defaults state of actions from XML and remove the following method
+    updateByDocumentKind();
+    updateByPlugins(anActiveFeature);
   }
-  // TODO(SBH): Get defaults state of actions from XML and remove the following method
-  updateByDocumentKind();
   updateCheckState();
-  updateByPlugins(anActiveFeature);
 }
 
 void XGUI_ActionsMgr::updateCheckState()
@@ -140,34 +147,22 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   if (aIdList.isEmpty())
     return;
 
+  ModuleBase_Operation* theOperation = myOperationMgr->currentOperation();
   //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   // only viewer selection is processed
-  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
-    // it seems that this code is not nesessary anymore. It leads to incorrect case:
-    // sketch operation start, click in any place in the viewer. The result is all nested
-    // entities are enabled(but the sketch plane is not selected yet). Any sketch operation
-    // can be started but will be incorrect on preview build before it uses the sketch unset plane.
-    /*foreach(QString aFeatureId, aIdList) {
-      foreach(QString aId, nestedCommands(aFeatureId)) {
-        setActionEnabled(aId, true);
-      }
-    }*/
-  } else { 
-    SessionPtr aMgr = ModelAPI_Session::get();
-    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-    foreach(QString aFeatureId, aIdList) {
-      foreach(QString aId, nestedCommands(aFeatureId)) {
-        ModelAPI_ValidatorsFactory::Validators aValidators;
-        aFactory->validators(aId.toStdString(), aValidators);
-        ModelAPI_ValidatorsFactory::Validators::iterator aValidatorIt = aValidators.begin();
-        for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
-          const ModuleBase_SelectionValidator* aSelValidator =
-              dynamic_cast<const ModuleBase_SelectionValidator*>(aFactory->validator(aValidatorIt->first));
-          if (!aSelValidator)
-            continue;
-          setActionEnabled(aId, aSelValidator->isValid(aSelection, aValidatorIt->second));
-        }
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  foreach(QString aFeatureId, aIdList) {
+    foreach(QString aId, nestedCommands(aFeatureId)) {
+      ModelAPI_ValidatorsFactory::Validators aValidators;
+      aFactory->validators(aId.toStdString(), aValidators);
+      ModelAPI_ValidatorsFactory::Validators::iterator aValidatorIt = aValidators.begin();
+      for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
+        const ModuleBase_SelectionValidator* aSelValidator =
+            dynamic_cast<const ModuleBase_SelectionValidator*>(aFactory->validator(aValidatorIt->first));
+        if (aSelValidator)
+          setActionEnabled(aId, aSelValidator->isValid(aSelection, theOperation));
       }
     }
   }
@@ -344,16 +339,16 @@ void XGUI_ActionsMgr::updateByDocumentKind()
   QString aDocKind = QString::fromStdString(aStdDocKind);
   XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
   foreach(QAction* eachAction, myActions.values()) {
-    AppElements_Command* aCmd = dynamic_cast<AppElements_Command*>(eachAction);
     QString aCmdDocKind;
-    if(aCmd) {
-      aCmdDocKind = aCmd->documentKind();
-    } else {
-      QString aId = eachAction->data().toString();
-      if (!aId.isEmpty()) {
-        aCmdDocKind = aWorkshop->salomeConnector()->documentKind(aId);
-      }
+#ifdef HAVE_SALOME
+    QString aId = eachAction->data().toString();
+    if (!aId.isEmpty()) {
+      aCmdDocKind = aWorkshop->salomeConnector()->documentKind(aId);
     }
+#else
+    AppElements_Command* aCmd = dynamic_cast<AppElements_Command*>(eachAction);
+    aCmdDocKind = aCmd->documentKind();
+#endif
     if(!aCmdDocKind.isEmpty() && aCmdDocKind != aDocKind) {
       eachAction->setEnabled(false);
     }

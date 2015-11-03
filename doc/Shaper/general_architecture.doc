@@ -1,0 +1,56 @@
+/*!
+\page general_architecture General Architecture
+
+A Shaper module is made of Workshop (see XGUI_Workshop) which loads a Module (see ModuleBase_IModule), connecting its features with GUI, providing it with services for launching of operations, tools for user inputs and visualisation of results. The Module can consist of one or several plug-ins which provide implementation of Module features. Each plug-in can implement one or several features. These features can be structured by Workbenches within Workshop. Workshop provides introducing of these Workbenches within main window in form of menus or/and tool bars.
+\n
+Workshop interacts with a Module with help of specific interface defined in ModuleBase package. Each module for NewGeom application has to implement ModuleBase_IModile interface.
+\n
+A Module manages a one document (ModelAPI_Document). This document consists of a one root document and several, loaded by request, sub-documents. Each sub-document can be stored in a single file. 
+\n
+
+<b>Main features of the general architecture of Shaper:</b>
+<ul>
+<li> It consists of a one Module running within a Workshop.</li>
+<li> It's Document consists of a main document and several sub-documents which can be stored and loaded as separated files.</li>
+<li> A Module is made of a one or several Plug-ins implementing Features supported by the Module.</li>
+<li> These Features are structured by Workbenches.</li>
+<li> The Module communicates with the Workshop through Interfaces.</li>
+<li> The API of Shaper consists of the Interface of the Workshop and of Module.</li>
+<li> A configuration file describes the composition of the Workshop where the Module and Plug-ins are referenced by their unique names.</li>
+</ul>
+\n\n
+\image html ../general_architecture_1.png
+\n\n
+Feature is a peace of code which performs an operation. The Feature is a main component of a plug-in. It consists of input attributes, operation functionality and result objects (one or several). All features are defined in plug-ins by the specific feature developer (in C++ or python).
+\n
+For today there is a one implementation of Shaper module which implements Part Set functionality (PartSet_Module).
+The geometric model (i.e. the whole geometry produced by Shaper) is created through operations, or features (ModelAPI_Feature), which define a meaningful piece of design (see \ref Plugins group). In order to easily create dedicated variants of the modeler, also to gradually develop Shaper, each feature is implemented in a <i>Plug-in</i> (ModelAPI_Plugin, a piece of application including its own GUI, built separately from the application. It is loaded dynamically to the application). In other words, a Module is made of a collection of Plug-ins.
+Each sub-document contains a data of a one Part. When the user saves its session, all documents are saved: the PartSet and each Part.
+\n
+
+<h2>SALOME module definition</h2>
+
+The NewGeom package allows to launch the application as one of the module of SALOME platform. In that case all user interface elements are integrated into SALOME platform: the \ref Salome package is used for this connection.
+\n
+To integrate Shaper into SALOME the next steps are done:
+<ol>
+<li> LightApp_Module class from SALOME GUI LightApp package is redefined (see NewGeom_Module). This redefined class provides a connection between LightApp_Module interface and Workshop object of the application.</li>
+<li>Provide Workshop with a <i>SALOME</i> mode of launching in SALOME environment. In this case it is launched without its own main window, 3d viewer and main menu.</li>
+<li>In <i>SALOME</i> mode workshop uses:
+  <ol>
+  <li>SALOME desktop as a main window.</li>
+  <li>OCC viewer from SALOME platform instead of its own 3d viewer.</li>
+  <li>SALOME main menu and tool bars for creation of workbenches commands.</li>
+  <li>Object Browser of New GEOM application is used instead of SALOME Object Browser.</li>
+  <li>Creation of a New GEOM property panel as a docking window of SALOME desktop.</li>
+  <li>Use SALOME Python console instead of console in main window. Since 3 packages from SALOME GUI module become shared between this project and SALOME modules and they are independent from other SALOME parts, it is proposed in the future to detach it from SALOME platform into separated prerequisite product to avoid code duplication.</li>
+  </ol>
+</li>
+<li>Each workbench is defined as a menu in main menu bar of SALOME desktop and as a tool bar with corresponded title.</li>
+<li>Each feature in the workbench is defined as a menu item in the corresponded menu and a button in the corresponded tool bar.</li>
+<li>Object Browser of SALOME is hidden on activation of NewGEOM and restored on its deactivation.</li>
+<li>Object Browser and Property panel of NewGEOM is shown on activation of the module and hidden on its deactivation.</li>
+<li>Persistent of NewGEOM is compatible with persistent of SALOME. On saving of SALOME study the content of NewGEOM data structure is saved into study also and restored on restoring of study.</li>
+</ol>
+
+*/

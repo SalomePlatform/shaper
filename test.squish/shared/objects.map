@@ -1,0 +1,6 @@
+:File_QtxMenu	{title='File' type='QtxMenu' unnamed='1' visible='1'}
+:Open File.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Open File_SUIT_FileDlg'}
+:Open File_SUIT_FileDlg	{name='QFileDialog' type='SUIT_FileDlg' visible='1' windowTitle='Open File'}
+:PoseidonGUI v1.6.4_LUIDesktop_TabDesktop	{type='LUIDesktop_TabDesktop' unnamed='1' visible='1' windowTitle='PoseidonGUI v1.6.4'}
+:PoseidonGUI v1.6.4_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':PoseidonGUI v1.6.4_LUIDesktop_TabDesktop'}
+:fileNameEdit_QLineEdit	{buddy=':Open File.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}

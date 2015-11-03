@@ -27,7 +27,6 @@ class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
 class ModelAPI_Validator;
-class GeomValidators_ShapeType;
 
 /**
 * \ingroup GUI

@@ -28,9 +28,15 @@
 #include <memory>
 #include <string>
 
+/**
+* Customization of Line edit control
+*/
 class CustomLineEdit : public QLineEdit
 {
 public:
+  /// Constructor
+  /// \param theParent a parent widget
+  /// \param thePlaceHolder a string which is shown when text is empty
   CustomLineEdit( QWidget* theParent, const QString& thePlaceHolder )
     : QLineEdit( theParent ), myPlaceHolder( thePlaceHolder )
   {
@@ -40,6 +46,8 @@ public:
   {
   }
 
+  /// Redefiniotion of virtual method
+  /// \param theEvent a paint event
   virtual void paintEvent( QPaintEvent* theEvent )
   {
     QLineEdit::paintEvent( theEvent );

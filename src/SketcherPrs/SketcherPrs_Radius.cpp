@@ -29,6 +29,7 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), myPlane(thePlane)
 {
+  // Set default values of the presentation
   myAspect = new Prs3d_DimensionAspect();
   myAspect->MakeArrows3d(false);
   myAspect->MakeText3d(false);
@@ -100,6 +101,8 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+  // The value of vertical aligment is sometimes changed
+  myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
@@ -107,6 +110,7 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                                    const Standard_Integer theMode)
 {
+  // Map the application selection modes to standard ones
   Standard_Integer aMode;
   switch (theMode) {
   case 0: // we should use selection of all objects

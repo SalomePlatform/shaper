@@ -19,18 +19,14 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetEditor.h
 	PartSet_WidgetMultiSelector.h
 	PartSet_WidgetPoint2dDistance.h
+	PartSet_WidgetPoint2DFlyout.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_WidgetFileSelector.h
 	PartSet_Filters.h
-	PartSet_LockApplyMgr.h
 	PartSet_FilterInfinite.h
 	PartSet_SketcherMgr.h
 	PartSet_MenuMgr.h
-	PartSet_DocumentDataModel.h
-	PartSet_PartDataModel.h
-	PartSet_DataTreeModel.h
 	PartSet_WidgetSketchCreator.h
-	PartSet_TopDataModel.h
 	PartSet_IconFactory.h
 )
 
@@ -47,18 +43,14 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dAngle.cpp
 	PartSet_WidgetPoint2dDistance.cpp
+	PartSet_WidgetPoint2DFlyout.cpp
 	PartSet_WidgetShapeSelector.cpp
 	PartSet_WidgetFileSelector.cpp
 	PartSet_Filters.cpp
-	PartSet_LockApplyMgr.cpp
 	PartSet_FilterInfinite.cpp
 	PartSet_SketcherMgr.cpp
 	PartSet_MenuMgr.cpp
-	PartSet_DocumentDataModel.cpp
-	PartSet_PartDataModel.cpp
-	PartSet_DataTreeModel.cpp
 	PartSet_WidgetSketchCreator.cpp
-	PartSet_TopDataModel.cpp
 	PartSet_IconFactory.cpp
 )
 
@@ -74,7 +66,6 @@ SET(PROJECT_LIBRARIES
     ModuleBase
     Config
     GeomAPI
-    GeomValidators
     GeomDataAPI
 	SketcherPrs
     ${QT_LIBRARIES}
@@ -112,7 +103,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/PartSetPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
-                    ${CMAKE_SOURCE_DIR}/src/GeomValidators
                     ${CMAKE_SOURCE_DIR}/src/AppElements
                     ${CAS_INCLUDE_DIRS}
                     ${SUIT_INCLUDE}

@@ -18,7 +18,6 @@
 #include <Events_Message.h>
 #include <GeomAPI_Interface.h>
 #include <GeomAPI_Shape.h>
-#include <GeomValidators_Tools.h>
 
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Data.h>
@@ -87,6 +86,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine->installEventFilter(this);
 
   aLayout->addRow(myLabel, myTextLine);
+  myLabel->setToolTip(aToolTip);
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
@@ -140,7 +140,7 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelectio
     DataPtr aData = myFeature->data();
     AttributePtr anAttribute = myFeature->attribute(attributeID());
 
-    ObjectPtr anObject = GeomValidators_Tools::getObject(anAttribute);
+    ObjectPtr anObject = ModuleBase_Tools::getObject(anAttribute);
     TopoDS_Shape aShape;
     std::shared_ptr<GeomAPI_Shape> aShapePtr = getShape();
     if (aShapePtr.get()) {
@@ -221,7 +221,7 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     isNameUpdated = true;
   }
   if (!isNameUpdated) {
-    ObjectPtr anObject = GeomValidators_Tools::getObject(myFeature->attribute(attributeID()));
+    ObjectPtr anObject = ModuleBase_Tools::getObject(myFeature->attribute(attributeID()));
     if (anObject.get() != NULL) {
       std::string aName = anObject->data()->name();
       myTextLine->setText(QString::fromStdString(aName));
@@ -251,7 +251,7 @@ void ModuleBase_WidgetShapeSelector::storeAttributeValue()
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = myFeature->attribute(attributeID());
 
-  myObject = GeomValidators_Tools::getObject(anAttribute);
+  myObject = ModuleBase_Tools::getObject(anAttribute);
   myShape = getShape();
   myRefAttribute = AttributePtr();
   myIsObject = false;

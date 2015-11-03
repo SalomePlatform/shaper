@@ -6,7 +6,7 @@ from macros.box.feature      import BoxFeature
 
 
 class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
-    """Class for Python features plugin.
+    """Implementation of features plugin.
 
     PythonFeaturesPlugin() -> plugin object
     """
@@ -30,6 +30,6 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
 
         return aFeature
 
-
+# The plugin object
 plugin = PythonFeaturesPlugin()
 plugin.__disown__()

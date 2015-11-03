@@ -28,6 +28,9 @@ class ModelAPI_Feature : public ModelAPI_Object
   std::list<std::shared_ptr<ModelAPI_Result> > myResults;
   ///< is feature disabled or not
   bool myIsDisabled;
+  ///< is feature is stable (not editing)
+  bool myIsStable;
+
  public:
   /// Returns the unique kind of a feature (like "Point")
   virtual const std::string& getKind() = 0;
@@ -131,6 +134,13 @@ class ModelAPI_Feature : public ModelAPI_Object
 
   /// Returns the feature by the object (result).
   MODELAPI_EXPORT static std::shared_ptr<ModelAPI_Feature> feature(ObjectPtr theObject);
+
+  /// Set the stable feature flag. If feature is currently editing then it is not stable.
+  /// \returns true if state is really changed
+  MODELAPI_EXPORT virtual bool setStable(const bool theFlag);
+
+  /// Returns the feature is stable or not.
+  MODELAPI_EXPORT virtual bool isStable();
 
  //
  // Helper methods, aliases for data()->method()

@@ -30,20 +30,24 @@ SketcherPrs_Mirror::SketcherPrs_Mirror(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_Mirror::updatePoints(double theStep) const
 {
+  // Get axis of mirror
   ObjectPtr aAxisObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   if (SketcherPrs_Tools::getShape(aAxisObj).get() == NULL)
     return false;
 
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  // Get source objects
   std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return false;
+  // Get mirrored objects
   std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = aData->reflist(SketchPlugin_Constraint::ENTITY_C());
   if (anAttrC.get() == NULL)
     return false;
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   int aNb = anAttrB->size();
+  // If size of source objects and mirrored ones is not equal then the constraint is not computed
   if (aNb != anAttrC->size())
     return false;
 
@@ -51,11 +55,13 @@ bool SketcherPrs_Mirror::updatePoints(double theStep) const
   int i;
   ObjectPtr aObj;
   gp_Pnt aP1;
+  // get position for each source object
   for (i = 0; i < aNb; i++) {
     aObj = anAttrB->object(i);
     aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(i + 1, aP1);
   }  
+  // Get position of each mirrored object
   for (i = 0; i < aNb; i++) {
     aObj = anAttrC->object(i);
     aP1 = aMgr->getPosition(aObj, this, theStep);
@@ -80,9 +86,6 @@ void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs, Qua
     return;
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-
-  //Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  //aGroup->SetPrimitivesAspect(aLineAspect);
 
   // drawListOfShapes uses myDrawer for attributes definition
   Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);

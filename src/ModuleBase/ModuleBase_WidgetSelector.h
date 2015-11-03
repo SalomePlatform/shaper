@@ -43,12 +43,12 @@ Q_OBJECT
   virtual bool isViewerSelector() { return true; }
 
   /// Checks the widget validity. By default, it returns true.
-  /// \param theValue a selected presentation in the view
+  /// \param thePrs a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// Fills the attribute with the value of the selected owner
-  /// \param theOwner a selected owner
+  /// \param thePrs a selected owner
   virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
   /// The methiod called when widget is deactivated
@@ -66,7 +66,7 @@ protected:
   /// Set an empty value to attribute
   virtual void clearAttribute() = 0;
 
-  // Update focus after the attribute value change
+  /// Update focus after the attribute value change
   virtual void updateFocus() = 0;
 
   /// Return the attribute values wrapped in a list of viewer presentations

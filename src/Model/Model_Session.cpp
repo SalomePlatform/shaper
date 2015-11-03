@@ -219,6 +219,15 @@ std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 static void makeCurrentLast(std::shared_ptr<ModelAPI_Document> theDoc) {
   if (theDoc.get()) {
     FeaturePtr aLast = std::dynamic_pointer_cast<Model_Document>(theDoc)->lastFeature();
+    // if last is nested into something else, make this something else as last:
+    // otherwise it will look like edition of sub-element, so, the main will be disabled
+    if (aLast.get()) {
+      CompositeFeaturePtr aMain = ModelAPI_Tools::compositeOwner(aLast);
+      while(aMain.get()) {
+        aLast = aMain;
+        aMain = ModelAPI_Tools::compositeOwner(aLast);
+      }
+    }
     theDoc->setCurrentFeature(aLast, false);
   }
 }

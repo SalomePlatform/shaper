@@ -10,6 +10,7 @@
 #include "XGUI.h"
 
 #include <ModuleBase_Operation.h>
+#include "ModelAPI_Feature.h"
 
 #include <QList>
 #include <QObject>
@@ -35,10 +36,14 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent
+  /// \param theWorkshop a reference to workshop
   XGUI_OperationMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop);
+
   /// Destructor
   virtual ~XGUI_OperationMgr();
 
+  /// Set reference to workshop
+  /// \param theWorkshop reference to workshop
   void setWorkshop(ModuleBase_IWorkshop* theWorkshop)
   { myWorkshop = theWorkshop; };
 
@@ -85,21 +90,13 @@ Q_OBJECT
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theId id of the operation which is going to start
-  /// \param isAdditionallyGranted a boolean flag whether the id operation is granted in the previous one
-  bool canStartOperation(const QString& theId, const bool isAdditionallyGranted = false);
+  bool canStartOperation(const QString& theId);
 
   /// Aborts the parameter operation if it is current, else abort operations from the stack
   /// of operations until the operation is found. All operations upper the parameter one are
   /// not aborted.
   /// \param theOperation an aborted operation
   void abortOperation(ModuleBase_Operation* theOperation);
-
-  /// Blocking/unblocking enabling of Ok button in property panel.
-  /// It is used when operation can not be validated even all attributes are valid
-  void setLockValidating(bool toLock);
-
-  /// Returns state of validation locking
-  bool isValidationLocked() const { return myIsValidationLock; }
 
   /// Returns enable apply state 
   /// \return theEnabled a boolean value
@@ -139,14 +136,6 @@ signals:
   /// Emitted when current operation is aborted
   void operationAborted(ModuleBase_Operation* theOperation);
 
-  /// Signal is emitted after the apply enable state changed.
-  //void validationStateChanged(bool);
-
-  /// Signal is emitted after the model is modified. It is emitted for all active operations.
-  /// \param theFeatureKind a feature id
-  /// \param theState validity of the operation with the feature kind
-  //void nestedStateChanged(const std::string& theFeatureKind, const bool theState);
-
   /// Signal is emitted after the current operation is filled with existing preselection.
   void operationActivatedByPreselection();
 
@@ -174,9 +163,13 @@ protected: // TEMPORARY
   /// Returns whether the parameter operation is granted in relation to the previous operation
   /// in a stack of started operations. It is used in canStopOperation to avoid warning message
   /// when granted operation is aborted, e.g. SketchLine in Sketch
-  /// \param theOperation the started operation
+  /// \param theId id of the operation which is checked
   /// \return boolean result
-  bool isGrantedOperation(ModuleBase_Operation* theOperation);
+  bool isGrantedOperation(const QString& theId);
+
+  /// Sets the feature as a current in the document
+  /// \param theFeature a feature
+  void setCurrentFeature(const FeaturePtr& theFeature);
 
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
@@ -188,13 +181,24 @@ protected: // TEMPORARY
   /// If there is a suspended operation, restart it.
   void onOperationStopped();
 
-  /// Slot called on operation start
+  /// Slot called before operation started. Stores the previous current feature, set the feature
+  /// of the operation as a current in the document. The previous current feature should be restored
+  /// by the operation abort/commit
+  void onBeforeOperationStarted();
+
+  /// Slot called after operation started
   void onOperationStarted();
 
-  /// Slot called on operation abort
+  /// Slot called before operation aborted. Restore the previous current operation
+  void onBeforeOperationAborted();
+
+  /// Slot called after operation aborted
   void onOperationAborted();
 
-  /// Slot called on operation commit
+  /// Slot called before operation committed. Restore the previous current operation
+  void onBeforeOperationCommitted();
+
+  /// Slot called after operation committed
   void onOperationCommitted();
 
   /// Slot called on operation resume
@@ -211,9 +215,6 @@ private:
   /// Current workshop
   ModuleBase_IWorkshop* myWorkshop;
 
-
-  /// Lock/Unlock access to Ok button in property panel
-  bool myIsValidationLock;
   /// Lock/Unlock access to Ok button in property panel
   bool myIsApplyEnabled;
 };

@@ -16,19 +16,7 @@
 #include <string>
 #include <iostream>
 
-/*!
- \class ModuleBase_ParamSpinBox
- */
 
-/*!
- \brief Constructor.
-
- Constructs a spin box with 0.0 as minimum value and 99.99 as maximum value,
- a step value of 1.0 and a precision of 2 decimal places.
- The value is initially set to 0.00.
-
- \param parent parent object
- */
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
     : ModuleBase_DoubleSpinBox(theParent, thePrecision),
       myAcceptVariables(true)
@@ -69,20 +57,11 @@ void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
           this, SLOT(onTextChanged(const QString&)));
 }
 
-/*!
- \brief This function is called when value is changed.
- */
 void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
 {
   myTextValue = text;
 }
 
-/*!
- \brief Interpret text entered by the user as a value.
- \param text text entered by the user
- \return mapped value
- \sa textFromValue()
- */
 double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
 {
   if (!hasVariable(theText))

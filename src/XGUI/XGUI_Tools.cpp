@@ -12,6 +12,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
+#include <Events_Error.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -106,15 +107,16 @@ bool canRemoveOrRename(QWidget* theParent, const QObjectPtrList& theObjects)
 }
 
 //******************************************************************
-bool canRename(QWidget* theParent, const ObjectPtr& theObject, const QString& theName)
+bool canRename(const ObjectPtr& theObject, const QString& theName)
 {
   if (std::dynamic_pointer_cast<ModelAPI_ResultParameter>(theObject).get()) {
     double aValue;
     ResultParameterPtr aParam;
     if (ModelAPI_Tools::findVariable(theObject->document(), qPrintable(theName), aValue, aParam)) {
-      QMessageBox::information(theParent, QObject::tr("Rename parameter"),
-          QString(QObject::tr("Selected parameter can not be renamed to: %1. \
-There is a parameter with the same name. Its value is: %2.")).arg(qPrintable(theName)).arg(aValue));
+      QString aErrMsg(QObject::tr("Selected parameter can not be renamed to: %1. \
+ There is a parameter with the same name. Its value is: %2.").arg(qPrintable(theName)).arg(aValue));
+      // We can not use here a dialog box for message - it will crash editing process in ObjectBrowser
+      Events_Error::send(aErrMsg.toStdString());
       return false;
     }
   }

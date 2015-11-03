@@ -6,6 +6,7 @@
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
+#include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_WidgetPoint2dAngle.h"
 #include "PartSet_WidgetMultiSelector.h"
@@ -117,9 +118,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
-#ifdef ModuleDataModel
-  myDataModel = new PartSet_DocumentDataModel(this);
-#endif
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -194,6 +192,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_TangentSelection", new PartSet_TangentSelection);
   aFactory->registerValidator("PartSet_FilletSelection", new PartSet_FilletSelection);
   aFactory->registerValidator("PartSet_AngleSelection", new PartSet_AngleSelection);
+  aFactory->registerValidator("PartSet_EqualSelection", new PartSet_EqualSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
   aFactory->registerValidator("PartSet_SketchEntityValidator", new PartSet_SketchEntityValidator);
@@ -214,7 +213,12 @@ void PartSet_Module::registerProperties()
                                    Config_Prop::Integer, SKETCH_WIDTH);
 }
 
-void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation) 
+void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
+{
+  mySketchMgr->connectToPropertyPanel(theWidget, isToConnect);
+}
+
+void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
 {
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
@@ -251,12 +255,12 @@ void PartSet_Module::breakOperationSequence()
   myRestartingMode = RM_None;
 }
 
-void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   breakOperationSequence();
 }
 
-void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->startSketch(theOperation);
@@ -270,16 +274,16 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     myCustomPrs->activate(aFOperation->feature(), true);
 }
 
-void PartSet_Module::onOperationResumed(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_IModule::onOperationResumed(theOperation);
+  ModuleBase_IModule::operationResumed(theOperation);
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation)
     myCustomPrs->activate(aFOperation->feature(), true);
 }
 
-void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   bool isModified = myCustomPrs->deactivate(false);
 
@@ -290,11 +294,12 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     mySketchMgr->stopNestedSketch(theOperation);
   }
 
-  if (isModified) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-    aDisplayer->updateViewer();
-  }
+  //VSV: Viewer is updated on feature update and redisplay
+  //if (isModified) {
+  //  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  //  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  //  aDisplayer->updateViewer();
+  //}
   mySketchMgr->onShowConstraintsToggle(myHasConstraintShown);
 }
 
@@ -343,11 +348,6 @@ bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& t
   return aValid;
 }
 
-bool PartSet_Module::canCommitOperation() const
-{
-  return mySketchMgr->canCommitOperation();
-}
-
 bool PartSet_Module::canEraseObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects erase
@@ -389,22 +389,23 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
 QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
 {
   QString anError = ModuleBase_IModule::getFeatureError(theFeature);
-
   if (anError.isEmpty())
     anError = sketchMgr()->getFeatureError(theFeature);
 
-  if (anError.isEmpty()) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
-    
-    if (anOpMgr->isValidationLocked()) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                             (anOpMgr->currentOperation());
-      if (!aFOperation || theFeature == aFOperation->feature())
-        anError = "Validation is locked by the current operation";
-    }
-  }
   return anError;
+}
+
+void PartSet_Module::grantedOperationIds(ModuleBase_Operation* theOperation,
+                                         QStringList& theIds) const
+{
+  myMenuMgr->grantedOperationIds(theOperation, theIds);
+
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+
+    theIds.append(aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text());
+  }
 }
 
 void PartSet_Module::activeSelectionModes(QIntList& theModes)
@@ -586,6 +587,12 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
     aWgt = aPointWgt;
+  } else if (theType == "sketch-2dpoint_flyout_selector") {
+    PartSet_WidgetPoint2DFlyout* aPointWgt = new PartSet_WidgetPoint2DFlyout(theParent, aWorkshop,
+                                                                 theWidgetApi, theParentId);
+    aPointWgt->setSketch(mySketchMgr->activeSketch());
+    connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
+    aWgt = aPointWgt;
   } else if (theType == "point2ddistance") {
     PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent,
                                                         aWorkshop, theWidgetApi, theParentId);
@@ -665,7 +672,7 @@ bool PartSet_Module::deleteObjects()
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
     // in order to do not abort/commit it
-    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+    if (!anOpMgr->canStartOperation(anOpAction->id()))
       return true; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -839,21 +846,34 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
   XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
   if (aOB) {
-    //QLineEdit* aLabel = aOB->activeDocLabel();
+    QLineEdit* aLabel = aOB->activeDocLabel();
+    connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)), 
+          SLOT(onActiveDocPopup(const QPoint&)));
     //QPalette aPalet = aLabel->palette();
     //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     //aLabel->setPalette(aPalet);
     aOB->treeView()->setExpandsOnDoubleClick(false);
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
-#ifdef ModuleDataModel
-    connect(aOB, SIGNAL(headerMouseDblClicked(const QModelIndex&)), 
-      SLOT(onTreeViewDoubleClick(const QModelIndex&)));
-    connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
-      myDataModel, SLOT(onMouseDoubleClick(const QModelIndex&)));
-#endif
   }
 }
+
+void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  QLineEdit* aHeader = aWorkshop->objectBrowser()->activeDocLabel();
+
+  aActivatePartAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
+
+  QMenu aMenu;
+  aMenu.addAction(aActivatePartAction);
+  aMenu.exec(aHeader->mapToGlobal(thePnt));
+}
+
 
 ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
 {
@@ -881,7 +901,8 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   int aSelected = aObjects.size();
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
-  QAction* aActivatePartSetAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
+
+  ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {
     bool hasResult = false;
     bool hasFeature = false;
@@ -892,13 +913,13 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     ObjectPtr aObject = aObjects.first();
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-      FeaturePtr aPartFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
       bool isPart = aPart.get() || 
-        (aPartFeature.get() && (aPartFeature->getKind() == PartSetPlugin_Part::ID()));
+        (aFeature.get() && (aFeature->getKind() == PartSetPlugin_Part::ID()));
       if (isPart) {
         DocumentPtr aPartDoc;
         if (!aPart.get()) {
-          aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
+          aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFeature->firstResult());
         }
         if (aPart.get()) // this may be null is Part feature is disabled
           aPartDoc = aPart->partDoc();
@@ -907,28 +928,24 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
         aActivatePartAction->setEnabled((aMgr->activeDocument() != aPartDoc));
 
       } else if (aObject->document() == aMgr->activeDocument()) {
-        if (hasParameter || hasFeature)
+        if (hasParameter || hasFeature) {
+          myMenuMgr->action("EDIT_CMD")->setEnabled(true);
           theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
+          if (aCurrentOp && aFeature.get()) {
+            if (aCurrentOp->id().toStdString() == aFeature->getKind())
+              myMenuMgr->action("EDIT_CMD")->setEnabled(false);
+          }
+        }
       }
 
       ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
       if( aResult.get() )
         theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
-    } else {  // If feature is 0 the it means that selected root object (document)
-      theMenu->addAction(aActivatePartSetAction);
-      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
     }
-  } else if (aSelected == 0) {
-    // if there is no selection then it means that upper label is selected
-    QModelIndexList aIndexes = myWorkshop->selection()->selectedIndexes();
-    if (aIndexes.size() == 0) // it means that selection happens in top label outside of tree view
-      theMenu->addAction(aActivatePartSetAction);
-      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
   }
-  bool aNotDeactivate = (myWorkshop->currentOperation() == 0);
+  bool aNotDeactivate = (aCurrentOp == 0);
   if (!aNotDeactivate) {
     aActivatePartAction->setEnabled(false);
-    aActivatePartSetAction->setEnabled(false);
   }
 }
 
@@ -953,38 +970,13 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-#ifdef ModuleDataModel
-    QModelIndex aOldIndex = myDataModel->activePartTree();
-    DocumentPtr aDoc = aMgr->moduleDocument();
-    if (aActiveDoc == aDoc) {
-      if (aOldIndex.isValid())
-        aTreeView->setExpanded(aOldIndex, false);
-      myDataModel->deactivatePart();
-      aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
-    } else {
-      std::string aGrpName = ModelAPI_ResultPart::group();
-      for (int i = 0; i < aDoc->size(aGrpName); i++) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
-        if (aPart->partDoc() == aActiveDoc) {
-          QModelIndex aIndex = myDataModel->partIndex(aPart);
-          if (myDataModel->activatePart(aIndex)) {
-            if (aOldIndex.isValid())
-              aTreeView->setExpanded(aOldIndex, false);
-            aTreeView->setExpanded(myDataModel->activePartTree(), true);
-            aPalet.setColor(QPalette::Text, Qt::black);
-          }
-          break;
-        }
-      }
-    }
-#else
     if (aActivePartIndex.isValid())
       aTreeView->setExpanded(aActivePartIndex, false);
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
     aActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
     if (aActivePartIndex.isValid())
       aTreeView->setExpanded(aActivePartIndex, true);
-#endif
+
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
 
@@ -1014,9 +1006,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   }
   if (theIndex.column() != 0) // Use only first column
     return;
-#ifdef ModuleDataModel
-  ObjectPtr aObj = myDataModel->object(theIndex);
-#else
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
@@ -1024,7 +1014,6 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   if ((aDataModel->flags(theIndex) & Qt::ItemIsSelectable) == 0)
     return;
   ObjectPtr aObj = aDataModel->object(theIndex);
-#endif
 
   ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
   if (!aPart.get()) { // Probably this is Feature
@@ -1081,4 +1070,10 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
         aWidgetValidated->activateFilters(true);
     }
   }
+}
+
+//******************************************************
+void PartSet_Module::widgetStateChanged(int thePreviousState)
+{
+  mySketchMgr->widgetStateChanged(thePreviousState);
 }

@@ -11,22 +11,22 @@
       <box id="BySizes" title="By sizes" icon=":icons/dimension_up_down_32x32.png">
         <groupbox>
           <doublevalue
-            id="from_size"
-            label="Size"
-            step="1.0"
-            default="10"
-            icon=":icons/dimension_down.png"
-            tooltip="From size">
-          </doublevalue>
-        </groupbox>
-        <groupbox>
-          <doublevalue
             id="to_size"
             label="Size"
             step="1.0"
             default="0"
             icon=":icons/dimension_up.png"
             tooltip="To size">
+          </doublevalue>
+        </groupbox>
+        <groupbox>
+          <doublevalue
+            id="from_size"
+            label="Size"
+            step="1.0"
+            default="10"
+            icon=":icons/dimension_down.png"
+            tooltip="From size">
           </doublevalue>
         </groupbox>
       </box>

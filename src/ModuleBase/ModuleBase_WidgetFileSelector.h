@@ -86,6 +86,10 @@ protected:
   /// Returns string containing formats
   QString filterString() const;
 
+  /// Add an extension to file name if the extension is not defined
+  /// \param theFileName a file name
+  /// \param theFilter a file filter
+  /// \return the file name with extension
   static QString applyExtension(const QString& theFileName, const QString& theFilter);
 
 protected:

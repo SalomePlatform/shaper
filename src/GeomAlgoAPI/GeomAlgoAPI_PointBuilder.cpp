@@ -25,6 +25,16 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_PointBuilder::point(
   return aRes;
 }
 
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_PointBuilder::point(
+    const double theX, const double theY, const double theZ)
+{
+  const gp_Pnt aPnt(theX, theY, theZ);
+  BRepBuilderAPI_MakeVertex aMaker(aPnt);
+  TopoDS_Vertex aVertex = aMaker.Vertex();
+  std::shared_ptr<GeomAPI_Vertex> aRes(new GeomAPI_Vertex);
+  aRes->setImpl(new TopoDS_Shape(aVertex));
+  return aRes;
+}
 
 std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_PointBuilder::point(std::shared_ptr<GeomAPI_Shape> theVertex)
 {

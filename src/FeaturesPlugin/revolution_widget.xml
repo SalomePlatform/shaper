@@ -20,22 +20,22 @@
       </shape_selector>
       <groupbox>
         <doublevalue
-          id="from_angle"
-          label="Angle"
-          step="1.0"
-          default="0"
-          icon=":icons/angle_down.png"
-          tooltip="From angle">
-        </doublevalue>
-      </groupbox>
-      <groupbox>
-        <doublevalue
           id="to_angle"
           label="Angle"
           step="1.0"
           default="360"
           icon=":icons/angle_up.png"
           tooltip="To angle">
+        </doublevalue>
+      </groupbox>
+      <groupbox>
+        <doublevalue
+          id="from_angle"
+          label="Angle"
+          step="1.0"
+          default="0"
+          icon=":icons/angle_down.png"
+          tooltip="From angle">
         </doublevalue>
       </groupbox>
     </box>

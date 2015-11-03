@@ -39,6 +39,9 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   /// Returns the state whether the external object is used
   bool useExternal() const { return myUseExternal; }
 
+  /// Checks validity of the given object
+  /// \param theObject an object to check
+  /// \return valid or not valid
   bool isValidObject(const ObjectPtr& theObject);
 
   /// Finds or create and external object

@@ -22,7 +22,6 @@ class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
-class PartSet_LockApplyMgr;
 
 class QGroupBox;
 class QMouseEvent;
@@ -50,12 +49,10 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
 
-  /// Fills the widget with default values
-  virtual bool reset();
-
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped widget values
+  /// \param theToValidate a validation flag
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
@@ -86,6 +83,9 @@ Q_OBJECT
   /// Returns coordinate Y currently defined in the control
   double y() const;
 
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
@@ -109,19 +109,24 @@ protected:
 
   virtual bool restoreValueCustom();
 
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom();
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
   /// Returns true if the feature contains Point2D attribute with the same coordinates
   /// The attribute of the widget is not processed.
+  /// \param theFeature a feature
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   /// \return boolean result
   bool isFeatureContainsPoint(const FeaturePtr& theFeature, double theX, double theY);
 
-private slots:
+//private slots:
   /// Process value changed event
-  void onValuesChanged();
+  //void onValuesChanged();
 
  private:
    /// Returns point 2d from selected vertex
@@ -136,8 +141,10 @@ private slots:
    /// \theObject a result object
    void setConstraintWith(const ObjectPtr& theObject);
 
+protected:
   ModuleBase_IWorkshop* myWorkshop;
-  PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
+
+private:
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
   ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate

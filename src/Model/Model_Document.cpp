@@ -23,6 +23,7 @@
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
+#include <TDataStd_IntegerArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Reference.hxx>
@@ -53,7 +54,7 @@ static const int TAG_GENERAL = 1;  // general properties tag
 
 // general sub-labels
 static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
-static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the cransaction
+static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 
 Model_Document::Model_Document(const std::string theID, const std::string theKind)
@@ -299,6 +300,7 @@ void Model_Document::close(const bool theForever)
 
 void Model_Document::startOperation()
 {
+  incrementTransactionID(); // outside of transaction in order to avoid empty transactions keeping
   if (myDoc->HasOpenCommand()) {  // start of nested command
     if (myDoc->CommitCommand()) { // commit the current: it will contain all nested after compactification
       myTransactions.rbegin()->myOCAFNum++; // if has open command, the list is not empty
@@ -309,7 +311,6 @@ void Model_Document::startOperation()
     myDoc->NewCommand();
   }
   // starts a new operation
-  incrementTransactionID();
   myTransactions.push_back(Transaction());
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())++;
@@ -336,11 +337,100 @@ void Model_Document::compactNested()
   }
 }
 
+/// Compares the content ofthe given attributes, returns true if equal.
+/// This method is used to avoid empty transactions when only "current" is changed
+/// to some value and then comes back in this transaction, so, it compares only
+/// references and Boolean and Integer Arrays for the current moment.
+static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute) theAttr2)
+{
+  if (Standard_GUID::IsEqual(theAttr1->ID(), TDF_Reference::GetID())) { // reference
+    Handle(TDF_Reference) aRef1 = Handle(TDF_Reference)::DownCast(theAttr1);
+    Handle(TDF_Reference) aRef2 = Handle(TDF_Reference)::DownCast(theAttr2);
+    if (aRef1.IsNull() && aRef2.IsNull())
+      return true;
+    if (aRef1.IsNull() || aRef2.IsNull())
+      return false;
+    return aRef1->Get().IsEqual(aRef2->Get()) == Standard_True;
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_BooleanArray::GetID())) {
+    Handle(TDataStd_BooleanArray) anArr1 = Handle(TDataStd_BooleanArray)::DownCast(theAttr1);
+    Handle(TDataStd_BooleanArray) anArr2 = Handle(TDataStd_BooleanArray)::DownCast(theAttr2);
+    if (anArr1.IsNull() && anArr2.IsNull())
+      return true;
+    if (anArr1.IsNull() || anArr2.IsNull())
+      return false;
+    if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
+      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
+        if (anArr1->Value(a) != anArr2->Value(a))
+          return false;
+      return true;
+    }
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_IntegerArray::GetID())) {
+    Handle(TDataStd_IntegerArray) anArr1 = Handle(TDataStd_IntegerArray)::DownCast(theAttr1);
+    Handle(TDataStd_IntegerArray) anArr2 = Handle(TDataStd_IntegerArray)::DownCast(theAttr2);
+    if (anArr1.IsNull() && anArr2.IsNull())
+      return true;
+    if (anArr1.IsNull() || anArr2.IsNull())
+      return false;
+    if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
+      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
+        if (anArr1->Value(a) != anArr2->Value(a)) {
+          // avoid the transaction ID checking
+          if (a == 2 && anArr1->Upper() == 2 && anArr2->Label().Tag() == 1 &&
+            (anArr2->Label().Depth() == 4 || anArr2->Label().Depth() == 6))
+            continue;
+          return false;
+        }
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Returns true if the last transaction is actually empty: modification to te same values 
+/// were performed only
+static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
+  Handle(TDF_Delta) aDelta;
+  aDelta = theDoc->GetUndos().Last();
+  TDF_LabelList aDeltaList;
+  aDelta->Labels(aDeltaList); // it clears list, so, use new one and then append to the result
+  for(TDF_ListIteratorOfLabelList aListIter(aDeltaList); aListIter.More(); aListIter.Next()) {
+    return false;
+  }
+  // add also label of the modified attributes
+  const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
+  for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
+    Handle(TDF_AttributeDelta)& anADelta = anAttr.Value();
+    if (!anADelta->Label().IsNull() && !anADelta->Attribute().IsNull()) {
+      Handle(TDF_Attribute) aCurrentAttr;
+      if (anADelta->Label().FindAttribute(anADelta->Attribute()->ID(), aCurrentAttr)) {
+        if (isEqualContent(anADelta->Attribute(), aCurrentAttr)) {
+          continue; // attribute is not changed actually
+        }
+      }
+    }
+    return false;
+  }
+  return true;
+}
+
 bool Model_Document::finishOperation()
 {
   bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
   static std::shared_ptr<Model_Session> aSession = 
     std::static_pointer_cast<Model_Session>(Model_Session::get());
+  // do it before flashes to enable and recompute nesting features correctly
+  if (myNestedNum.empty() || (isNestedClosed && myNestedNum.size() == 1)) {
+    // if all nested operations are closed, make current the higher level objects (to perform 
+    // it in the python scripts correctly): sketch become current after creation ofsub-elements
+    FeaturePtr aCurrent = currentFeature(false);
+    CompositeFeaturePtr aMain, aNext = ModelAPI_Tools::compositeOwner(aCurrent);
+    while(aNext.get()) {
+      aMain = aNext;
+      aNext = ModelAPI_Tools::compositeOwner(aMain);
+    }
+    if (aMain.get() && aMain != aCurrent)
+      setCurrentFeature(aMain, false);
+  }
   myObjs->synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -370,8 +460,13 @@ bool Model_Document::finishOperation()
 
   // transaction may be empty if this document was created during this transaction (create part)
   if (!myTransactions.empty() && myDoc->CommitCommand()) { // if commit is successfull, just increment counters
-    myTransactions.rbegin()->myOCAFNum++;
-    aResult = true;
+    if (isEmptyTransaction(myDoc)) { // erase this transaction
+      myDoc->Undo();
+      myDoc->ClearRedos();
+    } else {
+      myTransactions.rbegin()->myOCAFNum++;
+      aResult = true;
+    }
   }
 
   if (isNestedClosed) {
@@ -739,8 +834,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
     TDF_Label aLab = aRef->Get();
     FeaturePtr aResult = myObjs->feature(aLab);
     if (theVisible) { // get nearest visible (in history) going up
-      while(aResult.get() &&  // sub-composites are never in history
-             (!aResult->isInHistory() || ModelAPI_Tools::compositeOwner(aResult).get())) {
+      while(aResult.get() &&  !aResult->isInHistory()) {
         aResult = myObjs->nextFeature(aResult, true);
       }
     }
@@ -749,8 +843,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
   return std::shared_ptr<ModelAPI_Feature>(); // null feature means the higher than first
 }
 
-void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
-  const bool theVisible, const bool theFlushUpdates)
+void Model_Document::setCurrentFeature(
+  std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theVisible)
 {
   // blocks the flush signals to avoid each objects visualization in the viewer
   // they should not be shown once after all modifications are performed
@@ -759,20 +853,16 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
 
   TDF_Label aRefLab = generalLabel().FindChild(TAG_CURRENT_FEATURE);
   CompositeFeaturePtr aMain; // main feature that may nest the new current
+  std::set<FeaturePtr> anOwners; // composites that contain theCurrent (with any level of nesting)
   if (theCurrent.get()) {
     aMain = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theCurrent);
-    if (!aMain.get()) {
-      // if feature nests into compisite feature, make the composite feature as current
-      const std::set<AttributePtr>& aRefsToMe = theCurrent->data()->refsToMe();
-      std::set<AttributePtr>::const_iterator aRefToMe = aRefsToMe.begin();
-      for(; aRefToMe != aRefsToMe.end(); aRefToMe++) {
-        CompositeFeaturePtr aComposite = 
-          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*aRefToMe)->owner());
-        if (aComposite.get() && aComposite->isSub(theCurrent)) {
-          aMain = aComposite;
-          break;
-        }
+    CompositeFeaturePtr anOwner = ModelAPI_Tools::compositeOwner(theCurrent);
+    while(anOwner.get()) {
+      if (!aMain.get()) {
+        aMain = anOwner;
       }
+      anOwners.insert(anOwner);
+      anOwner = ModelAPI_Tools::compositeOwner(anOwner);
     }
   }
 
@@ -817,8 +907,13 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
     if (anIter == theCurrent) aPassed = true;
 
     bool aDisabledFlag = !aPassed;
-    if (aMain.get() && aMain->isSub(anIter)) // sub-elements of not-disabled feature are not disabled
-      aDisabledFlag = false;
+    if (aMain.get()) {
+      if (aMain->isSub(anIter)) // sub-elements of not-disabled feature are not disabled
+        aDisabledFlag = false;
+      else if (anOwners.find(anIter) != anOwners.end()) // disable the higher-level feature is the nested is the current
+        aDisabledFlag = true;
+    }
+
     if (anIter->getKind() == "Parameter") {// parameters are always out of the history of features, but not parameters
       if (theCurrent.get() && theCurrent->getKind() != "Parameter")
         aDisabledFlag = false;
@@ -844,12 +939,6 @@ void Model_Document::setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurr
   }
   // unblock  the flush signals and up them after this
   aLoop->activateFlushes(isActive);
-
-  if (theFlushUpdates) {
-    aLoop->flush(aCreateEvent);
-    aLoop->flush(aRedispEvent);
-    aLoop->flush(aDeleteEvent);
-  }
 }
 
 void Model_Document::setCurrentFeatureUp()
@@ -860,7 +949,7 @@ void Model_Document::setCurrentFeatureUp()
   if (aCurrent.get()) { // if not, do nothing because null is the upper
     FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
     // do not flush: it is called only on remove, it will be flushed in the end of transaction
-    setCurrentFeature(aPrev, false, false);
+    setCurrentFeature(aPrev, false);
   }
 }
 
@@ -961,6 +1050,17 @@ void Model_Document::setActive(const bool theFlag)
         std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
         for(; aRes != aResList.end(); aRes++) {
           ModelAPI_EventCreator::get()->sendUpdated(*aRes, aRedispEvent);
+          // #issue 1048: sub-compsolids also
+          ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRes);
+          if (aCompRes.get()) {
+            int aNumSubs = aCompRes->numberOfSubs();
+            for(int a = 0; a < aNumSubs; a++) {
+              ResultPtr aSub = aCompRes->subResult(a);
+              if (aSub.get()) {
+                ModelAPI_EventCreator::get()->sendUpdated(aSub, aRedispEvent);
+              }
+            }
+          }
         }
       }
     }

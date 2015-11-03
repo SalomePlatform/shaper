@@ -23,16 +23,22 @@ class NewGeom_NestedButton : public QWidgetAction
 {
   Q_OBJECT
  public:
-  NewGeom_NestedButton(QObject *parent, const QList<QAction*>& theNestedActions);
+   /// Constructor
+   /// \param theParent a parent objects
+   /// \param theNestedActions a list of nested actions
+  NewGeom_NestedButton(QObject* theParent, const QList<QAction*>& theNestedActions);
   virtual ~NewGeom_NestedButton();
 
  private slots:
   /// Shows/hides the additional buttons widget
   void showAdditionalButtons(bool);
+
+  /// Slot called on action state
   void actionStateChanged();
 
  protected:
   /// Creates the button representation
+  /// \param theParent a parent widget
   virtual QWidget * createWidget(QWidget * theParent);
 
  private:

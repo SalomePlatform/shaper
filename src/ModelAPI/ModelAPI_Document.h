@@ -103,9 +103,8 @@ public:
   //! will be appended after this one.
   //! \param theCurrent the selected feature as current: blow it everythin become disabled
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
-  //! \param theFlushUpdates if it is true (default) it flashes creation/redisplay/delete messages
   virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
-    const bool theVisible, const bool theFlushUpdates = true) = 0;
+    const bool theVisible) = 0;
   //! Makes the current feature one feature upper
   virtual void setCurrentFeatureUp() = 0;
 

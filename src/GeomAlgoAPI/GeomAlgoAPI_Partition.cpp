@@ -11,9 +11,22 @@
 
 #include <GEOMAlgo_Splitter.hxx>
 
+#include <Bnd_Box.hxx>
+#include <BRep_Tool.hxx>
+#include <BRepBndLib.hxx>
 #include <BRepCheck_Analyzer.hxx>
+#include <BRepLib_MakeFace.hxx>
+#include <BRepTools.hxx>
+#include <Geom_Plane.hxx>
+#include <GeomLib_IsPlanarSurface.hxx>
+#include <GeomLib_Tool.hxx>
+#include <IntAna_IntConicQuad.hxx>
+#include <IntAna_Quadric.hxx>
+#include <Precision.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS_Face.hxx>
 #include <TopTools_ListOfShape.hxx>
 
 //=================================================================================================
@@ -48,15 +61,65 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   GEOMAlgo_Splitter* anOperation = new GEOMAlgo_Splitter;
   myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation, GeomAlgoAPI_MakeShape::BOPAlgoBuilder));
 
+  // Bounding box of all objects.
+  Bnd_Box aBndBox;
+
   // Getting objects.
   for (ListOfShape::const_iterator anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
+    BRepBndLib::Add(aShape, aBndBox);
     anOperation->AddArgument(aShape);
+  }
+
+  // We enlarge bounding box just to be sure that plane will be large enough to cut all objects.
+  aBndBox.Enlarge(1.0);
+  Standard_Real aXArr[2] = {aBndBox.CornerMin().X(), aBndBox.CornerMax().X()};
+  Standard_Real aYArr[2] = {aBndBox.CornerMin().Y(), aBndBox.CornerMax().Y()};
+  Standard_Real aZArr[2] = {aBndBox.CornerMin().Z(), aBndBox.CornerMax().Z()};
+  gp_Pnt aPoints[8];
+  int aNum = 0;
+  for(int i = 0; i < 2; i++) {
+    for(int j = 0; j < 2; j++) {
+      for(int k = 0; k < 2; k++) {
+        aPoints[aNum] = gp_Pnt(aXArr[i], aYArr[j], aZArr[k]);
+        aNum++;
+      }
+    }
   }
 
   // Getting tools.
   for (ListOfShape::const_iterator aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++) {
-    const TopoDS_Shape& aShape = (*aToolsIt)->impl<TopoDS_Shape>();
+    TopoDS_Shape aShape = (*aToolsIt)->impl<TopoDS_Shape>();
+    if(aShape.ShapeType() == TopAbs_FACE) {
+      TopoDS_Face aFace = TopoDS::Face(aShape);
+      Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
+      if (!aSurf.IsNull()) {
+        GeomLib_IsPlanarSurface isPlanar(aSurf);
+        if(isPlanar.IsPlanar()) {
+          Standard_Real UMin, UMax, VMin, VMax;
+          BRepTools::UVBounds(aFace, UMin, UMax, VMin, VMax);
+          if(UMin == -Precision::Infinite() && UMax == Precision::Infinite() &&
+            VMin == -Precision::Infinite() && VMax == Precision::Infinite()) {
+            const gp_Pln& aFacePln = isPlanar.Plan();
+            Handle(Geom_Plane) aFacePlane = new Geom_Plane(aFacePln);
+            IntAna_Quadric aQuadric(aFacePln);
+            UMin = UMax = VMin = VMax = 0;
+            for(int i = 0; i < 8; i++) {
+              gp_Lin aLin(aPoints[i], aFacePln.Axis().Direction());
+              IntAna_IntConicQuad anIntAna(aLin, aQuadric);
+              const gp_Pnt& aPntOnFace = anIntAna.Point(1);
+              Standard_Real aPntU(0), aPntV(0);
+              GeomLib_Tool::Parameters(aFacePlane, aPntOnFace, Precision::Confusion(), aPntU, aPntV);
+              if(aPntU < UMin) UMin = aPntU;
+              if(aPntU > UMax) UMax = aPntU;
+              if(aPntV < VMin) VMin = aPntV;
+              if(aPntV > VMax) VMax = aPntV;
+            }
+            aShape = BRepLib_MakeFace(aFacePln, UMin, UMax, VMin, VMax).Face();
+          }
+        }
+      }
+    }
     anOperation->AddTool(aShape);
   }
 

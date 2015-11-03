@@ -55,11 +55,18 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   gp_Pnt aPnt1, aPnt2;
   if (!getPoints(aPnt1, aPnt2))
     return;
-  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
-  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
 
+  // compute flyout distance
+  double aD = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
   SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
+
+  // Update variable aspect parameters (depending on viewer scale)
+  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+  // The value of vertical aligment is sometimes changed
+  myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
+
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
 
@@ -67,6 +74,7 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
 {
   DataPtr aData = myConstraint->data();
   if (myConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
+    // The constraint is length
     std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
       (aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
@@ -77,6 +85,7 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
     if (!aFeature || aFeature->getKind() != SketchPlugin_Line::ID())
       return false;
 
+    // Get geometry of the object
     DataPtr aLineData = aFeature->data();
     std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = 
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
@@ -89,6 +98,7 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
     return true;
 
   } else if (myConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
+    // The constraint is distance
     std::shared_ptr<GeomDataAPI_Point2D> aPoint_A = SketcherPrs_Tools::getFeaturePoint(
         aData, SketchPlugin_Constraint::ENTITY_A(), myPlane);
     std::shared_ptr<GeomDataAPI_Point2D> aPoint_B = SketcherPrs_Tools::getFeaturePoint(
@@ -97,9 +107,11 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
     std::shared_ptr<GeomAPI_Pnt2d> aPnt_A;
     std::shared_ptr<GeomAPI_Pnt2d> aPnt_B;
     if (aPoint_A && aPoint_B) {
+      // Both objects are points
       aPnt_A = aPoint_A->pnt();
       aPnt_B = aPoint_B->pnt();
     } else if (!aPoint_A && aPoint_B) {
+      // First object is line
       FeaturePtr aLine = SketcherPrs_Tools::getFeatureLine(
           aData, SketchPlugin_Constraint::ENTITY_A());
       if (aLine) {
@@ -107,6 +119,7 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
         aPnt_A = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_B);
       }
     } else if (aPoint_A && !aPoint_B) {
+      // Second object is line
       FeaturePtr aLine = SketcherPrs_Tools::getFeatureLine(
           aData, SketchPlugin_Constraint::ENTITY_B());
       if (aLine) {
@@ -114,9 +127,10 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
         aPnt_B = SketcherPrs_Tools::getProjectionPoint(aLine, aPnt_A);
       }
     }
-    if (!aPnt_A || !aPnt_B)
+    if (!aPnt_A || !aPnt_B) // Objects not found
       return false;
 
+    // Get points from these objects
     std::shared_ptr<GeomAPI_Pnt> aPoint1 = myPlane->to3D(aPnt_A->x(), aPnt_A->y());
     std::shared_ptr<GeomAPI_Pnt> aPoint2 = myPlane->to3D(aPnt_B->x(), aPnt_B->y());
     thePnt1 = aPoint1->impl<gp_Pnt>();
@@ -131,6 +145,7 @@ bool SketcherPrs_LengthDimension::getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2)
 void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                                    const Standard_Integer theMode)
 {
+  // Map the application selection modes to standard ones
   Standard_Integer aMode;
   switch (theMode) {
   case 0: // we should use selection of all objects

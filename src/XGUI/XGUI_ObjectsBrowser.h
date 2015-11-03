@@ -11,12 +11,71 @@
 
 #include <QWidget>
 #include <QTreeView>
+#include <QLineEdit>
 
 class ModuleBase_IDocumentDataModel;
-class QLineEdit;
 class XGUI_DataModel;
 
-//#define ModuleDataModel
+/**
+* \ingroup GUI
+* Implementation of root label in Object Browser
+*/
+class XGUI_ActiveDocLbl: public QLineEdit
+{
+Q_OBJECT
+ public:
+   /// Constructor
+   /// \param theParent a parent widget
+   XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent );
+
+   void setTreeView(QTreeView* theView);
+
+   QTreeView* treePalette() const { return myTreeView;}
+
+#if (!defined HAVE_SALOME) && (defined WIN32)
+   virtual bool event(QEvent* theEvent);
+#endif
+
+public slots:
+  void unselect();
+
+protected:
+  virtual void mouseReleaseEvent( QMouseEvent* e);
+
+  bool eventFilter(QObject* theObj, QEvent* theEvent);
+
+private:
+  QString myPreSelectionStyle;
+  QString myNeutralStyle;
+  QString mySelectionStyle;
+
+  QTreeView* myTreeView;
+  bool myIsSelected;
+};
+
+
+#if (!defined HAVE_SALOME) && (defined WIN32)
+#include <QWindowsVistaStyle>
+/**
+* \ingroup GUI
+* Implementation of XGUI_DataTree custom style
+*/
+class XGUI_TreeViewStyle : public QWindowsVistaStyle
+{
+  Q_OBJECT
+public:
+  XGUI_TreeViewStyle() : QWindowsVistaStyle() {}
+
+  void drawPrimitive(PrimitiveElement theElement, const QStyleOption* theOption,
+                     QPainter* thePainter, const QWidget* theWidget = 0) const;
+
+  void setIndex(const QModelIndex& theIndex) { myIndex = theIndex; }
+  QModelIndex index() const { return myIndex; }
+
+private:
+  QModelIndex myIndex;
+};
+#endif
 
 /**
 * \ingroup GUI
@@ -33,7 +92,7 @@ Q_OBJECT
   virtual ~XGUI_DataTree();
 
   /// Returns current data model
-  ModuleBase_IDocumentDataModel* dataModel() const;
+  XGUI_DataModel* dataModel() const;
 
 signals:
   //! Emited on context menu request
@@ -47,6 +106,7 @@ public slots:
   /// Commit modified data (used for renaming of objects)
   virtual void commitData(QWidget* theEditor);
 
+  /// A slot which is called on mouse double click
   void onDoubleClick(const QModelIndex&);
 
  protected:
@@ -56,6 +116,13 @@ public slots:
    /// Redefinition of virtual method
   virtual void resizeEvent(QResizeEvent* theEvent);
 
+#if (!defined HAVE_SALOME) && (defined WIN32)
+  virtual void drawRow(QPainter* thePainter,
+                        const QStyleOptionViewItem& theOptions,
+                        const QModelIndex& theIndex) const;
+private:
+  XGUI_TreeViewStyle* myStyle;
+#endif
 };
 
 /**\class XGUI_ObjectsBrowser
@@ -72,17 +139,10 @@ Q_OBJECT
   virtual ~XGUI_ObjectsBrowser();
 
   //! Returns Model which provides access to data objects
-#ifdef ModuleDataModel
-  ModuleBase_IDocumentDataModel* dataModel() const
-  {
-    return myDocModel;
-  }
-#else
   XGUI_DataModel* dataModel() const
   {
     return myDocModel;
   }
-#endif
 
   //! Returns list of currently selected objects
   //! \param theIndexes - output list of corresponded indexes (can be NULL)
@@ -113,11 +173,6 @@ Q_OBJECT
   /// Resets the object browser into initial state
   void clearContent();
 
-  /// Set Data Model for the Object Browser
-#ifdef ModuleDataModel
-  void setDataModel(ModuleBase_IDocumentDataModel* theModel);
-#endif
-
 public slots:
   //! Called on Edit command request
   void onEditItem();
@@ -132,10 +187,6 @@ signals:
   //! Segnal is emitted when user cliks by mouse in header label of object browser
   void headerMouseDblClicked(const QModelIndex&);
 
- protected:
-   /// Redefinition of virtual method
-  virtual bool eventFilter(QObject* obj, QEvent* theEvent);
-
  private slots:
   /// Show context menu
   /// \param theEvent a context menu event
@@ -149,15 +200,10 @@ signals:
   void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
  private:
-  void closeDocNameEditing(bool toSave);
 
   //! Internal model
-#ifdef ModuleDataModel
-  ModuleBase_IDocumentDataModel* myDocModel;
-#else
   XGUI_DataModel* myDocModel;
-#endif
-  QLineEdit* myActiveDocLbl;
+  XGUI_ActiveDocLbl* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 };
 

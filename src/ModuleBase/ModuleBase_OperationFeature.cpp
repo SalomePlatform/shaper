@@ -26,6 +26,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -77,6 +78,9 @@ void ModuleBase_OperationFeature::startOperation()
   FeaturePtr aFeature = feature();
   if (!aFeature.get() || !isEditOperation())
     return;
+
+  if (aFeature.get() && isEditOperation())
+    aFeature->setStable(false);
 
   myVisualizedObjects.clear();
   // store hidden result features
@@ -179,6 +183,7 @@ void ModuleBase_OperationFeature::start()
   }
   ModelAPI_Session::get()->startOperation(anId.toStdString());
 
+  emit beforeStarted();
   startOperation();
 
   if (!myIsEditing) {
@@ -192,29 +197,15 @@ void ModuleBase_OperationFeature::start()
       return;
     }
   }
-  /// Set current feature and remeber old current feature
-  if (myIsEditing) {
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->activeDocument();
-    // the parameter of current feature should be false, we should use all feature, not only visible
-    // in order to correctly save the previous feature of the nested operation, where the
-    // features can be not visible in the tree. The problem case is Edit sketch entitity(line)
-    // in the Sketch, created in ExtrusionCut operation. The entity disappears by commit.
-    // When sketch entity operation started, the sketch should be cashed here as the current.
-    // Otherwise(the flag is true), the ExtrusionCut is cashed, when commit happens, the sketch
-    // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
-    // As a result the sketch disappears from the viewer. However after commit it is displayed back.
-    myPreviousCurrentFeature = aDoc->currentFeature(false);
-    aDoc->setCurrentFeature(feature(), false);
-  }
-
-  startOperation();
+  //Already called startOperation();
   emit started();
 
 }
 
 void ModuleBase_OperationFeature::abort()
 {
+  emit beforeAborted();
+
   // the viewer update should be blocked in order to avoid the features blinking before they are
   // hidden
   std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
@@ -230,21 +221,12 @@ void ModuleBase_OperationFeature::abort()
   if (aPropertyPanel)
     aPropertyPanel->cleanContent();
 
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (myIsEditing) {
-    DocumentPtr aDoc = aMgr->activeDocument();
-    bool aIsOp = aMgr->isOperation();
-    if (!aIsOp)
-      aMgr->startOperation();
-    aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
-    if (!aIsOp)
-      aMgr->finishOperation();
-    myPreviousCurrentFeature = FeaturePtr();
-  }
-  abortOperation();
+  myFeature->setStable(true);
 
+  abortOperation();
   stopOperation();
 
+  SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->abortOperation();
   emit stopped();
   // the viewer update should be unblocked in order to avoid the features blinking before they are
@@ -269,18 +251,12 @@ bool ModuleBase_OperationFeature::commit()
     if (aPropertyPanel)
       aPropertyPanel->cleanContent();
 
+    myFeature->setStable(true);
+
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
-    if (myIsEditing) {
-      DocumentPtr aDoc = aMgr->activeDocument();
-      bool aIsOp = aMgr->isOperation();
-      if (!aIsOp)
-        aMgr->startOperation();
-      aDoc->setCurrentFeature(myPreviousCurrentFeature, true);
-      if (!aIsOp)
-        aMgr->finishOperation();
-      myPreviousCurrentFeature = FeaturePtr();
-    }
+
+    emit beforeCommitted();
     commitOperation();
     aMgr->finishOperation();
 
@@ -298,6 +274,8 @@ void ModuleBase_OperationFeature::activateByPreselection()
 {
   if (myPreSelection.empty())
     return;
+
+  ModuleBase_ISelection::filterSelectionOnEqualPoints(myPreSelection);
 
   ModuleBase_ModelWidget* aFilledWgt = 0;
   ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();
@@ -348,6 +326,16 @@ void ModuleBase_OperationFeature::setParentFeature(CompositeFeaturePtr theParent
 CompositeFeaturePtr ModuleBase_OperationFeature::parentFeature() const
 {
   return myParentFeature;
+}
+
+void ModuleBase_OperationFeature::setPreviousCurrentFeature(const FeaturePtr& theFeature)
+{
+  myPreviousCurrentFeature = theFeature;
+}
+
+FeaturePtr ModuleBase_OperationFeature::previousCurrentFeature()
+{
+  return myPreviousCurrentFeature;
 }
 
 void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelection,

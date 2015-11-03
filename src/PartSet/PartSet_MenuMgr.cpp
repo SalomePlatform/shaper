@@ -29,7 +29,6 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_DataModel.h>
-#include <XGUI_ObjectsBrowser.h>
 #include <XGUI_OperationMgr.h>
 
 #include <Events_Loop.h>
@@ -257,48 +256,46 @@ QColor PartSet_MenuMgr::setLineColor(int theId, const QColor theColor, bool theU
 }
 
 
+void addRefCoincidentFeatures(const std::set<AttributePtr>& theRefList, 
+  std::shared_ptr<GeomAPI_Pnt2d>& theRefPnt,
+  QObjectPtrList& theOutList)
+{
+  std::set<AttributePtr>::const_iterator aIt;
+  for (aIt = theRefList.cbegin(); aIt != theRefList.cend(); ++aIt) {
+    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt = PartSet_Tools::getCoincedencePoint(aConstrFeature);
+      if (aPnt.get() == NULL)
+        return;
+      gp_Pnt aP = aPnt->impl<gp_Pnt>();
+      if (theRefPnt->isEqual(aPnt) && (!theOutList.contains(aConstrFeature))) {
+        theOutList.append(aConstrFeature);
+      } 
+    }
+  }
+}
+
 void PartSet_MenuMgr::onLineDetach(QAction* theAction)
 {
   int aId = theAction->data().toInt();
   FeaturePtr aLine = myCoinsideLines.at(aId);
-  std::shared_ptr<GeomAPI_Pnt2d> aOrig = PartSet_Tools::getPoint(mySelectedFeature,
-                                                        SketchPlugin_ConstraintCoincidence::ENTITY_A());
-  if (aOrig.get() == NULL)
-    aOrig = PartSet_Tools::getPoint(mySelectedFeature,
-                                    SketchPlugin_ConstraintCoincidence::ENTITY_B());
+  std::shared_ptr<GeomAPI_Pnt2d> aOrig = PartSet_Tools::getCoincedencePoint(mySelectedFeature);
+  if (!aOrig.get())
+    return;
   
-  gp_Pnt aOr = aOrig->impl<gp_Pnt>();
   const std::set<AttributePtr>& aRefsList = aLine->data()->refsToMe();
 
   QObjectPtrList aToDelFeatures;
-  std::set<AttributePtr>::const_iterator aIt;
-  // Find all coincedences corresponded to the selected line in the selected point
-  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt = PartSet_Tools::getPoint(aConstrFeature,
-                                            SketchPlugin_ConstraintCoincidence::ENTITY_A());
-      if (aPnt.get() == NULL)
-        aPnt = PartSet_Tools::getPoint(aConstrFeature,
-                                       SketchPlugin_ConstraintCoincidence::ENTITY_B());
-      if (aPnt.get() == NULL)
-        return;
-      gp_Pnt aP = aPnt->impl<gp_Pnt>();
-      if (aOrig->isEqual(aPnt)) {
-        aToDelFeatures.append(aConstrFeature);
-      } else {
-        aPnt = PartSet_Tools::getPoint(aConstrFeature,
-                                       SketchPlugin_ConstraintCoincidence::ENTITY_B());
-        if (aPnt.get() == NULL)
-          return;
-        aP = aPnt->impl<gp_Pnt>();
-        if (aOrig->isEqual(aPnt)) {
-          aToDelFeatures.append(aConstrFeature);
-          break;
-        }
-      }
-    }
+
+  addRefCoincidentFeatures(aRefsList, aOrig, aToDelFeatures);
+
+  const std::list<ResultPtr>& aResults = aLine->results();
+  std::list<ResultPtr>::const_iterator aResIt;
+  for (aResIt = aResults.cbegin(); aResIt != aResults.cend(); aResIt++) {
+    ResultPtr aResult = (*aResIt);
+    const std::set<AttributePtr>& aRefList = aResult->data()->refsToMe();
+    addRefCoincidentFeatures(aRefList, aOrig, aToDelFeatures);
   }
   if (aToDelFeatures.size() > 0) {
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
@@ -312,7 +309,7 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
     // in order to do not abort/commit it
-    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+    if (!anOpMgr->canStartOperation(tr("Detach")))
       return; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -370,7 +367,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
     anOpAction = new ModuleBase_OperationAction(anAction->text(), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
 
-    if (!anOpMgr->canStartOperation(anOpAction->id(), isSketchOp/*granted*/))
+    if (!anOpMgr->canStartOperation(anOpAction->id()))
       return; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -488,6 +485,15 @@ void PartSet_MenuMgr::activatePartSet() const
   if (isNewTransaction) aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
   if (isNewTransaction) aMgr->finishOperation();
+}
+
+void PartSet_MenuMgr::grantedOperationIds(ModuleBase_Operation* theOperation,
+                                          QStringList& theIds) const
+{
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
+    theIds.append(tr("Detach"));
+    theIds.append(tr("Auxiliary"));
+  }
 }
 
 void PartSet_MenuMgr::onEdit(bool)

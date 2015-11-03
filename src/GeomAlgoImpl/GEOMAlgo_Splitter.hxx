@@ -48,51 +48,66 @@
 //class    : GEOMAlgo_Splitter
 //purpose  :
 //=======================================================================
-class GEOMAlgo_Splitter : public BOPAlgo_Builder
+/*!
+ * \class GEOMAlgo_Splitter
+ * \ingroup DataAlgo
+ * A class for shapes partitioning
+ */
+ class GEOMAlgo_Splitter : public BOPAlgo_Builder
 {
  public:
+  /// Constructor
+  GEOMALGOIMPL_EXPORT GEOMAlgo_Splitter();
+
+  /// Constructor
+  /// \param theAllocator an allocator object
+  GEOMALGOIMPL_EXPORT GEOMAlgo_Splitter(const Handle(NCollection_BaseAllocator)& theAllocator);
   
-  GEOMALGOIMPL_EXPORT
-    GEOMAlgo_Splitter();
+  GEOMALGOIMPL_EXPORT virtual ~GEOMAlgo_Splitter();
 
-  GEOMALGOIMPL_EXPORT
-    GEOMAlgo_Splitter(const Handle(NCollection_BaseAllocator)& theAllocator);
-  
-  GEOMALGOIMPL_EXPORT
-    virtual ~GEOMAlgo_Splitter();
+  /// Add a tool shape
+  /// \param theShape a tool shape
+  GEOMALGOIMPL_EXPORT void AddTool(const TopoDS_Shape& theShape);
 
-  GEOMALGOIMPL_EXPORT
-    void AddTool(const TopoDS_Shape& theShape);
+  /// Returns list of tool shapes
+  GEOMALGOIMPL_EXPORT const BOPCol_ListOfShape& Tools()const;
 
-  GEOMALGOIMPL_EXPORT
-    const BOPCol_ListOfShape& Tools()const;
+  /// Set type of used shapes
+  /// \param aLimit a shape type
+  GEOMALGOIMPL_EXPORT void SetLimit(const TopAbs_ShapeEnum aLimit);
 
-  GEOMALGOIMPL_EXPORT
-    void SetLimit(const TopAbs_ShapeEnum aLimit);
+  /// Returns defined limit type
+  GEOMALGOIMPL_EXPORT TopAbs_ShapeEnum Limit()const;
 
-  GEOMALGOIMPL_EXPORT
-    TopAbs_ShapeEnum Limit()const;
+  /// Set mode (0 or 1) of limit
+  /// \param aMode the mode value
+  GEOMALGOIMPL_EXPORT void SetLimitMode(const Standard_Integer aMode);
 
-  GEOMALGOIMPL_EXPORT
-    void SetLimitMode(const Standard_Integer aMode);
+  /// Returns mode of limit
+  GEOMALGOIMPL_EXPORT Standard_Integer LimitMode()const;
 
-  GEOMALGOIMPL_EXPORT
-    Standard_Integer LimitMode()const;
-
-  GEOMALGOIMPL_EXPORT
-    virtual void Clear();
+  /// Clears all tool shapes
+  GEOMALGOIMPL_EXPORT virtual void Clear();
 
  protected:
-  GEOMALGOIMPL_EXPORT
-    virtual void BuildResult(const TopAbs_ShapeEnum theType);
+   /// Build result.
+   /// \param theType a type of limit
+  GEOMALGOIMPL_EXPORT virtual void BuildResult(const TopAbs_ShapeEnum theType);
 
-  GEOMALGOIMPL_EXPORT
-    virtual void PostTreat();
+  /// Post processing of the calculation
+  GEOMALGOIMPL_EXPORT virtual void PostTreat();
   
  protected:
+   /// List of tools
   BOPCol_ListOfShape myTools; 
+
+  /// Map of tools
   BOPCol_MapOfShape myMapTools;        
+
+  /// A limit type
   TopAbs_ShapeEnum myLimit;   
+
+  /// A limit mode
   Standard_Integer myLimitMode;  
 };
 

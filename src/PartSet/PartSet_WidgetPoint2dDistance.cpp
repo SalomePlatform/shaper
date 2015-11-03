@@ -6,7 +6,6 @@
 
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
-#include "PartSet_LockApplyMgr.h"
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_IWorkshop.h>
@@ -29,13 +28,7 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              const std::string& theParentId)
  : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId), myWorkshop(theWorkshop)
 {
-  myLockApplyMgr = new PartSet_LockApplyMgr(theParent, myWorkshop);
-
   myFirstPntName = theData->getProperty("first_point");
-
-  // Reconnect to local slot
-  disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
-  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
@@ -74,19 +67,16 @@ void PartSet_WidgetPoint2dDistance::activateCustom()
           this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-
-  myLockApplyMgr->activate();
 }
 
 void PartSet_WidgetPoint2dDistance::deactivate()
 {
+  ModuleBase_ModelWidget::deactivate();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
   disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-
-  myLockApplyMgr->deactivate();
 }
 
 void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -122,12 +112,19 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, aY);
 
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
+  bool isBlocked = blockValueState(true);
   setPoint(feature(), aPnt);
+  blockValueState(isBlocked);
+  setValueState(ModifiedInViewer);
 }
 
-void PartSet_WidgetPoint2dDistance::onValuesChanged()
+bool PartSet_WidgetPoint2dDistance::processEnter()
 {
-  myLockApplyMgr->valuesChanged();
-  emit valuesChanged();
+  bool isModified = mySpinBox->isModified();
+  if (isModified) {
+    emit valuesChanged();
+    mySpinBox->clearModified();
+    mySpinBox->selectAll();
+  }
+  return isModified;
 }
-

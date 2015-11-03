@@ -11,7 +11,6 @@ SET(PROJECT_HEADERS
   ModuleBase_Filter.h
   ModuleBase_FilterFactory.h
   ModuleBase_FilterValidated.h
-  ModuleBase_IDocumentDataModel.h
   ModuleBase_IErrorMgr.h
   ModuleBase_IModule.h
   ModuleBase_IPrefMgr.h
@@ -63,7 +62,6 @@ SET(PROJECT_SOURCES
   ModuleBase_Filter.cpp
   ModuleBase_FilterFactory.cpp
   ModuleBase_FilterValidated.cpp
-  ModuleBase_IDocumentDataModel.cpp
   ModuleBase_IErrorMgr.cpp
   ModuleBase_IModule.cpp
   ModuleBase_IPrefMgr.cpp
@@ -84,7 +82,6 @@ SET(PROJECT_SOURCES
   ModuleBase_ParamSpinBox.cpp
   ModuleBase_Preferences.cpp
   ModuleBase_ResultPrs.cpp
-  ModuleBase_SelectionValidator.cpp
   ModuleBase_ToolBox.cpp
   ModuleBase_Tools.cpp
   ModuleBase_ViewerFilters.cpp
@@ -116,7 +113,6 @@ SET(PROJECT_LIBRARIES
 	GeomAPI
 	GeomDataAPI
 	GeomAlgoAPI
-	GeomValidators
 	${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
@@ -144,7 +140,6 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
-    ${CMAKE_SOURCE_DIR}/src/GeomValidators
     ${SUIT_INCLUDE}
 )
 

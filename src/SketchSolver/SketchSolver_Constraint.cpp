@@ -221,8 +221,11 @@ void SketchSolver_Constraint::update(ConstraintPtr theConstraint)
   std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
   for (; aCIter != mySlvsConstraints.end(); aCIter++) {
     Slvs_Constraint aConstraint = myStorage->getConstraint(*aCIter);
-    if (aValueAttr)
+    if (aValueAttr) {
       aConstraint.valA = aValue;
+      if (aConstraint.type == SLVS_C_DIAMETER)
+        aConstraint.valA *= 2.0;
+    }
     Slvs_hEntity* aCoeffs[6] = {
         &aConstraint.ptA, &aConstraint.ptB,
         &aConstraint.entityA, &aConstraint.entityB,
@@ -644,15 +647,16 @@ Slvs_hEntity SketchSolver_Constraint::getId(FeaturePtr theFeature) const
   std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFIter = myFeatureMap.find(theFeature);
   if (aFIter == myFeatureMap.end())
     return SLVS_E_UNKNOWN;
-  // check the Feature is really in the storage
-  Slvs_Entity anEntity = myStorage->getEntity(aFIter->second);
-  if (anEntity.h == SLVS_E_UNKNOWN) {
-    // rebuild feature
-    int aType;
-    anEntity.h = const_cast<SketchSolver_Constraint*>(this)->changeEntity(aFIter->first, aType);
-    const_cast<SketchSolver_Constraint*>(this)->myFeatureMap[theFeature] = anEntity.h;
-  }
-  return anEntity.h;
+  //// check the Feature is really in the storage
+  //Slvs_Entity anEntity = myStorage->getEntity(aFIter->second);
+  //if (anEntity.h == SLVS_E_UNKNOWN) {
+  //  // rebuild feature
+  //  int aType;
+  //  anEntity.h = const_cast<SketchSolver_Constraint*>(this)->changeEntity(aFIter->first, aType);
+  //  const_cast<SketchSolver_Constraint*>(this)->myFeatureMap[theFeature] = anEntity.h;
+  //}
+  //return anEntity.h;
+  return aFIter->second;
 }
 
 Slvs_hEntity SketchSolver_Constraint::getId(AttributePtr theAttribute) const

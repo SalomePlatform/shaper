@@ -98,9 +98,12 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
         isCustomized = thePrs->setLineStyle(0) || isCustomized;
       }
     }
-    //else if (aShapeType == 7) { // otherwise this is a vertex
+    else if (aShapeType == 7) { // otherwise this is a vertex
+      // The width value do not have effect on the point presentation.
+      // It is defined in order to extend selection area of the object.
+      thePrs->setWidth(13);
     //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
-    //}
+    }
     return isCustomized;
   }
 

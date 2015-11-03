@@ -54,7 +54,7 @@ QString XGUI_EXPORT file(const QString& path, bool withExt = true);
  */
 QString XGUI_EXPORT addSlash(const QString& path);
 
-/// The model concerning tools
+// The model concerning tools
 
 /*!
  Returns true if the feature is a model object
@@ -73,18 +73,21 @@ std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
  all objects in the list are not PartSet document.
  It shows the warning control if the result is false.
  \param theParent a parent for the warning control
- \param theList a list of object
+ \param aList a list of object
  \return a boolean value
  */
 bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aList);
 
 /*! 
- Returns true if theObject can be renamed in theName
+ Check possibility to rename object
+ \param theObject an object to rename
+ \param theName a name
  */
-bool canRename(QWidget* theParent, const ObjectPtr& theObject, const QString& theName);
+bool canRename(const ObjectPtr& theObject, const QString& theName);
 
 /*!
  Returns true if there are no parts in the document, which are not activated
+ \param theNotActivatedNames out string which contains not activated names
  \return a boolean value
  */
 bool XGUI_EXPORT allDocumentsActivated(QString& theNotActivatedNames);
@@ -115,6 +118,8 @@ bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& 
  which has the object as a sub object.
  \param theSourceObject an object, which references are searched
  \param theObject an intermediate recursive object, should be set in the source object
+ \param theDirectRefFeatures direct references
+ \param theIndirectRefFeatures indirect references
  \param theAlreadyProcessed set of processed elements, used for optimization (do not reanalyse processed)
  \return a boolean value
  */

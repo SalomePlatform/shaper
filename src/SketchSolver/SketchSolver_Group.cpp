@@ -76,7 +76,7 @@ private:
   static Slvs_hGroup myGroupIndex; ///< index of the group
 };
 
-Slvs_hGroup GroupIndexer::myGroupIndex = 0;
+Slvs_hGroup GroupIndexer::myGroupIndex = SLVS_G_OUTOFGROUP;
 
 
 static void sendMessage(const char* theMessageName)
@@ -138,6 +138,15 @@ bool SketchSolver_Group::isInteract(
   return myFeatureStorage->isInteract(std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature));
 }
 
+// check the entity is really exists
+static void checkEntity(StoragePtr theStorage, Slvs_hEntity& theEntity)
+{
+  if (theEntity == SLVS_E_UNKNOWN)
+    return;
+  Slvs_Entity anEnt = theStorage->getEntity(theEntity);
+  theEntity = anEnt.h;
+}
+
 // ============================================================================
 //  Function: getFeatureId
 //  Class:    SketchSolver_Group
@@ -149,22 +158,19 @@ Slvs_hEntity SketchSolver_Group::getFeatureId(FeaturePtr theFeature) const
   if (!myFeatureStorage)
     return aResult;
   // Obtain regular constraints interacting with the feature and find its ID
-  std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theFeature);
-  if (aConstraints.empty())
-    return aResult;
-  std::set<ConstraintPtr>::iterator aConstrIter = aConstraints.begin();
-  for (; aConstrIter != aConstraints.end(); ++aConstrIter) {
-    ConstraintConstraintMap::const_iterator aCIter = myConstraints.find(*aConstrIter);
-    if (aCIter == myConstraints.end())
-      continue;
+  ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); ++aCIter) {
     aResult = aCIter->second->getId(theFeature);
+    checkEntity(myStorage, aResult);
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
   }
   // The feature is not found, check it in the temporary constraints
   std::set<SolverConstraintPtr>::iterator aTmpCIter = myTempConstraints.begin();
-  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
+  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter) {
     aResult = (*aTmpCIter)->getId(theFeature);
+    checkEntity(myStorage, aResult);
+  }
   return aResult;
 }
 
@@ -179,25 +185,26 @@ Slvs_hEntity SketchSolver_Group::getAttributeId(AttributePtr theAttribute) const
   if (!myFeatureStorage)
     return aResult;
   // Obtain regular constraints interacting with the attribute and find its ID
-  std::set<ConstraintPtr> aConstraints = myFeatureStorage->getConstraints(theAttribute);
-  std::set<ConstraintPtr>::iterator aConstrIter = aConstraints.begin();
-  for (; aConstrIter != aConstraints.end(); aConstrIter++) {
-    ConstraintConstraintMap::const_iterator aCIter = myConstraints.find(*aConstrIter);
-    if (aCIter == myConstraints.end())
-      continue;
+  ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); ++aCIter) {
     aResult = aCIter->second->getId(theAttribute);
+    checkEntity(myStorage, aResult);
     if (aResult != SLVS_E_UNKNOWN)
       return aResult;
   }
   // The attribute is not found, check it in the temporary constraints
   std::set<SolverConstraintPtr>::const_iterator aTmpCIter = myTempConstraints.begin();
-  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter)
+  for (; aTmpCIter != myTempConstraints.end() && aResult == SLVS_E_UNKNOWN; ++aTmpCIter) {
     aResult = (*aTmpCIter)->getId(theAttribute);
+    checkEntity(myStorage, aResult);
+  }
   // Last chance to find attribute in parametric constraints
   std::map<AttributePtr, SolverConstraintPtr>::const_iterator aParIter =
       myParametricConstraints.find(theAttribute);
-  if (aParIter != myParametricConstraints.end())
+  if (aParIter != myParametricConstraints.end()) {
     aResult = aParIter->second->getId(theAttribute);
+    checkEntity(myStorage, aResult);
+  }
   return aResult;
 }
 
@@ -314,23 +321,32 @@ bool SketchSolver_Group::changeConstraint(
   for (; anAttrIt != anAttributes.end(); ++anAttrIt) {
     AttributeRefAttrPtr aRefAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
-    if (!aRefAttr || aRefAttr->isObject())
+    if (!aRefAttr)
       continue;
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint;
+    if (aRefAttr->isObject()) {
+      FeaturePtr aFeat = ModelAPI_Feature::feature(aRefAttr->object());
+      if (aFeat->getKind() != SketchPlugin_Point::ID())
+        continue;
+      aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFeat->attribute(SketchPlugin_Point::COORD_ID()));
+    } else
+      aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+
     if (!aPoint || (aPoint->textX().empty() && aPoint->textY().empty()))
       continue;
 
     std::map<AttributePtr, SolverConstraintPtr>::iterator aFound =
-        myParametricConstraints.find(aRefAttr->attr());
+        myParametricConstraints.find(aPoint);
     if (aFound == myParametricConstraints.end()) {
       SolverConstraintPtr aConstraint =
-          SketchSolver_Builder::getInstance()->createParametricConstraint(aRefAttr->attr());
+          SketchSolver_Builder::getInstance()->createParametricConstraint(aPoint);
       if (!aConstraint)
         continue;
       aConstraint->setGroup(this);
       aConstraint->setStorage(myStorage);
-      myParametricConstraints[aRefAttr->attr()] = aConstraint;
+      myParametricConstraints[aPoint] = aConstraint;
     } else
       aFound->second->update();
   }
@@ -500,13 +516,13 @@ bool SketchSolver_Group::updateWorkplane()
     std::vector<Slvs_Param>::iterator aParIter = aParams.begin();
     for (; aParIter != aParams.end(); aParIter++) {
       aParIter->h = SLVS_E_UNKNOWN; // the ID should be generated by storage
-      aParIter->group = myID;
+      aParIter->group = SLVS_G_OUTOFGROUP;
       aParIter->h = myStorage->addParameter(*aParIter);
     }
     std::vector<Slvs_Entity>::iterator anEntIter = anEntities.begin();
     for (; anEntIter != anEntities.end(); anEntIter++) {
       anEntIter->h = SLVS_E_UNKNOWN; // the ID should be generated by storage
-      anEntIter->group = myID;
+      anEntIter->group = SLVS_G_OUTOFGROUP;
       anEntIter->wrkpl = myWorkplaneID;
       for (int i = 0; i < 4; i++)
         if (anEntIter->param[i] != SLVS_E_UNKNOWN)
@@ -674,9 +690,9 @@ void SketchSolver_Group::splitGroup(std::vector<SketchSolver_Group*>& theCuts)
   std::vector<ConstraintPtr>::iterator aUnuseIt = anUnusedConstraints.begin();
   while (aUnuseIt != anUnusedConstraints.end()) {
     if (aNewFeatStorage->isInteract(*aUnuseIt)) {
-      size_t aShift = aUnuseIt - anUnusedConstraints.begin();
+      aNewFeatStorage->changeConstraint(*aUnuseIt);
       anUnusedConstraints.erase(aUnuseIt);
-      aUnuseIt = anUnusedConstraints.begin() + aShift;
+      aUnuseIt = anUnusedConstraints.begin();
       continue;
     }
     aUnuseIt++;
@@ -700,6 +716,9 @@ void SketchSolver_Group::splitGroup(std::vector<SketchSolver_Group*>& theCuts)
       theCuts.push_back(aGroup);
     }
   }
+
+  // Update feature storage
+  myFeatureStorage = aNewFeatStorage;
 }
 
 // ============================================================================
@@ -769,6 +788,9 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
     }
   if (aCIter == myConstraints.end())
     return;
+
+  // Remove entities not used by constraints
+  myStorage->removeUnusedEntities();
 
   if (isFullyRemoved)
     myConstraints.erase(aCIter);

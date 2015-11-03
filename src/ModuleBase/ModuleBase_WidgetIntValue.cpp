@@ -82,16 +82,17 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
+  myLabel->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
-  connect(mySpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(valuesModified()));
 }
 
 ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()
 {
 }
 
-bool ModuleBase_WidgetIntValue::reset()
+bool ModuleBase_WidgetIntValue::resetCustom()
 {
   bool aDone = false;
   if (!isUseReset() || isComputedDefault()) {
