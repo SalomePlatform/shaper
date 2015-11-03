@@ -103,7 +103,10 @@ protected:
   QString mySelectedFilter;
 
   /// A title of open file dialog box
-  enum { WFS_OPEN, WFS_SAVE } myType;
+  enum {
+    WFS_OPEN, ///< open file
+    WFS_SAVE ///< save file
+  } myType; ///< type of dialog
 
   /// Default path
   QString myDefaultPath;

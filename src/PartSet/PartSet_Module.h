@@ -204,7 +204,7 @@ public:
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
   /// Validates the current operation and send the state change to sketch manager
-  /// \thePrevState the previous widget value state
+  /// \param thePreviousState the previous widget value state
   virtual void widgetStateChanged(int thePreviousState);
 
 public slots:

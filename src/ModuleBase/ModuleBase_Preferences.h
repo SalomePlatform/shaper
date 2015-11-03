@@ -60,6 +60,7 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   /// Retrieve preferences of resource manage to default state
   static void resetResourcePreferences(SUIT_PreferenceMgr* thePref);
 
+  /// Retrieve preferences of config prop to default state
   static void resetConfigPropPreferences(SUIT_PreferenceMgr* thePref);
 
 private:

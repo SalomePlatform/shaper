@@ -198,7 +198,7 @@ public:
   void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
 
   /// Visualize the operation feature if the previous state is modified value in property panel
-  /// \thePrevState the previous widget value state
+  /// \param thePreviousState the previous widget value state
   void widgetStateChanged(int thePreviousState);
 
 public slots:

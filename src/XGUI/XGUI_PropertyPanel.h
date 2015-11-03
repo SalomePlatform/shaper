@@ -47,6 +47,7 @@ Q_OBJECT
 
   /// Constructor
   /// \param theParent is a parent of the property panel
+  /// \param theMgr operation manager
   XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr);
 
   virtual ~XGUI_PropertyPanel();

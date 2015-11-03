@@ -82,6 +82,8 @@ protected:
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function
+  /// \param aSelection selection
+  /// \param aMode compute mode
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
     const Standard_Integer aMode);
 

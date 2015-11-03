@@ -63,11 +63,13 @@ Q_OBJECT
  protected slots:
    /// Called on text changed
   virtual void onTextChanged(const QString&);
+  /// Called on value changed
   void onValueChanged(const QString& theValue);
 
  protected:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
+  /// Called on key press event
   virtual void keyPressEvent(QKeyEvent* theEvent);
 
  private:

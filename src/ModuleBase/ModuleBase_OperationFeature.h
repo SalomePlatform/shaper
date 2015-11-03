@@ -108,7 +108,7 @@ Q_OBJECT
   CompositeFeaturePtr parentFeature() const;
 
   /// Stores the previous to the operation current feature
-  /// \set theFeature a feature
+  /// \param theFeature a feature
   void setPreviousCurrentFeature(const FeaturePtr& theFeature);
 
   /// Returns the previous to the operation current feature

@@ -45,10 +45,10 @@ class ExpressionEditor: public QPlainTextEdit
   /// Returns placeholder list
   QString placeHolderText() const;
 
-  // Returns true if the current value is modified by has not been applyed yet
+  /// Returns true if the current value is modified by has not been applyed yet
   bool isModified() const;
 
-  // Clears modified state
+  /// Clears modified state
   void clearModified();
 
  public slots:

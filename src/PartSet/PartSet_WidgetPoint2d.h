@@ -142,7 +142,7 @@ protected:
    void setConstraintWith(const ObjectPtr& theObject);
 
 protected:
-  ModuleBase_IWorkshop* myWorkshop;
+  ModuleBase_IWorkshop* myWorkshop; ///< workshop
 
 private:
 

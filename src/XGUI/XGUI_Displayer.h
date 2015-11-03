@@ -141,6 +141,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param isEnabled a boolean value
   bool enableUpdateViewer(const bool isEnabled);
 
+  /// Returns myEnableUpdateViewer flag
   bool isUpdateEnabled() const { return myEnableUpdateViewer; }
 
   /// Updates the viewer

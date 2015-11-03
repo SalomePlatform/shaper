@@ -25,11 +25,15 @@ class XGUI_ActiveDocLbl: public QLineEdit
 Q_OBJECT
  public:
    /// Constructor
+   /// \param theText a text
    /// \param theParent a parent widget
    XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent );
 
+   /// Sets tree view
+   /// \param theView a view
    void setTreeView(QTreeView* theView);
 
+   /// Returns tree view
    QTreeView* treePalette() const { return myTreeView;}
 
 #if (!defined HAVE_SALOME) && (defined WIN32)
@@ -37,11 +41,14 @@ Q_OBJECT
 #endif
 
 public slots:
+  /// On unselect
   void unselect();
 
 protected:
+  /// On mouse release
   virtual void mouseReleaseEvent( QMouseEvent* e);
 
+  /// Filter event
   bool eventFilter(QObject* theObj, QEvent* theEvent);
 
 private:
