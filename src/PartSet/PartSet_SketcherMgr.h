@@ -180,7 +180,7 @@ public:
   //! Incorrect states: the feature is sketch, the solver error value
   //! The feature value is reset, this is the flag of sketch mgr
   //! \return string value
-  QString getFeatureError(const FeaturePtr& theFeature);
+  QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
 
   /// Returns list of strings which contains id's of sketch operations
   static const QStringList& sketchOperationIdList();

@@ -206,7 +206,7 @@ public:
   //! Returns the feature error if the current state of the feature in the module is not correct
   //! If the feature is correct, it returns an empty value
   //! \return string value
-  virtual QString getFeatureError(const FeaturePtr& theFeature);
+  virtual QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
 
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
@@ -214,6 +214,10 @@ public:
   /// Validates the current operation and send the state change to sketch manager
   /// \thePrevState the previous widget value state
   virtual void widgetStateChanged(int thePreviousState);
+
+  /// Returns true if the event is processed. It gives the reentrance manager to process the enter.
+  /// \param thePreviousAttributeID an index of the previous active attribute
+  virtual bool processEnter(const std::string& thePreviousAttributeID);
 
 public slots:
   /// Redefines the parent method in order to customize the next case:

@@ -503,13 +503,15 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
       ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
       if (!aActiveWgt || !aActiveWgt->processEnter()) {
-        ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
-        if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
-          emit keyEnterReleased();
-          commitOperation();
+        if (!myWorkshop->module()->processEnter(aActiveWgt->attributeID())) {
+          ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+          if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty()) {
+            emit keyEnterReleased();
+            commitOperation();
+          }
+          else
+            isAccepted = false;
         }
-        else
-          isAccepted = false;
       }
     }
     break;

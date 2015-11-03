@@ -605,9 +605,6 @@ void PartSet_SketcherMgr::onApplicationStarted()
             aReentranceMgr, SLOT(onWidgetActivated()));
   }
 
-  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  connect(anOpMgr, SIGNAL(keyEnterReleased()), aReentranceMgr, SLOT(onEnterReleased()));
-
   XGUI_ViewerProxy* aViewerProxy = aWorkshop->viewer();
   connect(aViewerProxy, SIGNAL(enterViewPort()), this, SLOT(onEnterViewPort()));
   connect(aViewerProxy, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
@@ -678,7 +675,7 @@ bool PartSet_SketcherMgr::sketchSolverError()
   return anError;
 }
 
-QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
+QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
 {
   QString anError = "";
   if (!theFeature.get() || !theFeature->data()->isValid())
@@ -691,7 +688,7 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
   }
   else {
     ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-    if (anActiveWidget) {
+    if (isCheckGUI && anActiveWidget) {
       ModuleBase_ModelWidget::ValueState aState = anActiveWidget->getValueState();
       if (aState != ModuleBase_ModelWidget::Stored) {
         AttributePtr anAttr = anActiveWidget->feature()->attribute(anActiveWidget->attributeID());

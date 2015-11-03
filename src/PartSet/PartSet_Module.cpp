@@ -400,11 +400,11 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
   myMenuMgr->updateViewerMenu(theStdActions);
 }
 
-QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
+QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
 {
-  QString anError = ModuleBase_IModule::getFeatureError(theFeature);
+  QString anError = ModuleBase_IModule::getFeatureError(theFeature, isCheckGUI);
   if (anError.isEmpty())
-    anError = sketchMgr()->getFeatureError(theFeature);
+    anError = sketchMgr()->getFeatureError(theFeature, isCheckGUI);
 
   return anError;
 }
@@ -1039,4 +1039,9 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
 void PartSet_Module::widgetStateChanged(int thePreviousState)
 {
   mySketchMgr->widgetStateChanged(thePreviousState);
+}
+
+bool PartSet_Module::processEnter(const std::string& thePreviousAttributeID)
+{
+  return mySketchReentrantMgr->processEnter(thePreviousAttributeID);
 }

@@ -51,6 +51,12 @@ public:
   /// or return null. If the current widget of the operation is a viewer selector, it returns null.
   ModuleBase_ModelWidget* internalActiveWidget() const;
 
+  /// if the internal flags allow it and the manager is active, it starts an internal edit operation
+  /// for the created operation.
+  /// \param thePreviousAttributeID an index of the previous active attribute
+  //bool restartOperation(const std::string& thePreviousAttributeID);
+  bool processEnter(const std::string& thePreviousAttributeID);
+
   /// Resets the internal flags
   /// \param theOperation a started operation
   void operationStarted(ModuleBase_Operation* theOperation);
@@ -99,11 +105,6 @@ private slots:
   /// Processing of vertex selected. Set an internal reentrant flag to forbiddent state if
   /// the current feature is a line and there are not obligate widgets anymore
   void onVertexSelected();
-
-  /// SLOT, that is called by enter key released
-  /// Set a specific type of restarting the current operation to do not use the feature
-  /// for initialization of a new started operation.
-  void onEnterReleased();
 
   /// Deactivates selection and filters of the first operation widget if it is an internal
   /// 'edit' operation

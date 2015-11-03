@@ -173,23 +173,42 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
 {
   if (!isActiveMgr())
     return;
-  XGUI_OperationMgr* anOpMgr = workshop()->operationMgr();
-  if (!anOpMgr->isApplyEnabled())
-    return;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
+  if (!myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty())
+    return;
+
   if (aFOperation) {
     if (PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-      XGUI_OperationMgr* anOpMgr = workshop()->operationMgr();
       if (myRestartingMode != RM_Forbided) {
         myRestartingMode = RM_LastFeatureUsed;
         startInternalEdit(thePreviousAttributeID);
       }
-      else
+      else {
         aFOperation->commit();
+      }
     }
   }
+}
+
+bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousAttributeID)
+{
+  bool isDone = false;
+
+  if (!isActiveMgr())
+    return isDone;
+
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                       (myWorkshop->currentOperation());
+  if (!myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty())
+    return isDone;
+
+  myRestartingMode = RM_EmptyFeatureUsed;
+  startInternalEdit(thePreviousAttributeID);
+  isDone = true;
+
+  return isDone;
 }
 
 void PartSet_SketcherReetntrantMgr::onVertexSelected()
@@ -215,17 +234,6 @@ void PartSet_SketcherReetntrantMgr::onVertexSelected()
     if (!aFoundObligatory)
       myRestartingMode = RM_Forbided;
   }
-}
-
-void PartSet_SketcherReetntrantMgr::onEnterReleased()
-{
-  if (!isActiveMgr())
-    return;
-
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                      (myWorkshop->currentOperation());
-  if (myIsInternalEditOperation)
-    myRestartingMode = RM_EmptyFeatureUsed;
 }
 
 void PartSet_SketcherReetntrantMgr::onBeforeStopped()

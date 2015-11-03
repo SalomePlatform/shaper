@@ -189,7 +189,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! Returns the feature error if the current state of the feature in the module is not correct
   //! If the feature is correct, it returns an empty value
   //! \return string value
-  virtual QString getFeatureError(const FeaturePtr& theFeature);
+  virtual QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
 
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
@@ -202,6 +202,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Validates the operation to change the "Apply" button state.
   /// \param thePreviousState the previous state of the widget
   virtual void widgetStateChanged(int thePreviousState) {};
+
+  /// Returns true if the event is processed.
+  /// \param thePreviousAttributeID an index of the previous active attribute
+  virtual bool processEnter(const std::string& thePreviousAttributeID) { return false; };
 
 signals:
   /// Signal which is emitted when operation is launched
