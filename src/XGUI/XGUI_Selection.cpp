@@ -13,6 +13,14 @@
 #include <ModelAPI_Feature.h>
 
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_Axis.hxx>
+#include <AIS_Point.hxx>
+#include <Geom_Line.hxx>
+#include <BRep_Builder.hxx>
+#include <TopoDS_Edge.hxx>
+#include <Geom_Point.hxx>
+#include <Geom_TrimmedCurve.hxx>
+#include <Prs3d_DatumAspect.hxx>
 
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <StdSelect_BRepOwner.hxx>
@@ -120,7 +128,33 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
     TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
     if (!aShape.IsNull())
       thePrs.setShape(aShape);
-  }      
+  } else {
+    // Fill by trihedron shapes
+    Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(anIO);
+    if (!aAxis.IsNull()) {
+      // an Axis from Trihedron
+      Handle(Geom_Line) aLine = aAxis->Component();
+      Handle(Prs3d_DatumAspect) DA = aAxis->Attributes()->DatumAspect();
+      Handle(Geom_TrimmedCurve) aTLine = new Geom_TrimmedCurve(aLine, 0, DA->FirstAxisLength());
+
+      BRep_Builder aBuilder;      
+      TopoDS_Edge aEdge;
+      aBuilder.MakeEdge(aEdge, aTLine, Precision::Confusion());
+      if (!aEdge.IsNull())
+        thePrs.setShape(aEdge);
+    } else {
+      Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(anIO);
+      if (!aPoint.IsNull()) {
+        // A point from trihedron
+        Handle(Geom_Point) aPnt = aPoint->Component();
+        BRep_Builder aBuilder;
+        TopoDS_Vertex aVertex;
+        aBuilder.MakeVertex(aVertex, aPnt->Pnt(), Precision::Confusion());
+        if (!aVertex.IsNull())
+          thePrs.setShape(aVertex);
+      }
+    }
+  }
      
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   ObjectPtr aFeature = aDisplayer->getObject(anIO);

@@ -364,6 +364,10 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
 void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
                                        const bool theUpdateViewer)
 {
+  //Handle(AIS_InteractiveObject) aTriehedron = getTrihedron();
+  //if (!aTriehedron.IsNull())
+  //  deactivateAIS(aTriehedron);
+
   QObjectPtrList::const_iterator anIt = theObjList.begin(), aLast = theObjList.end();
   for (; anIt != aLast; anIt++) {
     deactivate(*anIt, false);
@@ -438,14 +442,22 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
 
   Handle(AIS_InteractiveObject) anAISIO;
   AIS_ListOfInteractive aPrsList;
-  if (theObjList.isEmpty())
-    return;
-  else {
-    foreach(ObjectPtr aObj, theObjList) {
-      if (myResult2AISObjectMap.contains(aObj))
-        aPrsList.Append(myResult2AISObjectMap[aObj]->impl<Handle(AIS_InteractiveObject)>());
-    }
+  //if (aObjList.isEmpty())
+  //  return;
+  //else {
+  foreach(ObjectPtr aObj, theObjList) {
+    if (myResult2AISObjectMap.contains(aObj))
+      aPrsList.Append(myResult2AISObjectMap[aObj]->impl<Handle(AIS_InteractiveObject)>());
   }
+  //}
+
+  // Add trihedron because it has to partisipate in selection
+  Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
+  if (!aTrihedron.IsNull())
+    aPrsList.Append(aTrihedron);
+
+  if (aPrsList.Extent() == 0)
+    return;
 
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
   bool isActivationChanged = false;
@@ -453,6 +465,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
     anAISIO = aLIt.Value();
     if (activate(anAISIO, myActiveSelectionModes, false))
       isActivationChanged = true;
+  }
+  if (!aTrihedron.IsNull()) {
+    foreach(int aMode, myActiveSelectionModes)
+      aContext->SetSelectionSensitivity(aTrihedron, aMode, 8);
   }
   // VSV It seems that there is no necessity to update viewer on activation
   //if (theUpdateViewer && isActivationChanged)
@@ -556,7 +572,16 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 
 void XGUI_Displayer::deactivateTrihedron() const
 {
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
+  if (!aTrihedron.IsNull()) {
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+    aContext->Deactivate(aTrihedron);
+  }
+}
+
+Handle(AIS_InteractiveObject) XGUI_Displayer::getTrihedron() const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
     AIS_ListOfInteractive aList;
     aContext->DisplayedObjects(aList, true);
@@ -564,15 +589,16 @@ void XGUI_Displayer::deactivateTrihedron() const
     for (aIt.Initialize(aList); aIt.More(); aIt.Next()) {
       Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aIt.Value());
       if (!aTrihedron.IsNull()) {
-        aContext->Deactivate(aTrihedron);
+        return aTrihedron;
       }
     }
   }
+  return Handle(AIS_InteractiveObject)();
 }
 
 void XGUI_Displayer::openLocalContext()
 {
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
   if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
     // Preserve selected objects
@@ -590,7 +616,7 @@ void XGUI_Displayer::openLocalContext()
 
     //aContext->ClearCurrents();
     aContext->OpenLocalContext();
-    deactivateTrihedron();
+    //deactivateTrihedron();
     //aContext->NotUseDisplayedObjects();
 
     //myUseExternalObjects = false;
@@ -732,7 +758,7 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
 
 void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode) const
 {
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
     if (theMode == -1)
       aContext->Deactivate(theIO);
@@ -752,7 +778,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
     aContext->OpenLocalContext();
-    deactivateTrihedron();
+    //deactivateTrihedron();
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
   }
@@ -1007,8 +1033,8 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
 
   // trihedron AIS check should be after the AIS loading.
   // If it is not loaded, it is steel selectable in the viewer.
-  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
-  if (aTrihedron.IsNull()) {
+  //Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
+  //if (aTrihedron.IsNull()) {
       //aContext->Load(anAISIO, -1, true);
       // In order to clear active modes list
     if (theModes.size() == 0) {
@@ -1022,7 +1048,7 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
           isActivationChanged = true;
         }
       }
-    }
+    //}
   }
   return isActivationChanged;
 }

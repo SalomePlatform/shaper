@@ -431,12 +431,44 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
 
     Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(theShape), aStart, aEnd);
     GeomAdaptor_Curve aAdaptor(aCurve);
+    std::shared_ptr<GeomAPI_Edge> anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge);
+    anEdge->setImpl(new TopoDS_Shape(theShape));
     if (aAdaptor.GetType() == GeomAbs_Line) {
       // Create line
       aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
+      if (!theObject.get()) {
+        // There is no selected result
+        std::shared_ptr<GeomAPI_Pnt> aPnt1 = anEdge->firstPoint();
+        std::shared_ptr<GeomAPI_Pnt> aPnt2 = anEdge->lastPoint();
+        std::shared_ptr<GeomAPI_Pnt2d> aPnt2d1 = convertTo2D(theSketch, aPnt1);
+        std::shared_ptr<GeomAPI_Pnt2d> aPnt2d2 = convertTo2D(theSketch, aPnt2);
+
+        std::shared_ptr<ModelAPI_Data> aData = aMyFeature->data();
+        std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
+        std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+
+        aPoint1->setValue(aPnt2d1);
+        aPoint2->setValue(aPnt2d2);
+
+        // If this is an axis then its name has to be changed correspondently
+        std::string aSuffix = "";
+        bool aXdir = fabs(aPnt1->x() - aPnt2->x()) > Precision::Confusion();
+        bool aYdir = fabs(aPnt1->y() - aPnt2->y()) > Precision::Confusion();
+        bool aZdir = fabs(aPnt1->z() - aPnt2->z()) > Precision::Confusion();
+        if (aXdir && (!aYdir) && (!aZdir))
+          aSuffix = "X";
+        else if ((!aXdir) && aYdir && (!aZdir))
+          aSuffix = "Y";
+        else if ((!aXdir) && (!aYdir) && aZdir)
+          aSuffix = "Z";
+        if (aSuffix.length() > 0)
+          aData->setName("Axis_" + aSuffix);
+        aMyFeature->execute();
+
+      }
     } else if (aAdaptor.GetType() == GeomAbs_Circle) {
-      std::shared_ptr<GeomAPI_Edge> anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge);
-      anEdge->setImpl(new TopoDS_Shape(theShape));
       if (anEdge->isArc()) {
         // Create arc
         aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
@@ -453,7 +485,10 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      if (anAttr && aRes) {
+      if (!aRes.get()) {
+        aRes = aMyFeature->firstResult();
+      }
+      if (anAttr.get() && aRes.get()) {
         std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
         anEdge->setImpl(new TopoDS_Shape(theShape));
 
@@ -480,7 +515,29 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      if (anAttr && aRes) {
+      if (!aRes.get()) {
+        // If the point is selected not from Result object
+        std::shared_ptr<GeomAPI_Shape> aShape = 
+          std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        aShape->setImpl(new TopoDS_Shape(theShape));
+
+        std::shared_ptr<GeomAPI_Vertex> aVertex = 
+          std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
+        std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+
+        std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = convertTo2D(theSketch, aPnt);
+        std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Point::COORD_ID()));
+        aPoint->setValue(aPnt2d);
+        if ((aPnt->x() < Precision::Confusion()) && 
+            (aPnt->y() < Precision::Confusion()) &&
+            (aPnt->z() < Precision::Confusion()))
+          aData->setName("Origin");
+
+        aMyFeature->execute();
+        aRes = aMyFeature->firstResult();
+      }
+      if (anAttr.get() && aRes.get()) {
         std::shared_ptr<GeomAPI_Shape> aVert(new GeomAPI_Shape);
         aVert->setImpl(new TopoDS_Shape(theShape));
 

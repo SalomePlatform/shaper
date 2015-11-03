@@ -227,6 +227,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theUpdateViewer update viewer flag
   /// \return previously defined color on the object
   QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool theUpdateViewer = true);
+
+  /// Returns Trihedron object if it is displayed
+  Handle(AIS_InteractiveObject) getTrihedron() const;
   
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
