@@ -57,13 +57,13 @@ class Interface():
 
         raise AttributeError()
 
+    def _fillAttribute(self, attribute, value):
+        """Fill ModelAPI_Attribute* with value."""
+        tools.fill_attribute(attribute, value)
+
     def feature(self):
         """Return ModelAPI_Feature."""
         return self._feature
-
-    def execute(self):
-        """Computes or recomputes the results"""
-        return self._feature.execute()
 
     def getKind(self):
         """Return the unique kind of the feature"""
@@ -81,10 +81,6 @@ class Interface():
         """Return the result in the list of results"""
         return self._feature.lastResult()
 
-    def _fillAttribute(self, attribute, value):
-        """Fill ModelAPI_Attribute* with value."""
-        tools.fill_attribute(attribute, value)
-
     def setRealInput(self, inputid, value):
         """I.setRealInput(str, float) -- set real value to the attribute"""
         self._feature.data().real(inputid).setValue(value)
@@ -94,8 +90,8 @@ class Interface():
         validators = ModelAPI.ModelAPI_Session.get().validators()
         return validators.validate(self._feature)
 
-    def _execute(self):
-        """I._execute() -- validate and execute the feature.
+    def execute(self):
+        """I.execute() -- validate and execute the feature.
 
         Raises RuntimeError if validation fails.
         """

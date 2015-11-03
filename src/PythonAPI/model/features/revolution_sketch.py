@@ -77,7 +77,7 @@ class RevolutionSketch(CompositeSketch):
         elif len(args) == 2:
             self.setAngles(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):

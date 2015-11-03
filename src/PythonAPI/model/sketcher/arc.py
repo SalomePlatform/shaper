@@ -27,7 +27,7 @@ class Arc(Interface):
             raise WrongNumberOfArguments(
                 "Arc takes 3 or 6 arguments (%s given)" % len(args)
                 )
-        self._execute()
+        self.execute()
         
     ########
     #

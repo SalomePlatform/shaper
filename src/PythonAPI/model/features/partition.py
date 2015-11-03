@@ -50,7 +50,7 @@ class Partition(Interface):
         self.setToolObjects(tool_objects)
         self.setPartitionCombine(partition_combine)
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):

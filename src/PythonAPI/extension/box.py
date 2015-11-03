@@ -47,7 +47,7 @@ class Box(Interface):
         self.setLength(dy)
         self.setHeight(dz)
 
-        self._execute()
+        self.execute()
         pass
 
     def setWidth(self, width):

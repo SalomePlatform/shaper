@@ -33,7 +33,7 @@ class Line(Interface):
             raise WrongNumberOfArguments(
                 "Arc takes 1, 2 or 4 arguments (%s given)" % len(args)
                 )
-        self._execute()
+        self.execute()
 
     def __createByCoordinates(self, x1, y1, x2, y2):
         self.setStartPoint(x1, y1)

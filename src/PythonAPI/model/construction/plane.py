@@ -59,7 +59,7 @@ class Plane(Interface):
         elif len(args) == 4:
             self.setGeneralEquation(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):

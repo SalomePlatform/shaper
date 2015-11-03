@@ -39,7 +39,7 @@ class Part(Interface):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Part")
 
-        self._execute()
+        self.execute()
         pass
 
     def document(self):

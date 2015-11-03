@@ -40,7 +40,7 @@ class Import(Interface):
         assert(len(args) == 1)
         self.setFilePath(args[0])
 
-        self._execute()
+        self.execute()
         pass
 
     def setFilePath(self, file_path):
@@ -94,7 +94,7 @@ class Export(Interface):
         self.setFileFormat(args[1])
         self.setObjects(args[2])
 
-        self._execute()
+        self.execute()
         pass
 
     def setFilePath(self, file_path):

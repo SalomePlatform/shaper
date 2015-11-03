@@ -15,7 +15,7 @@ class Point(Interface):
             self._feature.data().attribute("PointCoordinates")
             )
         self.setValue(x, y)
-        self._execute()
+        self.execute()
 
     def setValue(self, x, y):
         """Set point coordinates."""

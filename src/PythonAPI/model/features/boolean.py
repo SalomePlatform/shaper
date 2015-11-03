@@ -71,7 +71,7 @@ class Boolean(Interface):
         self.setToolObjects(tool_objects)
         self.setBoolType(bool_type)
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):

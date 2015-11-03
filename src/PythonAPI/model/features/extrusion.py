@@ -78,7 +78,7 @@ class Extrusion(Interface):
         elif len(args) == 1:
             self.setSize(args[0])
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):

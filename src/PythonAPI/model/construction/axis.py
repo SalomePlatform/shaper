@@ -53,7 +53,7 @@ class Axis(Interface):
         elif len(args) == 1:
             self.setCylindricalFace(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):

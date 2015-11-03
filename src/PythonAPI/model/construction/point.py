@@ -44,7 +44,7 @@ class Point(Interface):
         assert(len(args) == 3)
         self.setPoint(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def setPoint(self, x, y, z):

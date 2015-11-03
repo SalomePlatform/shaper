@@ -57,7 +57,7 @@ class Placement(Interface):
         self.setReverseDirection(args[3])
         self.setCentering(args[4])
 
-        self._execute()
+        self.execute()
         pass
 
     def setObjectList(self, objects_list):

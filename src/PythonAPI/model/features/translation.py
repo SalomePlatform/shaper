@@ -48,7 +48,7 @@ class Translation(Interface):
         self.setAxisObject(args[1])
         self.setDistance(args[2])
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):

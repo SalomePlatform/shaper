@@ -48,7 +48,7 @@ class Rotation(Interface):
         self.setAxisObject(args[1])
         self.setAngle(args[2])
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):

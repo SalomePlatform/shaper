@@ -69,7 +69,7 @@ class ExtrusionSketch(CompositeSketch):
         elif len(args) == 2:
             self.setSizes(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):

@@ -44,7 +44,7 @@ class Parameter(Interface):
         self.setName(args[0])
         self.setExpression(args[1])
 
-        self._execute()
+        self.execute()
         pass
 
     def setName(self, name):

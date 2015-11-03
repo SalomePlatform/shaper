@@ -40,7 +40,7 @@ class Group(Interface):
         assert(len(args) == 1)
         self.setGroupList(args[0])
 
-        self._execute()
+        self.execute()
         pass
 
     def setGroupList(self, main_objects):
