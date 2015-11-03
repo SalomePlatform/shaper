@@ -238,17 +238,15 @@ void PartSet_SketcherReetntrantMgr::onVertexSelected()
 
 void PartSet_SketcherReetntrantMgr::onBeforeStopped()
 {
+  if (!isActiveMgr() || !myIsInternalEditOperation)
+    return;
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                       (myWorkshop->currentOperation());
   if (aFOperation) {
     disconnect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
     disconnect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
   }
-  if (!isActiveMgr())
-    return;
-
-  if (!myIsInternalEditOperation)
-    return;
 
   PartSet_Module* aModule = module();
   ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
