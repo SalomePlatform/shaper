@@ -105,6 +105,10 @@ private slots:
   /// for initialization of a new started operation.
   void onEnterReleased();
 
+  /// Deactivates selection and filters of the first operation widget if it is an internal
+  /// 'edit' operation
+  void onBeforeStopped();
+
 private:
   /// Returns true if the current operation is a sketch or a nested sketch operation
   bool isActiveMgr() const;

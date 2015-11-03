@@ -228,6 +228,30 @@ void PartSet_SketcherReetntrantMgr::onEnterReleased()
     myRestartingMode = RM_EmptyFeatureUsed;
 }
 
+void PartSet_SketcherReetntrantMgr::onBeforeStopped()
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                      (myWorkshop->currentOperation());
+  if (aFOperation) {
+    disconnect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
+    disconnect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
+  }
+  if (!isActiveMgr())
+    return;
+
+  if (!myIsInternalEditOperation)
+    return;
+
+  PartSet_Module* aModule = module();
+  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
+  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
+  if (aFirstWidget != aPanel->activeWidget()) {
+    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
+    if (aWSelector)
+      aWSelector->activateSelectionAndFilters(false);
+  }
+}
+
 bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
 {
   return !isActiveMgr() || myRestartingMode == RM_None;
@@ -251,6 +275,9 @@ void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
   if (anOperationFeature.get() != NULL) {
 
     myIsInternalEditOperation = true;
+    connect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
+    connect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
+
     // activate selection filters of the first widget in the viewer
     onWidgetActivated();
 

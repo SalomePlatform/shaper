@@ -251,6 +251,7 @@ void ModuleBase_OperationFeature::abort()
 bool ModuleBase_OperationFeature::commit()
 {
   if (canBeCommitted()) {
+    emit beforeCommitted();
     // the widgets of property panel should not process any events come from data mode
     // after commit clicked. Some signal such as redisplay/create influence on content
     // of the object browser and viewer context. Therefore it influence to the current
@@ -265,7 +266,6 @@ bool ModuleBase_OperationFeature::commit()
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
 
-    emit beforeCommitted();
     commitOperation();
     aMgr->finishOperation();
 
