@@ -78,7 +78,7 @@ class Interface():
         return self._feature.firstResult()
 
     def lastResult(self):
-        """Return the result in the list of results"""
+        """Return the last result in the list of results"""
         return self._feature.lastResult()
 
     def setRealInput(self, inputid, value):
