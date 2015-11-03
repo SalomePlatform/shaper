@@ -45,15 +45,7 @@ ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() co
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
     if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector())) {
       // finds the first widget which can accept a value
-      QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-      ModuleBase_ModelWidget* aFirstWidget = 0;
-      ModuleBase_ModelWidget* aWgt;
-      QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-      for (aWIt = aWidgets.begin(); aWIt != aWidgets.end() && !aFirstWidget; ++aWIt) {
-        aWgt = (*aWIt);
-        if (aWgt->canSetValue())
-          aFirstWidget = aWgt;
-      }
+      ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aFirstWidget)
         aWidget = aFirstWidget;
     }
@@ -135,15 +127,19 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
 
   if (myIsInternalEditOperation) {
     ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
 
-    ModuleBase_ModelWidget* anActiveWidget = anOperation->propertyPanel()->activeWidget();
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
     if (!anActiveWidget || !anActiveWidget->isViewerSelector()) {
       restartOperation();
       aProcessed = true;
 
-      // fill the widget by the mouse event point
+      // fill the first widget by the mouse event point
+      // if the active widget is not the first, it means that the restarted operation is filled by
+      // the current preselection.
       PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
-      if (aPoint2DWdg) {
+      ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
+      if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
         aPoint2DWdg->onMouseRelease(theWnd, theEvent);
       }
     }
@@ -339,3 +335,4 @@ PartSet_Module* PartSet_SketcherReetntrantMgr::module() const
 {
   return dynamic_cast<PartSet_Module*>(myWorkshop->module());
 }
+
