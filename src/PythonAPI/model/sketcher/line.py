@@ -60,8 +60,8 @@ class Line(Interface):
         """Set the end point of the line."""
         self._end_point.setValue(x, y)
 
-    # TODO : methods below will be removed. 
-    # Kept until all tests have been updated
+    # TODO : methods below will be removed.
+    # Kept until all tests have been updated
     def startPointData(self):
         return self._start_point
 
