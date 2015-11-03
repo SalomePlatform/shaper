@@ -16,6 +16,10 @@ class SketcherAddPoint(SketcherTestCase):
         self.assertEqual(point.pointData().x(), 1.0)        
         self.assertEqual(point.pointData().y(), 2.0)
         
+    def test_empty_args(self):
+        with self.assertRaises(TypeError):
+            self.sketch.addPoint()
+        
     
 if __name__ == "__main__":
     unittest.main(verbosity=2)
