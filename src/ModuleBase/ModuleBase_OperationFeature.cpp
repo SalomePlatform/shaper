@@ -57,10 +57,7 @@ void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransact
   myIsEditing = true;
   if (theRestartTransaction) {
     SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->activeDocument();
-    FeaturePtr aFeature = aDoc->currentFeature(false);
     ModelAPI_Session::get()->finishOperation();
-    FeaturePtr anAFeature = aDoc->currentFeature(false);
 
     QString anId = getDescription()->operationId();
     if (myIsEditing) {
