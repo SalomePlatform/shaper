@@ -924,7 +924,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
-  if (isNestedCreateOperation(theOp))
+  if (isNestedCreateOperation(theOp) || myModule->sketchReentranceMgr()->isInternalEditActive())
     QApplication::restoreOverrideCursor();
 }
 

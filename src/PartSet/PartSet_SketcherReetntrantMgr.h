@@ -51,6 +51,9 @@ public:
   /// or return null. If the current widget of the operation is a viewer selector, it returns null.
   ModuleBase_ModelWidget* internalActiveWidget() const;
 
+  /// Return true if the current edit operation is an internal
+  bool isInternalEditActive() const;
+
   /// if the internal flags allow it and the manager is active, it starts an internal edit operation
   /// for the created operation.
   /// \param thePreviousAttributeID an index of the previous active attribute

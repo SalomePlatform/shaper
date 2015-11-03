@@ -53,6 +53,11 @@ ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() co
   return aWidget;
 }
 
+bool PartSet_SketcherReetntrantMgr::isInternalEditActive() const
+{
+  return myIsInternalEditOperation;
+}
+
 bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* theOperation)
 {
   bool aProcessed = false;
