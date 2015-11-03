@@ -16,6 +16,7 @@
 
 #include <ModuleBase_ViewerFilters.h>
 #include <ModuleBase_Definitions.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <GeomAPI_Pln.h>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
@@ -137,7 +138,7 @@ public:
 
   /// Returns False only if the sketch creating feature can not be visualized.
   /// \return a boolean value
-  bool canCommitOperation() const;
+  //bool canCommitOperation() const;
 
   /// Returns whether the object can be erased at the bounds of the active operation.
   /// Sketch sub-entities can not be erased during the sketch operation
@@ -191,6 +192,15 @@ public:
   /// \param theModes a list of modes
   static void sketchSelectionModes(QIntList& theModes);
 
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param theWidget a property contol widget
+  /// \param isToConnect a boolean value whether connect or disconnect
+  void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
+
+  /// Visualize the operation feature if the previous state is modified value in property panel
+  /// \thePrevState the previous widget value state
+  void widgetStateChanged(int thePreviousState);
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
@@ -207,8 +217,6 @@ private slots:
   void onLeaveViewPort();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
-  /// Listens to the signal about values are to be changed in the property panel
-  void onValuesChangedInPropertyPanel();
   /// Listens to the signal about the modification of the values have been done in the property panel
   void onAfterValuesChangedInPropertyPanel();
 
@@ -266,10 +274,6 @@ private:
                                   const FeatureToSelectionMap& theSelection,
                                   SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
 
-  /// Connects or disconnects to the value changed signal of the property panel widgets
-  /// \param isToConnect a boolean value whether connect or disconnect
-  void connectToPropertyPanel(const bool isToConnect);
-
   /// Returns true if the created feature is visible
   /// \param 
   bool isVisibleCreatedFeature() const;
@@ -278,17 +282,17 @@ private:
   /// \return an operation
   ModuleBase_Operation* getCurrentOperation() const;
 
+  /// Get the active widget in the property panel
+  ModuleBase_ModelWidget* getActiveWidget() const;
+
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
   /// \param theOperation an operation which feature is to be displayed, it is nested create operation
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
                         const bool isToDisplay, const bool isFlushRedisplay = true);
-private:
-  /// Gives a debug information about internal flags myIsMouseOverWindow and myIsResetCurrentValue
-  /// \return a string value
-  QString mouseOverWindowFlagsInfo() const;
 
+private:
   XGUI_OperationMgr* operationMgr() const;
 
 private:
@@ -297,7 +301,6 @@ private:
   bool myPreviousDrawModeEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
-  bool myIsResetCurrentValue; /// the state that value in the property panel is reset
   bool myIsMouseOverWindow; /// the state that the mouse over the view
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   bool myIsPopupMenuActive; /// the state of the popup menu is shown

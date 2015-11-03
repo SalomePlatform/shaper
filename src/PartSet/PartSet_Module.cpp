@@ -243,7 +243,12 @@ void PartSet_Module::registerProperties()
                                    Config_Prop::Integer, SKETCH_WIDTH);
 }
 
-void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation) 
+void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
+{
+  mySketchMgr->connectToPropertyPanel(theWidget, isToConnect);
+}
+
+void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
 {
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
@@ -260,13 +265,13 @@ void PartSet_Module::onOperationCommitted(ModuleBase_Operation* theOperation)
   }
 }
 
-void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   /// Restart sketcher operations automatically
   mySketchReentrantMgr->operationAborted(theOperation);
 }
 
-void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
   /// Restart sketcher operations automatically
   mySketchReentrantMgr->operationStarted(theOperation);
@@ -283,16 +288,16 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     myCustomPrs->activate(aFOperation->feature(), true);
 }
 
-void PartSet_Module::onOperationResumed(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_IModule::onOperationResumed(theOperation);
+  ModuleBase_IModule::operationResumed(theOperation);
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation)
     myCustomPrs->activate(aFOperation->feature(), true);
 }
 
-void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   bool isModified = myCustomPrs->deactivate(false);
 
@@ -357,11 +362,6 @@ bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& t
   return aValid;
 }
 
-bool PartSet_Module::canCommitOperation() const
-{
-  return mySketchMgr->canCommitOperation();
-}
-
 bool PartSet_Module::canEraseObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects erase
@@ -403,21 +403,9 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
 QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
 {
   QString anError = ModuleBase_IModule::getFeatureError(theFeature);
-
   if (anError.isEmpty())
     anError = sketchMgr()->getFeatureError(theFeature);
 
-  if (anError.isEmpty()) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-    XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
-    
-    if (anOpMgr->isValidationLocked()) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                             (anOpMgr->currentOperation());
-      if (!aFOperation || theFeature == aFOperation->feature())
-        anError = "Validation is locked by the current operation";
-    }
-  }
   return anError;
 }
 
@@ -823,7 +811,9 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
   XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
   if (aOB) {
-    //QLineEdit* aLabel = aOB->activeDocLabel();
+    QLineEdit* aLabel = aOB->activeDocLabel();
+    connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)), 
+          SLOT(onActiveDocPopup(const QPoint&)));
     //QPalette aPalet = aLabel->palette();
     //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     //aLabel->setPalette(aPalet);
@@ -832,6 +822,23 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
   }
 }
+
+void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  QLineEdit* aHeader = aWorkshop->objectBrowser()->activeDocLabel();
+
+  aActivatePartAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
+
+  QMenu aMenu;
+  aMenu.addAction(aActivatePartAction);
+  aMenu.exec(aHeader->mapToGlobal(thePnt));
+}
+
 
 ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
 {
@@ -859,7 +866,6 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   int aSelected = aObjects.size();
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
-  QAction* aActivatePartSetAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
 
   ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {
@@ -900,21 +906,11 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
       ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
       if( aResult.get() )
         theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
-    } else {  // If feature is 0 the it means that selected root object (document)
-      theMenu->addAction(aActivatePartSetAction);
-      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
     }
-  } else if (aSelected == 0) {
-    // if there is no selection then it means that upper label is selected
-    QModelIndexList aIndexes = myWorkshop->selection()->selectedIndexes();
-    if (aIndexes.size() == 0) // it means that selection happens in top label outside of tree view
-      theMenu->addAction(aActivatePartSetAction);
-      aActivatePartSetAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
   }
   bool aNotDeactivate = (aCurrentOp == 0);
   if (!aNotDeactivate) {
     aActivatePartAction->setEnabled(false);
-    aActivatePartSetAction->setEnabled(false);
   }
 }
 
@@ -1037,4 +1033,10 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
         aWSelector->activateSelectionAndFilters(true);
     }
   }
+}
+
+//******************************************************
+void PartSet_Module::widgetStateChanged(int thePreviousState)
+{
+  mySketchMgr->widgetStateChanged(thePreviousState);
 }

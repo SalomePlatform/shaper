@@ -14,6 +14,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_Tools.h"
 
 #include "SketcherPrs_Tools.h"
 
@@ -398,3 +399,62 @@ bool SketchPlugin_SolverErrorValidator::isNotObligatory(std::string theFeature, 
   return true;
 }
 
+bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribute,
+                                                 const std::list<std::string>& theArguments,
+                                                 std::string& theError) const
+{
+  if(!theAttribute.get()) {
+    return false;
+  }
+
+  AttributeRefAttrPtr aBase = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (aBase->isObject()) {
+    return false;
+  }
+
+  AttributePtr anAttrBase = aBase->attr();
+  const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aIt;
+  FeaturePtr aCoincident;
+  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+      AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
+      AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+      if(anAttrRefA.get() && !anAttrRefA->isObject()) {
+        AttributePtr anAttrA = anAttrRefA->attr();
+        if(anAttrBase == anAttrA) {
+          aCoincident = aConstrFeature;
+          break;
+        }
+      }
+      if(anAttrRefA.get() && !anAttrRefB->isObject()) {
+        AttributePtr anAttrB = anAttrRefB->attr();
+        if(anAttrBase == anAttrB) {
+          aCoincident = aConstrFeature;
+          break;
+        }
+      }
+    }
+  }
+
+  if(!aCoincident.get()) {
+    return false;
+  }
+
+  std::set<FeaturePtr> aCoinsideLines;
+  SketchPlugin_Tools::findCoincidences(aCoincident,
+                                       SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                       aCoinsideLines);
+  SketchPlugin_Tools::findCoincidences(aCoincident,
+                                       SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                       aCoinsideLines);
+  if(aCoinsideLines.size() != 2) {
+    return false;
+  }
+
+  return true;
+}

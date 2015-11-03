@@ -220,8 +220,10 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     // the fix from VPA for more suitable selection of sketcher lines
     if(anAISIO->Width() > 1) {
       for(int aModeIdx = 0; aModeIdx < myActiveSelectionModes.length(); ++aModeIdx) {
-        aContext->SetSelectionSensitivity(anAISIO,
-          myActiveSelectionModes.value(aModeIdx), anAISIO->Width() + 2);
+        int aMode = myActiveSelectionModes.value(aModeIdx);
+        double aPrecision = (aMode == getSelectionMode(TopAbs_VERTEX))? 15 : 
+                                                    (anAISIO->Width() + 2);
+        aContext->SetSelectionSensitivity(anAISIO, aMode, aPrecision);
       }
     }
   } 
@@ -390,16 +392,19 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
   }
 }
 
+int XGUI_Displayer::getSelectionMode(int theShapeType)
+{
+  return (theShapeType >= TopAbs_SHAPE)? theShapeType : 
+    AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theShapeType);
+}
+
 void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
                                      const bool theUpdateViewer)
 {
   // Convert shape types to selection types
   QIntList aModes;
   foreach(int aType, theModes) {
-    if (aType >= TopAbs_SHAPE) 
-      aModes.append(aType);
-    else
-      aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
+    aModes.append(getSelectionMode(aType));
   }
 
 #ifdef DEBUG_ACTIVATE_OBJECTS

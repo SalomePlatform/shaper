@@ -82,11 +82,13 @@ protected:
 
   /// Results naming.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
                     const ListOfShape& theShells,
-                    const std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos,
+                    const std::list<std::shared_ptr<GeomAPI_Interface>>& theSolidsAlgos,
+                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                     const ListOfShape& theTools,
-                    const GeomAlgoAPI_Boolean& theAlgo);
+                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
+                    GeomAlgoAPI_MakeShape& theMakeShape,
+                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
 
 protected:
   /// Type of boolean operation.

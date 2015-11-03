@@ -27,7 +27,9 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const std::string& theParentId)
     : QWidget(theParent),
       myParentId(theParentId),
-      myIsEditing(false)
+      myIsEditing(false),
+      myState(Stored),
+      myIsValueStateBlocked(false)
 {
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
@@ -36,6 +38,16 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myIsObligatory = theData->getBooleanAttribute(ATTR_OBLIGATORY, true);
 
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
+  connect(this, SIGNAL(valuesModified()), this, SLOT(onWidgetValuesModified()));
+}
+
+bool ModuleBase_ModelWidget::reset()
+{
+  bool aResult = resetCustom();
+  if (aResult)
+    setValueState(Reset);
+
+  return aResult;
 }
 
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
@@ -111,18 +123,52 @@ void ModuleBase_ModelWidget::activate()
   // It should happens in the creation mode only because all fields are filled in the edition mode
   if (!isEditingMode()) {
     AttributePtr anAttribute = myFeature->data()->attribute(myAttributeID);
-    if (anAttribute.get() != NULL && !anAttribute->isInitialized()) {
-      if (isComputedDefault()) {
-        if (myFeature->compute(myAttributeID)) {
-          restoreValue();
-        }
-      }
-      else {
-        storeValue();
-      }
-    }
+    if (anAttribute.get() != NULL && !anAttribute->isInitialized())
+      initializeValueByActivate();
   }
   activateCustom();
+}
+
+void ModuleBase_ModelWidget::deactivate()
+{
+  myIsValueStateBlocked = false;
+  if (myState == ModifiedInPP)
+    storeValue();
+  myState = Stored;
+}
+
+void ModuleBase_ModelWidget::initializeValueByActivate()
+{
+  if (isComputedDefault()) {
+    if (myFeature->compute(myAttributeID)) {
+      restoreValue();
+    }
+  }
+  else {
+    storeValue();
+  }
+}
+
+QWidget* ModuleBase_ModelWidget::getControlAcceptingFocus(const bool isFirst)
+{
+  QWidget* aControl = 0;
+
+  QList<QWidget*> aControls = getControls();
+  int aSize = aControls.size();
+
+  if (isFirst) {
+    for (int i = 0; i < aSize && !aControl; i++)  {
+      if (aControls[i]->focusPolicy() != Qt::NoFocus)
+        aControl = aControls[i];
+    }
+  }
+  else {
+    for (int i = aSize - 1; i >= 0 && !aControl; i--)  {
+      if (aControls[i]->focusPolicy() != Qt::NoFocus)
+        aControl = aControls[i];
+    }
+  }
+  return aControl;
 }
 
 void ModuleBase_ModelWidget::setDefaultValue(const std::string& theValue)
@@ -132,11 +178,30 @@ void ModuleBase_ModelWidget::setDefaultValue(const std::string& theValue)
 
 bool ModuleBase_ModelWidget::storeValue()
 {
+  setValueState(Stored);
+
   emit beforeValuesChanged();
   bool isDone = storeValueCustom();
   emit afterValuesChanged();
 
   return isDone;
+}
+
+ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState(const ModuleBase_ModelWidget::ValueState& theState)
+{
+  ValueState aState = myState;
+  if (myState != theState && !myIsValueStateBlocked) {
+    myState = theState;
+    emit valueStateChanged(aState);
+  }
+  return aState;
+}
+
+bool ModuleBase_ModelWidget::blockValueState(const bool theBlocked)
+{
+  bool isBlocked = myIsValueStateBlocked;
+  myIsValueStateBlocked = theBlocked;
+  return isBlocked;
 }
 
 bool ModuleBase_ModelWidget::restoreValue()
@@ -168,6 +233,11 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
   //blockUpdateViewer(false);
 }
 
+bool ModuleBase_ModelWidget::processEnter()
+{
+  return false;
+}
+
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
@@ -181,6 +251,17 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
       emit focusInWidget(this);
     }
   }
+  else if (theEvent->type() == QEvent::FocusOut) {
+    QFocusEvent* aFocusEvent = dynamic_cast<QFocusEvent*>(theEvent);
+
+    Qt::FocusReason aReason = aFocusEvent->reason();
+    bool aMouseOrKey = aReason == Qt::MouseFocusReason ||
+                        aReason == Qt::TabFocusReason ||
+                        aReason == Qt::BacktabFocusReason ||
+                        aReason == Qt::OtherFocusReason; // to process widget->setFocus()
+    if (aMouseOrKey && getControls().contains(aWidget) && getValueState() == ModifiedInPP)
+      storeValue();
+  }
   // pass the event on to the parent class
 
   return QObject::eventFilter(theObject, theEvent);
@@ -190,6 +271,12 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 void ModuleBase_ModelWidget::onWidgetValuesChanged()
 {
   storeValue();
+}
+
+//**************************************************************
+void ModuleBase_ModelWidget::onWidgetValuesModified()
+{
+  setValueState(ModifiedInPP);
 }
 
 //**************************************************************

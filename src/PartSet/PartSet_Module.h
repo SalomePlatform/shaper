@@ -82,27 +82,27 @@ public:
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
   /// Activate the operation presentation
   /// \param theOperation a started operation
-  virtual void onOperationStarted(ModuleBase_Operation* theOperation);
+  virtual void operationStarted(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation resume
   /// Activate the operation presentation
   /// \param theOperation a resumed operation
-  virtual void onOperationResumed(ModuleBase_Operation* theOperation);
+  virtual void operationResumed(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation commit
   /// Restarts sketcher operation automatically of it is necessary
   /// \param theOperation a committed operation
-  virtual void onOperationCommitted(ModuleBase_Operation* theOperation);
+  virtual void operationCommitted(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation abort
   /// Hides all sketcher sub-Objects, displays sketcher result and removes selection filters
   /// \param theOperation an aborted operation
-  virtual void onOperationAborted(ModuleBase_Operation* theOperation);
+  virtual void operationAborted(ModuleBase_Operation* theOperation);
 
   /// Realizes some functionality by an operation stop
   /// Hides all sketcher sub-Objects, displays sketcher result and removes selection filters
   /// \param theOperation a stopped operation
-  virtual void onOperationStopped(ModuleBase_Operation* theOperation);
+  virtual void operationStopped(ModuleBase_Operation* theOperation);
 
   /// Returns current operation
   virtual ModuleBase_Operation* currentOperation() const;
@@ -123,7 +123,7 @@ public:
 
   /// Returns True if the current operation can be committed. Asks the sketch manager.
   /// \return a boolean value
-  virtual bool canCommitOperation() const;
+  //virtual bool canCommitOperation() const;
 
   /// Returns whether the object can be erased at the bounds of the active operation.
   /// The sub-objects of the current operation can not be erased
@@ -211,6 +211,10 @@ public:
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 
+  /// Validates the current operation and send the state change to sketch manager
+  /// \thePrevState the previous widget value state
+  virtual void widgetStateChanged(int thePreviousState);
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -247,7 +251,7 @@ protected slots:
   /// A slot called on view window creation
   void onViewCreated(ModuleBase_IViewWindow*);
 
- protected:
+protected:
   /// Register validators for this module
   virtual void registerValidators();
 
@@ -257,8 +261,15 @@ protected slots:
   /// Register properties of this module
   virtual void registerProperties();
 
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param theWidget a property contol widget
+  /// \param isToConnect a boolean value whether connect or disconnect
+  virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
+
  private slots:
    void onTreeViewDoubleClick(const QModelIndex&);
+
+   void onActiveDocPopup(const QPoint&);
 
  private:
 

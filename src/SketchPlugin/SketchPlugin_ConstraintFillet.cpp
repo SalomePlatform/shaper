@@ -25,8 +25,10 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_Tools.h>
 
 #include <SketcherPrs_Factory.h>
+#include <SketcherPrs_Tools.h>
 
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
@@ -46,7 +48,6 @@ static void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB
                                   std::shared_ptr<GeomAPI_XY>& theTangentA,
                                   std::shared_ptr<GeomAPI_XY>& theTangentB);
 
-
 SketchPlugin_ConstraintFillet::SketchPlugin_ConstraintFillet()
 {
 }
@@ -55,11 +56,10 @@ void SketchPlugin_ConstraintFillet::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(PREVIOUS_VALUE, ModelAPI_AttributeDouble::typeId());
   // initialize attribute not applicable for user
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_C());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
   data()->attribute(PREVIOUS_VALUE)->setInitialized();
   std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(PREVIOUS_VALUE))->setValue(0.0);
 }
@@ -79,32 +79,83 @@ void SketchPlugin_ConstraintFillet::execute()
       aData->attribute(SketchPlugin_Constraint::VALUE()))->value();
   AttributeRefAttrPtr aBaseA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  AttributeRefAttrPtr aBaseB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  if (!aBaseA->isInitialized() || !aBaseB->isInitialized() ||
-      !aBaseA->isObject() || !aBaseB->isObject())
+  if (!aBaseA->isInitialized() || aBaseA->isObject()) {
+    setError("Bad vertex selected");
     return;
+  }
+
   // Check the fillet shapes is not initialized yet
   AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-      aData->attribute(SketchPlugin_Constraint::ENTITY_C()));
+      aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   bool needNewObjects = aRefListOfFillet->size() == 0;
 
-  // Obtain features for the base objects
-  FeaturePtr aFeatureA, aFeatureB;
-  aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseA->object());
-  if (aRC) aFeatureA = aRC->document()->feature(aRC);
-  aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseB->object());
-  if (aRC) aFeatureB = aRC->document()->feature(aRC);
-  if (!aFeatureA || !aFeatureB)
+  // Obtain base features
+  AttributePtr anAttrBase = aBaseA->attr();
+  const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aIt;
+  FeaturePtr aCoincident;
+  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+      AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
+      AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+      if(anAttrRefA.get() && !anAttrRefA->isObject()) {
+        AttributePtr anAttrA = anAttrRefA->attr();
+        if(anAttrBase == anAttrA) {
+          aCoincident = aConstrFeature;
+          break;
+        }
+      }
+      if(anAttrRefA.get() && !anAttrRefB->isObject()) {
+        AttributePtr anAttrB = anAttrRefB->attr();
+        if(anAttrBase == anAttrB) {
+          aCoincident = aConstrFeature;
+          break;
+        }
+      }
+    }
+  }
+
+  if(!aCoincident.get()) {
+    setError("No coincident edges at selected vertex");
     return;
+  }
+
+  std::set<FeaturePtr> aCoinsideLines;
+  SketchPlugin_Tools::findCoincidences(aCoincident,
+                                       SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                       aCoinsideLines);
+  SketchPlugin_Tools::findCoincidences(aCoincident,
+                                       SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                       aCoinsideLines);
+  if(aCoinsideLines.size() != 2) {
+    setError("At selected vertex should be two coincident lines");
+    return;
+  }
+
+  std::set<FeaturePtr>::iterator aLinesIt = aCoinsideLines.begin();
+  FeaturePtr anOldFeatureA = *aLinesIt;
+  if(!anOldFeatureA) {
+    setError("One of the edges is empty");
+    return;
+  }
+  aLinesIt++;
+  FeaturePtr anOldFeatureB = *aLinesIt;
+  if(!anOldFeatureB) {
+    setError("One of the edges is empty");
+    return;
+  }
 
   FeaturePtr aNewFeatureA, aNewFeatureB, aNewArc;
   if (needNewObjects) {
     // Create list of objects composing a fillet
     // copy aFeatureA
-    aNewFeatureA = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeatureA, sketch());
+    aNewFeatureA = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(anOldFeatureB, sketch());
     // copy aFeatureB
-    aNewFeatureB = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeatureB, sketch());
+    aNewFeatureB = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(anOldFeatureB, sketch());
     // create filleting arc (it will be attached to the list later)
     aNewArc = sketch()->addFeature(SketchPlugin_Arc::ID());
   } else {
@@ -118,7 +169,7 @@ void SketchPlugin_ConstraintFillet::execute()
 
   // Calculate arc attributes
   static const int aNbFeatures = 2;
-  FeaturePtr aFeature[aNbFeatures] = {aFeatureA, aFeatureB};
+  FeaturePtr aFeature[aNbFeatures] = {anOldFeatureA, anOldFeatureB};
   FeaturePtr aNewFeature[aNbFeatures] = {aNewFeatureA, aNewFeatureB};
   std::shared_ptr<GeomAPI_Dir2d> aTangentDir[aNbFeatures]; // tangent directions of the features in coincident point
   bool isStart[aNbFeatures]; // indicates which point the features share
@@ -194,7 +245,7 @@ void SketchPlugin_ConstraintFillet::execute()
 
   // Calculate fillet arc parameters
   std::shared_ptr<GeomAPI_XY> aCenter, aTangentPntA, aTangentPntB;
-  calculateFilletCenter(aFeatureA, aFeatureB, aFilletRadius, isStart, aCenter, aTangentPntA, aTangentPntB);
+  calculateFilletCenter(anOldFeatureA, anOldFeatureB, aFilletRadius, isStart, aCenter, aTangentPntA, aTangentPntB);
   // update features
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewFeatureA->attribute(aFeatAttributes[isStart[0] ? 0 : 1]))->setValue(
@@ -260,18 +311,18 @@ void SketchPlugin_ConstraintFillet::execute()
     myProducedFeatures.push_back(aConstraint);
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
     // 2. Fillet arc radius
-    aConstraint = sketch()->addFeature(SketchPlugin_ConstraintRadius::ID());
-    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    aRefAttr->setObject(aNewArc->lastResult());
-    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-        aConstraint->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aFilletRadius);
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))->setValue(
-        isStart[0] ? aStartEndPnt[0] : aStartEndPnt[1]);
-    aConstraint->execute();
-    myProducedFeatures.push_back(aConstraint);
-    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    //aConstraint = sketch()->addFeature(SketchPlugin_ConstraintRadius::ID());
+    //aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+    //    aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    //aRefAttr->setObject(aNewArc->lastResult());
+    //std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+    //    aConstraint->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aFilletRadius);
+    //std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    //    aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))->setValue(
+    //    isStart[0] ? aStartEndPnt[0] : aStartEndPnt[1]);
+    //aConstraint->execute();
+    //myProducedFeatures.push_back(aConstraint);
+    //ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
     // 3. Tangency of fillet arc and features
     for (int i = 0; i < aNbFeatures; i++) {
       aConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
@@ -311,14 +362,14 @@ void SketchPlugin_ConstraintFillet::execute()
       myProducedFeatures.push_back(aConstraint);
     }
     // make base features auxiliary
-    aFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
-    aFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
+    anOldFeatureA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
+    anOldFeatureB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(true);
     myBaseObjects.clear();
-    myBaseObjects.push_back(aFeatureA);
-    myBaseObjects.push_back(aFeatureB);
+    myBaseObjects.push_back(anOldFeatureA);
+    myBaseObjects.push_back(anOldFeatureB);
     // exchange the naming IDs of newly created and old line that become auxiliary
-    sketch()->exchangeIDs(aFeatureA, aNewFeatureA);
-    sketch()->exchangeIDs(aFeatureB, aNewFeatureB);
+    sketch()->exchangeIDs(anOldFeatureA, aNewFeatureA);
+    sketch()->exchangeIDs(anOldFeatureB, aNewFeatureB);
   } else {
     // Update radius value
     int aNbSubs = sketch()->numberOfSubs();
@@ -354,11 +405,10 @@ void SketchPlugin_ConstraintFillet::execute()
 
 void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
 {
-  if (theID == SketchPlugin_Constraint::ENTITY_A() ||
-      theID == SketchPlugin_Constraint::ENTITY_B()) {
+  if (theID == SketchPlugin_Constraint::ENTITY_A()) {
     // clear the list of fillet entities
     AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
+        data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
     aRefListOfFillet->clear();
 
     // remove all produced objects and constraints

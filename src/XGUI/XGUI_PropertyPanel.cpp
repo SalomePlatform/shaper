@@ -119,23 +119,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(aWidget, SIGNAL(keyReleased(QKeyEvent*)),
             this,    SIGNAL(keyReleased(QKeyEvent*)));
   }
-
-  QWidget* aLastControl = 0;
-  QList<QWidget*> aControls;
-  for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)  {
-    aControls = myWidgets[i]->getControls();
-    for (int j = aControls.size()-1; j >= 0 && !aLastControl; j--)  {
-      if (aControls[j]->focusPolicy() != Qt::NoFocus)
-        aLastControl = aControls[j];
-    }
-  }
-  if (aLastControl) {
-    QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
-
-    setTabOrder(aLastControl, anOkBtn);
-    setTabOrder(anOkBtn, aCancelBtn);
-  }
 }
 
 const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
@@ -145,7 +128,6 @@ const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
 
 ModuleBase_PageBase* XGUI_PropertyPanel::contentWidget()
 {
-
   return static_cast<ModuleBase_PageBase*>(myPanelPage);
 }
 
@@ -186,6 +168,64 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   activateWidget(NULL);
 }
 
+bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
+{
+  // it wraps the Tabs clicking to follow in the chain:
+  // controls, last control, Apply, Cancel, first control, controls
+
+  bool isChangedFocus = false;
+  if (theIsNext) { // forward by Tab
+    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+    if (aCancelBtn->hasFocus()) {
+      // after cancel, the first control should be focused
+      QWidget* aFirstControl = 0;
+      for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
+        aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
+      if (aFirstControl)
+        aFirstControl->setFocus();
+        isChangedFocus = true;
+    }
+    else {
+      // after the last control, the Apply button should be focused
+      QWidget* aLastControl = 0;
+      for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
+        aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
+      if (aLastControl && aLastControl->hasFocus()) {
+        setFocusOnOkButton();
+        isChangedFocus = true;
+      }
+    }
+  }
+  else { // backward by SHIFT + Tab
+    QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+    if (anOkBtn->hasFocus()) {
+      // after Apply, the last control should be focused
+      QWidget* aLastControl = 0;
+      for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
+        aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
+      if (aLastControl)
+        aLastControl->setFocus();
+        isChangedFocus = true;
+    }
+    else {
+      // after the first control, the Cancel button should be focused
+      QWidget* aFirstControl = 0;
+      for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
+        aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
+      if (aFirstControl && aFirstControl->hasFocus()) {
+        QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+        aCancelBtn->setFocus();
+        isChangedFocus = true;
+      }
+    }
+  }
+
+  if (!isChangedFocus)
+    isChangedFocus = ModuleBase_IPropertyPanel::focusNextPrevChild(theIsNext);
+
+  return isChangedFocus;
+}
+
 void XGUI_PropertyPanel::activateNextWidget()
 {
   activateNextWidget(myActiveWidget);
@@ -194,8 +234,21 @@ void XGUI_PropertyPanel::activateNextWidget()
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
+  if (setActiveWidget(theWidget)) {
+    if (myActiveWidget) {
+      emit widgetActivated(myActiveWidget);
+    } else if (!isEditingMode()) {
+      emit noMoreWidgets();
+      //setFocusOnOkButton();
+    }
+  }
+}
+
+bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
+{
+  // Avoid activation of already actve widget. It could happen on focusIn event many times
   if (theWidget == myActiveWidget) {
-    return;
+    return false;
   }
   std::string aPreviosAttributeID;
   if(myActiveWidget) {
@@ -209,10 +262,7 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
-  emit widgetActivated(theWidget);
-  if (!myActiveWidget && !isEditingMode()) {
-    emit noMoreWidgets(aPreviosAttributeID);
-  }
+  return true;
 }
 
 void XGUI_PropertyPanel::setFocusOnOkButton()

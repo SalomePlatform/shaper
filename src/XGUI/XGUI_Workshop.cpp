@@ -460,7 +460,8 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
   }
   updateCommandStatus();
 
-  myModule->onOperationStarted(aFOperation);
+  connectToPropertyPanel(true);
+  myModule->operationStarted(aFOperation);
 
   // the objects of the current operation should be deactivated
   QObjectPtrList anObjects;
@@ -488,7 +489,7 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
   }
   updateCommandStatus();
 
-  myModule->onOperationResumed(theOperation);
+  myModule->operationResumed(theOperation);
 }
 
 
@@ -508,7 +509,8 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
-  myModule->onOperationStopped(aFOperation);
+  connectToPropertyPanel(false);
+  myModule->operationStopped(aFOperation);
 
   // the deactivated objects of the current operation should be activated back.
   // They were deactivated on operation start or an object redisplay
@@ -534,12 +536,12 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 
 void XGUI_Workshop::onOperationCommitted(ModuleBase_Operation* theOperation)
 {
-  myModule->onOperationCommitted(theOperation);
+  myModule->operationCommitted(theOperation);
 }
 
 void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
 {
-  myModule->onOperationAborted(theOperation);
+  myModule->operationAborted(theOperation);
 }
 
 void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
@@ -605,6 +607,23 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
   myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
+}
+
+void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
+{
+  XGUI_PropertyPanel* aPropertyPanel = propertyPanel();
+  if (aPropertyPanel) {
+    const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
+    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+       myModule->connectToPropertyPanel(aWidget, isToConnect);
+      if (isToConnect) {
+        connect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+      }
+      else {
+        disconnect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+      }
+    }
+  }
 }
 
 /*
@@ -843,6 +862,21 @@ void XGUI_Workshop::onRebuild()
 }
 
 //******************************************************
+void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
+{
+  ModuleBase_ModelWidget* anActiveWidget = 0;
+  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+  if (anOperation) {
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+    if (aPanel)
+      anActiveWidget = aPanel->activeWidget();
+  }
+  if (anActiveWidget)
+    operationMgr()->onValidateOperation();
+
+  myModule->widgetStateChanged(thePreviousState);
+}
+
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName = QString::fromStdString(library(theModule.toStdString()));

@@ -45,6 +45,12 @@ class ExpressionEditor: public QPlainTextEdit
   /// Returns placeholder list
   QString placeHolderText() const;
 
+  // Returns true if the current value is modified by has not been applyed yet
+  bool isModified() const;
+
+  // Clears modified state
+  void clearModified();
+
  public slots:
   /// Insert additional string for completion
   /// \param theCompletion a string to insert
@@ -53,6 +59,17 @@ class ExpressionEditor: public QPlainTextEdit
 
   /// Perform completion
   void performCompletion();
+
+  /// A slot for processing text changed event
+  void onTextChanged();
+
+signals:
+  /// The signal about text change in the text editor
+  void valueModified();
+
+  /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theEvent key release event
+  void keyReleased(QKeyEvent* theEvent);
 
  protected:
   /// Perform completion by prefix
@@ -70,11 +87,14 @@ class ExpressionEditor: public QPlainTextEdit
   /// Redefinition of virtual method
   virtual void paintEvent( QPaintEvent* );
 
- private:
+private:
   QStringListModel* myCompleterModel;
   QCompleter* myCompleter;
   bool myCompletedAndSelected;
   QString myPlaceHolderText;
+
+  /// Boolean value whether the spin box content is modified
+  bool myIsModified;
 };
 
 /**
@@ -99,11 +119,17 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 
- public slots:
-   /// A slot for processing text changed event
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
+protected slots:
+  /// A slot for processing text changed event
   void onTextChanged();
 
 protected:
+  /// Do not initialize value on the widget activation
+  virtual void initializeValueByActivate();
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;

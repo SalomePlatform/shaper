@@ -375,13 +375,13 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       case Qt::DecorationRole:
         return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
       case Qt::ForegroundRole:
-        if ((flags(theIndex) & Qt::ItemIsEditable) == 0)
+        if ((theIndex.flags() & Qt::ItemIsEditable) == 0)
           return QBrush(Qt::lightGray);
         return ACTIVE_COLOR;
     }
   } else { // an object or sub-document
     if (theRole == Qt::ForegroundRole) {
-      if ((flags(theIndex) & Qt::ItemIsEditable) == 0)
+      if ((theIndex.flags() & Qt::ItemIsEditable) == 0)
         return QBrush(Qt::lightGray);
       return ACTIVE_COLOR;
     }

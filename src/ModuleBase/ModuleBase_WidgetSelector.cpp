@@ -165,6 +165,7 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrs& t
 //********************************************************************
 void ModuleBase_WidgetSelector::deactivate()
 {
+  ModuleBase_ModelWidget::deactivate();
   disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateSelectionAndFilters(false);
   ModuleBase_ModelWidget::deactivate();

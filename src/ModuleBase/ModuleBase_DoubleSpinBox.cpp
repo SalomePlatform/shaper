@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QDoubleValidator>
 #include <QVariant>
+#include <QKeyEvent>
 
 #include <limits>
 
@@ -57,7 +58,9 @@ const double PSEUDO_ZERO = 1.e-20;
  */
 ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
     : QDoubleSpinBox(theParent),
-      myCleared(false)
+      myCleared(false),
+      myIsModified(false),
+      myIsEmitKeyPressEvent(false)
 {
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid inconsistency of double-2-string and string-2-double conversion)
@@ -75,6 +78,8 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
 
   connect(lineEdit(), SIGNAL(textChanged( const QString& )), this,
           SLOT(onTextChanged( const QString& )));
+
+  connect(this, SIGNAL(valueChanged(const QString&)), this, SLOT(onValueChanged(const QString&)));
 }
 
 /*!
@@ -196,6 +201,22 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
   return res;
 }
 
+void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
+{
+  switch (theEvent->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return: {
+      // do not react to the Enter key, the property panel processes it
+      if (!myIsEmitKeyPressEvent)
+        return;
+    }
+    break;
+    default:
+      break;
+  }
+  QDoubleSpinBox::keyPressEvent(theEvent);
+}
+
 /*!
  \brief Perform \a steps increment/decrement steps.
 
@@ -306,4 +327,28 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
 void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 {
   myCleared = false;
+  myIsModified = true;
+}
+
+void ModuleBase_DoubleSpinBox::onValueChanged(const QString& theValue)
+{
+  myIsModified = true;
+}
+
+bool ModuleBase_DoubleSpinBox::isModified() const
+{
+  return myIsModified;
+}
+
+void ModuleBase_DoubleSpinBox::clearModified()
+{
+  myIsModified = false;
+}
+
+bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
+{
+  bool aPreviousValue = myIsEmitKeyPressEvent;
+  myIsEmitKeyPressEvent = theEnable;
+
+  return aPreviousValue;
 }

@@ -296,6 +296,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
+  ModuleBase_ModelWidget::deactivate();
   erasePreviewPlanes();
   activateSelection(false);
 

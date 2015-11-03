@@ -70,6 +70,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_CopyValidator);
   aFactory->registerValidator("SketchPlugin_SolverErrorValidator",
                               new SketchPlugin_SolverErrorValidator);
+  aFactory->registerValidator("SketchPlugin_FilletVertexValidator",
+                              new SketchPlugin_FilletVertexValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

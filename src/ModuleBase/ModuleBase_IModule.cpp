@@ -184,11 +184,6 @@ bool ModuleBase_IModule::canRedo() const
   return aMgr->hasModuleDocument() && aMgr->canRedo() && !aMgr->isOperation();
 }
 
-bool ModuleBase_IModule::canCommitOperation() const
-{
-  return true;
-}
-
 void ModuleBase_IModule::onFeatureTriggered()
 {
   QAction* aCmd = dynamic_cast<QAction*>(sender());
@@ -228,7 +223,7 @@ bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
   return !aFOperation || !aFOperation->hasObject(theObject);
 }
 
-void ModuleBase_IModule::onOperationResumed(ModuleBase_Operation* theOperation) 
+void ModuleBase_IModule::operationResumed(ModuleBase_Operation* theOperation) 
 {
-  emit operationResumed(theOperation);
+  emit resumed(theOperation);
 }

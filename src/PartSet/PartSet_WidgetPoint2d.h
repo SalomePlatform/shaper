@@ -22,7 +22,6 @@ class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
-class PartSet_LockApplyMgr;
 
 class QGroupBox;
 class QMouseEvent;
@@ -49,9 +48,6 @@ Q_OBJECT
                         const std::string& theParentId);
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
-
-  /// Fills the widget with default values
-  virtual bool reset();
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
@@ -91,6 +87,9 @@ Q_OBJECT
   /// Returns coordinate Y currently defined in the control
   double y() const;
 
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
@@ -113,6 +112,10 @@ protected:
 
   virtual bool restoreValueCustom();
 
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom();
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
@@ -124,9 +127,9 @@ protected:
   /// \return boolean result
   bool isFeatureContainsPoint(const FeaturePtr& theFeature, double theX, double theY);
 
-private slots:
+//private slots:
   /// Process value changed event
-  void onValuesChanged();
+  //void onValuesChanged();
 
  private:
    /// Returns point 2d from selected vertex
@@ -145,7 +148,6 @@ protected:
   ModuleBase_IWorkshop* myWorkshop;
 
 private:
-  PartSet_LockApplyMgr* myLockApplyMgr; ///< a manager to lock/unlock Apply button in PP
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
   ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate

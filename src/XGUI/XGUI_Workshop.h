@@ -299,6 +299,10 @@ signals:
   /// Rebuild data tree
   void onRebuild();
 
+  /// Validates the operation to change the "Apply" button state.
+  /// \param thePreviousState the previous state of the widget
+  void onWidgetStateChanged(int thePreviousState);
+
   /// Show property panel
   void showPropertyPanel();
 
@@ -338,6 +342,10 @@ signals:
   /// into the operation
   /// \param theOperation an operation
   void setPropertyPanel(ModuleBase_Operation* theOperation);
+
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param isToConnect a boolean value whether connect or disconnect
+  void connectToPropertyPanel(const bool isToConnect);
 
 private:
   /// Display all results

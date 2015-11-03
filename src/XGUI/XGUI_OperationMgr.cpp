@@ -9,6 +9,8 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_ErrorMgr.h"
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
@@ -25,8 +27,7 @@
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myIsValidationLock(false), myIsApplyEnabled(false),
-  myWorkshop(theWorkshop)
+: QObject(theParent), myIsApplyEnabled(false), myWorkshop(theWorkshop)
 {
 }
 
@@ -192,20 +193,10 @@ void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
     return;
-  //ModuleBase_Operation* anOperation = currentOperation();
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                           (currentOperation());
-  if(aFOperation && aFOperation->feature().get()) {
-    //bool aCanCommit = myWorkshop->module()->canCommitOperation();
-    //setApplyEnabled(!myIsValidationLock && aCanCommit && anOperation->isValid());
+  if(aFOperation && aFOperation->feature().get())
     setApplyEnabled(myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty());
-  }
-}
-
-void XGUI_OperationMgr::setLockValidating(bool toLock)
-{
-  myIsValidationLock = toLock;
-  onValidateOperation();
 }
 
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
@@ -500,15 +491,28 @@ void XGUI_OperationMgr::onOperationStopped()
 
 bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
+  QObject* aSender = sender();
+
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = true;
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      emit keyEnterReleased();
-      commitOperation();
+      ModuleBase_Operation* aOperation = currentOperation();
+      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+      if (!aActiveWgt || !aActiveWgt->processEnter()) {
+        ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+        if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
+          emit keyEnterReleased();
+          commitOperation();
+        }
+        else
+          isAccepted = false;
+      }
     }
+    break;
     case Qt::Key_N:
     case Qt::Key_P: {
       bool noModifiers = (theEvent->modifiers() == Qt::NoModifier);

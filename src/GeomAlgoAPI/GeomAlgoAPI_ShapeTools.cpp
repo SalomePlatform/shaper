@@ -24,6 +24,7 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Shell.hxx>
 #include <TopoDS.hxx>
+#include <TopExp_Explorer.hxx>
 
 
 //=================================================================================================
@@ -148,10 +149,13 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
     TopoDS_CompSolid aCSolid;
     TopoDS_Builder aBuilder;
     theType == GeomAPI_Shape::COMPSOLID ? aBuilder.MakeCompSolid(aCSolid) : aBuilder.MakeShell(aShell);
-    const NCollection_Map<TopoDS_Shape>& aShapesMap = anIter.Value();
-    for(NCollection_Map<TopoDS_Shape>::Iterator aShIter(aShapesMap); aShIter.More(); aShIter.Next()) {
-      const TopoDS_Shape& aShape = aShIter.Value();
-      theType == GeomAPI_Shape::COMPSOLID ? aBuilder.Add(aCSolid, aShape) : aBuilder.Add(aShell, aShape);
+    NCollection_Map<TopoDS_Shape>& aShapesMap = anIter.ChangeValue();
+    for(TopExp_Explorer anExp(aShapesComp, aTA); anExp.More(); anExp.Next()) {
+      const TopoDS_Shape& aShape = anExp.Current();
+      if(aShapesMap.Contains(aShape)) {
+        theType == GeomAPI_Shape::COMPSOLID ? aBuilder.Add(aCSolid, aShape) : aBuilder.Add(aShell, aShape);
+        aShapesMap.Remove(aShape);
+      }
     }
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
     TopoDS_Shape* aSh = theType == GeomAPI_Shape::COMPSOLID ? new TopoDS_Shape(aCSolid) : new TopoDS_Shape(aShell);
@@ -160,11 +164,13 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
   }
 
   // Adding free shapes.
-  for(NCollection_Map<TopoDS_Shape>::Iterator aShIter(aFreeShapes); aShIter.More(); aShIter.Next()) {
-    const TopoDS_Shape& aShape = aShIter.Value();
-    std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-    aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
-    theFreeShapes.push_back(aGeomShape);
+  for(TopExp_Explorer anExp(aShapesComp, aTA); anExp.More(); anExp.Next()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    if(aFreeShapes.Contains(aShape)) {
+      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+      aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
+      theFreeShapes.push_back(aGeomShape);
+    }
   }
 }
 

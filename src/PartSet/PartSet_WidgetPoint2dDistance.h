@@ -12,7 +12,6 @@
 
 #include <ModelAPI_CompositeFeature.h>
 
-class PartSet_LockApplyMgr;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
 class ModuleBase_IViewWindow;
@@ -59,6 +58,9 @@ Q_OBJECT
   /// Set sketch instance
   void setSketch(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
 
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
 public slots:
    /// Process of mouse move
    /// \param theWnd a pointer to a window
@@ -85,17 +87,10 @@ protected:
   virtual double computeValue(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
                               const std::shared_ptr<GeomAPI_Pnt2d>& theCurrentPnt);
 
-private slots:
-  /// Process values changed event
-  void onValuesChanged();
-
 protected:
   /// A reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
   
-  /// A manager to lock/unlock Apply button in PP
-  PartSet_LockApplyMgr* myLockApplyMgr;
-
   /// A name of the first point
   std::string myFirstPntName;
 
