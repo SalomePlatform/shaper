@@ -27,8 +27,6 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 
-#include <GeomValidators_ShapeType.h>
-
 #include <GeomDataAPI_Point2D.h>
 
 
@@ -56,7 +54,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
     ObjectPtr anObject = aRefAttr->object();
 
     const ModelAPI_AttributeValidator* aShapeValidator = 
-      dynamic_cast<const GeomValidators_ShapeType*>(aFactory->validator("GeomValidators_ShapeType"));
+      dynamic_cast<const ModelAPI_AttributeValidator*>(aFactory->validator("GeomValidators_ShapeType"));
     std::list<std::string> anArguments;
     anArguments.push_back("circle");
     std::string aCircleError;

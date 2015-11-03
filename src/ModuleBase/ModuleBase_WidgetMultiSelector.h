@@ -29,7 +29,6 @@ class QWidget;
 class QListWidget;
 class QComboBox;
 class ModuleBase_IWorkshop;
-class GeomValidators_ShapeType;
 class QAction;
 
 

@@ -8,10 +8,9 @@
 
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_ResultConstruction.h>
-
-#include <GeomValidators_Tools.h>
 
 #include <TopoDS_Iterator.hxx>
 
@@ -90,7 +89,7 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
     // for compounds check sub-shapes: it may be compound of needed type:
     // Booleans may produce compounds of Solids
     if (aShapeType == TopAbs_COMPOUND) {
-      aShapeType = GeomValidators_Tools::getCompoundSubType(aTopoShape);
+      aShapeType = ModuleBase_Tools::getCompoundSubType(aTopoShape);
     }
   }
 

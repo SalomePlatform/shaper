@@ -113,7 +113,6 @@ SET(PROJECT_LIBRARIES
 	GeomAPI
 	GeomDataAPI
 	GeomAlgoAPI
-	GeomValidators
 	${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
@@ -141,7 +140,6 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
-    ${CMAKE_SOURCE_DIR}/src/GeomValidators
     ${SUIT_INCLUDE}
 )
 

@@ -66,7 +66,6 @@ SET(PROJECT_LIBRARIES
     ModuleBase
     Config
     GeomAPI
-    GeomValidators
     GeomDataAPI
 	SketcherPrs
     ${QT_LIBRARIES}
@@ -104,7 +103,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/PartSetPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
-                    ${CMAKE_SOURCE_DIR}/src/GeomValidators
                     ${CMAKE_SOURCE_DIR}/src/AppElements
                     ${CAS_INCLUDE_DIRS}
                     ${SUIT_INCLUDE}

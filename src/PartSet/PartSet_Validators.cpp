@@ -13,7 +13,6 @@
 #include <BRep_Tool.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <GeomAbs_CurveType.hxx>
-#include <GeomValidators_Tools.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_OperationFeature.h>

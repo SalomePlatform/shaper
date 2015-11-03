@@ -7,13 +7,17 @@
 #include "ModuleBase_Tools.h"
 #include <ModuleBase_ParamSpinBox.h>
 
-#include <ModelAPI_Result.h>
-#include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
-#include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Result.h>
 #include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Tools.h>
+
+#include <TopoDS_Iterator.hxx>
 
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Error.h>
@@ -266,6 +270,54 @@ Quantity_Color color(const std::string& theSection,
   return Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB);
 }
 
+ObjectPtr getObject(const AttributePtr& theAttribute)
+{
+  ObjectPtr anObject;
+  std::string anAttrType = theAttribute->attributeType();
+  if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    if (anAttr != NULL && anAttr->isObject())
+      anObject = anAttr->object();
+  }
+  if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    if (anAttr != NULL)
+      anObject = anAttr->context();
+  }
+  if (anAttrType == ModelAPI_AttributeReference::typeId()) {
+    AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    if (anAttr.get() != NULL)
+      anObject = anAttr->value();
+  }
+  return anObject;
 }
+
+TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape)
+{
+  TopAbs_ShapeEnum aShapeType = theShape.ShapeType();
+
+  // for compounds check sub-shapes: it may be compound of needed type:
+  // Booleans may produce compounds of Solids
+  if (aShapeType == TopAbs_COMPOUND) {
+    for(TopoDS_Iterator aSubs(theShape); aSubs.More(); aSubs.Next()) {
+      if (!aSubs.Value().IsNull()) {
+        TopAbs_ShapeEnum aSubType = aSubs.Value().ShapeType();
+        if (aSubType == TopAbs_COMPOUND) { // compound of compound(s)
+          aShapeType = TopAbs_COMPOUND;
+          break;
+        }
+        if (aShapeType == TopAbs_COMPOUND) {
+          aShapeType = aSubType;
+        } else if (aShapeType != aSubType) { // compound of shapes of different types
+          aShapeType = TopAbs_COMPOUND;
+          break;
+        }
+      }
+    }
+  }
+  return aShapeType;
+}
+
+} // namespace ModuleBase_Tools
 
 
