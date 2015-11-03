@@ -55,17 +55,14 @@ class Sketch(Interface):
         assert(self._norm)
         assert(self._external)
 
-        if not args:
-            return
-
-        plane = args[0]
-
-        #   self.resultype ="Face" # Type of Sketch result
-        if isinstance(plane, str):
-            self.__sketchOnFace(plane)
-        else:
-            self.__sketchOnPlane(plane)
-        pass
+        # If no arguments are given the attributes of the feature 
+        # are not Initialized
+        if args is not None:
+            plane = args[0]
+            if isinstance(plane, str):
+                self.__sketchOnFace(plane)
+            else:
+                self.__sketchOnPlane(plane)
 
     def __sketchOnPlane(self, plane):
         """Create the sketch on a plane."""

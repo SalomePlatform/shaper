@@ -16,11 +16,10 @@ class Line(Interface):
             self._feature.data().attribute("EndPoint")
             )
 
-        # Check that input arguments are not None
+        # If no arguments are given the attributes of the feature 
+        # are'nt initialized
         if args is None:
-            raise WrongNumberOfArguments(
-                "No argument given, at least one argument needed"
-                )
+            return
         
         # Set attribute values and execute
         if len(args) == 4:
