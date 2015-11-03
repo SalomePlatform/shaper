@@ -83,12 +83,12 @@ class Revolution(Interface):
 
     def __clear(self):
         self._CreationMethod.setValue("ByAngles")
-        self._fill_attribute(self._to_angle, 0)
-        self._fill_attribute(self._from_angle, 0)
-        self._fill_attribute(self._to_object, None)
-        self._fill_attribute(self._to_offset, 0)
-        self._fill_attribute(self._from_object, None)
-        self._fill_attribute(self._from_offset, 0)
+        self._fillAttribute(self._to_angle, 0)
+        self._fillAttribute(self._from_angle, 0)
+        self._fillAttribute(self._to_object, None)
+        self._fillAttribute(self._to_offset, 0)
+        self._fillAttribute(self._from_object, None)
+        self._fillAttribute(self._from_offset, 0)
         pass
 
     def setBase(self, base):
@@ -96,7 +96,7 @@ class Revolution(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._base, base)
+        self._fillAttribute(self._base, base)
         pass
 
     def setAxisObject(self, axis_object):
@@ -104,7 +104,7 @@ class Revolution(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._axis_object, axis_object)
+        self._fillAttribute(self._axis_object, axis_object)
         pass
 
     def setAngles(self, to_angle, from_angle):
@@ -114,8 +114,8 @@ class Revolution(Interface):
         """
         self.__clear()
         self._CreationMethod.setValue("ByAngles")
-        self._fill_attribute(self._to_angle, to_angle)
-        self._fill_attribute(self._from_angle, from_angle)
+        self._fillAttribute(self._to_angle, to_angle)
+        self._fillAttribute(self._from_angle, from_angle)
         pass
 
     def setPlanesAndOffsets(self, to_object, to_offset,
@@ -126,8 +126,8 @@ class Revolution(Interface):
         """
         self.__clear()
         self._CreationMethod.setValue("ByPlanesAndOffsets")
-        self._fill_attribute(self._to_object, to_object)
-        self._fill_attribute(self._to_offset, to_offset)
-        self._fill_attribute(self._from_object, from_object)
-        self._fill_attribute(self._from_offset, from_offset)
+        self._fillAttribute(self._to_object, to_object)
+        self._fillAttribute(self._to_offset, to_offset)
+        self._fillAttribute(self._from_object, from_object)
+        self._fillAttribute(self._from_offset, from_offset)
         pass

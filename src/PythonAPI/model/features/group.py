@@ -48,5 +48,5 @@ class Group(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._group_list, group_list)
+        self._fillAttribute(self._group_list, group_list)
         pass

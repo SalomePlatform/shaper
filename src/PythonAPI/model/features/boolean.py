@@ -76,12 +76,12 @@ class Boolean(Interface):
 
     def setMainObjects(self, main_objects):
         """F.setMainObjects(iterable) -- modify main_objects attribute"""
-        self._fill_attribute(self._main_objects, main_objects)
+        self._fillAttribute(self._main_objects, main_objects)
         pass
 
     def setToolObjects(self, tool_objects):
         """F.setToolObjects(iterable) -- modify tool_objects attribute"""
-        self._fill_attribute(self._tool_objects, tool_objects)
+        self._fillAttribute(self._tool_objects, tool_objects)
         pass
 
     def setBoolType(self, bool_type):
@@ -92,5 +92,5 @@ class Boolean(Interface):
         - GeomAlgoAPI_Boolean.BOOL_CUT
         - GeomAlgoAPI_Boolean.BOOL_COMMON
         """
-        self._fill_attribute(self._bool_type, bool_type)
+        self._fillAttribute(self._bool_type, bool_type)
         pass

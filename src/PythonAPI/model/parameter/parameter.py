@@ -52,7 +52,7 @@ class Parameter(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._name, name)
+        self._fillAttribute(self._name, name)
         pass
 
     def setExpression(self, expression):
@@ -60,5 +60,5 @@ class Parameter(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._expression, expression)
+        self._fillAttribute(self._expression, expression)
         pass

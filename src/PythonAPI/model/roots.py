@@ -38,16 +38,11 @@ class Interface():
     def __init__(self, feature):
         """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         self._feature = feature
-        self._attribute_white_list = [
-            "execute",
-            "getKind", "results", "firstResult", "lastResult",
-            ]
 
     def __getattr__(self, name):
         """Process missing attributes.
 
         Add get*() methods for access feature attributes.
-        Redirect some missing attributes to the feature.
         """
         if name.startswith("get"):
             possible_names = [
@@ -60,16 +55,33 @@ class Interface():
                         return getattr(self, possible_name)
                     return getter
 
-        if name in self._attribute_white_list:
-            return getattr(self._feature, name)
-
         raise AttributeError()
 
     def feature(self):
         """Return ModelAPI_Feature."""
         return self._feature
 
-    def _fill_attribute(self, attribute, value):
+    def execute(self):
+        """Computes or recomputes the results"""
+        return self._feature.execute()
+
+    def getKind(self):
+        """Return the unique kind of the feature"""
+        return self._feature.getKind()
+
+    def results(self):
+        """Return current results of the feature"""
+        return self._feature.results()
+
+    def firstResult(self):
+        """Return the first result in the list of results"""
+        return self._feature.firstResult()
+
+    def lastResult(self):
+        """Return the result in the list of results"""
+        return self._feature.lastResult()
+
+    def _fillAttribute(self, attribute, value):
         """Fill ModelAPI_Attribute* with value."""
         tools.fill_attribute(attribute, value)
 

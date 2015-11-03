@@ -58,7 +58,7 @@ class Partition(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._main_objects, main_objects)
+        self._fillAttribute(self._main_objects, main_objects)
         pass
 
     def setToolObjects(self, tool_objects):
@@ -66,7 +66,7 @@ class Partition(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._tool_objects, tool_objects)
+        self._fillAttribute(self._tool_objects, tool_objects)
         pass
 
     def setPartitionCombine(self, partition_combine):
@@ -74,5 +74,5 @@ class Partition(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._partition_combine, partition_combine)
+        self._fillAttribute(self._partition_combine, partition_combine)
         pass

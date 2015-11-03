@@ -48,7 +48,7 @@ class Import(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._file_path, file_path)
+        self._fillAttribute(self._file_path, file_path)
         pass
 
 
@@ -102,7 +102,7 @@ class Export(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._file_path, file_path)
+        self._fillAttribute(self._file_path, file_path)
         pass
 
     def setFileFormat(self, file_format):
@@ -110,7 +110,7 @@ class Export(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._file_format, file_format)
+        self._fillAttribute(self._file_format, file_format)
         pass
 
     def setObjects(self, objects):
@@ -118,5 +118,5 @@ class Export(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._objects, object)
+        self._fillAttribute(self._objects, object)
         pass

@@ -52,7 +52,7 @@ class Point(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._x, x)
-        self._fill_attribute(self._y, y)
-        self._fill_attribute(self._z, z)
+        self._fillAttribute(self._x, x)
+        self._fillAttribute(self._y, y)
+        self._fillAttribute(self._z, z)
         pass

@@ -63,13 +63,13 @@ class Plane(Interface):
         pass
 
     def __clear(self):
-        self._fill_attribute(self._CreationMethod, "PlaneByFaceAndDistance")
-        self._fill_attribute(self._plane_face, None)
-        self._fill_attribute(self._distance, 0)
-        self._fill_attribute(self._a, 0)
-        self._fill_attribute(self._b, 0)
-        self._fill_attribute(self._c, 0)
-        self._fill_attribute(self._d, 0)
+        self._fillAttribute(self._CreationMethod, "PlaneByFaceAndDistance")
+        self._fillAttribute(self._plane_face, None)
+        self._fillAttribute(self._distance, 0)
+        self._fillAttribute(self._a, 0)
+        self._fillAttribute(self._b, 0)
+        self._fillAttribute(self._c, 0)
+        self._fillAttribute(self._d, 0)
 
     def setFaceAndDistance(self, face, distance):
         """Modify face and distance attribute of the feature.
@@ -77,9 +77,9 @@ class Plane(Interface):
         See __init__.
         """
         self.__clear()
-        self._fill_attribute(self._CreationMethod, "PlaneByFaceAndDistance")
-        self._fill_attribute(self._plane_face, face)
-        self._fill_attribute(self._distance, distance)
+        self._fillAttribute(self._CreationMethod, "PlaneByFaceAndDistance")
+        self._fillAttribute(self._plane_face, face)
+        self._fillAttribute(self._distance, distance)
         pass
 
     def setGeneralEquation(self, a, b, c, d):
@@ -88,9 +88,9 @@ class Plane(Interface):
         See __init__.
         """
         self.__clear()
-        self._fill_attribute(self._CreationMethod, "PlaneByGeneralEquation")
-        self._fill_attribute(self._a, a)
-        self._fill_attribute(self._b, b)
-        self._fill_attribute(self._c, c)
-        self._fill_attribute(self._d, d)
+        self._fillAttribute(self._CreationMethod, "PlaneByGeneralEquation")
+        self._fillAttribute(self._a, a)
+        self._fillAttribute(self._b, b)
+        self._fillAttribute(self._c, c)
+        self._fillAttribute(self._d, d)
         pass
