@@ -22,18 +22,12 @@ public:
   /// Algo type enum
   enum AlgoType {
     MakeShape,
-    MakePipe,
     BOPAlgoBuilder
   };
 
 public:
   /// Constructor by the already stored builder in the interface
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder, const AlgoType theAlgoType = MakeShape);
-
-  /// Constructor by the builder and wire. Used for pipe builder.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder,
-                                           const std::shared_ptr<GeomAPI_Shape> theWire,
-                                           const std::shared_ptr<GeomAPI_Shape> theBaseShape);
 
   /// Returns a shape built by the shape construction algorithm
   GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;
