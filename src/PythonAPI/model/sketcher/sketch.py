@@ -50,11 +50,6 @@ class Sketch(Interface):
             )
         self._external = self._feature.data().selection("External")
 
-        assert(self._origin)
-        assert(self._dir_x)
-        assert(self._norm)
-        assert(self._external)
-
         # If no arguments are given the attributes of the feature 
         # are not Initialized
         if args is not None:
@@ -85,11 +80,15 @@ class Sketch(Interface):
 
     def addPoint(self, *args):
         """Add a point to this Sketch."""
+        if not args:
+            raise TypeError("No arguments given")
         point_feature = self._feature.addFeature("SketchPoint")
         return Point(point_feature, *args)
 
     def addLine(self, *args):
         """Add a line to this Sketch."""
+        if not args:
+            raise TypeError("No arguments given")
         line_feature = self._feature.addFeature("SketchLine")
         line_interface = Line(line_feature, *args)
         # if the line is created by name add a rigid constraint
@@ -103,11 +102,15 @@ class Sketch(Interface):
 
     def addCircle(self, *args):
         """Add a circle to this Sketch."""
+        if not args:
+            raise TypeError("No arguments given")
         circle_feature = self._feature.addFeature("SketchCircle")
         return Circle(circle_feature, *args)
 
     def addArc(self, *args):
         """Add an arc to this Sketch."""
+        if not args:
+            raise TypeError("No arguments given")
         arc_feature = self._feature.addFeature("SketchArc")
         return Arc(arc_feature, *args)
 
@@ -120,7 +123,12 @@ class Sketch(Interface):
     def setCoincident(self, p1, p2):
         """Set coincident the two given points and add the corresponding
         constraint to this Sketch."""
-        assert(p1 and p2)
+        # assert(p1 and p2) NOTE : if an argument is missing python
+        # will raise TypeError by itself.
+        # It seems better to check only that provided arguments are not 
+        # None
+        if p1 is None or p2 is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintCoincidence")
         constraint.data().refattr("ConstraintEntityA").setAttr(p1)
         constraint.data().refattr("ConstraintEntityB").setAttr(p2)
@@ -130,7 +138,8 @@ class Sketch(Interface):
     def setParallel(self, l1, l2):
         """Set parallel the two given lines and add the corresponding
         constraint to this Sketch."""
-        assert(l1 and l2)
+        if l1 is None or l2 is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintParallel")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
@@ -140,7 +149,8 @@ class Sketch(Interface):
     def setPerpendicular(self, l1, l2):
         """Set perpendicular the two given lines and add the corresponding
         constraint to this Sketch."""
-        assert(l1 and l2)
+        if l1 is None or l2 is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintPerpendicular")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
@@ -150,6 +160,8 @@ class Sketch(Interface):
     def setHorizontal(self, line):
         """Set horizontal the given line and add the corresponding
         constraint to this Sketch."""
+        if line is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintHorizontal")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         self.execute()
@@ -158,6 +170,8 @@ class Sketch(Interface):
     def setVertical(self, line):
         """Set vertical the given line and add the corresponding
         constraint to this Sketch."""
+        if line is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintVertical")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         self.execute()
@@ -166,13 +180,13 @@ class Sketch(Interface):
     def setDistance(self, point, line, length):
         """Set the distance between the given point and line, and add
         the corresponding constraint to this Sketch."""
-        assert(point and line)
+        if point is None or line is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintDistance")
         if isinstance(line, basestring):
             # Add the edge identified by the given topological name
             # to this Sketch
             line = self.addLine(line).result()
-            assert(line)
         constraint.data().refattr("ConstraintEntityA").setAttr(point)
         constraint.data().refattr("ConstraintEntityB").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
@@ -182,7 +196,8 @@ class Sketch(Interface):
     def setLength(self, line, length):
         """Set the length of the given line and add the corresponding
         constraint to this Sketch."""
-        assert(line)
+        if line is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintLength")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
@@ -228,7 +243,7 @@ class Sketch(Interface):
         return constraint
 
     def setFillet(self, line_1, line_2, radius):
-        """Set a fillet constraint between the 3 given lines with the given
+        """Set a fillet constraint between the 2 given lines with the given
         filleting radius."""
         constraint = self._feature.addFeature("SketchConstraintFillet")
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)

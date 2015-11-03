@@ -60,7 +60,7 @@ class Line(Interface):
         self._end_point.setValue(x, y)
 
     # TODO : methods below will be removed. 
-    # Kept until all tests have been updated
+    # Kept until all tests have been updated
     def startPointData(self):
         return self._start_point
 
