@@ -56,6 +56,8 @@ void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransact
 
   myIsEditing = true;
   if (theRestartTransaction) {
+    FeaturePtr aPrevFeature = myPreviousCurrentFeature;
+
     SessionPtr aMgr = ModelAPI_Session::get();
     ModelAPI_Session::get()->finishOperation();
 
@@ -65,6 +67,8 @@ void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransact
     }
     ModelAPI_Session::get()->startOperation(anId.toStdString());
     emit beforeStarted();
+
+    myPreviousCurrentFeature = aPrevFeature;
   }
 
   propertyPanel()->setEditingMode(isEditOperation());
