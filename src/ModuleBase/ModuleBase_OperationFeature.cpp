@@ -49,12 +49,27 @@ ModuleBase_OperationFeature::~ModuleBase_OperationFeature()
   clearPreselection();
 }
 
-void ModuleBase_OperationFeature::setEditOperation()
+void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransaction)
 {
   if (isEditOperation())
     return;
 
   myIsEditing = true;
+  if (theRestartTransaction) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->activeDocument();
+    FeaturePtr aFeature = aDoc->currentFeature(false);
+    ModelAPI_Session::get()->finishOperation();
+    FeaturePtr anAFeature = aDoc->currentFeature(false);
+
+    QString anId = getDescription()->operationId();
+    if (myIsEditing) {
+      anId = anId.append(EditSuffix());
+    }
+    ModelAPI_Session::get()->startOperation(anId.toStdString());
+    emit beforeStarted();
+  }
+
   propertyPanel()->setEditingMode(isEditOperation());
 }
 

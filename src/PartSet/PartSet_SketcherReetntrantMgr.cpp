@@ -281,7 +281,7 @@ void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                      (myWorkshop->currentOperation());
 
-  aFOperation->setEditOperation();
+  aFOperation->setEditOperation(true);
   FeaturePtr anOperationFeature = aFOperation->feature();
   if (anOperationFeature.get() != NULL) {
 
