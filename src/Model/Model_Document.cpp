@@ -23,6 +23,7 @@
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
+#include <TDataStd_IntegerArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Reference.hxx>
@@ -53,7 +54,7 @@ static const int TAG_GENERAL = 1;  // general properties tag
 
 // general sub-labels
 static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
-static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the cransaction
+static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 
 Model_Document::Model_Document(const std::string theID, const std::string theKind)
@@ -299,6 +300,7 @@ void Model_Document::close(const bool theForever)
 
 void Model_Document::startOperation()
 {
+  incrementTransactionID(); // outside of transaction in order to avoid empty transactions keeping
   if (myDoc->HasOpenCommand()) {  // start of nested command
     if (myDoc->CommitCommand()) { // commit the current: it will contain all nested after compactification
       myTransactions.rbegin()->myOCAFNum++; // if has open command, the list is not empty
@@ -309,7 +311,6 @@ void Model_Document::startOperation()
     myDoc->NewCommand();
   }
   // starts a new operation
-  incrementTransactionID();
   myTransactions.push_back(Transaction());
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())++;
@@ -334,6 +335,82 @@ void Model_Document::compactNested()
     myTransactions.rbegin()->myOCAFNum += aSumOfTransaction;
     myNestedNum.pop_back();
   }
+}
+
+/// Compares the content ofthe given attributes, returns true if equal.
+/// This method is used to avoid empty transactions when only "current" is changed
+/// to some value and then comes back in this transaction, so, it compares only
+/// references and Boolean and Integer Arrays for the current moment.
+static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute) theAttr2)
+{
+  if (Standard_GUID::IsEqual(theAttr1->ID(), TDF_Reference::GetID())) { // reference
+    Handle(TDF_Reference) aRef1 = Handle(TDF_Reference)::DownCast(theAttr1);
+    Handle(TDF_Reference) aRef2 = Handle(TDF_Reference)::DownCast(theAttr2);
+    if (aRef1.IsNull() && aRef2.IsNull())
+      return true;
+    if (aRef1.IsNull() || aRef2.IsNull())
+      return false;
+    return aRef1->Get().IsEqual(aRef2->Get()) == Standard_True;
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_BooleanArray::GetID())) {
+    Handle(TDataStd_BooleanArray) anArr1 = Handle(TDataStd_BooleanArray)::DownCast(theAttr1);
+    Handle(TDataStd_BooleanArray) anArr2 = Handle(TDataStd_BooleanArray)::DownCast(theAttr2);
+    if (anArr1.IsNull() && anArr2.IsNull())
+      return true;
+    if (anArr1.IsNull() || anArr2.IsNull())
+      return false;
+    if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
+      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
+        if (anArr1->Value(a) != anArr2->Value(a))
+          return false;
+      return true;
+    }
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_IntegerArray::GetID())) {
+    Handle(TDataStd_IntegerArray) anArr1 = Handle(TDataStd_IntegerArray)::DownCast(theAttr1);
+    Handle(TDataStd_IntegerArray) anArr2 = Handle(TDataStd_IntegerArray)::DownCast(theAttr2);
+    if (anArr1.IsNull() && anArr2.IsNull())
+      return true;
+    if (anArr1.IsNull() || anArr2.IsNull())
+      return false;
+    if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
+      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
+        if (anArr1->Value(a) != anArr2->Value(a)) {
+          // avoid the transaction ID checking
+          if (a == 2 && anArr1->Upper() == 2 && anArr2->Label().Tag() == 1 &&
+            (anArr2->Label().Depth() == 4 || anArr2->Label().Depth() == 6))
+            continue;
+          return false;
+        }
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Returns true if the last transaction is actually empty: modification to te same values 
+/// were performed only
+static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
+  Handle(TDF_Delta) aDelta;
+  aDelta = theDoc->GetUndos().Last();
+  TDF_LabelList aDeltaList;
+  aDelta->Labels(aDeltaList); // it clears list, so, use new one and then append to the result
+  for(TDF_ListIteratorOfLabelList aListIter(aDeltaList); aListIter.More(); aListIter.Next()) {
+    return false;
+  }
+  // add also label of the modified attributes
+  const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
+  for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
+    Handle(TDF_AttributeDelta)& anADelta = anAttr.Value();
+    if (!anADelta->Label().IsNull() && !anADelta->Attribute().IsNull()) {
+      Handle(TDF_Attribute) aCurrentAttr;
+      if (anADelta->Label().FindAttribute(anADelta->Attribute()->ID(), aCurrentAttr)) {
+        if (isEqualContent(anADelta->Attribute(), aCurrentAttr)) {
+          continue; // attribute is not changed actually
+        }
+      }
+    }
+    return false;
+  }
+  return true;
 }
 
 bool Model_Document::finishOperation()
@@ -383,8 +460,13 @@ bool Model_Document::finishOperation()
 
   // transaction may be empty if this document was created during this transaction (create part)
   if (!myTransactions.empty() && myDoc->CommitCommand()) { // if commit is successfull, just increment counters
-    myTransactions.rbegin()->myOCAFNum++;
-    aResult = true;
+    if (isEmptyTransaction(myDoc)) { // erase this transaction
+      myDoc->Undo();
+      myDoc->ClearRedos();
+    } else {
+      myTransactions.rbegin()->myOCAFNum++;
+      aResult = true;
+    }
   }
 
   if (isNestedClosed) {
