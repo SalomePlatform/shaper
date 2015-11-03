@@ -57,7 +57,7 @@ class Placement(Interface):
         self.setReverseDirection(args[3])
         self.setCentering(args[4])
 
-        self._execute()
+        self.execute()
         pass
 
     def setObjectList(self, objects_list):
@@ -65,7 +65,7 @@ class Placement(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._objects_list, objects_list)
+        self._fillAttribute(self._objects_list, objects_list)
         pass
 
     def setStartShape(self, start_shape):
@@ -73,7 +73,7 @@ class Placement(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._start_shape, start_shape)
+        self._fillAttribute(self._start_shape, start_shape)
         pass
 
     def setEndShape(self, end_shape):
@@ -81,7 +81,7 @@ class Placement(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._end_shape, end_shape)
+        self._fillAttribute(self._end_shape, end_shape)
         pass
 
     def setReverseDirection(self, reverse_direction):
@@ -89,7 +89,7 @@ class Placement(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._reverse_direction, reverse_direction)
+        self._fillAttribute(self._reverse_direction, reverse_direction)
         pass
 
     def setCentering(self, centering):
@@ -97,5 +97,5 @@ class Placement(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._centering, centering)
+        self._fillAttribute(self._centering, centering)
         pass

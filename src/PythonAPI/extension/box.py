@@ -47,20 +47,20 @@ class Box(Interface):
         self.setLength(dy)
         self.setHeight(dz)
 
-        self._execute()
+        self.execute()
         pass
 
     def setWidth(self, width):
         """B.setWidth(float) -- modify width attribute"""
-        self._fill_attribute(self._width, width)
+        self._fillAttribute(self._width, width)
         pass
 
     def setLength(self, length):
         """B.setLength(float) -- modify length attribute"""
-        self._fill_attribute(self._length, length)
+        self._fillAttribute(self._length, length)
         pass
 
     def setHeight(self, height):
         """B.setHeight(float) -- modify height attribute"""
-        self._fill_attribute(self._height, height)
+        self._fillAttribute(self._height, height)
         pass

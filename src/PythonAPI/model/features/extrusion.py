@@ -78,17 +78,17 @@ class Extrusion(Interface):
         elif len(args) == 1:
             self.setSize(args[0])
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):
         self._CreationMethod.setValue("BySizes")
-        self._fill_attribute(self._to_size, 0)
-        self._fill_attribute(self._from_size, 0)
-        self._fill_attribute(self._to_object, None)
-        self._fill_attribute(self._to_offset, 0)
-        self._fill_attribute(self._from_object, None)
-        self._fill_attribute(self._from_offset, 0)
+        self._fillAttribute(self._to_size, 0)
+        self._fillAttribute(self._from_size, 0)
+        self._fillAttribute(self._to_object, None)
+        self._fillAttribute(self._to_offset, 0)
+        self._fillAttribute(self._from_object, None)
+        self._fillAttribute(self._from_offset, 0)
         pass
 
     def setBase(self, base):
@@ -96,7 +96,7 @@ class Extrusion(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._base, base)
+        self._fillAttribute(self._base, base)
         pass
 
     def setSizes(self, to_size, from_size):
@@ -105,9 +105,9 @@ class Extrusion(Interface):
         See __init__.
         """
         self.__clear()
-        self._fill_attribute(self._CreationMethod, "BySizes")
-        self._fill_attribute(self._to_size, to_size)
-        self._fill_attribute(self._from_size, from_size)
+        self._fillAttribute(self._CreationMethod, "BySizes")
+        self._fillAttribute(self._to_size, to_size)
+        self._fillAttribute(self._from_size, from_size)
         pass
 
     def setSize(self, size):
@@ -133,10 +133,10 @@ class Extrusion(Interface):
         """
         self.__clear()
         self._CreationMethod.setValue("ByPlanesAndOffsets")
-        self._fill_attribute(self._to_object, to_object)
-        self._fill_attribute(self._to_offset, to_offset)
-        self._fill_attribute(self._from_object, from_object)
-        self._fill_attribute(self._from_offset, from_offset)
+        self._fillAttribute(self._to_object, to_object)
+        self._fillAttribute(self._to_offset, to_offset)
+        self._fillAttribute(self._from_object, from_object)
+        self._fillAttribute(self._from_offset, from_offset)
         pass
 
     def result(self):

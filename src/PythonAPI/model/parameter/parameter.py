@@ -11,6 +11,7 @@ def addParameter(part, *args):
 
     Pass all args to Parameter __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Parameter")
     return Parameter(feature, *args)
 
@@ -30,8 +31,8 @@ class Parameter(Interface):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Parameter")
 
-        self._variable = self._feature.data().selection("variable")
-        self._expression = self._feature.data().real("expression")
+        self._variable = self._feature.data().string("variable")
+        self._expression = self._feature.data().string("expression")
 
         assert(self._variable)
         assert(self._expression)
@@ -43,7 +44,7 @@ class Parameter(Interface):
         self.setName(args[0])
         self.setExpression(args[1])
 
-        self._execute()
+        self.execute()
         pass
 
     def setName(self, name):
@@ -51,7 +52,7 @@ class Parameter(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._name, name)
+        self._fillAttribute(self._name, name)
         pass
 
     def setExpression(self, expression):
@@ -59,5 +60,5 @@ class Parameter(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._expression, expression)
+        self._fillAttribute(self._expression, expression)
         pass

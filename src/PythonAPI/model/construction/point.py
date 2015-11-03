@@ -11,6 +11,7 @@ def addPoint(part, *args):
 
     Pass all args to Point __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Point")
     return Point(feature, *args)
 
@@ -43,7 +44,7 @@ class Point(Interface):
         assert(len(args) == 3)
         self.setPoint(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def setPoint(self, x, y, z):
@@ -51,7 +52,7 @@ class Point(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._x, x)
-        self._fill_attribute(self._y, y)
-        self._fill_attribute(self._z, z)
+        self._fillAttribute(self._x, x)
+        self._fillAttribute(self._y, y)
+        self._fillAttribute(self._z, z)
         pass

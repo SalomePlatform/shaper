@@ -10,26 +10,32 @@ from GeomAlgoAPI import *
 from model.roots import Interface
 
 
-def addAddition(part, object, tool):
+def addAddition(part, *args):
     """Inserts an addition to the given Part and executes the operation.
     This operation adds tool to the given object.
     """
+    assert(args)
+    object, tool = args
     feature = part.addFeature("Boolean")
     return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_FUSE)
 
 
-def addSubtraction(part, object, tool):
+def addSubtraction(part, *args):
     """Inserts a subtraction to the given Part and executes the operation.
     This operation subtracts tool to the given object.
     """
+    assert(args)
+    object, tool = args
     feature = part.addFeature("Boolean")
     return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_CUT)
 
 
-def addIntersection(part, object, tool):
+def addIntersection(part, *args):
     """Inserts an intersection to the given Part and executes the operation.
     This operation intersects tool to the given object.
     """
+    assert(args)
+    object, tool = args
     feature = part.addFeature("Boolean")
     return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_COMMON)
 
@@ -65,17 +71,17 @@ class Boolean(Interface):
         self.setToolObjects(tool_objects)
         self.setBoolType(bool_type)
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):
         """F.setMainObjects(iterable) -- modify main_objects attribute"""
-        self._fill_attribute(self._main_objects, main_objects)
+        self._fillAttribute(self._main_objects, main_objects)
         pass
 
     def setToolObjects(self, tool_objects):
         """F.setToolObjects(iterable) -- modify tool_objects attribute"""
-        self._fill_attribute(self._tool_objects, tool_objects)
+        self._fillAttribute(self._tool_objects, tool_objects)
         pass
 
     def setBoolType(self, bool_type):
@@ -86,5 +92,5 @@ class Boolean(Interface):
         - GeomAlgoAPI_Boolean.BOOL_CUT
         - GeomAlgoAPI_Boolean.BOOL_COMMON
         """
-        self._fill_attribute(self._bool_type, bool_type)
+        self._fillAttribute(self._bool_type, bool_type)
         pass

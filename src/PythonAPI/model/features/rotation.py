@@ -48,7 +48,7 @@ class Rotation(Interface):
         self.setAxisObject(args[1])
         self.setAngle(args[2])
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):
@@ -56,7 +56,7 @@ class Rotation(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._main_objects, main_objects)
+        self._fillAttribute(self._main_objects, main_objects)
         pass
 
     def setAxisObject(self, axis_object):
@@ -64,7 +64,7 @@ class Rotation(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._axis_object, axis_object)
+        self._fillAttribute(self._axis_object, axis_object)
         pass
 
     def setAngle(self, angle):
@@ -72,5 +72,5 @@ class Rotation(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._angle, angle)
+        self._fillAttribute(self._angle, angle)
         pass

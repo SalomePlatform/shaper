@@ -38,17 +38,17 @@ class CompositeBoolean(Interface):
 
     def setSketch(self, sketch):
         """Modify sketch attribute"""
-        self._fill_attribute(self._sketch, sketch)
+        self._fillAttribute(self._sketch, sketch)
         pass
 
     def setSketchSelection(self, sketch_selection):
         """Modify sketch_selection attribute"""
-        self._fill_attribute(self._sketch_selection, sketch_selection)
+        self._fillAttribute(self._sketch_selection, sketch_selection)
         pass
 
     def setBooleanObjects(self, boolean_objects):
         """Modify boolean_objects attribute"""
-        self._fill_attribute(self._boolean_objects, boolean_objects)
+        self._fillAttribute(self._boolean_objects, boolean_objects)
         pass
 
 
@@ -85,10 +85,10 @@ class CompositeSketch(Interface):
 
     def setSketch(self, sketch):
         """Modify sketch attribute"""
-        self._fill_attribute(self._sketch, sketch)
+        self._fillAttribute(self._sketch, sketch)
         pass
 
     def setSketchSelection(self, sketch_selection):
         """Modify sketch_selection attribute"""
-        self._fill_attribute(self._sketch_selection, sketch_selection)
+        self._fillAttribute(self._sketch_selection, sketch_selection)
         pass

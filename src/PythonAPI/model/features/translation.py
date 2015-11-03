@@ -48,7 +48,7 @@ class Translation(Interface):
         self.setAxisObject(args[1])
         self.setDistance(args[2])
 
-        self._execute()
+        self.execute()
         pass
 
     def setMainObjects(self, main_objects):
@@ -56,7 +56,7 @@ class Translation(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._main_objects, main_objects)
+        self._fillAttribute(self._main_objects, main_objects)
         pass
 
     def setAxisObject(self, axis_object):
@@ -64,7 +64,7 @@ class Translation(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._axis_object, axis_object)
+        self._fillAttribute(self._axis_object, axis_object)
         pass
 
     def setDistance(self, distance):
@@ -72,5 +72,5 @@ class Translation(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._distance, distance)
+        self._fillAttribute(self._distance, distance)
         pass

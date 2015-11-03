@@ -11,6 +11,7 @@ def addAxis(part, *args):
 
     Pass all args to Axis __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Axis")
     return Axis(feature, *args)
 
@@ -52,14 +53,14 @@ class Axis(Interface):
         elif len(args) == 1:
             self.setCylindricalFace(*args)
 
-        self._execute()
+        self.execute()
         pass
 
     def __clear(self):
-        self._fill_attribute(self._CreationMethod, "AxisByPointsCase")
-        self._fill_attribute(self._FirstPoint, None)
-        self._fill_attribute(self._SecondPoint, None)
-        self._fill_attribute(self._CylindricalFace, None)
+        self._fillAttribute(self._CreationMethod, "AxisByPointsCase")
+        self._fillAttribute(self._FirstPoint, None)
+        self._fillAttribute(self._SecondPoint, None)
+        self._fillAttribute(self._CylindricalFace, None)
 
     def setPoints(self, p1, p2):
         """Modify points attribute of the feature.
@@ -67,9 +68,9 @@ class Axis(Interface):
         See __init__.
         """
         self.__clear()
-        self._fill_attribute(self._CreationMethod, "AxisByPointsCase")
-        self._fill_attribute(self._FirstPoint, p1)
-        self._fill_attribute(self._SecondPoint, p2)
+        self._fillAttribute(self._CreationMethod, "AxisByPointsCase")
+        self._fillAttribute(self._FirstPoint, p1)
+        self._fillAttribute(self._SecondPoint, p2)
         pass
 
     def setCylindricalFace(self, face):
@@ -78,6 +79,6 @@ class Axis(Interface):
         See __init__.
         """
         self.__clear()
-        self._fill_attribute(self._CreationMethod, "AxisByCylindricalFaceCase")
-        self._fill_attribute(self._CylindricalFace, face)
+        self._fillAttribute(self._CreationMethod, "AxisByCylindricalFaceCase")
+        self._fillAttribute(self._CylindricalFace, face)
         pass

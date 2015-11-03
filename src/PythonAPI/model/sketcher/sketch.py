@@ -124,7 +124,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintCoincidence")
         constraint.data().refattr("ConstraintEntityA").setAttr(p1)
         constraint.data().refattr("ConstraintEntityB").setAttr(p2)
-        self._execute()
+        self.execute()
         return constraint
 
     def setParallel(self, l1, l2):
@@ -134,7 +134,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintParallel")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
-        self._execute()
+        self.execute()
         return constraint
 
     def setPerpendicular(self, l1, l2):
@@ -144,7 +144,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintPerpendicular")
         constraint.data().refattr("ConstraintEntityA").setObject(l1)
         constraint.data().refattr("ConstraintEntityB").setObject(l2)
-        self._execute()
+        self.execute()
         return constraint
 
     def setHorizontal(self, line):
@@ -152,7 +152,7 @@ class Sketch(Interface):
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintHorizontal")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
-        self._execute()
+        self.execute()
         return constraint
 
     def setVertical(self, line):
@@ -160,7 +160,7 @@ class Sketch(Interface):
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintVertical")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
-        self._execute()
+        self.execute()
         return constraint
 
     def setDistance(self, point, line, length):
@@ -176,7 +176,7 @@ class Sketch(Interface):
         constraint.data().refattr("ConstraintEntityA").setAttr(point)
         constraint.data().refattr("ConstraintEntityB").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
-        self._execute()
+        self.execute()
         return constraint
 
     def setLength(self, line, length):
@@ -186,7 +186,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintLength")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
         constraint.data().real("ConstraintValue").setValue(length)
-        self._execute()
+        self.execute()
         return constraint
 
     def setRadius(self, circle, radius):
@@ -195,7 +195,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintRadius")
         constraint.data().refattr("ConstraintEntityA").setObject(circle)
         constraint.data().real("ConstraintValue").setValue(radius)
-        self._execute()
+        self.execute()
         return constraint
 
     def setEqual(self, object_1, object_2):
@@ -205,7 +205,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintEqual")
         constraint.data().refattr("ConstraintEntityA").setObject(object_1)
         constraint.data().refattr("ConstraintEntityB").setObject(object_2)
-        self._execute()
+        self.execute()
         return constraint
 
     def setAngle(self, line_1, line_2, angle):
@@ -215,7 +215,7 @@ class Sketch(Interface):
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)
         constraint.data().refattr("ConstraintEntityB").setObject(line_2)
         constraint.data().real("ConstraintValue").setValue(angle)
-        self._execute()
+        self.execute()
         return constraint
 
     def setTangent(self, object_1, object_2):
@@ -224,7 +224,7 @@ class Sketch(Interface):
         constraint = self._feature.addFeature("SketchConstraintTangent")
         constraint.data().refattr("ConstraintEntityA").setObject(object_1)
         constraint.data().refattr("ConstraintEntityB").setObject(object_2)
-        self._execute()
+        self.execute()
         return constraint
 
     def setFillet(self, line_1, line_2, radius):
@@ -234,7 +234,7 @@ class Sketch(Interface):
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)
         constraint.data().refattr("ConstraintEntityB").setObject(line_2)
         constraint.data().real("ConstraintValue").setValue(radius)
-        self._execute()
+        self.execute()
         return constraint
 
     #-------------------------------------------------------------

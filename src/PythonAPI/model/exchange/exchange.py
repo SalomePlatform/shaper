@@ -11,6 +11,7 @@ def addImport(part, *args):
 
     Pass all args to Import __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Import")
     return Import(feature, *args)
 
@@ -39,7 +40,7 @@ class Import(Interface):
         assert(len(args) == 1)
         self.setFilePath(args[0])
 
-        self._execute()
+        self.execute()
         pass
 
     def setFilePath(self, file_path):
@@ -47,7 +48,7 @@ class Import(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._file_path, file_path)
+        self._fillAttribute(self._file_path, file_path)
         pass
 
 
@@ -56,6 +57,7 @@ def exportToFile(part, *args):
 
     Pass all args to Export __init__ function.
     """
+    assert(args)
     feature = part.addFeature("Export")
     return Export(feature, *args)
 
@@ -92,7 +94,7 @@ class Export(Interface):
         self.setFileFormat(args[1])
         self.setObjects(args[2])
 
-        self._execute()
+        self.execute()
         pass
 
     def setFilePath(self, file_path):
@@ -100,7 +102,7 @@ class Export(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._file_path, file_path)
+        self._fillAttribute(self._file_path, file_path)
         pass
 
     def setFileFormat(self, file_format):
@@ -108,7 +110,7 @@ class Export(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._file_format, file_format)
+        self._fillAttribute(self._file_format, file_format)
         pass
 
     def setObjects(self, objects):
@@ -116,5 +118,5 @@ class Export(Interface):
 
         See __init__.
         """
-        self._fill_attribute(self._objects, object)
+        self._fillAttribute(self._objects, object)
         pass
