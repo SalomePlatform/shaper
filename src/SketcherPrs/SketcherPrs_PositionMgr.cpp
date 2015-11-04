@@ -14,7 +14,7 @@
 
 static SketcherPrs_PositionMgr* MyPosMgr = NULL;
 
-
+// The class is implemented as a singlton
 SketcherPrs_PositionMgr* SketcherPrs_PositionMgr::get()
 {
   if (MyPosMgr == NULL) 
@@ -31,15 +31,19 @@ int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
                                               const SketcherPrs_SymbolPrs* thePrs)
 {
   if (myShapes.count(theLine) == 1) {
+    // Find the map and add new [Presentation - Index] pair
     PositionsMap& aPosMap = myShapes[theLine];
     if (aPosMap.count(thePrs) == 1) {
+      // return existing index
       return aPosMap[thePrs];
     } else {
+      // Add a new [Presentation - Index] pair
       int aInd = aPosMap.size();
       aPosMap[thePrs] = aInd;
       return aInd;
     }
   } else {
+    // Create a new map with initial index
     PositionsMap aPosMap;
     aPosMap[thePrs] = 0;
     myShapes[theLine] = aPosMap;
@@ -71,6 +75,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
                   (aPnt1->z() + aPnt2->z())/2.);
 
     } else {
+      // this is a circle or arc
       double aMidParam = (aCurve->startParam() + aCurve->endParam()) / 2.;
       std::shared_ptr<GeomAPI_Pnt> aPnt = aCurve->getPoint(aMidParam);
       aP = aPnt->impl<gp_Pnt>();
@@ -88,10 +93,12 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     std::shared_ptr<GeomAPI_Dir> aDir = thePrs->plane()->dirX();
     aVec1 = gp_Vec(aDir->impl<gp_Dir>());
   }
+  // Compute shifting vector for a one symbol
   gp_Vec aShift = aVec1.Crossed(thePrs->plane()->normal()->impl<gp_Dir>());
   aShift.Normalize();
   aShift.Multiply(theStep * 0.8);
 
+  // Shift the position coordinate according to position index
   int aPos = getPositionIndex(theShape, thePrs);
   int aM = 1;
   if ((aPos % 2) == 0) {
@@ -126,13 +133,17 @@ void SketcherPrs_PositionMgr::deleteConstraint(const SketcherPrs_SymbolPrs* theP
 {
   std::map<ObjectPtr, PositionsMap>::iterator aIt;
   std::list<ObjectPtr> aToDel;
+  // Clear map for deleted presentation
   for (aIt = myShapes.begin(); aIt != myShapes.end(); ++aIt) {
     PositionsMap& aPosMap = aIt->second;
     if (aPosMap.count(thePrs) > 0) {
+      // Erase index
       aPosMap.erase(aPosMap.find(thePrs));
       if (aPosMap.size() == 0)
+        // Delete the map
         aToDel.push_back(aIt->first);
       else {
+        // Reindex objects positions in order to avoid spaces
         PositionsMap::iterator aIt;
         int i = 0;
         for (aIt = aPosMap.begin(); aIt != aPosMap.end(); aIt++, i++)

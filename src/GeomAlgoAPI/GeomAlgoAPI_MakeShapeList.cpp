@@ -104,6 +104,7 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       const TopoDS_Shape& aSh = aShape->impl<TopoDS_Shape>();
       aMakeShape->generated(aShape, aGeneratedShapes);
       for(ListOfShape::const_iterator anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
+        TopoDS_Shape aSh = (*anIt)->impl<TopoDS_Shape>();
         aTempShapes.Add((*anIt)->impl<TopoDS_Shape>());
         aResultShapes.Add((*anIt)->impl<TopoDS_Shape>());
         hasResults = true;
@@ -111,6 +112,7 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       ListOfShape aModifiedShapes;
       aMakeShape->modified(aShape, aModifiedShapes);
       for(ListOfShape::const_iterator anIt = aModifiedShapes.cbegin(); anIt != aModifiedShapes.cend(); anIt++) {
+        TopoDS_Shape aSH = (*anIt)->impl<TopoDS_Shape>();
         aTempShapes.Add((*anIt)->impl<TopoDS_Shape>());
         aResultShapes.Add((*anIt)->impl<TopoDS_Shape>());
         hasResults = true;

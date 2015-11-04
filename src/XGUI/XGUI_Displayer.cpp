@@ -11,7 +11,9 @@
 #include "XGUI_Selection.h"
 #include "XGUI_CustomPrs.h"
 
+#ifndef HAVE_SALOME
 #include <AppElements_Viewer.h>
+#endif
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
@@ -35,6 +37,7 @@
 #include <AIS_DimensionSelectionMode.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_Dimension.hxx>
+#include <AIS_Trihedron.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
@@ -96,7 +99,7 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 }
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myWorkshop(theWorkshop), myEnableUpdateViewer(true)
+  : myWorkshop(theWorkshop), myEnableUpdateViewer(true), myNeedUpdate(false)
 {
   enableUpdateViewer(true);
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs());
@@ -217,8 +220,10 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     // the fix from VPA for more suitable selection of sketcher lines
     if(anAISIO->Width() > 1) {
       for(int aModeIdx = 0; aModeIdx < myActiveSelectionModes.length(); ++aModeIdx) {
-        aContext->SetSelectionSensitivity(anAISIO,
-          myActiveSelectionModes.value(aModeIdx), anAISIO->Width() + 2);
+        int aMode = myActiveSelectionModes.value(aModeIdx);
+        double aPrecision = (aMode == getSelectionMode(TopAbs_VERTEX))? 15 : 
+                                                    (anAISIO->Width() + 2);
+        aContext->SetSelectionSensitivity(anAISIO, aMode, aPrecision);
       }
     }
   } 
@@ -363,8 +368,9 @@ void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
   for (; anIt != aLast; anIt++) {
     deactivate(*anIt, false);
   }
-  if (theUpdateViewer)
-    updateViewer();
+  //VSV It seems that there is no necessity to update viewer on deactivation
+  //if (theUpdateViewer)
+  //  updateViewer();
 }
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
@@ -386,16 +392,19 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
   }
 }
 
+int XGUI_Displayer::getSelectionMode(int theShapeType)
+{
+  return (theShapeType >= TopAbs_SHAPE)? theShapeType : 
+    AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theShapeType);
+}
+
 void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
                                      const bool theUpdateViewer)
 {
   // Convert shape types to selection types
   QIntList aModes;
   foreach(int aType, theModes) {
-    if (aType >= TopAbs_SHAPE) 
-      aModes.append(aType);
-    else
-      aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
+    aModes.append(getSelectionMode(aType));
   }
 
 #ifdef DEBUG_ACTIVATE_OBJECTS
@@ -439,12 +448,15 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   }
 
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
+  bool isActivationChanged = false;
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    activate(anAISIO, myActiveSelectionModes, false);
+    if (activate(anAISIO, myActiveSelectionModes, false))
+      isActivationChanged = true;
   }
-  if (theUpdateViewer)
-    updateViewer();
+  // VSV It seems that there is no necessity to update viewer on activation
+  //if (theUpdateViewer && isActivationChanged)
+  //  updateViewer();
 }
 
 bool XGUI_Displayer::isActive(ObjectPtr theObject) const
@@ -685,7 +697,10 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
   bool aWasEnabled = myEnableUpdateViewer;
 
   myEnableUpdateViewer = isEnabled;
-
+  if (myNeedUpdate && myEnableUpdateViewer) {
+    updateViewer();
+    myNeedUpdate = false;
+  }
   return aWasEnabled;
 }
 
@@ -695,6 +710,8 @@ void XGUI_Displayer::updateViewer() const
   if (!aContext.IsNull() && myEnableUpdateViewer) {
     myWorkshop->viewer()->Zfitall();
     aContext->UpdateCurrentViewer();
+  } else {
+    myNeedUpdate = true;
   }
 }
 
@@ -940,14 +957,15 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
   return ::canBeShaded(anAIS);
 }
 
-void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
+bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
                               const QIntList& theModes,
                               const bool theUpdateViewer) const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull() || theIO.IsNull())
-    return;
-
+    return false;
+  
+  bool isActivationChanged = false;
   // deactivate object in all modes, which are not in the list of activation
   // It seems that after the IO deactivation the selected state of the IO's owners
   // is modified in OCC(version: 6.8.0) and the selection of the object later is lost.
@@ -976,8 +994,10 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     // the selection from the previous activation modes should be cleared manually (#26172)
     theIO->ClearSelected();
     aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
-    if (theUpdateViewer)
-      updateViewer();
+    // For performance issues
+    //if (theUpdateViewer)
+    //  updateViewer();
+    isActivationChanged = true;
   }
 
   // loading the interactive object allowing the decomposition
@@ -999,10 +1019,12 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
         //aContext->Load(anAISIO, aMode, true);
         if (!aModesActivatedForIO.contains(aMode)) {
           activateAIS(theIO, aMode, theUpdateViewer);
+          isActivationChanged = true;
         }
       }
     }
   }
+  return isActivationChanged;
 }
 
 bool XGUI_Displayer::customizeObject(ObjectPtr theObject)

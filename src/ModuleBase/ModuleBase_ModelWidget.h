@@ -33,7 +33,13 @@ class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QWidget
 {
 Q_OBJECT
  public:
-  /// Constructor
+   /// State of the widget
+   enum ValueState { Stored, /// modification is finished and applyed to the model
+                     ModifiedInPP, /// modification has not been finished and set to the model yet
+                     ModifiedInViewer, /// modification performed by viewer events
+                     Reset }; /// the value is reset
+
+   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
@@ -44,9 +50,10 @@ Q_OBJECT
   {
   }
 
-  /// Fills the widget with default values
+  /// Fills the widget with default values. It calls the resetCustom method and change
+  /// the widget state to Reset if the reset is performed.
   /// \return true if the widget current value is reset
-  virtual bool reset() { return false; };
+  bool reset();
 
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theObject a model feature to be checked
@@ -70,6 +77,10 @@ Q_OBJECT
   /// \return the boolean result
   bool isUseReset() const { return myUseReset; }
 
+  /// Returns this widget value state
+  /// \return the enumeration result
+  ValueState getValueState() const { return myState; }
+
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
@@ -80,7 +91,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
-  /// \param toValidate the boolean value whether the value should be checked by filters
+  /// \param theToValidate the boolean value whether the value should be checked by filters
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate)
   {
@@ -100,11 +111,16 @@ Q_OBJECT
   void activate();
 
   /// The method called when widget is deactivated
-  virtual void deactivate() {}
+  virtual void deactivate();
 
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;
+
+  /// Returns the first or the last control that can accept the focus
+  /// \param isFirst if true, the first controls is returned or the last one
+  /// \return a control from a list of controls
+  QWidget* getControlAcceptingFocus(const bool isFirst);
 
   /// FocusIn events processing
   virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
@@ -137,6 +153,7 @@ Q_OBJECT
   }
 
   /// Set feature which is processing by active operation
+  /// \param theFeature a feature object
   /// \param theToStoreValue a value about necessity to store the widget value to the feature
   void setFeature(const FeaturePtr& theFeature, const bool theToStoreValue = false);
 
@@ -145,6 +162,9 @@ Q_OBJECT
 
   /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }
+
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object
@@ -159,6 +179,8 @@ signals:
   void beforeValuesChanged();
   /// The signal about widget values changed
   void valuesChanged();
+  /// The signal about widget values modified
+  void valuesModified();
   /// The signal about widget values are to be changed
   void afterValuesChanged();
 
@@ -179,6 +201,9 @@ signals:
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
+  /// The signal about value state modification
+  void valueStateChanged(int theState);
+
 protected:
   /// Sets default value of widget. Normally, widget should fetch this value
   /// from the xml. However, some widgets derived widgets could define it
@@ -189,6 +214,21 @@ protected:
   {
     myAttributeID = theAttribute;
   }
+
+  /// Sets the current value state. If the value is changed, the signal is emitted
+  /// If the current value state is Blocked, this method do nothing
+  /// \param theState a new state
+  /// \return the previous value state
+  ValueState setValueState(const ValueState& theState);
+
+  /// Blocks the value state change.
+  /// \param theBlocked a block state
+  /// \return the previous value
+  bool blockValueState(const bool theBlocked);
+
+  /// Compute the feature default value and fill the controls with it
+  /// or store the control value to the feature
+  virtual void initializeValueByActivate();
 
   /// Saves the internal parameters to the given feature. Emits signals before and after store
   /// \return True in success
@@ -201,6 +241,10 @@ protected:
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom() = 0;
 
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom() { return false; };
+
   /// The method called when widget is activated
   virtual void activateCustom() {};
 
@@ -211,6 +255,9 @@ protected:
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
   void onWidgetValuesChanged();
+
+  /// Changes widget state.
+  void onWidgetValuesModified();
 
  protected:
 
@@ -230,6 +277,9 @@ protected slots:
   /// The non-obligatory widgets should not accept the focus in the property panel
   bool myIsObligatory;
 
+  /// The widget value state
+  ValueState myState;
+
 private:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
   bool myIsComputedDefault;
@@ -239,6 +289,8 @@ private:
 
   /// the reset state. If it is false, the reset method of the widget is not performed
   bool myUseReset;
+  /// blocked flag of modification of the value state
+  bool myIsValueStateBlocked;
 };
 
 #endif

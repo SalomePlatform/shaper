@@ -13,9 +13,9 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Document.h>
 #include <Config_DataModelReader.h>
-#include <ModuleBase_IDocumentDataModel.h>
 #include <Events_Listener.h>
 
+#include <QAbstractItemModel>
 
 /**\class XGUI_DataModel
  * \ingroup GUI
@@ -27,10 +27,12 @@
  * - An index which contains internal pointer as ModelAPI_Object its the object
  * - An index which contains internal pointer as ModelAPI_Document is a folder which belongs to this document
  */
-class XGUI_EXPORT XGUI_DataModel : public ModuleBase_IDocumentDataModel, public Events_Listener
+class XGUI_EXPORT XGUI_DataModel : public QAbstractItemModel, public Events_Listener
 {
 Q_OBJECT
 public:
+  /// Constructor
+  /// \param theParent a parent object
   XGUI_DataModel(QObject* theParent);
 
   /// Event Listener method

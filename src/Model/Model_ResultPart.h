@@ -61,7 +61,8 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Updates the selection inside of the part by the selection index
   MODEL_EXPORT virtual bool updateInPart(const int theIndex);
   /// Returns the shape by the name in the part
-  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(const std::string& theName);
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(
+    const std::string& theName, const std::string& theType, int& theIndex);
   /// Updates the shape-result of the part (called on Part feature execution)
   MODEL_EXPORT virtual void updateShape();
   /// Applies the additional transformation of the part
@@ -71,6 +72,9 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
                                             std::string& theDefault);
+
+  /// Returns the shape selected in the selection index
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> selectionValue(const int theIndex);
 
 protected:
   /// makes a result on a temporary feature (an action)

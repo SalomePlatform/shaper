@@ -50,7 +50,8 @@ void Model_AttributeSelectionList::append(
   owner()->data()->sendAttributeUpdated(this);
 }
 
-void Model_AttributeSelectionList::append(std::string theNamingName)
+void Model_AttributeSelectionList::append(
+  const std::string theNamingName, const std::string& theType)
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
@@ -60,8 +61,9 @@ void Model_AttributeSelectionList::append(std::string theNamingName)
   if (owner()) {
     aNewAttr->setObject(owner());
   }
+  aNewAttr->setID(id());
   mySize->Set(aNewTag);
-  aNewAttr->selectSubShape(selectionType(), theNamingName);
+  aNewAttr->selectSubShape(theType.empty() ? selectionType() : theType, theNamingName);
   owner()->data()->sendAttributeUpdated(this);
 }
 

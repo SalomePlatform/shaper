@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source env.sh
-source env_standalone.sh
+source ${TOOLS_DIR}/env_standalone.sh
 
 CMAKE_ARGS=""
 if [ -f GCOV ]; then 
@@ -14,7 +14,7 @@ elif [ -f DEBUG ]; then
 else
   CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release"
 fi
-CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR}"
+CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=${NEWGEOM_ROOT_DIR}"
 CMAKE_ARGS="${CMAKE_ARGS} ${SOURCES_DIR}"
 
 mkdir -p ${BUILD_DIR}

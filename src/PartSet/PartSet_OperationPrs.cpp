@@ -25,8 +25,6 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultCompSolid.h>
 
-#include <GeomValidators_Tools.h>
-
 #include <GeomAPI_IPresentable.h>
 
 #include <StdPrs_WFDeflectionShape.hxx>

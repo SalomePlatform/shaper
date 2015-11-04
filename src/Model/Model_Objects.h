@@ -190,10 +190,13 @@ class Model_Objects
   /// be created before)
   std::string featureResultGroup(FeaturePtr theFeature);
 
-  ///! Returns all features of the document including the hidden features which are not in
-  ///! history. Not very fast method, for calling once, not in big cycles.
+  //! Returns all features of the document including the hidden features which are not in
+  //! history. Not very fast method, for calling once, not in big cycles.
   std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures();
 
+  //! synchronises back references for the given object basing on the collected data
+  void synchronizeBackRefsForObject(
+    const std::set<std::shared_ptr<ModelAPI_Attribute>>& theNewRefs, ObjectPtr theObject);
 
  private:
   TDF_Label myMain; ///< main label of the data storage

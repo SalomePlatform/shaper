@@ -153,7 +153,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi, myParentId);
   } else if (theType == WDG_SWITCH) {
     result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi, myParentId);
-  } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
+  } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE ||
+             theType == NODE_VALIDATOR) {
     // Do nothing for "box" and "case"
     result = NULL;
   } else {

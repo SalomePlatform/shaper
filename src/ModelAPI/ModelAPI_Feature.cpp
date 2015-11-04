@@ -199,6 +199,25 @@ bool ModelAPI_Feature::isDisabled()
   return myIsDisabled;
 }
 
+bool ModelAPI_Feature::setStable(const bool theFlag)
+{
+  if (myIsStable != theFlag) {
+    myIsStable = theFlag;
+    // send an event about the stability change (editing is started/finished)
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID EVENT_STAB = aLoop->eventByName(EVENT_STABILITY_CHANGED);
+    std::shared_ptr<Events_Message> aMessage(new Events_Message(EVENT_STAB, this));
+    aLoop->send(aMessage, false);
+    return true;
+  }
+  return false;
+}
+
+bool ModelAPI_Feature::isStable()
+{
+  return myIsStable;
+}
+
 bool ModelAPI_Feature::isPreviewNeeded() const
 {
   return true;
@@ -207,4 +226,5 @@ bool ModelAPI_Feature::isPreviewNeeded() const
 void ModelAPI_Feature::init()
 {
   myIsDisabled = false;
+  myIsStable = true;
 }

@@ -11,6 +11,7 @@
 #include <QDoubleSpinBox>
 #include <QValidator>
 
+class QKeyEvent;
 
 /**
 * \ingroup GUI
@@ -48,20 +49,38 @@ Q_OBJECT
   /// Validate current value
   virtual QValidator::State validate(QString&, int&) const;
 
+  /// Returns true if the current value is modified by has not been applyed yet
+  virtual bool isModified() const;
+
+  /// Clears modified state
+  void clearModified();
+
+  /// Change enable/disable internal state to emit key press event
+  /// \param theEnable if true, the signal is emitted
+  /// \return the previous value
+  bool enableKeyPressEvent(const bool& theEnable);
+
  protected slots:
    /// Called on text changed
   virtual void onTextChanged(const QString&);
+  void onValueChanged(const QString& theValue);
 
  protected:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
+  virtual void keyPressEvent(QKeyEvent* theEvent);
 
  private:
+  // boolen flag whether the key event is emitted. The default value is false
+  bool myIsEmitKeyPressEvent;
+
    /// Is clear flag
   bool myCleared;
 
   /// Precision value
   int myPrecision;
+  /// Boolean value whether the spin box content is modified
+  bool myIsModified;
 };
 
 #endif

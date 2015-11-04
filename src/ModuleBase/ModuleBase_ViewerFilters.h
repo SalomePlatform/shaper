@@ -60,7 +60,7 @@ public:
   Standard_EXPORT ModuleBase_ShapeInPlaneFilter(): SelectMgr_Filter() {}
 
   /// Set working plane
-  /// \param thePane plane object
+  /// \param thePlane a plane object
   void setPlane(const std::shared_ptr<GeomAPI_Pln>& thePlane) { myPlane = thePlane; }
 
   /// Returns current working plane

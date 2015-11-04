@@ -11,12 +11,14 @@
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_QtEvents.h"
 
+#ifndef HAVE_SALOME
 #include <AppElements_Workbench.h>
 #include <AppElements_Command.h>
 #include <AppElements_MainMenu.h>
 #include <AppElements_MainWindow.h>
 #include <AppElements_MenuGroupPanel.h>
 #include <AppElements_Button.h>
+#endif
 
 #include <ModuleBase_IModule.h>
 
@@ -191,7 +193,6 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     // the viewer's update context is unblocked, the viewer's update works
     XGUI_Displayer* aDisplayer = workshop()->displayer();
     aDisplayer->enableUpdateViewer(true);
-    aDisplayer->updateViewer();
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
@@ -219,12 +220,12 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     }
     return;
   }
-  if (!workshop()->isSalomeMode()) {
+#ifndef HAVE_SALOME
     SessionPtr aMgr = ModelAPI_Session::get();
     AppElements_MainWindow* aMainWindow = workshop()->mainWindow();
     if (aMgr->isModified() != aMainWindow->isModifiedState())
       aMainWindow->setModifiedState(aMgr->isModified());
-  }
+#endif
 }
 
 //******************************************************
@@ -357,10 +358,12 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     }
   }
   if (aRedisplayed) {
+    customizeCurrentObject();
+    //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
-    customizeCurrentObject();
-    aDisplayer->updateViewer();
+    else 
+      aDisplayer->updateViewer();
   }
 }
 //******************************************************
@@ -415,10 +418,12 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
   if (aDisplayed) {
+    customizeCurrentObject();
+    //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
-    customizeCurrentObject();
-    workshop()->displayer()->updateViewer();
+    else
+      workshop()->displayer()->updateViewer();
   }
   //if (aHasPart) { // TODO: Avoid activate last part on loading of document
   //  activateLastPart();
@@ -495,52 +500,52 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     }
   }
 
-  if (aWorkshop->isSalomeMode()) {
-    XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
-    QAction* aAction;
-    if (isColumnButton) {
-      aAction = aSalomeConnector->addFeatureOfNested(aWchName, aFeatureInfo, aNestedActList);
-    } else {
-      //Issue #650: in the SALOME mode the tooltip should be same as text
-      aFeatureInfo.toolTip = aFeatureInfo.text;
-      aAction = aSalomeConnector->addFeature(aWchName, aFeatureInfo);
-    }
-    aSalomeConnector->setNestedActions(aFeatureInfo.id, aNestedFeatures);
-    aSalomeConnector->setDocumentKind(aFeatureInfo.id, aDocKind);
-
-    aWorkshop->actionsMgr()->addCommand(aAction);
-    aWorkshop->module()->actionCreated(aAction);
+#ifdef HAVE_SALOME
+  XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
+  QAction* aAction;
+  if (isColumnButton) {
+    aAction = aSalomeConnector->addFeatureOfNested(aWchName, aFeatureInfo, aNestedActList);
   } else {
-    //Find or create Workbench
-    AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
-    AppElements_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
-    if (!aPage) {
-      aPage = aWorkshop->addWorkbench(aWchName);
-    }
-    //Find or create Group
-    QString aGroupName = QString::fromStdString(theMessage->groupId());
-    AppElements_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
-    if (!aGroup) {
-      aGroup = aPage->addGroup(aGroupName);
-    }
-    // Check if hotkey sequence is already defined:
-    XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
-    QKeySequence aHotKey = anActionsMgr->registerShortcut(aFeatureInfo.shortcut);
-    if(aHotKey != aFeatureInfo.shortcut) {
-      aFeatureInfo.shortcut = aHotKey;
-    }
-    // Create feature...
-    AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo,
-                                                       aDocKind,
-                                                       aNestedFeatures);
-    // Enrich created button with accept/abort buttons if necessary
-    AppElements_Button* aButton = aCommand->button();
-    if (aButton->isColumnButton()) {
-      aButton->setAdditionalButtons(aNestedActList);
-    }
-    aWorkshop->actionsMgr()->addCommand(aCommand);
-    aWorkshop->module()->actionCreated(aCommand);
+    //Issue #650: in the SALOME mode the tooltip should be same as text
+    aFeatureInfo.toolTip = aFeatureInfo.text;
+    aAction = aSalomeConnector->addFeature(aWchName, aFeatureInfo);
   }
+  aSalomeConnector->setNestedActions(aFeatureInfo.id, aNestedFeatures);
+  aSalomeConnector->setDocumentKind(aFeatureInfo.id, aDocKind);
+
+  aWorkshop->actionsMgr()->addCommand(aAction);
+  aWorkshop->module()->actionCreated(aAction);
+#else 
+  //Find or create Workbench
+  AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
+  AppElements_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
+  if (!aPage) {
+    aPage = aWorkshop->addWorkbench(aWchName);
+  }
+  //Find or create Group
+  QString aGroupName = QString::fromStdString(theMessage->groupId());
+  AppElements_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
+  if (!aGroup) {
+    aGroup = aPage->addGroup(aGroupName);
+  }
+  // Check if hotkey sequence is already defined:
+  XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
+  QKeySequence aHotKey = anActionsMgr->registerShortcut(aFeatureInfo.shortcut);
+  if(aHotKey != aFeatureInfo.shortcut) {
+    aFeatureInfo.shortcut = aHotKey;
+  }
+  // Create feature...
+  AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo,
+                                                      aDocKind,
+                                                      aNestedFeatures);
+  // Enrich created button with accept/abort buttons if necessary
+  AppElements_Button* aButton = aCommand->button();
+  if (aButton->isColumnButton()) {
+    aButton->setAdditionalButtons(aNestedActList);
+  }
+  aWorkshop->actionsMgr()->addCommand(aCommand);
+  aWorkshop->module()->actionCreated(aCommand);
+#endif
 }
 
 

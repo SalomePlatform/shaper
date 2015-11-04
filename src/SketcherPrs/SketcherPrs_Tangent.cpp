@@ -27,6 +27,7 @@ SketcherPrs_Tangent::SketcherPrs_Tangent(ModelAPI_Feature* theConstraint,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
+  // Init default points
   myPntArray = new Graphic3d_ArrayOfPoints(2);
   myPntArray->AddVertex(0., 0., 0.);
   myPntArray->AddVertex(0., 0., 0.);
@@ -41,6 +42,7 @@ bool SketcherPrs_Tangent::updatePoints(double theStep) const
   if (SketcherPrs_Tools::getShape(aObj2).get() == NULL)
     return false;
 
+  // Compute points coordinates
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
   gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);

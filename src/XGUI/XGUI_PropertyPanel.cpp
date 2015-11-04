@@ -9,6 +9,7 @@
 
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ActionsMgr.h>
+#include <XGUI_OperationMgr.h>
 //#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_Tools.h>
@@ -31,11 +32,12 @@
 #include <iostream>
 #endif
 
-XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
+XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
     : ModuleBase_IPropertyPanel(theParent), 
     myActiveWidget(NULL),
     myPreselectionWidget(NULL),
-    myPanelPage(NULL)
+    myPanelPage(NULL),
+    myOperationMgr(theMgr)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -117,19 +119,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(aWidget, SIGNAL(keyReleased(QKeyEvent*)),
             this,    SIGNAL(keyReleased(QKeyEvent*)));
   }
-  ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
-  if (aLastWidget) {
-    QList<QWidget*> aControls = aLastWidget->getControls();
-    if (!aControls.empty()) {
-      QWidget* aLastControl = aControls.last();
-
-      QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-      QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
-
-      setTabOrder(aLastControl, anOkBtn);
-      setTabOrder(anOkBtn, aCancelBtn);
-    }
-  }
 }
 
 const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
@@ -139,7 +128,6 @@ const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
 
 ModuleBase_PageBase* XGUI_PropertyPanel::contentWidget()
 {
-
   return static_cast<ModuleBase_PageBase*>(myPanelPage);
 }
 
@@ -166,23 +154,76 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
     activateWidget(NULL);
     return;
   }
-  ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
   activateWindow();
-  for (; anIt != aLast && !aNextWidget; anIt++) {
+  for (; anIt != aLast; anIt++) {
     if (isFoundWidget || !theWidget) {
       if ((*anIt)->focusTo()) {
-        aNextWidget = *anIt;
+        return;
       }
     }
-    isFoundWidget = (*anIt) == theWidget;
+    isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
-  // Normaly focusTo is enough to activate widget
-  // here is a special case on mouse click in the viewer
-  if(aNextWidget == NULL) {
-    activateWidget(aNextWidget);
+  activateWidget(NULL);
+}
+
+bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
+{
+  // it wraps the Tabs clicking to follow in the chain:
+  // controls, last control, Apply, Cancel, first control, controls
+
+  bool isChangedFocus = false;
+  if (theIsNext) { // forward by Tab
+    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+    if (aCancelBtn->hasFocus()) {
+      // after cancel, the first control should be focused
+      QWidget* aFirstControl = 0;
+      for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
+        aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
+      if (aFirstControl)
+        aFirstControl->setFocus();
+        isChangedFocus = true;
+    }
+    else {
+      // after the last control, the Apply button should be focused
+      QWidget* aLastControl = 0;
+      for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
+        aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
+      if (aLastControl && aLastControl->hasFocus()) {
+        setFocusOnOkButton();
+        isChangedFocus = true;
+      }
+    }
   }
+  else { // backward by SHIFT + Tab
+    QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+    if (anOkBtn->hasFocus()) {
+      // after Apply, the last control should be focused
+      QWidget* aLastControl = 0;
+      for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
+        aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
+      if (aLastControl)
+        aLastControl->setFocus();
+        isChangedFocus = true;
+    }
+    else {
+      // after the first control, the Cancel button should be focused
+      QWidget* aFirstControl = 0;
+      for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
+        aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
+      if (aFirstControl && aFirstControl->hasFocus()) {
+        QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+        aCancelBtn->setFocus();
+        isChangedFocus = true;
+      }
+    }
+  }
+
+  if (!isChangedFocus)
+    isChangedFocus = ModuleBase_IPropertyPanel::focusNextPrevChild(theIsNext);
+
+  return isChangedFocus;
 }
 
 void XGUI_PropertyPanel::activateNextWidget()
@@ -193,8 +234,21 @@ void XGUI_PropertyPanel::activateNextWidget()
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
+  if (setActiveWidget(theWidget)) {
+    if (myActiveWidget) {
+      emit widgetActivated(myActiveWidget);
+    } else if (!isEditingMode()) {
+      emit noMoreWidgets();
+      //setFocusOnOkButton();
+    }
+  }
+}
+
+bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
+{
+  // Avoid activation of already actve widget. It could happen on focusIn event many times
   if (theWidget == myActiveWidget) {
-    return;
+    return false;
   }
   if(myActiveWidget) {
     myActiveWidget->deactivate();
@@ -206,11 +260,7 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
-  if (myActiveWidget) {
-    emit widgetActivated(theWidget);
-  } else if (!isEditingMode()) {
-    emit noMoreWidgets();
-  }
+  return true;
 }
 
 void XGUI_PropertyPanel::setFocusOnOkButton()
@@ -260,4 +310,18 @@ ModuleBase_ModelWidget* XGUI_PropertyPanel::preselectionWidget() const
 void XGUI_PropertyPanel::setPreselectionWidget(ModuleBase_ModelWidget* theWidget)
 {
   myPreselectionWidget = theWidget;
+}
+
+
+void XGUI_PropertyPanel::closeEvent(QCloseEvent* theEvent)
+{
+  ModuleBase_Operation* aOp = myOperationMgr->currentOperation();
+  if (aOp) {
+    if (myOperationMgr->canStopOperation(aOp)) {
+      myOperationMgr->abortAllOperations();
+      theEvent->accept();
+    } else 
+      theEvent->ignore();
+  } else
+    ModuleBase_IPropertyPanel::closeEvent(theEvent);
 }

@@ -113,24 +113,32 @@ std::shared_ptr<GeomAPI_Shape>  ConstructionPlugin_Plane::createPlaneByFaceAndDi
       double aXmin, aYmin, Zmin, aXmax, aYmax, Zmax;
       aShape->computeSize(aXmin, aYmin, Zmin, aXmax, aYmax, Zmax);
 
-      std::shared_ptr<GeomAPI_Pnt> aPnt1 = std::shared_ptr<GeomAPI_Pnt>(
-          new GeomAPI_Pnt(aXmin, aYmin, Zmin));
-      std::shared_ptr<GeomAPI_Pnt> aPnt2 = std::shared_ptr<GeomAPI_Pnt>(
-          new GeomAPI_Pnt(aXmax, aYmax, Zmax));
-
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d1 = aPnt1->to2D(aNewPln);
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d2 = aPnt2->to2D(aNewPln);
-
-      double aWidth = aPnt2d2->x() - aPnt2d1->x();
-      double aHeight = aPnt2d2->y() - aPnt2d1->y();
-      double aWgap = aWidth * 0.1;
-      double aHgap = aHeight * 0.1;
-
+      // use all 8 points of the bounding box to find the 2D bounds
+      bool isFirst = true;
+      double aMinX2d, aMaxX2d, aMinY2d, aMaxY2d;
+      for(int aXIsMin = 0; aXIsMin < 2; aXIsMin++) {
+        for(int aYIsMin = 0; aYIsMin < 2; aYIsMin++) {
+          for(int aZIsMin = 0; aZIsMin < 2; aZIsMin++) {
+            std::shared_ptr<GeomAPI_Pnt> aPnt = std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(
+              aXIsMin ? aXmin : aXmax, aYIsMin ? aYmin : aYmax, aZIsMin ? Zmin : Zmax));
+            std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = aPnt->to2D(aNewPln);
+            if (isFirst || aPnt2d->x() < aMinX2d)
+              aMinX2d = aPnt2d->x();
+            if (isFirst || aPnt2d->y() < aMinY2d)
+              aMinY2d = aPnt2d->y();
+            if (isFirst || aPnt2d->x() > aMaxX2d)
+              aMaxX2d = aPnt2d->x();
+            if (isFirst || aPnt2d->y() > aMaxY2d)
+              aMaxY2d = aPnt2d->y();
+            if (isFirst)
+              isFirst = !isFirst;
+          }
+        }
+      }
+      double aWgap = (aMaxX2d - aMinX2d) * 0.1;
+      double aHgap = (aMaxY2d - aMinY2d) * 0.1;
       aPlane = GeomAlgoAPI_FaceBuilder::planarFace(aNewPln,
-                                                   aPnt2d1->x() - aWgap,
-                                                   aPnt2d1->y() - aHgap,
-                                                   aWidth + 2 * aWgap,
-                                                   aHeight + 2 * aHgap);
+        aMinX2d - aWgap, aMinY2d - aHgap, aMaxX2d - aMinX2d + 2. * aWgap, aMaxY2d - aMinY2d + 2. * aHgap);
     }
   }
   return aPlane;

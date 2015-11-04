@@ -44,7 +44,7 @@ Q_OBJECT
 
 protected:
   /// Checks the widget validity. By default, it returns true.
-  /// \param theValue a selected presentation in the view
+  /// \param thePrs a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
@@ -83,7 +83,9 @@ protected:
   void setPointAttribute(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
 protected:
+  /// A reference to external objects manager
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;
+
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;
 };

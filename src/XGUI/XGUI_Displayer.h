@@ -118,7 +118,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool theUpdateViewer = true);
 
-  // Remove default selection filters of the module from the current viewer
+  /// Remove default selection filters of the module from the current viewer
   void deactivateSelectionFilters();
 
   /// \brief Add selection filter
@@ -141,16 +141,21 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param isEnabled a boolean value
   bool enableUpdateViewer(const bool isEnabled);
 
+  bool isUpdateEnabled() const { return myEnableUpdateViewer; }
+
   /// Updates the viewer
   void updateViewer() const;
 
   /// Activate interactive context
-  /// \param theIO
-  /// \param theMode
+  /// \param theIO an interactive object
+  /// \param theMode activation mode
+  /// \param theUpdateViewer update viewer flag
   void activateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode,
                    const bool theUpdateViewer) const;
 
   /// Activate interactive context. It is necessary to call ClearOutdatedSelection after deactivation
+  /// \param theIO an interactive object
+  /// \param theMode a mode to deactivate. When theMode=-1 then all modes will be deactivated
   void deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode = -1) const;
 
   /// Searches the interactive object by feature
@@ -186,6 +191,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Activates in local context displayed outside of the context.
   /// \param theModes - modes on which it has to be activated (can be empty)
   /// \param theObjList - list of objects which has to be activated.
+  /// \param theUpdateViewer an update viewer flag
   void activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
                        const bool theUpdateViewer = true);
 
@@ -220,6 +226,10 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theUpdateViewer update viewer flag
   /// \return previously defined color on the object
   QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool theUpdateViewer = true);
+  
+  /// Converts shape type (TopAbs_ShapeEnum) to selection mode
+  /// \param theShapeType a shape type from TopAbs_ShapeEnum
+  static int getSelectionMode(int theShapeType);
 
 signals:
   /// Signal on object display
@@ -253,7 +263,8 @@ private:
   /// Activates the interactive object in the local context.
   /// \param theIO an interactive object
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
+  /// \return a flag is object activated or not
+  bool activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
                 const bool theUpdateViewer) const;
 
   /// Deactivates the given object (not allow selection)
@@ -302,7 +313,10 @@ private:
   QIntList myActiveSelectionModes;
 
   /// the enable update viewer flag
-  bool myEnableUpdateViewer;  
+  bool myEnableUpdateViewer; 
+
+  /// A flag that update was requested but not done
+  mutable bool myNeedUpdate;
 };
 
 #endif

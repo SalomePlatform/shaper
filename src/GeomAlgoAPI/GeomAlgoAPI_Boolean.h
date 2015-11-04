@@ -31,29 +31,6 @@ public:
   };
 
  public:
-  /** \brief Creates cut boolean operation.
-   *  \param[in] theObjects the main shape.
-   *  \param[in] theTools  toole shape for boolean.
-   *  \return a solid or compound of solids as result of operation.
-   */
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCut(const ListOfShape& theObjects,
-                                                                   const ListOfShape& theTools);
-
-  /** \brief Creates fuse boolean operation.
-   *  \param[in] theObjects the main shape.
-   *  \param[in] theTools  second shape.
-   *  \return a solid as result of operation.
-   */
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeFuse(const ListOfShape& theObjects,
-                                                                    const ListOfShape& theTools);
-
-  /** \brief Creates common boolean operation.
-   *  \param[in] theObjects the main shape.
-   *  \param[in] theTools  second shape.
-   *  \return a solid as result of operation.
-   */
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCommon(const ListOfShape& theObjects,
-                                                                      const ListOfShape& theTools);
 
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const ListOfShape& theObjects,

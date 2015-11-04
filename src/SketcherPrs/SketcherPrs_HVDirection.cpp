@@ -35,6 +35,7 @@ bool SketcherPrs_HVDirection::updatePoints(double theStep) const
   if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
     return false;
 
+  // Set point of the symbol
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
   myPntArray->SetVertice(1, aP1);
@@ -45,6 +46,7 @@ void SketcherPrs_HVDirection::drawLines(const Handle(Prs3d_Presentation)& thePrs
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
+  // Draw constrained object
   Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 

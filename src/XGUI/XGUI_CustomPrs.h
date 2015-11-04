@@ -25,6 +25,9 @@ public:
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
 
+  /// Returns color of a result object
+  /// \param theResult a result object
+  /// \param theColor a color in form of RGB vector
   static void getResultColor(ResultPtr theResult, std::vector<int>& theColor);
 };
 

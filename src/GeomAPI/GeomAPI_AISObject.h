@@ -36,6 +36,9 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   void createShape(std::shared_ptr<GeomAPI_Shape> theShape);
 
+  /// Reyirns shape used for the presentation creation (can be NULL)
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Shape> getShape() const;
+
   /** \brief Creates AIS_LengthDimension object
    *  \param[in] theStartPoint  first point for dimension
    *  \param[in] theEndPoint    second point for dimension
@@ -48,6 +51,14 @@ class GeomAPI_AISObject : public GeomAPI_Interface
                       std::shared_ptr<GeomAPI_Pnt> theEndPoint,
                       std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
                       std::shared_ptr<GeomAPI_Pln> thePlane, double theDistance);
+
+  /**
+   * Returns validity of the AIS distance. It is invalid if set measured geometry is not valid,
+   * e.g. the distance points are equal.
+   * \return a boolean result
+   */
+  GEOMAPI_EXPORT 
+  bool isEmptyDistanceGeometry();
 
   /** \brief Creates AIS_RadiusDimension object
    *  \param[in] theCircle      the radius is created for this circle

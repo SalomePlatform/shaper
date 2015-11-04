@@ -162,4 +162,22 @@ class SketchPlugin_SolverErrorValidator : public ModelAPI_FeatureValidator
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
+/**\class SketchPlugin_FilletVertexValidator
+ * \ingroup Validators
+ * \brief Validator for the point for fillet creation.
+ *
+ * Checks that selected point have exactly two coincident lines.
+ */
+class SketchPlugin_FilletVertexValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute (not used)
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+};
+
 #endif

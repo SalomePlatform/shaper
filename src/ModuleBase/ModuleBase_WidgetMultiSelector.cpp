@@ -36,14 +36,20 @@
 #include <memory>
 #include <string>
 
+/**
+* Customization of a List Widget to make it to be placed on full width of container
+*/
 class CustomListWidget : public QListWidget
 {
 public:
+  /// Constructor
+  /// \param theParent a parent widget
   CustomListWidget( QWidget* theParent )
     : QListWidget( theParent )
   {
   }
 
+  /// Redefinition of virtual method
   virtual QSize	sizeHint() const
   {
     int aHeight = 2*QFontMetrics( font() ).height();
@@ -51,6 +57,7 @@ public:
     return QSize( aSize.width(), aHeight );
   }
 
+  /// Redefinition of virtual method
   virtual QSize	minimumSizeHint() const
   {
     int aHeight = 2*QFontMetrics( font() ).height();

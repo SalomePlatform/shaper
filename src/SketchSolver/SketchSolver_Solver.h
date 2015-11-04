@@ -34,6 +34,8 @@ typedef unsigned int UINT32;
 #define SLVS_E_UNKNOWN 0
 // Unknown group
 #define SLVS_G_UNKNOWN 0
+// Group ID to store external objects
+#define SLVS_G_OUTOFGROUP 1
 
 /**
  * The main class that performs the high-level operations for connection to the SolveSpace.

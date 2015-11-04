@@ -31,6 +31,11 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     myLabel->setPixmap(QPixmap(aLabelIcon));
   aLayout->addWidget(myLabel);
 
+  std::string aToolstr = theData->widgetTooltip();
+  if (!aToolstr.empty()) {
+    myLabel->setToolTip(QString::fromStdString(aToolstr));
+  }
+
   myCombo = new QComboBox(this);
   aLayout->addWidget(myCombo, 1);
  

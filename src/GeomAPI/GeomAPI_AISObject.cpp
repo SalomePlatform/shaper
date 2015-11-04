@@ -83,6 +83,22 @@ void GeomAPI_AISObject::createShape(std::shared_ptr<GeomAPI_Shape> theShape)
   }
 }
 
+std::shared_ptr<GeomAPI_Shape> GeomAPI_AISObject::getShape() const
+{
+  std::shared_ptr<GeomAPI_Shape> aResult;
+
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
+    if (aShapeAIS) {
+      std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
+      aResult->setImpl(new TopoDS_Shape(aShapeAIS->Shape()));
+      return aResult;
+    }
+  }
+  return std::shared_ptr<GeomAPI_Shape>();
+}
+
 void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoint,
                                        std::shared_ptr<GeomAPI_Pnt> theEndPoint,
                                        std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
@@ -139,6 +155,21 @@ void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoin
       aDimAIS->Redisplay(Standard_True);
     }
   }
+}
+
+bool GeomAPI_AISObject::isEmptyDistanceGeometry()
+{
+  bool anEmpty = false;
+
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
+    if (!aDimAIS.IsNull()) {
+      anEmpty = !aDimAIS->IsValid();
+    }
+  }
+
+  return anEmpty;
 }
 
 void GeomAPI_AISObject::createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,

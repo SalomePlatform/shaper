@@ -28,6 +28,13 @@ const double tolerance = 1e-7;
 const double paramTolerance = 1.e-4;
 const double PI =3.141592653589793238463;
 
+
+static const std::string& INVERSED_ID()
+{
+  static const std::string MY_INVERSED_ID("InversedArc");
+  return MY_INVERSED_ID;
+}
+
 SketchPlugin_Arc::SketchPlugin_Arc()
     : SketchPlugin_SketchEntity()
 {
@@ -37,7 +44,6 @@ SketchPlugin_Arc::SketchPlugin_Arc()
   myXEndBefore = 0;
   myYEndBefore = 0;
 
-  myForwardDirection = true;
   myParamBefore = 0;
 }
 
@@ -51,6 +57,12 @@ void SketchPlugin_Arc::initAttributes()
     GeomDataAPI_Point2D>(data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId()));
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
+
+  data()->addAttribute(INVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
+  AttributeBooleanPtr isInversed =
+      std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
+  if (!isInversed->isInitialized())
+    isInversed->setValue(false);
 
   // get the initial values
   if (anEndAttr->isInitialized()) {
@@ -98,24 +110,26 @@ void SketchPlugin_Arc::execute()
       anEndAttr->setValue(aProjection);
     */
     std::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
+    AttributeBooleanPtr isInversed =
+        std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
 
     std::shared_ptr<GeomAPI_Dir> anXDir(new GeomAPI_Dir(aStartPoint->xyz()->decreased(aCenter->xyz())));
     std::shared_ptr<GeomAPI_Ax2> anAx2(new GeomAPI_Ax2(aCenter, aNormal, anXDir));
     std::shared_ptr<GeomAPI_Circ> aCirc(new GeomAPI_Circ(anAx2, aCenter->distance(aStartPoint)));
     double aParameterNew = 0.0;
     if(aCirc->parameter(aEndPoint, paramTolerance, aParameterNew)) {
-      if(0 < myParamBefore && myParamBefore <= PI / 2.0
-        && PI * 1.5 < aParameterNew && aParameterNew <= PI * 2.0) {
-          myForwardDirection = false;
-      } else if(PI * 1.5 < myParamBefore && myParamBefore <= PI * 2.0
-        && 0 < aParameterNew && aParameterNew <= PI / 2.0) {
-          myForwardDirection = true;
+      if(0 <= myParamBefore && myParamBefore <= PI / 2.0
+        && PI * 1.5 <= aParameterNew && aParameterNew <= PI * 2.0) {
+          isInversed->setValue(true);
+      } else if(PI * 1.5 <= myParamBefore && myParamBefore <= PI * 2.0
+        && 0 <= aParameterNew && aParameterNew <= PI / 2.0) {
+          isInversed->setValue(false);
       }
     }
     myParamBefore = aParameterNew;
 
     std::shared_ptr<GeomAPI_Shape> aCircleShape;
-    if(myForwardDirection) {
+    if(!isInversed->value()) {
       aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
     } else {
       aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aEndPoint, aStartPoint, aNormal);

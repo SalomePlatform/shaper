@@ -9,6 +9,8 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_ErrorMgr.h"
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
@@ -25,8 +27,7 @@
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myIsValidationLock(false), myIsApplyEnabled(false),
-  myWorkshop(theWorkshop)
+: QObject(theParent), myIsApplyEnabled(false), myWorkshop(theWorkshop)
 {
 }
 
@@ -116,9 +117,14 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
     currentOperation()->postpone();
   myOperations.append(theOperation);
 
+  connect(theOperation, SIGNAL(beforeStarted()), SLOT(onBeforeOperationStarted()));
+  connect(theOperation, SIGNAL(beforeAborted()), SLOT(onBeforeOperationAborted()));
+  connect(theOperation, SIGNAL(beforeCommitted()), SLOT(onBeforeOperationCommitted()));
+
   connect(theOperation, SIGNAL(started()), SLOT(onOperationStarted()));
   connect(theOperation, SIGNAL(aborted()), SLOT(onOperationAborted()));
   connect(theOperation, SIGNAL(committed()), SLOT(onOperationCommitted()));
+
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -187,20 +193,10 @@ void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
     return;
-  //ModuleBase_Operation* anOperation = currentOperation();
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                           (currentOperation());
-  if(aFOperation && aFOperation->feature().get()) {
-    //bool aCanCommit = myWorkshop->module()->canCommitOperation();
-    //setApplyEnabled(!myIsValidationLock && aCanCommit && anOperation->isValid());
+  if(aFOperation && aFOperation->feature().get())
     setApplyEnabled(myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty());
-  }
-}
-
-void XGUI_OperationMgr::setLockValidating(bool toLock)
-{
-  myIsValidationLock = toLock;
-  onValidateOperation();
 }
 
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
@@ -260,7 +256,7 @@ bool XGUI_OperationMgr::isParentOperationValid() const
 bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
 {
   //in case of nested (sketch) operation no confirmation needed
-  if (isGrantedOperation(theOperation))
+  if (isGrantedOperation(theOperation->id()))
     return true;
   if (theOperation && theOperation->isModified()) {
     QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
@@ -288,7 +284,7 @@ void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
   theOperation->resume();
 }
 
-bool XGUI_OperationMgr::isGrantedOperation(ModuleBase_Operation* theOperation)
+bool XGUI_OperationMgr::isGrantedOperation(const QString& theId)
 {
   bool isGranted = false;
 
@@ -297,26 +293,44 @@ bool XGUI_OperationMgr::isGrantedOperation(ModuleBase_Operation* theOperation)
   ModuleBase_Operation* aPreviousOperation = 0;
   while (anIt.hasPrevious()) {
     ModuleBase_Operation* anOp = anIt.previous();
-    if (anOp == theOperation) {
-      if (anIt.hasPrevious())
-        aPreviousOperation = anIt.previous();
-      break;
-    }
+    if (anOp)
+      isGranted = anOp->isGranted(theId);
   }
-  if (aPreviousOperation)
-    isGranted = aPreviousOperation->isGranted(theOperation->id());
-
   return isGranted;
 }
 
-bool XGUI_OperationMgr::canStartOperation(const QString& theId, const bool isAdditionallyGranted)
+void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+  bool aIsOp = aMgr->isOperation();
+  if (!aIsOp)
+    aMgr->startOperation();
+  aDoc->setCurrentFeature(theFeature, false);
+  if (!aIsOp)
+    aMgr->finishOperation();
+}
+
+bool XGUI_OperationMgr::canStartOperation(const QString& theId)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
-    bool aGranted = aCurrentOp->isGranted(theId) || isAdditionallyGranted;
-    if (!aGranted) {
-      if (canStopOperation(aCurrentOp)) {
+    bool aGranted = aCurrentOp->isGranted(theId);
+    // the started operation is granted for the current one,
+    // e.g. current - Sketch, started - Line
+    if (aGranted) {
+      aCanStart = true;
+    }
+    else {
+      if (!isGrantedOperation(theId)) {
+        // the operation is not granted in the current list of operations
+        // e.g. Edit Parameter when Sketch, Line in Sketch is active.
+        aCanStart = abortAllOperations();
+      }
+      else if (canStopOperation(aCurrentOp)) {
+        // the started operation is granted in the parrent operation,
+        // e.g. current - Line in Sketch, started Circle 
         if (myIsApplyEnabled && aCurrentOp->isModified())
           aCurrentOp->commit();
         else
@@ -362,6 +376,32 @@ void XGUI_OperationMgr::onAbortOperation()
   }
 }
 
+void XGUI_OperationMgr::onBeforeOperationStarted()
+{
+  ModuleBase_Operation* aCurrentOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  if (!aCurrentOperation)
+    return;
+
+  /// Set current feature and remeber old current feature
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
+  if (aFOperation) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->activeDocument();
+    // the parameter of current feature should be false, we should use all feature, not only visible
+    // in order to correctly save the previous feature of the nested operation, where the
+    // features can be not visible in the tree. The problem case is Edit sketch entitity(line)
+    // in the Sketch, created in ExtrusionCut operation. The entity disappears by commit.
+    // When sketch entity operation started, the sketch should be cashed here as the current.
+    // Otherwise(the flag is true), the ExtrusionCut is cashed, when commit happens, the sketch
+    // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
+    // As a result the sketch disappears from the viewer. However after commit it is displayed back.
+    aFOperation->setPreviousCurrentFeature(aDoc->currentFeature(false));
+    if (aFOperation->isEditOperation()) // it should be performed by the feature edit only
+      // in create operation, the current feature is changed by addFeature()
+      aDoc->setCurrentFeature(aFOperation->feature(), false);
+  }
+}
+
 void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
@@ -369,10 +409,38 @@ void XGUI_OperationMgr::onOperationStarted()
   emit operationStarted(aSenderOperation);
 }
 
+void XGUI_OperationMgr::onBeforeOperationAborted()
+{
+  onBeforeOperationCommitted();
+}
+
 void XGUI_OperationMgr::onOperationAborted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
   emit operationAborted(aSenderOperation);
+}
+
+void XGUI_OperationMgr::onBeforeOperationCommitted()
+{
+  ModuleBase_Operation* aCurrentOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  if (!aCurrentOperation)
+    return;
+
+  /// Restore the previous current feature
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
+  if (aFOperation) {
+    if (aFOperation->isEditOperation()) {
+      /// Restore the previous current feature
+      setCurrentFeature(aFOperation->previousCurrentFeature());
+    }
+    else { // create operation
+      // the Top created feature should stays the current. In nested operations, like Line in the Sketch or
+      // Sketch in ExtrusionCut, a previous feature should be restored on commit. It is performed here
+      // in order to perform it in the current transaction without opening a new one.
+      if (myOperations.front() != aFOperation)
+        setCurrentFeature(aFOperation->previousCurrentFeature());
+    }
+  }
 }
 
 void XGUI_OperationMgr::onOperationCommitted()
@@ -423,15 +491,28 @@ void XGUI_OperationMgr::onOperationStopped()
 
 bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
+  QObject* aSender = sender();
+
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = true;
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      emit keyEnterReleased();
-      commitOperation();
+      ModuleBase_Operation* aOperation = currentOperation();
+      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+      if (!aActiveWgt || !aActiveWgt->processEnter()) {
+        ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+        if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
+          emit keyEnterReleased();
+          commitOperation();
+        }
+        else
+          isAccepted = false;
+      }
     }
+    break;
     case Qt::Key_N:
     case Qt::Key_P: {
       bool noModifiers = (theEvent->modifiers() == Qt::NoModifier);

@@ -125,6 +125,8 @@ protected:
   /// Returns true if the feature is older that the argument and it must be updated
   bool isOlder(std::shared_ptr<ModelAPI_Feature> theFeature, 
                std::shared_ptr<ModelAPI_Object> theArgument);
+  /// Updates the properties of object because of stability state changes
+  void updateStability(void* theSender);
 };
 
 #endif

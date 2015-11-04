@@ -101,6 +101,11 @@ QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
   return anError;
 }
 
+void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,
+                                             QStringList& theIds) const
+{
+}
+
 ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& theFeatureId)
 {
   return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);
@@ -179,11 +184,6 @@ bool ModuleBase_IModule::canRedo() const
   return aMgr->hasModuleDocument() && aMgr->canRedo() && !aMgr->isOperation();
 }
 
-bool ModuleBase_IModule::canCommitOperation() const
-{
-  return true;
-}
-
 void ModuleBase_IModule::onFeatureTriggered()
 {
   QAction* aCmd = dynamic_cast<QAction*>(sender());
@@ -223,7 +223,7 @@ bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
   return !aFOperation || !aFOperation->hasObject(theObject);
 }
 
-void ModuleBase_IModule::onOperationResumed(ModuleBase_Operation* theOperation) 
+void ModuleBase_IModule::operationResumed(ModuleBase_Operation* theOperation) 
 {
-  emit operationResumed(theOperation);
+  emit resumed(theOperation);
 }

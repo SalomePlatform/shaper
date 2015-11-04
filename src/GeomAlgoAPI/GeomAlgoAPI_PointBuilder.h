@@ -24,6 +24,10 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_PointBuilder
   /// Creates a shape by point
   static std::shared_ptr<GeomAPI_Shape> point(std::shared_ptr<GeomAPI_Pnt> thePoint);
 
+  /// Creates a shape by point coordinates
+  static std::shared_ptr<GeomAPI_Shape> point(
+    const double theX, const double theY, const double theZ);
+
   /// Return point by shape vertex
   static std::shared_ptr<GeomAPI_Pnt> point(std::shared_ptr<GeomAPI_Shape> theVertex);
 };

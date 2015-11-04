@@ -17,39 +17,6 @@
 #include <TopTools_ListOfShape.hxx>
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCut(const ListOfShape& theObjects,
-                                                            const ListOfShape& theTools)
-{
-  GeomAlgoAPI_Boolean aBoolAlgo(theObjects, theTools, BOOL_CUT);
-  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
-    return aBoolAlgo.shape();
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeFuse(const ListOfShape& theObjects,
-                                                             const ListOfShape& theTools)
-{
-  GeomAlgoAPI_Boolean aBoolAlgo(theObjects, theTools, BOOL_FUSE);
-  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
-    return aBoolAlgo.shape();
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(const ListOfShape& theObjects,
-                                                               const ListOfShape& theTools)
-{
-  GeomAlgoAPI_Boolean aBoolAlgo(theObjects, theTools, BOOL_COMMON);
-  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
-    return aBoolAlgo.shape();
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-
-//=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType)

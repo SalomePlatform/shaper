@@ -15,6 +15,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <SketcherPrs_Tools.h>
+
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
@@ -676,7 +678,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
   if (!aPnt) return;
   FeaturePtr aObj = ModelAPI_Feature::feature(aPnt->object());
   if (!theList.contains(aObj)) {
-    std::shared_ptr<GeomAPI_Pnt2d> aOrig = getPoint(theStartCoin, theAttr);
+    std::shared_ptr<GeomAPI_Pnt2d> aOrig = getCoincedencePoint(theStartCoin);
     if (aOrig.get() == NULL)
       return;
     theList.append(aObj);
@@ -686,7 +688,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
       std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
       FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
       if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
-        std::shared_ptr<GeomAPI_Pnt2d> aPnt = getPoint(aConstrFeature, theAttr);
+        std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincedencePoint(aConstrFeature);
         if (aPnt.get() && aOrig->isEqual(aPnt)) {
           findCoincidences(aConstrFeature, theList, SketchPlugin_ConstraintCoincidence::ENTITY_A());
           findCoincidences(aConstrFeature, theList, SketchPlugin_ConstraintCoincidence::ENTITY_B());
@@ -694,6 +696,15 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
       }
     }
   }
+}
+
+std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getCoincedencePoint(FeaturePtr theStartCoin)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), 
+                                                                    SketchPlugin_Constraint::ENTITY_A());
+  if (aPnt.get() == NULL)
+    aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), SketchPlugin_Constraint::ENTITY_B());
+  return aPnt;
 }
 
 AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj, 

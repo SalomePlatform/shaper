@@ -19,6 +19,7 @@
 #include "SketcherPrs_Transformation.h"
 #include "SketcherPrs_Angle.h"
 
+// Macros for constraint presentation definition
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
 AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane) \
@@ -40,7 +41,7 @@ CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
 CONSTRAINT_PRS_IMPL(mirrorConstraint, SketcherPrs_Mirror);
 CONSTRAINT_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
 
-
+// Non-standard constraints definition
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 { 

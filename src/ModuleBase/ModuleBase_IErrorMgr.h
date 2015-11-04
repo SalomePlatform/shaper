@@ -12,11 +12,17 @@
 
 class ModuleBase_IPropertyPanel;
 
+/**
+ * \class ModuleBase_IErrorMgr
+ * \ingroup GUI
+ * \brief An interface to Errors manager object
+ */
 class MODULEBASE_EXPORT ModuleBase_IErrorMgr : public QObject
 {
   Q_OBJECT
 public:
   /// Default constructor
+  /// \param theParent a parent object
   ModuleBase_IErrorMgr(QObject* theParent = 0);
   /// Virtual destructor
   virtual ~ModuleBase_IErrorMgr();

@@ -58,7 +58,7 @@ ModelAPI_Document* getSubDocument(void* theObj)
 
 
 // Constructor *************************************************
-XGUI_DataModel::XGUI_DataModel(QObject* theParent) : ModuleBase_IDocumentDataModel(theParent)
+XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)
 {
   myXMLReader.readAll();
 
@@ -375,13 +375,13 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       case Qt::DecorationRole:
         return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
       case Qt::ForegroundRole:
-        if ((flags(theIndex) & Qt::ItemIsEditable) == 0)
+        if ((theIndex.flags() & Qt::ItemIsEditable) == 0)
           return QBrush(Qt::lightGray);
         return ACTIVE_COLOR;
     }
   } else { // an object or sub-document
     if (theRole == Qt::ForegroundRole) {
-      if ((flags(theIndex) & Qt::ItemIsEditable) == 0)
+      if ((theIndex.flags() & Qt::ItemIsEditable) == 0)
         return QBrush(Qt::lightGray);
       return ACTIVE_COLOR;
     }

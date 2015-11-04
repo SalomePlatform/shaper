@@ -60,6 +60,7 @@ class ModuleBase_ISelection
    */
   virtual QObjectPtrList selectedObjects() const = 0;
 
+  /// Set selected objects list
   virtual void setSelectedObjects( const QObjectPtrList& ) const = 0;
 
   /**
@@ -106,6 +107,17 @@ class ModuleBase_ISelection
   //! \return a list of prs, where only object is not empty
   static MODULEBASE_EXPORT QList<ModuleBase_ViewerPrs> getViewerPrs(
                                                        const QObjectPtrList& theObjects);
+
+  /// Removes selection items where owners have equal vertices. The first
+  /// owner with the qual vertex stays in the list.
+  static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
+                                              (QList<ModuleBase_ViewerPrs>& theSelected);
+private:
+  /// Returns true if the presentations have an owner with a vertex and these vertices are equal.
+  /// \param thePrs1 the first viewer selected presentation
+  /// \param thePrs2 the second viewer selected presentation
+  static bool isEqualVertices(const ModuleBase_ViewerPrs thePrs1,
+                              const ModuleBase_ViewerPrs thePrs2);
 };
 
 #endif

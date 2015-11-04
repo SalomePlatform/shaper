@@ -36,30 +36,4 @@ namespace GeomValidators_Tools {
     return anObject;
   }
 
-  TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape)
-  {
-    TopAbs_ShapeEnum aShapeType = theShape.ShapeType();
-
-    // for compounds check sub-shapes: it may be compound of needed type:
-    // Booleans may produce compounds of Solids
-    if (aShapeType == TopAbs_COMPOUND) {
-      for(TopoDS_Iterator aSubs(theShape); aSubs.More(); aSubs.Next()) {
-        if (!aSubs.Value().IsNull()) {
-          TopAbs_ShapeEnum aSubType = aSubs.Value().ShapeType();
-          if (aSubType == TopAbs_COMPOUND) { // compound of compound(s)
-            aShapeType = TopAbs_COMPOUND;
-            break;
-          }
-          if (aShapeType == TopAbs_COMPOUND) {
-            aShapeType = aSubType;
-          } else if (aShapeType != aSubType) { // compound of shapes of different types
-            aShapeType = TopAbs_COMPOUND;
-            break;
-          }
-        }
-      }
-    }
-    return aShapeType;
-  }
-
 }

@@ -22,6 +22,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
 {
   Q_OBJECT
  public:
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theData the widget configuration. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
                            const std::string& theParentId);
   virtual ~ModuleBase_WidgetToolbox();
@@ -30,7 +34,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   /// \return false because this is an info widget
   virtual bool canSetValue() const { return false; };
 
-  /// Overrides ModuleBase_PagedContainer
+  /// Add a page to the widget
+  /// \param theWidget a page widget
+  /// \param theName a name of page
+  /// \param theCaseId an Id of the page
+  /// \param theIcon an icon of the page
   virtual int addPage( ModuleBase_PageBase* theWidget,
                        const QString& theName,
                        const QString& theCaseId,
@@ -39,6 +47,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
  protected:
   /// Implements ModuleBase_PagedContainer
   virtual int currentPageIndex() const;
+
   /// Implements ModuleBase_PagedContainer
   virtual void setCurrentPageIndex(int);
 

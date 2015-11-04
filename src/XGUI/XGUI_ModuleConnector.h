@@ -63,12 +63,12 @@ Q_OBJECT
   virtual ModuleBase_Operation* findStartedOperation(const QString& theId);
 
   //! Returns true if the operation with id theId can be stopped. The operation manager is called.
-  //! \param theId a stopped operation
+  //! \param theOperation a stopped operation
   //! \return boolean result
   virtual bool canStopOperation(ModuleBase_Operation* theOperation);
 
   //! Aborts the operation. The operation manager is called.
-  //! \param theId an aborted operation
+  //! \param theOperation an aborted operation
   void abortOperation(ModuleBase_Operation* theOperation);
 
   //! Returns AIS object by data object

@@ -37,13 +37,9 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetIntValue();
 
-  /// Fills the widget with default values
-  virtual bool reset();
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
-
 
 protected:
   /// Saves the internal parameters to the given feature
@@ -53,6 +49,10 @@ protected:
   //! Read value of corresponded attribute from data model to the input control
   // \return True in success
   virtual bool restoreValueCustom();
+
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom();
 
 protected:
   /// Label of the widget

@@ -25,7 +25,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_PagedContain
   Q_OBJECT
  public:
    /// Constructor
-   /// \param parent a parent widget
+  /// \param theParent the parent object
+  /// \param theData the widget configuration. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetSwitch(QWidget* theParent,
                           const Config_WidgetAPI* theData,
                           const std::string& theParentId);
@@ -38,14 +40,18 @@ class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_PagedContain
   /// Add a page to the widget
   /// \param theWidget a page widget
   /// \param theName a name of page
+  /// \param theCaseId an Id of the page
+  /// \param theIcon an icon of the page
   virtual int addPage( ModuleBase_PageBase* theWidget,
                        const QString& theName,
                        const QString& theCaseId,
                        const QPixmap& theIcon );
 
  protected:
+   /// Returns index of the current page
   virtual int currentPageIndex() const;
-   /// Set current page by index
+
+  /// Set current page by index
   /// \param index index of the page
   virtual void setCurrentPageIndex(int index);
 

@@ -83,16 +83,17 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
+  myLabel->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
-  connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 {
 }
 
-bool ModuleBase_WidgetDoubleValue::reset()
+bool ModuleBase_WidgetDoubleValue::resetCustom()
 {
   bool aDone = false;
   if (!isUseReset() || isComputedDefault() || mySpinBox->hasVariable()) {
@@ -148,4 +149,15 @@ QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
   QList<QWidget*> aList;
   aList.append(mySpinBox);
   return aList;
+}
+
+bool ModuleBase_WidgetDoubleValue::processEnter()
+{
+  bool isModified = mySpinBox->isModified();
+  if (isModified) {
+    emit valuesChanged();
+    mySpinBox->clearModified();
+    mySpinBox->selectAll();
+  }
+  return isModified;
 }

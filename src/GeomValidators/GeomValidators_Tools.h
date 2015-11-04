@@ -20,10 +20,6 @@ namespace GeomValidators_Tools
   /// \param theObj an object 
   GEOMVALIDATORS_EXPORT ObjectPtr getObject(const AttributePtr& theAttribute);
 
-  // Returns the object from the attribute
-  /// \param theObj an object 
-  GEOMVALIDATORS_EXPORT TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape);
-
 };
 
 #endif

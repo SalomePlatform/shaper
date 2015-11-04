@@ -66,6 +66,11 @@ double GeomAPI_Pnt::distance(const std::shared_ptr<GeomAPI_Pnt>& theOther) const
   return MY_PNT->Distance(theOther->impl<gp_Pnt>());
 }
 
+bool GeomAPI_Pnt::isEqual(const std::shared_ptr<GeomAPI_Pnt>& theOther) const
+{
+  return distance(theOther) < Precision::Confusion();
+}
+
 std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
   const std::shared_ptr<GeomAPI_Dir>& theDirX, const std::shared_ptr<GeomAPI_Dir>& theDirY)
 {

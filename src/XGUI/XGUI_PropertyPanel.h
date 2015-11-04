@@ -22,6 +22,7 @@ class QKeyEvent;
 class QGridLayout;
 class ModuleBase_PageBase;
 class ModuleBase_PageWidget;
+class XGUI_OperationMgr;
 
 /// Internal name of property panel widget
 const static char* PROP_PANEL = "property_panel_dock";
@@ -46,7 +47,7 @@ Q_OBJECT
 
   /// Constructor
   /// \param theParent is a parent of the property panel
-  XGUI_PropertyPanel(QWidget* theParent);
+  XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr);
 
   virtual ~XGUI_PropertyPanel();
 
@@ -100,7 +101,10 @@ Q_OBJECT
   /// Sets widget processed by preselection
   virtual void setPreselectionWidget(ModuleBase_ModelWidget* theWidget);
 
- public slots:
+  /// Returns operation manager
+  XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
+
+public slots:
 
    /// \brief Update all widgets in property panel with values from the given feature
    /// \param theFeature a Feature to update values in widgets
@@ -114,7 +118,22 @@ Q_OBJECT
   */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
+protected:
+  /// Makes the widget active, deactivate the previous, activate and hightlight the given one
+  /// \param theWidget a widget
+  bool setActiveWidget(ModuleBase_ModelWidget* theWidget);
+
+  /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
+  /// Emits a signal about focus change
+  /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
+  virtual bool focusNextPrevChild(bool theIsNext);
+
  protected:
+   /// A method called on the property panel closed
+   /// \param theEvent a close event
+   void closeEvent(QCloseEvent* theEvent);
+
+  /// A header widget
   QWidget* myHeaderWidget;
 
  private:
@@ -125,6 +144,8 @@ Q_OBJECT
   ModuleBase_ModelWidget* myActiveWidget;
   /// Currently widget processed by preselection
   ModuleBase_ModelWidget* myPreselectionWidget;
+
+  XGUI_OperationMgr* myOperationMgr;
 };
 
 #endif /* XGUI_PROPERTYPANEL_H_ */

@@ -54,8 +54,17 @@ void ModelAPI_Result::setIsConcealed(const bool theValue)
 {
   if (myIsConcealed != theValue) {
     myIsConcealed = theValue;
-    if (document().get()) // can be on creation of result
+    if (document().get()) { // can be on creation of result
       document()->updateHistory(groupName()); // to update the history cash data in the document
+      if (myIsConcealed) {
+        ModelAPI_EventCreator::get()->sendDeleted(document(), groupName());
+        static Events_ID kDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), kDispEvent);
+      } else {
+        static Events_ID kEventCreated = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), kEventCreated);
+      }
+    }
   }
 }
 

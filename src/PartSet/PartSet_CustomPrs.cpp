@@ -15,8 +15,6 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 
-#include <GeomValidators_Tools.h>
-
 #include <Config_PropManager.h>
 
 #include <AIS_InteractiveContext.hxx>
