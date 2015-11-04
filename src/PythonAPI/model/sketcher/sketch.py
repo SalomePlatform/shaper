@@ -249,7 +249,13 @@ class Sketch(Interface):
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)
         constraint.data().reflist("ConstraintEntityB").clear
         constraint.data().reflist("ConstraintEntityB").append(line_1)
-        
+        self.execute()
+        return constraint
+    
+    def setRigid(self, object_):
+        """Set a rigid constraint on a given object."""
+        constraint = self._feature.addFeature("SketchConstraintRigid")
+        constraint.data().refattr("ConstraintEntityA").setObject(object_)
         self.execute()
         return constraint
 
