@@ -247,8 +247,8 @@ class Sketch(Interface):
         filleting radius."""
         constraint = self._feature.addFeature("SketchConstraintFillet")
         constraint.data().refattr("ConstraintEntityA").setObject(line_1)
-        constraint.data().reflist("ConstraintEntityB").clear
-        constraint.data().reflist("ConstraintEntityB").append(line_1)
+        constraint.data().reflist("ConstraintEntityB").clear()
+        constraint.data().reflist("ConstraintEntityB").append(line_2)
         self.execute()
         return constraint
     
