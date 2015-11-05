@@ -97,6 +97,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolutionSketch.py
                TestRevolutionCut.py
                TestRevolutionFuse.py
+               TestCompositeFeaturesOnCompSolids.py
                TestPartition.py
                TestPlacement.py
                TestTranslation.py
