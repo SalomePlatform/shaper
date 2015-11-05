@@ -33,6 +33,7 @@
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 static const std::string PREVIOUS_VALUE("FilletPreviousRadius");
@@ -97,75 +98,11 @@ void SketchPlugin_ConstraintFillet::execute()
 
   // Obtain base features
   FeaturePtr anOldFeatureA, anOldFeatureB;
-  if(needNewObjects) {
-    AttributePtr anAttrBase = aBaseA->attr();
-    const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
-    std::set<AttributePtr>::const_iterator aIt;
-    FeaturePtr aCoincident;
-    for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-      FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-        AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
-        AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
-        if(anAttrRefA.get() && !anAttrRefA->isObject()) {
-          AttributePtr anAttrA = anAttrRefA->attr();
-          if(anAttrBase == anAttrA) {
-            aCoincident = aConstrFeature;
-            break;
-          }
-        }
-        if(anAttrRefA.get() && !anAttrRefB->isObject()) {
-          AttributePtr anAttrB = anAttrRefB->attr();
-          if(anAttrBase == anAttrB) {
-            aCoincident = aConstrFeature;
-            break;
-          }
-        }
-      }
-    }
+  std::list<ObjectPtr> aNewFeatList = aRefListOfBaseLines->list();
+  std::list<ObjectPtr>::iterator aFeatIt = aNewFeatList.begin();
+  anOldFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
+  anOldFeatureB = ModelAPI_Feature::feature(*aFeatIt);
 
-    if(!aCoincident.get()) {
-      setError("No coincident edges at selected vertex");
-      return;
-    }
-
-    std::set<FeaturePtr> aCoinsideLines;
-    SketchPlugin_Tools::findCoincidences(aCoincident,
-                                         SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                         aCoinsideLines);
-    SketchPlugin_Tools::findCoincidences(aCoincident,
-                                         SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                         aCoinsideLines);
-
-    // Remove auxilary lines
-    if(aCoinsideLines.size() > 2) {
-      std::set<FeaturePtr> aNewLines;
-      for(std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin(); anIt != aCoinsideLines.end(); ++anIt) {
-        if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
-          aNewLines.insert(*anIt);
-        }
-      }
-      aCoinsideLines = aNewLines;
-    }
-
-
-    if(aCoinsideLines.size() != 2) {
-      setError("At selected vertex should be two coincident lines");
-      return;
-    }
-
-    std::set<FeaturePtr>::iterator aLinesIt = aCoinsideLines.begin();
-    anOldFeatureA = *aLinesIt++;
-    anOldFeatureB = *aLinesIt;
-  } else {
-    std::list<ObjectPtr> aNewFeatList = aRefListOfBaseLines->list();
-    std::list<ObjectPtr>::iterator aFeatIt = aNewFeatList.begin();
-    anOldFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
-    anOldFeatureB = ModelAPI_Feature::feature(*aFeatIt++);
-  }
 
   if(!anOldFeatureA.get() || !anOldFeatureB.get()) {
     setError("One of the edges is empty");
@@ -176,7 +113,7 @@ void SketchPlugin_ConstraintFillet::execute()
   if (needNewObjects) {
     // Create list of objects composing a fillet
     // copy aFeatureA
-    aNewFeatureA = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(anOldFeatureB, sketch());
+    aNewFeatureA = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(anOldFeatureA, sketch());
     // copy aFeatureB
     aNewFeatureB = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(anOldFeatureB, sketch());
     // create filleting arc (it will be attached to the list later)
@@ -439,6 +376,11 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
         data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
     aRefListOfFillet->clear();
 
+    // clear the list of base features
+    AttributeRefListPtr aRefListOfBaseLines = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
+      aRefListOfBaseLines->clear();
+
     // remove all produced objects and constraints
     DocumentPtr aDoc = sketch()->document();
     std::list<FeaturePtr>::iterator aCIt = myProducedFeatures.begin();
@@ -450,6 +392,108 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
     for (aCIt = myBaseObjects.begin(); aCIt != myBaseObjects.end(); ++aCIt)
       (*aCIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
     myBaseObjects.clear();
+
+    AttributeRefAttrPtr aBaseA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    if(!aBaseA->isInitialized() || aBaseA->isObject()) {
+      return;
+    }
+
+    AttributePtr anAttrBase = aBaseA->attr();
+    const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aIt;
+    FeaturePtr aCoincident;
+    for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+        AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
+        AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+        if(anAttrRefA.get() && !anAttrRefA->isObject()) {
+          AttributePtr anAttrA = anAttrRefA->attr();
+          if(anAttrBase == anAttrA) {
+            aCoincident = aConstrFeature;
+            break;
+          }
+        }
+        if(anAttrRefA.get() && !anAttrRefB->isObject()) {
+          AttributePtr anAttrB = anAttrRefB->attr();
+          if(anAttrBase == anAttrB) {
+            aCoincident = aConstrFeature;
+            break;
+          }
+        }
+      }
+    }
+
+    if(!aCoincident.get()) {
+      setError("No coincident edges at selected vertex");
+      return;
+    }
+
+    std::set<FeaturePtr> aCoinsideLines;
+    SketchPlugin_Tools::findCoincidences(aCoincident,
+                                         SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                         aCoinsideLines);
+    SketchPlugin_Tools::findCoincidences(aCoincident,
+                                         SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                         aCoinsideLines);
+
+    // Remove auxilary lines
+    if(aCoinsideLines.size() > 2) {
+      std::set<FeaturePtr> aNewLines;
+      for(std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin(); anIt != aCoinsideLines.end(); ++anIt) {
+        if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
+          aNewLines.insert(*anIt);
+        }
+      }
+      aCoinsideLines = aNewLines;
+    }
+
+
+    if(aCoinsideLines.size() != 2) {
+      setError("At selected vertex should be two coincident lines");
+      return;
+    }
+
+    FeaturePtr anOldFeatureA, anOldFeatureB;
+    std::set<FeaturePtr>::iterator aLinesIt = aCoinsideLines.begin();
+    anOldFeatureA = *aLinesIt++;
+    anOldFeatureB = *aLinesIt;
+    aRefListOfBaseLines->append(anOldFeatureA);
+    aRefListOfBaseLines->append(anOldFeatureB);
+
+
+    // Set default value equal to 1/3 of the smallest line sharing the point.
+    static const int aNbFeatures = 2;
+    FeaturePtr aFeature[aNbFeatures] = {anOldFeatureA, anOldFeatureB};
+    double aLength = 0;
+
+    double aLengths[aNbFeatures];
+    for (int i = 0; i < aNbFeatures; i++) {
+      std::shared_ptr<GeomAPI_Pnt2d> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature[i]->attribute(
+        aFeature[i]->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::START_ID() : SketchPlugin_Arc::START_ID()))->pnt();
+      std::shared_ptr<GeomAPI_Pnt2d> anEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature[i]->attribute(
+        aFeature[i]->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::END_ID() : SketchPlugin_Arc::END_ID()))->pnt();
+      if(aFeature[i]->getKind() == SketchPlugin_Line::ID()) {
+        aLengths[i] = aStartPnt->distance(anEndPnt);
+      } else {
+        std::shared_ptr<GeomAPI_Pnt2d> anArcCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature[i]->attribute(
+          SketchPlugin_Arc::CENTER_ID()))->pnt();
+        std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(aStartPnt->xy()->decreased(anArcCenter->xy())));
+        std::shared_ptr<GeomAPI_Dir2d> anEndDir(new GeomAPI_Dir2d(anEndPnt->xy()->decreased(anArcCenter->xy())));
+        double aRadius = aStartPnt->distance(anArcCenter);
+        double anAngle = aStartDir->angle(anEndDir);
+        aLengths[i] = aRadius * abs(anAngle);
+      }
+    }
+    aLength = aLengths[0];
+    for(int i = 1; i < aNbFeatures; i++) {
+      if(aLengths[i] < aLength) aLength = aLengths[i];
+    }
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aLength / 3.0);
   }
 }
 
