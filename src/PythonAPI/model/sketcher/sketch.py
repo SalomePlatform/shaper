@@ -2,10 +2,10 @@
 #         finalized by Renaud Nedelec and Sergey Pokhodenko
 # Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-"""Sketch Feature Interface
+"""Sketcher interface
 
-This interface allows to add a Sketch
-in a Part.
+This interface allows to add a sketch
+in a part or partset.
 The created sketch object provides all the needed methods 
 for sketch modification and constraint edition.
 """
@@ -118,10 +118,16 @@ class Sketch(Interface):
     def addArc(self, *args):
         """Add an arc to the sketch.
         
-        :param sequence args: A sequence of arguments that can be:
+        .. function:: addArc(center, start, end)
         
-           * The center, start and end points
-           * The center, start and end points coordinates
+        :param point center: center of the arc
+        :param point start: start point of the arc
+        :param point end: end point of the arc
+        
+        .. function:: addArc(center_x, center_y, start_x, start_y, end_x, end_y)
+        
+        Same as above but with coordinates
+        
         :return: arc object
         :rtype: :class:`model.sketcher.Arc`
         :raises TypeError: if no argument is provided
