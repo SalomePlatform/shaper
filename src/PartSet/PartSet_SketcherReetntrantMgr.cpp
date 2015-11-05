@@ -273,6 +273,7 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
     aFOperation->setEditOperation(true);
+    workshop()->operationMgr()->updateApplyOfOperations();
 
     createInternalFeature();
 
