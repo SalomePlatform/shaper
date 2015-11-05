@@ -149,28 +149,7 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
         // Find coincident in these coordinates
         ObjectPtr aObj = aPrsList.first().object();
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-        const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
-        std::set<AttributePtr>::const_iterator aIt;
-        FeaturePtr aCoincident;
-        for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-          std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-          FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-          if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
-            std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = 
-              PartSet_Tools::getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
-            if (a2dPnt.get() && aSelPnt->isEqual(a2dPnt)) { 
-              aCoincident = aConstrFeature;
-              break;
-            } else {
-              a2dPnt = PartSet_Tools::getPoint(aConstrFeature,
-                                               SketchPlugin_ConstraintCoincidence::ENTITY_B());
-              if (a2dPnt.get() && aSelPnt->isEqual(a2dPnt)) { 
-                aCoincident = aConstrFeature;
-                break;
-              }
-            }
-          }
-        }
+        FeaturePtr aCoincident = PartSet_Tools::findFirstCoincidence(aFeature, aSelPnt);
         // If we have coincidence then add Detach menu
         if (aCoincident.get() != NULL) {
           mySelectedFeature = aCoincident;

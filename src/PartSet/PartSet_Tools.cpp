@@ -728,6 +728,35 @@ std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(std::shared_ptr<ModelAPI_
   return std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
+FeaturePtr PartSet_Tools::findFirstCoincidence(const FeaturePtr& theFeature,
+                                               std::shared_ptr<GeomAPI_Pnt2d> thePoint)
+{
+  FeaturePtr aCoincident;
+
+  const std::set<AttributePtr>& aRefsList = theFeature->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aIt;
+  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+      std::shared_ptr<GeomAPI_Pnt2d> a2dPnt = 
+        PartSet_Tools::getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
+      if (a2dPnt.get() && thePoint->isEqual(a2dPnt)) { 
+        aCoincident = aConstrFeature;
+        break;
+      } else {
+        a2dPnt = PartSet_Tools::getPoint(aConstrFeature,
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_B());
+        if (a2dPnt.get() && thePoint->isEqual(a2dPnt)) { 
+          aCoincident = aConstrFeature;
+          break;
+        }
+      }
+    }
+  }
+  return aCoincident;
+}
+
 void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                      std::string theAttr)
 {

@@ -200,6 +200,15 @@ class PARTSET_EXPORT PartSet_Tools
                                                  const std::string& theAttribute);
 
   /**
+  * Gets all references to the feature, take coincidence constraint features, get point 2d attributes
+  * and compare the point value to be equal with the given. Returns the first feature, which has
+  * equal points.
+  * \return the coincidence feature or null
+  */
+  static FeaturePtr findFirstCoincidence(const FeaturePtr& theFeature,
+                                         std::shared_ptr<GeomAPI_Pnt2d> thePoint);
+
+  /**
   * Returns list of features connected in a councedence feature point
   * \param theStartCoin the coincidence feature
   * \param theList a list which collects lines features

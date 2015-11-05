@@ -336,8 +336,10 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         else {
           if (getPoint2d(aView, aShape, aX, aY))
             setPoint(aX, aY);
+          bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch);
           setConstraintWith(aObject);
-          emit vertexSelected();
+          if (!anOrphanPoint)
+            emit vertexSelected();
           emit focusOutWidget(this);
         }
       }
@@ -351,6 +353,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         setPoint(aX, aY);
       }
       else {
+        bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch);
         // do not set a coincidence constraint in the attribute if the feature contains a point
         // with the same coordinates. It is important for line creation in order to do not set
         // the same constraints for the same points, oterwise the result line has zero length.
@@ -369,7 +372,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         // points of the line becomes less than the tolerance. Validator of the line returns
         // false, the line will be aborted, but sketch stays valid.
         updateObject(feature());
-        emit vertexSelected();
+        if (!anOrphanPoint)
+          emit vertexSelected();
         emit focusOutWidget(this);
       }
     }
@@ -475,4 +479,44 @@ bool PartSet_WidgetPoint2D::processEnter()
       myYSpin->selectAll();
   }
   return isModified;
+}
+
+bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
+                                          const CompositeFeaturePtr& theSketch)
+{
+  bool anOrphanPoint = false;
+  if (theFeature.get()) {
+    std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
+    std::string aFeatureKind = theFeature->getKind();
+    if (aFeatureKind == SketchPlugin_Point::ID())
+      aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                       theFeature->attribute(SketchPlugin_Point::COORD_ID()));
+    else if (aFeatureKind == SketchPlugin_Circle::ID())
+      aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                       theFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
+
+    else if (aFeatureKind == SketchPlugin_Arc::ID())
+      aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                       theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+
+    if (aPointAttr.get()) {
+      std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
+      FeaturePtr aCoincidence = PartSet_Tools::findFirstCoincidence(theFeature, aPoint);
+      anOrphanPoint = true;
+      // if there is at least one concident line to the point, the point is not an orphant
+      if (aCoincidence.get()) {
+        QList<FeaturePtr> aCoinsideLines;
+        PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines,
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_A());
+        PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines,
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_B());
+        QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(),
+                                          aLast = aCoinsideLines.end();
+        for (; anIt != aLast && anOrphanPoint; anIt++) {
+          anOrphanPoint = (*anIt)->getKind() != SketchPlugin_Line::ID();
+        }
+      }
+    }
+  }
+  return anOrphanPoint;
 }
