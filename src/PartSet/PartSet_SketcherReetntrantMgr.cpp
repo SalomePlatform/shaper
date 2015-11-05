@@ -180,16 +180,14 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty())
     return;
 
-  if (aFOperation) {
-    if (PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-      if (myRestartingMode != RM_Forbided) {
-        myRestartingMode = RM_LastFeatureUsed;
-        startInternalEdit(thePreviousAttributeID);
-      }
-      else {
-        aFOperation->commit();
-      }
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+    bool isStarted = false;
+    if (myRestartingMode != RM_Forbided) {
+      myRestartingMode = RM_LastFeatureUsed;
+      isStarted = startInternalEdit(thePreviousAttributeID);
     }
+    if (!isStarted)
+      aFOperation->commit();
   }
 }
 
@@ -206,8 +204,7 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
     return isDone;
 
   myRestartingMode = RM_EmptyFeatureUsed;
-  startInternalEdit(thePreviousAttributeID);
-  isDone = true;
+  isDone = startInternalEdit(thePreviousAttributeID);
 
   return isDone;
 }
@@ -267,16 +264,21 @@ bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
   return anActive;
 }
 
-void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
+bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
 {
+  bool isDone = false;
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                      (myWorkshop->currentOperation());
 
-  aFOperation->setEditOperation(true);
-  FeaturePtr anOperationFeature = aFOperation->feature();
-  if (anOperationFeature.get() != NULL) {
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+    aFOperation->setEditOperation(true);
+    FeaturePtr anOperationFeature = aFOperation->feature();
+
+    CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+    myInternalFeature = aSketch->addFeature(anOperationFeature->getKind());
 
     myIsInternalEditOperation = true;
+    isDone = true;
     connect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
     connect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
 
@@ -300,6 +302,7 @@ void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
       }
     }
   }
+  return isDone;
 }
 
 void PartSet_SketcherReetntrantMgr::beforeStopInternalEdit()
@@ -310,6 +313,10 @@ void PartSet_SketcherReetntrantMgr::beforeStopInternalEdit()
     disconnect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
     disconnect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
   }
+
+  QObjectPtrList anObjects;
+  anObjects.append(myInternalFeature);
+  workshop()->deleteFeatures(anObjects);
 
   PartSet_Module* aModule = module();
   ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();

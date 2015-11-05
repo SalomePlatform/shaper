@@ -120,7 +120,8 @@ private:
   /// Sets the focus to the last control of the property panel and activates selection
   /// of the first widget to can select first value of the next create operation
   /// \param thePreviousAttributeID an index of the previous attribute to set focus to this widget
-  void startInternalEdit(const std::string& thePreviousAttributeID);
+  /// \return true if it is started
+  bool startInternalEdit(const std::string& thePreviousAttributeID);
 
   /// Disconnects this manager from operation signals, deactivate selection of the first control
   /// in the viewer.
@@ -144,6 +145,8 @@ private:
   RestartingMode myRestartingMode;  /// automatical restarting mode flag
   bool myIsFlagsBlocked; /// true when reset of flags should not be perfromed
   bool myIsInternalEditOperation; /// true when the 'internal' edit is started
+
+  FeaturePtr myInternalFeature;
 };
 
 #endif
