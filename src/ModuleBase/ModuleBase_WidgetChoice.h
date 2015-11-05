@@ -13,6 +13,7 @@
 class QWidget;
 class QLabel;
 class QComboBox;
+class QButtonGroup;
 
 /**
 * \ingroup GUI
@@ -25,6 +26,12 @@ class QComboBox;
 *     string_list="Cut Fuse Common"
 *   />
 * \endcode
+* Aditionally can be used: 
+* A key "widget_type". It can have values "combobox" or "radiobuttons".
+* By default it uses "combobox".
+* A key "buttons_dir" which is applicable only for "radiobuttons" mode.
+* It defines direction of radiobuttons layout. it can be "vertical" or "horizontal"
+* Default value is "vertical"
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetChoice : public ModuleBase_ModelWidget
 {
@@ -62,6 +69,7 @@ private:
 
   /// The control
   QComboBox* myCombo;
+  QButtonGroup* myButtons;
 };
 
 #endif

@@ -1,9 +1,18 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
+  <choice id="bool_type"
+    widget_type="radiobuttons"
+    buttons_dir="horizontal"
+    label="Operation type" 
+    tooltip="Type of boolean operation"
+    string_list="Cut Fuse Common"
+    icons_list=":icons/bool_cut.png :icons/bool_fuse.png :icons/bool_common.png"
+    default="0"
+  />
   <multi_selector id="main_objects"
     label="Main objects"
-    icon=":icons/cut_shape.png"
+    icon=""
     tooltip="Select a solid objects"
     type_choice="Solids"
     concealment="true">
@@ -12,18 +21,12 @@
   </multi_selector>
   <multi_selector id="tool_objects" 
     label="Tool object" 
-    icon=":icons/cut_tool.png" 
+    icon="" 
     tooltip="Select a tool solid"
     type_choice="Solids"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
     <validator id="GeomValidators_ShapeType" parameters="empty,solid"/>
   </multi_selector>
-  <choice id="bool_type" 
-    label="Type" 
-    tooltip="Type of boolean operation"
-    string_list="Cut Fuse Common"
-    default="0"
-  />
   <validator id="GeomValidators_BooleanArguments" parameters="main_objects,tool_objects,bool_type"/>
 </source>

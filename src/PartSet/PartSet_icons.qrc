@@ -74,5 +74,8 @@
      <file>icons/by_two_points_32x32.png</file>
      <file>icons/cylindrical_face_32x32.png</file>
      <file>icons/dimension_vert_32x32.png</file>
+     <file>icons/bool_cut.png</file>
+     <file>icons/bool_fuse.png</file>
+     <file>icons/bool_common.png</file>
  </qresource>
  </RCC>
