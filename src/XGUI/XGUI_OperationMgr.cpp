@@ -294,7 +294,7 @@ bool XGUI_OperationMgr::isGrantedOperation(const QString& theId)
   QListIterator<ModuleBase_Operation*> anIt(myOperations);
   anIt.toBack();
   ModuleBase_Operation* aPreviousOperation = 0;
-  while (anIt.hasPrevious()) {
+  while (anIt.hasPrevious() && !isGranted) {
     ModuleBase_Operation* anOp = anIt.previous();
     if (anOp)
       isGranted = anOp->isGranted(theId);
