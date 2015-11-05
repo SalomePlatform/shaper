@@ -9,7 +9,7 @@ ENDIF(WIN32)
 IF(HAVE_SALOME)
   SET(EXCLUDE_DOC_DIR "*/AppElements/* */OpenParts/*")
 ELSE(HAVE_SALOME)
-  SET(EXCLUDE_DOC_DIR "*/NewGeom/* */Shaper/*")
+  SET(EXCLUDE_DOC_DIR "*/Shaper/*")
 ENDIF(HAVE_SALOME)
 
 CONFIGURE_FILE(doxyfile.in
