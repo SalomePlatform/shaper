@@ -1,7 +1,13 @@
+# Author: Daniel Brunier-Coulin with contribution by Mikhail Ponikarov
+#         finalized by Renaud Nedelec and Sergey Pokhodenko
+# Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 """Sketch Feature Interface
-Author: Daniel Brunier-Coulin with contribution by Mikhail Ponikarov
-        finalized by Renaud Nedelec and Sergey Pokhodenko
-Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+This interface allows to add a Sketch
+in a Part.
+The created sketch object provides all the needed methods 
+for sketch modification and constraint edition.
 """
 
 from ModelAPI import modelAPI_ResultConstruction, featureToCompositeFeature
@@ -12,6 +18,7 @@ from model.sketcher.point import Point
 from model.sketcher.line import Line
 from model.sketcher.circle import Circle
 from model.sketcher.arc import Arc
+from model.sketcher.mirror import Mirror
 from model.roots import Interface
 from model.tools import Selection
 
@@ -22,6 +29,7 @@ def addSketch(doc, plane):
 
     A Sketch object is instanciated with a feature as input parameter
     it provides an interface for manipulation of the feature data.
+    
     :return: interface on the feature
     :rtype: Sketch"""
     feature = featureToCompositeFeature(doc.addFeature("Sketch"))
@@ -108,7 +116,7 @@ class Sketch(Interface):
         return Circle(circle_feature, *args)
 
     def addArc(self, *args):
-        """Add an arc to this Sketch."""
+        """Add an arc to the sketch."""
         if not args:
             raise TypeError("No arguments given")
         arc_feature = self._feature.addFeature("SketchArc")
@@ -236,6 +244,8 @@ class Sketch(Interface):
     def setTangent(self, object_1, object_2):
         """Set a tangential continuity between two objects
         at their coincidence point."""
+        if object_1 is None or object_2 is None:
+            raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintTangent")
         constraint.data().refattr("ConstraintEntityA").setObject(object_1)
         constraint.data().refattr("ConstraintEntityB").setObject(object_2)
@@ -258,6 +268,25 @@ class Sketch(Interface):
         constraint.data().refattr("ConstraintEntityA").setObject(object_)
         self.execute()
         return constraint
+    
+    #-------------------------------------------------------------
+    #
+    # Transformation constraints
+    #
+    #-------------------------------------------------------------
+    
+    def addMirror(self, mirror_line, sketch_objects):
+        """Add a mirror transformation of the given objects to the sketch.
+        
+        This transformation is a constraint.
+        :return: interface to the constraint
+        :rtype: Mirror object
+        """
+        mirror_constraint = self._feature.addFeature("SketchConstraintMirror")
+        mirror_interface = Mirror(mirror_constraint, mirror_line, sketch_objects)
+        self.execute()
+        return mirror_interface
+        
 
     #-------------------------------------------------------------
     #

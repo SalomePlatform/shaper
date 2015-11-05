@@ -5,7 +5,7 @@ from model.roots import Interface
 
 class Circle(Interface):
     """Interface for circle feature data manipulation."""
-    def __init__(self, feature, x, y, radius):
+    def __init__(self, feature, *args):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "SketchCircle")
         
@@ -13,8 +13,18 @@ class Circle(Interface):
             self._feature.data().attribute("CircleCenter")
             )
         self._radius = self._feature.data().real("CircleRadius")
-        self.setCenter(x, y)
-        self.setRadius(radius)
+        
+        if not args:
+            return
+        
+        if len(args) != 3:
+            raise TypeError(
+                "Invalid number of arguments, 3 arguments needed  (%s given)" 
+                % len(args)
+                )
+        
+        self.setCenter(args[0], args[1])
+        self.setRadius(args[2])
         self.execute()
 
     def setCenter(self, x, y):
