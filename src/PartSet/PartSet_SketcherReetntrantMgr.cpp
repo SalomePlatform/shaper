@@ -273,31 +273,8 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
     aFOperation->setEditOperation(true);
-    FeaturePtr anOperationFeature = aFOperation->feature();
 
-    CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
-    myInternalFeature = aSketch->addFeature(anOperationFeature->getKind());
-    XGUI_PropertyPanel* aPropertyPanel = dynamic_cast<XGUI_PropertyPanel*>
-                                                 (aFOperation->propertyPanel());
-
-    myInternalWidget = new QWidget(aPropertyPanel->contentWidget()->pageWidget());
-    myInternalWidget->setVisible(false);
-
-    ModuleBase_PageWidget* anInternalPage = new ModuleBase_PageWidget(myInternalWidget);
-
-    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
-    ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myWorkshop);
-
-    aFactory.createWidget(anInternalPage);
-    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-
-    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-      aWidget->setFeature(myInternalFeature, true);
-    }
-    ModuleBase_ModelWidget* aFirstWidget = ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
-                                                                                        (aWidgets);
-    if (aFirstWidget)
-      myInternalActiveWidget = aFirstWidget;
+    createInternalFeature();
 
     myIsInternalEditOperation = true;
     isDone = true;
@@ -336,19 +313,7 @@ void PartSet_SketcherReetntrantMgr::beforeStopInternalEdit()
     disconnect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
   }
 
-  if (myInternalActiveWidget) {
-    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
-    if (aWSelector)
-      aWSelector->activateSelectionAndFilters(false);
-    myInternalActiveWidget = 0;
-  }
-  delete myInternalWidget;
-  myInternalWidget = 0;
-
-  QObjectPtrList anObjects;
-  anObjects.append(myInternalFeature);
-  workshop()->deleteFeatures(anObjects);
-
+  deleteInternalFeature();
 }
 
 void PartSet_SketcherReetntrantMgr::restartOperation()
@@ -364,6 +329,57 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
       resetFlags();
     }
   }
+}
+
+void PartSet_SketcherReetntrantMgr::createInternalFeature()
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                     (myWorkshop->currentOperation());
+
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+    aFOperation->setEditOperation(true);
+    FeaturePtr anOperationFeature = aFOperation->feature();
+
+    CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+    myInternalFeature = aSketch->addFeature(anOperationFeature->getKind());
+    XGUI_PropertyPanel* aPropertyPanel = dynamic_cast<XGUI_PropertyPanel*>
+                                                  (aFOperation->propertyPanel());
+
+    myInternalWidget = new QWidget(aPropertyPanel->contentWidget()->pageWidget());
+    myInternalWidget->setVisible(false);
+
+    ModuleBase_PageWidget* anInternalPage = new ModuleBase_PageWidget(myInternalWidget);
+
+    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+    ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myWorkshop);
+
+    aFactory.createWidget(anInternalPage);
+    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+
+    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+      aWidget->setFeature(myInternalFeature, true);
+    }
+    ModuleBase_ModelWidget* aFirstWidget = ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
+                                                                                        (aWidgets);
+    if (aFirstWidget)
+      myInternalActiveWidget = aFirstWidget;
+  }
+}
+
+void PartSet_SketcherReetntrantMgr::deleteInternalFeature()
+{
+  if (myInternalActiveWidget) {
+    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
+    if (aWSelector)
+      aWSelector->activateSelectionAndFilters(false);
+    myInternalActiveWidget = 0;
+  }
+  delete myInternalWidget;
+  myInternalWidget = 0;
+
+  QObjectPtrList anObjects;
+  anObjects.append(myInternalFeature);
+  workshop()->deleteFeatures(anObjects);
 }
 
 void PartSet_SketcherReetntrantMgr::resetFlags()

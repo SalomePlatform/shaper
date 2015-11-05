@@ -17,6 +17,7 @@
 #include <ModuleBase_IViewer.h>
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_OperationFeature.h"
+#include "ModuleBase_Tools.h"
 
 #include "ModelAPI_CompositeFeature.h"
 #include "ModelAPI_Session.h"
@@ -24,6 +25,8 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QKeyEvent>
+
+//#define DEBUG_CURRENT_FEATURE
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
@@ -396,9 +399,27 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
     // As a result the sketch disappears from the viewer. However after commit it is displayed back.
     aFOperation->setPreviousCurrentFeature(aDoc->currentFeature(false));
+
+#ifdef DEBUG_CURRENT_FEATURE
+    FeaturePtr aFeature = aFOperation->feature();
+    QString aKind = aFeature ? aFeature->getKind().c_str() : "";
+    qDebug(QString("onBeforeOperationStarted(), edit operation = %1, feature = %2")
+            .arg(aFOperation->isEditOperation())
+            .arg(ModuleBase_Tools::objectInfo(aFeature)).toStdString().c_str());
+
+    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
+            ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
+
     if (aFOperation->isEditOperation()) // it should be performed by the feature edit only
       // in create operation, the current feature is changed by addFeature()
       aDoc->setCurrentFeature(aFOperation->feature(), false);
+
+#ifdef DEBUG_CURRENT_FEATURE
+    qDebug("\tdocument->setCurrentFeature");
+    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
+            ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
   }
 }
 
@@ -429,6 +450,16 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
   /// Restore the previous current feature
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
   if (aFOperation) {
+#ifdef DEBUG_CURRENT_FEATURE
+    QString aKind = aFOperation->feature()->getKind().c_str();
+    qDebug(QString("onBeforeOperationCommitted(), edit operation = %1, feature = %2")
+            .arg(aFOperation->isEditOperation())
+            .arg(ModuleBase_Tools::objectInfo(aFOperation->feature())).toStdString().c_str());
+
+    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
+            ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
+
     if (aFOperation->isEditOperation()) {
       /// Restore the previous current feature
       setCurrentFeature(aFOperation->previousCurrentFeature());
@@ -440,6 +471,11 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
       if (myOperations.front() != aFOperation)
         setCurrentFeature(aFOperation->previousCurrentFeature());
     }
+#ifdef DEBUG_CURRENT_FEATURE
+    qDebug("\tdocument->setCurrentFeature");
+    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
+            ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
   }
 }
 

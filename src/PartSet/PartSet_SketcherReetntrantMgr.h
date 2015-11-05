@@ -130,6 +130,12 @@ private:
   /// Commits the current operation and launches a new with the commited operation feature index
   void restartOperation();
 
+  /// Creates an internal feature and controls to process it
+  void createInternalFeature();
+
+  /// A pair method for an internal creation to remove it and clear all created controls
+  void deleteInternalFeature();
+
   /// Breaks sequense of automatically resterted operations
   void resetFlags();
 
