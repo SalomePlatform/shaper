@@ -122,6 +122,10 @@ private:
   /// \param thePreviousAttributeID an index of the previous attribute to set focus to this widget
   void startInternalEdit(const std::string& thePreviousAttributeID);
 
+  /// Disconnects this manager from operation signals, deactivate selection of the first control
+  /// in the viewer.
+  void beforeStopInternalEdit();
+
   /// Commits the current operation and launches a new with the commited operation feature index
   void restartOperation();
 

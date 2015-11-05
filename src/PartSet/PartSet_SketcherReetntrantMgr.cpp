@@ -242,21 +242,7 @@ void PartSet_SketcherReetntrantMgr::onBeforeStopped()
   if (!isActiveMgr() || !myIsInternalEditOperation)
     return;
 
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                      (myWorkshop->currentOperation());
-  if (aFOperation) {
-    disconnect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
-    disconnect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
-  }
-
-  PartSet_Module* aModule = module();
-  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
-  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
-  if (aFirstWidget != aPanel->activeWidget()) {
-    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
-    if (aWSelector)
-      aWSelector->activateSelectionAndFilters(false);
-  }
+  beforeStopInternalEdit();
 }
 
 bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
@@ -313,6 +299,25 @@ void PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
           aPreviousAttributeWidget->focusTo();
       }
     }
+  }
+}
+
+void PartSet_SketcherReetntrantMgr::beforeStopInternalEdit()
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                      (myWorkshop->currentOperation());
+  if (aFOperation) {
+    disconnect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
+    disconnect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
+  }
+
+  PartSet_Module* aModule = module();
+  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
+  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
+  if (aFirstWidget != aPanel->activeWidget()) {
+    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
+    if (aWSelector)
+      aWSelector->activateSelectionAndFilters(false);
   }
 }
 
