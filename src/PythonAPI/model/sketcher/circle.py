@@ -35,13 +35,17 @@ class Circle(Interface):
         """Set the radius of the circle."""
         self._radius.setValue(radius)
         
-    def centerData(self):
-        """Return center data."""
+    def center(self):
+        """Return the center attribute of the circle."""
         return self._center
 
-    def radiusData(self):
-        """Return radius data."""
-        return self._radius
+    def radius(self):
+        """Return the radius value.
+        
+        :return: radius
+        :rtype: double
+        """
+        return self._radius.value()
 
     def result(self):
         """Return the cicular line attribute."""

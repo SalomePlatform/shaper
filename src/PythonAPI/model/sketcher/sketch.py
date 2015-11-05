@@ -116,7 +116,16 @@ class Sketch(Interface):
         return Circle(circle_feature, *args)
 
     def addArc(self, *args):
-        """Add an arc to the sketch."""
+        """Add an arc to the sketch.
+        
+        :param sequence args: A sequence of arguments that can be:
+        
+           * The center, start and end points
+           * The center, start and end points coordinates
+        :return: arc object
+        :rtype: :class:`model.sketcher.Arc`
+        :raises TypeError: if no argument is provided
+        """
         if not args:
             raise TypeError("No arguments given")
         arc_feature = self._feature.addFeature("SketchArc")
@@ -279,6 +288,7 @@ class Sketch(Interface):
         """Add a mirror transformation of the given objects to the sketch.
         
         This transformation is a constraint.
+        
         :return: interface to the constraint
         :rtype: Mirror object
         """
