@@ -147,6 +147,8 @@ private:
   bool myIsInternalEditOperation; /// true when the 'internal' edit is started
 
   FeaturePtr myInternalFeature;
+  QWidget* myInternalWidget;
+  ModuleBase_ModelWidget* myInternalActiveWidget;
 };
 
 #endif

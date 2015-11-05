@@ -17,12 +17,17 @@ ModuleBase_IPropertyPanel::ModuleBase_IPropertyPanel(QWidget* theParent) : QDock
 
 ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget()
 {
+  return ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget(modelWidgets());
+}
+
+ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget(
+                                                              const QList<ModuleBase_ModelWidget*>& theWidgets)
+{
   ModuleBase_ModelWidget* aFirstWidget = 0;
 
-  QList<ModuleBase_ModelWidget*> aWidgets = modelWidgets();
   ModuleBase_ModelWidget* aWgt;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-  for (aWIt = aWidgets.begin(); aWIt != aWidgets.end() && !aFirstWidget; ++aWIt) {
+  for (aWIt = theWidgets.begin(); aWIt != theWidgets.end() && !aFirstWidget; ++aWIt) {
     aWgt = (*aWIt);
     if (aWgt->canSetValue())
       aFirstWidget = aWgt;
