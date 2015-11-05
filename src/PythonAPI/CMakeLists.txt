@@ -17,7 +17,9 @@ ADD_UNIT_TESTS(
   TestSketcherAddLine.py
   TestSketcherAddArc.py
   TestSketcherAddCircle.py
+  TestSketcherAddMirror.py
   TestSketcherSetCoincident.py
+  TestSketcherSetTangent.py
   TestSketcherSetParallel.py
   TestSketcherSetPerpendicular.py
   TestSketcherSetHorizontal.py
