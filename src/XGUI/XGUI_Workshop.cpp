@@ -486,6 +486,7 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     setPropertyPanel(theOperation);
+    connectToPropertyPanel(true);
   }
   updateCommandStatus();
 
