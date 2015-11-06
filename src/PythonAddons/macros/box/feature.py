@@ -37,7 +37,7 @@ class BoxFeature(modeler.Feature):
     return "height"
 
   def getKind(self):
-    """Returns ID of еру ауфегку"""
+    """Returns ID of the feature"""
     return BoxFeature.ID()
 
 	

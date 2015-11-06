@@ -6,7 +6,7 @@ from macros.box.feature      import BoxFeature
 
 
 class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
-"""Implementation of features plugin"""
+    """Implementation of features plugin"""
 
     def __init__(self):
         """Constructor"""
