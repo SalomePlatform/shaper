@@ -221,7 +221,8 @@ void ModuleBase_OperationFeature::abort()
   if (aPropertyPanel)
     aPropertyPanel->cleanContent();
 
-  myFeature->setStable(true);
+  if (myFeature.get())
+    myFeature->setStable(true);
 
   abortOperation();
   stopOperation();
