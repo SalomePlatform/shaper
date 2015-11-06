@@ -1,27 +1,37 @@
-.. Shaper python API documentation master file, created by
-   sphinx-quickstart on Thu Oct 15 11:55:42 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Shaper textual interface documentation
+======================================
 
-Welcome to Shaper python API's documentation!
-=============================================
+Shaper provides two different textual interfaces that allows you to create
+models through python scripts:
 
+* a "direct" API, which allows you to create geometrical objects
+  without any parametric considerations
 
-Sketching operations
---------------------
+* a "parametric" API, which is very close to what is done
+  in the graphical interface and allows you to recalculate a model
+  when a parameter is changed 
+
+Parametric API
+--------------
+
+This API is implemented in the model Python package. A script written
+with the parametric API will typically begin with a code like below:
+
+.. doctest:: 
+
+   >>> import model
+   >>> model.begin()
+   >>> partset = model.moduleDocument()
+   >>> part = model.addPart(partset).document()
+   >>> plane = model.defaultPlane("XOY")
+   >>> sketch = model.addSketch(part, plane)
+   >>> line = sketch.addLine(0, 0, 0, 1)
+
 
 .. toctree::
    :maxdepth: 2
 
    sketcher
-   arc
-
-Features
---------
-
-.. toctree::
-   :maxdepth: 2
-
    extrusion
 
 
@@ -31,5 +41,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
-

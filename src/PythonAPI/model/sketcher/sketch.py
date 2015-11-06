@@ -2,8 +2,7 @@
 #         finalized by Renaud Nedelec and Sergey Pokhodenko
 # Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-"""Sketcher interface
-
+"""Sketcher interface.
 This interface allows to add a sketch
 in a part or partset.
 The created sketch object provides all the needed methods 

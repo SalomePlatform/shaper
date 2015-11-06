@@ -1,5 +1,5 @@
-:mod:`model.features.extrusion` -- Extrusion feature interface
---------------------------------------------------------------
+Extrusion
+---------
 
 .. automodule:: model.features.extrusion
    :members:
