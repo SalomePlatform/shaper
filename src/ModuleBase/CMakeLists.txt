@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
   ModuleBase_FilterValidated.h
   ModuleBase_IErrorMgr.h
   ModuleBase_IModule.h
+  ModuleBase_IntSpinBox.h
   ModuleBase_IPrefMgr.h
   ModuleBase_IPropertyPanel.h
   ModuleBase_ISelection.h
@@ -64,6 +65,7 @@ SET(PROJECT_SOURCES
   ModuleBase_FilterValidated.cpp
   ModuleBase_IErrorMgr.cpp
   ModuleBase_IModule.cpp
+  ModuleBase_IntSpinBox.cpp
   ModuleBase_IPrefMgr.cpp
   ModuleBase_IPropertyPanel.cpp
   ModuleBase_ISelection.cpp

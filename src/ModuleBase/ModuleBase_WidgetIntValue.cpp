@@ -7,6 +7,7 @@
 #include <ModuleBase_WidgetIntValue.h>
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IntSpinBox.h>
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
@@ -22,7 +23,6 @@
 #include <QLabel>
 #include <QEvent>
 #include <QTimer>
-#include <QSpinBox>
 
 #include <math.h>
 
@@ -48,7 +48,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
 
-  mySpinBox = new QSpinBox(this);
+  mySpinBox = new ModuleBase_IntSpinBox(this);
   QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
@@ -138,4 +138,15 @@ QList<QWidget*> ModuleBase_WidgetIntValue::getControls() const
   QList<QWidget*> aList;
   aList.append(mySpinBox);
   return aList;
+}
+
+bool ModuleBase_WidgetIntValue::processEnter()
+{
+  bool isModified = mySpinBox->isModified();
+  if (isModified) {
+    emit valuesChanged();
+    mySpinBox->clearModified();
+    mySpinBox->selectAll();
+  }
+  return isModified;
 }
