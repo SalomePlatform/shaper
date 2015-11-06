@@ -48,6 +48,9 @@
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QCheckBox>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QStackedWidget>
 
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
@@ -58,23 +61,53 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 : ModuleBase_WidgetValidated(theParent, theWorkshop, theData, theParentId),
   myPreviewDisplayed(false)
 {
-  myText = QString::fromStdString(theData->getProperty("title"));
-  myLabel = new QLabel("", theParent);
-  myLabel->setWordWrap(true);
-  myTooltip = QString::fromStdString(theData->getProperty("tooltip"));
-  myLabel->setToolTip("");
-  myLabel->setIndent(5);
-
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
-  aLayout->addWidget(myLabel);
+
+  myStackWidget = new QStackedWidget(this);
+  myStackWidget->setContentsMargins(0,0,0,0);
+  aLayout->addWidget(myStackWidget);
+
+  // Define label for plane selection
+  QWidget* aFirstWgt = new QWidget(this);
+
+  QString aText = QString::fromStdString(theData->getProperty("title"));
+  QLabel* aLabel = new QLabel(aText, aFirstWgt);
+  aLabel->setWordWrap(true);
+  QString aTooltip = QString::fromStdString(theData->getProperty("tooltip"));
+  aLabel->setToolTip(aTooltip);
+  aLabel->setIndent(5);
+
+  aLayout = new QVBoxLayout(aFirstWgt);
+  ModuleBase_Tools::zeroMargins(aLayout);
+  aLayout->addWidget(aLabel);
+
+  myStackWidget->addWidget(aFirstWgt);
+
+  // Define widget for sketch manmagement
+  QWidget* aSecondWgt = new QWidget(this);
+  aLayout = new QVBoxLayout(aSecondWgt);
+  ModuleBase_Tools::zeroMargins(aLayout);
+
+  QGroupBox* aViewBox = new QGroupBox(tr("Sketcher plane"), this);
+  QVBoxLayout* aViewLayout = new QVBoxLayout(aViewBox);
+
+  myViewInverted = new QCheckBox(tr("Inverted"), aViewBox);
+  aViewLayout->addWidget(myViewInverted);
+
+  QPushButton* aSetViewBtn = new QPushButton(QIcon(":icons/plane_view.png"), tr("Set plane view"), aViewBox);
+  connect(aSetViewBtn, SIGNAL(clicked(bool)), this, SLOT(onSetPlaneView()));
+  aViewLayout->addWidget(aSetViewBtn);
+
+  aLayout->addWidget(aViewBox);
 
   myShowConstraints = new QCheckBox(tr("Show constraints"), this);
-  aLayout->addWidget(myShowConstraints);
-
-  setLayout(aLayout);
   connect(myShowConstraints, SIGNAL(toggled(bool)), this, SIGNAL(showConstraintToggled(bool)));
   myShowConstraints->setChecked(toShowConstraints);
+  aLayout->addWidget(myShowConstraints);
+
+  myStackWidget->addWidget(aSecondWgt);
+  //setLayout(aLayout);
 }
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
@@ -101,7 +134,7 @@ bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theVal
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 {
   QList<QWidget*> aResult;
-  aResult << myLabel;
+  aResult << myStackWidget;
   return aResult;
 }
 
@@ -161,13 +194,13 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
 
     // Rotate view if the sketcher plane is selected only from preview planes
     // Preview planes are created only if there is no any shape
-    if (myYZPlane.get()) {
+    if (myYZPlane.get())
       myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
-    }
   }
   // 3. Clear text in the label
-  myLabel->setText("");
-  myLabel->setToolTip("");
+  myStackWidget->setCurrentIndex(1);
+  //myLabel->setText("");
+  //myLabel->setToolTip("");
   disconnect(workshop()->selector(), SIGNAL(selectionChanged()), 
               this, SLOT(onSelectionChanged()));
   // 4. deactivate face selection filter
@@ -185,7 +218,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // 6. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = workshop()->actionsMgr();
   anActMgr->update();
-  //VSV myWorkshop->viewer()->update();
+  myWorkshop->viewer()->update();
 }
 
 std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
@@ -196,13 +229,13 @@ std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
 
 bool PartSet_WidgetSketchLabel::focusTo()
 {
-  myLabel->setFocus();
+  myStackWidget->setFocus();
   return true;
 }
 
 void PartSet_WidgetSketchLabel::enableFocusProcessing()
 {
-  myLabel->installEventFilter(this);
+  myStackWidget->installEventFilter(this);
 }
 
 void PartSet_WidgetSketchLabel::storeAttributeValue()
@@ -265,10 +298,12 @@ void PartSet_WidgetSketchLabel::activateCustom()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get()) {
+    myStackWidget->setCurrentIndex(1);
     activateSelection(true);
     return;
   }
 
+  myStackWidget->setCurrentIndex(0);
   bool aBodyIsVisualized = false;
   XGUI_Displayer* aDisp = workshop()->displayer();
   QObjectPtrList aDisplayed = aDisp->displayedObjects();
@@ -287,8 +322,8 @@ void PartSet_WidgetSketchLabel::activateCustom()
   }
   activateSelection(true);
 
-  myLabel->setText(myText);
-  myLabel->setToolTip(myTooltip);
+  //myLabel->setText(myText);
+  //myLabel->setToolTip(myTooltip);
 
   connect(workshop()->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateFilters(true);
@@ -394,6 +429,8 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
 
   // get plane parameters
   std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
+  if (!aPlane.get())
+    return std::shared_ptr<GeomAPI_Dir>();
 
   // set plane parameters to feature
   std::shared_ptr<ModelAPI_Data> aData = feature()->data();
@@ -437,4 +474,17 @@ XGUI_Workshop* PartSet_WidgetSketchLabel::workshop() const
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   return aConnector->workshop();
+}
+
+
+void PartSet_WidgetSketchLabel::onSetPlaneView()
+{
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  if (aPlane.get()) {
+    std::shared_ptr<GeomAPI_Dir> aDirection = aPlane->direction();
+    gp_Dir aDir = aDirection->impl<gp_Dir>();
+    if (myViewInverted->isChecked())
+      aDir.Reverse();
+    myWorkshop->viewer()->setViewProjection(aDir.X(), aDir.Y(), aDir.Z(), 0.);
+  }
 }

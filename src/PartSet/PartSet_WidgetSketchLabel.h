@@ -22,6 +22,7 @@ class QLabel;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 class QCheckBox;
+class QStackedWidget;
 
 /// the plane edge width
 #define SKETCH_WIDTH        "4"
@@ -128,6 +129,9 @@ protected:
    /// Slot on change selection
   void onSelectionChanged();
 
+  /// A slot called on set sketch plane view
+  void onSetPlaneView();
+
  private:
    /// Create preview of planes for sketch plane selection
    /// \param theOrigin an origin of the plane
@@ -151,16 +155,15 @@ protected:
   void showPreviewPlanes();
 
 
-  QLabel* myLabel;
-  QString myText;
-  QString myTooltip;
-
   AISObjectPtr myYZPlane;
   AISObjectPtr myXZPlane;
   AISObjectPtr myXYPlane;
   bool myPreviewDisplayed;
 
   QCheckBox* myShowConstraints;
+  QCheckBox* myViewInverted;
+
+  QStackedWidget* myStackWidget;
 };
 
 #endif

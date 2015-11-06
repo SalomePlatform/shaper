@@ -77,5 +77,6 @@
      <file>icons/bool_cut.png</file>
      <file>icons/bool_fuse.png</file>
      <file>icons/bool_common.png</file>
+     <file>icons/plane_view.png</file>
  </qresource>
  </RCC>
