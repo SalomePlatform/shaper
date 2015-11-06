@@ -68,7 +68,7 @@ void SketchPlugin_MultiRotation::execute()
 
   if (attribute(ANGLE_ID())->isInitialized() && !attribute(ANGLE_FULL_ID())->isInitialized()) {
     myBlockAngle = true;
-    SketchPlugin_Tools::updateAngleAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
+    SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
                                              aNbCopies, true);
     myBlockAngle = false;
   }
@@ -329,7 +329,7 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
     int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
     if (aNbCopies > 0) {
       myBlockAngle = true;
-      SketchPlugin_Tools::updateAngleAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
+      SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
                                                aNbCopies, true);
       myBlockAngle = false;
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
@@ -339,27 +339,32 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
     int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
     if (aNbCopies > 0) {
       myBlockAngle = true;
-      SketchPlugin_Tools::updateAngleAttribute(attribute(ANGLE_FULL_ID()), attribute(ANGLE_ID()),
+      SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_FULL_ID()), attribute(ANGLE_ID()),
                                                aNbCopies, false);
       myBlockAngle = false;
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     }
   }
   else if (theID == NUMBER_OF_OBJECTS_ID()) {
-    AttributeStringPtr aMethodTypeAttr = string(ANGLE_TYPE());
-    std::string aMethodType = aMethodTypeAttr->value();
-    int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-    if (aNbCopies > 0) {
-      myBlockAngle = true;
-      if (aMethodType == "SingleAngle")
-        SketchPlugin_Tools::updateAngleAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
-                                                 aNbCopies, true);
-      else
-        SketchPlugin_Tools::updateAngleAttribute(attribute(ANGLE_FULL_ID()), attribute(ANGLE_ID()),
-                                                 aNbCopies, false);
-
-      myBlockAngle = false;
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    if (attribute(NUMBER_OF_OBJECTS_ID())->isInitialized() &&
+        attribute(ANGLE_FULL_ID())->isInitialized() &&
+        attribute(ANGLE_ID())->isInitialized() &&
+        attribute(ANGLE_TYPE())->isInitialized()) {
+      AttributeStringPtr aMethodTypeAttr = string(ANGLE_TYPE());
+      std::string aMethodType = aMethodTypeAttr->value();
+      int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
+      if (aNbCopies > 0) {
+        myBlockAngle = true;
+        if (aMethodType == "SingleAngle")
+          SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
+                                                   aNbCopies, true);
+        else {
+          SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_FULL_ID()), attribute(ANGLE_ID()),
+                                                   aNbCopies, false);
+        }
+        myBlockAngle = false;
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+      }
     }
   }
 }

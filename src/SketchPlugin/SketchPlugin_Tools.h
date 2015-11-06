@@ -29,16 +29,15 @@ void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
                       std::set<FeaturePtr>& theList);
 
-/// Changes the second attribute value to full or single angle. If it is corrected to full
-/// value, the first angle is miltipied to the number of copies otherwise it is separated by it.
+/// Changes the second attribute value to be multiplied or divided by the given value.
 /// \param theFirstAngleAttribute the source attribute
 /// \param theSecondAngleAttribute the changed attribute
-/// \param theNumberOfCopies a value for modification
-/// \param toFullAngle a type of modification
-void updateAngleAttribute(const AttributePtr& theFirstAngleAttribute,
+/// \param theValue a value for modification
+/// \param toMultiply a type of modification
+void updateMultiAttribute(const AttributePtr& theFirstAngleAttribute,
                           const AttributePtr& theSecondAngleAttribute,
-                          const int& theNumberOfCopies,
-                          const bool toFullAngle);
+                          const int& theValue,
+                          const bool toMultiply);
 
 }; // namespace SketchPlugin_Tools
 
