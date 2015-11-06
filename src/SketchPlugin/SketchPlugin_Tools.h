@@ -10,6 +10,7 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Attribute.h>
 
 namespace SketchPlugin_Tools {
 
@@ -27,6 +28,17 @@ std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin
 void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
                       std::set<FeaturePtr>& theList);
+
+/// Changes the second attribute value to full or single angle. If it is corrected to full
+/// value, the first angle is miltipied to the number of copies otherwise it is separated by it.
+/// \param theFirstAngleAttribute the source attribute
+/// \param theSecondAngleAttribute the changed attribute
+/// \param theNumberOfCopies a value for modification
+/// \param toFullAngle a type of modification
+void updateAngleAttribute(const AttributePtr& theFirstAngleAttribute,
+                          const AttributePtr& theSecondAngleAttribute,
+                          const int& theNumberOfCopies,
+                          const bool toFullAngle);
 
 }; // namespace SketchPlugin_Tools
 

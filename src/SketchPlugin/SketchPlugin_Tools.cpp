@@ -101,4 +101,24 @@ void findCoincidences(const FeaturePtr theStartCoin,
   }
 }
 
+void updateAngleAttribute(const AttributePtr& theFirstAngleAttribute,
+                          const AttributePtr& theSecondAngleAttribute,
+                          const int& theNumberOfCopies,
+                          const bool toFullAngle)
+{
+  if (theNumberOfCopies == 0)
+    return;
+
+  AttributeDoublePtr aDoubleFirstAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+                                                                theFirstAngleAttribute);
+  double aValue = aDoubleFirstAttr->value();
+
+  AttributeDoublePtr aDoubleSecondAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+                                                                theSecondAngleAttribute);
+  if (toFullAngle)
+    aDoubleSecondAttr->setValue(aValue*theNumberOfCopies);
+  else
+    aDoubleSecondAttr->setValue(aValue/theNumberOfCopies);
+}
+
 } // namespace SketchPlugin_Tools

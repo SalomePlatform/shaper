@@ -52,12 +52,26 @@ class SketchPlugin_MultiRotation : public SketchPlugin_ConstraintBase
     static const std::string MY_CENTER_ID("MultiRotationCenter");
     return MY_CENTER_ID;
   }
+  /// attribute name for first point
+  inline static const std::string& ANGLE_TYPE()
+  {
+    static const std::string ANGLE_TYPE_ATTR("AngleType");
+    return ANGLE_TYPE_ATTR;
+  }
+
   /// End point of translation
   inline static const std::string& ANGLE_ID()
   {
     static const std::string MY_ANGLE_ID("MultiRotationAngle");
     return MY_ANGLE_ID;
   }
+  /// End point of translation
+  inline static const std::string& ANGLE_FULL_ID()
+  {
+    static const std::string MY_ANGLE_FULL_ID("MultiRotationFullAngle");
+    return MY_ANGLE_FULL_ID;
+  }
+
   /// Total number of objects, initial and translated objects
   inline static const std::string& NUMBER_OF_OBJECTS_ID()
   {
@@ -85,6 +99,11 @@ private:
   ObjectPtr copyFeature(ObjectPtr theObject);
   void rotateFeature(ObjectPtr theInitial, ObjectPtr theTarget,
                      double theCenterX, double theCenterY, double theAngle);
+
+  bool updateFullAngleValue();
+
+private:
+  bool myBlockAngle; /// a boolean state to avoid recusive angle change in attributeChanged
 };
 
 #endif

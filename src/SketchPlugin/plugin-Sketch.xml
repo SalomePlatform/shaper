@@ -320,12 +320,23 @@
             title="Center of rotation"
             tooltip="Center of rotation"
             default="0"/>
-        <point2dangle id="MultiRotationAngle"
+        <toolbox id="AngleType">
+          <box id="SingleAngle" title="Single angle" icon=":icons/angle_up_32x32.png">
+            <point2dangle id="MultiRotationAngle"
                          first_point="MultiRotationCenter"
                          label="Angle"
                          icon=":icons/angle.png"
                          tooltip="Rotation angle"
                          default="90"/>
+          </box>
+          <box id="FullAngle" title="Full angle" icon=":icons/angle_up_full_32x32.png">
+            <point2dangle id="MultiRotationFullAngle"
+                         first_point="MultiRotationCenter"
+                         label="Full angle"
+                         icon=":icons/angle.png"
+                         tooltip="Rotation angle"/>
+          </box>
+        </toolbox>
         <integervalue id="MultiRotationObjects"
             label="Total number of objects"
             tooltip="Total number of objects" 
