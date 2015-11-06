@@ -92,7 +92,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   QGroupBox* aViewBox = new QGroupBox(tr("Sketcher plane"), this);
   QVBoxLayout* aViewLayout = new QVBoxLayout(aViewBox);
 
-  myViewInverted = new QCheckBox(tr("Inverted"), aViewBox);
+  myViewInverted = new QCheckBox(tr("Reversed"), aViewBox);
   aViewLayout->addWidget(myViewInverted);
 
   QPushButton* aSetViewBtn = new QPushButton(QIcon(":icons/plane_view.png"), tr("Set plane view"), aViewBox);
@@ -194,7 +194,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
 
     // Rotate view if the sketcher plane is selected only from preview planes
     // Preview planes are created only if there is no any shape
-    if (myYZPlane.get())
+    bool aRotate = Config_PropManager::boolean("Sketch planes", "rotate_to_plane", "false");
+    if (aRotate)
       myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
   }
   // 3. Clear text in the label

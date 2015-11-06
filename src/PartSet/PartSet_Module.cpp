@@ -211,6 +211,8 @@ void PartSet_Module::registerProperties()
                                    PLANE_SIZE);
   Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
                                    Config_Prop::Integer, SKETCH_WIDTH);
+  Config_PropManager::registerProp("Sketch planes", "rotate_to_plane", "Rotate to plane when selected",
+    Config_Prop::Boolean, "false");
 }
 
 void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
