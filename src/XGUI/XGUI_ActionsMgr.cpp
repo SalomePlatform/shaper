@@ -108,8 +108,8 @@ void XGUI_ActionsMgr::update()
       anActiveFeature = aFOperation->feature();
       if(anActiveFeature.get()) {
         setAllEnabled(false);
-        QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
-        setActionEnabled(aFeatureId, true);
+        //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
+        //setActionEnabled(aFeatureId, true);
       }
       setNestedStackEnabled(aFOperation);
     } else {
@@ -306,7 +306,7 @@ void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
     return;
   FeaturePtr aFeature = anOperation->feature();
   QString aFeatureId = QString::fromStdString(aFeature->getKind());
-  setActionEnabled(aFeatureId, true);
+  //setActionEnabled(aFeatureId, true);
   setNestedCommandsEnabled(true, aFeatureId);
 
   setNestedStackEnabled(myOperationMgr->previousOperation(theOperation));
