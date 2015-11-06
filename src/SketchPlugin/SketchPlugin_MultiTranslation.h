@@ -19,10 +19,9 @@
  *  SketchPlugin_Constraint::ENTITY_A() for initial list of objects and
  *  SketchPlugin_Constraint::ENTITY_B() for the list of created objects
  *
- *  The list of created objects contains a number of copies of each object given in
- *  the NUMBER_OF_COPIES_ID() attribute plus 1 (the initial objects are stored into this
- *  attribute too). At the start of the list, there are collected N copies
- *  of first object from initial list, then N copies of second object etc.
+ *  The list of created objects contains initial and copied objects of each object given. The
+ *  number copies is the NUMBER_OF_OBJECTS_ID() minus 1. At the start of the list, there are
+ *  collected N copies of first object from initial list, then N copies of second object etc.
  */
 class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
 {
@@ -59,11 +58,11 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
     static const std::string MY_END_POINT_ID("MultiTranslationEndPoint");
     return MY_END_POINT_ID;
   }
-  /// Number of translated objects
-  inline static const std::string& NUMBER_OF_COPIES_ID()
+  /// Total number of objects, initial and translated objects
+  inline static const std::string& NUMBER_OF_OBJECTS_ID()
   {
-    static const std::string MY_NUMBER_OF_COPIES_ID("MultiTranslationCopies");
-    return MY_NUMBER_OF_COPIES_ID;
+    static const std::string MY_NUMBER_OF_OBJECTS_ID("MultiTranslationObjects");
+    return MY_NUMBER_OF_OBJECTS_ID;
   }
 
   /// \brief Creates a new part document if needed

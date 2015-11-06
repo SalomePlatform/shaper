@@ -27,7 +27,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
 {
   data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
+  data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(TRANSLATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
@@ -44,7 +44,9 @@ void SketchPlugin_MultiTranslation::execute()
   }
 
   AttributeRefListPtr aTranslationObjectRefs = reflist(TRANSLATION_LIST_ID());
-  int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
+  int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value()-1;
+  if (aNbCopies <= 0)
+    return;
 
   // Calculate shift vector
   std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -222,7 +224,9 @@ void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
   if (theID == TRANSLATION_LIST_ID()) {
     AttributeRefListPtr aTranslationObjectRefs = reflist(TRANSLATION_LIST_ID());
     if (aTranslationObjectRefs->size() == 0) {
-      int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
+      int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value()-1;
+      if (aNbCopies <= 0)
+        return;
       // Clear list of objects
       AttributeRefListPtr aRefListOfTranslated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
           data()->attribute(SketchPlugin_Constraint::ENTITY_B()));

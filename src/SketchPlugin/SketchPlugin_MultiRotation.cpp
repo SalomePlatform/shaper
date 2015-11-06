@@ -33,7 +33,7 @@ void SketchPlugin_MultiRotation::initAttributes()
 {
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
+  data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(ROTATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
@@ -50,7 +50,9 @@ void SketchPlugin_MultiRotation::execute()
   }
 
   AttributeRefListPtr aRotationObjectRefs = reflist(ROTATION_LIST_ID());
-  int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
+  int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
+  if (aNbCopies <= 0)
+    return;
 
   // Obtain center and angle of rotation
   std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -279,7 +281,10 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
   if (theID == ROTATION_LIST_ID()) {
     AttributeRefListPtr aRotationObjectRefs = reflist(ROTATION_LIST_ID());
     if (aRotationObjectRefs->size() == 0) {
-      int aNbCopies = integer(NUMBER_OF_COPIES_ID())->value();
+      int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value()-1;
+      if (aNbCopies <= 0)
+        return;
+
       // Clear list of objects
       AttributeRefListPtr aRefListOfRotated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
           data()->attribute(SketchPlugin_Constraint::ENTITY_B()));

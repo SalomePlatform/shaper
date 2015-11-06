@@ -54,7 +54,7 @@ private:
 
 private:
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
-  virtual const std::string& nameNbCopies();
+  virtual const std::string& nameNbObjects();
 
 private:
   Slvs_hEntity myRotationCenter; ///< ID of center of rotation

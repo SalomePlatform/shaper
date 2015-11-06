@@ -72,8 +72,8 @@ protected:
   virtual void updateLocal() = 0;
 
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
-  virtual const std::string& nameNbCopies() = 0;
-
+  virtual const std::string& nameNbObjects() = 0;
+  
 protected:
   /// \brief Convert absolute coordinates to relative coordinates
   virtual void getRelative(double theAbsX, double theAbsY, double& theRelX, double& theRelY) = 0;

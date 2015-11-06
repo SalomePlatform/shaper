@@ -46,7 +46,10 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
   AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   myNumberOfObjects = anInitialRefList->size();
-  myNumberOfCopies = (size_t) aData->integer(SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID())->value();
+  myNumberOfCopies = (size_t) aData->integer(SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID())->value() - 1;
+  if (myNumberOfCopies <= 0)
+    return;
+
   AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
   if (!aRefList) {
@@ -199,7 +202,7 @@ void SketchSolver_ConstraintMultiTranslation::transformRelative(double& theX, do
   theY += myDelta[1];
 }
 
-const std::string& SketchSolver_ConstraintMultiTranslation::nameNbCopies()
+const std::string& SketchSolver_ConstraintMultiTranslation::nameNbObjects()
 {
-  return SketchPlugin_MultiTranslation::NUMBER_OF_COPIES_ID();
+  return SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID();
 }

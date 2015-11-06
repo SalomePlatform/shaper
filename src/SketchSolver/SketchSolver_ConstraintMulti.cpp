@@ -64,8 +64,8 @@ void SketchSolver_ConstraintMulti::update(ConstraintPtr theConstraint)
   if (!theConstraint || theConstraint == myBaseConstraint) {
     AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    AttributeIntegerPtr aNbCopies = myBaseConstraint->integer(nameNbCopies());
-    if (anInitialRefList->size() != myNumberOfObjects || aNbCopies->value() != myNumberOfCopies) {
+    AttributeIntegerPtr aNbObjects = myBaseConstraint->integer(nameNbObjects());
+    if (anInitialRefList->size() != myNumberOfObjects || aNbObjects->value()-1 != myNumberOfCopies) {
       remove(myBaseConstraint);
       process();
       return;

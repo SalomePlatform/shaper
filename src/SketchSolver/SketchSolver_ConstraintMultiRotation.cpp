@@ -40,7 +40,9 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   myNumberOfObjects = anInitialRefList->size();
-  myNumberOfCopies = (size_t) aData->integer(SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID())->value();
+  myNumberOfCopies = (size_t) aData->integer(SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID())->value() - 1;
+  if (myNumberOfCopies <= 0)
+    return;
   AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
   if (!aRefList) {
@@ -205,7 +207,7 @@ void SketchSolver_ConstraintMultiRotation::transformRelative(double& theX, doubl
   theX = aTemp;
 }
 
-const std::string& SketchSolver_ConstraintMultiRotation::nameNbCopies()
+const std::string& SketchSolver_ConstraintMultiRotation::nameNbObjects()
 {
-  return SketchPlugin_MultiRotation::NUMBER_OF_COPIES_ID();
+  return SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID();
 }
