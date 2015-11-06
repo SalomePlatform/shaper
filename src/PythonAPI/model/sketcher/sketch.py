@@ -8,6 +8,18 @@ This interface allows to add a sketch
 in a part or partset.
 The created sketch object provides all the needed methods 
 for sketch modification and constraint edition.
+
+Example of code:
+
+.. doctest:: 
+
+   >>> import model
+   >>> model.begin()
+   >>> partset = model.moduleDocument()
+   >>> part = model.addPart(partset).document()
+   >>> plane = model.defaultPlane("XOY")
+   >>> sketch = model.addSketch(part, plane)
+   >>> line = sketch.addLine(0, 0, 0, 1)
 """
 
 from ModelAPI import modelAPI_ResultConstruction, featureToCompositeFeature
@@ -23,15 +35,16 @@ from model.roots import Interface
 from model.tools import Selection
 
 
-def addSketch(doc, plane):
-    """Add a Sketch feature to the Part or PartSet and return an interface
-    on it.
+def addSketch(document, plane):
+    """Add a sketch to a Part or PartSet.
 
-    A Sketch object is instanciated with a feature as input parameter
-    it provides an interface for manipulation of the feature data.
+    Arguments:
+       document(ModelAPI_Document): part or partset document
+       plane(geom.Ax3): plane on wich the sketch is built
     
-    :return: interface on the feature
-    :rtype: Sketch"""
+    Returns:
+       Sketch: sketch object
+    """
     feature = featureToCompositeFeature(doc.addFeature("Sketch"))
     return Sketch(feature, plane)
 
@@ -87,14 +100,35 @@ class Sketch(Interface):
     #-------------------------------------------------------------
 
     def addPoint(self, *args):
-        """Add a point to this Sketch."""
+        """Add a point to the sketch."""
         if not args:
             raise TypeError("No arguments given")
         point_feature = self._feature.addFeature("SketchPoint")
         return Point(point_feature, *args)
 
     def addLine(self, *args):
-        """Add a line to this Sketch."""
+        """Add a line to the sketch.
+        
+        .. function:: addLine(name)
+        Select an existing line. The line is added to the sketch with a rigid 
+        constraint (it cannot be modified by the sketch)
+        
+        Arguments:
+            name(str): name of an existing line
+        
+        .. function:: addLine(start, end)
+        Create a line by points
+        
+        Arguments:
+           start(point): start point of the line
+           end(point): end point of the line
+        
+        .. function:: addLine(start_x, start_y, end_x, end_y)
+        Create a line by coordinates
+        
+        Arguments:
+           start_x(double): start point x coordinate
+        """
         if not args:
             raise TypeError("No arguments given")
         line_feature = self._feature.addFeature("SketchLine")
@@ -116,21 +150,25 @@ class Sketch(Interface):
         return Circle(circle_feature, *args)
 
     def addArc(self, *args):
-        """Add an arc to the sketch.
+        """Add an arc of circle to the sketch and return an arc object.
+        
+        Two different syntaxes are allowed:
         
         .. function:: addArc(center, start, end)
         
-        :param point center: center of the arc
-        :param point start: start point of the arc
-        :param point end: end point of the arc
+        Arguments:
+            center (point): center of the arc  
+            start (point): start point of the arc
+            end (point): end point of the arc
         
         .. function:: addArc(center_x, center_y, start_x, start_y, end_x, end_y)
         
         Same as above but with coordinates
         
-        :return: arc object
-        :rtype: :class:`model.sketcher.Arc`
-        :raises TypeError: if no argument is provided
+        Returns:
+            Arc: arc object
+        Raises:
+            TypeError: if no argument is provided
         """
         if not args:
             raise TypeError("No arguments given")
