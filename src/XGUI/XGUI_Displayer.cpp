@@ -221,7 +221,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     if(anAISIO->Width() > 1) {
       for(int aModeIdx = 0; aModeIdx < myActiveSelectionModes.length(); ++aModeIdx) {
         int aMode = myActiveSelectionModes.value(aModeIdx);
-        double aPrecision = (aMode == getSelectionMode(TopAbs_VERTEX))? 15 : 
+        double aPrecision = (aMode == getSelectionMode(TopAbs_VERTEX))? 20 : 
                                                     (anAISIO->Width() + 2);
         aContext->SetSelectionSensitivity(anAISIO, aMode, aPrecision);
       }
