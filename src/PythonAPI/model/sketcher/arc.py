@@ -29,6 +29,31 @@ class Arc(Interface):
                 )
         self.execute()
         
+        
+    ########
+    #
+    # Getters
+    #
+    ########
+
+
+    def center(self):
+        """Return the center point."""
+        return self._center
+
+    def startPoint(self):
+        """Return the start point."""
+        return self._start_point
+
+    def endPoint(self):
+        """Return the end point."""
+        return self._end_point
+
+    def result(self):
+        """Return the arc circular line attribute."""
+        return self._feature.lastResult()
+    
+        
     ########
     #
     # Set methods
@@ -46,30 +71,6 @@ class Arc(Interface):
     def setEndPoint(self, x, y):
         """Set end point value."""
         self._end_point.setValue(x, y)
-        
-    
-    ########
-    #
-    # Getters
-    #
-    ########
-
-
-    def centerData(self):
-        """Return the center point data."""
-        return self._center
-
-    def startPointData(self):
-        """Return the start point data."""
-        return self._start_point
-
-    def endPointData(self):
-        """Return the end point data."""
-        return self._end_point
-
-    def result(self):
-        """Return the arc circular line attribute."""
-        return self._feature.lastResult()
 
 
     ########

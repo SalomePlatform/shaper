@@ -45,7 +45,7 @@ def addSketch(document, plane):
     Returns:
        Sketch: sketch object
     """
-    feature = featureToCompositeFeature(doc.addFeature("Sketch"))
+    feature = featureToCompositeFeature(document.addFeature("Sketch"))
     return Sketch(feature, plane)
 
 class Sketch(Interface):

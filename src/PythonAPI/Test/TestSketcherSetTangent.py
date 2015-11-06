@@ -8,7 +8,7 @@ class SketcherSetTangent(SketcherTestCase):
         self.line = self.sketch.addLine(0, 0, 0, 1)
         self.arc = self.sketch.addArc(0, 1, 0, 0, 1, 1)
         self.sketch.setCoincident(
-            self.line.endPointData(), self.arc.startPointData()
+            self.line.endPointData(), self.arc.startPoint()
             )
         
     def test_set_tangent(self):
