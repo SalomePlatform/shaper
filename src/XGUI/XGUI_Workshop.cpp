@@ -310,6 +310,10 @@ void XGUI_Workshop::initMenu()
   aCommand->connectTo(this, SLOT(onSave()));
   //aCommand->disable();
 
+  aCommand = aGroup->addFeature("SAVEAS_CMD", tr("Save as..."), tr("Save the document into a file"),
+                                QIcon(":pictures/save.png"), QKeySequence());
+  aCommand->connectTo(this, SLOT(onSaveAs()));
+
   QString aUndoId = "UNDO_CMD";
   aCommand = aGroup->addFeature(aUndoId, tr("Undo"), tr("Undo last command"),
                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
@@ -328,13 +332,10 @@ void XGUI_Workshop::initMenu()
                  SIGNAL(updateRedoHistory(const QList<ActionInfo>&)),
                  SLOT(onRedo(int)));
 
-  aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
-    QIcon(":pictures/rebuild.png"), QKeySequence());
-  aCommand->connectTo(this, SLOT(onRebuild()));
+  //aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+  //  QIcon(":pictures/rebuild.png"), QKeySequence());
+  //aCommand->connectTo(this, SLOT(onRebuild()));
 
-  aCommand = aGroup->addFeature("SAVEAS_CMD", tr("Save as..."), tr("Save the document into a file"),
-                                QIcon(":pictures/save.png"), QKeySequence());
-  aCommand->connectTo(this, SLOT(onSaveAs()));
   //aCommand->disable();
 
   aCommand = aGroup->addFeature("OPEN_CMD", tr("Open..."), tr("Open a new document"),
