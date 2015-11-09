@@ -721,6 +721,7 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature, const
 
 void PartSet_SketcherMgr::clearClickedFlags()
 {
+  return;
   myClickedPoint.clear();
   myCurrentPoint.clear();
 }
