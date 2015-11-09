@@ -107,7 +107,7 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theF
   QString anError = myWorkshop->module()->getFeatureError(theFeature);
   bool anEnabled = anError.isEmpty();
 
-  bool isActionEnabled = theAction->data() != INVALID_VALUE;
+  /*bool isActionEnabled = theAction->data() != INVALID_VALUE;
   if (anEnabled  != isActionEnabled) {
     // update enable state of the button
     theAction->setIcon(anEnabled ? QIcon(":pictures/button_ok.png"): QIcon(":pictures/button_ok_error.png"));
@@ -115,7 +115,8 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const FeaturePtr& theF
       theAction->setData("");
     else
       theAction->setData(INVALID_VALUE);
-  }
+  }*/
+  theAction->setEnabled(anEnabled);
   // some operations have no property panel, so it is important to check that it is not null
   if (myPropertyPanel) {
     // update controls error information
