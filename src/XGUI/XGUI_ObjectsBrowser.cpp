@@ -182,6 +182,7 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
   int aSize = aModel->rowCount(aParent);
   for (int i = 0; i < aSize; i++) {
     update(aModel->index(i, 0, aParent));
+    update(aModel->index(i, 1, aParent));
   }
 }
 
