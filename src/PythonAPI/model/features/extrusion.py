@@ -9,8 +9,35 @@ from model import Selection
 
 def addExtrusion(part, *args):
     """Add an Extrusion feature to the Part and return Extrusion.
-
-    Pass all args to Extrusion __init__ function.
+    
+    This function has *3 signatures*:
+    
+    .. function:: addExtrusion(base, size)
+    
+    Arguments:
+        base(str, Sketch or list): base object(s)
+        size(double): size of the extrusion, the side is decided by the sign
+    
+    .. function:: addExtrusion(base, to_size, from_size)
+    
+    Arguments:
+        base(str, Sketch or list): base object(s)
+        to_size(double): upper size of the extrusion
+        from_size(double): lower size of the extrusion
+    
+    .. function:: addExtrusion(base, to_object, to_offset, from_object, from_offset)
+    
+    Arguments:
+        base(str, Sketch or list): base object(s)
+        to_object(plane): upper object
+        to_offset(double): offset from upper object
+        from_object(plane): lower plane
+        from_offset(double): offset from lower plane
+        
+    In all three cases the function returns an extrusion object
+    
+    Returns:
+        Extrusion: extrusion object
     """
     assert(args)
     feature = part.addFeature("Extrusion")
@@ -19,28 +46,28 @@ def addExtrusion(part, *args):
 
 class Extrusion(Interface):
     """Interface class for Extrusion feature.
-
-    Extrusion(feature) -> feature interface without initialization
-    Extrusion(feature, base, size) ->
-        feature interface initialized from arguments:
-        - base -- name, sketch or list of names and sketches
-        - size -- if positive -> to_size, if negative -> from_size
-    Extrusion(feature, base, to_size, from_size) ->
-        feature interface initialized from arguments:
-        - base -- name, sketch or list of names and sketches
-        - to_size -- upper size
-        - from_size -- lower size
-    Extrusion(feature, base, to_object, to_offset, from_object, from_offset) ->
-        feature interface initialized from arguments:
-        - base -- name, sketch or list of names and sketches
-        - to_object -- upper object (plane)
-        - to_offset -- offset from upper object
-        - from_object -- lower object (plane)
-        - from_offset -- offset from lower object
     """
 
     def __init__(self, feature, *args):
-        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
+        """
+        Extrusion(feature) -> feature interface without initialization
+        Extrusion(feature, base, size) ->
+            feature interface initialized from arguments:
+            - base -- name, sketch or list of names and sketches
+            - size -- if positive -> to_size, if negative -> from_size
+        Extrusion(feature, base, to_size, from_size) ->
+            feature interface initialized from arguments:
+            - base -- name, sketch or list of names and sketches
+            - to_size -- upper size
+            - from_size -- lower size
+        Extrusion(feature, base, to_object, to_offset, from_object, from_offset) ->
+            feature interface initialized from arguments:
+            - base -- name, sketch or list of names and sketches
+            - to_object -- upper object (plane)
+            - to_offset -- offset from upper object
+            - from_object -- lower object (plane)
+            - from_offset -- offset from lower object
+        """
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Extrusion")
 

@@ -19,6 +19,10 @@ Example of code:
    >>> plane = model.defaultPlane("XOY")
    >>> sketch = model.addSketch(part, plane)
    >>> line = sketch.addLine(0, 0, 0, 1)
+   >>> line.endPointData().x()
+   0.0
+   >>> line.endPointData().y()
+   1.0
 """
 
 from ModelAPI import modelAPI_ResultConstruction, featureToCompositeFeature

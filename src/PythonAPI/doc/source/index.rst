@@ -27,9 +27,15 @@ with the parametric API will typically begin with a code like below:
    >>> sketch = model.addSketch(part, plane)
    >>> line = sketch.addLine(0, 0, 0, 1)
 
+Features
+........
+
+This API provides functions for creating the features listed below.
+These functions return an interface to the feature that allow 
+to modify the feature and retrieve data from it.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    sketcher
    extrusion

@@ -12,8 +12,8 @@ Create a sketch
 .. autosummary::
    addSketch
 
-Add geometries to the sketch
-----------------------------
+Add geometries
+--------------
 
 .. autosummary::
 
@@ -30,8 +30,8 @@ Set constraints
    Sketch.setRadius
    Sketch.setParallel
 
-Detailed description of sketch interface
-----------------------------------------
+Detailed description
+--------------------
 
 Add a sketch to the document
 ............................
