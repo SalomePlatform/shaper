@@ -304,6 +304,9 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
       }
     }
   }
+  if (isDone)
+    module()->sketchMgr()->clearClickedFlags();
+
   return isDone;
 }
 

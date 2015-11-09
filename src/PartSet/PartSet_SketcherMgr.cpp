@@ -719,6 +719,12 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature, const
   return anError;
 }
 
+void PartSet_SketcherMgr::clearClickedFlags()
+{
+  myClickedPoint.clear();
+  myCurrentPoint.clear();
+}
+
 const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
 {
   static QStringList aIds;

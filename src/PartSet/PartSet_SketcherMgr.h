@@ -186,6 +186,9 @@ public:
   //! \return string value
   QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
 
+  /// It nullify internal flags concerned to clicked mouse event
+  void clearClickedFlags();
+
   /// Returns list of strings which contains id's of sketch operations
   static const QStringList& sketchOperationIdList();
 
