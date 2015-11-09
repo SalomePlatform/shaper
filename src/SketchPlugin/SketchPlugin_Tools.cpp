@@ -106,7 +106,7 @@ void updateMultiAttribute(const AttributePtr& theFirstAngleAttribute,
                           const int& theValue,
                           const bool toMultiply)
 {
-  if (theValue == 0)
+  if (theValue == 0 || !theFirstAngleAttribute->isInitialized())
     return;
 
   AttributeDoublePtr aDoubleFirstAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(

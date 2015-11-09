@@ -28,7 +28,7 @@
 #define PI 3.1415926535897932
 
 SketchPlugin_MultiRotation::SketchPlugin_MultiRotation()
-: myBlockAngle(true)
+: myBlockAngle(false)
 {
 }
 
@@ -347,7 +347,6 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
   }
   else if (theID == NUMBER_OF_OBJECTS_ID()) {
     if (attribute(NUMBER_OF_OBJECTS_ID())->isInitialized() &&
-        attribute(ANGLE_FULL_ID())->isInitialized() &&
         attribute(ANGLE_ID())->isInitialized() &&
         attribute(ANGLE_TYPE())->isInitialized()) {
       AttributeStringPtr aMethodTypeAttr = string(ANGLE_TYPE());
