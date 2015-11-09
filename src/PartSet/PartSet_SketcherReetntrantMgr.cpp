@@ -297,8 +297,10 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
             aPreviousAttributeWidget = aWidgets[i];
         }
         // If the current widget is a selector, do nothing, it processes the mouse press
-        if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector())
+        if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector()) {
           aPreviousAttributeWidget->focusTo();
+          aPreviousAttributeWidget->selectContent();
+        }
       }
     }
   }

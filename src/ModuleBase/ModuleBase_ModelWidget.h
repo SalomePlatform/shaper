@@ -107,6 +107,9 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// Select the internal content if it can be selected. It is empty in the default realization
+  virtual void selectContent() {}
+
   /// The method called when widget is activated
   void activate();
 

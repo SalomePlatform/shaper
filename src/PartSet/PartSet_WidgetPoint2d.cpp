@@ -167,6 +167,11 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
   return isDone;
 }
 
+void PartSet_WidgetPoint2D::selectContent()
+{
+  myXSpin->selectAll();
+}
+
 bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
 {
   if (fabs(theX) >= MaxCoordinate)
