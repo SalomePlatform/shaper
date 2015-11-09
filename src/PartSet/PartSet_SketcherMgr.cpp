@@ -11,6 +11,7 @@
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetSketchLabel.h"
+#include "PartSet_WidgetEditor.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -579,7 +580,9 @@ void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMo
       // Find corresponded widget to activate value editing
       foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
         if (aWgt->attributeID() == "ConstraintValue") {
-          aWgt->focusTo();
+          PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
+          if (anEditor)
+            anEditor->showPopupEditor();
           return;
         }
       }

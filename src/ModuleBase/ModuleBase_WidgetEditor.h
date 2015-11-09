@@ -43,7 +43,6 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
- private slots:
    /// Shous popup window under cursor for data editing
    void showPopupEditor();
 
