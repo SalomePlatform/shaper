@@ -39,6 +39,17 @@ void updateMultiAttribute(const AttributePtr& theFirstAngleAttribute,
                           const int& theValue,
                           const bool toMultiply);
 
+/// Changes the second attribute value to be multiplied or divided by the given value.
+/// \param theFirstAngleAttribute the source attribute
+/// \param theSecondAngleAttribute the changed attribute
+/// \param theValue a value for modification
+/// \param toMultiply a type of modification
+void updateMultiAttribute(const AttributePtr& theFirstAttribute,
+                          const AttributePtr& theSecondAttribute,
+                          const AttributePtr& theModifiedAttribute,
+                          const int& theValue,
+                          const bool toMultiply);
+
 }; // namespace SketchPlugin_Tools
 
 #endif // SKETCHPLUGIN_TOOLS_H_

@@ -440,6 +440,10 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
                                                    double theX, double theY)
 {
   bool aPointIsFound = false;
+
+  if (feature()->getKind() != SketchPlugin_Line::ID())
+    return aPointIsFound;
+
   AttributePtr aWidgetAttribute = myFeature->attribute(attributeID());
 
   std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 

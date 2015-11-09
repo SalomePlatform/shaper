@@ -55,6 +55,8 @@
      <file>icons/coincedence.png</file>
      <file>icons/mirror.png</file>
      <file>icons/translate.png</file>
+     <file>icons/translate_32x32.png</file>
+     <file>icons/translate_full_32x32.png</file>
      <file>icons/rotate.png</file>
      <file>icons/exec_state_failed.png</file>
      <file>icons/exec_state_invalid_parameters.png</file>

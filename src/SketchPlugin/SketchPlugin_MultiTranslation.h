@@ -46,6 +46,13 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
     return MY_TRANSLATION_LIST_ID;
   }
 
+  /// attribute name for first point
+  inline static const std::string& VALUE_TYPE()
+  {
+    static const std::string VALUE_TYPE_ATTR("ValueType");
+    return VALUE_TYPE_ATTR;
+  }
+
   /// Start point of translation
   inline static const std::string& START_POINT_ID()
   {
@@ -58,6 +65,13 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
     static const std::string MY_END_POINT_ID("MultiTranslationEndPoint");
     return MY_END_POINT_ID;
   }
+  /// End point of translation
+  inline static const std::string& END_FULL_POINT_ID()
+  {
+    static const std::string MY_END_FULL_POINT_ID("MultiTranslationFullEndPoint");
+    return MY_END_FULL_POINT_ID;
+  }
+
   /// Total number of objects, initial and translated objects
   inline static const std::string& NUMBER_OF_OBJECTS_ID()
   {
@@ -83,6 +97,9 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
 
 private:
   ObjectPtr copyFeature(ObjectPtr theObject);
+
+private:
+  bool myBlockValue; /// a boolean state to avoid recusive value change in attributeChanged
 };
 
 #endif

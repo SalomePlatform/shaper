@@ -16,6 +16,9 @@
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageWidget.h>
 
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
+
 #include <QEvent>
 #include <QFrame>
 #include <QIcon>
@@ -154,12 +157,19 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
     activateWidget(NULL);
     return;
   }
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
   activateWindow();
   for (; anIt != aLast; anIt++) {
+    ModuleBase_ModelWidget* aCurrentWidget = *anIt;
     if (isFoundWidget || !theWidget) {
-      if ((*anIt)->focusTo()) {
+
+      if (!aValidators->isCase(aCurrentWidget->feature(), aCurrentWidget->attributeID()))
+        continue; // this attribute is not participated in the current case
+
+      if (aCurrentWidget->focusTo()) {
         return;
       }
     }

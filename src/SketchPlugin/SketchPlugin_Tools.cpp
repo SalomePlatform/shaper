@@ -121,4 +121,37 @@ void updateMultiAttribute(const AttributePtr& theFirstAngleAttribute,
     aDoubleSecondAttr->setValue(aValue/theValue);
 }
 
+void updateMultiAttribute(const AttributePtr& theFirstAttribute,
+                          const AttributePtr& theSecondAttribute,
+                          const AttributePtr& theModifiedAttribute,
+                          const int& theValue,
+                          const bool toMultiply)
+{
+  if (theValue == 0 || !theFirstAttribute->isInitialized()
+                    || !theSecondAttribute->isInitialized())
+    return;
+
+  std::shared_ptr<GeomDataAPI_Point2D> aFirstPoint = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFirstAttribute);
+  std::shared_ptr<GeomDataAPI_Point2D> aSecondPoint = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theSecondAttribute);
+  std::shared_ptr<GeomDataAPI_Point2D> aModifiedPoint = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theModifiedAttribute);
+
+  if (!aFirstPoint.get() || !aSecondPoint.get() || !aModifiedPoint.get())
+    return;
+
+  if (aFirstPoint->pnt()->isEqual(aSecondPoint->pnt()))
+    aModifiedPoint->setValue(aFirstPoint->pnt());
+  else {
+    double aDx = aSecondPoint->x() - aFirstPoint->x();
+    double aDy = aSecondPoint->y() - aFirstPoint->y();
+
+    double aX  = toMultiply ? aDx * theValue : aDx / theValue;
+    double anY = toMultiply ? aDy * theValue : aDy / theValue;
+
+    aModifiedPoint->setValue(aFirstPoint->x() + aX, aFirstPoint->y() + anY);
+  }
+}
+
 } // namespace SketchPlugin_Tools

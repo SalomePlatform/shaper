@@ -285,16 +285,32 @@
             use_external="true">
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
-        <groupbox title="Direction">
-          <sketch-2dpoint_selector
-              id="MultiTranslationStartPoint"
-              title="Start point"
-              tooltip="Start point of translation"/>
-          <sketch-2dpoint_selector
-              id="MultiTranslationEndPoint"
-              title="End point"
-              tooltip="Final point of translation"/>
-        </groupbox>
+        <toolbox id="ValueType">
+          <box id="SingleValue" title="Single value" icon=":icons/translate_32x32.png">
+            <groupbox title="Direction">
+              <sketch-2dpoint_selector
+                  id="MultiTranslationStartPoint"
+                  title="Start point"
+                  tooltip="Start point of translation"/>
+              <sketch-2dpoint_selector
+                  id="MultiTranslationEndPoint"
+                  title="End point"
+                  tooltip="Final point of translation"/>
+            </groupbox>
+          </box>
+          <box id="FullValue" title="Full value" icon=":icons/translate_full_32x32.png">
+            <groupbox title="Direction">
+              <sketch-2dpoint_selector
+                  id="MultiTranslationStartPoint"
+                  title="Start point"
+                  tooltip="Start point of translation"/>
+              <sketch-2dpoint_selector
+                  id="MultiTranslationFullEndPoint"
+                  title="End point"
+                  tooltip="Final point of translation"/>
+            </groupbox>
+          </box>
+        </toolbox>
         <integervalue id="MultiTranslationObjects"
             label="Total number of objects"
             tooltip="Total number of objects" 
