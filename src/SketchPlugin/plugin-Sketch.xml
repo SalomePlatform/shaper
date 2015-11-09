@@ -301,7 +301,7 @@
           <box id="FullValue" title="Full value" icon=":icons/translate_full_32x32.png">
             <groupbox title="Direction">
               <sketch-2dpoint_selector
-                  id="MultiTranslationStartPoint"
+                  id="MultiTranslationFullStartPoint"
                   title="Start point"
                   tooltip="Start point of translation"/>
               <sketch-2dpoint_selector

@@ -31,6 +31,7 @@ void SketchPlugin_MultiTranslation::initAttributes()
   data()->addAttribute(VALUE_TYPE(),   ModelAPI_AttributeString::typeId());
 
   data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(START_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
@@ -271,6 +272,24 @@ void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
     }
+  }
+  else if (theID == START_POINT_ID() && !myBlockValue) {
+    myBlockValue = true;
+    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aStartFullPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_FULL_POINT_ID()));
+    aStartFullPoint->setValue(aStartPoint->pnt());
+    myBlockValue = false;
+  }
+  else if (theID == START_FULL_POINT_ID() && !myBlockValue) {
+    myBlockValue = true;
+    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aStartFullPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_FULL_POINT_ID()));
+    aStartPoint->setValue(aStartFullPoint->pnt());
+    myBlockValue = false;
   }
   else if (theID == END_POINT_ID() && !myBlockValue) {
     int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;

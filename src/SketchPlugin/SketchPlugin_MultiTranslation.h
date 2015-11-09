@@ -59,6 +59,13 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
     static const std::string MY_START_POINT_ID("MultiTranslationStartPoint");
     return MY_START_POINT_ID;
   }
+  /// Start point of translation
+  inline static const std::string& START_FULL_POINT_ID()
+  {
+    static const std::string MY_START_FULL_POINT_ID("MultiTranslationFullStartPoint");
+    return MY_START_FULL_POINT_ID;
+  }
+
   /// End point of translation
   inline static const std::string& END_POINT_ID()
   {
