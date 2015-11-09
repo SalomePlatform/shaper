@@ -197,10 +197,11 @@ void PartSet_SketcherMgr::onEnterViewPort()
   return;
   #endif
 
+  if (canChangeCursor(getCurrentOperation()))
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
-
-  QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
 
   operationMgr()->onValidateOperation();
 
@@ -232,10 +233,11 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   return;
   #endif
 
+  if (canChangeCursor(getCurrentOperation()))
+    QApplication::restoreOverrideCursor();
+
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
-
-  QApplication::restoreOverrideCursor();
 
   // the method should be performed if the popup menu is called,
   // the reset of the current widget should not happen
@@ -919,15 +921,15 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
-  if (isNestedCreateOperation(theOperation) && myIsMouseOverWindow)
-    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));//QIcon(":pictures/button_plus.png").pixmap(20,20)));
+  if (canChangeCursor(theOperation) && myIsMouseOverWindow)
+    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }
 
-void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
+void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
-  if (isNestedCreateOperation(theOp) || myModule->sketchReentranceMgr()->isInternalEditActive())
+  if (canChangeCursor(theOperation))
     QApplication::restoreOverrideCursor();
 }
 
@@ -1058,6 +1060,12 @@ bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
       aCanDisplay = anActiveWidget->getValueState() == ModuleBase_ModelWidget::Stored;
   }
   return aCanDisplay;
+}
+
+bool PartSet_SketcherMgr::canChangeCursor(ModuleBase_Operation* theOperation) const
+{
+  return isNestedCreateOperation(theOperation) ||
+         myModule->sketchReentranceMgr()->isInternalEditActive();
 }
 
 bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const

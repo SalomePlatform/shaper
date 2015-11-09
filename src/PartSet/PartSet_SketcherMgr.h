@@ -155,6 +155,10 @@ public:
   /// \return boolean result
   bool canDisplayCurrentCreatedFeature() const;
 
+  /// Returns true if the current operation is nested creation or internal reentrant edit
+  /// \param theOperation an operation
+  bool canChangeCursor(ModuleBase_Operation* theOperation) const;
+
   /// Returns state of constraints showing flag 
   bool isConstraintsShown() const { return myIsConstraintsShown; }
 
