@@ -735,7 +735,7 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
   } else if (aDoc) {
     // A folder under sub-document
     if (aActiveDoc.get() != aDoc)
-      return aDefaultFlag;
+      return aNullFlag;
   }
   return aEditingFlag;
 }
