@@ -272,7 +272,7 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
                                                      (myWorkshop->currentOperation());
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-    aFOperation->setEditOperation(true);
+    aFOperation->setEditOperation(false);
     workshop()->operationMgr()->updateApplyOfOperations();
 
     createInternalFeature();
@@ -340,7 +340,6 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
                                                      (myWorkshop->currentOperation());
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-    aFOperation->setEditOperation(true);
     FeaturePtr anOperationFeature = aFOperation->feature();
 
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
