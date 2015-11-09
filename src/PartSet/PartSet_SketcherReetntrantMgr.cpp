@@ -3,7 +3,7 @@
 #include "PartSet_SketcherReetntrantMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_SketcherMgr.h"
-#include "PartSet_WidgetPoint2D.h"
+#include "PartSet_WidgetPoint2d.h"
 
 #include "ModelAPI_Session.h"
 
