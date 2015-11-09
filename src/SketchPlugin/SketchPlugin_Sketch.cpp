@@ -145,9 +145,15 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
 {
   if (!data()->isValid()) // sketch is already removed (case on undo of sketch), sync is not needed
     return;
-  // to keep the persistent sub-elements indexing, do not remove elements from list,
-  // but substitute by nulls
-  reflist(SketchPlugin_Sketch::FEATURES_ID())->substitute(theFeature, ObjectPtr());
+  AttributeRefListPtr aList = reflist(SketchPlugin_Sketch::FEATURES_ID());
+  // if the object is last, remove it from the list (needed to skip empty transaction on edit of sketch feature)
+  if (aList->object(aList->size(true) - 1, true) == theFeature) {
+    aList->remove(theFeature);
+  } else {
+    // to keep the persistent sub-elements indexing, do not remove elements from list,
+    // but substitute by nulls
+    aList->substitute(theFeature, ObjectPtr());
+  }
 }
 
 int SketchPlugin_Sketch::numberOfSubs(bool forTree) const

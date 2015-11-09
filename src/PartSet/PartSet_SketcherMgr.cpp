@@ -5,11 +5,13 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "PartSet_SketcherMgr.h"
+#include "PartSet_SketcherReetntrantMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetSketchLabel.h"
+#include "PartSet_WidgetEditor.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -298,6 +300,9 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
+    return;
+
   get2dPoint(theWnd, theEvent, myClickedPoint);
 
   if (!(theEvent->buttons() & Qt::LeftButton))
@@ -400,6 +405,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent))
+    return;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
@@ -435,6 +443,9 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
+    return;
+
   if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
     myIsMouseOverViewProcessed = true;
     // 1. perform the widget mouse move functionality and display the presentation
@@ -569,7 +580,9 @@ void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMo
       // Find corresponded widget to activate value editing
       foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
         if (aWgt->attributeID() == "ConstraintValue") {
-          aWgt->focusTo();
+          PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
+          if (anEditor)
+            anEditor->showPopupEditor();
           return;
         }
       }
@@ -582,10 +595,17 @@ void PartSet_SketcherMgr::onApplicationStarted()
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
+  PartSet_SketcherReetntrantMgr* aReentranceMgr = myModule->sketchReentranceMgr();
+
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
   if (aPropertyPanel) {
     connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
             this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
+
+    connect(aPropertyPanel, SIGNAL(noMoreWidgets(const std::string&)),
+            aReentranceMgr, SLOT(onNoMoreWidgets(const std::string&)));
+    connect(aPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+            aReentranceMgr, SLOT(onWidgetActivated()));
   }
 
   XGUI_ViewerProxy* aViewerProxy = aWorkshop->viewer();
@@ -658,7 +678,7 @@ bool PartSet_SketcherMgr::sketchSolverError()
   return anError;
 }
 
-QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
+QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
 {
   QString anError = "";
   if (!theFeature.get() || !theFeature->data()->isValid())
@@ -671,7 +691,7 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
   }
   else {
     ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-    if (anActiveWidget) {
+    if (isCheckGUI && anActiveWidget) {
       ModuleBase_ModelWidget::ValueState aState = anActiveWidget->getValueState();
       if (aState != ModuleBase_ModelWidget::Stored) {
         AttributePtr anAttr = anActiveWidget->feature()->attribute(anActiveWidget->attributeID());
@@ -907,7 +927,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOp)
 {
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
-  if (isNestedCreateOperation(theOp))
+  if (isNestedCreateOperation(theOp) || myModule->sketchReentranceMgr()->isInternalEditActive())
     QApplication::restoreOverrideCursor();
 }
 

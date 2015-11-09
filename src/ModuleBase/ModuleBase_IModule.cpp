@@ -78,7 +78,7 @@ const char* toString(ModelAPI_ExecState theExecState)
 #undef TO_STRING
 }
 
-QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
+QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
 {
   QString anError;
   if (!theFeature.get() || !theFeature->data()->isValid() || theFeature->isAction())

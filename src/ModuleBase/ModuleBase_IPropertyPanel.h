@@ -64,6 +64,15 @@ public:
   /// Sets widget processed by preselection
   virtual void setPreselectionWidget(ModuleBase_ModelWidget* theWidget) = 0;
 
+  /// Returns the first widget, where canSetValue returns true 
+  /// \return a widget or null
+  ModuleBase_ModelWidget* findFirstAcceptingValueWidget();
+
+  /// Returns the first widget, where canSetValue returns true 
+  /// \return a widget or null
+  static ModuleBase_ModelWidget* findFirstAcceptingValueWidget(
+                          const QList<ModuleBase_ModelWidget*>& theWidgets);
+
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
@@ -78,7 +87,8 @@ signals:
   void widgetActivated(ModuleBase_ModelWidget* theWidget);
 
   /// Emited when there is no next widget
-  void noMoreWidgets();
+  /// \param thePreviousAttributeID an attribute key of the previous active widget
+  void noMoreWidgets(const std::string& thePreviousAttributeID);
 
 public slots:
   /// Activate the next widget in the property panel

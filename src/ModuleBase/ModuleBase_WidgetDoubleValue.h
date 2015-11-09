@@ -37,6 +37,9 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetDoubleValue();
 
+  /// Select the internal content if it can be selected. It is empty in the default realization
+  virtual void selectContent();
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;

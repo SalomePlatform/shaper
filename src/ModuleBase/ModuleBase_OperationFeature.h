@@ -64,6 +64,13 @@ Q_OBJECT
   /// Returns True id the current operation is launched in editing mode
   bool isEditOperation() const { return myIsEditing; }
 
+  /// Change the operation mode from create to edit.
+  /// The transaction and the operation name in the model history of transaction are the same.
+  /// It updates the edit state in the widgets of property panel
+  /// \param theRestartTransaction if true, the current model transaction is committed and
+  /// the new one is started
+  void setEditOperation(const bool theRestartTransaction);
+
   /// Returns the operation feature
   /// \return the feature
   FeaturePtr feature() const;

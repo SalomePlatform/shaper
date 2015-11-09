@@ -7,6 +7,7 @@
 #include "PartSet_Validators.h"
 
 #include "PartSet_Tools.h"
+#include "PartSet_SketcherMgr.h"
 
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -92,14 +93,21 @@ std::shared_ptr<GeomAPI_Pln> sketcherPlane(ModuleBase_Operation* theOperation)
 bool isEmptySelectionValid(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  // during the create operation empty selection is always valid
   if (!aFeatureOp->isEditOperation()) {
     return true;
   }
-  std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
-  if (aPlane.get())
-    return true;
-  else 
-    return false;
+  else {
+    if (PartSet_SketcherMgr::isSketchOperation(aFeatureOp)) {
+      std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
+      if (aPlane.get())
+        return true;
+      else 
+        return false;
+    }
+    else// in edit operation an empty selection is always valid, performed for re-entrant operrations
+      return true;
+  }
 }
 
 bool PartSet_DistanceSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const

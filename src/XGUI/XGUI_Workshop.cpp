@@ -487,6 +487,7 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     setPropertyPanel(theOperation);
+    connectToPropertyPanel(true);
   }
   updateCommandStatus();
 
@@ -1045,7 +1046,6 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
-  connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
   //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),

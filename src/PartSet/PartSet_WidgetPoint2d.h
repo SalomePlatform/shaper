@@ -56,11 +56,18 @@ Q_OBJECT
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
+  /// Select the internal content if it can be selected. It is empty in the default realization
+  virtual void selectContent();
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
   //bool initFromPrevious(ObjectPtr theObject);
+
+  /// Defines if the widget can be activated by mouse move.
+  /// By default it returns false
+  virtual bool canBeActivatedByMove();
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
@@ -96,7 +103,6 @@ public slots:
   /// \param theEvent a mouse event
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
-protected slots:
   /// Process mouse release event
   /// \param theWnd a view window
   /// \param theEvent a mouse event

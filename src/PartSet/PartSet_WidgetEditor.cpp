@@ -23,7 +23,7 @@ PartSet_WidgetEditor::PartSet_WidgetEditor(QWidget* theParent, ModuleBase_IWorks
 bool PartSet_WidgetEditor::focusTo()
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-  if (aModule->isMouseOverWindow())
+  if (aModule->isMouseOverWindow() && !isEditingMode())
     return ModuleBase_WidgetEditor::focusTo();
   else {
     return ModuleBase_WidgetDoubleValue::focusTo();

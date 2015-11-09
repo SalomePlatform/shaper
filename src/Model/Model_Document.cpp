@@ -23,9 +23,11 @@
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
+#include <TDataStd_ReferenceList.hxx>
 #include <TDataStd_IntegerArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
 #include <TDataStd_Name.hxx>
+#include <TDataStd_AsciiString.hxx>
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
@@ -360,7 +362,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
       return false;
     if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
       for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
-        if (anArr1->Value(a) != anArr2->Value(a))
+        if (a != 1 && anArr1->Value(a) != anArr2->Value(a)) // second is for display
           return false;
       return true;
     }
@@ -382,6 +384,42 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
         }
       return true;
     }
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_ReferenceArray::GetID())) {
+    Handle(TDataStd_ReferenceArray) anArr1 = Handle(TDataStd_ReferenceArray)::DownCast(theAttr1);
+    Handle(TDataStd_ReferenceArray) anArr2 = Handle(TDataStd_ReferenceArray)::DownCast(theAttr2);
+    if (anArr1.IsNull() && anArr2.IsNull())
+      return true;
+    if (anArr1.IsNull() || anArr2.IsNull())
+      return false;
+    if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
+      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
+        if (anArr1->Value(a) != anArr2->Value(a)) {
+          // avoid the transaction ID checking
+          if (a == 2 && anArr1->Upper() == 2 && anArr2->Label().Tag() == 1 &&
+            (anArr2->Label().Depth() == 4 || anArr2->Label().Depth() == 6))
+            continue;
+          return false;
+        }
+      return true;
+    }
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_ReferenceList::GetID())) {
+    Handle(TDataStd_ReferenceList) aList1 = Handle(TDataStd_ReferenceList)::DownCast(theAttr1);
+    Handle(TDataStd_ReferenceList) aList2= Handle(TDataStd_ReferenceList)::DownCast(theAttr2);
+    if (aList1.IsNull() && aList2.IsNull())
+      return true;
+    if (aList1.IsNull() || aList2.IsNull())
+      return false;
+    const TDF_LabelList& aLList1 = aList1->List();
+    const TDF_LabelList& aLList2 = aList2->List();
+    TDF_ListIteratorOfLabelList aLIter1(aLList1);
+    TDF_ListIteratorOfLabelList aLIter2(aLList2);
+    for(; aLIter1.More() && aLIter2.More(); aLIter1.Next(), aLIter2.Next()) {
+      if (aLIter1.Value() != aLIter2.Value())
+        return false;
+    }
+    return !aLIter1.More() && !aLIter2.More(); // both lists are with the same size
+  } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDF_TagSource::GetID())) {
+    return true; // it just for created and removed feature: nothing is changed
   }
   return false;
 }
@@ -406,6 +444,8 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
         if (isEqualContent(anADelta->Attribute(), aCurrentAttr)) {
           continue; // attribute is not changed actually
         }
+      } else if (Standard_GUID::IsEqual(anADelta->Attribute()->ID(), TDataStd_AsciiString::GetID())) {
+        continue; // error message is disappeared
       }
     }
     return false;

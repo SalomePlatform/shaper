@@ -133,19 +133,43 @@ PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                                          const bool theToValidate)
 {
+  bool isDone = false;
   if (theValues.empty())
-    return false;
+    return isDone;
 
   ModuleBase_ViewerPrs aValue = theValues.takeFirst();
-
-  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-  bool isDone = false;
   TopoDS_Shape aShape = aValue.shape();
-  double aX, aY;
-  if (getPoint2d(aView, aShape, aX, aY)) {
-    isDone = setPoint(aX, aY);
+  if (!aShape.IsNull()) {
+    Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+    double aX, aY;
+    if (getPoint2d(aView, aShape, aX, aY)) {
+      isDone = setPoint(aX, aY);
+    }
+  }
+  else if (canBeActivatedByMove()) {
+    if (feature()->getKind() == SketchPlugin_Line::ID()) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aValue.object());
+      // Initialise new line with first point equal to end of previous
+      if (aFeature.get()) {
+        std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+        std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                       aData->attribute(SketchPlugin_Line::END_ID()));
+        if (aPoint) {
+          setPoint(aPoint->x(), aPoint->y());
+          PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aPoint->x(),
+                                        aPoint->y());
+          isDone = true;
+        }
+      }
+    }
   }
   return isDone;
+}
+
+void PartSet_WidgetPoint2D::selectContent()
+{
+  myXSpin->selectAll();
 }
 
 bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
@@ -248,6 +272,16 @@ void PartSet_WidgetPoint2D::activateCustom()
   aModes << TopAbs_VERTEX;
   aModes << TopAbs_EDGE;
   myWorkshop->activateSubShapesSelection(aModes);
+}
+
+bool PartSet_WidgetPoint2D::canBeActivatedByMove()
+{
+  bool aCanBeActivated = false;
+  if (feature()->getKind() == SketchPlugin_Line::ID() &&
+      attributeID() == SketchPlugin_Line::START_ID())
+    aCanBeActivated = true;
+
+  return aCanBeActivated;
 }
 
 void PartSet_WidgetPoint2D::deactivate()

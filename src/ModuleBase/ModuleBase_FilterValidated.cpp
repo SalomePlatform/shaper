@@ -25,7 +25,7 @@ Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityO
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
     if (!aCurrentWidget)
-      aCurrentWidget = aPanel->activeWidget();
+      aCurrentWidget = myWorkshop->module()->activeWidget();
     ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                            (aCurrentWidget);
     ModuleBase_ViewerPrs aPrs;

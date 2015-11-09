@@ -144,6 +144,11 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
   return true;
 }
 
+void ModuleBase_WidgetDoubleValue::selectContent()
+{
+  mySpinBox->selectAll();
+}
+
 QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
 {
   QList<QWidget*> aList;

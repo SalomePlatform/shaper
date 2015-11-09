@@ -31,6 +31,7 @@ class ModuleBase_IViewWindow;
 class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
+class PartSet_SketcherReetntrantMgr;
 
 class QAction;
 
@@ -65,6 +66,10 @@ public:
   /// Creates custom widgets for property panel
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi, std::string theParentId);
+
+  /// Returns the active widget, by default it is the property panel active widget
+  /// If the internal edit operation is started, this is the first widget of the operation
+  virtual ModuleBase_ModelWidget* activeWidget() const;
 
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
@@ -158,6 +163,9 @@ public:
   /// Returns sketch manager object
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
 
+  /// Returns sketch reentrant manager
+  PartSet_SketcherReetntrantMgr* sketchReentranceMgr() { return mySketchReentrantMgr; }
+
   /// Performs functionality on closing document
   virtual void closeDocument();
 
@@ -198,7 +206,7 @@ public:
   //! Returns the feature error if the current state of the feature in the module is not correct
   //! If the feature is correct, it returns an empty value
   //! \return string value
-  virtual QString getFeatureError(const FeaturePtr& theFeature);
+  virtual QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
 
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
@@ -207,11 +215,11 @@ public:
   /// \param thePreviousState the previous widget value state
   virtual void widgetStateChanged(int thePreviousState);
 
-public slots:
-  /// SLOT, that is called by no more widget signal emitted by property panel
-  /// Set a specific flag to restart the sketcher operation
-  void onNoMoreWidgets();
+  /// Returns true if the event is processed. It gives the reentrance manager to process the enter.
+  /// \param thePreviousAttributeID an index of the previous active attribute
+  virtual bool processEnter(const std::string& thePreviousAttributeID);
 
+public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
   /// the operation should be always aborted.
@@ -240,10 +248,6 @@ protected slots:
   /// \param theEvent the key event
   void onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
-  /// SLOT, that is called by enter key released
-  /// Set a specific type of restarting the current operation
-  void onEnterReleased();
-
   /// SLOT, that is called by the current operation filling with the preselection.
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();
@@ -267,30 +271,20 @@ protected:
   virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
 
  private slots:
-   /// Processing of vertex selected
-   void onVertexSelected();
-
    void onTreeViewDoubleClick(const QModelIndex&);
 
    void onActiveDocPopup(const QPoint&);
 
  private:
-  /// Breaks sequense of automatically resterted operations
-  void breakOperationSequence();
 
   //! Delete features
   virtual bool deleteObjects();
 
  private:
-   QString myLastOperationId;
-   FeaturePtr myLastFeature;
-
-   // Automatical restarting mode flag
-   RestartingMode myRestartingMode;
-
   SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
+  PartSet_SketcherReetntrantMgr* mySketchReentrantMgr;
   PartSet_MenuMgr* myMenuMgr;
   /// A default custom presentation, which is used for references objects of started operation
   PartSet_CustomPrs* myCustomPrs;

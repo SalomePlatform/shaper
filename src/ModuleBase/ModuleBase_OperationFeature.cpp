@@ -49,6 +49,32 @@ ModuleBase_OperationFeature::~ModuleBase_OperationFeature()
   clearPreselection();
 }
 
+void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransaction)
+{
+  if (isEditOperation())
+    return;
+
+  if (theRestartTransaction) {
+    // finsh previous create operation
+    emit beforeCommitted();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    ModelAPI_Session::get()->finishOperation();
+
+    // start new edit operation
+    myIsEditing = true;
+    QString anId = getDescription()->operationId();
+    if (myIsEditing) {
+      anId = anId.append(EditSuffix());
+    }
+    ModelAPI_Session::get()->startOperation(anId.toStdString());
+    emit beforeStarted();
+  }
+  else
+    myIsEditing = true;
+
+  propertyPanel()->setEditingMode(isEditOperation());
+}
+
 FeaturePtr ModuleBase_OperationFeature::feature() const
 {
   return myFeature;
@@ -243,6 +269,7 @@ void ModuleBase_OperationFeature::abort()
 bool ModuleBase_OperationFeature::commit()
 {
   if (canBeCommitted()) {
+    emit beforeCommitted();
     // the widgets of property panel should not process any events come from data mode
     // after commit clicked. Some signal such as redisplay/create influence on content
     // of the object browser and viewer context. Therefore it influence to the current
@@ -257,7 +284,6 @@ bool ModuleBase_OperationFeature::commit()
     SessionPtr aMgr = ModelAPI_Session::get();
     /// Set current feature and remeber old current feature
 
-    emit beforeCommitted();
     commitOperation();
     aMgr->finishOperation();
 
