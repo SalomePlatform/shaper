@@ -30,6 +30,8 @@ class Model_Update : public Events_Listener
   std::map<std::shared_ptr<ModelAPI_Object>, int > myUpdated;
   /// current id of modification inside of the current transaction
   int myModification;
+  /// id of modification inside of the current transaction on start of processing
+  int myModificationInStartProcessing;
   /// features that must be additionally processed after execution of finish operation
   std::set<std::shared_ptr<ModelAPI_Object> > myWaitForFinish;
   /// to know that all next updates are caused by this execution
@@ -127,6 +129,8 @@ protected:
                std::shared_ptr<ModelAPI_Object> theArgument);
   /// Updates the properties of object because of stability state changes
   void updateStability(void* theSender);
+  /// Returns true if the feature is the given modification ID is processed in the current processOperation
+  bool isProcessed(const int theModificationID);
 };
 
 #endif

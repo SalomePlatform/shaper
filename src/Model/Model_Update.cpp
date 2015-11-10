@@ -65,6 +65,7 @@ Model_Update::Model_Update()
   myIsParamUpdated = false;
   myIsFinish = false;
   myModification = 0;
+  myModificationInStartProcessing = 0;
 }
 
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -109,6 +110,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
         myIsParamUpdated = true;
       }
+      if (myIsExecuted) // modifications from outside are with never IDs to take them into account in the current updates
+        myModification++;
       // on undo/redo, abort do not update persisten features
       FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
       if (std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures() ||
@@ -223,33 +226,13 @@ void Model_Update::iterateUpdateBreak(std::shared_ptr<ModelAPI_Feature> theFeatu
 
 void Model_Update::processOperation(const bool theTotalUpdate, const bool theFinish)
 {
-  /* cancel hardcode due to issue 948
-  if (theFinish) {
-    // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
-    std::set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter;
-    for(aFIter = myWaitForFinish.begin(); aFIter != myWaitForFinish.end(); aFIter++)
-    {
-      FeaturePtr aF = std::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
-      if (aF && aF->data()->isValid() && 
-           (aF->getKind() == "Extrusion" || aF->getKind() == "Revolution")) {
-        AttributeSelectionListPtr aBase = aF->selectionList("base");
-        if (aBase.get()) {
-          for(int a = aBase->size() - 1; a >= 0; a--) {
-            ResultPtr aSketchRes = aBase->value(a)->context();
-            if (aSketchRes) {
-              aSketchRes->setDisplayed(false);
-            }
-          }
-        }
-      }
-    }
-  } */
   // perform update of everything if needed
   if (!myIsExecuted) {
     #ifdef DEB_UPDATE
       std::cout<<"****** Start processing"<<std::endl;
     #endif
     myIsExecuted = true;
+    myModificationInStartProcessing = myModification;
 
     bool isAutomaticChanged = false;
 
@@ -262,16 +245,27 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
 
     if (isAutomaticChanged) myIsAutomatic = false;
     myIsExecuted = false;
+    // flush updates just before "myModification" increment: to distinguish
+    // updates by "execute" produced by this updater and other updates, coming outside,
+    // which are really important for "processEvent" of this updater
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+    aLoop->flush(kUpdatedEvent);
     myModification++;
 
     // flush to update display
-    static Events_Loop* aLoop = Events_Loop::loop();
     static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     aLoop->flush(EVENT_DISP);
     #ifdef DEB_UPDATE
       std::cout<<"****** End processing"<<std::endl;
     #endif
   }
+}
+
+bool Model_Update::isProcessed(const int theModificationID)
+{
+  return theModificationID >= myModificationInStartProcessing && 
+         theModificationID <= myModification;
 }
 
 void Model_Update::updateFeature(FeaturePtr theFeature)
@@ -303,7 +297,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   // If automatice update is not needed and feature attributes were not updated right now,
   // do not execute it and do not update arguments.
   if (!myIsAutomatic && 
-       (myUpdated.find(theFeature) == myUpdated.end() || myUpdated[theFeature] != myModification)
+       (myUpdated.find(theFeature) == myUpdated.end() || !isProcessed(myUpdated[theFeature]))
        && !aCompos.get()) {
     // execute will be performed later, but some features may have not-result 
     // presentations, so call update for them (like coincidence in the sketcher)
@@ -338,7 +332,7 @@ void Model_Update::updateFeature(FeaturePtr theFeature)
   if (aJustUpdated) {
     // if preview is not needed, the created feature was not updated before, so, myModification is not actual for this
     if (theFeature->isPreviewNeeded()) {
-      aJustUpdated = myUpdated[theFeature] == myModification;
+      aJustUpdated = isProcessed(myUpdated[theFeature]);
     }
   }
 

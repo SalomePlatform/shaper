@@ -216,7 +216,9 @@ void SketchPlugin_ConstraintFillet::execute()
       aNewFeatureB->attribute(aFeatAttributes[2 + (isStart[1] ? 0 : 1)]))->setValue(
       aTangentPntB->x(), aTangentPntB->y());
   aNewFeatureB->execute();
-  // update fillet arc
+  // update fillet arc: make the arc correct for sure, so, it is not needed to process the "attribute updated"
+  // by arc; moreover, it may cause cyclicity in hte mechanism of updater
+  aNewArc->data()->blockSendAttributeUpdated(true);
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(
       aCenter->x(), aCenter->y());
@@ -229,6 +231,7 @@ void SketchPlugin_ConstraintFillet::execute()
       aNewArc->attribute(SketchPlugin_Arc::START_ID()))->setValue(aTangentPntA->x(), aTangentPntA->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(aTangentPntB->x(), aTangentPntB->y());
+  aNewArc->data()->blockSendAttributeUpdated(false);
   aNewArc->execute();
 
   if (needNewObjects) {
