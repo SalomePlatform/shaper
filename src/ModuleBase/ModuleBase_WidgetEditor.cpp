@@ -111,5 +111,7 @@ void ModuleBase_WidgetEditor::showPopupEditor()
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   }
   emit valuesChanged();
-  emit focusOutWidget(this);
+  // the focus leaves the control automatically by the Enter/Esc event
+  // it is processed in operation manager
+  //emit focusOutWidget(this);
 }
