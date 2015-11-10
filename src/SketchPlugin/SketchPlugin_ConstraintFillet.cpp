@@ -88,6 +88,14 @@ void SketchPlugin_ConstraintFillet::execute()
     return;
   }
 
+  // Obtain fillet point
+  std::shared_ptr<GeomDataAPI_Point2D> aBasePoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aBaseA->attr());
+  if (!aBasePoint) {
+    setError("Bad vertex selected");
+    return;
+  }
+  std::shared_ptr<GeomAPI_Pnt2d> aFilletPoint = aBasePoint->pnt();
+
   // Check the fillet shapes is not initialized yet
   AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
@@ -157,16 +165,12 @@ void SketchPlugin_ConstraintFillet::execute()
     aStartEndPnt[2*i+1] = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature[i]->attribute(aEndAttr))->pnt();
   }
-  for (int i = 0; i < aNbFeatures; i++) {
-    int j = aNbFeatures;
-    for (; j < 2 * aNbFeatures; j++)
-      if (aStartEndPnt[i]->distance(aStartEndPnt[j]) < 1.e-10) {
-        isStart[0] = i==0;
-        isStart[1] = j==aNbFeatures;
+  for (int aFeatInd = 0; aFeatInd < aNbFeatures; aFeatInd++) {
+    for (int j = 0; j < 2; j++) // loop on start-end of each feature
+      if (aStartEndPnt[aFeatInd * aNbFeatures + j]->distance(aFilletPoint) < 1.e-10) {
+        isStart[aFeatInd] = (j==0);
         break;
       }
-    if (j < 2 * aNbFeatures)
-      break;
   }
   // tangent directions of the features
   for (int i = 0; i < aNbFeatures; i++) {
@@ -703,23 +707,36 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
         new GeomAPI_Dir2d(aEnd[1-aLineInd]->decreased(aCenter[1-aLineInd])));
     double anArcAngle = aEndArcDir->angle(aStartArcDir);
 
-    // get and filter possible centers
+    // get possible centers and filter them
     std::list< std::shared_ptr<GeomAPI_XY> > aSuspectCenters;
     possibleFilletCenterLineArc(aStart[aLineInd], aDirLine, aCenter[1-aLineInd], anArcRadius, theRadius, aSuspectCenters);
     double aDot = 0.0;
+    // the line is forward into the arc
+    double innerArc = aCenter[1-aLineInd]->decreased(aStart[aLineInd])->dot(aDirLine->xy());
     std::shared_ptr<GeomAPI_XY> aLineTgPoint, anArcTgPoint;
+    // The possible centers are ranged by their positions.
+    // If the point is not satisfy one of criteria, the weight is decreased with penalty.
+    int aBestWeight = 0;
     std::list< std::shared_ptr<GeomAPI_XY> >::iterator anIt = aSuspectCenters.begin();
     for (; anIt != aSuspectCenters.end(); anIt++) {
+      int aWeight = 2;
       aDot = aDirT->xy()->dot(aStart[aLineInd]->decreased(*anIt));
       aLineTgPoint = (*anIt)->added(aDirT->xy()->multiplied(aDot));
-      if (aLineTgPoint->decreased(aStart[aLineInd])->dot(aDirLine->xy()) < 0.0)
-        continue; // incorrect position
+      // Check the point is placed on the correct arc (penalty if false)
+      if (aCenter[1-aLineInd]->distance(*anIt) * innerArc > anArcRadius * innerArc)
+        aWeight -= 1;
       std::shared_ptr<GeomAPI_Dir2d> aCurDir = std::shared_ptr<GeomAPI_Dir2d>(
           new GeomAPI_Dir2d((*anIt)->decreased(aCenter[1-aLineInd])));
       double aCurAngle = aCurDir->angle(aStartArcDir);
       if (anArcAngle < 0.0) aCurAngle *= -1.0;
       if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle))
-        continue; // incorrect position
+        continue;
+      if (aWeight > aBestWeight)
+        aBestWeight = aWeight;
+      else if (aWeight < aBestWeight ||
+               aStart[aLineInd]->distance(*anIt) >
+               aStart[aLineInd]->distance(theCenter)) // <-- take closer point
+        continue;
       // the center is found, stop searching
       theCenter = *anIt;
       anArcTgPoint = aCenter[1-aLineInd]->added(aCurDir->xy()->multiplied(anArcRadius));
@@ -730,7 +747,7 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
         theTangentA = anArcTgPoint;
         theTangentB = aLineTgPoint;
       }
-      return;
+      //return;
     }
   } else if (theFeatureA->getKind() == SketchPlugin_Arc::ID() &&
       theFeatureB->getKind() == SketchPlugin_Arc::ID()) {
