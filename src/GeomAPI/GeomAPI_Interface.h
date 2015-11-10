@@ -19,7 +19,7 @@
 class GeomAPI_Interface
 {
  private:
-  std::shared_ptr<void> myImpl;  ///< pointer to the internal impl object
+  std::shared_ptr<char> myImpl;  ///< pointer to the internal impl object
 
  public:
   /// None - constructor
@@ -28,7 +28,7 @@ class GeomAPI_Interface
   /// Constructor by the impl pointer (used for internal needs)
   template<class T> explicit GeomAPI_Interface(T* theImpl)
   {
-    myImpl.reset(theImpl);
+    myImpl.reset(reinterpret_cast<char*>(theImpl));
   }
 
   /// Destructor
@@ -37,22 +37,22 @@ class GeomAPI_Interface
   /// Returns the pointer to the impl
   template<class T> inline T* implPtr()
   {
-    return static_cast<T*>(myImpl.get());
+    return reinterpret_cast<T*>(myImpl.get());
   }
   /// Returns the pointer to the impl
   template<class T> inline const T* implPtr() const
   {
-    return static_cast<T*>(myImpl.get());
+    return reinterpret_cast<T*>(myImpl.get());
   }
   /// Returns the reference object of the impl
   template<class T> inline const T& impl() const
   {
-    return *(static_cast<T*>(myImpl.get()));
+    return *(reinterpret_cast<T*>(myImpl.get()));
   }
   /// Updates the impl (deletes the old one)
   template<class T> inline void setImpl(T* theImpl)
   {
-    myImpl.reset(theImpl);
+    myImpl.reset(reinterpret_cast<char*>(theImpl));
   }
 
   /// Returns true if the impl is empty
