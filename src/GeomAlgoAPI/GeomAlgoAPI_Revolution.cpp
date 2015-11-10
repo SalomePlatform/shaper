@@ -53,9 +53,11 @@ GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> th
 //=================================================================================================
 TopoDS_Face GeomAlgoAPI_Revolution::makeFaceFromPlane(gp_Pln& thePlane, const gp_Pnt& thePoint)
 {
-  gp_XYZ aVec = thePoint.XYZ() - thePlane.Location().XYZ();
-  double aSign = aVec * thePlane.Axis().Direction().XYZ();
-  if(aSign < 0) thePlane.SetAxis(thePlane.Axis().Reversed());
+  if(!thePlane.Contains(thePoint, Precision::Confusion())) {
+    gp_XYZ aVec = thePoint.XYZ() - thePlane.Location().XYZ();
+    double aSign = aVec * thePlane.Axis().Direction().XYZ();
+    if(aSign < 0) thePlane.SetAxis(thePlane.Axis().Reversed());
+  }
 
   BRepBuilderAPI_MakeFace aMakeFace(thePlane);
   TopoDS_Face aResultFace = TopoDS::Face(aMakeFace.Shape());
