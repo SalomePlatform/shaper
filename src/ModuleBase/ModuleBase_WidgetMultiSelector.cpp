@@ -32,6 +32,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <QTimer>
 
 #include <memory>
 #include <string>
@@ -64,6 +65,17 @@ public:
     QSize aSize = QListWidget::minimumSizeHint();
     return QSize( aSize.width(), aHeight );
   }
+
+#ifndef WIN32
+// The code is necessary only for Linux because
+//it can not update viewport on widget resize
+protected:
+  void resizeEvent(QResizeEvent* theEvent)
+  {
+    QListWidget::resizeEvent(theEvent);
+    QTimer::singleShot(5, viewport(), SLOT(repaint()));
+  }
+#endif
 };
 
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
