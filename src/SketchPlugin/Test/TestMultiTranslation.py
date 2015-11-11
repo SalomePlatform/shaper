@@ -4,9 +4,12 @@
         
     SketchPlugin_MultiTranslation
         static const std::string MY_CONSTRAINT_TRANSLATION_ID("SketchMultiTranslation");
+        data()->addAttribute(VALUE_TYPE(), ModelAPI_AttributeString::typeId());
         data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
+        data()->addAttribute(START_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
         data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-        data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
+        data()->addAttribute(END_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
+        data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
         data()->addAttribute(TRANSLATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
@@ -33,7 +36,7 @@ def createSketch(theSketch):
     theSketch.execute()
     return allFeatures
     
-def checkTranslation(theObjects, theNbCopies, theDeltaX, theDeltaY):
+def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
     # Verify distances of the objects and the number of copies
     aFeatures = []
     aSize = theObjects.size()
@@ -45,7 +48,7 @@ def checkTranslation(theObjects, theNbCopies, theDeltaX, theDeltaY):
     anInd = 0 
     for feat, next in zip(aFeatures[:-1], aFeatures[1:]):
         anInd = anInd + 1
-        if (anInd > theNbCopies):
+        if (anInd > theNbObjects):
             anInd = 0
             continue
         assert(feat.getKind() == next.getKind())
@@ -66,7 +69,7 @@ def checkTranslation(theObjects, theNbCopies, theDeltaX, theDeltaY):
             aDiffY = aPoint2.y() - aPoint1.y() - theDeltaY
             assert(aDiffX**2 + aDiffY**2 < 1.e-15)
     # Check the number of copies is as planed
-    assert(anInd == theNbCopies)
+    assert(anInd == theNbObjects-1)
 
 
 #=========================================================================
@@ -115,12 +118,15 @@ for aFeature in aFeaturesList:
     aResult = modelAPI_ResultConstruction(aFeature.lastResult())
     assert(aResult is not None)
     aTransList.append(aResult)
+
+aValueType = aMultiTranslation.string("ValueType")
+aValueType.setValue("SingleValue")
 aStartPoint = geomDataAPI_Point2D(aMultiTranslation.attribute("MultiTranslationStartPoint"))
 aEndPoint = geomDataAPI_Point2D(aMultiTranslation.attribute("MultiTranslationEndPoint"))
 aStartPoint.setValue(START_X, START_Y)
 aEndPoint.setValue(START_X + DIR_X, START_Y + DIR_Y)
-aNbCopies = aMultiTranslation.integer("MultiTranslationCopies")
-aNbCopies.setValue(1)
+aNbCopies = aMultiTranslation.integer("MultiTranslationObjects")
+aNbCopies.setValue(2)
 aMultiTranslation.execute()
 aSession.finishOperation()
 #=========================================================================

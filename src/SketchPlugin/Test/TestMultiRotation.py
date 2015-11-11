@@ -4,9 +4,10 @@
         
     SketchPlugin_MultiRotation
         static const std::string MY_CONSTRAINT_ROTATION_ID("SketchMultiRotation");
-        data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
-        data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-        data()->addAttribute(NUMBER_OF_COPIES_ID(), ModelAPI_AttributeInteger::typeId());
+        data()->addAttribute(ANGLE_TYPE(), ModelAPI_AttributeString::typeId());
+        data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(ANGLE_FULL_ID(), ModelAPI_AttributeDouble::typeId());
+        data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
         data()->addAttribute(ROTATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
@@ -34,7 +35,7 @@ def createSketch(theSketch):
     theSketch.execute()
     return allFeatures
     
-def checkRotation(theObjects, theNbCopies, theCenterX, theCenterY, theAngle):
+def checkRotation(theObjects, theNbObjects, theCenterX, theCenterY, theAngle):
     # Verify distances of the objects and the number of copies
     aFeatures = []
     aSize = theObjects.size()
@@ -48,7 +49,7 @@ def checkRotation(theObjects, theNbCopies, theCenterX, theCenterY, theAngle):
     anInd = 0 
     for feat, next in zip(aFeatures[:-1], aFeatures[1:]):
         anInd = anInd + 1
-        if (anInd > theNbCopies):
+        if (anInd > theNbObjects-1):
             anInd = 0
             continue
         assert(feat.getKind() == next.getKind())
@@ -74,7 +75,7 @@ def checkRotation(theObjects, theNbCopies, theCenterX, theCenterY, theAngle):
             aLocCosA = (aDirX1 * aDirX2 + aDirY1 * aDirY2) / aLen1 / aLen2
             assert(math.fabs(aLocCosA - cosA) < 1.e-10)
     # Check the number of copies is as planed
-    assert(anInd == theNbCopies)
+    assert(anInd == theNbObjects-1)
 
 
 #=========================================================================
@@ -120,12 +121,16 @@ for aFeature in aFeaturesList:
     aResult = modelAPI_ResultConstruction(aFeature.lastResult())
     assert(aResult is not None)
     aRotList.append(aResult)
+
+aValueType = aMultiRotation.string("AngleType")
+aValueType.setValue("SingleValue")
+
 aCenter = geomDataAPI_Point2D(aMultiRotation.attribute("MultiRotationCenter"))
 anAngle = aMultiRotation.real("MultiRotationAngle")
 aCenter.setValue(CENTER_X, CENTER_Y)
 anAngle.setValue(ANGLE)
-aNbCopies = aMultiRotation.integer("MultiRotationCopies")
-aNbCopies.setValue(1)
+aNbCopies = aMultiRotation.integer("MultiRotationObjects")
+aNbCopies.setValue(2)
 aMultiRotation.execute()
 aSession.finishOperation()
 #=========================================================================
