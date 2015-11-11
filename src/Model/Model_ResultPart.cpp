@@ -221,53 +221,30 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
   if (!aDoc.get()) // the part document is not presented for the moment
     return "";
   TDF_Label anAccessLabel = aDoc->generalLabel();
-
+  // make the selection attribute anyway: otherwise just by name it is not stable to search the result
   std::string aName;
-  // check if the subShape is already in DF
-  Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShape, anAccessLabel);
-  Handle(TDataStd_Name) anAttr;
-  if(!aNS.IsNull() && !aNS->IsEmpty()) { // in the document    
-    if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
-      aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-      if(!aName.empty()) {	    
-        const TDF_Label& aLabel = aDoc->findNamingName(aName);
-
-        static const std::string aPostFix("_");
-        TNaming_Iterator anItL(aNS);
-        for(int i = 1; anItL.More(); anItL.Next(), i++) {
-          if(anItL.NewShape() == aShape) {
-            aName += aPostFix;
-            aName += TCollection_AsciiString (i).ToCString();
-            break;
-          }
-        }
-      }	
-    }
-  }
-  if (aName.empty()) { // not found, so use the selection mechanism
-    // for this the context result is needed
-    ResultPtr aContext;
-    const std::string& aBodyGroup = ModelAPI_ResultBody::group();
-    for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
-      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
-      if (aBody.get() && aBody->shape().get() && !aBody->isDisabled()) {
-        TopoDS_Shape aBodyShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
-        // check is body contain the selected sub-shape
-        for(TopExp_Explorer anExp(aBodyShape, aShape.ShapeType()); anExp.More(); anExp.Next()) {
-          if (aShape.IsEqual(anExp.Current())) {
-            aContext = aBody;
-            break;
-          }
+  // for this the context result is needed
+  ResultPtr aContext;
+  const std::string& aBodyGroup = ModelAPI_ResultBody::group();
+  for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
+    ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
+    if (aBody.get() && aBody->shape().get() && !aBody->isDisabled()) {
+      TopoDS_Shape aBodyShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
+      // check is body contain the selected sub-shape
+      for(TopExp_Explorer anExp(aBodyShape, aShape.ShapeType()); anExp.More(); anExp.Next()) {
+        if (aShape.IsEqual(anExp.Current())) {
+          aContext = aBody;
+          break;
         }
       }
     }
-    if (aContext.get()) {
-      AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
-      aSelAttr->append(aContext, theShape);
-      theIndex = aSelAttr->size();
-      AttributeSelectionPtr aNewAttr = aSelAttr->value(theIndex - 1);
-      return aNewAttr->namingName();
-    }
+  }
+  if (aContext.get()) {
+    AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+    aSelAttr->append(aContext, theShape);
+    theIndex = aSelAttr->size();
+    AttributeSelectionPtr aNewAttr = aSelAttr->value(theIndex - 1);
+    return aNewAttr->namingName();
   }
   return aName;
 }
@@ -295,6 +272,15 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
     return aResult;
 
   AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+  // check this selection is already there: reuse it
+  int aSize = aSelAttr->size();
+  for(int a = 0; a < aSize; a++) {
+    if (aSelAttr->value(a)->namingName() == theName) {
+      theIndex = a;
+      return aSelAttr->value(a)->value();
+    }
+  }
+
   aSelAttr->append(theName, theType);
   theIndex = aSelAttr->size();
   aResult = aSelAttr->value(theIndex - 1)->value();

@@ -205,15 +205,22 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
         return std::shared_ptr<GeomAPI_Shape>(); // postponed naming needed
       Handle(TDataStd_Integer) anIndex;
       if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
-        return aPart->selectionValue(anIndex->Get());
+        if (anIndex->Get()) { // special selection attribute was created, use it
+          return aPart->selectionValue(anIndex->Get());
+        } else { // face with name is already in the data model, so try to take it by name
+          Handle(TDataStd_Name) aName;
+          if (selectionLabel().FindAttribute(TDataStd_Name::GetID(), aName)) {
+            std::string aSubShapeName(TCollection_AsciiString(aName->Get()).ToCString());
+            std::size_t aPartEnd = aSubShapeName.find('/');
+            if (aPartEnd != string::npos && aPartEnd != aSubShapeName.rfind('/')) {
+              string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
+              int anIndex;
+              std::string aType; // to reuse already existing selection the type is not needed
+              return aPart->shapeInPart(aNameInPart, aType, anIndex);
+            }
+          }
+        }
       }
-      /*
-      Handle(TDataStd_Name) aName;
-      if (!selectionLabel().FindAttribute(TDataStd_Name::GetID(), aName)) {
-        return std::shared_ptr<GeomAPI_Shape>(); // something is wrong
-      }
-      return aPart->shapeInPart(TCollection_AsciiString(aName->Get()).ToCString());
-      */
     }
 
     Handle(TNaming_NamedShape) aSelection;
