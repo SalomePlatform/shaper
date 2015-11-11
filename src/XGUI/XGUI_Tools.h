@@ -128,6 +128,13 @@ void XGUI_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
                                              std::set<FeaturePtr>& theDirectRefFeatures,
                                              std::set<FeaturePtr>& theIndirectRefFeatures,
                                              std::set<FeaturePtr>& theAlreadyProcessed);
+
+/*!
+* Returns true if the result is a sub object of some composite object
+* \param theObject a result object
+* \returns boolean value
+*/
+bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject);
 };
 
 #endif

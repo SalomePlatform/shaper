@@ -156,6 +156,20 @@ void refsToFeatureInFeatureDocument(const ObjectPtr& theObject, std::set<Feature
 }
 
 //**************************************************************
+bool XGUI_Tools::isSubOfComposite(const ObjectPtr& theObject)
+{
+  bool isSub = false;
+  std::set<FeaturePtr> aRefFeatures;
+  refsToFeatureInFeatureDocument(theObject, aRefFeatures);
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast && !isSub; anIt++) {
+    isSub = isSubOfComposite(theObject, *anIt);
+  }
+  return isSub;
+}
+
+//**************************************************************
 bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 {
   bool isSub = false;
@@ -188,11 +202,13 @@ void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectP
   theAlreadyProcessed.insert(aFeature);
 
   // 1. find references in the current document
+
   std::set<FeaturePtr> aRefFeatures;
   refsToFeatureInFeatureDocument(theObject, aRefFeatures);
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
+    // composite feature should not be deleted when the sub feature is to be deleted
     if (!isSubOfComposite(theSourceObject, *anIt))
       theDirectRefFeatures.insert(*anIt);
   }
