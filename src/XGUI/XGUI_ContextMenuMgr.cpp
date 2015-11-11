@@ -218,7 +218,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         if( aMgr->activeDocument() == aObject->document() )
         {
           action("RENAME_CMD")->setEnabled(true);
-          action("DELETE_CMD")->setEnabled(true);
+          action("DELETE_CMD")->setEnabled(!hasSubFeature);
         }
       }
     } else {

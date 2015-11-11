@@ -245,11 +245,11 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
 
-    hasResult = (aResult.get() != NULL);
-    hasFeature = (aFeature.get() != NULL);
-    hasParameter = (aConstruction.get() != NULL);
+    hasResult |= (aResult.get() != NULL);
+    hasFeature |= (aFeature.get() != NULL);
+    hasParameter |= (aConstruction.get() != NULL);
     if (hasFeature) 
-      hasSubFeature = (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
+      hasSubFeature |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
     if (hasFeature && hasResult  && hasParameter && hasSubFeature)
       break;
   }
