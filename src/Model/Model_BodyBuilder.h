@@ -109,6 +109,10 @@ public:
   /// (theFlag = true) and back (theFlag = false)
   MODEL_EXPORT virtual void evolutionToSelection(const bool theFlag);
 
+  /// Returns true if the latest modification of this body in the naming history
+  // is equal to the given shape
+  MODEL_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
 protected:
   /// Default constructor accessible only by Model_Objects
   Model_BodyBuilder(ModelAPI_Object* theOwner);

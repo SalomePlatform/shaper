@@ -114,13 +114,15 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             else:
                 groupType = "SOLID"
 
-        # iterate on exported objects and check if the current
-        # group refers to this object
-        for obj in self.geomObjects: 
-            if aSelectionContext.shape().isEqual(obj[0]):
-                aGroup = self.geompy.CreateGroup(obj[1], self.geompy.ShapeType[groupType])
-                self.geompy.UnionIDs(aGroup,Ids)
-                self.geompy.addToStudyInFather(obj[1], aGroup, theGroupName)
+        aContextBody = ModelAPI.modelAPI_ResultBody(aSelectionContext)
+        if aContextBody is not None:
+          # iterate on exported objects and check if the current
+          # group refers to this object
+          for obj in self.geomObjects: 
+              if aContextBody.isLatestEqual(obj[0]):
+                  aGroup = self.geompy.CreateGroup(obj[1], self.geompy.ShapeType[groupType])
+                  self.geompy.UnionIDs(aGroup,Ids)
+                  self.geompy.addToStudyInFather(obj[1], aGroup, theGroupName)
           
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):

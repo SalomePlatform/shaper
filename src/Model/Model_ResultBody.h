@@ -40,6 +40,11 @@ public:
   /// naming data structure if theFlag if false. Or restores everything on theFlag is true.
   MODEL_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     const bool theFlag);
+
+  /// Returns true if the latest modification of this body in the naming history
+  // is equal to the given shape
+  MODEL_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody() {};
 

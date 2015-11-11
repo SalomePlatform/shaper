@@ -12,6 +12,7 @@
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>
+#include <TNaming_Tool.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TopoDS.hxx>
@@ -758,4 +759,22 @@ std::shared_ptr<GeomAPI_Shape> Model_BodyBuilder::shape()
     }
   }
   return std::shared_ptr<GeomAPI_Shape>();
+}
+
+bool Model_BodyBuilder::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  if (theShape.get()) {
+    TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+    if (aData) {
+      TDF_Label& aShapeLab = aData->shapeLab();
+      Handle(TNaming_NamedShape) aName;
+      if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
+        TopoDS_Shape aLatest = TNaming_Tool::CurrentShape(aName);
+        if (aLatest.IsEqual(aShape))
+          return true;
+      }
+    }
+  }
+  return false;
 }

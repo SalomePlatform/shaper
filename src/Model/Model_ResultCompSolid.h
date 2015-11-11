@@ -70,6 +70,10 @@ public:
   /// Sets all subs as concealed in the data tree (referenced by other objects)
   MODEL_EXPORT virtual void setIsConcealed(const bool theValue);
 
+  /// Returns true if the latest modification of this body in the naming history
+  // is equal to the given shape
+  MODEL_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
 protected:
   /// Makes a body on the given feature
   Model_ResultCompSolid();

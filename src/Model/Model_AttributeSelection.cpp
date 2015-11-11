@@ -327,11 +327,14 @@ TDF_LabelMap& Model_AttributeSelection::scope()
          aCompositeOwnerOwner = ModelAPI_Tools::compositeOwner(aCompositeOwner);
       }
     }
+    // for group Scope is not limitet: this is always up to date objects
+    bool isGroup = aFeature.get() && aFeature->getKind() == "Group";
     for(; aFIter != allFeatures.end(); aFIter++) {
       if (*aFIter == owner()) {  // the left features are created later (except subs of composite)
         aMePassed = true;
         continue;
       }
+      if (isGroup) aMePassed = false;
       bool isInScope = !aMePassed;
       if (!isInScope && aComposite.get()) { // try to add sub-elements of composite if this is composite
         if (aComposite->isSub(*aFIter))
@@ -903,14 +906,24 @@ void Model_AttributeSelection::selectSubShape(
 
 int Model_AttributeSelection::Id()
 {
+  int anID = 0;
   std::shared_ptr<GeomAPI_Shape> aSelection = value();
   std::shared_ptr<GeomAPI_Shape> aContext = context()->shape();
-  const TopoDS_Shape& aMainShape = aContext->impl<TopoDS_Shape>();
+  TopoDS_Shape aMainShape = aContext->impl<TopoDS_Shape>();
   const TopoDS_Shape& aSubShape = aSelection->impl<TopoDS_Shape>();
-  int anID = 0;
+  // searching for the latest main shape
   if (aSelection && !aSelection->isNull() &&
     aContext   && !aContext->isNull())
   {
+    std::shared_ptr<Model_Document> aDoc =
+      std::dynamic_pointer_cast<Model_Document>(context()->document());
+    if (aDoc.get()) {
+      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aMainShape, aDoc->generalLabel());
+      if (!aNS.IsNull()) {
+        aMainShape = TNaming_Tool::CurrentShape(aNS);
+      }
+    }
+
     TopTools_IndexedMapOfShape aSubShapesMap;
     TopExp::MapShapes(aMainShape, aSubShapesMap);
     anID = aSubShapesMap.FindIndex(aSubShape);

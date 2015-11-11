@@ -188,3 +188,8 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
     aECreator->sendUpdated(data()->owner(), EVENT_DISP);
   }
 }
+
+bool Model_ResultCompSolid::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  return myBuilder->isLatestEqual(theShape);
+}

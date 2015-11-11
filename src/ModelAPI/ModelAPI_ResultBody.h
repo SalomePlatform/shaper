@@ -111,6 +111,10 @@ public:
   MODELAPI_EXPORT virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape,
     const std::string& theName,int&  theTag);
 
+  /// Returns true if the latest modification of this body in the naming history
+  // is equal to the given shape
+  MODELAPI_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
 protected:
   /// Default constructor accessible only from Model_Objects
   MODELAPI_EXPORT ModelAPI_ResultBody();

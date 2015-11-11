@@ -41,3 +41,8 @@ bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, con
   }
   return aChanged;
 }
+
+bool Model_ResultBody::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  return myBuilder->isLatestEqual(theShape);
+}

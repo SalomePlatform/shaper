@@ -101,6 +101,10 @@ public:
   /// (theFlag = true) and back (theFlag = false)
   virtual void evolutionToSelection(const bool theFlag) = 0;
 
+  /// Returns true if the latest modification of this body in the naming history
+  // is equal to the given shape
+  virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
 protected:
   /// Returns the data manager of this object: attributes
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Data> data() const;
