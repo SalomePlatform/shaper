@@ -634,6 +634,8 @@ bool Model_Document::canUndo()
 
 void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchronize)
 {
+  if (myTransactions.empty())
+    return;
   int aNumTransactions = myTransactions.rbegin()->myOCAFNum;
   myRedos.push_back(*myTransactions.rbegin());
   myTransactions.pop_back();
