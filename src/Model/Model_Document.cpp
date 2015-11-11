@@ -438,14 +438,17 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
   const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
   for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
     Handle(TDF_AttributeDelta)& anADelta = anAttr.Value();
-    if (!anADelta->Label().IsNull() && !anADelta->Attribute().IsNull()) {
-      Handle(TDF_Attribute) aCurrentAttr;
-      if (anADelta->Label().FindAttribute(anADelta->Attribute()->ID(), aCurrentAttr)) {
-        if (isEqualContent(anADelta->Attribute(), aCurrentAttr)) {
-          continue; // attribute is not changed actually
+    Handle(TDF_DeltaOnAddition)& anAddition = Handle(TDF_DeltaOnAddition)::DownCast(anADelta);
+    if (anAddition.IsNull()) { // if the attribute was added, transaction is not empty
+      if (!anADelta->Label().IsNull() && !anADelta->Attribute().IsNull()) {
+        Handle(TDF_Attribute) aCurrentAttr;
+        if (anADelta->Label().FindAttribute(anADelta->Attribute()->ID(), aCurrentAttr)) {
+          if (isEqualContent(anADelta->Attribute(), aCurrentAttr)) {
+            continue; // attribute is not changed actually
+          }
+        } else if (Standard_GUID::IsEqual(anADelta->Attribute()->ID(), TDataStd_AsciiString::GetID())) {
+          continue; // error message is disappeared
         }
-      } else if (Standard_GUID::IsEqual(anADelta->Attribute()->ID(), TDataStd_AsciiString::GetID())) {
-        continue; // error message is disappeared
       }
     }
     return false;
