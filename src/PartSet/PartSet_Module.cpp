@@ -225,12 +225,16 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
 
   /// Restart sketcher operations automatically
   if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
-    // the selection is cleared after commit the create operation
-    // in order to do not use the same selected objects in the restarted operation
-    // for common behaviour, the selection is cleared even if the operation is not restarted
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-    XGUI_Workshop* aWorkshop = aConnector->workshop();
-    aWorkshop->selector()->clearSelection();
+
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (aFOperation && !aFOperation->isEditOperation()) {
+      // the selection is cleared after commit the create operation
+      // in order to do not use the same selected objects in the restarted operation
+      // for common behaviour, the selection is cleared even if the operation is not restarted
+      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+      XGUI_Workshop* aWorkshop = aConnector->workshop();
+      aWorkshop->selector()->clearSelection();
+    }
   }
 }
 
