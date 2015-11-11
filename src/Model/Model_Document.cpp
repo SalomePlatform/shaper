@@ -438,7 +438,7 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
   const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
   for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
     Handle(TDF_AttributeDelta)& anADelta = anAttr.Value();
-    Handle(TDF_DeltaOnAddition)& anAddition = Handle(TDF_DeltaOnAddition)::DownCast(anADelta);
+    Handle(TDF_DeltaOnAddition) anAddition = Handle(TDF_DeltaOnAddition)::DownCast(anADelta);
     if (anAddition.IsNull()) { // if the attribute was added, transaction is not empty
       if (!anADelta->Label().IsNull() && !anADelta->Attribute().IsNull()) {
         Handle(TDF_Attribute) aCurrentAttr;

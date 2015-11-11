@@ -156,20 +156,6 @@ void refsToFeatureInFeatureDocument(const ObjectPtr& theObject, std::set<Feature
 }
 
 //**************************************************************
-bool XGUI_Tools::isSubOfComposite(const ObjectPtr& theObject)
-{
-  bool isSub = false;
-  std::set<FeaturePtr> aRefFeatures;
-  refsToFeatureInFeatureDocument(theObject, aRefFeatures);
-  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
-                                       aLast = aRefFeatures.end();
-  for (; anIt != aLast && !isSub; anIt++) {
-    isSub = isSubOfComposite(theObject, *anIt);
-  }
-  return isSub;
-}
-
-//**************************************************************
 bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 {
   bool isSub = false;
@@ -184,6 +170,20 @@ bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
         isSub = isSubOfComposite(theObject, aComposite->subFeature(aSub));
       }
     }
+  }
+  return isSub;
+}
+
+//**************************************************************
+bool isSubOfComposite(const ObjectPtr& theObject)
+{
+  bool isSub = false;
+  std::set<FeaturePtr> aRefFeatures;
+  refsToFeatureInFeatureDocument(theObject, aRefFeatures);
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast && !isSub; anIt++) {
+    isSub = isSubOfComposite(theObject, *anIt);
   }
   return isSub;
 }
