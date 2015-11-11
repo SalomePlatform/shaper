@@ -234,6 +234,8 @@ XGUI_ActiveDocLbl::XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent 
 void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
 {
   myTreeView = theView;
+  setFont(myTreeView->font());
+
   QPalette aPalet = myTreeView->palette();
   QColor aHighlight = aPalet.highlight().color();
   QColor aHighlightText = aPalet.highlightedText().color();
