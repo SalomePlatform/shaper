@@ -20,13 +20,13 @@ if "%PDIR%" == "" (
 
 rem --------------- cmake 2.8.7 --------------
 if "%CMAKEDIR%" == "" (
-  set CMAKEDIR=%PDIR%\cmake-2.8.10.2
+  set CMAKEDIR=%PDIR%\cmake-2.8.12.2
 )
 set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM CASCADE
-@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.9.0
+@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.9.1
 @SET CASROOT=%CAS_ROOT_DIR%
 @REM -------------------------
 
@@ -55,7 +55,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM FREEIMAGE (Used by OCCT and Graphviz)
-@SET PATH=%PDIR%\freeimage-3.15.4\bin;%PATH%
+@SET PATH=%PDIR%\freeimage-3.16.0\dll;%PATH%
 @REM -------------------------
 
 @REM -------------------------
@@ -77,7 +77,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM TBB (Used by OCCT)
-@SET PATH=%PDIR%\tbb\bin;%PATH%
+@SET PATH=%PDIR%\tbb-4.2.4\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
@@ -92,7 +92,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM PYTHON
-@SET PYTHONHOME=%PDIR%\python-2.7.3
+@SET PYTHONHOME=%PDIR%\python-2.7.10
 @SET PYTHON_INCLUDE=%PYTHONHOME%\include
 @SET PATH=%PYTHONHOME%;%PYTHONHOME%\libs;%PATH%
 @SET PYTHONPATH=%PYTHONHOME%\Lib;%PYTHONPATH%
