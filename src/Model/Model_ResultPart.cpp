@@ -119,6 +119,11 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
           updateShape();
           shape();
           aDoc->setCurrentFeature(FeaturePtr(), false);
+          // in order to update OB sub-elements of document before the document closing
+          Events_Loop* aLoop = Events_Loop::loop();
+          aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+          aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+          aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
         }
       }
     }
