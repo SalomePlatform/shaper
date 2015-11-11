@@ -27,18 +27,22 @@ public:
   virtual ~ModuleBase_IntSpinBox() {};
 
   /// Returns true if the current value is modified by has not been applyed yet
-  virtual bool isModified() const;
+  //virtual bool isModified() const;
 
   /// Clears modified state
-  void clearModified();
+  //void clearModified();
 
 protected slots:
   /// Called on value changed
-  void onValueChanged(const QString& theValue);
+  //void onValueChanged(const QString& theValue);
 
- private:
+protected:
+  /// Called on key press event
+  virtual void keyPressEvent(QKeyEvent* theEvent);
+
+private:
   /// Boolean value whether the spin box content is modified
-  bool myIsModified;
+  //bool myIsModified;
 };
 
 #endif

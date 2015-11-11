@@ -50,10 +50,10 @@ Q_OBJECT
   virtual QValidator::State validate(QString&, int&) const;
 
   /// Returns true if the current value is modified by has not been applyed yet
-  virtual bool isModified() const;
+  //virtual bool isModified() const;
 
   /// Clears modified state
-  void clearModified();
+  //void clearModified();
 
   /// Change enable/disable internal state to emit key press event
   /// \param theEnable if true, the signal is emitted
@@ -64,7 +64,7 @@ Q_OBJECT
    /// Called on text changed
   virtual void onTextChanged(const QString&);
   /// Called on value changed
-  void onValueChanged(const QString& theValue);
+  //void onValueChanged(const QString& theValue);
 
  protected:
    /// Removes extra trailing zero symbols
@@ -82,7 +82,7 @@ Q_OBJECT
   /// Precision value
   int myPrecision;
   /// Boolean value whether the spin box content is modified
-  bool myIsModified;
+  //bool myIsModified;
 };
 
 #endif

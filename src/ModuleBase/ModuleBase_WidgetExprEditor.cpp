@@ -314,10 +314,11 @@ QList<QWidget*> ModuleBase_WidgetExprEditor::getControls() const
 
 bool ModuleBase_WidgetExprEditor::processEnter()
 {
-  bool isModified = myEditor->isModified();
+  //bool isModified = myEditor->isModified();
+  bool isModified = getValueState() == ModifiedInPP;
   if (isModified) {
     emit valuesChanged();
-    myEditor->clearModified();
+    //myEditor->clearModified();
     myEditor->selectAll();
   }
   return isModified;
