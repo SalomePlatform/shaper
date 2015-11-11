@@ -13,7 +13,7 @@
 #include <ModuleBase_Tools.h>
 
 #include <QLayout>
-#include <QLabel>
+#include <QLineEdit>
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
@@ -223,7 +223,7 @@ void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
 //********************************************************************
 //********************************************************************
 XGUI_ActiveDocLbl::XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent )
-  : QLineEdit(theText, theParent), 
+  : QLabel(theText, theParent), 
   myPreSelectionStyle(""), 
   myNeutralStyle(""), 
   mySelectionStyle(""),
@@ -238,21 +238,21 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   QColor aHighlight = aPalet.highlight().color();
   QColor aHighlightText = aPalet.highlightedText().color();
 
-  myPreSelectionStyle = "QLineEdit {background-color: ";
+  myPreSelectionStyle = "QLabel {background-color: ";
   myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " + aHighlight.lighter(170).name() + ");"; 
   myPreSelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
 
   QString aName = aPalet.color(QPalette::Base).name();
-  myNeutralStyle = "QLineEdit { border: 1px solid " + aName + " }";
+  myNeutralStyle = "QLabel { border: 1px solid " + aName + " }";
 
 
 #if (!defined HAVE_SALOME) && (defined WIN32)
-  mySelectionStyle = "QLineEdit {background-color: ";
+  mySelectionStyle = "QLabel {background-color: ";
   mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(236, 245, 255)";
   mySelectionStyle += ", stop:1 rgb(208, 229, 255));"; 
   mySelectionStyle += "border: 1px solid rgb(132, 172, 221); border-radius: 2px }";
 #else
-  mySelectionStyle = "QLineEdit {background-color: " + aHighlight.name();
+  mySelectionStyle = "QLabel {background-color: " + aHighlight.name();
   mySelectionStyle += "; color : " + aHighlightText.name() + "}";
 #endif
 
@@ -273,7 +273,7 @@ bool XGUI_ActiveDocLbl::event(QEvent* theEvent)
         setStyleSheet(myNeutralStyle);
       break;
   }
-  return QLineEdit::event(theEvent);
+  return QLabel::event(theEvent);
 }
 #endif
 
@@ -283,7 +283,7 @@ bool XGUI_ActiveDocLbl::eventFilter(QObject* theObj, QEvent* theEvent)
     if (theEvent->type() == QEvent::MouseButtonRelease)
       unselect();
   }
-  return QLineEdit::eventFilter(theObj, theEvent);
+  return QLabel::eventFilter(theObj, theEvent);
 }
 
 static bool MYClearing = false;
@@ -295,7 +295,7 @@ void XGUI_ActiveDocLbl::mouseReleaseEvent( QMouseEvent* e)
   // We can not block signals because on 
   // clear selection the View state will not be updated
   myTreeView->clearSelection();
-  QLineEdit::mouseReleaseEvent(e);
+  QLabel::mouseReleaseEvent(e);
   MYClearing = false;
 }
 
@@ -338,8 +338,8 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   DocumentPtr aDoc = aMgr->moduleDocument();
 
   myActiveDocLbl = new XGUI_ActiveDocLbl(tr("Part set"), aLabelWgt);
-  myActiveDocLbl->setReadOnly(true);
-  myActiveDocLbl->setFrame(false);
+//  myActiveDocLbl->setReadOnly(true);
+//  myActiveDocLbl->setFrame(false);
   myActiveDocLbl->setContextMenuPolicy(Qt::CustomContextMenu);
 
   aLabelLay->addWidget(myActiveDocLbl);

@@ -780,7 +780,8 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
   XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
   if (aOB) {
-    QLineEdit* aLabel = aOB->activeDocLabel();
+    QLabel* aLabel = aOB->activeDocLabel();
+    aLabel->installEventFilter(myMenuMgr);
     connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)), 
           SLOT(onActiveDocPopup(const QPoint&)));
     //QPalette aPalet = aLabel->palette();
@@ -799,7 +800,7 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
-  QLineEdit* aHeader = aWorkshop->objectBrowser()->activeDocLabel();
+  QLabel* aHeader = aWorkshop->objectBrowser()->activeDocLabel();
 
   aActivatePartAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
 
@@ -899,7 +900,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
     XGUI_Workshop* aWorkshop = aConnector->workshop();
     XGUI_DataTree* aTreeView = aWorkshop->objectBrowser()->treeView();
-    QLineEdit* aLabel = aWorkshop->objectBrowser()->activeDocLabel();
+    QLabel* aLabel = aWorkshop->objectBrowser()->activeDocLabel();
     QPalette aPalet = aLabel->palette();
 
     SessionPtr aMgr = ModelAPI_Session::get();

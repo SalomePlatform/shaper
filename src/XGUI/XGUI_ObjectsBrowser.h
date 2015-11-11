@@ -11,7 +11,7 @@
 
 #include <QWidget>
 #include <QTreeView>
-#include <QLineEdit>
+#include <QLabel>
 
 class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
@@ -20,7 +20,7 @@ class XGUI_DataModel;
 * \ingroup GUI
 * Implementation of root label in Object Browser
 */
-class XGUI_ActiveDocLbl: public QLineEdit
+class XGUI_ActiveDocLbl: public QLabel
 {
 Q_OBJECT
  public:
@@ -172,7 +172,7 @@ Q_OBJECT
   }
 
   /// Returns active doc label object
-  QLineEdit* activeDocLabel() const { return myActiveDocLbl; }
+  QLabel* activeDocLabel() const { return myActiveDocLbl; }
 
   /// Rebuild data tree
   void rebuildDataTree();

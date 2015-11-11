@@ -39,6 +39,7 @@
 
 #include <QAction>
 #include <QMenu>
+#include <QEvent>
 
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
@@ -505,4 +506,14 @@ void PartSet_MenuMgr::onSelectParentFeature()
   QObjectPtrList aSelection;
   aSelection.append( aParentFeature );
   myModule->workshop()->selection()->setSelectedObjects( aSelection );
+}
+
+bool PartSet_MenuMgr::eventFilter(QObject* theObj, QEvent* theEvent)
+{
+  if (theEvent->type() == QEvent::MouseButtonDblClick) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (aMgr->activeDocument() != aMgr->moduleDocument())
+      activatePartSet();
+  }
+  return QObject::eventFilter(theObj, theEvent);
 }

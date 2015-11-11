@@ -82,6 +82,9 @@ private slots:
 
   void onSelectParentFeature();
 
+protected:
+  bool eventFilter(QObject* theObj, QEvent* theEvent);
+
 private:
   /// Returns true if the current operation is sketch entity create operation
   /// \param theValue the current auxiliary value
