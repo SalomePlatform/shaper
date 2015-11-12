@@ -414,7 +414,7 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributePtr aBaseLinesAttribute = aFeature->attribute(SketchPlugin_Constraint::ENTITY_C());
   AttributeRefListPtr aRefListOfBaseLines = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aBaseLinesAttribute);
-  if(aRefListOfBaseLines->list().size() == 2) {
+  if(!aRefListOfBaseLines->list().empty()) {
     return true;
   }
 

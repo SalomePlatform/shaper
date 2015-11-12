@@ -106,11 +106,10 @@ void SketchPlugin_ConstraintFillet::execute()
 
   // Obtain base features
   FeaturePtr anOldFeatureA, anOldFeatureB;
-  std::list<ObjectPtr> aNewFeatList = aRefListOfBaseLines->list();
-  std::list<ObjectPtr>::iterator aFeatIt = aNewFeatList.begin();
+  std::list<ObjectPtr> anOldFeatList = aRefListOfBaseLines->list();
+  std::list<ObjectPtr>::iterator aFeatIt = anOldFeatList.begin();
   anOldFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
   anOldFeatureB = ModelAPI_Feature::feature(*aFeatIt);
-
 
   if(!anOldFeatureA.get() || !anOldFeatureB.get()) {
     setError("One of the edges is empty");
@@ -243,10 +242,6 @@ void SketchPlugin_ConstraintFillet::execute()
     aRefListOfFillet->append(aNewFeatureA->lastResult());
     aRefListOfFillet->append(aNewFeatureB->lastResult());
     aRefListOfFillet->append(aNewArc->lastResult());
-
-    // attach base lines to the list
-    aRefListOfBaseLines->append(anOldFeatureA);
-    aRefListOfBaseLines->append(anOldFeatureB);
 
     myProducedFeatures.push_back(aNewFeatureA);
     myProducedFeatures.push_back(aNewFeatureB);
