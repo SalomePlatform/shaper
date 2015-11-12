@@ -31,13 +31,6 @@ class SketchPlugin_Point : public SketchPlugin_SketchEntity
     static const std::string MY_COORD_ID("PointCoordindates");
     return MY_COORD_ID;
   }
-  /// Coordinates of the point
-  inline static const std::string& TABLE_ID()
-  {
-    static const std::string MY_TABLE_ID("TableValue");
-    return MY_TABLE_ID;
-  }
-
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
