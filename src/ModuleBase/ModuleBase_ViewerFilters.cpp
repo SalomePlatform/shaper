@@ -15,6 +15,12 @@
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
+#include <AIS_Axis.hxx>
+#include <AIS_Point.hxx>
+#include <AIS_Plane.hxx>
+#include <Geom_Point.hxx>
+#include <Geom_Line.hxx>
+#include <Geom_Plane.hxx>
 
 #include <StdSelect_BRepOwner.hxx>
 
@@ -74,11 +80,11 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
   if (myPlane.get()) {
     aValid = Standard_False;
     if (theOwner->HasSelectable()) {
+      gp_Pln aPlane = myPlane->impl<gp_Pln>();
       Handle(StdSelect_BRepOwner) aShapeOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
       if (!aShapeOwner.IsNull() && aShapeOwner->HasShape()) {
         TopoDS_Shape aShape = aShapeOwner->Shape();
         TopAbs_ShapeEnum aType = aShape.ShapeType();
-        gp_Pln aPlane = myPlane->impl<gp_Pln>();
         switch (aType) {
         case TopAbs_VERTEX:
           {
@@ -105,6 +111,23 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
         break;
         }
       } else {
+        // Check Trihedron sub-objects
+        Handle(SelectMgr_SelectableObject) aSelObj = theOwner->Selectable();
+        Handle(Standard_Type) aType = aSelObj->DynamicType();
+        if (aType == STANDARD_TYPE(AIS_Axis)) {
+          Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(aSelObj);
+          gp_Lin aLine = aAxis->Component()->Lin();
+          return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
+
+        } else if (aType == STANDARD_TYPE(AIS_Point)) {
+          Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(aSelObj);
+          return aPlane.Distance(aPoint->Component()->Pnt()) < Precision::Confusion();
+
+        } else if (aType == STANDARD_TYPE(AIS_Plane)) {
+          Handle(AIS_Plane) aAisPlane = Handle(AIS_Plane)::DownCast(aSelObj);
+          gp_Pln aPln = aAisPlane->Component()->Pln();
+          return aPlane.Distance(aPln) < Precision::Confusion();
+        }
         // This is not object controlled by the filter
         aValid = Standard_True;
       }

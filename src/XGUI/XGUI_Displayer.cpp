@@ -471,7 +471,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   }
   if (!aTrihedron.IsNull()) {
     foreach(int aMode, myActiveSelectionModes)
-      aContext->SetSelectionSensitivity(aTrihedron, aMode, 15);
+      aContext->SetSelectionSensitivity(aTrihedron, aMode, 20);
   }
   // VSV It seems that there is no necessity to update viewer on activation
   //if (theUpdateViewer && isActivationChanged)
@@ -573,11 +573,24 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   return aErased;
 }
 
+#define DEACTVATE_COMP(TheComp) \
+  if (!TheComp.IsNull()) \
+    aContext->Deactivate(TheComp);
+
 void XGUI_Displayer::deactivateTrihedron() const
 {
   Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
   if (!aTrihedron.IsNull()) {
-    deactivateAIS(aTrihedron);
+    Handle(AIS_Trihedron) aTrie = Handle(AIS_Trihedron)::DownCast(aTrihedron);
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+    aContext->Deactivate(aTrie);
+    DEACTVATE_COMP(aTrie->XAxis());
+    DEACTVATE_COMP(aTrie->YAxis());
+    DEACTVATE_COMP(aTrie->Axis());
+    DEACTVATE_COMP(aTrie->Position());
+    DEACTVATE_COMP(aTrie->XYPlane());
+    DEACTVATE_COMP(aTrie->XZPlane());
+    DEACTVATE_COMP(aTrie->YZPlane());
   }
 }
 
@@ -1126,6 +1139,7 @@ std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 void XGUI_Displayer::activateTrihedron(bool theIsActive) 
 {  
   myIsTrihedronActive = theIsActive; 
-  if (!myIsTrihedronActive) 
+  if (!myIsTrihedronActive) {
     deactivateTrihedron();
+  }
 }
