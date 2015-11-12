@@ -27,6 +27,15 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
                                                  std::string& theError) const
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
+  if (!aStrAttr->isInitialized()) {
+    theError = "Attribute \"" + aStrAttr->id() + "\" is not initialized.";
+    return false;
+  }
+  bool isEmptyExpr = aStrAttr->value().empty();
+  if (isEmptyExpr) {
+    theError = "Attribute \"" + aStrAttr->id() + "\" value is empty.";
+    return false;
+  }
   if (!isVariable(aStrAttr->value())) {
     theError = "Incorrect variable name.";
     return false;
@@ -94,6 +103,10 @@ bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttrib
 
   AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
+  if (!aStrAttr->isInitialized()) {
+    theError = "Attribute \"" + aStrAttr->id() + "\" is not initialized.";
+    return false;
+  }
   bool isEmptyExpr = aStrAttr->value().empty();
   if (isEmptyExpr) {
     theError = "Expression is empty.";
