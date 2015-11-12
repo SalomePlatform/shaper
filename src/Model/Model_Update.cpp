@@ -432,6 +432,7 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
   // to redisplay "presentable" feature (for ex. distance constraint)
   ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
   theFeature->data()->execState(theState);
+  myUpdated[theFeature] = myModification; // feature is also updated to avoid re-updation of it
 }
 
 /// Updates the state by the referenced object: if something bad with it, set state for this one
@@ -459,6 +460,38 @@ bool Model_Update::isOlder(std::shared_ptr<ModelAPI_Feature> theFeature,
   std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator anAIter = myUpdated.find(theArgument);
   if (anAIter == myUpdated.end())
     return false;
+  // for the modification IDs compare results: modification ID of feature means only that attributes
+  // of this feature were updated, but if results are obsolete relatively to the referenced results,
+  // the feature must be updated
+  const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+  for (; aRIter != aResults.cend(); aRIter++) {
+    std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+    if (!aRes->isDisabled()) {
+      std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator anRIter = myUpdated.find(aRes);
+      if (anRIter == myUpdated.end()) // not updated at all
+        return true;
+      if (anRIter->second < anAIter->second)
+        return true;
+      // iterate sub-bodies of compsolid
+      ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
+      if (aComp.get()) {
+        int aNumSub = aComp->numberOfSubs();
+        for(int a = 0; a < aNumSub; a++) {
+          ResultPtr aSub = aComp->subResult(a);
+          if (!aSub->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
+            std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator anSIter = myUpdated.find(aSub);
+            if (anSIter == myUpdated.end()) // not updated at all
+              return true;
+            if (anSIter->second < anAIter->second)
+              return true;
+          }
+        }
+      }
+    }
+  }
+  // also check a feature: some have no parameters,
+  // but must be updated anyway (like Coincidence of sketch) to be redisplayed
   std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator aFIter = myUpdated.find(theFeature);
   if (aFIter == myUpdated.end())
     return true; // argument is updated, but feature is not updated at all
