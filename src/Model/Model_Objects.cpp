@@ -137,13 +137,15 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     // keep the feature ID to restore document later correctly
     TDataStd_Comment::Set(aFeatureLab, theFeature->getKind().c_str());
     myFeatures.Bind(aFeatureLab, theFeature);
+    // must be before the event sending: for OB the feature is already added
+    updateHistory(ModelAPI_Feature::group());
+    // event: feature is added, mist be before "initData" to update OB correctly on Duplicate:
+    // first new part, then the content
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);
     // must be after binding to the map because of "Box" macro feature that 
     // creates other features in "initData"
     initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
-    // event: feature is added
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-    ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);
-    updateHistory(ModelAPI_Feature::group());
   } else { // make feature has not-null data anyway
     theFeature->setData(Model_Data::invalidData());
     theFeature->setDoc(myDoc);
