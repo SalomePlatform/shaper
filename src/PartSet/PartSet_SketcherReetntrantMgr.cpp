@@ -178,7 +178,7 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
-  if (!myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty())
+  if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return;
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
@@ -201,7 +201,7 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
-  if (!myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty())
+  if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return isDone;
 
   myRestartingMode = RM_EmptyFeatureUsed;

@@ -387,8 +387,8 @@ void XGUI_Workshop::onAcceptActionClicked()
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
-      if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
-        myOperationMgr->onCommitOperation();
+      //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
+      myOperationMgr->onCommitOperation();
     }
   }
 }

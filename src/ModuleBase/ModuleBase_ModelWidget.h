@@ -81,6 +81,10 @@ Q_OBJECT
   /// \return the enumeration result
   ValueState getValueState() const { return myState; }
 
+  /// Returns an attribute error according to the value state
+  /// It exists in all cases excepring the "Store" case
+  QString getValueStateError() const;
+
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 

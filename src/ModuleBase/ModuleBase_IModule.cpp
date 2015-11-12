@@ -8,9 +8,11 @@
 #include "ModuleBase_ISelection.h"
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_OperationFeature.h"
+#include <ModuleBase_ModelWidget.h>
 
 #include <Events_Loop.h>
 
+#include <ModelAPI_Validator.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
@@ -78,7 +80,7 @@ const char* toString(ModelAPI_ExecState theExecState)
 #undef TO_STRING
 }
 
-QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
+QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   QString anError;
   if (!theFeature.get() || !theFeature->data()->isValid() || theFeature->isAction())
@@ -97,6 +99,35 @@ QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature, const 
     if (!isDone)
       anError = toString(theFeature->data()->execState());
   }
+
+  return anError;
+}
+
+QString ModuleBase_IModule::getWidgetError(ModuleBase_ModelWidget* theWidget)
+{
+  QString anError;
+
+  if (!theWidget || !theWidget->feature().get())
+    return anError;
+
+  std::string anAttributeID = theWidget->attributeID();
+  AttributePtr anAttribute = theWidget->feature()->attribute(anAttributeID);
+  if (!anAttribute.get())
+    return anError;
+
+  std::string aValidatorID;
+  std::string anErrorMsg;
+
+  static ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+  if (!aValidators->validate(anAttribute, aValidatorID, anErrorMsg)) {
+    if (anErrorMsg.empty())
+      anErrorMsg = "unknown error.";
+    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg;
+  }
+
+  anError = QString::fromStdString(anErrorMsg);
+  if (anError.isEmpty())
+    anError = theWidget->getValueStateError();
 
   return anError;
 }

@@ -29,6 +29,7 @@ void ModuleBase_IErrorMgr::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
     foreach(const ModuleBase_ModelWidget* aWgt, myPropertyPanel->modelWidgets()) {
       connect(aWgt, SIGNAL(afterValuesChanged()), this, SLOT(onWidgetChanged()));
       connect(aWgt, SIGNAL(afterValuesRestored()), this, SLOT(onWidgetChanged()));
+      connect(aWgt, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetChanged()));
     }
   }
 }

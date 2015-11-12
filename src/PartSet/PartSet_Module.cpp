@@ -373,11 +373,11 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
   myMenuMgr->updateViewerMenu(theStdActions);
 }
 
-QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
+QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
 {
-  QString anError = ModuleBase_IModule::getFeatureError(theFeature, isCheckGUI);
+  QString anError = ModuleBase_IModule::getFeatureError(theFeature);
   if (anError.isEmpty())
-    anError = sketchMgr()->getFeatureError(theFeature, isCheckGUI);
+    anError = sketchMgr()->getFeatureError(theFeature);
 
   return anError;
 }

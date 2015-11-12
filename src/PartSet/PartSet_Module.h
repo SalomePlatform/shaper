@@ -206,7 +206,7 @@ public:
   //! Returns the feature error if the current state of the feature in the module is not correct
   //! If the feature is correct, it returns an empty value
   //! \return string value
-  virtual QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
+  virtual QString getFeatureError(const FeaturePtr& theFeature);
 
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;

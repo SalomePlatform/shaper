@@ -184,7 +184,7 @@ public:
   //! Incorrect states: the feature is sketch, the solver error value
   //! The feature value is reset, this is the flag of sketch mgr
   //! \return string value
-  QString getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI = true);
+  QString getFeatureError(const FeaturePtr& theFeature);
 
   /// It nullify internal flags concerned to clicked mouse event
   void clearClickedFlags();

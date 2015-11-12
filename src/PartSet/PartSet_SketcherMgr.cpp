@@ -680,7 +680,7 @@ bool PartSet_SketcherMgr::sketchSolverError()
   return anError;
 }
 
-QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature, const bool isCheckGUI)
+QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
 {
   QString anError = "";
   if (!theFeature.get() || !theFeature->data()->isValid())
@@ -690,31 +690,6 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature, const
   if (aSketch.get() && aSketch == theFeature) {
     AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
     anError = aAttributeString->value().c_str();
-  }
-  else {
-    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-    if (isCheckGUI && anActiveWidget) {
-      ModuleBase_ModelWidget::ValueState aState = anActiveWidget->getValueState();
-      if (aState != ModuleBase_ModelWidget::Stored) {
-        AttributePtr anAttr = anActiveWidget->feature()->attribute(anActiveWidget->attributeID());
-        if (anAttr.get()) {
-          QString anAttributeName = anAttr->id().c_str();
-          switch (aState) {
-            case ModuleBase_ModelWidget::ModifiedInPP:
-              anError = "Attribute \"" + anAttributeName +
-                        "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
-              break;
-            case ModuleBase_ModelWidget::ModifiedInViewer:
-              anError = "Attribute \"" + anAttributeName +
-                        "\" is locked by modification value in the viewer.";
-              break;
-            case ModuleBase_ModelWidget::Reset:
-              anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
-              break;
-          }
-        }
-      }
-    }
   }
   return anError;
 }

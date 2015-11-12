@@ -14,6 +14,8 @@
 
 class XGUI_Workshop;
 class ModuleBase_IWorkshop;
+class ModuleBase_ModelWidget;
+
 class QAction;
 class QDialog;
 class QLabel;
@@ -42,12 +44,6 @@ public:
   /// \param theFeature a feature
   void updateAcceptAllAction(const FeaturePtr& theFeature);
 
-  /// Return true if the feature has no error. If there is an error and the action
-  /// is not valid, the dialog with the error information is shown.
-  /// \param theAction an action, which is checked on validity
-  /// \param theFeature a feature that provides error information
-  bool canProcessClick(QAction* theAction, const FeaturePtr& theFeature);
-
 public slots:
   /// Reimplemented from ModuleBase_ErrorMgr::onValidationStateChanged().
   //virtual void onValidationStateChanged();
@@ -57,21 +53,26 @@ protected slots:
   virtual void onWidgetChanged();
 
 private:
-  /// It updates the action state according to the given parameter
+  /// It disables the action if the error message is not empty
+  /// The message is set to the header tool tip.
   /// \param theAction an action to be changed
-  /// \param theFeature an feature that corresponds to the action
-  void updateActionState(QAction* theAction, const FeaturePtr& theFeature);
+  /// \param theError an error state
+  void updateActionState(QAction* theAction, const QString& theError);
 
-  /// Returns the feature error message
-  /// \param theFeature a feature
-  /// \return the error message
-  //QString getFeatureError(const FeaturePtr& theFeature) const;
+  /// It updates the tool tip of the widget controls according to the widget error
+  /// \param theWidget a widget
+  /// \param theError an error state
+  void updateToolTip(ModuleBase_ModelWidget* theWidget, const QString& theError);
 
   /// Returns casted workshop
   XGUI_Workshop* workshop() const;
 
+  /// Returns an active widget of the current operation
+  /// \return the widget or zero
+  ModuleBase_ModelWidget* activeWidget() const;
+
 private:
-  ModuleBase_IWorkshop* myWorkshop;
+  ModuleBase_IWorkshop* myWorkshop; /// workshop
   QDialog* myErrorDialog; /// contains the error message
   QLabel* myErrorLabel; /// contains an error information
 };

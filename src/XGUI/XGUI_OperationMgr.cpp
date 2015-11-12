@@ -198,8 +198,18 @@ void XGUI_OperationMgr::onValidateOperation()
     return;
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                           (currentOperation());
-  if(aFOperation && aFOperation->feature().get())
-    setApplyEnabled(myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty());
+  if(aFOperation && aFOperation->feature().get()) {
+    QString anError = myWorkshop->module()->getFeatureError(aFOperation->feature());
+    if (anError.isEmpty()) {
+      ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+      if (aPanel) {
+        ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+        if (anActiveWidget)
+          anError = myWorkshop->module()->getWidgetError(anActiveWidget);
+      }
+    }
+    setApplyEnabled(anError.isEmpty());
+  }
 }
 
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
@@ -541,7 +551,7 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       if (!aActiveWgt || !aActiveWgt->processEnter()) {
         if (!myWorkshop->module()->processEnter(aActiveWgt ? aActiveWgt->attributeID() : "")) {
           ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
-          if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature(), false).isEmpty()) {
+          if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
             emit keyEnterReleased();
             commitOperation();
           }

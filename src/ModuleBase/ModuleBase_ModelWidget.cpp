@@ -55,6 +55,33 @@ bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
   return theObject->data()->attribute(attributeID())->isInitialized();
 }
 
+QString ModuleBase_ModelWidget::getValueStateError() const
+{
+  QString anError = "";
+
+  ModuleBase_ModelWidget::ValueState aState = getValueState();
+  if (aState != ModuleBase_ModelWidget::Stored) {
+    AttributePtr anAttr = feature()->attribute(attributeID());
+    if (anAttr.get()) {
+      QString anAttributeName = anAttr->id().c_str();
+      switch (aState) {
+        case ModuleBase_ModelWidget::ModifiedInPP:
+          anError = "Attribute \"" + anAttributeName +
+                    "\" modification is not applyed. Please click \"Enter\" or \"Tab\".";
+          break;
+        case ModuleBase_ModelWidget::ModifiedInViewer:
+          anError = "Attribute \"" + anAttributeName +
+                    "\" is locked by modification value in the viewer.";
+          break;
+        case ModuleBase_ModelWidget::Reset:
+          anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
+          break;
+      }
+    }
+  }
+  return anError;
+}
+
 void ModuleBase_ModelWidget::enableFocusProcessing()
 {
   QList<QWidget*> aMyControls = getControls();
