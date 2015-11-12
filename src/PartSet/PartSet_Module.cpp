@@ -36,7 +36,6 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_OperationFeature.h>
-#include <ModuleBase_WidgetTable.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -512,10 +511,7 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
-  }
-  else if (theType == "tablevalue") {
-    aWgt = new ModuleBase_WidgetTable(theParent, theWidgetApi, theParentId);
-  }else if (theType == "sketch-2dpoint_flyout_selector") {
+  } else if (theType == "sketch-2dpoint_flyout_selector") {
     PartSet_WidgetPoint2DFlyout* aPointWgt = new PartSet_WidgetPoint2DFlyout(theParent, aWorkshop,
                                                                  theWidgetApi, theParentId);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
