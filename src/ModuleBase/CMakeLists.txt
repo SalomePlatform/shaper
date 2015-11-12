@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
   ModuleBase_Preferences.h
   ModuleBase_ResultPrs.h
   ModuleBase_SelectionValidator.h
+  ModuleBase_TableModel.h
   ModuleBase_ToolBox.h
   ModuleBase_Tools.h
   ModuleBase_ViewerFilters.h
@@ -52,6 +53,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetShapeSelector.h
   ModuleBase_WidgetSwitch.h
   ModuleBase_WidgetToolbox.h
+  ModuleBase_WidgetTable.h
   ModuleBase_WidgetValidated.h
   ModuleBase_IconFactory.h
   ModuleBase_WidgetErrorLabel.h
@@ -84,6 +86,7 @@ SET(PROJECT_SOURCES
   ModuleBase_ParamSpinBox.cpp
   ModuleBase_Preferences.cpp
   ModuleBase_ResultPrs.cpp
+  ModuleBase_TableModel.cpp
   ModuleBase_ToolBox.cpp
   ModuleBase_Tools.cpp
   ModuleBase_ViewerFilters.cpp
@@ -103,6 +106,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetShapeSelector.cpp
   ModuleBase_WidgetSwitch.cpp
   ModuleBase_WidgetToolbox.cpp
+  ModuleBase_WidgetTable.cpp
   ModuleBase_WidgetValidated.cpp
   ModuleBase_IconFactory.cpp
   ModuleBase_WidgetErrorLabel.cpp

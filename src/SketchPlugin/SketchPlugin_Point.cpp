@@ -30,6 +30,9 @@ void SketchPlugin_Point::initAttributes()
   SketchPlugin_SketchEntity::initAttributes();
 
   data()->addAttribute(SketchPlugin_Point::COORD_ID(), GeomDataAPI_Point2D::typeId());
+
+  data()->addAttribute(SketchPlugin_Point::TABLE_ID(), GeomDataAPI_Point2D::typeId());
+
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }

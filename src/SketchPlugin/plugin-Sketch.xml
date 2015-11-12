@@ -20,6 +20,7 @@
       <feature id="SketchPoint" title="Point" tooltip="Create point" icon=":icons/point.png">
         <sketch-2dpoint_selector id="PointCoordindates" title="Point" tooltip="Point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <tablevalue id="TableValue"/>
       </feature>
       <feature id="SketchLine" title="Line" tooltip="Create line" icon=":icons/line.png">
         <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
