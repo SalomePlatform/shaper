@@ -231,6 +231,11 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Returns Trihedron object if it is displayed
   Handle(AIS_InteractiveObject) getTrihedron() const;
   
+  // Set trihedron active (used in selection) or non active
+  void activateTrihedron(bool theIsActive);
+
+  bool isTrihedronActive() const { return myIsTrihedronActive; }
+
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
   static int getSelectionMode(int theShapeType);
@@ -318,6 +323,9 @@ private:
 
   /// the enable update viewer flag
   bool myEnableUpdateViewer; 
+
+  // Flag: use trihedgon for selection or not
+  bool myIsTrihedronActive;
 
   /// A flag that update was requested but not done
   mutable bool myNeedUpdate;

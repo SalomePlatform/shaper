@@ -822,6 +822,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   // Display all sketcher sub-Objects
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFOperation->feature());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  aConnector->workshop()->displayer()->activateTrihedron(true);
 
   // Hide sketcher result
   std::list<ResultPtr> aResults = myCurrentSketch->results();
@@ -924,6 +925,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   }
   // restore the module selection modes, which were changed on startSketch
   aConnector->activateModuleSelectionModes();
+  aConnector->workshop()->displayer()->activateTrihedron(false);
 }
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
@@ -1375,3 +1377,4 @@ XGUI_OperationMgr* PartSet_SketcherMgr::operationMgr() const
 
   return aWorkshop->operationMgr();
 }
+

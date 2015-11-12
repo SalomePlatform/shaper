@@ -99,7 +99,8 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 }
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myWorkshop(theWorkshop), myEnableUpdateViewer(true), myNeedUpdate(false)
+  : myWorkshop(theWorkshop), myEnableUpdateViewer(true), myNeedUpdate(false),
+  myIsTrihedronActive(false)
 {
   enableUpdateViewer(true);
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs());
@@ -364,9 +365,9 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
 void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
                                        const bool theUpdateViewer)
 {
-  //Handle(AIS_InteractiveObject) aTriehedron = getTrihedron();
-  //if (!aTriehedron.IsNull())
-  //  deactivateAIS(aTriehedron);
+  //Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
+  //if (!aTrihedron.IsNull())
+  //  deactivateAIS(aTrihedron);
 
   QObjectPtrList::const_iterator anIt = theObjList.begin(), aLast = theObjList.end();
   for (; anIt != aLast; anIt++) {
@@ -452,10 +453,12 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   //}
 
   // Add trihedron because it has to partisipate in selection
-  Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
-  if (!aTrihedron.IsNull())
-    aPrsList.Append(aTrihedron);
-
+  Handle(AIS_InteractiveObject) aTrihedron;
+  if (isTrihedronActive()) {
+    aTrihedron = getTrihedron();
+    if (!aTrihedron.IsNull())
+      aPrsList.Append(aTrihedron);
+  }
   if (aPrsList.Extent() == 0)
     return;
 
@@ -468,7 +471,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   }
   if (!aTrihedron.IsNull()) {
     foreach(int aMode, myActiveSelectionModes)
-      aContext->SetSelectionSensitivity(aTrihedron, aMode, 8);
+      aContext->SetSelectionSensitivity(aTrihedron, aMode, 15);
   }
   // VSV It seems that there is no necessity to update viewer on activation
   //if (theUpdateViewer && isActivationChanged)
@@ -574,8 +577,7 @@ void XGUI_Displayer::deactivateTrihedron() const
 {
   Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
   if (!aTrihedron.IsNull()) {
-    Handle(AIS_InteractiveContext) aContext = AISContext();
-    aContext->Deactivate(aTrihedron);
+    deactivateAIS(aTrihedron);
   }
 }
 
@@ -778,7 +780,8 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
     aContext->OpenLocalContext();
-    //deactivateTrihedron();
+    if (!isTrihedronActive())
+      deactivateTrihedron();
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
   }
@@ -1033,22 +1036,21 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
 
   // trihedron AIS check should be after the AIS loading.
   // If it is not loaded, it is steel selectable in the viewer.
-  //Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
-  //if (aTrihedron.IsNull()) {
-      //aContext->Load(anAISIO, -1, true);
+  Handle(AIS_Trihedron) aTrihedron;
+  if (!isTrihedronActive())
+    aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
+  if (aTrihedron.IsNull()) {
       // In order to clear active modes list
     if (theModes.size() == 0) {
-      //aContext->Load(anAISIO, 0, true);
       activateAIS(theIO, 0, theUpdateViewer);
     } else {
       foreach(int aMode, theModes) {
-        //aContext->Load(anAISIO, aMode, true);
         if (!aModesActivatedForIO.contains(aMode)) {
           activateAIS(theIO, aMode, theUpdateViewer);
           isActivationChanged = true;
         }
       }
-    //}
+    }
   }
   return isActivationChanged;
 }
@@ -1119,4 +1121,11 @@ std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
   }
   return QString("myResult2AISObjectMap: size = %1\n%2\n").arg(myResult2AISObjectMap.size()).
                                             arg(aContent.join("\n")).toStdString().c_str();
+}
+
+void XGUI_Displayer::activateTrihedron(bool theIsActive) 
+{  
+  myIsTrihedronActive = theIsActive; 
+  if (!myIsTrihedronActive) 
+    deactivateTrihedron();
 }
