@@ -16,6 +16,11 @@
  * \brief General base class for all interfaces in this package
  */
 
+template <typename T>
+void GeomAPI_deleter( void* p ) {
+   delete reinterpret_cast<T*>(p);
+}
+
 class GeomAPI_Interface
 {
  private:
@@ -28,7 +33,7 @@ class GeomAPI_Interface
   /// Constructor by the impl pointer (used for internal needs)
   template<class T> explicit GeomAPI_Interface(T* theImpl)
   {
-    myImpl.reset(reinterpret_cast<char*>(theImpl));
+    myImpl = std::shared_ptr<char>(reinterpret_cast<char*>(theImpl), GeomAPI_deleter<T>);
   }
 
   /// Destructor
@@ -52,7 +57,7 @@ class GeomAPI_Interface
   /// Updates the impl (deletes the old one)
   template<class T> inline void setImpl(T* theImpl)
   {
-    myImpl.reset(reinterpret_cast<char*>(theImpl));
+    myImpl = std::shared_ptr<char>(reinterpret_cast<char*>(theImpl), GeomAPI_deleter<T>);
   }
 
   /// Returns true if the impl is empty
