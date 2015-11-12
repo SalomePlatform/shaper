@@ -49,7 +49,7 @@ ModuleBase_WidgetTable::ModuleBase_WidgetTable(QWidget* theParent,
 
   connect(anAddBtn, SIGNAL(clicked()), this, SLOT(onAddRow()));
 
-  aLayout->addWidget(new QLabel("aLabel"), 0, 0);
+  aLayout->addWidget(new QLabel(aLabel), 0, 0);
   aLayout->addWidget(anAddBtn, 0, 1);
   aLayout->addWidget(aRemBtn, 0, 2);
 
