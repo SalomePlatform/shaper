@@ -43,6 +43,7 @@
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_IsoAspect.hxx>
+#include <SelectMgr_SelectionManager.hxx>
 
 #include <StdSelect_ViewerSelector3d.hxx>
 
@@ -55,6 +56,8 @@
 #include <set>
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
+
+#define WORKAROUND_691
 
 //#define DEBUG_ACTIVATE_OBJECTS
 //#define DEBUG_DEACTIVATE
@@ -315,7 +318,15 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
         arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
     #endif
     if (!isEqualShapes || isCustomized) {
+#ifdef WORKAROUND_691
+      // this is a workaround for OCCT 6.9.1, selection area is wrong
+      // on sketch and 3D features
+      aContext->RecomputePrsOnly (aAISIO, false);
+      aContext->SelectionManager()->RecomputeSelection (aAISIO, true);
+      aContext->LocalContext()->ClearOutdatedSelection (aAISIO, false);
+#else
       aContext->Redisplay(aAISIO, false);
+#endif
       aRedisplayed = true;
       #ifdef DEBUG_FEATURE_REDISPLAY
         qDebug("  Redisplay happens");
