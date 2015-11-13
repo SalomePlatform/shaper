@@ -121,7 +121,8 @@ signals:
   /// to change behavior of operation. There is no point in using this method. It would
   /// be better to inherit own operator from base one and redefine startOperation method
   /// instead.
-  virtual void start();
+  /// \return true if the start is successful
+  virtual bool start();
 
   /// Deactivates current operation which can be resumed later.
   virtual void postpone();

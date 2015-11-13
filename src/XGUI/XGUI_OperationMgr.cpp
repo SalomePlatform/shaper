@@ -136,9 +136,10 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
     connect(aFOperation, SIGNAL(activatedByPreselection()),
             SIGNAL(operationActivatedByPreselection()));
 
-  theOperation->start();
-  onValidateOperation();
-  return true;
+  bool isStarted = theOperation->start();
+  if (isStarted)
+    onValidateOperation();
+  return isStarted;
 }
 
 bool XGUI_OperationMgr::abortAllOperations()

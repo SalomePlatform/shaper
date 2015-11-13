@@ -75,7 +75,7 @@ bool ModuleBase_Operation::canBeCommitted() const
   return isValid();
 }
 
-void ModuleBase_Operation::start()
+bool ModuleBase_Operation::start()
 {
   myIsModified = false;
 
@@ -83,6 +83,8 @@ void ModuleBase_Operation::start()
 
   startOperation();
   emit started();
+
+  return true;
 }
 
 void ModuleBase_Operation::postpone()

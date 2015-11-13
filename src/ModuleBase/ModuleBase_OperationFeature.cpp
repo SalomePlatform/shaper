@@ -200,7 +200,7 @@ bool ModuleBase_OperationFeature::isDisplayedOnStart(ObjectPtr theObject)
   return myVisualizedObjects.find(theObject) != myVisualizedObjects.end();
 }
 
-void ModuleBase_OperationFeature::start()
+bool ModuleBase_OperationFeature::start()
 {
   setIsModified(false);
   QString anId = getDescription()->operationId();
@@ -220,12 +220,12 @@ void ModuleBase_OperationFeature::start()
       // in order to update commands status in the workshop, to be exact the feature action
       // to be unchecked
       abort();
-      return;
+      return false;
     }
   }
   //Already called startOperation();
   emit started();
-
+  return true;
 }
 
 void ModuleBase_OperationFeature::abort()

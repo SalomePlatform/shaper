@@ -133,7 +133,8 @@ signals:
   /// to change behavior of operation. There is no point in using this method. It would
   /// be better to inherit own operator from base one and redefine startOperation method
   /// instead.
-  void start();
+  /// \return true if the start is successful
+  virtual bool start();
 
   /// Aborts operation
   /// Public slot. Aborts operation. This slot is not virtual and cannot be redefined.
