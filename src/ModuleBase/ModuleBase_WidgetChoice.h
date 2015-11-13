@@ -45,7 +45,11 @@ Q_OBJECT
                           const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetChoice();
-  
+
+  /// Defines if it is supported to set the value in this widget
+  /// It returns false because this is an info widget
+  virtual bool canSetValue() const { return false; };
+
   virtual bool focusTo();
 
   /// Returns list of widget controls

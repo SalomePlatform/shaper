@@ -138,7 +138,7 @@ bool ModuleBase_WidgetChoice::focusTo()
   if (myCombo)
     myCombo->setFocus();
   else
-    myButtons->button(0)->setFocus();
+    return false;
   return true;
 }
 
