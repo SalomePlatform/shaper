@@ -11,6 +11,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QToolButton>
+#include <QEvent>
 
 NewGeom_NestedButton::NewGeom_NestedButton(QObject* theParent,
                                            const QList<QAction*>& theNestedActions)
@@ -75,6 +76,18 @@ QWidget * NewGeom_NestedButton::createWidget(QWidget * theParent)
   connect(this, SIGNAL(changed()), this, SLOT(actionStateChanged()));
   return myButtonFrame;
 }
+
+bool NewGeom_NestedButton::event(QEvent* theEvent)
+{
+  if (theEvent->type() == QEvent::ActionChanged) {
+    if (myThisButton) {
+      myThisButton->setEnabled(isEnabled());
+      return true;
+    }
+  }
+  return QWidgetAction::event(theEvent);
+}
+
 
 void NewGeom_NestedButton::actionStateChanged()
 {
