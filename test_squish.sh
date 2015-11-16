@@ -54,7 +54,7 @@ TESTCASES="${TESTCASES} --testcase tst_common_1"
 TESTCASES="${TESTCASES} --testcase tst_crash_1"
 TESTCASES="${TESTCASES} --testcase tst_DISTANCE"
 TESTCASES="${TESTCASES} --testcase tst_RADIUS"
-squishrunner-run suite_STANDALONE "${TESTCASES}"
+#squishrunner-run suite_STANDALONE "${TESTCASES}"
 
 TESTCASES=""
 TESTCASES="${TESTCASES} --testcase tst_679"
