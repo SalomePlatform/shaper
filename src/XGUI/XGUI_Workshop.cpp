@@ -620,9 +620,11 @@ void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
        myModule->connectToPropertyPanel(aWidget, isToConnect);
       if (isToConnect) {
         connect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+        connect(aWidget, SIGNAL(afterValuesChanged()), myOperationMgr, SLOT(onValidateOperation()));
       }
       else {
         disconnect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+        disconnect(aWidget, SIGNAL(afterValuesChanged()), myOperationMgr, SLOT(onValidateOperation()));
       }
     }
   }
