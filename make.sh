@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source env.sh
-source ${TOOLS_DIR}/env_standalone.sh
+source ${TOOLS_DIR}/env_salome.sh
 
 CMAKE_ARGS=""
 if [ -f GCOV ]; then 

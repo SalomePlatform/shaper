@@ -22,8 +22,8 @@ fi
 
 echo "export PLATFORM=${PLATFORM}" >> env_config.sh
 
-main() {
-  local salome_version='7.6.0'
+include_salome() {
+  local salome_version=$1
   local platform="$(lsb_release -is)"
   local release="$(lsb_release -rs)"
   if [[ ${salome_version} = '7.5.1' ]]; then
@@ -34,12 +34,16 @@ main() {
   elif [[ ${salome_version} = '7.6.0' ]]; then
     if   [[ "${platform}" = 'CentOS' ]]; then export INST_ROOT=/dn23/NEWGEOM/common/SALOME-7.6.0_CentOS-6.3_SOURCES
     elif [[ "${platform}" = 'Debian' && ${release} =~ ^6 ]]; then export INST_ROOT=/dn23/NEWGEOM/common/SALOME-7.6.0_Debian-6.0_SOURCES
-    else 
-      echo "Could not find SALOME for the platform ${platform} ${release}"
-      exit 1
     fi
+  elif [[ ${salome_version} = '7.7.0' ]]; then
+    if   [[ "${platform}" = 'CentOS' ]]; then export INST_ROOT=/dn23/NEWGEOM/common/SALOME-7.7.0_CentOS63-64
+    elif [[ "${platform}" = 'Debian' && ${release} =~ ^6 ]]; then export INST_ROOT=/dn23/NEWGEOM/common/SALOME-7.7.0_Debian60-64
+    fi
+  else 
+    echo "Could not find SALOME for the platform ${platform} ${release}"
+    exit 1
   fi
 }
-main
+include_salome '7.7.0'
 echo "export INST_ROOT=${INST_ROOT}" >> env_config.sh
 

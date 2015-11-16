@@ -1,5 +1,13 @@
 #!/bin/bash
 
+for path in TOOLS_DIR; do
+  if [[ -z "${!path}" ]]; then
+    echo "${path} not found."; exit 1
+  else
+    echo "Found ${path}: ${!path}"
+  fi
+done
+
 source ${TOOLS_DIR}/env_linux.sh
 
 # Correcting path which defined with error

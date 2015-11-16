@@ -15,7 +15,8 @@ for path in INST_ROOT NEWGEOM_PDIR NEWGEOM_ROOT_DIR; do
 done
 
 set +u
-source ${INST_ROOT}/env_products.sh
+echo "Source ${INST_ROOT}/$(cd ${INST_ROOT} && ls *env_products.sh)"
+source ${INST_ROOT}/$(cd ${INST_ROOT} && ls *env_products.sh)
 set -u
 
 #------ SolveSpace ------
