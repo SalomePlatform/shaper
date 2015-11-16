@@ -6,6 +6,7 @@
 
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Tools.h"
+#include "PartSet_Module.h"
 
 #include "SketchPlugin_SketchEntity.h"
 
@@ -195,8 +196,12 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     // Rotate view if the sketcher plane is selected only from preview planes
     // Preview planes are created only if there is no any shape
     bool aRotate = Config_PropManager::boolean("Sketch planes", "rotate_to_plane", "false");
-    if (aRotate)
+    if (aRotate) {
       myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
+      PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+      if (aModule)
+        aModule->onViewTransformed();
+    }
   }
   // 3. Clear text in the label
   myStackWidget->setCurrentIndex(1);
@@ -487,5 +492,8 @@ void PartSet_WidgetSketchLabel::onSetPlaneView()
     if (myViewInverted->isChecked())
       aDir.Reverse();
     myWorkshop->viewer()->setViewProjection(aDir.X(), aDir.Y(), aDir.Z(), 0.);
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+    if (aModule)
+      aModule->onViewTransformed();
   }
 }
