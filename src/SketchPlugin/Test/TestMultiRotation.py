@@ -130,7 +130,7 @@ anAngle = aMultiRotation.real("MultiRotationAngle")
 aCenter.setValue(CENTER_X, CENTER_Y)
 anAngle.setValue(ANGLE)
 aNbCopies = aMultiRotation.integer("MultiRotationObjects")
-aNbCopies.setValue(2)
+aNbCopies.setValue(1)
 aMultiRotation.execute()
 aSession.finishOperation()
 #=========================================================================
