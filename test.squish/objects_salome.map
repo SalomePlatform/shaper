@@ -126,6 +126,7 @@
 :Mirror.Segments:_QListWidget	{aboveWidget=':Mirror.Segments:_QLabel' container=':SALOME*.Mirror_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :Mirror.property_panel_ok_QToolButton	{container=':SALOME*.Mirror_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :OK_QPushButton	{container=':Object browser_XGUI_DataTree' text='OK' type='QPushButton' unnamed='1' visible='1'}
+:Object browser.Part set_XGUI_ActiveDocLbl	{container=':SALOME*.Object browser_QDockWidget' text='Part set' type='XGUI_ActiveDocLbl' unnamed='1' visible='1'}
 :Object browser.qt_dockwidget_closebutton_QDockWidgetTitleButton	{container=':SALOME*.Object browser_QDockWidget' name='qt_dockwidget_closebutton' type='QDockWidgetTitleButton' visible='1'}
 :Object browser.qt_dockwidget_floatbutton_QDockWidgetTitleButton	{container=':SALOME*.Object browser_QDockWidget' name='qt_dockwidget_floatbutton' type='QDockWidgetTitleButton' visible='1'}
 :Object browser.qt_dockwidget_floatbutton_XGUI_ObjectsBrowser	{aboveWidget=':Object browser.qt_dockwidget_floatbutton_QDockWidgetTitleButton' container=':SALOME*.Object browser_QDockWidget' type='XGUI_ObjectsBrowser' unnamed='1' visible='1'}

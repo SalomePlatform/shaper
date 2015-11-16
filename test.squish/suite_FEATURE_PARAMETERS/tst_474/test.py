@@ -12,6 +12,7 @@ def main():
     activateItem(waitForObjectItem(":Part_QMenu", "Parameter"))
     type(waitForObject(":Parameter_QLineEdit"), "aa")
     type(waitForObject(":Parameter_ExpressionEditor"), "4")
+    type(waitForObject(":Parameter_ExpressionEditor"), "<Return>")
     clickButton(waitForObject(":Parameter.property_panel_ok_QToolButton"))
 
     # check the new parameter
@@ -23,12 +24,13 @@ def main():
     activateItem(waitForObjectItem(":Part_QMenu", "Parameter"))
     type(waitForObject(":Parameter_QLineEdit"), "bb")
     type(waitForObject(":Parameter_ExpressionEditor"), "aa+1")
+    type(waitForObject(":Parameter_ExpressionEditor"), "<Return>")
     clickButton(waitForObject(":Parameter.property_panel_ok_QToolButton"))
 
     # check the new parameter
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1.Parameters (1).bb = 5")
 
-    openContextMenu(waitForObject(":Object browser_QLineEdit"), 10, 10, 0)
+    openContextMenu(waitForObject(":Object browser.Part set_XGUI_ActiveDocLbl"), 10, 10, 0)
     activateItem(waitForObjectItem(":_QMenu", "Activate"))
     
     openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Parameters (1).aa = 4", 10, 10, 0)

@@ -30,6 +30,7 @@ def main():
     
     #[step] Enter variable expression '100+b'
     type(waitForObject(":Parameter_ExpressionEditor"), "100+b")
+    type(waitForObject(":Parameter_ExpressionEditor"), "<Return>")
     
     #[step] Check that expression tooltip is: Errors:\nexpression - Parameters_ExpressionValidator: name 'b' is not defined
     waitFor("object.exists(':Parameter_ExpressionEditor')", 20000)

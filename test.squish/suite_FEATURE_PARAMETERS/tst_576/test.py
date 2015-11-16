@@ -10,6 +10,7 @@ def main():
     clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
     type(waitForObject(":Parameter_QLineEdit"), "a")
     type(waitForObject(":Parameter_ExpressionEditor"), "3")
+    type(waitForObject(":Parameter_ExpressionEditor"), "<Return>")
     clickButton(waitForObject(":Parameter.property_panel_ok_QToolButton"))
     
     openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Parameters (1).a = 3", 10, 10, 0)

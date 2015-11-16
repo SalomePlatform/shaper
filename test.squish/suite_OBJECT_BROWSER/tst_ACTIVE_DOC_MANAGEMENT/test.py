@@ -96,13 +96,13 @@ def main():
     test.compare(False, findMenuItem(waitForObject(":_QMenu"), "Activate").enabled, "Activate is disabled on active Part")
 
     #[step] Deactivate part by context menu on PartSet 
-    openContextMenu(waitForObject(":Object browser_QLineEdit"), 10, 10, 0)
+    openContextMenu(waitForObject(":Object browser.Part set_XGUI_ActiveDocLbl"), 10, 10, 0)
     activateItem(waitForObjectItem(":_QMenu", "Activate"))
     
     checkPartDeactivatedState("Part deactivation by context menu on PartSet")
 
     #[step] Check that Activate is disabled in PartSet context menu  
-    openContextMenu(waitForObject(":Object browser_QLineEdit"), 10, 10, 0)
+    openContextMenu(waitForObject(":Object browser.Part set_XGUI_ActiveDocLbl"), 10, 10, 0)
     test.compare(False, findMenuItem(waitForObject(":_QMenu"), "Activate").enabled, "Activate is disabled on active PartSet")
 
     #[step] Activate part by context menu on Part
