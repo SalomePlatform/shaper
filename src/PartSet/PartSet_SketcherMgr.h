@@ -94,6 +94,11 @@ public:
   //// \return boolean value
   static bool isNestedCreateOperation(ModuleBase_Operation* theOperation);
 
+  /// Returns true if the operation is an edit nested feature one
+  /// \param theOperation a checked operation
+  //// \return boolean value
+  static bool isNestedEditOperation(ModuleBase_Operation* theOperation);
+
   /// Returns whether the current operation is a sketch entity - line, point, arc or circle
   /// \param theId is an id of object
   /// \return a boolean value

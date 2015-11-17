@@ -271,7 +271,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
-  if (isNestedCreateOperation(getCurrentOperation()))
+  if (!isNestedEditOperation(getCurrentOperation()) ||
+      myModule->sketchReentranceMgr()->isInternalEditActive())
     return;
   // it is necessary to save current selection in order to restore it after the values are modifed
   storeSelection();
@@ -284,7 +285,8 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 
 void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 {
-  if (isNestedCreateOperation(getCurrentOperation()))
+  if (!isNestedEditOperation(getCurrentOperation()) ||
+      myModule->sketchReentranceMgr()->isInternalEditActive())
     return;
   // it is necessary to restore current selection in order to restore it after the values are modified
   restoreSelection();
@@ -765,6 +767,13 @@ bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOpera
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (theOperation);
   return aFOperation && !aFOperation->isEditOperation() && isNestedSketchOperation(aFOperation);
+}
+
+bool PartSet_SketcherMgr::isNestedEditOperation(ModuleBase_Operation* theOperation)
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                               (theOperation);
+  return aFOperation && aFOperation->isEditOperation() && isNestedSketchOperation(aFOperation);
 }
 
 bool PartSet_SketcherMgr::isEntity(const std::string& theId)
