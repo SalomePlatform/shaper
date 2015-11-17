@@ -95,31 +95,28 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
   return false;
 }
 
-void XGUI_ActionsMgr::update()
+void XGUI_ActionsMgr::updateCommandsStatus()
 {
+  setAllEnabled(true);
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
-  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() > 0) {
+  if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() > 0)
     updateOnViewSelection();
-  } else {
-    FeaturePtr anActiveFeature = FeaturePtr();
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                           (myOperationMgr->currentOperation());
-    if (aFOperation) {
-      anActiveFeature = aFOperation->feature();
-      if(anActiveFeature.get()) {
-        setAllEnabled(false);
-        //QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
-        //setActionEnabled(aFeatureId, true);
-      }
-      setNestedStackEnabled(aFOperation);
-    } else {
-      setAllEnabled(true);
-      setNestedCommandsEnabled(false);
+
+  FeaturePtr anActiveFeature = FeaturePtr();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myOperationMgr->currentOperation());
+  if (aFOperation) {
+    anActiveFeature = aFOperation->feature();  
+    QStringList aNested = allNestedCommands(aFOperation);
+    foreach(QString aAction, myActions.keys()) {
+      if (!aNested.contains(aAction))
+        setActionEnabled(aAction, false);
     }
-    // TODO(SBH): Get defaults state of actions from XML and remove the following method
-    updateByDocumentKind();
-    updateByPlugins(anActiveFeature);
-  }
+  } else 
+    setNestedCommandsEnabled(false);
+
+  updateByPlugins(anActiveFeature);
+  updateByDocumentKind();
   updateCheckState();
 }
 
@@ -276,8 +273,7 @@ ActionInfo XGUI_ActionsMgr::actionInfoById(const QString& theId)
 
 void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
 {
-  foreach(QString eachAction, myActions.keys())
-  {
+  foreach(QString eachAction, myActions.keys()) {
     setActionEnabled(eachAction, isEnabled);
   }
 }
@@ -312,6 +308,20 @@ void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
   setNestedStackEnabled(myOperationMgr->previousOperation(theOperation));
 }
 
+QStringList XGUI_ActionsMgr::allNestedCommands(ModuleBase_Operation* theOperation)
+{
+  QStringList aFeatures;
+  ModuleBase_OperationFeature* anOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if(!anOperation || !anOperation->feature())
+    return aFeatures;
+  FeaturePtr aFeature = anOperation->feature();
+  QString aFeatureId = QString::fromStdString(aFeature->getKind());
+
+  aFeatures << myNestedActions[aFeatureId];
+  aFeatures << allNestedCommands(myOperationMgr->previousOperation(theOperation));
+  return aFeatures;
+}
+
 void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theChecked)
 {
   if (myActions.contains(theId)) {
@@ -325,7 +335,11 @@ void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theCheck
 void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabled)
 {
   if (myActions.contains(theId)) {
-    myActions[theId]->setEnabled(theEnabled);
+    QAction* aAction = myActions[theId];
+    // Initially all actions are enabled
+    // If it was disabled for any reason then we can not enable it
+    if (aAction->isEnabled())
+      aAction->setEnabled(theEnabled);
   }
 }
 

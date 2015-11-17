@@ -132,3 +132,8 @@ void XGUI_ModuleConnector::abortOperation(ModuleBase_Operation* theOperation)
 {
   myWorkshop->operationMgr()->abortOperation(theOperation);
 }
+
+void XGUI_ModuleConnector::updateCommandStatus()
+{
+  myWorkshop->updateCommandStatus();
+}

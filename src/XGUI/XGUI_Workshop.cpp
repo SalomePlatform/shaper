@@ -129,7 +129,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
-  //connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
+  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateCommandStatus()));
 
   myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
@@ -227,7 +227,7 @@ void XGUI_Workshop::activateModule()
   connect(myDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
     myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
 
-  myActionsMgr->update();
+  updateCommandStatus();
 
   // activate visualized objects in the viewer
   XGUI_Displayer* aDisplayer = displayer();
@@ -991,7 +991,7 @@ void XGUI_Workshop::updateCommandStatus()
         aCmd->setEnabled(false);
     }
   }
-  myActionsMgr->update();
+  myActionsMgr->updateCommandsStatus();
   emit commandStatusUpdated();
 }
 

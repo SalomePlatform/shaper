@@ -101,6 +101,9 @@ Q_OBJECT
   //! \param theValues a list of presentations
   virtual void setSelected(const QList<ModuleBase_ViewerPrs>& theValues) = 0;
 
+   /// Update of commands status
+  virtual void updateCommandStatus() = 0;
+
 signals:
   /// Signal selection changed.
   void selectionChanged();

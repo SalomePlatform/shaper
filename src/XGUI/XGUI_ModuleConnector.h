@@ -81,6 +81,9 @@ Q_OBJECT
   //! If the list is empty then selection will be cleared
   virtual void setSelected(const QList<ModuleBase_ViewerPrs>& theValues);
 
+   /// Update of commands status
+  virtual void updateCommandStatus();
+
   //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
