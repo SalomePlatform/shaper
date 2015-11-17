@@ -22,6 +22,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_SketchEntity.h>
 #include <FeaturesPlugin_CompositeBoolean.h>
@@ -31,6 +32,8 @@
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_OperationFeature.h>
 #include <Config_WidgetAPI.h>
+
+#include <Events_Loop.h>
 
 #include <QLabel>
 #include <QLineEdit>
@@ -227,6 +230,13 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
             aSelList->clear();
         }
       }
+    }
+    else {
+      // this is a workarount to display the feature results in the operation selection mode
+      // if this is absent, sketch point/line local selection is available on extrusion cut result
+      static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      ModelAPI_EventCreator::get()->sendUpdated(feature(), anUpdateEvent);
+      updateObject(feature());
     }
   }
 }

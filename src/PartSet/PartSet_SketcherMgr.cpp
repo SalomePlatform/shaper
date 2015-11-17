@@ -75,6 +75,7 @@
 
 #include <QMouseEvent>
 #include <QApplication>
+#include <QCursor>
 
 //#define DEBUG_DO_NOT_BY_ENTER
 
@@ -200,10 +201,13 @@ void PartSet_SketcherMgr::onEnterViewPort()
   #endif
 
   if (canChangeCursor(getCurrentOperation())) {
+    QCursor* aCurrentCursor = QApplication::overrideCursor();
+    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
+      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 #ifdef DEBUG_CURSOR
-    qDebug("onEnterViewPort() : Qt::CrossCursor");
+      qDebug("onEnterViewPort() : Qt::CrossCursor");
 #endif
-    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+    }
   }
 
   if (!isNestedCreateOperation(getCurrentOperation()))
@@ -925,10 +929,13 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
   if (canChangeCursor(theOperation) && myIsMouseOverWindow) {
-    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+    QCursor* aCurrentCursor = QApplication::overrideCursor();
+    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
+      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 #ifdef DEBUG_CURSOR
-    qDebug("startNestedSketch() : Qt::CrossCursor");
+      qDebug("startNestedSketch() : Qt::CrossCursor");
 #endif
+    }
   }
 }
 
