@@ -70,6 +70,8 @@ void SketchPlugin_ConstraintFillet::initAttributes()
 
 void SketchPlugin_ConstraintFillet::execute()
 {
+  static const double aTol = 1.e-7;
+
   // the viewer update should be blocked in order to avoid the temporaty fillet sub-features visualization
   // before they are processed by the solver
   //std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
@@ -230,10 +232,16 @@ void SketchPlugin_ConstraintFillet::execute()
     aTangentPntA = aTangentPntB;
     aTangentPntB = aTmp;
   }
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::START_ID()))->setValue(aTangentPntA->x(), aTangentPntA->y());
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aNewArc->attribute(SketchPlugin_Arc::END_ID()))->setValue(aTangentPntB->x(), aTangentPntB->y());
+  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aNewArc->attribute(SketchPlugin_Arc::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aNewArc->attribute(SketchPlugin_Arc::END_ID()));
+  if (aStartPoint->isInitialized() && aEndPoint->isInitialized() &&
+     (aStartPoint->pnt()->xy()->distance(aTangentPntA) > aTol ||
+      aEndPoint->pnt()->xy()->distance(aTangentPntB) > aTol))
+    std::dynamic_pointer_cast<SketchPlugin_Arc>(aNewArc)->setReversed(false);
+  aStartPoint->setValue(aTangentPntA->x(), aTangentPntA->y());
+  aEndPoint->setValue(aTangentPntB->x(), aTangentPntB->y());
   aNewArc->data()->blockSendAttributeUpdated(false);
   aNewArc->execute();
 

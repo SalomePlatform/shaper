@@ -85,6 +85,10 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
+  /// Updates the "reversed" flag
+  /// \param isReversed  whether the arc will be reversed
+  void setReversed(bool isReversed);
+
   /// Use plugin manager for features creation
   SketchPlugin_Arc();
 
