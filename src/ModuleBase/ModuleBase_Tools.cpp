@@ -258,7 +258,10 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
 void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                     const Handle(Prs3d_Drawer)& theDrawer)
 {
-  if (!theShape.IsNull() && theShape.ShapeType() == TopAbs_EDGE)
+  if (theShape.IsNull())
+    return;
+  TopAbs_ShapeEnum aType = theShape.ShapeType();
+  if ((aType == TopAbs_EDGE) || (aType == TopAbs_WIRE)) 
     theDrawer->SetDeviationCoefficient(1.e-4);
 }
 

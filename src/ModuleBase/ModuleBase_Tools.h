@@ -108,7 +108,7 @@ MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasR
 /*! Sets the default coeffient into the driver calculated accordingly the shape type.
 It provides 1.e-4 for a shape withe Edge shape type
 \param theShape a shape to define the deviation coeffient, 
-\return double value
+\param theDrawer a drawer
 */
 MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                                       const Handle(Prs3d_Drawer)& theDrawer);
