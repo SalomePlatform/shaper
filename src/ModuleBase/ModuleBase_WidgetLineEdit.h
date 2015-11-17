@@ -43,9 +43,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
   /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 
- public slots:
-   /// A slot for processing text changed event
-  void onTextChanged();
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
 
 protected:
   /// Saves the internal parameters to the given feature

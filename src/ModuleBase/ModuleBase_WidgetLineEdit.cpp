@@ -99,7 +99,7 @@ ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
   aMainLay->addRow(aLabel, myLineEdit);
   this->setLayout(aMainLay);
 
-  connect(myLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged()));
+  connect(myLineEdit, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
 }
 
 ModuleBase_WidgetLineEdit::~ModuleBase_WidgetLineEdit()
@@ -141,7 +141,12 @@ QList<QWidget*> ModuleBase_WidgetLineEdit::getControls() const
   return result;
 }
 
-void ModuleBase_WidgetLineEdit::onTextChanged()
+bool ModuleBase_WidgetLineEdit::processEnter()
 {
-  storeValue();
+  bool isModified = getValueState() == ModifiedInPP;
+  if (isModified) {
+    emit valuesChanged();
+    myLineEdit->selectAll();
+  }
+  return isModified;
 }
