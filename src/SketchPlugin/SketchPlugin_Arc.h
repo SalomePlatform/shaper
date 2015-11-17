@@ -57,6 +57,13 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
     return MY_END_ID;
   }
 
+  /// Inversed flag
+  inline static const std::string& INVERSED_ID()
+  {
+    static const std::string MY_INVERSED_ID("InversedArc");
+    return MY_INVERSED_ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

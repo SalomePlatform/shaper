@@ -6,7 +6,9 @@
 
 #include "SketchPlugin_ConstraintFillet.h"
 
+#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Dir2d.h>
+#include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
@@ -38,6 +40,9 @@
 
 static const std::string PREVIOUS_VALUE("FilletPreviousRadius");
 
+const double tolerance = 1.e-7;
+const double paramTolerance = 1.e-4;
+
 /// \brief Attract specified point on theNewArc to the attribute of theFeature
 static void recalculateAttributes(FeaturePtr theNewArc, const std::string& theNewArcAttribute,
   FeaturePtr theFeature, const std::string& theFeatureAttribute);
@@ -48,6 +53,15 @@ static void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB
                                   std::shared_ptr<GeomAPI_XY>& theCenter,
                                   std::shared_ptr<GeomAPI_XY>& theTangentA,
                                   std::shared_ptr<GeomAPI_XY>& theTangentB);
+
+/// Get point on 1/3 length of edge from fillet point
+static void getPointOnEdge(const FeaturePtr theFeature,
+                           const std::shared_ptr<GeomAPI_Pnt2d> theFilletPoint,
+                           std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
+/// Get distance from point to feature
+static double getProjectionDistance(const FeaturePtr theFeature,
+                             const std::shared_ptr<GeomAPI_Pnt2d> thePoint);
 
 SketchPlugin_ConstraintFillet::SketchPlugin_ConstraintFillet()
 {
@@ -403,14 +417,21 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
       (*aCIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
     myBaseObjects.clear();
 
+    // Obtain fillet point
     AttributeRefAttrPtr aBaseA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
     if(!aBaseA->isInitialized() || aBaseA->isObject()) {
       return;
     }
+    AttributePtr anAttrBaseA = aBaseA->attr();
+    std::shared_ptr<GeomDataAPI_Point2D> aBasePoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrBaseA);
+    if (!aBasePoint) {
+      return;
+    }
+    std::shared_ptr<GeomAPI_Pnt2d> aFilletPoint = aBasePoint->pnt();
 
-    AttributePtr anAttrBase = aBaseA->attr();
-    const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
+    // Obtain conicident edges
+    const std::set<AttributePtr>& aRefsList = anAttrBaseA->owner()->data()->refsToMe();
     std::set<AttributePtr>::const_iterator aIt;
     FeaturePtr aCoincident;
     for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
@@ -423,14 +444,14 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
           aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
         if(anAttrRefA.get() && !anAttrRefA->isObject()) {
           AttributePtr anAttrA = anAttrRefA->attr();
-          if(anAttrBase == anAttrA) {
+          if(anAttrBaseA == anAttrA) {
             aCoincident = aConstrFeature;
             break;
           }
         }
         if(anAttrRefA.get() && !anAttrRefB->isObject()) {
           AttributePtr anAttrB = anAttrRefB->attr();
-          if(anAttrBase == anAttrB) {
+          if(anAttrBaseA == anAttrB) {
             aCoincident = aConstrFeature;
             break;
           }
@@ -462,12 +483,12 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
       aCoinsideLines = aNewLines;
     }
 
-
     if(aCoinsideLines.size() != 2) {
       setError("At selected vertex should be two coincident lines");
       return;
     }
 
+    // Store base lines
     FeaturePtr anOldFeatureA, anOldFeatureB;
     std::set<FeaturePtr>::iterator aLinesIt = aCoinsideLines.begin();
     anOldFeatureA = *aLinesIt++;
@@ -475,35 +496,18 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
     aRefListOfBaseLines->append(anOldFeatureA);
     aRefListOfBaseLines->append(anOldFeatureB);
 
+    // Getting points located at 1/3 of edge length from fillet point
+    std::shared_ptr<GeomAPI_Pnt2d> aPntA, aPntB;
+    getPointOnEdge(anOldFeatureA, aFilletPoint, aPntA);
+    getPointOnEdge(anOldFeatureB, aFilletPoint, aPntB);
 
-    // Set default value equal to 1/3 of the smallest line sharing the point.
-    static const int aNbFeatures = 2;
-    FeaturePtr aFeature[aNbFeatures] = {anOldFeatureA, anOldFeatureB};
-    double aLength = 0;
+    /// Getting distances
+    double aRadius = 1;
+    double aDistanceA = getProjectionDistance(anOldFeatureB, aPntA);
+    double aDistanceB = getProjectionDistance(anOldFeatureA, aPntB);
+    aRadius = aDistanceA < aDistanceB ? aDistanceA / 2.0 : aDistanceB / 2.0;
 
-    double aLengths[aNbFeatures];
-    for (int i = 0; i < aNbFeatures; i++) {
-      std::shared_ptr<GeomAPI_Pnt2d> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature[i]->attribute(
-        aFeature[i]->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::START_ID() : SketchPlugin_Arc::START_ID()))->pnt();
-      std::shared_ptr<GeomAPI_Pnt2d> anEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature[i]->attribute(
-        aFeature[i]->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::END_ID() : SketchPlugin_Arc::END_ID()))->pnt();
-      if(aFeature[i]->getKind() == SketchPlugin_Line::ID()) {
-        aLengths[i] = aStartPnt->distance(anEndPnt);
-      } else {
-        std::shared_ptr<GeomAPI_Pnt2d> anArcCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature[i]->attribute(
-          SketchPlugin_Arc::CENTER_ID()))->pnt();
-        std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(aStartPnt->xy()->decreased(anArcCenter->xy())));
-        std::shared_ptr<GeomAPI_Dir2d> anEndDir(new GeomAPI_Dir2d(anEndPnt->xy()->decreased(anArcCenter->xy())));
-        double aRadius = aStartPnt->distance(anArcCenter);
-        double anAngle = aStartDir->angle(anEndDir);
-        aLengths[i] = aRadius * abs(anAngle);
-      }
-    }
-    aLength = aLengths[0];
-    for(int i = 1; i < aNbFeatures; i++) {
-      if(aLengths[i] < aLength) aLength = aLengths[i];
-    }
-    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aLength / 3.0);
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()))->setValue(aRadius);
   }
 }
 
@@ -793,4 +797,73 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
       return;
     }
   }
+}
+
+void getPointOnEdge(const FeaturePtr theFeature,
+                    const std::shared_ptr<GeomAPI_Pnt2d> theFilletPoint,
+                    std::shared_ptr<GeomAPI_Pnt2d>& thePoint) {
+  if(theFeature->getKind() == SketchPlugin_Line::ID()) {
+    std::shared_ptr<GeomAPI_Pnt2d> aPntStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::START_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::END_ID()))->pnt();
+    if(aPntStart->distance(theFilletPoint) > 1.e-7) {
+      aPntStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        theFeature->attribute(SketchPlugin_Line::END_ID()))->pnt();
+      aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        theFeature->attribute(SketchPlugin_Line::START_ID()))->pnt();
+    }
+    thePoint.reset( new GeomAPI_Pnt2d(aPntStart->xy()->added( aPntEnd->xy()->decreased( aPntStart->xy() )->multiplied(1.0 / 3.0) ) ) );
+  } else {
+    std::shared_ptr<GeomAPI_Pnt2d> aPntTemp;
+    std::shared_ptr<GeomAPI_Pnt2d> aPntStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::START_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::END_ID()))->pnt();
+    if(theFeature->attribute(SketchPlugin_Arc::INVERSED_ID())) {
+      aPntTemp = aPntStart;
+      aPntStart = aPntEnd;
+      aPntEnd = aPntTemp;
+    }
+    std::shared_ptr<GeomAPI_Pnt2d> aCenterPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Circ2d> aCirc(new GeomAPI_Circ2d(aCenterPnt, aPntStart));
+    double aStartParameter(0), anEndParameter(0);
+    aCirc->parameter(aPntStart, paramTolerance, aStartParameter);
+    aCirc->parameter(aPntEnd, paramTolerance, anEndParameter);
+    if(aPntStart->distance(theFilletPoint) > tolerance) {
+      double aTmpParameter = aStartParameter;
+      aStartParameter = anEndParameter;
+      anEndParameter = aTmpParameter;
+    }
+    double aPntParameter = aStartParameter + (anEndParameter - aStartParameter) / 3.0;
+    aCirc->D0(aPntParameter, thePoint);
+  }
+}
+
+double getProjectionDistance(const FeaturePtr theFeature,
+                             const std::shared_ptr<GeomAPI_Pnt2d> thePoint)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aProjectPnt;
+  if(theFeature->getKind() == SketchPlugin_Line::ID()) {
+    std::shared_ptr<GeomAPI_Pnt2d> aPntStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::START_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::END_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Lin2d> aLin(new GeomAPI_Lin2d(aPntStart, aPntEnd));
+    aProjectPnt = aLin->project(thePoint);
+  } else {
+    std::shared_ptr<GeomAPI_Pnt2d> aPntStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::START_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::END_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aCenterPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Circ2d> aCirc(new GeomAPI_Circ2d(aCenterPnt, aPntStart));
+    aProjectPnt = aCirc->project(thePoint);
+  }
+  if(aProjectPnt.get()) {
+    return aProjectPnt->distance(thePoint);
+  }
+  return -1;
 }

@@ -12,6 +12,7 @@
 #include <gp_Circ2d.hxx>
 #include <gp_Pnt2d.hxx>
 #include <gp_Ax2d.hxx>
+#include <GeomLib_Tool.hxx>
 #include <Geom2d_Circle.hxx>
 #include <Geom2dAPI_ProjectPointOnCurve.hxx>
 #include <Precision.hxx>
@@ -95,5 +96,23 @@ const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::center() const
 double GeomAPI_Circ2d::radius() const
 {
   return MY_CIRC2D->Radius();
+}
+
+//=================================================================================================
+const bool GeomAPI_Circ2d::parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoint,
+                                   const double theTolerance,
+                                   double& theParameter) const
+{
+  Handle(Geom2d_Circle) aCurve = new Geom2d_Circle(*MY_CIRC2D);
+  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt2d>(), theTolerance, theParameter) == Standard_True;
+}
+
+//=================================================================================================
+void GeomAPI_Circ2d::D0(const double theU, std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  Handle(Geom2d_Circle) aCurve = new Geom2d_Circle(*MY_CIRC2D);
+  gp_Pnt2d aPnt;
+  aCurve->D0(theU, aPnt);
+  thePoint.reset(new GeomAPI_Pnt2d(aPnt.X(), aPnt.Y()));
 }
 

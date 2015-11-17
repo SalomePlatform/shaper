@@ -29,12 +29,6 @@ const double paramTolerance = 1.e-4;
 const double PI =3.141592653589793238463;
 
 
-static const std::string& INVERSED_ID()
-{
-  static const std::string MY_INVERSED_ID("InversedArc");
-  return MY_INVERSED_ID;
-}
-
 SketchPlugin_Arc::SketchPlugin_Arc()
     : SketchPlugin_SketchEntity()
 {
