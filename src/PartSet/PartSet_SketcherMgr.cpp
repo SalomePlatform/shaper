@@ -78,6 +78,8 @@
 
 //#define DEBUG_DO_NOT_BY_ENTER
 
+//#define DEBUG_CURSOR
+
 /// Returns list of unique objects by sum of objects from List1 and List2
 /*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
                                        const QList<ModuleBase_ViewerPrs>& theList2)
@@ -197,8 +199,12 @@ void PartSet_SketcherMgr::onEnterViewPort()
   return;
   #endif
 
-  if (canChangeCursor(getCurrentOperation()))
+  if (canChangeCursor(getCurrentOperation())) {
+#ifdef DEBUG_CURSOR
+    qDebug("onEnterViewPort() : Qt::CrossCursor");
+#endif
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+  }
 
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
@@ -233,8 +239,12 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   return;
   #endif
 
-  if (canChangeCursor(getCurrentOperation()))
+  if (canChangeCursor(getCurrentOperation())) {
     QApplication::restoreOverrideCursor();
+#ifdef DEBUG_CURSOR
+    qDebug("onLeaveViewPort() : None");
+#endif
+  }
 
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
@@ -914,16 +924,24 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 {
-  if (canChangeCursor(theOperation) && myIsMouseOverWindow)
+  if (canChangeCursor(theOperation) && myIsMouseOverWindow) {
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+#ifdef DEBUG_CURSOR
+    qDebug("startNestedSketch() : Qt::CrossCursor");
+#endif
+  }
 }
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
-  if (canChangeCursor(theOperation))
+  if (canChangeCursor(theOperation)) {
     QApplication::restoreOverrideCursor();
+#ifdef DEBUG_CURSOR
+    qDebug("stopNestedSketch() : None");
+#endif
+  }
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
