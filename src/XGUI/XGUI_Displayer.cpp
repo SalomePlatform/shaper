@@ -57,7 +57,7 @@
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
-#define WORKAROUND_691
+//#define WORKAROUND_691
 
 //#define DEBUG_ACTIVATE_OBJECTS
 //#define DEBUG_DEACTIVATE
