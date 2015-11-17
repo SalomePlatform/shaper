@@ -95,6 +95,8 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   /// Updates the "reversed" flag
   /// \param isReversed  whether the arc will be reversed
   void setReversed(bool isReversed);
+  /// Returns \c true is the arc is reversed
+  bool isReversed();
 
   /// Use plugin manager for features creation
   SketchPlugin_Arc();

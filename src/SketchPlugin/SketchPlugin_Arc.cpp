@@ -325,3 +325,8 @@ void SketchPlugin_Arc::setReversed(bool isReversed)
   std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()))->setValue(isReversed);
   myParamBefore = 0.0;
 }
+
+bool SketchPlugin_Arc::isReversed()
+{
+  return std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()))->value();
+}

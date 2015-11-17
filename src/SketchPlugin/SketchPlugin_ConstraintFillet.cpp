@@ -205,7 +205,7 @@ void SketchPlugin_ConstraintFillet::execute()
       double y = aDir->y();
       aDir->setX(-y);
       aDir->setY(x);
-      if (!isStart[i])
+      if (isStart[i] == std::dynamic_pointer_cast<SketchPlugin_Arc>(aFeature[i])->isReversed())
         aDir = aDir->multiplied(-1.0);
     }
     aTangentDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(aDir));
