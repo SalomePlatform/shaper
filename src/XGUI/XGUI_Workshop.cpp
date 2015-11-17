@@ -280,13 +280,13 @@ void XGUI_Workshop::initMenu()
   addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
 
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
-  aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
-                                              QIcon(":pictures/rebuild.png"), QKeySequence(),
-                                              false, "MEN_DESK_EDIT");
-  salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
+  //aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+  //                                            QIcon(":pictures/rebuild.png"), QKeySequence(),
+  //                                            false, "MEN_DESK_EDIT");
+  //salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
 
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
-  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
+  //connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
+  //salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
   aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current document into a NewGeom file"),
                                               QIcon(), QKeySequence(),
@@ -847,21 +847,21 @@ void XGUI_Workshop::onRedo(int theTimes)
 }
 
 //******************************************************
-void XGUI_Workshop::onRebuild()
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  bool aWasOperation = aMgr->isOperation(); // keep this value
-  if (!aWasOperation) {
-    aMgr->startOperation("Rebuild");
-  }
-  static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
-  Events_Loop::loop()->send(std::shared_ptr<Events_Message>(
-    new Events_Message(aRebuildEvent, this)));
-  if (!aWasOperation) {
-    aMgr->finishOperation();
-  }
-  updateCommandStatus();
-}
+//void XGUI_Workshop::onRebuild()
+//{
+//  SessionPtr aMgr = ModelAPI_Session::get();
+//  bool aWasOperation = aMgr->isOperation(); // keep this value
+//  if (!aWasOperation) {
+//    aMgr->startOperation("Rebuild");
+//  }
+//  static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
+//  Events_Loop::loop()->send(std::shared_ptr<Events_Message>(
+//    new Events_Message(aRebuildEvent, this)));
+//  if (!aWasOperation) {
+//    aMgr->finishOperation();
+//  }
+//  updateCommandStatus();
+//}
 
 //******************************************************
 void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)

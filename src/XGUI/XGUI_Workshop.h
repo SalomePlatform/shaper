@@ -296,8 +296,8 @@ signals:
   /// Redo previous command
   void onRedo(int times = 1);
 
-  /// Rebuild data tree
-  void onRebuild();
+  // Rebuild data tree
+  //void onRebuild();
 
   /// Validates the operation to change the "Apply" button state.
   /// \param thePreviousState the previous state of the widget
