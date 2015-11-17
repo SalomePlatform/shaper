@@ -273,7 +273,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
     if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance) {
       if (!isStable()) { // issue #855: trying to update only not-updated coordinate if it is possible
-        if (abs(myXEndBefore - anEndAttr->x()) < 1.e-10) { // keep Y unchanged
+        if (fabs(myXEndBefore - anEndAttr->x()) < 1.e-10) { // keep Y unchanged
           double aVy = aCenterAttr->y() - anEndAttr->y();
           double aVy2 = aVy * aVy;
           double aR2 = aCircleForArc->radius() * aCircleForArc->radius();
@@ -285,7 +285,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
               aProjection->setX(aCenterAttr->x() - aDX);
             aProjection->setY(anEndAttr->y());
           }
-        } else if (abs(myYEndBefore - anEndAttr->y()) < 1.e-10) { // keep X unchanged
+        } else if (fabs(myYEndBefore - anEndAttr->y()) < 1.e-10) { // keep X unchanged
           double aVx = aCenterAttr->x() - anEndAttr->x();
           double aVx2 = aVx * aVx;
           double aR2 = aCircleForArc->radius() * aCircleForArc->radius();
