@@ -792,14 +792,15 @@ void Model_Objects::synchronizeBackRefs()
       synchronizeBackRefsForObject(aFound->second, aFeature);
     }
     // also for results
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-    for(; aRes != aResults.cend(); aRes++) {
-      aFound = allRefs.find(*aRes);
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
+    std::list<ResultPtr>::iterator aRIter = aResults.begin();
+    for(; aRIter != aResults.cend(); aRIter++) {
+      aFound = allRefs.find(*aRIter);
       if (aFound == allRefs.end()) { // not found => erase all back references
-        synchronizeBackRefsForObject(anEmpty, *aRes);
+        synchronizeBackRefsForObject(anEmpty, *aRIter);
       } else {
-        synchronizeBackRefsForObject(aFound->second, *aRes);
+        synchronizeBackRefsForObject(aFound->second, *aRIter);
       }
     }
   }

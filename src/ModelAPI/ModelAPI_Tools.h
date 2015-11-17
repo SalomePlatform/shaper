@@ -74,6 +74,11 @@ MODELAPI_EXPORT ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub);
 */
 MODELAPI_EXPORT bool hasSubResults(const ResultPtr& theResult);
 
+/*!
+* Adds the results of the given feature to theResults list: including disabled and sub-results
+*/
+MODELAPI_EXPORT void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults);
+
 }
 
 #endif

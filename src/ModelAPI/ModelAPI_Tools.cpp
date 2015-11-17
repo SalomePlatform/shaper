@@ -211,5 +211,23 @@ bool hasSubResults(const ResultPtr& theResult)
   return aCompSolid.get() && aCompSolid->numberOfSubs() > 0;
 }
 
+void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
+{
+  const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+  for (; aRIter != aResults.cend(); aRIter++) {
+    theResults.push_back(*aRIter);
+    // iterate sub-bodies of compsolid
+    ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
+    if (aComp.get()) {
+      int aNumSub = aComp->numberOfSubs();
+      for(int a = 0; a < aNumSub; a++) {
+        theResults.push_back(aComp->subResult(a));
+      }
+    }
+  }
+}
+
 } // namespace ModelAPI_Tools
+
 

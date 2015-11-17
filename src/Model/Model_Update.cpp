@@ -398,9 +398,11 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
 {
   // make updated and redisplay all results
   static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-  for (; aRIter != aResults.cend(); aRIter++) {
+
+  std::list<ResultPtr> allResults;
+  ModelAPI_Tools::allResults(theFeature, allResults);
+  std::list<ResultPtr>::iterator aRIter = allResults.begin();
+  for (; aRIter != allResults.cend(); aRIter++) {
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
     if (!aRes->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
       aRes->data()->execState(theState);
@@ -411,23 +413,6 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
       aRes->data()->setUpdateID(theFeature->data()->updateID());
     }
     ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-    // iterate sub-bodies of compsolid
-    ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
-    if (aComp.get()) {
-      int aNumSub = aComp->numberOfSubs();
-      for(int a = 0; a < aNumSub; a++) {
-        ResultPtr aSub = aComp->subResult(a);
-        if (!aSub->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
-          aSub->data()->execState(theState);
-          if (theState == ModelAPI_StateDone) // feature become "done", so execution changed results
-            myUpdated[aSub] = myModification;
-        }
-        if (theFeature->data()->updateID() > aSub->data()->updateID()) {
-          aSub->data()->setUpdateID(theFeature->data()->updateID());
-        }
-        ModelAPI_EventCreator::get()->sendUpdated(aSub, EVENT_DISP);
-      }
-    }
   }
   // to redisplay "presentable" feature (for ex. distance constraint)
   ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
@@ -463,8 +448,9 @@ bool Model_Update::isOlder(std::shared_ptr<ModelAPI_Feature> theFeature,
   // for the modification IDs compare results: modification ID of feature means only that attributes
   // of this feature were updated, but if results are obsolete relatively to the referenced results,
   // the feature must be updated
-  const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+  std::list<ResultPtr> aResults;
+  ModelAPI_Tools::allResults(theFeature, aResults);
+  std::list<ResultPtr>::iterator aRIter = aResults.begin();
   for (; aRIter != aResults.cend(); aRIter++) {
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
     if (!aRes->isDisabled()) {
@@ -473,21 +459,6 @@ bool Model_Update::isOlder(std::shared_ptr<ModelAPI_Feature> theFeature,
         return true;
       if (anRIter->second < anAIter->second)
         return true;
-      // iterate sub-bodies of compsolid
-      ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
-      if (aComp.get()) {
-        int aNumSub = aComp->numberOfSubs();
-        for(int a = 0; a < aNumSub; a++) {
-          ResultPtr aSub = aComp->subResult(a);
-          if (!aSub->isDisabled()) {// update state only for enabled results (Placement Result Part may make the original Part Result as invalid)
-            std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator anSIter = myUpdated.find(aSub);
-            if (anSIter == myUpdated.end()) // not updated at all
-              return true;
-            if (anSIter->second < anAIter->second)
-              return true;
-          }
-        }
-      }
     }
   }
   // also check a feature: some have no parameters,
