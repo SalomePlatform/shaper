@@ -104,9 +104,15 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
   for ( ; it != anExprParams.end(); it++) {
     std::string& aVariableName = *it;
 
+    // parameter with the same name should be searched in the parent document
+    // currently there is no way to get parent document, so we get PartSet doc
+    DocumentPtr aDocument = document();
+    if (data()->name() == aVariableName)
+      aDocument = ModelAPI_Session::get()->moduleDocument();
+
     double aValue;
     ResultParameterPtr aParamRes;
-    if (!ModelAPI_Tools::findVariable(aVariableName, aValue, aParamRes, document())) continue;
+    if (!ModelAPI_Tools::findVariable(aVariableName, aValue, aParamRes, aDocument)) continue;
     aParamsList.push_back(aParamRes);
 
     std::ostringstream sstream;
