@@ -65,7 +65,7 @@ void ParametersPlugin_Parameter::updateName()
   setResult(aParam);
 }
 
-void ParametersPlugin_Parameter::updateExpression()
+bool ParametersPlugin_Parameter::updateExpression()
 {
   std::string anExpression = string(EXPRESSION_ID())->value();
 
@@ -73,25 +73,21 @@ void ParametersPlugin_Parameter::updateExpression()
   double aValue = evaluate(anExpression, outErrorMessage);
 
   data()->string(EXPRESSION_ERROR_ID())->setValue(outErrorMessage);
-  if (!outErrorMessage.empty()) {
-    setError("Expression error.", false);
-    data()->execState(ModelAPI_StateExecFailed);
-    return;
-  }
+  if (!outErrorMessage.empty())
+    return false;
 
   ResultParameterPtr aParam = document()->createParameter(data());
   AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
   aValueAttribute->setValue(aValue);
   setResult(aParam);
-
-  setError("", false);
-  data()->execState(ModelAPI_StateDone);
+  return true;
 }
 
 void ParametersPlugin_Parameter::execute()
 {
   updateName();
-  updateExpression();
+  if (!updateExpression())
+    setError("Expression error.", false);
 }
 
 double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)

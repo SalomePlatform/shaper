@@ -86,7 +86,7 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   /// Updates name of the parameter
   void updateName();
   /// Updates expression of the parameter
-  void updateExpression();
+  bool updateExpression();
 
  private:
   std::shared_ptr<ParametersPlugin_PyInterp> myInterp;
