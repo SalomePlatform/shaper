@@ -21,6 +21,8 @@
 #include <AIS_InteractiveObject.hxx>
 #include <Prs3d_PointAspect.hxx>
 
+//#define DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
+
 #define OPERATION_PARAMETER_COLOR "255, 255, 0"
 
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
@@ -40,6 +42,10 @@ bool PartSet_CustomPrs::isActive()
 
 bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature, const bool theUpdateViewer)
 {
+#ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
+  return false;
+#endif
+
   bool isModified = false;
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
 
@@ -112,6 +118,10 @@ Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation()
 
 bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject, const bool theUpdateViewer)
 {
+#ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
+  return false;
+#endif
+
   bool isModified = false;
   // the presentation should be recomputed if the previous AIS depend on the result
   // [it should be hiddend] or the new AIS depend on it [it should be visualized]
