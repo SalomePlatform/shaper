@@ -79,13 +79,13 @@ void ParametersPlugin_Parameter::updateExpression()
     return;
   }
 
-  setError("", false);
-  data()->execState(ModelAPI_StateDone);
-
   ResultParameterPtr aParam = document()->createParameter(data());
   AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
   aValueAttribute->setValue(aValue);
   setResult(aParam);
+
+  setError("", false);
+  data()->execState(ModelAPI_StateDone);
 }
 
 void ParametersPlugin_Parameter::execute()
