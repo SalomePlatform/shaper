@@ -101,9 +101,14 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
 /*!
  \brief This function is used to set a current value for this spinbox.
  \param value current value
+
+ The new value is ignored if the spinbox has a variable.
  */
 void ModuleBase_ParamSpinBox::setValue(const double value)
 {
+  if (hasVariable())
+    return;
+
   myTextValue = ModuleBase_DoubleSpinBox::textFromValue(value);
   ModuleBase_DoubleSpinBox::setValue(value);
 }
