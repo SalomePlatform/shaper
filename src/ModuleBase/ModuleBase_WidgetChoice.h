@@ -56,6 +56,9 @@ Q_OBJECT
   /// \return a controls list
   virtual QList<QWidget*> getControls() const;
 
+signals:
+  void itemSelected(int);
+
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success

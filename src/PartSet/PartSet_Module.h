@@ -255,6 +255,10 @@ protected slots:
   /// A slot called on view window creation
   void onViewCreated(ModuleBase_IViewWindow*);
 
+  /// A slot to change property panel title on change of boolean operation type
+  /// \param theOperation the operation type
+  void onBooleanOperationChange(int theOperation);
+
 protected:
   /// Register validators for this module
   virtual void registerValidators();

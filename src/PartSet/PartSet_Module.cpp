@@ -18,6 +18,7 @@
 #include "PartSet_MenuMgr.h"
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
+#include "PartSet_WidgetChoice.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -543,6 +544,9 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aWgt = new PartSet_WidgetFileSelector(theParent, aWorkshop, theWidgetApi, theParentId);
   } else if (theType == "sketch_launcher") {
     aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi, theParentId);
+  } else if (theType == "module_choice") {
+    aWgt = new PartSet_WidgetChoice(theParent, theWidgetApi, theParentId);
+    connect(aWgt, SIGNAL(itemSelected(int)), SLOT(onBooleanOperationChange(int)));
   }
   return aWgt;
 }
@@ -1018,4 +1022,25 @@ void PartSet_Module::widgetStateChanged(int thePreviousState)
 bool PartSet_Module::processEnter(const std::string& thePreviousAttributeID)
 {
   return mySketchReentrantMgr->processEnter(thePreviousAttributeID);
+}
+
+
+//******************************************************
+void PartSet_Module::onBooleanOperationChange(int theOperation)
+{
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (!aOperation)
+    return;
+  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  switch (theOperation) {
+  case 0:
+    aPanel->setWindowTitle(tr("Cut"));
+    break;
+  case 1:
+    aPanel->setWindowTitle(tr("Fuse"));
+    break;
+  case 2:
+    aPanel->setWindowTitle(tr("Common"));
+    break;
+  }
 }

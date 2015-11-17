@@ -77,6 +77,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     }
     myButtons->button(0)->setChecked(true);
     connect(myButtons, SIGNAL(buttonClicked(int)), this, SLOT(onCurrentIndexChanged(int)));
+    connect(myButtons, SIGNAL(buttonClicked(int)), this, SIGNAL(itemSelected(int)));
   } else {
     myLabel = new QLabel(aLabelText, this);
     if (!aLabelIcon.isEmpty())
@@ -94,6 +95,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     myCombo->addItems(aList);
 
     connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
+    connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SIGNAL(itemSelected(int)));
   }
 }
 
@@ -128,6 +130,7 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
       bool isBlocked = myButtons->blockSignals(true);
       myButtons->button(aIntAttr->value())->setChecked(true);
       myButtons->blockSignals(isBlocked);
+      emit itemSelected(aIntAttr->value());
     }
   }
   return true;

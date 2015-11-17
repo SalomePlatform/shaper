@@ -29,6 +29,7 @@ SET(PROJECT_HEADERS
 	PartSet_MenuMgr.h
 	PartSet_WidgetSketchCreator.h
 	PartSet_IconFactory.h
+	PartSet_WidgetChoice.h
 )
 
 SET(PROJECT_SOURCES
