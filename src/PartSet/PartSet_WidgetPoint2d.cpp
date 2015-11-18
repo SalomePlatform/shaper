@@ -352,9 +352,9 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
     ObjectPtr aObject = aObjects.front();
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
     bool anExternal = false;
-    if (aSelectedFeature.get() != NULL) {
-      std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-              std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+      std::shared_ptr<SketchPlugin_Feature> aSPFeature;
+      if (aSelectedFeature.get() != NULL)
+        aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
       if ((!aSPFeature) && (!aShape.IsNull())) {
         anExternal = true;
         ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
@@ -377,7 +377,6 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           emit focusOutWidget(this);
         }
       }
-    }
     if (!anExternal) {
       double aX, aY;
       bool isProcessed = false;

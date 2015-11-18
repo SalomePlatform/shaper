@@ -27,6 +27,8 @@
 
 #include <set>
 
+#define DEBUG_DELIVERY
+
 XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
     : myWorkshop(theWorkshop)
 {
@@ -126,9 +128,14 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
     // the located method is called in the context to obtain the shape by the SelectedShape() method,
     // so the shape is located by the same rules
     TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
+#ifndef DEBUG_DELIVERY
+    if (aShape.IsNull())
+      aShape = findAxisShape(anIO);
+#endif
     if (!aShape.IsNull())
       thePrs.setShape(aShape);
   } else {
+#ifdef DEBUG_DELIVERY
     // Fill by trihedron shapes
     Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(anIO);
     if (!aAxis.IsNull()) {
@@ -154,6 +161,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
           thePrs.setShape(aVertex);
       }
     }
+#endif
   }
      
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
@@ -262,6 +270,9 @@ void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList,
 
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     TopoDS_Shape aShape = aContext->SelectedShape();
+    if (aShape.IsNull()) {
+      aShape = findAxisShape(aContext->SelectedInteractive());
+    }
     if (!aShape.IsNull()) {
       theList.Append(aShape);
       Handle(SelectMgr_EntityOwner) aEO = aContext->SelectedOwner();
@@ -314,4 +325,36 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
         theOwners.Add(anOwner);
     }
   }
+}
+
+//**************************************************************
+TopoDS_Shape XGUI_Selection::findAxisShape(Handle(AIS_InteractiveObject) theIO) const
+{
+  TopoDS_Shape aShape;
+  // Fill by trihedron shapes
+  Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(theIO);
+  if (!aAxis.IsNull()) {
+    // an Axis from Trihedron
+    Handle(Geom_Line) aLine = aAxis->Component();
+    Handle(Prs3d_DatumAspect) DA = aAxis->Attributes()->DatumAspect();
+    Handle(Geom_TrimmedCurve) aTLine = new Geom_TrimmedCurve(aLine, 0, DA->FirstAxisLength());
+
+    BRep_Builder aBuilder;      
+    TopoDS_Edge aEdge;
+    aBuilder.MakeEdge(aEdge, aTLine, Precision::Confusion());
+    if (!aEdge.IsNull())
+      aShape = aEdge;
+  } else {
+    Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(theIO);
+    if (!aPoint.IsNull()) {
+      // A point from trihedron
+      Handle(Geom_Point) aPnt = aPoint->Component();
+      BRep_Builder aBuilder;
+      TopoDS_Vertex aVertex;
+      aBuilder.MakeVertex(aVertex, aPnt->Pnt(), Precision::Confusion());
+      if (!aVertex.IsNull())
+        aShape = aVertex;
+    }
+  }
+  return aShape;
 }
