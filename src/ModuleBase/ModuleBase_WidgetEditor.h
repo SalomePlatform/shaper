@@ -46,6 +46,9 @@ Q_OBJECT
    /// Shous popup window under cursor for data editing
    void showPopupEditor();
 
+protected slots:
+  void onKeyReleased(QKeyEvent* theEvent);
+
 private:
    void editedValue(double& outValue, QString& outText);
 
@@ -55,6 +58,8 @@ private:
 
    ///< the kinds of possible features
    QStringList myFeatureKinds;  
+
+   bool myIsKeyReleasedEmitted;
 };
 
 #endif

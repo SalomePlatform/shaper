@@ -35,7 +35,8 @@
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,
                                                  const std::string& theParentId)
-    : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
+: ModuleBase_WidgetDoubleValue(theParent, theData, theParentId),
+  myIsKeyReleasedEmitted(false)
 {
 }
 
@@ -52,7 +53,7 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
   ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(&aDlg);
   anEditor->enableKeyPressEvent(true);
   if (!myIsEditing) {
-    connect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
+    connect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SLOT(onKeyReleased(QKeyEvent*)));
   }
 
   anEditor->setMinimum(0);
@@ -72,7 +73,7 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
   aDlg.exec();
 
   if (!myIsEditing) {
-    disconnect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
+    disconnect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SLOT(onKeyReleased(QKeyEvent*)));
   }
 
   outText = anEditor->text();
@@ -99,6 +100,8 @@ bool ModuleBase_WidgetEditor::focusTo()
 
 void ModuleBase_WidgetEditor::showPopupEditor()
 {
+  myIsKeyReleasedEmitted = false;
+
   // we need to emit the focus in event manually in order to save the widget as an active
   // in the property panel before the mouse leave event happens in the viewer. The module
   // ask an active widget and change the feature visualization if the widget is not the current one.
@@ -122,4 +125,12 @@ void ModuleBase_WidgetEditor::showPopupEditor()
   // the focus leaves the control automatically by the Enter/Esc event
   // it is processed in operation manager
   //emit focusOutWidget(this);
+
+  if (myIsKeyReleasedEmitted)
+    emit enterClicked();
+}
+
+void ModuleBase_WidgetEditor::onKeyReleased(QKeyEvent* theEvent)
+{
+  myIsKeyReleasedEmitted = true;
 }

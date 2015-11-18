@@ -274,6 +274,12 @@ bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
 bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
 {
   bool isDone = false;
+  /// this is workaround for ModuleBase_WidgetEditor, used in SALOME mode. Sometimes key enter
+  /// event comes two times, so we should not start another internal edit operation
+  /// the Apply button becomes disabled becase the second additional internal feature is created
+  if (myIsInternalEditOperation)
+    return true;
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                      (myWorkshop->currentOperation());
 

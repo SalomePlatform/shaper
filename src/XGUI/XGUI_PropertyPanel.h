@@ -119,6 +119,9 @@ public slots:
   */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
+signals:
+  void enterClicked();
+
 protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget

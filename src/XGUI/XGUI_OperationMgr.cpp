@@ -546,7 +546,8 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      ModuleBase_Operation* aOperation = currentOperation();
+      isAccepted = onProcessEnter();
+      /*ModuleBase_Operation* aOperation = currentOperation();
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
       ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
       if (!aActiveWgt || !aActiveWgt->processEnter()) {
@@ -559,7 +560,7 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
           else
             isAccepted = false;
         }
-      }
+      }*/
     }
     break;
     case Qt::Key_N:
@@ -586,6 +587,26 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   //if(anOperation) {
   //  anOperation->keyReleased(theEvent->key());
   //}
+  return isAccepted;
+}
+
+bool XGUI_OperationMgr::onProcessEnter()
+{
+  bool isAccepted = true;
+  ModuleBase_Operation* aOperation = currentOperation();
+  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+  if (!aActiveWgt || !aActiveWgt->processEnter()) {
+    if (!myWorkshop->module()->processEnter(aActiveWgt ? aActiveWgt->attributeID() : "")) {
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+      if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
+        emit keyEnterReleased();
+        commitOperation();
+      }
+      else
+        isAccepted = false;
+    }
+  }
   return isAccepted;
 }
 

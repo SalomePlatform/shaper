@@ -200,6 +200,9 @@ signals:
   /// \param theEvent key release event
   void keyReleased(QKeyEvent* theEvent);
 
+  /// The signal is emitted if the enter is clicked in the control of the widget
+  void enterClicked();
+
   /// The signal about the widget is get focus
   /// \param theWidget the model base widget
   void focusInWidget(ModuleBase_ModelWidget* theWidget);

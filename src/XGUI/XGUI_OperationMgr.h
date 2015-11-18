@@ -176,6 +176,11 @@ protected: // TEMPORARY
   /// \param theEvent the mouse event
   bool onKeyReleased(QKeyEvent* theEvent);
 
+  /// The functionaly, that should be done by enter click
+  /// Fistly the active widget processes it, then module. If no one do not
+  /// process it, the current operation is committed
+  bool onProcessEnter();
+
   protected slots:
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
   /// If there is a suspended operation, restart it.
