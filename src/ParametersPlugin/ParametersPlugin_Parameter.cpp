@@ -53,6 +53,8 @@ void ParametersPlugin_Parameter::attributeChanged(const std::string& theID)
 {
   if (theID == EXPRESSION_ID())
     updateExpression();
+
+  data()->execState(ModelAPI_StateMustBeUpdated);
 }
 
 void ParametersPlugin_Parameter::updateName()
