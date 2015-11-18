@@ -172,7 +172,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // place where results are cleared)
     myIsParamUpdated = false;
     myUpdated.clear();
-    myModification = 0;
+    // do not erase it since there may be modification increment on start of operation
+    //myModification = 0;
     myWaitForFinish.clear();
   }
 }
@@ -240,6 +241,8 @@ void Model_Update::processOperation(const bool theTotalUpdate, const bool theFin
       isAutomaticChanged = true;
       myIsAutomatic = true;
     }
+    // modifications inside of the iteration will be different from modification that comes outside
+    myModification++;
     // init iteration from the root document
     iterateUpdate(CompositeFeaturePtr());
 
@@ -455,6 +458,9 @@ bool Model_Update::isOlder(std::shared_ptr<ModelAPI_Feature> theFeature,
     std::shared_ptr<ModelAPI_Result> aRes = *aRIter;
     if (!aRes->isDisabled()) {
       std::map<std::shared_ptr<ModelAPI_Object>, int >::iterator anRIter = myUpdated.find(aRes);
+      int aResultID = aRes->data()->updateID();
+      if (aResultID < anArgID)
+        return true;
       if (anRIter == myUpdated.end()) // not updated at all
         return true;
       if (anRIter->second < anAIter->second)

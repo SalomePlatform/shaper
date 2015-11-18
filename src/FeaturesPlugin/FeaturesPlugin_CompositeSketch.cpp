@@ -115,7 +115,10 @@ void FeaturesPlugin_CompositeSketch::execute()
   if(!aConstruction.get()) {
     return;
   }
-  selection(SKETCH_SELECTION_ID())->setValue(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+
+  if (!selection(SKETCH_SELECTION_ID())->isInitialized() || selection(SKETCH_SELECTION_ID())->context() != aSketchRes) {
+    selection(SKETCH_SELECTION_ID())->setValue(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+  }
   int aSketchFacesNum = aConstruction->facesNum();
   if(aSketchFacesNum == 0) {
     return;

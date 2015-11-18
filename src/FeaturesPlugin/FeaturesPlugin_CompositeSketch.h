@@ -27,7 +27,7 @@ class FeaturesPlugin_CompositeSketch : public ModelAPI_CompositeFeature
     return MY_SKETCH_OBJECT_ID;
   }
 
-  /// Attribute name of sketch feature.
+  /// Attribute name of sketch feature selection: needed for naming of the selected sketch.
   inline static const std::string& SKETCH_SELECTION_ID()
   {
     static const std::string MY_SKETCH_SELECTION_ID("sketch_selection");
