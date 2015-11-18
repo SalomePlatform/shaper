@@ -270,7 +270,6 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
   if (anActiveWidget)
     anActiveWidget->reset();
-  aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
 
   // hides the presentation of the current operation feature
   // the feature is to be erased here, but it is correct to call canDisplayObject because
@@ -281,6 +280,9 @@ void PartSet_SketcherMgr::onLeaveViewPort()
     FeaturePtr aFeature = aFOperation->feature();
     visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
   }
+  // we should update viewer after the presentation are hidden in the viewer
+  // otherwise the reset presentation(line) appears in the viewer(by quick move from viewer to PP)
+  aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
 }
 
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
