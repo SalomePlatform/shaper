@@ -129,7 +129,10 @@ void Events_Loop::flush(const Events_ID& theID)
     send(aGroup, false);
 
     if (!aWasFlushed)
-      myFlushed.erase(myFlushed.find(theID.myID));
+      // TODO: Stabilization fix. Check later.
+      if(myFlushed.find(theID.myID) != myFlushed.end()) {
+        myFlushed.erase(myFlushed.find(theID.myID));
+      }
   }
 }
 

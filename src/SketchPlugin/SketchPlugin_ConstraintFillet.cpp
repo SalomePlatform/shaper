@@ -226,6 +226,10 @@ void SketchPlugin_ConstraintFillet::execute()
   // Calculate fillet arc parameters
   std::shared_ptr<GeomAPI_XY> aCenter, aTangentPntA, aTangentPntB;
   calculateFilletCenter(anOldFeatureA, anOldFeatureB, aFilletRadius, isStart, aCenter, aTangentPntA, aTangentPntB);
+  if(!aCenter.get() || !aTangentPntA.get() || !aTangentPntB.get()) {
+    setError("Can not create fillet with the specified parameters.");
+    return;
+  }
   // update features
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aNewFeatureA->attribute(aFeatAttributes[isStart[0] ? 0 : 1]))->setValue(
