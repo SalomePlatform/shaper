@@ -26,7 +26,7 @@ public:
    /// Returns True if selection is valid
    /// \param theSelection selection instance
    /// \param theOperation - current operation (can be 0)
-  virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const = 0;
+  virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
 #endif

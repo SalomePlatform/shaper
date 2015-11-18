@@ -106,6 +106,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetValidated.cpp
   ModuleBase_IconFactory.cpp
   ModuleBase_WidgetErrorLabel.cpp
+  ModuleBase_SelectionValidator.cpp
 )
 
 SET(PROJECT_LIBRARIES
