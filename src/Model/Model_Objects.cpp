@@ -340,7 +340,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
 {
   std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(theGroupID);
   if (aHIter == myHistory.end()) {
-    std::vector<ObjectPtr>& aResult = std::vector<ObjectPtr>();
+    std::vector<ObjectPtr> aResult = std::vector<ObjectPtr>();
     // iterate the array of references and get feature by feature from the array
     bool isFeature = theGroupID == ModelAPI_Feature::group();
     Handle(TDataStd_ReferenceArray) aRefs;
