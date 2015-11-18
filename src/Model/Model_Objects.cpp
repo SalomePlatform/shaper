@@ -340,8 +340,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
 {
   std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(theGroupID);
   if (aHIter == myHistory.end()) {
-    myHistory[theGroupID] = std::vector<ObjectPtr>();
-    std::vector<ObjectPtr>& aResult = myHistory[theGroupID];
+    std::vector<ObjectPtr>& aResult = std::vector<ObjectPtr>();
     // iterate the array of references and get feature by feature from the array
     bool isFeature = theGroupID == ModelAPI_Feature::group();
     Handle(TDataStd_ReferenceArray) aRefs;
@@ -356,7 +355,8 @@ void Model_Objects::createHistory(const std::string& theGroupID)
                 aResult.push_back(aFeature);
               }
             } else if (!aFeature->isDisabled()) { // iterate all results of not-disabled feature
-              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+              // do not use reference to the list here since results can be changed by "isConcealed"
+              const std::list<std::shared_ptr<ModelAPI_Result> > aResults = aFeature->results();
               std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
               for (; aRIter != aResults.cend(); aRIter++) {
                 ResultPtr aRes = *aRIter;
@@ -370,6 +370,9 @@ void Model_Objects::createHistory(const std::string& theGroupID)
         }
       }
     }
+    // to be sure that isConcealed did not update the history (issue 1089) during the iteration
+    if (myHistory.find(theGroupID) == myHistory.end())
+      myHistory[theGroupID] = aResult;
   }
 }
 
