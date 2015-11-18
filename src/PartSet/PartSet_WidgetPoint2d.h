@@ -148,11 +148,16 @@ protected:
    void setConstraintWith(const ObjectPtr& theObject);
 
    /// Returns if the feature is an orphan point, circle or an arc. Returns true if it
-   /// has no a coincident to other lines. In Circle and arc only center points are processed.
+   /// has no a coincident to other lines. It processes point, circle and arc features
+   /// In circle an arc features, only centers are processed, for other points, it returns
+   /// that the point is not an orphan.
    /// \param theFeature a checked feature
    /// \param theSketch a sketch
+   /// \param theX an X coordinate of the point
+   /// \param theY an Y coordinate of the point
    /// \return boolean result
-   static bool isOrphanPoint(const FeaturePtr& theFeature, const CompositeFeaturePtr& theSketch);
+   static bool isOrphanPoint(const FeaturePtr& theFeature, const CompositeFeaturePtr& theSketch,
+                             double theX, double theY);
 
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop

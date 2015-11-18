@@ -370,7 +370,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         else {
           if (getPoint2d(aView, aShape, aX, aY))
             setPoint(aX, aY);
-          bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch);
+          bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
           setConstraintWith(aObject);
           if (!anOrphanPoint)
             emit vertexSelected();
@@ -386,7 +386,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         setPoint(aX, aY);
       }
       else {
-        bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch);
+        bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
         // do not set a coincidence constraint in the attribute if the feature contains a point
         // with the same coordinates. It is important for line creation in order to do not set
         // the same constraints for the same points, oterwise the result line has zero length.
@@ -520,7 +520,8 @@ bool PartSet_WidgetPoint2D::processEnter()
 }
 
 bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
-                                          const CompositeFeaturePtr& theSketch)
+                                          const CompositeFeaturePtr& theSketch,
+                                          double theX, double theY)
 {
   bool anOrphanPoint = false;
   if (theFeature.get()) {
@@ -536,6 +537,16 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
     else if (aFeatureKind == SketchPlugin_Arc::ID())
       aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                        theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+
+    /// check that the geometry point with the given coordinates is the checked point
+    /// e.g. in arc the (x,y) point can not coicide to the center point and it automatically
+    /// means that this point is not an orphant one.
+    if (aPointAttr.get()) {
+      std::shared_ptr<GeomAPI_Pnt2d> aCheckedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
+                                                    new GeomAPI_Pnt2d(theX, theY));
+      if (!aCheckedPoint->isEqual(aPointAttr->pnt()))
+        return anOrphanPoint;
+    }
 
     if (aPointAttr.get()) {
       std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
