@@ -29,6 +29,7 @@
 
 #include <GeomDataAPI_Point2D.h>
 
+const double tolerance = 1.e-7;
 
 bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                  const std::list<std::string>& theArguments,
@@ -406,19 +407,73 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   }
 
   AttributeRefAttrPtr aBase = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributePtr anAttrBase = aBase->attr();
   if(aBase->isObject()) {
     return false;
   }
 
-  // If we alredy have some result then all ok
+  // If we alredy have some result then:
+  // - if it is the same point all ok
+  // - if it is point on the fillet arc then it is not valid
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributePtr aBaseLinesAttribute = aFeature->attribute(SketchPlugin_Constraint::ENTITY_C());
   AttributeRefListPtr aRefListOfBaseLines = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aBaseLinesAttribute);
+  std::list<ObjectPtr> anOldFeatList = aRefListOfBaseLines->list();
   if(!aRefListOfBaseLines->list().empty()) {
-    return true;
+    FeaturePtr anOldFeatureA, anOldFeatureB;
+    std::list<ObjectPtr>::iterator aFeatIt = anOldFeatList.begin();
+    anOldFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
+    anOldFeatureB = ModelAPI_Feature::feature(*aFeatIt);
+
+    AttributePtr anAttrStartA = 
+      anOldFeatureA->attribute(anOldFeatureA->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::START_ID() : SketchPlugin_Arc::START_ID());
+    AttributePtr anAttrEndA = 
+      anOldFeatureA->attribute(anOldFeatureA->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::END_ID() : SketchPlugin_Arc::END_ID());
+    AttributePtr anAttrStartB = 
+      anOldFeatureB->attribute(anOldFeatureB->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::START_ID() : SketchPlugin_Arc::START_ID());
+    AttributePtr anAttrEndB = 
+      anOldFeatureB->attribute(anOldFeatureB->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::END_ID() : SketchPlugin_Arc::END_ID());
+
+    std::shared_ptr<GeomAPI_Pnt2d> aBasePnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrBase)->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aStartPntA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrStartA)->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> anEndPntA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrEndA)->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aStartPntB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrStartB)->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> anEndPntB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrEndB)->pnt();
+    double aDistBaseStartA = aBasePnt->distance(aStartPntA);
+    double aDistBaseEndA = aBasePnt->distance(anEndPntA);
+    double aDistStartAStartB = aStartPntA->distance(aStartPntB);
+    double aDistStartAEndB = aStartPntA->distance(anEndPntB);
+    double aDistEndAStartB = anEndPntA->distance(aStartPntB);
+    double aDistEndAEndB = anEndPntA->distance(anEndPntB);
+
+    if((aDistBaseStartA < tolerance && (aDistStartAStartB < tolerance || aDistStartAEndB < tolerance)) ||
+      (aDistBaseEndA < tolerance && (aDistEndAStartB < tolerance || aDistEndAStartB < tolerance))) {
+      return true;
+    }
+
+    // Check that point not on fillet arc
+    AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        aFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
+    std::list<ObjectPtr> aNewFeatList = aRefListOfFillet->list();
+    if(!aNewFeatList.empty()) {
+      aFeatIt = aNewFeatList.begin();
+      FeaturePtr aNewArc;
+      //aNewFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
+      //aNewFeatureB = ModelAPI_Feature::feature(*aFeatIt++);
+      aFeatIt++; aFeatIt++;
+      aNewArc = ModelAPI_Feature::feature(*aFeatIt);
+      AttributePtr anArcStart = aNewArc->attribute(SketchPlugin_Arc::START_ID());
+      AttributePtr anArcEnd = aNewArc->attribute(SketchPlugin_Arc::END_ID());
+      std::shared_ptr<GeomAPI_Pnt2d> anArcStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcStart)->pnt();
+      std::shared_ptr<GeomAPI_Pnt2d> anArcEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcEnd)->pnt();
+      double aDistBaseArcStart = aBasePnt->distance(anArcStartPnt);
+      double aDistBaseArcEnd = aBasePnt->distance(anArcEndPnt);
+      if(aDistBaseArcStart < tolerance || aDistBaseArcEnd < tolerance) {
+        return false;
+      }
+    }
   }
 
-  AttributePtr anAttrBase = aBase->attr();
   const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
   std::set<AttributePtr>::const_iterator aIt;
   FeaturePtr aCoincident;
