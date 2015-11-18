@@ -181,15 +181,18 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return;
 
-  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-    bool isStarted = false;
+  bool isStarted = false;
+  bool isSketchSolverError = module()->sketchMgr()->sketchSolverError();
+  if (!isSketchSolverError &&
+      aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
     if (myRestartingMode != RM_Forbided) {
       myRestartingMode = RM_LastFeatureUsed;
       isStarted = startInternalEdit(thePreviousAttributeID);
     }
-    if (!isStarted)
-      aFOperation->commit();
   }
+
+  if (!isStarted)
+    aFOperation->commit();
 }
 
 bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousAttributeID)
@@ -204,8 +207,11 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return isDone;
 
-  myRestartingMode = RM_EmptyFeatureUsed;
-  isDone = startInternalEdit(thePreviousAttributeID);
+  bool isSketchSolverError = module()->sketchMgr()->sketchSolverError();
+  if (!isSketchSolverError) {
+    myRestartingMode = RM_EmptyFeatureUsed;
+    isDone = startInternalEdit(thePreviousAttributeID);
+  }
 
   return isDone;
 }
