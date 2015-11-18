@@ -451,34 +451,39 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     return false;
   }
 
-  std::set<FeaturePtr> aCoinsideLines;
+  std::set<FeaturePtr> aCoinsides;
   SketchPlugin_Tools::findCoincidences(aCoincident,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                       aCoinsideLines);
+                                       aCoinsides);
   SketchPlugin_Tools::findCoincidences(aCoincident,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                       aCoinsideLines);
-  if(aCoinsideLines.size() < 2) {
-    return false;
+                                       aCoinsides);
+  // Remove points
+  std::set<FeaturePtr> aNewLines;
+  for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
+    if((*anIt)->getKind() != SketchPlugin_Point::ID()) {
+      aNewLines.insert(*anIt);
+    }
   }
+  aCoinsides = aNewLines;
 
   // Remove auxilary lines
-  if(aCoinsideLines.size() > 2) {
-    std::set<FeaturePtr> aNewLines;
-    for(std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin(); anIt != aCoinsideLines.end(); ++anIt) {
+  if(aCoinsides.size() > 2) {
+    aNewLines.clear();
+    for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
       if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
         aNewLines.insert(*anIt);
       }
     }
-    aCoinsideLines = aNewLines;
+    aCoinsides = aNewLines;
   }
 
-  if(aCoinsideLines.size() != 2) {
+  if(aCoinsides.size() != 2) {
     return false;
   }
 
   // Check that lines not collinear
-  std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin();
+  std::set<FeaturePtr>::iterator anIt = aCoinsides.begin();
   FeaturePtr aFirstFeature = *anIt++;
   FeaturePtr aSecondFeature = *anIt;
   if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && aSecondFeature->getKind() == SketchPlugin_Line::ID()) {

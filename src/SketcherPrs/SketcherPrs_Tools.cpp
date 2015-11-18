@@ -57,8 +57,10 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
   FeaturePtr aFeature;
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(theFeature->data()->attribute(theAttribute));
-  if (anAttr)
-    aFeature = ModelAPI_Feature::feature(anAttr->object());
+  if(!anAttr.get()) {
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+  }
+  aFeature = ModelAPI_Feature::feature(anAttr->object());
 
   if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
     aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

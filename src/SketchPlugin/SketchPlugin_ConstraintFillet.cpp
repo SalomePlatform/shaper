@@ -27,6 +27,7 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Tools.h>
 
 #include <SketcherPrs_Factory.h>
@@ -468,33 +469,42 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
       return;
     }
 
-    std::set<FeaturePtr> aCoinsideLines;
+    std::set<FeaturePtr> aCoinsides;
     SketchPlugin_Tools::findCoincidences(aCoincident,
                                          SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                         aCoinsideLines);
+                                         aCoinsides);
     SketchPlugin_Tools::findCoincidences(aCoincident,
                                          SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                         aCoinsideLines);
+                                         aCoinsides);
+
+    // Remove points
+    std::set<FeaturePtr> aNewLines;
+    for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
+      if((*anIt)->getKind() != SketchPlugin_Point::ID()) {
+        aNewLines.insert(*anIt);
+      }
+    }
+    aCoinsides = aNewLines;
 
     // Remove auxilary lines
-    if(aCoinsideLines.size() > 2) {
-      std::set<FeaturePtr> aNewLines;
-      for(std::set<FeaturePtr>::iterator anIt = aCoinsideLines.begin(); anIt != aCoinsideLines.end(); ++anIt) {
+    if(aCoinsides.size() > 2) {
+      aNewLines.clear();
+      for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
         if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
           aNewLines.insert(*anIt);
         }
       }
-      aCoinsideLines = aNewLines;
+      aCoinsides = aNewLines;
     }
 
-    if(aCoinsideLines.size() != 2) {
+    if(aCoinsides.size() != 2) {
       setError("At selected vertex should be two coincident lines");
       return;
     }
 
     // Store base lines
     FeaturePtr anOldFeatureA, anOldFeatureB;
-    std::set<FeaturePtr>::iterator aLinesIt = aCoinsideLines.begin();
+    std::set<FeaturePtr>::iterator aLinesIt = aCoinsides.begin();
     anOldFeatureA = *aLinesIt++;
     anOldFeatureB = *aLinesIt;
     aRefListOfBaseLines->append(anOldFeatureA);
