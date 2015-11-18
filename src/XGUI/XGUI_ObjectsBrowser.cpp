@@ -140,6 +140,7 @@ void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
     setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH);
     setColumnWidth(1, SECOND_COL_WIDTH);
   }
+  QTreeView::resizeEvent(theEvent);
 }
 
 void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
