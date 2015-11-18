@@ -155,6 +155,7 @@ private:
   FeaturePtr myInternalFeature;
   QWidget* myInternalWidget;
   ModuleBase_ModelWidget* myInternalActiveWidget;
+  std::string myNoMoreWidgetsAttribute;
 };
 
 #endif

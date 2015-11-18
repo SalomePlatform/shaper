@@ -30,7 +30,8 @@ PartSet_SketcherReetntrantMgr::PartSet_SketcherReetntrantMgr(ModuleBase_IWorksho
   myWorkshop(theWorkshop),
   myRestartingMode(RM_None),
   myIsFlagsBlocked(false),
-  myIsInternalEditOperation(false)
+  myIsInternalEditOperation(false),
+  myNoMoreWidgetsAttribute("")
 {
 }
 
@@ -175,6 +176,15 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
 {
   if (!isActiveMgr())
     return;
+
+  // we should avoid processing of the signal about no more widgets attributes and 
+  // do this after the restart operaion is finished if it was called
+  // onNoMoreWidgets depends on myIsFlagsBlocked and fill myNoMoreWidgetsAttribute
+  // if it should be called after restart
+  if (myIsFlagsBlocked) {
+    myNoMoreWidgetsAttribute = thePreviousAttributeID;
+    return;
+  }
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
@@ -339,11 +349,20 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(
                                                                   myWorkshop->currentOperation());
     if (aFOperation) {
+      myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
       aFOperation->commit();
       module()->launchOperation(aFOperation->id());
       myIsFlagsBlocked = false;
       resetFlags();
+      // we should avoid processing of the signal about no more widgets attributes and 
+      // do this after the restart operaion is finished if it was called
+      // onNoMoreWidgets depends on myIsFlagsBlocked and fill myNoMoreWidgetsAttribute
+      // if it should be called after restart
+      if (!myNoMoreWidgetsAttribute.empty()) {
+        onNoMoreWidgets(myNoMoreWidgetsAttribute);
+        myNoMoreWidgetsAttribute = "";
+      }
     }
   }
 }
