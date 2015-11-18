@@ -181,18 +181,17 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return;
 
-  bool isStarted = false;
-  bool isSketchSolverError = module()->sketchMgr()->sketchSolverError();
-  if (!isSketchSolverError &&
-      aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-    if (myRestartingMode != RM_Forbided) {
-      myRestartingMode = RM_LastFeatureUsed;
-      isStarted = startInternalEdit(thePreviousAttributeID);
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+    bool isStarted = false;
+    if (!module()->sketchMgr()->sketchSolverError()) {
+      if (myRestartingMode != RM_Forbided) {
+        myRestartingMode = RM_LastFeatureUsed;
+        isStarted = startInternalEdit(thePreviousAttributeID);
+      }
     }
+    if (!isStarted)
+      aFOperation->commit();
   }
-
-  if (!isStarted)
-    aFOperation->commit();
 }
 
 bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousAttributeID)
