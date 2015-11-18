@@ -60,6 +60,11 @@ Q_OBJECT
   /// \return the previous value
   bool enableKeyPressEvent(const bool& theEnable);
 
+signals:
+  /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theEvent key release event
+  void keyReleased(QKeyEvent* theEvent);
+
  protected slots:
    /// Called on text changed
   virtual void onTextChanged(const QString&);

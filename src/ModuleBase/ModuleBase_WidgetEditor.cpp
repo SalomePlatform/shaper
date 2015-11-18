@@ -51,6 +51,9 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(&aDlg);
   anEditor->enableKeyPressEvent(true);
+  if (!myIsEditing) {
+    connect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
+  }
 
   anEditor->setMinimum(0);
   anEditor->setMaximum(DBL_MAX);
@@ -67,6 +70,11 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   aDlg.move(QCursor::pos());
   aDlg.exec();
+
+  if (!myIsEditing) {
+    disconnect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
+  }
+
   outText = anEditor->text();
   bool isDouble;
   double aValue = outText.toDouble(&isDouble);
