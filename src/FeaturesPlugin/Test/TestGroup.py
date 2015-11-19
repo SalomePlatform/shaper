@@ -44,12 +44,12 @@ aLineBStartPoint = geomDataAPI_Point2D(aSketchLineB.attribute("StartPoint"))
 aLineBEndPoint = geomDataAPI_Point2D(aSketchLineB.attribute("EndPoint"))
 aLineCStartPoint = geomDataAPI_Point2D(aSketchLineC.attribute("StartPoint"))
 aLineCEndPoint = geomDataAPI_Point2D(aSketchLineC.attribute("EndPoint"))
-aLineAStartPoint.setValue(25., 25.)
-aLineAEndPoint.setValue(100., 25.)
-aLineBStartPoint.setValue(100., 25.)
-aLineBEndPoint.setValue(60., 75.)
-aLineCStartPoint.setValue(60., 75.)
-aLineCEndPoint.setValue(25., 25.)
+aLineAStartPoint.setValue(-100., 0.)
+aLineAEndPoint.setValue(100., 0.)
+aLineBStartPoint.setValue(100., 0.)
+aLineBEndPoint.setValue(0., 173.2)
+aLineCStartPoint.setValue(0., 173.2)
+aLineCEndPoint.setValue(-100., 0.)
 aSession.finishOperation()
 # Build sketch faces
 aSession.startOperation()
@@ -59,33 +59,186 @@ origin = geomDataAPI_Point(aTriangleSketchFeature.attribute("Origin")).pnt()
 dirX = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirX")).dir()
 norm = geomDataAPI_Dir(aTriangleSketchFeature.attribute("Norm")).dir()
 aSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, norm, aSketchEdges, aSketchFaces)
+GeomAlgoAPI_SketchBuilder.createFaces(origin, dirX, norm, aSketchEdges, aSketchFaces)
 # Create extrusion on them
 anExtrusionFt = aPart.addFeature("Extrusion")
-anExtrusionFt.selectionList("base").append(
-    aSketchResult, aSketchFaces[0])
-anExtrusionFt.real("from_size").setValue(50)
+anExtrusionFt.selectionList("base").append(aSketchResult, aSketchFaces[0])
+anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
+anExtrusionFt.real("from_size").setValue(50)
+anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
+anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
 anExtrusionFt.execute()
 aSession.finishOperation()
 anExtrusionBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
 #=========================================================================
+# Create group of vertex
+#=========================================================================
+aSession.startOperation()
+aGroupFeature = aSession.activeDocument().addFeature("Group")
+aSelectionListAttr = aGroupFeature.selectionList("group_list")
+aSelectionListAttr.setSelectionType("vertex")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_1|Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1|Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_1|Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2|Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1|Extrusion_1_1/FromFace_1")
+aSession.finishOperation()
+#=========================================================================
+# Check results
+#=========================================================================
+assert(aSelectionListAttr.size() == 6)
+aGroupResult = aGroupFeature.firstResult()
+assert(aGroupResult)
+#=========================================================================
 # Create group of edges
-# TODO: After implementation of selection from batch script
-# update this test to have proper reslts in the group feature
 #=========================================================================
 aSession.startOperation()
 aGroupFeature = aSession.activeDocument().addFeature("Group")
 aSelectionListAttr = aGroupFeature.selectionList("group_list")
 aSelectionListAttr.setSelectionType("edge")
-aSelectionListAttr.append("Extrusion_1/LateralFace_3|Extrusion_1/LateralFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_1|Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_1|Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/ToFace_1")
 aSession.finishOperation()
 #=========================================================================
 # Check results
 #=========================================================================
-#aGroupResult = aGroupFeature.firstResult()
-#assert(aGroupResult)
+assert(aSelectionListAttr.size() == 9)
+aGroupResult = aGroupFeature.firstResult()
+assert(aGroupResult)
+#=========================================================================
+# Create group of faces
+#=========================================================================
+aSession.startOperation()
+aGroupFeature = aSession.activeDocument().addFeature("Group")
+aSelectionListAttr = aGroupFeature.selectionList("group_list")
+aSelectionListAttr.setSelectionType("face")
+aShapeExplorer = GeomAPI_ShapeExplorer(anExtrusionBody.shape(), GeomAPI_Shape.FACE)
+while aShapeExplorer.more():
+  aSelectionListAttr.append(anExtrusionBody, aShapeExplorer.current())
+  aShapeExplorer.next();
+aSession.finishOperation()
+#=========================================================================
+# Check results
+#=========================================================================
+assert(aSelectionListAttr.size() == 5)
+aGroupResult = aGroupFeature.firstResult()
+assert(aGroupResult)
+#=========================================================================
+# Create group of solids
+#=========================================================================
+aSession.startOperation()
+aGroupFeature = aSession.activeDocument().addFeature("Group")
+aSelectionListAttr = aGroupFeature.selectionList("group_list")
+aSelectionListAttr.setSelectionType("face")
+aSelectionListAttr.append(anExtrusionBody, None)
+aSession.finishOperation()
+#=========================================================================
+# Check results
+#=========================================================================
+assert(aSelectionListAttr.size() == 1)
+aGroupResult = aGroupFeature.firstResult()
+assert(aGroupResult)
+
+#=========================================================================
+# Create group of face
+#=========================================================================
+aSession.startOperation()
+aGroupFeature = aSession.activeDocument().addFeature("Group")
+aSelectionListAttr = aGroupFeature.selectionList("group_list")
+aSelectionListAttr.setSelectionType("face")
+aSelectionListAttr.append("Extrusion_1_1/ToFace_1")
+aSession.finishOperation()
+#=========================================================================
+# Check results
+#=========================================================================
+assert(aSelectionListAttr.size() == 1)
+aGroupResult = aGroupFeature.firstResult()
+assert(aGroupResult)
+
+#=========================================================================
+# Create a sketch circle to extrude
+#=========================================================================
+aSession.startOperation()
+aCircleSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
+origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin"))
+origin.setValue(0, 0, 0)
+dirx = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX"))
+dirx.setValue(1, 0, 0)
+norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm"))
+norm.setValue(0, 0, 1)
+# Create circle
+aSketchCircle = aCircleSketchFeature.addFeature("SketchCircle")
+anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
+aCircleRadius = aSketchCircle.real("CircleRadius")
+anCircleCentr.setValue(0., 57.74)
+aCircleRadius.setValue(50.)
+aSession.finishOperation()
+#=========================================================================
+# Make extrusion on circle
+#=========================================================================
+# Build shape from sketcher results
+aCircleSketchResult = aCircleSketchFeature.firstResult()
+aCircleSketchEdges = modelAPI_ResultConstruction(aCircleSketchResult).shape()
+origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin")).pnt()
+dirX = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX")).dir()
+norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm")).dir()
+aCircleSketchFaces = ShapeList()
+GeomAlgoAPI_SketchBuilder.createFaces(origin, dirX, norm, aCircleSketchEdges, aCircleSketchFaces)
+assert(len(aCircleSketchFaces) > 0)
+assert(aCircleSketchFaces[0] is not None)
+# Create extrusion
+aSession.startOperation()
+anExtrusionFt = aPart.addFeature("Extrusion")
+assert (anExtrusionFt.getKind() == "Extrusion")
+# selection type FACE=4
+anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchFaces[0])
+anExtrusionFt.string("CreationMethod").setValue("BySizes")
+anExtrusionFt.real("to_size").setValue(50)
+anExtrusionFt.real("from_size").setValue(50)
+anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
+anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
+anExtrusionFt.execute()
+aSession.finishOperation()
+aCylinderBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
+
+#=========================================================================
+# Create a cut
+#=========================================================================
+aSession.startOperation()
+aBooleanFt = aPart.addFeature("Boolean")
+aBooleanFt.selectionList("main_objects").append(anExtrusionBody, None)
+aBooleanFt.selectionList("tool_objects").append(aCylinderBody, None)
+aBooleanTypeCut = 0
+aBooleanFt.integer("bool_type").setValue(aBooleanTypeCut)
+aBooleanFt.execute()
+aSession.finishOperation()
+
+#=========================================================================
+# Move group feature
+#=========================================================================
+aSession.startOperation()
+aPart.moveFeature(aGroupFeature, aBooleanFt)
+aSession.finishOperation()
+
+#=========================================================================
+# Check results
+#=========================================================================
+aFactory = ModelAPI_Session.get().validators()
+assert(aFactory.validate(aGroupFeature))
+assert(aSelectionListAttr.size() == 1)
+assert(len(aGroupFeature.results()) > 0)
+aGroupResult = aGroupFeature.firstResult()
+assert(aGroupResult)
 #=========================================================================
 # End of test
 #=========================================================================
+
