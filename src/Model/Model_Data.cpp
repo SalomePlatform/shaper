@@ -24,7 +24,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
-#include <ModelAPI_ResultCompsolid.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 #include <Model_Validator.h>
 
