@@ -104,6 +104,9 @@
 #include <dlfcn.h>
 #endif
 
+
+QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
+
 //#define DEBUG_DELETE
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
@@ -804,14 +807,18 @@ void XGUI_Workshop::onUndo(int theTimes)
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
+  std::list<std::string> aUndoList = aMgr->undoList();
   if (aMgr->isOperation()) {
     /// this is important for nested operations
     /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
     operationMgr()->onAbortOperation();
   }
-  for (int i = 0; i < theTimes; ++i) {
+  std::list<std::string>::const_iterator aIt = aUndoList.cbegin();
+  for (int i = 0; (i < theTimes) && (aIt != aUndoList.cend()); ++i, ++aIt) {
     aMgr->undo();
+    if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND)
+      myObjectBrowser->rebuildDataTree();
   }
 
   operationMgr()->updateApplyOfOperations();
@@ -829,14 +836,18 @@ void XGUI_Workshop::onRedo(int theTimes)
 
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
+  std::list<std::string> aRedoList = aMgr->redoList();
   if (aMgr->isOperation()) {
     /// this is important for nested operations
     /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
     operationMgr()->onAbortOperation();
   }
-  for (int i = 0; i < theTimes; ++i) {
+  std::list<std::string>::const_iterator aIt = aRedoList.cbegin();
+  for (int i = 0; (i < theTimes) && (aIt != aRedoList.cend()); ++i, ++aIt) {
     aMgr->redo();
+    if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND)
+      myObjectBrowser->rebuildDataTree();
   }
   operationMgr()->updateApplyOfOperations();
   updateCommandStatus();

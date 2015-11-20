@@ -259,7 +259,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
     }
     int aChildNb = rowCount(aParent);
-    rebuildBranch(aStartId, aChildNb - aStartId);
+    rebuildBranch(aStartId, aChildNb - aStartId, aParent);
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
     if (aDoc != aRootDoc) {

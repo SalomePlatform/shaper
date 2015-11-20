@@ -445,9 +445,32 @@ void XGUI_ObjectsBrowser::onEditItem()
 }
 
 //***************************************************
+QModelIndexList XGUI_ObjectsBrowser::expandedItems(const QModelIndex& theParent) const
+{
+  QModelIndexList aIndexes;
+  QModelIndex aIndex;
+  for (int i = 0; i < myDocModel->rowCount(); i++) {
+    aIndex = myDocModel->index(i, 0, theParent);
+    if (myDocModel->hasChildren(aIndex)) {
+      if (myTreeView->isExpanded(aIndex)) {
+        aIndexes.append(aIndex);
+        QModelIndexList aSubIndexes = expandedItems(aIndex);
+        if (!aSubIndexes.isEmpty())
+          aIndexes.append(aSubIndexes);
+      }
+    }
+  }
+  return aIndexes;
+}
+
+//***************************************************
 void XGUI_ObjectsBrowser::rebuildDataTree()
 {
+  QModelIndexList aIndexList = expandedItems();
   myDocModel->rebuildDataTree();
+  foreach(QModelIndex aIndex, aIndexList) {
+    myTreeView->setExpanded(aIndex, true);
+  }
   update();
 }
 

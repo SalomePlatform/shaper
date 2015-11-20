@@ -207,6 +207,7 @@ signals:
   void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
  private:
+  QModelIndexList expandedItems(const QModelIndex& theParent = QModelIndex()) const;
 
   //! Internal model
   XGUI_DataModel* myDocModel;

@@ -47,6 +47,7 @@ class QMainWindow;
 
 class QAction;
 
+
 /**\class XGUI_Workshop
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
@@ -257,6 +258,10 @@ Q_OBJECT
   /// \param theGroup the group name
   /// \param theUpdateViewer update viewer flag
   void synchronizeGroupInViewer(const DocumentPtr& theDoc, const std::string& theGroup, bool theUpdateViewer);
+
+  /// A constant string used for "Move to end" command definition
+  /// It is used for specific processing of Undo/Redo for this command.
+  static QString MOVE_TO_END_COMMAND;
 
 signals:
   /// Emitted when selection happens in Salome viewer
