@@ -58,7 +58,6 @@ ADD_SUBDIRECTORY (src/SketchPlugin)
 ADD_SUBDIRECTORY (src/SketchSolver)
 ADD_SUBDIRECTORY (src/ModuleBase)
 ADD_SUBDIRECTORY (src/PartSet)
-ADD_SUBDIRECTORY (src/DFBrowser)
 
 IF(NOT ${HAVE_SALOME})
     ADD_SUBDIRECTORY (src/AppElements)
