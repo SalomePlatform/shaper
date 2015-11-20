@@ -76,6 +76,7 @@ void FeaturesPlugin_Partition::execute()
   }
 
   GeomAlgoAPI_MakeShapeList aMakeShapeList;
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints = GeomAlgoAPI_ShapeTools::getBoundingBox(anObjects, 1.0);
 
   // Getting tools.
   AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Partition::TOOL_LIST_ID());
@@ -86,7 +87,7 @@ void FeaturesPlugin_Partition::execute()
       // it could be a construction plane
       ResultPtr aContext = aToolAttr->context();
       if(aContext.get()) {
-        aTool = GeomAlgoAPI_ShapeTools::faceToInfinitePlane(aContext->shape());
+        aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aContext->shape(), aBoundingPoints);
         std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(new GeomAlgoAPI_MakeShapeCustom);
         aMkShCustom->addModified(aContext->shape(), aTool);
         aMakeShapeList.append(aMkShCustom);

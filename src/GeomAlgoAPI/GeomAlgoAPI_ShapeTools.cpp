@@ -10,13 +10,19 @@
 
 #include <gp_Pln.hxx>
 
+#include <Bnd_Box.hxx>
 #include <BOPTools.hxx>
+#include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
+#include <GeomLib_IsPlanarSurface.hxx>
+#include <GeomLib_Tool.hxx>
 #include <GProp_GProps.hxx>
+#include <IntAna_IntConicQuad.hxx>
+#include <IntAna_Quadric.hxx>
 #include <NCollection_Vector.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_Builder.hxx>
@@ -28,7 +34,7 @@
 
 
 //=================================================================================================
-double GeomAlgoAPI_ShapeTools::volume(std::shared_ptr<GeomAPI_Shape> theShape)
+double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   GProp_GProps aGProps;
   if(!theShape) {
@@ -43,7 +49,7 @@ double GeomAlgoAPI_ShapeTools::volume(std::shared_ptr<GeomAPI_Shape> theShape)
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeTools::centreOfMass(std::shared_ptr<GeomAPI_Shape> theShape)
+std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeTools::centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   GProp_GProps aGProps;
   if(!theShape) {
@@ -175,7 +181,41 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape>& theFace)
+std::list<std::shared_ptr<GeomAPI_Pnt> > GeomAlgoAPI_ShapeTools::getBoundingBox(const ListOfShape& theShapes, const double theEnlarge)
+{
+  // Bounding box of all objects.
+  Bnd_Box aBndBox;
+
+  // Getting box.
+  for (ListOfShape::const_iterator anObjectsIt = theShapes.begin(); anObjectsIt != theShapes.end(); anObjectsIt++) {
+    const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
+    BRepBndLib::Add(aShape, aBndBox);
+  }
+
+  if(theEnlarge != 0.0) {
+    // We enlarge bounding box just to be sure that plane will be large enough to cut all objects.
+    aBndBox.Enlarge(theEnlarge);
+  }
+
+  Standard_Real aXArr[2] = {aBndBox.CornerMin().X(), aBndBox.CornerMax().X()};
+  Standard_Real aYArr[2] = {aBndBox.CornerMin().Y(), aBndBox.CornerMax().Y()};
+  Standard_Real aZArr[2] = {aBndBox.CornerMin().Z(), aBndBox.CornerMax().Z()};
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aResultPoints;
+  int aNum = 0;
+  for(int i = 0; i < 2; i++) {
+    for(int j = 0; j < 2; j++) {
+      for(int k = 0; k < 2; k++) {
+        std::shared_ptr<GeomAPI_Pnt> aPnt(new GeomAPI_Pnt(aXArr[i], aYArr[j], aZArr[k]));
+        aResultPoints.push_back(aPnt);
+      }
+    }
+  }
+
+  return aResultPoints;
+}
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace)
 {
   if (!theFace.get())
     return std::shared_ptr<GeomAPI_Shape>();
@@ -194,4 +234,57 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const
   std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
   aResult->setImpl(new TopoDS_Shape(anInfiniteFace));
   return aResult;
+}
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
+                                                                     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints)
+{
+  std::shared_ptr<GeomAPI_Shape> aResultShape;
+
+  if(!thePlane.get()) {
+    return aResultShape;
+  }
+
+  const TopoDS_Shape& aShape = thePlane->impl<TopoDS_Shape>();
+  if(aShape.ShapeType() != TopAbs_FACE) {
+    return aResultShape;
+  }
+
+  TopoDS_Face aFace = TopoDS::Face(aShape);
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
+  if(aSurf.IsNull()) {
+    return aResultShape;
+  }
+
+  GeomLib_IsPlanarSurface isPlanar(aSurf);
+  if(!isPlanar.IsPlanar()) {
+    return aResultShape;
+  }
+
+  if(thePoints.size() != 8) {
+    return aResultShape;
+  }
+
+  const gp_Pln& aFacePln = isPlanar.Plan();
+  Handle(Geom_Plane) aFacePlane = new Geom_Plane(aFacePln);
+  IntAna_Quadric aQuadric(aFacePln);
+  Standard_Real UMin, UMax, VMin, VMax;
+  UMin = UMax = VMin = VMax = 0;
+  for (std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPointsIt = thePoints.begin(); aPointsIt != thePoints.end(); aPointsIt++) {
+    const gp_Pnt& aPnt = (*aPointsIt)->impl<gp_Pnt>();
+    gp_Lin aLin(aPnt, aFacePln.Axis().Direction());
+    IntAna_IntConicQuad anIntAna(aLin, aQuadric);
+    const gp_Pnt& aPntOnFace = anIntAna.Point(1);
+    Standard_Real aPntU(0), aPntV(0);
+    GeomLib_Tool::Parameters(aFacePlane, aPntOnFace, Precision::Confusion(), aPntU, aPntV);
+    if(aPntU < UMin) UMin = aPntU;
+    if(aPntU > UMax) UMax = aPntU;
+    if(aPntV < VMin) VMin = aPntV;
+    if(aPntV > VMax) VMax = aPntV;
+  }
+  aResultShape.reset(new GeomAPI_Shape);
+  aResultShape->setImpl(new TopoDS_Shape(BRepLib_MakeFace(aFacePln, UMin, UMax, VMin, VMax).Face()));
+
+  return aResultShape;
 }
