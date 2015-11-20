@@ -24,6 +24,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultCompsolid.h>
 #include <ModelAPI_Tools.h>
 #include <Model_Validator.h>
 
@@ -430,7 +431,10 @@ void Model_Data::updateConcealmentFlag()
   std::shared_ptr<ModelAPI_Result> aRes = 
     std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
   if (aRes.get()) {
-    aRes->setIsConcealed(false);
+    // if compsolid result has subs, do nothing directly: it depends on the sub's status (#1100)
+    ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+    if (!aComp || aComp->numberOfSubs() == 0 || aComp->ModelAPI_ResultCompSolid::isConcealed())
+      aRes->setIsConcealed(false);
   }
 }
 
