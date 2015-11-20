@@ -98,8 +98,13 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
     (theSubShape == anOldShape || (theSubShape && anOldShape && theSubShape->isEqual(anOldShape)));
   if (isOldShape) return; // shape is the same, so context is also unchanged
   // update the referenced object if needed
-  if (!isOldContext)
-    myRef.setValue(theContext);
+  if (!isOldContext) {
+    ResultCompSolidPtr anOwner = ModelAPI_Tools::compSolidOwner(theContext);
+    if (anOwner.get())
+      myRef.setValue(anOwner);
+    else
+      myRef.setValue(theContext);
+  }
 
   // do noth use naming if selected shape is result shape itself, but not sub-shape
   TDF_Label aSelLab = selectionLabel();

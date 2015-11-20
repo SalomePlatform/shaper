@@ -93,7 +93,7 @@ public:
   /// load and orient modified shapes
   MODELAPI_EXPORT virtual void loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes);
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes, const bool theIsStoreSeparate = false);
   /// load and orient generated shapes
   MODELAPI_EXPORT virtual void loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape,

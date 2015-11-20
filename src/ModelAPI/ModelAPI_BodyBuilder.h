@@ -78,7 +78,8 @@ public:
                                                const int  theKindOfShape,
                                                const int  theTag,
 											   const std::string& theName,
-                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes,
+                                               const bool theIsStoreSeparate = false) = 0;
   /// load and orient generated shapes
   virtual void loadAndOrientGeneratedShapes (
 	                                           GeomAlgoAPI_MakeShape* theMS,

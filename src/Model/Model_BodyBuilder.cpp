@@ -329,8 +329,13 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   const int  theKindOfShape,
   const int  theTag,
   const std::string& theName,
-  GeomAPI_DataMapOfShapeShape& theSubShapes)
+  GeomAPI_DataMapOfShapeShape& theSubShapes,
+  const bool theIsStoreSeparate)
 {
+  int aTag = theTag;
+  std::string aName = theName;
+  std::ostringstream aStream;
+  int anIndex = 1;
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
   bool isBuilt = theName.empty();
@@ -350,9 +355,19 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
       }
       if (!aRoot.IsSame (aNewShape)) {
-        builder(theTag)->Modify(aRoot,aNewShape);
-        if(!isBuilt) 
-          buildName(theTag, theName);		
+        builder(aTag)->Modify(aRoot,aNewShape);
+        if(!isBuilt) {
+          if(theIsStoreSeparate) {
+            aStream.str(std::string());
+            aStream.clear();
+            aStream << theName << "_" << anIndex++;
+            aName = aStream.str();
+          }
+          buildName(aTag, aName);
+        }
+        if(theIsStoreSeparate) {
+          aTag++;
+        }
       }
     }
   }

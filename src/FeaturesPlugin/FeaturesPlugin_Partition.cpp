@@ -22,6 +22,8 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <sstream>
+
 //=================================================================================================
 FeaturesPlugin_Partition::FeaturesPlugin_Partition()
 {
@@ -191,21 +193,28 @@ void FeaturesPlugin_Partition::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody>
   if(theBaseShape->isEqual(theResultShape)) {
     theResultBody->store(theResultShape);
   } else {
-    const int aModifyTag = 1;
-    const int aDeletedTag = 2;
-    const int aSubsolidsTag = 3; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+    const int aDeletedTag = 1;
+    const int aSubsolidsTag = 2; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+    const int aModifyTag = 100000;
+    int aModifyToolsTag = 200000;
+    std::ostringstream aStream;
 
     theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
     std::string aModName = "Modified";
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyTag, aModName, theMapOfShapes);
+                                               aModifyTag, aModName, theMapOfShapes, true);
     theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
 
+    int anIndex = 1;
     for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
+      aStream.str(std::string());
+      aStream.clear();
+      aStream << aModName << "_" << anIndex++;
       theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
-                                                 aModifyTag, aModName, theMapOfShapes);
+                                                 aModifyToolsTag, aStream.str(), theMapOfShapes, true);
       theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
+      aModifyToolsTag += 10000;
     }
   }
 }

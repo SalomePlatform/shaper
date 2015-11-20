@@ -110,10 +110,10 @@ void ModelAPI_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
 
 void ModelAPI_ResultBody::loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes)
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes, const bool theIsStoreSeparate)
 {
   myBuilder->loadAndOrientModifiedShapes(
-    theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes);
+    theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate);
 }
 
 void ModelAPI_ResultBody::loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* theMS,
