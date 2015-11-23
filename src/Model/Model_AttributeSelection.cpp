@@ -99,10 +99,6 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   if (isOldShape) return; // shape is the same, so context is also unchanged
   // update the referenced object if needed
   if (!isOldContext) {
-    ResultCompSolidPtr anOwner = ModelAPI_Tools::compSolidOwner(theContext);
-    if (anOwner.get())
-      myRef.setValue(anOwner);
-    else
       myRef.setValue(theContext);
   }
 
