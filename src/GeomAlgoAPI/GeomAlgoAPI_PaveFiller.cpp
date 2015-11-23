@@ -39,7 +39,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape, const bool
   }
 
   BOPAlgo_Builder* aBuilder = new BOPAlgo_Builder();
-  myMkShape.reset(new GeomAlgoAPI_MakeShape(aBuilder, GeomAlgoAPI_MakeShape::BOPAlgoBuilder));
+  myMkShape.reset(new GeomAlgoAPI_MakeShape(aBuilder, GeomAlgoAPI_MakeShape::OCCT_BOPAlgo_Builder));
   aBuilder->SetArguments(aListOfShape);
   aBuilder->PerformWithFiller(aPaveFiller);
   iErr = aBuilder->ErrorStatus();

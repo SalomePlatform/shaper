@@ -8,13 +8,12 @@
 
 //=================================================================================================
 GeomAlgoAPI_MakeShapeCustom::GeomAlgoAPI_MakeShapeCustom()
-: GeomAlgoAPI_MakeShape()
 {}
 
 //=================================================================================================
 void GeomAlgoAPI_MakeShapeCustom::setResult(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  myShape = theShape;
+  setShape(theShape);
 }
 
 //=================================================================================================
@@ -35,12 +34,6 @@ bool GeomAlgoAPI_MakeShapeCustom::addGenerated(const std::shared_ptr<GeomAPI_Sha
 bool GeomAlgoAPI_MakeShapeCustom::addDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   return myDeleted.bind(theShape, theShape);
-}
-
-//=================================================================================================
-const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShapeCustom::shape() const
-{
-  return myShape;
 }
 
 //=================================================================================================

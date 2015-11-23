@@ -10,8 +10,7 @@
 #include <memory>
 #include <GeomAPI_Interface.h>
 
-class GeomAPI_Pnt;
-class GeomAPI_Dir;
+#include <GeomAPI_Shape.h>
 
 /**\class GeomAPI_DataMapOfShapeShape
  * \ingroup DataModel
@@ -20,42 +19,43 @@ class GeomAPI_Dir;
 class GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
 {
  public:
-  /// Creation of plane by the point and normal
-  GEOMAPI_EXPORT 
+  /// Constructor.
+  GEOMAPI_EXPORT
   GeomAPI_DataMapOfShapeShape();
 
-  /// Clear 
-  GEOMAPI_EXPORT 
+  /// Clears map.
+  GEOMAPI_EXPORT
   void clear();
 
-  /// Size of the map
-  GEOMAPI_EXPORT 
+  /// Size of the map.
+  GEOMAPI_EXPORT
   int size();
 
-  /// Adds \a theKey to me with \a theItem. Returns True if the Key  was not already in the map
-  GEOMAPI_EXPORT 
-  bool bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem);
+  /// Adds \a theKey to me with \a theItem. Returns True if the Key  was not already in the map.
+  GEOMAPI_EXPORT
+  bool bind (const std::shared_ptr<GeomAPI_Shape> theKey, const std::shared_ptr<GeomAPI_Shape> theItem);
 
-  /// Merges two maps
+  /// Merges two maps.
   GEOMAPI_EXPORT void merge(const GeomAPI_DataMapOfShapeShape& theDataMap);
 
-  /// Merges two maps
+  /// Merges two maps.
   GEOMAPI_EXPORT void merge(const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMap);
 
-  /// Returns true if theKey is stored  in the map.
-  GEOMAPI_EXPORT 
-  bool isBound (std::shared_ptr<GeomAPI_Shape> theKey);
+  /// \return true if theKey is stored  in the map.
+  GEOMAPI_EXPORT
+  bool isBound (const std::shared_ptr<GeomAPI_Shape> theKey);
 
-  /// Returns  the Item stored  with the Key in the Map.
-  GEOMAPI_EXPORT 
-  const std::shared_ptr<GeomAPI_Shape> find(std::shared_ptr<GeomAPI_Shape> theKey);  
-  
-  /// Removes the Key from the  map. Returns true if the Key was in the Map
-  GEOMAPI_EXPORT 
-  bool unBind(std::shared_ptr<GeomAPI_Shape> theKey);
+  /// \return the Item stored  with the Key in the Map.
+  GEOMAPI_EXPORT
+  const std::shared_ptr<GeomAPI_Shape> find(const std::shared_ptr<GeomAPI_Shape> theKey);
+
+  /// \brief Removes the Key from the  map.
+  /// \return true if the Key was in the Map.
+  GEOMAPI_EXPORT
+  bool unBind(const std::shared_ptr<GeomAPI_Shape> theKey);
 
   /// Destructor
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   ~GeomAPI_DataMapOfShapeShape();
 };
 

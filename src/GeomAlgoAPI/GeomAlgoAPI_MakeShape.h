@@ -6,51 +6,81 @@
 #ifndef GeomAlgoAPI_MakeShape_H_
 #define GeomAlgoAPI_MakeShape_H_
 
-#include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI.h>
+#include <GeomAPI_DataMapOfShapeShape.h>
 
 #include <list>
 #include <memory>
 
-/**\class GeomAlgoAPI_MakeShape
- * \ingroup DataAlgo
- * \brief Interface to the root class of all topological shapes constructions
+/** \class GeomAlgoAPI_MakeShape
+ *  \ingroup DataAlgo
+ *  \brief Interface to the root class of all topological shapes constructions
  */
 class GeomAlgoAPI_MakeShape : public GeomAPI_Interface
 {
 public:
-  /// Algo type enum
-  enum AlgoType {
-    MakeShape,
-    BOPAlgoBuilder
+  /// Builder type enum
+  enum BuilderType {
+    OCCT_BRepBuilderAPI_MakeShape,
+    OCCT_BOPAlgo_Builder
   };
 
 public:
-  /// Constructor by the already stored builder in the interface
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder, const AlgoType theAlgoType = MakeShape);
+  /** \brief Constructor by builder and builder type.
+   *  \param[in] theBuilder pointer to the builder.
+   *  \param[in] theBuilderType builder type.
+   */
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder, const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape);
 
-  /// Returns a shape built by the shape construction algorithm
+  /// \return status of builder.
+  GEOMALGOAPI_EXPORT bool isDone() const;
+
+  /// \return a shape built by the shape construction algorithm.
   GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;
 
-  /// Returns the list of shapes generated from the shape \a theShape
-  GEOMALGOAPI_EXPORT virtual void generated(
-    const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
+  /** \return the list of shapes generated from the shape \a theShape.
+   *  \param[in] theShape base shape.
+   *  \param[out] theHistory generated shapes.
+   */
+  GEOMALGOAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
+                                            ListOfShape& theHistory);
 
-  /// Returns the  list of shapes modified from the shape \a theShape
-  GEOMALGOAPI_EXPORT virtual void modified(
-    const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
+  /** \return the list of shapes modified from the shape \a theShape.
+   *  \param[in] theShape base shape.
+   *  \param[out] theHistory modified shapes.
+   */
+  GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
+                                           ListOfShape& theHistory);
 
-  /// Returns whether the shape is deleted
+  /** \return true if theShape was deleted.
+   *  \param[in] theShape base shape.
+   */
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
 protected:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(){};
+  /// \brief Default constructor.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape();
 
-protected:
-  GeomAlgoAPI_MakeShape::AlgoType myAlgoType; ///< Type of make shape algo.
+  /** \brief Sets builder type.
+   *  \param[in] theBuilderType new builder type.
+   */
+  GEOMALGOAPI_EXPORT void setBuilderType(const BuilderType theBuilderType);
+
+  /** \brief Sets status of builder.
+   *  \param[in] theFlag new status.
+   */
+  GEOMALGOAPI_EXPORT void setDone(const bool theFlag);
+
+  /** \brief Sets result shape.
+   *  \param[in] theShape new shape.
+   */
+  GEOMALGOAPI_EXPORT void setShape(const std::shared_ptr<GeomAPI_Shape> theShape);
+
+private:
+  GeomAlgoAPI_MakeShape::BuilderType myBuilderType; ///< Type of make shape builder.
+  bool myDone; ///< Builder status.
   std::shared_ptr<GeomAPI_Shape> myShape; ///< Resulting shape.
-  std::shared_ptr<GeomAPI_Shape> myWire; ///< Wire for pipe algo.
-  std::shared_ptr<GeomAPI_Shape> myBaseShape; ///< Base shape of algo.
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap; ///< Data map to keep correct orientation of sub-shapes.
 };
 
 typedef std::list<std::shared_ptr<GeomAlgoAPI_MakeShape> > ListOfMakeShape;

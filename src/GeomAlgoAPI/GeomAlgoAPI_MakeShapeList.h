@@ -63,9 +63,8 @@ public:
 
 private:
   void result(const std::shared_ptr<GeomAPI_Shape> theShape,
-              ListOfShape& theHistory,
-              OperationType theOperationType);
-
+              OperationType theOperationType,
+              ListOfShape& theHistory);
 
 protected:
   ListOfMakeShape myListOfMakeShape; ///< List of make shape algos.

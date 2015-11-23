@@ -36,22 +36,18 @@ public:
   /// Adds deleted shape.
   GEOMALGOAPI_EXPORT bool addDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
-  /// \return a shape built by the shape construction algorithms
-  GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;
-
   /// \return the list of shapes generated from the shape theShape
-  GEOMALGOAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
+  GEOMALGOAPI_EXPORT void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
                                             ListOfShape& theHistory);
 
   /// \return the list of shapes modified from the shape theShape
-  GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
+  GEOMALGOAPI_EXPORT void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                            ListOfShape& theHistory);
 
   /// \return whether the shape is deleted
-  GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
+  GEOMALGOAPI_EXPORT bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
 private:
-  std::shared_ptr<GeomAPI_Shape>    myShape;
   GeomAPI_DataMapOfShapeMapOfShapes myGenerated;
   GeomAPI_DataMapOfShapeMapOfShapes myModified;
   GeomAPI_DataMapOfShapeShape       myDeleted;

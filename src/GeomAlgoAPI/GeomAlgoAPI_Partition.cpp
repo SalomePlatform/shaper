@@ -59,7 +59,7 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   // Creating partition operation.
   GEOMAlgo_Splitter* anOperation = new GEOMAlgo_Splitter;
-  myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation, GeomAlgoAPI_MakeShape::BOPAlgoBuilder));
+  myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation, GeomAlgoAPI_MakeShape::OCCT_BOPAlgo_Builder));
 
   // Getting objects.
   for (ListOfShape::const_iterator anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {

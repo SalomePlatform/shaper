@@ -14,21 +14,29 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape, const AlgoType theAlgoType)
+GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape, const BuilderType theBuilderType)
 : GeomAPI_Interface(theMkShape),
-  myAlgoType(theAlgoType),
+  myBuilderType(theBuilderType),
   myShape(new GeomAPI_Shape())
 {
-  switch (myAlgoType) {
-    case MakeShape: {
+  switch (myBuilderType) {
+    case OCCT_BRepBuilderAPI_MakeShape: {
+      myDone = implPtr<BRepBuilderAPI_MakeShape>()->IsDone() == Standard_True;
       myShape->setImpl(new TopoDS_Shape(implPtr<BRepBuilderAPI_MakeShape>()->Shape()));
       break;
     }
-    case BOPAlgoBuilder: {
+    case OCCT_BOPAlgo_Builder: {
+      myDone = true;
       myShape->setImpl(new TopoDS_Shape(implPtr<BOPAlgo_Builder>()->Shape()));
       break;
     }
   }
+}
+
+//=================================================================================================
+bool GeomAlgoAPI_MakeShape::isDone() const
+{
+  return myDone;
 }
 
 //=================================================================================================
@@ -42,10 +50,10 @@ void GeomAlgoAPI_MakeShape::generated(const std::shared_ptr<GeomAPI_Shape> theSh
                                       ListOfShape& theHistory)
 {
   TopTools_ListOfShape aList;
-  if(myAlgoType == MakeShape) {
+  if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
     aList = aMakeShape->Generated(theShape->impl<TopoDS_Shape>());
-  } else if(myAlgoType == BOPAlgoBuilder) {
+  } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
     aList = aBOPBuilder->Generated(theShape->impl<TopoDS_Shape>());
   }
@@ -64,10 +72,10 @@ void GeomAlgoAPI_MakeShape::modified(const std::shared_ptr<GeomAPI_Shape> theSha
                                      ListOfShape& theHistory)
 {
   TopTools_ListOfShape aList;
-  if(myAlgoType == MakeShape) {
+  if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
     aList = aMakeShape->Modified(theShape->impl<TopoDS_Shape>());
-  } else if(myAlgoType == BOPAlgoBuilder) {
+  } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
     aList = aBOPBuilder->Modified(theShape->impl<TopoDS_Shape>());
   }
@@ -85,13 +93,40 @@ void GeomAlgoAPI_MakeShape::modified(const std::shared_ptr<GeomAPI_Shape> theSha
 bool GeomAlgoAPI_MakeShape::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   bool isDeleted = false;
-  if(myAlgoType == MakeShape) {
+  if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
     isDeleted = aMakeShape->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True;
-  } else if(myAlgoType == BOPAlgoBuilder) {
+  } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
     isDeleted = aBOPBuilder->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True;
   }
 
   return isDeleted;
+}
+
+
+//=================================================================================================
+GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
+: myBuilderType(OCCT_BRepBuilderAPI_MakeShape),
+  myDone(false),
+  myShape(new GeomAPI_Shape())
+{
+}
+
+//=================================================================================================
+void GeomAlgoAPI_MakeShape::setBuilderType(const BuilderType theBuilderType)
+{
+  myBuilderType = theBuilderType;
+}
+
+//=================================================================================================
+void GeomAlgoAPI_MakeShape::setDone(const bool theFlag)
+{
+  myDone = theFlag;
+}
+
+//=================================================================================================
+void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  myShape = theShape;
 }
