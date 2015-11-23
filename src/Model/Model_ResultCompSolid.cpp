@@ -191,5 +191,14 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
 
 bool Model_ResultCompSolid::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
-  return myBuilder->isLatestEqual(theShape);
+  if (myBuilder->isLatestEqual(theShape))
+    return true;
+  // also check that it is asked for sub-elements
+  std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+  for(; aSubIter != mySubs.cend(); aSubIter++) {
+    if (aSubIter->get() && (*aSubIter)->isLatestEqual(theShape)) {
+      return true;
+    }
+  }
+  return false;
 }

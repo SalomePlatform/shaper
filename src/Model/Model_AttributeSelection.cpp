@@ -917,6 +917,11 @@ int Model_AttributeSelection::Id()
   int anID = 0;
   std::shared_ptr<GeomAPI_Shape> aSelection = value();
   std::shared_ptr<GeomAPI_Shape> aContext = context()->shape();
+  // support for compsolids:
+  if (context().get() && ModelAPI_Tools::compSolidOwner(context()).get())
+    aContext = ModelAPI_Tools::compSolidOwner(context())->shape();
+
+
   TopoDS_Shape aMainShape = aContext->impl<TopoDS_Shape>();
   const TopoDS_Shape& aSubShape = aSelection->impl<TopoDS_Shape>();
   // searching for the latest main shape

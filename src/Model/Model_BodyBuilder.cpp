@@ -791,8 +791,15 @@ bool Model_BodyBuilder::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theS
       Handle(TNaming_NamedShape) aName;
       if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
         TopoDS_Shape aLatest = TNaming_Tool::CurrentShape(aName);
+        if (aLatest.IsNull())
+          return false;
         if (aLatest.IsEqual(aShape))
           return true;
+        // check sub-shapes for comp-solids:
+        for (TopExp_Explorer anExp(aShape, aLatest.ShapeType()); anExp.More(); anExp.Next()) {
+          if (aLatest.IsEqual(anExp.Current()))
+            return true;
+        }
       }
     }
   }
