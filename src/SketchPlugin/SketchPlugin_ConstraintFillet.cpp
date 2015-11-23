@@ -343,6 +343,22 @@ void SketchPlugin_ConstraintFillet::execute()
       aRefAttr->setAttr(aNewFeature[i]->attribute(aFeatAttributes[anAttrInd]));
       myProducedFeatures.push_back(aConstraint);
     }
+    // 4.1. Additional tangency constraints when the fillet is based on arcs.
+    //      It is used to verify the created arc will be placed on a source.
+    for (int i = 0; i < aNbFeatures; ++i) {
+      if (aNewFeature[i]->getKind() != SketchPlugin_Arc::ID())
+        continue;
+      aConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      aRefAttr->setObject(aFeature[i]->lastResult());
+      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      aRefAttr->setObject(aNewFeature[i]->lastResult());
+      aConstraint->execute();
+      myProducedFeatures.push_back(aConstraint);
+      ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    }
     // 5. Tangent points should be placed on the base features
     for (int i = 0; i < aNbFeatures; i++) {
       anAttrInd = 2*i + (isStart[i] ? 0 : 1);
