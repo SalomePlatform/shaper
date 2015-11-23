@@ -19,7 +19,7 @@ SketcherPrs_SensitivePoint::SketcherPrs_SensitivePoint(const Handle(SelectBasics
                                                        int theId)
 :Select3D_SensitiveEntity(anOwner), myId(theId)
 {
-  SetSensitivityFactor(12.);
+  SetSensitivityFactor(12);
 }
 
 Standard_Boolean SketcherPrs_SensitivePoint::Matches (SelectBasics_SelectingVolumeManager& theMgr,

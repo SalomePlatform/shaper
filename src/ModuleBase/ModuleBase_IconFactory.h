@@ -26,6 +26,8 @@ public:
   virtual QIcon getIcon(ObjectPtr theObj);
 
 protected:
+  ModuleBase_IconFactory();
+
   /// Set the current icons factory instance
   /// \param theFactory a new factory
   static void setFactory(ModuleBase_IconFactory* theFactory);

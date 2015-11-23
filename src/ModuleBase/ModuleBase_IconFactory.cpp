@@ -10,6 +10,11 @@
 ModuleBase_IconFactory* MYIconFactory = 0;
 
 
+ModuleBase_IconFactory::ModuleBase_IconFactory()
+{
+  setFactory(this);
+}
+
 void ModuleBase_IconFactory::setFactory(ModuleBase_IconFactory* theFactory)
 {
   if (MYIconFactory)

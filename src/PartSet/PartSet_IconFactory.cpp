@@ -19,7 +19,6 @@ QMap<QString, QString> PartSet_IconFactory::myIcons;
 
 PartSet_IconFactory::PartSet_IconFactory():ModuleBase_IconFactory()
 {
-  setFactory(this);
   Events_Loop::loop()->registerListener(this, 
     Events_Loop::eventByName(Config_FeatureMessage::GUI_EVENT()));
 }
@@ -28,6 +27,9 @@ PartSet_IconFactory::PartSet_IconFactory():ModuleBase_IconFactory()
 QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
 {
   QIcon anIcon;
+
+  if (!theObj.get())
+    return anIcon;
 
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   if (aFeature.get()) {
@@ -60,14 +62,36 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
       break;
       default: break;  
     }
-  } else {
-    std::string aGroup = theObj->groupName();
-    if (aGroup == ModelAPI_ResultPart::group()) {
-      return QIcon(":pictures/part_ico.png");
-    } else {
-      if (theObj && theObj->data() && theObj->data()->execState() == ModelAPI_StateMustBeUpdated)
-        return QIcon(":pictures/constr_object_modified.png");
-      return QIcon(":pictures/constr_object.png");
+  } 
+
+  if (theObj->data() && theObj->data()->execState() == ModelAPI_StateMustBeUpdated)
+    return QIcon(":pictures/constr_object_modified.png");
+
+  std::string aGroup = theObj->groupName();
+  if (aGroup == ModelAPI_ResultPart::group())
+    return QIcon(":pictures/part_ico.png");
+
+  if (aGroup == ModelAPI_ResultConstruction::group())
+    return QIcon(":pictures/constr_object.png");
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+  if (aResult.get()) {
+    GeomShapePtr aShape = aResult->shape();
+    if (aShape.get()) {
+      if (aShape->isSolid()) 
+        return QIcon(":pictures/solid.png");
+      else if (aShape->isCompound()) 
+        return QIcon(":pictures/compound.png");
+      else if (aShape->isCompoundOfSolids()) 
+        return QIcon(":pictures/compoundofsolids.png");
+      else if (aShape->isCompSolid()) 
+        return QIcon(":pictures/compsolid.png");
+      else if (aShape->isEdge()) 
+        return QIcon(":pictures/edge.png");
+      else if (aShape->isFace()) 
+        return QIcon(":pictures/face.png");
+      else if (aShape->isVertex()) 
+        return QIcon(":pictures/vertex.png");
     }
   }
   return anIcon;  

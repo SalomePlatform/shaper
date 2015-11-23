@@ -45,5 +45,13 @@
      <file>pictures/wireframe.png</file>
      <file>pictures/expression.png</file>
      <file>pictures/arrow.png</file>
+   
+     <file>pictures/solid.png</file>
+     <file>pictures/compsolid.png</file>
+     <file>pictures/compoundofsolids.png</file>
+     <file>pictures/edge.png</file>
+     <file>pictures/vertex.png</file>
+     <file>pictures/face.png</file>
+     <file>pictures/compound.png</file>
  </qresource>
  </RCC>
