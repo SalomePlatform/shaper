@@ -21,11 +21,16 @@
 #include <GeomAPI_Lin2d.h>
 
 #include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
+
+#include <AIS_DisplaySpecialSymbol.hxx>
 
 
 static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
+
+static const Standard_ExtCharacter MySummSymbol(0x2211);
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
@@ -66,6 +71,13 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
   // The value of vertical aligment is sometimes changed
   myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
+
+  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
+  std::set<std::string> aParams = aValue->usedParameters();
+  if (aParams.size() > 0) {
+    SetSpecialSymbol(MySummSymbol);
+    SetDisplaySpecialSymbol(AIS_DSS_Before);
+  }
 
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
