@@ -13,6 +13,9 @@ INCLUDE(FindSalome)
 INCLUDE(FindCAS)
 INCLUDE(FindSUIT)
 
+# It could be called only once
+FIND_PACKAGE(LibXml2 REQUIRED)
+
 IF(UNIX)
   IF(CMAKE_COMPILER_IS_GNUCC)
     #C++11 is not supported on some platforms, disable it
@@ -70,6 +73,7 @@ ADD_SUBDIRECTORY (doc)
 ADD_SUBDIRECTORY (src/Config)
 ADD_SUBDIRECTORY (src/Events)
 ADD_SUBDIRECTORY (src/Model)
+ADD_SUBDIRECTORY (src/XAO)
 ADD_SUBDIRECTORY (src/GeomAPI)
 ADD_SUBDIRECTORY (src/ModelAPI)
 ADD_SUBDIRECTORY (src/GeomAlgoAPI)
