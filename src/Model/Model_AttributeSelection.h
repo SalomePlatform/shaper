@@ -58,6 +58,10 @@ public:
   /// will be possible from SMESH module of SALOME.
   MODEL_EXPORT virtual int Id();
 
+  /// Defines the sub-shape by Id
+  /// NOTE: This method is opposite to Id() method.
+  MODEL_EXPORT virtual void setId(int theID);
+
   /// Selects (i.e. creates Naming data structure) of sub-shape specifed by textual name
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName);
 
