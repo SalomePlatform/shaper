@@ -28,4 +28,11 @@ start.bat
 *~
 /.project
 *DFBrowser*
+
 *.pyc
+*.swp
+test.*results/*
+err_*
+log_*
+env_config.sh
+
