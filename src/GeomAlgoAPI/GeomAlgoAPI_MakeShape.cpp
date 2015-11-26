@@ -14,11 +14,7 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape, const BuilderType theBuilderType)
-: GeomAPI_Interface(theMkShape),
-  myBuilderType(theBuilderType),
-  myShape(new GeomAPI_Shape())
-{
+void GeomAlgoAPI_MakeShape::initialize() {
   switch (myBuilderType) {
     case OCCT_BRepBuilderAPI_MakeShape: {
       myDone = implPtr<BRepBuilderAPI_MakeShape>()->IsDone() == Standard_True;
