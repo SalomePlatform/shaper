@@ -54,9 +54,9 @@ NewGeom_EXPORT CAM_Module* createModule()
 
 NewGeom_EXPORT char* getModuleVersion()
 {
-  return "0.0";
+  return (char*)"0.0";
 }
-}
+} // extern "C"
 
 /** 
 * Class for preferences management
