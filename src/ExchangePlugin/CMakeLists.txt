@@ -8,6 +8,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+                    ${PROJECT_SOURCE_DIR}/src/XAO
 )
 
 SET(PROJECT_HEADERS
@@ -41,6 +42,7 @@ SET(PROJECT_LIBRARIES
     ModelAPI
     GeomAPI
     GeomAlgoAPI
+    XAO
 )
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 

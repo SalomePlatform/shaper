@@ -53,6 +53,8 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns an id of the selection
   virtual int Id() = 0;
 
+  /// Defines an id of the selection
+  virtual void setId(int theID) = 0;
 
   /// Selects sub-shape by the textual Name
   virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName) = 0;
