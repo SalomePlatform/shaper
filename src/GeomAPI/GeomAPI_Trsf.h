@@ -22,13 +22,6 @@ class GeomAPI_Trsf : public GeomAPI_Interface
  public:
   /// Keeps no transformation, it may be set by setImpl
   GEOMAPI_EXPORT GeomAPI_Trsf();
-
-  /// Constructor by the impl pointer (used for internal needs)
-  template<class T> explicit GeomAPI_Trsf(T* theTrsf)
-  : GeomAPI_Interface(theTrsf)
-  {
-  }
-
   /// Takes the pointer to existing transformation
   GEOMAPI_EXPORT GeomAPI_Trsf(void* theTrsf);
 
