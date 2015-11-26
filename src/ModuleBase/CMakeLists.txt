@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
   ModuleBase_ISelection.h
   ModuleBase_IViewWindow.h
   ModuleBase_IViewer.h
+  ModuleBase_IWidgetCreator.h
   ModuleBase_IWorkshop.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
@@ -71,6 +72,7 @@ SET(PROJECT_SOURCES
   ModuleBase_ISelection.cpp
   ModuleBase_IViewWindow.cpp
   ModuleBase_IViewer.cpp
+  ModuleBase_IWidgetCreator.cpp
   ModuleBase_IWorkshop.cpp
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
