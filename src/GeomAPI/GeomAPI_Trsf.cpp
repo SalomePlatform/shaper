@@ -20,12 +20,6 @@ GeomAPI_Trsf::GeomAPI_Trsf()
 }
 
 //=================================================================================================
-GeomAPI_Trsf::GeomAPI_Trsf(void* theTrsf)
-: GeomAPI_Interface(theTrsf)
-{
-}
-
-//=================================================================================================
 void GeomAPI_Trsf::setTranslation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                   const double theDistance)
 {
