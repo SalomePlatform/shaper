@@ -19,10 +19,10 @@ def main():
     test.compare(str(findObject(":Parameter_QFrame").toolTip), "Model_FeatureValidator: Attribute \"expression\" is not initialized.")
     #[step] Check that name tooltip is: Errors:\nvariable - Parameters_VariableValidator: Incorrect variable name.
     waitFor("object.exists(':Parameter_QLineEdit')", 20000)
-    test.compare(str(findObject(":Parameter_QLineEdit").toolTip), "Errors:\nvariable - Parameters_VariableValidator: Incorrect variable name.")
+    test.compare(str(findObject(":Parameter_QLineEdit").toolTip), 'Errors:\nvariable - Parameters_VariableValidator: Attribute "variable" value is empty.')
     #[step] Check that expression tooltip is: Errors:\nexpression - Parameters_ExpressionValidator: Expression is empty.
     waitFor("object.exists(':Parameter_ExpressionEditor')", 20000)
-    test.compare(str(findObject(":Parameter_ExpressionEditor").toolTip), "Errors:\nexpression - Parameters_ExpressionValidator: Expression is empty.")
+    test.compare(str(findObject(":Parameter_ExpressionEditor").toolTip), 'Errors:\nexpression - Parameters_ExpressionValidator: Attribute "expression" is not initialized.')
 
     #[step] Enter variable name 'a'    
     type(waitForObject(":Parameter_QLineEdit"), "a")
@@ -34,16 +34,16 @@ def main():
     
     #[step] Check that expression tooltip is: Errors:\nexpression - Parameters_ExpressionValidator: name 'b' is not defined
     waitFor("object.exists(':Parameter_ExpressionEditor')", 20000)
-    test.compare(str(findObject(":Parameter_ExpressionEditor").toolTip), "Errors:\nexpression - Parameters_ExpressionValidator: name 'b' is not defined")
+    test.compare(str(findObject(":Parameter_ExpressionEditor").toolTip), "Errors:\nexpression - Parameters_ExpressionValidator: Result is empty.")
     #[step] Check that result message is: Error: unexpected EOF while parsing (<string>, line 0)
     waitFor("object.exists(':Parameter.Result_QLabel')", 20000)
     test.compare(str(findObject(":Parameter.Result_QLabel").text), "Error: name 'b' is not defined")
 
     #[step] Check that feature ToolTip is: expression - Parameters_ExpressionValidator: name 'b' is not defined
     waitFor("object.exists(':Parameter_QFrame')", 20000)
-    test.compare(str(findObject(":Parameter_QFrame").toolTip), "expression - Parameters_ExpressionValidator: name 'b' is not defined")
+    test.compare(str(findObject(":Parameter_QFrame").toolTip), "expression - Parameters_ExpressionValidator: Result is empty.")
 
-    #[step] Check that apply button is red [vp VP_APPLY_RED]
-    test.vp("VP_APPLY_RED")
+    #[step] Check that apply button is grey [vp VP_APPLY_GREY]
+    test.vp("VP_APPLY_GREY")
 
     close_application()
