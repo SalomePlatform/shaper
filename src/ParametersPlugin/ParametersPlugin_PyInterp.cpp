@@ -81,7 +81,7 @@ std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& the
   }
 
   PyObject *aCodePyObj =
-      PyObject_CallMethod(aCodeopModule, "compile_command", "(s)", theExpression.c_str());
+      PyObject_CallMethod(aCodeopModule, (char*)"compile_command", (char*)"(s)", theExpression.c_str());
 
   if(!aCodePyObj || aCodePyObj == Py_None || !PyCode_Check(aCodePyObj)) {
     Py_XDECREF(aCodePyObj);
