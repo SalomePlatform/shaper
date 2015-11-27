@@ -371,6 +371,14 @@ bool SketchSolver_Storage::isPointFixed(
       break;
     }
 
+  // Check whether one of coincident points is out-of-group
+  std::set<Slvs_hEntity>::const_iterator aCoincIt = aCoincident.begin();
+  for (; aCoincIt != aCoincident.end(); ++aCoincIt) {
+    Slvs_Entity aPoint = getEntity(*aCoincIt);
+    if (aPoint.group == SLVS_G_OUTOFGROUP)
+      return true;
+  }
+
   // Search the Rigid constraint
   theFixed = SLVS_C_UNKNOWN;
   std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();

@@ -563,7 +563,8 @@ bool SketchSolver_Group::resolveConstraints()
     updateConstraints();
 
   bool aResolved = false;
-  if (myStorage->isNeedToResolve() && !isEmpty()) {
+  bool isGroupEmpty = isEmpty();
+  if (myStorage->isNeedToResolve() && !isGroupEmpty) {
     myConstrSolver.setGroupID(myID);
     myConstrSolver.calculateFailedConstraints(false);
     myStorage->initializeSolver(myConstrSolver);
@@ -631,6 +632,16 @@ bool SketchSolver_Group::resolveConstraints()
     }
 
     aResolved = true;
+  } else if (!isGroupEmpty) {
+    myFeatureStorage->blockEvents(true);
+    // Check there are constraints Fixed. If they exist, update parameters by stored values
+    ConstraintConstraintMap::iterator aCIt = myConstraints.begin();
+    for (; aCIt != myConstraints.end(); ++aCIt)
+      if (aCIt->first->getKind() == SketchPlugin_ConstraintRigid::ID()) {
+        aCIt->second->refresh();
+        aResolved = true;
+      }
+     myFeatureStorage->blockEvents(false);
   }
   removeTemporaryConstraints();
   myStorage->setNeedToResolve(false);

@@ -40,41 +40,71 @@ void SketchSolver_ConstraintRigid::process()
   fixFeature();
 }
 
-void SketchSolver_ConstraintRigid::fixFeature()
+void SketchSolver_ConstraintRigid::update(ConstraintPtr theConstraint)
 {
-  Slvs_hEntity anEntID;
-  if (!myFeatureMap.empty())
-    anEntID = myFeatureMap.begin()->second;
-  else
-    anEntID = myAttributeMap.begin()->second;
-  //if (myStorage->isEntityFixed(anEntID, true)) {
-  //  myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
-  //  return;
-  //}
-
-  std::string aKind;
-  if (!myFeatureMap.empty())
-    aKind = myFeatureMap.begin()->first->getKind();
-  else
-    aKind = myAttributeMap.begin()->first->attributeType();
-
-  if (aKind == SketchPlugin_Line::ID()) {
-    Slvs_Entity aLine = myStorage->getEntity(anEntID);
-    fixLine(aLine);
-  }
-  else if (aKind == SketchPlugin_Arc::ID()) {
-    Slvs_Entity anArc = myStorage->getEntity(anEntID);
-    fixArc(anArc);
-  }
-  else if (aKind == SketchPlugin_Circle::ID()) {
-    Slvs_Entity aCirc = myStorage->getEntity(anEntID);
-    fixCircle(aCirc);
-  }
-  else if (aKind == SketchPlugin_Point::ID() || aKind == GeomDataAPI_Point2D::typeId()) {
-    fixPoint(anEntID);
+  cleanErrorMsg();
+  if (theConstraint && theConstraint == myBaseConstraint &&
+      theConstraint->getKind() == myBaseConstraint->getKind() &&
+      checkAttributesChanged(theConstraint)) {
+    // remove previous constraint and set the given one
+    remove(myBaseConstraint);
+    myBaseConstraint = theConstraint;
+    process();
   }
 }
 
+static void fixEntity(StoragePtr theStorage, const Slvs_hEntity& theEntID)
+{
+  Slvs_Entity anEntity = theStorage->getEntity(theEntID);
+  anEntity.group = SLVS_G_OUTOFGROUP;
+  theStorage->updateEntity(anEntity);
+  // move out of group all sub-entities
+  for (int i = 0; i < 4; ++i)
+    if (anEntity.point[i] != SLVS_E_UNKNOWN)
+      fixEntity(theStorage, anEntity.point[i]);
+  // move out of group the radius of circle
+  if (anEntity.distance != SLVS_E_UNKNOWN)
+    fixEntity(theStorage, anEntity.distance);
+  // move out of group parameters
+  for (int i = 0; i < 4; ++i)
+    if (anEntity.param[i] != SLVS_E_UNKNOWN) {
+      Slvs_Param aParam = theStorage->getParameter(anEntity.param[i]);
+      aParam.group = SLVS_G_OUTOFGROUP;
+      theStorage->updateParameter(aParam);
+    }
+}
+
+void SketchSolver_ConstraintRigid::fixFeature()
+{
+  Slvs_hEntity anEntID = fixedEntity();
+  if (anEntID != SLVS_E_UNKNOWN)
+    fixEntity(myStorage, anEntID);
+}
+
+Slvs_hEntity SketchSolver_ConstraintRigid::fixedEntity() const
+{
+  Slvs_hEntity anEntID = SLVS_E_UNKNOWN;
+  if (myBaseConstraint) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    if (aRefAttr->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+      std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFound = myFeatureMap.find(aFeature);
+      if (aFound != myFeatureMap.end())
+        anEntID = aFound->second;
+    } else {
+      std::map<AttributePtr, Slvs_hEntity>::const_iterator aFound = myAttributeMap.find(aRefAttr->attr());
+      if (aFound != myAttributeMap.end())
+        anEntID = aFound->second;
+    }
+  }
+  else if (myBaseFeature) {
+    std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFound = myFeatureMap.find(myBaseFeature);
+    if (aFound != myFeatureMap.end())
+      anEntID = aFound->second;
+  }
+  return anEntID;
+}
 
 void SketchSolver_ConstraintRigid::getAttributes(
     double& theValue,
@@ -116,38 +146,6 @@ void SketchSolver_ConstraintRigid::getAttributes(
     theAttributes.push_back(anEntityID);
 }
 
-void SketchSolver_ConstraintRigid::adjustConstraint()
-{
-  if (myFeatureMap.empty() || (
-      myFeatureMap.begin()->first->getKind() != SketchPlugin_Arc::ID() && 
-      myFeatureMap.begin()->first->getKind() != SketchPlugin_Circle::ID()))
-    return;
-  FeaturePtr aFeature = myFeatureMap.begin()->first;
-
-  // Search radius constraints and update them
-  Slvs_Constraint aConstraint;
-  std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
-  for (; aCIter != mySlvsConstraints.end(); aCIter++) {
-    aConstraint = myStorage->getConstraint(*aCIter);
-    if (aConstraint.type != SLVS_C_DIAMETER)
-      continue;
-    double aRadius = 0.0;
-    if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
-      std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
-      std::shared_ptr<GeomAPI_Pnt2d> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->attribute(SketchPlugin_Arc::START_ID()))->pnt();
-      aRadius = aCenter->distance(aStart);
-    } else {
-      aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-          aFeature->attribute(SketchPlugin_Circle::RADIUS_ID()))->value();
-    }
-
-    aConstraint.valA = aRadius * 2.0;
-    *aCIter = myStorage->updateConstraint(aConstraint);
-  }
-}
-
 
 bool SketchSolver_ConstraintRigid::remove(ConstraintPtr theConstraint)
 {
@@ -155,9 +153,18 @@ bool SketchSolver_ConstraintRigid::remove(ConstraintPtr theConstraint)
   if (theConstraint && theConstraint != myBaseConstraint)
     return false;
   bool isFullyRemoved = true;
+
   std::vector<Slvs_hConstraint>::iterator aCIter = mySlvsConstraints.begin();
-  for (; aCIter != mySlvsConstraints.end(); aCIter++)
+  for (; aCIter != mySlvsConstraints.end(); ++aCIter)
     isFullyRemoved = myStorage->removeConstraint(*aCIter) && isFullyRemoved;
+
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aFIter = myFeatureMap.begin();
+  for (; aFIter != myFeatureMap.end(); ++aFIter)
+    isFullyRemoved = myStorage->removeEntity(aFIter->second) && isFullyRemoved;
+
+  std::map<AttributePtr, Slvs_hEntity>::iterator anAtIter = myAttributeMap.begin();
+  for (; anAtIter != myAttributeMap.end(); ++anAtIter)
+    isFullyRemoved = myStorage->removeEntity(anAtIter->second) && isFullyRemoved;
 
   if (isFullyRemoved) {
     myFeatureMap.clear();
@@ -169,10 +176,10 @@ bool SketchSolver_ConstraintRigid::remove(ConstraintPtr theConstraint)
   return true;
 }
 
-void SketchSolver_ConstraintRigid::fixPoint(const Slvs_hEntity& thePointID)
+Slvs_hConstraint SketchSolver_ConstraintRigid::fixPoint(const Slvs_hEntity& thePointID)
 {
   if (thePointID == SLVS_E_UNKNOWN)
-    return;
+    return SLVS_C_UNKNOWN;
 
   Slvs_Constraint aConstraint;
   Slvs_hConstraint aConstrID = SLVS_E_UNKNOWN;
@@ -180,22 +187,23 @@ void SketchSolver_ConstraintRigid::fixPoint(const Slvs_hEntity& thePointID)
   bool isForceUpdate = (isFixed && !myBaseConstraint &&
                         myStorage->isTemporary(aConstrID));
   if (!isForceUpdate) { // create new constraint
-    if (isFixed) return;
-    aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroup->getId(), getType(), myGroup->getWorkplaneId(),
+    if (isFixed) return aConstrID;
+    aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(), getType(), myGroup->getWorkplaneId(),
         0.0, thePointID, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
     aConstraint.h = myStorage->addConstraint(aConstraint);
     mySlvsConstraints.push_back(aConstraint.h);
     if (!myBaseConstraint)
       myStorage->addConstraintWhereDragged(aConstraint.h);
   } else { // update already existent constraint
-    if (!isFixed || aConstrID == SLVS_E_UNKNOWN || myBaseConstraint)
-      return;
+    if (!isFixed || aConstrID == SLVS_C_UNKNOWN || myBaseConstraint)
+      return SLVS_C_UNKNOWN;
     aConstraint = myStorage->getConstraint(aConstrID);
     aConstraint.ptA = thePointID;
     myStorage->addConstraint(aConstraint);
     if (!myBaseConstraint)
       myStorage->addConstraintWhereDragged(aConstraint.h);
   }
+  return aConstraint.h;
 }
 
 void SketchSolver_ConstraintRigid::fixLine(const Slvs_Entity& theLine)

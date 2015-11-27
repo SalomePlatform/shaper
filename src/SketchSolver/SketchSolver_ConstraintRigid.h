@@ -15,7 +15,10 @@
  *  \brief   Stores data of Rigid (Fixed) constraint
  *
  *  Rigid constraint may have NULL basic SketchPlugin constraint,
- *  because the Rigid constraint may be temporary for correct moving of objects
+ *  because the Rigid constraint may be temporary for correct moving of objects.
+ *
+ *  Rigid constraint does not create a constraint, but builds the entities in separate group,
+ *  so they will not be moved while resolving the set of constraints.
  */
 class SketchSolver_ConstraintRigid : public SketchSolver_Constraint
 {
@@ -26,6 +29,9 @@ public:
   {}
   /// Creates temporary constraint based on feature
   SketchSolver_ConstraintRigid(FeaturePtr theFeature);
+
+  /// \brief Update constraint
+  virtual void update(ConstraintPtr theConstraint = ConstraintPtr());
 
   /// \brief Tries to remove constraint
   /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
@@ -44,17 +50,16 @@ protected:
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes);
 
-  /// \brief This method is used in derived objects to check consistence of constraint.
-  ///        E.g. the distance between line and point may be signed.
-  virtual void adjustConstraint();
-
   /// \brief Fixed feature basing on its type
-  void fixFeature();
+  virtual void fixFeature();
 
   /// \brief Fix given point
-  void fixPoint(const Slvs_hEntity& thePointID);
+  /// \return ID of the Fixed constraint
+  Slvs_hConstraint fixPoint(const Slvs_hEntity& thePointID);
 
-private:
+  /// \brief Returns ID of fixed entity
+  Slvs_hEntity fixedEntity() const;
+
   /// \brief Fixing line position (start and end points)
   void fixLine(const Slvs_Entity& theLine);
   /// \brief Fixing circle (center and radius)

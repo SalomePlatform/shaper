@@ -394,6 +394,10 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(AttributePtr theEntity, int& 
   }
 
   Slvs_hGroup aGroupID = myGroup->getId();
+  // do not update entity from another group
+  if (aCurrentEntity.h != SLVS_E_UNKNOWN && aGroupID != aCurrentEntity.group)
+    return aCurrentEntity.h;
+
   // Point in 3D
   std::shared_ptr<GeomDataAPI_Point> aPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point>(theEntity);
@@ -488,6 +492,10 @@ Slvs_hEntity SketchSolver_Constraint::changeEntity(FeaturePtr theEntity, int& th
   }
 
   Slvs_hGroup aGroupID = myGroup->getId();
+  // do not update entity from another group
+  if (aCurrentEntity.h != SLVS_E_UNKNOWN && aGroupID != aCurrentEntity.group)
+    return aCurrentEntity.h;
+
   Slvs_hEntity aWorkplaneID = myGroup->getWorkplaneId();
   DataPtr aData = theEntity->data();
 

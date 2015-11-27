@@ -69,6 +69,9 @@ public:
   void copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo);
   /// \brief Check the entity is used in constraints
   bool isUsedByConstraints(const Slvs_hEntity& theEntityID) const;
+  /// \brief Returns maximal ID of entities in this storage
+  const Slvs_hEntity& entityMaxID() const
+  { return myEntityMaxID; }
 
   /// \brief Verifies the current point or another coincident one is fixed
   /// \param[in]  thePointID  entity to be checked fixed
@@ -105,6 +108,9 @@ public:
   const Slvs_Constraint& getConstraint(const Slvs_hConstraint& theConstraintID) const;
   /// \brief Returns list of constraints of specified type
   std::list<Slvs_Constraint> getConstraintsByType(int theConstraintType) const;
+  /// \brief Returns quantity of constraints in this storage
+  size_t nbConstraints() const
+  { return myConstraints.size(); }
 
   /// \brief Attach constraint SLVS_C_WHERE_DRAGGED to this storage. It need to make precise calculations
   void addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID);
