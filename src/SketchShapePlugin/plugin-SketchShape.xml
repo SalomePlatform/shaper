@@ -6,15 +6,14 @@
       <feature id="SketchShape" title="Sketch vertices, edges and faces" tooltip="Construct vertices, edges and faces by sketch" icon=":icons/sketchshape.png">
         <sketchshape_groupbox title="Direction">
           <boolvalue id="VertexChoice" label="VERTICES" default="true" tooltip="Vertices selection on sketch"/>
-
-        <sketch_multi_selector id="VertexList"
+          <sketch_multi_selector id="VertexList"
             label=""
             tooltip="Select list of mirroring objects"
             type_choice="Vertices"
             use_external="false"
             use_choice="false">
-          <validator id="SketchShapePlugin_FeatureValidator" />
-        </sketch_multi_selector>
+            <validator id="SketchShapePlugin_FeatureValidator" />
+          </sketch_multi_selector>
         </sketchshape_groupbox>
       </feature>
     </group>

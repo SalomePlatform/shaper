@@ -5,7 +5,7 @@
 
 #include "ModuleBase.h"
 
-#include <list>
+#include <set>
 #include <string>
 
 class ModuleBase_ModelWidget;
@@ -27,7 +27,7 @@ public:
 
   /// Returns a list of possible widget types, which this creator can process
   /// \param theTypes
-  virtual void widgetTypes(std::list<std::string>& theTypes) = 0;
+  virtual const std::set<std::string>& widgetTypes() = 0;
 
    /// Create widget by its type
    /// \param theType a type

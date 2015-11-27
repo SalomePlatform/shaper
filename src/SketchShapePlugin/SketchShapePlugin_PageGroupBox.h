@@ -15,14 +15,14 @@ class QWidget;
  * \ingroup GUI
  * Represent a property panel's list of ModuleBase_ModelWidgets.
  */
-class SketchShapePlugin_PageGroupBox// : public ModuleBase_PageGroupBox
+class SketchShapePlugin_PageGroupBox : public ModuleBase_PageGroupBox
 {
   //Q_OBJECT
- public:
+public:
   /// Constructs a page that looks like a QGroupBox
-  SketchShapePlugin_PageGroupBox(QWidget* theParent = 0) {};
+  SketchShapePlugin_PageGroupBox(QWidget* theParent = 0);
   /// Destructs the page
-  virtual ~SketchShapePlugin_PageGroupBox() {};
+  virtual ~SketchShapePlugin_PageGroupBox() {}
 };
 
 #endif /* SKETCHSHAPEPLUGIN_PAGEGROUPBOX_H_ */

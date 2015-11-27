@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
     SketchShapePlugin_Plugin.h
     SketchShapePlugin_Validators.h
     SketchShapePlugin_Tools.h
+    SketchShapePlugin_WidgetCreator.h
 )
 
 SET(PROJECT_SOURCES
@@ -18,6 +19,7 @@ SET(PROJECT_SOURCES
     SketchShapePlugin_Plugin.cpp
     SketchShapePlugin_Validators.cpp
     SketchShapePlugin_Tools.cpp
+    SketchShapePlugin_WidgetCreator.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -34,7 +36,7 @@ SET(XML_RESOURCES
   plugin-SketchShape.xml
 )
 
-ADD_DEFINITIONS(-DSKETCHSHAPEPLUGIN_EXPORTS)
+ADD_DEFINITIONS(-DSKETCHSHAPEPLUGIN_EXPORTS -DWNT)
 ADD_LIBRARY(SketchShapePlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 TARGET_LINK_LIBRARIES(SketchShapePlugin ${PROJECT_LIBRARIES})
 
