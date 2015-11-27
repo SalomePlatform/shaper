@@ -29,6 +29,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(XML_RESOURCES
+    export_widget.xml
     plugin-Exchange.xml
 )
 

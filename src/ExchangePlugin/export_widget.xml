@@ -1,0 +1,33 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <switch id="ExportType">
+    <case id="Regular" title="BREP, STEP, IGES">
+      <export_file_selector id="file_path"
+                            type="save"
+                            title="Export file"
+                            path="">
+        <validator id="ExchangePlugin_ExportFormat"
+                   parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES-5.1,IGES|IGS:IGES-5.3" />
+      </export_file_selector>
+    </case>
+    <case id="XAO" title="XAO">
+      <export_file_selector id="file_path"
+                            type="save"
+                            title="Export file"
+                            path="">
+        <validator id="ExchangePlugin_ExportFormat"
+                   parameters="XAO:XAO" />
+      </export_file_selector>
+      <stringvalue id="xao_author"
+                   label="Author"
+                   placeholder="Please input the author">
+      </stringvalue>
+    </case>
+  </switch>
+  <multi_selector id="selection_list" 
+                  tooltip="Select a set of objects" 
+                  type_choice="Vertices Edges Faces Solids Objects">
+    <validator id="GeomValidators_Finite"/>
+  </multi_selector>
+</source>

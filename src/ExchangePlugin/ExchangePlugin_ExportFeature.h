@@ -29,6 +29,12 @@ public:
     static const std::string MY_EXPORT_ID("Export");
     return MY_EXPORT_ID;
   }
+  /// attribute name for file format
+  inline static const std::string& EXPORT_TYPE_ID()
+  {
+    static const std::string MY_EXPORT_TYPE_ID("ExportType");
+    return MY_EXPORT_TYPE_ID;
+  }
   /// attribute name of file path
   inline static const std::string& FILE_PATH_ID()
   {
@@ -47,16 +53,25 @@ public:
     static const std::string MY_SELECTION_LIST_ID("selection_list");
     return MY_SELECTION_LIST_ID;
   }
+  /// attribute name of author for XAO format
+  inline static const std::string& XAO_AUTHOR_ID()
+  {
+    static const std::string MY_XAO_AUTHOR_ID("xao_author");
+    return MY_XAO_AUTHOR_ID;
+  }
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ExportFeature();
   /// Default destructor
   EXCHANGEPLUGIN_EXPORT virtual ~ExchangePlugin_ExportFeature();
 
+  /// Returns the unique kind of a feature
+  EXCHANGEPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    return ExchangePlugin_ExportFeature::ID();
+  }
+
   /// Request for initialization of data model of the feature: adding all attributes
   EXCHANGEPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Returns the unique kind of a feature
-  EXCHANGEPLUGIN_EXPORT virtual const std::string& getKind();
 
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();
@@ -68,10 +83,14 @@ public:
   EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
 
 protected:
-  /// Performs the export of the file
-  EXCHANGEPLUGIN_EXPORT bool exportFile(const std::string& theFileName,
+  /// Performs export of the file
+  EXCHANGEPLUGIN_EXPORT void exportFile(const std::string& theFileName,
                                         const std::string& theFormat,
                                         std::shared_ptr<GeomAPI_Shape> theShape);
+
+  /// Performs export to XAO file
+  EXCHANGEPLUGIN_EXPORT void exportXAO(const std::string& theFileName,
+                                       std::shared_ptr<GeomAPI_Shape> theShape);
 };
 
 #endif /* EXPORT_EXPORTFEATURE_H_ */

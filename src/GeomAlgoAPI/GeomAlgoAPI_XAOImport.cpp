@@ -6,8 +6,6 @@
 
 #include <GeomAlgoAPI_XAOImport.h>
 
-#include <cassert>
-
 #include <TopoDS_Shape.hxx>
 
 #include <XAO_XaoExporter.hxx>
@@ -22,11 +20,14 @@ std::shared_ptr<GeomAPI_Shape> XAOImport(const std::string& theFileName,
                                          std::string& theError,
                                          XAO::Xao* theXao)
 {
-  assert(theXao);
-
   #ifdef _DEBUG
   std::cout << "Import XAO from file " << theFileName << std::endl;
   #endif
+  if (theFileName.empty() || !theXao) {
+    theError = "An invalid argument.";
+    return std::shared_ptr<GeomAPI_Shape>();
+  }
+
   TopoDS_Shape aShape;
   try {
     if (XAO::XaoExporter::readFromFile(theFileName, theXao)) {

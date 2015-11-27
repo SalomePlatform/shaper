@@ -19,8 +19,8 @@
 #include <GeomAlgoAPI_BREPImport.h>
 #include <GeomAlgoAPI_IGESImport.h>
 #include <GeomAlgoAPI_STEPImport.h>
-#include <GeomAlgoAPI_XAOImport.h>
 #include <GeomAlgoAPI_Tools.h>
+#include <GeomAlgoAPI_XAOImport.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -104,7 +104,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   } else if (anExtension == "IGES" || anExtension == "IGS") {
     aGeomShape = IGESImport(theFileName, anExtension, anError);
   } else {
-    anError = "Cann't read files with extension: " + anExtension;
+    anError = "Unsupported format: " + anExtension;
   }
 
   // Check if shape is valid
@@ -133,10 +133,14 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   }
 
   XAO::Geometry* aXaoGeometry = aXao.getGeometry();
-  data()->setName(aXaoGeometry->getName());
 
-  std::shared_ptr<ModelAPI_ResultBody> aResultBody = createResultBody(aGeomShape);
-  aResultBody->data()->setName(aXaoGeometry->getName());
+  // use the geometry name or the file name for the feature
+  std::string aBodyName = aXaoGeometry->getName().empty()
+      ? GeomAlgoAPI_Tools::File_Tools::name(theFileName)
+      : aXaoGeometry->getName();
+  data()->setName(aBodyName);
+
+  ResultBodyPtr aResultBody = createResultBody(aGeomShape);
   setResult(aResultBody);
 
   // Process groups

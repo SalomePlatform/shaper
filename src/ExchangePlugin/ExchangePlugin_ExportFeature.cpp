@@ -6,16 +6,23 @@
 
 #include <ExchangePlugin_ExportFeature.h>
 
-#include <ExchangePlugin_Tools.h>
+#include <algorithm>
+#include <iterator>
+#include <string>
+#ifdef _DEBUG
+#include <iostream>
+#include <ostream>
+#endif
+
+#include <Config_Common.h>
+#include <Config_PropManager.h>
 
 #include <GeomAlgoAPI_BREPExport.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_IGESExport.h>
 #include <GeomAlgoAPI_STEPExport.h>
 #include <GeomAlgoAPI_Tools.h>
-
-#include <Config_Common.h>
-#include <Config_PropManager.h>
+#include <GeomAlgoAPI_XAOExport.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -25,14 +32,12 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
-#include <algorithm>
-#include <iterator>
-#include <string>
-#ifdef _DEBUG
-#include <iostream>
-#include <ostream>
-#endif
+#include <XAO_Xao.hxx>
+
+#include <ExchangePlugin_Tools.h>
 
 ExchangePlugin_ExportFeature::ExchangePlugin_ExportFeature()
 {
@@ -44,21 +49,17 @@ ExchangePlugin_ExportFeature::~ExchangePlugin_ExportFeature()
 }
 
 /*
- * Returns the unique kind of a feature
- */
-const std::string& ExchangePlugin_ExportFeature::getKind()
-{
-  return ExchangePlugin_ExportFeature::ID();
-}
-
-/*
  * Request for initialization of data model of the feature: adding all attributes
  */
 void ExchangePlugin_ExportFeature::initAttributes()
 {
+  data()->addAttribute(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(), ModelAPI_AttributeString::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
 }
 
 /*
@@ -102,14 +103,13 @@ void ExchangePlugin_ExportFeature::execute()
   exportFile(aFilePath, aFormat, aShape);
 }
 
-bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
+void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
                                               const std::string& theFormat,
                                               std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  // retrieve the file and plugin library names
   std::string aFormatName = theFormat;
 
-  if (theFormat.empty()) { // look at extension
+  if (aFormatName.empty()) { // get default format for the extension
     // ".brep" -> "BREP"
     std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(theFileName);
     if (anExtension == "BREP" || anExtension == "BRP") {
@@ -118,9 +118,16 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
       aFormatName = "STEP";
     } else if (anExtension == "IGES" || anExtension == "IGS") {
       aFormatName = "IGES-5.1";
+    } else if (anExtension == "XAO") {
+      aFormatName = "XAO";
     } else {
       aFormatName = anExtension;
     }
+  }
+
+  if (aFormatName == "XAO") {
+    exportXAO(theFileName, theShape);
+    return;
   }
 
   // Perform the export
@@ -133,15 +140,28 @@ bool ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   } else if (aFormatName.substr(0, 4) == "IGES") {
     aResult = IGESExport(theFileName, aFormatName, theShape, anError);
   } else {
-    anError = "Unsupported format " + aFormatName;
+    anError = "Unsupported format: " + aFormatName;
   }
 
-  if (!aResult) {
-    std::string aShapeError =
-        "An error occurred while exporting " + theFileName + ": " + anError;
-    setError(aShapeError);
-    return false;
+  if (!anError.empty()) {
+    setError("An error occurred while exporting " + theFileName + ": " + anError);
+    return;
   }
-
-  return true;
 }
+
+void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
+                                             std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  std::string anAuthor = string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
+
+  XAO::Xao aXao(anAuthor, "1.0");
+
+  std::string anError;
+  XAOExport(theFileName, theShape, &aXao, anError);
+
+  if (!anError.empty()) {
+    setError("An error occurred while exporting " + theFileName + ": " + anError);
+    return;
+  }
+}
+
