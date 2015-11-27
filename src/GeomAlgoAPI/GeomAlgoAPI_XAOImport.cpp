@@ -19,7 +19,6 @@
  */
 //=============================================================================
 std::shared_ptr<GeomAPI_Shape> XAOImport(const std::string& theFileName,
-                                         const std::string&,
                                          std::string& theError,
                                          XAO::Xao* theXao)
 {
@@ -30,9 +29,8 @@ std::shared_ptr<GeomAPI_Shape> XAOImport(const std::string& theFileName,
   #endif
   TopoDS_Shape aShape;
   try {
-//    XAO::Xao aXao;
-    if (XAO::XaoExporter::readFromFile(theFileName, theXao/*&aXao*/)) {
-      XAO::Geometry* aGeometry = /*aXao*/theXao->getGeometry();
+    if (XAO::XaoExporter::readFromFile(theFileName, theXao)) {
+      XAO::Geometry* aGeometry = theXao->getGeometry();
       XAO::Format aFormat = aGeometry->getFormat();
       if (aFormat == XAO::BREP) {
         if (XAO::BrepGeometry* aBrepGeometry = dynamic_cast<XAO::BrepGeometry*>(aGeometry))

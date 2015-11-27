@@ -24,14 +24,18 @@
 
 #include <GeomAPI_Shape.h>
 
-#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <XAO_Xao.hxx>
 #include <XAO_Group.hxx>
@@ -46,19 +50,14 @@ ExchangePlugin_ImportFeature::~ExchangePlugin_ImportFeature()
 }
 
 /*
- * Returns the unique kind of a feature
- */
-const std::string& ExchangePlugin_ImportFeature::getKind()
-{
-  return ExchangePlugin_ImportFeature::ID();
-}
-
-/*
  * Request for initialization of data model of the feature: adding all attributes
  */
 void ExchangePlugin_ImportFeature::initAttributes()
 {
   data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ImportFeature::GROUP_LIST_ID(), ModelAPI_AttributeRefList::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ImportFeature::GROUP_LIST_ID());
 }
 
 /*
@@ -66,86 +65,121 @@ void ExchangePlugin_ImportFeature::initAttributes()
  */
 void ExchangePlugin_ImportFeature::execute()
 {
-  AttributeStringPtr aFilePathAttr =
-      this->string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
+  AttributeStringPtr aFilePathAttr = string(ExchangePlugin_ImportFeature::FILE_PATH_ID());
   std::string aFilePath = aFilePathAttr->value();
-  if (aFilePath.empty())
+  if (aFilePath.empty()) {
+    setError("File path is empty.");
     return;
+  }
 
   importFile(aFilePath);
 }
 
-bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
+std::shared_ptr<ModelAPI_ResultBody> ExchangePlugin_ImportFeature::createResultBody(
+    std::shared_ptr<GeomAPI_Shape> aGeomShape)
 {
-  // retrieve the file and plugin library names
-  // ".brep" -> "BREP"
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+  //LoadNamingDS of the imported shape
+  loadNamingDS(aGeomShape, aResultBody);
+  return aResultBody;
+}
+
+void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
+{
+  // "*.brep" -> "BREP"
   std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(theFileName);
+
+  if (anExtension == "XAO") {
+    importXAO(theFileName);
+    return;
+  }
 
   // Perform the import
   std::string anError;
-
   std::shared_ptr<GeomAPI_Shape> aGeomShape;
-  std::shared_ptr<XAO::Xao> aXao;
   if (anExtension == "BREP" || anExtension == "BRP") {
     aGeomShape = BREPImport(theFileName, anExtension, anError);
   } else if (anExtension == "STEP" || anExtension == "STP") {
     aGeomShape = STEPImport(theFileName, anExtension, anError);
   } else if (anExtension == "IGES" || anExtension == "IGS") {
     aGeomShape = IGESImport(theFileName, anExtension, anError);
-  } else if (anExtension == "XAO") {
-    std::shared_ptr<XAO::Xao> aTmpXao(new XAO::Xao);
-    aGeomShape = XAOImport(theFileName, anExtension, anError, aTmpXao.get());
-    if (!aGeomShape->isNull())
-      aXao = aTmpXao;
+  } else {
+    anError = "Cann't read files with extension: " + anExtension;
   }
 
   // Check if shape is valid
-  if (aGeomShape->isNull()) {
-    const static std::string aShapeError =
-      "An error occurred while importing " + theFileName + ": " + anError;
-    setError(aShapeError);
-    return false;
+  if (!anError.empty()) {
+    setError("An error occurred while importing " + theFileName + ": " + anError);
+    return;
   }
 
   // Pass the results into the model
   std::string anObjectName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
   data()->setName(anObjectName);
-  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
 
-  //LoadNamingDS of the imported shape
-  loadNamingDS(aGeomShape, aResultBody);
+  setResult(createResultBody(aGeomShape));
+}
 
-  setResult(aResultBody);
+void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
+{
+  std::string anError;
 
-  if (aXao.get()) {
-    XAO::Geometry* aXaoGeometry = aXao->getGeometry();
+  XAO::Xao aXao;
+  std::shared_ptr<GeomAPI_Shape> aGeomShape = XAOImport(theFileName, anError, &aXao);
 
-    // Creates group results
-    for (int aGroupIndex = 0; aGroupIndex < aXao->countGroups(); ++aGroupIndex) {
-      XAO::Group* aXaoGroup = aXao->getGroup(aGroupIndex);
-
-      std::shared_ptr<ModelAPI_Feature> aGroupFeature = document()->addFeature("Group", false);
-      if (aGroupFeature) {
-        if (!aXaoGroup->getName().empty())
-          aGroupFeature->data()->setName(aXaoGroup->getName());
-        AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
-        aSelectionList->setSelectionType(XAO::XaoUtils::dimensionToString(aXaoGroup->getDimension()));
-
-        for (int anElementIndex = 0; anElementIndex < aXaoGroup->count(); ++anElementIndex) {
-          aSelectionList->append(aResultBody, GeomShapePtr());
-          int anElementID = aXaoGroup->get(anElementIndex);
-          std::string aReferenceString =
-              aXaoGeometry->getElementReference(aXaoGroup->getDimension(), anElementID);
-          int aReferenceID = XAO::XaoUtils::stringToInt(aReferenceString);
-          aSelectionList->value(anElementIndex)->setId(aReferenceID);
-        }
-
-        document()->setCurrentFeature(aGroupFeature, true);
-      }
-    }
+  if (!anError.empty()) {
+    setError("An error occurred while importing " + theFileName + ": " + anError);
+    return;
   }
 
-  return true;
+  XAO::Geometry* aXaoGeometry = aXao.getGeometry();
+  data()->setName(aXaoGeometry->getName());
+
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody = createResultBody(aGeomShape);
+  aResultBody->data()->setName(aXaoGeometry->getName());
+  setResult(aResultBody);
+
+  // Process groups
+  AttributeRefListPtr aRefListOfGroups = reflist(ExchangePlugin_ImportFeature::GROUP_LIST_ID());
+
+  // Remove previous groups stored in RefList
+  std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
+  std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
+  for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
+    std::shared_ptr<ModelAPI_Feature> aFeature =
+        std::dynamic_pointer_cast<ModelAPI_Feature>(*anGroupIt);
+    if (aFeature)
+      document()->removeFeature(aFeature);
+  }
+
+  // Create new groups
+  for (int aGroupIndex = 0; aGroupIndex < aXao.countGroups(); ++aGroupIndex) {
+    XAO::Group* aXaoGroup = aXao.getGroup(aGroupIndex);
+
+    std::shared_ptr<ModelAPI_Feature> aGroupFeature = document()->addFeature("Group", false);
+
+    // group name
+    if (!aXaoGroup->getName().empty())
+      aGroupFeature->data()->setName(aXaoGroup->getName());
+
+    // fill selection
+    AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
+    aSelectionList->setSelectionType(XAO::XaoUtils::dimensionToString(aXaoGroup->getDimension()));
+    for (int anElementIndex = 0; anElementIndex < aXaoGroup->count(); ++anElementIndex) {
+      aSelectionList->append(aResultBody, GeomShapePtr());
+      // complex conversion of element index to reference id
+      int anElementID = aXaoGroup->get(anElementIndex);
+      std::string aReferenceString =
+          aXaoGeometry->getElementReference(aXaoGroup->getDimension(), anElementID);
+      int aReferenceID = XAO::XaoUtils::stringToInt(aReferenceString);
+
+      aSelectionList->value(anElementIndex)->setId(aReferenceID);
+    }
+
+    aRefListOfGroups->append(aGroupFeature);
+
+    document()->setCurrentFeature(aGroupFeature, true);
+  }
 }
 
 //============================================================================

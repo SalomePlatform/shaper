@@ -20,7 +20,6 @@ class Xao;
 /// Implementation of the import XAO files algorithms
 GEOMALGOAPI_EXPORT
 std::shared_ptr<GeomAPI_Shape> XAOImport(const std::string& theFileName,
-                                          const std::string& theFormatName,
                                           std::string& theError,
                                           XAO::Xao* theXao);
 

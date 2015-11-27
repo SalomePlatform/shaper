@@ -35,13 +35,22 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
     static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
+  /// attribute name of group list
+  inline static const std::string& GROUP_LIST_ID()
+  {
+    static const std::string MY_GROUP_LIST_ID("group_list");
+    return MY_GROUP_LIST_ID;
+  }
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature();
   /// Default destructor
   EXCHANGEPLUGIN_EXPORT virtual ~ExchangePlugin_ImportFeature();
 
   /// Returns the unique kind of a feature
-  EXCHANGEPLUGIN_EXPORT virtual const std::string& getKind();
+  EXCHANGEPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    return ExchangePlugin_ImportFeature::ID();
+  }
 
   /// Request for initialization of data model of the feature: adding all attributes
   EXCHANGEPLUGIN_EXPORT virtual void initAttributes();
@@ -54,7 +63,14 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 
  protected:
   /// Performs the import of the file
-  EXCHANGEPLUGIN_EXPORT bool importFile(const std::string& theFileName);
+  EXCHANGEPLUGIN_EXPORT void importFile(const std::string& theFileName);
+
+  /// Performs the import of XAO file
+  EXCHANGEPLUGIN_EXPORT void importXAO(const std::string& theFileName);
+
+  /// Creates and prepares a result body from the shape
+  std::shared_ptr<ModelAPI_ResultBody> createResultBody(
+      std::shared_ptr<GeomAPI_Shape> aGeomShape);
 
 private:
   /// Loads Naming data structure to the document
