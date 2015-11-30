@@ -60,9 +60,11 @@ void ExchangePlugin_ExportFeature::initAttributes()
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(), ModelAPI_AttributeString::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
 }
 
 /*
@@ -182,6 +184,11 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     setError("An error occurred while exporting " + theFileName + ": " + anError);
     return;
   }
+
+  // geometry name
+
+  std::string aGeometryName = string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
+  aXao.getGeometry()->setName(aGeometryName);
 
   // groups
 

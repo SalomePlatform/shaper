@@ -59,6 +59,12 @@ public:
     static const std::string MY_XAO_AUTHOR_ID("xao_author");
     return MY_XAO_AUTHOR_ID;
   }
+  /// attribute name of geometry name for XAO format
+  inline static const std::string& XAO_GEOMETRY_NAME_ID()
+  {
+    static const std::string MY_XAO_GEOMETRY_NAME_ID("xao_geometry_name");
+    return MY_XAO_GEOMETRY_NAME_ID;
+  }
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ExportFeature();
   /// Default destructor

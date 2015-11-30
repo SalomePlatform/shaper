@@ -28,6 +28,10 @@
                    label="Author"
                    placeholder="Please input the author">
       </stringvalue>
+      <stringvalue id="xao_geometry_name"
+                   label="Geometry name"
+                   placeholder="Please input the geometry name">
+      </stringvalue>
     </case>
   </switch>
 </source>
