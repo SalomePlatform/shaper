@@ -32,9 +32,11 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <XAO_Group.hxx>
 #include <XAO_Xao.hxx>
 
 #include <ExchangePlugin_Tools.h>
@@ -59,6 +61,7 @@ void ExchangePlugin_ExportFeature::initAttributes()
   data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(), ModelAPI_AttributeString::typeId());
 
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
 }
 
@@ -70,9 +73,6 @@ void ExchangePlugin_ExportFeature::execute()
   AttributeStringPtr aFormatAttr =
       this->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID());
   std::string aFormat = aFormatAttr->value();
-  // Format may be empty. In this case look at extension.
-//  if (aFormat.empty())
-//    return;
 
   AttributeStringPtr aFilePathAttr =
       this->string(ExchangePlugin_ExportFeature::FILE_PATH_ID());
@@ -80,32 +80,11 @@ void ExchangePlugin_ExportFeature::execute()
   if (aFilePath.empty())
     return;
 
-  AttributeSelectionListPtr aSelectionListAttr =
-      this->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
-  std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
-  for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
-    AttributeSelectionPtr anAttrSelection = aSelectionListAttr->value(i);
-    std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
-    if (aCurShape.get() == NULL)
-      aCurShape = anAttrSelection->context()->shape();
-    if (aCurShape.get() != NULL)
-      aShapes.push_back(aCurShape);
-  }
-
-  // Store compound if we have more than one shape.
-  std::shared_ptr<GeomAPI_Shape> aShape;
-  if(aShapes.size() == 1) {
-    aShape = aShapes.front();
-  } else {
-    aShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-  }
-
-  exportFile(aFilePath, aFormat, aShape);
+  exportFile(aFilePath, aFormat);
 }
 
 void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
-                                              const std::string& theFormat,
-                                              std::shared_ptr<GeomAPI_Shape> theShape)
+                                              const std::string& theFormat)
 {
   std::string aFormatName = theFormat;
 
@@ -126,19 +105,40 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   }
 
   if (aFormatName == "XAO") {
-    exportXAO(theFileName, theShape);
+    exportXAO(theFileName);
     return;
+  }
+
+  // make shape for export from selected shapes
+  AttributeSelectionListPtr aSelectionListAttr =
+      this->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
+  std::list<GeomShapePtr> aShapes;
+  for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
+    AttributeSelectionPtr anAttrSelection = aSelectionListAttr->value(i);
+    std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
+    if (aCurShape.get() == NULL)
+      aCurShape = anAttrSelection->context()->shape();
+    if (aCurShape.get() != NULL)
+      aShapes.push_back(aCurShape);
+  }
+
+  // Store compound if we have more than one shape.
+  std::shared_ptr<GeomAPI_Shape> aShape;
+  if(aShapes.size() == 1) {
+    aShape = aShapes.front();
+  } else {
+    aShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
   }
 
   // Perform the export
   std::string anError;
   bool aResult = false;
   if (aFormatName == "BREP") {
-    aResult = BREPExport(theFileName, aFormatName, theShape, anError);
+    aResult = BREPExport(theFileName, aFormatName, aShape, anError);
   } else if (aFormatName == "STEP") {
-    aResult = STEPExport(theFileName, aFormatName, theShape, anError);
+    aResult = STEPExport(theFileName, aFormatName, aShape, anError);
   } else if (aFormatName.substr(0, 4) == "IGES") {
-    aResult = IGESExport(theFileName, aFormatName, theShape, anError);
+    aResult = IGESExport(theFileName, aFormatName, aShape, anError);
   } else {
     anError = "Unsupported format: " + aFormatName;
   }
@@ -149,19 +149,85 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   }
 }
 
-void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName,
-                                             std::shared_ptr<GeomAPI_Shape> theShape)
+void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 {
-  std::string anAuthor = string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
-
-  XAO::Xao aXao(anAuthor, "1.0");
+  try {
 
   std::string anError;
-  XAOExport(theFileName, theShape, &aXao, anError);
+  XAO::Xao aXao;
+
+  // author
+
+  std::string anAuthor = string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
+  aXao.setAuthor(anAuthor);
+
+  // make shape for export from all results
+  std::list<GeomShapePtr> aShapes;
+  int aBodyCount = document()->size(ModelAPI_ResultBody::group());
+  for (int aBodyIndex = 0; aBodyIndex < aBodyCount; ++aBodyIndex) {
+    ResultBodyPtr aResultBody =
+        std::dynamic_pointer_cast<ModelAPI_ResultBody>(
+            document()->object(ModelAPI_ResultBody::group(), aBodyIndex));
+    if (!aResultBody.get())
+      continue;
+    aShapes.push_back(aResultBody->shape());
+  }
+  GeomShapePtr aShape = (aShapes.size() == 1)
+      ? *aShapes.begin()
+      : GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+
+  SetShapeToXAO(aShape, &aXao, anError);
 
   if (!anError.empty()) {
     setError("An error occurred while exporting " + theFileName + ": " + anError);
     return;
   }
-}
 
+  // groups
+
+  int aGroupCount = document()->size(ModelAPI_ResultGroup::group());
+  for (int aGroupIndex = 0; aGroupIndex < aGroupCount; ++aGroupIndex) {
+    ResultGroupPtr aResultGroup =
+        std::dynamic_pointer_cast<ModelAPI_ResultGroup>(
+            document()->object(ModelAPI_ResultGroup::group(), aGroupIndex));
+
+    FeaturePtr aGroupFeature = document()->feature(aResultGroup);
+
+    AttributeSelectionListPtr aSelectionList =
+        aGroupFeature->selectionList("group_list");
+
+    // conversion of dimension
+    std::string aSelectionType = aSelectionList->selectionType();
+    std::string aDimensionString = ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
+    XAO::Dimension aGroupDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
+
+    XAO::Group* aXaoGroup = aXao.addGroup(aGroupDimension,
+                                          aResultGroup->data()->name());
+
+    for (int aSelectionIndex = 0; aSelectionIndex < aSelectionList->size(); ++aSelectionIndex) {
+      AttributeSelectionPtr aSelection = aSelectionList->value(aSelectionIndex);
+
+      // complex conversion of reference id to element index
+      int aReferenceID = aSelection->Id();
+      std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
+      int anElementID = aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
+
+      aXaoGroup->add(anElementID);
+    }
+  }
+
+  // exporting
+
+  XAOExport(theFileName, &aXao, anError);
+
+  if (!anError.empty()) {
+    setError("An error occurred while exporting " + theFileName + ": " + anError);
+    return;
+  }
+
+  } catch (XAO::XAO_Exception& e) {
+    std::string anError = e.what();
+    setError("An error occurred while importing " + theFileName + ": " + anError);
+    return;
+  }
+}

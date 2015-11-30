@@ -85,12 +85,10 @@ public:
 protected:
   /// Performs export of the file
   EXCHANGEPLUGIN_EXPORT void exportFile(const std::string& theFileName,
-                                        const std::string& theFormat,
-                                        std::shared_ptr<GeomAPI_Shape> theShape);
+                                        const std::string& theFormat);
 
   /// Performs export to XAO file
-  EXCHANGEPLUGIN_EXPORT void exportXAO(const std::string& theFileName,
-                                       std::shared_ptr<GeomAPI_Shape> theShape);
+  EXCHANGEPLUGIN_EXPORT void exportXAO(const std::string& theFileName);
 };
 
 #endif /* EXPORT_EXPORTFEATURE_H_ */

@@ -40,6 +40,8 @@
 #include <XAO_Xao.hxx>
 #include <XAO_Group.hxx>
 
+#include <ExchangePlugin_Tools.h>
+
 ExchangePlugin_ImportFeature::ExchangePlugin_ImportFeature()
 {
 }
@@ -122,6 +124,7 @@ void ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 
 void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 {
+  try {
   std::string anError;
 
   XAO::Xao aXao;
@@ -168,7 +171,13 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
     // fill selection
     AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
-    aSelectionList->setSelectionType(XAO::XaoUtils::dimensionToString(aXaoGroup->getDimension()));
+
+    // conversion of dimension
+    XAO::Dimension aGroupDimension = aXaoGroup->getDimension();
+    std::string aDimensionString = XAO::XaoUtils::dimensionToString(aXaoGroup->getDimension());
+    std::string aSelectionType = ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
+
+    aSelectionList->setSelectionType(aSelectionType);
     for (int anElementIndex = 0; anElementIndex < aXaoGroup->count(); ++anElementIndex) {
       aSelectionList->append(aResultBody, GeomShapePtr());
       // complex conversion of element index to reference id
@@ -183,6 +192,12 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
     aRefListOfGroups->append(aGroupFeature);
 
     document()->setCurrentFeature(aGroupFeature, true);
+  }
+
+  } catch (XAO::XAO_Exception& e) {
+    std::string anError = e.what();
+    setError("An error occurred while importing " + theFileName + ": " + anError);
+    return;
   }
 }
 

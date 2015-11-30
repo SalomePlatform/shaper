@@ -22,6 +22,12 @@ public:
   static std::list<std::string> split(const std::string& theString,
                                       char theDelimiter);
 
+  /// Converts string representation of selection type to XAO dimension.
+  static std::string selectionType2xaoDimension(const std::string& theString);
+
+  /// Converts string representation of XAO dimension to selection type.
+  static std::string xaoDimension2selectionType(const std::string& theDimension);
+
 };
 
 #endif /* EXCHANGEPLUGIN_TOOLS_H_ */

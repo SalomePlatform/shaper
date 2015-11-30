@@ -17,10 +17,15 @@ namespace XAO {
 class Xao;
 } // namespace XAO
 
+/// Defines shape for the XAO object
+GEOMALGOAPI_EXPORT
+bool SetShapeToXAO(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                   XAO::Xao* theXao,
+                   std::string& theError);
+
 /// Implementation of the export XAO files algorithms
 GEOMALGOAPI_EXPORT
 bool XAOExport(const std::string& theFileName,
-               const std::shared_ptr<GeomAPI_Shape>& theShape,
                XAO::Xao* theXao,
                std::string& theError);
 
