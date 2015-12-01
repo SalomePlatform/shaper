@@ -237,7 +237,7 @@ private slots:
   void onMouseMoved(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*);
   void onApplicationStarted();
-  void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
+  //void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
   void onBeforeContextMenu();
   void onAfterContextMenu();
@@ -317,7 +317,7 @@ private:
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   bool myIsPopupMenuActive; /// the state of the popup menu is shown
   Point myCurrentPoint;
-  Point myClickedPoint;
+  //Point myClickedPoint;
 
   CompositeFeaturePtr myCurrentSketch;
 

@@ -323,7 +323,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
     return;
 
-  get2dPoint(theWnd, theEvent, myClickedPoint);
+  //get2dPoint(theWnd, theEvent, myClickedPoint);
 
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
@@ -435,7 +435,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   ModuleBase_Operation* aOp = getCurrentOperation();
   if (aOp) {
     if (isNestedSketchOperation(aOp)) {
-      get2dPoint(theWnd, theEvent, myClickedPoint);
+      //get2dPoint(theWnd, theEvent, myClickedPoint);
 
       // Only for sketcher operations
       if (myIsDragging) {
@@ -491,7 +491,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     }
   }
 
-  myClickedPoint.clear();
+  //myClickedPoint.clear();
 
   if (myIsDragging) {
     // 1. the current selection is saved in the mouse press method in order to restore it after moving
@@ -619,8 +619,8 @@ void PartSet_SketcherMgr::onApplicationStarted()
 
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
   if (aPropertyPanel) {
-    connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
-            this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
+    //connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
+    //        this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
 
     connect(aPropertyPanel, SIGNAL(noMoreWidgets(const std::string&)),
             aReentranceMgr, SLOT(onNoMoreWidgets(const std::string&)));
@@ -637,23 +637,23 @@ void PartSet_SketcherMgr::onApplicationStarted()
   connect(aContextMenuMgr, SIGNAL(afterContextMenu()), this, SLOT(onAfterContextMenu()));
 }
 
-void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget)
-{
-  if (!myClickedPoint.myIsInitialized)
-    return;
+//void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget)
+//{
+  //if (!myClickedPoint.myIsInitialized)
+  //  return;
 
-  ModuleBase_Operation* aOperation = getCurrentOperation();
+  //ModuleBase_Operation* aOperation = getCurrentOperation();
   // the distance constraint feature should not use the clickedd point
   // this is workaround in order to don't throw down the flyout point value,
   // set by execute() method of these type of features
-  if (isDistanceOperation(aOperation))
-    return;
+  //if (isDistanceOperation(aOperation))
+  //  return;
 
-  PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(theWidget);
-  if (aPnt2dWgt) {
-    aPnt2dWgt->setPoint(myClickedPoint.myCurX, myClickedPoint.myCurY);
-  }
-}
+  //PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(theWidget);
+  //if (aPnt2dWgt) {
+  //  aPnt2dWgt->setPoint(myClickedPoint.myCurX, myClickedPoint.myCurY);
+  //}
+//}
 
 void PartSet_SketcherMgr::onBeforeContextMenu()
 {
@@ -714,8 +714,7 @@ QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
 
 void PartSet_SketcherMgr::clearClickedFlags()
 {
-  return;
-  myClickedPoint.clear();
+  //myClickedPoint.clear();
   myCurrentPoint.clear();
 }
 

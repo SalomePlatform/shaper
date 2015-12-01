@@ -134,6 +134,13 @@ protected:
   /// Process value changed event
   //void onValuesChanged();
 
+  /// Compute the feature default value and fill the controls with it
+  /// or store the control value to the feature
+  /// The widget is not initialize the attribute value in order to avoid the 
+  /// incorrect visualization in Sketch. E.g. by a line creation, the line should not
+  /// be visualized immediatelly when the end point widget is activated.
+  virtual void initializeValueByActivate();
+
  private:
    /// Returns point 2d from selected vertex
    /// \param theView a view window

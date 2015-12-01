@@ -496,6 +496,10 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
   return aPointIsFound;
 }
 
+void PartSet_WidgetPoint2D::initializeValueByActivate()
+{
+}
+
 /*void PartSet_WidgetPoint2D::onValuesChanged()
 {
   emit valuesChanged();
