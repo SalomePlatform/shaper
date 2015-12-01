@@ -388,7 +388,6 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   // Result construction menu
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(action("HIDEALL_CMD"));
   aList.append(action("COLOR_CMD"));
   myViewerMenu[ModelAPI_ResultConstruction::group()] = aList;
   // Result part menu
@@ -402,7 +401,6 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(mySeparator);
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(action("HIDEALL_CMD"));
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
@@ -466,6 +464,8 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
     aActions.append(action("HIDE_CMD"));
     aActions.append(action("COLOR_CMD"));
   }
+  // hide all is shown always even if selection in the viewer is empty
+  aActions.append(action("HIDEALL_CMD"));
   theMenu->addActions(aActions);
 
 #ifndef HAVE_SALOME
