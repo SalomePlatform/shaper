@@ -69,6 +69,7 @@
 :Exit_SalomeApp_ExitDlg	{type='SalomeApp_ExitDlg' unnamed='1' visible='1' windowTitle='Exit'}
 :Extrusion.From_ModuleBase_PageGroupBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.From_ModuleBase_PageGroupBox_2	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
+:Extrusion.From_ModuleBase_PageGroupBox_3	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.Select a sketch face_QLabel	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
 :Extrusion.Select a sketch face_QListWidget	{aboveWidget=':Extrusion.Select a sketch face_QLabel' container=':SALOME*.Extrusion_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :Extrusion.To_ModuleBase_PageGroupBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
@@ -105,6 +106,7 @@
 :From.from_offset_ModuleBase_ParamSpinBox	{container=':Extrusion.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :From.from_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :From.from_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
+:From.qt_spinbox_lineedit_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox_3' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :From_QLineEdit_2	{container=':Revolution.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :From_QLineEdit_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
@@ -345,6 +347,7 @@
 :SALOME*.property_panel_dock_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.qt_toolbar_ext_button_QToolBarExtension	{name='qt_toolbar_ext_button' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.qt_toolbar_ext_button_QToolBarExtension_2	{name='qt_toolbar_ext_button' occurrence='2' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.qt_toolbar_ext_button_QToolBarExtension_3	{name='qt_toolbar_ext_button' occurrence='3' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QAbstractButton	{occurrence='41' type='QAbstractButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QFrame	{occurrence='7' type='QFrame' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QFrame_2	{occurrence='12' type='QFrame' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
@@ -371,9 +374,11 @@
 :Save File.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Save File_SUIT_FileDlg'}
 :Save File_SUIT_FileDlg	{name='QFileDialog' type='SUIT_FileDlg' visible='1' windowTitle='Save File'}
 :Sketch.Show constraints_QCheckBox	{container=':SALOME*.Sketch_XGUI_PropertyPanel' text='Show constraints' type='QCheckBox' unnamed='1' visible='1'}
+:Sketch.Sketcher plane_QGroupBox	{container=':SALOME*.Sketch_XGUI_PropertyPanel' title='Sketcher plane' type='QGroupBox' unnamed='1' visible='1'}
 :Sketch.property_panel_cancel_QToolButton	{container=':SALOME*.Sketch_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Sketch.property_panel_ok_QToolButton	{container=':SALOME*.Sketch_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Sketch_QMenu	{title='Sketch' type='QMenu' unnamed='1' visible='1'}
+:Sketcher plane.Set plane view_QPushButton	{container=':Sketch.Sketcher plane_QGroupBox' text='Set plane view' type='QPushButton' unnamed='1' visible='1'}
 :Start point.X _ModuleBase_ParamSpinBox	{container=':Line.Start point_QGroupBox' leftWidget=':Start point.X _QLabel' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Start point.X _ModuleBase_ParamSpinBox_2	{container=':Arc.Start point_QGroupBox' leftWidget=':Start point.X _QLabel_2' type='ModuleBase_ParamSpinBox' unnamed='1' visible='1'}
 :Start point.X _QLabel	{container=':Line.Start point_QGroupBox' text='X ' type='QLabel' unnamed='1' visible='1'}
