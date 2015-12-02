@@ -83,7 +83,12 @@ void ExchangePlugin_ExportFeature::execute()
       this->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
   for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; ++i) {
-    aShapes.push_back(aSelectionListAttr->value(i)->value());
+    AttributeSelectionPtr anAttrSelection = aSelectionListAttr->value(i);
+    std::shared_ptr<GeomAPI_Shape> aCurShape = anAttrSelection->value();
+    if (aCurShape.get() == NULL)
+      aCurShape = anAttrSelection->context()->shape();
+    if (aCurShape.get() != NULL)
+      aShapes.push_back(aCurShape);
   }
   std::shared_ptr<GeomAPI_Shape> aShape =
       GeomAlgoAPI_CompoundBuilder::compound(aShapes);
