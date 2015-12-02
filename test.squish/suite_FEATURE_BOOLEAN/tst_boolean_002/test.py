@@ -35,7 +35,7 @@ def main():
     boolean_fuse((139, 138), (420, 195))
 
     #[check] Check that operation has been executed successfully
-    test.vp("VP1")
+    test.vp("FUSE")
     
     # [step] Close application without saving
     close_application()
