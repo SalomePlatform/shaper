@@ -45,3 +45,14 @@ void GeomAPI_Pln::coefficients(double& theA, double& theB, double& theC, double&
 {
   impl<gp_Pln>().Coefficients(theA, theB, theC, theD);
 }
+
+bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, const double theTolerance)
+{
+  if(!thePlane.get()) {
+    return false;
+  }
+
+  const gp_Pln& aMyPln = impl<gp_Pln>();
+  const gp_Pln& anOtherPln = thePlane->impl<gp_Pln>();
+  return (aMyPln.Contains(anOtherPln.Location(), theTolerance) && aMyPln.Axis().IsParallel(anOtherPln.Axis(), theTolerance));
+}

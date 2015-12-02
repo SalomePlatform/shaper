@@ -81,5 +81,5 @@
       </box>
     </toolbox>
   </groupbox>
-  <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,ByAngles,to_angle,from_angle,to_object,to_offset,from_object,from_offset"/>
+  <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,ByAngles,sketch_selection,to_angle,from_angle,to_object,to_offset,from_object,from_offset"/>
 </source>

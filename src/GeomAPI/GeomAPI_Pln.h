@@ -46,6 +46,10 @@ class GeomAPI_Pln : public GeomAPI_Interface
   /// Returns the plane coefficients (Ax+By+Cz+D=0)
   GEOMAPI_EXPORT 
   void coefficients(double& theA, double& theB, double& theC, double& theD);
+
+  /// Returns true if planes are coincident.
+  GEOMAPI_EXPORT
+  bool isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, const double theTolerance = 1.e-7);
 };
 
 #endif

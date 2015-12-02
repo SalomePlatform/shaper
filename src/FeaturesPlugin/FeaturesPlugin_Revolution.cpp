@@ -58,34 +58,26 @@ void FeaturesPlugin_Revolution::execute()
   ListOfShape aFacesList;
   AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
   for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aFaceSel = aFacesSelectionList->value(anIndex);
-    ResultPtr aContext = aFaceSel->context();
-    std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
-    if(!aContextShape.get()) {
-      static const std::string aContextError = "The selection context is bad";
-      setError(aContextError);
-      break;
-    }
-
+    AttributeSelectionPtr aFaceSel = aFacesSelectionList->value(anIndex);
     std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();
-    int aFacesNum = -1; // this mean that "aFace" is used
-    ResultConstructionPtr aConstruction = 
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
-    if(!aFaceShape.get()) { // this may be the whole sketch result selected, check and get faces
-      if (aConstruction.get()) {
-        aFacesNum = aConstruction->facesNum();
-      } else {
+    if(aFaceShape.get() && !aFaceShape->isNull()) { // Getting face.
+      aFacesList.push_back(aFaceShape);
+    } else { // This may be the whole sketch result selected, check and get faces.
+      ResultPtr aContext = aFaceSel->context();
+      std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
+      if(!aContextShape.get()) {
+        static const std::string aContextError = "The selection context is bad";
+        setError(aContextError);
+        return;
+      }
+      ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+      if(!aConstruction.get()) {
         static const std::string aFaceError = "Can not find basis for revolution";
         setError(aFaceError);
-        break;
+        return;
       }
-    }
-    for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
-      std::shared_ptr<GeomAPI_Shape> aBaseShape;
-      if (aFacesNum == -1) {
-        aFacesList.push_back(aFaceShape);
-        break;
-      } else {
+      int aFacesNum = aConstruction->facesNum();
+      for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
         aFaceShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
         aFacesList.push_back(aFaceShape);
       }

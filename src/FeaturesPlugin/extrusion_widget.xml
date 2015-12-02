@@ -77,5 +77,5 @@
       </groupbox>
     </box>
   </toolbox>
-  <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
+  <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,base,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
 </source>

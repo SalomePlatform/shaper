@@ -6,18 +6,25 @@
 
 #include <GeomValidators_ZeroOffset.h>
 
-#include <GeomAPI_Shape.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_ResultConstruction.h>
+
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_Face.h>
+#include <GeomAPI_Shape.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Pnt.h>
 
 //=================================================================================================
 bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                         const std::list<std::string>& theArguments,
                                         std::string& theError) const
 {
-  if(theArguments.size() != 8) {
-    theError = "Wrong number of arguments (expected 8).";
+  if(theArguments.size() != 9) {
+    theError = "Wrong number of validator arguments in xml(expected 9).";
     return false;
   }
 
@@ -30,7 +37,45 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   anIt++;
   std::string aCreationMethod = *anIt;
   anIt++;
-  
+
+  ListOfShape aFacesList;
+  if(theFeature->selection(*anIt)) {
+    AttributeSelectionPtr aFaceSelection = theFeature->selection(*anIt);
+    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFaceSelection->context());
+    if(aConstruction.get()) {
+      int aSketchFacesNum = aConstruction->facesNum();
+      for(int aFaceIndex = 0; aFaceIndex < aSketchFacesNum; aFaceIndex++) {
+        std::shared_ptr<GeomAPI_Shape> aFace = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+        aFacesList.push_back(aFace);
+      }
+    }
+  } else if(theFeature->selectionList(*anIt)) {
+    AttributeSelectionListPtr aFacesSelectionList = theFeature->selectionList(*anIt);
+    for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
+      AttributeSelectionPtr aFaceSel = aFacesSelectionList->value(anIndex);
+      std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();
+      if(aFaceShape.get() && !aFaceShape->isNull()) { // Getting face.
+        aFacesList.push_back(aFaceShape);
+      } else { // This may be the whole sketch result selected, check and get faces.
+        ResultPtr aContext = aFaceSel->context();
+        std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
+        if(!aContextShape.get()) {
+          break;
+        }
+        ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+        if(!aConstruction.get()) {
+          break;
+        }
+        int aFacesNum = aConstruction->facesNum();
+        for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
+          aFaceShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+          aFacesList.push_back(aFaceShape);
+        }
+      }
+    }
+  }
+  anIt++;
+
   double aToSize = 0.0;
   double aFromSize = 0.0;
 
@@ -84,9 +129,42 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
     aFromSize = anAttrDouble->value();
   }
 
-  if(((!aFromShape && !aToShape) || ((aFromShape && aToShape) && aFromShape->isEqual(aToShape)))
-    && (aFromSize == -aToSize)) {
-    theError = "FromSize = -ToSize and bounding planes are equal.";
+  bool isPlanesCoincident = false;
+  if(!aFromShape.get() && !aToShape.get()) {
+    isPlanesCoincident = true;
+  } else if(aFromShape.get() && aToShape.get()) {
+    std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aFromShape));
+    std::shared_ptr<GeomAPI_Pln>  aFromPln = aFromFace->getPlane();
+
+    std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aToShape));
+    std::shared_ptr<GeomAPI_Pln>  aToPln = aToFace->getPlane();
+
+    if(aFromPln.get()) {
+      isPlanesCoincident = aFromPln->isCoincident(aToPln);
+    }
+  } else {
+    std::shared_ptr<GeomAPI_Face> aFace;
+    if(aFromShape.get()) {
+      aFace.reset(new GeomAPI_Face(aFromShape));
+    } else {
+      aFace.reset(new GeomAPI_Face(aToShape));
+    }
+    std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
+    if(aPln.get()) {
+      for(ListOfShape::const_iterator anIter = aFacesList.cbegin(); anIter != aFacesList.cend(); anIter++) {
+        std::shared_ptr<GeomAPI_Shape> aSketchShape = *anIter;
+        std::shared_ptr<GeomAPI_Face> aSketchFace(new GeomAPI_Face(aSketchShape));
+        std::shared_ptr<GeomAPI_Pln>  aSketchPln = aSketchFace->getPlane();
+        if(aPln->isCoincident(aSketchPln)) {
+          isPlanesCoincident = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if(isPlanesCoincident && aFromSize == -aToSize) {
+    theError = "FromSize = -ToSize and bounding planes are coincident.";
     return false;
   }
 
