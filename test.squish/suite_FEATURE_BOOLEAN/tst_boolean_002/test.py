@@ -29,6 +29,7 @@ def main():
     
     #[step] Fit all
     fit_all()
+    test.vp("INIT")    
 
     #[step] Implement boolean fuse for existing objects
     boolean_fuse((139, 138), (420, 195))

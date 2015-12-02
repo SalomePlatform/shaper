@@ -29,6 +29,7 @@ def main():
     
     #[step] Fit all
     fit_all()
+    test.vp("INIT")
 
     #[step] Implement boolean common for existing objects
     boolean_common((139, 138), (420, 195))

@@ -14,7 +14,7 @@ def main():
     set_defaults()
     
     activate_newgeom()
-    
+
     sketch_create(help_points("XY_plane"), lambda: sketch_circle())
     sketch_create(help_points("XY_plane"), lambda: sketch_lines())
     test.vp("VP_SKETCHES")

@@ -29,12 +29,13 @@ def main():
     
     #[step] Fit all
     fit_all()
+    test.vp("INIT")
     
     #[step] Implement boolean cut for existing objects
     boolean_cut((139, 138), (420, 195))
 
     #[check] Check that operation has been executed successfully
-    test.vp("VP1")
+    test.vp("CUT")
     
     # [step] Close application without saving
     close_application()
