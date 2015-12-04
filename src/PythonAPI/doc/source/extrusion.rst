@@ -1,5 +1,5 @@
 Extrusion
----------
+=========
 
 .. testsetup::
 
@@ -25,16 +25,39 @@ by the following code:
    >>> # Modification of the extrusion
    >>> extrusion.setSize(20)
    
-All the ways to create an extrusion and the data access and modification methods 
+All the ways to create an extrusion and the data access and modification methods
 of the extrusion are documented below
 
 Create an extrusion
-...................
-   
-.. autofunction:: model.features.extrusion.addExtrusion
+-------------------
+
+.. autofunction:: model.addExtrusion
 
 Extrusion object
 ................
 
 .. autoclass:: model.features.extrusion.Extrusion
+   :members:
+
+Create an Extrusion Bolean
+--------------------------
+
+.. autofunction:: model.addExtrusionCut
+.. autofunction:: model.addExtrusionFuse
+
+Extrusion Boolean object
+........................
+
+.. autoclass:: model.features.extrusion_boolean.ExtrusionBoolean
+   :members:
+   
+Create an Extrusion Sketch
+--------------------------
+
+.. autofunction:: model.addExtrusionSketch
+
+Extrusion Sketch object
+.......................
+
+.. autoclass:: model.features.extrusion_sketch.ExtrusionSketch
    :members:

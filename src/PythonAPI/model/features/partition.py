@@ -7,7 +7,7 @@ from model.roots import Interface
 
 
 def addPartition(part, *args):
-    """Add an Partition feature to the Part and return Partition.
+    """Add a Partition feature to the Part and return Partition.
 
     Pass all args to Partition __init__ function.
     """
