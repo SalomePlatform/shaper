@@ -15,8 +15,28 @@
           <boolvalue id="VertexChoice" label="VERTICES" default="true" tooltip="Vertices selection on sketch"/>
           <sketch_multi_selector id="VertexList"
             label=""
-            tooltip="Select list of mirroring objects"
-            type_choice="Vertices"
+            tooltip="Select list of vertices"
+            type_choice="Vertices Edges Faces"
+            use_external="false"
+            use_choice="false">
+            <validator id="SketchShapePlugin_FeatureValidator" />
+          </sketch_multi_selector>
+
+          <boolvalue id="EdgeChoice" label="EDGES" default="true" tooltip="Edges selection on sketch"/>
+          <sketch_multi_selector id="EdgeList"
+            label=""
+            tooltip="Select list of edges"
+            type_choice="Vertices Edges Faces"
+            use_external="false"
+            use_choice="false">
+            <validator id="SketchShapePlugin_FeatureValidator" />
+          </sketch_multi_selector>
+
+          <boolvalue id="FaceChoice" label="FACES" default="true" tooltip="Faces selection on sketch"/>
+          <sketch_multi_selector id="FaceList"
+            label=""
+            tooltip="Select list of faces"
+            type_choice="Vertices Edges Faces"
             use_external="false"
             use_choice="false">
             <validator id="SketchShapePlugin_FeatureValidator" />

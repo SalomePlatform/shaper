@@ -61,7 +61,7 @@ public:
   /// Redefinition of virtual method
   virtual QSize	minimumSizeHint() const
   {
-    int aHeight = 2*QFontMetrics( font() ).height();
+    int aHeight = 4/*2*/*QFontMetrics( font() ).height();
     QSize aSize = QListWidget::minimumSizeHint();
     return QSize( aSize.width(), aHeight );
   }

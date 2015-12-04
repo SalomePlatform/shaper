@@ -36,6 +36,13 @@ class SketchShapePlugin_Feature : public ModelAPI_Feature
     return MY_SKETCH_ID;
   }
 
+  /// State whether the vertices are selectable
+  inline static const std::string& VERTEX_CHOICE_ID()
+  {
+    static const std::string MY_VERTEX_CHOICE_ID("VertexChoice");
+    return MY_VERTEX_CHOICE_ID;
+  }
+
   /// List of vertices to be extracted
   inline static const std::string& VERTEX_LIST_ID()
   {
@@ -43,11 +50,32 @@ class SketchShapePlugin_Feature : public ModelAPI_Feature
     return MY_VERTEX_LIST_ID;
   }
 
-  /// State whether the vertices are selectable
-  inline static const std::string& VERTEX_CHOICE_ID()
+    /// State whether the vertices are selectable
+  inline static const std::string& EDGE_CHOICE_ID()
   {
-    static const std::string MY_VERTEX_CHOICE_ID("VertexChoice");
-    return MY_VERTEX_CHOICE_ID;
+    static const std::string MY_EDGE_CHOICE_ID("EdgeChoice");
+    return MY_EDGE_CHOICE_ID;
+  }
+
+  /// List of vertices to be extracted
+  inline static const std::string& EDGE_LIST_ID()
+  {
+    static const std::string MY_EDGE_LIST_ID("EdgeList");
+    return MY_EDGE_LIST_ID;
+  }
+
+    /// State whether the vertices are selectable
+  inline static const std::string& FACE_CHOICE_ID()
+  {
+    static const std::string MY_FACE_CHOICE_ID("FaceChoice");
+    return MY_FACE_CHOICE_ID;
+  }
+
+  /// List of vertices to be extracted
+  inline static const std::string& FACE_LIST_ID()
+  {
+    static const std::string MY_FACE_LIST_ID("FaceList");
+    return MY_FACE_LIST_ID;
   }
 
   /// Returns the kind of a feature
