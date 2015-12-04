@@ -7,6 +7,7 @@
 
 #include <set>
 #include <string>
+#include <memory>
 
 class ModuleBase_ModelWidget;
 
