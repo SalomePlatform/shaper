@@ -36,22 +36,52 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
   std::set<std::string>::const_iterator anIt = aTypes.begin(), aLast = aTypes.end();
   for (; anIt != aLast; anIt++) {
     std::string aKey = *anIt;
-    if (!myModelWidgets.contains(aKey))
-      myModelWidgets[aKey] = theCreator;
+    if (!myCreators.contains(aKey))
+      myCreators[aKey] = theCreator;
     else {
-      Events_Error::send("The" + aKey + " widget XML definition has been already\
-                                        used by another widget creator");
+      Events_Error::send("The" + aKey + " widget XML definition has been already \
+used by another widget creator");
+    }
+  }
+
+  const std::set<std::string>& aPTypes = theCreator->pageTypes();
+  for (anIt = aPTypes.begin(), aLast = aPTypes.end(); anIt != aLast; anIt++) {
+    std::string aKey = *anIt;
+    if (!myPageToCreator.contains(aKey))
+      myPageToCreator[aKey] = theCreator;
+    else {
+      Events_Error::send("The" + aKey + " page XML definition has been already \
+used by another widget creator");
     }
   }
 }
+
+bool ModuleBase_WidgetCreatorFactory::hasPageWidget(const std::string& theType)
+{
+  return myPageToCreator.contains(theType);
+}
+
+ModuleBase_PageBase* ModuleBase_WidgetCreatorFactory::createPageByType(
+                              const std::string& theType, QWidget* theParent)
+{
+  ModuleBase_PageBase* aPage = 0;
+
+  if (myPageToCreator.contains(theType)) {
+    WidgetCreatorPtr aCreator = myPageToCreator[theType];
+    aPage = aCreator->createPageByType(theType, theParent);
+  }
+
+  return aPage;
+}
+
 
 ModuleBase_ModelWidget* ModuleBase_WidgetCreatorFactory::createWidgetByType(
                               const std::string& theType, QWidget* theParent)
 {
   ModuleBase_ModelWidget* aWidget = 0;
 
-  if (myModelWidgets.contains(theType)) {
-    WidgetCreatorPtr aCreator = myModelWidgets[theType];
+  if (myCreators.contains(theType)) {
+    WidgetCreatorPtr aCreator = myCreators[theType];
     aWidget = aCreator->createWidgetByType(theType, theParent);
   }
 

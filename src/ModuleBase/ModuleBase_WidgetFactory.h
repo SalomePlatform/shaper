@@ -51,9 +51,16 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
  protected:
   /// check if ModuleBase_Widget has expandable widgets in getControls
   bool hasExpandingControls(QWidget* theParent);
-   /// Create widget by its type
-   /// \param theType a type
-   /// \param theParent a parent widget
+
+  /// Create page by its type
+  /// \param theType a type
+  /// \param theParent a parent widget
+  ModuleBase_PageBase* createPageByType(const std::string& theType,
+                                        QWidget* theParent);
+
+  /// Create widget by its type
+  /// \param theType a type
+  /// \param theParent a parent widget
   ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                              QWidget* theParent = NULL);
 

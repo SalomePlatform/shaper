@@ -24,9 +24,19 @@ public:
   /// Virtual destructor
   ~SketchShapePlugin_WidgetCreator() {}
 
+  /// Returns a container of possible page types, which this creator can process
+  /// \returns types
+  virtual const std::set<std::string>& pageTypes();
+
   /// Returns a list of possible widget types, which this creator can process
-  /// \return theTypes
+  /// \returns types
   virtual const std::set<std::string>& widgetTypes();
+
+  /// Create page by its type
+  /// \param theType a type
+  /// \param theParent a parent widget
+  virtual ModuleBase_PageBase* createPageByType(const std::string& theType,
+                                                QWidget* theParent);
 
   /// Create widget by its type
   /// \param theType a type
@@ -35,6 +45,7 @@ public:
                                                      QWidget* theParent = NULL);
 
 private:
+  std::set<std::string> myPages; /// types of pages
   std::set<std::string> myTypes; /// types of widgets
 };
 

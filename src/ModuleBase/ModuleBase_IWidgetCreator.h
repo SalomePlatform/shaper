@@ -10,6 +10,7 @@
 #include <memory>
 
 class ModuleBase_ModelWidget;
+class ModuleBase_PageBase;
 
 class QWidget;
 
@@ -26,11 +27,21 @@ public:
   /// Virtual destructor
   ~ModuleBase_IWidgetCreator();
 
-  /// Returns a list of possible widget types, which this creator can process
-  /// \param theTypes
+  /// Returns a container of possible page types, which this creator can process
+  /// \returns types
+  virtual const std::set<std::string>& pageTypes() = 0;
+
+  /// Returns a container of possible widget types, which this creator can process
+  /// \returns types
   virtual const std::set<std::string>& widgetTypes() = 0;
 
-   /// Create widget by its type
+  /// Create page by its type
+  /// \param theType a type
+  /// \param theParent a parent widget
+  virtual ModuleBase_PageBase* createPageByType(const std::string& theType,
+                                                QWidget* theParent) = 0;
+
+  /// Create widget by its type
    /// \param theType a type
    /// \param theParent a parent widget
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,

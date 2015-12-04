@@ -17,6 +17,7 @@
 #include <ModuleBase_IWidgetCreator.h>
 
 class ModuleBase_ModelWidget;
+class ModuleBase_PageBase;
 
 class QWidget;
 
@@ -38,6 +39,16 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// \param theCreator a new widget creator
   void registerCreator(const WidgetCreatorPtr& theCreator);
 
+  /// Returns true if there is a creator, which can make a page by the type
+  /// \param theType a type
+  bool hasPageWidget(const std::string& theType);
+
+  /// Create page by its type
+  /// \param theType a type
+  /// \param theParent a parent widget
+  ModuleBase_PageBase* createPageByType(const std::string& theType,
+                                        QWidget* theParent = NULL);
+
   /// Create widget by its type
   /// \param theType a type
   /// \param theParent a parent widget
@@ -48,8 +59,11 @@ private:
   /// Constructor is hidden
   ModuleBase_WidgetCreatorFactory();
 
-  /// List of created model widgets
-  QMap<std::string, WidgetCreatorPtr> myModelWidgets;
+  /// Map of widget type in XML to creator
+  QMap<std::string, WidgetCreatorPtr> myCreators;
+
+  /// Map of widget page in XML to creator
+  QMap<std::string, WidgetCreatorPtr> myPageToCreator;
 };
 
 typedef std::shared_ptr<ModuleBase_WidgetCreatorFactory> WidgetCreatorFactoryPtr;

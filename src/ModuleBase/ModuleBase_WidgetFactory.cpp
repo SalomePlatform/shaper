@@ -77,11 +77,12 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
     // Create PageGroup TODO: extract
-    if (myWidgetApi->isGroupBoxWidget()) {
+    if (myWidgetApi->isGroupBoxWidget() ||
+        ModuleBase_WidgetCreatorFactory::get()->hasPageWidget(aWdgType)) {
+
       //if current widget is groupbox (container) process it's children recursively
-      QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
-      ModuleBase_PageGroupBox* aPage = new ModuleBase_PageGroupBox(thePage->pageWidget());
-      aPage->setTitle(aGroupName);
+      ModuleBase_PageBase* aPage = createPageByType(aWdgType, thePage->pageWidget());
+
       createWidget(aPage);
       thePage->addPageWidget(aPage);
     } else {
@@ -117,6 +118,24 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   } while (myWidgetApi->toNextWidget());
 
   thePage->alignToTop();
+}
+
+ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::string& theType,
+                                                                QWidget* theParent)
+{
+  ModuleBase_PageBase* aResult = NULL;
+
+  if (theType == WDG_GROUP) {
+    QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
+    ModuleBase_PageGroupBox* aPage = new ModuleBase_PageGroupBox(theParent);
+    aPage->setTitle(aGroupName);
+    aResult = aPage;
+  }
+
+  if (!aResult)
+    aResult = ModuleBase_WidgetCreatorFactory::get()->createPageByType(theType, theParent);
+
+  return aResult;
 }
 
 ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
