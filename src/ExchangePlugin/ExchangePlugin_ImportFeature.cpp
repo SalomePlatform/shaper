@@ -191,7 +191,10 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
     aRefListOfGroups->append(aGroupFeature);
 
-    document()->setCurrentFeature(aGroupFeature, true);
+    // hide the group in the history
+    document()->setCurrentFeature(aGroupFeature, false);
+    // groups features is internal part of the import
+    aGroupFeature->setInHistory(aGroupFeature, false);
   }
 
   } catch (XAO::XAO_Exception& e) {
