@@ -31,6 +31,7 @@
 #include <ModuleBase_PageGroupBox.h>
 #include <ModuleBase_PageWidget.h>
 #include <ModuleBase_WidgetExprEditor.h>
+#include <ModuleBase_WidgetCreatorFactory.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -159,15 +160,16 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = NULL;
   } else {
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myParentId);
+    if (!result)
+      result = ModuleBase_WidgetCreatorFactory::get()->createWidgetByType(theType, theParent);
     #ifdef _DEBUG
     if (!result) {
       qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type %s", theType.c_str());
     }
     #endif
   }
-  if (result) {
+  if (result)
     myModelWidgets.append(result);
-  }
   return result;
 }
 

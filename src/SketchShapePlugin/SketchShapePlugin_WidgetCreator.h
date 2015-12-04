@@ -38,5 +38,6 @@ private:
   std::set<std::string> myTypes; /// types of widgets
 };
 
+typedef std::shared_ptr<SketchShapePlugin_WidgetCreator> SketchShapePlguinWidgetCreatorPtr;
 
 #endif

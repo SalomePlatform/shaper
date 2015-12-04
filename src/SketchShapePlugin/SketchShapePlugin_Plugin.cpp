@@ -15,6 +15,9 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Validator.h>
+
+#include <ModuleBase_WidgetCreatorFactory.h>
+#include <SketchShapePlugin_WidgetCreator.h>
 /*#include <ModelAPI_Data.h>
 
 #include <ModuleBase_ModelWidget.h>
@@ -23,7 +26,7 @@
 #include <memory>*/
 
 // the only created instance of this plugin
-//static SketchShapePlugin_Plugin* MY_SKETCH_SHAPE_INSTANCE = new SketchShapePlugin_Plugin();
+static SketchShapePlugin_Plugin* MY_SKETCH_SHAPE_INSTANCE = new SketchShapePlugin_Plugin();
 
 SketchShapePlugin_Plugin::SketchShapePlugin_Plugin()
 {
@@ -31,6 +34,10 @@ SketchShapePlugin_Plugin::SketchShapePlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchShapePlugin_FeatureValidator",
                               new SketchShapePlugin_FeatureValidator);
+
+  WidgetCreatorFactoryPtr aWidgetCreatorFactory = ModuleBase_WidgetCreatorFactory::get();
+  aWidgetCreatorFactory->registerCreator(
+          std::shared_ptr<SketchShapePlugin_WidgetCreator>(new SketchShapePlugin_WidgetCreator()));
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

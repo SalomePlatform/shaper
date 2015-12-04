@@ -36,5 +36,7 @@ public:
                                                      QWidget* theParent = NULL) = 0;
 };
 
+typedef std::shared_ptr<ModuleBase_IWidgetCreator> WidgetCreatorPtr;
+
 
 #endif

@@ -4,7 +4,7 @@ INCLUDE(Common)
 SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
-	ModuleBase.h
+  ModuleBase.h
   ModuleBase_ActionInfo.h
   ModuleBase_Definitions.h
   ModuleBase_DoubleSpinBox.h
@@ -40,6 +40,7 @@ SET(PROJECT_HEADERS
   ModuleBase_ViewerPrs.h
   ModuleBase_WidgetBoolValue.h
   ModuleBase_WidgetChoice.h
+  ModuleBase_WidgetCreatorFactory.h
   ModuleBase_WidgetDoubleValue.h
   ModuleBase_WidgetEditor.h
   ModuleBase_WidgetExprEditor.h
@@ -92,6 +93,7 @@ SET(PROJECT_SOURCES
   ModuleBase_ViewerPrs.cpp
   ModuleBase_WidgetBoolValue.cpp
   ModuleBase_WidgetChoice.cpp
+  ModuleBase_WidgetCreatorFactory.cpp
   ModuleBase_WidgetDoubleValue.cpp
   ModuleBase_WidgetEditor.cpp
   ModuleBase_WidgetExprEditor.cpp

@@ -18,13 +18,12 @@ ModuleBase_ModelWidget* SketchShapePlugin_WidgetCreator::createWidgetByType(
                                    const std::string& theType, QWidget* theParent)
 {
   ModuleBase_ModelWidget* aWidget = 0;
-  if (myTypes.find(theType) != myTypes.end())
+  if (myTypes.find(theType) == myTypes.end())
     return aWidget;
 
-  if (theType == "sketchshape_groupbox") {
-    //aWidget = 
-      new SketchShapePlugin_PageGroupBox(theParent);
-  }
+  //if (theType == "sketchshape_groupbox") {
+  //  aWidget = new SketchShapePlugin_PageGroupBox(theParent);
+  //}
 
   return aWidget;
 }
