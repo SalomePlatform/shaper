@@ -29,6 +29,13 @@ class SketchShapePlugin_Feature : public ModelAPI_Feature
     return MY_SKETCH_SHAPE_ID;
   }
 
+  /// Sketch feature
+  inline static const std::string& SKETCH_ID()
+  {
+    static const std::string MY_SKETCH_ID("Sketch");
+    return MY_SKETCH_ID;
+  }
+
   /// List of vertices to be extracted
   inline static const std::string& VERTEX_LIST_ID()
   {

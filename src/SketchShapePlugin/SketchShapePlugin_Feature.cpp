@@ -6,6 +6,7 @@
 
 #include "SketchShapePlugin_Feature.h"
 
+#include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeBoolean.h>
 
@@ -16,6 +17,7 @@ SketchShapePlugin_Feature::SketchShapePlugin_Feature()
 
 void SketchShapePlugin_Feature::initAttributes()
 {
+  data()->addAttribute(SKETCH_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(VERTEX_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(VERTEX_CHOICE_ID(), ModelAPI_AttributeBoolean::typeId());
 }

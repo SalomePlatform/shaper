@@ -4,6 +4,13 @@
   <workbench id="Sketch">
     <group id="Exchange">
       <feature id="SketchShape" title="Sketch vertices, edges and faces" tooltip="Construct vertices, edges and faces by sketch" icon=":icons/sketchshape.png">
+        <shape_selector id="Sketch"
+          label="Sketch"
+          icon=":icons/sketch.png"
+          tooltip="Select a sketch"
+          shape_types="objects">
+          <validator id="PartSet_SketchEntityValidator" parameters="Sketch"/>
+        </shape_selector>
         <sketchshape_groupbox title="Direction">
           <boolvalue id="VertexChoice" label="VERTICES" default="true" tooltip="Vertices selection on sketch"/>
           <sketch_multi_selector id="VertexList"
