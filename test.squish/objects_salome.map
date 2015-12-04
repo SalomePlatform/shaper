@@ -207,6 +207,7 @@
 :Python Console.qt_dockwidget_closebutton_QDockWidgetTitleButton	{container=':SALOME*.Python Console_QtxDockWidget' name='qt_dockwidget_closebutton' type='QDockWidgetTitleButton' visible='1'}
 :Python Console.qt_dockwidget_floatbutton_QDockWidgetTitleButton	{container=':SALOME*.Python Console_QtxDockWidget' name='qt_dockwidget_floatbutton' type='QDockWidgetTitleButton' visible='1'}
 :Python Console_PyConsole_EnhEditor	{container=':SALOME*.Python Console_QtxDockWidget' type='PyConsole_EnhEditor' unnamed='1' visible='1'}
+:QFileDialog_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1'}
 :Radius.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
 :Radius.property_panel_cancel_QToolButton	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Radius.property_panel_ok_QToolButton	{container=':SALOME*.Radius_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
@@ -436,16 +437,34 @@
 :_ModuleBase_ParamSpinBox	{type='ModuleBase_ParamSpinBox' unnamed='1' visible='1' window=':_QDialog'}
 :_QDialog	{type='QDialog' unnamed='1' visible='1'}
 :_QExpandingLineEdit	{columnIndex='0' container=':Object browser_XGUI_DataTree' rowIndex='0' type='QExpandingLineEdit' unnamed='1' visible='1'}
+:_QExpandingLineEdit_2	{columnIndex='0' container=':Object browser_XGUI_DataTree' rowIndex='5' type='QExpandingLineEdit' unnamed='1' visible='1'}
 :_QMenu	{type='QMenu' unnamed='1' visible='1'}
 :_QtxMenu	{type='QtxMenu' unnamed='1' visible='1'}
 :fileNameEdit_QLineEdit	{buddy=':Save File.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :fileNameEdit_QLineEdit_2	{buddy=':Open File.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
+:fileNameEdit_QLineEdit_3	{buddy=':property_panel_dock.fileNameLabel_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :frame.stackedWidget_QStackedWidget	{container=':splitter.frame_QFrame' name='stackedWidget' type='QStackedWidget' visible='1'}
 :frame.stackedWidget_QStackedWidget_2	{container=':splitter.frame_QFrame_2' name='stackedWidget' type='QStackedWidget' visible='1'}
+:property_panel_dock...._QPushButton	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='...' type='QPushButton' unnamed='1' visible='1'}
+:property_panel_dock.Author_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Author' type='QLabel' unnamed='1' visible='1'}
+:property_panel_dock.Author_QLineEdit	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' leftWidget=':property_panel_dock.Author_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:property_panel_dock.Cancel_QPushButton	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Cancel' type='QPushButton' unnamed='1' visible='1'}
+:property_panel_dock.Geometry name_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Geometry name' type='QLabel' unnamed='1' visible='1'}
+:property_panel_dock.Geometry name_QLineEdit	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' leftWidget=':property_panel_dock.Geometry name_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:property_panel_dock.Import file_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Import file' type='QLabel' unnamed='1' visible='1'}
+:property_panel_dock.Import file_QLineEdit	{aboveWidget=':property_panel_dock.Import file_QLabel' container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
 :property_panel_dock.Main objects_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Main objects' type='QLabel' unnamed='1' visible='1'}
 :property_panel_dock.Operation type_QGroupBox	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' title='Operation type' type='QGroupBox' unnamed='1' visible='1'}
+:property_panel_dock.Save_QPushButton	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Save' type='QPushButton' unnamed='1' visible='1'}
+:property_panel_dock.Selected objects:_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Selected objects:' type='QLabel' unnamed='1' visible='1'}
+:property_panel_dock.Selected objects:_QListWidget	{aboveWidget=':property_panel_dock.Selected objects:_QLabel' container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
 :property_panel_dock.Tool object_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
 :property_panel_dock.property_panel_cancel_QToolButton	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
+:property_panel_dock.Type_QComboBox	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' leftWidget=':property_panel_dock.Type_QLabel' type='QComboBox' unnamed='1' visible='1'}
+:property_panel_dock.Type_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Type' type='QLabel' unnamed='1' visible='1'}
+:property_panel_dock.fileNameLabel_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='fileNameLabel' type='QLabel' visible='1'}
+:property_panel_dock.fileTypeCombo_QComboBox	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='fileTypeCombo' type='QComboBox' visible='1'}
+:property_panel_dock_QComboBox	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' type='QComboBox' unnamed='1' visible='1'}
 :splitter.frame_QFrame	{container=':Save File.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_2	{container=':Open File.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :stackedWidget.treeView_QTreeView	{container=':frame.stackedWidget_QStackedWidget' name='treeView' type='QTreeView' visible='1'}

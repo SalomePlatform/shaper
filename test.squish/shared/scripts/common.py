@@ -1,9 +1,12 @@
+import filecmp
 import os
+import shutil
 
 testSettings.logScreenshotOnError = True
 testSettings.logScreenshotOnFail = True
 # RESULTS_PATH = "/dn48/SHAPER/eso/sources/test.squish/shared/testresults/"
 DATA_PATH = os.getenv('TEST_DATA_DIR')
+TMP_DIR = os.path.join(DATA_PATH, 'tmp')
 
 g_points = {"XY_plane": (332, 250), "XZ_plane": (355, 207)}  # one of the construction planes
 def help_points(name):
@@ -26,8 +29,18 @@ def getSpinBoxRealName(name):
     return "{container=%s name='%s' type='ModuleBase_ParamSpinBox' visible='1'}" % (getPropertyPanelRealName(), name)
 
 #---------------------------------------------------------------------------------------------
+def create_tmp():
+    remove_tmp()
+    os.makedirs(TMP_DIR)
+
+def remove_tmp():
+    if os.path.exists(TMP_DIR):
+        shutil.rmtree(TMP_DIR)
+
+#---------------------------------------------------------------------------------------------
 def set_defaults():
     waitForObject(":SALOME*_STD_TabDesktop").resize(1024, 768)
+    create_tmp()
 
 def activate_SHAPER():
     clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
@@ -38,11 +51,13 @@ def close_application():
     clickButton(waitForObject(":Exit.Ok_QPushButton"))
     clickButton(waitForObject(":Close active study.Close w/o saving_QPushButton"))
 #     snooze(10)
+    remove_tmp()
 
 def close_application_wo_saving():
     sendEvent("QCloseEvent", waitForObject(":SALOME*_STD_TabDesktop"))
     clickButton(waitForObject(":Exit.Ok_QPushButton"))
     clickButton(waitForObject(":Close active study.Close w/o saving_QPushButton"))
+    remove_tmp()
 
 def part_create():
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Part"))
