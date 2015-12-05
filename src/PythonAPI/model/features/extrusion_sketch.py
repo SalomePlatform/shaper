@@ -7,9 +7,30 @@ from .roots import CompositeSketch
 
 
 def addExtrusionSketch(part, *args):
-    """Add an ExtrusionSketch feature to the Part and return ExtrusionSketch.
+    """Add an ExtrusionSketch feature to the Part.
 
-    Pass all args to ExtrusionSketch __init__ function.
+    .. function:: addExtrusionSketch(part, sketch, sketch_selection, to_size, from_size)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        to_size (double): upper size of the extrusion
+        from_size (double): lower size of the extrusion
+
+    .. function:: addExtrusionSketch(part, sketch, sketch_selection, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        to_object (Selection): upper plane
+        to_offset (double): offset from upper plane
+        from_object (Selection): lower plane
+        from_offset (double): offset from lower plane
+
+    Returns:
+        ExtrusionSketch: extrusion sketch object
     """
     assert(args)
     feature = part.addFeature("ExtrusionSketch")
@@ -19,25 +40,17 @@ def addExtrusionSketch(part, *args):
 class ExtrusionSketch(CompositeSketch):
     """Interface class for ExtrusionSketch feature.
 
-    ExtrusionSketch(feature) -> feature interface without initialization
-    ExtrusionSketch(feature,
-                    sketch, sketch_selection,
-                    to_size, from_size) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - to_size
-        - from_size
-    ExtrusionSketch(feature,
-                    sketch, sketch_selection,
-                    to_object, to_offset, from_object, from_offset) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - to_object
-        - to_offset
-        - from_object
-        - from_offset
+    .. function:: ExtrusionSketch(feature)
+
+    Create interface for the feature without initialization.
+
+    .. function:: ExtrusionSketch(feature, sketch, sketch_selection, to_size, from_size)
+
+    Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: ExtrusionSketch(feature, sketch, sketch_selection, to_object, to_offset, from_object, from_offset)
+
+    Create interface for the feature and initialize the feature with arguments.
     """
     def __init__(self, feature, *args):
         """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""

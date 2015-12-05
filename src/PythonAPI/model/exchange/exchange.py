@@ -7,9 +7,16 @@ from model.roots import Interface
 
 
 def addImport(part, *args):
-    """Add an Import feature to the Part and return Import.
+    """Add an Import feature to the Part.
 
-    Pass all args to Import __init__ function.
+    .. function:: addImport(part, file_path)
+
+    Args:
+        part (ModelAPI_Document): part document
+        file_path (string): path to the imported file
+
+    Returns:
+        Import: import object
     """
     assert(args)
     feature = part.addFeature("Import")
@@ -19,10 +26,13 @@ def addImport(part, *args):
 class Import(Interface):
     """Interface class for Import feature.
 
-    Import(feature) -> feature interface without initialization
-    Import(feature, file_path) ->
-        feature interface initialized from arguments:
-        - file_path -- path to the imported file
+    .. function:: Import(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Import(feature, file_path)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):
@@ -53,9 +63,18 @@ class Import(Interface):
 
 
 def exportToFile(part, *args):
-    """Add an Export feature to the Part and return Export.
+    """Perform export from the Part to file.
 
-    Pass all args to Export __init__ function.
+    .. function:: exportToFile(part, file_path, file_format, selection_list)
+
+    Args:
+        part (ModelAPI_Document): part document
+        file_path (string): path to the exported file
+        file_format (string): format of to the exported file
+        selection_list (list of Selection): objects to export
+
+    Returns:
+        Export: export object
     """
     assert(args)
     feature = part.addFeature("Export")
@@ -65,12 +84,13 @@ def exportToFile(part, *args):
 class Export(Interface):
     """Interface class for Export feature.
 
-    Export(feature) -> feature interface without initialization
-    Export(feature, file_path, file_format, selection_list) ->
-        feature interface initialized from arguments:
-        - file_path -- path to the exported file
-        - file_format -- format of to the exported file
-        - selection_list -- objects to export
+    .. function:: Export(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Export(feature, file_path, file_format, selection_list)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

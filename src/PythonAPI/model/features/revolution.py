@@ -7,9 +7,30 @@ from model.roots import Interface
 
 
 def addRevolution(part, *args):
-    """Add an Revolution feature to the Part and return Revolution.
+    """Add a Revolution feature to the Part.
 
-    Pass all args to Revolution __init__ function.
+    .. function:: addRevolution(part, base, axis_object, to_angle, from_angle)
+
+    Args:
+        part (ModelAPI_Document): part document
+        base (list of Selection): base objects
+        axis_object (Selection): axis object
+        to_angle (double): to angle
+        from_angle (double): from angle
+
+    .. function:: addRevolution(feature, base, axis_object, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        base (list of Selection): base objects
+        axis_object (Selection): axis object
+        to_object (plane): upper plane
+        to_offset (double): offset from upper object
+        from_object (plane): lower plane
+        from_offset (double): offset from lower plane
+
+    Returns:
+        Revolution: revolution object
     """
     assert(len(args) > 0 and args[0] is not None)
     feature = part.addFeature("Revolution")
@@ -19,22 +40,17 @@ def addRevolution(part, *args):
 class Revolution(Interface):
     """Interface class for Revolution features.
 
-    Revolution(feature) -> feature interface without initialization
-    Revolution(feature, base, axis_object, to_angle, from_angle) ->
-        feature interface initialized from arguments:
-        - base -- name, sketch or list of names and sketches
-        - axis_object -- name, edge for axis
-        - to_angle -- upper angle
-        - from_angle -- lower angle
-    Revolution(feature, base, axis_object,
-               to_object, to_offset, from_object, from_offset) ->
-        feature interface initialized from arguments:
-        - base -- name, sketch or list of names and sketches
-        - axis_object -- name, edge for axis
-        - to_object -- upper object (plane)
-        - to_offset -- offset from upper object
-        - from_object -- lower object (plane)
-        - from_offset -- offset from lower object
+    .. function:: Revolution(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Revolution(feature, base, axis_object, to_angle, from_angle)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: Revolution(feature, base, axis_object, to_object, to_offset, from_object, from_offset)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

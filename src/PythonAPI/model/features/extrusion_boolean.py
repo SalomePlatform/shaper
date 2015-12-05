@@ -7,9 +7,32 @@ from .roots import CompositeBoolean
 
 
 def addExtrusionCut(part, *args):
-    """Add an ExtrusionCut feature to the Part and return ExtrusionBoolean.
+    """Add an ExtrusionCut feature to the Part.
 
-    Pass all args to Extrusion __init__ function.
+    .. function:: addExtrusionCut(part, sketch, sketch_selection, boolean_objects, to_size, from_size)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        to_size (double): upper size of the extrusion
+        from_size (double): lower size of the extrusion
+
+    .. function:: addExtrusionCut(part, sketch, sketch_selection, boolean_objects, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        to_object (Selection): upper plane
+        to_offset (double): offset from upper plane
+        from_object (Selection): lower plane
+        from_offset (double): offset from lower plane
+
+    Returns:
+        ExtrusionBoolean: extrusion boolean object
     """
     assert(args)
     feature = part.addFeature("ExtrusionCut")
@@ -18,7 +41,30 @@ def addExtrusionCut(part, *args):
 def addExtrusionFuse(part, *args):
     """Add an ExtrusionFuse feature to the Part and return ExtrusionBoolean.
 
-    Pass all args to Extrusion __init__ function.
+    .. function:: addExtrusionFuse(part, sketch, sketch_selection, boolean_objects, to_size, from_size)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        to_size (double): upper size of the extrusion
+        from_size (double): lower size of the extrusion
+
+    .. function:: addExtrusionFuse(part, sketch, sketch_selection, boolean_objects, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        to_object (Selection): upper plane
+        to_offset (double): offset from upper plane
+        from_object (Selection): lower plane
+        from_offset (double): offset from lower plane
+
+    Returns:
+        ExtrusionBoolean: extrusion boolean object
     """
     assert(args)
     feature = part.addFeature("ExtrusionFuse")
@@ -29,30 +75,21 @@ class ExtrusionBoolean(CompositeBoolean):
     """Interface class for ExtrusionBoolean features.
 
     Supported features:
-    - ExtrusionCut
-    - ExtrusionFuse
 
-    ExtrusionBoolean(feature) -> feature interface without initialization
-    ExtrusionBoolean(feature,
-                     sketch, sketch_selection, boolean_objects,
-                     to_size, from_size) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - boolean_objects
-        - to_size
-        - from_size
-    ExtrusionBoolean(feature,
-                     sketch, sketch_selection, boolean_objects,
-                     to_object, to_offset, from_object, from_offset) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - boolean_objects
-        - to_object
-        - to_offset
-        - from_object
-        - from_offset
+    * ExtrusionCut
+    * ExtrusionFuse
+
+    .. function:: ExtrusionBoolean(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: ExtrusionBoolean(feature, sketch, sketch_selection, boolean_objects, to_size, from_size)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: ExtrusionBoolean(feature, sketch, sketch_selection, boolean_objects, to_object, to_offset, from_object, from_offset)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

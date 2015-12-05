@@ -7,9 +7,32 @@ from .roots import CompositeSketch
 
 
 def addRevolutionSketch(part, *args):
-    """Add an RevolutionSketch feature to the Part and return RevolutionSketch.
+    """Add a RevolutionSketch feature to the Part.
 
-    Pass all args to RevolutionSketch __init__ function.
+    .. function:: addRevolutionSketch(part, sketch, sketch_selection, axis_object, to_angle, from_angle)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        axis_object (Selection): axis object
+        to_size (double): upper size of the extrusion
+        from_size (double): lower size of the extrusion
+
+    .. function:: addRevolutionSketch(part, sketch, sketch_selection, axis_object, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        axis_object (Selection): axis object
+        to_object (Selection): upper plane
+        to_offset (double): offset from upper plane
+        from_object (Selection): lower plane
+        from_offset (double): offset from lower plane
+
+    Returns:
+        RevolutionSketch: revolution sketch object
     """
     assert(args)
     feature = part.addFeature("RevolutionSketch")
@@ -19,25 +42,17 @@ def addRevolutionSketch(part, *args):
 class RevolutionSketch(CompositeSketch):
     """Interface class for RevolutionSketch features.
 
-    RevolutionSketch(feature) -> feature interface without initialization
-    RevolutionSketch(feature,
-                     sketch, sketch_selection,
-                     to_angle, from_angle) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - to_angle
-        - from_angle
-    RevolutionSketch(feature,
-                     sketch, sketch_selection,
-                     to_object, to_offset, from_object, from_offset) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - to_object
-        - to_offset
-        - from_object
-        - from_offset
+    .. function:: RevolutionSketch(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: RevolutionSketch(feature, sketch, sketch_selection, to_size, from_size)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: RevolutionSketch(feature, sketch, sketch_selection, to_object, to_offset, from_object, from_offset)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

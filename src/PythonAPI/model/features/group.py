@@ -7,9 +7,16 @@ from model.roots import Interface
 
 
 def addGroup(part, *args):
-    """Add an Group feature to the Part and return Group.
+    """Add a Group feature to the Part.
 
-    Pass all args to Group __init__ function.
+    .. function:: addGroup(part, group_list)
+
+    Args:
+        part (ModelAPI_Document): part document
+        group_list (list of Selection): list of objects
+
+    Returns:
+        Group: group object
     """
     assert(args)
     feature = part.addFeature("Group")
@@ -19,10 +26,13 @@ def addGroup(part, *args):
 class Group(Interface):
     """Interface class for Group feature.
 
-    Group(feature) -> feature interface without initialization
-    Group(feature, group_list) ->
-        feature interface initialized from arguments:
-        - group_list
+    .. function:: Group(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Group(feature, group_list)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

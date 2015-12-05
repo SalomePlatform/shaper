@@ -9,33 +9,33 @@ from model import Selection
 
 def addExtrusion(part, *args):
     """Add an Extrusion feature to the Part and return Extrusion.
-    
+
     This function has *3 signatures*:
-    
+
     .. function:: addExtrusion(base, size)
-    
+
     Arguments:
         base(str, Sketch or list): base object(s)
         size(double): size of the extrusion, the side is decided by the sign
-    
+
     .. function:: addExtrusion(base, to_size, from_size)
-    
+
     Arguments:
         base(str, Sketch or list): base object(s)
         to_size(double): upper size of the extrusion
         from_size(double): lower size of the extrusion
-    
+
     .. function:: addExtrusion(base, to_object, to_offset, from_object, from_offset)
-    
+
     Arguments:
         base(str, Sketch or list): base object(s)
-        to_object(plane): upper object
+        to_object(plane): upper plane
         to_offset(double): offset from upper object
         from_object(plane): lower plane
         from_offset(double): offset from lower plane
-        
+
     In all three cases the function returns an extrusion object
-    
+
     Returns:
         Extrusion: extrusion object
     """

@@ -7,6 +7,10 @@ from model.roots import Interface
 
 
 def exportToGEOM(part):
-    """Export the Part to GEOM module."""
+    """Export the Part to GEOM module.
+
+    Args:
+        part (ModelAPI_Document): part document
+    """
     feature = part.addFeature("ExportToGEOM")
     feature.execute()

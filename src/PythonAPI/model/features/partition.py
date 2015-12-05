@@ -7,9 +7,19 @@ from model.roots import Interface
 
 
 def addPartition(part, *args):
-    """Add a Partition feature to the Part and return Partition.
+    """Add a Partition feature to the Part.
 
-    Pass all args to Partition __init__ function.
+    .. function:: addPartition(part, main_objects, tool_objects, partition_combine)
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of Selection): main objects
+        tool_objects (list of Selection): tool objects
+        partition_combine (boolean):
+            If True combines all results to one. If False builds separate result for each object.
+
+    Returns:
+        Partition: partition object
     """
     assert(len(args) > 0 and args[0] is not None)
     feature = part.addFeature("Partition")
@@ -19,12 +29,13 @@ def addPartition(part, *args):
 class Partition(Interface):
     """Interface class for Partition feature.
 
-    Partition(feature) -> feature interface without initialization
-    Partition(feature, main_objects, tool_objects, partition_combine) ->
-        feature interface initialized from arguments:
-        - main_objects -- list of solids
-        - tool_objects -- list of solids
-        - partition_combine -- boolean value
+    .. function:: Partition(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Partition(feature, main_objects, tool_objects, partition_combine)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

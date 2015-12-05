@@ -9,7 +9,24 @@ from model.roots import Interface
 def addPlane(part, *args):
     """Add a Plane feature to the Part and return Plane.
 
-    Pass all args to Plane __init__ function.
+    .. function:: addPartition(part, face, distance)
+
+    Args:
+        part (ModelAPI_Document): part document
+        face (Selection): plane face
+        distance (double): distance
+
+    .. function:: addPartition(part, a, b, c, d)
+
+    Args:
+        part (ModelAPI_Document): part document
+        a (double): general equation parameter
+        b (double): general equation parameter
+        c (double): general equation parameter
+        d (double): general equation parameter
+
+    Returns:
+        Plane: plane object
     """
     assert(args)
     feature = part.addFeature("Plane")
@@ -19,14 +36,17 @@ def addPlane(part, *args):
 class Plane(Interface):
     """Interface class for Plane feature.
 
-    Plane(feature) -> feature interface without initialization
-    Plane(feature, face, distance) ->
-        feature interface initialized from arguments:
-        - face -- planeFace
-        - distance -- distance
-    Plane(feature, a, b, c, d) ->
-        feature interface initialized from arguments:
-        - A, B, C, D -- GeneralEquation parameters
+    .. function:: Plane(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Plane(feature, face, distance)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: Plane(feature, a, b, c, d)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

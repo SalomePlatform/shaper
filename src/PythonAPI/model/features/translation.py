@@ -7,9 +7,18 @@ from model.roots import Interface
 
 
 def addTranslation(part, *args):
-    """Add an Translation feature to the Part and return Translation.
+    """Add a Translation feature to the Part.
 
-    Pass all args to Translation __init__ function.
+    .. function:: addTranslation(part, main_objects, axis_object, distance)
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of Selection): main objects
+        axis_object (Selection): axis objects
+        distance (double): distance
+
+    Returns:
+        Translation: translation object
     """
     assert(args)
     feature = part.addFeature("Translation")
@@ -19,12 +28,13 @@ def addTranslation(part, *args):
 class Translation(Interface):
     """Interface class for Translation features.
 
-    Translation(feature) -> feature interface without initialization
-    Translation(feature, main_objects, axis_object, distance) ->
-        feature interface initialized from arguments:
-        - main_objects
-        - axis_object
-        - distance
+    .. function:: Translation(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Translation(feature, main_objects, axis_object, distance)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

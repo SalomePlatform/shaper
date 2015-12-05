@@ -9,6 +9,16 @@ from model.roots import Interface
 def addParameter(part, *args):
     """Add a Parameter feature to the Part and return Parameter.
 
+    .. function:: addParameter(part, variable, expression)
+
+    Args:
+        part (ModelAPI_Document): part document
+        variable (string): variable name
+        expression (string): Python expression
+
+    Returns:
+        Parameter: parameter object
+
     Pass all args to Parameter __init__ function.
     """
     assert(args)
@@ -19,11 +29,13 @@ def addParameter(part, *args):
 class Parameter(Interface):
     """Interface class for Parameter feature.
 
-    Parameter(feature) -> feature interface without initialization
-    Parameter(feature, variable, expression) ->
-        feature interface initialized from arguments:
-        - variable -- variable name
-        - expression -- Python expression
+    .. function:: Point(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Point(feature, variable, expression)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

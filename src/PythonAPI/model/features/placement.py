@@ -7,9 +7,20 @@ from model.roots import Interface
 
 
 def addPlacement(part, *args):
-    """Add an Placement feature to the Part and return Placement.
+    """Add a Placement feature to the Part.
 
-    Pass all args to Placement __init__ function.
+    .. function:: addPlacement(part, objects_list, start_shape, end_shape, reverse_direction, centering)
+
+    Args:
+        part (ModelAPI_Document): part document
+        objects_list (list of Selection): solid objects
+        start_shape (Selection): start face, edge or vertex
+        end_shape (Selection): end face, edge or vertex
+        reverse_direction (boolean): reverse placement direction
+        centering (boolean): center faces under placement
+
+    Returns:
+        Placement: placement object
     """
     assert(args)
     feature = part.addFeature("Placement")
@@ -19,15 +30,13 @@ def addPlacement(part, *args):
 class Placement(Interface):
     """Interface class for Placement feature.
 
-    Placement(feature) -> feature interface without initialization
-    Placement(feature, objects_list, start_shape, end_shape,
-              reverse_direction, centering) ->
-        feature interface initialized from arguments:
-        - objects_list
-        - start_shape
-        - end_shape
-        - reverse_direction
-        - centering
+    .. function:: Placement(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Placement(feature, objects_list, start_shape, end_shape, reverse_direction, centering)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

@@ -11,19 +11,34 @@ from model.roots import Interface
 def addPart(partset):
     """Add a Part feature to the Part and return Part.
 
-    Pass all args to Part __init__ function.
+    Args:
+        partset (ModelAPI_Document): partset document
+
+    Returns:
+        Part: part object
     """
     feature = partset.addFeature("Part")
     return Part(feature)
 
 def duplicatePart(part):
-    """Create a copy of the Part."""
+    """Create a copy of the Part.
+
+    Args:
+        part (ModelAPI_Document): part document
+
+    Returns:
+        Part: part object
+    """
     feature = part.addFeature("Duplicate")
     feature.execute()
     return Part(feature)
 
 def removePart(part):
-    """Remove the Part."""
+    """Remove the Part.
+
+    Args:
+        part (ModelAPI_Document): part document
+    """
     feature = part.addFeature("Remove")
     feature.execute()
 
@@ -31,7 +46,9 @@ def removePart(part):
 class Part(Interface):
     """Interface class for Part feature.
 
-    Part(feature) -> feature interface without initialization
+    .. function:: Part(feature)
+
+        Create interface for the feature without initialization.
     """
 
     def __init__(self, feature):

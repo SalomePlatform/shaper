@@ -9,7 +9,16 @@ from model.roots import Interface
 def addPoint(part, *args):
     """Add an Point feature to the Part and return Point.
 
-    Pass all args to Point __init__ function.
+    .. function:: addPoint(part, x, y, z)
+
+    Args:
+        part (ModelAPI_Document): part document
+        x (double): X coordinate for the point
+        y (double): Y coordinate for the point
+        z (double): Z coordinate for the point
+
+    Returns:
+        Point: point object
     """
     assert(args)
     feature = part.addFeature("Point")
@@ -19,10 +28,13 @@ def addPoint(part, *args):
 class Point(Interface):
     """Interface class for Point feature.
 
-    Point(feature) -> feature interface without initialization
-    Point(feature, x, y, z) ->
-        feature interface initialized from arguments:
-        - x, y, z -- coordinates for the point
+    .. function:: Point(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Point(feature, x, y, z)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

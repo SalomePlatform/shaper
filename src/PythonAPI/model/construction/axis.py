@@ -7,9 +7,23 @@ from model.roots import Interface
 
 
 def addAxis(part, *args):
-    """Add an Axis feature to the Part and return Axis.
+    """Add an Axis feature to the Part.
 
-    Pass all args to Axis __init__ function.
+    .. function:: addAxis(part, p1, p2)
+
+    Args:
+        part (ModelAPI_Document): part document
+        p1 (Selection): first point
+        p2 (Selection): second point
+
+    .. function:: addAxis(part, face)
+
+    Args:
+        part (ModelAPI_Document): part document
+        face (Selection): cylindrical face
+
+    Returns:
+        Axis: axis object
     """
     assert(args)
     feature = part.addFeature("Axis")
@@ -19,14 +33,17 @@ def addAxis(part, *args):
 class Axis(Interface):
     """Interface class for Axis feature.
 
-    Axis(feature) -> feature interface without initialization
-    Axis(feature, p1, p2) ->
-        feature interface initialized from arguments:
-        - p1 -- FirstPoint
-        - p2 -- SecondPoint
-    Axis(feature, face) ->
-        feature interface initialized from arguments:
-        - face -- CylindricalFace
+    .. function:: Axis(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Axis(feature, p1, p2)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: Axis(feature, face)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

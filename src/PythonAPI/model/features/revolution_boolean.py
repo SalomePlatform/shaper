@@ -7,18 +7,71 @@ from .roots import CompositeBoolean
 
 
 def addRevolutionCut(part, *args):
-    """Add an RevolutionCut feature to the Part and return RevolutionBoolean.
+    """Add a RevolutionCut feature to the Part.
 
-    Pass all args to RevolutionCut __init__ function.
+    .. function:: addRevolutionCut(part, sketch, sketch_selection, boolean_objects, axis_object, to_angle, from_angle)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        axis_object (Selection): axis object
+        to_size (double): upper size of the extrusion
+        from_size (double): lower size of the extrusion
+
+    .. function:: addRevolutionCut(part, sketch, sketch_selection, boolean_objects, axis_object, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        axis_object (Selection): axis object
+        to_object (Selection): upper plane
+        to_offset (double): offset from upper plane
+        from_object (Selection): lower plane
+        from_offset (double): offset from lower plane
+
+    Returns:
+        RevolutionBoolean: revolution boolean object
     """
     assert(args)
     feature = part.addFeature("RevolutionCut")
     return RevolutionBoolean(feature, *args)
 
 def addRevolutionFuse(part, *args):
-    """Add an RevolutionFuse feature to the Part and return RevolutionBoolean.
+    """Add a RevolutionFuse feature to the Part.
+
+    .. function:: addRevolutionFuse(part, sketch, sketch_selection, boolean_objects, axis_object, to_angle, from_angle)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        axis_object (Selection): axis object
+        to_size (double): upper size of the extrusion
+        from_size (double): lower size of the extrusion
+
+    .. function:: addRevolutionFuse(part, sketch, sketch_selection, boolean_objects, axis_object, to_object, to_offset, from_object, from_offset)
+
+    Args:
+        part (ModelAPI_Document): part document
+        sketch (ModelAPI_Object): sketch feature
+        sketch_selection (Selection): sketch objects
+        boolean_objects (list of Selection): boolean objects
+        axis_object (Selection): axis object
+        to_object (Selection): upper plane
+        to_offset (double): offset from upper plane
+        from_object (Selection): lower plane
+        from_offset (double): offset from lower plane
+
 
     Pass all args to RevolutionFuse __init__ function.
+
+    Returns:
+        RevolutionBoolean: revolution boolean object
     """
     assert(args)
     feature = part.addFeature("RevolutionFuse")
@@ -29,30 +82,21 @@ class RevolutionBoolean(CompositeBoolean):
     """Interface class for RevolutionBoolean features.
 
     Supported features:
-    - RevolutionCut
-    - RevolutionFuse
 
-    RevolutionBoolean(feature) -> feature interface without initialization
-    RevolutionBoolean(feature,
-                      sketch, sketch_selection, boolean_objects,
-                      to_angle, from_angle) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - boolean_objects
-        - to_angle
-        - from_angle
-    RevolutionBoolean(feature,
-                      sketch, sketch_selection, boolean_objects,
-                      to_object, to_offset, from_object, from_offset) ->
-        feature interface initialized from arguments:
-        - sketch
-        - sketch_selection
-        - boolean_objects
-        - to_object
-        - to_offset
-        - from_object
-        - from_offset
+    * RevolutionCut
+    * RevolutionFuse
+
+    .. function:: RevolutionBoolean(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: RevolutionBoolean(feature, sketch, sketch_selection, boolean_objects, axis_object, to_angle, from_angle)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: RevolutionBoolean(feature, sketch, sketch_selection, boolean_objects, axis_object, to_object, to_offset, from_object, from_offset)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):

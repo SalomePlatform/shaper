@@ -1,46 +1,89 @@
 """Boolean operations Interface
-Author: Daniel Brunier-Coulin
+Author: Daniel Brunier-Coulin with contribution by Sergey Pokhodenko
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
+from GeomAlgoAPI import GeomAlgoAPI_Boolean
+
 from model.roots import Interface
 
+
 def addAddition(part, *args):
-    """Inserts an addition to the given Part and executes the operation.
-    This operation adds tool to the given object.
+    """Perform addition in the Part.
+
+    .. function:: addAddition(part, main_objects, tool_objects)
+
+        This operation adds tools to the given objects.
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of :class:`model.Selection`): main objects
+        tool_objects (list of :class:`model.Selection`): tool_objects objects
+
+    Returns:
+        Boolean: boolean object
     """
     assert(args)
-    object, tool = args
+    main_objects, tool_objects = args
     feature = part.addFeature("Boolean")
-    return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_FUSE)
+    return Boolean(
+        feature, main_objects, tool_objects, GeomAlgoAPI_Boolean.BOOL_FUSE)
 
 
 def addSubtraction(part, *args):
-    """Inserts a subtraction to the given Part and executes the operation.
-    This operation subtracts tool to the given object.
+    """Perform subtraction in the Part.
+
+    .. function:: addSubtraction(part, main_objects, tool_objects)
+
+        This operation subtracts tools from the given objects.
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of :class:`model.Selection`): main objects
+        tool_objects (list of :class:`model.Selection`): tool_objects objects
+
+    Returns:
+        Boolean: boolean object
     """
     assert(args)
-    object, tool = args
+    main_objects, tool_objects = args
     feature = part.addFeature("Boolean")
-    return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_CUT)
+    return Boolean(
+        feature, main_objects, tool_objects, GeomAlgoAPI_Boolean.BOOL_CUT)
 
 
 def addIntersection(part, *args):
-    """Inserts an intersection to the given Part and executes the operation.
-    This operation intersects tool to the given object.
+    """Perform intersection in the Part.
+
+    .. function:: addIntersection(part, main_objects, tool_objects)
+
+        This operation intersects tools with the given objects.
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of :class:`model.Selection`): main objects
+        tool_objects (list of :class:`model.Selection`): tool_objects objects
+
+    Returns:
+        Boolean: boolean object
     """
     assert(args)
-    object, tool = args
+    main_objects, tool_objects = args
     feature = part.addFeature("Boolean")
-    return Boolean(feature, object, tool, GeomAlgoAPI_Boolean.BOOL_COMMON)
+    return Boolean(
+        feature, main_objects, tool_objects, GeomAlgoAPI_Boolean.BOOL_COMMON)
 
 
 class Boolean(Interface):
     """Interface class for Boolean features.
 
-    Boolean(feature) -> feature interface without initialization
-    Boolean(feature, main_objects, tool_objects, bool_type) ->
-        feature interface initialized from arguments
+    .. function:: Boolean(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Boolean(feature, main_objects, tool_objects, bool_type)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):
@@ -70,22 +113,34 @@ class Boolean(Interface):
         pass
 
     def setMainObjects(self, main_objects):
-        """F.setMainObjects(iterable) -- modify main_objects attribute"""
+        """Modify main_objects attribute of the feature.
+
+        Args:
+            main_objects (list of :class:`model.Selection`): main objects
+        """
         self._fillAttribute(self._main_objects, main_objects)
         pass
 
     def setToolObjects(self, tool_objects):
-        """F.setToolObjects(iterable) -- modify tool_objects attribute"""
+        """Modify tool_objects attribute of the feature.
+
+        Args:
+            tool_objects (list of :class:`model.Selection`): tool objects
+        """
         self._fillAttribute(self._tool_objects, tool_objects)
         pass
 
     def setBoolType(self, bool_type):
-        """F.setBoolType(integer) -- modify bool_type attribute.
+        """Modify bool_type attribute of the feature.
+
+        Args:
+            bool_type (integer): type of operation
 
         Available types:
-        - GeomAlgoAPI_Boolean.BOOL_FUSE
-        - GeomAlgoAPI_Boolean.BOOL_CUT
-        - GeomAlgoAPI_Boolean.BOOL_COMMON
+
+        * GeomAlgoAPI_Boolean.BOOL_FUSE
+        * GeomAlgoAPI_Boolean.BOOL_CUT
+        * GeomAlgoAPI_Boolean.BOOL_COMMON
         """
         self._fillAttribute(self._bool_type, bool_type)
         pass

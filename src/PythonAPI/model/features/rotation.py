@@ -7,9 +7,18 @@ from model.roots import Interface
 
 
 def addRotation(part, *args):
-    """Add an Rotation feature to the Part and return Rotation.
+    """Add a Rotation feature to the Part.
 
-    Pass all args to Rotation __init__ function.
+    .. function:: addRotation(part, main_objects, axis_object, angle)
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of Selection): main objects
+        axis_object (list of Selection): axis object
+        angle (double): angle
+
+    Returns:
+        Rotation: rotation object
     """
     assert(args)
     feature = part.addFeature("Rotation")
@@ -19,12 +28,13 @@ def addRotation(part, *args):
 class Rotation(Interface):
     """Interface class for Rotation features.
 
-    Rotation(feature) -> feature interface without initialization
-    Rotation(feature, main_objects, axis_object, angle) ->
-        feature interface initialized from arguments:
-        - main_objects
-        - axis_object
-        - angle
+    .. function:: Rotation(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Rotation(feature, main_objects, axis_object, angle)
+
+        Create interface for the feature and initialize the feature with arguments.
     """
 
     def __init__(self, feature, *args):
