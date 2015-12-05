@@ -36,24 +36,10 @@ to modify the feature and retrieve data from it.
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
    sketcher
-
-   connection
-   construction
-   exchange
-
-   boolean
-   partition
-   extrusion
-   revolution
-   placement
-   rotation
-   translation
-   group
-
-   parameter
-   partset
+   model/*
 
 Indices and tables
 ==================

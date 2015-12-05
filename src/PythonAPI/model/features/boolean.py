@@ -3,12 +3,7 @@ Author: Daniel Brunier-Coulin
 Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 """
 
-from ModelAPI    import *
-from GeomAlgoAPI import *
-
-
 from model.roots import Interface
-
 
 def addAddition(part, *args):
     """Inserts an addition to the given Part and executes the operation.

@@ -2,7 +2,7 @@
 # Author: Daniel Brunier-Coulin
 # -----------------------------
 
-from GeomAPI import *
+#from GeomAPI import *
 
 
 class Ax3:
