@@ -139,7 +139,7 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
 bool ModuleBase_WidgetChoice::focusTo()
 {
   if (myCombo)
-    myCombo->setFocus();
+    ModuleBase_Tools::setFocus(myCombo, "ModuleBase_WidgetChoice::focusTo()");
   else
     return false;
   return true;

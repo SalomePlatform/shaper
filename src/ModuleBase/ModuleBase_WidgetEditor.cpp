@@ -65,7 +65,7 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   aLay->addWidget(anEditor);
 
-  anEditor->setFocus();
+  ModuleBase_Tools::setFocus(anEditor, "ModuleBase_WidgetEditor::editedValue");
   anEditor->selectAll();
   QObject::connect(anEditor, SIGNAL(editingFinished()), &aDlg, SLOT(accept()));
 

@@ -37,6 +37,23 @@ MODULEBASE_EXPORT void adjustMargins(QLayout* theLayout);
 MODULEBASE_EXPORT void zeroMargins(QWidget* theWidget);
 MODULEBASE_EXPORT void zeroMargins(QLayout* theLayout);
 
+/*
+ * Calls the same-named Qt method for the given widget.
+ * It sets the top-level widget containing this widget to be the active window.
+ * An active window is a visible top-level window that has the keyboard input focus.
+ * \param theWidget a widget to be activated
+ * \param theIndo a debug information
+ */
+MODULEBASE_EXPORT void activateWindow(QWidget* theWidget, const QString& theInfo = QString());
+
+/*
+ * Calls the same-named Qt method for the given widget.
+ * Gives the keyboard input focus to this widget (or its focus proxy) if this widget or
+ * one of its parents is the active window.
+ * \param theWidget a widget to be activated
+ * \param theIndo a debug information
+ */
+MODULEBASE_EXPORT void setFocus(QWidget* theWidget, const QString& theInfo = QString());
 
 /**
  * \ingroup GUI

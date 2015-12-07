@@ -164,7 +164,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
-  activateWindow();
+  ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCurrentWidget = *anIt;
     if (isFoundWidget || !theWidget) {
@@ -195,7 +195,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
       for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
         aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
       if (aFirstControl)
-        aFirstControl->setFocus();
+        ModuleBase_Tools::setFocus(aFirstControl, "XGUI_PropertyPanel::focusNextPrevChild()");
         isChangedFocus = true;
     }
     else {
@@ -217,7 +217,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
       for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
         aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
       if (aLastControl)
-        aLastControl->setFocus();
+        ModuleBase_Tools::setFocus(aLastControl, "XGUI_PropertyPanel::focusNextPrevChild()");
         isChangedFocus = true;
     }
     else {
@@ -227,7 +227,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
         aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
       if (aFirstControl && aFirstControl->hasFocus()) {
         QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
-        aCancelBtn->setFocus();
+        ModuleBase_Tools::setFocus(aCancelBtn, "XGUI_PropertyPanel::focusNextPrevChild()");
         isChangedFocus = true;
       }
     }
@@ -283,7 +283,7 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
 void XGUI_PropertyPanel::setFocusOnOkButton()
 {
   QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-  anOkBtn->setFocus();
+  ModuleBase_Tools::setFocus(anOkBtn, "XGUI_PropertyPanel::setFocusOnOkButton()");
 }
 
 void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)

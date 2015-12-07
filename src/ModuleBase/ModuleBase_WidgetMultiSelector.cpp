@@ -329,7 +329,8 @@ void ModuleBase_WidgetMultiSelector::updateFocus()
   // Set focus to List control in order to make possible 
   // to use Tab key for transfer the focus to next widgets
   myListControl->setCurrentRow(myListControl->model()->rowCount() - 1);
-  myListControl->setFocus();
+  ModuleBase_Tools::setFocus(myListControl,
+                             "ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()");
 }
 
 //********************************************************************

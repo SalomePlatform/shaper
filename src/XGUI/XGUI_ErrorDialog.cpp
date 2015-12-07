@@ -8,6 +8,8 @@
  */
 #include <XGUI_ErrorDialog.h>
 
+#include <ModuleBase_Tools.h>
+
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -61,7 +63,7 @@ void XGUI_ErrorDialog::addError(const QString& theError)
   if (!isVisible()) {
     show();
     raise();
-    activateWindow();
+    ModuleBase_Tools::activateWindow(this, "XGUI_ErrorDialog::addError");
   }
 }
 

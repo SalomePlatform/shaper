@@ -34,6 +34,8 @@
 
 const double tolerance = 1e-7;
 
+//#define DEBUG_ACTIVATE_WINDOW
+//#define DEBUG_SET_FOCUS
 
 namespace ModuleBase_Tools {
 
@@ -69,6 +71,24 @@ void zeroMargins(QLayout* theLayout)
     return;
   theLayout->setContentsMargins(0, 0, 0, 0);
   theLayout->setSpacing(5);
+}
+
+void activateWindow(QWidget* theWidget, const QString& theInfo)
+{
+  theWidget->activateWindow();
+
+#ifdef DEBUG_ACTIVATE_WINDOW
+  qDebug(QString("activateWindow: %1").arg(theInfo).toStdString().c_str());
+#endif
+}
+
+void setFocus(QWidget* theWidget, const QString& theInfo)
+{
+  theWidget->setFocus();
+
+#ifdef DEBUG_SET_FOCUS
+  qDebug(QString("setFocus: %1").arg(theInfo).toStdString().c_str());
+#endif
 }
 
 QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon)

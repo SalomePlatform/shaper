@@ -235,7 +235,7 @@ std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
 
 bool PartSet_WidgetSketchLabel::focusTo()
 {
-  myStackWidget->setFocus();
+  ModuleBase_Tools::setFocus(myStackWidget, "PartSet_WidgetSketchLabel::focusTo()");
   return true;
 }
 

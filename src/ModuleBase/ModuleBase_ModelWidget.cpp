@@ -5,6 +5,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_Tools.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
@@ -136,7 +137,7 @@ bool ModuleBase_ModelWidget::focusTo()
   for (; anIt != aLast && !isFocusAccepted; anIt++) {
     QWidget* aWidget = *anIt;
     if (aWidget && aWidget->focusPolicy() != Qt::NoFocus) {
-      aWidget->setFocus();
+      ModuleBase_Tools::setFocus(aWidget, "ModuleBase_ModelWidget::focusTo()");
       isFocusAccepted = true;
     }
   }
