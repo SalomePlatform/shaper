@@ -94,7 +94,7 @@ squishrunner-run suite_FEATURE_EXTRUSION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_partition_001"
-#squishrunner-run suite_FEATURE_PARTITION "${TESTCASES}"
+squishrunner-run suite_FEATURE_PARTITION "${TESTCASES}"
 
 TESTCASES=""
 #TESTCASES="${TESTCASES} --testcase tst_revolution_001"
