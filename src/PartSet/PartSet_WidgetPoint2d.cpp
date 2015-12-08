@@ -286,6 +286,14 @@ bool PartSet_WidgetPoint2D::canBeActivatedByMove()
 
 void PartSet_WidgetPoint2D::deactivate()
 {
+  // the value of the control should be stored to model if it was not
+  // initialized yet. It is important when we leave this control by Tab key.
+  // It should not be performed by the widget activation as the preview
+  // is visualized with default value. Line point is moved to origin.
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  if (anAttribute && !anAttribute->isInitialized())
+    storeValue();
+
   ModuleBase_ModelWidget::deactivate();
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
   disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
