@@ -14,19 +14,10 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 //=================================================================================================
-void GeomAlgoAPI_MakeShape::initialize() {
-  switch (myBuilderType) {
-    case OCCT_BRepBuilderAPI_MakeShape: {
-      myDone = implPtr<BRepBuilderAPI_MakeShape>()->IsDone() == Standard_True;
-      myShape->setImpl(new TopoDS_Shape(implPtr<BRepBuilderAPI_MakeShape>()->Shape()));
-      break;
-    }
-    case OCCT_BOPAlgo_Builder: {
-      myDone = true;
-      myShape->setImpl(new TopoDS_Shape(implPtr<BOPAlgo_Builder>()->Shape()));
-      break;
-    }
-  }
+GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
+: myBuilderType(OCCT_BRepBuilderAPI_MakeShape),
+  myDone(false)
+{
 }
 
 //=================================================================================================
@@ -100,15 +91,6 @@ bool GeomAlgoAPI_MakeShape::isDeleted(const std::shared_ptr<GeomAPI_Shape> theSh
   return isDeleted;
 }
 
-
-//=================================================================================================
-GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
-: myBuilderType(OCCT_BRepBuilderAPI_MakeShape),
-  myDone(false),
-  myShape(new GeomAPI_Shape())
-{
-}
-
 //=================================================================================================
 void GeomAlgoAPI_MakeShape::setBuilderType(const BuilderType theBuilderType)
 {
@@ -125,4 +107,22 @@ void GeomAlgoAPI_MakeShape::setDone(const bool theFlag)
 void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   myShape = theShape;
+}
+
+//=================================================================================================
+void GeomAlgoAPI_MakeShape::initialize() {
+  switch (myBuilderType) {
+    case OCCT_BRepBuilderAPI_MakeShape: {
+      myDone = implPtr<BRepBuilderAPI_MakeShape>()->IsDone() == Standard_True;
+      myShape.reset(new GeomAPI_Shape());
+      myShape->setImpl(new TopoDS_Shape(implPtr<BRepBuilderAPI_MakeShape>()->Shape()));
+      break;
+    }
+    case OCCT_BOPAlgo_Builder: {
+      myDone = true;
+      myShape.reset(new GeomAPI_Shape());
+      myShape->setImpl(new TopoDS_Shape(implPtr<BOPAlgo_Builder>()->Shape()));
+      break;
+    }
+  }
 }

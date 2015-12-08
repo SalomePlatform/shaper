@@ -26,18 +26,30 @@ public:
   };
 
 public:
+  /// \brief Empty constructor.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape();
+
   /** \brief Constructor by builder and builder type.
    *  \param[in] theBuilder pointer to the builder.
    *  \param[in] theBuilderType builder type.
    */
   template<class T> explicit GeomAlgoAPI_MakeShape(T* theBuilder, const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
   : GeomAPI_Interface(theBuilder),
-    myBuilderType(theBuilderType),
-    myShape(new GeomAPI_Shape())
+    myBuilderType(theBuilderType)
   {
     initialize();
   }
 
+  /** \brief Initializes internals.
+   *  \param[in] theBuilder pointer to the builder.
+   *  \param[in] theBuilderType builder type.
+   */
+  template<class T> void initialize(T* theBuilder, const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
+  {
+    setImpl(theBuilder);
+    myBuilderType = theBuilder;
+    initialize();
+  }
 
   /// \return status of builder.
   GEOMALGOAPI_EXPORT bool isDone() const;
@@ -65,9 +77,6 @@ public:
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
 protected:
-  /// \brief Default constructor.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape();
-
   /** \brief Sets builder type.
    *  \param[in] theBuilderType new builder type.
    */
@@ -83,8 +92,9 @@ protected:
    */
   GEOMALGOAPI_EXPORT void setShape(const std::shared_ptr<GeomAPI_Shape> theShape);
 
+private:
   /// \brief Initializes internals.
-  GEOMALGOAPI_EXPORT void initialize();
+  void initialize();
 
 private:
   GeomAlgoAPI_MakeShape::BuilderType myBuilderType; ///< Type of make shape builder.

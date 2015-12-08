@@ -35,7 +35,7 @@ public:
 protected:
   GeomAlgoAPI_MakeSweep(){};
 
-protected:
+private:
   ListOfShape myFromFaces;
   ListOfShape myToFaces;
 };
