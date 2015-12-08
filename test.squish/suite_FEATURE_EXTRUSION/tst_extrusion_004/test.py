@@ -74,14 +74,8 @@ def main():
     clickButton(waitForObject(":ExtrusionFuse.property_panel_ok_QToolButton"))
 
     # [step] Click 'Reset view' toolbar button
-    need_expand = not object.exists(":SALOME*.Reset_QToolButton")
-    if need_expand:
-        clickButton(waitForObject(":SALOME*.qt_toolbar_ext_button_QToolBarExtension_3"))
-
-    clickButton(waitForObject(":SALOME*.Reset_QToolButton"))
-
-    if need_expand:
-        clickButton(waitForObject(":SALOME*.qt_toolbar_ext_button_QToolBarExtension_3"))
+    clickButton(waitForObject(":SALOME*.Reset_QToolButton_2"))
+    mouseClick(waitForObject(":SALOME*_OCCViewer_ViewPort3d"), 10, 450, 0, Qt.LeftButton)  # close tool bar extension bar
 
     # [check] Check that extrusionCut operation has been executed successfully [vp EXTRUSION_FUSE]
     test.vp("EXTRUSION_FUSE")

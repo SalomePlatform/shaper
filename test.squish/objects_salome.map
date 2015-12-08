@@ -319,6 +319,7 @@
 :SALOME*.Rebuild_QToolButton	{text='Rebuild' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Remove part_QToolButton	{text='Remove part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Reset_QToolButton	{text='Reset' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.Reset_QToolButton_2	{text='Reset' type='QToolButton' unnamed='1' visible='0' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.RevolutionCut_QToolButton	{text='RevolutionCut' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.RevolutionCut_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='RevolutionCut'}
 :SALOME*.RevolutionFuse_QToolButton	{text='RevolutionFuse' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
@@ -346,8 +347,9 @@
 :SALOME*.Zooming style switch_QToolButton	{text='Zooming style switch' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.property_panel_dock_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.qt_toolbar_ext_button_QToolBarExtension	{name='qt_toolbar_ext_button' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
-:SALOME*.qt_toolbar_ext_button_QToolBarExtension_2	{name='qt_toolbar_ext_button' occurrence='2' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.qt_toolbar_ext_button_QToolBarExtension_2	{container=':SALOME*.3D View Operations_QtxToolBar' name='qt_toolbar_ext_button' occurrence='2' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.qt_toolbar_ext_button_QToolBarExtension_3	{name='qt_toolbar_ext_button' occurrence='3' type='QToolBarExtension' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*_OCCViewer_ViewPort3d	{type='OCCViewer_ViewPort3d' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QAbstractButton	{occurrence='41' type='QAbstractButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QFrame	{occurrence='7' type='QFrame' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*_QFrame_2	{occurrence='12' type='QFrame' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
