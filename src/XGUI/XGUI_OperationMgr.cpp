@@ -431,6 +431,9 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
             ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
 #endif
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule)
+    aModule->beforeOperationStarted(aFOperation);
   }
 }
 
@@ -487,6 +490,9 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
     qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
             ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
 #endif
+    ModuleBase_IModule* aModule = myWorkshop->module();
+    if (aModule)
+      aModule->beforeOperationStopped(aFOperation);
   }
 }
 

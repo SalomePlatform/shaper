@@ -219,6 +219,14 @@ public:
   /// \param thePreviousAttributeID an index of the previous active attribute
   virtual bool processEnter(const std::string& thePreviousAttributeID);
 
+  /// Performs some GUI actions after an operation transaction is opened
+  /// Default realization is empty
+  virtual void beforeOperationStarted(ModuleBase_Operation* theOperation);
+
+  /// Performs some GUI actions before an operation transaction is stopped
+  /// Default realization is empty
+  virtual void beforeOperationStopped(ModuleBase_Operation* theOperation);
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,

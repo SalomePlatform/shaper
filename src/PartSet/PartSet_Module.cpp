@@ -275,19 +275,16 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   bool isModified = myCustomPrs->deactivate(false);
 
-  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
-    mySketchMgr->stopSketch(theOperation);
-  }
-  else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
+  if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
   }
 
   //VSV: Viewer is updated on feature update and redisplay
-  //if (isModified) {
-  //  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  //  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-  //  aDisplayer->updateViewer();
-  //}
+  if (isModified) {
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+    aDisplayer->updateViewer();
+  }
   mySketchMgr->onShowConstraintsToggle(myHasConstraintShown);
 }
 
@@ -485,7 +482,6 @@ void PartSet_Module::onOperationActivatedByPreselection()
   if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
-
     /// Commit sketcher operations automatically
     anOperation->commit();
   }
@@ -512,7 +508,7 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
-  } else if (theType == "sketch-2dpoint_flyout_selector") {
+  }else if (theType == "sketch-2dpoint_flyout_selector") {
     PartSet_WidgetPoint2DFlyout* aPointWgt = new PartSet_WidgetPoint2DFlyout(theParent, aWorkshop,
                                                                  theWidgetApi, theParentId);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
@@ -1024,6 +1020,18 @@ bool PartSet_Module::processEnter(const std::string& thePreviousAttributeID)
   return mySketchReentrantMgr->processEnter(thePreviousAttributeID);
 }
 
+//******************************************************
+void PartSet_Module::beforeOperationStarted(ModuleBase_Operation* theOperation)
+{
+}
+
+//******************************************************
+void PartSet_Module::beforeOperationStopped(ModuleBase_Operation* theOperation)
+{
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
+    mySketchMgr->stopSketch(theOperation);
+  }
+}
 
 //******************************************************
 void PartSet_Module::onBooleanOperationChange(int theOperation)

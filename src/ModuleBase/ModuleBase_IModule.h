@@ -212,6 +212,14 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param thePreviousAttributeID an index of the previous active attribute
   virtual bool processEnter(const std::string& thePreviousAttributeID) { return false; };
 
+  /// Performs some GUI actions after an operation transaction is opened
+  /// Default realization is empty
+  virtual void beforeOperationStarted(ModuleBase_Operation* theOperation) {};
+
+  /// Performs some GUI actions before an operation transaction is stopped
+  /// Default realization is empty
+  virtual void beforeOperationStopped(ModuleBase_Operation* theOperation) {};
+
 signals:
   /// Signal which is emitted when operation is launched
   void operationLaunched();
