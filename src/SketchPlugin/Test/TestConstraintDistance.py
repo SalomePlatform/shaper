@@ -59,7 +59,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aSketchPoint = aSketchFeature.addFeature("SketchPoint")
 aSketchPointCoords = geomDataAPI_Point2D(
-    aSketchPoint.attribute("PointCoordindates"))
+    aSketchPoint.attribute("PointCoordinates"))
 aSketchPointCoords.setValue(50., 50.)
 aSketchLine = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
