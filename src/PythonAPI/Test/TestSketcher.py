@@ -14,3 +14,4 @@ class SketcherTestCase(unittest.TestCase):
 
     def tearDown(self):
         model.end()
+        model.reset()
