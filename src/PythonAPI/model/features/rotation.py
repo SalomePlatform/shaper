@@ -1,0 +1,86 @@
+"""Rotation Interface
+Author: Sergey Pokhodenko
+Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+"""
+
+from model.roots import Interface
+
+
+def addRotation(part, *args):
+    """Add a Rotation feature to the Part.
+
+    .. function:: addRotation(part, main_objects, axis_object, angle)
+
+    Args:
+        part (ModelAPI_Document): part document
+        main_objects (list of Selection): main objects
+        axis_object (list of Selection): axis object
+        angle (double): angle
+
+    Returns:
+        Rotation: rotation object
+    """
+    assert(args)
+    feature = part.addFeature("Rotation")
+    return Rotation(feature, *args)
+
+
+class Rotation(Interface):
+    """Interface class for Rotation features.
+
+    .. function:: Rotation(feature)
+
+        Create interface for the feature without initialization.
+
+    .. function:: Rotation(feature, main_objects, axis_object, angle)
+
+        Create interface for the feature and initialize the feature with arguments.
+    """
+
+    def __init__(self, feature, *args):
+        """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
+        Interface.__init__(self, feature)
+        assert(self._feature.getKind() == "Rotation")
+
+        self._main_objects = self._feature.data().selectionList("main_objects")
+        self._axis_object = self._feature.data().selection("axis_object")
+        self._angle = self._feature.data().real("angle")
+
+        assert(self._main_objects)
+        assert(self._axis_object)
+        assert(self._angle)
+
+        if not args:
+            return
+
+        assert(len(args) == 3)
+        self.setMainObjects(args[0])
+        self.setAxisObject(args[1])
+        self.setAngle(args[2])
+
+        self.execute()
+        pass
+
+    def setMainObjects(self, main_objects):
+        """Modify main_objects attribute of the feature.
+
+        See __init__.
+        """
+        self._fillAttribute(self._main_objects, main_objects)
+        pass
+
+    def setAxisObject(self, axis_object):
+        """Modify axis_object attribute of the feature.
+
+        See __init__.
+        """
+        self._fillAttribute(self._axis_object, axis_object)
+        pass
+
+    def setAngle(self, angle):
+        """Modify angle attribute of the feature.
+
+        See __init__.
+        """
+        self._fillAttribute(self._angle, angle)
+        pass

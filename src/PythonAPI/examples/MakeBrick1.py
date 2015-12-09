@@ -2,23 +2,23 @@
 # Author: Daniel Brunier-Coulin
 # -----------------------------
 
-import modeler
+import model
 
 
 # Initialisation
 
-modeler.begin()
-mypartset = modeler.moduleDocument()
+model.begin()
+mypartset = model.moduleDocument()
 
 
 # Creating a new Part
 
-mypart = modeler.addPart(mypartset).document()
+mypart = model.addPart(mypartset).document()
 
 
 # Creating the base of the box
 
-mybase = modeler.addSketch( mypart, modeler.defaultPlane("XOY") )
+mybase = model.addSketch( mypart, model.defaultPlane("XOY") )
 
 l1 = mybase.addLine( 0, 0, 0, 1 )
 l2 = mybase.addLine( 0, 1, 1, 1 )
@@ -38,37 +38,35 @@ mybase.setPerpendicular( l1.result(), l4.result() )
 mywidth  = mybase.setLength( l1.result(), 50 )
 mylength = mybase.setDistance( l1.startPointData(), l3.result(), 50 )
 
-
 # Creating the extrusion
 
-mybox = modeler.addExtrusion( mypart, mybase.selectFace(), 50 )
-
+mybox = model.addExtrusion( mypart, mybase.selectFace(), 50 )
 
 # Creating a cylinder on a face of the box
 
-thisface = "Extrusion_1/LateralFace_2"
-thisxmin = "Extrusion_1/LateralFace_3|Extrusion_1/LateralFace_2"
-thisxmax = "Extrusion_1/LateralFace_2|Extrusion_1/LateralFace_1"
+thisface = "Extrusion_1_1/LateralFace_2"
+thisxmin = "Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2"
+thisxmax = "Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1"
 thiszmin = "Sketch_1/Edge5_1"
-thiszmax = "Extrusion_1/LateralFace_2|Extrusion_1/TopFace_1"
+thiszmax = "Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1"
 
-mystand = modeler.addSketch( mypart, thisface )
+mystand = model.addSketch( mypart, thisface )
+
 c1      = mystand.addCircle( 0, 25, 5)
 mystand.setDistance( c1.centerData(), thisxmin, 10 )
 mystand.setDistance( c1.centerData(), thiszmax, 10 )
 
-myboss = modeler.addExtrusion( mypart, mystand.selectFace(c1.result()), -5 )
-
+myboss = model.addExtrusion( mypart, mystand.selectFace(c1.result()), -5 )
 
 # Subtracting the cylinder to the box
 
-modeler.addSubtraction( mypart, mybox.result(), myboss.result() )
-modeler.end()
+model.addSubtraction( mypart, mybox.result(), myboss.result() )
+model.end()
 
 
 # Editing the box
 
-modeler.begin()
+model.begin()
 mybase.setValue( mylength, 100 )
 mybox.setSize( 80 )
-modeler.end()
+model.end()

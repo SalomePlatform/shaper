@@ -29,4 +29,4 @@ start.bat
 *~
 /.project
 *DFBrowser*
-
+*.pyc
