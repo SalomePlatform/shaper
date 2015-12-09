@@ -49,8 +49,8 @@ thiszmax = "Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1"
 
 mystand = model.addSketch(mypart, thisface)
 circle = mystand.addCircle(0, 25, 5)
-mystand.setDistance(circle.centerData(), thisxmin, 10)
-mystand.setDistance(circle.centerData(), thiszmax, 10)
+mystand.setDistance(circle.center(), thisxmin, 10)
+mystand.setDistance(circle.center(), thiszmax, 10)
 
 myboss = model.addExtrusion(mypart, mystand.selectFace(), -5)
 
