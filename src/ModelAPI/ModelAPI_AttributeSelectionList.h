@@ -23,7 +23,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
-  ///           (used to remove immideately, without the following updates)
+  ///           (used to remove immediately, without the following updates)
   virtual void append(const ResultPtr& theContext,
                       const GeomShapePtr& theSubShape,
                       const bool theTemporarily = false) = 0;

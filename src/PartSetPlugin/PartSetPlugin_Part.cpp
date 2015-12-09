@@ -31,8 +31,8 @@ void PartSetPlugin_Part::execute()
     // do not activate part by simple execution if it is not loaded yet: it must be explicitly
     // activated for this
     if (!ModelAPI_Session::get()->isLoadByDemand(aResult->data()->name())) {
-      // On undo/redo creation of the part result the Object Borwser must get creation event
-      // earlier that activation of this part event (otherwise the crash is producted)
+      // On undo/redo creation of the part result the Object Browser must get creation event
+      // earlier that activation of this part event (otherwise the crash is produced)
       // So, send a creation event earlier, without any grouping
       static Events_ID aCreateID = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aResult, aCreateID, false);

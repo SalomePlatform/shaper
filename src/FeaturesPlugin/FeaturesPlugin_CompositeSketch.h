@@ -52,7 +52,7 @@ class FeaturesPlugin_CompositeSketch : public ModelAPI_CompositeFeature
   /// \return the sub-feature unique identifier in this composite feature by zero-base index.
   FEATURESPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;
 
-  /// \return true if feature or reuslt belong to this composite feature as subs.
+  /// \return true if feature or result belong to this composite feature as subs.
   FEATURESPLUGIN_EXPORT virtual bool isSub(ObjectPtr theObject) const;
 
   /// This method to inform that sub-feature is removed and must be removed from the internal data

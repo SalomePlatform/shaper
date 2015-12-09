@@ -61,7 +61,7 @@ using namespace std;
 #ifdef DEB_NAMING
 #include <BRepTools.hxx>
 #endif
-/// adeed to the index in the packed map to signalize that the vertex of edge is seleted
+/// added to the index in the packed map to signalize that the vertex of edge is selected
 /// (multiplied by the index of the edge)
 static const int kSTART_VERTEX_DELTA = 1000000;
 // identifier that there is simple reference: selection equals to context
@@ -247,7 +247,7 @@ bool Model_AttributeSelection::isInvalid()
 
 bool Model_AttributeSelection::isInitialized()
 {
-  if (ModelAPI_AttributeSelection::isInitialized()) { // additional checkings if it is initialized
+  if (ModelAPI_AttributeSelection::isInitialized()) { // additional checks if it is initialized
     std::shared_ptr<GeomAPI_Shape> aResult;
     if (myRef.isInitialized()) {
       TDF_Label aSelLab = selectionLabel();
@@ -320,7 +320,7 @@ void Model_AttributeSelection::setObject(const std::shared_ptr<ModelAPI_Object>&
 TDF_LabelMap& Model_AttributeSelection::scope()
 {
   if (myScope.IsEmpty()) { // create a new scope if not yet done
-    // gets all featueres with named shapes that are bofore this feature label (before in history)
+    // gets all features with named shapes that are before this feature label (before in history)
     DocumentPtr aMyDoc = owner()->document();
     std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures = aMyDoc->allFeatures();
     std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFIter = allFeatures.begin();
@@ -469,7 +469,7 @@ bool Model_AttributeSelection::update()
         if (aNoIndexes) {
           aNewSelected = aConstructionContext->face(0);
         } else { // searching for most looks-like initial face by the indexes
-          // prepare edges of the current resut for the fast searching
+          // prepare edges of the current result for the fast searching
           NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
@@ -681,7 +681,7 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
       aName<<"f";
     else if (theOrientation == -1)
       aName<<"r";
-  } else { // make a compisite name from all sub-elements indexes: "1_2_3_4"
+  } else { // make a composite name from all sub-elements indexes: "1_2_3_4"
     TColStd_MapIteratorOfPackedMapOfInteger aRef(theRefs->GetMap());
     for(; aRef.More(); aRef.Next()) {
       aName<<"-"<<aRef.Key();
@@ -717,7 +717,7 @@ void Model_AttributeSelection::selectConstruction(
   }
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(owner()->data());
   TDF_Label aLab = myRef.myRef->Label();
-  // identify the reuslts of sub-object of the composite by edges
+  // identify the results of sub-object of the composite by edges
   // save type of the selected shape in integer attribute
   TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
   TDataStd_Integer::Set(aLab, (int)aShapeType);
@@ -837,7 +837,7 @@ bool Model_AttributeSelection::selectPart(
     }
     return true; // nothing to do, referencing just by name
   }
-  // store the shape (in case part is not loaded it should be usefull
+  // store the shape (in case part is not loaded it should be useful
   TopoDS_Shape aShape;
   std::string aName = theContext->data()->name();
   if (!theSubShape.get() || theSubShape->isNull()) {// the whole part shape is selected
