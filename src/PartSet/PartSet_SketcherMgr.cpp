@@ -416,8 +416,12 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
 
+      // this is temporary commented in order to avoid the following wrong case:
+      // Distance constraint is under edition, double click on the digit -> nothing happens
+      // because QApplication::processEvents() calls onMouseDoubleClick, which try to show editor
+      // but as the prev edit is commited an new one is not started, editor is not shown.
       // This is necessary in order to finalize previous operation
-      QApplication::processEvents();
+      //QApplication::processEvents();
       launchEditing();
     }
   }
