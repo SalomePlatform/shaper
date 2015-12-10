@@ -35,6 +35,8 @@ Q_OBJECT
   //! Returns Vsd_View object from currently active view window
   virtual Handle(V3d_View) activeView() const;
 
+  virtual QWidget* activeViewPort() const;
+
   //! Enable or disable selection in the viewer
   virtual void enableSelection(bool isEnabled);
 

@@ -201,7 +201,7 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
   return res;
 }
 
-void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
+void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent* theEvent)
 {
   bool isEmitKeyRelease = false;
   switch (theEvent->key()) {
@@ -220,7 +220,27 @@ void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent *theEvent)
   QDoubleSpinBox::keyPressEvent(theEvent);
 
   if (isEmitKeyRelease)
-    emit keyReleased(theEvent);
+    emit enterPressed();
+}
+
+void ModuleBase_DoubleSpinBox::keyReleaseEvent(QKeyEvent* theEvent)
+{
+  switch (theEvent->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return: {
+      // the enter has already been processed when key is pressed,
+      // key release should not be processed in operation manager
+      if (myIsEmitKeyPressEvent) {
+        theEvent->accept();
+        emit enterReleased();
+        return;
+      }
+    }
+    break;
+    default:
+      break;
+  }
+  QDoubleSpinBox::keyReleaseEvent(theEvent);
 }
 
 /*!

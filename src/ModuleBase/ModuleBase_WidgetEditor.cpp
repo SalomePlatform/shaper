@@ -36,7 +36,8 @@ ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,
                                                  const std::string& theParentId)
 : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId),
-  myIsKeyReleasedEmitted(false)
+  //myIsEnterPressedEmitted(false),
+  myXPosition(-1), myYPosition(-1)
 {
 }
 
@@ -52,9 +53,9 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(&aDlg);
   anEditor->enableKeyPressEvent(true);
-  if (!myIsEditing) {
-    connect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SLOT(onKeyReleased(QKeyEvent*)));
-  }
+  //if (!myIsEditing) {
+  //  connect(anEditor, SIGNAL(enterPressed()), this, SLOT(onEnterPressed()));
+  //}
 
   anEditor->setMinimum(0);
   anEditor->setMaximum(DBL_MAX);
@@ -67,14 +68,18 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   ModuleBase_Tools::setFocus(anEditor, "ModuleBase_WidgetEditor::editedValue");
   anEditor->selectAll();
-  QObject::connect(anEditor, SIGNAL(editingFinished()), &aDlg, SLOT(accept()));
+  QObject::connect(anEditor, SIGNAL(enterReleased()), &aDlg, SLOT(accept()));
 
-  aDlg.move(QCursor::pos());
+  QPoint aPoint = QCursor::pos();
+  if (myXPosition >= 0 && myYPosition >= 0)
+    aPoint = QPoint(myXPosition, myYPosition);
+
+  aDlg.move(aPoint);
   aDlg.exec();
 
-  if (!myIsEditing) {
-    disconnect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SLOT(onKeyReleased(QKeyEvent*)));
-  }
+  //if (!myIsEditing) {
+  //  disconnect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SLOT(onEnterPressed()));
+  //}
 
   outText = anEditor->text();
   bool isDouble;
@@ -87,25 +92,19 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
 bool ModuleBase_WidgetEditor::focusTo()
 {
-  // nds: it seems, that the timer is not necessary anymore
-
-  // We can not launch here modal process for value editing because 
-  // it can be called on other focusOutWidget event and will block it
-  //QTimer::singleShot(1, this, SLOT(showPopupEditor()));
-
   showPopupEditor();
-
   return true;
 }
 
-void ModuleBase_WidgetEditor::showPopupEditor()
+void ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
 {
-  myIsKeyReleasedEmitted = false;
+  //myIsEnterPressedEmitted = false;
 
   // we need to emit the focus in event manually in order to save the widget as an active
   // in the property panel before the mouse leave event happens in the viewer. The module
   // ask an active widget and change the feature visualization if the widget is not the current one.
-  emit focusInWidget(this);
+  if (theSendSignals)
+    emit focusInWidget(this);
 
   // nds: it seems, that the envents processing is not necessary anymore
   // White while all events will be processed
@@ -121,16 +120,27 @@ void ModuleBase_WidgetEditor::showPopupEditor()
   } else {
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   }
-  emit valuesChanged();
-  // the focus leaves the control automatically by the Enter/Esc event
-  // it is processed in operation manager
-  //emit focusOutWidget(this);
+  if (theSendSignals) {
+    emit valuesChanged();
+    // the focus leaves the control automatically by the Enter/Esc event
+    // it is processed in operation manager
+    //emit focusOutWidget(this);
 
-  if (myIsKeyReleasedEmitted)
-    emit enterClicked();
+    //if (myIsEnterPressedEmitted)
+    if (!myIsEditing)
+      emit enterClicked();
+  }
+  else
+    storeValue();
 }
 
-void ModuleBase_WidgetEditor::onKeyReleased(QKeyEvent* theEvent)
+/*void ModuleBase_WidgetEditor::onEnterPressed()
 {
-  myIsKeyReleasedEmitted = true;
+  myIsEnterPressedEmitted = true;
+}*/
+
+void ModuleBase_WidgetEditor::setCursorPosition(const int theX, const int theY)
+{
+  myXPosition = theX;
+  myYPosition = theY;
 }

@@ -63,7 +63,8 @@ Q_OBJECT
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
-  void keyReleased(QKeyEvent* theEvent);
+  void enterPressed();
+  void enterReleased();
 
  protected slots:
    /// Called on text changed
@@ -74,6 +75,9 @@ signals:
  protected:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
+  /// Called on key press event
+  virtual void keyReleaseEvent(QKeyEvent* theEvent);
+
   /// Called on key press event
   virtual void keyPressEvent(QKeyEvent* theEvent);
 

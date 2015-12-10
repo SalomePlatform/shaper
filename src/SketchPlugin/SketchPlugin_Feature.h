@@ -10,7 +10,6 @@
 #include "SketchPlugin.h"
 #include <ModelAPI_CompositeFeature.h>
 #include <GeomAPI_Shape.h>
-#include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>

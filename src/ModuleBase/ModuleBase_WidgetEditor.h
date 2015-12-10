@@ -43,11 +43,15 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
-   /// Shous popup window under cursor for data editing
-   void showPopupEditor();
+  /// Shous popup window under cursor for data editing
+  /// \param theSendSignals a flag whether the signals should be sent or the value
+  /// is to be applyed directly
+  void showPopupEditor(const bool theSendSignals = true);
 
-protected slots:
-  void onKeyReleased(QKeyEvent* theEvent);
+  void setCursorPosition(const int theX, const int theY);
+
+//protected slots:
+  //void onEnterPressed();
 
 private:
    void editedValue(double& outValue, QString& outText);
@@ -59,7 +63,9 @@ private:
    ///< the kinds of possible features
    QStringList myFeatureKinds;  
 
-   bool myIsKeyReleasedEmitted;
+   //bool myIsEnterPressedEmitted;
+
+   int myXPosition, myYPosition;
 };
 
 #endif

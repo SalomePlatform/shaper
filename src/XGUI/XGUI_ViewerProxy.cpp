@@ -52,6 +52,17 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
 #endif
 }
 
+QWidget* XGUI_ViewerProxy::activeViewPort() const
+{
+#ifdef HAVE_SALOME
+  return myWorkshop->salomeConnector()->viewer()->activeView();
+#else
+  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+  return (aViewer->activeViewWindow()) ? 
+         aViewer->activeViewWindow()->viewPortApp(): 0;
+#endif
+}
+
 void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ, double theTwist)
 {
   Handle(V3d_View) aView3d = activeView();
