@@ -9,6 +9,7 @@
 
 #include <LightApp_Study.h>
 #include <CAM_Application.h>
+#include <CAM_DataObject.h>
 #include <SUIT_Tools.h>
 #include <SUIT_ResourceMgr.h>
 
@@ -131,6 +132,20 @@ bool NewGeom_DataModel::isSaved() const
 
 void NewGeom_DataModel::update(LightApp_DataObject* theObj, LightApp_Study* theStudy)
 {
+  // Nothing to do here: we always keep the data tree in the up-to-date state
+  // The only goal of this method is to hide default behavior from LightApp_DataModel
+  return;
+}
+
+void NewGeom_DataModel::initRootObject()
+{
+  LightApp_Study* study = dynamic_cast<LightApp_Study*>( module()->application()->activeStudy() );
+  CAM_ModuleObject *aModelRoot = dynamic_cast<CAM_ModuleObject*>(root());
+  if(study && aModelRoot == NULL) {
+    aModelRoot = createModuleObject( study->root() );
+    aModelRoot->setDataModel( this );
+    setRoot(aModelRoot);
+  }
 }
 
 void NewGeom_DataModel::removeDirectory(const QString& theDirectoryName)

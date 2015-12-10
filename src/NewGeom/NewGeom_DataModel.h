@@ -51,6 +51,11 @@ class NewGeom_EXPORT NewGeom_DataModel : public LightApp_DataModel
   /// Returns True if the data structure is already saved
   virtual bool isSaved() const;
 
+  /// Creates a module root object if it has not been created yet
+  /// and append it to the active study. It is necessary for correct persistent
+  /// of the model.
+  void initRootObject();
+
   /// Update data object
   /// \param theObj an data object
   /// \param theStudy a current study

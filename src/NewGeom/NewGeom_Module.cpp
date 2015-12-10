@@ -144,6 +144,9 @@ void NewGeom_Module::viewManagers(QStringList& theList) const
 bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
 {
   bool isDone = LightApp_Module::activateModule(theStudy);
+  NewGeom_DataModel* aDataModel = dynamic_cast<NewGeom_DataModel*>(dataModel());
+  aDataModel->initRootObject();
+
   if (isDone) {
     setMenuShown(true);
     setToolShown(true);
@@ -348,13 +351,7 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
 //******************************************************
 CAM_DataModel* NewGeom_Module::createDataModel()
 {
-  NewGeom_DataModel* aDataModel = new NewGeom_DataModel(this);
-
-  // Calling addComponent() for persistent functionality work in the SalomeApp_Study
-  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(application()->activeStudy() );
-  aStudy->addComponent(aDataModel);
-
-  return aDataModel;
+  return new NewGeom_DataModel(this);
 }
 
 QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& theInfo)
