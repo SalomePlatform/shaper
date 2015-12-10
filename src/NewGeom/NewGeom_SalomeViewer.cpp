@@ -89,6 +89,19 @@ Handle(V3d_View) NewGeom_SalomeViewer::activeView() const
 }
 
 //**********************************************
+QWidget* NewGeom_SalomeViewer::activeViewPort() const
+{
+  QWidget* aViewPort;
+  if (mySelector) {
+    OCCViewer_Viewer* aViewer = mySelector->viewer();
+    SUIT_ViewManager* aMgr = aViewer->getViewManager();
+    OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(aMgr->getActiveView());
+    aViewPort = aWnd->getViewPort();
+  }
+  return aViewPort;
+}
+
+//**********************************************
 void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
 {
   if (mySelector) {

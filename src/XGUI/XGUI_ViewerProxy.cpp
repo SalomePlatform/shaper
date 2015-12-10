@@ -55,7 +55,7 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
 QWidget* XGUI_ViewerProxy::activeViewPort() const
 {
 #ifdef HAVE_SALOME
-  return myWorkshop->salomeConnector()->viewer()->activeView();
+  return myWorkshop->salomeConnector()->viewer()->activeViewPort();
 #else
   AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
   return (aViewer->activeViewWindow()) ? 
