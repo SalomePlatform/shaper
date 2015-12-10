@@ -133,6 +133,10 @@ public:
   /// \param theOperation a committed operation
   void commitNestedSketch(ModuleBase_Operation* theOperation);
 
+  /// Commit the operation if it is possible. If the operation is dimention constraint,
+  /// it gives widget editor to input dimention value
+  void operationActivatedByPreselection();
+
   /// Returns True if there are available Undos and the sketch manager allows undo
   /// \return the boolean result
   bool canUndo() const;

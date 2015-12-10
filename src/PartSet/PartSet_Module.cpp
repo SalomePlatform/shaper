@@ -473,77 +473,11 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
   anOpMgr->onKeyReleased(theEvent);
 }
 
-#include <XGUI_SalomeConnector.h>
 void PartSet_Module::onOperationActivatedByPreselection()
 {
   if (!mySketchReentrantMgr->canBeCommittedByPreselection())
     return;
-
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
-    // Set final definitions if they are necessary
-    //propertyPanelDefined(aOperation);
-    /// Commit sketcher operations automatically
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                            (anOperation);
-    if (aFOperation) {
-      if (PartSet_SketcherMgr::isDistanceOperation(aFOperation)) {
-        // Activate dimension value editing on double click
-        ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-        // Find corresponded widget to activate value editing
-        foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-          if (aWgt->attributeID() == "ConstraintValue") {
-            FeaturePtr aFeature = aFOperation->feature();
-            // the featue should be displayed in order to find the AIS text position,
-            // the place where the editor will be shown
-            aFeature->setDisplayed(true);
-            /// the execute is necessary to perform in the feature compute for flyout position
-            aFeature->execute();
-
-            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-
-            PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
-            if (anEditor) {
-              int aX = 0, anY = 0;
-              XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-              XGUI_Workshop* aWorkshop = aConnector->workshop();
-              XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-              AISObjectPtr anAIS = aDisplayer->getAISObject(aFeature);
-              Handle(AIS_InteractiveObject) anAISIO;
-              if (anAIS.get() != NULL) {
-                anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
-              }
-              if (anAIS.get() != NULL) {
-                Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
-
-                if (!anAISIO.IsNull()) {
-                  Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
-                  if (!aDim.IsNull()) {
-                    gp_Pnt aPosition = aDim->GetTextPosition();
-
-                    ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-                    Handle(V3d_View) aView = aViewer->activeView();
-                    int aCX, aCY;
-                    aView->Convert(aPosition.X(), aPosition.Y(), aPosition.Z(), aCX, aCY);
-
-                    QWidget* aViewPort = aViewer->activeViewPort();
-                    QPoint aGlPoint = aViewPort->mapToGlobal(QPoint(aCX, aCY));
-                    aX = aGlPoint.x();
-                    anY = aGlPoint.y();
-                  }
-                }
-                anEditor->setCursorPosition(aX, anY);
-                anEditor->showPopupEditor(false);
-              }
-            }
-          }
-        }
-      }
-    }
-    anOperation->commit();
-  }
+  mySketchMgr->operationActivatedByPreselection();
 }
 
 ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
