@@ -108,7 +108,7 @@ void XGUI_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
  \param theFeature a candidate to be a composite feature
  \return a boolean value
  */
-bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject);
+bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
 
 /*!
  Returns a container of references feature to the source object. The search happens in the object
