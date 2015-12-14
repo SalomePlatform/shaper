@@ -120,6 +120,19 @@ void NewGeom_Module::initialize(CAM_Application* theApp)
   LightApp_Module::initialize(theApp);
   inspectSalomeModules();
 
+  // if there are created viewer managers, we should try to create viewer
+  // selector and initialize viewer with it. It sets interactive contect to the 
+  // proxy viewer. If study is opened, startApplication causes the objects visualization,
+  // AIS context should be initialized in the viewer before this.
+  if (!mySelector) {
+    ViewManagerList OCCViewManagers;
+    application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
+    if (OCCViewManagers.size() > 0) {
+      // the viewer is restored by "store_visual_state"
+      mySelector = createSelector(OCCViewManagers.first());
+    }
+  }
+
   myWorkshop->startApplication();
   LightApp_Application* anApp = dynamic_cast<LightApp_Application*>(theApp);
   if (anApp)
