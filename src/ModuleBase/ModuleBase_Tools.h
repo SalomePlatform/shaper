@@ -55,6 +55,13 @@ MODULEBASE_EXPORT void activateWindow(QWidget* theWidget, const QString& theInfo
  */
 MODULEBASE_EXPORT void setFocus(QWidget* theWidget, const QString& theInfo = QString());
 
+
+//! Sets or removes the shadow effect to the widget
+//! \param theWidget a widget to be styled
+//! \param isSetEffect if true, the shadow effect is set, overwise cleared
+//! \return resulting pixmap
+MODULEBASE_EXPORT void setShadowEffect(QWidget* theWidget, const bool isSetEffect);
+
 /**
  * \ingroup GUI
  * Methods to modify a resource pixmap

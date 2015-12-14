@@ -29,6 +29,8 @@
 #include <QPainter>
 #include <QBitmap>
 #include <QDoubleSpinBox>
+#include <QGraphicsDropShadowEffect>
+#include <QColor>
 
 #include <sstream>
 
@@ -89,6 +91,23 @@ void setFocus(QWidget* theWidget, const QString& theInfo)
 #ifdef DEBUG_SET_FOCUS
   qDebug(QString("setFocus: %1").arg(theInfo).toStdString().c_str());
 #endif
+}
+
+void setShadowEffect(QWidget* theWidget, const bool isSetEffect)
+{
+  if (isSetEffect) {
+    QGraphicsDropShadowEffect* aGlowEffect = new QGraphicsDropShadowEffect();
+    aGlowEffect->setOffset(.0);
+    aGlowEffect->setBlurRadius(10.0);
+    aGlowEffect->setColor(QColor(0, 170, 255)); // Light-blue color, #00AAFF
+    theWidget->setGraphicsEffect(aGlowEffect);
+  }
+  else {
+    QGraphicsEffect* anEffect = theWidget->graphicsEffect();
+    if(anEffect)
+    anEffect->deleteLater();
+    theWidget->setGraphicsEffect(NULL);
+  }
 }
 
 QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon)

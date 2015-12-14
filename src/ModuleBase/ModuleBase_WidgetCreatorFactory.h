@@ -18,6 +18,7 @@
 
 class ModuleBase_ModelWidget;
 class ModuleBase_PageBase;
+class ModuleBase_IWorkshop;
 
 class QWidget;
 
@@ -47,13 +48,18 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// \param theType a type
   /// \param theParent a parent widget
   ModuleBase_PageBase* createPageByType(const std::string& theType,
-                                        QWidget* theParent = NULL);
+                                        QWidget* theParent,
+                                        Config_WidgetAPI* theWidgetApi,
+                                        std::string theParentId);
 
   /// Create widget by its type
   /// \param theType a type
   /// \param theParent a parent widget
   ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
-                                             QWidget* theParent = NULL);
+                                             QWidget* theParent,
+                                             Config_WidgetAPI* theWidgetApi,
+                                             std::string theParentId,
+                                             ModuleBase_IWorkshop* theWorkshop);
 
 private:
   /// Constructor is hidden

@@ -10,7 +10,9 @@ SET(PROJECT_HEADERS
     SketchShapePlugin_Plugin.h
     SketchShapePlugin_Validators.h
     SketchShapePlugin_Tools.h
+    SketchShapePlugin_WidgetCheckGroupBox.h
     SketchShapePlugin_WidgetCreator.h
+    SketchShapePlugin_WidgetMultiSelector.h
 )
 
 SET(PROJECT_SOURCES
@@ -19,7 +21,9 @@ SET(PROJECT_SOURCES
     SketchShapePlugin_Plugin.cpp
     SketchShapePlugin_Validators.cpp
     SketchShapePlugin_Tools.cpp
+    SketchShapePlugin_WidgetCheckGroupBox.cpp
     SketchShapePlugin_WidgetCreator.cpp
+    SketchShapePlugin_WidgetMultiSelector.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -29,6 +29,7 @@
 #include <ModuleBase_WidgetToolbox.h>
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageGroupBox.h>
+#include <ModuleBase_WidgetCheckGroupBox.h>
 #include <ModuleBase_PageWidget.h>
 #include <ModuleBase_WidgetExprEditor.h>
 #include <ModuleBase_WidgetCreatorFactory.h>
@@ -131,9 +132,20 @@ ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::strin
     aPage->setTitle(aGroupName);
     aResult = aPage;
   }
-
+  else if (theType == WDG_CHECK_GROUP) {
+    QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
+    ModuleBase_WidgetCheckGroupBox* aPage = new ModuleBase_WidgetCheckGroupBox(theParent,
+                                                                myWidgetApi, myParentId);
+    aPage->setTitle(aGroupName);
+    aResult = aPage;
+  }
   if (!aResult)
-    aResult = ModuleBase_WidgetCreatorFactory::get()->createPageByType(theType, theParent);
+    aResult = ModuleBase_WidgetCreatorFactory::get()->createPageByType(theType, theParent,
+                                                                       myWidgetApi, myParentId);
+
+  ModuleBase_ModelWidget* aWidget = dynamic_cast<ModuleBase_ModelWidget*>(aResult);
+  if (aWidget)
+    myModelWidgets.append(aWidget);
 
   return aResult;
 }
@@ -180,7 +192,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
   } else {
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myParentId);
     if (!result)
-      result = ModuleBase_WidgetCreatorFactory::get()->createWidgetByType(theType, theParent);
+      result = ModuleBase_WidgetCreatorFactory::get()->createWidgetByType(theType, theParent,
+                                                              myWidgetApi, myParentId, myWorkshop);
     #ifdef _DEBUG
     if (!result) {
       qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type %s", theType.c_str());

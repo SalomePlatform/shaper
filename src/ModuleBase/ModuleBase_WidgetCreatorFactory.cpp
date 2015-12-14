@@ -7,6 +7,8 @@
 #include <ModuleBase_WidgetCreatorFactory.h>
 #include <ModuleBase_IWidgetCreator.h>
 
+#include <Config_WidgetAPI.h>
+
 #include <Events_Error.h>
 
 #include <QStringList>
@@ -62,13 +64,14 @@ bool ModuleBase_WidgetCreatorFactory::hasPageWidget(const std::string& theType)
 }
 
 ModuleBase_PageBase* ModuleBase_WidgetCreatorFactory::createPageByType(
-                              const std::string& theType, QWidget* theParent)
+                              const std::string& theType, QWidget* theParent,
+                              Config_WidgetAPI* theWidgetApi, std::string theParentId)
 {
   ModuleBase_PageBase* aPage = 0;
 
   if (myPageToCreator.contains(theType)) {
     WidgetCreatorPtr aCreator = myPageToCreator[theType];
-    aPage = aCreator->createPageByType(theType, theParent);
+    aPage = aCreator->createPageByType(theType, theParent, theWidgetApi, theParentId);
   }
 
   return aPage;
@@ -76,13 +79,16 @@ ModuleBase_PageBase* ModuleBase_WidgetCreatorFactory::createPageByType(
 
 
 ModuleBase_ModelWidget* ModuleBase_WidgetCreatorFactory::createWidgetByType(
-                              const std::string& theType, QWidget* theParent)
+                              const std::string& theType, QWidget* theParent,
+                              Config_WidgetAPI* theWidgetApi, std::string theParentId,
+                              ModuleBase_IWorkshop* theWorkshop)
 {
   ModuleBase_ModelWidget* aWidget = 0;
 
   if (myCreators.contains(theType)) {
     WidgetCreatorPtr aCreator = myCreators[theType];
-    aWidget = aCreator->createWidgetByType(theType, theParent);
+    aWidget = aCreator->createWidgetByType(theType, theParent, theWidgetApi, theParentId,
+                                           theWorkshop);
   }
 
   return aWidget;

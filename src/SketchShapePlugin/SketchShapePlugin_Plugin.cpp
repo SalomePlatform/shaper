@@ -52,12 +52,3 @@ FeaturePtr SketchShapePlugin_Plugin::createFeature(std::string theFeatureID)
   return FeaturePtr();
 }
 
-/*ModuleBase_ModelWidget* SketchShapePlugin_Plugin::createWidgetByType(const std::string& theType,
-                                                                     QWidget* theParent)
-{
-  ModuleBase_ModelWidget* aWidget = 0;
-  if (theType == "sketchshape_groupbox")
-    aWidget = new SketchShapePlugin_PageGroupBox(theParent);
-  return aWidget;
-}*/
-

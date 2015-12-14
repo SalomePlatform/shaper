@@ -9,6 +9,7 @@
 #include <set>
 
 class ModuleBase_ModelWidget;
+class ModuleBase_IWorkshop;
 class QWidget;
 
 /** 
@@ -36,17 +37,22 @@ public:
   /// \param theType a type
   /// \param theParent a parent widget
   virtual ModuleBase_PageBase* createPageByType(const std::string& theType,
-                                                QWidget* theParent);
+                                                QWidget* theParent,
+                                                Config_WidgetAPI* theWidgetApi,
+                                                std::string theParentId);
 
   /// Create widget by its type
   /// \param theType a type
   /// \param theParent a parent widget
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
-                                                     QWidget* theParent = NULL);
+                                                     QWidget* theParent,
+                                                     Config_WidgetAPI* theWidgetApi,
+                                                     std::string theParentId,
+                                                     ModuleBase_IWorkshop* theWorkshop);
 
 private:
   std::set<std::string> myPages; /// types of pages
-  std::set<std::string> myTypes; /// types of widgets
+  std::set<std::string> myWidgets; /// types of widgets
 };
 
 typedef std::shared_ptr<SketchShapePlugin_WidgetCreator> SketchShapePlguinWidgetCreatorPtr;

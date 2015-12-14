@@ -11,6 +11,9 @@
 
 class ModuleBase_ModelWidget;
 class ModuleBase_PageBase;
+class ModuleBase_IWorkshop;
+
+class Config_WidgetAPI;
 
 class QWidget;
 
@@ -39,13 +42,18 @@ public:
   /// \param theType a type
   /// \param theParent a parent widget
   virtual ModuleBase_PageBase* createPageByType(const std::string& theType,
-                                                QWidget* theParent) = 0;
+                                                QWidget* theParent,
+                                                Config_WidgetAPI* theWidgetApi,
+                                                std::string theParentId) = 0;
 
   /// Create widget by its type
    /// \param theType a type
    /// \param theParent a parent widget
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
-                                                     QWidget* theParent = NULL) = 0;
+                                                     QWidget* theParent,
+                                                     Config_WidgetAPI* theWidgetApi,
+                                                     std::string theParentId,
+                                                     ModuleBase_IWorkshop* theWorkshop) = 0;
 };
 
 typedef std::shared_ptr<ModuleBase_IWidgetCreator> WidgetCreatorPtr;

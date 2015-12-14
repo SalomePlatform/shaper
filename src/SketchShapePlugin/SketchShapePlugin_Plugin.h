@@ -28,11 +28,6 @@ public:
   /// Creates the feature object of this plugin by the feature string ID
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
-  /// Create widget by its type
-  /// \param theType a type
-  /// \param theParent a parent widget
-  //virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
-  //                                                   QWidget* theParent = NULL);
  public:
    SketchShapePlugin_Plugin();
 };

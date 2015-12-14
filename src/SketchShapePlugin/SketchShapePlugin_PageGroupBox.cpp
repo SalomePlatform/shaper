@@ -9,6 +9,10 @@
 SketchShapePlugin_PageGroupBox::SketchShapePlugin_PageGroupBox(QWidget* theParent)
 : ModuleBase_PageGroupBox(theParent)
 {
-  setTitle("SketchShapePlugin_PageGroupBox");
+}
+
+void SketchShapePlugin_PageGroupBox::setHighlightedGroupBox(bool isHighlighted)
+{
+  ModuleBase_Tools::setShadowEffect(this, isHighlighted);
 }
 

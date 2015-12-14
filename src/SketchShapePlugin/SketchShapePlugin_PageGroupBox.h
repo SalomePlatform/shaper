@@ -23,6 +23,10 @@ public:
   SketchShapePlugin_PageGroupBox(QWidget* theParent = 0);
   /// Destructs the page
   virtual ~SketchShapePlugin_PageGroupBox() {}
+
+  //! Switch On/Off highlighting of the widget
+  //! Set highlight to the parent group box if there is such parent
+  void setHighlightedGroupBox(bool isHighlighted);
 };
 
 #endif /* SKETCHSHAPEPLUGIN_PAGEGROUPBOX_H_ */

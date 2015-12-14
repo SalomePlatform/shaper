@@ -18,8 +18,6 @@
 #include <Events_Loop.h>
 
 #include <QEvent>
-#include <QGraphicsDropShadowEffect>
-#include <QColor>
 #include <QLabel>
 #include <QFocusEvent>
 
@@ -104,21 +102,10 @@ void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
     QLabel* aLabel = qobject_cast<QLabel*>(aWidget);
     // We won't set the effect to QLabels - it looks ugly
     if(aLabel) continue;
-    if(isHighlighted) {
-      // If effect is the installed on a different widget, setGraphicsEffect() will
-      // remove the effect from the widget and install it on this widget.
-      // That's why we create a new effect for each widget
-      QGraphicsDropShadowEffect* aGlowEffect = new QGraphicsDropShadowEffect();
-      aGlowEffect->setOffset(.0);
-      aGlowEffect->setBlurRadius(10.0);
-      aGlowEffect->setColor(QColor(0, 170, 255)); // Light-blue color, #00AAFF
-      aWidget->setGraphicsEffect(aGlowEffect);
-    } else {
-      QGraphicsEffect* anEffect = aWidget->graphicsEffect();
-      if(anEffect)
-        anEffect->deleteLater();
-      aWidget->setGraphicsEffect(NULL);
-    }
+    // If effect is the installed on a different widget, setGraphicsEffect() will
+    // remove the effect from the widget and install it on this widget.
+    // That's why we create a new effect for each widget
+    ModuleBase_Tools::setShadowEffect(aWidget, isHighlighted);
   }
 }
 
