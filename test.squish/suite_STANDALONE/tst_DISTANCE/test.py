@@ -9,7 +9,7 @@ def sketch():
     
     mouseClick(waitForObject(":OpenParts*_AppElements_ViewPort"), annotaion_point[0], annotaion_point[1], 0, Qt.LeftButton)
     waitFor("object.exists(':Distance.First object_QLineEdit')", 20000)
-    test.compare(str(findObject(":Distance.First object_QLineEdit").text), "SketchPoint_1/PointCoordinates")
+    test.compare(str(findObject(":Distance.First object_QLineEdit").text), "SketchPoint_1/PointCoordindates")
     waitFor("object.exists(':Distance.Second object_QLineEdit')", 20000)
     test.compare(str(findObject(":Distance.Second object_QLineEdit").text), "SketchLine_1")
     waitFor("object.exists(':Distance.ConstraintValue_ModuleBase_ParamSpinBox')", 20000)

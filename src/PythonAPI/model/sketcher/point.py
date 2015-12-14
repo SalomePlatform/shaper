@@ -12,7 +12,7 @@ class Point(Interface):
         
         # Initialize attributes of the feature
         self._point_data = geomDataAPI_Point2D(
-            self._feature.data().attribute("PointCoordinates")
+            self._feature.data().attribute("PointCoordindates")
             )
         self.setValue(x, y)
         self.execute()

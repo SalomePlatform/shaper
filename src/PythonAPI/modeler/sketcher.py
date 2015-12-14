@@ -183,12 +183,12 @@ class Point():
     """Constructor"""
     ### Create the feature
     self.my = sketch.addFeature("SketchPoint")
-    geomDataAPI_Point2D( self.my.data().attribute("PointCoordinates") ).setValue(x, y)
+    geomDataAPI_Point2D( self.my.data().attribute("PointCoordindates") ).setValue(x, y)
     self.my.execute()
 
   def pointData (self):
     """Returns points attribute"""
-    return geomDataAPI_Point2D( self.my.data().attribute("PointCoordinates") )
+    return geomDataAPI_Point2D( self.my.data().attribute("PointCoordindates") )
 
   def result (self):
     """Returns result object"""
