@@ -124,6 +124,19 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
+@SET PLANEGCS_ROOT_DIR=%PDIR%\planegcs-0.16
+@SET PATH=%PLANEGCS_ROOT_DIR%\lib;%PATH%
+@REM -------------------------
+
+@REM -------------------------
+@SET EIGEN_ROOT_DIR=%PDIR%\eigen-3.2.7
+@REM -------------------------
+
+@REM -------------------------
+@SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
+@REM -------------------------
+
+@REM -------------------------
 @REM PTHREAD
 @SET PATH=%PDIR%\pthreads-2.9.1\lib;%PATH%
 @REM -------------------------
