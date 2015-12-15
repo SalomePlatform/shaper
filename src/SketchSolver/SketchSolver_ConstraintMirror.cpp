@@ -17,9 +17,10 @@ void SketchSolver_ConstraintMirror::getAttributes(
     std::vector<EntityWrapperPtr>& theBaseEntities,
     std::vector<EntityWrapperPtr>& theMirrorEntities)
 {
-  AttributeRefAttrPtr aMirLineAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  if (!aMirLineAttr || !aMirLineAttr->isInitialized() || !aMirLineAttr->isObject()) {
+  AttributePtr aMirLineAttr = myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A());
+  AttributeRefAttrPtr aMirLineRefAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aMirLineAttr);
+  if (!aMirLineRefAttr || !aMirLineRefAttr->isInitialized() || !aMirLineRefAttr->isObject()) {
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
     return;
   }

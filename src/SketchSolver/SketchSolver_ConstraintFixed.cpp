@@ -119,15 +119,16 @@ void SketchSolver_ConstraintFixed::getAttributes(
   } else if (myBaseConstraint) {
     // Constraint Fixed is added by user.
     // Get the attribute of constraint (it should be alone in the list of constraints).
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        myBaseConstraint->attribute(SketchPlugin_ConstraintRigid::ENTITY_A()));
+    AttributePtr anAttr = myBaseConstraint->attribute(SketchPlugin_ConstraintRigid::ENTITY_A());
+    AttributeRefAttrPtr aRefAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
     if (!aRefAttr || !aRefAttr->isInitialized()) {
       myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
       return;
     }
 
-    myStorage->update(aRefAttr, myGroupID);
-    aSolverEntity = myStorage->entity(aRefAttr);
+    myStorage->update(anAttr, myGroupID);
+    aSolverEntity = myStorage->entity(anAttr);
   } else
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
 
