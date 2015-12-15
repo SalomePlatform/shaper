@@ -92,6 +92,11 @@ Q_OBJECT
   /// By default it returns true
   virtual bool canSetValue() const { return true; };
 
+  //! Returns the widget error, get it from the attribute validator and state of the widget
+  //! If the feature is correct, it returns an empty value
+  //! \return string value
+  QString getError() const;
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values

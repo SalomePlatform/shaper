@@ -11,6 +11,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -77,6 +78,35 @@ QString ModuleBase_ModelWidget::getValueStateError() const
       }
     }
   }
+  return anError;
+}
+
+QString ModuleBase_ModelWidget::getError() const
+{
+  QString anError;
+
+  if (!feature().get())
+    return anError;
+
+  std::string anAttributeID = attributeID();
+  AttributePtr anAttribute = feature()->attribute(anAttributeID);
+  if (!anAttribute.get())
+    return anError;
+
+  std::string aValidatorID;
+  std::string anErrorMsg;
+
+  static ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+  if (!aValidators->validate(anAttribute, aValidatorID, anErrorMsg)) {
+    if (anErrorMsg.empty())
+      anErrorMsg = "unknown error.";
+    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg;
+  }
+
+  anError = QString::fromStdString(anErrorMsg);
+  if (anError.isEmpty())
+    anError = getValueStateError();
+
   return anError;
 }
 

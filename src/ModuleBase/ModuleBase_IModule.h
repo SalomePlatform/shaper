@@ -191,11 +191,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   //! \return string value
   virtual QString getFeatureError(const FeaturePtr& theFeature);
 
-  //! Returns the widget error, get it from the attribute validator and state of the widget
-  //! If the feature is correct, it returns an empty value
-  //! \return string value
-  virtual QString getWidgetError(ModuleBase_ModelWidget* theWidget);
-
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
 

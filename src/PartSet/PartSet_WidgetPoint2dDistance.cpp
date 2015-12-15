@@ -95,7 +95,10 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
 
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
   setPoint(feature(), aPnt);
-  emit focusOutWidget(this);
+
+  // if the validator of the control returns false, focus should not be switched
+  if (getError().isEmpty())
+    emit focusOutWidget(this);
 }
 
 void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)

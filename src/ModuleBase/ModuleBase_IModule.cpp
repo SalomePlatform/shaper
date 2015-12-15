@@ -12,7 +12,6 @@
 
 #include <Events_Loop.h>
 
-#include <ModelAPI_Validator.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
@@ -84,35 +83,6 @@ const char* toString(ModelAPI_ExecState theExecState)
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   return ModelAPI_Tools::getFeatureError(theFeature).c_str();
-}
-
-QString ModuleBase_IModule::getWidgetError(ModuleBase_ModelWidget* theWidget)
-{
-  QString anError;
-
-  if (!theWidget || !theWidget->feature().get())
-    return anError;
-
-  std::string anAttributeID = theWidget->attributeID();
-  AttributePtr anAttribute = theWidget->feature()->attribute(anAttributeID);
-  if (!anAttribute.get())
-    return anError;
-
-  std::string aValidatorID;
-  std::string anErrorMsg;
-
-  static ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
-  if (!aValidators->validate(anAttribute, aValidatorID, anErrorMsg)) {
-    if (anErrorMsg.empty())
-      anErrorMsg = "unknown error.";
-    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg;
-  }
-
-  anError = QString::fromStdString(anErrorMsg);
-  if (anError.isEmpty())
-    anError = theWidget->getValueStateError();
-
-  return anError;
 }
 
 void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,

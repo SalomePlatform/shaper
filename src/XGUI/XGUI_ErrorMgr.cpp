@@ -65,7 +65,8 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
     QString aWidgetError = "";
     if (!isApplyEnabledByActiveWidget) {
       anError = myWorkshop->module()->getFeatureError(theFeature);
-      aWidgetError = myWorkshop->module()->getWidgetError(anActiveWidget);
+      if (anActiveWidget)
+        aWidgetError = anActiveWidget->getError();
       if (anError.isEmpty())
         anError = aWidgetError;
     }
@@ -77,9 +78,11 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
 void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
 {
   QString anError = myWorkshop->module()->getFeatureError(theFeature);
-  if (anError.isEmpty())
-    anError = myWorkshop->module()->getWidgetError(activeWidget());
-
+  if (anError.isEmpty()) {
+    ModuleBase_ModelWidget* anActiveWidget = activeWidget();
+    if (anActiveWidget)
+      anError = anActiveWidget->getError();
+  }
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   if (workshop()->isFeatureOfNested(theFeature)) {
     QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
@@ -121,7 +124,7 @@ void XGUI_ErrorMgr::onWidgetChanged()
   if (!aModelWidget || !aModelWidget->feature().get())
     return;
 
-  QString aWidgetError = myWorkshop->module()->getWidgetError(aModelWidget);
+  QString aWidgetError = aModelWidget->getError();
   updateToolTip(aModelWidget, aWidgetError);
 }
 
