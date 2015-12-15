@@ -1,176 +1,98 @@
 #include <SketchSolver_ConstraintMovement.h>
 #include <SketchSolver_Error.h>
-#include <SketchSolver_Group.h>
+#include <SketchSolver_Manager.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 
-SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(FeaturePtr theFeature)
-  : SketchSolver_ConstraintRigid(theFeature)
-{
-  process();
-}
+#include <GeomDataAPI_Point2D.h>
+
 
 void SketchSolver_ConstraintMovement::process()
 {
   cleanErrorMsg();
-  if (!myBaseFeature || !myStorage || myGroup == 0) {
-    /// TODO: Put error message here
+  if (!myBaseFeature || !myStorage || myGroupID == GID_UNKNOWN) {
+    // Not enough parameters are initialized
     return;
   }
-  if (!mySlvsConstraints.empty()) // some data is changed, update constraint
-    update(myBaseConstraint);
 
-  double aValue;
-  std::vector<Slvs_hEntity> anEntities;
-  bool isFullyMoved;
-  getAttributes(aValue, anEntities, isFullyMoved);
-  if (!myErrorMsg.empty() || (myFeatureMap.empty() && myAttributeMap.empty()))
+  ParameterWrapperPtr aValue;
+  getAttributes(aValue, myMovedEntities);
+  if (!myErrorMsg.empty() || myMovedEntities.empty()) {
+    // Nothing to move, clear the feature to avoid changing its group
+    // after removing the Movement constraint.
+    myBaseFeature = FeaturePtr();
     return;
-
-  if (isFullyMoved)
-    fixFeature();
-  else {
-    std::vector<Slvs_hEntity>::iterator anEntIt = anEntities.begin();
-    for (; anEntIt != anEntities.end(); ++anEntIt)
-      fixPoint(*anEntIt);
   }
+
+  std::vector<EntityWrapperPtr>::iterator anEntIt = myMovedEntities.begin();
+  for (; anEntIt != myMovedEntities.end(); ++anEntIt)
+    fixFeature(*anEntIt);
+}
+
+
+static std::list<EntityWrapperPtr> movedEntities(
+    EntityWrapperPtr theOld, StoragePtr theOldStorage,
+    EntityWrapperPtr theNew, StoragePtr theNewStorage)
+{
+  bool isFullyMoved = true;
+  std::list<EntityWrapperPtr> aMoved;
+  if (theOld->isEqual(theNew))
+    return aMoved;
+
+  std::list<EntityWrapperPtr> anOldSubs = theOld->subEntities();
+  std::list<EntityWrapperPtr> aNewSubs = theNew->subEntities();
+  std::list<EntityWrapperPtr>::const_iterator anOldIt = anOldSubs.begin();
+  std::list<EntityWrapperPtr>::const_iterator aNewIt = aNewSubs.begin();
+  for (; anOldIt != anOldSubs.end() && aNewIt != aNewSubs.end(); ++anOldIt, ++aNewIt) {
+    std::list<EntityWrapperPtr> aMovedSubs = movedEntities(
+        *anOldIt, theOldStorage, *aNewIt, theNewStorage);
+    if (aMovedSubs.size() != 1 || aMovedSubs.front() != *anOldIt)
+      isFullyMoved = false;
+    aMoved.insert(aMoved.end(), aMovedSubs.begin(), aMovedSubs.end());
+  }
+  if (isFullyMoved) {
+    aMoved.clear();
+    aMoved.push_back(theOld);
+  }
+  return aMoved;
 }
 
 
 void SketchSolver_ConstraintMovement::getAttributes(
-    double& theValue,
-    std::vector<Slvs_hEntity>& theAttributes,
-    bool& theIsFullyMoved)
+    ParameterWrapperPtr& theValue,
+    std::vector<EntityWrapperPtr>& theAttributes)
 {
-  bool isComplexFeature = false;
-  theValue = 0.0;
-  theIsFullyMoved = true;
-  int aType = SLVS_E_UNKNOWN; // type of created entity
-  Slvs_hEntity anEntityID = SLVS_E_UNKNOWN;
-  Slvs_hEntity anEntMaxID = myStorage->entityMaxID();
-  anEntityID = myGroup->getFeatureId(myBaseFeature);
-  if (anEntityID == SLVS_E_UNKNOWN) {
-    anEntityID = changeEntity(myBaseFeature, aType);
-    if (anEntityID == SLVS_E_UNKNOWN) {
-      myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
-      return;
-    }
-
-    // Check the entity is complex
-    Slvs_Entity anEntity = myStorage->getEntity(anEntityID);
-    if (anEntity.point[0] != SLVS_E_UNKNOWN)
-      isComplexFeature = true;
-    else // simple entity
-      theAttributes.push_back(anEntityID);
-  }
-  else {
-     myFeatureMap[myBaseFeature] = anEntityID;
-     isComplexFeature = true;
-  }
-
-  int aNbOutOfGroup = 0;
-  if (isComplexFeature) {
-     std::list<AttributePtr> aPoints =
-        myBaseFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-     std::list<AttributePtr>::iterator anIt = aPoints.begin();
-     for (; anIt != aPoints.end(); ++anIt) {
-       std::map<AttributePtr, Slvs_hEntity>::const_iterator aFound = myAttributeMap.find(*anIt);
-       Slvs_hEntity anAttr = aFound != myAttributeMap.end() ?
-                             aFound->second : myGroup->getAttributeId(*anIt);
-       Slvs_Entity anAttrEnt = myStorage->getEntity(anAttr);
-
-       // Check the attribute changes coordinates
-       std::shared_ptr<GeomDataAPI_Point2D> aPt =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-       // Check the entity is not lying in the current group or it is not moved
-       if (anAttr == SLVS_E_UNKNOWN || anAttrEnt.group != myGroup->getId() ||
-           (anAttr <= anEntMaxID && !isMoved(aPt, anAttrEnt))) {
-         if (anAttrEnt.group == SLVS_G_OUTOFGROUP)
-           ++aNbOutOfGroup;
-         theIsFullyMoved = false;
-       }
-       else {
-         theAttributes.push_back(anAttr);
-         // update point coordinates
-         Slvs_Entity anAttrEnt = myStorage->getEntity(anAttr);
-         double aNewPos[2] = {aPt->x(), aPt->y()};
-         for (int i = 0; i < 2; i++) {
-           Slvs_Param aParam = myStorage->getParameter(anAttrEnt.param[i]);
-           aParam.val = aNewPos[i];
-           myStorage->updateParameter(aParam);
-         }
-       }
-     }
-  }
-
-  // Additional checking, which leads to fix whole feature, if it has fixed points
-  if (!theIsFullyMoved) {
-    Slvs_Entity aFeature = myStorage->getEntity(anEntityID);
-    int aNbPoints = 4;
-    while (aNbPoints > 0 && aFeature.point[aNbPoints-1] == SLVS_E_UNKNOWN)
-      --aNbPoints;
-    if (aNbPoints == aNbOutOfGroup + (int)theAttributes.size()) {
-      theIsFullyMoved = true;
-      return;
-    }
-  }
-
-  // Leave only points which are used in constraints
-  if (myStorage->isUsedByConstraints(anEntityID))
+  // There will be build entities, according to the fixed feature, in the separate storage
+  // to check whether any point is moved
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  StoragePtr anOtherStorage = aBuilder->createStorage(myGroupID);
+  anOtherStorage->setSketch(myStorage->sketch());
+  if (!anOtherStorage->update(myBaseFeature, myGroupID))
     return;
-  std::vector<Slvs_hEntity>::iterator anIt = theAttributes.begin();
-  while (anIt != theAttributes.end()) {
-    if (myStorage->isUsedByConstraints(*anIt))
-      ++anIt;
-    else {
-      int aShift = anIt - theAttributes.begin();
-      theAttributes.erase(anIt);
-      anIt = theAttributes.begin() + aShift;
+  EntityWrapperPtr aNewEntity = anOtherStorage->entity(myBaseFeature);
+  EntityWrapperPtr anOldEntity = myStorage->entity(myBaseFeature);
+
+  std::list<EntityWrapperPtr> aMoved;
+  if (aNewEntity && anOldEntity)
+    aMoved = movedEntities(anOldEntity, myStorage, aNewEntity, anOtherStorage);
+  else {
+    // get attributes moved
+    std::list<AttributePtr> anAttrList =
+        myBaseFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+    std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
+    for (; anIt != anAttrList.end(); ++anIt) {
+      aNewEntity = anOtherStorage->entity(*anIt);
+      anOldEntity = myStorage->entity(*anIt);
+      if (!aNewEntity || !anOldEntity)
+        continue;
+      std::list<EntityWrapperPtr> aMovedAttr = movedEntities(
+          anOldEntity, myStorage, aNewEntity, anOtherStorage);
+      aMoved.insert(aMoved.end(), aMovedAttr.begin(), aMovedAttr.end());
     }
   }
+  theAttributes.clear();
+  theAttributes.insert(theAttributes.begin(), aMoved.begin(), aMoved.end());
 }
-
-bool SketchSolver_ConstraintMovement::isMoved(
-    std::shared_ptr<GeomDataAPI_Point2D> thePoint, const Slvs_Entity& theEntity)
-{
-  double aDeltaX = myStorage->getParameter(theEntity.param[0]).val;
-  double aDeltaY = myStorage->getParameter(theEntity.param[1]).val;
-  aDeltaX -= thePoint->x();
-  aDeltaY -= thePoint->y();
-  return aDeltaX * aDeltaX + aDeltaY * aDeltaY >= tolerance * tolerance;
-}
-
-void SketchSolver_ConstraintMovement::fixFeature()
-{
-  Slvs_hEntity anEntID = fixedEntity();
-
-  std::string aKind;
-  std::map<FeaturePtr, Slvs_hEntity>::const_iterator aFIt = myFeatureMap.begin();
-  for (; aFIt != myFeatureMap.end() && aKind.empty(); ++aFIt)
-    if (aFIt->second == anEntID)
-      aKind = aFIt->first->getKind();
-  std::map<AttributePtr, Slvs_hEntity>::const_iterator anAtIt = myAttributeMap.begin();
-  for (; anAtIt != myAttributeMap.end() && aKind.empty(); ++anAtIt)
-    if (anAtIt->second == anEntID)
-      aKind = anAtIt->first->attributeType();
-
-  if (aKind == SketchPlugin_Line::ID()) {
-    Slvs_Entity aLine = myStorage->getEntity(anEntID);
-    fixLine(aLine);
-  }
-  else if (aKind == SketchPlugin_Arc::ID()) {
-    Slvs_Entity anArc = myStorage->getEntity(anEntID);
-    fixArc(anArc);
-  }
-  else if (aKind == SketchPlugin_Circle::ID()) {
-    Slvs_Entity aCirc = myStorage->getEntity(anEntID);
-    fixCircle(aCirc);
-  }
-  else if (aKind == SketchPlugin_Point::ID() || aKind == GeomDataAPI_Point2D::typeId()) {
-    fixPoint(anEntID);
-  }
-}
-

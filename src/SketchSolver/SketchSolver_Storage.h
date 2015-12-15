@@ -1,218 +1,216 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:    SketchSolver_Storage.h
-// Created: 18 Mar 2015
+// Created: 30 Nov 2015
 // Author:  Artem ZHIDKOV
 
 #ifndef SketchSolver_Storage_H_
 #define SketchSolver_Storage_H_
 
-#include "SketchSolver.h"
-#include <SketchSolver_Solver.h>
+#include <SketchSolver.h>
+#include <SketchSolver_IConstraintWrapper.h>
+#include <SketchSolver_IEntityWrapper.h>
+#include <SketchSolver_IParameterWrapper.h>
+#include <SketchSolver_ISolver.h>
 
-#include <list>
-#include <memory>
-#include <set>
-#include <vector>
+#include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Feature.h>
+#include <SketchPlugin_Constraint.h>
 
 /** \class   SketchSolver_Storage
  *  \ingroup Plugins
- *  \brief   Contains all necessary data in SolveSpace format to solve a single group of constraints
+ *  \brief   Interface to map SketchPlugin features to the entities of corresponding solver.
  */
 class SketchSolver_Storage
 {
-public:
+private:
   SketchSolver_Storage();
+  SketchSolver_Storage(const SketchSolver_Storage&);
+  SketchSolver_Storage& operator=(const SketchSolver_Storage&);
 
-  /** \brief Add new parameter to the current group
-   *  \param[in] theParam  SolveSpace parameter
-   *  \return the ID of added parameter
-   */
-  Slvs_hParam addParameter(const Slvs_Param& theParam);
-  /** \brief Updates parameter in the current group. If the ID of parameter is zero, the new item will be added
-   *  \param[in] theParam  SolveSpace parameter
-   *  \return the ID of updated/added parameter
-   */
-  Slvs_hParam updateParameter(const Slvs_Param& theParam);
-  /** \brief Removes the parameter by its ID
-   *  \param[in] theParamID  index of parameter to be removed
-   *  \return \c true if the parameter was successfully removed
-   */
-  bool removeParameter(const Slvs_hParam& theParamID);
-  /// \brief Returns the parameter by its ID
-  const Slvs_Param& getParameter(const Slvs_hParam& theParamID) const;
+public:
+  SketchSolver_Storage(const GroupID& theGroup)
+    : myGroupID(theGroup),
+      myNeedToResolve(false)
+  {}
 
-  /** \brief Add new entity to the current group
-   *  \param[in] theEntity  SolveSpace entity
-   *  \return the ID of added entity
-   */
-  Slvs_hEntity addEntity(const Slvs_Entity& theEntity);
-  /** \brief Updates entity in the current group. If the ID of entity is zero, the new item will be added
-   *  \param[in] theEntity  SolveSpace entity
-   *  \return the ID of updated/added entity
-   */
-  Slvs_hEntity updateEntity(const Slvs_Entity& theEntity);
-  /** \brief Removes the entity by its ID. All parameters used in this entity,
-   *         and not used in other constraints, will be removed too.
-   *  \param[in] theEntityID  index of entity to be removed
-   *  \return \c true if the entity was successfully removed
-   */
-  bool removeEntity(const Slvs_hEntity& theEntityID);
-  /** \brief Remove all entities, which are not used in constraints
-   */
-  void removeUnusedEntities();
-  /// \brief Returns the entity by its ID
-  const Slvs_Entity& getEntity(const Slvs_hEntity& theEntityID) const;
-  /// \brief Makes a full copy of the given entity
-  Slvs_hEntity copyEntity(const Slvs_hEntity& theCopied);
-  /// \brief Copy one entity to another
-  void copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo);
-  /// \brief Check the entity is used in constraints
-  bool isUsedByConstraints(const Slvs_hEntity& theEntityID) const;
-  /// \brief Returns maximal ID of entities in this storage
-  const Slvs_hEntity& entityMaxID() const
-  { return myEntityMaxID; }
+  /// \brief Change mapping between constraint from SketchPlugin and
+  ///        a constraint applicable for corresponding solver.
+  /// \param theConstraint       [in]   original SketchPlugin constraint
+  /// \param theSolverConstraint [in]   solver's constraints
+  SKETCHSOLVER_EXPORT void addConstraint(ConstraintPtr        theConstraint,
+                                         ConstraintWrapperPtr theSolverConstraints);
+  /// \brief Change mapping between constraint from SketchPlugin and
+  ///        the list of constraints applicable for corresponding solver.
+  /// \param theConstraint        [in]   original SketchPlugin constraint
+  /// \param theSolverConstraints [in]   list of solver's constraints
+  SKETCHSOLVER_EXPORT
+    void addConstraint(ConstraintPtr                   theConstraint,
+                       std::list<ConstraintWrapperPtr> theSolverConstraints);
 
-  /// \brief Verifies the current point or another coincident one is fixed
-  /// \param[in]  thePointID  entity to be checked fixed
-  /// \param[out] theFixed    ID of constraint
-  /// \param[in]  theAccurate if \c true, the calculation will be made for all type of constraints,
-  ///                         if \c false, only the point is verified
-  /// \return \c true if the point is fixed
-  bool isPointFixed(const Slvs_hEntity& thePointID, Slvs_hConstraint& theFixed, bool theAccurate = false) const;
-  /// \brief Verifies the current entity is fully fixed (may not be changed by constraints)
-  /// \param[in] theEntityID entity to be checked fixed
-  /// \param[in] theAccurate if \c true, the calculation will be made for all type of constraints,
-  ///                        if \c false, only points are verified
-  /// \return \c true if the entity is fixed
-  bool isEntityFixed(const Slvs_hEntity& theEntityID, bool theAccurate = false) const;
+  /// \brief Convert feature to the form applicable for specific solver and map it
+  /// \param theFeature [in]  feature to convert
+  /// \param theGroup   [in]  id of the group where the feature should be placed
+  /// \return \c true if the feature has been created or updated
+  SKETCHSOLVER_EXPORT bool update(FeaturePtr theFeature, const GroupID& theGroup = GID_UNKNOWN);
+  /// \brief Convert attribute to the form applicable for specific solver and map it
+  /// \param theFeature [in]  feature to convert
+  /// \return \c true if the attribute has been created or updated
+  SKETCHSOLVER_EXPORT bool update(AttributePtr theAttribute, const GroupID& theGroup = GID_UNKNOWN);
 
-  /** \brief Add new constraint to the current group
-   *  \param[in] theConstraint   SolveSpace's constraint
-   *  \return the ID of added constraint
-   */
-  Slvs_hConstraint addConstraint(const Slvs_Constraint& theConstraint);
-  /** \brief Updates constraint in the current group.
-   *         If the ID of constraint is zero, the new item will be added
-   *  \param[in] theConstraint  SolveSpace constraint
-   *  \return the ID of updated/added constraint
-   */
-  Slvs_hConstraint updateConstraint(const Slvs_Constraint& theConstraint);
-  /** \brief Removes the constraint by its ID. All entities and parameters depending on this
-   *         constraint, which are not used in other constraints, will be removed too.
-   *  \param[in] theConstraintID  index of constraint to be removed
-   *  \return \c true if the constraint was successfully removed
-   */
-  bool removeConstraint(const Slvs_hConstraint& theConstraintID);
-  /// \brief Returns the constraint by its ID
-  const Slvs_Constraint& getConstraint(const Slvs_hConstraint& theConstraintID) const;
-  /// \brief Returns list of constraints of specified type
-  std::list<Slvs_Constraint> getConstraintsByType(int theConstraintType) const;
-  /// \brief Returns quantity of constraints in this storage
-  size_t nbConstraints() const
-  { return myConstraints.size(); }
+  /// \brief Returns constraint related to corresponding constraint
+  SKETCHSOLVER_EXPORT
+    const std::list<ConstraintWrapperPtr>& constraint(const ConstraintPtr& theConstraint) const;
 
-  /// \brief Attach constraint SLVS_C_WHERE_DRAGGED to this storage. It need to make precise calculations
-  void addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID);
+  /// \brief Returns entity related to corresponding feature
+  SKETCHSOLVER_EXPORT const EntityWrapperPtr& entity(const FeaturePtr& theFeature) const;
+  /// \brief Returns entity related to corresponding attribute
+  SKETCHSOLVER_EXPORT const EntityWrapperPtr& entity(const AttributePtr& theAttribute) const;
 
-  /// \brief Add transient constraint
-  void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);
-  /// \brief Remove all transient constraints
-  void removeTemporaryConstraints();
-  /// \brief Remove one temporary constraint. Preferable to remove the points under Point-on-Line constraint
-  /// \return Number of remaining temporary constraints
-  int deleteTemporaryConstraint();
-  /// \brief Checks the constraint is temporary
-  bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
-  /// \brief Number of temporary constraints
-  int numberTemporary() const
-  { return (int)myTemporaryConstraints.size(); }
+////  /// \brief Returns parameter related to corresponding scalar attribute
+////  SKETCHSOLVER_EXPORT
+////    const ParameterWrapperPtr& parameter(const AttributeDoublePtr& theAttribute) const;
+
+  /// \brief Return parsed sketch entity
+  const EntityWrapperPtr& sketch() const;
+  /// \brief Set parsed sketch entity.
+  /// Be careful, this method does not update fields of the storage specific for the solver.
+  /// Does not update if the sketch already exists.
+  void setSketch(const EntityWrapperPtr& theSketch);
+
+  /// \brief Mark two points as coincident
+  virtual void addCoincidentPoints(EntityWrapperPtr theMaster, EntityWrapperPtr theSlave) = 0;
+
+  /// \brief Shows the storage has any constraint twice
+  virtual bool hasDuplicatedConstraint() const = 0;
+
+  /// \brief Removes constraint from the storage
+  /// \return \c true if the constraint and all its parameters are removed successfully
+  virtual bool removeConstraint(ConstraintPtr theConstraint) = 0;
+  /// \brief Removes feature from the storage
+  /// \return \c true if the feature and its attributes are removed successfully;
+  ///         \c false if the feature or any it attribute is used by remaining constraints.
+  virtual bool removeEntity(FeaturePtr theFeature) = 0;
+  /// \brief Removes attribute from the storage
+  /// \return \c true if the attribute is not used by remaining features and constraints
+  virtual bool removeEntity(AttributePtr theAttribute) = 0;
+
+  /// \brief Remove all features became invalid
+  SKETCHSOLVER_EXPORT void removeInvalidEntities();
+
+  /// \brief Mark specified constraint as temporary
+  virtual void setTemporary(ConstraintPtr theConstraint) = 0;
+  /// \brief Returns number of temporary constraints
+  virtual size_t nbTemporary() const = 0;
+  /// \brief Remove temporary constraints
+  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
+  /// \return number of remaining temporary constraints
+  virtual size_t removeTemporary(size_t theNbConstraints = 1) = 0;
+
+  /// \brief Check whether the feature or its attributes are used by this storage
+  /// \param theFeature [in]  feature to be checked
+  /// \return \c true if the feature interacts with the storage
+  bool isInteract(const FeaturePtr& theFeature) const;
+  /// \brief Check whether the attribute is used by this storage
+  /// \param theAttribute [in]  attribute to be checked
+  /// \return \c true if the attribute interacts with the storage
+  bool isInteract(const AttributePtr& theAttribute) const;
+
+  /// \brief Check the features is not removed
+  bool isConsistent() const;
 
   /// \brief Shows the sketch should be resolved
-  bool isNeedToResolve();
-
-  /// \brief Shows the storage has the same constraint twice
-  bool hasDuplicatedConstraint() const
-  { return myDuplicatedConstraint; }
-
+  virtual bool isNeedToResolve()
+  { return myNeedToResolve; }
   /// \brief Changes the flag of group to be resolved
   void setNeedToResolve(bool theFlag)
   { myNeedToResolve = theFlag; }
 
-  /// \brief Returns lists of removed elements
-  void getRemoved(std::set<Slvs_hParam>& theParameters,
-                  std::set<Slvs_hEntity>& theEntities,
-                  std::set<Slvs_hConstraint>& theConstraints);
+  /// \brief Initialize solver by constraints, entities and parameters
+  virtual void initializeSolver(SolverPtr theSolver) = 0;
 
-  /// \brief Initialize constraint solver by the entities collected by current storage
-  void initializeSolver(SketchSolver_Solver& theSolver);
+  /// \brief Update SketchPlugin features after resolving constraints
+  /// \param theFixedOnly [in]  if \c true the fixed points will be updated only
+  virtual void refresh(bool theFixedOnly = false) const = 0;
+
+  /// \brief Check if some parameters or entities are returned
+  ///        to the current group after removing temporary constraints
+  virtual void verifyFixed() = 0;
+
+  /// \brief Calculate point on theBase entity. Value theCoeff is in [0.0 .. 1.0] and
+  ///        shows the distance from the start point.
+  virtual EntityWrapperPtr calculateMiddlePoint(EntityWrapperPtr theBase,
+                                                double theCoeff) = 0;
+
+protected:
+  /// \brief Change mapping feature from SketchPlugin and
+  ///        the entity applicable for corresponding solver.
+  /// \param theFeature      [in]  original SketchPlugin feature
+  /// \param theSolverEntity [in]  solver's entity, created outside
+  SKETCHSOLVER_EXPORT
+    void addEntity(FeaturePtr       theFeature,
+                   EntityWrapperPtr theSolverEntity);
+
+  /// \brief Change mapping attribute of a feature and the entity applicable for corresponding solver.
+  /// \param theAttribute    [in]  original attribute
+  /// \param theSolverEntity [in]  solver's entity, created outside
+  SKETCHSOLVER_EXPORT
+    void addEntity(AttributePtr     theAttribute,
+                   EntityWrapperPtr theSolverEntity);
+
+////  /// \brief Change mapping scalar attribute and the parameter applicable for corresponding solver.
+////  /// \param theValue       [in]  original attribute
+////  /// \param theSolverParam [in]  solver's parameter, created outside
+////  SKETCHSOLVER_EXPORT
+////    void addParameter(AttributeDoublePtr  theValue,
+////                      ParameterWrapperPtr theSolverParam);
+
+  /// \brief Update constraint's data
+  /// \return \c true if any value is updated
+  virtual bool update(ConstraintWrapperPtr& theConstraint) = 0;
+  /// \brief Update entity's data
+  /// \return \c true if any value is updated
+  virtual bool update(EntityWrapperPtr& theEntity) = 0;
+  /// \brief Update parameter's data
+  /// \return \c true if the value of parameter is updated
+  virtual bool update(ParameterWrapperPtr& theParameter) = 0;
+
+  /// \brief Remove constraint
+  /// \return \c true if the constraint and all its parameters are removed successfully
+  virtual bool remove(ConstraintWrapperPtr theConstraint) = 0;
+  /// \brief Remove entity
+  /// \return \c true if the entity and all its parameters are removed successfully
+  virtual bool remove(EntityWrapperPtr theEntity) = 0;
+  /// \brief Remove parameter
+  /// \return \c true if the parameter has been removed
+  virtual bool remove(ParameterWrapperPtr theParameter) = 0;
+
+  /// \brief Update the group for the given entity, its sub-entities and parameters
+  virtual void changeGroup(EntityWrapperPtr theEntity, const GroupID& theGroup) = 0;
+  /// \brief Update the group for the given parameter
+  virtual void changeGroup(ParameterWrapperPtr theParam, const GroupID& theGroup) = 0;
+
+  /// \brief Block or unblock events when refreshing features
+  SKETCHSOLVER_EXPORT void blockEvents(bool isBlocked) const;
 
 private:
-  /// \brief Store coincident points
-  void addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
-  /// \brief Remove point from lists of coincidence
-  void removeCoincidentPoint(const Slvs_hEntity& thePoint);
-  /// \brief Remove point-point coincidence
-  void removeCoincidence(const Slvs_Constraint& theCoincidence);
+  /// \brief Find the normal of the sketch
+  EntityWrapperPtr getNormal() const;
 
-public:
-  /// \brief Check two points are coincident
-  bool isCoincident(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
+protected:
+  GroupID myGroupID; ///< identifier of the group, this storage belongs to
 
-  /// \brief Check two points are coincident or have same coordinates
-  bool isEqual(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
-
-  /// \brief Check the entity is horizontal of vertical
-  bool isAxisParallel(const Slvs_hEntity& theEntity) const;
-
-  /// \brief Verifies the entity is used in any equal constraint
-  /// \param[in]  theEntity entity to be found
-  /// \param[out] theEqual  constraint, which uses the entity
-  /// \return \c true, if the Equal constrait is found
-  bool isUsedInEqual(const Slvs_hEntity& theEntity, Slvs_Constraint& theEqual) const;
-
-  /// \brief Fixes specified entity
-  /// \param theEntity  ID of the entity to be fixed
-  /// \return List of created constraints
-  std::vector<Slvs_hConstraint> fixEntity(const Slvs_hEntity& theEntity);
-
-private:
-  /// \brief Fixes specified point
-  /// \param [in]  thePoint    point to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixPoint(const Slvs_Entity& thePoint, std::vector<Slvs_hConstraint>& theCreated);
-  /// \brief Fixes specified line
-  /// \param [in]  theLine     line to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixLine(const Slvs_Entity& theLine, std::vector<Slvs_hConstraint>& theCreated);
-  /// \brief Fixes specified circle
-  /// \param [in]  theCircle   circle to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixCircle(const Slvs_Entity& theCircle, std::vector<Slvs_hConstraint>& theCreated);
-  /// \brief Fixes specified arc
-  /// \param [in]  theArc      arc to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixArc(const Slvs_Entity& theArc, std::vector<Slvs_hConstraint>& theCreated);
-
-private:
-  Slvs_hParam myParamMaxID; ///< current parameter index (may differs with the number of parameters)
-  std::vector<Slvs_Param> myParameters; ///< list of parameters used in the current group of constraints (sorted by the identifier)
-  Slvs_hEntity myEntityMaxID; ///< current entity index (may differs with the number of entities)
-  std::vector<Slvs_Entity> myEntities; ///< list of entities used in the current group of constraints (sorted by the identifier)
-  Slvs_hConstraint myConstrMaxID; ///< current constraint index (may differs with the number of constraints)
-  std::vector<Slvs_Constraint> myConstraints; ///< list of constraints used in the current group (sorted by the identifier)
-
-  std::vector< std::set<Slvs_hEntity> > myCoincidentPoints; ///< lists of coincident points
-  Slvs_hConstraint myFixed; ///< identifier of one of temporary constraints to fix separate point
+  /// map SketchPlugin constraint to a list of solver's constraints
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> > myConstraintMap;
+  /// map SketchPlugin feature to solver's entity
+  std::map<FeaturePtr, EntityWrapperPtr>                    myFeatureMap;
+  /// map attribute to solver's entity
+  std::map<AttributePtr, EntityWrapperPtr>                  myAttributeMap;
+////  /// map scalar attribute to solver's parameter
+////  std::map<AttributeDoublePtr, ParameterWrapperPtr>         myParametersMap;
 
   bool myNeedToResolve; ///< parameters are changed and group needs to be resolved
-  bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
-
-  std::set<Slvs_hConstraint> myTemporaryConstraints; ///< list of transient constraints
-  std::set<Slvs_hParam> myRemovedParameters; ///< list of just removed parameters (cleared when returning to applicant)
-  std::set<Slvs_hEntity> myRemovedEntities; ///< list of just removed entities (cleared when returning to applicant)
-  std::set<Slvs_hConstraint> myRemovedConstraints; ///< list of just removed constraints (cleared when returning to applicant)
-  std::set<Slvs_hParam> myUpdatedParameters; ///< list of just updated parameters (cleared when isNeedToResolve() called)
 };
 
 typedef std::shared_ptr<SketchSolver_Storage> StoragePtr;

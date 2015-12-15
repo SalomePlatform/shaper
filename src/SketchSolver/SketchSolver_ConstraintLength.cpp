@@ -1,44 +1,26 @@
 #include <SketchSolver_ConstraintLength.h>
-#include <SketchSolver_Group.h>
 #include <SketchSolver_Error.h>
 
 
-void SketchSolver_ConstraintLength::process()
+void SketchSolver_ConstraintLength::getAttributes(
+    double& theValue,
+    std::vector<EntityWrapperPtr>& theAttributes)
 {
-  cleanErrorMsg();
-  if (!myBaseConstraint || !myStorage || myGroup == 0) {
-    /// TODO: Put error message here
-    return;
-  }
-  if (!mySlvsConstraints.empty()) // some data is changed, update constraint
-    update(myBaseConstraint);
-
-  double aValue;
-  std::vector<Slvs_hEntity> anEntities;
-  getAttributes(aValue, anEntities);
-  if (!myErrorMsg.empty())
-    return;
-
-  // Check the entity is a line
-  Slvs_Entity aLine = myStorage->getEntity(anEntities[2]);
-  if (aLine.type != SLVS_E_LINE_SEGMENT){
-    myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+  SketchSolver_Constraint::getAttributes(theValue, theAttributes);
+  if (!myErrorMsg.empty() || !theAttributes[2] || 
+      theAttributes[2]->type() != ENTITY_LINE) {
+    theAttributes.clear();
     return;
   }
 
-  Slvs_Constraint aConstraint = Slvs_MakeConstraint(SLVS_C_UNKNOWN, myGroup->getId(),
-      getType(), myGroup->getWorkplaneId(), aValue,
-      aLine.point[0], aLine.point[1], SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-  aConstraint.h = myStorage->addConstraint(aConstraint);
-  mySlvsConstraints.push_back(aConstraint.h);
-  adjustConstraint();
-}
+  // Get boundary points of line segment and create point-point distance constraint
+  std::list<EntityWrapperPtr> aSubs = theAttributes[2]->subEntities();
+  theAttributes.assign(theAttributes.size(), EntityWrapperPtr());
+  std::vector<EntityWrapperPtr>::iterator anAttrIt = theAttributes.begin();
+  std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
+  for (; aSubIt != aSubs.end(); ++aSubIt, ++anAttrIt)
+    *anAttrIt = *aSubIt;
 
-void SketchSolver_ConstraintLength::adjustConstraint()
-{
-  // No need to store the line, which length is constrained
-  // Upd: The line need to be stored to check that constraint
-  //      is changed/unchanged during modifications in GUI
-  //myFeatureMap.clear();
+  myType = CONSTRAINT_PT_PT_DISTANCE;
 }
 
