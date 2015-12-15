@@ -302,7 +302,7 @@ private:
   /// blocked flag of modification of the value state
   bool myIsValueStateBlocked;
 
-  friend ModuleBase_OperationFeature; // to call storeValue() by commit if value state is ModifiedInPP
+  friend class ModuleBase_OperationFeature; // to call storeValue() by commit if value state is ModifiedInPP
 };
 
 #endif
