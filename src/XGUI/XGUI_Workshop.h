@@ -399,15 +399,6 @@ private:
   /// the operation can be committed and do it if it returns true.
   void onAcceptActionClicked();
 
-  /// Listens the corresponded signal from operation manager and send it with the Ok
-  /// action to operation manager.
-  /// \param theEnabled an enabled state for the action
-  //void onValidationStateChanged(bool theEnabled);
-
-  //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
-  //        aOkAct,          SLOT(setEnabled(bool)));
-
-
  private:
    /// Init menu
   void initMenu();

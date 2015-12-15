@@ -163,8 +163,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onOperationCommitted(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
           SLOT(onOperationAborted(ModuleBase_Operation*)));
-  //connect(myOperationMgr, SIGNAL(validationStateChanged(bool)), 
-  //        myErrorMgr, SLOT(onValidationStateChanged()));
 
 #ifndef HAVE_SALOME
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
@@ -395,21 +393,6 @@ void XGUI_Workshop::onAcceptActionClicked()
     }
   }
 }
-
-//******************************************************
-/*void XGUI_Workshop::onValidationStateChanged(bool theEnabled)
-{
-  XGUI_OperationMgr* anOperationMgr = operationMgr();
-  if (anOperationMgr) {
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                    (anOperationMgr->currentOperation());
-    if (aFOperation) {
-      QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
-      myErrorMgr->updateActionState(anAction, aFOperation->feature(), theEnabled);
-    }
-  }
-}*/
-
 
 //******************************************************
 void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer)
@@ -1062,8 +1045,6 @@ void XGUI_Workshop::createDockWidgets()
 
   connect(myPropertyPanel, SIGNAL(enterClicked()),
           myOperationMgr,  SLOT(onProcessEnter()));
-  //connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
-  //        this, SLOT(onValidationStateChanged(bool)));
 }
 
 //******************************************************

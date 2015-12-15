@@ -34,10 +34,6 @@ public:
   /// \return Currently installed property panel
   ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
-public slots:
-  /// SLOT, that is called after the operation is validated and feature validation errors have changed.
-  //virtual void onValidationStateChanged() = 0;
-
 protected slots:
   /// Process values changed event for processing feature attribute validation errors.
   virtual void onWidgetChanged() = 0;

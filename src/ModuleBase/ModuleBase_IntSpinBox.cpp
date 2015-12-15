@@ -8,26 +8,9 @@
 #include <QKeyEvent>
 
 ModuleBase_IntSpinBox::ModuleBase_IntSpinBox(QWidget* theParent)
-: QSpinBox(theParent)//,
-  //myIsModified(false)
+: QSpinBox(theParent)
 {
-  //connect(this, SIGNAL(valueChanged(const QString&)), this, SLOT(onValueChanged(const QString&)));
 }
-
-/*void ModuleBase_IntSpinBox::onValueChanged(const QString& theValue)
-{
-  myIsModified = true;
-}
-
-bool ModuleBase_IntSpinBox::isModified() const
-{
-  return myIsModified;
-}
-
-void ModuleBase_IntSpinBox::clearModified()
-{
-  myIsModified = false;
-}*/
 
 void ModuleBase_IntSpinBox::keyPressEvent(QKeyEvent *theEvent)
 {

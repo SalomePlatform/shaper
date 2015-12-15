@@ -515,14 +515,10 @@ void PartSet_WidgetPoint2D::initializeValueByActivate()
 
 bool PartSet_WidgetPoint2D::processEnter()
 {
-  //bool isModified = myXSpin->isModified() || myYSpin->isModified();
   bool isModified = getValueState() == ModifiedInPP;
   if (isModified) {
-    bool isXModified = myXSpin->hasFocus();//myXSpin->isModified();
+    bool isXModified = myXSpin->hasFocus();
     emit valuesChanged();
-    //onValuesChanged();
-    //myXSpin->clearModified();
-    //myYSpin->clearModified();
     if (isXModified)
       myXSpin->selectAll();
     else

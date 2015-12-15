@@ -44,10 +44,6 @@ public:
   /// \param theFeature a feature
   void updateAcceptAllAction(const FeaturePtr& theFeature);
 
-public slots:
-  /// Reimplemented from ModuleBase_ErrorMgr::onValidationStateChanged().
-  //virtual void onValidationStateChanged();
-
 protected slots:
   /// Reimplemented from ModuleBase_ErrorMgr::onWidgetChanged().
   virtual void onWidgetChanged();

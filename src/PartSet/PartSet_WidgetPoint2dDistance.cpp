@@ -120,11 +120,9 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
 
 bool PartSet_WidgetPoint2dDistance::processEnter()
 {
-  //bool isModified = mySpinBox->isModified();
   bool isModified = getValueState() == ModifiedInPP;
   if (isModified) {
     emit valuesChanged();
-    //mySpinBox->clearModified();
     mySpinBox->selectAll();
   }
   return isModified;

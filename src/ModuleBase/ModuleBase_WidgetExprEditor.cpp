@@ -36,7 +36,7 @@
 #include <string>
 
 ExpressionEditor::ExpressionEditor(QWidget* theParent)
-: QPlainTextEdit(theParent), myCompletedAndSelected(false), myIsModified(false)
+: QPlainTextEdit(theParent), myCompletedAndSelected(false)
 {
   myCompleter = new QCompleter(this);
   myCompleter->setWidget(this);
@@ -114,8 +114,6 @@ void ExpressionEditor::performCompletion(const QString& theCompletionPrefix)
 
 void ExpressionEditor::keyPressEvent(QKeyEvent* theEvent)
 {
-  bool anIsModified = myIsModified;
-
   if (myCompletedAndSelected && handledCompletedAndSelected(theEvent))
     return;
   myCompletedAndSelected = false;
@@ -173,16 +171,6 @@ QString ExpressionEditor::placeHolderText() const
   return myPlaceHolderText;
 }
 
-bool ExpressionEditor::isModified() const
-{
-  return myIsModified;
-}
-
-void ExpressionEditor::clearModified()
-{
-  myIsModified = false;
-}
-
 void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
 {
   QPlainTextEdit::paintEvent( theEvent );
@@ -214,7 +202,6 @@ void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
 
 void ExpressionEditor::onTextChanged()
 {
-  myIsModified = true;
   emit valueModified();
 }
 
@@ -314,11 +301,9 @@ QList<QWidget*> ModuleBase_WidgetExprEditor::getControls() const
 
 bool ModuleBase_WidgetExprEditor::processEnter()
 {
-  //bool isModified = myEditor->isModified();
   bool isModified = getValueState() == ModifiedInPP;
   if (isModified) {
     emit valuesChanged();
-    //myEditor->clearModified();
     myEditor->selectAll();
   }
   return isModified;

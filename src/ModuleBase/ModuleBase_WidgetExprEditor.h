@@ -45,12 +45,6 @@ class ExpressionEditor: public QPlainTextEdit
   /// Returns placeholder list
   QString placeHolderText() const;
 
-  /// Returns true if the current value is modified by has not been applyed yet
-  bool isModified() const;
-
-  /// Clears modified state
-  void clearModified();
-
  public slots:
   /// Insert additional string for completion
   /// \param theCompletion a string to insert
@@ -92,9 +86,6 @@ private:
   QCompleter* myCompleter;
   bool myCompletedAndSelected;
   QString myPlaceHolderText;
-
-  /// Boolean value whether the spin box content is modified
-  bool myIsModified;
 };
 
 /**

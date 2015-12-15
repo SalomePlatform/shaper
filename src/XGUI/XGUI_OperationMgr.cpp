@@ -221,7 +221,6 @@ void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
   if (aFOperation) {
     workshop()->errorMgr()->updateActions(aFOperation->feature());
   }
-  //emit validationStateChanged(theEnabled);
 }
 
 void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperation)
@@ -553,20 +552,6 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
     case Qt::Key_Return:
     case Qt::Key_Enter: {
       isAccepted = onProcessEnter();
-      /*ModuleBase_Operation* aOperation = currentOperation();
-      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-      ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-      if (!aActiveWgt || !aActiveWgt->processEnter()) {
-        if (!myWorkshop->module()->processEnter(aActiveWgt ? aActiveWgt->attributeID() : "")) {
-          ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
-          if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
-            emit keyEnterReleased();
-            commitOperation();
-          }
-          else
-            isAccepted = false;
-        }
-      }*/
     }
     break;
     case Qt::Key_N:

@@ -59,7 +59,6 @@ const double PSEUDO_ZERO = 1.e-20;
 ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
     : QDoubleSpinBox(theParent),
       myCleared(false),
-      //myIsModified(false),
       myIsEmitKeyPressEvent(false)
 {
   // VSR 01/07/2010: Disable thousands separator for spin box
@@ -78,8 +77,6 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
 
   connect(lineEdit(), SIGNAL(textChanged( const QString& )), this,
           SLOT(onTextChanged( const QString& )));
-
-  //connect(this, SIGNAL(valueChanged(const QString&)), this, SLOT(onValueChanged(const QString&)));
 }
 
 /*!
@@ -353,23 +350,7 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
 void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 {
   myCleared = false;
-  //myIsModified = true;
 }
-
-/*void ModuleBase_DoubleSpinBox::onValueChanged(const QString& theValue)
-{
-  myIsModified = true;
-}
-
-bool ModuleBase_DoubleSpinBox::isModified() const
-{
-  return myIsModified;
-}
-
-void ModuleBase_DoubleSpinBox::clearModified()
-{
-  myIsModified = false;
-}*/
 
 bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
 {

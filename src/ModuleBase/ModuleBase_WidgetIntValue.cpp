@@ -143,10 +143,8 @@ QList<QWidget*> ModuleBase_WidgetIntValue::getControls() const
 bool ModuleBase_WidgetIntValue::processEnter()
 {
   bool isModified = getValueState() == ModifiedInPP;
-  //bool isModified = mySpinBox->isModified();
   if (isModified) {
     emit valuesChanged();
-    //mySpinBox->clearModified();
     mySpinBox->selectAll();
   }
   return isModified;
