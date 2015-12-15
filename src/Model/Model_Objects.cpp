@@ -716,8 +716,8 @@ void Model_Objects::synchronizeFeatures(
   aLoop->activateFlushes(isActive);
 
   if (theFlush) {
-    aLoop->flush(aCreateEvent);
     aLoop->flush(aDeleteEvent);
+    aLoop->flush(aCreateEvent); // delete should be emitted before create to reacts to aborted feature
     aLoop->flush(anUpdateEvent);
     aLoop->flush(aCreateEvent); // after update of features, there could be results created
     aLoop->flush(aDeleteEvent); // or deleted
