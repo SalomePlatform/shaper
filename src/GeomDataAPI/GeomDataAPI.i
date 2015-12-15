@@ -1,21 +1,11 @@
 /* GeomDataAPI.i */
 %module GeomDataAPI
 %{
-  #include "ModelAPI_Attribute.h"
-  #include "GeomDataAPI.h"
-  #include "GeomDataAPI_Point.h"
-  #include "GeomDataAPI_Dir.h"
-  #include "GeomDataAPI_Point2D.h"
-
-  #include <memory>
-  #include <string>
-  #include <list>
-  
-  template<class T> std::shared_ptr<T> castTo(std::shared_ptr<ModelAPI_Attribute> theObject) 
-  { 
-    return std::dynamic_pointer_cast<T>(theObject); 
-  } 
+  #include "GeomDataAPI_swig.h"
 %}
+
+// import other modules
+%import "ModelAPI.i"
 
 // to avoid error on this
 #define GEOMDATAAPI_EXPORT
@@ -27,13 +17,11 @@
 %include "std_list.i"
 %include "std_shared_ptr.i"
 
-%shared_ptr(ModelAPI_Attribute)
 %shared_ptr(GeomDataAPI_Point)
 %shared_ptr(GeomDataAPI_Dir)
 %shared_ptr(GeomDataAPI_Point2D)
 
 // all supported interfaces
-%include "ModelAPI_Attribute.h"
 %include "GeomDataAPI_Point.h"
 %include "GeomDataAPI_Dir.h"
 %include "GeomDataAPI_Point2D.h"
