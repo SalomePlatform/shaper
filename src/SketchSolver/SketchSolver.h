@@ -3,6 +3,8 @@
 #ifndef SKETCHSOLVER_H
 #define SKETCHSOLVER_H
 
+#include <stdlib.h>
+
 #if defined SKETCHSOLVER_EXPORTS
 #if defined WIN32
 #define SKETCHSOLVER_EXPORT              __declspec( dllexport )
