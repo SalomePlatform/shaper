@@ -9,7 +9,6 @@
 
 #include <SketchSolver_IConstraintWrapper.h>
 #include <SolveSpaceSolver_Solver.h>
-#include <slvs.h>
 
 namespace ConstraintType
 {

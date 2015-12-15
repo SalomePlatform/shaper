@@ -124,8 +124,7 @@ bool SketchSolver_Group::isBaseWorkplane(CompositeFeaturePtr theWorkplane) const
 //  Class:    SketchSolver_Group
 //  Purpose:  verify are there any entities in the group used by given constraint
 // ============================================================================
-bool SketchSolver_Group::isInteract(
-    std::shared_ptr<SketchPlugin_Feature> theFeature) const
+bool SketchSolver_Group::isInteract(FeaturePtr theFeature) const
 {
   // Empty group interacts with everything
   if (isEmpty())
@@ -301,7 +300,7 @@ void SketchSolver_Group::updateConstraints()
   myChangedConstraints.clear();
 }
 
-bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 {
   if (!checkFeatureValidity(theFeature))
     return false;
@@ -335,7 +334,7 @@ bool SketchSolver_Group::updateFeature(std::shared_ptr<SketchPlugin_Feature> the
   return isUpdated;
 }
 
-void SketchSolver_Group::moveFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
 
@@ -390,9 +389,9 @@ bool SketchSolver_Group::updateWorkplane()
     myStorage = aBuilder->createStorage(getId());
 
   // sketch should be unchanged, set it out of current group
-  bool isUpdated = myStorage->update(mySketch, GID_OUTOFGROUP);
+  bool isUpdated = myStorage->update(FeaturePtr(mySketch), GID_OUTOFGROUP);
   if (isUpdated) {
-    EntityWrapperPtr anEntity = myStorage->entity(mySketch);
+    EntityWrapperPtr anEntity = myStorage->entity(FeaturePtr(mySketch));
     myWorkplaneID = anEntity->id();
   }
   return isUpdated;
@@ -542,7 +541,7 @@ void SketchSolver_Group::splitGroup(std::list<SketchSolver_Group*>& theCuts)
   std::list<ConstraintPtr> anUnusedConstraints;
   ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
   for ( ; aCIter != myConstraints.end(); aCIter++) {
-    if (aNewStorage->isInteract(aCIter->first))
+    if (aNewStorage->isInteract(FeaturePtr(aCIter->first)))
       aNewStorage->addConstraint(aCIter->first, aDummyVec);
     else
       anUnusedConstraints.push_back(aCIter->first);
@@ -551,7 +550,7 @@ void SketchSolver_Group::splitGroup(std::list<SketchSolver_Group*>& theCuts)
   // Check the unused constraints once again, because they may become interacted with new storage since adding constraints
   std::list<ConstraintPtr>::iterator aUnuseIt = anUnusedConstraints.begin();
   while (aUnuseIt != anUnusedConstraints.end()) {
-    if (aNewStorage->isInteract(*aUnuseIt)) {
+    if (aNewStorage->isInteract(FeaturePtr(*aUnuseIt))) {
       aNewStorage->addConstraint(*aUnuseIt, aDummyVec);
       anUnusedConstraints.erase(aUnuseIt);
       aUnuseIt = anUnusedConstraints.begin();

@@ -455,7 +455,8 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createSketchEntity(
   Slvs_Entity aWorkplane = Slvs_MakeWorkplane(SLVS_E_UNKNOWN, (Slvs_hGroup)theGroupID,
       SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
 
-  aNewEnt = EntityWrapperPtr(new SolveSpaceSolver_EntityWrapper(theSketch, aWorkplane));
+  aNewEnt = EntityWrapperPtr(
+      new SolveSpaceSolver_EntityWrapper(FeaturePtr(theSketch), aWorkplane));
   aNewEnt->setSubEntities(aSubs);
   return aNewEnt;
 }

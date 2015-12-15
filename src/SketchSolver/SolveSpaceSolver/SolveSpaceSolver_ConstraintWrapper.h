@@ -8,7 +8,7 @@
 #define SolveSpaceSolver_ConstraintWrapper_H_
 
 #include <SketchSolver_IConstraintWrapper.h>
-#include <slvs.h>
+#include <SolveSpaceSolver_Solver.h>
 
 
 /**

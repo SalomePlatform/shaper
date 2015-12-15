@@ -8,8 +8,7 @@
 #define SolveSpaceSolver_ParameterWrapper_H_
 
 #include <SketchSolver_IParameterWrapper.h>
-
-#include <slvs.h>
+#include <SolveSpaceSolver_Solver.h>
 
 /**
  *  Wrapper providing operations with parameters in SolveSpace.

@@ -8,7 +8,7 @@
 #define SolveSpaceSolver_EntityWrapper_H_
 
 #include <SketchSolver_IEntityWrapper.h>
-#include <slvs.h>
+#include <SolveSpaceSolver_Solver.h>
 
 /**
  *  Wrapper providing operations with SolveSpace entities.

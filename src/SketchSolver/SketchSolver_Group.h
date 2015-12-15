@@ -75,19 +75,19 @@ class SketchSolver_Group
   /** \brief Updates the data corresponding the specified feature
    *  \param[in] theFeature the feature to be updated
    */
-  bool updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature);
+  bool updateFeature(FeaturePtr theFeature);
 
   /** \brief Updates the data corresponding the specified feature moved in GUI.
    *         Additional Fixed constraints are created.
    *  \param[in] theFeature the feature to be updated
    */
-  void moveFeature(std::shared_ptr<SketchPlugin_Feature> theFeature);
+  void moveFeature(FeaturePtr theFeature);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
    *  \return \c true if some of attributes are used in current group
    */
-  bool isInteract(std::shared_ptr<SketchPlugin_Feature> theFeature) const;
+  bool isInteract(FeaturePtr theFeature) const;
 
   /** \brief Verifies the specified feature is equal to the base workplane for this group
    *  \param[in] theWorkplane the feature to be compared with base workplane
