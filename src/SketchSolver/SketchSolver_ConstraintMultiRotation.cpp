@@ -13,8 +13,8 @@
 ////
 ////#include <GeomAPI_Dir2d.h>
 ////#include <GeomAPI_XY.h>
-////
-////#include <math.h>
+
+#include <math.h>
 
 void SketchSolver_ConstraintMultiRotation::getAttributes(
     EntityWrapperPtr& theCenter, double& theAngle,
