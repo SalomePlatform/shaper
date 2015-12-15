@@ -8,25 +8,25 @@
 #define SketchSolver_ConstraintMovement_H_
 
 #include "SketchSolver.h"
-#include <SketchSolver_ConstraintFixed.h>
+#include <SketchSolver_ConstraintRigid.h>
+
+#include <GeomDataAPI_Point2D.h>
 
 /** \class   SketchSolver_ConstraintMovement
  *  \ingroup Plugins
- *  \brief   Stores data to the Fixed constraint for the moved feature only
+ *  \brief   Stores data of Rigid (Fixed) constraint for the moved feature only
  */
-class SketchSolver_ConstraintMovement : public SketchSolver_ConstraintFixed
+class SketchSolver_ConstraintMovement : public SketchSolver_ConstraintRigid
 {
 private:
   /// Creates constraint to manage the given constraint from plugin
   SketchSolver_ConstraintMovement(ConstraintPtr theConstraint)
-    : SketchSolver_ConstraintFixed(theConstraint)
+    : SketchSolver_ConstraintRigid(theConstraint)
   {}
 
 public:
   /// Creates temporary constraint based on feature
-  SketchSolver_ConstraintMovement(FeaturePtr theFeature)
-    : SketchSolver_ConstraintFixed(theFeature)
-  {}
+  SketchSolver_ConstraintMovement(FeaturePtr theFeature);
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
@@ -34,11 +34,16 @@ protected:
 
   /// \brief Generate list of attributes of constraint in order useful for SolveSpace constraints
   /// \param[out] theValue        numerical characteristic of constraint (e.g. distance)
-  /// \param[out] theAttributes   list of attributes to be filled (list of moved entities or attributes)
-  virtual void getAttributes(ParameterWrapperPtr& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  /// \param[out] theAttributes   list of attributes to be filled
+  /// \param[out] theIsFullyMoved shows that the feature is moved, in other case only one point of the feature is shifted
+  virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes, bool& theIsFullyMoved);
+
+  /// \brief Fixed feature basing on its type
+  virtual void fixFeature();
 
 private:
-  std::vector<EntityWrapperPtr> myMovedEntities; ///< list of entities that are moved
+  /// \brief Check the coordinates of point are differ than coordinates of correponding SolveSpace entity
+  bool isMoved(std::shared_ptr<GeomDataAPI_Point2D> thePoint, const Slvs_Entity& theEntity);
 };
 
 #endif

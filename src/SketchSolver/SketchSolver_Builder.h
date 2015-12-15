@@ -7,112 +7,74 @@
 #ifndef SketchSolver_Builder_H_
 #define SketchSolver_Builder_H_
 
+#include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
+
 #include <SketchPlugin_Constraint.h>
 
-#include <GeomAPI_Lin2d.h>
-#include <GeomAPI_Pnt2d.h>
+#include <ModelAPI_CompositeFeature.h>
 
 /** \class   SketchSolver_Builder
  *  \ingroup Plugins
- *  \brief   Abstract class for builders of solver's entities
+ *  \brief   Create bridges between SketchPlugin constraints and SolveSpace constraints
  */
 class SketchSolver_Builder
 {
+private:
+  /// Default constructor
+  SketchSolver_Builder() {}
+
 public:
-  /// \brief Creates a storage specific for used solver
-  virtual StoragePtr createStorage(const GroupID& theGroup) const = 0;
-  /// \brief Creates specific solver
-  virtual SolverPtr createSolver() const = 0;
+  /// \brief Returns single instance of builder
+  static SketchSolver_Builder* getInstance();
 
   /// \brief Creates a solver's constraint using given SketchPlugin constraint
   ///        or returns empty pointer if not all attributes are correct
-  SolverConstraintPtr createConstraint(ConstraintPtr theConstraint) const;
+  SolverConstraintPtr createConstraint(ConstraintPtr theConstraint);
 
   /// \brief Creates temporary constraint to fix the placement of the feature
-  SolverConstraintPtr createFixedConstraint(FeaturePtr theFixedFeature) const;
+  SolverConstraintPtr createRigidConstraint(FeaturePtr theFixedFeature);
 
   /// \brief Creates temporary constraint to fix the feature after movement
-  SolverConstraintPtr createMovementConstraint(FeaturePtr theFixedFeature) const;
+  SolverConstraintPtr createMovementConstraint(FeaturePtr theFixedFeature);
 
-////  /// \brief Creates constraint for parametrically given attribute
-////  SolverConstraintPtr createParametricConstraint(AttributePtr theAttribute) const;
+  /// \brief Creates constraint for parametrically given attribute
+  SolverConstraintPtr createParametricConstraint(AttributePtr theAttribute);
 
-  /// \brief Creates new constraint(s) using given parameters
-  /// \param theConstraint [in]  original constraint
-  /// \param theGroupID    [in]  group the constraint belongs to
-  /// \param theSketchID   [in]  sketch the constraint belongs to
-  /// \param theType       [in]  type of constraint
-  /// \param theValue      [in]  numeric characteristic of constraint (e.g. distance or radius) if applicable
-  /// \param theEntity1    [in]  first attribute of constraint
-  /// \param theEntity2    [in]  second attribute of constraint
-  /// \param theEntity3    [in]  third attribute of constraint
-  /// \param theEntity4    [in]  fourth attribute of constraint
-  /// \return Created list of wrappers of constraints applicable for specific solver.
-  ///         Most of constraint types lead to single constraint, but there are some kind of
-  ///         constraints (e.g. mirror), which may produce couple of constraints.
-  virtual std::list<ConstraintWrapperPtr>
-    createConstraint(ConstraintPtr theConstraint,
-                     const GroupID& theGroup,
-                     const EntityID& theSketchID,
-                     const SketchSolver_ConstraintType& theType,
-                     const double& theValue,
-                     const EntityWrapperPtr& theEntity1,
-                     const EntityWrapperPtr& theEntity2 = EntityWrapperPtr(),
-                     const EntityWrapperPtr& theEntity3 = EntityWrapperPtr(),
-                     const EntityWrapperPtr& theEntity4 = EntityWrapperPtr()) const = 0;
+  /// \brief Converts sketch parameters to the list of SolveSpace entities.
+  ///        Identifiers of entities and parameters are local. They should be changed while adding into storage.
+  ///        The sketch entity goes last.
+  /// \param[in]  theSketch     the element to be converted
+  /// \param[out] theEntities   created list of entities
+  /// \param[out] theParameters created list of parameters of the entities
+  /// \return \c true if workplane created
+  bool createWorkplane(CompositeFeaturePtr theSketch,
+                       std::vector<Slvs_Entity>& theEntities,
+                       std::vector<Slvs_Param>& theParameters);
 
-  /// \brief Creates new multi-translation or multi-rotation constraint
-  /// \param theConstraint [in]  original constraint
-  /// \param theGroupID    [in]  group the constraint belongs to
-  /// \param theSketchID   [in]  sketch the constraint belongs to
-  /// \param theType       [in]  type of constraint
-  /// \param theValue      [in]  numeric characteristic of constraint (angle for multi-rotation) if applicable
-  /// \param thePoint1     [in]  center for multi-rotation or start point for multi-translation
-  /// \param thePoint2     [in]  end point for multi-translation (empty for multi-rotation)
-  /// \param theTrsfEnt    [in]  list of transformed entities
-  virtual std::list<ConstraintWrapperPtr>
-    createConstraint(ConstraintPtr theConstraint,
-                     const GroupID& theGroup,
-                     const EntityID& theSketchID,
-                     const SketchSolver_ConstraintType& theType,
-                     const double& theValue,
-                     const EntityWrapperPtr& thePoint1,
-                     const EntityWrapperPtr& thePoint2,
-                     const std::list<EntityWrapperPtr>& theTrsfEnt) const = 0;
+  /// \brief Converts attribute to the list of entities.
+  ///        Identifiers are local (see createWorkplane).
+  ///        The main entity goes last.
+  bool createEntity(AttributePtr theAttribute,
+                    std::vector<Slvs_Entity>& theEntities,
+                    std::vector<Slvs_Param>& theParameters);
+  /// \brief Converts feature to the list of entities.
+  ///        Identifiers are local (see createWorkplane).
+  ///        The main entity goes last.
+  bool createEntity(FeaturePtr theFeature,
+                    std::vector<Slvs_Entity>& theEntities,
+                    std::vector<Slvs_Param>& theParameters);
 
-  /// \brief Update flags for several kinds of constraints
-  virtual void adjustConstraint(ConstraintWrapperPtr theConstraint) const = 0;
+  /// \brief Converts normal and OX direction to the list of entities representing a normal in SolveSpace.
+  ///        Identifiers are local (see createWorkplane).
+  ///        The main entity goes last.
+  bool createNormal(AttributePtr theNormal,
+                    AttributePtr theDirX,
+                    std::vector<Slvs_Entity>& theEntities,
+                    std::vector<Slvs_Param>& theParameters);
 
-  /// \brief Creates a feature using list of already created attributes
-  /// \param theFeature    [in]  feature to create
-  /// \param theAttributes [in]  attributes of the feature
-  /// \param theGroupID    [in]  group the feature belongs to
-  /// \param theSketchID   [in]  sketch the feature belongs to
-  /// \return Created wrapper of the feature applicable for specific solver
-  virtual EntityWrapperPtr createFeature(FeaturePtr theFeature,
-                                         const std::list<EntityWrapperPtr>& theAttributes,
-                                         const GroupID& theGroupID,
-                                         const EntityID& theSketchID = EID_UNKNOWN) const = 0;
-
-  /// \brief Creates an attribute
-  /// \param theAttribute [in]  attribute to create
-  /// \param theGroup     [in]  group the attribute belongs to
-  /// \param theSketchID  [in]  sketch the attribute belongs to
-  /// \return Created wrapper of the attribute applicable for specific solver
-  virtual EntityWrapperPtr createAttribute(AttributePtr theAttribute,
-                                           const GroupID& theGroup,
-                                           const EntityID& theSketchID = EID_UNKNOWN) const = 0;
-
-
-  /// \brief Convert entity to point
-  /// \return empty pointer if the entity is not a point
-  SKETCHSOLVER_EXPORT std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity) const;
-  /// \brief Convert entity to line
-  /// \return empty pointer if the entity is not a line
-  SKETCHSOLVER_EXPORT std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const;
+private:
+  static SketchSolver_Builder* mySelf;
 };
-
-typedef std::shared_ptr<SketchSolver_Builder> BuilderPtr;
 
 #endif

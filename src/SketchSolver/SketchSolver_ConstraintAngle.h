@@ -22,14 +22,17 @@ public:
       myAngle(0.0)
   {}
 
+  virtual int getType() const
+  { return SLVS_C_ANGLE; }
+
   /// \brief This method is used in derived objects to check consistence of constraint.
   virtual void adjustConstraint();
 
 protected:
-  /// \brief Generate list of attributes of constraint in order useful for constraints
+  /// \brief Generate list of attributes of constraint in order useful for SolveSpace constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(double& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes);
 
 private:
   double myAngle;

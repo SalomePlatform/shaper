@@ -22,11 +22,15 @@ public:
       SketchSolver_Constraint(theConstraint)
   {}
 
+  virtual int getType() const
+  { return myType; }
+
 protected:
-  /// \brief Generate list of attributes of constraint in order useful for constraints
-  /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
-  /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(double& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
+  virtual void process();
+
+private:
+  int myType; ///< type of constraint (applicable: SLVS_C_ARC_LINE_TANGENT, SLVS_C_CURVE_CURVE_TANGENT)
 };
 
 #endif

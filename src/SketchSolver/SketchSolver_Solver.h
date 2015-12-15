@@ -1,15 +1,15 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:    SolveSpaceSolver_Solver.h
+// File:    SketchSolver_Solver.h
 // Created: 07 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SolveSpaceSolver_Solver_H_
-#define SolveSpaceSolver_Solver_H_
+#ifndef SketchSolver_Solver_H_
+#define SketchSolver_Solver_H_
 
-#include <SketchSolver_ISolver.h>
+#include "SketchSolver.h"
 
-// Need to be defined before including SolveSpace to avoid additional dependences on Windows platform
+// Need to be defined before including SolveSpace to avoid additional dependances on Windows platform
 #if defined(WIN32) && !defined(HAVE_C99_INTEGER_TYPES)
 typedef unsigned int UINT32;
 #else
@@ -19,6 +19,8 @@ typedef unsigned int UINT32;
 #include <slvs.h>
 
 #include <vector>
+
+#define SLVS_RESULT_EMPTY_SET -1
 
 // Unknown constraint (for error reporting)
 #define SLVS_C_UNKNOWN 0
@@ -35,15 +37,21 @@ typedef unsigned int UINT32;
 // Group ID to store external objects
 #define SLVS_G_OUTOFGROUP 1
 
-/** \class SolveSpaceSolver_Solver
- *  \ingroup Plugins
- *  \brief Performs high-level operations to solve sketch in SolveSpace.
+/**
+ * The main class that performs the high-level operations for connection to the SolveSpace.
  */
-class SolveSpaceSolver_Solver : public SketchSolver_ISolver
+class SketchSolver_Solver
 {
  public:
-  SolveSpaceSolver_Solver();
-  virtual ~SolveSpaceSolver_Solver();
+  SketchSolver_Solver();
+  ~SketchSolver_Solver();
+
+  /** \brief Initialize the ID of the group
+   */
+  inline void setGroupID(Slvs_hGroup theGroupID)
+  {
+    myGroupID = theGroupID;
+  }
 
   /** \brief Change array of parameters
    *  \param[in] theParameters pointer to the array of parameters
@@ -69,13 +77,25 @@ class SolveSpaceSolver_Solver : public SketchSolver_ISolver
    */
   void setDraggedParameters(const Slvs_hParam* theDragged);
 
+  /** \brief Set or unset the flag which allows to find all failed constraints
+   */
+  void calculateFailedConstraints(bool theSic)
+  { myEquationsSystem.calculateFaileds = theSic ? 1 : 0; }
+
   /** \brief Solve the set of equations
    *  \return identifier whether solution succeeded
    */
-  virtual SketchSolver_SolveStatus solve();
+  int solve();
+
+  /** \brief Updates the list of parameters by calculated values
+   *  \param[in,out] theParameters parameters to be updated
+   *  \return \c true if parameters are updated correctly
+   */
+  bool getResult(std::vector<Slvs_Param>& theParameters);
 
  private:
-  Slvs_System myEquationsSystem; ///< set of equations for solving in SolveSpace
+  Slvs_hGroup myGroupID;         ///< identifier of the group to be solved
+  Slvs_System myEquationsSystem;  ///< set of equations for solving in SolveSpace
 };
 
 #endif

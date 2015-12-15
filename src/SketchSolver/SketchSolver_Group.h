@@ -10,16 +10,18 @@
 #include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
 #include <SketchSolver_Storage.h>
-#include <SketchSolver_ISolver.h>
+#include <SketchSolver_FeatureStorage.h>
+#include <SketchSolver_Solver.h>
 
 #include <SketchPlugin_Constraint.h>
-////#include <ModelAPI_Data.h>
+#include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
-////#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeRefList.h>
 
 #include <memory>
 #include <list>
 #include <map>
+#include <vector>
 #include <set>
 
 typedef std::map<ConstraintPtr, SolverConstraintPtr> ConstraintConstraintMap;
@@ -40,16 +42,21 @@ class SketchSolver_Group
   ~SketchSolver_Group();
 
   /// \brief Returns group's unique identifier
-  inline const GroupID& getId() const
+  inline const Slvs_hGroup& getId() const
   {
     return myID;
   }
 
   /// \brief Returns identifier of the workplane
-  inline const EntityID& getWorkplaneId() const
+  inline const Slvs_hEntity& getWorkplaneId() const
   {
     return myWorkplaneID;
   }
+
+  /// \brief Find the identifier of the feature, if it already exists in the group
+  Slvs_hEntity getFeatureId(FeaturePtr theFeature) const;
+  /// \brief Find the identifier of the attribute, if it already exists in the group
+  Slvs_hEntity getAttributeId(AttributePtr theAttribute) const;
 
   /// \brief Returns true if the group has no constraints yet
   inline bool isEmpty() const
@@ -75,19 +82,19 @@ class SketchSolver_Group
   /** \brief Updates the data corresponding the specified feature
    *  \param[in] theFeature the feature to be updated
    */
-  bool updateFeature(FeaturePtr theFeature);
+  bool updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Updates the data corresponding the specified feature moved in GUI.
    *         Additional Fixed constraints are created.
    *  \param[in] theFeature the feature to be updated
    */
-  void moveFeature(FeaturePtr theFeature);
+  void moveFeature(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
    *  \return \c true if some of attributes are used in current group
    */
-  bool isInteract(FeaturePtr theFeature) const;
+  bool isInteract(std::shared_ptr<SketchPlugin_Feature> theFeature) const;
 
   /** \brief Verifies the specified feature is equal to the base workplane for this group
    *  \param[in] theWorkplane the feature to be compared with base workplane
@@ -119,7 +126,7 @@ class SketchSolver_Group
   /** \brief Cut from the group several subgroups, which are not connected to the current one by any constraint
    *  \param[out] theCuts enlarge this list by newly created groups
    */
-  void splitGroup(std::list<SketchSolver_Group*>& theCuts);
+  void splitGroup(std::vector<SketchSolver_Group*>& theCuts);
 
   /** \brief Start solution procedure if necessary and update attributes of features
    *  \return \c false when no need to solve constraints
@@ -148,7 +155,10 @@ private:
    */
   bool addWorkplane(CompositeFeaturePtr theSketch);
 
-  /// \brief Append given constraint to the group of temporary constraints
+  /// \brief Apply temporary rigid constraints for the list of features
+  void fixFeaturesList(AttributeRefListPtr theList);
+
+  /// \brief Append given constraint to th group of temporary constraints
   void setTemporary(SolverConstraintPtr theConstraint);
 
   /// \brief Verifies is the feature valid
@@ -161,8 +171,8 @@ private:
   void notifyMultiConstraints();
 
 private:
-  GroupID  myID; ///< Index of the group
-  EntityID myWorkplaneID; ///< Index of workplane, the group is based on
+  Slvs_hGroup myID; ///< Index of the group
+  Slvs_hEntity myWorkplaneID; ///< Index of workplane, the group is based on
   CompositeFeaturePtr mySketch; ///< Sketch is equivalent to workplane
   ConstraintConstraintMap myConstraints; ///< List of constraints
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
@@ -170,8 +180,9 @@ private:
   std::set<ConstraintPtr> myChangedConstraints; ///< List of just updated constraints
 
   StoragePtr myStorage; ///< Container for the set of SolveSpace constraints and their entities
+  FeatureStoragePtr myFeatureStorage; ///< Container for the set of SketchPlugin features and their dependencies
 
-  SolverPtr mySketchSolver;  ///< Solver for set of equations obtained by constraints
+  SketchSolver_Solver myConstrSolver;  ///< Solver for set of equations obtained by constraints
 
   bool myPrevSolved; ///< Indicates that previous solving was done correctly
 };

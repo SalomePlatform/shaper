@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:    SketchSolver_Manager.cpp
+// File:    SketchSolver_ConstraintManager.cpp
 // Created: 08 May 2014
 // Author:  Artem ZHIDKOV
 
-#include "SketchSolver_Manager.h"
+#include "SketchSolver_ConstraintManager.h"
 
 #include <Events_Loop.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -29,23 +29,23 @@
 #include <memory>
 
 // Initialization of constraint manager self pointer
-SketchSolver_Manager* SketchSolver_Manager::mySelf = 0;
+SketchSolver_ConstraintManager* SketchSolver_ConstraintManager::_self = 0;
 
 /// Global constraint manager object
-SketchSolver_Manager* myManager = SketchSolver_Manager::instance();
+SketchSolver_ConstraintManager* myManager = SketchSolver_ConstraintManager::Instance();
 
 
 // ========================================================
-// ========= SketchSolver_Manager ===============
+// ========= SketchSolver_ConstraintManager ===============
 // ========================================================
-SketchSolver_Manager* SketchSolver_Manager::instance()
+SketchSolver_ConstraintManager* SketchSolver_ConstraintManager::Instance()
 {
-  if (!mySelf)
-    mySelf = new SketchSolver_Manager();
-  return mySelf;
+  if (!_self)
+    _self = new SketchSolver_ConstraintManager();
+  return _self;
 }
 
-SketchSolver_Manager::SketchSolver_Manager()
+SketchSolver_ConstraintManager::SketchSolver_ConstraintManager()
 {
   myGroups.clear();
   myIsComputed = false;
@@ -57,26 +57,17 @@ SketchSolver_Manager::SketchSolver_Manager()
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_MOVED));
 }
 
-SketchSolver_Manager::~SketchSolver_Manager()
+SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 {
   myGroups.clear();
 }
 
-void SketchSolver_Manager::setBuilder(BuilderPtr theBuilder)
-{
-  myBuilder = theBuilder;
-}
-
-BuilderPtr SketchSolver_Manager::builder()
-{
-  return myBuilder;
-}
-
 // ============================================================================
 //  Function: processEvent
+//  Class:    SketchSolver_Session
 //  Purpose:  listen the event loop and process the message
 // ============================================================================
-void SketchSolver_Manager::processEvent(
+void SketchSolver_ConstraintManager::processEvent(
   const std::shared_ptr<Events_Message>& theMessage)
 {
   if (myIsComputed)
@@ -117,7 +108,7 @@ void SketchSolver_Manager::processEvent(
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
         if (!aFeature)
           continue;
-        hasProperFeature = changeFeature(aFeature) || hasProperFeature;
+        hasProperFeature = changeConstraintOrEntity(aFeature) || hasProperFeature;
       }
     }
 
@@ -138,7 +129,7 @@ void SketchSolver_Manager::processEvent(
 
     if (aFGrIter != aFeatureGroups.end()) {
       std::vector<SketchSolver_Group*>::iterator aGroupIter = myGroups.begin();
-      std::list<SketchSolver_Group*> aSeparatedGroups;
+      std::vector<SketchSolver_Group*> aSeparatedGroups;
       while (aGroupIter != myGroups.end()) {
         if (!(*aGroupIter)->isWorkplaneValid()) {  // the group should be removed
           delete *aGroupIter;
@@ -160,9 +151,10 @@ void SketchSolver_Manager::processEvent(
 
 // ============================================================================
 //  Function: changeWorkplane
+//  Class:    SketchSolver_Session
 //  Purpose:  update workplane by given parameters of the sketch
 // ============================================================================
-bool SketchSolver_Manager::changeWorkplane(CompositeFeaturePtr theSketch)
+bool SketchSolver_ConstraintManager::changeWorkplane(CompositeFeaturePtr theSketch)
 {
   bool aResult = true;  // changed when a workplane wrongly updated
   bool isUpdated = false;
@@ -171,7 +163,8 @@ bool SketchSolver_Manager::changeWorkplane(CompositeFeaturePtr theSketch)
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if ((*aGroupIter)->isBaseWorkplane(theSketch)) {
       isUpdated = true;
-      aResult = false;
+      if (!(*aGroupIter)->updateWorkplane())
+        aResult = false;
     }
   // If the workplane is not updated, so this is a new workplane
   if (!isUpdated) {
@@ -188,12 +181,14 @@ bool SketchSolver_Manager::changeWorkplane(CompositeFeaturePtr theSketch)
 
 // ============================================================================
 //  Function: changeConstraintOrEntity
+//  Class:    SketchSolver_Session
 //  Purpose:  create/update the constraint or the feature and place it into appropriate group
 // ============================================================================
-bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
+    std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   // Search the groups which this feature touches
-  std::set<GroupID> aGroups;
+  std::set<Slvs_hGroup> aGroups;
   findGroups(theFeature, aGroups);
 
   std::shared_ptr<SketchPlugin_Constraint> aConstraint = 
@@ -215,7 +210,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
     myGroups.push_back(aGroup);
     return true;
   } else if (aGroups.size() == 1) {  // Only one group => add feature into it
-    GroupID aGroupId = *(aGroups.begin());
+    Slvs_hGroup aGroupId = *(aGroups.begin());
     std::vector<SketchSolver_Group*>::iterator aGroupIter;
     for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
       if ((*aGroupIter)->getId() == aGroupId) {
@@ -225,7 +220,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
         return (*aGroupIter)->changeConstraint(aConstraint);
       }
   } else if (aGroups.size() > 1) {  // Several groups applicable for this feature => need to merge them
-    std::set<GroupID>::const_iterator aGroupsIter = aGroups.begin();
+    std::set<Slvs_hGroup>::const_iterator aGroupsIter = aGroups.begin();
 
     // Search first group
     std::vector<SketchSolver_Group*>::iterator aFirstGroupIter;
@@ -266,9 +261,11 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
 
 // ============================================================================
 //  Function: moveEntity
+//  Class:    SketchSolver_Session
 //  Purpose:  update element moved on the sketch, which is used by constraints
 // ============================================================================
-void SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature)
+void SketchSolver_ConstraintManager::moveEntity(
+    std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   std::vector<SketchSolver_Group*>::iterator aGroupIt = myGroups.begin();
   for (; aGroupIt != myGroups.end(); aGroupIt++)
@@ -278,11 +275,12 @@ void SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theF
 
 // ============================================================================
 //  Function: findGroups
+//  Class:    SketchSolver_Session
 //  Purpose:  search groups of entities interacting with given feature
 // ============================================================================
-void SketchSolver_Manager::findGroups(
+void SketchSolver_ConstraintManager::findGroups(
     std::shared_ptr<SketchPlugin_Feature> theFeature,
-    std::set<GroupID>& theGroupIDs) const
+    std::set<Slvs_hGroup>& theGroupIDs) const
 {
   std::shared_ptr<ModelAPI_CompositeFeature> aWP = findWorkplane(theFeature);
 
@@ -303,9 +301,10 @@ void SketchSolver_Manager::findGroups(
 
 // ============================================================================
 //  Function: findWorkplane
+//  Class:    SketchSolver_Session
 //  Purpose:  search workplane containing given feature
 // ============================================================================
-std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
+std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager
 ::findWorkplane(std::shared_ptr<SketchPlugin_Feature> theFeature) const
 {
   // Already verified workplanes
@@ -335,9 +334,10 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
 
 // ============================================================================
 //  Function: resolveConstraints
+//  Class:    SketchSolver_Session
 //  Purpose:  change entities according to available constraints
 // ============================================================================
-void SketchSolver_Manager::resolveConstraints(const bool theForceUpdate)
+void SketchSolver_ConstraintManager::resolveConstraints(const bool theForceUpdate)
 {
   myIsComputed = true;
   bool needToUpdate = false;
@@ -364,3 +364,4 @@ void SketchSolver_Manager::resolveConstraints(const bool theForceUpdate)
   if (needToUpdate || theForceUpdate)
     Events_Loop::loop()->flush(anUpdateEvent);
 }
+
