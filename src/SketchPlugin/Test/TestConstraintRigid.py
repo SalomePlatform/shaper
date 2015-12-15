@@ -112,7 +112,20 @@ assert (kLineBEnd == (aLineBEndPoint.x(),   aLineBEndPoint.y()))
 assert (kLineCStart == (aLineCStartPoint.x(), aLineCStartPoint.y()))
 assert (kLineCEnd == (aLineCEndPoint.x(),   aLineCEndPoint.y()))
 #=========================================================================
-# Check that
+# Check that moving line A does not affect lines
+#=========================================================================
+aSession.startOperation()
+aLineAEndPoint.setValue(90., 0.)
+aSession.finishOperation()
+# Check that constarint keep features' values
+assert (kLineAStart == (aLineAStartPoint.x(), aLineAStartPoint.y()))
+assert (kLineAEnd == (aLineAEndPoint.x(),   aLineAEndPoint.y()))
+assert (kLineBStart == (aLineBStartPoint.x(), aLineBStartPoint.y()))
+assert (kLineBEnd == (aLineBEndPoint.x(),   aLineBEndPoint.y()))
+assert (kLineCStart == (aLineCStartPoint.x(), aLineCStartPoint.y()))
+assert (kLineCEnd == (aLineCEndPoint.x(),   aLineCEndPoint.y()))
+#=========================================================================
+# Check that moving line B does not affect lines
 #=========================================================================
 aSession.startOperation()
 aLineBEndPoint.setValue(90., 150.)

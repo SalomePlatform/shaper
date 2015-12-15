@@ -1,4 +1,5 @@
 #include <SketchSolver_ConstraintAngle.h>
+#include <SketchSolver_Manager.h>
 
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Lin2d.h>
@@ -8,7 +9,7 @@
 #include <cmath>
 
 void SketchSolver_ConstraintAngle::getAttributes(
-    double& theValue, std::vector<Slvs_hEntity>& theAttributes)
+    double& theValue, std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
 
@@ -19,24 +20,28 @@ void SketchSolver_ConstraintAngle::getAttributes(
 void SketchSolver_ConstraintAngle::adjustConstraint()
 {
   static const double aTol = 1000. * tolerance;
-  Slvs_Constraint aConstraint = myStorage->getConstraint(mySlvsConstraints.front());
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+
+  ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
+  if (fabs(myAngle - aConstraint->value()) < aTol)
+    return;
+  myAngle = aConstraint->value();
 
   bool isFixed[2][2];
   std::shared_ptr<GeomAPI_Pnt2d> aPoints[2][2]; // start and end points of lines
-  Slvs_hConstraint aFixedConstraint;
-  Slvs_hEntity anEnt[2] = {aConstraint.entityA, aConstraint.entityB};
-  for (int i = 0; i < 2; i++) {
-    const Slvs_Entity& aLine = myStorage->getEntity(anEnt[i]);
-    double aCoef = -1.0;
-    for (int j = 0; j < 2; j++, aCoef += 2.0) {
-      const Slvs_Entity& aPoint = myStorage->getEntity(aLine.point[j]);
-      double aCoords[2];
-      for (int k = 0; k < 2; k++)
-        aCoords[k] = myStorage->getParameter(aPoint.param[k]).val;
-      isFixed[i][j] = myStorage->isPointFixed(aPoint.h, aFixedConstraint, true);
-      aPoints[i][j] = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCoords[0], aCoords[1]));
+  const std::list<EntityWrapperPtr>& aConstrLines = aConstraint->entities();
+  std::list<EntityWrapperPtr>::const_iterator aCLIt = aConstrLines.begin();
+  for (int i = 0; aCLIt != aConstrLines.end(); ++i, ++aCLIt) {
+    const std::list<EntityWrapperPtr>& aLinePoints = (*aCLIt)->subEntities();
+    std::list<EntityWrapperPtr>::const_iterator aLPIt = aLinePoints.begin();
+    for (int j = 0; aLPIt != aLinePoints.end(); ++j, ++aLPIt) {
+      isFixed[i][j] = ((*aLPIt)->group() != myGroupID);
+      aPoints[i][j] = aBuilder->point(*aLPIt);
     }
   }
+
+  if (isFixed[0][0] && isFixed[0][1] && isFixed[1][0] && isFixed[1][1])
+    return; // both lines are fixed => no need to update them
 
   std::shared_ptr<GeomAPI_Lin2d> aLine[2] = {
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[0][0], aPoints[0][1])),
@@ -75,21 +80,6 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
       }
     }
 
-  aConstraint.other = false;
-  for (int i = 0; i < 2; i++)
-    if (aLine[i]->direction()->dot(aDir[i]) < 0.0)
-      aConstraint.other = !aConstraint.other;
-  myStorage->updateConstraint(aConstraint);
-
-  bool isChanged = fabs(myAngle - aConstraint.valA) > aTol;
-  // myAngle should be updated even if the angle of constraint is changed too little
-  myAngle = aConstraint.valA;
-  if (!isChanged)
-    return; // the angle was not changed, no need to recalculate positions of lines
-
-  if (isFixed[0][0] && isFixed[0][1] && isFixed[1][0] && isFixed[1][1])
-    return; // both lines are fixed => no need to update them
-
   // Recalculate positions of lines to avoid conflicting constraints
   // while changing angle value several times
   double cosA = cos(myAngle * PI / 180.0);
@@ -124,15 +114,18 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
   }
 
   // Update positions of points
-  const Slvs_Entity& anUpdLine = myStorage->getEntity(anEnt[aLineToUpd]);
-  Slvs_Param aParam;
-  for (int i = 0; i < 2; i++) {
-    const Slvs_Entity& aPoint = myStorage->getEntity(anUpdLine.point[i]);
-    aParam = myStorage->getParameter(aPoint.param[0]);
-    aParam.val = aNewPoints[i]->x();
-    myStorage->updateParameter(aParam);
-    aParam = myStorage->getParameter(aPoint.param[1]);
-    aParam.val = aNewPoints[i]->y();
-    myStorage->updateParameter(aParam);
+  std::list<EntityWrapperPtr>::const_iterator anUpdLine = aConstrLines.begin();
+  if (aLineToUpd > 0) ++anUpdLine;
+  const std::list<EntityWrapperPtr>& anUpdPoints = (*anUpdLine)->subEntities();
+  std::list<EntityWrapperPtr>::const_iterator aPIt = anUpdPoints.begin();
+  for (int i = 0; aPIt != anUpdPoints.end(); ++aPIt, ++i) {
+    double aCoord[2] = {aNewPoints[i]->x(), aNewPoints[i]->y()};
+    const std::list<ParameterWrapperPtr>& aParams = (*aPIt)->parameters();
+    std::list<ParameterWrapperPtr>::const_iterator aParIt = aParams.begin();
+    for (int j = 0; aParIt != aParams.end(); ++j, ++aParIt)
+      (*aParIt)->setValue(aCoord[j]);
   }
+
+  aBuilder->adjustConstraint(aConstraint);
+  myStorage->addConstraint(myBaseConstraint, aConstraint);
 }

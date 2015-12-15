@@ -20,60 +20,36 @@ public:
   /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintMirror(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
-      myNumberOfObjects(0),
-      myMirrorLineLength(0.0)
+      myNumberOfObjects(0)
   {}
 
-  virtual int getType() const
-  { return SLVS_C_SYMMETRIC_LINE; }
-
   /// \brief Update constraint
-  virtual void update(ConstraintPtr theConstraint = ConstraintPtr());
-
-  /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
-  virtual bool remove(ConstraintPtr theConstraint = ConstraintPtr());
+  virtual void update();
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
 
-  /// \brief Generate list of attributes of constraint in order useful for SolveSpace constraints
+  /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(double& theValue, std::vector<Slvs_hEntity>& theAttributes)
+  virtual void getAttributes(double& theValue, std::vector<EntityWrapperPtr>& theAttributes)
   { /* do nothing here */ }
-
-  /// \brief Verify the attributes of constraint are changed (and constraint need to rebuild)
-  /// \param[in] theConstraint constraint, which attributes should be checked (if NULL, the myBaseConstraint is used)
-  /// \return \c true if some attributes are changed
-  virtual bool checkAttributesChanged(ConstraintPtr theConstraint);
 
   /// \brief Generate list of entities of mirror constraint
   /// \param[out] theMirrorLine     entity corresponding to mirror line
   /// \param[out] theBaseEntities   list of entities to mirror
   /// \param[out] theMirrorEntities list of mirrored entities
-  void getAttributes(Slvs_Entity& theMirrorLine,
-                     std::vector<Slvs_Entity>& theBaseEntities,
-                     std::vector<Slvs_Entity>& theMirrorEntities);
+  void getAttributes(EntityWrapperPtr& theMirrorLine,
+                     std::vector<EntityWrapperPtr>& theBaseEntities,
+                     std::vector<EntityWrapperPtr>& theMirrorEntities);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
   ///        E.g. the distance between line and point may be signed.
   virtual void adjustConstraint();
 
 private:
-  /// \brief Change parameters of entities to be symmetric relative a line,
-  ///        given by array of parameters (coordinates of first and last points)
-  void makeMirrorEntity(const Slvs_Entity& theBase,
-                        const Slvs_Entity& theMirror,
-                        const double theMirrorLine[]) const;
-
-  /// \brief Precisely update last point to be on arc
-  void adjustArcPoints(const Slvs_Entity& theArc) const;
-
-private:
   size_t myNumberOfObjects;  ///< number of previously mirrored objects
-  double myMirrorLineLength; ///< length of mirror line (should be always greater than 0)
 };
 
 #endif
