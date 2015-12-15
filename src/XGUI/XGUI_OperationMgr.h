@@ -98,15 +98,6 @@ Q_OBJECT
   /// \param theOperation an aborted operation
   void abortOperation(ModuleBase_Operation* theOperation);
 
-  /// Returns enable apply state 
-  /// \return theEnabled a boolean value
-  bool isApplyEnabled() const;
-
-  /// Returns valid state of the parent operation. If the current operation is the last one
-  /// it returns the valid state of the operation
-  /// \return boolean value
-  bool isParentOperationValid() const;
-
 public slots:
   /// Slot that commits the current operation.
   void onCommitOperation();
@@ -141,11 +132,6 @@ signals:
 
   /// Signal is emitted after the key released click.
   void keyEnterReleased();
-
- protected:
-  /// Sets apply state to the value and emit signal about this state is changed
-  /// \param theEnabled the state value
-  void setApplyEnabled(const bool theEnabled);
 
 public: // TEMPORARY, it should be protected and be performed automatically
   /// Emits nestedStateChange for operations with an information about validity of the operation
@@ -219,9 +205,6 @@ private:
 
   /// Current workshop
   ModuleBase_IWorkshop* myWorkshop;
-
-  /// Lock/Unlock access to Ok button in property panel
-  bool myIsApplyEnabled;
 };
 
 #endif

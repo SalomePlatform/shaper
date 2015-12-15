@@ -86,17 +86,9 @@ bool ModuleBase_OperationFeature::isValid() const
     return true; // rename operation
   if (myFeature->isAction())
     return true;
-  //Get validators for the Id
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  bool aValid = aFactory->validate(myFeature);
 
-  // the feature exec state should be checked in order to do not apply features, which result can not
-  // be built. E.g. extrusion on sketch, where the "to" is a perpendicular plane to the sketch
-  bool isDone = ( myFeature->data()->execState() == ModelAPI_StateDone
-               || myFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
-
-  return aValid && isDone;
+  std::string anError = ModelAPI_Tools::getFeatureError(myFeature);
+  return anError.empty();
 }
 
 void ModuleBase_OperationFeature::startOperation()
@@ -268,6 +260,13 @@ void ModuleBase_OperationFeature::abort()
 
 bool ModuleBase_OperationFeature::commit()
 {
+  ModuleBase_IPropertyPanel* aPanel = propertyPanel();
+  if (aPanel) {
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+    if (anActiveWidget && anActiveWidget->getValueState() == ModuleBase_ModelWidget::ModifiedInPP) {
+      anActiveWidget->storeValue();
+    }
+  }
   if (canBeCommitted()) {
     emit beforeCommitted();
     // the widgets of property panel should not process any events come from data mode

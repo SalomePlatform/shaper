@@ -16,6 +16,7 @@
 
 #include <memory>
 
+class ModuleBase_OperationFeature;
 class Config_WidgetAPI;
 class ModuleBase_IWorkshop;
 class QKeyEvent;
@@ -301,6 +302,8 @@ private:
   bool myUseReset;
   /// blocked flag of modification of the value state
   bool myIsValueStateBlocked;
+
+  friend ModuleBase_OperationFeature; // to call storeValue() by commit if value state is ModifiedInPP
 };
 
 #endif

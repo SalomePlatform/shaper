@@ -8,7 +8,7 @@
 #include "ModuleBase_ISelection.h"
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_OperationFeature.h"
-#include <ModuleBase_ModelWidget.h>
+#include "ModuleBase_ModelWidget.h"
 
 #include <Events_Loop.h>
 
@@ -16,6 +16,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
+#include "ModelAPI_Tools.h"
 
 #include <Config_PointerMessage.h>
 #include <Config_WidgetReader.h>
@@ -82,25 +83,7 @@ const char* toString(ModelAPI_ExecState theExecState)
 
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
-  QString anError;
-  if (!theFeature.get() || !theFeature->data()->isValid() || theFeature->isAction())
-    return anError;
-
-  // to be removed later, this error should be got from the feature
-  if (theFeature->data()->execState() == ModelAPI_StateDone ||
-      theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
-    return anError;
-
-  // set error indication
-  anError = QString::fromStdString(theFeature->error());
-  if (anError.isEmpty()) {
-    bool isDone = ( theFeature->data()->execState() == ModelAPI_StateDone
-                 || theFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
-    if (!isDone)
-      anError = toString(theFeature->data()->execState());
-  }
-
-  return anError;
+  return ModelAPI_Tools::getFeatureError(theFeature).c_str();
 }
 
 QString ModuleBase_IModule::getWidgetError(ModuleBase_ModelWidget* theWidget)

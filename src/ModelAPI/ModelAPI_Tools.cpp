@@ -22,6 +22,29 @@ std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   return theResult->shape();
 }
 
+std::string getFeatureError(const FeaturePtr& theFeature)
+{
+  std::string anError;
+  if (!theFeature.get() || !theFeature->data()->isValid() || theFeature->isAction())
+    return anError;
+
+  // to be removed later, this error should be got from the feature
+  if (theFeature->data()->execState() == ModelAPI_StateDone ||
+      theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
+    return anError;
+
+  // set error indication
+  anError = theFeature->error();
+  if (anError.empty()) {
+    bool isDone = ( theFeature->data()->execState() == ModelAPI_StateDone
+                 || theFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
+    if (!isDone)
+      anError = theFeature->data()->execState();
+  }
+
+  return anError;
+}
+
 ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup, const std::string& theName)
 {
   for (int anIndex = 0; anIndex < theDocument->size(theGroup); ++anIndex) {

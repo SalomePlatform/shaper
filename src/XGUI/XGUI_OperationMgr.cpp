@@ -30,7 +30,7 @@
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myIsApplyEnabled(false), myWorkshop(theWorkshop)
+: QObject(theParent), myWorkshop(theWorkshop)
 {
 }
 
@@ -174,7 +174,7 @@ bool XGUI_OperationMgr::commitAllOperations()
   bool isCompositeCommitted = false;
   while (hasOperation()) {
     ModuleBase_Operation* anOperation = currentOperation();
-    if (isApplyEnabled()) {
+    if (workshop()->errorMgr()->isApplyEnabled()) {
       onCommitOperation();
     } else {
       abortOperation(anOperation);
@@ -199,28 +199,8 @@ void XGUI_OperationMgr::onValidateOperation()
     return;
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                           (currentOperation());
-  if(aFOperation && aFOperation->feature().get()) {
-    QString anError = myWorkshop->module()->getFeatureError(aFOperation->feature());
-    if (anError.isEmpty()) {
-      ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-      if (aPanel) {
-        ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-        if (anActiveWidget)
-          anError = myWorkshop->module()->getWidgetError(anActiveWidget);
-      }
-    }
-    setApplyEnabled(anError.isEmpty());
-  }
-}
-
-void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
-{
-  myIsApplyEnabled = theEnabled;
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                          (currentOperation());
-  if (aFOperation) {
+  if(aFOperation && aFOperation->feature().get())
     workshop()->errorMgr()->updateActions(aFOperation->feature());
-  }
 }
 
 void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperation)
@@ -230,40 +210,13 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation)
       anErrorMgr->updateAcceptAllAction(aFOperation->feature());
-    //emit nestedStateChanged(theOperation->getDescription()->operationId().toStdString(),
-    //                        theOperation->isValid());
   }
   else {
     foreach(ModuleBase_Operation* anOperation, myOperations) {
       if (anOperation)
         updateApplyOfOperations(anOperation);
-      //emit nestedStateChanged(anOperation->getDescription()->operationId().toStdString(),
-      //                        anOperation->isValid());
     }
   }
-}
-
-bool XGUI_OperationMgr::isApplyEnabled() const
-{
-  return myIsApplyEnabled;
-}
-
-bool XGUI_OperationMgr::isParentOperationValid() const
-{
-  bool isValid = false;
-  // the enable state of the parent operation of the nested one is defined by the rules that
-  // firstly there are nested operations and secondly the parent operation is valid
-  ModuleBase_Operation* aPrevOp = 0;
-  Operations::const_iterator anIt = myOperations.end();
-  if (anIt != myOperations.begin()) { // there are items in the operations list
-    --anIt;
-    aPrevOp = *anIt; // the last top operation, the operation which is started
-    if (anIt != myOperations.begin()) { // find the operation where the started operation is nested
-      --anIt;
-      aPrevOp = *anIt;
-    }
-  }
-  return aPrevOp && aPrevOp->isValid();
 }
 
 bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
@@ -344,7 +297,7 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId)
       else if (canStopOperation(aCurrentOp)) {
         // the started operation is granted in the parrent operation,
         // e.g. current - Line in Sketch, started Circle 
-        if (myIsApplyEnabled && aCurrentOp->isModified())
+        if (workshop()->errorMgr()->isApplyEnabled() && aCurrentOp->isModified())
           aCurrentOp->commit();
         else
           abortOperation(aCurrentOp);

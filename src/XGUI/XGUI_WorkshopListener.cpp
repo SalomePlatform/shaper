@@ -74,8 +74,6 @@ XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
     myUpdatePrefs(false)
 {
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
-  //connect(anOperationMgr, SIGNAL(nestedStateChanged(const std::string&, const bool)),
-  //        this, SLOT(onNestedStateChanged(const std::string&, const bool)));
 }
 
 //******************************************************
@@ -429,30 +427,6 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //  activateLastPart();
   //}
 }
-
-/*void XGUI_WorkshopListener::onNestedStateChanged(const std::string& theFeatureId, const bool theState)
-{
-  XGUI_Workshop* aWorkshop = workshop();
-
-  //one button is used for all features, which can have nested actions, so it is obtained from
-  // the action manager
-  //bool aActionToBeUpdated = aWorkshop->isFeatureOfNested(theFeatureId);
-  if (aWorkshop->isSalomeMode()) {
-    XGUI_SalomeConnector* aSalomeConnector = aWorkshop->salomeConnector();
-    XGUI_ActionsMgr* anActionsMgr = aWorkshop->actionsMgr();
-    if (aSalomeConnector->isFeatureOfNested(anActionsMgr->action(theFeatureId.c_str())))
-      aActionToBeUpdated = true;
-  } else {
-    AppElements_MainMenu* aMenuBar = aWorkshop->mainWindow()->menuObject();
-    AppElements_Command* aCommand = aMenuBar->feature(theFeatureId.c_str());
-    if (aCommand && aCommand->button()->additionalButtonWidget())
-      aActionToBeUpdated = true;
-  }
-  if (aActionToBeUpdated) {
-    QAction* anAcceptAllAction = aWorkshop->actionsMgr()->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
-    anAcceptAllAction->setEnabled(theState);
-  }
-}*/
 
 bool XGUI_WorkshopListener::event(QEvent * theEvent)
 {

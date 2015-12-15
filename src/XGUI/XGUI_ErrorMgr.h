@@ -44,6 +44,9 @@ public:
   /// \param theFeature a feature
   void updateAcceptAllAction(const FeaturePtr& theFeature);
 
+  /// Returns true if the apply is enabled for the current feature
+  bool isApplyEnabled() const;
+
 protected slots:
   /// Reimplemented from ModuleBase_ErrorMgr::onWidgetChanged().
   virtual void onWidgetChanged();

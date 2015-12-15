@@ -55,13 +55,20 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
                                       (workshop()->operationMgr()->currentOperation());
   if (aFOperation && aFOperation->feature() == theFeature) {
     QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
-    QString anError = myWorkshop->module()->getFeatureError(theFeature);
-
+    
     ModuleBase_ModelWidget* anActiveWidget = activeWidget();
-    QString aWidgetError = myWorkshop->module()->getWidgetError(anActiveWidget);
-    if (anError.isEmpty())
-      anError = aWidgetError;
-
+    bool isApplyEnabledByActiveWidget = false;
+    if (anActiveWidget)
+      isApplyEnabledByActiveWidget = anActiveWidget->getValueState() ==
+                                     ModuleBase_ModelWidget::ModifiedInPP;
+    QString anError = "";
+    QString aWidgetError = "";
+    if (!isApplyEnabledByActiveWidget) {
+      anError = myWorkshop->module()->getFeatureError(theFeature);
+      aWidgetError = myWorkshop->module()->getWidgetError(anActiveWidget);
+      if (anError.isEmpty())
+        anError = aWidgetError;
+    }
     updateActionState(anOkAction, anError);
     updateToolTip(anActiveWidget, aWidgetError);
   }
@@ -80,6 +87,19 @@ void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
     anAcceptAllAction->setEnabled(anEnabled);
     anAcceptAllAction->setToolTip(anError);
   }
+}
+
+bool XGUI_ErrorMgr::isApplyEnabled() const
+{
+  bool isEnabled = false;
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                      (workshop()->operationMgr()->currentOperation());
+  if (aFOperation) {
+    QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+    isEnabled = anOkAction && anOkAction->isEnabled();
+  }
+  return isEnabled;
 }
 
 void XGUI_ErrorMgr::updateActionState(QAction* theAction, const QString& theError)
