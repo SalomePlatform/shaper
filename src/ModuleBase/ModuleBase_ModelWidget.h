@@ -9,14 +9,13 @@
 
 #include <ModuleBase.h>
 #include <ModuleBase_ViewerPrs.h>
-
+#include <ModuleBase_OperationFeature.h>
 #include <ModelAPI_Feature.h>
 
 #include <QWidget>
 
 #include <memory>
 
-class ModuleBase_OperationFeature;
 class Config_WidgetAPI;
 class ModuleBase_IWorkshop;
 class QKeyEvent;
