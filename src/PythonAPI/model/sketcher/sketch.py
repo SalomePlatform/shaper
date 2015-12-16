@@ -194,8 +194,8 @@ class Sketch(Interface):
         if p1 is None or p2 is None:
             raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintCoincidence")
-        constraint.data().refattr("ConstraintEntityA").setAttr(p1)
-        constraint.data().refattr("ConstraintEntityB").setAttr(p2)
+        self._fillAttribute(constraint.refattr("ConstraintEntityA"), p1)
+        self._fillAttribute(constraint.refattr("ConstraintEntityB"), p2)
         self.execute()
         return constraint
 
@@ -264,7 +264,7 @@ class Sketch(Interface):
             raise TypeError("NoneType argument given")
         constraint = self._feature.addFeature("SketchConstraintLength")
         constraint.data().refattr("ConstraintEntityA").setObject(line)
-        constraint.data().real("ConstraintValue").setValue(length)
+        self._fillAttribute(constraint.real("ConstraintValue"), length)
         self.execute()
         return constraint
 
@@ -272,8 +272,8 @@ class Sketch(Interface):
         """Set the radius of the given circle and add the corresponding
         constraint to this Sketch."""
         constraint = self._feature.addFeature("SketchConstraintRadius")
-        constraint.data().refattr("ConstraintEntityA").setObject(circle)
-        constraint.data().real("ConstraintValue").setValue(radius)
+        self._fillAttribute(constraint.refattr("ConstraintEntityA"), circle)
+        self._fillAttribute(constraint.real("ConstraintValue"), radius)
         self.execute()
         return constraint
 
@@ -321,7 +321,7 @@ class Sketch(Interface):
     def setRigid(self, object_):
         """Set a rigid constraint on a given object."""
         constraint = self._feature.addFeature("SketchConstraintRigid")
-        constraint.data().refattr("ConstraintEntityA").setObject(object_)
+        self._fillAttribute(constraint.refattr("ConstraintEntityA"), object_)
         self.execute()
         return constraint
 
