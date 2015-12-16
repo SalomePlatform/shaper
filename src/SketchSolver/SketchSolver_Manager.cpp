@@ -81,6 +81,7 @@ void SketchSolver_Manager::processEvent(
 {
   if (myIsComputed)
     return;
+  myIsComputed = true;
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
@@ -156,6 +157,7 @@ void SketchSolver_Manager::processEvent(
         myGroups.insert(myGroups.end(), aSeparatedGroups.begin(), aSeparatedGroups.end());
     }
   }
+  myIsComputed = false;
 }
 
 // ============================================================================
@@ -339,7 +341,7 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
 // ============================================================================
 void SketchSolver_Manager::resolveConstraints(const bool theForceUpdate)
 {
-  myIsComputed = true;
+  //myIsComputed = true;
   bool needToUpdate = false;
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   // to avoid redisplay of each segment on update by solver one by one in the viewer
@@ -360,7 +362,7 @@ void SketchSolver_Manager::resolveConstraints(const bool theForceUpdate)
   // Must be before flush because on "Updated" flush the results may be produced
   // and the creation event is appeared with many new objects. If myIsComputed these
   // events are missed in processEvents and some elements are not added.
-  myIsComputed = false;
+  //myIsComputed = false;
   if (needToUpdate || theForceUpdate)
     Events_Loop::loop()->flush(anUpdateEvent);
 }

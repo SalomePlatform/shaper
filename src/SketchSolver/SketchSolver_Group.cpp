@@ -199,6 +199,13 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 {
   if (!checkFeatureValidity(theFeature))
     return false;
+  // the external feature always should keep the up to date values, so, 
+  // refresh from the solver is never needed
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+    std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+  if (aSketchFeature.get() && aSketchFeature->isExternal())
+    return false;
+
   myStorage->refresh(true);
   return myStorage->update(theFeature);
 }
