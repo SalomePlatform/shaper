@@ -295,6 +295,10 @@ void Model_Document::close(const bool theForever)
     mySelectionFeature.reset();
   } else {
     setCurrentFeature(FeaturePtr(), false); // disables all features
+    // update the OB: features are disabled (on remove of Part)
+    Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID aDeleteEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+    aLoop->flush(aDeleteEvent);
   }
 
   std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
