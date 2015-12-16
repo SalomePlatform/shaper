@@ -2,10 +2,12 @@ from GeomDataAPI import geomDataAPI_Point2D
 from model.roots import Interface
 from model.errors import WrongNumberOfArguments
 
-class Line(Interface):
+from .entity import Entity
+
+class Line(Entity):
     """Interface for editing of a sketch line feature."""
     def __init__(self, feature, *args):
-        Interface.__init__(self, feature)
+        Entity.__init__(self, feature)
         assert(self._feature.getKind() == "SketchLine")
 
         # Initialize attributes
