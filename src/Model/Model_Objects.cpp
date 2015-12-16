@@ -562,6 +562,13 @@ void Model_Objects::setUniqueName(FeaturePtr theFeature)
         isSameName = (*aRIter)->data()->name() == aName;
       }
     }
+    // for new Parts create names that are not in the Postponed list
+    if (!isSameName && (theFeature->getKind() == "Part" || theFeature->getKind() == "Duplicate")) {
+      std::shared_ptr<Model_Session> aSession = 
+        std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+      isSameName = aSession->isLoadByDemand(aName) || aSession->hasDocument(aName);
+    }
+
     if (isSameName) {
       aNumObjects++;
       std::stringstream aNameStream;

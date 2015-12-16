@@ -62,8 +62,15 @@ void Model_ResultPart::activate()
 
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   
+  // activation may cause changes in current features in document, so it must be in transaction
+  bool isNewTransaction = false;
+  SessionPtr aMgr = ModelAPI_Session::get();
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
     myIsInLoad = true;
+    if (!aMgr->isOperation()) {
+      aMgr->startOperation("Activation");
+      isNewTransaction = true;
+    }
     std::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
     myIsInLoad = false;
     if (aDoc) {
@@ -72,16 +79,10 @@ void Model_ResultPart::activate()
     }
   }
   if (aDocRef->value().get()) {
-    SessionPtr aMgr = ModelAPI_Session::get();
-    bool isNewTransaction = !aMgr->isOperation();
-    // activation may cause changes in current features in document, so it must be in transaction
-    if (isNewTransaction) {
-      aMgr->startOperation("Activation");
-    }
     ModelAPI_Session::get()->setActiveDocument(aDocRef->value());
-    if (isNewTransaction) {
-      aMgr->finishOperation();
-    }
+  }
+  if (isNewTransaction) {
+    aMgr->finishOperation();
   }
 }
 

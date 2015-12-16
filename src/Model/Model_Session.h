@@ -81,6 +81,8 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
   /// Returns the document by ID, loads if not loaded yet. Returns null if no such document.
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> document(std::string theDocID);
+  /// Return true if document with such ID has been already created
+  MODEL_EXPORT virtual bool hasDocument(std::string theDocID);
 
   /// Return true if root document has been already created
   MODEL_EXPORT virtual bool hasModuleDocument();

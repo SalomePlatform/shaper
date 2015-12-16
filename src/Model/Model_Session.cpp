@@ -61,8 +61,11 @@ void Model_Session::startOperation(const std::string& theId, const bool theAttac
     (new Events_Message(Events_Loop::eventByName("StartOperation")));
   Events_Loop::loop()->send(aStartedMsg);
   // remove all useless documents that has been closed: on start of operation undo/redo is cleared
-  std::list<std::shared_ptr<ModelAPI_Document> > aUsedDocs = allOpenedDocuments();
-  Model_Application::getApplication()->removeUselessDocuments(aUsedDocs);
+  // MPV: this code is dangerous now because it may close the document that is activated right now
+  // but not in the list of the opened documents yet (create, delete, undo, activate Part)
+  // later this must be updated by correct usage of uniques IDs of documents, not names of results
+  //std::list<std::shared_ptr<ModelAPI_Document> > aUsedDocs = allOpenedDocuments();
+  //Model_Application::getApplication()->removeUselessDocuments(aUsedDocs);
 }
 
 void Model_Session::finishOperation()
@@ -206,6 +209,11 @@ std::shared_ptr<ModelAPI_Document> Model_Session::document(std::string theDocID)
 bool Model_Session::hasModuleDocument()
 {
   return Model_Application::getApplication()->hasDocument("root");
+}
+
+bool Model_Session::hasDocument(std::string theDocID)
+{
+  return Model_Application::getApplication()->hasDocument(theDocID);
 }
 
 std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
