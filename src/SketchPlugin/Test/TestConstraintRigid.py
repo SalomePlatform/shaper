@@ -105,12 +105,9 @@ eachRefattr.setObject(aResult)
 aSession.finishOperation()
 
 # Check that constarints doesn't affected lines' values
-assert (kLineAStart == (aLineAStartPoint.x(), aLineAStartPoint.y()))
-assert (kLineAEnd == (aLineAEndPoint.x(),   aLineAEndPoint.y()))
-assert (kLineBStart == (aLineBStartPoint.x(), aLineBStartPoint.y()))
-assert (kLineBEnd == (aLineBEndPoint.x(),   aLineBEndPoint.y()))
-assert (kLineCStart == (aLineCStartPoint.x(), aLineCStartPoint.y()))
-assert (kLineCEnd == (aLineCEndPoint.x(),   aLineCEndPoint.y()))
+assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
+assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
+assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
 #=========================================================================
 # Check that moving line A does not affect lines
 #=========================================================================
@@ -118,12 +115,9 @@ aSession.startOperation()
 aLineAEndPoint.setValue(90., 0.)
 aSession.finishOperation()
 # Check that constarint keep features' values
-assert (kLineAStart == (aLineAStartPoint.x(), aLineAStartPoint.y()))
-assert (kLineAEnd == (aLineAEndPoint.x(),   aLineAEndPoint.y()))
-assert (kLineBStart == (aLineBStartPoint.x(), aLineBStartPoint.y()))
-assert (kLineBEnd == (aLineBEndPoint.x(),   aLineBEndPoint.y()))
-assert (kLineCStart == (aLineCStartPoint.x(), aLineCStartPoint.y()))
-assert (kLineCEnd == (aLineCEndPoint.x(),   aLineCEndPoint.y()))
+assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
+assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
+assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
 #=========================================================================
 # Check that moving line B does not affect lines
 #=========================================================================
@@ -131,12 +125,9 @@ aSession.startOperation()
 aLineBEndPoint.setValue(90., 150.)
 aSession.finishOperation()
 # Check that constarint keep features' values
-assert (kLineAStart == (aLineAStartPoint.x(), aLineAStartPoint.y()))
-assert (kLineAEnd == (aLineAEndPoint.x(),   aLineAEndPoint.y()))
-assert (kLineBStart == (aLineBStartPoint.x(), aLineBStartPoint.y()))
-assert (kLineBEnd != (aLineBEndPoint.x(),   aLineBEndPoint.y()))
-assert (kLineCStart != (aLineCStartPoint.x(), aLineCStartPoint.y()))
-assert (kLineCEnd == (aLineCEndPoint.x(),   aLineCEndPoint.y()))
+assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
+assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
+assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line to check that constraint are not applied

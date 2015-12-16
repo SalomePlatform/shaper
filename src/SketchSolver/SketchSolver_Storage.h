@@ -50,7 +50,7 @@ public:
   ///        the list of constraints applicable for corresponding solver.
   /// \param theConstraint        [in]   original SketchPlugin constraint
   /// \param theSolverConstraints [in]   list of solver's constraints
-  SKETCHSOLVER_EXPORT
+  SKETCHSOLVER_EXPORT virtual
     void addConstraint(ConstraintPtr                   theConstraint,
                        std::list<ConstraintWrapperPtr> theSolverConstraints);
 
@@ -192,14 +192,14 @@ protected:
   /// \brief Update the group for the given parameter
   virtual void changeGroup(ParameterWrapperPtr theParam, const GroupID& theGroup) = 0;
 
+  /// \brief Verify the feature or any its attribute is used by constraint
+  SKETCHSOLVER_EXPORT bool isUsed(FeaturePtr theFeature) const;
+  /// \brief Verify the attribute is used by constraint
+  SKETCHSOLVER_EXPORT bool isUsed(AttributePtr theAttirubute) const;
+
 private:
   /// \brief Find the normal of the sketch
   EntityWrapperPtr getNormal() const;
-
-  /// \brief Verify the feature or any its attribute is used by constraint
-  bool isUsed(FeaturePtr theFeature) const;
-  /// \brief Verify the attribute is used by constraint
-  bool isUsed(AttributePtr theAttirubute) const;
 
 protected:
   GroupID myGroupID;       ///< identifier of the group, this storage belongs to

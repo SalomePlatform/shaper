@@ -100,10 +100,12 @@ aTangency.execute()
 aSession.finishOperation()
 anArcVecX = anArcStartPoint.x() - anArcCentr.x()
 anArcVecY = anArcStartPoint.y() - anArcCentr.y()
+aLen = math.sqrt(anArcVecX**2 + anArcVecY**2)
 aLineVecX = aLine1EndPoint.x() - aLine1StartPoint.x()
 aLineVecY = aLine1EndPoint.y() - aLine1StartPoint.y()
+aLen = aLen * math.sqrt(aLineVecX**2 + aLineVecY**2)
 aDot = anArcVecX * aLineVecX + anArcVecY * aLineVecY
-assert(math.fabs(aDot) <= 1.e-12)
+assert math.fabs(aDot) <= 2.e-6 * aLen, "Observed dot product: {0}".format(aDot)
 #=========================================================================
 # Add tangency constraint for arc and second line and check correctness
 #=========================================================================
@@ -121,10 +123,12 @@ aTangency.execute()
 aSession.finishOperation()
 anArcVecX = anArcEndPoint.x() - anArcCentr.x()
 anArcVecY = anArcEndPoint.y() - anArcCentr.y()
+aLen = math.sqrt(anArcVecX**2 + anArcVecY**2)
 aLineVecX = aLine2EndPoint.x() - aLine2StartPoint.x()
 aLineVecY = aLine2EndPoint.y() - aLine2StartPoint.y()
+aLen = aLen * math.sqrt(aLineVecX**2 + aLineVecY**2)
 aDot = anArcVecX * aLineVecX + anArcVecY * aLineVecY
-assert(math.fabs(aDot) <= 1.e-12)
+assert math.fabs(aDot) <= 2.e-6 * aLen, "Observed dot product: {0}".format(aDot)
 
 #=========================================================================
 # TEST 2. Arc-arc tangency
@@ -179,10 +183,12 @@ aTangency.execute()
 aSession.finishOperation()
 anArc1VecX = anArc1EndPoint.x() - anArc1Centr.x()
 anArc1VecY = anArc1EndPoint.y() - anArc1Centr.y()
+aLen = math.sqrt(anArc1VecX**2 + anArc1VecY**2)
 anArc2VecX = anArc2StartPoint.x() - anArc2Centr.x()
 anArc2VecY = anArc2StartPoint.y() - anArc2Centr.y()
+aLen = aLen * math.sqrt(anArc2VecX**2 + anArc2VecY**2)
 aCross = anArc1VecX * anArc2VecY - anArc1VecY * anArc2VecX
-assert(math.fabs(aCross) <= 1.e-12)
+assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
 
 #=========================================================================
 # TEST 3. Tangency between non-connected objects should be wrong

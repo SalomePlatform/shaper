@@ -11,6 +11,7 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+import math
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -76,7 +77,7 @@ aSession.finishOperation()
 assert (aLineAStartPoint.y() == 25)
 assert (aLineAEndPoint.y() == 25)
 # length of the line is the same
-assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 100)
+assert (math.fabs(aLineAEndPoint.x() - aLineAStartPoint.x() - 100) < 1.e-10)
 #=========================================================================
 # Change the length value of the constraint
 #=========================================================================
@@ -84,7 +85,7 @@ aSession.startOperation()
 aLength.setValue(140.)
 aLengthConstraint.execute()
 aSession.finishOperation()
-assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 140)
+assert (math.fabs(aLineAEndPoint.x() - aLineAStartPoint.x() - 140) < 1.e-10)
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line's start point to

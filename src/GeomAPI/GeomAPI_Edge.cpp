@@ -166,3 +166,9 @@ bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
 
   return true;
 }
+
+void GeomAPI_Edge::getRange(double& theFirst, double& theLast) const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, theFirst, theLast);
+}

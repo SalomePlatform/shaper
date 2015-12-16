@@ -60,6 +60,10 @@ public:
   /// Returns true if the current edge is geometrically equal to the given edge
   GEOMAPI_EXPORT 
   bool isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const;
+
+  /// Returns range of parameter on the curve
+  GEOMAPI_EXPORT 
+  void getRange(double& theFirst, double& theLast) const;
 };
 
 #endif
