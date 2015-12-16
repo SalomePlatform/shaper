@@ -308,13 +308,20 @@ class Sketch(Interface):
         self.execute()
         return constraint
 
-    def setFillet(self, line_1, line_2, radius):
+    def setFillet(self, *args):
         """Set a fillet constraint between the 2 given lines with the given
         filleting radius."""
+        assert(args)
         constraint = self._feature.addFeature("SketchConstraintFillet")
-        constraint.data().refattr("ConstraintEntityA").setObject(line_1)
-        constraint.data().reflist("ConstraintEntityB").clear()
-        constraint.data().reflist("ConstraintEntityB").append(line_2)
+        if len(args) == 3:
+            line_1, line_2, radius = args
+            constraint.data().refattr("ConstraintEntityA").setObject(line_1)
+            constraint.data().reflist("ConstraintEntityB").clear()
+            constraint.data().reflist("ConstraintEntityB").append(line_2)
+        elif len(args) == 2:
+            point, radius = args
+            self._fillAttribute(constraint.refattr("ConstraintEntityA"), point)
+            self._fillAttribute(constraint.real("ConstraintValue"), radius)
         self.execute()
         return constraint
 
