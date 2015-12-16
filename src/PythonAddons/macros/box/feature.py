@@ -87,8 +87,7 @@ class BoxFeature(model.Feature):
         """F.execute() -- execute the feature"""
         # Retrieving the user inputs
         width = self.getRealInput(self.WIDTH_ID())
-        length = self.getRealInpuut(self.WIDTH_ID())
-        length = self.getRealInt(self.LENGTH_ID())
+        length = self.getRealInput(self.LENGTH_ID())
         height = self.getRealInput(self.HEIGHT_ID())
 
         # Editing the box

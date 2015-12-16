@@ -131,7 +131,10 @@ class Extrusion(Interface):
 
         See __init__.
         """
-        self.__clear()
+        # MPV: with "clear" calling here the extrusion all the time becomes modificed (height is set to 
+        # zero and then to actual value, but this function is used in macro Bax, that causes "modified"
+        # values without changes that causes cyclic dependency
+        #self.__clear()
         self._fillAttribute(self._CreationMethod, "BySizes")
         self._fillAttribute(self._to_size, to_size)
         self._fillAttribute(self._from_size, from_size)
