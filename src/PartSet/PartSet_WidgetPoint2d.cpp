@@ -144,6 +144,7 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
     double aX, aY;
     if (getPoint2d(aView, aShape, aX, aY)) {
       isDone = setPoint(aX, aY);
+      PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
     }
   }
   else if (canBeActivatedByMove()) {
@@ -378,7 +379,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         else {
           if (getPoint2d(aView, aShape, aX, aY))
             setPoint(aX, aY);
-          bool anOrphanPoint = isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
+          bool anOrphanPoint = aShape.ShapeType() == TopAbs_VERTEX ||
+                               isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
           setConstraintWith(aObject);
           if (!anOrphanPoint)
             emit vertexSelected();
