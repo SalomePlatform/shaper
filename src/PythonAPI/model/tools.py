@@ -63,10 +63,12 @@ def fill_attribute(attribute, value):
     if (isinstance(attribute, ModelAPI.ModelAPI_AttributeBoolean) or
         isinstance(attribute, ModelAPI.ModelAPI_AttributeDocRef) or
         isinstance(attribute, ModelAPI.ModelAPI_AttributeInteger) or
-        isinstance(attribute, ModelAPI.ModelAPI_AttributeReference) or
-        isinstance(attribute, ModelAPI.ModelAPI_AttributeString)
+        isinstance(attribute, ModelAPI.ModelAPI_AttributeReference)
         ):
         attribute.setValue(value)
+
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeString):
+        attribute.setValue(str(value))
 
     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeDouble):
         if isinstance(value, basestring):
