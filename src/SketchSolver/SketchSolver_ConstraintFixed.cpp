@@ -53,7 +53,7 @@ void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
   // extract feature from the group
   if (theFeature->baseAttribute())
     myStorage->update(theFeature->baseAttribute(), GID_OUTOFGROUP);
-  else
+  else if (theFeature->baseFeature())
     myStorage->update(theFeature->baseFeature(), GID_OUTOFGROUP);
 }
 

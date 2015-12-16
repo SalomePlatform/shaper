@@ -49,7 +49,8 @@ static std::list<EntityWrapperPtr> movedEntities(
   for (; anOldIt != anOldSubs.end() && aNewIt != aNewSubs.end(); ++anOldIt, ++aNewIt) {
     std::list<EntityWrapperPtr> aMovedSubs = movedEntities(
         *anOldIt, theOldStorage, *aNewIt, theNewStorage);
-    if (aMovedSubs.size() != 1 || aMovedSubs.front() != *anOldIt)
+    if ((*anOldIt)->type() == ENTITY_POINT && // check only the points to be moved (because arcs in PlaneGCS have scalar subs too)
+       (aMovedSubs.size() != 1 || aMovedSubs.front() != *anOldIt))
       isFullyMoved = false;
     aMoved.insert(aMoved.end(), aMovedSubs.begin(), aMovedSubs.end());
   }
@@ -95,4 +96,22 @@ void SketchSolver_ConstraintMovement::getAttributes(
   }
   theAttributes.clear();
   theAttributes.insert(theAttributes.begin(), aMoved.begin(), aMoved.end());
+}
+
+bool SketchSolver_ConstraintMovement::remove()
+{
+  cleanErrorMsg();
+  // Move fixed entities back to the current group
+  std::vector<EntityWrapperPtr>::iterator aMoveIt = myMovedEntities.begin();
+  for (; aMoveIt != myMovedEntities.end(); ++aMoveIt) {
+    if ((*aMoveIt)->baseAttribute())
+      myStorage->update((*aMoveIt)->baseAttribute(), myGroupID);
+    else if ((*aMoveIt)->baseFeature())
+      myStorage->update((*aMoveIt)->baseFeature(), myGroupID);
+  }
+
+  // Remove base feature
+  if (myBaseFeature)
+    myStorage->removeEntity(myBaseFeature);
+  return true;
 }

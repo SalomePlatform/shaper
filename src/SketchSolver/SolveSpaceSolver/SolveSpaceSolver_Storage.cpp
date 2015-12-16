@@ -295,8 +295,9 @@ void SolveSpaceSolver_Storage::addCoincidentPoints(
     replaceInFeatures(theSlave, theMaster);
     replaceInConstraints(theSlave, theMaster);
 
-    // Remove slave entity
-    removeEntity((Slvs_hEntity)theSlave->id());
+    // Remove slave entity (if the IDs are equal no need to remove slave entity, just update it)
+    if (theMaster->id() != theSlave->id())
+      removeEntity((Slvs_hEntity)theSlave->id());
 
     std::shared_ptr<SolveSpaceSolver_EntityWrapper> aPointMaster = 
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theMaster);

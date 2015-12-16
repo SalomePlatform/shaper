@@ -28,6 +28,10 @@ public:
     : SketchSolver_ConstraintFixed(theFeature)
   {}
 
+  /// \brief Tries to remove constraint
+  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  virtual bool remove();
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();

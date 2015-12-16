@@ -41,7 +41,7 @@ typedef unsigned int UINT32;
  */
 class SolveSpaceSolver_Solver : public SketchSolver_ISolver
 {
- public:
+public:
   SolveSpaceSolver_Solver();
   virtual ~SolveSpaceSolver_Solver();
 
