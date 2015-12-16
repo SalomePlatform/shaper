@@ -37,7 +37,7 @@ def defaultPlane (name):
         n = GeomAPI.GeomAPI_Dir(0, 0, 1)
         x = GeomAPI.GeomAPI_Dir(1, 0, 0)
     elif name == "XOZ":
-        n = GeomAPI.GeomAPI_Dir(0, 1, 0)
+        n = GeomAPI.GeomAPI_Dir(0, -1, 0)
         x = GeomAPI.GeomAPI_Dir(1, 0, 0)
     elif name == "YOZ":
         n = GeomAPI.GeomAPI_Dir(1, 0, 0)
