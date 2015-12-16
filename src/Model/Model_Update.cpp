@@ -664,13 +664,14 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
       aState = ModelAPI_StateExecFailed;
     } else {
       aState = ModelAPI_StateDone;
-      myWaitForFinish.insert(theFeature);
     }
   } catch(...) {
     aState = ModelAPI_StateExecFailed;
     Events_Error::send(
       "Feature " + theFeature->getKind() + " has failed during the execution");
   }
+  // The macro feature has to be deleted in any case even its execution is failed 
+  myWaitForFinish.insert(theFeature);
   if (aState != ModelAPI_StateDone) {
     theFeature->eraseResults();
   }
