@@ -228,6 +228,27 @@ bool SketchSolver_Storage::isConsistent() const
   return true;
 }
 
+bool SketchSolver_Storage::isFixed(EntityWrapperPtr theEntity) const
+{
+  if (theEntity->group() != myGroupID)
+    return true;
+  // no need additional checking for entities differ than point
+  if (theEntity->type() != ENTITY_POINT)
+    return false;
+
+  CoincidentPointsMap::const_iterator anIt = myCoincidentPoints.begin();
+  for (; anIt != myCoincidentPoints.end(); ++anIt)
+    if (anIt->first == theEntity || anIt->second.find(theEntity) != anIt->second.end()) {
+      if (anIt->first->group() != myGroupID)
+        return true;
+      std::set<EntityWrapperPtr>::const_iterator anEntIt = anIt->second.begin();
+      for (; anEntIt != anIt->second.end(); ++anEntIt)
+        if ((*anEntIt)->group() != myGroupID)
+          return true;
+    }
+  return false;
+}
+
 void SketchSolver_Storage::removeInvalidEntities()
 {
   // Remove invalid constraints

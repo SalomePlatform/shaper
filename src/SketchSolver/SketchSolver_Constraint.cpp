@@ -163,7 +163,7 @@ void SketchSolver_Constraint::getAttributes(
       return;
     }
 
-    myStorage->update(*anIter, myGroupID);
+    myStorage->update(*anIter/*, myGroupID*/);
     EntityWrapperPtr anEntity = myStorage->entity(*anIter);
 
     SketchSolver_EntityType aType = anEntity->type();

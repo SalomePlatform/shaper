@@ -15,7 +15,6 @@
 #include <set>
 #include <vector>
 
-typedef std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > CoincidentPointsMap;
 typedef std::list< std::set<ConstraintWrapperPtr> >             SameConstraintMap;
 
 /** \class   SolveSpaceSolver_Storage
@@ -266,7 +265,6 @@ private:
   Slvs_hConstraint myConstrMaxID; ///< current constraint index (may differs with the number of constraints)
   std::vector<Slvs_Constraint> myConstraints; ///< list of constraints used in the current group (sorted by the identifier)
 
-  CoincidentPointsMap myCoincidentPoints; ///< lists of coincident points (first is a master point, second is a set of slaves)
   Slvs_hConstraint myFixed; ///< identifier of one of temporary constraints to fix separate point
 
   bool myDuplicatedConstraint; ///< shows the storage has same constraint twice

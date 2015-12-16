@@ -18,6 +18,8 @@
 #include <ModelAPI_Feature.h>
 #include <SketchPlugin_Constraint.h>
 
+typedef std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > CoincidentPointsMap;
+
 /** \class   SketchSolver_Storage
  *  \ingroup Plugins
  *  \brief   Interface to map SketchPlugin features to the entities of corresponding solver.
@@ -116,6 +118,10 @@ public:
   /// \brief Check the features is not removed
   bool isConsistent() const;
 
+  /// \brief Check the entity is fixed.
+  ///        If the point is under verification, all coincident points are checked too.
+  bool isFixed(EntityWrapperPtr theEntity) const;
+
   /// \brief Shows the sketch should be resolved
   virtual bool isNeedToResolve()
   { return myNeedToResolve; }
@@ -188,7 +194,8 @@ private:
   EntityWrapperPtr getNormal() const;
 
 protected:
-  GroupID myGroupID; ///< identifier of the group, this storage belongs to
+  GroupID myGroupID;       ///< identifier of the group, this storage belongs to
+  bool    myNeedToResolve; ///< parameters are changed and group needs to be resolved
 
   /// map SketchPlugin constraint to a list of solver's constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> > myConstraintMap;
@@ -197,7 +204,7 @@ protected:
   /// map attribute to solver's entity
   std::map<AttributePtr, EntityWrapperPtr>                  myAttributeMap;
 
-  bool myNeedToResolve; ///< parameters are changed and group needs to be resolved
+  CoincidentPointsMap myCoincidentPoints; ///< lists of coincident points (first is a master point, second is a set of slaves)
 };
 
 typedef std::shared_ptr<SketchSolver_Storage> StoragePtr;
