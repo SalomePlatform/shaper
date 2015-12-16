@@ -89,3 +89,8 @@ void Model_ResultConstruction::setInfinite(const bool theInfinite)
 {
   myIsInfinite = theInfinite;
 }
+
+void Model_ResultConstruction::setIsConcealed(const bool theValue)
+{
+  // do nothing: the construction element is never consealed
+}
