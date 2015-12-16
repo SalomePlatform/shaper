@@ -50,6 +50,7 @@
         <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" min="0" default="1" use_reset="false">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>
+        <validator id="PartSet_FilletSelection"/>
       </feature>
     </group>
       
