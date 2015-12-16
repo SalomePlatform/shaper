@@ -132,6 +132,20 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
 
   EntityWrapperPtr aRelated = entity(anAttribute);
   if (!aRelated) { // Attribute is not exist, create it
+    // verify the attribute is a point of arc and add whole arc
+    if (anAttribute->owner()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anAttribute->owner());
+      if (aFeature->getKind() == SketchPlugin_Arc::ID() &&
+          myFeatureMap.find(aFeature) == myFeatureMap.end()) {
+        // Additional checking that all attributes are initialized
+        if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
+            aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
+            aFeature->attribute(SketchPlugin_Arc::END_ID())->isInitialized()) {
+////          myFeatureMap[aFeature] = EntityWrapperPtr();
+          return SketchSolver_Storage::update(aFeature);
+        }
+      }
+    }
     BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
     GroupID aGroup = theGroup != GID_UNKNOWN ? theGroup : myGroupID;
     aRelated = aBuilder->createAttribute(anAttribute, aGroup);

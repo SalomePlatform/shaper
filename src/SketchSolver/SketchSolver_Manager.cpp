@@ -258,8 +258,11 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
     }
 
     if (aConstraint)
-      return (*aFirstGroupIter)->changeConstraint(aConstraint);
-    return (*aFirstGroupIter)->updateFeature(theFeature);
+      (*aFirstGroupIter)->changeConstraint(aConstraint);
+    else
+      (*aFirstGroupIter)->updateFeature(theFeature);
+    // groups are merged => need to resolve them
+    return true;
   }
 
   // Something goes wrong

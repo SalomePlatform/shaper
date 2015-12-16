@@ -184,21 +184,6 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
 
     if (anEntity->type() == ENTITY_SKETCH)
       storeWorkplane(anEntity);
-
-    // For the correct work with arcs we will add them if their parameter is added
-    if (theEntity->baseAttribute()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(theEntity->baseAttribute()->owner());
-      if (aFeature->getKind() == SketchPlugin_Arc::ID() &&
-          myFeatureMap.find(aFeature) == myFeatureMap.end()) {
-        // Additional checking that all attributes are initialized
-        if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
-            aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
-            aFeature->attribute(SketchPlugin_Arc::END_ID())->isInitialized()) {
-          myFeatureMap[aFeature] = EntityWrapperPtr();
-          return SketchSolver_Storage::update(aFeature);
-        }
-      }
-    }
   }
 
   return isUpdated;
