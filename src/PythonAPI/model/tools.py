@@ -83,9 +83,9 @@ def fill_attribute(attribute, value):
         assert(isinstance(value, ModelAPI.ModelAPI_Attribute) or
                isinstance(value, ModelAPI.ModelAPI_Object))
         if isinstance(value, ModelAPI.ModelAPI_Attribute):
-            attrubute.setAttr(value)
+            attribute.setAttr(value)
         elif isinstance(value, ModelAPI.ModelAPI_Object):
-            attrubute.setObject(value)
+            attribute.setObject(value)
 
     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeRefList):
         attribute.clear()
