@@ -40,7 +40,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Session.h
     ModelAPI_Tools.h
     ModelAPI_Validator.h
-	ModelAPI_Entity.h
+    ModelAPI_Entity.h
 )
 
 SET(PROJECT_SOURCES
@@ -107,7 +107,7 @@ SET(SWIG_SCRIPTS
 
 SET(SWIG_LINK_LIBRARIES
   ModelAPI
-  GeomAPI 
+  GeomAPI
   ${PYTHON_LIBRARIES}
 )
 

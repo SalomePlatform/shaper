@@ -16,11 +16,11 @@ class Line(Interface):
             self._feature.data().attribute("EndPoint")
             )
 
-        # If no arguments are given the attributes of the feature 
+        # If no arguments are given the attributes of the feature
         # are'nt initialized
         if args is None:
             return
-        
+
         # Set attribute values and execute
         if len(args) == 4:
             self.__createByCoordinates(*args)
@@ -44,22 +44,22 @@ class Line(Interface):
 
     def __createByName(self, name):
         self._feature.data().selection("External").selectSubShape("EDGE", name)
-    
+
     #######
     #
     # Set methods
     #
     #######
-    
+
     def setStartPoint(self, x, y):
         """Set the start point of the line."""
         self._start_point.setValue(x, y)
-        
+
     def setEndPoint(self, x, y):
         """Set the end point of the line."""
         self._end_point.setValue(x, y)
 
-    # TODO : methods below will be removed. 
+    # TODO : methods below will be removed.
     # Kept until all tests have been updated
     def startPointData(self):
         return self._start_point

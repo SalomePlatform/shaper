@@ -5,12 +5,12 @@
 """Sketcher interface.
 This interface allows to add a sketch
 in a part or partset.
-The created sketch object provides all the needed methods 
+The created sketch object provides all the needed methods
 for sketch modification and constraint edition.
 
 Example of code:
 
-.. doctest:: 
+.. doctest::
 
    >>> import model
    >>> model.begin()
@@ -44,7 +44,7 @@ def addSketch(document, plane):
     Arguments:
        document(ModelAPI_Document): part or partset document
        plane(geom.Ax3): plane on wich the sketch is built
-    
+
     Returns:
        Sketch: sketch object
     """
@@ -74,7 +74,7 @@ class Sketch(Interface):
             )
         self._external = self._feature.data().selection("External")
 
-        # If no arguments are given the attributes of the feature 
+        # If no arguments are given the attributes of the feature
         # are not Initialized
         if args is not None:
             plane = args[0]
@@ -111,24 +111,24 @@ class Sketch(Interface):
 
     def addLine(self, *args):
         """Add a line to the sketch.
-        
+
         .. function:: addLine(name)
-        Select an existing line. The line is added to the sketch with a rigid 
+        Select an existing line. The line is added to the sketch with a rigid
         constraint (it cannot be modified by the sketch)
-        
+
         Arguments:
             name(str): name of an existing line
-        
+
         .. function:: addLine(start, end)
         Create a line by points
-        
+
         Arguments:
            start(point): start point of the line
            end(point): end point of the line
-        
+
         .. function:: addLine(start_x, start_y, end_x, end_y)
         Create a line by coordinates
-        
+
         Arguments:
            start_x(double): start point x coordinate
         """
@@ -154,20 +154,20 @@ class Sketch(Interface):
 
     def addArc(self, *args):
         """Add an arc of circle to the sketch and return an arc object.
-        
+
         Two different syntaxes are allowed:
-        
+
         .. function:: addArc(center, start, end)
-        
+
         Arguments:
-            center (point): center of the arc  
+            center (point): center of the arc
             start (point): start point of the arc
             end (point): end point of the arc
-        
+
         .. function:: addArc(center_x, center_y, start_x, start_y, end_x, end_y)
-        
+
         Same as above but with coordinates
-        
+
         Returns:
             Arc: arc object
         Raises:
@@ -189,7 +189,7 @@ class Sketch(Interface):
         constraint to this Sketch."""
         # assert(p1 and p2) NOTE : if an argument is missing python
         # will raise TypeError by itself.
-        # It seems better to check only that provided arguments are not 
+        # It seems better to check only that provided arguments are not
         # None
         if p1 is None or p2 is None:
             raise TypeError("NoneType argument given")
@@ -317,25 +317,25 @@ class Sketch(Interface):
         constraint.data().reflist("ConstraintEntityB").append(line_2)
         self.execute()
         return constraint
-    
+
     def setRigid(self, object_):
         """Set a rigid constraint on a given object."""
         constraint = self._feature.addFeature("SketchConstraintRigid")
         constraint.data().refattr("ConstraintEntityA").setObject(object_)
         self.execute()
         return constraint
-    
+
     #-------------------------------------------------------------
     #
     # Transformation constraints
     #
     #-------------------------------------------------------------
-    
+
     def addMirror(self, mirror_line, sketch_objects):
         """Add a mirror transformation of the given objects to the sketch.
-        
+
         This transformation is a constraint.
-        
+
         :return: interface to the constraint
         :rtype: Mirror object
         """
@@ -343,7 +343,7 @@ class Sketch(Interface):
         mirror_interface = Mirror(mirror_constraint, mirror_line, sketch_objects)
         self.execute()
         return mirror_interface
-        
+
 
     #-------------------------------------------------------------
     #
