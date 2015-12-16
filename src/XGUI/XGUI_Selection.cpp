@@ -10,7 +10,10 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_ObjectsBrowser.h"
 
+#include "ModuleBase_ResultPrs.h"
+
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Tools.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Axis.hxx>
@@ -166,6 +169,26 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
      
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   ObjectPtr aFeature = aDisplayer->getObject(anIO);
+
+  Handle(ModuleBase_BRepOwner) aCompSolidBRO = Handle(ModuleBase_BRepOwner)::DownCast(theOwner);
+  if (!aCompSolidBRO.IsNull()) {
+    // If ModuleBase_BRepOwner object is created then it means that TopAbs_COMPSOLID selection mode
+    // is On and we have to use parent result which corresponds to the CompSolid shape
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aFeature);
+    if (aResult.get()) {
+      ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(aResult);
+      if (aCompSolid.get()) {
+        GeomShapePtr aShapePtr = aCompSolid->shape();
+        if (aShapePtr.get()) {
+          TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+          if (aShape.IsEqual(thePrs.shape())) {
+            thePrs.setObject(aCompSolid);
+            return;
+          }
+        }
+      }
+    }
+  }
   thePrs.setObject(aFeature);
 }
 

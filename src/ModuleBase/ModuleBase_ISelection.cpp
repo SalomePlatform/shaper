@@ -38,12 +38,11 @@ ResultPtr ModuleBase_ISelection::getResult(const ModuleBase_ViewerPrs& thePrs)
 {
   ResultPtr aResult;
 
-  if (!thePrs.owner().IsNull()) {
+  if (thePrs.object().get())
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+  else if (!thePrs.owner().IsNull()) {
     ObjectPtr anObject = getSelectableObject(thePrs.owner());
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-  }
-  else {
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
   }
 
   return aResult;

@@ -13,6 +13,31 @@
 
 #include <ViewerData_AISShape.hxx>
 #include <Standard_DefineHandle.hxx>
+#include <StdSelect_BRepOwner.hxx>
+
+DEFINE_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner)
+
+/**
+* \ingroup GUI
+* A redefinition of standard BRep Owner in order to provide specific selection
+* of CompSolid objects. This owner is created only for selection mode TopAbs_COMPSOLID
+*/
+class ModuleBase_BRepOwner: public StdSelect_BRepOwner
+{
+public:
+  ModuleBase_BRepOwner(const TopoDS_Shape& aShape, 
+    const Standard_Integer aPriority = 0, 
+    const Standard_Boolean ComesFromDecomposition = Standard_False)
+    : StdSelect_BRepOwner(aShape, aPriority, ComesFromDecomposition) {}
+
+  virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM, 
+    const Quantity_NameOfColor aCol, const Standard_Integer aMode = 0)
+  {  Selectable()->HilightOwnerWithColor(aPM, aCol, this); }
+
+  DEFINE_STANDARD_RTTI(ModuleBase_BRepOwner)
+};
+
+
 
 DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, ViewerData_AISShape)
 
@@ -28,6 +53,16 @@ public:
   /// \param theResult a result object
   Standard_EXPORT ModuleBase_ResultPrs(ResultPtr theResult);
 
+
+  //! Method which draws selected owners ( for fast presentation draw )
+  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                               const SelectMgr_SequenceOfOwner& theOwners);
+  
+  //! Method which hilight an owner belonging to
+  //! this selectable object  ( for fast presentation draw )
+  Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                                     const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
+
   /// Returns result object
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
@@ -36,6 +71,9 @@ public:
 
   /// Returns a list of faces
   Standard_EXPORT const std::list<std::shared_ptr<GeomAPI_Shape> >& facesList() { return myFacesList; }
+
+  /// Returns true if the object is used in CompSolid selection mode
+  Standard_EXPORT bool hasCompSolidSelectionMode() const;
 
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
@@ -48,6 +86,10 @@ protected:
     const Standard_Integer aMode) ;
 
 private:
+  /// Returns shape dependent on CompSolid selection mode
+  /// In case CompSolid selection mode it returns parent's compsolid shape
+  TopoDS_Shape getSelectionShape() const;
+
   /// Reference to result object
   ResultPtr myResult;
 
