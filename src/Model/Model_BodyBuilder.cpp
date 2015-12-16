@@ -766,11 +766,6 @@ std::shared_ptr<GeomAPI_Shape> Model_BodyBuilder::shape()
     Handle(TNaming_NamedShape) aName;
     if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
       TopoDS_Shape aShape = aName->Get();
-      if (aShape.IsNull())
-        std::cout<<"Model_BodyBuilder::shape returns empty shape "<<std::endl;
-      else 
-        std::cout<<"Model_BodyBuilder::shape returns shape "<<&(*(aShape.TShape()))<<" with type "
-          <<aShape.ShapeType()<<std::endl;
       if (!aShape.IsNull()) {
         std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
         aRes->setImpl(new TopoDS_Shape(aShape));

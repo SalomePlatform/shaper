@@ -1708,6 +1708,15 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
   std::list<ParameterWrapperPtr> aParams;
   std::list<ParameterWrapperPtr>::const_iterator aParIt;
   for (; anIt != myAttributeMap.end(); ++anIt) {
+    // the external feature always should keep the up to date values, so, 
+    // refresh from the solver is never needed
+    if (anIt->first.get()) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(anIt->first->owner());
+      if (aSketchFeature.get() && aSketchFeature->isExternal())
+        continue;
+    }
+
     // update parameter wrappers and obtain values of attributes
     aParams = anIt->second->parameters();
     double aCoords[3];
