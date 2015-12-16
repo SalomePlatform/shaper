@@ -213,8 +213,8 @@ bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    int aCount = shapesNbLines(theSelection);
-    return (aCount > 0) && (aCount < 3);
+    int aCount = shapesNbPoints(theSelection);
+    return aCount == 1;
   }
 }
 
