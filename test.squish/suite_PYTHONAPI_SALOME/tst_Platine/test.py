@@ -1,3 +1,12 @@
+def set_parameter_value(name, value):
+    openContextMenu(waitForObject(":Parameters.%s = _QModelIndex" % name), 10, 10, 0)
+    activateItem(waitForObjectItem(":_QMenu", "Edit..."))
+    mouseClick(waitForObject(":Parameter_ExpressionEditor"), 10, 10, 0, Qt.LeftButton)
+    type(waitForObject(":Parameter_ExpressionEditor"), "<Ctrl+A>")
+    type(waitForObject(":Parameter_ExpressionEditor"), value)
+    type(waitForObject(":Parameter_ExpressionEditor"), "<Return>")
+    clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
+
 def main():
     # [project] NewGEOM
     # [Scenario] 'Platine' model created by PythonAPI
@@ -21,9 +30,9 @@ def main():
     # [step] In Python console type: import examples.Platine
     type(waitForObject(":Python Console_PyConsole_EnhEditor"), "import examples.Platine")
     type(waitForObject(":Python Console_PyConsole_EnhEditor"), "<Return>")
-    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
 
     # [step] Check that the model is correct [vp VP_PLATINE]
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
     test.vp("VP_PLATINE")
 
     # [step] Check that the object browser contains all objects from the model [vp VP_TREE]
@@ -35,5 +44,26 @@ def main():
     clickItem(":Object browser_XGUI_DataTree", "Part\\_1.Bodies (1)", -10, 10, 0, Qt.LeftButton)
     test.vp("VP_TREE")
 
-    # [step] Close application without saving
+    # [step] Change parameter values: L = 64, E = 5, P = 80
+    set_parameter_value("L", 64)
+    set_parameter_value("E", 5)
+    set_parameter_value("P", 80)
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    test.vp("VP_PLATINE_E")
+
+    # [step] Change parameter values: L = 90, E = 20, P = 80
+    set_parameter_value("L", 90)
+    set_parameter_value("E", 20)
+    set_parameter_value("P", 80)
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    test.vp("VP_PLATINE_L")
+
+    # [step] Change parameter values: L = 64, E = 20, P = 120
+    set_parameter_value("L", 64)
+    set_parameter_value("E", 20)
+    set_parameter_value("P", 120)
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    test.vp("VP_PLATINE_P")
+
+    # [step] Cloase application
     close_application()
