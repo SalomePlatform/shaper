@@ -456,9 +456,11 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
   QActionsList aActions;
   if (aSelected == 1) {
     ObjectPtr aObject = aPrsList.first().object();
-    std::string aName = aObject->groupName();
-    if (myViewerMenu.contains(aName))
-      aActions = myViewerMenu[aName];
+    if (aObject.get() != NULL) {
+      std::string aName = aObject->groupName();
+      if (myViewerMenu.contains(aName))
+        aActions = myViewerMenu[aName];
+    }
     aActions.append(action("COLOR_CMD"));
   } else if (aSelected > 1) {
     aActions.append(action("HIDE_CMD"));

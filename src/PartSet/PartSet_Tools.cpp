@@ -732,6 +732,8 @@ FeaturePtr PartSet_Tools::findFirstCoincidence(const FeaturePtr& theFeature,
                                                std::shared_ptr<GeomAPI_Pnt2d> thePoint)
 {
   FeaturePtr aCoincident;
+  if (theFeature.get() == NULL)
+    return aCoincident;
 
   const std::set<AttributePtr>& aRefsList = theFeature->data()->refsToMe();
   std::set<AttributePtr>::const_iterator aIt;

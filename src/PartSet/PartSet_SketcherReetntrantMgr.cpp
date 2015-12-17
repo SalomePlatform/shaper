@@ -392,7 +392,10 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
     QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
 
     foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-      aWidget->setFeature(myInternalFeature, true);
+      bool isStoreValue = !aFOperation->isEditOperation() &&
+                          !aWidget->getDefaultValue().empty() &&
+                          !aWidget->isComputedDefault();
+      aWidget->setFeature(myInternalFeature, isStoreValue);
     }
     ModuleBase_ModelWidget* aFirstWidget = ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
                                                                                         (aWidgets);
