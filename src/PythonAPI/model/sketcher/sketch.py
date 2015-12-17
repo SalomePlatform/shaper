@@ -152,7 +152,7 @@ class Sketch(Interface):
         circle_feature = self._feature.addFeature("SketchCircle")
         return Circle(circle_feature, *args)
 
-    def addArc(self, *args):
+    def addArc(self, *args, **kwargs):
         """Add an arc of circle to the sketch and return an arc object.
 
         Two different syntaxes are allowed:
@@ -176,7 +176,7 @@ class Sketch(Interface):
         if not args:
             raise TypeError("No arguments given")
         arc_feature = self._feature.addFeature("SketchArc")
-        return Arc(arc_feature, *args)
+        return Arc(arc_feature, *args, **kwargs)
 
     #-------------------------------------------------------------
     #
