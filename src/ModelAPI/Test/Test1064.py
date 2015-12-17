@@ -9,6 +9,7 @@
 from ModelAPI import *
 from GeomDataAPI import *
 from GeomAlgoAPI import *
+from GeomAPI import *
 
 __updated__ = "2015-10-16"
 

@@ -6,7 +6,7 @@ from model.roots import Interface
 
 class Arc(Interface):
     """Interface to a sketch arc feature."""
-    def __init__(self, feature, *args):
+    def __init__(self, feature, *args, **kwargs):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "SketchArc")
 
@@ -19,6 +19,7 @@ class Arc(Interface):
         self._end_point = geomDataAPI_Point2D(
             self._feature.data().attribute("ArcEndPoint")
             )
+        self._inversed = self._feature.boolean("InversedArc")
         if len(args) == 6:
             self.__createByCoordinates(*args)
         elif len(args) == 3:
@@ -27,9 +28,11 @@ class Arc(Interface):
             raise WrongNumberOfArguments(
                 "Arc takes 3 or 6 arguments (%s given)" % len(args)
                 )
+        if "inversed" in kwargs:
+            self.setInversed(kwargs["inversed"])
         self.execute()
-        
-        
+
+
     ########
     #
     # Getters
@@ -52,26 +55,28 @@ class Arc(Interface):
     def result(self):
         """Return the arc circular line attribute."""
         return self._feature.lastResult()
-    
-        
+
+
     ########
     #
     # Set methods
     #
     ########
-    
+
     def setCenter(self, x, y):
         """Set arc center."""
         self._center.setValue(x, y)
-        
+
     def setStartPoint(self, x, y):
         """Set start point."""
         self._start_point.setValue(x, y)
-        
+
     def setEndPoint(self, x, y):
         """Set end point value."""
         self._end_point.setValue(x, y)
 
+    def setInversed(self, inversed):
+        self._fillAttribute(self._inversed, inversed)
 
     ########
     #

@@ -22,7 +22,8 @@ SET(PROJECT_LIBRARIES
     ModelAPI
 )
 
-INCLUDE_DIRECTORIES( 
+INCLUDE_DIRECTORIES(
+  ../GeomAPI        # only for SWIG
   ../ModelAPI
 )
 

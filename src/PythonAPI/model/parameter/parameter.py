@@ -43,8 +43,8 @@ class Parameter(Interface):
         Interface.__init__(self, feature)
         assert(self._feature.getKind() == "Parameter")
 
-        self._variable = self._feature.data().string("variable")
-        self._expression = self._feature.data().string("expression")
+        self._variable = self._feature.string("variable")
+        self._expression = self._feature.string("expression")
 
         assert(self._variable)
         assert(self._expression)
@@ -64,7 +64,7 @@ class Parameter(Interface):
 
         See __init__.
         """
-        self._fillAttribute(self._name, name)
+        self._fillAttribute(self._variable, name)
         pass
 
     def setExpression(self, expression):

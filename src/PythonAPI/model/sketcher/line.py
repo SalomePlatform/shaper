@@ -2,10 +2,12 @@ from GeomDataAPI import geomDataAPI_Point2D
 from model.roots import Interface
 from model.errors import WrongNumberOfArguments
 
-class Line(Interface):
+from .entity import Entity
+
+class Line(Entity):
     """Interface for editing of a sketch line feature."""
     def __init__(self, feature, *args):
-        Interface.__init__(self, feature)
+        Entity.__init__(self, feature)
         assert(self._feature.getKind() == "SketchLine")
 
         # Initialize attributes
@@ -15,12 +17,13 @@ class Line(Interface):
         self._end_point = geomDataAPI_Point2D(
             self._feature.data().attribute("EndPoint")
             )
+        self._external = self._feature.selection("External")
 
-        # If no arguments are given the attributes of the feature 
+        # If no arguments are given the attributes of the feature
         # are'nt initialized
         if args is None:
             return
-        
+
         # Set attribute values and execute
         if len(args) == 4:
             self.__createByCoordinates(*args)
@@ -43,29 +46,33 @@ class Line(Interface):
         self.setEndPoint(p2.x(), p2.y())
 
     def __createByName(self, name):
-        self._feature.data().selection("External").selectSubShape("EDGE", name)
-    
+        self.setExternal(name)
+
     #######
     #
     # Set methods
     #
     #######
-    
+
     def setStartPoint(self, x, y):
         """Set the start point of the line."""
         self._start_point.setValue(x, y)
-        
+
     def setEndPoint(self, x, y):
         """Set the end point of the line."""
         self._end_point.setValue(x, y)
 
-    # TODO : methods below will be removed. 
+    # TODO : methods below will be removed.
     # Kept until all tests have been updated
     def startPointData(self):
         return self._start_point
 
     def endPointData(self):
         return self._end_point
+
+    def setExternal(self, name):
+        """Set external edge"""
+        self._external.selectSubShape("EDGE", name)
 
     def result(self):
         return self._feature.firstResult()

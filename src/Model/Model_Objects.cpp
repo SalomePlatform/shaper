@@ -139,13 +139,19 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     myFeatures.Bind(aFeatureLab, theFeature);
     // must be before the event sending: for OB the feature is already added
     updateHistory(ModelAPI_Feature::group());
+    // do not change the order:
+    // initData()
+    // sendUpdated()
+    // during python script with fillet constraint feature data should be
+    // initialized before using it in GUI
+
+    // must be after binding to the map because of "Box" macro feature that
+    // creates other features in "initData"
+    initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
     // event: feature is added, mist be before "initData" to update OB correctly on Duplicate:
     // first new part, then the content
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);
-    // must be after binding to the map because of "Box" macro feature that 
-    // creates other features in "initData"
-    initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
   } else { // make feature has not-null data anyway
     theFeature->setData(Model_Data::invalidData());
     theFeature->setDoc(myDoc);
