@@ -73,6 +73,9 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr& theConstraint)
   std::list<EntityWrapperPtr>::iterator anIt = anEntities.begin();
   for (; anIt != anEntities.end(); ++anIt) {
     isUpdated = update(*anIt) || isUpdated;
+    // do not update constrained entities for Multi constraints
+    if (aSlvsConstr.type == SLVS_C_MULTI_ROTATION || aSlvsConstr.type != SLVS_C_MULTI_TRANSLATION)
+      continue;
 
     Slvs_hEntity anID = (Slvs_hEntity)(*anIt)->id();
     if ((*anIt)->type() == ENTITY_POINT) {
