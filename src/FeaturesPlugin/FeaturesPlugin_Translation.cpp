@@ -47,7 +47,8 @@ void FeaturesPlugin_Translation::execute()
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) {
+    if(!anObject.get()) { // may be for not-activated parts
+      eraseResults();
       return;
     }
     anObjects.push_back(anObject);
