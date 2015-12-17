@@ -23,6 +23,7 @@
 #include <StdPrs_WFDeflectionShape.hxx>
 #include <StdSelect_BRepSelectionTool.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 
 
@@ -62,7 +63,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
 
   // Activate individual repaintng if this is a part of compsolid
   ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
-  SetAutoHilight(aCompSolid.get() == NULL);
+  //SetAutoHilight(aCompSolid.get() == NULL);
 }
 
 
@@ -183,8 +184,8 @@ TopoDS_Shape ModuleBase_ResultPrs::getSelectionShape() const
 void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
                                            const SelectMgr_SequenceOfOwner& theOwners)
 {
-  TopoDS_Shape aShape = getSelectionShape();
-  if (!aShape.IsNull()) {
+  if (hasCompSolidSelectionMode()) {
+    TopoDS_Shape aShape = getSelectionShape();
     Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
     aSelectionPrs->Clear();
 
@@ -194,6 +195,15 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
     aSelectionPrs->Highlight(Aspect_TOHM_COLOR, aSelectionPrs->HighlightColor());
     aSelectionPrs->Display();
     thePM->Highlight(this);
+  } else {
+    Handle(SelectMgr_EntityOwner) anOwner;
+    for (int i = 1; i <= theOwners.Length(); i++) {
+      anOwner = theOwners.Value(i);
+      if (!anOwner->IsSelected()) { // anOwner is not selected
+        anOwner->SetSelected(true);
+        AIS_Selection::Select(anOwner);
+      }
+    }
   }
 }
   
