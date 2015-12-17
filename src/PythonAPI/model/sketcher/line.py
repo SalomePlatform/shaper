@@ -17,6 +17,7 @@ class Line(Entity):
         self._end_point = geomDataAPI_Point2D(
             self._feature.data().attribute("EndPoint")
             )
+        self._external = self._feature.selection("External")
 
         # If no arguments are given the attributes of the feature
         # are'nt initialized
@@ -45,7 +46,7 @@ class Line(Entity):
         self.setEndPoint(p2.x(), p2.y())
 
     def __createByName(self, name):
-        self._feature.data().selection("External").selectSubShape("EDGE", name)
+        self.setExternal(name)
 
     #######
     #
@@ -68,6 +69,10 @@ class Line(Entity):
 
     def endPointData(self):
         return self._end_point
+
+    def setExternal(self, name):
+        """Set external edge"""
+        self._external.selectSubShape("EDGE", name)
 
     def result(self):
         return self._feature.firstResult()
