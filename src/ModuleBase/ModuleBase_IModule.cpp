@@ -66,20 +66,6 @@ void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
-const char* toString(ModelAPI_ExecState theExecState) 
-{
-#define TO_STRING(__NAME__) case __NAME__: return #__NAME__;
-  switch (theExecState) {
-  TO_STRING(ModelAPI_StateDone)
-  TO_STRING(ModelAPI_StateMustBeUpdated)
-  TO_STRING(ModelAPI_StateExecFailed)
-  TO_STRING(ModelAPI_StateInvalidArgument)
-  TO_STRING(ModelAPI_StateNothing)
-  default: return "Unknown ExecState.";
-  }
-#undef TO_STRING
-}
-
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   return ModelAPI_Tools::getFeatureError(theFeature).c_str();

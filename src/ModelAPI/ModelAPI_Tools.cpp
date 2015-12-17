@@ -22,6 +22,20 @@ std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   return theResult->shape();
 }
 
+const char* toString(ModelAPI_ExecState theExecState) 
+{
+#define TO_STRING(__NAME__) case __NAME__: return #__NAME__;
+  switch (theExecState) {
+  TO_STRING(ModelAPI_StateDone)
+  TO_STRING(ModelAPI_StateMustBeUpdated)
+  TO_STRING(ModelAPI_StateExecFailed)
+  TO_STRING(ModelAPI_StateInvalidArgument)
+  TO_STRING(ModelAPI_StateNothing)
+  default: return "Unknown ExecState.";
+  }
+#undef TO_STRING
+}
+
 std::string getFeatureError(const FeaturePtr& theFeature)
 {
   std::string anError;
@@ -39,7 +53,7 @@ std::string getFeatureError(const FeaturePtr& theFeature)
     bool isDone = ( theFeature->data()->execState() == ModelAPI_StateDone
                  || theFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
     if (!isDone)
-      anError = theFeature->data()->execState();
+      anError = toString(theFeature->data()->execState());
   }
 
   return anError;
