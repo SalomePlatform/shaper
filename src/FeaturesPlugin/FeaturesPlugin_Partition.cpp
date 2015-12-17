@@ -116,9 +116,12 @@ void FeaturesPlugin_Partition::execute()
 
   if(isCombine) {
     // Create single result.
-    std::shared_ptr<GeomAPI_Shape> aCompoud = GeomAlgoAPI_CompoundBuilder::compound(anObjects);
-    anObjects.clear();
-    anObjects.push_back(aCompoud);
+    if(!aTools.empty()) {
+      // This is a workaround for naming. Passing compound of objects as argument instead each object separately.
+      std::shared_ptr<GeomAPI_Shape> aCompoud = GeomAlgoAPI_CompoundBuilder::compound(anObjects);
+      anObjects.clear();
+      anObjects.push_back(aCompoud);
+    }
     GeomAlgoAPI_Partition aPartitionAlgo(anObjects, aTools);
 
     // Checking that the algorithm worked properly.
