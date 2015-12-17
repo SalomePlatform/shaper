@@ -8,6 +8,8 @@
 
 #include <SUIT_ViewManager.h>
 
+#include <QtxActionToolMgr.h>
+
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 #include <QMouseEvent>
@@ -74,6 +76,12 @@ Handle(V3d_Viewer) NewGeom_SalomeViewer::v3dViewer() const
   if (mySelector)
     return mySelector->viewer()->getViewer3d();
   return Handle(V3d_Viewer)();
+}
+
+//**********************************************
+Handle(AIS_Trihedron) NewGeom_SalomeViewer::trihedron() const
+{
+  return mySelector->viewer()->getTrihedron();
 }
 
 //**********************************************
@@ -237,13 +245,20 @@ void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
   OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(theView);
 
   OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
-  if (aWnd)
+  if (aWnd) {
     connect(aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
       this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+    OCCViewer_ViewPort3d* aViewPort = aWnd->getViewPort();
+    if (aViewPort)
+      connect(aViewPort, SIGNAL(vpMapped(OCCViewer_ViewPort3d*)), this, SLOT(onViewPortMapped()));
+  }
+  reconnectActions(aWnd, true);
 
   myWindowScale.insert (aView->getViewPort()->getView(), aView->getViewPort()->getView()->Camera()->Scale());
 
   emit viewCreated(myView);
+
+
 }
 
 //**********************************************
@@ -295,6 +310,32 @@ bool NewGeom_SalomeViewer::enableDrawMode(bool isEnabled)
   if (mySelector)
     return mySelector->viewer()->enableDrawMode(isEnabled);
   return false;
+}
+
+//**********************************************
+void NewGeom_SalomeViewer::reconnectActions(SUIT_ViewWindow* theWindow,
+                                            const bool theUseNewGeomSlot)
+{
+  OCCViewer_ViewWindow* aWindow = dynamic_cast<OCCViewer_ViewWindow*>(theWindow);
+  if (!aWindow)
+    return;
+
+  QAction* anAction = theWindow->toolMgr()->action(OCCViewer_ViewWindow::TrihedronShowId);
+  if (!anAction)
+    return;
+
+  if (theUseNewGeomSlot) {
+    anAction->disconnect(anAction, SIGNAL(toggled(bool)),
+                         theWindow, SLOT(onTrihedronShow(bool)));
+    anAction->connect(anAction, SIGNAL(toggled(bool)),
+                      this, SIGNAL(trihedronVisibilityChanged(bool)));
+  }
+  else {
+    anAction->connect(anAction, SIGNAL(toggled(bool)),
+                      theWindow, SLOT(onTrihedronShow(bool)));
+    anAction->disconnect(anAction, SIGNAL(toggled(bool)),
+                         this, SIGNAL(trihedronVisibilityChanged(bool)));
+  }
 }
 
 //**********************************************
@@ -388,6 +429,12 @@ void NewGeom_SalomeViewer::onViewTransformed(OCCViewer_ViewWindow::OperationType
 }
 
 //***************************************
+void NewGeom_SalomeViewer::onViewPortMapped()
+{
+  emit trihedronVisibilityChanged(true);
+}
+
+//***************************************
 void NewGeom_SalomeViewer::activateViewer(bool toActivate)
 {
   if (!mySelector || !mySelector->viewer())
@@ -400,6 +447,7 @@ void NewGeom_SalomeViewer::activateViewer(bool toActivate)
       OCCViewer_ViewWindow* aWnd = aOCCView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
       connect(aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
         this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+      reconnectActions(aWnd, true);
     }
   } else {
     foreach (SUIT_ViewWindow* aView, aViews) {
@@ -407,6 +455,7 @@ void NewGeom_SalomeViewer::activateViewer(bool toActivate)
       OCCViewer_ViewWindow* aWnd = aOCCView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
       disconnect((OCCViewer_ViewWindow*)aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
         this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
+      reconnectActions(aWnd, false);
     }
   }
 }

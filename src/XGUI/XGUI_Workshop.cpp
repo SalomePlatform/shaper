@@ -216,6 +216,10 @@ void XGUI_Workshop::startApplication()
   
   onNew();
 
+  myViewerProxy->connectViewProxy();
+  connect(myViewerProxy, SIGNAL(trihedronVisibilityChanged(bool)),
+          SLOT(onTrihedronVisibilityChanged(bool)));
+
   emit applicationStarted();
 }
 
@@ -730,6 +734,14 @@ void XGUI_Workshop::onPreferences()
   }
 }
 #endif
+
+//******************************************************
+void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
+{
+  XGUI_Displayer* aDisplayer = displayer();
+  if (aDisplayer)
+    aDisplayer->displayTrihedron(theState);
+}
 
 //******************************************************
 bool XGUI_Workshop::onSave()

@@ -231,9 +231,14 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Returns Trihedron object if it is displayed
   Handle(AIS_InteractiveObject) getTrihedron() const;
   
-  // Set trihedron active (used in selection) or non active
+  /// Set trihedron active (used in selection) or non active
   void activateTrihedron(bool theIsActive);
 
+  /// Displays/erases thrihedron in current modes. It will be activated or deactivated
+  /// depending on the trihedron visible state and displayer active trihedron state
+  void displayTrihedron(bool theToDisplay) const;
+
+  /// Returns true if the trihedron should be activated in current selection modes
   bool isTrihedronActive() const { return myIsTrihedronActive; }
 
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
@@ -281,7 +286,8 @@ private:
   void deactivate(ObjectPtr theObject, const bool theUpdateViewer);
 
   /// Find a trihedron in a list of displayed presentations and deactivate it.
-  void deactivateTrihedron() const;
+  /// \param theUpdateViewer an update viewer flag
+  void deactivateTrihedron(const bool theUpdateViewer) const;
 
   /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();

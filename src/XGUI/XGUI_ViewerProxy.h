@@ -6,6 +6,8 @@
 #include "XGUI.h"
 #include <ModuleBase_IViewer.h>
 
+#include <AIS_Trihedron.hxx>
+
 #ifndef HAVE_SALOME
   #include <AppElements_ViewWindow.h>
 #endif
@@ -26,8 +28,14 @@ Q_OBJECT
    /// \param theParent a parent object
   XGUI_ViewerProxy(XGUI_Workshop* theParent);
 
+  /// Connects some signals to the viewer from the module connector
+  void connectViewProxy();
+
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const;
+
+  //! Trihedron 3d object shown in the viewer
+  virtual Handle(AIS_Trihedron) trihedron() const;
 
   //! Retrurns V3d_Vioewer from current viewer
   virtual Handle(V3d_Viewer) v3dViewer() const;
@@ -95,6 +103,9 @@ signals:
 
   /// Emits by mouse leaving of the view port
   void leaveViewPort();
+
+  /// Signal emited on selection changed
+  void trihedronVisibilityChanged(bool theState);
 
 protected:
   /// processes the application signals to catch the mouse leaving state of the main window

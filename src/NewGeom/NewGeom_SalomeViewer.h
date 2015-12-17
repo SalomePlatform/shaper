@@ -12,6 +12,7 @@
 #include <OCCViewer_ViewWindow.h>
 
 #include <V3d_View.hxx>
+#include <AIS_Trihedron.hxx>
 
 class SUIT_ViewWindow;
 class QMouseEvent;
@@ -76,6 +77,9 @@ Q_OBJECT
   //! Retrurns V3d_Vioewer from current viewer
   virtual Handle(V3d_Viewer) v3dViewer() const;
 
+  //! Trihedron 3d object shown in the viewer
+  virtual Handle(AIS_Trihedron) trihedron() const;
+
   //! Returns Vsd_View object from currently active view window
   virtual Handle(V3d_View) activeView() const;
 
@@ -96,6 +100,9 @@ Q_OBJECT
 
   //! Enable or disable draw mode in the viewer
   virtual bool enableDrawMode(bool isEnabled);
+
+  //! For some signals it disconnects the window from usual signal and connect it to the module ones
+  void reconnectActions(SUIT_ViewWindow* theWindow, const bool theUseNewGeomSlot);
 
   //! Perfroms the fit all for the active view
   virtual void fitAll();
@@ -160,6 +167,10 @@ Q_OBJECT
 
   void onSelectionChanged();
   void onViewTransformed(OCCViewer_ViewWindow::OperationType);
+
+  /// Emit signal about trihedron visiblity change because SALOME sets the trihedron visible by this signal.
+  /// It is necessary to activate the viewer trihedron in the current selection mode
+  void onViewPortMapped();
 
  private:
   NewGeom_OCCSelector* mySelector;

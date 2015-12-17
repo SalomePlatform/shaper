@@ -38,6 +38,9 @@
 #include <AIS_Shape.hxx>
 #include <AIS_Dimension.hxx>
 #include <AIS_Trihedron.hxx>
+#include <AIS_Axis.hxx>
+#include <AIS_Plane.hxx>
+#include <AIS_Point.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
@@ -457,7 +460,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   Handle(AIS_InteractiveObject) aTrihedron;
   if (isTrihedronActive()) {
     aTrihedron = getTrihedron();
-    if (!aTrihedron.IsNull())
+    if (!aTrihedron.IsNull() && aContext->IsDisplayed(aTrihedron))
       aPrsList.Append(aTrihedron);
   }
   if (aPrsList.Extent() == 0)
@@ -574,42 +577,47 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   return aErased;
 }
 
-#define DEACTVATE_COMP(TheComp) \
-  if (!TheComp.IsNull()) \
-    aContext->Deactivate(TheComp);
+void deactivateObject(Handle(AIS_InteractiveContext) theContext,
+                      Handle(AIS_InteractiveObject) theObject,
+                      const bool theClear = true)
+{
+  if (!theObject.IsNull()) {
+    theContext->Deactivate(theObject);
+    //if (theClear) {
+      //theObject->ClearSelected();
+      //  theContext->LocalContext()->ClearOutdatedSelection(theObject, true);
+    //}
+  }
+}
 
-void XGUI_Displayer::deactivateTrihedron() const
+void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
 {
   Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
-  if (!aTrihedron.IsNull()) {
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aTrihedron.IsNull() && aContext->IsDisplayed(aTrihedron)) {
     Handle(AIS_Trihedron) aTrie = Handle(AIS_Trihedron)::DownCast(aTrihedron);
-    Handle(AIS_InteractiveContext) aContext = AISContext();
-    aContext->Deactivate(aTrie);
-    DEACTVATE_COMP(aTrie->XAxis());
-    DEACTVATE_COMP(aTrie->YAxis());
-    DEACTVATE_COMP(aTrie->Axis());
-    DEACTVATE_COMP(aTrie->Position());
-    DEACTVATE_COMP(aTrie->XYPlane());
-    DEACTVATE_COMP(aTrie->XZPlane());
-    DEACTVATE_COMP(aTrie->YZPlane());
+    deactivateObject(aContext, aTrie);
+
+    /// #1136 hidden axis are selected in sketch
+    /// workaround for Cascade: there is a crash in AIS_LocalContext::ClearOutdatedSelection
+    /// for Position AIS object in SelectionModes.
+    deactivateObject(aContext, aTrie->XAxis());
+    deactivateObject(aContext, aTrie->YAxis());
+    deactivateObject(aContext, aTrie->Axis());
+    deactivateObject(aContext, aTrie->Position());
+
+    deactivateObject(aContext, aTrie->XYPlane());
+    deactivateObject(aContext, aTrie->XZPlane());
+    deactivateObject(aContext, aTrie->YZPlane());
+
+    if (theUpdateViewer)
+      updateViewer();
   }
 }
 
 Handle(AIS_InteractiveObject) XGUI_Displayer::getTrihedron() const
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    AIS_ListOfInteractive aList;
-    aContext->DisplayedObjects(aList, true);
-    AIS_ListIteratorOfListOfInteractive aIt;
-    for (aIt.Initialize(aList); aIt.More(); aIt.Next()) {
-      Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aIt.Value());
-      if (!aTrihedron.IsNull()) {
-        return aTrihedron;
-      }
-    }
-  }
-  return Handle(AIS_InteractiveObject)();
+  return myWorkshop->viewer()->trihedron();
 }
 
 void XGUI_Displayer::openLocalContext()
@@ -795,7 +803,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
     aContext->OpenLocalContext();
     if (!isTrihedronActive())
-      deactivateTrihedron();
+      deactivateTrihedron(true);
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
   }
@@ -1141,6 +1149,38 @@ void XGUI_Displayer::activateTrihedron(bool theIsActive)
 {  
   myIsTrihedronActive = theIsActive; 
   if (!myIsTrihedronActive) {
-    deactivateTrihedron();
+    deactivateTrihedron(true);
   }
+}
+
+void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+
+  Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
+
+  if (theToDisplay) {
+    if (!aContext->IsDisplayed(aTrihedron))
+      aContext->Display(aTrihedron,
+                        0 /*wireframe*/,
+                        -1 /* selection mode */,
+                        Standard_True /* update viewer*/,
+                        Standard_False /* allow decomposition */,
+                        AIS_DS_Displayed /* xdisplay status */);
+
+    if (!isTrihedronActive())
+      deactivateTrihedron(false);
+    else
+      activate(aTrihedron, myActiveSelectionModes, false);
+  } else {
+    deactivateTrihedron(false);
+    //aContext->LocalContext()->ClearOutdatedSelection(aTrihedron, true);
+    // the selection from the previous activation modes should be cleared manually (#26172)
+
+    aContext->Erase(aTrihedron);
+  }
+
+  updateViewer();
 }

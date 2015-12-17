@@ -337,6 +337,9 @@ signals:
   void onPreferences();
 #endif
 
+  /// Activates/deactivates the trihedron in the viewer AIS context
+  void onTrihedronVisibilityChanged(bool theState);
+
  protected:
   /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
   /// and set them into the operation. Secondly, it asks the module about ids of granted operations.

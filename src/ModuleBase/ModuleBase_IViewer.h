@@ -8,6 +8,7 @@
 #include <QMap>
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_View.hxx>
+#include <AIS_Trihedron.hxx>
 
 class QMouseEvent;
 class QKeyEvent;
@@ -29,6 +30,9 @@ Q_OBJECT
 
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const = 0;
+
+  //! Trihedron 3d object shown in the viewer
+  virtual Handle(AIS_Trihedron) trihedron() const = 0;
 
   //! Retrurns V3d_Vioewer from current viewer
   virtual Handle(V3d_Viewer) v3dViewer() const = 0;
@@ -148,6 +152,9 @@ signals:
   /// Signal emitted on transformation of view point in view window
   /// \param theTransformation type of transformation (see AppElements_ViewWindow::OperationType)
   void viewTransformed(int theTransformation);
+
+  /// Signal emited on selection changed
+  void trihedronVisibilityChanged(bool theState);
 
   protected:
     /// A map for storing a scale factors dependent on view object

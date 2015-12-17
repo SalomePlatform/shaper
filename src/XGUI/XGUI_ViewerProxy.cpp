@@ -22,12 +22,32 @@ XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
 {
 }
 
+void XGUI_ViewerProxy::connectViewProxy()
+{
+#ifdef HAVE_SALOME
+  connect(myWorkshop->salomeConnector()->viewer(), SIGNAL(trihedronVisibilityChanged(bool)),
+         SIGNAL(trihedronVisibilityChanged(bool)));
+#else
+  connect(myWorkshop->mainWindow()->viewer(), SIGNAL(trihedronVisibilityChanged(bool)),
+         SLOT(trihedronVisibilityChanged(bool)));
+#endif
+}
+
 Handle(AIS_InteractiveContext) XGUI_ViewerProxy::AISContext() const
 {
 #ifdef HAVE_SALOME
   return myWorkshop->salomeConnector()->viewer()->AISContext();
 #else
   return myWorkshop->mainWindow()->viewer()->AISContext();
+#endif
+}
+
+Handle(AIS_Trihedron) XGUI_ViewerProxy::trihedron() const
+{
+#ifdef HAVE_SALOME
+  return myWorkshop->salomeConnector()->viewer()->trihedron();
+#else
+  return myWorkshop->mainWindow()->viewer()->trihedron();
 #endif
 }
 
