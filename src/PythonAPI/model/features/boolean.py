@@ -6,7 +6,7 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 from GeomAlgoAPI import GeomAlgoAPI_Boolean
 
 from model.roots import Interface
-
+from model import Selection
 
 def addAddition(part, *args):
     """Perform addition in the Part.
@@ -144,3 +144,7 @@ class Boolean(Interface):
         """
         self._fillAttribute(self._bool_type, bool_type)
         pass
+
+    def result(self):
+        """F.result() -> list of Selection objects"""
+        return [Selection(result, result.shape()) for result in (self.firstResult(),)]
