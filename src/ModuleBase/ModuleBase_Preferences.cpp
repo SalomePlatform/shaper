@@ -301,6 +301,10 @@ void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
                                        "rows_number");
   myPreferences->setItemProperty("min", 1, aRowsNb);
   myPreferences->setItemProperty("max", 6, aRowsNb);
+
+  myPreferences->addItem(tr("Show Status Bar"), aSizeGroup,
+                         SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::MENU_SECTION,
+                         "status_bar");
 }
 
 void ModuleBase_PreferencesDlg::accept()

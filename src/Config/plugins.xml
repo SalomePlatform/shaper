@@ -5,7 +5,6 @@
   <plugin library="InitializationPlugin"/>
   <plugin library="PartSetPlugin" configuration="plugin-PartSet.xml"/>
   <plugin library="SketchPlugin" configuration="plugin-Sketch.xml"/>
-  <plugin library="SketchShapePlugin" configuration="plugin-SketchShape.xml"/>
   <plugin library="ConstructionPlugin" configuration="plugin-Construction.xml"/>
   <plugin library="FeaturesPlugin" configuration="plugin-Features.xml"/>
   <plugin library="ExchangePlugin" configuration="plugin-Exchange.xml"/>
