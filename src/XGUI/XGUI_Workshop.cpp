@@ -166,6 +166,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
 #ifndef HAVE_SALOME
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
+  onTrihedronVisibilityChanged(true);
 #endif
 
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
