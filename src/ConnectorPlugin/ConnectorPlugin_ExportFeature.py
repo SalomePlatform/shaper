@@ -4,6 +4,7 @@
 
 import EventsAPI
 import ModelAPI
+import GeomAlgoAPI
 
 import salome
 from salome.geom import geomBuilder
@@ -39,10 +40,6 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
     def isAction(self):
         return True
 
-    # The action is not placed into the history anyway
-    #def isInHistory(self):
-    #    return False
-
     ## This feature has no attributes, as it is action.
     def initAttributes(self):
       pass
@@ -57,24 +54,38 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             return
           
         anObjList = [self.Part.object(kResultBodyType, idx) for idx in xrange(aPartSize)]     
+        aShapesList = GeomAlgoAPI.ShapeList()
+        aName = ""
         for idx, anObject in enumerate(anObjList):
             aResult = ModelAPI.modelAPI_Result(anObject)
             aBodyResult = ModelAPI.modelAPI_ResultBody(aResult)
             if not aBodyResult:
                 continue
             aShape = aBodyResult.shape()
-            aDump = aShape.getShapeStream()
-            # Load shape to SALOME Geom
-            aBrep = self.geompy.RestoreShape(aDump)
-            aName = aBodyResult.data().name()
+            if aShape is not None and not aShape.isNull():
+              aShapesList.append(aShape)
+              if len(aShapesList) == 1:
+                aName = aBodyResult.data().name()
+
+        # issue 1045: create compound if there are more than one shape
+        if len(aShapesList) > 1:
+          self.shape = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.compound(aShapesList)
+          aName = "ShaperResults"
+        elif len(aShapesList) == 1:
+          self.shape = aShapesList[0]
+
+        # so, only one shape is always in the result
+        aDump = self.shape.getShapeStream()
+        # Load shape to SALOME Geom
+        aBrep = self.geompy.RestoreShape(aDump)
             
-            # Make unique name
-            aId = getObjectIndex(aName)
-            if aId != 0:
-                aName = aName + '_' + str(aId)
+        # Make unique name
+        aId = getObjectIndex(aName)
+        if aId != 0:
+            aName = aName + '_' + str(aId)
             
-            self.geompy.addToStudy(aBrep, aName)
-            self.geomObjects.append([aShape, aBrep])
+        self.geompy.addToStudy(aBrep, aName)
+        self.brep = aBrep
 
     ## Exports all groups
     def exportGroups(self):
@@ -102,8 +113,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         Ids = []
         for aSelIndex in range(0, aSelectionNum):
             aSelection = theSelectionList.value(aSelIndex)
-            aSelectionContext = aSelection.context()
-            anID = aSelection.Id()
+            anID = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(self.shape, aSelection.value())
             Ids.append(anID)
             if aSelection.value().isVertex():
                 groupType = "VERTEX"
@@ -114,15 +124,9 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             else:
                 groupType = "SOLID"
 
-        aContextBody = ModelAPI.modelAPI_ResultBody(aSelectionContext)
-        if aContextBody is not None:
-          # iterate on exported objects and check if the current
-          # group refers to this object
-          for obj in self.geomObjects: 
-              if aContextBody.isLatestEqual(obj[0]):
-                  aGroup = self.geompy.CreateGroup(obj[1], self.geompy.ShapeType[groupType])
-                  self.geompy.UnionIDs(aGroup,Ids)
-                  self.geompy.addToStudyInFather(obj[1], aGroup, theGroupName)
+        aGroup = self.geompy.CreateGroup(self.brep, self.geompy.ShapeType[groupType])
+        self.geompy.UnionIDs(aGroup,Ids)
+        self.geompy.addToStudyInFather(self.brep, aGroup, theGroupName)
           
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):

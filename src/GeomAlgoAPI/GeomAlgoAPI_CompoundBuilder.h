@@ -27,6 +27,12 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_CompoundBuilder
   /// \param theShapes a list of shapes
   static std::shared_ptr<GeomAPI_Shape> compound(
       std::list<std::shared_ptr<GeomAPI_Shape> > theShapes);
+
+  /// Produces the integerr identifier of the shape theSub in theContext (needed for 
+  /// groups export to old GEOM)
+  /// \returns zero if theSub not found in theContext
+  static int id(
+      std::shared_ptr<GeomAPI_Shape> theContext, std::shared_ptr<GeomAPI_Shape> theSub);
 };
 
 #endif
