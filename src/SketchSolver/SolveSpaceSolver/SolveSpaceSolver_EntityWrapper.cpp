@@ -21,13 +21,13 @@ SolveSpaceSolver_EntityWrapper::SolveSpaceSolver_EntityWrapper(
 }
 
 SolveSpaceSolver_EntityWrapper::SolveSpaceSolver_EntityWrapper(
-    const std::shared_ptr<SketchPlugin_Point> theFeature,
-    const AttributePtr theAttribute,
+    const FeaturePtr thePointFeature,
+    const AttributePtr thePointAttribute,
     const Slvs_Entity& theEntity)
   : myEntity(theEntity)
 {
-  myBaseFeature = FeaturePtr(theFeature);
-  myBaseAttribute = theAttribute;
+  myBaseFeature = thePointFeature;
+  myBaseAttribute = thePointAttribute;
 }
 
 

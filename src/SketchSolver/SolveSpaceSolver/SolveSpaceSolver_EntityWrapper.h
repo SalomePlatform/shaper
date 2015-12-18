@@ -10,8 +10,6 @@
 #include <SketchSolver_IEntityWrapper.h>
 #include <SolveSpaceSolver_Solver.h>
 
-#include <SketchPlugin_Point.h>
-
 /**
  *  Wrapper providing operations with SolveSpace entities.
  */
@@ -22,8 +20,8 @@ public:
   SolveSpaceSolver_EntityWrapper(const AttributePtr theAttribute, const Slvs_Entity& theEntity);
 
   /// \brief Constructor useful for SketchPlugin_Point only
-  SolveSpaceSolver_EntityWrapper(const std::shared_ptr<SketchPlugin_Point> theFeature,
-                                 const AttributePtr theAttribute,
+  SolveSpaceSolver_EntityWrapper(const FeaturePtr thePointFeature,
+                                 const AttributePtr thePointAttribute,
                                  const Slvs_Entity& theEntity);
 
   /// \brief Return SolveSpace entity
