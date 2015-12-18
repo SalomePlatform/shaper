@@ -10,7 +10,7 @@ INSTALL(FILES shaper.py DESTINATION PythonAPI)
 INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
-  TestShaper.py
+  TestPythonAPI.py
   TestModel.py
 
   TestSketcherAddPoint.py
