@@ -322,10 +322,10 @@ bool PartSet_Module::canRedo() const
 bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const
 {
   bool aValid = true;
-  if (theActionId == "DELETE_CMD" || theActionId == "MOVE_CMD") {
+  if (theActionId == "MOVE_CMD") {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature) {
-      // part features are removed in the PartSet module only.
+      // part features can not be moved in the history.
       if (aFeature->getKind() == PartSetPlugin_Part::ID())
         aValid = false;
     }
@@ -557,6 +557,8 @@ ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
 
 bool PartSet_Module::deleteObjects()
 {
+  bool isProcessed = false;
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
@@ -567,6 +569,7 @@ bool PartSet_Module::deleteObjects()
   bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
        isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
   if (isSketchOp || isNestedOp) {
+    isProcessed = true;
     // 2. find selected presentations
     // selected objects should be collected before the current operation abort because
     // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
@@ -615,41 +618,7 @@ bool PartSet_Module::deleteObjects()
     // 5. stop operation
     anOpMgr->commitOperation();
   }
-  else {
-    bool isPartRemoved = false;
-    // Delete part with help of PartSet plugin
-    // TODO: the deleted objects has to be processed by multiselection
-    QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
-    if (aObjects.size() == 1) {
-      ObjectPtr aObj = aObjects.first();
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      if (aFeature.get() && (aFeature->getKind() == PartSetPlugin_Part::ID())) {
-        // Remove feature should be created in the document of the part results
-        ResultPtr aPartResult = aFeature->firstResult();
-        if (aPartResult.get()) {
-          std::shared_ptr<ModelAPI_ResultPart> aPart =
-                       std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartResult);
-          DocumentPtr aPartDoc = aPart->partDoc();
-          if (aPartDoc.get()) {
-            ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction
-                                              (PartSetPlugin_Remove::ID().c_str(), this);
-            if (!anOpMgr->canStartOperation(anOpAction->id()))
-              return true; // the objects are processed but can not be deleted
-
-            anOpMgr->startOperation(anOpAction);
-
-            FeaturePtr aFeature = aPartDoc->addFeature(PartSetPlugin_Remove::ID());
-            aFeature->execute();
-
-            anOpMgr->commitOperation();
-            isPartRemoved = true;
-          }
-        }
-      }
-    }
-    return isPartRemoved;
-  }
-  return true;
+  return isProcessed;
 }
 
 void PartSet_Module::onFeatureTriggered()

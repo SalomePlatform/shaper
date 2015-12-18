@@ -1354,9 +1354,6 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
     if (!anObjectGroups.contains(aGroupName.c_str()))
       continue;
 
-    if (!myModule->canApplyAction(aObj, anActionId))
-      continue;
-
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature) {
       /*// TODO: to learn the workshop to delegate the Part object deletion to the PartSet module
