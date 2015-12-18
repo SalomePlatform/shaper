@@ -63,7 +63,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
 
   // Activate individual repaintng if this is a part of compsolid
   ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
-  //SetAutoHilight(aCompSolid.get() == NULL);
+  SetAutoHilight(aCompSolid.get() == NULL);
 }
 
 
@@ -135,8 +135,8 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
           aDeflection, myDrawer->HLRAngle(), 9, 500);
 
         for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-          Handle(SelectMgr_EntityOwner) anOwner
-            = Handle(SelectMgr_EntityOwner)::DownCast (aSelection->Sensitive()->BaseSensitive()->OwnerId());
+          Handle(SelectMgr_EntityOwner) anOwner =
+            Handle(SelectMgr_EntityOwner)::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
           anOwner->Set(this);
         }
         return;
@@ -184,25 +184,24 @@ TopoDS_Shape ModuleBase_ResultPrs::getSelectionShape() const
 void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
                                            const SelectMgr_SequenceOfOwner& theOwners)
 {
-  if (hasCompSolidSelectionMode()) {
-    TopoDS_Shape aShape = getSelectionShape();
-    Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
-    aSelectionPrs->Clear();
+  Handle(SelectMgr_EntityOwner) anOwner;
+  Handle(ModuleBase_BRepOwner) aCompOwner;
+  for (int i = 1; i <= theOwners.Length(); i++) {
+    anOwner = theOwners.Value(i);
+    aCompOwner = Handle(ModuleBase_BRepOwner)::DownCast(anOwner);
+    if (aCompOwner.IsNull())
+      anOwner->Hilight(thePM);
+    else {
+      TopoDS_Shape aShape = aCompOwner->Shape();
+      Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
+      aSelectionPrs->Clear();
 
-    StdPrs_WFDeflectionShape::Add(aSelectionPrs, aShape, myDrawer);
+      StdPrs_WFDeflectionShape::Add(aSelectionPrs, aShape, myDrawer);
 
-    aSelectionPrs->SetDisplayPriority(9);
-    aSelectionPrs->Highlight(Aspect_TOHM_COLOR, aSelectionPrs->HighlightColor());
-    aSelectionPrs->Display();
-    thePM->Highlight(this);
-  } else {
-    Handle(SelectMgr_EntityOwner) anOwner;
-    for (int i = 1; i <= theOwners.Length(); i++) {
-      anOwner = theOwners.Value(i);
-      if (!anOwner->IsSelected()) { // anOwner is not selected
-        anOwner->SetSelected(true);
-        AIS_Selection::Select(anOwner);
-      }
+      aSelectionPrs->SetDisplayPriority(9);
+      aSelectionPrs->Highlight(Aspect_TOHM_COLOR, aSelectionPrs->HighlightColor());
+      aSelectionPrs->Display();
+      thePM->Highlight(this);
     }
   }
 }
@@ -211,7 +210,11 @@ void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_Presentatio
                                                  const Quantity_NameOfColor theColor, 
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
-  TopoDS_Shape aShape = getSelectionShape();
+  Handle(StdSelect_BRepOwner) aOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
+  if (aOwner.IsNull())
+    return;
+
+  TopoDS_Shape aShape = aOwner->Shape();
   if (!aShape.IsNull()) {
     thePM->Color(this, theColor);
 

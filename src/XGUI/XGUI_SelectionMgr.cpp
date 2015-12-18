@@ -107,11 +107,10 @@ void XGUI_SelectionMgr::onViewerSelection()
   QObjectPtrList aFeatures;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
-    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-      Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-      ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
-      if (aResult)
-        aFeatures.append(aResult);
+    QList<ModuleBase_ViewerPrs> aPresentations = selection()->getSelected(ModuleBase_ISelection::Viewer);
+    foreach(ModuleBase_ViewerPrs aPrs, aPresentations) {
+      if (aPrs.object().get())
+        aFeatures.append(aPrs.object());
     }
   }
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
