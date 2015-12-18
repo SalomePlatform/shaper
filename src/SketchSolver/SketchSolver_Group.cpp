@@ -133,6 +133,7 @@ bool SketchSolver_Group::changeConstraint(
     return false;
 
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  myStorage->blockEvents(true);
 
   bool isNewConstraint = myConstraints.find(theConstraint) == myConstraints.end();
   if (isNewConstraint) {
@@ -200,6 +201,7 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
   if (!checkFeatureValidity(theFeature))
     return false;
 
+  myStorage->blockEvents(true);
   myStorage->refresh(true);
   return myStorage->update(theFeature);
 }
@@ -209,6 +211,7 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
 
   // Firstly, revert changes in the fixed entities
+  myStorage->blockEvents(true);
   myStorage->refresh(true);
 
   // Secondly, search attributes of the feature in the list of the Multi constraints and update them
@@ -295,19 +298,17 @@ bool SketchSolver_Group::resolveConstraints()
         // To avoid overconstraint situation, we will remove temporary constraints one-by-one
         // and try to find the case without overconstraint
         bool isLastChance = false;
-        size_t aNbTemp = myStorage->nbTemporary();
         while (true) {
           aResult = mySketchSolver->solve();
           if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET || isLastChance)
             break;
-          if (aNbTemp == 0) {
-            // try to update parameters and resolve once again
-            ConstraintConstraintMap::iterator aConstrIt = myConstraints.begin();
-            for (; aConstrIt != myConstraints.end(); ++aConstrIt)
-              aConstrIt->second->update();
-            isLastChance = true;
-          } else
-            aNbTemp = myStorage->removeTemporary();
+          // try to update parameters and resolve once again
+          ConstraintConstraintMap::iterator aConstrIt = myConstraints.begin();
+          for (; aConstrIt != myConstraints.end(); ++aConstrIt)
+            aConstrIt->second->update();
+          isLastChance = true;
+
+          removeTemporaryConstraints();
           mySketchSolver->calculateFailedConstraints(true); // something failed => need to find it
           myStorage->initializeSolver(mySketchSolver);
         }
@@ -353,6 +354,7 @@ bool SketchSolver_Group::resolveConstraints()
       myStorage->refresh();
   }
   removeTemporaryConstraints();
+  myStorage->blockEvents(false);
   myStorage->setNeedToResolve(false);
   return aResolved;
 }
@@ -497,10 +499,6 @@ void SketchSolver_Group::removeTemporaryConstraints()
   for (; aTmpIt != myTempConstraints.end(); ++aTmpIt)
     (*aTmpIt)->remove();
 
-  size_t aNbTemp = myStorage->nbTemporary();
-  if (aNbTemp > 0)
-    myStorage->removeTemporary(aNbTemp);
-
   if (!myTempConstraints.empty())
     myStorage->verifyFixed();
   myStorage->setNeedToResolve(false);
@@ -569,7 +567,6 @@ bool SketchSolver_Group::isComplexConstraint(FeaturePtr theConstraint)
 // ============================================================================
 void SketchSolver_Group::setTemporary(SolverConstraintPtr theConstraint)
 {
-  theConstraint->makeTemporary();
   myTempConstraints.insert(theConstraint);
 }
 

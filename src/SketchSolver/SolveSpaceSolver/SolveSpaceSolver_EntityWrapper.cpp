@@ -20,6 +20,17 @@ SolveSpaceSolver_EntityWrapper::SolveSpaceSolver_EntityWrapper(
   myBaseAttribute = theAttribute;
 }
 
+SolveSpaceSolver_EntityWrapper::SolveSpaceSolver_EntityWrapper(
+    const std::shared_ptr<SketchPlugin_Point> theFeature,
+    const AttributePtr theAttribute,
+    const Slvs_Entity& theEntity)
+  : myEntity(theEntity)
+{
+  myBaseFeature = FeaturePtr(theFeature);
+  myBaseAttribute = theAttribute;
+}
+
+
 EntityID SolveSpaceSolver_EntityWrapper::id() const
 {
   return (EntityID)myEntity.h;

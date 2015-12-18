@@ -44,6 +44,9 @@ void SketchSolver_Storage::addConstraint(
       update(*aCIt);
   }
   myConstraintMap[theConstraint] = theSolverConstraints;
+  // block events if necessary
+  if (myEventsBlocked && theConstraint->data() && theConstraint->data()->isValid())
+    theConstraint->data()->blockSendAttributeUpdated(myEventsBlocked);
 }
 
 void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
@@ -54,6 +57,9 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
     setNeedToResolve(true); // the entity is new or modified
 
   myFeatureMap[theFeature] = theSolverEntity;
+  // block events if necessary
+  if (myEventsBlocked && theFeature->data() && theFeature->data()->isValid())
+    theFeature->data()->blockSendAttributeUpdated(myEventsBlocked);
 }
 
 void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
@@ -64,6 +70,10 @@ void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
     setNeedToResolve(true); // the entity is new or modified
 
   myAttributeMap[theAttribute] = theSolverEntity;
+  // block events if necessary
+  if (myEventsBlocked && theAttribute->owner() &&
+      theAttribute->owner()->data() && theAttribute->owner()->data()->isValid())
+    theAttribute->owner()->data()->blockSendAttributeUpdated(myEventsBlocked);
 }
 
 
@@ -73,6 +83,8 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
   EntityWrapperPtr aRelated = entity(theFeature);
   if (!aRelated) { // Feature is not exist, create it
     std::list<EntityWrapperPtr> aSubs;
+    // Reserve the feature in the map of features (do not want to add several copies of it)
+    myFeatureMap[theFeature] = aRelated;
     // Firstly, create/update its attributes
     std::list<AttributePtr> anAttrs =
         theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
@@ -95,7 +107,8 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
     }
     // Secondly, convert feature
     BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-    aRelated = aBuilder->createFeature(theFeature, aSubs, theGroup);
+    GroupID aGroup = theGroup != GID_UNKNOWN ? theGroup : myGroupID;
+    aRelated = aBuilder->createFeature(theFeature, aSubs, aGroup);
     if (!aRelated)
       return false;
     addEntity(theFeature, aRelated);
@@ -119,7 +132,8 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
   EntityWrapperPtr aRelated = entity(anAttribute);
   if (!aRelated) { // Attribute is not exist, create it
     BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-    aRelated = aBuilder->createAttribute(anAttribute, theGroup);
+    GroupID aGroup = theGroup != GID_UNKNOWN ? theGroup : myGroupID;
+    aRelated = aBuilder->createAttribute(anAttribute, aGroup);
     if (!aRelated)
       return false;
     addEntity(anAttribute, aRelated);
@@ -172,6 +186,171 @@ const EntityWrapperPtr& SketchSolver_Storage::entity(const AttributePtr& theAttr
   }
   return aDummy;
 }
+
+bool SketchSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
+{
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::iterator
+      aFound = myConstraintMap.find(theConstraint);
+  if (aFound == myConstraintMap.end())
+    return true; // no constraint, already deleted
+
+  // Remove constraint
+  std::list<ConstraintWrapperPtr> aConstrList = aFound->second;
+  myConstraintMap.erase(aFound);
+  // Remove SolveSpace constraints
+  bool isFullyRemoved = true;
+  std::list<ConstraintWrapperPtr>::iterator anIt = aConstrList.begin();
+  while (anIt != aConstrList.end()) {
+    if (remove(*anIt)) {
+      std::list<ConstraintWrapperPtr>::iterator aRemoveIt = anIt++;
+      aConstrList.erase(aRemoveIt);
+    } else {
+      isFullyRemoved = false;
+      ++anIt;
+    }
+  }
+  if (!isFullyRemoved)
+    myConstraintMap[theConstraint] = aConstrList;
+  return isFullyRemoved;
+}
+
+template <class ENT_TYPE>
+static bool isUsed(ConstraintWrapperPtr theConstraint, ENT_TYPE theEntity)
+{
+  std::list<EntityWrapperPtr>::const_iterator anEntIt = theConstraint->entities().begin();
+  for (; anEntIt != theConstraint->entities().end(); ++anEntIt)
+    if ((*anEntIt)->isBase(theEntity))
+      return true;
+  return false;
+}
+
+static bool isUsed(EntityWrapperPtr theFeature, AttributePtr theSubEntity)
+{
+  std::list<EntityWrapperPtr>::const_iterator aSubIt = theFeature->subEntities().begin();
+  for (; aSubIt != theFeature->subEntities().end(); ++aSubIt)
+    if ((*aSubIt)->isBase(theSubEntity))
+      return true;
+  return false;
+}
+
+bool SketchSolver_Storage::isUsed(FeaturePtr theFeature) const
+{
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
+      aCIt = myConstraintMap.begin();
+  std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
+  for (; aCIt != myConstraintMap.end(); ++aCIt)
+    for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt)
+      if (::isUsed(*aCWIt, theFeature))
+        return true;
+  // check attributes
+  std::list<AttributePtr> anAttrList = theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
+  for (; anIt != anAttrList.end(); ++anIt)
+    if (isUsed(*anIt))
+      return true;
+  return false;
+}
+
+bool SketchSolver_Storage::isUsed(AttributePtr theAttribute) const
+{
+  AttributePtr anAttribute = theAttribute;
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+  if (aRefAttr) {
+    if (aRefAttr->isObject())
+      return isUsed(ModelAPI_Feature::feature(aRefAttr->object()));
+    else
+      anAttribute = aRefAttr->attr();
+  }
+
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
+      aCIt = myConstraintMap.begin();
+  std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
+  for (; aCIt != myConstraintMap.end(); ++aCIt)
+    for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt)
+      if (::isUsed(*aCWIt, anAttribute))
+        return true;
+  return false;
+}
+
+
+bool SketchSolver_Storage::removeEntity(FeaturePtr theFeature)
+{
+  std::map<FeaturePtr, EntityWrapperPtr>::iterator aFound = myFeatureMap.find(theFeature);
+  if (aFound == myFeatureMap.end())
+    return false; // feature not found, nothing to delete
+
+  // Check the feature is not used by constraints
+  if (isUsed(theFeature))
+    return false; // the feature is used, don't remove it
+
+  // Remove feature
+  EntityWrapperPtr anEntity = aFound->second;
+  myFeatureMap.erase(aFound);
+  if (remove(anEntity))
+    return true;
+  // feature is not removed, revert operation
+  myFeatureMap[theFeature] = anEntity;
+  return false;
+}
+
+bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
+{
+  std::map<AttributePtr, EntityWrapperPtr>::iterator aFound = myAttributeMap.find(theAttribute);
+  if (aFound == myAttributeMap.end())
+    return false; // attribute not found, nothing to delete
+
+  // Check the attribute is not used by constraints
+  if (isUsed(theAttribute))
+    return false; // the attribute is used, don't remove it
+  // Check the attribute is not used by other features
+  std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
+  for (; aFIt != myFeatureMap.end(); ++aFIt)
+    if (::isUsed(aFIt->second, theAttribute)) // the attribute is used, don't remove it
+      return false;
+
+  // Remove attribute
+  EntityWrapperPtr anEntity = aFound->second;
+  myAttributeMap.erase(aFound);
+  if (remove(anEntity))
+    return true;
+  // attribute is not removed, revert operation
+  myAttributeMap[theAttribute] = anEntity;
+  return false;
+}
+
+
+bool SketchSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
+{
+  bool isFullyRemoved = true;
+  std::list<EntityWrapperPtr>::const_iterator anIt = theConstraint->entities().begin();
+  for (; anIt != theConstraint->entities().end(); ++anIt) {
+    FeaturePtr aBaseFeature = (*anIt)->baseFeature();
+    if (aBaseFeature)
+      isFullyRemoved = SketchSolver_Storage::removeEntity(aBaseFeature) && isFullyRemoved;
+    else
+      isFullyRemoved = SketchSolver_Storage::removeEntity((*anIt)->baseAttribute()) && isFullyRemoved;
+  }
+  return isFullyRemoved;
+}
+
+bool SketchSolver_Storage::remove(EntityWrapperPtr theEntity)
+{
+  bool isFullyRemoved = true;
+  std::list<EntityWrapperPtr>::const_iterator anEntIt = theEntity->subEntities().begin();
+  for (; anEntIt != theEntity->subEntities().end(); ++anEntIt) {
+    FeaturePtr aBaseFeature = (*anEntIt)->baseFeature();
+    if (aBaseFeature)
+      isFullyRemoved = SketchSolver_Storage::removeEntity(aBaseFeature) && isFullyRemoved;
+    else
+      isFullyRemoved = SketchSolver_Storage::removeEntity((*anEntIt)->baseAttribute()) && isFullyRemoved;
+  }
+
+  std::list<ParameterWrapperPtr>::const_iterator aParIt = theEntity->parameters().begin();
+  for (; aParIt != theEntity->parameters().end(); ++aParIt)
+    isFullyRemoved = remove(*aParIt) && isFullyRemoved;
+  return isFullyRemoved;
+}
+
 
 bool SketchSolver_Storage::isInteract(const FeaturePtr& theFeature) const
 {
@@ -293,7 +472,7 @@ const EntityWrapperPtr& SketchSolver_Storage::sketch() const
 
   std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
   for (; aFIt != myFeatureMap.end(); ++aFIt)
-    if (aFIt->second->type() == ENTITY_SKETCH)
+    if (aFIt->second && aFIt->second->type() == ENTITY_SKETCH)
       break;
   if (aFIt == myFeatureMap.end())
     return aDummySketch;
@@ -307,8 +486,11 @@ void SketchSolver_Storage::setSketch(const EntityWrapperPtr& theSketch)
   addEntity(FeaturePtr(), theSketch);
 }
 
-void SketchSolver_Storage::blockEvents(bool isBlocked) const
+void SketchSolver_Storage::blockEvents(bool isBlocked)
 {
+  if (isBlocked == myEventsBlocked)
+    return;
+
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
       aCIter = myConstraintMap.begin();
   for (; aCIter != myConstraintMap.end(); aCIter++)
@@ -325,6 +507,7 @@ void SketchSolver_Storage::blockEvents(bool isBlocked) const
     if (anAtIter->first->owner() && anAtIter->first->owner()->data() &&
         anAtIter->first->owner()->data()->isValid())
       anAtIter->first->owner()->data()->blockSendAttributeUpdated(isBlocked);
+  myEventsBlocked = isBlocked;
 }
 
 

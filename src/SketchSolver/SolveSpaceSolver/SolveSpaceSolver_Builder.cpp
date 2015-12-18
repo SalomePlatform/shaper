@@ -311,11 +311,12 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
     if (!aSub)
       return aDummy;
 
+    std::shared_ptr<SketchPlugin_Point> aPointFeature = 
+        std::dynamic_pointer_cast<SketchPlugin_Point>(theFeature);
+
     const Slvs_Entity& aSubEnt =
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(aSub)->entity();
-    EntityWrapperPtr aNewEntity(new SolveSpaceSolver_EntityWrapper(theFeature, aSubEnt));
-    aNewEntity->setSubEntities(std::list<EntityWrapperPtr>(1, aSub));
-    return aNewEntity;
+    return EntityWrapperPtr(new SolveSpaceSolver_EntityWrapper(aPointFeature, aPoint, aSubEnt));
   }
 
   // wrong entity

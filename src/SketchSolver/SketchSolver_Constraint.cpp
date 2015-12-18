@@ -217,9 +217,3 @@ bool SketchSolver_Constraint::isUsed(AttributePtr theAttribute) const
       return true;
   return false;
 }
-
-void SketchSolver_Constraint::makeTemporary() const
-{
-  myStorage->setTemporary(myBaseConstraint);
-}
-

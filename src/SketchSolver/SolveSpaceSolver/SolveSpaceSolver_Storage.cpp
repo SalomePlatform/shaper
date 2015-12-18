@@ -162,6 +162,15 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
       isUpdated = true;
     }
   }
+  if (theEntity->type() == ENTITY_POINT && aSubEntities.size() == 1) {
+    // theEntity is based on SketchPlugin_Point => need to substitute its attribute instead
+    bool isNew = (aSlvsEnt.h == SLVS_E_UNKNOWN);
+    aSlvsEnt = getEntity(aSlvsEnt.point[0]);
+    if (isNew) {
+      anEntity->changeEntity() = aSlvsEnt;
+      isUpdated = true;
+    }
+  }
 
   // update entity itself
   if (aSlvsEnt.wrkpl == SLVS_E_UNKNOWN && myWorkplaneID != SLVS_E_UNKNOWN)
@@ -181,8 +190,13 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
       FeaturePtr aFeature = ModelAPI_Feature::feature(theEntity->baseAttribute()->owner());
       if (aFeature->getKind() == SketchPlugin_Arc::ID() &&
           myFeatureMap.find(aFeature) == myFeatureMap.end()) {
-        myFeatureMap[aFeature] = EntityWrapperPtr();
-        return SketchSolver_Storage::update(aFeature, myGroupID);
+        // Additional checking that all attributes are initialized
+        if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
+            aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
+            aFeature->attribute(SketchPlugin_Arc::END_ID())->isInitialized()) {
+          myFeatureMap[aFeature] = EntityWrapperPtr();
+          return SketchSolver_Storage::update(aFeature);
+        }
       }
     }
   }
@@ -327,6 +341,8 @@ void SolveSpaceSolver_Storage::replaceInFeatures(
 {
   std::map<FeaturePtr, EntityWrapperPtr>::const_iterator anIt = myFeatureMap.begin();
   for (; anIt != myFeatureMap.end(); ++anIt) {
+    if (!anIt->second)
+      continue;
     bool isUpdated = false;
     std::list<EntityWrapperPtr> aSubs = anIt->second->subEntities();
     std::list<EntityWrapperPtr>::iterator aSubIt = aSubs.begin();
@@ -1124,67 +1140,6 @@ void SolveSpaceSolver_Storage::addConstraintWhereDragged(const Slvs_hConstraint&
     myFixed = theConstraintID;
 }
 
-void SolveSpaceSolver_Storage::addTemporaryConstraint(const Slvs_hConstraint& theConstraintID)
-{
-  myTemporaryConstraints.insert(theConstraintID);
-}
-
-void SolveSpaceSolver_Storage::removeAllTemporary()
-{
-  myTemporaryConstraints.clear();
-}
-
-size_t SolveSpaceSolver_Storage::removeTemporary(size_t theNbConstraints)
-{
-  if (myTemporaryConstraints.empty())
-    return 0;
-  // Search the point-on-line or a non-rigid constraint
-  std::set<Slvs_hConstraint>::iterator aCIt = myTemporaryConstraints.begin();
-  for (; aCIt != myTemporaryConstraints.end(); aCIt++) {
-    int aPos = Search(*aCIt, myConstraints);
-    if (aPos >= (int)myConstraints.size() || myConstraints[aPos].type != SLVS_C_WHERE_DRAGGED)
-      break;
-    std::vector<Slvs_Constraint>::iterator anIt = myConstraints.begin();
-    for (; anIt != myConstraints.end(); anIt++)
-      if (anIt->type == SLVS_C_PT_ON_LINE && anIt->ptA == myConstraints[aPos].ptA)
-        break;
-    if (anIt != myConstraints.end())
-      break;
-  }
-  if (aCIt == myTemporaryConstraints.end())
-    aCIt = myTemporaryConstraints.begin();
-  bool aNewFixed = false;
-
-  size_t aNbRemain = theNbConstraints;
-  while (aNbRemain > 0 && aCIt != myTemporaryConstraints.end()) {
-    aNewFixed = aNewFixed || (*aCIt == myFixed);
-    --aNbRemain;
-
-    std::set<Slvs_hConstraint>::iterator aRemoveIt = aCIt++;
-    removeConstraint(*aRemoveIt);
-    myTemporaryConstraints.erase(aRemoveIt);
-    if (aCIt == myTemporaryConstraints.end())
-      aCIt = myTemporaryConstraints.begin();
-  }
-
-  if (aNewFixed) {
-    for (aCIt = myTemporaryConstraints.begin(); aCIt != myTemporaryConstraints.end(); aCIt++) {
-      int aPos = Search(*aCIt, myConstraints);
-      if (myConstraints[aPos].type == SLVS_C_WHERE_DRAGGED) {
-        myFixed = *aCIt;
-        break;
-      }
-    }
-  }
-  return myTemporaryConstraints.size();
-}
-
-bool SolveSpaceSolver_Storage::isTemporary(const Slvs_hConstraint& theConstraintID) const
-{
-  return myTemporaryConstraints.find(theConstraintID) != myTemporaryConstraints.end();
-}
-
-
 
 void SolveSpaceSolver_Storage::initializeSolver(SolverPtr theSolver)
 {
@@ -1280,7 +1235,7 @@ void SolveSpaceSolver_Storage::fixPoint(const Slvs_Entity& thePoint,
   Slvs_Constraint aConstraint;
   Slvs_hConstraint aConstrID = SLVS_E_UNKNOWN;
   bool isFixed = isPointFixed(thePoint.h, aConstrID, true);
-  bool isForceUpdate = (isFixed && isTemporary(aConstrID));
+  bool isForceUpdate = (isFixed /*&& isTemporary(aConstrID)*/);
   if (!isForceUpdate) { // create new constraint
     if (isFixed) return;
     aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, thePoint.group, SLVS_C_WHERE_DRAGGED, thePoint.wrkpl,
@@ -1519,142 +1474,6 @@ bool SolveSpaceSolver_Storage::isUsedInEqual(
   return false;
 }
 
-void SolveSpaceSolver_Storage::setTemporary(ConstraintPtr theConstraint)
-{
-  // TODO
-}
-
-bool SolveSpaceSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
-{
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::iterator
-      aFound = myConstraintMap.find(theConstraint);
-  if (aFound == myConstraintMap.end())
-    return true; // no constraint, already deleted
-
-  // Remove constraint
-  std::list<ConstraintWrapperPtr> aConstrList = aFound->second;
-  myConstraintMap.erase(aFound);
-  // Remove SolveSpace constraints
-  bool isFullyRemoved = true;
-  std::list<ConstraintWrapperPtr>::iterator anIt = aConstrList.begin();
-  while (anIt != aConstrList.end()) {
-    if (remove(*anIt)) {
-      std::list<ConstraintWrapperPtr>::iterator aRemoveIt = anIt++;
-      aConstrList.erase(aRemoveIt);
-    } else {
-      isFullyRemoved = false;
-      ++anIt;
-    }
-  }
-  if (!isFullyRemoved)
-    myConstraintMap[theConstraint] = aConstrList;
-  return isFullyRemoved;
-}
-
-template <class ENT_TYPE>
-static bool isUsed(ConstraintWrapperPtr theConstraint, ENT_TYPE theEntity)
-{
-  std::list<EntityWrapperPtr>::const_iterator anEntIt = theConstraint->entities().begin();
-  for (; anEntIt != theConstraint->entities().end(); ++anEntIt)
-    if (std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(*anEntIt)->isBase(theEntity))
-      return true;
-  return false;
-}
-
-static bool isUsed(EntityWrapperPtr theFeature, AttributePtr theSubEntity)
-{
-  std::list<EntityWrapperPtr>::const_iterator aSubIt = theFeature->subEntities().begin();
-  for (; aSubIt != theFeature->subEntities().end(); ++aSubIt)
-    if (std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(*aSubIt)->isBase(theSubEntity))
-      return true;
-  return false;
-}
-
-bool SolveSpaceSolver_Storage::isUsed(FeaturePtr theFeature) const
-{
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
-      aCIt = myConstraintMap.begin();
-  std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
-  for (; aCIt != myConstraintMap.end(); ++aCIt)
-    for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt)
-      if (::isUsed(*aCWIt, theFeature))
-        return true;
-  // check attributes
-  std::list<AttributePtr> anAttrList = theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
-  for (; anIt != anAttrList.end(); ++anIt)
-    if (isUsed(*anIt))
-      return true;
-  return false;
-}
-
-bool SolveSpaceSolver_Storage::isUsed(AttributePtr theAttribute) const
-{
-  AttributePtr anAttribute = theAttribute;
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
-  if (aRefAttr) {
-    if (aRefAttr->isObject())
-      return isUsed(ModelAPI_Feature::feature(aRefAttr->object()));
-    else
-      anAttribute = aRefAttr->attr();
-  }
-
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
-      aCIt = myConstraintMap.begin();
-  std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
-  for (; aCIt != myConstraintMap.end(); ++aCIt)
-    for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt)
-      if (::isUsed(*aCWIt, anAttribute))
-        return true;
-  return false;
-}
-
-
-bool SolveSpaceSolver_Storage::removeEntity(FeaturePtr theFeature)
-{
-  std::map<FeaturePtr, EntityWrapperPtr>::iterator aFound = myFeatureMap.find(theFeature);
-  if (aFound == myFeatureMap.end())
-    return false; // feature not found, nothing to delete
-
-  // Check the feature is not used by constraints
-  if (isUsed(theFeature))
-    return false; // the feature is used, don't remove it
-
-  // Remove feature
-  EntityWrapperPtr anEntity = aFound->second;
-  myFeatureMap.erase(aFound);
-  if (remove(anEntity))
-    return true;
-  // feature is not removed, revert operation
-  myFeatureMap[theFeature] = anEntity;
-  return false;
-}
-
-bool SolveSpaceSolver_Storage::removeEntity(AttributePtr theAttribute)
-{
-  std::map<AttributePtr, EntityWrapperPtr>::iterator aFound = myAttributeMap.find(theAttribute);
-  if (aFound == myAttributeMap.end())
-    return false; // attribute not found, nothing to delete
-
-  // Check the attribute is not used by constraints
-  if (isUsed(theAttribute))
-    return false; // the attribute is used, don't remove it
-  // Check the attribute is not used by other features
-  std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
-  for (; aFIt != myFeatureMap.end(); ++aFIt)
-    if (::isUsed(aFIt->second, theAttribute)) // the attribute is used, don't remove it
-      return false;
-
-  // Remove attribute
-  EntityWrapperPtr anEntity = aFound->second;
-  myAttributeMap.erase(aFound);
-  if (remove(anEntity))
-    return true;
-  // attribute is not removed, revert operation
-  myAttributeMap[theAttribute] = anEntity;
-  return false;
-}
-
 
 bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
 {
@@ -1672,42 +1491,18 @@ bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     return true;
 
   bool isFullyRemoved = removeConstraint((Slvs_hConstraint)aConstraint->id());
-
-  std::list<EntityWrapperPtr>::const_iterator anIt = aConstraint->entities().begin();
-  for (; anIt != aConstraint->entities().end(); ++anIt) {
-    std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
-        std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(*anIt);
-    FeaturePtr aBaseFeature = anEntity->baseFeature();
-    if (aBaseFeature)
-      isFullyRemoved = removeEntity(aBaseFeature) && isFullyRemoved;
-    else
-      isFullyRemoved = removeEntity(anEntity->baseAttribute()) && isFullyRemoved;
-  }
-
-  return isFullyRemoved;
+  return SketchSolver_Storage::remove(theConstraint) && isFullyRemoved;
 }
 
 bool SolveSpaceSolver_Storage::remove(EntityWrapperPtr theEntity)
 {
+  if (!theEntity)
+    return false;
+
   std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theEntity);
   bool isFullyRemoved = removeEntity((Slvs_hEntity)anEntity->id());
-
-  std::list<EntityWrapperPtr>::const_iterator anEntIt = anEntity->subEntities().begin();
-  for (; anEntIt != anEntity->subEntities().end(); ++anEntIt) {
-    std::shared_ptr<SolveSpaceSolver_EntityWrapper> aSubEntity = 
-        std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(*anEntIt);
-    FeaturePtr aBaseFeature = aSubEntity->baseFeature();
-    if (aBaseFeature)
-      isFullyRemoved = removeEntity(aBaseFeature) && isFullyRemoved;
-    else
-      isFullyRemoved = removeEntity(aSubEntity->baseAttribute()) && isFullyRemoved;
-  }
-
-  std::list<ParameterWrapperPtr>::const_iterator aParIt = anEntity->parameters().begin();
-  for (; aParIt != anEntity->parameters().end(); ++aParIt)
-    isFullyRemoved = remove(*aParIt) && isFullyRemoved;
-  return isFullyRemoved;
+  return SketchSolver_Storage::remove(theEntity) && isFullyRemoved;
 }
 
 bool SolveSpaceSolver_Storage::remove(ParameterWrapperPtr theParameter)
@@ -1718,7 +1513,7 @@ bool SolveSpaceSolver_Storage::remove(ParameterWrapperPtr theParameter)
 
 void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
 {
-  blockEvents(true);
+  //blockEvents(true);
 
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
   std::list<ParameterWrapperPtr> aParams;
@@ -1789,7 +1584,7 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
     }
   }
 
-  blockEvents(false);
+  //blockEvents(false);
 }
 
 void SolveSpaceSolver_Storage::verifyFixed()

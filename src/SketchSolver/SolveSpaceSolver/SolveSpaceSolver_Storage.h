@@ -38,16 +38,16 @@ public:
   /// \return \c true if the value of parameter is updated
   virtual bool update(ParameterWrapperPtr& theParameter);
 
-  /// \brief Removes constraint from the storage
-  /// \return \c true if the constraint and all its parameters are remove successfully
-  virtual bool removeConstraint(ConstraintPtr theConstraint);
-  /// \brief Removes feature from the storage
-  /// \return \c true if the feature and its attributes are removed successfully;
-  ///         \c false if the feature or any it attribute is used by remaining constraints.
-  virtual bool removeEntity(FeaturePtr theFeature);
-  /// \brief Removes attribute from the storage
-  /// \return \c true if the attribute is not used by remaining features and constraints
-  virtual bool removeEntity(AttributePtr theAttribute);
+////  /// \brief Removes constraint from the storage
+////  /// \return \c true if the constraint and all its parameters are remove successfully
+////  virtual bool removeConstraint(ConstraintPtr theConstraint);
+////  /// \brief Removes feature from the storage
+////  /// \return \c true if the feature and its attributes are removed successfully;
+////  ///         \c false if the feature or any it attribute is used by remaining constraints.
+////  virtual bool removeEntity(FeaturePtr theFeature);
+////  /// \brief Removes attribute from the storage
+////  /// \return \c true if the attribute is not used by remaining features and constraints
+////  virtual bool removeEntity(AttributePtr theAttribute);
 
   /// \brief Update SketchPlugin features after resolving constraints
   /// \param theFixedOnly [in]  if \c true the fixed points will be updated only
@@ -177,21 +177,21 @@ public:
   /// \brief Attach constraint SLVS_C_WHERE_DRAGGED to this storage. It need to make precise calculations
   void addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID);
 
-  /// \brief Add transient constraint
-  void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);
-  /// \brief Mark specified constraint as temporary
-  virtual void setTemporary(ConstraintPtr theConstraint);
-  /// \brief Remove all transient constraints
-  void removeAllTemporary();
-  /// \brief Remove temporary constraint s. Preferable to remove the points under Point-on-Line constraint
-  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
-  /// \return Number of remaining temporary constraints
-  virtual size_t removeTemporary(size_t theNbConstraints);
-  /// \brief Checks the constraint is temporary
-  bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
-  /// \brief Number of temporary constraints
-  virtual size_t nbTemporary() const
-  { return myTemporaryConstraints.size(); }
+////  /// \brief Add transient constraint
+////  void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);
+////  /// \brief Mark specified constraint as temporary
+////  virtual void setTemporary(ConstraintPtr theConstraint);
+////  /// \brief Remove all transient constraints
+////  void removeAllTemporary();
+////  /// \brief Remove temporary constraint s. Preferable to remove the points under Point-on-Line constraint
+////  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
+////  /// \return Number of remaining temporary constraints
+////  virtual size_t removeTemporary(size_t theNbConstraints);
+////  /// \brief Checks the constraint is temporary
+////  bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
+////  /// \brief Number of temporary constraints
+////  virtual size_t nbTemporary() const
+////  { return myTemporaryConstraints.size(); }
 
   /// \brief Shows the storage has the same constraint twice
   virtual bool hasDuplicatedConstraint() const
@@ -239,11 +239,6 @@ private:
   /// \brief Update arc points to be on circle sharp.
   void adjustArc(const Slvs_Entity& theArc);
 
-  /// \brief Verify the feature or any its attribute is used by constraint
-  bool isUsed(FeaturePtr theFeature) const;
-  /// \brief Verify the attribute is used by constraint
-  bool isUsed(AttributePtr theAttirubute) const;
-
   /// \brief Replace sub-entity theSource in all features by theDest
   void replaceInFeatures(EntityWrapperPtr theSource, EntityWrapperPtr theDest);
   /// \brief Replace constrained entity theSource by theDest in all constraints;
@@ -269,7 +264,7 @@ private:
 
   bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
 
-  std::set<Slvs_hConstraint> myTemporaryConstraints; ///< list of transient constraints
+////  std::set<Slvs_hConstraint> myTemporaryConstraints; ///< list of transient constraints
   std::set<Slvs_hParam> myUpdatedParameters; ///< list of just updated parameters (cleared when isNeedToResolve() called)
 
   SameConstraintMap myEqualConstraints; ///< list of groups of equal constraints

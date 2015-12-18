@@ -18,7 +18,9 @@
 #include <ModelAPI_Feature.h>
 #include <SketchPlugin_Constraint.h>
 
+
 typedef std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > CoincidentPointsMap;
+
 
 /** \class   SketchSolver_Storage
  *  \ingroup Plugins
@@ -34,7 +36,8 @@ private:
 public:
   SketchSolver_Storage(const GroupID& theGroup)
     : myGroupID(theGroup),
-      myNeedToResolve(false)
+      myNeedToResolve(false),
+      myEventsBlocked(false)
   {}
 
   /// \brief Change mapping between constraint from SketchPlugin and
@@ -85,26 +88,26 @@ public:
 
   /// \brief Removes constraint from the storage
   /// \return \c true if the constraint and all its parameters are removed successfully
-  virtual bool removeConstraint(ConstraintPtr theConstraint) = 0;
+  SKETCHSOLVER_EXPORT bool removeConstraint(ConstraintPtr theConstraint);
   /// \brief Removes feature from the storage
   /// \return \c true if the feature and its attributes are removed successfully;
   ///         \c false if the feature or any it attribute is used by remaining constraints.
-  virtual bool removeEntity(FeaturePtr theFeature) = 0;
+  SKETCHSOLVER_EXPORT bool removeEntity(FeaturePtr theFeature);
   /// \brief Removes attribute from the storage
   /// \return \c true if the attribute is not used by remaining features and constraints
-  virtual bool removeEntity(AttributePtr theAttribute) = 0;
+  SKETCHSOLVER_EXPORT bool removeEntity(AttributePtr theAttribute);
 
   /// \brief Remove all features became invalid
   SKETCHSOLVER_EXPORT void removeInvalidEntities();
 
-  /// \brief Mark specified constraint as temporary
-  virtual void setTemporary(ConstraintPtr theConstraint) = 0;
-  /// \brief Returns number of temporary constraints
-  virtual size_t nbTemporary() const = 0;
-  /// \brief Remove temporary constraints
-  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
-  /// \return number of remaining temporary constraints
-  virtual size_t removeTemporary(size_t theNbConstraints = 1) = 0;
+////  /// \brief Mark specified constraint as temporary
+////  virtual void setTemporary(ConstraintPtr theConstraint) = 0;
+////  /// \brief Returns number of temporary constraints
+////  virtual size_t nbTemporary() const = 0;
+////  /// \brief Remove temporary constraints
+////  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
+////  /// \return number of remaining temporary constraints
+////  virtual size_t removeTemporary(size_t theNbConstraints = 1) = 0;
 
   /// \brief Check whether the feature or its attributes are used by this storage
   /// \param theFeature [in]  feature to be checked
@@ -145,6 +148,9 @@ public:
   virtual EntityWrapperPtr calculateMiddlePoint(EntityWrapperPtr theBase,
                                                 double theCoeff) = 0;
 
+  /// \brief Block or unblock events when refreshing features
+  SKETCHSOLVER_EXPORT void blockEvents(bool isBlocked);
+
 protected:
   /// \brief Change mapping feature from SketchPlugin and
   ///        the entity applicable for corresponding solver.
@@ -173,10 +179,10 @@ protected:
 
   /// \brief Remove constraint
   /// \return \c true if the constraint and all its parameters are removed successfully
-  virtual bool remove(ConstraintWrapperPtr theConstraint) = 0;
+  SKETCHSOLVER_EXPORT virtual bool remove(ConstraintWrapperPtr theConstraint);
   /// \brief Remove entity
   /// \return \c true if the entity and all its parameters are removed successfully
-  virtual bool remove(EntityWrapperPtr theEntity) = 0;
+  SKETCHSOLVER_EXPORT virtual bool remove(EntityWrapperPtr theEntity);
   /// \brief Remove parameter
   /// \return \c true if the parameter has been removed
   virtual bool remove(ParameterWrapperPtr theParameter) = 0;
@@ -186,16 +192,19 @@ protected:
   /// \brief Update the group for the given parameter
   virtual void changeGroup(ParameterWrapperPtr theParam, const GroupID& theGroup) = 0;
 
-  /// \brief Block or unblock events when refreshing features
-  SKETCHSOLVER_EXPORT void blockEvents(bool isBlocked) const;
-
 private:
   /// \brief Find the normal of the sketch
   EntityWrapperPtr getNormal() const;
 
+  /// \brief Verify the feature or any its attribute is used by constraint
+  bool isUsed(FeaturePtr theFeature) const;
+  /// \brief Verify the attribute is used by constraint
+  bool isUsed(AttributePtr theAttirubute) const;
+
 protected:
   GroupID myGroupID;       ///< identifier of the group, this storage belongs to
   bool    myNeedToResolve; ///< parameters are changed and group needs to be resolved
+  bool    myEventsBlocked; ///< indicates that features do not send events
 
   /// map SketchPlugin constraint to a list of solver's constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> > myConstraintMap;

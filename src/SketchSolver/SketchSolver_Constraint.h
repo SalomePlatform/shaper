@@ -57,9 +57,6 @@ public:
   virtual SketchSolver_ConstraintType getType() const
   { return myType; }
 
-  /// \brief The constraint is made temporary
-  void makeTemporary() const;
-
   /// \brief Verify the feature or any its attribute is used by constraint
   bool isUsed(FeaturePtr theFeature) const;
   /// \brief Verify the attribute is used by constraint
