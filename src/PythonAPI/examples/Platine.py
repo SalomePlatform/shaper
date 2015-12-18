@@ -189,15 +189,15 @@ def body_4():
 b1 = vertical_body()
 b2 = bottom_body()
 
-boolean = model.addAddition(part, b1.result() + b2.result(), [])
+boolean = model.addAddition(part, b1.result() + b2.result())
 model.do()
 
 b3 = body_3()
 
-boolean = model.addAddition(part, boolean.result() + b3.result(), [])
+boolean = model.addAddition(part, boolean.result() + b3.result())
 model.do()
 
 b4 = body_4()
 
-boolean = model.addAddition(part, boolean.result() + b4.result(), [])
+boolean = model.addAddition(part, boolean.result() + b4.result())
 model.do()

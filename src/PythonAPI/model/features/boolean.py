@@ -18,16 +18,15 @@ def addAddition(part, *args):
     Args:
         part (ModelAPI_Document): part document
         main_objects (list of :class:`model.Selection`): main objects
-        tool_objects (list of :class:`model.Selection`): tool_objects objects
+        tool_objects (list of :class:`model.Selection`): (optional) tool_objects objects
 
     Returns:
         Boolean: boolean object
     """
     assert(args)
-    main_objects, tool_objects = args
     feature = part.addFeature("Boolean")
     return Boolean(
-        feature, main_objects, tool_objects, GeomAlgoAPI_Boolean.BOOL_FUSE)
+        feature, GeomAlgoAPI_Boolean.BOOL_FUSE, *args)
 
 
 def addSubtraction(part, *args):
@@ -49,7 +48,7 @@ def addSubtraction(part, *args):
     main_objects, tool_objects = args
     feature = part.addFeature("Boolean")
     return Boolean(
-        feature, main_objects, tool_objects, GeomAlgoAPI_Boolean.BOOL_CUT)
+        feature, GeomAlgoAPI_Boolean.BOOL_CUT, main_objects, tool_objects)
 
 
 def addIntersection(part, *args):
@@ -71,7 +70,7 @@ def addIntersection(part, *args):
     main_objects, tool_objects = args
     feature = part.addFeature("Boolean")
     return Boolean(
-        feature, main_objects, tool_objects, GeomAlgoAPI_Boolean.BOOL_COMMON)
+        feature, GeomAlgoAPI_Boolean.BOOL_COMMON, main_objects, tool_objects)
 
 
 class Boolean(Interface):
@@ -81,7 +80,11 @@ class Boolean(Interface):
 
         Create interface for the feature without initialization.
 
-    .. function:: Boolean(feature, main_objects, tool_objects, bool_type)
+    .. function:: Boolean(feature, bool_type, main_objects)
+
+        Create interface for the feature and initialize the feature with arguments.
+
+    .. function:: Boolean(feature, bool_type, main_objects, tool_objects)
 
         Create interface for the feature and initialize the feature with arguments.
     """
@@ -102,12 +105,15 @@ class Boolean(Interface):
         if not args:
             return
 
-        assert(len(args) == 3)
-        main_objects, tool_objects, bool_type = args
+        assert(len(args) in (2, 3))
+        bool_type, main_objects = args[:2]
 
-        self.setMainObjects(main_objects)
-        self.setToolObjects(tool_objects)
         self.setBoolType(bool_type)
+        self.setMainObjects(main_objects)
+
+        if len(args) == 3:
+            tool_objects = args[2]
+            self.setToolObjects(tool_objects)
 
         self.execute()
         pass
