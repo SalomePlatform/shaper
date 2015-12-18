@@ -49,6 +49,7 @@ def main():
     set_parameter_value("E", 5)
     set_parameter_value("P", 80)
     clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    mouseMove(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 320, 240)
     test.vp("VP_PLATINE_E")
 
     # [step] Change parameter values: L = 90, E = 20, P = 80
@@ -56,6 +57,7 @@ def main():
     set_parameter_value("E", 20)
     set_parameter_value("P", 80)
     clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    mouseMove(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 320, 240)
     test.vp("VP_PLATINE_L")
 
     # [step] Change parameter values: L = 64, E = 20, P = 120
@@ -63,7 +65,8 @@ def main():
     set_parameter_value("E", 20)
     set_parameter_value("P", 120)
     clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
+    mouseMove(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 320, 240)
     test.vp("VP_PLATINE_P")
 
-    # [step] Cloase application
+    # [step] Close application
     close_application()
