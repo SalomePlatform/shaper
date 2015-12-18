@@ -19,9 +19,9 @@ Example of code:
    >>> plane = model.defaultPlane("XOY")
    >>> sketch = model.addSketch(part, plane)
    >>> line = sketch.addLine(0, 0, 0, 1)
-   >>> line.endPointData().x()
+   >>> line.endPoint().x()
    0.0
-   >>> line.endPointData().y()
+   >>> line.endPoint().y()
    1.0
 """
 
@@ -381,7 +381,7 @@ class Sketch(Interface):
         # Adding and connecting next lines
         for c2 in coords[2:]:
             line_2 = self.addLine(c1, c2)
-            self.setCoincident(line_1.endPointData(), line_2.startPointData())
+            self.setCoincident(line_1.endPoint(), line_2.startPoint())
             polyline.append(line_2)
             c1 = c2
             line_1 = line_2
@@ -398,10 +398,10 @@ class Sketch(Interface):
         cn = coords[len(coords) - 1]
         ln = self.addLine(cn, c0)
         self.setCoincident(
-            pg[len(coords) - 2].endPointData(), ln.startPointData()
+            pg[len(coords) - 2].endPoint(), ln.startPoint()
             )
         self.setCoincident(
-            ln.endPointData(), pg[0].startPointData()
+            ln.endPoint(), pg[0].startPoint()
             )
         pg.append(ln)
         return pg

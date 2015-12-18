@@ -33,7 +33,7 @@ mybase.setParallel(line[1].result(), line[3].result())
 mybase.setPerpendicular(line[0].result(), line[3].result())
 
 mywidth = mybase.setLength(line[0].result(), 50)
-mylength = mybase.setDistance(line[0].startPointData(), line[2].result(), 50)
+mylength = mybase.setDistance(line[0].startPoint(), line[2].result(), 50)
 
 
 # Creating the extrusion

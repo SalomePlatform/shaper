@@ -14,12 +14,12 @@ class SketcherSetEqual(SketcherTestCase):
         model.do()
         # Check the result
         length_1 = math.sqrt(
-            math.pow((l1.endPointData().x() - l1.startPointData().x()), 2) +
-            math.pow((l1.endPointData().y() - l1.startPointData().y()), 2)
+            math.pow((l1.endPoint().x() - l1.startPoint().x()), 2) +
+            math.pow((l1.endPoint().y() - l1.startPoint().y()), 2)
             )
         length_2 = math.sqrt(
-            math.pow((l2.endPointData().x() - l2.startPointData().x()), 2) +
-            math.pow((l2.endPointData().y() - l2.startPointData().y()), 2)
+            math.pow((l2.endPoint().x() - l2.startPoint().x()), 2) +
+            math.pow((l2.endPoint().y() - l2.startPoint().y()), 2)
             )
         self.assertAlmostEqual(length_1, length_2, delta=TestSketcher.DELTA)
 

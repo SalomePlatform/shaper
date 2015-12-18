@@ -13,17 +13,17 @@ class SketcherSetAngle(SketcherTestCase):
         # Commit the transaction
         model.do()
         # Check the result
-        dot_product = (l1.endPointData().x() - l1.startPointData().x()) * \
-                      (l2.endPointData().x() - l2.startPointData().x()) + \
-                      (l1.endPointData().y() - l1.startPointData().y()) * \
-                      (l2.endPointData().y() - l2.startPointData().y())
+        dot_product = (l1.endPoint().x() - l1.startPoint().x()) * \
+                      (l2.endPoint().x() - l2.startPoint().x()) + \
+                      (l1.endPoint().y() - l1.startPoint().y()) * \
+                      (l2.endPoint().y() - l2.startPoint().y())
         norm_1 = math.sqrt(
-            math.pow((l1.endPointData().x() - l1.startPointData().x()), 2) + 
-            math.pow((l1.endPointData().y() - l1.startPointData().y()), 2)
+            math.pow((l1.endPoint().x() - l1.startPoint().x()), 2) + 
+            math.pow((l1.endPoint().y() - l1.startPoint().y()), 2)
             )
         norm_2 = math.sqrt(
-            math.pow((l2.endPointData().x() - l2.startPointData().x()), 2) + 
-            math.pow((l2.endPointData().y() - l2.startPointData().y()), 2)
+            math.pow((l2.endPoint().x() - l2.startPoint().x()), 2) + 
+            math.pow((l2.endPoint().y() - l2.startPoint().y()), 2)
             )
         angle = math.acos(dot_product / (norm_1 * norm_2))
         self.assertAlmostEqual(

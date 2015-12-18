@@ -25,10 +25,10 @@ l2 = mybase.addLine(0, 1, 1, 1)
 l3 = mybase.addLine(1, 1, 1, 0)
 l4 = mybase.addLine(1, 0, 0, 0)
 
-mybase.setCoincident(l1.endPointData(), l2.startPointData())
-mybase.setCoincident(l2.endPointData(), l3.startPointData())
-mybase.setCoincident(l3.endPointData(), l4.startPointData())
-mybase.setCoincident(l4.endPointData(), l1.startPointData())
+mybase.setCoincident(l1.endPoint(), l2.startPoint())
+mybase.setCoincident(l2.endPoint(), l3.startPoint())
+mybase.setCoincident(l3.endPoint(), l4.startPoint())
+mybase.setCoincident(l4.endPoint(), l1.startPoint())
 
 mybase.setParallel(l1.result(), l3.result())
 mybase.setParallel(l2.result(), l4.result())
@@ -36,7 +36,7 @@ mybase.setParallel(l2.result(), l4.result())
 mybase.setPerpendicular(l1.result(), l4.result())
 
 mywidth = mybase.setLength(l1.result(), 50)
-mylength = mybase.setDistance(l1.startPointData(), l3.result(), 50)
+mylength = mybase.setDistance(l1.startPoint(), l3.result(), 50)
 
 # Creating the extrusion
 

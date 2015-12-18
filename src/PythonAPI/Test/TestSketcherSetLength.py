@@ -13,8 +13,8 @@ class SketcherSetLength(SketcherTestCase):
         model.do()
         # Check the result
         length = math.sqrt(
-            math.pow((line.endPointData().x() - line.startPointData().x()), 2) + 
-            math.pow((line.endPointData().y() - line.startPointData().y()), 2)
+            math.pow((line.endPoint().x() - line.startPoint().x()), 2) + 
+            math.pow((line.endPoint().y() - line.startPoint().y()), 2)
             )
         self.assertAlmostEqual(length, 25.0, delta=TestSketcher.DELTA)
         

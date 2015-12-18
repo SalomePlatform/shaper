@@ -7,7 +7,7 @@ class SketcherSetVertical(SketcherTestCase):
         line = self.sketch.addLine(0, 0, 1, 1)
         self.sketch.setVertical(line.result())
         model.do()
-        self.assertEqual(line.startPointData().x(), line.endPointData().x())
+        self.assertEqual(line.startPoint().x(), line.endPoint().x())
 
 if __name__ == "__main__":
     unittest.main()

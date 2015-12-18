@@ -64,10 +64,10 @@ class Line(Entity):
 
     # TODO : methods below will be removed.
     # Kept until all tests have been updated
-    def startPointData(self):
+    def startPoint(self):
         return self._start_point
 
-    def endPointData(self):
+    def endPoint(self):
         return self._end_point
 
     def setExternal(self, name):

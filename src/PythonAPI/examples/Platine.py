@@ -30,7 +30,7 @@ def vertical_body():
     left, top, right, bottom = sketch.addPolygon(*geom_points)
 
     # Set constraints
-    sketch.setRigid(left.startPointData())
+    sketch.setRigid(left.startPoint())
 
     sketch.setHorizontal(bottom.result())
     sketch.setHorizontal(top.result())
@@ -41,7 +41,7 @@ def vertical_body():
     sketch.setLength(top.result(), "L")
     sketch.setLength(left.result(), "L")
 
-    sketch.setFillet(left.endPointData(), 32)
+    sketch.setFillet(left.endPoint(), 32)
 
     model.do()  #!!!
 
@@ -88,13 +88,13 @@ def bottom_body():
     sketch.setLength(h2.result(), 20)
 
     sketch.setCoincident(arc.center(), v1.result())
-    sketch.setCoincident(arc.startPoint(), h2.endPointData())
-    sketch.setCoincident(arc.endPoint(), h1.startPointData())
+    sketch.setCoincident(arc.startPoint(), h2.endPoint())
+    sketch.setCoincident(arc.endPoint(), h1.startPoint())
 
     # Binding
     left_e = sketch.addLine("Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1")
-    sketch.setCoincident(left_e.startPointData(), left.endPointData())
-    sketch.setCoincident(left_e.endPointData(), left.startPointData())
+    sketch.setCoincident(left_e.startPoint(), left.endPoint())
+    sketch.setCoincident(left_e.endPoint(), left.startPoint())
 
     model.do()  #!!!
 
@@ -139,15 +139,15 @@ def body_3():
     sketch.setLength(top_left.result(), l)
 
     sketch.setCoincident(top_middle.result(), arc.center())
-    sketch.setCoincident(top_middle.endPointData(), arc.startPoint())
-    sketch.setCoincident(top_middle.startPointData(), arc.endPoint())
+    sketch.setCoincident(top_middle.endPoint(), arc.startPoint())
+    sketch.setCoincident(top_middle.startPoint(), arc.endPoint())
 
     sketch.setRadius(arc.result(), r)
 
     # Binding
     bottom_e = sketch.addLine("Boolean_1_1/Modified_1|Boolean_1_1/Modified_3")
-    sketch.setCoincident(bottom_e.result(), bottom.startPointData())
-    sketch.setCoincident(bottom_e.startPointData(), bottom.endPointData())
+    sketch.setCoincident(bottom_e.result(), bottom.startPoint())
+    sketch.setCoincident(bottom_e.startPoint(), bottom.endPoint())
 
     model.do()  #!!!
 
@@ -170,11 +170,11 @@ def body_4():
 
     # Binding
     bottom_e = sketch.addLine("Boolean_2_1/Modified_8|Boolean_2_1/Modified_7")
-    sketch.setCoincident(bottom_e.endPointData(), bottom.startPointData())
-    sketch.setCoincident(bottom_e.startPointData(), left.startPointData())
+    sketch.setCoincident(bottom_e.endPoint(), bottom.startPoint())
+    sketch.setCoincident(bottom_e.startPoint(), left.startPoint())
 
     left_e = sketch.addLine("Boolean_2_1/Modified_3|Boolean_2_1/Modified_2")
-    sketch.setCoincident(left_e.startPointData(), left.endPointData())
+    sketch.setCoincident(left_e.startPoint(), left.endPoint())
 
     model.do()  #!!!
 

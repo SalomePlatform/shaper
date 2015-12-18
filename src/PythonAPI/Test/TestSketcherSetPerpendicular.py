@@ -11,10 +11,10 @@ class SketcherSetPerpendicular(SketcherTestCase):
         self.sketch.setPerpendicular(l1.result(), l2.result())
         model.do()
         
-        dot_product = (l1.endPointData().x() - l1.startPointData().x()) * \
-                      (l2.endPointData().x() - l2.startPointData().x()) + \
-                      (l1.endPointData().y() - l1.startPointData().y()) * \
-                      (l2.endPointData().y() - l2.startPointData().y())
+        dot_product = (l1.endPoint().x() - l1.startPoint().x()) * \
+                      (l2.endPoint().x() - l2.startPoint().x()) + \
+                      (l1.endPoint().y() - l1.startPoint().y()) * \
+                      (l2.endPoint().y() - l2.startPoint().y())
         self.assertAlmostEqual(dot_product, 0.0, delta=TestSketcher.DELTA)
 
 if __name__ == "__main__":
