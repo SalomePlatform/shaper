@@ -14,6 +14,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
@@ -22,7 +23,6 @@
 #include <SketcherPrs_Factory.h>
 
 SketchPlugin_MultiTranslation::SketchPlugin_MultiTranslation()
-: myBlockValue(false)
 {
 }
 
@@ -30,10 +30,9 @@ void SketchPlugin_MultiTranslation::initAttributes()
 {
   data()->addAttribute(VALUE_TYPE(),   ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(START_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(END_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(START_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(END_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
+
   data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
@@ -56,30 +55,19 @@ void SketchPlugin_MultiTranslation::execute()
     return;
 
   // Calculate shift vector
-  std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(START_POINT_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(END_POINT_ID()));
-  if (!aStart || !aEnd || !aStart->isInitialized() || !aEnd->isInitialized())
+  AttributeRefAttrPtr aStartAttr = data()->refattr(START_POINT_ID());
+  AttributeRefAttrPtr anEndAttr = data()->refattr(END_POINT_ID());
+
+  if (!aStartAttr || !anEndAttr || !aStartAttr->isInitialized() || !anEndAttr->isInitialized())
     return;
 
-  if (attribute(END_POINT_ID())->isInitialized() && !attribute(END_FULL_POINT_ID())->isInitialized()) {
-    myBlockValue = true;
-    SketchPlugin_Tools::updateMultiAttribute(attribute(START_POINT_ID()), attribute(END_POINT_ID()),
-                                             attribute(END_FULL_POINT_ID()), aNbCopies, true);
-    myBlockValue = false;
-  }
-
-
-  // make a visible points
-  SketchPlugin_Sketch::createPoint2DResult(this, sketch(), START_POINT_ID(), 0);
-
-  std::string aSecondPointAttributeID = END_POINT_ID();
-  AttributeStringPtr aMethodTypeAttr = string(VALUE_TYPE());
-  std::string aMethodType = aMethodTypeAttr->value();
-  if (aMethodType != "SingleValue")
-    aSecondPointAttributeID = END_FULL_POINT_ID();
-  SketchPlugin_Sketch::createPoint2DResult(this, sketch(), aSecondPointAttributeID, 1);
+  DataPtr aData = data();
+  std::shared_ptr<GeomDataAPI_Point2D> aStart = GeomDataAPI_Point2D::getPoint2D(aData,
+                                                                                START_POINT_ID());
+  std::shared_ptr<GeomDataAPI_Point2D> aEnd = GeomDataAPI_Point2D::getPoint2D(aData,
+                                                                              END_POINT_ID());
+  if (!aStart || !aEnd)
+    return;
 
   std::shared_ptr<GeomAPI_XY> aShiftVec(new GeomAPI_XY(aEnd->x() - aStart->x(), aEnd->y() - aStart->y()));
 
@@ -89,7 +77,6 @@ void SketchPlugin_MultiTranslation::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
-  std::shared_ptr<ModelAPI_Data> aData = data();
   AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributeRefListPtr aRefListOfTranslated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
@@ -271,65 +258,6 @@ void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
         data()->attribute(SketchPlugin_Constraint::ENTITY_A()))->clear();
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
-    }
-  }
-  else if (theID == START_POINT_ID() && !myBlockValue) {
-    myBlockValue = true;
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aStartFullPoint = 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_FULL_POINT_ID()));
-    aStartFullPoint->setValue(aStartPoint->pnt());
-    myBlockValue = false;
-  }
-  else if (theID == START_FULL_POINT_ID() && !myBlockValue) {
-    myBlockValue = true;
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aStartFullPoint = 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_FULL_POINT_ID()));
-    aStartPoint->setValue(aStartFullPoint->pnt());
-    myBlockValue = false;
-  }
-  else if (theID == END_POINT_ID() && !myBlockValue) {
-    int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-    if (aNbCopies > 0) {
-      myBlockValue = true;
-      SketchPlugin_Tools::updateMultiAttribute(attribute(START_POINT_ID()), attribute(END_POINT_ID()),
-                                               attribute(END_FULL_POINT_ID()), aNbCopies, true);
-      myBlockValue = false;
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    }
-  }
-  else if (theID == END_FULL_POINT_ID() && !myBlockValue) {
-    int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-    if (aNbCopies > 0) {
-      myBlockValue = true;
-      SketchPlugin_Tools::updateMultiAttribute(attribute(START_POINT_ID()), attribute(END_FULL_POINT_ID()),
-                                               attribute(END_POINT_ID()), aNbCopies, false);
-      myBlockValue = false;
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    }
-  }
-  else if (theID == NUMBER_OF_OBJECTS_ID()) {
-    if (attribute(NUMBER_OF_OBJECTS_ID())->isInitialized() &&
-        attribute(END_POINT_ID())->isInitialized() &&
-        attribute(VALUE_TYPE())->isInitialized()) {
-      AttributeStringPtr aMethodTypeAttr = string(VALUE_TYPE());
-      std::string aMethodType = aMethodTypeAttr->value();
-      int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-      if (aNbCopies > 0) {
-        myBlockValue = true;
-        if (aMethodType == "SingleValue")
-          SketchPlugin_Tools::updateMultiAttribute(attribute(START_POINT_ID()), attribute(END_POINT_ID()),
-                                                   attribute(END_FULL_POINT_ID()), aNbCopies, true);
-        else {
-          SketchPlugin_Tools::updateMultiAttribute(attribute(START_POINT_ID()), attribute(END_FULL_POINT_ID()),
-                                                   attribute(END_POINT_ID()), aNbCopies, false);
-        }
-        myBlockValue = false;
-        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-      }
     }
   }
 }

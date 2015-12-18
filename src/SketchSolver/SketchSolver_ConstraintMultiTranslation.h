@@ -10,6 +10,8 @@
 #include "SketchSolver.h"
 #include <SketchSolver_ConstraintMulti.h>
 
+#include "GeomDataAPI_Point2D.h"
+
 /** \class   SketchSolver_ConstraintMultiTranslation
  *  \ingroup Plugins
  *  \brief   Convert translated features to the list of SolveSpace constraints
@@ -34,12 +36,16 @@ protected:
                      std::list< std::list<EntityWrapperPtr> >& theEntities);
 
   /// \brief Update parameters (called from base class)
-  virtual void updateLocal()
-  {}
+  virtual void updateLocal();
 
 private:
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
   virtual const std::string& nameNbObjects();
+
+private:
+  AttributePoint2DPtr myStartPointAttribute;
+  AttributePoint2DPtr myEndPointAttribute;
+  bool                myIsFullValue;
 };
 
 #endif

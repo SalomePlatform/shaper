@@ -59,24 +59,12 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
     static const std::string MY_START_POINT_ID("MultiTranslationStartPoint");
     return MY_START_POINT_ID;
   }
-  /// Start point of translation
-  inline static const std::string& START_FULL_POINT_ID()
-  {
-    static const std::string MY_START_FULL_POINT_ID("MultiTranslationFullStartPoint");
-    return MY_START_FULL_POINT_ID;
-  }
 
   /// End point of translation
   inline static const std::string& END_POINT_ID()
   {
     static const std::string MY_END_POINT_ID("MultiTranslationEndPoint");
     return MY_END_POINT_ID;
-  }
-  /// End point of translation
-  inline static const std::string& END_FULL_POINT_ID()
-  {
-    static const std::string MY_END_FULL_POINT_ID("MultiTranslationFullEndPoint");
-    return MY_END_FULL_POINT_ID;
   }
 
   /// Total number of objects, initial and translated objects
@@ -105,8 +93,6 @@ class SketchPlugin_MultiTranslation : public SketchPlugin_ConstraintBase
 private:
   ObjectPtr copyFeature(ObjectPtr theObject);
 
-private:
-  bool myBlockValue; /// a boolean state to avoid recusive value change in attributeChanged
 };
 
 #endif

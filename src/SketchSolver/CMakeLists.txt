@@ -53,6 +53,7 @@ SET(PROJECT_LIBRARIES
     Events
     ModelAPI
     GeomAPI
+    GeomDataAPI
 )
 
 INCLUDE_DIRECTORIES(

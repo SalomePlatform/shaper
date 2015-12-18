@@ -9,6 +9,7 @@
 
 #include <GeomDataAPI.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_Data.h>
 
 #include <set>
 
@@ -81,6 +82,12 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
 
   /// Returns the type of this class of attributes, not static method
   GEOMDATAAPI_EXPORT virtual std::string attributeType();
+
+  /// Returns this attribute from the data if it is possible
+  /// \param theData a model data
+  /// \param theAttribute an attribute index
+  static GEOMDATAAPI_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getPoint2D(const DataPtr& theData,
+                                                                  const std::string& theAttribute);
 
  protected:
   /// Objects are created for features automatically

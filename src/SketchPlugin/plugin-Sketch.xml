@@ -289,37 +289,57 @@
         <toolbox id="ValueType">
           <box id="SingleValue" title="Single value" icon=":icons/translate_32x32.png">
             <groupbox title="Direction">
-              <sketch-2dpoint_selector
-                  id="MultiTranslationStartPoint"
-                  title="Start point"
-                  tooltip="Start point of translation"/>
-              <sketch-2dpoint_selector
-                  id="MultiTranslationEndPoint"
-                  title="End point"
-                  tooltip="Final point of translation"/>
+              <sketch_shape_selector
+                    id="MultiTranslationStartPoint"
+                    label="Start point"
+                    tooltip="Start point of translation"
+                    shape_types="vertex">
+                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+                <validator id="PartSet_DifferentObjects"/>
+                <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+              </sketch_shape_selector>
+              <sketch_shape_selector
+                    id="MultiTranslationEndPoint"
+                    label="End point"
+                    tooltip="Final point of translation"
+                    shape_types="vertex">
+                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+                <validator id="PartSet_DifferentObjects"/>
+                <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+              </sketch_shape_selector>
             </groupbox>
           </box>
           <box id="FullValue" title="Full value" icon=":icons/translate_full_32x32.png">
             <groupbox title="Direction">
-              <sketch-2dpoint_selector
-                  id="MultiTranslationFullStartPoint"
-                  title="Start point"
-                  tooltip="Start point of translation"/>
-              <sketch-2dpoint_selector
-                  id="MultiTranslationFullEndPoint"
-                  title="End point"
-                  tooltip="Final point of translation"/>
+              <sketch_shape_selector
+                    id="MultiTranslationStartPoint"
+                    label="Start point"
+                    tooltip="Start point of translation"
+                    shape_types="vertex">
+                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+                <validator id="PartSet_DifferentObjects"/>
+                <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+              </sketch_shape_selector>
+              <sketch_shape_selector
+                    id="MultiTranslationEndPoint"
+                    label="End point"
+                    tooltip="Final point of translation"
+                    shape_types="vertex">
+                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+                <validator id="PartSet_DifferentObjects"/>
+                <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+              </sketch_shape_selector>
             </groupbox>
           </box>
         </toolbox>
         <integervalue id="MultiTranslationObjects"
             label="Total number of objects"
-            tooltip="Total number of objects" 
+            tooltip="Total number of objects"
             default="2" min="2" use_reset="false">
           <validator id="GeomValidators_Positive"/>
         </integervalue>
       </feature>
-      
+
       <!--  SketchMultiRotation  -->
       <feature
         id="SketchMultiRotation"

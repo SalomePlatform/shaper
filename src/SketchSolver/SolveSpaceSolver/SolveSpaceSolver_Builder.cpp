@@ -837,6 +837,13 @@ void adjustMultiTranslation(ConstraintWrapperPtr theConstraint)
   std::shared_ptr<GeomAPI_Pnt2d> aEndPnt = aBuilder->point(*aSIt++);
   std::shared_ptr<GeomAPI_XY> aDelta = aEndPnt->xy()->decreased(aStartPnt->xy());
 
+  bool isFullValue = theConstraint->isFullValue();
+  int aNbObjects = aSubs.size()-3;
+  if (isFullValue && aNbObjects > 0) {
+    aDelta->setX(aDelta->x()/aNbObjects);
+    aDelta->setY(aDelta->y()/aNbObjects);
+  }
+
   std::list<EntityWrapperPtr>::const_iterator aPrevIt = aSIt++;
   for (; aSIt != aSubs.end(); ++aPrevIt, ++aSIt)
     translate(*aPrevIt, *aSIt, aDelta);

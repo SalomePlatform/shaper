@@ -80,6 +80,13 @@ public:
   const double& value() const
   { return myValue; }
 
+  /// \brief Store a boolean flag for full value using
+  void setIsFullValue(const bool& theFullValue)
+  { myIsFullValue = theFullValue; }
+  /// \brief Return a flag of a full value using
+  const bool& isFullValue() const
+  { return myIsFullValue; }
+
   /// \brief Verify the feature is used in the constraint
   virtual bool isUsed(FeaturePtr theFeature) const = 0;
   /// \brief Verify the attribute is used in the constraint
@@ -96,6 +103,7 @@ protected:
   ConstraintPtr               myBaseConstraint;
   std::list<EntityWrapperPtr> myConstrained;
   double                      myValue;
+  bool                        myIsFullValue;
 };
 
 typedef std::shared_ptr<SketchSolver_IConstraintWrapper> ConstraintWrapperPtr;
