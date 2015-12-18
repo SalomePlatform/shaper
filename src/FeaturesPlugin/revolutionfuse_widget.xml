@@ -38,7 +38,7 @@
           </doublevalue>
         </groupbox>
       </box>
-      <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon=":icons/plane_inverted_32x32.png">
+      <box id="ByPlanesAndOffsets" title="By bounding planes and angles" icon=":icons/plane_inverted_32x32.png">
         <shape_selector id="axis_object"
                         icon=":icons/axis.png"
                         label="Axis"
@@ -56,10 +56,10 @@
                           default="&lt;sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
-          <doublevalue id="from_offset" label="Offset"
+          <doublevalue id="from_offset" label="Angle"
             step="1.0" default="0"
             icon=":icons/angle_up_down.png"
-            tooltip="Offset for bounding plane">
+            tooltip="Angle for &quot;from&quot; for bounding plane">
           </doublevalue>
         </groupbox>
         <groupbox title="To">
@@ -71,10 +71,10 @@
                           default="&lt;sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
-          <doublevalue  id="to_offset" label="Offset"
+          <doublevalue  id="to_offset" label="Angle"
             step="1.0" default="0"
             icon=":icons/angle_up_down.png"
-            tooltip="Offset for bounding plane">
+            tooltip="Angle for &quot;to&quot; bounding plane">
           </doublevalue>
         </groupbox>
       </box>
