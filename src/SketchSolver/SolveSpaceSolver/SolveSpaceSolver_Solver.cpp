@@ -82,8 +82,8 @@ void SolveSpaceSolver_Solver::setConstraints(Slvs_Constraint* theConstraints, in
 
 SketchSolver_SolveStatus SolveSpaceSolver_Solver::solve()
 {
-  if (myEquationsSystem.constraints <= 0)
-    return STATUS_EMPTYSET;
+  //if (myEquationsSystem.constraints <= 0)
+  //  return STATUS_EMPTYSET;
 
   myEquationsSystem.calculateFaileds = myFindFaileds ? 1 : 0;
 

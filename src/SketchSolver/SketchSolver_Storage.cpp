@@ -50,7 +50,7 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
                                      EntityWrapperPtr theSolverEntity)
 {
   std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFound = myFeatureMap.find(theFeature);
-  if (aFound == myFeatureMap.end() || !aFound->second->isEqual(theSolverEntity))
+  if (aFound == myFeatureMap.end() || !aFound->second || !aFound->second->isEqual(theSolverEntity))
     setNeedToResolve(true); // the entity is new or modified
 
   myFeatureMap[theFeature] = theSolverEntity;
@@ -60,7 +60,7 @@ void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
                                      EntityWrapperPtr theSolverEntity)
 {
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator aFound = myAttributeMap.find(theAttribute);
-  if (aFound == myAttributeMap.end() || !aFound->second->isEqual(theSolverEntity))
+  if (aFound == myAttributeMap.end() || !aFound->second || !aFound->second->isEqual(theSolverEntity))
     setNeedToResolve(true); // the entity is new or modified
 
   myAttributeMap[theAttribute] = theSolverEntity;

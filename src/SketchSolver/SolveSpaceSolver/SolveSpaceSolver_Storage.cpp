@@ -19,6 +19,7 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <SketchPlugin_Arc.h>
 
 /** \brief Search the entity/parameter with specified ID in the list of elements
  *  \param[in] theEntityID unique ID of the element
@@ -174,7 +175,18 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
 
     if (anEntity->type() == ENTITY_SKETCH)
       storeWorkplane(anEntity);
+
+    // For the correct work with arcs we will add them if their parameter is added
+    if (theEntity->baseAttribute()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(theEntity->baseAttribute()->owner());
+      if (aFeature->getKind() == SketchPlugin_Arc::ID() &&
+          myFeatureMap.find(aFeature) == myFeatureMap.end()) {
+        myFeatureMap[aFeature] = EntityWrapperPtr();
+        return SketchSolver_Storage::update(aFeature, myGroupID);
+      }
+    }
   }
+
   return isUpdated;
 }
 
