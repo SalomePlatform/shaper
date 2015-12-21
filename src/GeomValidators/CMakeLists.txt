@@ -4,6 +4,7 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
     GeomValidators.h
+    GeomValidators_BodyShapes.h
     GeomValidators_BooleanArguments.h
     GeomValidators_ConstructionComposite.h
     GeomValidators_DifferentShapes.h
@@ -19,6 +20,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+    GeomValidators_BodyShapes.cpp
     GeomValidators_BooleanArguments.cpp
     GeomValidators_ConstructionComposite.cpp
     GeomValidators_DifferentShapes.cpp
@@ -34,7 +36,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
-    ModelAPI 
+    ModelAPI
     Events
     GeomAPI
 )

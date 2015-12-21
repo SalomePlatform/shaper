@@ -1,7 +1,9 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <multi_selector id="group_list" 
-    tooltip="Select a set of objects" 
-    type_choice="Vertices Edges Faces Solids" /> 
+  <multi_selector id="group_list"
+    tooltip="Select a set of objects"
+    type_choice="Vertices Edges Faces Solids">
+    <validator id="GeomValidators_BodyShapes" parameters="Sketch"/>
+  </multi_selector>
 </source>
