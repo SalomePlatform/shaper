@@ -214,9 +214,11 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   /// The name of the created feature stays unique.
   /// \param theFeature a source feature
   /// \param theSketch a sketch intance
+  /// \param theIsCopy if true sets feature copy attribute to true.
   /// \return a created feature
   static FeaturePtr addUniqueNamedCopiedFeature(FeaturePtr theFeature,
-                                                SketchPlugin_Sketch* theSketch);
+                                                SketchPlugin_Sketch* theSketch,
+                                                const bool theIsCopy = false);
 
   /// Creates a plane of the sketch.
   /// \param theSketch a sketch intance

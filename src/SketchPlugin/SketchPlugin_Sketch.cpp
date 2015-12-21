@@ -297,7 +297,8 @@ void SketchPlugin_Sketch::createPoint2DResult(ModelAPI_Feature* theFeature,
 }
 
 FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeature,
-                                                            SketchPlugin_Sketch* theSketch)
+                                                            SketchPlugin_Sketch* theSketch,
+                                                            const bool theIsCopy)
 {
   FeaturePtr aNewFeature = theSketch->addFeature(theFeature->getKind());
   // addFeature generates a unique name for the feature, it caches the name
@@ -308,6 +309,8 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
   aNewFeature->data()->setName(aUniqueFeatureName);
   // text expressions could block setValue of some attributes
   SketchPlugin_Tools::clearExpressions(aNewFeature);
+  // Set copy attribute
+  aNewFeature->data()->boolean(SketchPlugin_SketchEntity::COPY_ID())->setValue(theIsCopy);
 
   return aNewFeature;
 }

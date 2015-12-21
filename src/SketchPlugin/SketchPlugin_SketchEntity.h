@@ -46,6 +46,13 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     return MY_EXTERNAL_ID;
   }
 
+  /// Reference to the copy type of the feature
+  inline static const std::string& COPY_ID()
+  {
+    static const std::string MY_COPY_ID("Copy");
+    return MY_COPY_ID;
+  }
+
   /// Request for initialization of data model of the feature: adding all attributes
   virtual void initAttributes();
 
@@ -55,6 +62,16 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
     if (aAttr)
       return aAttr->context().get() != NULL;
+    return false;
+  }
+
+  /// Returns true of the feature is a copy of other feature
+  virtual bool isCopy() const
+  {
+    AttributeBooleanPtr anAttr = data()->boolean(COPY_ID());
+    if(anAttr.get()) {
+      return anAttr->value();
+    }
     return false;
   }
 
@@ -103,6 +120,10 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       // It is defined in order to extend selection area of the object.
       thePrs->setWidth(17);
     //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
+    }
+    if(isCopy()) {
+      double aWidth = thePrs->width();
+      thePrs->setWidth(aWidth / 2.5);
     }
     return isCustomized;
   }

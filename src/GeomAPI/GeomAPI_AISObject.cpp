@@ -319,6 +319,16 @@ void GeomAPI_AISObject::setColor(const int& theColor)
   aContext->SetColor(anAIS, aColor, false);
 }
 
+double GeomAPI_AISObject::width()
+{
+  double aWidth = 0.0;
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    aWidth = anAIS->Width();
+  }
+  return aWidth;
+}
+
 bool GeomAPI_AISObject::setWidth(const double& theWidth)
 {
   bool isChanged = false;

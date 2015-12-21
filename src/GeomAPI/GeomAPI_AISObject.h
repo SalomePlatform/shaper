@@ -122,6 +122,10 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   void getColor(int& theR, int& theG, int& theB);
 
+  /// \return Current width of the lines of shape
+  GEOMAPI_EXPORT 
+  double width();
+
   /// \brief Assigns the width of the lines of shape
   GEOMAPI_EXPORT 
   bool setWidth(const double& theWidth);
