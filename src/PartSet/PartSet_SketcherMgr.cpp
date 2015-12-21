@@ -984,55 +984,66 @@ void PartSet_SketcherMgr::operationActivatedByPreselection()
                                                                             (anOperation);
     if (aFOperation) {
       if (PartSet_SketcherMgr::isDistanceOperation(aFOperation)) {
-        // Activate dimension value editing on double click
-        ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-        // Find corresponded widget to activate value editing
-        foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-          if (aWgt->attributeID() == "ConstraintValue") {
-            FeaturePtr aFeature = aFOperation->feature();
-            // the featue should be displayed in order to find the AIS text position,
-            // the place where the editor will be shown
-            aFeature->setDisplayed(true);
-            /// the execute is necessary to perform in the feature compute for flyout position
-            aFeature->execute();
+        FeaturePtr aFeature = aFOperation->feature();
+        // editor is shown only if all attribute references are filled by preseletion
+        bool anAllRefAttrInitialized = true;
 
-            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+        std::list<AttributePtr> aRefAttrs = aFeature->data()->attributes(
+                                                    ModelAPI_AttributeRefAttr::typeId());
+        std::list<AttributePtr>::const_iterator anIt = aRefAttrs.begin(), aLast = aRefAttrs.end();
+        for (; anIt != aLast && anAllRefAttrInitialized; anIt++) {
+          anAllRefAttrInitialized = (*anIt)->isInitialized();
+        }
+        if (anAllRefAttrInitialized) {
+          // Activate dimension value editing on double click
+          ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+          QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+          // Find corresponded widget to activate value editing
+          foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+            if (aWgt->attributeID() == "ConstraintValue") {
+              // the featue should be displayed in order to find the AIS text position,
+              // the place where the editor will be shown
+              aFeature->setDisplayed(true);
+              /// the execute is necessary to perform in the feature compute for flyout position
+              aFeature->execute();
 
-            PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
-            if (anEditor) {
-              int aX = 0, anY = 0;
+              Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+              Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
-              ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-              XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-              XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-              AISObjectPtr anAIS = aDisplayer->getAISObject(aFeature);
-              Handle(AIS_InteractiveObject) anAISIO;
-              if (anAIS.get() != NULL) {
-                anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
-              }
-              if (anAIS.get() != NULL) {
-                Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+              PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
+              if (anEditor) {
+                int aX = 0, anY = 0;
 
-                if (!anAISIO.IsNull()) {
-                  Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
-                  if (!aDim.IsNull()) {
-                    gp_Pnt aPosition = aDim->GetTextPosition();
-
-                    ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-                    Handle(V3d_View) aView = aViewer->activeView();
-                    int aCX, aCY;
-                    aView->Convert(aPosition.X(), aPosition.Y(), aPosition.Z(), aCX, aCY);
-
-                    QWidget* aViewPort = aViewer->activeViewPort();
-                    QPoint aGlPoint = aViewPort->mapToGlobal(QPoint(aCX, aCY));
-                    aX = aGlPoint.x();
-                    anY = aGlPoint.y();
-                  }
+                ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+                XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+                XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+                AISObjectPtr anAIS = aDisplayer->getAISObject(aFeature);
+                Handle(AIS_InteractiveObject) anAISIO;
+                if (anAIS.get() != NULL) {
+                  anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
                 }
-                anEditor->setCursorPosition(aX, anY);
-                anEditor->showPopupEditor(false);
+                if (anAIS.get() != NULL) {
+                  Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+
+                  if (!anAISIO.IsNull()) {
+                    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
+                    if (!aDim.IsNull()) {
+                      gp_Pnt aPosition = aDim->GetTextPosition();
+
+                      ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+                      Handle(V3d_View) aView = aViewer->activeView();
+                      int aCX, aCY;
+                      aView->Convert(aPosition.X(), aPosition.Y(), aPosition.Z(), aCX, aCY);
+
+                      QWidget* aViewPort = aViewer->activeViewPort();
+                      QPoint aGlPoint = aViewPort->mapToGlobal(QPoint(aCX, aCY));
+                      aX = aGlPoint.x();
+                      anY = aGlPoint.y();
+                    }
+                  }
+                  anEditor->setCursorPosition(aX, anY);
+                  anEditor->showPopupEditor(false);
+                }
               }
             }
           }
