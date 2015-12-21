@@ -103,36 +103,56 @@ bool Model_ResultCompSolid::isConcealed()
     aResult = true;
   } else {
     std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
-    for(; aSubIter != mySubs.cend(); aSubIter++)
-      if ((*aSubIter)->isConcealed())
+    for(; aSubIter != mySubs.cend(); aSubIter++) {
+      if ((*aSubIter)->ModelAPI_ResultBody::isConcealed()) {
         aResult = true;
+        break;
+      }
+    }
   }
   if (myLastConcealed != aResult) {
     myLastConcealed = aResult;
-    setIsConcealed(aResult); // set for all subs the same result
+    //setIsConcealed(aResult); // set for all subs the same result
+    std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+    for(; aSubIter != mySubs.cend(); aSubIter++) { // update the visualization status of each sub
+      if ((*aSubIter)->ModelAPI_ResultBody::isConcealed() != aResult) {
+        if (aResult) { // hidden unit must be redisplayed (hidden)
+          ModelAPI_EventCreator::get()->sendDeleted(document(), (*aSubIter)->groupName());
+          // redisplay for the viewer (it must be disappeared also)
+          static Events_ID EVENT_DISP = 
+            Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+          ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, EVENT_DISP);
+        } else { // was not concealed become concealed => delete event
+          static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+          ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, anEvent);
+        }
+      }
+    }
   }
   return aResult;
 }
 
 void Model_ResultCompSolid::setIsConcealed(const bool theValue)
 {
-  ModelAPI_ResultCompSolid::setIsConcealed(theValue);
-  std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
-  for(; aSubIter != mySubs.cend(); aSubIter++) {
-    if ((*aSubIter)->isConcealed() != theValue) {
-      (*aSubIter)->setIsConcealed(theValue);
-      if (theValue) { // hidden unit must be redisplayed (hidden)
-        ModelAPI_EventCreator::get()->sendDeleted(document(), (*aSubIter)->groupName());
-        // redisplay for the viewer (it must be disappeared also)
-        static Events_ID EVENT_DISP = 
-          Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-        ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, EVENT_DISP);
-      } else { // was not concealed become concealed => delete event
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-        ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, anEvent);
+  if (theValue != ModelAPI_ResultCompSolid::isConcealed()) {
+    std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+    for(; aSubIter != mySubs.cend(); aSubIter++) {
+      if ((*aSubIter)->ModelAPI_ResultBody::isConcealed() != theValue) {
+        if (theValue) { // hidden unit must be redisplayed (hidden)
+          ModelAPI_EventCreator::get()->sendDeleted(document(), (*aSubIter)->groupName());
+          // redisplay for the viewer (it must be disappeared also)
+          static Events_ID EVENT_DISP = 
+            Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+          ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, EVENT_DISP);
+        } else { // was not concealed become concealed => delete event
+          static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+          ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, anEvent);
+        }
       }
     }
+    ModelAPI_ResultCompSolid::setIsConcealed(theValue);
   }
+  myLastConcealed = theValue;
 }
 
 void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape)

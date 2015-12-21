@@ -41,6 +41,10 @@ public:
   MODEL_EXPORT virtual bool setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     const bool theFlag);
 
+  /// The compsolid is concealed if at least one of the sub is concealed,
+  /// so, sub is Concealed if at least one sub is concealed
+  MODEL_EXPORT virtual bool isConcealed();
+
   /// Returns true if the latest modification of this body in the naming history
   // is equal to the given shape
   MODEL_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape);

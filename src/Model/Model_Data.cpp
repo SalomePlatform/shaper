@@ -427,14 +427,10 @@ void Model_Data::updateConcealmentFlag()
       }
     }
   }
-  // thus, no concealment references anymore => make not-concealed
   std::shared_ptr<ModelAPI_Result> aRes = 
     std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
   if (aRes.get()) {
-    // if compsolid result has subs, do nothing directly: it depends on the sub's status (#1100)
-    ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
-    if (!aComp || aComp->numberOfSubs() == 0 || aComp->ModelAPI_ResultCompSolid::isConcealed())
-      aRes->setIsConcealed(false);
+    aRes->setIsConcealed(false);
   }
 }
 

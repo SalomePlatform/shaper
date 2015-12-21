@@ -7,6 +7,7 @@
 #include <Model_ResultBody.h>
 #include <Model_BodyBuilder.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_Tools.h>
 #include <Config_PropManager.h>
 // DEB
 //#include <TCollection_AsciiString.hxx>
@@ -45,4 +46,19 @@ bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, con
 bool Model_ResultBody::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
   return myBuilder->isLatestEqual(theShape);
+}
+
+bool Model_ResultBody::isConcealed()
+{
+  if (ModelAPI_ResultBody::isConcealed())
+    return true;
+  ResultPtr aThis = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
+  if (aThis.get()) {
+    ResultCompSolidPtr aParent = ModelAPI_Tools::compSolidOwner(aThis);
+    if (aParent.get()) {
+      if (aParent->isConcealed())
+        return true;
+    }
+  }
+  return false;
 }
