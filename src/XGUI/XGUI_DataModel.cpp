@@ -214,11 +214,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               break;
             }
           }
-        } 
-#ifdef _DEBUG
-        else
-          Events_Error::send("Problem with Data Model definition of sub-document");
-#endif
+        }
       }
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
