@@ -447,6 +447,7 @@ void PartSet_MenuMgr::onActivatePart(bool)
     }
     if (aPart.get())
       aPart->activate();
+      myModule->workshop()->updateCommandStatus();
   }
 }
 
@@ -465,6 +466,8 @@ void PartSet_MenuMgr::activatePartSet() const
   if (isNewTransaction) aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
   if (isNewTransaction) aMgr->finishOperation();
+
+  myModule->workshop()->updateCommandStatus();
 }
 
 void PartSet_MenuMgr::grantedOperationIds(ModuleBase_Operation* theOperation,
