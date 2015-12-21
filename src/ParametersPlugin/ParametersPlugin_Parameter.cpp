@@ -107,7 +107,7 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
     // Currently there is no way to get parent document, so we get PartSet for all.
     DocumentPtr aDocument = document();
     if (data()->name() == aVariableName) {
-      if (aDocument = ModelAPI_Session::get()->moduleDocument())
+      if (aDocument == ModelAPI_Session::get()->moduleDocument())
         continue;
       aDocument = ModelAPI_Session::get()->moduleDocument();
     }

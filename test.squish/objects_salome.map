@@ -153,9 +153,11 @@
 :Parameter_ExpressionEditor	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='ExpressionEditor' unnamed='1' visible='1'}
 :Parameter_QFrame	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='QFrame' unnamed='1' visible='1'}
 :Parameter_QLineEdit	{container=':SALOME*.Parameter_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
+:Parameters (1).a = 32_QModelIndex	{column='0' container=':Part_1.Parameters (1)_QModelIndex' text='a = 32' type='QModelIndex'}
 :Parameters.E = _QModelIndex	{column='0' container=':Part_1.Parameters_QModelIndex' text?='E = *' type='QModelIndex'}
 :Parameters.L = _QModelIndex	{column='0' container=':Part_1.Parameters_QModelIndex' text?='L = *' type='QModelIndex'}
 :Parameters.P = _QModelIndex	{column='0' container=':Part_1.Parameters_QModelIndex' text?='P = *' type='QModelIndex'}
+:Part_1.Parameters (1)_QModelIndex	{column='0' container=':Part_1_QModelIndex' text='Parameters (1)' type='QModelIndex'}
 :Part_1.Parameters_QModelIndex	{column='0' container=':Part_1_QModelIndex' text?='Parameters*' type='QModelIndex'}
 :Part_1_QModelIndex	{column='0' container=':Object browser_XGUI_DataTree' text='Part_1' type='QModelIndex'}
 :Part_QMenu	{title='Part' type='QMenu' unnamed='1' visible='1'}
