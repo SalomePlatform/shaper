@@ -4,6 +4,7 @@
 
 import EventsAPI
 import ModelAPI
+import GeomAPI
 import GeomAlgoAPI
 
 import salome
@@ -52,8 +53,8 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         if aPartSize == 0:
             EventsAPI.Events_Error_send("No results in the active document")
             return
-          
-        anObjList = [self.Part.object(kResultBodyType, idx) for idx in xrange(aPartSize)]     
+
+        anObjList = [self.Part.object(kResultBodyType, idx) for idx in xrange(aPartSize)]
         aShapesList = GeomAlgoAPI.ShapeList()
         aName = ""
         for idx, anObject in enumerate(anObjList):
@@ -78,12 +79,12 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         aDump = self.shape.getShapeStream()
         # Load shape to SALOME Geom
         aBrep = self.geompy.RestoreShape(aDump)
-            
+
         # Make unique name
         aId = getObjectIndex(aName)
         if aId != 0:
             aName = aName + '_' + str(aId)
-            
+
         self.geompy.addToStudy(aBrep, aName)
         self.brep = aBrep
 
@@ -102,7 +103,18 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
                   aName = aFeature.firstResult().data().name()
                 groupIndex = groupIndex + 1
                 self.createGroupFromList(aSelectionList, aName)
-                     
+
+    ## Returns a type of the shape in the old GEOM representation
+    def shapeType(self, shape):
+        if shape.isVertex():
+            return "VERTEX"
+        elif shape.isEdge():
+            return "EDGE"
+        elif shape.isFace():
+            return "FACE"
+        
+        return "SOLID"
+
     ## Creates a group by given list of selected objects and the name
     #  @param theSelectionList: list of selected objects
     #  @param theGroupName: name of the group to create
@@ -111,23 +123,29 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         # and get the corresponding ID
         aSelectionNum = theSelectionList.size()
         Ids = []
+        groupType = ""
         for aSelIndex in range(0, aSelectionNum):
             aSelection = theSelectionList.value(aSelIndex)
             anID = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(self.shape, aSelection.value())
-            Ids.append(anID)
-            if aSelection.value().isVertex():
-                groupType = "VERTEX"
-            elif aSelection.value().isEdge():
-                groupType = "EDGE" 
-            elif aSelection.value().isFace():
-                groupType = "FACE"
+            if anID == 0:
+                #it may be a compound of objects if movement of the group to the end
+                # splits the original element to several (issue 1146)
+                anExp = GeomAPI.GeomAPI_ShapeExplorer(aSelection.value(), GeomAPI.GeomAPI_Shape.SHAPE)
+                while anExp.more():
+                    anID = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(self.shape, anExp.current())
+                    if anID != 0:
+                        Ids.append(anID)
+                        groupType = self.shapeType(anExp.current())
+                    anExp.next()
             else:
-                groupType = "SOLID"
+                Ids.append(anID)
+                groupType = self.shapeType(aSelection.value())
+
 
         aGroup = self.geompy.CreateGroup(self.brep, self.geompy.ShapeType[groupType])
         self.geompy.UnionIDs(aGroup,Ids)
         self.geompy.addToStudyInFather(self.brep, aGroup, theGroupName)
-          
+
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):
         aSession = ModelAPI.ModelAPI_Session.get()
@@ -137,7 +155,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         self.geomObjects = []
         ## geomBuilder tool
         self.geompy = geomBuilder.New(salome.myStudy)
-       
+
         # Export bodies and groups
         self.exportBodies()
         self.exportGroups()
