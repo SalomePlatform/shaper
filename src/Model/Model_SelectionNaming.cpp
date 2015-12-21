@@ -168,12 +168,12 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           if(i == 1)
             aName = aFaceName;
           else 
-            aName += "|" + aFaceName;
+            aName += "&" + aFaceName;
         }
         TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
         for (;itl.More();itl.Next()) {
           std::string aFaceName = getShapeName(aDoc, itl.Value());
-          aName += "|" + aFaceName;
+          aName += "&" + aFaceName;
         }		  
       }
       break;
@@ -230,7 +230,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
               if(i == 1)
                 aName = anEdgeName;
               else 
-                aName += "|" + anEdgeName;
+                aName += "&" + anEdgeName;
             }
           }//reg
           else { // dangle vertex: if(aList22.Extent() == 1)
@@ -245,7 +245,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             if(i == 1)
               aName = aFaceName;
             else 
-              aName += "|" + aFaceName;
+              aName += "&" + aFaceName;
           }
         }
       }
@@ -340,7 +340,7 @@ int ParseName(const std::string& theSubShapeName,   std::list<std::string>& theL
   std::string aName = theSubShapeName;
   std::string aLastName;
   int n1(0), n2(0); // n1 - start position, n2 - position of the delimiter
-  while ((n2 = aName.find('|', n1)) != std::string::npos) {
+  while ((n2 = aName.find('&', n1)) != std::string::npos) {
     const std::string aName1 = aName.substr(n1, n2 - n1); //name of face
     theList.push_back(aName1);	
     n1 = n2 + 1;

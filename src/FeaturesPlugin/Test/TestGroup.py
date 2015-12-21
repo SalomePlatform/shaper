@@ -1,11 +1,11 @@
 """
       TestBoolean.py
       Unit test of FeaturesPlugin_Group class
-      
+
       class FeaturesPlugin_Group
         static const std::string MY_GROUP_ID("Group");
         static const std::string MY_GROUP_LIST_ID("group_list");
-        
+
         data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 """
 #=========================================================================
@@ -78,12 +78,12 @@ aSession.startOperation()
 aGroupFeature = aSession.activeDocument().addFeature("Group")
 aSelectionListAttr = aGroupFeature.selectionList("group_list")
 aSelectionListAttr.setSelectionType("vertex")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_1|Extrusion_1_1/ToFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1|Extrusion_1_1/ToFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_1|Extrusion_1_1/FromFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2|Extrusion_1_1/FromFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1|Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_1&Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2&Extrusion_1_1/LateralFace_1&Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_1&Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_2&Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2&Extrusion_1_1/LateralFace_1&Extrusion_1_1/FromFace_1")
 aSession.finishOperation()
 #=========================================================================
 # Check results
@@ -98,15 +98,15 @@ aSession.startOperation()
 aGroupFeature = aSession.activeDocument().addFeature("Group")
 aSelectionListAttr = aGroupFeature.selectionList("group_list")
 aSelectionListAttr.setSelectionType("edge")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/LateralFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_2")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/LateralFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/FromFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_1|Extrusion_1_1/ToFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_1|Extrusion_1_1/FromFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/ToFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_2|Extrusion_1_1/FromFace_1")
-aSelectionListAttr.append("Extrusion_1_1/LateralFace_3|Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2&Extrusion_1_1/LateralFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_2")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_1&Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_1&Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_2&Extrusion_1_1/FromFace_1")
+aSelectionListAttr.append("Extrusion_1_1/LateralFace_3&Extrusion_1_1/ToFace_1")
 aSession.finishOperation()
 #=========================================================================
 # Check results
@@ -241,4 +241,3 @@ assert(aGroupResult)
 #=========================================================================
 # End of test
 #=========================================================================
-
