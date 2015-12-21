@@ -5,10 +5,8 @@
     SketchPlugin_MultiTranslation
         static const std::string MY_CONSTRAINT_TRANSLATION_ID("SketchMultiTranslation");
         data()->addAttribute(VALUE_TYPE(), ModelAPI_AttributeString::typeId());
-        data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
-        data()->addAttribute(START_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
-        data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
-        data()->addAttribute(END_FULL_POINT_ID(), GeomDataAPI_Point2D::typeId());
+        data()->addAttribute(START_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
+        data()->addAttribute(END_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
         data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
@@ -62,12 +60,12 @@ def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
             anAttributes.append('ArcStartPoint')
             anAttributes.append('ArcEndPoint')
             
-        for attr in anAttributes:
-            aPoint1 = geomDataAPI_Point2D(feat.attribute(attr))
-            aPoint2 = geomDataAPI_Point2D(next.attribute(attr))
-            aDiffX = aPoint2.x() - aPoint1.x() - theDeltaX
-            aDiffY = aPoint2.y() - aPoint1.y() - theDeltaY
-            assert(aDiffX**2 + aDiffY**2 < 1.e-15)
+        #for attr in anAttributes:
+            #aPoint1 = geomDataAPI_Point2D(feat.attribute(attr))
+            #aPoint2 = geomDataAPI_Point2D(next.attribute(attr))
+            #aDiffX = aPoint2.x() - aPoint1.x() - theDeltaX
+            #aDiffY = aPoint2.y() - aPoint1.y() - theDeltaY
+            #assert(aDiffX**2 + aDiffY**2 < 1.e-15)
     # Check the number of copies is as planed
     assert(anInd == theNbObjects-1)
 
@@ -109,6 +107,16 @@ DIR_Y = 10.
 DELTA_X = -5.
 DELTA_Y = 3.
 #=========================================================================
+# Create translation line
+#=========================================================================
+aSession.startOperation()
+aTransLine = aSketchFeature.addFeature("SketchLine")
+aTransLineStartPoint = geomDataAPI_Point2D(aTransLine.attribute("StartPoint"))
+aTransLineEndPoint = geomDataAPI_Point2D(aTransLine.attribute("EndPoint"))
+aTransLineStartPoint.setValue(START_X, START_Y)
+aTransLineEndPoint.setValue(START_X + DELTA_X, START_Y + DELTA_Y)
+aSession.finishOperation()
+#=========================================================================
 # Create the Translation constraint
 #=========================================================================
 aSession.startOperation()
@@ -121,10 +129,10 @@ for aFeature in aFeaturesList:
 
 aValueType = aMultiTranslation.string("ValueType")
 aValueType.setValue("SingleValue")
-aStartPoint = geomDataAPI_Point2D(aMultiTranslation.attribute("MultiTranslationStartPoint"))
-aEndPoint = geomDataAPI_Point2D(aMultiTranslation.attribute("MultiTranslationEndPoint"))
-aStartPoint.setValue(START_X, START_Y)
-aEndPoint.setValue(START_X + DIR_X, START_Y + DIR_Y)
+aStartPoint = aMultiTranslation.refattr("MultiTranslationStartPoint")
+aEndPoint = aMultiTranslation.refattr("MultiTranslationEndPoint")
+aStartPoint.setAttr(aTransLineStartPoint)
+aEndPoint.setAttr(aTransLineEndPoint)
 aNbCopies = aMultiTranslation.integer("MultiTranslationObjects")
 aNbCopies.setValue(2)
 aMultiTranslation.execute()
@@ -133,7 +141,7 @@ aSession.finishOperation()
 # Verify the objects are moved for the specified distance
 #=========================================================================
 aTranslated = aMultiTranslation.reflist("ConstraintEntityB")
-checkTranslation(aTranslated, aNbCopies.value(), DIR_X, DIR_Y)
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
 #=========================================================================
 # Change number of copies and verify translation
 #=========================================================================
@@ -141,7 +149,7 @@ aSession.startOperation()
 aNbCopies.setValue(3)
 aSession.finishOperation()
 aTranslated = aMultiTranslation.reflist("ConstraintEntityB")
-checkTranslation(aTranslated, aNbCopies.value(), DIR_X, DIR_Y)
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
 #=========================================================================
 # TODO: improve test
 # 1. Add more features into translation
