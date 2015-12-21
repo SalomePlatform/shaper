@@ -9,6 +9,7 @@
 
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 
@@ -209,8 +210,10 @@ bool SketchSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
       ++anIt;
     }
   }
-  if (!isFullyRemoved)
-    myConstraintMap[theConstraint] = aConstrList;
+  if (!isFullyRemoved) {
+    // revert removed constraint
+    addConstraint(theConstraint, aConstrList);
+  }
   return isFullyRemoved;
 }
 
@@ -235,6 +238,9 @@ static bool isUsed(EntityWrapperPtr theFeature, AttributePtr theSubEntity)
 
 bool SketchSolver_Storage::isUsed(FeaturePtr theFeature) const
 {
+  if (myFeatureMap.find(theFeature) != myFeatureMap.end())
+    return true;
+  // check constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
       aCIt = myConstraintMap.begin();
   std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
@@ -262,6 +268,9 @@ bool SketchSolver_Storage::isUsed(AttributePtr theAttribute) const
       anAttribute = aRefAttr->attr();
   }
 
+  if (myAttributeMap.find(theAttribute) != myAttributeMap.end())
+    return true;
+  // check in constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
       aCIt = myConstraintMap.begin();
   std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
@@ -269,6 +278,11 @@ bool SketchSolver_Storage::isUsed(AttributePtr theAttribute) const
     for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt)
       if (::isUsed(*aCWIt, anAttribute))
         return true;
+  // check in features
+  std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
+  for (; aFIt != myFeatureMap.end(); ++aFIt)
+    if (::isUsed(aFIt->second, anAttribute))
+      return true;
   return false;
 }
 
@@ -290,6 +304,7 @@ bool SketchSolver_Storage::removeEntity(FeaturePtr theFeature)
     return true;
   // feature is not removed, revert operation
   myFeatureMap[theFeature] = anEntity;
+  update(anEntity);
   return false;
 }
 
@@ -315,6 +330,7 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
     return true;
   // attribute is not removed, revert operation
   myAttributeMap[theAttribute] = anEntity;
+  update(anEntity);
   return false;
 }
 
@@ -379,6 +395,19 @@ bool SketchSolver_Storage::isInteract(const AttributePtr& theAttribute) const
 {
   if (!theAttribute)
     return false;
+
+  AttributeRefListPtr aRefList = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
+  if (aRefList) {
+    std::list<ObjectPtr> anObjects = aRefList->list();
+    std::list<ObjectPtr>::iterator anObjIt = anObjects.begin();
+    for (; anObjIt != anObjects.end(); ++anObjIt) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(*anObjIt);
+      if (isInteract(aFeature))
+        return true;
+    }
+    return false;
+  }
 
   AttributeRefAttrPtr aRefAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);

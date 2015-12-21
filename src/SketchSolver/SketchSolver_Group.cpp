@@ -196,6 +196,17 @@ void SketchSolver_Group::updateConstraints()
   myChangedConstraints.clear();
 }
 
+static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, FeaturePtr theFeature)
+{
+  ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
+  for (; aCIt != theConstraints.end(); ++aCIt) {
+    if ((aCIt->second->getType() == CONSTRAINT_MULTI_ROTATION ||
+         aCIt->second->getType() == CONSTRAINT_MULTI_TRANSLATION)
+        && aCIt->second->isUsed(theFeature))
+      std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
+  }
+}
+
 bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 {
   if (!checkFeatureValidity(theFeature))
@@ -203,7 +214,10 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 
   myStorage->blockEvents(true);
   myStorage->refresh(true);
-  return myStorage->update(theFeature);
+  bool isUpdated = myStorage->update(theFeature);
+
+  updateMultiConstraints(myConstraints, theFeature);
+  return isUpdated;
 }
 
 void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
@@ -214,22 +228,16 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   myStorage->blockEvents(true);
   myStorage->refresh(true);
 
-  // Secondly, search attributes of the feature in the list of the Multi constraints and update them
-  ConstraintConstraintMap::iterator aCIt = myConstraints.begin();
-  for (; aCIt != myConstraints.end(); ++aCIt) {
-    if ((aCIt->second->getType() == CONSTRAINT_MULTI_ROTATION ||
-         aCIt->second->getType() == CONSTRAINT_MULTI_TRANSLATION)
-        && aCIt->second->isUsed(theFeature))
-      std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
-  }
-
-  // Then, create temporary rigid constraint
+  // Then, create temporary Fixed constraint
   SolverConstraintPtr aConstraint = aBuilder->createMovementConstraint(theFeature);
   if (!aConstraint)
     return;
   aConstraint->process(myStorage, getId(), getWorkplaneId());
   if (aConstraint->error().empty())
     setTemporary(aConstraint);
+
+  // Secondly, search attributes of the feature in the list of the Multi constraints and update them
+  updateMultiConstraints(myConstraints, theFeature);
 }
 
 // ============================================================================

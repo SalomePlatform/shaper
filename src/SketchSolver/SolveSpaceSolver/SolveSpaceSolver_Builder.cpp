@@ -231,8 +231,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
     std::list<EntityWrapperPtr>::const_iterator anIt1 = theEntity1->subEntities().begin();
     std::list<EntityWrapperPtr>::const_iterator anIt2 = theEntity2->subEntities().begin();
     if ((*anIt2)->group() == theGroupID) // mirrored point is not fixed
-      makeMirrorPoints(theEntity1->subEntities().front(),
-          theEntity2->subEntities().front(), theMirrorLine);
+      makeMirrorPoints(*anIt1, *anIt2, theMirrorLine);
 
     // Workaround to avoid problems in SolveSpace.
     // The symmetry of two arcs will be done using symmetry of three points on these arcs:

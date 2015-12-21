@@ -122,7 +122,10 @@ void SketchSolver_Constraint::update()
   if (aValueAttr) {
     std::list<ConstraintWrapperPtr>::iterator aWIt = aWrapper.begin();
     for (; aWIt != aWrapper.end(); ++aWIt)
-      (*aWIt)->setValue(aValueAttr->value());
+      if (fabs((*aWIt)->value() - aValueAttr->value()) > tolerance) {
+        (*aWIt)->setValue(aValueAttr->value());
+        myStorage->setNeedToResolve(true);
+      }
   }
   myStorage->addConstraint(myBaseConstraint, aWrapper);
 

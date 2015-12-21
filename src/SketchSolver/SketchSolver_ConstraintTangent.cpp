@@ -21,8 +21,12 @@ static bool hasSingleCoincidence(EntityWrapperPtr theEntity1, EntityWrapperPtr t
   int aNbCoinc = 0;
   std::list<EntityWrapperPtr>::const_iterator anIt1, anIt2;
   for (anIt1 = aStartIt1; anIt1 != aPoints1.end(); ++anIt1) {
+    if ((*anIt1)->type() != ENTITY_POINT)
+      continue;
     std::shared_ptr<GeomAPI_Pnt2d> aPt1 = aBuilder->point(*anIt1);
     for (anIt2 = aStartIt2; anIt2 != aPoints2.end(); ++anIt2) {
+      if ((*anIt2)->type() != ENTITY_POINT)
+        continue;
       std::shared_ptr<GeomAPI_Pnt2d> aPt2 = aBuilder->point(*anIt2);
       if (aPt1->distance(aPt2) < tolerance)
         ++aNbCoinc;

@@ -18,7 +18,7 @@ void SketchSolver_ConstraintMirror::getAttributes(
   }
 
   myType = TYPE(myBaseConstraint);
-  myStorage->update(aMirLineAttr, myGroupID);
+  myStorage->update(aMirLineAttr/*, myGroupID*/);
   theMirrorLine = myStorage->entity(aMirLineAttr);
 
   // Create SolveSpace entity for all features
@@ -45,7 +45,7 @@ void SketchSolver_ConstraintMirror::getAttributes(
       if (!aFeature)
         continue;
 
-      myStorage->update(aFeature, myGroupID);
+      myStorage->update(aFeature/*, myGroupID*/);
       aList->push_back(myStorage->entity(aFeature));
     }
   }
