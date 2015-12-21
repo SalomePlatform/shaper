@@ -64,7 +64,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
       << SketchPlugin_Circle::ID().c_str();
   }
 
-  // the control should accept the focus, so the boolen flag is corrected to be true
+  // the control should accept the focus, so the boolean flag is corrected to be true
   myIsObligatory = true;
   //myOptionParam = theData->getProperty(PREVIOUS_FEATURE_PARAM);
   QString aPageName = QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME));
@@ -150,7 +150,7 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
   else if (canBeActivatedByMove()) {
     if (feature()->getKind() == SketchPlugin_Line::ID()) {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aValue.object());
-      // Initialise new line with first point equal to end of previous
+      // Initialize new line with first point equal to end of previous
       if (aFeature.get()) {
         std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
         std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
