@@ -71,6 +71,8 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   myGroupBox = new QGroupBox(aPageName, theParent);
   myGroupBox->setFlat(false);
 
+  bool aAcceptVariables = theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
+
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
   ModuleBase_Tools::adjustMargins(aGroupLay);
   aGroupLay->setSpacing(2);
@@ -81,6 +83,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aGroupLay->addWidget(aLabel, 0, 0);
 
     myXSpin = new ModuleBase_ParamSpinBox(myGroupBox);
+    myXSpin->setAcceptVariables(aAcceptVariables);
     myXSpin->setMinimum(-DBL_MAX);
     myXSpin->setMaximum(DBL_MAX);
     myXSpin->setToolTip(tr("X"));
@@ -94,6 +97,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aGroupLay->addWidget(aLabel, 1, 0);
 
     myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
+    myYSpin->setAcceptVariables(aAcceptVariables);
     myYSpin->setMinimum(-DBL_MAX);
     myYSpin->setMaximum(DBL_MAX);
     myYSpin->setToolTip(tr("Y"));

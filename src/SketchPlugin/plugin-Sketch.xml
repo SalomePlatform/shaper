@@ -18,26 +18,26 @@
       <!--icon=":pictures/x_point.png"-->
       </feature>
       <feature id="SketchPoint" title="Point" tooltip="Create point" icon=":icons/point.png">
-        <sketch-2dpoint_selector id="PointCoordindates" title="Point" tooltip="Point coordinates"/>
+        <sketch-2dpoint_selector id="PointCoordindates" accept_expressions="0" title="Point" tooltip="Point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
       <feature id="SketchLine" title="Line" tooltip="Create line" icon=":icons/line.png">
-        <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
-        <sketch-2dpoint_selector id="EndPoint" title="End point" tooltip="End point coordinates"/>
+        <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
+        <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create circle" icon=":icons/circle.png">
-        <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center coordinates"/>
-        <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
+        <sketch-2dpoint_selector id="CircleCenter" accept_expressions="0" title="Center" tooltip="Center coordinates"/>
+        <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
           <validator id="GeomValidators_Positive"/>
         </point2ddistance>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
       <feature id="SketchArc" title="Arc" tooltip="Create arc" icon=":icons/arc.png">
-        <sketch-2dpoint_selector id="ArcCenter" title="Center" tooltip="Center of a circle"/>
-        <sketch-2dpoint_selector id="ArcStartPoint" title="Start point" tooltip="Start point"/>
-        <sketch-2dpoint_selector id="ArcEndPoint" title="End point" tooltip="End point"/>
+        <sketch-2dpoint_selector id="ArcCenter" accept_expressions="0" title="Center" tooltip="Center of a circle"/>
+        <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"/>
+        <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="ArcCenter,ArcStartPoint,ArcEndPoint"/>
       </feature>
@@ -47,7 +47,7 @@
             label="Point" tooltip="Select point for fillet (should be shared by two entities only)" shape_types="vertex">
           <validator id="SketchPlugin_FilletVertexValidator"/>
         </sketch_shape_selector>
-        <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" min="0" default="1" use_reset="false">
+        <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" default="1" use_reset="false">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>
         <validator id="PartSet_FilletSelection"/>
