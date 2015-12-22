@@ -92,9 +92,11 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
     std::list<AttributePtr>::const_iterator anAttrIt = aPntAttrs.begin();
     for (; anAttrIt != aPntAttrs.end(); ++anAttrIt)
         addEntity(*anAttrIt, EntityWrapperPtr());
-  }
+    if (aFound == myFeatureMap.end())
+      myFeatureMap[theFeature] = theSolverEntity;
+  } else
+    myFeatureMap[theFeature] = theSolverEntity;
 
-  myFeatureMap[theFeature] = theSolverEntity;
   // block events if necessary
   if (myEventsBlocked && theFeature->data() && theFeature->data()->isValid())
     theFeature->data()->blockSendAttributeUpdated(myEventsBlocked);
@@ -108,7 +110,8 @@ void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
      (theSolverEntity && !aFound->second->isEqual(theSolverEntity)))
     setNeedToResolve(true); // the entity is new or modified
 
-  myAttributeMap[theAttribute] = theSolverEntity;
+  if (theSolverEntity || aFound == myAttributeMap.end())
+    myAttributeMap[theAttribute] = theSolverEntity;
   // block events if necessary
   if (myEventsBlocked && theAttribute->owner() &&
       theAttribute->owner()->data() && theAttribute->owner()->data()->isValid())
