@@ -88,11 +88,11 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
   drawListOfShapes(anAttrB, thePrs);
   if (myConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
     // If it is translation
-    std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID()));
-  
+    AttributePoint2DPtr aStart = GeomDataAPI_Point2D::getPoint2D(aData,
+                                            SketchPlugin_MultiTranslation::START_POINT_ID());
+    AttributePoint2DPtr aEnd = GeomDataAPI_Point2D::getPoint2D(aData,
+                                            SketchPlugin_MultiTranslation::END_POINT_ID());
+
     if (aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized()) {
       // Add start point
       std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aStart->x(), aStart->y());
@@ -106,8 +106,7 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
     }
   } else if (myConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
     // if it is rotation
-    std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_MultiRotation::CENTER_ID()));
+    AttributePoint2DPtr aCenter = GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
     if (aCenter.get() && aCenter->isInitialized()) {
       // Show center of rotation
       std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aCenter->x(), aCenter->y());

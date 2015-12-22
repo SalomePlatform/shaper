@@ -112,6 +112,14 @@ CENTER_X = 0.
 CENTER_Y = 0.
 ANGLE = 30.
 #=========================================================================
+# Create rotation point
+#=========================================================================
+aSession.startOperation()
+aRotationPoint = aSketchFeature.addFeature("SketchPoint")
+aRotationPointPoint = geomDataAPI_Point2D(aRotationPoint.attribute("PointCoordindates"))
+aRotationPointPoint.setValue(CENTER_X, CENTER_Y)
+aSession.finishOperation()
+#=========================================================================
 # Create the Rotation constraint
 #=========================================================================
 aSession.startOperation()
@@ -125,12 +133,17 @@ for aFeature in aFeaturesList:
 aValueType = aMultiRotation.string("AngleType")
 aValueType.setValue("SingleValue")
 
-aCenter = geomDataAPI_Point2D(aMultiRotation.attribute("MultiRotationCenter"))
+aCenter = aMultiRotation.refattr("MultiRotationCenter")
+aCenter.setAttr(aRotationPointPoint)
+
 anAngle = aMultiRotation.real("MultiRotationAngle")
-aCenter.setValue(CENTER_X, CENTER_Y)
 anAngle.setValue(ANGLE)
+
+anAngle = aMultiRotation.string("AngleType")
+anAngle.setValue("SingleAngle")
+
 aNbCopies = aMultiRotation.integer("MultiRotationObjects")
-aNbCopies.setValue(1)
+aNbCopies.setValue(2)
 aMultiRotation.execute()
 aSession.finishOperation()
 #=========================================================================

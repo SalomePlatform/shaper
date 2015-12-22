@@ -134,6 +134,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
     const EntityID& theSketchID,
     const SketchSolver_ConstraintType& theType,
     const double& theValue,
+    const bool& theFullValue,
     const EntityWrapperPtr& thePoint1,
     const EntityWrapperPtr& thePoint2,
     const std::list<EntityWrapperPtr>& theTrsfEnt) const
@@ -156,6 +157,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
 
   ConstraintWrapperPtr aResult(new SolveSpaceSolver_ConstraintWrapper(theConstraint, aConstraint));
   aResult->setValue(theValue);
+  aResult->setIsFullValue(theFullValue);
   aResult->setEntities(aConstrAttrList);
   return std::list<ConstraintWrapperPtr>(1, aResult);
 }
@@ -812,11 +814,19 @@ void adjustMultiRotation(ConstraintWrapperPtr theConstraint)
 {
   BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
 
-  double anAngleRad = theConstraint->value() * PI / 180.0;
+  double anAngleValue = theConstraint->value();
+  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
+
+  bool isFullValue = theConstraint->isFullValue();
+  int aNbObjects = aSubs.size()-2;
+  if (isFullValue && aNbObjects > 0) {
+    anAngleValue /= aNbObjects;
+  }
+
+  double anAngleRad = anAngleValue * PI / 180.0;
   double aSin = sin(anAngleRad);
   double aCos = cos(anAngleRad);
 
-  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
   std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
 
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = aBuilder->point(*aSIt++);

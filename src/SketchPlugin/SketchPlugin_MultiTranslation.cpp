@@ -62,10 +62,8 @@ void SketchPlugin_MultiTranslation::execute()
     return;
 
   DataPtr aData = data();
-  std::shared_ptr<GeomDataAPI_Point2D> aStart = GeomDataAPI_Point2D::getPoint2D(aData,
-                                                                                START_POINT_ID());
-  std::shared_ptr<GeomDataAPI_Point2D> aEnd = GeomDataAPI_Point2D::getPoint2D(aData,
-                                                                              END_POINT_ID());
+  AttributePoint2DPtr aStart = GeomDataAPI_Point2D::getPoint2D(aData, START_POINT_ID());
+  AttributePoint2DPtr aEnd = GeomDataAPI_Point2D::getPoint2D(aData, END_POINT_ID());
   if (!aStart || !aEnd)
     return;
 

@@ -4,10 +4,13 @@
 
 #include <SketchPlugin_MultiRotation.h>
 
+#include <ModelAPI_AttributeString.h>
+
 #include <math.h>
 
 void SketchSolver_ConstraintMultiRotation::getAttributes(
     EntityWrapperPtr& theCenter, double& theAngle,
+    bool& theFullValue,
     std::list< std::list<EntityWrapperPtr> >& theEntities)
 {
   DataPtr aData = myBaseConstraint->data();
@@ -25,6 +28,9 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   myStorage->update(aCenterAttr, GID_OUTOFGROUP);
   theCenter = myStorage->entity(aCenterAttr);
 
+  AttributeStringPtr aMethodTypeAttr = aData->string(SketchPlugin_MultiRotation::ANGLE_TYPE());
+  theFullValue = aMethodTypeAttr->value() != "SingleAngle";
+
   getEntitiesAndCopies(theEntities);
 }
 
@@ -37,8 +43,9 @@ void SketchSolver_ConstraintMultiRotation::process()
   }
 
   EntityWrapperPtr aRotationCenter;
+  bool isFullValue;
   std::list<std::list<EntityWrapperPtr> > anEntitiesAndCopies;
-  getAttributes(aRotationCenter, myAngle, anEntitiesAndCopies);
+  getAttributes(aRotationCenter, myAngle, isFullValue, anEntitiesAndCopies);
   if (!myErrorMsg.empty())
     return;
 
@@ -49,7 +56,7 @@ void SketchSolver_ConstraintMultiRotation::process()
   for (; anEntIt != anEntitiesAndCopies.end(); ++anEntIt) {
     std::list<ConstraintWrapperPtr> aNewConstraints =
         aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
-        myAngle, aRotationCenter, EntityWrapperPtr(), *anEntIt);
+        myAngle, isFullValue, aRotationCenter, EntityWrapperPtr(), *anEntIt);
     aRotConstraints.insert(aRotConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
   myStorage->addConstraint(myBaseConstraint, aRotConstraints);
@@ -68,9 +75,49 @@ void SketchSolver_ConstraintMultiRotation::updateLocal()
   myAngle = aValue;
 
   // update center
-  AttributePtr aCenterAttr = myBaseConstraint->attribute(SketchPlugin_MultiRotation::CENTER_ID());
-  if (myStorage->update(aCenterAttr, myGroupID)) {
-    myStorage->update(aCenterAttr, GID_UNKNOWN);
+  DataPtr aData = myBaseConstraint->data();
+  AttributePoint2DPtr aCenterPointAttribute = GeomDataAPI_Point2D::getPoint2D(aData,
+                                           SketchPlugin_MultiRotation::CENTER_ID());
+  bool aCenterPointChanged = aCenterPointAttribute != myCenterPointAttribute;
+  if (aCenterPointChanged)
+    myCenterPointAttribute = aCenterPointAttribute;
+
+  AttributeStringPtr aMethodTypeAttr = aData->string(SketchPlugin_MultiRotation::ANGLE_TYPE());
+  bool aFullValue = aMethodTypeAttr->value() != "SingleAngle";
+  bool isMethodChanged = aFullValue != myIsFullValue;
+  if (isMethodChanged)
+    myIsFullValue = aFullValue;
+
+  if (aCenterPointChanged || isMethodChanged) {
+    DataPtr aData = myBaseConstraint->data();
+    std::list<ConstraintWrapperPtr> aConstraints = myStorage->constraint(myBaseConstraint);
+    std::list<ConstraintWrapperPtr>::const_iterator anIt = aConstraints.begin(),
+      aLast = aConstraints.end();
+    std::list<EntityWrapperPtr> anEntities;
+    for (; anIt != aLast; anIt++) {
+      ConstraintWrapperPtr aConstraint = *anIt;
+      aConstraint->setIsFullValue(myIsFullValue);
+      if (aCenterPointChanged) {
+        anEntities.clear();
+        const std::list<EntityWrapperPtr>& aConstraintEntities = aConstraint->entities();
+        std::list<EntityWrapperPtr>::const_iterator aSIt = aConstraintEntities.begin(),
+          aSLast = aConstraintEntities.end();
+        EntityWrapperPtr aCenterPointEntity = *aSIt++;
+        if (aCenterPointChanged) {
+          AttributePtr aCenterPointAttr = aData->attribute(SketchPlugin_MultiRotation::CENTER_ID());
+          myStorage->update(aCenterPointAttr);
+          aCenterPointEntity = myStorage->entity(aCenterPointAttr);
+        }
+        anEntities.push_back(aCenterPointEntity);
+
+        for (; aSIt != aSLast; ++aSIt)
+          anEntities.push_back(*aSIt);
+
+        aConstraint->setEntities(anEntities);
+      }
+    }
+    myStorage->addConstraint(myBaseConstraint, aConstraints);
+
     myAdjusted = false;
   }
 }

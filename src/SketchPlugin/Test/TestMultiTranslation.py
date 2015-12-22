@@ -60,12 +60,12 @@ def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
             anAttributes.append('ArcStartPoint')
             anAttributes.append('ArcEndPoint')
             
-        #for attr in anAttributes:
-            #aPoint1 = geomDataAPI_Point2D(feat.attribute(attr))
-            #aPoint2 = geomDataAPI_Point2D(next.attribute(attr))
-            #aDiffX = aPoint2.x() - aPoint1.x() - theDeltaX
-            #aDiffY = aPoint2.y() - aPoint1.y() - theDeltaY
-            #assert(aDiffX**2 + aDiffY**2 < 1.e-15)
+        for attr in anAttributes:
+             aPoint1 = geomDataAPI_Point2D(feat.attribute(attr))
+             aPoint2 = geomDataAPI_Point2D(next.attribute(attr))
+             aDiffX = aPoint2.x() - aPoint1.x() - theDeltaX
+             aDiffY = aPoint2.y() - aPoint1.y() - theDeltaY
+             assert(aDiffX**2 + aDiffY**2 < 1.e-15)
     # Check the number of copies is as planed
     assert(anInd == theNbObjects-1)
 

@@ -74,6 +74,7 @@ public:
                      const EntityID& theSketchID,
                      const SketchSolver_ConstraintType& theType,
                      const double& theValue,
+                     const bool& theFullValue,
                      const EntityWrapperPtr& thePoint1,
                      const EntityWrapperPtr& thePoint2,
                      const std::list<EntityWrapperPtr>& theTrsfEnt) const = 0;

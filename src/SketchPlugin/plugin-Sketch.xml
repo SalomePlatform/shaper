@@ -294,7 +294,6 @@
                     label="Start point"
                     tooltip="Start point of translation"
                     shape_types="vertex">
-                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
               </sketch_shape_selector>
@@ -303,7 +302,6 @@
                     label="End point"
                     tooltip="Final point of translation"
                     shape_types="vertex">
-                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
               </sketch_shape_selector>
@@ -316,7 +314,6 @@
                     label="Start point"
                     tooltip="Start point of translation"
                     shape_types="vertex">
-                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
               </sketch_shape_selector>
@@ -325,7 +322,6 @@
                     label="End point"
                     tooltip="Final point of translation"
                     shape_types="vertex">
-                <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
               </sketch_shape_selector>
@@ -352,26 +348,27 @@
             use_external="true">
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
-        <sketch-2dpoint_selector
-            id="MultiRotationCenter"
-            title="Center of rotation"
-            tooltip="Center of rotation"
-            default="0"/>
+        <sketch_shape_selector
+              id="MultiRotationCenter"
+              label="Center of rotation"
+              tooltip="Center of rotation"
+              shape_types="vertex">
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
         <toolbox id="AngleType">
           <box id="SingleAngle" title="Single angle" icon=":icons/angle_up_32x32.png">
-            <point2dangle id="MultiRotationAngle"
-                         first_point="MultiRotationCenter"
+            <doublevalue id="MultiRotationAngle"
                          label="Angle"
                          icon=":icons/angle.png"
                          tooltip="Rotation angle"
-                         default="90"/>
+                         default="90" use_reset="false"/>
           </box>
           <box id="FullAngle" title="Full angle" icon=":icons/angle_up_full_32x32.png">
-            <point2dangle id="MultiRotationFullAngle"
-                         first_point="MultiRotationCenter"
-                         label="Full angle"
+            <doublevalue id="MultiRotationAngle"
+                         label="Angle"
                          icon=":icons/angle.png"
-                         tooltip="Rotation angle"/>
+                         tooltip="Rotation angle"
+                         default="90" use_reset="false"/>
           </box>
         </toolbox>
         <integervalue id="MultiRotationObjects"

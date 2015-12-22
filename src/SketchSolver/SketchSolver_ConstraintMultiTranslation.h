@@ -31,9 +31,10 @@ protected:
   /// \brief Generate list of translated entities
   /// \param[out] theStartPoint start point of translation
   /// \param[out] theEndPoint   final point of translation
+  /// \param[out] theFullValue  applying translation using the disstance as a full or single value
   /// \param[out] theEntities   list of entities and their translated copies
   void getAttributes(EntityWrapperPtr& theStartPoint, EntityWrapperPtr& theEndPoint,
-                     std::list< std::list<EntityWrapperPtr> >& theEntities);
+                     bool& theFullValue, std::list< std::list<EntityWrapperPtr> >& theEntities);
 
   /// \brief Update parameters (called from base class)
   virtual void updateLocal();

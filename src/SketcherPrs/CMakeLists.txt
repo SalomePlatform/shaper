@@ -50,6 +50,7 @@ SET(PROJECT_LIBRARIES
     Config
     ModelAPI
     GeomAPI
+    GeomDataAPI
     Events
     ${CAS_KERNEL}
     ${CAS_MODELER}

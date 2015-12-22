@@ -15,7 +15,6 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
 	PartSet_WidgetPoint2d.h
-	PartSet_WidgetPoint2dAngle.h
 	PartSet_WidgetEditor.h
 	PartSet_WidgetMultiSelector.h
 	PartSet_WidgetPoint2dDistance.h
@@ -43,7 +42,6 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetEditor.cpp
 	PartSet_WidgetMultiSelector.cpp
 	PartSet_WidgetPoint2d.cpp
-	PartSet_WidgetPoint2dAngle.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetPoint2DFlyout.cpp
 	PartSet_WidgetShapeSelector.cpp

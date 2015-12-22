@@ -8,6 +8,7 @@
 #include "SketchPlugin_Tools.h"
 
 #include <GeomDataAPI_Point2D.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -28,17 +29,15 @@
 #define PI 3.1415926535897932
 
 SketchPlugin_MultiRotation::SketchPlugin_MultiRotation()
-: myBlockAngle(false)
 {
 }
 
 void SketchPlugin_MultiRotation::initAttributes()
 {
-  data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(CENTER_ID(), ModelAPI_AttributeRefAttr::typeId());
 
   data()->addAttribute(ANGLE_TYPE(),   ModelAPI_AttributeString::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(ANGLE_FULL_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
@@ -61,26 +60,15 @@ void SketchPlugin_MultiRotation::execute()
     return;
 
   // Obtain center and angle of rotation
-  std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(CENTER_ID()));
+  AttributeRefAttrPtr aCenter = data()->refattr(CENTER_ID());
   if (!aCenter || !aCenter->isInitialized())
     return;
 
-  if (attribute(ANGLE_ID())->isInitialized() && !attribute(ANGLE_FULL_ID())->isInitialized()) {
-    myBlockAngle = true;
-    SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
-                                             aNbCopies, true);
-    myBlockAngle = false;
-  }
-
-  // make a visible points
-  SketchPlugin_Sketch::createPoint2DResult(this, sketch(), CENTER_ID(), 0);
-
-  double anAngle = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-                                                             attribute(ANGLE_ID()))->value();
+  //double anAngle = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+  //                                                           attribute(ANGLE_ID()))->value();
 
   // Convert angle to radians
-  anAngle *= PI / 180.0;
+  //anAngle *= PI / 180.0;
 
   // Wait all objects being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -250,7 +238,7 @@ ObjectPtr SketchPlugin_MultiRotation::copyFeature(ObjectPtr theObject)
   return ObjectPtr();
 }
 
-void SketchPlugin_MultiRotation::rotateFeature(
+/*void SketchPlugin_MultiRotation::rotateFeature(
     ObjectPtr theInitial, ObjectPtr theTarget,
     double theCenterX, double theCenterY, double theAngle)
 {
@@ -288,7 +276,7 @@ void SketchPlugin_MultiRotation::rotateFeature(
 
   // unblock feature update
   aTargetFeature->data()->blockSendAttributeUpdated(false);
-}
+}*/
 
 
 void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
@@ -323,47 +311,6 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
         data()->attribute(SketchPlugin_Constraint::ENTITY_A()))->clear();
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
-    }
-  }
-  else if (theID == ANGLE_ID() && !myBlockAngle) {
-    int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-    if (aNbCopies > 0) {
-      myBlockAngle = true;
-      SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
-                                               aNbCopies, true);
-      myBlockAngle = false;
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    }
-  }
-  else if (theID == ANGLE_FULL_ID() && !myBlockAngle) {
-    int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-    if (aNbCopies > 0) {
-      myBlockAngle = true;
-      SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_FULL_ID()), attribute(ANGLE_ID()),
-                                               aNbCopies, false);
-      myBlockAngle = false;
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    }
-  }
-  else if (theID == NUMBER_OF_OBJECTS_ID()) {
-    if (attribute(NUMBER_OF_OBJECTS_ID())->isInitialized() &&
-        attribute(ANGLE_ID())->isInitialized() &&
-        attribute(ANGLE_TYPE())->isInitialized()) {
-      AttributeStringPtr aMethodTypeAttr = string(ANGLE_TYPE());
-      std::string aMethodType = aMethodTypeAttr->value();
-      int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value() - 1;
-      if (aNbCopies > 0) {
-        myBlockAngle = true;
-        if (aMethodType == "SingleAngle")
-          SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_ID()), attribute(ANGLE_FULL_ID()),
-                                                   aNbCopies, true);
-        else {
-          SketchPlugin_Tools::updateMultiAttribute(attribute(ANGLE_FULL_ID()), attribute(ANGLE_ID()),
-                                                   aNbCopies, false);
-        }
-        myBlockAngle = false;
-        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-      }
     }
   }
 }

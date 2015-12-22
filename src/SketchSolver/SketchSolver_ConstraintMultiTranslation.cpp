@@ -10,7 +10,7 @@
 
 void SketchSolver_ConstraintMultiTranslation::getAttributes(
     EntityWrapperPtr& theStartPoint, EntityWrapperPtr& theEndPoint,
-    std::list< std::list<EntityWrapperPtr> >& theEntities)
+    bool& theFullValue, std::list< std::list<EntityWrapperPtr> >& theEntities)
 {
   DataPtr aData = myBaseConstraint->data();
   AttributePtr aStartPointAttr = aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
@@ -28,8 +28,10 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
   myStorage->update(aEndPointAttr);
   theEndPoint = myStorage->entity(aEndPointAttr);
 
-  getEntitiesAndCopies(theEntities);
+  AttributeStringPtr aMethodTypeAttr = aData->string(SketchPlugin_MultiTranslation::VALUE_TYPE());
+  theFullValue = aMethodTypeAttr->value() != "SingleValue";
 
+  getEntitiesAndCopies(theEntities);
 }
 
 void SketchSolver_ConstraintMultiTranslation::process()
@@ -41,8 +43,9 @@ void SketchSolver_ConstraintMultiTranslation::process()
   }
 
   EntityWrapperPtr aStartPoint, aEndPoint;
+  bool aFullValue;
   std::list<std::list<EntityWrapperPtr> > anEntitiesAndCopies;
-  getAttributes(aStartPoint, aEndPoint, anEntitiesAndCopies);
+  getAttributes(aStartPoint, aEndPoint, aFullValue, anEntitiesAndCopies);
   if (!myErrorMsg.empty())
     return;
 
@@ -58,7 +61,7 @@ void SketchSolver_ConstraintMultiTranslation::process()
   for (; anEntIt != anEntitiesAndCopies.end(); ++anEntIt) {
     std::list<ConstraintWrapperPtr> aNewConstraints =
         aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
-        0.0, aStartPoint, aEndPoint, *anEntIt);
+        0.0, aFullValue, aStartPoint, aEndPoint, *anEntIt);
     aTransConstraints.insert(aTransConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
   std::list<ConstraintWrapperPtr>::iterator aTCIt = aTransConstraints.begin();
