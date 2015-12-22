@@ -134,7 +134,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
     const EntityID& theSketchID,
     const SketchSolver_ConstraintType& theType,
     const double& theValue,
-    const bool& theFullValue,
+    const bool theFullValue,
     const EntityWrapperPtr& thePoint1,
     const EntityWrapperPtr& thePoint2,
     const std::list<EntityWrapperPtr>& theTrsfEnt) const

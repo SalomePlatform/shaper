@@ -65,6 +65,7 @@ public:
   /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
   /// \param theValue      [in]  numeric characteristic of constraint (angle for multi-rotation) if applicable
+  /// \param theFullValue  [in]  indicates theValue shows full translation delta/rotation angle or delta/angle between neighbor entities
   /// \param thePoint1     [in]  center for multi-rotation or start point for multi-translation
   /// \param thePoint2     [in]  end point for multi-translation (empty for multi-rotation)
   /// \param theTrsfEnt    [in]  list of transformed entities
@@ -74,7 +75,7 @@ public:
                      const EntityID& theSketchID,
                      const SketchSolver_ConstraintType& theType,
                      const double& theValue,
-                     const bool& theFullValue,
+                     const bool theFullValue,
                      const EntityWrapperPtr& thePoint1,
                      const EntityWrapperPtr& thePoint2,
                      const std::list<EntityWrapperPtr>& theTrsfEnt) const = 0;

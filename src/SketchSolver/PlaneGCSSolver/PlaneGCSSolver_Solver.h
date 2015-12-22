@@ -48,6 +48,13 @@ public:
    */
   virtual SketchSolver_SolveStatus solve();
 
+  /// \brief Prepare for solving. Store initial values of parameters for undo
+  virtual void prepare()
+  { /* do nothing */ }
+
+  /// \brief Revert solution to initial values
+  virtual void undo();
+
 private:
   GCS::VEC_pD                myParameters;     ///< list of unknowns
   std::set<GCS::Constraint*> myConstraints;    ///< list of constraints already processed by the system
