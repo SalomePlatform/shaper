@@ -209,6 +209,28 @@ ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub)
   return ResultPtr();
 }
 
+FeaturePtr findPartFeature(const DocumentPtr& theMain, const DocumentPtr& theSub)
+{
+  if (theMain != theSub) { // to optimize and avoid of crash on partset document close (don't touch the sub-document structure)
+    for (int a = theMain->size(ModelAPI_Feature::group()) - 1; a >= 0; a--) {
+      FeaturePtr aPartFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(
+          theMain->object(ModelAPI_Feature::group(), a));
+      if (aPartFeat.get()) {
+        const std::list<std::shared_ptr<ModelAPI_Result> >& aResList = aPartFeat->results();
+        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
+        for(; aRes != aResList.end(); aRes++) {
+          ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes);
+          if (aPart.get()) {
+            if (aPart->isActivated() && aPart->partDoc() == theSub)
+              return aPartFeat;
+          } else break; // if the first is not Part, others are also not
+        }
+      }
+    }
+  }
+  return FeaturePtr();
+}
+
 CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
 {
   if (theFeature.get() && theFeature->data()->isValid()) {

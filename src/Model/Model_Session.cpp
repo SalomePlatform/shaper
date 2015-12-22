@@ -252,6 +252,18 @@ void Model_Session::setActiveDocument(
     std::shared_ptr<ModelAPI_Document> aPrevious = myCurrentDoc;
     myCurrentDoc = theDoc;
     if (theDoc.get() && theSendSignal) {
+      // this must be before the synchronisation call because features in PartSet lower than this
+      // part feature must be disabled and don't recomputed anymore (issue 1156,
+      // translation feature is failed on activation of Part 2)
+      if (isOperation()) { // do it only in transaction, not on opening of document
+        DocumentPtr aRoot = moduleDocument();
+        if (myCurrentDoc != aRoot) {
+          FeaturePtr aPartFeat = ModelAPI_Tools::findPartFeature(aRoot, myCurrentDoc);
+          if (aPartFeat.get()) {
+            aRoot->setCurrentFeature(aPartFeat, false);
+          }
+        }
+      }
       // syncronize the document: it may be just opened or opened but removed before
       std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theDoc);
       if (aDoc.get()) {
@@ -275,14 +287,6 @@ void Model_Session::setActiveDocument(
       } else {
         // make the current feature the latest in sub, root current feature becomes this sub
         makeCurrentLast(myCurrentDoc);
-        DocumentPtr aRoot = moduleDocument();
-        ResultPtr aPartRes = ModelAPI_Tools::findPartResult(aRoot, myCurrentDoc);
-        if (aPartRes.get()) {
-          FeaturePtr aPartFeat = aRoot->feature(aPartRes);
-          if (aPartFeat.get()) {
-            aRoot->setCurrentFeature(aPartFeat, false);
-          }
-        }
       }
     }
   }

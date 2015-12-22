@@ -870,6 +870,8 @@ const int Model_Document::index(std::shared_ptr<ModelAPI_Object> theObject)
 
 int Model_Document::size(const std::string& theGroupID)
 {
+  if (myObjs == 0) // may be on close
+    return 0;
   return myObjs->size(theGroupID);
 }
 

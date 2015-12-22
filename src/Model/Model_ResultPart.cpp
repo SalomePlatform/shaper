@@ -97,6 +97,8 @@ std::shared_ptr<ModelAPI_ResultPart> Model_ResultPart::original()
 bool Model_ResultPart::isActivated() 
 {
   if (myTrsf.get()) {
+    if (!baseRef().get()) // may be on close
+      return false;
     return baseRef()->isActivated();
   }
 

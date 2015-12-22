@@ -53,11 +53,21 @@ MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues);
 
 /*!
  * Searches for Part result that contains the reference to the given document.
+ * The result must be presented in the tree.
  * \param theMain document that contains the searched feature
  * \param theSub document that is searched, the resulting feature references to it
  * \returns null if not found
  */
 MODELAPI_EXPORT ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub);
+
+/*!
+ * Searches for Part the feature that contains in result the reference to the given document.
+ * The result may be disabled.
+ * \param theMain document that contains the searched feature
+ * \param theSub document that is searched, the resulting feature references to it
+ * \returns null if not found
+ */
+MODELAPI_EXPORT FeaturePtr findPartFeature(const DocumentPtr& theMain, const DocumentPtr& theSub);
 
 /*!
  * Returns the composite feature - parent of this feature.
