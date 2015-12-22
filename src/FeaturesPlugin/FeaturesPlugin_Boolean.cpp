@@ -10,7 +10,6 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeInteger.h>
-#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Session.h>
@@ -199,7 +198,7 @@ void FeaturesPlugin_Boolean::execute()
         }
 
         GeomAlgoAPI_MakeShapeList aMakeShapeList;
-        aMakeShapeList.append(aBoolAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aBoolAlgo.makeShape());
         GeomAPI_DataMapOfShapeShape aMapOfShapes;
         aMapOfShapes.merge(aBoolAlgo.mapOfShapes());
 
@@ -213,7 +212,7 @@ void FeaturesPlugin_Boolean::execute()
           return;
         }
 
-        aMakeShapeList.append(aFillerAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aFillerAlgo.makeShape());
         aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
 
         if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo.shape()) > 1.e-7) {
@@ -275,7 +274,7 @@ void FeaturesPlugin_Boolean::execute()
 
           if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo.shape()) > 1.e-7) {
             aSolidsToFuse.push_back(aCutAlgo.shape());
-            aMakeShapeList.append(aCutAlgo.makeShape());
+            aMakeShapeList.appendAlgo(aCutAlgo.makeShape());
             aMapOfShapes.merge(aCutAlgo.mapOfShapes());
           }
         }
@@ -307,7 +306,7 @@ void FeaturesPlugin_Boolean::execute()
       }
 
       std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo.shape();
-      aMakeShapeList.append(aFuseAlgo.makeShape());
+      aMakeShapeList.appendAlgo(aFuseAlgo.makeShape());
       aMapOfShapes.merge(aFuseAlgo.mapOfShapes());
 
       // Add result to not used solids from compsolid (if we have any).
@@ -331,7 +330,7 @@ void FeaturesPlugin_Boolean::execute()
         }
 
         aShape = aFillerAlgo.shape();
-        aMakeShapeList.append(aFillerAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aFillerAlgo.makeShape());
         aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
       }
 

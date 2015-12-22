@@ -4,11 +4,10 @@
 // Created:     11 June 2015
 // Author:      Dmitry Bobylev
 
-#include <FeaturesPlugin_CompositeBoolean.h>
+#include "FeaturesPlugin_CompositeBoolean.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
-#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
@@ -239,7 +238,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
         }
 
         GeomAlgoAPI_MakeShapeList aMakeShapeList;
-        aMakeShapeList.append(aBoolAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aBoolAlgo.makeShape());
         GeomAPI_DataMapOfShapeShape aMapOfShapes;
         aMapOfShapes.merge(aBoolAlgo.mapOfShapes());
 
@@ -253,7 +252,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
           return;
         }
 
-        aMakeShapeList.append(aFillerAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aFillerAlgo.makeShape());
         aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
 
         if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo.shape()) > 1.e-7) {
@@ -309,7 +308,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
 
           if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo.shape()) > 1.e-7) {
             aSolidsToFuse.push_back(aCutAlgo.shape());
-            aMakeShapeList.append(aCutAlgo.makeShape());
+            aMakeShapeList.appendAlgo(aCutAlgo.makeShape());
             aMapOfShapes.merge(aCutAlgo.mapOfShapes());
           }
         }
@@ -331,7 +330,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
       }
 
       std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo.shape();
-      aMakeShapeList.append(aFuseAlgo.makeShape());
+      aMakeShapeList.appendAlgo(aFuseAlgo.makeShape());
       aMapOfShapes.merge(aFuseAlgo.mapOfShapes());
 
       // Add result to not used solids from compsolid (if we have any).
@@ -355,7 +354,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
         }
 
         aShape = aFillerAlgo.shape();
-        aMakeShapeList.append(aFillerAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aFillerAlgo.makeShape());
         aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
       }
 
@@ -413,8 +412,8 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
       //Insert lateral face : Face from Edge
       if(std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(*aSolidsAlgosIter)) {
         std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(*aSolidsAlgosIter);
-        aSubShapes = aPrismAlgo->mapOfShapes();
-        theResultBody->loadAndOrientGeneratedShapes(aPrismAlgo->makeShape().get(), *aShellsIter, GeomAPI_Shape::EDGE, aGenTag,
+        aSubShapes = aPrismAlgo->mapOfSubShapes();
+        theResultBody->loadAndOrientGeneratedShapes(aPrismAlgo.get(), *aShellsIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
 
         aFromFaces = aPrismAlgo->fromFaces();

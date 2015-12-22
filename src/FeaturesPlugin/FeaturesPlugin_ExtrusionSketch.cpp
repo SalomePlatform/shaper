@@ -79,17 +79,17 @@ void FeaturesPlugin_ExtrusionSketch::makeSolid(const std::shared_ptr<GeomAPI_Sha
   }
 
   // Extrude face
-  GeomAlgoAPI_Prism aPrismAlgo(theFace, aToShape, aToSize, aFromShape, aFromSize);
+  std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo(new GeomAlgoAPI_Prism(theFace, aToShape, aToSize, aFromShape, aFromSize));
 
   // Checking that the algorithm worked properly.
-  if(!aPrismAlgo.isDone() || !aPrismAlgo.shape().get() || aPrismAlgo.shape()->isNull() ||
-     !aPrismAlgo.isValid()) {
+  if(!aPrismAlgo->isDone() || !aPrismAlgo->shape().get() || aPrismAlgo->shape()->isNull() ||
+     !aPrismAlgo->isValid()) {
     return;
   }
 
-  theResult = aPrismAlgo.shape();
-  theFromFaces = aPrismAlgo.fromFaces();
-  theToFaces = aPrismAlgo.toFaces();
-  theMakeShape = aPrismAlgo.makeShape();
-  theDataMap = aPrismAlgo.mapOfShapes();
+  theResult = aPrismAlgo->shape();
+  theFromFaces = aPrismAlgo->fromFaces();
+  theToFaces = aPrismAlgo->toFaces();
+  theMakeShape = aPrismAlgo;
+  theDataMap = aPrismAlgo->mapOfSubShapes();
 }

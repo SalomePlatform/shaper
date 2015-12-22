@@ -12,10 +12,9 @@
 
 #include <memory>
 
-/** \class GeomAlgoAPI_MakeShapeList
- *  \ingroup DataAlgo
- *  \brief List of topological shapes constructions
- */
+/// \class GeomAlgoAPI_MakeShapeList
+/// \ingroup DataAlgo
+/// \brief List of topological shapes constructions
 class GeomAlgoAPI_MakeShapeList : public GeomAlgoAPI_MakeShape
 {
   enum OperationType {
@@ -27,25 +26,17 @@ public:
   /// Default constructor
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShapeList();
 
-  /** \brief Constructor
-   *  \param[in] theMakeShapeList list of algorithms.
-   */
+  /// \brief Constructor
+  /// \param[in] theMakeShapeList list of algorithms.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShapeList(const ListOfMakeShape& theMakeShapeList);
 
-  /** \brief Initializes a class with new list of algorithms.
-   *  \param[in] theMakeShapeList list of algorithms.
-   */
+  /// \brief Initializes a class with new list of algorithms.
+  /// \param[in] theMakeShapeList list of algorithms.
   GEOMALGOAPI_EXPORT void init(const ListOfMakeShape& theMakeShapeList);
 
-  /** \brief Adds algo to the end of list.
-   *  \param[in] theMakeShape algo to be added.
-   */
-  GEOMALGOAPI_EXPORT void append(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
-
-  /** \brief Adds another one list of algos to the end of list.
-   *  \param[in] theMakeShapeList algo list to be added.
-   */
-  GEOMALGOAPI_EXPORT void append(const GeomAlgoAPI_MakeShapeList& theMakeShapeList);
+  /// \brief Adds algo to the end of list.
+  /// \param[in] theMakeShape algo to be added.
+  GEOMALGOAPI_EXPORT void appendAlgo(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 
   /// \return a shape built by the shape construction algorithms
   GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;

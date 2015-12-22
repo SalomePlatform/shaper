@@ -4,18 +4,21 @@
 // Created:     20 Oct 2014
 // Author:      Sergey ZARITCHNY
 
-#include <GeomAlgoAPI_MakeShape.h>
+#include "GeomAlgoAPI_MakeShape.h"
 
 #include <BOPAlgo_Builder.hxx>
 #include <BRepBuilderAPI_MakeShape.hxx>
-#include <BRepOffsetAPI_MakePipe.hxx>
+#include <BRepCheck_Analyzer.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
+#include <Precision.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 //=================================================================================================
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
-: myBuilderType(OCCT_BRepBuilderAPI_MakeShape),
+: myBuilderType(UNKNOWN),
   myDone(false)
 {
 }
@@ -30,6 +33,33 @@ bool GeomAlgoAPI_MakeShape::isDone() const
 const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
 {
   return myShape;
+}
+
+//=================================================================================================
+bool GeomAlgoAPI_MakeShape::isValid() const
+{
+  BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
+  return (aChecker.IsValid() == Standard_True);
+}
+
+//=================================================================================================
+bool GeomAlgoAPI_MakeShape::hasVolume() const
+{
+  bool hasVolume = false;
+  if(isValid()) {
+    const TopoDS_Shape& aRShape = myShape->impl<TopoDS_Shape>();
+    GProp_GProps aGProp;
+    BRepGProp::VolumeProperties(aRShape, aGProp);
+    if(aGProp.Mass() > Precision::Confusion())
+      hasVolume = true;
+  }
+  return hasVolume;
+}
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_MakeShape::mapOfSubShapes() const
+{
+  return myMap;
 }
 
 //=================================================================================================
@@ -106,7 +136,31 @@ void GeomAlgoAPI_MakeShape::setDone(const bool theFlag)
 //=================================================================================================
 void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
+  if(myShape.get() && myShape->isEqual(theShape)) {
+    return;
+  }
+
   myShape = theShape;
+
+  // Filling data map to keep correct orientation of sub-shapes.
+  if(myShape.get()) {
+    if(myMap.get()) {
+      myMap->clear();
+    } else {
+      myMap.reset(new GeomAPI_DataMapOfShapeShape);
+    }
+
+    const TopoDS_Shape& aTopoDSSHape = myShape->impl<TopoDS_Shape>();
+    for(TopExp_Explorer anExp(aTopoDSSHape,TopAbs_FACE); anExp.More(); anExp.Next()) {
+      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+      aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
+      myMap->bind(aCurrentShape, aCurrentShape);
+    }
+  } else {
+    if(myMap.get()) {
+      myMap->clear();
+    }
+  }
 }
 
 //=================================================================================================

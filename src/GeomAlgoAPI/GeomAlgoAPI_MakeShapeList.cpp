@@ -4,12 +4,10 @@
 // Created:     27 May 2015
 // Author:      Dmitry Bobylev
 
-#include <GeomAlgoAPI_MakeShapeList.h>
+#include "GeomAlgoAPI_MakeShapeList.h"
 
-#include <BRepBuilderAPI_MakeShape.hxx>
 #include <NCollection_Map.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <TopTools_ListIteratorOfListOfShape.hxx>
+#include <TopoDS_Shape.hxx>
 
 //=================================================================================================
 GeomAlgoAPI_MakeShapeList::GeomAlgoAPI_MakeShapeList()
@@ -30,28 +28,21 @@ void GeomAlgoAPI_MakeShapeList::init(const ListOfMakeShape& theMakeShapeList)
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeShapeList::append(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+void GeomAlgoAPI_MakeShapeList::appendAlgo(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
   myListOfMakeShape.push_back(theMakeShape);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeShapeList::append(const GeomAlgoAPI_MakeShapeList& theMakeShapeList)
-{
-  for(ListOfMakeShape::const_iterator anIt = theMakeShapeList.myListOfMakeShape.cbegin();
-    anIt != theMakeShapeList.myListOfMakeShape.cend(); anIt++) {
-    myListOfMakeShape.push_back(*anIt);
-  }
-}
-
-//=================================================================================================
 const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShapeList::shape() const
 {
-  if(myListOfMakeShape.empty()) {
-    return std::shared_ptr<GeomAPI_Shape>();
-  } else {
+  std::shared_ptr<GeomAPI_Shape> aShape = GeomAlgoAPI_MakeShape::shape();
+  if(aShape.get() && !aShape->impl<TopoDS_Shape>().IsNull()) {
+    return aShape;
+  } else if(!myListOfMakeShape.empty()) {
     return myListOfMakeShape.back()->shape();
   }
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 //=================================================================================================

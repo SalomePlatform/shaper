@@ -93,7 +93,7 @@ void FeaturesPlugin_Partition::execute()
         aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aContext->shape(), aBoundingPoints);
         std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(new GeomAlgoAPI_MakeShapeCustom);
         aMkShCustom->addModified(aContext->shape(), aTool);
-        aMakeShapeList.append(aMkShCustom);
+        aMakeShapeList.appendAlgo(aMkShCustom);
         aTools.push_back(aTool);
         aToolsForNaming.push_back(aContext->shape());
       }
@@ -143,7 +143,7 @@ void FeaturesPlugin_Partition::execute()
 
     if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo.shape()) > 1.e-7) {
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      aMakeShapeList.append(aPartitionAlgo.makeShape());
+      aMakeShapeList.appendAlgo(aPartitionAlgo.makeShape());
       GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo.mapOfShapes().get();
       loadNamingDS(aResultBody, anObjects.front(), aToolsForNaming, aPartitionAlgo.shape(), aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
@@ -175,7 +175,7 @@ void FeaturesPlugin_Partition::execute()
 
       if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo.shape()) > 1.e-7) {
         std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-        aMakeShapeList.append(aPartitionAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aPartitionAlgo.makeShape());
         GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo.mapOfShapes().get();
         loadNamingDS(aResultBody, anObject, aToolsForNaming, aPartitionAlgo.shape(), aMakeShapeList, aMapOfShapes);
         setResult(aResultBody, aResultIndex);

@@ -27,13 +27,30 @@ class GeomAlgoAPI_MakeSweep : public GeomAlgoAPI_MakeShapeList
 {
 public:
   /// \returns the list of from faces.
-  GEOMALGOAPI_EXPORT const ListOfShape& fromFaces() const;
+  GEOMALGOAPI_EXPORT virtual const ListOfShape& fromFaces() const;
 
   /// \return the list of to faces.
-  GEOMALGOAPI_EXPORT const ListOfShape& toFaces() const;
+  GEOMALGOAPI_EXPORT virtual const ListOfShape& toFaces() const;
 
 protected:
-  GeomAlgoAPI_MakeSweep(){};
+  /// Empty constructor.
+  GeomAlgoAPI_MakeSweep() : GeomAlgoAPI_MakeShapeList() {};
+
+  /// \brief Adds a face to list of from faces.
+  /// \param[in] theFace a face to add.
+  void addFromFace(const std::shared_ptr<GeomAPI_Shape> theFace);
+
+  /// \brief Sets from faces
+  /// \param[in] theListOfFaces list of from faces.
+  void setFromFaces(const ListOfShape& theListOfFaces);
+
+  /// \brief Adds a face to list of to faces.
+  /// \param[in] theFace a face to add.
+  void addToFace(const std::shared_ptr<GeomAPI_Shape> theFace);
+
+  /// \brief Sets to faces
+  /// \param[in] theListOfFaces list of to faces.
+  void setToFaces(const ListOfShape& theListOfFaces);
 
 private:
   ListOfShape myFromFaces;

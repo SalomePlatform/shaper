@@ -9,64 +9,37 @@
 
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Shape.h>
-#include <GeomAlgoAPI_MakeShape.h>
-#include <GeomAPI_DataMapOfShapeShape.h>
+#include <GeomAlgoAPI_MakeSweep.h>
+
 #include <memory>
 
-/** \class GeomAlgoAPI_Prism
- *  \ingroup DataAlgo
- *  \brief Allows to create the prism based on a given face and bounding planes.
- *  \n Note that only planar faces are allowed as bounding faces and resulting
- *  extrusion will be bounded by the infinite planes taken from the faces.
- */
-class GeomAlgoAPI_Prism : public GeomAPI_Interface
+/// \class GeomAlgoAPI_Prism
+/// \ingroup DataAlgo
+/// \brief Allows to create the prism based on a given face and bounding planes.
+/// \n Note that only planar faces are allowed as bounding faces and resulting
+/// extrusion will be bounded by the infinite planes taken from the faces.
+class GeomAlgoAPI_Prism : public GeomAlgoAPI_MakeSweep
 {
 public:
-  /** \brief Creates extrusion for the given shape along the normal for this shape.
-   *  \param[in] theBaseShape face or wire to be extruded.
-   *  \param[in] theToSize offset for "to" plane.
-   *  \param[in] theFromSize offset for "from" plane.
-   */
+  /// \brief Creates extrusion for the given shape along the normal for this shape.
+  /// \param[in] theBaseShape face or wire to be extruded.
+  /// \param[in] theToSize offset for "to" plane.
+  /// \param[in] theFromSize offset for "from" plane.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                        double                         theToSize,
                                        double                         theFromSize);
 
-  /** \brief Creates extrusion for the given shape along the normal for this shape.
-   *  \param[in] theBaseShape face or wire to be extruded.
-   *  \param[in] theToShape top bounding shape.  Can be empty. In this case offset will be applied to the basis.
-   *  \param[in] theToSize offset for "to" plane.
-   *  \param[in] theFromShape bottom bounding shape. Can be empty. In this case offset will be applied to the basis.
-   *  \param[in] theFromSize offset for "from" plane.
-   */
+  /// \brief Creates extrusion for the given shape along the normal for this shape.
+  /// \param[in] theBaseShape face or wire to be extruded.
+  /// \param[in] theToShape top bounding shape.  Can be empty. In this case offset will be applied to the basis.
+  /// \param[in] theToSize offset for "to" plane.
+  /// \param[in] theFromShape bottom bounding shape. Can be empty. In this case offset will be applied to the basis.
+  /// \param[in] theFromSize offset for "from" plane.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                        std::shared_ptr<GeomAPI_Shape> theToShape,
                                        double                         theToSize,
                                        std::shared_ptr<GeomAPI_Shape> theFromShape,
                                        double                         theFromSize);
-
-  /// \return true if algorithm succeed.
-  GEOMALGOAPI_EXPORT bool isDone() const;
-
-  /// \return true if resulting shape is valid.
-  GEOMALGOAPI_EXPORT bool isValid() const;
-
-  /// \return true if resulting shape has volume.
-  GEOMALGOAPI_EXPORT bool hasVolume() const;
-
-  /// \return result of the Prism algorithm.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape() const;
-
-  /// \returns the list of from faces.
-  GEOMALGOAPI_EXPORT const ListOfShape& fromFaces() const;
-
-  /// \return the list of to faces.
-  GEOMALGOAPI_EXPORT const ListOfShape& toFaces() const;
-
-  /// \return map of sub-shapes of the result. To be used for History keeping.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
-
-  /// \return interface for History processing.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
 
 private:
   /// Builds resulting shape.
@@ -75,15 +48,6 @@ private:
              double                                theToSize,
              const std::shared_ptr<GeomAPI_Shape>& theFromShape,
              double                                theFromSize);
-
-private:
-  /// Fields.
-  bool myDone;
-  std::shared_ptr<GeomAPI_Shape> myShape;
-  ListOfShape myFromFaces;
-  ListOfShape myToFaces;
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
-  std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };
 
 #endif

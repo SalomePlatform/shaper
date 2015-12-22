@@ -4,22 +4,16 @@
 // Created:     30 May 2014
 // Author:      Vitaly SMETANNIKOV
 
-#include <FeaturesPlugin_Extrusion.h>
+#include "FeaturesPlugin_Extrusion.h"
 
-#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_Document.h>
-#include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
-#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeString.h>
-#include <ModelAPI_AttributeReference.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Prism.h>
@@ -171,12 +165,12 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
   //load result
   theResultBody->storeGenerated(theBasis, thePrismAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = thePrismAlgo.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = thePrismAlgo.mapOfSubShapes();
 
   //Insert lateral face : Face from Edge
   const std::string aLatName = "LateralFace";
   const int aLatTag = 1;
-  theResultBody->loadAndOrientGeneratedShapes(thePrismAlgo.makeShape().get(), theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(&thePrismAlgo, theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
 
   //Insert to faces
   const std::string aToName = "ToFace";
