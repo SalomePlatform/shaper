@@ -406,10 +406,25 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
       std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleted =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
       if (aDeleted && 
-          aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end() &&
-          !ModelAPI_Tools::findPartResult(moduleDocument(), activeDocument()).get()) // another part may be disabled
+          aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end())
       {
-        setActiveDocument(moduleDocument());
+         // check that the current feature of the session is still the active Part (even disabled)
+        bool aFound = false;
+        FeaturePtr aCurrentPart = moduleDocument()->currentFeature(true);
+        if (aCurrentPart.get()) {
+          const std::list<std::shared_ptr<ModelAPI_Result> >& aResList = aCurrentPart->results();
+          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
+          for(; !aFound && aRes != aResList.end(); aRes++) {
+            ResultPartPtr aPRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes);
+            if (aPRes.get() && aPRes->isActivated() && aPRes->partDoc() == activeDocument()) {
+              aFound = true;
+
+            }
+          }
+        }
+        if (!aFound) { // if not, the part was removed, so activate the module document
+          setActiveDocument(moduleDocument());
+        }
       }
     }
   }
