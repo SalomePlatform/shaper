@@ -27,6 +27,8 @@ SolveSpaceSolver_Solver::SolveSpaceSolver_Solver()
   // If the set of constraints is inconsistent,
   // the failed field will contain wrong constraints
   myEquationsSystem.calculateFaileds = 0;
+
+  myParamsCopy = 0;
 }
 
 SolveSpaceSolver_Solver::~SolveSpaceSolver_Solver()
@@ -37,6 +39,9 @@ SolveSpaceSolver_Solver::~SolveSpaceSolver_Solver()
   if (myEquationsSystem.failed)
     delete[] myEquationsSystem.failed;
   myEquationsSystem.failed = 0;
+  if (myParamsCopy)
+    delete [] myParamsCopy;
+  myParamsCopy = 0;
 }
 
 void SolveSpaceSolver_Solver::setParameters(Slvs_Param* theParameters, int theSize)
@@ -104,5 +109,83 @@ SketchSolver_SolveStatus SolveSpaceSolver_Solver::solve()
   default:
     aStatus = STATUS_FAILED;
   }
+
+  if (aStatus == STATUS_OK) {
+    // additional verification of arcs to be non-degenerated
+    if (hasDegeneratedArcs()) {
+      undo();
+      aStatus = STATUS_INCONSISTENT;
+    }
+  }
+
   return aStatus;
+}
+
+void SolveSpaceSolver_Solver::prepare()
+{
+  // make a copy of parameters to be able to make undo
+  if (myParamsCopy)
+    delete [] myParamsCopy;
+  myParamsCopy = new Slvs_Param[myEquationsSystem.params];
+  memcpy(myParamsCopy, myEquationsSystem.param, myEquationsSystem.params * sizeof(Slvs_Param));
+}
+
+void SolveSpaceSolver_Solver::undo()
+{
+  if (myParamsCopy) {
+    memcpy(myEquationsSystem.param, myParamsCopy, myEquationsSystem.params * sizeof(Slvs_Param));
+    delete [] myParamsCopy;
+  }
+  myParamsCopy = 0;
+}
+
+
+bool SolveSpaceSolver_Solver::hasDegeneratedArcs() const
+{
+  const double aTol2 = tolerance * tolerance;
+  double anArcPoints[3][2];
+
+  for (int anEnt = 0; anEnt < myEquationsSystem.entities; ++anEnt) {
+    const Slvs_Entity& anEntity = myEquationsSystem.entity[anEnt];
+    if (anEntity.type != SLVS_E_ARC_OF_CIRCLE)
+      continue;
+
+    for (int aPnt = 0; aPnt < 3; ++aPnt) {
+      // search point of arc
+      const int aShift = anEntity.point[aPnt] - anEntity.h;
+      int aPntInd = anEnt + aShift;
+      int aStep = 1;
+      if (myEquationsSystem.entity[aPntInd].h > anEntity.point[aPnt])
+        aStep = -1;
+      for (; aPntInd >=0 && aPntInd < myEquationsSystem.entities; aPntInd += aStep)
+        if (myEquationsSystem.entity[aPntInd].h == anEntity.point[aPnt])
+          break;
+
+      // search coordinates of the point
+      int aParamInd = myEquationsSystem.entity[aPntInd].param[0];
+      if (aParamInd >= myEquationsSystem.params) {
+        aParamInd = myEquationsSystem.params - 1;
+        aStep = -1;
+      }
+      else if ((int)myEquationsSystem.param[aParamInd].h > aParamInd)
+        aStep = -1;
+      else aStep = 1;
+
+      for (; aParamInd >=0 && aParamInd < myEquationsSystem.params; aParamInd += aStep)
+        if (myEquationsSystem.param[aParamInd].h == myEquationsSystem.entity[aPntInd].param[0])
+          break;
+      anArcPoints[aPnt][0] = myEquationsSystem.param[aParamInd].val;
+      anArcPoints[aPnt][1] = myEquationsSystem.param[aParamInd+1].val;
+    }
+
+    // check radius of arc
+    anArcPoints[1][0] -= anArcPoints[0][0];
+    anArcPoints[1][1] -= anArcPoints[0][1];
+    anArcPoints[2][0] -= anArcPoints[0][0];
+    anArcPoints[2][1] -= anArcPoints[0][1];
+    if (anArcPoints[1][0] * anArcPoints[1][0] + anArcPoints[1][1] * anArcPoints[1][1] < aTol2 ||
+        anArcPoints[2][0] * anArcPoints[2][0] + anArcPoints[2][1] * anArcPoints[2][1] < aTol2)
+      return true;
+  }
+  return false;
 }

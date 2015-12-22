@@ -74,8 +74,19 @@ public:
    */
   virtual SketchSolver_SolveStatus solve();
 
- private:
+  /// \brief Prepare for solving. Store initial values of parameters for undo
+  virtual void prepare();
+
+  /// \brief Revert solution to initial values
+  virtual void undo();
+
+private:
+  /// \brief Check whether degenerated arcs exist
+  bool hasDegeneratedArcs() const;
+
+private:
   Slvs_System myEquationsSystem; ///< set of equations for solving in SolveSpace
+  Slvs_Param* myParamsCopy;      ///< copy of parameters
 };
 
 #endif

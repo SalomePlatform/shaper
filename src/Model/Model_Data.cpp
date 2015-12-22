@@ -565,7 +565,9 @@ void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
   std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aMyIter = myAttrs.begin();
   for(; aMyIter != myAttrs.end(); aMyIter++) {
     if (aMyIter->second->isInitialized()) {
-      theTarget->attribute(aMyIter->first)->setInitialized();
+      AttributePtr aTargetAttr = theTarget->attribute(aMyIter->first);
+      if (aTargetAttr)
+        aTargetAttr->setInitialized();
     }
   }
 }

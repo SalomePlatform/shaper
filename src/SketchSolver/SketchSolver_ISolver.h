@@ -36,9 +36,15 @@ public:
   void calculateFailedConstraints(bool theSic)
   { myFindFaileds = theSic; }
 
+  /// \brief Prepare for solving. Store initial values of parameters for undo
+  virtual void prepare() = 0;
+
   /// \brief Solve the set of equations
   /// \return identifier whether solution succeeded
   virtual SketchSolver_SolveStatus solve() = 0;
+
+  /// \brief Revert solution to initial values
+  virtual void undo() = 0;
 
 protected:
   GroupID myGroup;       ///< ID of the group to be solved

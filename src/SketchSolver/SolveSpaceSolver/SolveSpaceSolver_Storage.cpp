@@ -161,6 +161,8 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr theEntity)
       aSlvsEnt.distance = anID;
     else if (aSlvsEnt.point[anInd] != anID) {
       aSlvsEnt.point[anInd] = anID;
+      if ((*aSIt)->baseAttribute())
+        SketchSolver_Storage::addEntity((*aSIt)->baseAttribute(), *aSIt);
       isUpdated = true;
     }
   }

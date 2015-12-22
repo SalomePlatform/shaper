@@ -85,6 +85,15 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
      (theSolverEntity && !aFound->second->isEqual(theSolverEntity)))
     setNeedToResolve(true); // the entity is new or modified
 
+  if (!theSolverEntity) {
+    // feature links to the empty entity, add its attributes
+    std::list<AttributePtr> aPntAttrs =
+        theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+    std::list<AttributePtr>::const_iterator anAttrIt = aPntAttrs.begin();
+    for (; anAttrIt != aPntAttrs.end(); ++anAttrIt)
+        addEntity(*anAttrIt, EntityWrapperPtr());
+  }
+
   myFeatureMap[theFeature] = theSolverEntity;
   // block events if necessary
   if (myEventsBlocked && theFeature->data() && theFeature->data()->isValid())

@@ -297,6 +297,7 @@ bool SketchSolver_Group::resolveConstraints()
     mySketchSolver->setGroup(myID);
     mySketchSolver->calculateFailedConstraints(false);
     myStorage->initializeSolver(mySketchSolver);
+    mySketchSolver->prepare();
 
     SketchSolver_SolveStatus aResult = STATUS_OK;
     try {
@@ -329,6 +330,7 @@ bool SketchSolver_Group::resolveConstraints()
         sendMessage(EVENT_SOLVER_FAILED);
         myPrevSolved = false;
       }
+      mySketchSolver->undo();
       return false;
     }
     if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {  // solution succeeded, store results into correspondent attributes
@@ -339,13 +341,16 @@ bool SketchSolver_Group::resolveConstraints()
         sendMessage(EVENT_SOLVER_REPAIRED);
         myPrevSolved = true;
       }
-    } else if (!myConstraints.empty()) {
+    } else {
+      mySketchSolver->undo();
+      if (!myConstraints.empty()) {
 //      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
-      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
-      if (myPrevSolved) {
-        // the error message should be changed before sending the message
-        sendMessage(EVENT_SOLVER_FAILED);
-        myPrevSolved = false;
+        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
+        if (myPrevSolved) {
+          // the error message should be changed before sending the message
+          sendMessage(EVENT_SOLVER_FAILED);
+          myPrevSolved = false;
+        }
       }
     }
 
