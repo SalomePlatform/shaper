@@ -4,7 +4,7 @@
 // Created:     11 September 2015
 // Author:      Dmitry Bobylev
 
-#include <FeaturesPlugin_RevolutionSketch.h>
+#include "FeaturesPlugin_RevolutionSketch.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -96,17 +96,17 @@ void FeaturesPlugin_RevolutionSketch::makeSolid(const std::shared_ptr<GeomAPI_Sh
   }
 
   // Revol face
-  GeomAlgoAPI_Revolution aRevolAlgo(theFace, anAxis, aToShape, aToAngle, aFromShape, aFromAngle);
+  std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo(new GeomAlgoAPI_Revolution(theFace, anAxis, aToShape, aToAngle, aFromShape, aFromAngle));
 
   // Checking that the algorithm worked properly.
-  if(!aRevolAlgo.isDone() || !aRevolAlgo.shape().get() || aRevolAlgo.shape()->isNull() ||
-     !aRevolAlgo.isValid()) {
+  if(!aRevolAlgo->isDone() || !aRevolAlgo->shape().get() || aRevolAlgo->shape()->isNull() ||
+     !aRevolAlgo->isValid()) {
     return;
   }
 
-  theResult = aRevolAlgo.shape();
-  theFromFaces = aRevolAlgo.fromFaces();
-  theToFaces = aRevolAlgo.toFaces();
-  theMakeShape = aRevolAlgo.makeShape();
-  theDataMap = aRevolAlgo.mapOfShapes();
+  theResult = aRevolAlgo->shape();
+  theFromFaces = aRevolAlgo->fromFaces();
+  theToFaces = aRevolAlgo->toFaces();
+  theMakeShape = aRevolAlgo;
+  theDataMap = aRevolAlgo->mapOfSubShapes();
 }

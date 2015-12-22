@@ -4,7 +4,7 @@
 // Created:     12 May 2015
 // Author:      Dmitry Bobylev
 
-#include <FeaturesPlugin_Revolution.h>
+#include "FeaturesPlugin_Revolution.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -181,12 +181,12 @@ void FeaturesPlugin_Revolution::loadNamingDS(GeomAlgoAPI_Revolution& theRevolAlg
   //load result
   theResultBody->storeGenerated(theBasis, theRevolAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRevolAlgo.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRevolAlgo.mapOfSubShapes();
 
   //Insert lateral face : Face from Edge
   const std::string aLatName = "LateralFace";
   const int aLatTag = 1;
-  theResultBody->loadAndOrientGeneratedShapes(theRevolAlgo.makeShape().get(), theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(&theRevolAlgo, theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
 
   //Insert to faces
   const std::string aToName = "ToFace";
