@@ -46,6 +46,11 @@ void SketchSolver_ConstraintMultiTranslation::process()
   if (!myErrorMsg.empty())
     return;
 
+  AttributeStringPtr aMethodTypeAttr =
+      myBaseConstraint->data()->string(SketchPlugin_MultiTranslation::VALUE_TYPE());
+  myIsFullValue = aMethodTypeAttr->value() != "SingleValue";
+
+
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
   std::list<ConstraintWrapperPtr> aTransConstraints;
 
@@ -56,6 +61,10 @@ void SketchSolver_ConstraintMultiTranslation::process()
         0.0, aStartPoint, aEndPoint, *anEntIt);
     aTransConstraints.insert(aTransConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
+  std::list<ConstraintWrapperPtr>::iterator aTCIt = aTransConstraints.begin();
+  for (; aTCIt != aTransConstraints.end(); ++ aTCIt)
+    (*aTCIt)->setIsFullValue(myIsFullValue);
+
   myStorage->addConstraint(myBaseConstraint, aTransConstraints);
 
   myAdjusted = false;
