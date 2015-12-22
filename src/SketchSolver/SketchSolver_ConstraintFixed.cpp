@@ -94,12 +94,14 @@ bool SketchSolver_ConstraintFixed::remove()
   cleanErrorMsg();
   // Move fixed entities back to the current group
   FeaturePtr aFeature = myBaseFeature;
-  if (myBaseConstraint && myFixedAttribute && myFixedAttribute->isObject())
-    aFeature = ModelAPI_Feature::feature(myFixedAttribute->object());
+  if (myBaseConstraint && myFixedAttribute) {
+    if (myFixedAttribute->isObject())
+      aFeature = ModelAPI_Feature::feature(myFixedAttribute->object());
+    else
+      myStorage->update(AttributePtr(myFixedAttribute), myGroupID);
+  }
   if (aFeature)
     myStorage->update(aFeature, myGroupID);
-  else if (myFixedAttribute)
-    myStorage->update(AttributePtr(myFixedAttribute), myGroupID);
 
   // Remove constraint or base feature
   if (myBaseConstraint) {

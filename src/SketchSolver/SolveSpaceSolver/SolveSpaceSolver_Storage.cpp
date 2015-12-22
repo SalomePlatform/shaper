@@ -1552,8 +1552,8 @@ bool SolveSpaceSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstra
       std::set<EntityWrapperPtr> aSlaves = aPtPtIt->second;
       EntityWrapperPtr aNewMaster = *aSlaves.begin();
       aSlaves.erase(aSlaves.begin());
-      myCoincidentPoints[aNewMaster] = aSlaves;
       myCoincidentPoints.erase(aPtPtIt);
+      myCoincidentPoints[aNewMaster] = aSlaves;
       aPtPtIt = myCoincidentPoints.find(aNewMaster);
     } else
       aPtPtIt->second.erase(aNotCIt->first);

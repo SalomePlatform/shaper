@@ -335,13 +335,10 @@ bool SketchSolver_Storage::removeEntity(FeaturePtr theFeature)
   EntityWrapperPtr anEntity = aFound->second;
   myFeatureMap.erase(aFound);
 
-  // Check the feature is not used by constraints
-  if (isUsed(theFeature))
-    return false; // the feature is used, don't remove it
-
-  // Remove feature
-  if (remove(anEntity))
+  // Check if the feature is not used by constraints, remove it
+  if (!isUsed(theFeature) && remove(anEntity))
     return true;
+
   // feature is not removed, revert operation
   myFeatureMap[theFeature] = anEntity;
   update(anEntity);
@@ -357,18 +354,10 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
   EntityWrapperPtr anEntity = aFound->second;
   myAttributeMap.erase(aFound);
 
-  // Check the attribute is not used by constraints
-  if (isUsed(theAttribute))
-    return false; // the attribute is used, don't remove it
-  // Check the attribute is not used by other features
-  std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
-  for (; aFIt != myFeatureMap.end(); ++aFIt)
-    if (::isUsed(aFIt->second, theAttribute)) // the attribute is used, don't remove it
-      return false;
-
-  // Remove attribute
-  if (remove(anEntity))
+  // Check if the attribute is not used by constraints and features, remove it
+  if (!isUsed(theAttribute) && remove(anEntity))
     return true;
+
   // attribute is not removed, revert operation
   myAttributeMap[theAttribute] = anEntity;
   update(anEntity);
