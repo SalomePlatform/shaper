@@ -133,7 +133,11 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
+@IF "%SALOME_ROOT_DIR%" == "" (
 @SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
+) ELSE (
+@SET BOOST_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\boost-1.52.0
+)
 @REM -------------------------
 
 @REM -------------------------

@@ -33,7 +33,11 @@ if "%EIGEN_ROOT_DIR%" == "" (
 )
 
 if "%BOOST_ROOT_DIR%" == "" (
-  SET BOOST_ROOT_DIR=%ROOT_DIR%\products\boost-1.52.0
+  if "SALOME_ROOT_DIR" == "" (
+    SET BOOST_ROOT_DIR=%ROOT_DIR%\products\boost-1.52.0
+  ) else (
+    SET BOOST_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\boost-1.52.0
+  )
 )
 
 cd %SALOME_ROOT_DIR%\WORK
