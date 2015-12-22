@@ -19,7 +19,9 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 /** \brief Search the entity/parameter with specified ID in the list of elements
  *  \param[in] theEntityID unique ID of the element
@@ -178,7 +180,7 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
   if (aSlvsEnt.group == SLVS_G_UNKNOWN)
     aSlvsEnt.group = (Slvs_hGroup)myGroupID;
   Slvs_hEntity anEntID = updateEntity(aSlvsEnt);
-  if (aSlvsEnt.h == SLVS_E_UNKNOWN) {
+  if (aSlvsEnt.h == SLVS_E_UNKNOWN || isUpdated) {
     anEntity->changeEntity() = getEntity(anEntID);
     isUpdated = true;
 
@@ -1460,6 +1462,101 @@ bool SolveSpaceSolver_Storage::isUsedInEqual(
 }
 
 
+bool SolveSpaceSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
+{
+  std::list<EntityWrapperPtr> aPoints = theConstraint->entities();
+  std::list<EntityWrapperPtr>::const_iterator aPIt;
+
+  CoincidentPointsMap::iterator aPtPtIt = myCoincidentPoints.begin();
+  for (; aPtPtIt != myCoincidentPoints.end(); ++aPtPtIt) {
+    for (aPIt = aPoints.begin(); aPIt != aPoints.end(); ++aPIt)
+      if (aPtPtIt->first == *aPIt ||
+          aPtPtIt->second.find(*aPIt) != aPtPtIt->second.end())
+        break;
+    if (aPIt != aPoints.end())
+      break;
+  }
+
+  if (aPtPtIt == myCoincidentPoints.end())
+    return true; // already removed
+
+  // Create new copies of coincident points
+  BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
+  std::list<EntityWrapperPtr> aNewPoints;
+  for (aPIt = aPoints.begin(); aPIt != aPoints.end(); ++aPIt)
+    aNewPoints.push_back(aBuilder->createAttribute(
+        (*aPIt)->baseAttribute(), myGroupID, myWorkplaneID));
+
+  // Find all points fallen out of group of coincident points
+  std::map<EntityWrapperPtr, EntityWrapperPtr> aNotCoinc;
+  aNotCoinc[aPtPtIt->first] = EntityWrapperPtr();
+  std::set<EntityWrapperPtr>::const_iterator aTempIt = aPtPtIt->second.begin();
+  for (; aTempIt != aPtPtIt->second.end(); ++aTempIt)
+    aNotCoinc[*aTempIt] = EntityWrapperPtr();
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::iterator
+      aConstrIt = myConstraintMap.begin();
+  for (; aConstrIt != myConstraintMap.end(); ++aConstrIt)
+    if (aConstrIt->first->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+      AttributeRefAttrPtr aRefAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstrIt->first->attribute(SketchPlugin_Constraint::ENTITY_A()));
+      AttributeRefAttrPtr aRefAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstrIt->first->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      if (!aRefAttrA || !aRefAttrB || aRefAttrA->isObject() || aRefAttrB->isObject())
+        continue;
+      std::map<AttributePtr, EntityWrapperPtr>::iterator
+          aFound = myAttributeMap.find(aRefAttrA->attr());
+      if (aFound != myAttributeMap.end())
+        aNotCoinc.erase(aFound->second);
+      aFound = myAttributeMap.find(aRefAttrB->attr());
+      if (aFound != myAttributeMap.end())
+        aNotCoinc.erase(aFound->second);
+    }
+  if (aNotCoinc.empty())
+    return false;
+  std::list<EntityWrapperPtr>::const_iterator aNewPIt;
+  for (aPIt = aPoints.begin(), aNewPIt = aNewPoints.begin();
+       aPIt != aPoints.end(); ++aPIt, ++aNewPIt) {
+    if (aNotCoinc.find(*aPIt) != aNotCoinc.end())
+      aNotCoinc[*aPIt] = *aNewPIt;
+  }
+
+  // Find all features and constraints uses coincident points
+  std::map<EntityWrapperPtr, EntityWrapperPtr>::iterator aNotCIt;
+  std::set<EntityWrapperPtr> anUpdFeatures;
+  std::map<FeaturePtr, EntityWrapperPtr>::iterator aFIt = myFeatureMap.begin();
+  for (; aFIt != myFeatureMap.end(); ++aFIt) {
+    for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
+      if (!aFIt->second->isUsed(aNotCIt->first->baseAttribute()))
+        continue;
+      std::list<EntityWrapperPtr> aSubs = aFIt->second->subEntities();
+      std::list<EntityWrapperPtr>::iterator aSIt = aSubs.begin();
+      for (; aSIt != aSubs.end(); ++aSIt)
+        if (*aSIt == aNotCIt->first)
+          *aSIt = aNotCIt->second;
+      aFIt->second->setSubEntities(aSubs);
+      anUpdFeatures.insert(aFIt->second);
+    }
+  }
+  // update features
+  std::set<EntityWrapperPtr>::iterator anUpdIt = anUpdFeatures.begin();
+  for (; anUpdIt != anUpdFeatures.end(); ++anUpdIt)
+    update(EntityWrapperPtr(*anUpdIt));
+
+  // remove not coincident points
+  for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
+    if (aPtPtIt->first == aNotCIt->first) {
+      std::set<EntityWrapperPtr> aSlaves = aPtPtIt->second;
+      EntityWrapperPtr aNewMaster = *aSlaves.begin();
+      aSlaves.erase(aSlaves.begin());
+      myCoincidentPoints[aNewMaster] = aSlaves;
+      myCoincidentPoints.erase(aPtPtIt);
+      aPtPtIt = myCoincidentPoints.find(aNewMaster);
+    } else
+      aPtPtIt->second.erase(aNotCIt->first);
+  }
+  return true;
+}
+
 bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
 {
   std::shared_ptr<SolveSpaceSolver_ConstraintWrapper> aConstraint =
@@ -1476,6 +1573,11 @@ bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     return true;
 
   bool isFullyRemoved = removeConstraint((Slvs_hConstraint)aConstraint->id());
+
+  // remove point-point coincidence
+  if (aConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT)
+    isFullyRemoved = removeCoincidence(theConstraint);
+
   return SketchSolver_Storage::remove(theConstraint) && isFullyRemoved;
 }
 
@@ -1504,6 +1606,8 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
   std::list<ParameterWrapperPtr> aParams;
   std::list<ParameterWrapperPtr>::const_iterator aParIt;
   for (; anIt != myAttributeMap.end(); ++anIt) {
+    if (!anIt->second)
+      continue;
     // the external feature always should keep the up to date values, so, 
     // refresh from the solver is never needed
     if (anIt->first.get()) {
@@ -1576,6 +1680,8 @@ void SolveSpaceSolver_Storage::verifyFixed()
 {
   std::map<AttributePtr, EntityWrapperPtr>::iterator anAttrIt = myAttributeMap.begin();
   for (; anAttrIt != myAttributeMap.end(); ++anAttrIt) {
+    if (!anAttrIt->second)
+      continue;
     const std::list<ParameterWrapperPtr>& aParameters = anAttrIt->second->parameters();
     std::list<ParameterWrapperPtr>::const_iterator aParIt = aParameters.begin();
     for (; aParIt != aParameters.end(); ++aParIt)

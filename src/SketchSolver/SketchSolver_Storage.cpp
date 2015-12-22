@@ -23,8 +23,11 @@ static bool isEqual(const std::list<ConstraintWrapperPtr>& theCVec1,
 void SketchSolver_Storage::addConstraint(ConstraintPtr        theConstraint,
                                          ConstraintWrapperPtr theSolverConstraint)
 {
-  std::list<ConstraintWrapperPtr> aConstrList(1, theSolverConstraint);
-  addConstraint(theConstraint, aConstrList);
+  if (theSolverConstraint) {
+    std::list<ConstraintWrapperPtr> aConstrList(1, theSolverConstraint);
+    addConstraint(theConstraint, aConstrList);
+  } else
+    addConstraint(theConstraint, std::list<ConstraintWrapperPtr>());
 }
 
 void SketchSolver_Storage::addConstraint(
@@ -36,10 +39,34 @@ void SketchSolver_Storage::addConstraint(
   if (aFound == myConstraintMap.end() || !isEqual(aFound->second, theSolverConstraints))
     setNeedToResolve(true);
 
-  // Do not add point-point coincidence, because it is already made by setting
-  // the same parameters for both points
-  if (!theSolverConstraints.empty() &&
-      theSolverConstraints.front()->type() != CONSTRAINT_PT_PT_COINCIDENT) {
+  if (theSolverConstraints.empty()) {
+    // constraint links to the empty list, add its attributes linked to the empty entities
+    std::list<AttributePtr> aRefAttrs =
+        theConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+    std::list<AttributePtr>::const_iterator anAttrIt = aRefAttrs.begin();
+    for (; anAttrIt != aRefAttrs.end(); ++anAttrIt) {
+      AttributeRefAttrPtr aRef = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
+      if (aRef->isObject()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
+        if (aFeature) addEntity(aFeature, EntityWrapperPtr());
+      } else
+        addEntity(aRef->attr(), EntityWrapperPtr());
+    }
+    std::list<AttributePtr> aRefLists =
+        theConstraint->data()->attributes(ModelAPI_AttributeRefList::typeId());
+    for (anAttrIt = aRefLists.begin(); anAttrIt != aRefLists.end(); ++anAttrIt) {
+      AttributeRefListPtr aRef = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIt);
+      std::list<ObjectPtr> anObj = aRef->list();
+      std::list<ObjectPtr>::iterator anIt = anObj.begin();
+      for (; anIt != anObj.end(); ++anIt) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+        if (aFeature) addEntity(aFeature, EntityWrapperPtr());
+      }
+    }
+  }
+  else if (theSolverConstraints.front()->type() != CONSTRAINT_PT_PT_COINCIDENT) {
+    // Do not add point-point coincidence, because it is already made by setting
+    // the same parameters for both points
     std::list<ConstraintWrapperPtr>::iterator aCIt = theSolverConstraints.begin();
     for (; aCIt != theSolverConstraints.end(); ++aCIt)
       update(*aCIt);
@@ -54,7 +81,8 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
                                      EntityWrapperPtr theSolverEntity)
 {
   std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFound = myFeatureMap.find(theFeature);
-  if (aFound == myFeatureMap.end() || !aFound->second || !aFound->second->isEqual(theSolverEntity))
+  if (aFound == myFeatureMap.end() || !aFound->second ||
+     (theSolverEntity && !aFound->second->isEqual(theSolverEntity)))
     setNeedToResolve(true); // the entity is new or modified
 
   myFeatureMap[theFeature] = theSolverEntity;
@@ -67,7 +95,8 @@ void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
                                      EntityWrapperPtr theSolverEntity)
 {
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator aFound = myAttributeMap.find(theAttribute);
-  if (aFound == myAttributeMap.end() || !aFound->second || !aFound->second->isEqual(theSolverEntity))
+  if (aFound == myAttributeMap.end() || !aFound->second ||
+     (theSolverEntity && !aFound->second->isEqual(theSolverEntity)))
     setNeedToResolve(true); // the entity is new or modified
 
   myAttributeMap[theAttribute] = theSolverEntity;
@@ -224,10 +253,6 @@ bool SketchSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
       ++anIt;
     }
   }
-  if (!isFullyRemoved) {
-    // revert removed constraint
-    addConstraint(theConstraint, aConstrList);
-  }
   return isFullyRemoved;
 }
 
@@ -307,13 +332,14 @@ bool SketchSolver_Storage::removeEntity(FeaturePtr theFeature)
   if (aFound == myFeatureMap.end())
     return false; // feature not found, nothing to delete
 
+  EntityWrapperPtr anEntity = aFound->second;
+  myFeatureMap.erase(aFound);
+
   // Check the feature is not used by constraints
   if (isUsed(theFeature))
     return false; // the feature is used, don't remove it
 
   // Remove feature
-  EntityWrapperPtr anEntity = aFound->second;
-  myFeatureMap.erase(aFound);
   if (remove(anEntity))
     return true;
   // feature is not removed, revert operation
@@ -328,6 +354,9 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
   if (aFound == myAttributeMap.end())
     return false; // attribute not found, nothing to delete
 
+  EntityWrapperPtr anEntity = aFound->second;
+  myAttributeMap.erase(aFound);
+
   // Check the attribute is not used by constraints
   if (isUsed(theAttribute))
     return false; // the attribute is used, don't remove it
@@ -338,8 +367,6 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
       return false;
 
   // Remove attribute
-  EntityWrapperPtr anEntity = aFound->second;
-  myAttributeMap.erase(aFound);
   if (remove(anEntity))
     return true;
   // attribute is not removed, revert operation
@@ -468,6 +495,21 @@ bool SketchSolver_Storage::isFixed(EntityWrapperPtr theEntity) const
         if ((*anEntIt)->group() != myGroupID)
           return true;
     }
+
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator aCIt = myConstraintMap.begin();
+  std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
+  for (; aCIt != myConstraintMap.end(); ++aCIt) {
+    if (aCIt->second.empty())
+      continue;
+    aCWIt = aCIt->second.begin();
+    if ((*aCWIt)->type() != CONSTRAINT_FIXED)
+      continue;
+    for (; aCWIt != aCIt->second.end(); ++aCIt)
+      if ((theEntity->baseAttribute() && (*aCWIt)->isUsed(theEntity->baseAttribute())) ||
+          (theEntity->baseFeature() && (*aCWIt)->isUsed(theEntity->baseFeature())))
+        return true;
+  }
+
   return false;
 }
 

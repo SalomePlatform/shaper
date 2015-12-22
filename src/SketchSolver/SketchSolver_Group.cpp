@@ -524,36 +524,11 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
   ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
   for (; aCIter != myConstraints.end(); aCIter++)
     if (aCIter->first == theConstraint) {
-      if (!aCIter->second->remove()) // the constraint is not fully removed
-        isFullyRemoved = false;
+      aCIter->second->remove(); // the constraint is not fully removed
       break;
     }
-  if (aCIter == myConstraints.end())
-    return;
-
-  if (isFullyRemoved)
+  if (aCIter != myConstraints.end())
     myConstraints.erase(aCIter);
-  else if (aCIter != myConstraints.end() &&
-           aCIter->first->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-    // Update multicoincidence
-    std::list<ConstraintPtr> aMultiCoinc;
-    SolverConstraintPtr aCoincidence = aCIter->second;
-    while (aCIter != myConstraints.end()) {
-      if (aCIter->second != aCoincidence) {
-        ++aCIter;
-        continue;
-      }
-      if (aCIter->first != theConstraint)
-        aMultiCoinc.push_back(aCIter->first);
-      aCIter->second->remove();
-      ConstraintConstraintMap::iterator aRemoveIt = aCIter++;
-      myConstraints.erase(aRemoveIt);
-    }
-
-    std::list<ConstraintPtr>::iterator anIt = aMultiCoinc.begin();
-    for (; anIt != aMultiCoinc.end(); ++anIt)
-      changeConstraint(*anIt);
-  }
 }
 
 // ============================================================================

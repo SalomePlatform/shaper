@@ -98,6 +98,8 @@ bool SketchSolver_ConstraintFixed::remove()
     aFeature = ModelAPI_Feature::feature(myFixedAttribute->object());
   if (aFeature)
     myStorage->update(aFeature, myGroupID);
+  else if (myFixedAttribute)
+    myStorage->update(myFixedAttribute, myGroupID);
 
   // Remove constraint or base feature
   if (myBaseConstraint) {

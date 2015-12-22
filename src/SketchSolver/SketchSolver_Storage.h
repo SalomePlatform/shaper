@@ -123,7 +123,7 @@ public:
 
   /// \brief Check the entity is fixed.
   ///        If the point is under verification, all coincident points are checked too.
-  bool isFixed(EntityWrapperPtr theEntity) const;
+  SKETCHSOLVER_EXPORT bool isFixed(EntityWrapperPtr theEntity) const;
 
   /// \brief Shows the sketch should be resolved
   virtual bool isNeedToResolve()
