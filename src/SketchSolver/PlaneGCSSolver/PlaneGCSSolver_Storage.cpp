@@ -73,7 +73,7 @@ void PlaneGCSSolver_Storage::addConstraint(
 }
 
 
-bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr& theConstraint)
+bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr theConstraint)
 {
   bool isUpdated = false;
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
@@ -126,7 +126,7 @@ static bool updateValues(EntityWrapperPtr& theEntity)
   return isUpdated;
 }
 
-bool PlaneGCSSolver_Storage::update(EntityWrapperPtr& theEntity)
+bool PlaneGCSSolver_Storage::update(EntityWrapperPtr theEntity)
 {
   if (theEntity->type() == ENTITY_SKETCH)
     return true; // sketch is not necessary for PlaneGCS, so it is always says true
@@ -174,7 +174,7 @@ bool PlaneGCSSolver_Storage::update(EntityWrapperPtr& theEntity)
   return isUpdated;
 }
 
-bool PlaneGCSSolver_Storage::update(ParameterWrapperPtr& theParameter)
+bool PlaneGCSSolver_Storage::update(ParameterWrapperPtr theParameter)
 {
   std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aParam =
       std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(theParameter);

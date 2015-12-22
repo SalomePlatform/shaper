@@ -56,13 +56,13 @@ public:
 
   /// \brief Update constraint's data
   /// \return \c true if any value is updated
-  virtual bool update(ConstraintWrapperPtr& theConstraint);
+  virtual bool update(ConstraintWrapperPtr theConstraint);
   /// \brief Update entity's data
   /// \return \c true if any value is updated
-  virtual bool update(EntityWrapperPtr& theEntity);
+  virtual bool update(EntityWrapperPtr theEntity);
   /// \brief Update parameter's data
   /// \return \c true if the value of parameter is updated
-  virtual bool update(ParameterWrapperPtr& theParameter);
+  virtual bool update(ParameterWrapperPtr theParameter);
 
   /// \brief Update SketchPlugin features after resolving constraints
   /// \param theFixedOnly [in]  if \c true the fixed points will be updated only
