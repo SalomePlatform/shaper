@@ -50,7 +50,7 @@ SolveSpaceSolver_Storage::SolveSpaceSolver_Storage(const GroupID& theGroup)
 {
 }
 
-bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr& theConstraint)
+bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
 {
   bool isUpdated = false;
   std::shared_ptr<SolveSpaceSolver_ConstraintWrapper> aConstraint =
@@ -111,7 +111,7 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr& theConstraint)
   return isUpdated;
 }
 
-bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
+bool SolveSpaceSolver_Storage::update(EntityWrapperPtr theEntity)
 {
   bool isUpdated = false;
   std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
@@ -191,7 +191,7 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr& theEntity)
   return isUpdated;
 }
 
-bool SolveSpaceSolver_Storage::update(ParameterWrapperPtr& theParameter)
+bool SolveSpaceSolver_Storage::update(ParameterWrapperPtr theParameter)
 {
   std::shared_ptr<SolveSpaceSolver_ParameterWrapper> aParameter = 
       std::dynamic_pointer_cast<SolveSpaceSolver_ParameterWrapper>(theParameter);

@@ -169,13 +169,13 @@ protected:
 
   /// \brief Update constraint's data
   /// \return \c true if any value is updated
-  virtual bool update(ConstraintWrapperPtr& theConstraint) = 0;
+  virtual bool update(ConstraintWrapperPtr theConstraint) = 0;
   /// \brief Update entity's data
   /// \return \c true if any value is updated
-  virtual bool update(EntityWrapperPtr& theEntity) = 0;
+  virtual bool update(EntityWrapperPtr theEntity) = 0;
   /// \brief Update parameter's data
   /// \return \c true if the value of parameter is updated
-  virtual bool update(ParameterWrapperPtr& theParameter) = 0;
+  virtual bool update(ParameterWrapperPtr theParameter) = 0;
 
   /// \brief Remove constraint
   /// \return \c true if the constraint and all its parameters are removed successfully

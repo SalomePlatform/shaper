@@ -30,13 +30,13 @@ public:
 
   /// \brief Update constraint's data
   /// \return \c true if any value is updated
-  virtual bool update(ConstraintWrapperPtr& theConstraint);
+  virtual bool update(ConstraintWrapperPtr theConstraint);
   /// \brief Update entity's data
   /// \return \c true if any value is updated
-  virtual bool update(EntityWrapperPtr& theEntity);
+  virtual bool update(EntityWrapperPtr theEntity);
   /// \brief Update parameter's data
   /// \return \c true if the value of parameter is updated
-  virtual bool update(ParameterWrapperPtr& theParameter);
+  virtual bool update(ParameterWrapperPtr theParameter);
 
 ////  /// \brief Removes constraint from the storage
 ////  /// \return \c true if the constraint and all its parameters are remove successfully
