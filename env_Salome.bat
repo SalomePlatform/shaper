@@ -23,6 +23,19 @@ if "%SOLVESPACE_ROOT_DIR%" == "" (
 )
 SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 
+if "%PLANEGCS_ROOT_DIR%" == "" (
+  SET PLANEGCS_ROOT_DIR=%ROOT_DIR%\products\planegcs-0.16
+)
+SET PATH=%PLANEGCS_ROOT_DIR%\lib;%PATH%
+
+if "%EIGEN_ROOT_DIR%" == "" (
+  SET EIGEN_ROOT_DIR=%ROOT_DIR%\products\eigen-3.2.7
+)
+
+if "%BOOST_ROOT_DIR%" == "" (
+  SET BOOST_ROOT_DIR=%ROOT_DIR%\products\boost-1.52.0
+)
+
 cd %SALOME_ROOT_DIR%\WORK
 call set_env.bat %1
 call "%PDIR%\env_compile.bat"

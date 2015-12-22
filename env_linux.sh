@@ -24,6 +24,19 @@ export SOLVESPACE_ROOT_DIR=${NEWGEOM_PDIR}/solvespace-2.1
 export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 
+#------ PlaneGCS ------
+export PLANEGCS_ROOT_DIR=${NEWGEOM_PDIR}/planegcs-0.16
+export LD_LIBRARY_PATH=${PLANEGCS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+##
+
+#------ Eigen ------
+export EIGEN_ROOT_DIR=${NEWGEOM_PDIR}/eigen-3.2.7
+##
+
+#------ Boost ------
+export BOOST_ROOT_DIR=${NEWGEOM_PDIR}/boost-1.52.0
+##
+
 #------ lcov ------
 export LCOV_ROOT_DIR=${NEWGEOM_PDIR}/lcov-1.11
 export PATH=${LCOV_ROOT_DIR}/bin:${PATH}

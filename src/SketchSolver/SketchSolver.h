@@ -36,6 +36,7 @@ const GroupID       GID_OUTOFGROUP = 1;
 
 const ParameterID   PID_UNKNOWN    = 0;
 const EntityID      EID_UNKNOWN    = 0;
+const EntityID      EID_SKETCH     = 1;
 const ConstraintID  CID_UNKNOWN    = 0;
 
 #endif
