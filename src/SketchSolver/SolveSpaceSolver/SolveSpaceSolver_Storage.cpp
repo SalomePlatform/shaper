@@ -1649,13 +1649,25 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
         if (!isUpd[1]) aCoords[1] = aPoint2D->y();
         aPoint2D->setValue(aCoords[0], aCoords[1]);
         // Find points coincident with this one (probably not in GID_OUTOFGROUP)
-        std::map<AttributePtr, EntityWrapperPtr>::const_iterator aLocIt =
-            theFixedOnly ? myAttributeMap.begin() : anIt;
-        for (++aLocIt; aLocIt != myAttributeMap.end(); ++aLocIt)
+        std::map<AttributePtr, EntityWrapperPtr>::const_iterator aLocIt;
+        if (theFixedOnly) 
+          aLocIt = myAttributeMap.begin();
+        else {
+          aLocIt = anIt;
+          ++aLocIt;
+        }
+        for (; aLocIt != myAttributeMap.end(); ++aLocIt) {
+          if (!aLocIt->second)
+            continue;
+          std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(aLocIt->first->owner());
+          if (aSketchFeature && aSketchFeature->isExternal())
+            continue;
           if (anIt->second->id() == aLocIt->second->id()) {
             aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aLocIt->first);
             aPoint2D->setValue(aCoords[0], aCoords[1]);
           }
+        }
       }
       continue;
     }

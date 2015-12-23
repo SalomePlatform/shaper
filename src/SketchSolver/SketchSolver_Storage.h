@@ -150,6 +150,9 @@ public:
 
   /// \brief Block or unblock events when refreshing features
   SKETCHSOLVER_EXPORT void blockEvents(bool isBlocked);
+  /// \brief Shows the events are blocked for the features in the storage
+  bool isEventsBlocked() const
+  { return myEventsBlocked; }
 
 protected:
   /// \brief Change mapping feature from SketchPlugin and

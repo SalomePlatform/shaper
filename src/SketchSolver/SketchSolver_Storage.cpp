@@ -71,7 +71,9 @@ void SketchSolver_Storage::addConstraint(
     for (; aCIt != theSolverConstraints.end(); ++aCIt)
       update(*aCIt);
   }
-  myConstraintMap[theConstraint] = theSolverConstraints;
+
+  if (!theSolverConstraints.empty() || aFound == myConstraintMap.end())
+    myConstraintMap[theConstraint] = theSolverConstraints;
   // block events if necessary
   if (myEventsBlocked && theConstraint->data() && theConstraint->data()->isValid())
     theConstraint->data()->blockSendAttributeUpdated(myEventsBlocked);
@@ -91,7 +93,7 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
         theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
     std::list<AttributePtr>::const_iterator anAttrIt = aPntAttrs.begin();
     for (; anAttrIt != aPntAttrs.end(); ++anAttrIt)
-        addEntity(*anAttrIt, EntityWrapperPtr());
+      addEntity(*anAttrIt, EntityWrapperPtr());
     if (aFound == myFeatureMap.end())
       myFeatureMap[theFeature] = theSolverEntity;
   } else

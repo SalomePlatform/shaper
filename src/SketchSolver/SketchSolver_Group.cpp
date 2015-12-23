@@ -212,11 +212,19 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
   if (!checkFeatureValidity(theFeature))
     return false;
 
-  myStorage->blockEvents(true);
+  bool isBlocked = myStorage->isEventsBlocked();
+  if (!isBlocked)
+    myStorage->blockEvents(true);
+
   myStorage->refresh(true);
   bool isUpdated = myStorage->update(theFeature);
 
   updateMultiConstraints(myConstraints, theFeature);
+
+  // events were not blocked before, the feature has not been updated,
+  // so it is necessary to revert blocking
+  if (!isUpdated && !isBlocked)
+    myStorage->blockEvents(false);
   return isUpdated;
 }
 
