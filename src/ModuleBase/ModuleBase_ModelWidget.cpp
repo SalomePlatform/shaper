@@ -114,13 +114,8 @@ void ModuleBase_ModelWidget::enableFocusProcessing()
 {
   QList<QWidget*> aMyControls = getControls();
   foreach(QWidget*  eachControl, aMyControls) {
-    if (myIsObligatory) {
       eachControl->setFocusPolicy(Qt::StrongFocus);
       eachControl->installEventFilter(this);
-    }
-    else {
-      eachControl->setFocusPolicy(Qt::NoFocus);
-    }
   }
 }
 

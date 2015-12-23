@@ -171,6 +171,8 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
       if (!aValidators->isCase(aCurrentWidget->feature(), aCurrentWidget->attributeID()))
         continue; // this attribute is not participated in the current case
+      if (!aCurrentWidget->isObligatory())
+        continue; // not obligatory widgets are not activated automatically
 
       if (aCurrentWidget->focusTo()) {
         return;
@@ -180,7 +182,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   }
   activateWidget(NULL);
 }
-
+//#define DEBUG_TAB
 #ifdef DEBUG_TAB
 void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const bool theDebug)
 {

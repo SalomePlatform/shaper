@@ -45,6 +45,7 @@ void ModuleBase_ToolBox::addItem( QWidget* thePage, const QString& theName, cons
   myStack->addWidget( thePage );
 
   QToolButton* aButton = new QToolButton( myButtonsFrame );
+  aButton->setFocusPolicy(Qt::StrongFocus);
   aButton->setCheckable( true );
   aButton->setIcon( theIcon );
   aButton->setIconSize( theIcon.size() );
