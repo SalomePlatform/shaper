@@ -63,9 +63,9 @@ public:
   /// Returns True if the given value is within min and max of the control
   bool checkRange(const double) const;
 
-  /// Finds a variable by its name. Rreturns true in success
+  /// Finds a variable by its name. Returns true in success
   /// \param theName a name of variable
-  /// \param outValue an output val;ue of the variable
+  /// \param outValue an output value of the variable
   bool findVariable(const QString& theName, double& outValue) const;
 
  protected:

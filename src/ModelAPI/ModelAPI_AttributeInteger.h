@@ -24,7 +24,7 @@ class ModelAPI_AttributeInteger : public ModelAPI_Attribute
   /// Defines the integer value
   MODELAPI_EXPORT virtual void setValue(const int theValue) = 0;
 
-  /// Returns the inhteger value
+  /// Returns the integer value
   MODELAPI_EXPORT virtual int value() = 0;
 
   /// Returns the type of this class of attributes

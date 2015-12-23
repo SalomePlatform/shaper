@@ -219,7 +219,7 @@ bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
 }
 
 /*!
- \brief This function is called when the spinbox recieves key press event.
+ \brief This function is called when the spinbox receives key press event.
  */
 //void ModuleBase_ParamSpinBox::keyPressEvent(QKeyEvent* e)
 //{
@@ -231,7 +231,7 @@ bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
 //}
 
 /*!
- \brief This function is called when the spinbox recieves show event.
+ \brief This function is called when the spinbox receives show event.
  */
 void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
 {

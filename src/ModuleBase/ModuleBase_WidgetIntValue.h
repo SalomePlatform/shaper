@@ -18,10 +18,10 @@ class QTimer;
 
 /**
 * \ingroup GUI
-* A class of property panel widget for double value input
-* It can be defined with "doublevalue" keyword. For example:
+* A class of property panel widget for integer value input
+* It can be defined with "integervalue" keyword. For example:
 * \code
-* <doublevalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="X coordinate"/>
+* <integervalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="X coordinate"/>
 * \endcode
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetIntValue : public ModuleBase_ModelWidget
@@ -30,7 +30,7 @@ Q_OBJECT
  public:
   /// Constructor
   /// \param theParent the parent object
-  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent structure (widget, operation, group)
   ModuleBase_WidgetIntValue(QWidget* theParent, const Config_WidgetAPI* theData,
                                const std::string& theParentId);

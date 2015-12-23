@@ -29,7 +29,7 @@ class Model_AttributeInteger : public ModelAPI_AttributeInteger
   MODEL_EXPORT virtual int value();
 
  protected:
-  /// Initializes attibutes
+  /// Initializes attributes
   Model_AttributeInteger(TDF_Label& theLabel);
 
   friend class Model_Data;
