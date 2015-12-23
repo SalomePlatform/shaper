@@ -253,6 +253,9 @@ private:
   ///        of point coincidence.
   void addSameConstraints(ConstraintWrapperPtr theConstraint1, ConstraintWrapperPtr theConstraint2);
 
+  /// \brief Search constraint equal to the given in terms of SolveSpace notation
+  bool findSameConstraint(ConstraintWrapperPtr theConstraint);
+
 private:
   Slvs_hEntity myWorkplaneID; ///< identifier of workplane
 

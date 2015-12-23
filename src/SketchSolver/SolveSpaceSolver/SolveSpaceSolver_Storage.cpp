@@ -102,10 +102,14 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
       aSlvsConstr.wrkpl = myWorkplaneID;
     if (aSlvsConstr.group == SLVS_G_UNKNOWN)
       aSlvsConstr.group = (Slvs_hGroup)myGroupID;
+    bool hasDupConstraints = myDuplicatedConstraint;
     Slvs_hConstraint aConstrID = updateConstraint(aSlvsConstr);
     if (aSlvsConstr.h == SLVS_C_UNKNOWN) {
       aConstraint->changeConstraint() = getConstraint(aConstrID);
       isUpdated = true;
+      // check duplicated constraints based on different attributes
+      if (myDuplicatedConstraint && !hasDupConstraints && findSameConstraint(aConstraint))
+        myDuplicatedConstraint = false;
     }
   }
   return isUpdated;
@@ -447,6 +451,40 @@ void SolveSpaceSolver_Storage::addSameConstraints(ConstraintWrapperPtr theConstr
   aNewGroup.insert(theConstraint1);
   aNewGroup.insert(theConstraint2);
   myEqualConstraints.push_back(aNewGroup);
+}
+
+bool SolveSpaceSolver_Storage::findSameConstraint(ConstraintWrapperPtr theConstraint)
+{
+  if (theConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT ||
+      theConstraint->type() == CONSTRAINT_MULTI_ROTATION ||
+      theConstraint->type() == CONSTRAINT_MULTI_TRANSLATION)
+    return false;
+
+  const Slvs_Constraint& aCBase =
+      std::dynamic_pointer_cast<SolveSpaceSolver_ConstraintWrapper>(theConstraint)->constraint();
+
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
+      aCIt = myConstraintMap.begin();
+  std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
+  for (; aCIt != myConstraintMap.end(); ++aCIt)
+    for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt) {
+      if ((*aCWIt)->type() == CONSTRAINT_PT_PT_COINCIDENT ||
+          (*aCWIt)->type() == CONSTRAINT_MULTI_ROTATION ||
+          (*aCWIt)->type() == CONSTRAINT_MULTI_TRANSLATION)
+        continue;
+      if ((*aCWIt)->type() == theConstraint->type()) {
+        const Slvs_Constraint& aCComp = std::dynamic_pointer_cast<
+            SolveSpaceSolver_ConstraintWrapper>(*aCWIt)->constraint();
+        if (aCBase.ptA == aCComp.ptA && aCBase.ptB == aCComp.ptB &&
+            aCBase.entityA == aCComp.entityA && aCBase.entityB == aCComp.entityB &&
+            aCBase.entityC == aCComp.entityC && aCBase.entityD == aCComp.entityD &&
+            fabs(aCBase.valA -aCComp.valA) < tolerance) {
+          addSameConstraints(*aCWIt, theConstraint);
+          return true;
+        }
+      }
+    }
+  return false;
 }
 
 
@@ -1026,8 +1064,10 @@ Slvs_hConstraint SolveSpaceSolver_Storage::addConstraint(const Slvs_Constraint& 
       continue;
     if (aConstraint.ptA == aCIt->ptA && aConstraint.ptB == aCIt->ptB &&
         aConstraint.entityA == aCIt->entityA && aConstraint.entityB == aCIt->entityB &&
-        aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD)
+        aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD) {
       myDuplicatedConstraint = true;
+      return aCIt->h;
+    }
   }
 
   if (aConstraint.h > myConstrMaxID)
