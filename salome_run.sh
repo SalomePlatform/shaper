@@ -12,7 +12,9 @@ if [ -f .salomeport ]; then
 fi 
 
 SALOME_ARGS=""
-SALOME_ARGS="${SALOME_ARGS} -r ${SOURCES_DIR}/test.squish/shared/testdata/SalomeApp.xml"
+if [[ "${SALOME_SQUISH_PREFS:-FALSE}" == "TRUE" ]]; then
+  SALOME_ARGS="${SALOME_ARGS} -r ${SOURCES_DIR}/test.squish/shared/testdata/SalomeApp.xml"
+fi
 SALOME_ARGS="${SALOME_ARGS} --ns-port-log=$(pwd)/.salomeport"
 
 ${KERNEL_ROOT_DIR}/bin/salome/runSalome.py ${SALOME_ARGS} >log_runSalome 2>err_runSalome
