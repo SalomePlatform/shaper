@@ -37,7 +37,8 @@ public:
   SketchSolver_Storage(const GroupID& theGroup)
     : myGroupID(theGroup),
       myNeedToResolve(false),
-      myEventsBlocked(false)
+      myEventsBlocked(false),
+      myExistArc(false)
   {}
 
   /// \brief Change mapping between constraint from SketchPlugin and
@@ -200,6 +201,9 @@ protected:
   /// \brief Verify the attribute is used by constraint
   SKETCHSOLVER_EXPORT bool isUsed(AttributePtr theAttirubute) const;
 
+  /// \brief Find arcs without corresponding entity applicable for the solver and build them
+  SKETCHSOLVER_EXPORT void processArcs();
+
 private:
   /// \brief Find the normal of the sketch
   EntityWrapperPtr getNormal() const;
@@ -208,6 +212,7 @@ protected:
   GroupID myGroupID;       ///< identifier of the group, this storage belongs to
   bool    myNeedToResolve; ///< parameters are changed and group needs to be resolved
   bool    myEventsBlocked; ///< indicates that features do not send events
+  bool    myExistArc;      ///< the storage has any point of arc but not full arc, need to add it
 
   /// map SketchPlugin constraint to a list of solver's constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> > myConstraintMap;

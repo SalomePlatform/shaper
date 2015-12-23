@@ -184,8 +184,10 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
         if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
             aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
             aFeature->attribute(SketchPlugin_Arc::END_ID())->isInitialized()) {
-////          myFeatureMap[aFeature] = EntityWrapperPtr();
           return SketchSolver_Storage::update(aFeature);
+        } else {
+          myFeatureMap[aFeature] = EntityWrapperPtr();
+          myExistArc = true;
         }
       }
     }
@@ -572,6 +574,22 @@ void SketchSolver_Storage::setSketch(const EntityWrapperPtr& theSketch)
   if (sketch())
     return;
   addEntity(FeaturePtr(), theSketch);
+}
+
+void SketchSolver_Storage::processArcs()
+{
+  myExistArc = false;
+  std::map<FeaturePtr, EntityWrapperPtr>::iterator aFIt = myFeatureMap.begin();
+  for (; aFIt != myFeatureMap.end(); ++aFIt)
+    if (!aFIt->second && aFIt->first->getKind() == SketchPlugin_Arc::ID()) {
+      // Additional checking the attributes are initialized
+      if (aFIt->first->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
+          aFIt->first->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
+          aFIt->first->attribute(SketchPlugin_Arc::END_ID())->isInitialized())
+        update(aFIt->first);
+      else
+        myExistArc = true;
+    }
 }
 
 void SketchSolver_Storage::blockEvents(bool isBlocked)

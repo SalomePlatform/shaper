@@ -1134,6 +1134,9 @@ void SolveSpaceSolver_Storage::initializeSolver(SolverPtr theSolver)
   if (!aSolver)
     return;
 
+  if (myExistArc)
+    processArcs();
+
   if (myConstraints.empty()) {
     // Adjust all arc to place their points correctly
     std::vector<Slvs_Entity>::const_iterator anEntIt = myEntities.begin();

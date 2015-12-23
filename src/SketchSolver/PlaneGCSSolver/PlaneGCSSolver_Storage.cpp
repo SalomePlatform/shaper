@@ -968,6 +968,11 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
 {
   std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
       std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(theSolver);
+  if (!aSolver)
+    return;
+
+  if (myExistArc)
+    processArcs();
 
   // initialize constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
