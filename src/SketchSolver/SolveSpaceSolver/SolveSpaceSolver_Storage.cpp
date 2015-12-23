@@ -677,9 +677,6 @@ bool SolveSpaceSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
     for (int i = 0; i < 4; i++)
       if (anEntity.param[i] != SLVS_E_UNKNOWN)
         aResult = removeParameter(anEntity.param[i]) && aResult;
-    for (int i = 0; i < 4; i++)
-      if (anEntity.point[i] != SLVS_E_UNKNOWN)
-        aResult = removeEntity(anEntity.point[i]) && aResult;
     myNeedToResolve = true;
   }
   return aResult;
