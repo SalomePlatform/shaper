@@ -488,19 +488,39 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
   if (aState == ModelAPI_StateInvalidArgument) // a chance to be corrected
     aState = ModelAPI_StateMustBeUpdated;
   // check the parameters state
-  // Double
-  std::list<AttributePtr> aDoubles =
-    theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId());
-  std::list<AttributePtr>::iterator aDoubleIter = aDoubles.begin();
-  for(; aDoubleIter != aDoubles.end(); aDoubleIter++) {
-    AttributeDoublePtr aDouble =
-      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
-    if (aDouble.get() && !aDouble->text().empty()) {
-      if (myIsParamUpdated) {
-        ModelAPI_AttributeEvalMessage::send(aDouble, this);
+  // Integer
+  {
+    std::list<AttributePtr> anAttrinbutes =
+      theFeature->data()->attributes(ModelAPI_AttributeInteger::typeId());
+    std::list<AttributePtr>::iterator anIter = anAttrinbutes.begin();
+    for(; anIter != anAttrinbutes.end(); anIter++) {
+      AttributeIntegerPtr anAttribute =
+        std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(*anIter);
+      if (anAttribute.get() && !anAttribute->text().empty()) {
+        if (myIsParamUpdated) {
+          ModelAPI_AttributeEvalMessage::send(anAttribute, this);
+        }
+        if (anAttribute->expressionInvalid()) {
+          aState = ModelAPI_StateInvalidArgument;
+        }
       }
-      if (aDouble->expressionInvalid()) {
-        aState = ModelAPI_StateInvalidArgument;
+    }
+  }
+  // Double
+  {
+    std::list<AttributePtr> aDoubles =
+      theFeature->data()->attributes(ModelAPI_AttributeDouble::typeId());
+    std::list<AttributePtr>::iterator aDoubleIter = aDoubles.begin();
+    for(; aDoubleIter != aDoubles.end(); aDoubleIter++) {
+      AttributeDoublePtr aDouble =
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(*aDoubleIter);
+      if (aDouble.get() && !aDouble->text().empty()) {
+        if (myIsParamUpdated) {
+          ModelAPI_AttributeEvalMessage::send(aDouble, this);
+        }
+        if (aDouble->expressionInvalid()) {
+          aState = ModelAPI_StateInvalidArgument;
+        }
       }
     }
   }

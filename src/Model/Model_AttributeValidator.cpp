@@ -5,7 +5,10 @@
 // Author:      Sergey POKHODENKO
 
 #include "Model_AttributeValidator.h"
+
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
+
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 
@@ -13,6 +16,14 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
                                        const std::list<std::string>& theArguments, 
                                        std::string& theError) const
 {
+  if (theAttribute->attributeType() == ModelAPI_AttributeInteger::typeId()) {
+    AttributeIntegerPtr anAttribue =
+        std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttribute);
+    if (!anAttribue->expressionError().empty()) {
+      theError = anAttribue->expressionError();
+      return false;
+    }
+  } else
   if (theAttribute->attributeType() == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttribue = 
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);

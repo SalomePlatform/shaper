@@ -13,6 +13,8 @@
 
 #include <Events_Error.h>
 
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeValidator.h>
@@ -21,7 +23,6 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 
-#include <ModelAPI_AttributeDouble.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 
@@ -116,6 +117,18 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
   std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
       std::dynamic_pointer_cast<ModelAPI_AttributeEvalMessage>(theMessage);
 
+  if (aMessage->attribute()->attributeType() == ModelAPI_AttributeInteger::typeId()) {
+    AttributeIntegerPtr anAttribute =
+        std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aMessage->attribute());
+    std::string anError;
+    int aValue = (int)evaluate(anAttribute->text(), anError, anAttribute->owner()->document());
+    bool isValid = anError.empty();
+    if (isValid)
+      anAttribute->setCalculatedValue(aValue);
+    anAttribute->setUsedParameters(isValid ? toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
+    anAttribute->setExpressionInvalid(!isValid);
+    anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
+  } else
   if (aMessage->attribute()->attributeType() == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
@@ -241,6 +254,14 @@ void ParametersPlugin_EvalListener::renameInAttribute(
     const std::string& theOldName,
     const std::string& theNewName)
 {
+  if (theAttribute->attributeType() == ModelAPI_AttributeInteger::typeId()) {
+    AttributeIntegerPtr anAttribute =
+        std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttribute);
+    std::string anExpressionString = anAttribute->text();
+    anExpressionString = renameInPythonExpression(anExpressionString,
+                                                  theOldName, theNewName);
+    anAttribute->setText(anExpressionString);
+  } else
   if (theAttribute->attributeType() == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);

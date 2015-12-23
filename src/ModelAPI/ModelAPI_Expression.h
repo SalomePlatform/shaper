@@ -8,6 +8,7 @@
 #define ModelAPI_Expression_H_
 
 #include "ModelAPI.h"
+
 #include <memory>
 #include <set>
 #include <string>
@@ -18,9 +19,6 @@
  */
 class ModelAPI_Expression
 {
- protected:
-  bool myIsInitialized; ///< is some value assigned to this attribute
-
  public:
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Expression();
@@ -30,12 +28,6 @@ class ModelAPI_Expression
 
   /// Makes attribute initialized
   MODELAPI_EXPORT virtual void setInitialized();
-
-  /// Defines the double value
-  MODELAPI_EXPORT virtual void setValue(const double theValue) = 0;
-
-  /// Returns the double value
-  MODELAPI_EXPORT virtual double value() = 0;
 
   /// Sets the text of this Expression
   MODELAPI_EXPORT virtual void setText(const std::string& theText) = 0;
@@ -65,10 +57,57 @@ class ModelAPI_Expression
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_Expression();
 
+  bool myIsInitialized; ///< is some value assigned to this attribute
+
   friend class Model_Data;
 };
 
-//! Pointer on Expression object
+
+/**\class ModelAPI_ExpressionDouble
+ * \ingroup DataModel
+ * \brief Expression for calculated double values.
+ */
+class ModelAPI_ExpressionDouble : public virtual ModelAPI_Expression
+{
+ public:
+  /// Defines the double value
+  MODELAPI_EXPORT virtual void setValue(const double theValue) = 0;
+
+  /// Returns the double value
+  MODELAPI_EXPORT virtual double value() = 0;
+
+ protected:
+  /// Objects are created for features automatically
+  MODELAPI_EXPORT ModelAPI_ExpressionDouble();
+
+  friend class Model_Data;
+};
+
+
+/**\class ModelAPI_ExpressionInteger
+ * \ingroup DataModel
+ * \brief Expression for calculated integer values.
+ */
+class ModelAPI_ExpressionInteger : public virtual ModelAPI_Expression
+{
+ public:
+  /// Defines the integer value
+  MODELAPI_EXPORT virtual void setValue(const int theValue) = 0;
+
+  /// Returns the integer value
+  MODELAPI_EXPORT virtual int value() = 0;
+
+ protected:
+  /// Objects are created for features automatically
+  MODELAPI_EXPORT ModelAPI_ExpressionInteger();
+
+  friend class Model_Data;
+};
+
+
+//! Smart pointers for objects
 typedef std::shared_ptr<ModelAPI_Expression> ExpressionPtr;
+typedef std::shared_ptr<ModelAPI_ExpressionDouble> ExpressionDoublePtr;
+typedef std::shared_ptr<ModelAPI_ExpressionInteger> ExpressionIntegerPtr;
 
 #endif

@@ -120,12 +120,17 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   if (theAttrType == ModelAPI_AttributeDocRef::typeId()) {
     anAttr = new Model_AttributeDocRef(anAttrLab);
   } else if (theAttrType == Model_AttributeInteger::typeId()) {
-    anAttr = new Model_AttributeInteger(anAttrLab);
+    Model_AttributeInteger* anAttribute = new Model_AttributeInteger(anAttrLab);
+    // Expression should use the same label to support backward compatibility
+    TDF_Label anExpressionLab = anAttrLab;
+    anAttribute->myExpression.reset(new Model_ExpressionInteger(anExpressionLab));
+    anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression->isInitialized();
+    anAttr = anAttribute;
   } else if (theAttrType == ModelAPI_AttributeDouble::typeId()) {
     Model_AttributeDouble* anAttribute = new Model_AttributeDouble(anAttrLab);
     TDF_Label anExpressionLab = anAttrLab.FindChild(1);
-    anAttribute->myExpression.reset(new Model_Expression(anExpressionLab));
-    anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression->isInitialized(); 
+    anAttribute->myExpression.reset(new Model_ExpressionDouble(anExpressionLab));
+    anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression->isInitialized();
     anAttr = anAttribute;
   } else if (theAttrType == Model_AttributeBoolean::typeId()) {
     anAttr = new Model_AttributeBoolean(anAttrLab);
@@ -149,7 +154,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     GeomData_Point* anAttribute = new GeomData_Point(anAttrLab);
     for (int aComponent = 0; aComponent < GeomData_Point::NUM_COMPONENTS; ++aComponent) {
       TDF_Label anExpressionLab = anAttrLab.FindChild(aComponent + 1);
-      anAttribute->myExpression[aComponent].reset(new Model_Expression(anExpressionLab));
+      anAttribute->myExpression[aComponent].reset(new Model_ExpressionDouble(anExpressionLab));
       anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression[aComponent]->isInitialized(); 
     }
     anAttr = anAttribute;
@@ -159,7 +164,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     GeomData_Point2D* anAttribute = new GeomData_Point2D(anAttrLab);
     for (int aComponent = 0; aComponent < GeomData_Point2D::NUM_COMPONENTS; ++aComponent) {
       TDF_Label anExpressionLab = anAttrLab.FindChild(aComponent + 1);
-      anAttribute->myExpression[aComponent].reset(new Model_Expression(anExpressionLab));
+      anAttribute->myExpression[aComponent].reset(new Model_ExpressionDouble(anExpressionLab));
       anAttribute->myIsInitialized = anAttribute->myIsInitialized && anAttribute->myExpression[aComponent]->isInitialized(); 
     }
     anAttr = anAttribute;
@@ -509,6 +514,12 @@ void Model_Data::referencesToObjects(
       for(int a = aRef->size() - 1; a >= 0; a--) {
         aReferenced.push_back(aRef->value(a)->context());
       }
+    } else if (aType == ModelAPI_AttributeInteger::typeId()) { // integer attribute
+      AttributeIntegerPtr anAttribute =
+          std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(anAttr->second);
+      std::set<std::string> anUsedParameters = anAttribute->usedParameters();
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters, aMyFeature->document());
+      aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == ModelAPI_AttributeDouble::typeId()) { // double attribute
       AttributeDoublePtr anAttribute =
           std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr->second);

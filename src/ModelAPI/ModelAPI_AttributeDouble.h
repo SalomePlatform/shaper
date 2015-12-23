@@ -7,11 +7,10 @@
 #ifndef ModelAPI_AttributeDouble_H_
 #define ModelAPI_AttributeDouble_H_
 
-#include "ModelAPI_Attribute.h"
+#include <ModelAPI_Attribute.h>
 
 #include <set>
-
-class ModelAPI_Expression;
+#include <string>
 
 /**\class ModelAPI_AttributeDouble
  * \ingroup DataModel

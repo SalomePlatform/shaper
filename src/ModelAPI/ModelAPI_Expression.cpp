@@ -25,3 +25,13 @@ void ModelAPI_Expression::setInitialized()
 {
   myIsInitialized = true;
 }
+
+ModelAPI_ExpressionDouble::ModelAPI_ExpressionDouble()
+{
+
+}
+
+ModelAPI_ExpressionInteger::ModelAPI_ExpressionInteger()
+{
+
+}

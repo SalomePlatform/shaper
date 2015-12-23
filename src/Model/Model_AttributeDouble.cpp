@@ -9,7 +9,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Expression.h>
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 
 Model_AttributeDouble::Model_AttributeDouble(TDF_Label& theLabel)
 {
@@ -38,7 +38,7 @@ void Model_AttributeDouble::setText(const std::string& theValue)
 {
   if (text() != theValue) {
     myExpression->setText(theValue);
-    // Send it to evaluator to convert into the double and store in the attribute
+    // Send it to evaluator to convert text to double and store in the attribute
     ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
     owner()->data()->sendAttributeUpdated(this);
   }

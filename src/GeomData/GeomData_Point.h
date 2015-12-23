@@ -12,7 +12,7 @@
 
 #include <TDF_Label.hxx>
 
-class ModelAPI_Expression;
+class ModelAPI_ExpressionDouble;
 
 /**\class GeomData_Point
  * \ingroup DataModel
@@ -21,7 +21,7 @@ class ModelAPI_Expression;
 class GeomData_Point : public GeomDataAPI_Point
 {
   enum { NUM_COMPONENTS = 3 };
-  std::shared_ptr<ModelAPI_Expression> myExpression[NUM_COMPONENTS]; ///< Expressions for X, Y and Z 
+  std::shared_ptr<ModelAPI_ExpressionDouble> myExpression[NUM_COMPONENTS]; ///< Expressions for X, Y and Z 
  public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);

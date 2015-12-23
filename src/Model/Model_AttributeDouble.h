@@ -12,7 +12,7 @@
 
 #include <TDF_Label.hxx>
 
-class ModelAPI_Expression;
+class ModelAPI_ExpressionDouble;
 
 /**\class Model_AttributeDouble
  * \ingroup DataModel
@@ -21,7 +21,7 @@ class ModelAPI_Expression;
 
 class Model_AttributeDouble : public ModelAPI_AttributeDouble
 {
-  std::shared_ptr<ModelAPI_Expression> myExpression;
+  std::shared_ptr<ModelAPI_ExpressionDouble> myExpression;
 
  public:
   /// Defines the double value
