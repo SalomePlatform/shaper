@@ -383,11 +383,17 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         else {
           if (getPoint2d(aView, aShape, aX, aY))
             setPoint(aX, aY);
+          else
+            setValueState(Stored); // in case of edge selection, Apply state should also be updated
           bool anOrphanPoint = aShape.ShapeType() == TopAbs_VERTEX ||
                                isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
           setConstraintWith(aObject);
-          if (!anOrphanPoint)
+          // fignal updated should be flushed in order to visualize possible created external objects
+          // e.g. selection of trihedron axis when input end arc point
+          updateObject(feature());
+          if (!anOrphanPoint && !anExternal)
             emit vertexSelected();
+
           emit focusOutWidget(this);
         }
       }
@@ -409,8 +415,10 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
-          if (MyFeaturesForCoincedence.contains(myFeature->getKind().c_str()))
+          if (MyFeaturesForCoincedence.contains(myFeature->getKind().c_str())) {
             setConstraintWith(aObject);
+            setValueState(Stored); // in case of edge selection, Apply state should also be updated
+          }
         }
         // it is important to perform updateObject() in order to the current value is 
         // processed by Sketch Solver. Test case: line is created from a previous point
@@ -419,7 +427,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         // points of the line becomes less than the tolerance. Validator of the line returns
         // false, the line will be aborted, but sketch stays valid.
         updateObject(feature());
-        if (!anOrphanPoint)
+        if (!anOrphanPoint && !anExternal)
           emit vertexSelected();
         emit focusOutWidget(this);
       }

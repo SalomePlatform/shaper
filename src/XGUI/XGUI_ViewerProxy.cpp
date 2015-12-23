@@ -29,7 +29,7 @@ void XGUI_ViewerProxy::connectViewProxy()
          SIGNAL(trihedronVisibilityChanged(bool)));
 #else
   connect(myWorkshop->mainWindow()->viewer(), SIGNAL(trihedronVisibilityChanged(bool)),
-         SLOT(trihedronVisibilityChanged(bool)));
+         SIGNAL(trihedronVisibilityChanged(bool)));
 #endif
 }
 
