@@ -181,12 +181,91 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   activateWidget(NULL);
 }
 
+#ifdef DEBUG_TAB
+void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const bool theDebug)
+{
+  QList<QWidget*> aWidgets;
+
+  if (theParent) {
+    QLayout* aLayout = theParent->layout();
+    if (aLayout) {
+      for (int i = 0, aCount = aLayout->count(); i < aCount; i++) {
+        QLayoutItem* anItem = aLayout->itemAt(i);
+        QWidget* aWidget = anItem ? anItem->widget() : 0;
+        if (aWidget && aWidget->isVisible()) {
+          if (aWidget->focusPolicy() != Qt::NoFocus)
+            theWidgets.append(aWidget);
+          findDirectChildren(aWidget, theWidgets, false);
+        }
+        else {
+          if (aWidget) {
+            QString anInfo = QString("widget [%1] is visible = %2, nofocus policy = %3").arg(aWidget->objectName()).
+              arg(aWidget->isVisible()).arg(aWidget->focusPolicy() == Qt::NoFocus);
+            qDebug(anInfo.toStdString().c_str());
+          }
+        }
+      }
+    }
+  }
+  if (theDebug) {
+    QStringList aWidgetTypes;
+    QList<QWidget*>::const_iterator anIt =  theWidgets.begin(), aLast = theWidgets.end();
+    for (; anIt != aLast; anIt++) {
+      QWidget* aWidget = *anIt;
+      if (aWidget)
+        aWidgetTypes.append(aWidget->objectName());
+    }
+    QString anInfo = QString("theWidgets[%1]: %2").arg(theWidgets.count()).arg(aWidgetTypes.join(","));
+    qDebug(anInfo.toStdString().c_str());
+  }
+}
+
 bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 {
   // it wraps the Tabs clicking to follow in the chain:
   // controls, last control, Apply, Cancel, first control, controls
-
   bool isChangedFocus = false;
+
+  QWidget* aFocusWidget = focusWidget();
+  if (aFocusWidget) {
+    QString anInfo = QString("focus Widget: %1").arg(aFocusWidget->objectName());
+    qDebug(anInfo.toStdString().c_str());
+  }
+
+  QWidget* aNewFocusWidget = 0;
+  if (theIsNext) {
+    if (aFocusWidget) {
+      QList<QWidget*> aChildren;
+      findDirectChildren(this, aChildren, true);
+
+      int aChildrenCount = aChildren.count();
+      int aFocusWidgetIndex = aChildren.indexOf(aFocusWidget);
+      if (aFocusWidgetIndex >= 0) {
+        if (aFocusWidgetIndex == aChildrenCount-1) {
+          QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+          aNewFocusWidget = anOkBtn;
+        }
+        else {
+          aNewFocusWidget = aChildren[aFocusWidgetIndex+1];
+        }
+      }
+    }
+  }
+  else {
+  }
+  if (aNewFocusWidget) {
+    ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
+    isChangedFocus = true;
+  }
+  return isChangedFocus;
+}
+#else
+bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
+{
+  // it wraps the Tabs clicking to follow in the chain:
+  // controls, last control, Apply, Cancel, first control, controls
+  bool isChangedFocus = false;
+
   if (theIsNext) { // forward by Tab
     QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
     if (aCancelBtn->hasFocus()) {
@@ -235,10 +314,10 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 
   if (!isChangedFocus)
     isChangedFocus = ModuleBase_IPropertyPanel::focusNextPrevChild(theIsNext);
-
   return isChangedFocus;
 }
 
+#endif
 void XGUI_PropertyPanel::activateNextWidget()
 {
   activateNextWidget(myActiveWidget);

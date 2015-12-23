@@ -49,6 +49,7 @@ void ModuleBase_ToolBox::addItem( QWidget* thePage, const QString& theName, cons
   aButton->setIcon( theIcon );
   aButton->setIconSize( theIcon.size() );
   aButton->setToolTip( theName );
+  aButton->setObjectName( theName );
   myButtonsGroup->addButton( aButton, anOldCount );
   myButtonsLayout->insertWidget( anOldCount, aButton );
 }

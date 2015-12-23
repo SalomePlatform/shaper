@@ -125,6 +125,9 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   }
 
   myListControl = new CustomListWidget(this);
+  QString anObjName = QString::fromStdString(attributeID());
+  myListControl->setObjectName(anObjName);
+
   aMainLay->addWidget(myListControl, 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);
   //aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???

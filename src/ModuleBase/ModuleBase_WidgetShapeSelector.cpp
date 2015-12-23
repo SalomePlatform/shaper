@@ -81,6 +81,8 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
   myTextLine = new QLineEdit(this);
+  QString anObjName = QString::fromStdString(attributeID());
+  myTextLine->setObjectName(anObjName);
   myTextLine->setReadOnly(true);
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
