@@ -11,31 +11,16 @@
 
 #include <GEOMAlgo_Splitter.hxx>
 
-#include <Bnd_Box.hxx>
-#include <BRep_Tool.hxx>
-#include <BRepBndLib.hxx>
-#include <BRepCheck_Analyzer.hxx>
-#include <BRepLib_MakeFace.hxx>
-#include <BRepTools.hxx>
-#include <Geom_Plane.hxx>
-#include <GeomLib_IsPlanarSurface.hxx>
-#include <GeomLib_Tool.hxx>
-#include <IntAna_IntConicQuad.hxx>
-#include <IntAna_Quadric.hxx>
-#include <Precision.hxx>
 #include <TopExp_Explorer.hxx>
-#include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopTools_ListOfShape.hxx>
 
 //=================================================================================================
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Partition::make(const ListOfShape& theObjects,
                                                            const ListOfShape& theTools)
 {
-  GeomAlgoAPI_Partition aBoolAlgo(theObjects, theTools);
-  if(aBoolAlgo.isDone() && !aBoolAlgo.shape()->isNull() && aBoolAlgo.isValid()) {
-    return aBoolAlgo.shape();
+  GeomAlgoAPI_Partition aPartitionAlgo(theObjects, theTools);
+  if(aPartitionAlgo.isDone() && !aPartitionAlgo.shape()->isNull() && aPartitionAlgo.isValid()) {
+    return aPartitionAlgo.shape();
   }
   return std::shared_ptr<GeomAPI_Shape>();
 }
@@ -43,7 +28,6 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Partition::make(const ListOfShape& th
 //=================================================================================================
 GeomAlgoAPI_Partition::GeomAlgoAPI_Partition(const ListOfShape& theObjects,
                                              const ListOfShape& theTools)
-: myDone(false)
 {
   build(theObjects, theTools);
 }
@@ -59,7 +43,8 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   // Creating partition operation.
   GEOMAlgo_Splitter* anOperation = new GEOMAlgo_Splitter;
-  myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation, GeomAlgoAPI_MakeShape::OCCT_BOPAlgo_Builder));
+  this->setImpl(anOperation);
+  this->setBuilderType(OCCT_BOPAlgo_Builder);
 
   // Getting objects.
   for (ListOfShape::const_iterator anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
@@ -75,11 +60,10 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   // Building and getting result.
   anOperation->Perform();
-  TopoDS_Shape aResult = anOperation->Shape();
-  myDone = !aResult.IsNull();
-  if (!myDone) {
+  if(anOperation->ErrorStatus() != 0) {
     return;
   }
+  TopoDS_Shape aResult = anOperation->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
@@ -105,44 +89,8 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
     }
   }
 
-  // fill data map to keep correct orientation of sub-shapes
-  myMap.reset(new GeomAPI_DataMapOfShapeShape());
-  for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-    aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-    myMap->bind(aCurrentShape, aCurrentShape);
-  }
-  myShape.reset(new GeomAPI_Shape());
-  myShape->setImpl(new TopoDS_Shape(aResult));
-}
-
-//=================================================================================================
-const bool GeomAlgoAPI_Partition::isDone() const
-{
-  return myDone;
-}
-
-//=================================================================================================
-const bool GeomAlgoAPI_Partition::isValid() const
-{
-  BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
-  return (aChecker.IsValid() == Standard_True);
-}
-
-//=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Partition::shape() const
-{
-  return myShape;
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Partition::mapOfShapes() const
-{
-  return myMap;
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Partition::makeShape() const
-{
-  return myMkShape;
+  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+  aShape->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aShape);
+  this->setDone(true);
 }

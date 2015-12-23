@@ -49,20 +49,6 @@ void FeaturesPlugin_Partition::initAttributes()
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Partition::getShape(const std::string& theAttrName)
-{
-  std::shared_ptr<ModelAPI_AttributeReference> aObjRef =
-      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(data()->attribute(theAttrName));
-  if (aObjRef) {
-    std::shared_ptr<ModelAPI_ResultBody> aConstr =
-        std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObjRef->value());
-    if (aConstr)
-      return aConstr->shape();
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-
-//=================================================================================================
 void FeaturesPlugin_Partition::execute()
 {
   ListOfShape anObjects, aTools, aToolsForNaming;
@@ -122,30 +108,30 @@ void FeaturesPlugin_Partition::execute()
       anObjects.clear();
       anObjects.push_back(aCompoud);
     }
-    GeomAlgoAPI_Partition aPartitionAlgo(anObjects, aTools);
+    std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(anObjects, aTools));
 
     // Checking that the algorithm worked properly.
-    if (!aPartitionAlgo.isDone()) {
+    if (!aPartitionAlgo->isDone()) {
       static const std::string aFeatureError = "Partition algorithm failed";
       setError(aFeatureError);
       return;
     }
-    if (aPartitionAlgo.shape()->isNull()) {
+    if (aPartitionAlgo->shape()->isNull()) {
       static const std::string aShapeError = "Resulting shape is Null";
       setError(aShapeError);
       return;
     }
-    if (!aPartitionAlgo.isValid()) {
+    if (!aPartitionAlgo->isValid()) {
       std::string aFeatureError = "Warning: resulting shape is not valid";
       setError(aFeatureError);
       return;
     }
 
-    if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo.shape()) > 1.e-7) {
+    if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-7) {
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      aMakeShapeList.appendAlgo(aPartitionAlgo.makeShape());
-      GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo.mapOfShapes().get();
-      loadNamingDS(aResultBody, anObjects.front(), aToolsForNaming, aPartitionAlgo.shape(), aMakeShapeList, aMapOfShapes);
+      aMakeShapeList.appendAlgo(aPartitionAlgo);
+      GeomAPI_DataMapOfShapeShape& aMapOfShapes = *aPartitionAlgo->mapOfSubShapes().get();
+      loadNamingDS(aResultBody, anObjects.front(), aToolsForNaming, aPartitionAlgo->shape(), aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
     }
@@ -154,30 +140,31 @@ void FeaturesPlugin_Partition::execute()
     for (ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
       std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
       ListOfShape aListWithObject; aListWithObject.push_back(anObject);
-      GeomAlgoAPI_Partition aPartitionAlgo(aListWithObject, aTools);
+      std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(aListWithObject, aTools));
 
       // Checking that the algorithm worked properly.
-      if (!aPartitionAlgo.isDone()) {
+      if (!aPartitionAlgo->isDone()) {
         static const std::string aFeatureError = "Partition algorithm failed";
         setError(aFeatureError);
         return;
       }
-      if (aPartitionAlgo.shape()->isNull()) {
+      if (aPartitionAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Resulting shape is Null";
         setError(aShapeError);
         return;
       }
-      if (!aPartitionAlgo.isValid()) {
+      if (!aPartitionAlgo->isValid()) {
         std::string aFeatureError = "Warning: resulting shape is not valid";
         setError(aFeatureError);
         return;
       }
 
-      if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo.shape()) > 1.e-7) {
+      if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-7) {
         std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-        aMakeShapeList.appendAlgo(aPartitionAlgo.makeShape());
-        GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo.mapOfShapes().get();
-        loadNamingDS(aResultBody, anObject, aToolsForNaming, aPartitionAlgo.shape(), aMakeShapeList, aMapOfShapes);
+        GeomAlgoAPI_MakeShapeList aMakeShapeListCopy = aMakeShapeList;
+        aMakeShapeListCopy.appendAlgo(aPartitionAlgo);
+        GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo->mapOfSubShapes().get();
+        loadNamingDS(aResultBody, anObject, aToolsForNaming, aPartitionAlgo->shape(), aMakeShapeListCopy, aMapOfShapes);
         setResult(aResultBody, aResultIndex);
         aResultIndex++;
       }

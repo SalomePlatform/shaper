@@ -12,12 +12,11 @@
 
 #include <GeomAlgoAPI_Partition.h>
 
-/**\class FeaturesPlugin_Partition
- * \ingroup Plugins
- * \brief Feature for applying of Partition operations on Solids. Partition makes conjunctional
- * faces of solids as shared. The result of partitions is a compsolid.
- * Main objects are solids, tool objects are solids or faces
- */
+/// \class FeaturesPlugin_Partition
+/// \ingroup Plugins
+/// \brief Feature for applying of Partition operations on Solids. Partition makes conjunctional
+/// faces of solids as shared. The result of partitions is a compsolid.
+/// Main objects are solids, tool objects are solids or faces
 class FeaturesPlugin_Partition : public ModelAPI_Feature
 {
 public:
@@ -64,8 +63,6 @@ public:
   FeaturesPlugin_Partition();
 
 private:
-  std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
-
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
