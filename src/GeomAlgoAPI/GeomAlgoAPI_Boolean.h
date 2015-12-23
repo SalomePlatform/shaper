@@ -11,22 +11,17 @@
 #include <GeomAlgoAPI_MakeShape.h>
 
 #include <GeomAPI_Shape.h>
-#include <GeomAPI_Interface.h>
-#include <GeomAPI_DataMapOfShapeShape.h>
 
-#include <memory>
-
-/** \class GeomAlgoAPI_Boolean
- *  \ingroup DataAlgo
- *  \brief Allows to perform of boolean operations
- */
-class GeomAlgoAPI_Boolean : public GeomAPI_Interface
+/// \class GeomAlgoAPI_Boolean
+/// \ingroup DataAlgo
+/// \brief Allows to perform of boolean operations
+class GeomAlgoAPI_Boolean : public GeomAlgoAPI_MakeShape
 {
 public:
   /// Type of booelan operation
   enum OperationType{
-    BOOL_CUT, ///< Cut objects
-    BOOL_FUSE, ///< Fuse objects
+    BOOL_CUT,   ///< Cut objects
+    BOOL_FUSE,  ///< Fuse objects
     BOOL_COMMON ///< Take common part of objects
   };
 
@@ -37,33 +32,11 @@ public:
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType);
 
-  /// \return true if algorithm succeed.
-  GEOMALGOAPI_EXPORT const bool isDone() const;
-
-  /// \return true if resulting shape is valid.
-  GEOMALGOAPI_EXPORT const bool isValid() const;
-
-  /// \return result of the boolean algorithm.
-  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>& shape() const;
-
-  /// \return map of sub-shapes of the result. To be used for History keeping.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfShapes() const;
-
-  /// \return interface for for History processing.
-  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape() const;
-
 private:
   /// Builds resulting shape.
   void build(const ListOfShape& theObjects,
              const ListOfShape& theTools,
              const OperationType theOperationType);
-
-private:
-  /// Fields.
-  bool myDone;
-  std::shared_ptr<GeomAPI_Shape> myShape;
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
-  std::shared_ptr<GeomAlgoAPI_MakeShape> myMkShape;
 };
 
 #endif

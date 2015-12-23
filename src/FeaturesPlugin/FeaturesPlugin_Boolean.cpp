@@ -151,7 +151,7 @@ void FeaturesPlugin_Boolean::execute()
 
         if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, anObject, aTools, aBoolAlgo.shape(), *aBoolAlgo.makeShape(), *aBoolAlgo.mapOfShapes());
+          loadNamingDS(aResultBody, anObject, aTools, aBoolAlgo.shape(), aBoolAlgo, *aBoolAlgo.mapOfSubShapes().get());
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -178,33 +178,33 @@ void FeaturesPlugin_Boolean::execute()
           }
         }
 
-        GeomAlgoAPI_Boolean aBoolAlgo(aUsedInOperationSolids, aTools, aType);
+        std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedInOperationSolids, aTools, aType));
 
         // Checking that the algorithm worked properly.
-        if(!aBoolAlgo.isDone()) {
+        if(!aBoolAlgo->isDone()) {
           static const std::string aFeatureError = "Boolean algorithm failed";
           setError(aFeatureError);
           return;
         }
-        if(aBoolAlgo.shape()->isNull()) {
+        if(aBoolAlgo->shape()->isNull()) {
           static const std::string aShapeError = "Resulting shape is Null";
           setError(aShapeError);
           return;
         }
-        if(!aBoolAlgo.isValid()) {
+        if(!aBoolAlgo->isValid()) {
           std::string aFeatureError = "Warning: resulting shape is not valid";
           setError(aFeatureError);
           return;
         }
 
         GeomAlgoAPI_MakeShapeList aMakeShapeList;
-        aMakeShapeList.appendAlgo(aBoolAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aBoolAlgo);
         GeomAPI_DataMapOfShapeShape aMapOfShapes;
-        aMapOfShapes.merge(aBoolAlgo.mapOfShapes());
+        aMapOfShapes.merge(aBoolAlgo->mapOfSubShapes());
 
         // Add result to not used solids from compsolid.
         ListOfShape aShapesToAdd = aNotUsedSolids;
-        aShapesToAdd.push_back(aBoolAlgo.shape());
+        aShapesToAdd.push_back(aBoolAlgo->shape());
         GeomAlgoAPI_PaveFiller aFillerAlgo(aShapesToAdd, true);
         if(!aFillerAlgo.isDone()) {
           std::string aFeatureError = "PaveFiller algorithm failed";
@@ -270,12 +270,12 @@ void FeaturesPlugin_Boolean::execute()
         for(ListOfShape::iterator anIt = anOriginalSolids.begin(); anIt != anOriginalSolids.end(); anIt++) {
           ListOfShape aOneObjectList;
           aOneObjectList.push_back(*anIt);
-          GeomAlgoAPI_Boolean aCutAlgo(aOneObjectList, aNotUsedSolids, GeomAlgoAPI_Boolean::BOOL_CUT);
+          std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(aOneObjectList, aNotUsedSolids, GeomAlgoAPI_Boolean::BOOL_CUT));
 
-          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo.shape()) > 1.e-7) {
-            aSolidsToFuse.push_back(aCutAlgo.shape());
-            aMakeShapeList.appendAlgo(aCutAlgo.makeShape());
-            aMapOfShapes.merge(aCutAlgo.mapOfShapes());
+          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-7) {
+            aSolidsToFuse.push_back(aCutAlgo->shape());
+            aMakeShapeList.appendAlgo(aCutAlgo);
+            aMapOfShapes.merge(aCutAlgo->mapOfSubShapes());
           }
         }
       }
@@ -286,28 +286,28 @@ void FeaturesPlugin_Boolean::execute()
       aTools = aSolidsToFuse;
 
       // Fuse all objects and all tools.
-      GeomAlgoAPI_Boolean aFuseAlgo(anObjects, aTools, aType);
+      std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects, aTools, aType));
 
       // Checking that the algorithm worked properly.
-      if(!aFuseAlgo.isDone()) {
+      if(!aFuseAlgo->isDone()) {
         static const std::string aFeatureError = "Boolean algorithm failed";
         setError(aFeatureError);
         return;
       }
-      if(aFuseAlgo.shape()->isNull()) {
+      if(aFuseAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Resulting shape is Null";
         setError(aShapeError);
         return;
       }
-      if(!aFuseAlgo.isValid()) {
+      if(!aFuseAlgo->isValid()) {
         std::string aFeatureError = "Warning: resulting shape is not valid";
         setError(aFeatureError);
         return;
       }
 
-      std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo.shape();
-      aMakeShapeList.appendAlgo(aFuseAlgo.makeShape());
-      aMapOfShapes.merge(aFuseAlgo.mapOfShapes());
+      std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo->shape();
+      aMakeShapeList.appendAlgo(aFuseAlgo);
+      aMapOfShapes.merge(aFuseAlgo->mapOfSubShapes());
 
       // Add result to not used solids from compsolid (if we have any).
       if(!aNotUsedSolids.empty()) {

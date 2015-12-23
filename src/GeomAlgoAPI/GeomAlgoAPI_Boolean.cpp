@@ -12,15 +12,12 @@
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
-#include <BRepCheck_Analyzer.hxx>
-#include <TopExp_Explorer.hxx>
 #include <TopTools_ListOfShape.hxx>
 
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType)
-: myDone(false)
 {
   build(theObjects, theTools, theOperationType);
 }
@@ -68,14 +65,14 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
       return;
     }
   }
-  myMkShape.reset(new GeomAlgoAPI_MakeShape(anOperation));
+  this->setImpl(anOperation);
+  this->setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
   anOperation->SetArguments(anObjects);
   anOperation->SetTools(aTools);
 
   // Building and getting result.
   anOperation->Build();
-  myDone = anOperation->IsDone() == Standard_True;
-  if(!myDone) {
+  if(anOperation->IsDone() != Standard_True) {
     return;
   }
   TopoDS_Shape aResult = anOperation->Shape();
@@ -84,45 +81,8 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   }
 
-  // fill data map to keep correct orientation of sub-shapes
-  myMap.reset(new GeomAPI_DataMapOfShapeShape());
-  for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-    aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-    myMap->bind(aCurrentShape, aCurrentShape);
-  }
-  myShape.reset(new GeomAPI_Shape());
-  myShape->setImpl(new TopoDS_Shape(aResult));
-
-}
-
-//=================================================================================================
-const bool GeomAlgoAPI_Boolean::isDone() const
-{
-  return myDone;
-}
-
-//=================================================================================================
-const bool GeomAlgoAPI_Boolean::isValid() const
-{
-  BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
-  return (aChecker.IsValid() == Standard_True);
-}
-
-//=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Boolean::shape() const
-{
-  return myShape;
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Boolean::mapOfShapes() const
-{
-  return myMap;
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Boolean::makeShape() const
-{
-  return myMkShape;
+  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+  aShape->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aShape);
+  this->setDone(true);
 }

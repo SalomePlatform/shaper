@@ -203,7 +203,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
         if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
           loadNamingDS(aResultBody, aShells, aSolidsAlgos, anObject, aTools, aBoolAlgo.shape(),
-                       *aBoolAlgo.makeShape(), *aBoolAlgo.mapOfShapes());
+                       aBoolAlgo, *aBoolAlgo.mapOfSubShapes().get());
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -230,22 +230,22 @@ void FeaturesPlugin_CompositeBoolean::execute()
           }
         }
 
-        GeomAlgoAPI_Boolean aBoolAlgo(aUsedInOperationSolids, aTools, myBooleanOperationType);
+        std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedInOperationSolids, aTools, myBooleanOperationType));
 
         // Checking that the algorithm worked properly.
-        if(!aBoolAlgo.isDone() || aBoolAlgo.shape()->isNull() || !aBoolAlgo.isValid()) {
+        if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
           setError("Boolean algorithm failed");
           return;
         }
 
         GeomAlgoAPI_MakeShapeList aMakeShapeList;
-        aMakeShapeList.appendAlgo(aBoolAlgo.makeShape());
+        aMakeShapeList.appendAlgo(aBoolAlgo);
         GeomAPI_DataMapOfShapeShape aMapOfShapes;
-        aMapOfShapes.merge(aBoolAlgo.mapOfShapes());
+        aMapOfShapes.merge(aBoolAlgo->mapOfSubShapes());
 
         // Add result to not used solids from compsolid.
         ListOfShape aShapesToAdd = aNotUsedSolids;
-        aShapesToAdd.push_back(aBoolAlgo.shape());
+        aShapesToAdd.push_back(aBoolAlgo->shape());
         GeomAlgoAPI_PaveFiller aFillerAlgo(aShapesToAdd, true);
         if(!aFillerAlgo.isDone()) {
           std::string aFeatureError = "PaveFiller algorithm failed";
@@ -305,12 +305,12 @@ void FeaturesPlugin_CompositeBoolean::execute()
         for(ListOfShape::iterator anIt = anOriginalSolids.begin(); anIt != anOriginalSolids.end(); anIt++) {
           ListOfShape aOneObjectList;
           aOneObjectList.push_back(*anIt);
-          GeomAlgoAPI_Boolean aCutAlgo(aOneObjectList, aNotUsedSolids, GeomAlgoAPI_Boolean::BOOL_CUT);
+          std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(aOneObjectList, aNotUsedSolids, GeomAlgoAPI_Boolean::BOOL_CUT));
 
-          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo.shape()) > 1.e-7) {
-            aSolidsToFuse.push_back(aCutAlgo.shape());
-            aMakeShapeList.appendAlgo(aCutAlgo.makeShape());
-            aMapOfShapes.merge(aCutAlgo.mapOfShapes());
+          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-7) {
+            aSolidsToFuse.push_back(aCutAlgo->shape());
+            aMakeShapeList.appendAlgo(aCutAlgo);
+            aMapOfShapes.merge(aCutAlgo->mapOfSubShapes());
           }
         }
       }
@@ -321,18 +321,18 @@ void FeaturesPlugin_CompositeBoolean::execute()
       aTools = aSolidsToFuse;
 
       // Fuse all objects and all tools.
-      GeomAlgoAPI_Boolean aFuseAlgo(anObjects, aTools, myBooleanOperationType);
+      std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects, aTools, myBooleanOperationType));
 
       // Checking that the algorithm worked properly.
-      if(!aFuseAlgo.isDone() || aFuseAlgo.shape()->isNull() || !aFuseAlgo.isValid()) {
+      if(!aFuseAlgo->isDone() || aFuseAlgo->shape()->isNull() || !aFuseAlgo->isValid()) {
         static const std::string aFeatureError = "Boolean algorithm failed";
         setError(aFeatureError);
         return;
       }
 
-      std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo.shape();
-      aMakeShapeList.appendAlgo(aFuseAlgo.makeShape());
-      aMapOfShapes.merge(aFuseAlgo.mapOfShapes());
+      std::shared_ptr<GeomAPI_Shape> aShape = aFuseAlgo->shape();
+      aMakeShapeList.appendAlgo(aFuseAlgo);
+      aMapOfShapes.merge(aFuseAlgo->mapOfSubShapes());
 
       // Add result to not used solids from compsolid (if we have any).
       if(!aNotUsedSolids.empty()) {
