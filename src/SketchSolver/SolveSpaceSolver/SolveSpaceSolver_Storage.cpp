@@ -1530,15 +1530,20 @@ bool SolveSpaceSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstra
   std::map<FeaturePtr, EntityWrapperPtr>::iterator aFIt = myFeatureMap.begin();
   for (; aFIt != myFeatureMap.end(); ++aFIt) {
     for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
-      if (!aFIt->second->isUsed(aNotCIt->first->baseAttribute()))
+      if (!aNotCIt->second || !aFIt->second->isUsed(aNotCIt->first->baseAttribute()))
         continue;
       std::list<EntityWrapperPtr> aSubs = aFIt->second->subEntities();
       std::list<EntityWrapperPtr>::iterator aSIt = aSubs.begin();
+      bool isUpd = false;
       for (; aSIt != aSubs.end(); ++aSIt)
-        if (*aSIt == aNotCIt->first)
+        if (*aSIt == aNotCIt->first) {
           *aSIt = aNotCIt->second;
-      aFIt->second->setSubEntities(aSubs);
-      anUpdFeatures.insert(aFIt->second);
+          isUpd = true;
+        }
+      if (isUpd) {
+        aFIt->second->setSubEntities(aSubs);
+        anUpdFeatures.insert(aFIt->second);
+      }
     }
   }
   // update features
