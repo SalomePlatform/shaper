@@ -121,6 +121,17 @@ void XGUI_SelectionMgr::onViewerSelection()
 }
 
 //**************************************************************
+void XGUI_SelectionMgr::updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace)
+{
+  QList<ModuleBase_ViewerPrs> aSelectedPrs =
+               myWorkshop->selector()->selection()->getSelected(thePlace);
+  if (thePlace == ModuleBase_ISelection::Browser) {
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    aDisplayer->setSelected(aSelectedPrs);
+  }
+
+}
+//**************************************************************
 void XGUI_SelectionMgr::clearSelection()
 {
   QObjectPtrList aFeatures;

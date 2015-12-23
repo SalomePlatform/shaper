@@ -1131,12 +1131,16 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     moveObjects();
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
-  else if (theId == "SHOW_CMD")
+  else if (theId == "SHOW_CMD") {
     showObjects(aObjects, true);
+    mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
+  }
   else if (theId == "HIDE_CMD")
     showObjects(aObjects, false);
-  else if (theId == "SHOW_ONLY_CMD")
+  else if (theId == "SHOW_ONLY_CMD") {
     showOnlyObjects(aObjects);
+    mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
+  }
   else if (theId == "SHADING_CMD")
     setDisplayMode(aObjects, XGUI_Displayer::Shading);
   else if (theId == "WIREFRAME_CMD")

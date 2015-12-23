@@ -5,6 +5,7 @@
 
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
+#include <ModuleBase_ISelection.h>
 #include <QObject>
 #include <QModelIndexList>
 
@@ -52,6 +53,10 @@ Q_OBJECT
 
   //! Clears selection in Viewer and object Browser
   void clearSelection();
+
+  /// Updates selection, which are depend on the selection in the given place
+  /// \thePlace a widget where selection has happened.
+  void updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace);
 
 signals:
   //! Emited when selection in a one of viewers was changed
