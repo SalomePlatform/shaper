@@ -1621,6 +1621,11 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
         std::dynamic_pointer_cast<SketchPlugin_Feature>(anIt->first->owner());
       if (aSketchFeature.get() && aSketchFeature->isExternal())
         continue;
+      // not need to refresh here sketch's origin and normal vector
+      CompositeFeaturePtr aSketch =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(anIt->first->owner());
+      if (aSketch)
+        continue;
     }
 
     // update parameter wrappers and obtain values of attributes
