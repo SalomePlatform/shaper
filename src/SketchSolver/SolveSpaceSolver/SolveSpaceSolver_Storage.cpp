@@ -367,9 +367,11 @@ void SolveSpaceSolver_Storage::replaceInConstraints(
   std::list<ConstraintWrapperPtr>::const_iterator aCIt;
   for (; anIt != myConstraintMap.end(); ++anIt)
     for (aCIt = anIt->second.begin(); aCIt != anIt->second.end(); ++aCIt) {
-      // Do not process coincidence between points
+      // Do not process coincidence between points and "multi" constraints
       // (these constraints are stored to keep the structure of constraints).
-      if ((*aCIt)->type() == CONSTRAINT_PT_PT_COINCIDENT)
+      if ((*aCIt)->type() == CONSTRAINT_PT_PT_COINCIDENT ||
+          (*aCIt)->type() == CONSTRAINT_MULTI_ROTATION ||
+          (*aCIt)->type() == CONSTRAINT_MULTI_TRANSLATION)
         continue;
 
       bool isUpdated = false;
