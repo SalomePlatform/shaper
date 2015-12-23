@@ -3,6 +3,8 @@
 source env.sh
 source ${TOOLS_DIR}/env_salome.sh
 
+${TOOLS_DIR}/solver.sh "$@"
+
 # kill processes of previous SALOME run
 if [ -f .salomeport ]; then
   SALOME_PORT=$(cat .salomeport)
