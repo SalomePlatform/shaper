@@ -86,11 +86,7 @@ protected:
 
   /// Create solid from face with extrusion.
   virtual void makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
-                         std::shared_ptr<GeomAPI_Shape>& theResult,
-                         ListOfShape& theFromFaces,
-                         ListOfShape& theToFaces,
-                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
-                         std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theDataMap);
+                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape);
 
 public:
   /// Use plugin manager for features creation.

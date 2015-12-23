@@ -79,7 +79,7 @@ protected:
   /// Create solids from faces with revolution.
   virtual void makeSolids(const ListOfShape& theFaces,
                           ListOfShape& theResults,
-                          std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos);
+                          ListOfMakeShape& theAlgos);
 
 protected:
   FeaturesPlugin_RevolutionBoolean(){};

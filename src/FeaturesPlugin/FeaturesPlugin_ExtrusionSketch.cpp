@@ -39,11 +39,7 @@ void FeaturesPlugin_ExtrusionSketch::initMakeSolidsAttributes()
 
 //=================================================================================================
 void FeaturesPlugin_ExtrusionSketch::makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
-                                               std::shared_ptr<GeomAPI_Shape>& theResult,
-                                               ListOfShape& theFromFaces,
-                                               ListOfShape& theToFaces,
-                                               std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
-                                               std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theDataMap)
+                                               std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape)
 {
   // Getting extrusion sizes.
   double aToSize = 0.0;
@@ -87,9 +83,5 @@ void FeaturesPlugin_ExtrusionSketch::makeSolid(const std::shared_ptr<GeomAPI_Sha
     return;
   }
 
-  theResult = aPrismAlgo->shape();
-  theFromFaces = aPrismAlgo->fromFaces();
-  theToFaces = aPrismAlgo->toFaces();
   theMakeShape = aPrismAlgo;
-  theDataMap = aPrismAlgo->mapOfSubShapes();
 }

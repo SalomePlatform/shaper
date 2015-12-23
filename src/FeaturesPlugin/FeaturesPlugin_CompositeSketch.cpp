@@ -140,20 +140,17 @@ void FeaturesPlugin_CompositeSketch::execute()
   int aErrorsNum = 0;
   int aResultIndex = 0;
   for(ListOfShape::const_iterator anIter = aShells.cbegin(); anIter != aShells.cend(); anIter++) {
-    std::shared_ptr<GeomAPI_Shape> aResult;
-    ListOfShape aFromFaces, aToFaces;
     std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape;
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aDataMap;
 
     std::shared_ptr<GeomAPI_Shape> aBaseFace = *anIter;
-    makeSolid(aBaseFace, aResult, aFromFaces, aToFaces, aMakeShape, aDataMap);
-    if(!aResult.get()) {
+    makeSolid(aBaseFace, aMakeShape);
+    if(!aMakeShape.get()) {
       aErrorsNum++;
       continue;
     }
 
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    loadNamingDS(aResultBody, aBaseFace, aResult, aFromFaces, aToFaces, aMakeShape, aDataMap);
+    loadNamingDS(aResultBody, aBaseFace, aMakeShape);
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
@@ -171,39 +168,41 @@ void FeaturesPlugin_CompositeSketch::execute()
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                                   const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                                                  const std::shared_ptr<GeomAPI_Shape>& theResult,
-                                                  const ListOfShape& theFromFaces,
-                                                  const ListOfShape& theToFaces,
-                                                  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
-                                                  const std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theDataMap)
+                                                  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape)
 {
   //load result
-  theResultBody->storeGenerated(theBaseShape, theResult);
+  theResultBody->storeGenerated(theBaseShape, theMakeShape->shape());
 
   //Insert lateral face : Face from Edge
   const std::string aLatName = "LateralFace";
   const int aLatTag = 1;
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::EDGE, aLatTag, aLatName, *theDataMap);
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aDataMap = theMakeShape->mapOfSubShapes();
+  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aDataMap.get());
 
-  //Insert to faces
-  const std::string aToName = "ToFace";
-  int aToTag = 2;
-  for(ListOfShape::const_iterator anIt = theToFaces.cbegin(); anIt != theToFaces.cend(); anIt++) {
-    std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
-    if(theDataMap->isBound(aToFace)) {
-      aToFace = theDataMap->find(aToFace);
+  std::shared_ptr<GeomAlgoAPI_MakeSweep> aSweepAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
+  if(aSweepAlgo.get()) {
+    //Insert to faces
+    const std::string aToName = "ToFace";
+    int aToTag = 2;
+    const ListOfShape& aToFaces = aSweepAlgo->toFaces();
+    for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
+      std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
+      if(aDataMap->isBound(aToFace)) {
+        aToFace = aDataMap->find(aToFace);
+      }
+      theResultBody->generated(aToFace, aToName, aToTag++);
     }
-    theResultBody->generated(aToFace, aToName, aToTag++);
-  }
 
-  //Insert from faces
-  const std::string aFromName = "FromFace";
-  int aFromTag = aToTag > 10000 ? aToTag : 10000;
-  for(ListOfShape::const_iterator anIt = theFromFaces.cbegin(); anIt != theFromFaces.cend(); anIt++) {
-    std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
-    if(theDataMap->isBound(aFromFace)) {
-      aFromFace = theDataMap->find(aFromFace);
+    //Insert from faces
+    const std::string aFromName = "FromFace";
+    int aFromTag = aToTag > 10000 ? aToTag : 10000;
+    const ListOfShape& aFromFaces = aSweepAlgo->fromFaces();
+    for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
+      std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
+      if(aDataMap->isBound(aFromFace)) {
+        aFromFace = aDataMap->find(aFromFace);
+      }
+      theResultBody->generated(aFromFace, aFromName, aFromTag++);
     }
-    theResultBody->generated(aFromFace, aFromName, aFromTag++);
   }
 }

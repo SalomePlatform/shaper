@@ -16,6 +16,7 @@
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_MakeSweep.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_Revolution.h>
@@ -142,7 +143,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
 
   // Pass shells/faces to solids creation function.
   ListOfShape aTools;
-  std::list<std::shared_ptr<GeomAPI_Interface>> aSolidsAlgos;
+  ListOfMakeShape aSolidsAlgos;
   makeSolids(aShells, aTools, aSolidsAlgos);
   if(aTools.empty()) {
     return;
@@ -377,7 +378,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                                    const ListOfShape& theShells,
-                                                   const std::list<std::shared_ptr<GeomAPI_Interface>>& theSolidsAlgos,
+                                                   ListOfMakeShape& theSolidsAlgos,
                                                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                                    const ListOfShape& theTools,
                                                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
@@ -403,47 +404,39 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
     theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
     ListOfShape::const_iterator aShellsIter = theShells.begin();
-    std::list<std::shared_ptr<GeomAPI_Interface>>::const_iterator aSolidsAlgosIter = theSolidsAlgos.begin();
+    ListOfMakeShape::const_iterator aSolidsAlgosIter = theSolidsAlgos.begin();
     for(; aShellsIter != theShells.end() && aSolidsAlgosIter != theSolidsAlgos.end(); aShellsIter++, aSolidsAlgosIter++) {
-      ListOfShape aFromFaces;
-      ListOfShape aToFaces;
-      std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes;
-
       //Insert lateral face : Face from Edge
-      if(std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(*aSolidsAlgosIter)) {
-        std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(*aSolidsAlgosIter);
-        aSubShapes = aPrismAlgo->mapOfSubShapes();
-        theResultBody->loadAndOrientGeneratedShapes(aPrismAlgo.get(), *aShellsIter, GeomAPI_Shape::EDGE, aGenTag,
+      std::shared_ptr<GeomAlgoAPI_MakeShape> aSolidAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_MakeShape>(*aSolidsAlgosIter);
+      if(aSolidAlgo.get()) {
+        std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = aSolidAlgo->mapOfSubShapes();
+        theResultBody->loadAndOrientGeneratedShapes(aSolidAlgo.get(), *aShellsIter, GeomAPI_Shape::EDGE, aGenTag,
                                                     aLatName, *aSubShapes.get());
 
-        aFromFaces = aPrismAlgo->fromFaces();
-        aToFaces = aPrismAlgo->toFaces();
-      } else if(std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter)) {
-        std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Revolution>(*aSolidsAlgosIter);
-        aSubShapes = aRevolAlgo->mapOfSubShapes();
-        theResultBody->loadAndOrientGeneratedShapes(aRevolAlgo.get(), *aShellsIter, GeomAPI_Shape::EDGE, aGenTag,
-                                                    aLatName, *aSubShapes.get());
-        aFromFaces = aRevolAlgo->fromFaces();
-        aToFaces = aRevolAlgo->toFaces();
-      }
 
-      //Insert to faces
-      for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
-        std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
-        if(aSubShapes->isBound(aToFace)) {
-          aToFace = aSubShapes->find(aToFace);
-        }
-        theResultBody->generated(aToFace, aToName, aToTag++);
-      }
+        std::shared_ptr<GeomAlgoAPI_MakeSweep> aSweepAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(aSolidAlgo);
+        if(aSweepAlgo.get()) {
+          //Insert to faces
+          const ListOfShape& aToFaces = aSweepAlgo->toFaces();
+          for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
+            std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
+            if(aSubShapes->isBound(aToFace)) {
+              aToFace = aSubShapes->find(aToFace);
+            }
+            theResultBody->generated(aToFace, aToName, aToTag++);
+          }
 
-      //Insert from faces
-      if (aFromTag < aToTag) aFromTag = aToTag;
-      for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
-        std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
-        if(aSubShapes->isBound(aFromFace)) {
-          aFromFace = aSubShapes->find(aFromFace);
+          //Insert from faces
+          const ListOfShape& aFromFaces = aSweepAlgo->fromFaces();
+          if (aFromTag < aToTag) aFromTag = aToTag;
+          for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
+            std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
+            if(aSubShapes->isBound(aFromFace)) {
+              aFromFace = aSubShapes->find(aFromFace);
+            }
+            theResultBody->generated(aFromFace, aFromName, aFromTag++);
+          }
         }
-        theResultBody->generated(aFromFace, aFromName, aFromTag++);
       }
     }
 

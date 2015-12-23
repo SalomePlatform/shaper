@@ -43,11 +43,7 @@ void FeaturesPlugin_RevolutionSketch::initMakeSolidsAttributes()
 
 //=================================================================================================
 void FeaturesPlugin_RevolutionSketch::makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
-                                                std::shared_ptr<GeomAPI_Shape>& theResult,
-                                                ListOfShape& theFromFaces,
-                                                ListOfShape& theToFaces,
-                                                std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape,
-                                                std::shared_ptr<GeomAPI_DataMapOfShapeShape>& theDataMap)
+                                                std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape)
 {
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
@@ -104,9 +100,5 @@ void FeaturesPlugin_RevolutionSketch::makeSolid(const std::shared_ptr<GeomAPI_Sh
     return;
   }
 
-  theResult = aRevolAlgo->shape();
-  theFromFaces = aRevolAlgo->fromFaces();
-  theToFaces = aRevolAlgo->toFaces();
   theMakeShape = aRevolAlgo;
-  theDataMap = aRevolAlgo->mapOfSubShapes();
 }

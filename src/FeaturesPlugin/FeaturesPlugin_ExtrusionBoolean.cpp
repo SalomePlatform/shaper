@@ -35,7 +35,7 @@ void FeaturesPlugin_ExtrusionBoolean::initMakeSolidsAttributes()
 //=================================================================================================
 void FeaturesPlugin_ExtrusionBoolean::makeSolids(const ListOfShape& theFaces,
                                                  ListOfShape& theResults,
-                                                 std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos)
+                                                 ListOfMakeShape& theAlgos)
 {
   // Getting extrusion sizes.
   double aToSize = 0.0;

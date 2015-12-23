@@ -39,7 +39,7 @@ void FeaturesPlugin_RevolutionBoolean::initMakeSolidsAttributes()
 //=================================================================================================
 void FeaturesPlugin_RevolutionBoolean::makeSolids(const ListOfShape& theFaces,
                                                   ListOfShape& theResults,
-                                                  std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos)
+                                                  ListOfMakeShape& theAlgos)
 {
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;

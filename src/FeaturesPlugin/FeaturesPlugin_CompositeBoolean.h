@@ -78,12 +78,12 @@ protected:
   /// Define this function to create solids from faces with extrusion/revolution.
   virtual void makeSolids(const ListOfShape& theFaces,
                           ListOfShape& theResults,
-                          std::list<std::shared_ptr<GeomAPI_Interface>>& theAlgos) = 0;
+                          ListOfMakeShape& theAlgos) = 0;
 
   /// Results naming.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const ListOfShape& theShells,
-                    const std::list<std::shared_ptr<GeomAPI_Interface>>& theSolidsAlgos,
+                    ListOfMakeShape& theSolidsAlgos,
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                     const ListOfShape& theTools,
                     const std::shared_ptr<GeomAPI_Shape> theResultShape,
