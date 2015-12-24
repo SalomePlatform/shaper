@@ -4,7 +4,7 @@
 // Created:     29 July 2015
 // Author:      Dmitry Bobylev
 
-#include <GeomAlgoAPI_Transform.h>
+#include "GeomAlgoAPI_Transform.h"
 
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -16,8 +16,7 @@
 //=================================================================================================
 GeomAlgoAPI_Transform::GeomAlgoAPI_Transform(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                              std::shared_ptr<GeomAPI_Trsf>  theTrsf)
-: myDone(false),
-  myTrsf(theTrsf)
+: myTrsf(theTrsf)
 {
   build(theSourceShape, theTrsf);
 }
@@ -41,60 +40,18 @@ void GeomAlgoAPI_Transform::build(std::shared_ptr<GeomAPI_Shape> theSourceShape,
   if(!aBuilder) {
     return;
   }
-  myMkShape.reset(new GeomAlgoAPI_MakeShape(aBuilder));
+  this->setImpl(aBuilder);
+  this->setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
-  myDone = aBuilder->IsDone() == Standard_True;
-  if(!myDone) {
+  if(aBuilder->IsDone() != Standard_True) {
     return;
   }
-
   TopoDS_Shape aResult = aBuilder->Shape();
 
-  // Fill data map to keep correct orientation of sub-shapes.
-  myMap.reset(new GeomAPI_DataMapOfShapeShape());
-  for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More(); anExp.Next()) {
-    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-    aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
-    myMap->bind(aCurrentShape, aCurrentShape);
-  }
-
-  myShape.reset(new GeomAPI_Shape());
-  myShape->setImpl(new TopoDS_Shape(aResult));
-}
-
-//=================================================================================================
-const bool GeomAlgoAPI_Transform::isValid() const
-{
-  BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
-  return (aChecker.IsValid() == Standard_True);
-}
-
-//=================================================================================================
-const bool GeomAlgoAPI_Transform::hasVolume() const
-{
-  bool hasVolume(false);
-  if(isValid() && (GeomAlgoAPI_ShapeTools::volume(myShape) > Precision::Confusion())) {
-    hasVolume = true;
-  }
-  return hasVolume;
-}
-
-//=================================================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Transform::shape() const
-{
-  return myShape;
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_Transform::mapOfShapes() const
-{
-  return myMap;
-}
-
-//=================================================================================================
-std::shared_ptr<GeomAlgoAPI_MakeShape> GeomAlgoAPI_Transform::makeShape() const
-{
-  return myMkShape;
+  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+  aShape->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aShape);
+  this->setDone(true);
 }
 
 //=================================================================================================
