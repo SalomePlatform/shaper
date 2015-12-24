@@ -275,6 +275,8 @@ bool SketchSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
 template <class ENT_TYPE>
 static bool isUsed(ConstraintWrapperPtr theConstraint, ENT_TYPE theEntity)
 {
+  if (!theConstraint || !theEntity)
+    return false;
   std::list<EntityWrapperPtr>::const_iterator anEntIt = theConstraint->entities().begin();
   for (; anEntIt != theConstraint->entities().end(); ++anEntIt)
     if ((*anEntIt)->isBase(theEntity))
@@ -284,6 +286,8 @@ static bool isUsed(ConstraintWrapperPtr theConstraint, ENT_TYPE theEntity)
 
 static bool isUsed(EntityWrapperPtr theFeature, AttributePtr theSubEntity)
 {
+  if (!theFeature || !theSubEntity)
+    return false;
   std::list<EntityWrapperPtr>::const_iterator aSubIt = theFeature->subEntities().begin();
   for (; aSubIt != theFeature->subEntities().end(); ++aSubIt)
     if ((*aSubIt)->isBase(theSubEntity))
@@ -352,7 +356,7 @@ bool SketchSolver_Storage::removeEntity(FeaturePtr theFeature)
   myFeatureMap.erase(aFound);
 
   // Check if the feature is not used by constraints, remove it
-  if (!isUsed(theFeature) && remove(anEntity))
+  if (!anEntity || (!isUsed(theFeature) && remove(anEntity)))
     return true;
 
   // feature is not removed, revert operation
@@ -371,7 +375,7 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
   myAttributeMap.erase(aFound);
 
   // Check if the attribute is not used by constraints and features, remove it
-  if (!isUsed(theAttribute) && remove(anEntity))
+  if (!anEntity || (!isUsed(theAttribute) && remove(anEntity)))
     return true;
 
   // attribute is not removed, revert operation

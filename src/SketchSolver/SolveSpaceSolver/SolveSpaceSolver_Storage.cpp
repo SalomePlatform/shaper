@@ -408,7 +408,12 @@ void SolveSpaceSolver_Storage::replaceInConstraints(
             aConstr.entityC == aSlvsCIt->entityC && aConstr.entityD == aSlvsCIt->entityD) {
           Slvs_hConstraint anIDToRemove = aConstr.h;
           aConstr = *aSlvsCIt;
+          int aShift = aSlvsCIt - myConstraints.begin();
           removeConstraint(anIDToRemove);
+          aSlvsCIt = myConstraints.begin() + aShift - 1;
+          for (; aSlvsCIt != myConstraints.end(); ++aSlvsCIt)
+            if (aSlvsCIt->h == aConstr.h)
+              break;
           break;
         }
 
@@ -1048,6 +1053,8 @@ bool SolveSpaceSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstra
   std::set<EntityWrapperPtr> anUpdFeatures;
   std::map<FeaturePtr, EntityWrapperPtr>::iterator aFIt = myFeatureMap.begin();
   for (; aFIt != myFeatureMap.end(); ++aFIt) {
+    if (!aFIt->second)
+      continue; // avoid not completed arcs
     for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
       if (!aNotCIt->second || !aFIt->second->isUsed(aNotCIt->first->baseAttribute()))
         continue;
