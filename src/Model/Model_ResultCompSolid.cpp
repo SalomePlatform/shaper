@@ -151,8 +151,10 @@ void Model_ResultCompSolid::setIsConcealed(const bool theValue)
       }
     }
     ModelAPI_ResultCompSolid::setIsConcealed(theValue);
+    // to set correct myLastConcealed
+    isConcealed();
   }
-  myLastConcealed = theValue;
+  //myLastConcealed = theValue;
 }
 
 void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape)
