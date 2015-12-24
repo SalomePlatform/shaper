@@ -160,6 +160,10 @@ bool PlaneGCSSolver_Storage::update(EntityWrapperPtr theEntity)
     if (theEntity->type() == ENTITY_POINT) {
       std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint =
           std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity);
+      if (!aPoint) {
+        aPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+            theEntity->subEntities().front());
+      }
       aPoint->setId(++myEntityLastID);
     } else if (theEntity->type() == ENTITY_SCALAR) {
       std::shared_ptr<PlaneGCSSolver_ScalarWrapper> aScalar =
@@ -260,16 +264,27 @@ void PlaneGCSSolver_Storage::addCoincidentPoints(
   if (theMaster->type() != ENTITY_POINT || theSlave->type() != ENTITY_POINT)
     return;
 
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aMaster =
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theMaster);
+  if (!aMaster)
+    aMaster = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theMaster)->subEntities().front());
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aSlave =
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theSlave);
+  if (!aSlave)
+    aSlave = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theSlave)->subEntities().front());
+
   // Search available coincidence
-  CoincidentPointsMap::iterator aMasterFound = myCoincidentPoints.find(theMaster);
-  CoincidentPointsMap::iterator aSlaveFound = myCoincidentPoints.find(theSlave);
+  CoincidentPointsMap::iterator aMasterFound = myCoincidentPoints.find(aMaster);
+  CoincidentPointsMap::iterator aSlaveFound = myCoincidentPoints.find(aSlave);
   if (aMasterFound == myCoincidentPoints.end() &&  aSlaveFound == myCoincidentPoints.end()) {
     // try to find master and slave points in the lists of slaves of already existent coincidences
     CoincidentPointsMap::iterator anIt = myCoincidentPoints.begin();
     for (; anIt != myCoincidentPoints.end(); ++anIt) {
-      if (anIt->second.find(theMaster) != anIt->second.end())
+      if (anIt->second.find(aMaster) != anIt->second.end())
         aMasterFound = anIt;
-      else if (anIt->second.find(theSlave) != anIt->second.end())
+      else if (anIt->second.find(aSlave) != anIt->second.end())
         aSlaveFound = anIt;
 
       if (aMasterFound != myCoincidentPoints.end() &&  aSlaveFound != myCoincidentPoints.end())
@@ -279,8 +294,8 @@ void PlaneGCSSolver_Storage::addCoincidentPoints(
 
   if (aMasterFound == myCoincidentPoints.end()) {
     // create new group
-    myCoincidentPoints[theMaster] = std::set<EntityWrapperPtr>();
-    aMasterFound = myCoincidentPoints.find(theMaster);
+    myCoincidentPoints[aMaster] = std::set<EntityWrapperPtr>();
+    aMasterFound = myCoincidentPoints.find(aMaster);
   } else if (aMasterFound == aSlaveFound)
     return; // already coincident
 
@@ -292,17 +307,17 @@ void PlaneGCSSolver_Storage::addCoincidentPoints(
 
     std::set<EntityWrapperPtr>::const_iterator aSlIt = aNewSlaves.begin();
     for (; aSlIt != aNewSlaves.end(); ++aSlIt)
-      addCoincidentPoints(theMaster, *aSlIt);
+      addCoincidentPoints(aMaster, *aSlIt);
   } else {
-////    std::list<ParameterWrapperPtr> aSlaveParams = theSlave->parameters();
-////    theSlave->setParameters(theMaster->parameters());
-////
-////    // Remove slave's parameters
-////    std::list<ParameterWrapperPtr>::iterator aParIt = aSlaveParams.begin();
-////    for (; aParIt != aSlaveParams.end(); ++aParIt)
-////      remove(*aParIt);
+    //std::list<ParameterWrapperPtr> aSlaveParams = aSlave->parameters();
+    //aSlave->setParameters(aMaster->parameters());
 
-    aMasterFound->second.insert(theSlave);
+    //// Remove slave's parameters
+    //std::list<ParameterWrapperPtr>::iterator aParIt = aSlaveParams.begin();
+    //for (; aParIt != aSlaveParams.end(); ++aParIt)
+    //  remove(*aParIt);
+
+    aMasterFound->second.insert(aSlave);
   }
 }
 
@@ -1019,11 +1034,12 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
   for (; anIt != myAttributeMap.end(); ++anIt) {
     // the external feature always should keep the up to date values, so, 
     // refresh from the solver is never needed
+    bool isExternal = false;
     if (anIt->first.get()) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
         std::dynamic_pointer_cast<SketchPlugin_Feature>(anIt->first->owner());
       if (aSketchFeature.get() && aSketchFeature->isExternal())
-        continue;
+        isExternal = true;
     }
 
     // update parameter wrappers and obtain values of attributes
@@ -1032,7 +1048,8 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
     bool isUpd[3] = {false};
     int i = 0;
     for (aParIt = aParams.begin(); i < 3 && aParIt != aParams.end(); ++aParIt, ++i) {
-      if (!theFixedOnly || (*aParIt)->group() == GID_OUTOFGROUP || (*aParIt)->isParametric()) {
+      if (!theFixedOnly || isExternal ||
+          (*aParIt)->group() == GID_OUTOFGROUP || (*aParIt)->isParametric()) {
         aCoords[i] = (*aParIt)->value();
         isUpd[i] = true;
       }
@@ -1044,24 +1061,33 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anIt->first);
     if (aPoint2D) {
       if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > tolerance) ||
-          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > tolerance)) {
-        if (!isUpd[0]) aCoords[0] = aPoint2D->x();
-        if (!isUpd[1]) aCoords[1] = aPoint2D->y();
+          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > tolerance) || isExternal) {
+        if (!isUpd[0] || isExternal) aCoords[0] = aPoint2D->x();
+        if (!isUpd[1] || isExternal) aCoords[1] = aPoint2D->y();
         aPoint2D->setValue(aCoords[0], aCoords[1]);
         // Find points coincident with this one (probably not in GID_OUTOFGROUP)
-        std::map<AttributePtr, EntityWrapperPtr>::const_iterator aLocIt =
-            theFixedOnly ? myAttributeMap.begin() : anIt;
-        for (++aLocIt; aLocIt != myAttributeMap.end(); ++aLocIt)
-          if (anIt->second->id() == aLocIt->second->id()) {
-            aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aLocIt->first);
+        CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
+        for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt)
+          if (aCoincIt->first == anIt->second ||
+              aCoincIt->second.find(anIt->second) != aCoincIt->second.end())
+            break;
+        if (aCoincIt != myCoincidentPoints.end()) {
+          aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+              aCoincIt->first->baseAttribute());
+          if (aPoint2D)
+            aPoint2D->setValue(aCoords[0], aCoords[1]);
+          std::set<EntityWrapperPtr>::const_iterator aSlaveIt = aCoincIt->second.begin();
+          for (; aSlaveIt != aCoincIt->second.end(); ++aSlaveIt) {
+            aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aSlaveIt)->baseAttribute());
             if (aPoint2D)
               aPoint2D->setValue(aCoords[0], aCoords[1]);
           }
+        }
       }
       continue;
     }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
-    if (aScalar) {
+    if (aScalar && !isExternal) {
       if (isUpd[0] && fabs(aScalar->value() - aCoords[0]) > tolerance)
         aScalar->setValue(aCoords[0]);
       continue;

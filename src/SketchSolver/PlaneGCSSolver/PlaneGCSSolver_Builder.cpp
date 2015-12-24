@@ -183,25 +183,32 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createConstraint(
 {
   ConstraintWrapperPtr aResult;
   ParameterWrapperPtr anIntermediate;
+
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint1 = GCS_POINT_WRAPPER(thePoint1);
+  if (!aPoint1 && thePoint1->type() == ENTITY_POINT)
+    aPoint1 = GCS_POINT_WRAPPER( GCS_ENTITY_WRAPPER(thePoint1)->subEntities().front() );
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint2 = GCS_POINT_WRAPPER(thePoint2);
+  if (!aPoint2 && thePoint2->type() == ENTITY_POINT)
+    aPoint2 = GCS_POINT_WRAPPER( GCS_ENTITY_WRAPPER(thePoint2)->subEntities().front() );
+
   switch (theType) {
   case CONSTRAINT_PT_PT_COINCIDENT:
-    aResult = createConstraintCoincidence(theConstraint, theGroupID,
-                  GCS_POINT_WRAPPER(thePoint1), GCS_POINT_WRAPPER(thePoint2));
+    aResult = createConstraintCoincidence(theConstraint, theGroupID, aPoint1, aPoint2);
     break;
   case CONSTRAINT_PT_ON_LINE:
   case CONSTRAINT_PT_ON_CIRCLE:
     aResult = createConstraintPointOnEntity(theConstraint, theGroupID, theType,
-                  GCS_POINT_WRAPPER(thePoint1), GCS_ENTITY_WRAPPER(theEntity1));
+                  aPoint1, GCS_ENTITY_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_PT_PT_DISTANCE:
     aResult = createConstraintDistancePointPoint(theConstraint, theGroupID,
                   GCS_PARAMETER_WRAPPER(createParameter(GID_OUTOFGROUP, theValue)),
-                  GCS_POINT_WRAPPER(thePoint1), GCS_POINT_WRAPPER(thePoint2));
+                  aPoint1, aPoint2);
     break;
   case CONSTRAINT_PT_LINE_DISTANCE:
     aResult = createConstraintDistancePointLine(theConstraint, theGroupID,
                   GCS_PARAMETER_WRAPPER(createParameter(GID_OUTOFGROUP, theValue)),
-                  GCS_POINT_WRAPPER(thePoint1), GCS_ENTITY_WRAPPER(theEntity1));
+                  aPoint1, GCS_ENTITY_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_RADIUS:
     aResult = createConstraintRadius(theConstraint, theGroupID,
@@ -304,10 +311,12 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createMirror(
     if (theEntity2->group() == theGroupID) // theEntity2 is not fixed
       makeMirrorPoints(theEntity1, theEntity2, theMirrorLine);
 
-    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint1 = 
-        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity1);
-    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint2 = 
-        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity2);
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint1 = GCS_POINT_WRAPPER(theEntity1);
+    if (!aPoint1 && theEntity1->type() == ENTITY_POINT)
+      aPoint1 = GCS_POINT_WRAPPER( GCS_ENTITY_WRAPPER(theEntity1)->subEntities().front() );
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint2 = GCS_POINT_WRAPPER(theEntity2);
+    if (!aPoint2 && theEntity2->type() == ENTITY_POINT)
+      aPoint2 = GCS_POINT_WRAPPER( GCS_ENTITY_WRAPPER(theEntity2)->subEntities().front() );
 
     std::shared_ptr<PlaneGCSSolver_EntityWrapper> aMirrorLine = 
         std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theMirrorLine);
@@ -476,10 +485,14 @@ EntityWrapperPtr PlaneGCSSolver_Builder::createFeature(
     return createArc(theFeature, theAttributes, theGroupID);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
   else if (aFeatureKind == SketchPlugin_Point::ID()) {
-    AttributePtr aPoint = theFeature->attribute(SketchPlugin_Point::COORD_ID());
-    if (!aPoint->isInitialized())
-      return aDummy;
-    EntityWrapperPtr aSub = createAttribute(aPoint, theGroupID);
+    EntityWrapperPtr aSub;
+    if (theAttributes.size() == 1)
+      aSub = theAttributes.front();
+    else {
+      AttributePtr aPoint = theFeature->attribute(SketchPlugin_Point::COORD_ID());
+      if (aPoint->isInitialized())
+        aSub = createAttribute(aPoint, theGroupID);
+    }
     if (!aSub)
       return aDummy;
 
