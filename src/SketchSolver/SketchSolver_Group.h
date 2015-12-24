@@ -168,7 +168,7 @@ private:
 
   SolverPtr mySketchSolver;  ///< Solver for set of equations obtained by constraints
 
-  bool myPrevSolved; ///< Indicates that previous solving was done correctly
+  SketchSolver_SolveStatus myPrevResult; ///< Result of previous solution of the set of constraints
 };
 
 #endif

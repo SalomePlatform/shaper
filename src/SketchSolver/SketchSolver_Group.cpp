@@ -77,7 +77,7 @@ static void sendMessage(const char* theMessageName)
 SketchSolver_Group::SketchSolver_Group(
     std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane)
     : myID(GroupIndexer::NEW_GROUP()),
-      myPrevSolved(true)
+      myPrevResult(STATUS_UNKNOWN)
 {
   // Initialize workplane
   myWorkplaneID = EID_UNKNOWN;
@@ -333,31 +333,31 @@ bool SketchSolver_Group::resolveConstraints()
     } catch (...) {
 //      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
-      if (myPrevSolved) {
+      if (myPrevResult == STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_FAILED);
-        myPrevSolved = false;
+        myPrevResult = STATUS_FAILED;
       }
       mySketchSolver->undo();
       return false;
     }
     if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {  // solution succeeded, store results into correspondent attributes
       myStorage->refresh();
-      if (!myPrevSolved) {
+      if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_REPAIRED);
-        myPrevSolved = true;
+        myPrevResult = STATUS_OK;
       }
     } else {
       mySketchSolver->undo();
       if (!myConstraints.empty()) {
 //      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
-        if (myPrevSolved) {
+        if (myPrevResult != aResult || myPrevResult == STATUS_UNKNOWN) {
           // the error message should be changed before sending the message
           sendMessage(EVENT_SOLVER_FAILED);
-          myPrevSolved = false;
+          myPrevResult = aResult;
         }
       }
     }
