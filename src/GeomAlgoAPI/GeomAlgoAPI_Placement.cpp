@@ -4,10 +4,13 @@
 // Created:     2 Dec 2014
 // Author:      Artem ZHIDKOV
 
-#include <GeomAlgoAPI_Placement.h>
+#include "GeomAlgoAPI_Placement.h"
+
 #include <GeomAlgoAPI_DFLoader.h>
 
+#include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
@@ -15,38 +18,30 @@
 #include <GeomAPI_XYZ.h>
 
 #include <BRepBuilderAPI_Transform.hxx>
+#include <BRepClass3d_SolidClassifier.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_Quaternion.hxx>
-#include <TopExp_Explorer.hxx>
-#include <BRepCheck_Analyzer.hxx>
-#include <BRepClass3d_SolidClassifier.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
 #include <Precision.hxx>
 
-GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
-  std::shared_ptr<GeomAPI_Shape> theSourceSolid,
-  std::shared_ptr<GeomAPI_Shape> theDestSolid,
-  std::shared_ptr<GeomAPI_Shape> theSourceShape,
-  std::shared_ptr<GeomAPI_Shape> theDestShape,
-  bool theIsReverse,
-  bool theIsCentering, 
-  bool theSimpleTransform)
-  : myDone(false),
-  myShape(new GeomAPI_Shape())
+GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(const std::shared_ptr<GeomAPI_Shape> theSourceSolid,
+                                             const std::shared_ptr<GeomAPI_Shape> theDestSolid,
+                                             const std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                                             const std::shared_ptr<GeomAPI_Shape> theDestShape,
+                                             const bool theIsReverse,
+                                             const bool theIsCentering,
+                                             const bool theSimpleTransform)
 {
-  build(theSourceSolid, theDestSolid, theSourceShape, theDestShape, 
+  build(theSourceSolid, theDestSolid, theSourceShape, theDestShape,
     theIsReverse, theIsCentering, theSimpleTransform);
 }
 
-void GeomAlgoAPI_Placement::build(
-  const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
-  const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
-  const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
-  const std::shared_ptr<GeomAPI_Shape>& theDestShape,
-  bool theIsReverse,
-  bool theIsCentering,
-  bool theSimpleTransform)
+void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourceSolid,
+                                  const std::shared_ptr<GeomAPI_Shape>& theDestSolid,
+                                  const std::shared_ptr<GeomAPI_Shape>& theSourceShape,
+                                  const std::shared_ptr<GeomAPI_Shape>& theDestShape,
+                                  const bool theIsReverse,
+                                  const bool theIsCentering,
+                                  const bool theSimpleTransform)
 {
   // Filling the parameters of the objects
   static const int aNbObjects = 2;
@@ -192,83 +187,36 @@ void GeomAlgoAPI_Placement::build(
 
   if (theSimpleTransform) { // just add transformation
     TopLoc_Location aDelta(aTrsf);
-    TopoDS_Shape aResult = aSourceShape.Moved(aDelta);
-    myShape->setImpl(new TopoDS_Shape(aResult));
     // store the accumulated information about the result and this delta
     //myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf * aSourceShape.Location().Transformation())));
-    myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf)));
-    myDone = true; // it is allways true for simple transformation generation
+    myTrsf.reset(new GeomAPI_Trsf(new gp_Trsf(aTrsf)));
+    TopoDS_Shape aResult = aSourceShape.Moved(aDelta);
+    std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aResult));
+    this->setShape(aShape);
+    this->setDone(true); // it is allways true for simple transformation generation
   } else { // internal rebuild of the shape
     // Transform the shape with copying it
     BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, aTrsf, true);
-    if(aBuilder) {
-      setImpl(aBuilder);
-      myDone = aBuilder->IsDone() == Standard_True;
-      if (myDone) {
-        TopoDS_Shape aResult = aBuilder->Shape();
-        // fill data map to keep correct orientation of sub-shapes 
-        for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-          std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-          aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-          myMap.bind(aCurrentShape, aCurrentShape);
-        }
-        myShape->setImpl(new TopoDS_Shape(aResult));
-        myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
-      }
+    if(!aBuilder) {
+      return;
     }
+    this->setImpl(aBuilder);
+    this->setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
+    if(aBuilder->IsDone() != Standard_True) {
+      return;
+    }
+    TopoDS_Shape aResult = aBuilder->Shape();
+
+    std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aResult));
+    this->setShape(aShape);
+    this->setDone(true);
   }
 }
 
-//============================================================================
-const bool GeomAlgoAPI_Placement::isValid() const
-{
-  if (myShape.get()) { // only for not-simple transform
-    BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
-    return (aChecker.IsValid() == Standard_True);
-  }
-  return true;
-}
-
-//============================================================================
-const bool GeomAlgoAPI_Placement::hasVolume() const
-{
-  bool hasVolume(false);
-  if(isValid()) {
-    const TopoDS_Shape& aRShape = myShape->impl<TopoDS_Shape>();
-    GProp_GProps aGProp;
-    BRepGProp::VolumeProperties(aRShape, aGProp);
-    if(aGProp.Mass() > Precision::Confusion()) 
-      hasVolume = true;	
-  }
-  return hasVolume;
-}
-
-//============================================================================
-const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Placement::shape () const 
-{
-  return myShape;
-}
-
-//============================================================================
-void GeomAlgoAPI_Placement::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const
-{
-  theMap = myMap;
-}
-
-//============================================================================
-GeomAlgoAPI_MakeShape * GeomAlgoAPI_Placement::makeShape() const
-{
-  return myMkShape;
-}
-
+//=================================================================================================
 std::shared_ptr<GeomAPI_Trsf> GeomAlgoAPI_Placement::transformation() const
 {
   return myTrsf;
-}
-
-//============================================================================
-GeomAlgoAPI_Placement::~GeomAlgoAPI_Placement()
-{
-  if (!empty())
-    myMap.clear();
 }
