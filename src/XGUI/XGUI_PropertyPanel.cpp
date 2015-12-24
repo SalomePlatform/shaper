@@ -182,7 +182,10 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   }
   activateWidget(NULL);
 }
-//#define DEBUG_TAB
+
+#define DEBUG_TAB_WIDGETS
+
+#define DEBUG_TAB
 #ifdef DEBUG_TAB
 void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const bool theDebug)
 {
@@ -199,16 +202,10 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
             theWidgets.append(aWidget);
           findDirectChildren(aWidget, theWidgets, false);
         }
-        else {
-          if (aWidget) {
-            QString anInfo = QString("widget [%1] is visible = %2, nofocus policy = %3").arg(aWidget->objectName()).
-              arg(aWidget->isVisible()).arg(aWidget->focusPolicy() == Qt::NoFocus);
-            qDebug(anInfo.toStdString().c_str());
-          }
-        }
       }
     }
   }
+#ifdef DEBUG_TAB_WIDGETS
   if (theDebug) {
     QStringList aWidgetTypes;
     QList<QWidget*>::const_iterator anIt =  theWidgets.begin(), aLast = theWidgets.end();
@@ -220,30 +217,36 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
     QString anInfo = QString("theWidgets[%1]: %2").arg(theWidgets.count()).arg(aWidgetTypes.join(","));
     qDebug(anInfo.toStdString().c_str());
   }
+#endif
 }
 
 bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 {
+  //bool isChangedFocus = ModuleBase_IPropertyPanel::focusNextPrevChild(theIsNext);
+  //return true;//isChangedFocus;
+
   // it wraps the Tabs clicking to follow in the chain:
   // controls, last control, Apply, Cancel, first control, controls
   bool isChangedFocus = false;
 
+#ifdef DEBUG_TAB_WIDGETS
   QWidget* aFocusWidget = focusWidget();
   if (aFocusWidget) {
     QString anInfo = QString("focus Widget: %1").arg(aFocusWidget->objectName());
     qDebug(anInfo.toStdString().c_str());
   }
+#endif
 
   QWidget* aNewFocusWidget = 0;
-  if (theIsNext) {
-    if (aFocusWidget) {
-      QList<QWidget*> aChildren;
-      findDirectChildren(this, aChildren, true);
-
-      int aChildrenCount = aChildren.count();
-      int aFocusWidgetIndex = aChildren.indexOf(aFocusWidget);
-      if (aFocusWidgetIndex >= 0) {
+  if (aFocusWidget) {
+    QList<QWidget*> aChildren;
+    findDirectChildren(this, aChildren, true);
+    int aChildrenCount = aChildren.count();
+    int aFocusWidgetIndex = aChildren.indexOf(aFocusWidget);
+    if (aFocusWidgetIndex >= 0) {
+      if (theIsNext) {
         if (aFocusWidgetIndex == aChildrenCount-1) {
+          // after the last widget focus should be set to "Apply"
           QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
           aNewFocusWidget = anOkBtn;
         }
@@ -251,12 +254,27 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
           aNewFocusWidget = aChildren[aFocusWidgetIndex+1];
         }
       }
+      else {
+        if (aFocusWidgetIndex == 0) {
+          // before the first widget, the last should accept focus
+          aNewFocusWidget = aChildren[aChildrenCount - 1];
+        }
+        else {
+          // before the "Apply" button, the last should accept focus for consistency with "Next"
+          QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+          if (aFocusWidget == anOkBtn) {
+            aNewFocusWidget = aChildren[aChildrenCount - 1];
+          }
+          else {
+            aNewFocusWidget = aChildren[aFocusWidgetIndex-1];
+          }
+        }
+      }
     }
   }
-  else {
-  }
   if (aNewFocusWidget) {
-    ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
+    //ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
+    aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
     isChangedFocus = true;
   }
   return isChangedFocus;
