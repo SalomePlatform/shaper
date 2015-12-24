@@ -391,6 +391,13 @@ void SolveSpaceSolver_Storage::replaceInConstraints(
 
       std::shared_ptr<SolveSpaceSolver_ConstraintWrapper> aWrapper =
           std::dynamic_pointer_cast<SolveSpaceSolver_ConstraintWrapper>(*aCIt);
+      if (theSource->id() == theDest->id()) {
+        // No need to update SolveSpace constraint if the entities are the same
+        aWrapper->changeConstraint() = getConstraint((Slvs_hConstraint)aWrapper->id());
+        aWrapper->setEntities(aSubs);
+        continue;
+      }
+
       // change constraint entities
       Slvs_Constraint aConstr = aWrapper->constraint();
       if (aConstr.ptA == (Slvs_hEntity)theSource->id())
