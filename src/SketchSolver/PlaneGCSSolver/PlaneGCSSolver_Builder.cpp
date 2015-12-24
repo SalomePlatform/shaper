@@ -185,10 +185,10 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createConstraint(
   ParameterWrapperPtr anIntermediate;
 
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint1 = GCS_POINT_WRAPPER(thePoint1);
-  if (!aPoint1 && thePoint1->type() == ENTITY_POINT)
+  if (!aPoint1 && thePoint1 && thePoint1->type() == ENTITY_POINT)
     aPoint1 = GCS_POINT_WRAPPER( GCS_ENTITY_WRAPPER(thePoint1)->subEntities().front() );
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint2 = GCS_POINT_WRAPPER(thePoint2);
-  if (!aPoint2 && thePoint2->type() == ENTITY_POINT)
+  if (!aPoint2 && thePoint2 && thePoint2->type() == ENTITY_POINT)
     aPoint2 = GCS_POINT_WRAPPER( GCS_ENTITY_WRAPPER(thePoint2)->subEntities().front() );
 
   switch (theType) {
