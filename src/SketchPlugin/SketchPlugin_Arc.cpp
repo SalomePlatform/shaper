@@ -41,10 +41,8 @@ SketchPlugin_Arc::SketchPlugin_Arc()
   myParamBefore = 0;
 }
 
-void SketchPlugin_Arc::initAttributes()
+void SketchPlugin_Arc::initDerivedClassAttributes()
 {
-  SketchPlugin_SketchEntity::initAttributes();
-
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
   std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<

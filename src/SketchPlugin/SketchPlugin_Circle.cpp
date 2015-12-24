@@ -26,10 +26,8 @@ SketchPlugin_Circle::SketchPlugin_Circle()
 {
 }
 
-void SketchPlugin_Circle::initAttributes()
+void SketchPlugin_Circle::initDerivedClassAttributes()
 {
-  SketchPlugin_SketchEntity::initAttributes();
-
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());

@@ -123,7 +123,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     }
     if(isCopy()) {
       double aWidth = thePrs->width();
-      thePrs->setWidth(aWidth / 2.5);
+      isCustomized = thePrs->setWidth(aWidth / 2.5) || isCustomized;
     }
     return isCustomized;
   }
@@ -131,6 +131,10 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
 protected:
   /// initializes mySketch
   SketchPlugin_SketchEntity();
+
+  /// \brief Initializes attributes of derived class.
+  virtual void initDerivedClassAttributes(){};
+
 };
 
 #endif

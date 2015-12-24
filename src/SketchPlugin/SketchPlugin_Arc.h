@@ -77,9 +77,6 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   /// Creates an arc-shape
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Request for initialization of data model of the feature: adding all attributes
-  SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
@@ -100,6 +97,10 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
 
   /// Use plugin manager for features creation
   SketchPlugin_Arc();
+
+protected:
+  /// \brief Initializes attributes of derived class.
+  virtual void initDerivedClassAttributes();
 
 private:
   /// Returns true if all obligatory attributes are initialized

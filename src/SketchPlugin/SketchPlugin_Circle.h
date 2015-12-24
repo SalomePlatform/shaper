@@ -53,9 +53,6 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Request for initialization of data model of the feature: adding all attributes
-  SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature)
@@ -73,6 +70,10 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity
 
   /// Use plugin manager for features creation
   SketchPlugin_Circle();
+
+protected:
+  /// \brief Initializes attributes of derived class.
+  virtual void initDerivedClassAttributes();
 };
 
 #endif

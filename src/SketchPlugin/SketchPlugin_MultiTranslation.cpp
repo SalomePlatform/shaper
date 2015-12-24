@@ -20,6 +20,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <SketchPlugin_SketchEntity.h>
 #include <SketcherPrs_Factory.h>
 
 SketchPlugin_MultiTranslation::SketchPlugin_MultiTranslation()
@@ -195,6 +196,38 @@ AISObjectPtr SketchPlugin_MultiTranslation::getAISObject(AISObjectPtr thePreviou
     anAIS = SketcherPrs_Factory::translateConstraint(this, sketch()->coordinatePlane());
   }
   return anAIS;
+}
+
+void SketchPlugin_MultiTranslation::erase()
+{
+  // Set copy attribute to false on all copied features.
+  AttributeRefListPtr aRefListOfTranslated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
+
+  if(aRefListOfTranslated.get()) {
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
+    std::list<ObjectPtr> aTargetList = aRefListOfTranslated->list();
+    for(std::list<ObjectPtr>::const_iterator aTargetIt = aTargetList.cbegin(); aTargetIt != aTargetList.cend(); aTargetIt++) {
+      if((*aTargetIt).get()) {
+        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aTargetIt);
+        if(aRes.get()) {
+          FeaturePtr aFeature = aRes->document()->feature(aRes);
+          if(aFeature.get()) {
+            AttributeBooleanPtr aBooleanAttr = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
+            if(aBooleanAttr.get()) {
+              aBooleanAttr->setValue(false);
+              // Redisplay object as it is not copy anymore.
+              ModelAPI_EventCreator::get()->sendUpdated(aRes, aRedispEvent);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  SketchPlugin_ConstraintBase::erase();
 }
 
 ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)

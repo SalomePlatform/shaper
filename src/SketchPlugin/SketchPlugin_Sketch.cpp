@@ -310,12 +310,10 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
   // text expressions could block setValue of some attributes
   SketchPlugin_Tools::clearExpressions(aNewFeature);
   // Set copy attribute
-  std::shared_ptr<ModelAPI_AttributeBoolean> anAttr = aNewFeature->data()->boolean(SketchPlugin_SketchEntity::COPY_ID());
-  if(!anAttr.get()) {
-    aNewFeature->data()->addAttribute(SketchPlugin_SketchEntity::COPY_ID(), ModelAPI_AttributeBoolean::typeId());
-    ModelAPI_Session::get()->validators()->registerNotObligatory(aNewFeature->getKind(), SketchPlugin_SketchEntity::COPY_ID());
+  AttributeBooleanPtr anAttr = aNewFeature->data()->boolean(SketchPlugin_SketchEntity::COPY_ID());
+  if(anAttr.get()) {
+    anAttr->setValue(theIsCopy);
   }
-  aNewFeature->data()->boolean(SketchPlugin_SketchEntity::COPY_ID())->setValue(theIsCopy);
 
   return aNewFeature;
 }

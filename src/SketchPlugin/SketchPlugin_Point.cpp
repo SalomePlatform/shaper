@@ -25,10 +25,8 @@ SketchPlugin_Point::SketchPlugin_Point()
 {
 }
 
-void SketchPlugin_Point::initAttributes()
+void SketchPlugin_Point::initDerivedClassAttributes()
 {
-  SketchPlugin_SketchEntity::initAttributes();
-
   data()->addAttribute(SketchPlugin_Point::COORD_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());

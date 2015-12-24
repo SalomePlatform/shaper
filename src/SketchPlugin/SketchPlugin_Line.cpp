@@ -26,10 +26,8 @@ SketchPlugin_Line::SketchPlugin_Line()
     : SketchPlugin_SketchEntity()
 {}
 
-void SketchPlugin_Line::initAttributes()
+void SketchPlugin_Line::initDerivedClassAttributes()
 {
-  SketchPlugin_SketchEntity::initAttributes();
-
   data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());

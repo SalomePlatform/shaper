@@ -86,6 +86,9 @@ class SketchPlugin_MultiRotation : public SketchPlugin_ConstraintBase
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
+  /// removes all fields from this feature: results, data, etc
+  SKETCHPLUGIN_EXPORT virtual void erase();
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_MultiRotation();
 

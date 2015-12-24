@@ -49,9 +49,6 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Request for initialization of data model of the feature: adding all attributes
-  SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
@@ -66,6 +63,10 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
 
   /// Use plugin manager for features creation
   SketchPlugin_Line();
+
+protected:
+  /// \brief Initializes attributes of derived class.
+  virtual void initDerivedClassAttributes();
 };
 
 #endif
