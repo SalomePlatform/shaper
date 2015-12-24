@@ -406,8 +406,9 @@ void SolveSpaceSolver_Storage::replaceInConstraints(
             aConstr.ptA == aSlvsCIt->ptA && aConstr.ptB == aSlvsCIt->ptB &&
             aConstr.entityA == aSlvsCIt->entityA && aConstr.entityB == aSlvsCIt->entityB &&
             aConstr.entityC == aSlvsCIt->entityC && aConstr.entityD == aSlvsCIt->entityD) {
-          removeConstraint(aConstr.h);
+          Slvs_hConstraint anIDToRemove = aConstr.h;
           aConstr = *aSlvsCIt;
+          removeConstraint(anIDToRemove);
           break;
         }
 
