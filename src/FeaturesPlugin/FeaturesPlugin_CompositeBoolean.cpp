@@ -246,19 +246,19 @@ void FeaturesPlugin_CompositeBoolean::execute()
         // Add result to not used solids from compsolid.
         ListOfShape aShapesToAdd = aNotUsedSolids;
         aShapesToAdd.push_back(aBoolAlgo->shape());
-        GeomAlgoAPI_PaveFiller aFillerAlgo(aShapesToAdd, true);
-        if(!aFillerAlgo.isDone()) {
+        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+        if(!aFillerAlgo->isDone()) {
           std::string aFeatureError = "PaveFiller algorithm failed";
           setError(aFeatureError);
           return;
         }
 
-        aMakeShapeList.appendAlgo(aFillerAlgo.makeShape());
-        aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
+        aMakeShapeList.appendAlgo(aFillerAlgo);
+        aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
 
-        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo.shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-7) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, aShells, aSolidsAlgos, aCompSolid, aTools, aFillerAlgo.shape(), aMakeShapeList, aMapOfShapes);
+          loadNamingDS(aResultBody, aShells, aSolidsAlgos, aCompSolid, aTools, aFillerAlgo->shape(), aMakeShapeList, aMapOfShapes);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -337,26 +337,26 @@ void FeaturesPlugin_CompositeBoolean::execute()
       // Add result to not used solids from compsolid (if we have any).
       if(!aNotUsedSolids.empty()) {
         aNotUsedSolids.push_back(aShape);
-        GeomAlgoAPI_PaveFiller aFillerAlgo(aNotUsedSolids, true);
-        if(!aFillerAlgo.isDone()) {
+        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aNotUsedSolids, true));
+        if(!aFillerAlgo->isDone()) {
           std::string aFeatureError = "PaveFiller algorithm failed";
           setError(aFeatureError);
           return;
         }
-        if(aFillerAlgo.shape()->isNull()) {
+        if(aFillerAlgo->shape()->isNull()) {
           static const std::string aShapeError = "Resulting shape is Null";
           setError(aShapeError);
           return;
         }
-        if(!aFillerAlgo.isValid()) {
+        if(!aFillerAlgo->isValid()) {
           std::string aFeatureError = "Warning: resulting shape is not valid";
           setError(aFeatureError);
           return;
         }
 
-        aShape = aFillerAlgo.shape();
-        aMakeShapeList.appendAlgo(aFillerAlgo.makeShape());
-        aMapOfShapes.merge(aFillerAlgo.mapOfShapes());
+        aShape = aFillerAlgo->shape();
+        aMakeShapeList.appendAlgo(aFillerAlgo);
+        aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
       }
 
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
