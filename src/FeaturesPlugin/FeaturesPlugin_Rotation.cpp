@@ -8,9 +8,7 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
-#include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
 
 #include <GeomAPI_Edge.h>
@@ -108,7 +106,7 @@ void FeaturesPlugin_Rotation::execute()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      LoadNamingDS(aRotationAlgo, aResultBody, aBaseShape);
+      loadNamingDS(aRotationAlgo, aResultBody, aBaseShape);
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -118,19 +116,19 @@ void FeaturesPlugin_Rotation::execute()
   removeResults(aResultIndex);
 }
 
-void FeaturesPlugin_Rotation::LoadNamingDS(const GeomAlgoAPI_Rotation& theRotaionAlgo,
+void FeaturesPlugin_Rotation::loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
   // Store result.
   theResultBody->storeModified(theBaseShape, theRotaionAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRotaionAlgo.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRotaionAlgo.mapOfSubShapes();
 
   int aRotatedTag = 1;
   std::string aRotatedName = "Rotated";
-  theResultBody->loadAndOrientModifiedShapes(theRotaionAlgo.makeShape().get(),
-                                              theBaseShape, GeomAPI_Shape::FACE,
-                                              aRotatedTag, aRotatedName, *aSubShapes.get());
+  theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
+                                             theBaseShape, GeomAPI_Shape::FACE,
+                                             aRotatedTag, aRotatedName, *aSubShapes.get());
 
 }

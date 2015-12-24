@@ -13,10 +13,9 @@
 
 #include <GeomAlgoAPI_Rotation.h>
 
-/** \class FeaturesPlugin_Rotation
- *  \ingroup Plugins
- *  \brief Feature for rotation objects around the axis.
- */
+/// \class FeaturesPlugin_Rotation
+/// \ingroup Plugins
+/// \brief Feature for rotation objects around the axis.
 class FeaturesPlugin_Rotation : public ModelAPI_Feature
 {
  public:
@@ -65,7 +64,7 @@ class FeaturesPlugin_Rotation : public ModelAPI_Feature
   FeaturesPlugin_Rotation();
 
 private:
-  void LoadNamingDS(const GeomAlgoAPI_Rotation& theRotaionAlgo,
+  void loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
