@@ -346,7 +346,7 @@ bool SketchSolver_Storage::removeEntity(FeaturePtr theFeature)
 {
   std::map<FeaturePtr, EntityWrapperPtr>::iterator aFound = myFeatureMap.find(theFeature);
   if (aFound == myFeatureMap.end())
-    return false; // feature not found, nothing to delete
+    return true; // feature not found, nothing to delete
 
   EntityWrapperPtr anEntity = aFound->second;
   myFeatureMap.erase(aFound);
@@ -365,7 +365,7 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
 {
   std::map<AttributePtr, EntityWrapperPtr>::iterator aFound = myAttributeMap.find(theAttribute);
   if (aFound == myAttributeMap.end())
-    return false; // attribute not found, nothing to delete
+    return true; // attribute not found, nothing to delete
 
   EntityWrapperPtr anEntity = aFound->second;
   myAttributeMap.erase(aFound);
