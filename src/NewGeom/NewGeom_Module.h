@@ -18,6 +18,7 @@
 class XGUI_Workshop;
 class NewGeom_OCCSelector;
 class OCCViewer_Viewer;
+class CAM_Study;
 
 /** 
  * \ingroup Salome
@@ -141,6 +142,11 @@ Q_OBJECT
   void inspectSalomeModules();
 
  public slots:
+  /// \brief The method is redefined to connect to the study viewer before the data
+  /// model is filled by opened file. This file open will flush redisplay signals for,
+  /// objects which should be visualized
+  virtual void connectToStudy(CAM_Study* theStudy);
+
    /// \brief The method is called on the module activation
    /// \param theStudy current study
   virtual bool activateModule(SUIT_Study* theStudy);
