@@ -937,39 +937,14 @@ Slvs_hConstraint SolveSpaceSolver_Storage::updateConstraint(const Slvs_Constrain
 
 bool SolveSpaceSolver_Storage::removeConstraint(const Slvs_hConstraint& theConstraintID)
 {
-  bool aResult = true;
   int aPos = Search(theConstraintID, myConstraints);
   if (aPos >= 0 && aPos < (int)myConstraints.size()) {
     Slvs_Constraint aConstraint = myConstraints[aPos];
     myConstraints.erase(myConstraints.begin() + aPos);
     myConstrMaxID = myConstraints.empty() ? SLVS_E_UNKNOWN : myConstraints.back().h;
     myNeedToResolve = true;
-
-    // Remove all entities
-    Slvs_hEntity anEntities[6] = {aConstraint.ptA, aConstraint.ptB,
-        aConstraint.entityA, aConstraint.entityB,
-        aConstraint.entityC, aConstraint.entityD};
-    for (int i = 0; i < 6; i++)
-      if (anEntities[i] != SLVS_E_UNKNOWN)
-        aResult = removeEntity(anEntities[i]) && aResult;
-    // remove temporary fixed point, if available
-    if (myDuplicatedConstraint) {
-      // Check the duplicated constraints are still available
-      myDuplicatedConstraint = false;
-      std::vector<Slvs_Constraint>::const_iterator anIt1 = myConstraints.begin();
-      std::vector<Slvs_Constraint>::const_iterator anIt2 = myConstraints.begin();
-      for (; anIt1 != myConstraints.end() && !myDuplicatedConstraint; anIt1++)
-        for (anIt2 = anIt1+1; anIt2 != myConstraints.end() && !myDuplicatedConstraint; anIt2++) {
-          if (anIt1->type != anIt2->type)
-            continue;
-          if (anIt1->ptA == anIt2->ptA && anIt1->ptB == anIt2->ptB &&
-              anIt1->entityA == anIt2->entityA && anIt1->entityB == anIt2->entityB &&
-              anIt1->entityC == anIt2->entityC && anIt1->entityD == anIt2->entityD)
-            myDuplicatedConstraint = true;
-        }
-    }
   }
-  return aResult;
+  return true;
 }
 
 const Slvs_Constraint& SolveSpaceSolver_Storage::getConstraint(const Slvs_hConstraint& theConstraintID) const
