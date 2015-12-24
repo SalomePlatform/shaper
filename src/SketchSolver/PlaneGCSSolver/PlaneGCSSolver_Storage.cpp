@@ -209,11 +209,9 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
   if (!isFullyRemoved &&
      (!aConstraint->baseConstraint()->data() || !aConstraint->baseConstraint()->data()->isValid()))
     isFullyRemoved = true;
-  if (isFullyRemoved) {
-    setNeedToResolve(true);
-    myRemovedConstraints.insert(myRemovedConstraints.end(),
-        aConstraint->constraints().begin(), aConstraint->constraints().end());
-  }
+  setNeedToResolve(true);
+  myRemovedConstraints.insert(myRemovedConstraints.end(),
+      aConstraint->constraints().begin(), aConstraint->constraints().end());
   return isFullyRemoved;
 }
 
