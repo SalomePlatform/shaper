@@ -30,6 +30,7 @@ SET(PROJECT_HEADERS
   ModuleBase_PageGroupBox.h
   ModuleBase_PageWidget.h	
   ModuleBase_PagedContainer.h
+  ModuleBase_ParamIntSpinBox.h
   ModuleBase_ParamSpinBox.h
   ModuleBase_Preferences.h
   ModuleBase_ResultPrs.h
@@ -85,6 +86,7 @@ SET(PROJECT_SOURCES
   ModuleBase_PageGroupBox.cpp
   ModuleBase_PageWidget.cpp
   ModuleBase_PagedContainer.cpp
+  ModuleBase_ParamIntSpinBox.cpp
   ModuleBase_ParamSpinBox.cpp
   ModuleBase_Preferences.cpp
   ModuleBase_ResultPrs.cpp

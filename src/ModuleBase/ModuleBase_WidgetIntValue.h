@@ -10,7 +10,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
 
-class ModuleBase_IntSpinBox;
+class ModuleBase_ParamIntSpinBox;
 class Config_WidgetAPI;
 class QWidget;
 class QLabel;
@@ -37,6 +37,9 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetIntValue();
 
+  /// Select the internal content if it can be selected. It is empty in the default realization
+  virtual void selectContent();
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -62,7 +65,7 @@ protected:
   QLabel* myLabel;
 
   /// Input value control
-  ModuleBase_IntSpinBox* mySpinBox;
+  ModuleBase_ParamIntSpinBox* mySpinBox;
 };
 
 #endif

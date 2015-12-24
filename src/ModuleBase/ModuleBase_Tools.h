@@ -24,6 +24,7 @@
 class QWidget;
 class QLayout;
 class QDoubleSpinBox;
+class ModuleBase_ParamIntSpinBox;
 class ModuleBase_ParamSpinBox;
 
 namespace ModuleBase_Tools {
@@ -101,6 +102,16 @@ MODULEBASE_EXPORT void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double the
 /// \param theSpin an ModuleBase_ParamSpinBox that accepts text
 /// \param theText a new value
 MODULEBASE_EXPORT void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText);
+
+/// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
+/// \param theSpin a ModuleBase_ParamIntSpinBox object
+/// \param theValue a new value
+MODULEBASE_EXPORT void setSpinValue(ModuleBase_ParamIntSpinBox* theSpin, int theValue);
+
+/// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
+/// \param theSpin a SpinBox that accepts text
+/// \param theText a new value
+MODULEBASE_EXPORT void setSpinText(ModuleBase_ParamIntSpinBox* theSpin, const QString& theText);
 
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object

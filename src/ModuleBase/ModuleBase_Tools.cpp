@@ -5,6 +5,8 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_Tools.h"
+
+#include <ModuleBase_ParamIntSpinBox.h>
 #include <ModuleBase_ParamSpinBox.h>
 
 #include <ModelAPI_Attribute.h>
@@ -184,6 +186,26 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue)
 {
   if (fabs(theSpin->value() - theValue) < tolerance)
+    return;
+  bool isBlocked = theSpin->blockSignals(true);
+  theSpin->setValue(theValue);
+  theSpin->blockSignals(isBlocked);
+}
+
+void setSpinText(ModuleBase_ParamIntSpinBox* theSpin, const QString& theText)
+{
+  // In order to avoid extra text setting because it will
+  // reset cursor position in control
+  if (theSpin->text() == theText)
+    return;
+  bool isBlocked = theSpin->blockSignals(true);
+  theSpin->setText(theText);
+  theSpin->blockSignals(isBlocked);
+}
+
+void setSpinValue(ModuleBase_ParamIntSpinBox* theSpin, int theValue)
+{
+  if (theSpin->value() == theValue)
     return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);

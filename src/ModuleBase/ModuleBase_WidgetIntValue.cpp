@@ -7,7 +7,7 @@
 #include <ModuleBase_WidgetIntValue.h>
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_IntSpinBox.h>
+#include <ModuleBase_ParamIntSpinBox.h>
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
@@ -48,7 +48,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
 
-  mySpinBox = new ModuleBase_IntSpinBox(this);
+  mySpinBox = new ModuleBase_ParamIntSpinBox(this);
   QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
@@ -95,18 +95,16 @@ ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()
 bool ModuleBase_WidgetIntValue::resetCustom()
 {
   bool aDone = false;
-  if (!isUseReset() || isComputedDefault()) {
+  if (!isUseReset() || isComputedDefault() || mySpinBox->hasVariable()) {
     aDone = false;
   } else {
     bool isOk;
     int aDefValue = QString::fromStdString(getDefaultValue()).toInt(&isOk);
     // reset the value just if there is a default value definition in the XML definition
-    // if the double value can not be found by the default value, do nothing
+    // if the value can not be found by the default value, do nothing
     if (isOk) {
-      bool isBlocked = mySpinBox->blockSignals(true);
-      mySpinBox->setValue(isOk ? aDefValue : 0);
-      mySpinBox->blockSignals(isBlocked);
-      storeValueCustom();
+      ModuleBase_Tools::setSpinValue(mySpinBox, aDefValue);
+      storeValue();
       aDone = true;
     }
   }
@@ -116,9 +114,18 @@ bool ModuleBase_WidgetIntValue::resetCustom()
 bool ModuleBase_WidgetIntValue::storeValueCustom() const
 {
   DataPtr aData = myFeature->data();
-  AttributeIntegerPtr aIntVal = aData->integer(attributeID());
-  int aVal = mySpinBox->value();
-  aIntVal->setValue(mySpinBox->value());
+  AttributeIntegerPtr anAttribute = aData->integer(attributeID());
+  if (mySpinBox->hasVariable()) {
+    // Here is a text of a real value or an expression.
+    std::string aText = mySpinBox->text().toStdString();
+    anAttribute->setText(aText);
+  } else {
+    // it is important to set the empty text value to the attribute before set the value
+    // because setValue tries to calculate the attribute value according to the
+    // attribute current text
+    anAttribute->setText("");
+    anAttribute->setValue(mySpinBox->value());
+  }
   updateObject(myFeature);
   return true;
 }
@@ -126,11 +133,19 @@ bool ModuleBase_WidgetIntValue::storeValueCustom() const
 bool ModuleBase_WidgetIntValue::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
-  AttributeIntegerPtr aRef = aData->integer(attributeID());
-  bool isBlocked = mySpinBox->blockSignals(true);
-  mySpinBox->setValue(aRef->value());
-  mySpinBox->blockSignals(isBlocked);
+  AttributeIntegerPtr anAttribute = aData->integer(attributeID());
+  std::string aTextRepr = anAttribute->text();
+  if (!aTextRepr.empty()) {
+    ModuleBase_Tools::setSpinText(mySpinBox, QString::fromStdString(aTextRepr));
+  } else {
+    ModuleBase_Tools::setSpinValue(mySpinBox, anAttribute->value());
+  }
   return true;
+}
+
+void ModuleBase_WidgetIntValue::selectContent()
+{
+  mySpinBox->selectAll();
 }
 
 QList<QWidget*> ModuleBase_WidgetIntValue::getControls() const
