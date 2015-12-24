@@ -28,9 +28,6 @@ public:
   /// \brief Return list of constraints
   const std::list<GCSConstraintPtr>& constraints() const
   { return myGCSConstraints; }
-////  /// \brief Return SolveSpace constraint to change
-////  GCSConstraintPtr& changeConstraint()
-////  { return myGCSConstraint; }
 
   /// \brief Return ID of current entity
   virtual ConstraintID id() const

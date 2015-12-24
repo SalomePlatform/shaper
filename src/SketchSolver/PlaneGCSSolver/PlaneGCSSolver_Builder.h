@@ -125,15 +125,6 @@ private:
   EntityWrapperPtr createSketchEntity(CompositeFeaturePtr theSketch,
                                       const GroupID& theGroupID) const;
 
-////  /// \brief Converts two axes of sketch's trihedron to the normal entity
-////  /// \param theNormal  [in]  direction of the normal of the sketch
-////  /// \param theDirX    [in]  direction of the X axis of the sketch
-////  /// \param theGroupID [in]  group, the normal belongs to
-////  /// \return Created entity or empty pointer, if there are incorrect attributes
-////  EntityWrapperPtr createNormal(AttributePtr theNormal,
-////                                AttributePtr theDirX,
-////                                const GroupID& theGroupID) const;
-
 private:
   static BuilderPtr mySelf;
 };

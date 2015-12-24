@@ -533,7 +533,6 @@ void SketchSolver_Group::removeTemporaryConstraints()
 // ============================================================================
 void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
 {
-  bool isFullyRemoved = true;
   ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
   for (; aCIter != myConstraints.end(); aCIter++)
     if (aCIter->first == theConstraint) {

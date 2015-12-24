@@ -38,17 +38,6 @@ public:
   /// \return \c true if the value of parameter is updated
   virtual bool update(ParameterWrapperPtr theParameter);
 
-////  /// \brief Removes constraint from the storage
-////  /// \return \c true if the constraint and all its parameters are remove successfully
-////  virtual bool removeConstraint(ConstraintPtr theConstraint);
-////  /// \brief Removes feature from the storage
-////  /// \return \c true if the feature and its attributes are removed successfully;
-////  ///         \c false if the feature or any it attribute is used by remaining constraints.
-////  virtual bool removeEntity(FeaturePtr theFeature);
-////  /// \brief Removes attribute from the storage
-////  /// \return \c true if the attribute is not used by remaining features and constraints
-////  virtual bool removeEntity(AttributePtr theAttribute);
-
   /// \brief Update SketchPlugin features after resolving constraints
   /// \param theFixedOnly [in]  if \c true the fixed points will be updated only
   virtual void refresh(bool theFixedOnly = false) const;
@@ -138,20 +127,6 @@ public:
   const Slvs_hEntity& entityMaxID() const
   { return myEntityMaxID; }
 
-  /// \brief Verifies the current point or another coincident one is fixed
-  /// \param[in]  thePointID  entity to be checked fixed
-  /// \param[out] theFixed    ID of constraint
-  /// \param[in]  theAccurate if \c true, the calculation will be made for all type of constraints,
-  ///                         if \c false, only the point is verified
-  /// \return \c true if the point is fixed
-  bool isPointFixed(const Slvs_hEntity& thePointID, Slvs_hConstraint& theFixed, bool theAccurate = false) const;
-  /// \brief Verifies the current entity is fully fixed (may not be changed by constraints)
-  /// \param[in] theEntityID entity to be checked fixed
-  /// \param[in] theAccurate if \c true, the calculation will be made for all type of constraints,
-  ///                        if \c false, only points are verified
-  /// \return \c true if the entity is fixed
-  bool isEntityFixed(const Slvs_hEntity& theEntityID, bool theAccurate = false) const;
-
   /** \brief Add new constraint to the current group
    *  \param[in] theConstraint   SolveSpace's constraint
    *  \return the ID of added constraint
@@ -171,30 +146,9 @@ public:
   bool removeConstraint(const Slvs_hConstraint& theConstraintID);
   /// \brief Returns the constraint by its ID
   const Slvs_Constraint& getConstraint(const Slvs_hConstraint& theConstraintID) const;
-  /// \brief Returns list of constraints of specified type
-  std::list<Slvs_Constraint> getConstraintsByType(int theConstraintType) const;
   /// \brief Returns quantity of constraints in this storage
   size_t nbConstraints() const
   { return myConstraints.size(); }
-
-  /// \brief Attach constraint SLVS_C_WHERE_DRAGGED to this storage. It need to make precise calculations
-  void addConstraintWhereDragged(const Slvs_hConstraint& theConstraintID);
-
-////  /// \brief Add transient constraint
-////  void addTemporaryConstraint(const Slvs_hConstraint& theConstraintID);
-////  /// \brief Mark specified constraint as temporary
-////  virtual void setTemporary(ConstraintPtr theConstraint);
-////  /// \brief Remove all transient constraints
-////  void removeAllTemporary();
-////  /// \brief Remove temporary constraint s. Preferable to remove the points under Point-on-Line constraint
-////  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
-////  /// \return Number of remaining temporary constraints
-////  virtual size_t removeTemporary(size_t theNbConstraints);
-////  /// \brief Checks the constraint is temporary
-////  bool isTemporary(const Slvs_hConstraint& theConstraintID) const;
-////  /// \brief Number of temporary constraints
-////  virtual size_t nbTemporary() const
-////  { return myTemporaryConstraints.size(); }
 
   /// \brief Shows the storage has the same constraint twice
   virtual bool hasDuplicatedConstraint() const
@@ -203,42 +157,7 @@ public:
   /// \brief Initialize constraint solver by the entities collected by current storage
   virtual void initializeSolver(SolverPtr theSolver);
 
-public:
-  /// \brief Check two points are coincident or have same coordinates
-  bool isEqual(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2) const;
-
-  /// \brief Check the entity is horizontal of vertical
-  bool isAxisParallel(const Slvs_hEntity& theEntity) const;
-
-  /// \brief Verifies the entity is used in any equal constraint
-  /// \param[in]  theEntity entity to be found
-  /// \param[out] theEqual  constraint, which uses the entity
-  /// \return \c true, if the Equal constrait is found
-  bool isUsedInEqual(const Slvs_hEntity& theEntity, Slvs_Constraint& theEqual) const;
-
-  /// \brief Fixes specified entity
-  /// \param theEntity  ID of the entity to be fixed
-  /// \return List of created constraints
-  std::vector<Slvs_hConstraint> fixEntity(const Slvs_hEntity& theEntity);
-
 private:
-  /// \brief Fixes specified point
-  /// \param [in]  thePoint    point to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixPoint(const Slvs_Entity& thePoint, std::vector<Slvs_hConstraint>& theCreated);
-  /// \brief Fixes specified line
-  /// \param [in]  theLine     line to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixLine(const Slvs_Entity& theLine, std::vector<Slvs_hConstraint>& theCreated);
-  /// \brief Fixes specified circle
-  /// \param [in]  theCircle   circle to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixCircle(const Slvs_Entity& theCircle, std::vector<Slvs_hConstraint>& theCreated);
-  /// \brief Fixes specified arc
-  /// \param [in]  theArc      arc to be fixed
-  /// \param [out] theCreated  list of the Fixed constraints created
-  void fixArc(const Slvs_Entity& theArc, std::vector<Slvs_hConstraint>& theCreated);
-
   /// \brief Update arc points to be on circle sharp.
   void adjustArc(const Slvs_Entity& theArc);
 
@@ -266,11 +185,8 @@ private:
   Slvs_hConstraint myConstrMaxID; ///< current constraint index (may differs with the number of constraints)
   std::vector<Slvs_Constraint> myConstraints; ///< list of constraints used in the current group (sorted by the identifier)
 
-  Slvs_hConstraint myFixed; ///< identifier of one of temporary constraints to fix separate point
-
   bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
 
-////  std::set<Slvs_hConstraint> myTemporaryConstraints; ///< list of transient constraints
   std::set<Slvs_hParam> myUpdatedParameters; ///< list of just updated parameters (cleared when isNeedToResolve() called)
 
   SameConstraintMap myEqualConstraints; ///< list of groups of equal constraints

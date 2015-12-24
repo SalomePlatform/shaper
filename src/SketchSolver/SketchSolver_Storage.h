@@ -101,15 +101,6 @@ public:
   /// \brief Remove all features became invalid
   SKETCHSOLVER_EXPORT void removeInvalidEntities();
 
-////  /// \brief Mark specified constraint as temporary
-////  virtual void setTemporary(ConstraintPtr theConstraint) = 0;
-////  /// \brief Returns number of temporary constraints
-////  virtual size_t nbTemporary() const = 0;
-////  /// \brief Remove temporary constraints
-////  /// \param theNbConstraints [in]  number of temporary constraints to be deleted
-////  /// \return number of remaining temporary constraints
-////  virtual size_t removeTemporary(size_t theNbConstraints = 1) = 0;
-
   /// \brief Check whether the feature or its attributes are used by this storage
   /// \param theFeature [in]  feature to be checked
   /// \return \c true if the feature interacts with the storage

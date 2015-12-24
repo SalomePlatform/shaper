@@ -10,16 +10,7 @@
 #include <SketchSolver_ISolver.h>
 #include <PlaneGCSSolver_Defs.h>
 
-////// Need to be defined before including SolveSpace to avoid additional dependences on Windows platform
-////#if defined(WIN32) && !defined(HAVE_C99_INTEGER_TYPES)
-////typedef unsigned int UINT32;
-////#else
-////#include <stdint.h>
-////#endif
-////#include <string.h>
 #include <GCS.h>
-
-////#include <vector>
 
 /**
  * The main class that performs the high-level operations for connection to the PlaneGCS.

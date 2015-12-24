@@ -443,8 +443,8 @@ void PlaneGCSSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstraint
   // Update flags and parameters in constraints
   if (aType == CONSTRAINT_ANGLE)
     adjustAngle(theConstraint);
-////  else if (aType == CONSTRAINT_SYMMETRIC)
-////    adjustMirror(theConstraint);
+  //else if (aType == CONSTRAINT_SYMMETRIC)
+  //  adjustMirror(theConstraint);
   else if (aType == CONSTRAINT_MULTI_ROTATION)
     adjustMultiRotation(theConstraint);
   else if (aType == CONSTRAINT_MULTI_TRANSLATION)
@@ -579,41 +579,6 @@ EntityWrapperPtr PlaneGCSSolver_Builder::createSketchEntity(
   aSketchEnt->setId(EID_SKETCH);
   return aSketchEnt;
 }
-
-
-
-////EntityWrapperPtr PlaneGCSSolver_Builder::createNormal(
-////    AttributePtr theNormal,
-////    AttributePtr theDirX,
-////    const GroupID& theGroupID) const
-////{
-////  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theNormal);
-////  std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirX);
-////  if (!aDirX || !aNorm ||
-////      (fabs(aDirX->x()) + fabs(aDirX->y()) + fabs(aDirX->z()) < tolerance) || 
-////      !aNorm->isInitialized())
-////    return EntityWrapperPtr();
-////  // calculate Y direction
-////  std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aDirX->dir())));
-////
-////  // quaternion parameters of normal vector
-////  double qw, qx, qy, qz;
-////  Slvs_MakeQuaternion(aDirX->x(), aDirX->y(), aDirX->z(), aDirY->x(), aDirY->y(), aDirY->z(), &qw,
-////                      &qx, &qy, &qz);
-////  double aNormCoord[4] = { qw, qx, qy, qz };
-////
-////  // Create parameters of the normal
-////  std::list<ParameterWrapperPtr> aParameters;
-////  for (int i = 0; i < 4; i++)
-////    aParameters.push_back(createParameter(theGroupID, aNormCoord[i]));
-////
-////  // Create a normal with empty parameters
-////  Slvs_Entity aNormalEnt = Slvs_MakeNormal3d(SLVS_E_UNKNOWN, (Slvs_hGroup)theGroupID,
-////      SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
-////  EntityWrapperPtr aNormal(new SolveSpaceSolver_EntityWrapper(theNormal, aNormalEnt));
-////  aNormal->setParameters(aParameters);
-////  return aNormal;
-////}
 
 
 

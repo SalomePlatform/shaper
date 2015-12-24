@@ -49,7 +49,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   if (myParameters.empty())
     return STATUS_INCONSISTENT;
 
-////  myEquationSystem.calculateFaileds = myFindFaileds ? 1 : 0;
+  //myEquationSystem.calculateFaileds = myFindFaileds ? 1 : 0;
 
   Events_LongOp::start(this);
   GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);

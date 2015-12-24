@@ -75,22 +75,6 @@ bool PlaneGCSSolver_ConstraintWrapper::isEqual(const ConstraintWrapperPtr& theOt
 {
   if (type() != theOther->type())
     return false;
-////  const Slvs_Constraint anOtherConstraint = 
-////    std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theOther)->constraint();
-////  if (mySlvsConstraint.type != anOtherConstraint.type)
-////    return false;
-////
-////  // Verify SolveSpace entities. If they are equal, no need additional checking of parameters.
-////  if (mySlvsConstraint.group   == anOtherConstraint.group   &&
-////      mySlvsConstraint.ptA     == anOtherConstraint.ptA     &&
-////      mySlvsConstraint.ptB     == anOtherConstraint.ptB     &&
-////      mySlvsConstraint.entityA == anOtherConstraint.entityA &&
-////      mySlvsConstraint.entityB == anOtherConstraint.entityB &&
-////      mySlvsConstraint.entityC == anOtherConstraint.entityC &&
-////      mySlvsConstraint.entityD == anOtherConstraint.entityD &&
-////      fabs(mySlvsConstraint.valA - anOtherConstraint.valA) < tolerance) {
-////    return true;
-////  }
 
   // Verify equality of values
   if (fabs(myValue - theOther->value()) > tolerance)
