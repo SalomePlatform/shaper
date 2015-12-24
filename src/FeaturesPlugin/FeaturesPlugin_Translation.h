@@ -13,18 +13,17 @@
 
 #include <GeomAlgoAPI_Translation.h>
 
-/** \class FeaturesPlugin_Translation
- *  \ingroup Plugins
- *  \brief Feature for movement objects along the axis.
- */
+/// \class FeaturesPlugin_Translation
+/// \ingroup Plugins
+/// \brief Feature for translation objects along the axis.
 class FeaturesPlugin_Translation : public ModelAPI_Feature
 {
  public:
-  /// Movement kind.
+  /// Translation kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_MOVEMENT_ID("Translation");
-    return MY_MOVEMENT_ID;
+    static const std::string MY_TRANSLATION_ID("Translation");
+    return MY_TRANSLATION_ID;
   }
 
   /// Attribute name of referenced objects.
@@ -65,7 +64,7 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
   FeaturesPlugin_Translation();
 
 private:
-  void LoadNamingDS(const GeomAlgoAPI_Translation& theMovementAlgo,
+  void loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };

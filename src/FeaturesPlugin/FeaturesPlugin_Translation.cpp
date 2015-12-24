@@ -89,27 +89,27 @@ void FeaturesPlugin_Translation::execute()
       aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart);
     } else {
-      GeomAlgoAPI_Translation aMovementAlgo(aBaseShape, anAxis, aDistance);
+      GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, anAxis, aDistance);
 
       // Checking that the algorithm worked properly.
-      if(!aMovementAlgo.isDone()) {
-        static const std::string aFeatureError = "Movement algorithm failed";
+      if(!aTranslationAlgo.isDone()) {
+        static const std::string aFeatureError = "Translation algorithm failed";
         setError(aFeatureError);
         break;
       }
-      if(aMovementAlgo.shape()->isNull()) {
+      if(aTranslationAlgo.shape()->isNull()) {
         static const std::string aShapeError = "Resulting shape is Null";
         setError(aShapeError);
         break;
       }
-      if(!aMovementAlgo.isValid()) {
+      if(!aTranslationAlgo.isValid()) {
         std::string aFeatureError = "Warning: resulting shape is not valid";
         setError(aFeatureError);
         break;
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      LoadNamingDS(aMovementAlgo, aResultBody, aBaseShape);
+      loadNamingDS(aTranslationAlgo, aResultBody, aBaseShape);
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -119,19 +119,19 @@ void FeaturesPlugin_Translation::execute()
   removeResults(aResultIndex);
 }
 
-void FeaturesPlugin_Translation::LoadNamingDS(const GeomAlgoAPI_Translation& theMovementAlgo,
-                                           std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                           std::shared_ptr<GeomAPI_Shape> theBaseShape)
+void FeaturesPlugin_Translation::loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
+                                              std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+                                              std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
   // Store result.
-  theResultBody->storeModified(theBaseShape, theMovementAlgo.shape());
+  theResultBody->storeModified(theBaseShape, theTranslationAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theMovementAlgo.mapOfShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTranslationAlgo.mapOfSubShapes();
 
-  int aMovedTag = 1;
-  std::string aMovedName = "Moved";
-  theResultBody->loadAndOrientModifiedShapes(theMovementAlgo.makeShape().get(),
-                                              theBaseShape, GeomAPI_Shape::FACE,
-                                              aMovedTag, aMovedName, *aSubShapes.get());
+  int aTranslatedTag = 1;
+  std::string aTranslatedName = "Translated";
+  theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
+                                             theBaseShape, GeomAPI_Shape::FACE,
+                                             aTranslatedTag, aTranslatedName, *aSubShapes.get());
 
 }
