@@ -195,6 +195,37 @@ AISObjectPtr SketchPlugin_ConstraintMirror::getAISObject(AISObjectPtr thePreviou
   return anAIS;
 }
 
+void SketchPlugin_ConstraintMirror::erase()
+{
+  // Set copy attribute to false on all copied features.
+  AttributeRefListPtr aRefListOfMirrored = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
+
+  if(aRefListOfMirrored.get()) {
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
+    std::list<ObjectPtr> aTargetList = aRefListOfMirrored->list();
+    for(std::list<ObjectPtr>::const_iterator aTargetIt = aTargetList.cbegin(); aTargetIt != aTargetList.cend(); aTargetIt++) {
+      if((*aTargetIt).get()) {
+        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aTargetIt);
+        if(aRes.get()) {
+          FeaturePtr aFeature = aRes->document()->feature(aRes);
+          if(aFeature.get()) {
+            AttributeBooleanPtr aBooleanAttr = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
+            if(aBooleanAttr.get()) {
+              aBooleanAttr->setValue(false);
+              // Redisplay object as it is not copy anymore.
+              ModelAPI_EventCreator::get()->sendUpdated(aRes, aRedispEvent);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  SketchPlugin_ConstraintBase::erase();
+}
 
 void SketchPlugin_ConstraintMirror::attributeChanged(const std::string& theID)
 {
