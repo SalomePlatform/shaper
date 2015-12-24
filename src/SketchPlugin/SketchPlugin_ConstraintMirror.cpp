@@ -214,7 +214,8 @@ void SketchPlugin_ConstraintMirror::erase()
           if(aFeature.get()) {
             AttributeBooleanPtr aBooleanAttr = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
             if(aBooleanAttr.get()) {
-              aBooleanAttr->setValue(false);
+              if (ModelAPI_Session::get()->isOperation()) // if this is not undo or redo
+                aBooleanAttr->setValue(false);
               // Redisplay object as it is not copy anymore.
               ModelAPI_EventCreator::get()->sendUpdated(aRes, aRedispEvent);
             }

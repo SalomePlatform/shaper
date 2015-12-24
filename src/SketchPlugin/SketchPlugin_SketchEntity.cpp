@@ -21,8 +21,4 @@ void SketchPlugin_SketchEntity::initAttributes()
   AttributePtr anAttr = data()->addAttribute(SketchPlugin_SketchEntity::COPY_ID(), ModelAPI_AttributeBoolean::typeId());
   anAttr->setIsArgument(false);
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_SketchEntity::COPY_ID());
-  AttributeBooleanPtr anAttrBool = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(anAttr);
-  if(anAttr.get()) {
-    anAttrBool->setValue(false);
-  }
 }
