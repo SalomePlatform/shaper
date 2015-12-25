@@ -393,7 +393,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
     const int aModTag = 2;
     const int aDelTag = 3;
     const int aSubsolidsTag=4; /// sub solids will be placed at labels 6, 7, etc. if result is compound of solids
-    int aToTag = 5; // may be many labels, starting from this index
+    int aToTag = 5000; // may be many labels, starting from this index
     int aFromTag = 10000; // may be many labels, starting from this index or last aToTag index
     const std::string aGenName = "Generated";
     const std::string aModName = "Modified";
