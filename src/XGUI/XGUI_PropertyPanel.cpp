@@ -167,7 +167,11 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
   // it is important for features where in cases the same attributes are used, isCase for this
   // attribute returns true, however it can be placed in hidden stack widget(extrusion: elements,
   // sketch multi rotation -> single/full point)
-  activateNextWidget(theWidget, false); // true
+  // it is important to check the widget visibility to do not check of the next widget visible
+  // state if the current is not shown. (example: sketch circle re-entrant operation after mouse
+  // release in the viewer, next, radius, widget should be activated but the first is not visualized)
+  bool isVisible = theWidget->isVisible();
+  activateNextWidget(theWidget, isVisible);
 }
 
 
