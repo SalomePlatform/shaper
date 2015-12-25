@@ -2,7 +2,6 @@
 #
 # Modify plugins.xml to switch solver
 
-export solver=${solver:-SolveSpace}
 export PLUGINS_PATH=${PLUGINS_PATH:-${NEWGEOM_ROOT_DIR}/plugins/plugins.xml}
 
 while [[ $# > 0 ]]; do
@@ -27,6 +26,8 @@ while [[ $# > 0 ]]; do
   esac
 done
 
+if [[ -z ${solver:-} ]]; then exit 0; fi
+
 case $solver in
   PlaneGCS)
     export SWITCH_ON=PlaneGCSSolver
@@ -41,8 +42,9 @@ esac
 echo "Switch $solver solver in ${PLUGINS_PATH}"
 
 cat ${PLUGINS_PATH} \
-  | sed -e "s/^\(<!--\)\?\(.*${SWITCH_ON}.*\/>\)\( -->\)\?/\2/" \
-  | sed -e "s/^\(<!--\)\?\(.*${SWITCH_OFF}.*\/>\)\( -->\)\?/<!--\2 -->/" \
+  | tr '\n' '\r' \
+  | sed -e "s|\r  <plugin library=\"[^\r]*Solver\"\/>\r<!--|\r  <plugin library=\"${solver}Solver\"\/>\r<!--|" \
+  | tr '\r' '\n' \
   > ${PLUGINS_PATH}_out
 mv -f ${PLUGINS_PATH}_out ${PLUGINS_PATH}
 cat ${PLUGINS_PATH}
