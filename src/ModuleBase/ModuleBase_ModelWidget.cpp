@@ -171,7 +171,7 @@ void ModuleBase_ModelWidget::activate()
 void ModuleBase_ModelWidget::deactivate()
 {
   myIsValueStateBlocked = false;
-  if (myState == ModifiedInPP)
+  if (myState == ModifiedInPP || myState == ModifiedInViewer)
     storeValue();
   myState = Stored;
 }
@@ -298,8 +298,11 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
                         aReason == Qt::TabFocusReason ||
                         aReason == Qt::BacktabFocusReason ||
                         aReason == Qt::OtherFocusReason; // to process widget->setFocus()
-    if (aMouseOrKey && getControls().contains(aWidget) && getValueState() == ModifiedInPP)
-      storeValue();
+    if (aMouseOrKey && getControls().contains(aWidget)) {
+      if (getValueState() == ModifiedInPP) {
+        storeValue();
+      }
+    }
   }
   // pass the event on to the parent class
 

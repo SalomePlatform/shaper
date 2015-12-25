@@ -183,7 +183,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   activateWidget(NULL);
 }
 
-#define DEBUG_TAB_WIDGETS
+//#define DEBUG_TAB_WIDGETS
 
 #define DEBUG_TAB
 #ifdef DEBUG_TAB
@@ -229,8 +229,8 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
   // controls, last control, Apply, Cancel, first control, controls
   bool isChangedFocus = false;
 
-#ifdef DEBUG_TAB_WIDGETS
   QWidget* aFocusWidget = focusWidget();
+#ifdef DEBUG_TAB_WIDGETS
   if (aFocusWidget) {
     QString anInfo = QString("focus Widget: %1").arg(aFocusWidget->objectName());
     qDebug(anInfo.toStdString().c_str());
@@ -273,6 +273,15 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
     }
   }
   if (aNewFocusWidget) {
+    if (myActiveWidget) {
+      myActiveWidget->getControls();
+      bool isFirstControl = !theIsNext;
+      QWidget* aLastFocusControl = myActiveWidget->getControlAcceptingFocus(isFirstControl);
+      if (aFocusWidget == aLastFocusControl) {
+        this->setActiveWidget(NULL);
+      }
+    }
+
     //ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
     aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
     isChangedFocus = true;

@@ -217,7 +217,10 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
     return isDone;
 
   bool isSketchSolverError = module()->sketchMgr()->sketchSolverError();
-  if (!isSketchSolverError) {
+
+  // empty previous attribute means that the Apply/Ok button has focus and the enter
+  // should not lead to start edition mode of the previous operation
+  if (!isSketchSolverError && !thePreviousAttributeID.empty()) {
     myRestartingMode = RM_EmptyFeatureUsed;
     isDone = startInternalEdit(thePreviousAttributeID);
   }
