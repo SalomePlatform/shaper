@@ -31,8 +31,8 @@ void SketchSolver_ConstraintMulti::getEntitiesAndCopies(
   std::list<EntityWrapperPtr> anEntities; // list of transformed entities
   std::list<ObjectPtr> anObjectList = aRefList->list();
   std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
-  if (myNumberOfCopies + 1 != aRefList->size()) // execute for the feature is not called yet
-    myNumberOfCopies = aRefList->size() - 1;
+  if ((myNumberOfCopies + 1) * myNumberOfObjects != aRefList->size()) // execute for the feature is not called yet
+    myNumberOfCopies = aRefList->size() / myNumberOfObjects - 1;
 
   while (anObjIt != anObjectList.end()) {
     anEntities.clear();
