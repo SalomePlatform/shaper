@@ -16,9 +16,9 @@
 :Axis.property_panel_ok_QToolButton	{container=':SALOME*.Axis_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Axis_QLineEdit	{container=':SALOME*.Axis_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
 :Boolean.Main objects_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Main objects' type='QLabel' unnamed='1' visible='1'}
-:Boolean.Main objects_QListWidget	{aboveWidget=':property_panel_dock.Main objects_QLabel' container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Boolean.Main objects_QListWidget	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='main_objects' type='QListWidget' visible='1'}
 :Boolean.Tool object_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
-:Boolean.Tool object_QListWidget	{aboveWidget=':property_panel_dock.Tool object_QLabel' container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Boolean.Tool object_QListWidget	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='tool_objects' type='QListWidget' visible='1'}
 :Boolean.Type_QComboBox	{container=':SALOME*.Boolean_XGUI_PropertyPanel' leftWidget=':Boolean.Type_QLabel' type='QComboBox' unnamed='1' visible='1'}
 :Boolean.Type_QLabel	{container=':SALOME*.Boolean_XGUI_PropertyPanel' text='Type' type='QLabel' unnamed='1' visible='1'}
 :Boolean.property_panel_ok_QToolButton	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
@@ -119,8 +119,8 @@
 :From.qt_spinbox_lineedit_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox_3' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
 :From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :From_QLineEdit_2	{container=':Revolution.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
-:From_QLineEdit_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
-:From_QLineEdit_4	{container=':Revolution.From_ModuleBase_PageGroupBox_3' type='QLineEdit' unnamed='1' visible='1'}
+:From_QLineEdit_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' name='from_object' type='QLineEdit' visible='1'}
+:From_QLineEdit_4	{container=':Revolution.From_ModuleBase_PageGroupBox_3' name='from_object' type='QLineEdit' visible='1'}
 :From_QLineEdit_5	{container=':Extrusion.From_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
 :Horizontal.property_panel_cancel_QToolButton	{container=':SALOME*.Horizontal_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :Length.ConstraintValue_ModuleBase_ParamSpinBox	{container=':SALOME*.Length_XGUI_PropertyPanel' name='ConstraintValue' type='ModuleBase_ParamSpinBox' visible='1'}
@@ -215,7 +215,7 @@
 :Revolution.From_ModuleBase_PageGroupBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Revolution.From_ModuleBase_PageGroupBox_3	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Revolution.Select a sketch face_QLabel	{container=':SALOME*.Revolution_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
-:Revolution.Select a sketch face_QListWidget	{aboveWidget=':Revolution.Select a sketch face_QLabel' container=':SALOME*.Revolution_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Revolution.Select a sketch face_QListWidget	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='base' type='QListWidget' visible='1'}
 :Revolution.To_ModuleBase_PageGroupBox	{container=':SALOME*.Revolution_XGUI_PropertyPanel' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Revolution.To_ModuleBase_PageGroupBox_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Revolution.To_ModuleBase_PageGroupBox_3	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
@@ -237,15 +237,15 @@
 :RevolutionCut.property_panel_ok_QToolButton	{container=':SALOME*.RevolutionCut_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :RevolutionFuse.Revolution_ModuleBase_PageGroupBox	{container=':SALOME*.RevolutionFuse_XGUI_PropertyPanel' title='Revolution' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :RevolutionFuse.property_panel_ok_QToolButton	{container=':SALOME*.RevolutionFuse_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
-:Revolution_QLineEdit	{container=':SALOME*.Revolution_XGUI_PropertyPanel' type='QLineEdit' unnamed='1' visible='1'}
-:Revolution_QLineEdit_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QLineEdit' unnamed='1' visible='1'}
-:Revolution_QLineEdit_3	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QLineEdit' unnamed='1' visible='1'}
+:Revolution_QLineEdit	{container=':SALOME*.Revolution_XGUI_PropertyPanel' name='axis_object' type='QLineEdit' visible='1'}
+:Revolution_QLineEdit_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='axis_object' type='QLineEdit' visible='1'}
+:Revolution_QLineEdit_3	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' name='axis_object' type='QLineEdit' visible='1'}
 :Revolution_QLineEdit_4	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :Revolution_QToolButton	{container=':SALOME*.Revolution_XGUI_PropertyPanel' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
-:Revolution_QToolButton_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' type='QToolButton' unnamed='1' visible='1'}
-:Revolution_QToolButton_3	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Revolution_QToolButton_2	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='By angles' type='QToolButton' visible='1'}
+:Revolution_QToolButton_3	{container=':RevolutionFuse.Revolution_ModuleBase_PageGroupBox' name='By bounding planes and angles' type='QToolButton' visible='1'}
 :Revolution_QToolButton_4	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' type='QToolButton' unnamed='1' visible='1'}
-:Revolution_QToolButton_5	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Revolution_QToolButton_5	{container=':RevolutionCut.Revolution_ModuleBase_PageGroupBox' name='By bounding planes and angles' type='QToolButton' visible='1'}
 :Rotation.Center of rotation_QGroupBox	{container=':SALOME*.Rotation_XGUI_PropertyPanel' title='Center of rotation' type='QGroupBox' unnamed='1' visible='1'}
 :Rotation.MultiRotationAngle_ModuleBase_ParamSpinBox	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='MultiRotationAngle' type='ModuleBase_ParamSpinBox' visible='1'}
 :Rotation.MultiRotationCopies_QSpinBox	{container=':SALOME*.Rotation_XGUI_PropertyPanel' name='MultiRotationCopies' type='QSpinBox' visible='1'}
@@ -420,8 +420,8 @@
 :To.to_offset_ModuleBase_ParamSpinBox_4	{container=':Extrusion.To_ModuleBase_PageGroupBox_3' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To_QLineEdit	{container=':Extrusion.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :To_QLineEdit_2	{container=':Revolution.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
-:To_QLineEdit_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
-:To_QLineEdit_4	{container=':Revolution.To_ModuleBase_PageGroupBox_3' type='QLineEdit' unnamed='1' visible='1'}
+:To_QLineEdit_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' name='to_object' type='QLineEdit' visible='1'}
+:To_QLineEdit_4	{container=':Revolution.To_ModuleBase_PageGroupBox_3' name='to_object' type='QLineEdit' visible='1'}
 :To_QLineEdit_5	{container=':Extrusion.To_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
 :To_QLineEdit_6	{container=':Extrusion.To_ModuleBase_PageGroupBox_3' type='QLineEdit' unnamed='1' visible='1'}
 :Translation.Direction_ModuleBase_PageGroupBox	{container=':SALOME*.Translation_XGUI_PropertyPanel' title='Direction' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
