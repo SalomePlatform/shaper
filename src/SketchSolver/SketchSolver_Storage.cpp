@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 
 /// \brief Verify two vectors of constraints are equal.
@@ -295,6 +296,22 @@ static bool isUsed(EntityWrapperPtr theFeature, AttributePtr theSubEntity)
   return false;
 }
 
+static bool isUsed(ConstraintPtr theConstraint, AttributePtr theAttribute)
+{
+  if (!theConstraint || !theAttribute)
+    return false;
+  std::list<AttributePtr> anAttrList = theConstraint->data()->attributes(std::string());
+  std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
+  for (; anIt != anAttrList.end(); ++anIt) {
+    if (*anIt == theAttribute)
+      return true;
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
+    if (aRefAttr && !aRefAttr->isObject() && aRefAttr->attr() == theAttribute)
+      return true;
+  }
+  return false;
+}
+
 bool SketchSolver_Storage::isUsed(FeaturePtr theFeature) const
 {
   if (myFeatureMap.find(theFeature) != myFeatureMap.end())
@@ -333,10 +350,15 @@ bool SketchSolver_Storage::isUsed(AttributePtr theAttribute) const
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
       aCIt = myConstraintMap.begin();
   std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
-  for (; aCIt != myConstraintMap.end(); ++aCIt)
+  for (; aCIt != myConstraintMap.end(); ++aCIt) {
     for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++aCWIt)
       if (::isUsed(*aCWIt, anAttribute))
         return true;
+    // Additional check for the Fixed constraints, which have no wrapper associated.
+    if (aCIt->first->getKind() == SketchPlugin_ConstraintRigid::ID() &&
+        ::isUsed(aCIt->first, anAttribute))
+      return true;
+  }
   // check in features
   std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
   for (; aFIt != myFeatureMap.end(); ++aFIt)

@@ -55,6 +55,9 @@ void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
     myStorage->update(theFeature->baseAttribute(), GID_OUTOFGROUP);
   else if (theFeature->baseFeature())
     myStorage->update(theFeature->baseFeature(), GID_OUTOFGROUP);
+
+  if (myBaseConstraint)
+    myStorage->addConstraint(myBaseConstraint, std::list<ConstraintWrapperPtr>());
 }
 
 void SketchSolver_ConstraintFixed::getAttributes(

@@ -1119,12 +1119,12 @@ bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     return true;
 
   bool isFullyRemoved = removeConstraint((Slvs_hConstraint)aConstraint->id());
+  isFullyRemoved = SketchSolver_Storage::remove(theConstraint) && isFullyRemoved;
 
   // remove point-point coincidence
   if (aConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT)
-    isFullyRemoved = removeCoincidence(theConstraint);
-
-  return SketchSolver_Storage::remove(theConstraint) && isFullyRemoved;
+    isFullyRemoved = removeCoincidence(theConstraint) && isFullyRemoved;
+  return isFullyRemoved;
 }
 
 bool SolveSpaceSolver_Storage::remove(EntityWrapperPtr theEntity)
@@ -1132,9 +1132,32 @@ bool SolveSpaceSolver_Storage::remove(EntityWrapperPtr theEntity)
   if (!theEntity)
     return false;
 
+  // Additional check for entity to be used in point-point coincidence
+  bool isCoincide = false;
+  if (theEntity->type() == ENTITY_POINT) {
+    CoincidentPointsMap::const_iterator anIt = myCoincidentPoints.begin();
+    std::set<EntityWrapperPtr>::const_iterator aCIt;
+    for (; anIt != myCoincidentPoints.end(); ++anIt) {
+      if (anIt->first == theEntity)
+        break;
+      for (aCIt = anIt->second.begin(); aCIt != anIt->second.end(); ++aCIt)
+        if (*aCIt == theEntity)
+          break;
+      if (aCIt != anIt->second.end())
+        break;
+    }
+    if (anIt != myCoincidentPoints.end()) {
+      if (anIt->first != theEntity && isUsed(anIt->first->baseAttribute()))
+        isCoincide = true;
+      for (aCIt = anIt->second.begin(); !isCoincide && aCIt != anIt->second.end(); ++aCIt)
+        if (*aCIt != theEntity && isUsed((*aCIt)->baseAttribute()))
+          isCoincide = true;
+    }
+  }
+
   std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theEntity);
-  bool isFullyRemoved = removeEntity((Slvs_hEntity)anEntity->id());
+  bool isFullyRemoved = isCoincide ? true : removeEntity((Slvs_hEntity)anEntity->id());
   return SketchSolver_Storage::remove(theEntity) && isFullyRemoved;
 }
 
