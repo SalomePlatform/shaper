@@ -183,7 +183,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
         aSub = mySubs[aSubIndex];
       }
       if (!aSolidShape->isEqual(aSub->shape())) {
-        aSub->store(aSolidShape);
+        aSub->store(aSolidShape, false);
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }

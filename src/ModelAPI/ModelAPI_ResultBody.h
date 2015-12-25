@@ -44,8 +44,11 @@ public:
     return RESULT_BODY_COLOR;
   }
 
-  /// Stores the shape (called by the execution method).
-  MODELAPI_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
+  /// \brief Stores the shape (called by the execution method).
+  /// param[in] theShape shape to store.
+  /// param[in] theIsStoreSameShapes if false stores reference to the same shape if it is already in document.
+  MODELAPI_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                     const bool theIsStoreSameShapes = true);
 
   /// Stores the generated shape (called by the execution method).
   MODELAPI_EXPORT virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,

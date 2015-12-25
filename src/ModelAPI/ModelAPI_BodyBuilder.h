@@ -28,7 +28,8 @@ public:
   MODELAPI_EXPORT virtual ~ModelAPI_BodyBuilder() {};
 
   /// Stores the shape (called by the execution method).
-  virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+  virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                     const bool theIsStoreSameShapes = true) = 0;
 
   /// Stores the generated shape (called by the execution method).
   virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,

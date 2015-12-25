@@ -25,9 +25,10 @@ std::string ModelAPI_ResultBody::groupName()
   return group();
 }
 
-void ModelAPI_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
+void ModelAPI_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                const bool theIsStoreSameShapes)
 {
-  myBuilder->store(theShape);
+  myBuilder->store(theShape, theIsStoreSameShapes);
 
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);

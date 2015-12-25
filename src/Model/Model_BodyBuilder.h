@@ -27,7 +27,8 @@ class Model_BodyBuilder : public ModelAPI_BodyBuilder
   std::vector<TNaming_Builder*> myBuilders;
 public:
   /// Stores the shape (called by the execution method).
-  MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
+  MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                  const bool theIsStoreSameShapes = true);
 
   /// Stores the generated shape (called by the execution method).
   MODEL_EXPORT virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,

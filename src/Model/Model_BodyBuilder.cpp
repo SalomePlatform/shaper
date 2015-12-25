@@ -18,6 +18,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
 #include <TDF_ChildIterator.hxx>
+#include <TDF_Reference.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_ListOfShape.hxx>
@@ -107,7 +108,8 @@ void Model_BodyBuilder::evolutionToSelection(const bool theFlag)
   evolutionToSelectionRec(aShapeLab, theFlag);
 }
 
-void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
+void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                              const bool theIsStoreSameShapes)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
@@ -121,6 +123,16 @@ void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
     TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
     if (aShape.IsNull())
       return;  // null shape inside
+
+    if(!theIsStoreSameShapes) {
+      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShape, aShapeLab);
+      if(!aNS.IsNull() && !aNS->IsEmpty()) {
+        // This shape is already in document, store reference instead of shape;
+        const TDF_Label aFoundLabel = aNS->Label();
+        TDF_Reference::Set(aShapeLab, aFoundLabel);
+        return;
+      }
+    }
 
     aBuilder.Generated(aShape);	
     // register name
@@ -202,6 +214,12 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
 
       TopoDS_Iterator aSubIter(aShapeNew);
       for(int aTag = theDecomposeSolidsTag; aSubIter.More(); aSubIter.Next()) {
+        const TopoDS_Shape& aShape = aSubIter.Value();
+        Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShape, aShapeLab);
+        if(!aNS.IsNull() && !aNS->IsEmpty()) {
+          // This shape is already in document, don't add it.
+          continue;
+        }
         TNaming_Builder aSubBuilder(aShapeLab.FindChild(aTag++));
         aSubBuilder.Generated(aSubIter.Value());
         if(!aName.IsEmpty()) {
@@ -763,6 +781,10 @@ std::shared_ptr<GeomAPI_Shape> Model_BodyBuilder::shape()
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
     TDF_Label& aShapeLab = aData->shapeLab();
+    Handle(TDF_Reference) aRef;
+    if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+      aShapeLab = aRef->Get();
+    }
     Handle(TNaming_NamedShape) aName;
     if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
       TopoDS_Shape aShape = aName->Get();
