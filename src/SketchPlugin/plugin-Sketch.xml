@@ -119,16 +119,16 @@
 
       <!--  SketchConstraintAngle  -->
       <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon=":icons/angle_constr.png">
-        <shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select an line" shape_types="edge" >
+        <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
-        </shape_selector>
-        <shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select an line" shape_types="edge" >
+        </sketch_shape_selector>
+        <sketch_shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
-        </shape_selector>
+        </sketch_shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Angle" id="ConstraintValue" default="computed" min="0" max="180" />
         <validator id="PartSet_AngleSelection"/>
