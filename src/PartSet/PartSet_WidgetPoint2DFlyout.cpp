@@ -22,13 +22,12 @@ PartSet_WidgetPoint2DFlyout::PartSet_WidgetPoint2DFlyout(QWidget* theParent,
                                                          const std::string& theParentId)
  : PartSet_WidgetPoint2D(theParent, theWorkshop, theData, theParentId)
 {
-  myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 }
 
 bool PartSet_WidgetPoint2DFlyout::focusTo()
 {
   bool aCanAcceptFocus = true;
-  if (myIsInternal && isComputedDefault()) {
+  if (isInternal() && isComputedDefault()) {
     AISObjectPtr anObject = workshop()->displayer()->getAISObject(feature());
     aCanAcceptFocus = anObject.get() && !anObject->isEmptyDistanceGeometry();
   }

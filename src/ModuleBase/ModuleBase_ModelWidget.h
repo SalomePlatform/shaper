@@ -69,6 +69,10 @@ Q_OBJECT
   /// \return the boolean result
   std::string getDefaultValue() const { return myDefaultValue; }
 
+  /// Returns true, if widget is internal
+  /// \return the boolean result
+  bool isInternal() const { return myIsInternal; }
+
   /// Returns true, if the obligatory value of the widget is not defined in the XML or has true value
   /// \return the boolean result
   bool isObligatory() const { return myIsObligatory; }
@@ -301,6 +305,9 @@ private:
 
   /// the default value, which is defined in the XML for this attribute    
   std::string myDefaultValue;
+
+  /// an XML internal state
+  bool myIsInternal;
 
   /// the reset state. If it is false, the reset method of the widget is not performed
   bool myUseReset;

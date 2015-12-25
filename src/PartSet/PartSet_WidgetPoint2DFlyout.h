@@ -40,9 +40,6 @@ public:
 private:
   //! Returns workshop
   XGUI_Workshop* workshop() const;
-
-private:
-  bool myIsInternal; /// an XML internal state
 };
 
 #endif

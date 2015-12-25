@@ -194,7 +194,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
 
       if (!aValidators->isCase(aCurrentWidget->feature(), aCurrentWidget->attributeID()))
         continue; // this attribute is not participated in the current case
-      if (isCheckVisibility) {
+      if (isCheckVisibility && !aCurrentWidget->isInternal()) {
         if (!aCurrentWidget->isVisible())
           continue;
       }
