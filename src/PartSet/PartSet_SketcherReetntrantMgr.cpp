@@ -211,6 +211,11 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
   if (!isActiveMgr())
     return isDone;
 
+  // empty previous attribute means that the Apply/Ok button has focus and the enter
+  // should not lead to start edition mode of the previous operation
+  if (thePreviousAttributeID.empty())
+    return isDone;
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
@@ -218,9 +223,7 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
 
   bool isSketchSolverError = module()->sketchMgr()->sketchSolverError();
 
-  // empty previous attribute means that the Apply/Ok button has focus and the enter
-  // should not lead to start edition mode of the previous operation
-  if (!isSketchSolverError && !thePreviousAttributeID.empty()) {
+  if (!isSketchSolverError) {
     myRestartingMode = RM_EmptyFeatureUsed;
     isDone = startInternalEdit(thePreviousAttributeID);
   }

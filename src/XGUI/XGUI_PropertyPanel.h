@@ -119,6 +119,8 @@ public slots:
   */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
+  void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
+
 signals:
   void enterClicked();
 
@@ -131,6 +133,12 @@ protected:
   /// Emits a signal about focus change
   /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
   virtual bool focusNextPrevChild(bool theIsNext);
+
+  /// Activate the next widget in the property panel
+  /// \param theWidget a widget. The next widget should be activated
+  /// \param isCheckVisibility flag whether the next widget visibility is checked
+  void activateNextWidget(ModuleBase_ModelWidget* theWidget,
+                          const bool isCheckVisibility);
 
  protected:
    /// A method called on the property panel closed

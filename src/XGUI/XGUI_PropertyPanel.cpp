@@ -118,7 +118,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(aWidget, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
             this,    SLOT(activateWidget(ModuleBase_ModelWidget*)));
     connect(aWidget, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
-            this,    SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
+            this,    SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
     connect(aWidget, SIGNAL(keyReleased(QKeyEvent*)),
             this,    SIGNAL(keyReleased(QKeyEvent*)));
     connect(aWidget, SIGNAL(enterClicked()),
@@ -155,6 +155,25 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
+  // it is possible that the property panel widgets have not been visualized
+  // (e.g. on start operation), so it is strictly important to do not check visualized state
+  activateNextWidget(theWidget, false);
+}
+
+void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
+{
+  // this slot happens when some widget lost focus, the next widget which accepts the focus
+  // should be shown, so the second parameter is true
+  // it is important for features where in cases the same attributes are used, isCase for this
+  // attribute returns true, however it can be placed in hidden stack widget(extrusion: elements,
+  // sketch multi rotation -> single/full point)
+  activateNextWidget(theWidget, true);
+}
+
+
+void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
+                                            const bool isCheckVisibility)
+{
   // TO CHECK: Editing operation does not have automatical activation of widgets
   if (isEditingMode()) {
     activateWidget(NULL);
@@ -171,6 +190,10 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
       if (!aValidators->isCase(aCurrentWidget->feature(), aCurrentWidget->attributeID()))
         continue; // this attribute is not participated in the current case
+      if (isCheckVisibility) {
+        if (!aCurrentWidget->isVisible())
+          continue;
+      }
       if (!aCurrentWidget->isObligatory())
         continue; // not obligatory widgets are not activated automatically
 
@@ -181,6 +204,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
     isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
   activateWidget(NULL);
+  //focusNextPrevChild(true);
 }
 
 //#define DEBUG_TAB_WIDGETS
@@ -278,7 +302,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
       bool isFirstControl = !theIsNext;
       QWidget* aLastFocusControl = myActiveWidget->getControlAcceptingFocus(isFirstControl);
       if (aFocusWidget == aLastFocusControl) {
-        this->setActiveWidget(NULL);
+        setActiveWidget(NULL);
       }
     }
 

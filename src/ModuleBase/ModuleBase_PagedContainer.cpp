@@ -22,6 +22,9 @@ ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent, const C
 : ModuleBase_ModelWidget(theParent, theData, theParentId),
   myIsFocusOnCurrentPage(false)
 {
+  // it is not obligatory to be ignored when property panel tries to activate next active widget
+  // but if focus is moved to this control, it can accept it.
+  myIsObligatory = false;
 }
 
 ModuleBase_PagedContainer::~ModuleBase_PagedContainer()
