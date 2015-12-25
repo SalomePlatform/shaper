@@ -150,7 +150,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
   TopoDS_Vertex aCurVertex = aStartVertex;
   gp_Dir aCurDir = aDirY.Reversed();
-  gp_Dir aCurNorm = aNorm.Reversed();
+  gp_Dir aCurNorm = aNorm; //aNorm.Reversed();
 
   // Go through the edges and find loops
   TopoDS_Vertex aNextVertex;
