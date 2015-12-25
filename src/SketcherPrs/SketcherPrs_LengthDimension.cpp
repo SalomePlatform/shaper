@@ -30,7 +30,7 @@ static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 
-static const Standard_ExtCharacter MySummSymbol(0x2211);
+static const Standard_ExtCharacter MySummSymbol(0x03A3);
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
