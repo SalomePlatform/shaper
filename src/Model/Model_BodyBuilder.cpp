@@ -780,7 +780,7 @@ std::shared_ptr<GeomAPI_Shape> Model_BodyBuilder::shape()
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     Handle(TDF_Reference) aRef;
     if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
       aShapeLab = aRef->Get();
