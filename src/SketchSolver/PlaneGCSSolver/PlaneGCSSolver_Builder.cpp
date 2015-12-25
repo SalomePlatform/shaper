@@ -1084,6 +1084,9 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
     }
   }
 
+  if (aDir[0]->cross(aDir[1]) * aConstraint->value() < 0.0)
+    aConstraint->setValue(-aConstraint->value());
+
   bool isChange = false;
   for (int i = 0; i < 2; i++)
     if (aLine[i]->direction()->dot(aDir[i]) < 0.0)
