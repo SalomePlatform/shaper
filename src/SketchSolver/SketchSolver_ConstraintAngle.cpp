@@ -23,8 +23,8 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
 
   ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
-  if (fabs(myAngle - aConstraint->value()) < aTol)
-    return;
+  //if (fabs(myAngle - aConstraint->value()) < aTol)
+  //  return;
   myAngle = aConstraint->value();
   aBuilder->adjustConstraint(aConstraint);
   myStorage->addConstraint(myBaseConstraint, aConstraint);
