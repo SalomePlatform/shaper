@@ -167,7 +167,7 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
   // it is important for features where in cases the same attributes are used, isCase for this
   // attribute returns true, however it can be placed in hidden stack widget(extrusion: elements,
   // sketch multi rotation -> single/full point)
-  activateNextWidget(theWidget, true);
+  activateNextWidget(theWidget, false); // true
 }
 
 
