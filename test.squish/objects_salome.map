@@ -80,7 +80,7 @@
 :Extrusion.From_ModuleBase_PageGroupBox_2	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.From_ModuleBase_PageGroupBox_3	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' title='From' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.Select a sketch face_QLabel	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' text='Select a sketch face' type='QLabel' unnamed='1' visible='1'}
-:Extrusion.Select a sketch face_QListWidget	{aboveWidget=':Extrusion.Select a sketch face_QLabel' container=':SALOME*.Extrusion_XGUI_PropertyPanel' type='QListWidget' unnamed='1' visible='1'}
+:Extrusion.Select a sketch face_QListWidget	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='base' type='QListWidget' visible='1'}
 :Extrusion.To_ModuleBase_PageGroupBox	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.To_ModuleBase_PageGroupBox_2	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Extrusion.To_ModuleBase_PageGroupBox_3	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' title='To' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
@@ -102,9 +102,9 @@
 :ExtrusionFuse.property_panel_cancel_QToolButton	{container=':SALOME*.ExtrusionFuse_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :ExtrusionFuse.property_panel_ok_QToolButton	{container=':SALOME*.ExtrusionFuse_XGUI_PropertyPanel' name='property_panel_ok' type='QToolButton' visible='1'}
 :Extrusion_ModuleBase_WidgetDoubleValue	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' type='ModuleBase_WidgetDoubleValue' unnamed='1' visible='1'}
-:Extrusion_QToolButton	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Extrusion_QToolButton	{container=':SALOME*.Extrusion_XGUI_PropertyPanel' name='By bounding planes and offsets' type='QToolButton' visible='1'}
 :Extrusion_QToolButton_2	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' type='QToolButton' unnamed='1' visible='1'}
-:Extrusion_QToolButton_3	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:Extrusion_QToolButton_3	{container=':ExtrusionCut.Extrusion_ModuleBase_PageGroupBox' name='By bounding planes and offsets' type='QToolButton' visible='1'}
 :Extrusion_QToolButton_4	{container=':ExtrusionFuse.Extrusion_ModuleBase_PageGroupBox' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
 :Fatal error.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Fatal error_QMessageBox'}
 :Fatal error_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Fatal error'}
@@ -117,7 +117,7 @@
 :From.from_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.From_ModuleBase_PageGroupBox' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :From.from_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' name='from_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :From.qt_spinbox_lineedit_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox_3' name='qt_spinbox_lineedit' type='QLineEdit' visible='1'}
-:From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
+:From_QLineEdit	{container=':Extrusion.From_ModuleBase_PageGroupBox' name='from_object' type='QLineEdit' visible='1'}
 :From_QLineEdit_2	{container=':Revolution.From_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :From_QLineEdit_3	{container=':Revolution.From_ModuleBase_PageGroupBox_2' name='from_object' type='QLineEdit' visible='1'}
 :From_QLineEdit_4	{container=':Revolution.From_ModuleBase_PageGroupBox_3' name='from_object' type='QLineEdit' visible='1'}
@@ -418,11 +418,11 @@
 :To.to_offset_ModuleBase_ParamSpinBox_2	{container=':Revolution.To_ModuleBase_PageGroupBox' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
 :To.to_offset_ModuleBase_ParamSpinBox_4	{container=':Extrusion.To_ModuleBase_PageGroupBox_3' name='to_offset' type='ModuleBase_ParamSpinBox' visible='1'}
-:To_QLineEdit	{container=':Extrusion.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
+:To_QLineEdit	{container=':Extrusion.To_ModuleBase_PageGroupBox' name='to_object' type='QLineEdit' visible='1'}
 :To_QLineEdit_2	{container=':Revolution.To_ModuleBase_PageGroupBox' type='QLineEdit' unnamed='1' visible='1'}
 :To_QLineEdit_3	{container=':Revolution.To_ModuleBase_PageGroupBox_2' name='to_object' type='QLineEdit' visible='1'}
 :To_QLineEdit_4	{container=':Revolution.To_ModuleBase_PageGroupBox_3' name='to_object' type='QLineEdit' visible='1'}
-:To_QLineEdit_5	{container=':Extrusion.To_ModuleBase_PageGroupBox_2' type='QLineEdit' unnamed='1' visible='1'}
+:To_QLineEdit_5	{container=':Extrusion.To_ModuleBase_PageGroupBox_2' name='to_object' type='QLineEdit' visible='1'}
 :To_QLineEdit_6	{container=':Extrusion.To_ModuleBase_PageGroupBox_3' type='QLineEdit' unnamed='1' visible='1'}
 :Translation.Direction_ModuleBase_PageGroupBox	{container=':SALOME*.Translation_XGUI_PropertyPanel' title='Direction' type='ModuleBase_PageGroupBox' unnamed='1' visible='1'}
 :Translation.MultiTranslationCopies_QSpinBox	{container=':SALOME*.Translation_XGUI_PropertyPanel' name='MultiTranslationCopies' type='QSpinBox' visible='1'}
