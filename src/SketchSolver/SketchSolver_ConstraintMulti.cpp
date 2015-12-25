@@ -9,6 +9,7 @@
 void SketchSolver_ConstraintMulti::getEntitiesAndCopies(
     std::list< std::list<EntityWrapperPtr> >& theEntAndCopies)
 {
+  myAdjusted = false;
   DataPtr aData = myBaseConstraint->data();
 
   // Lists of objects and number of copies
@@ -30,6 +31,9 @@ void SketchSolver_ConstraintMulti::getEntitiesAndCopies(
   std::list<EntityWrapperPtr> anEntities; // list of transformed entities
   std::list<ObjectPtr> anObjectList = aRefList->list();
   std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
+  if (myNumberOfCopies + 1 != aRefList->size()) // execute for the feature is not called yet
+    myNumberOfCopies = aRefList->size() - 1;
+
   while (anObjIt != anObjectList.end()) {
     anEntities.clear();
     for (int i = 0; i <= myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
@@ -83,5 +87,6 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
   for (; anIt != aConstraints.end(); ++anIt)
     aBuilder->adjustConstraint(*anIt);
   myStorage->addConstraint(myBaseConstraint, aConstraints);
+
   myAdjusted = true;
 }
