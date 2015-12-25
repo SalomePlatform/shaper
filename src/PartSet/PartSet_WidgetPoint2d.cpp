@@ -359,8 +359,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   NCollection_List<TopoDS_Shape> aShapes;
   std::list<ObjectPtr> aObjects;
   aSelection->selectedShapes(aShapes, aObjects);
-  // if we have selection
-  if (aShapes.Extent() > 0) {
+  // if we have selection and use it
+  if (aShapes.Extent() > 0 && useSelectedShapes()) {
     TopoDS_Shape aShape = aShapes.First();
     ObjectPtr aObject = aObjects.front();
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
@@ -539,6 +539,11 @@ bool PartSet_WidgetPoint2D::processEnter()
       myYSpin->selectAll();
   }
   return isModified;
+}
+
+bool PartSet_WidgetPoint2D::useSelectedShapes() const
+{
+  return true;
 }
 
 bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,

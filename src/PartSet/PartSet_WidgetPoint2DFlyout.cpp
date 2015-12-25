@@ -24,6 +24,11 @@ PartSet_WidgetPoint2DFlyout::PartSet_WidgetPoint2DFlyout(QWidget* theParent,
 {
 }
 
+bool PartSet_WidgetPoint2DFlyout::useSelectedShapes() const
+{
+  return false;
+}
+
 bool PartSet_WidgetPoint2DFlyout::focusTo()
 {
   bool aCanAcceptFocus = true;

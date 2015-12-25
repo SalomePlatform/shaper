@@ -93,6 +93,10 @@ Q_OBJECT
   /// Returns true if the event is processed.
   virtual bool processEnter();
 
+  /// Returns true if the attribute can be changed using the selected shapes in the viewer
+  /// and creating a coincidence constraint to them. This control use them.
+  virtual bool useSelectedShapes() const;
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();

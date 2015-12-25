@@ -37,6 +37,10 @@ public:
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// Returns true if the attribute can be changed using the selected shapes in the viewer
+  /// and creating a coincidence constraint to them. This control does not use them.
+  virtual bool useSelectedShapes() const;
+
 private:
   //! Returns workshop
   XGUI_Workshop* workshop() const;
