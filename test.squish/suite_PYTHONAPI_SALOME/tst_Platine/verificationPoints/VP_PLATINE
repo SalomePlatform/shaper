@@ -5,6 +5,7 @@
    <Rect width="52" x="8" y="409" height="58" type="negative"/>
    <Rect width="32" x="423" y="125" height="32" type="negative"/>
    <Rect width="33" x="421" y="457" height="24" type="negative"/>
+   <Rect width="12" x="147" y="306" height="15" type="negative"/>
   </Mask>
   <Algorithm description="Strict mode" name="strict"/>
  </Verification>
