@@ -150,7 +150,18 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
   TopoDS_Vertex aCurVertex = aStartVertex;
   gp_Dir aCurDir = aDirY.Reversed();
-  gp_Dir aCurNorm = aNorm; //aNorm.Reversed();
+  gp_Dir aCurNorm = aNorm.Reversed();
+
+  const BOPCol_ListOfShape& anEdgesList = aMapVE.FindFromKey(aStartVertex);
+  BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
+  for (; aEdIter.More(); aEdIter.Next()) {
+    const TopoDS_Edge& anEdge = static_cast<const TopoDS_Edge&>(aEdIter.Value());
+    gp_Dir aTang = getOuterEdgeDirection(anEdge, aStartVertex);
+    if (aTang.X() < 0.0) {
+      aCurNorm = aNorm;
+      break;
+    }
+  }
 
   // Go through the edges and find loops
   TopoDS_Vertex aNextVertex;
