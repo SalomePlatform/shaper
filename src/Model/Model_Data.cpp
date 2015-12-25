@@ -61,7 +61,7 @@ static const int kFlagDeleted = 2;
 // invalid data
 const static std::shared_ptr<ModelAPI_Data> kInvalid(new Model_Data());
 
-Model_Data::Model_Data() : mySendAttributeUpdated(true)
+Model_Data::Model_Data() : mySendAttributeUpdated(true), myWasChangedButBlocked(false)
 {
 }
 
@@ -268,17 +268,28 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
 {
   theAttr->setInitialized();
   if (theAttr->isArgument()) {
-    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-    ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
-    if (mySendAttributeUpdated && myObject) {
-      myObject->attributeChanged(theAttr->id());
+    if (mySendAttributeUpdated) {
+      if (myObject) {
+        myObject->attributeChanged(theAttr->id());
+        static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+        ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+      }
+    } else {
+      myWasChangedButBlocked = true;
     }
   }
 }
 
 void Model_Data::blockSendAttributeUpdated(const bool theBlock)
 {
-  mySendAttributeUpdated = !theBlock;
+  if (mySendAttributeUpdated == theBlock) {
+    mySendAttributeUpdated = !theBlock;
+    if (mySendAttributeUpdated && myWasChangedButBlocked) { // so, now it is ok to send the update signal
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+      myWasChangedButBlocked = false;
+    }
+  }
 }
 
 void Model_Data::erase()

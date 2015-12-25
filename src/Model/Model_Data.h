@@ -55,6 +55,8 @@ class Model_Data : public ModelAPI_Data
   std::set<AttributePtr> myRefsToMe;
   /// flag that may block the "attribute updated" sending
   bool mySendAttributeUpdated;
+  /// if some attribute was changed, but mySendAttributeUpdated was false, this flag stores this
+  bool myWasChangedButBlocked;
 
   /// Returns label of this feature
   TDF_Label label()
