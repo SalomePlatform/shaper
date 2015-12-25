@@ -100,6 +100,9 @@ list<ObjectPtr> Model_AttributeRefList::list()
 
 bool Model_AttributeRefList::isInList(const ObjectPtr& theObj)
 {
+  if(!theObj.get()) {
+    return false;
+  }
   std::list<ObjectPtr> aResult;
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
       owner()->document());
