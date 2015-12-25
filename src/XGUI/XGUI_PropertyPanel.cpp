@@ -208,7 +208,11 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
     isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
   activateWidget(NULL);
-  //focusNextPrevChild(true);
+  // if there is no the next widget to be automatically activated, the Ok button in property
+  // panel should accept the focus(example is parallel constraint on sketch lines)
+  QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+  if (anOkBtn)
+    anOkBtn->setFocus(Qt::TabFocusReason);
 }
 
 //#define DEBUG_TAB_WIDGETS
