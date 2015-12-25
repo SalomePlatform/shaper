@@ -278,7 +278,7 @@ void SolveSpaceSolver_Storage::addCoincidentPoints(
   // Search available coincidence
   CoincidentPointsMap::iterator aMasterFound = myCoincidentPoints.find(theMaster);
   CoincidentPointsMap::iterator aSlaveFound = myCoincidentPoints.find(theSlave);
-  if (aMasterFound == myCoincidentPoints.end() &&  aSlaveFound == myCoincidentPoints.end()) {
+  if (aMasterFound == myCoincidentPoints.end() || aSlaveFound == myCoincidentPoints.end()) {
     // try to find master and slave points in the lists of slaves of already existent coincidences
     CoincidentPointsMap::iterator anIt = myCoincidentPoints.begin();
     for (; anIt != myCoincidentPoints.end(); ++anIt) {

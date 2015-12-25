@@ -155,6 +155,10 @@ bool SolveSpaceSolver_Solver::hasDegeneratedArcs() const
       const int aShift = anEntity.point[aPnt] - anEntity.h;
       int aPntInd = anEnt + aShift;
       int aStep = 1;
+      if (aPntInd < 0)
+        aPntInd = 0;
+      else if (aPntInd >= myEquationsSystem.entities)
+        aPntInd = myEquationsSystem.entities - 1;
       if (myEquationsSystem.entity[aPntInd].h > anEntity.point[aPnt])
         aStep = -1;
       for (; aPntInd >=0 && aPntInd < myEquationsSystem.entities; aPntInd += aStep)
