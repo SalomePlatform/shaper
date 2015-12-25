@@ -200,18 +200,24 @@ AISObjectPtr SketchPlugin_MultiTranslation::getAISObject(AISObjectPtr thePreviou
 
 void SketchPlugin_MultiTranslation::erase()
 {
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
   // Set copy attribute to false on all copied features.
+  AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributeRefListPtr aRefListOfTranslated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
 
-  if(aRefListOfTranslated.get()) {
-    static Events_Loop* aLoop = Events_Loop::loop();
-    static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-
-    std::list<ObjectPtr> aTargetList = aRefListOfTranslated->list();
-    for(std::list<ObjectPtr>::const_iterator aTargetIt = aTargetList.cbegin(); aTargetIt != aTargetList.cend(); aTargetIt++) {
-      if((*aTargetIt).get()) {
-        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aTargetIt);
+  if(aRefListOfShapes.get() && aRefListOfTranslated.get()) {
+    for(int anIndex = 0; anIndex < aRefListOfTranslated->size(); anIndex++) {
+      ObjectPtr anObject = aRefListOfTranslated->object(anIndex);
+      if(aRefListOfShapes->isInList(anObject)) {
+        // Don't modify attribute of original features, just skip.
+        continue;
+      }
+      if(anObject.get()) {
+        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
         if(aRes.get()) {
           FeaturePtr aFeature = aRes->document()->feature(aRes);
           if(aFeature.get()) {
