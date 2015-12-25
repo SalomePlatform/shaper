@@ -140,8 +140,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   const gp_Pnt& anEnd = theEndPoint->impl<gp_Pnt>();
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder;
-  if (aStart.IsEqual(anEnd, Precision::Confusion())
-      || gp_Pnt(0, 0, 0).IsEqual(anEnd, Precision::Confusion()))
+  if (aStart.IsEqual(anEnd, Precision::Confusion()))
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle);
   else
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
