@@ -45,7 +45,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(XML_RESOURCES
-  plugins.xml
+  ${CMAKE_CURRENT_BINARY_DIR}/plugins.xml
   dataModel.xml
 )
 
@@ -63,6 +63,44 @@ ADD_DEFINITIONS(-DCONFIG_EXPORTS -D_SCL_SECURE_NO_WARNINGS)
 ADD_LIBRARY(Config SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 
 TARGET_LINK_LIBRARIES(Config ${PROJECT_LIBRARIES})
+
+# Prepare plugins.xml
+
+# the solver to activate after installation
+SET(DEFAULT_SOLVER "SolveSpace")
+
+# the list of all solvers
+SET(SOLVERS "SolveSpace" "PlaneGCS")
+
+# apply NO_<solver> variables
+FOREACH(solver IN LISTS SOLVERS)
+  IF(NO_${solver})
+    LIST(REMOVE_ITEM SOLVERS ${solver})
+  ENDIF()
+ENDFOREACH()
+
+# check default solver in the list of solvers
+LIST(FIND SOLVERS ${DEFAULT_SOLVER} INDEX)
+IF(${INDEX} GREATER -1)
+  MESSAGE(STATUS "Default solver: ${DEFAULT_SOLVER}") 
+ELSE()
+  MESSAGE(FATAL_ERROR "Default solver: ${DEFAULT_SOLVER} is switched off.\nUnset NO_${DEFAULT_SOLVER} variable or define another default solver DEFAULT_SOLVER=<SOLVER> from the list: ${SOLVERS}.") 
+ENDIF()
+
+# prepare variables for configuration
+SET(DEFAULT_SOLVER "  <plugin library=\"${DEFAULT_SOLVER}Solver\"/>")
+FOREACH(solver IN LISTS SOLVERS)
+  IF(DEFINED ALL_SOLVERS)
+    SET(ALL_SOLVERS "${ALL_SOLVERS}\n")
+  ENDIF()
+  SET(ALL_SOLVERS "${ALL_SOLVERS}  <plugin library=\"${solver}Solver\"/>")
+ENDFOREACH()
+
+# configuration
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/plugins.xml.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/plugins.xml"
+  )
 
 INSTALL(TARGETS Config DESTINATION bin)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)

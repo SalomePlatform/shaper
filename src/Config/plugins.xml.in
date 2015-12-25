@@ -11,8 +11,10 @@
   <plugin script="addons_Features" configuration="addons_Features.xml"/>
   <plugin script="ConnectorPlugin" configuration="plugin-Connector.xml" dependency="Geometry"/>
   <plugin library="ParametersPlugin" configuration="plugin-Parameters.xml"/>
-  <plugin library="SolveSpaceSolver"/>
-<!--  <plugin library="PlaneGCSSolver"/> -->
+@DEFAULT_SOLVER@
+<!--
+@ALL_SOLVERS@
+-->
   <plugin library="GeomValidators"/>
   <plugin library="DFBrowser" internal="true"/>
 </plugins>
