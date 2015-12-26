@@ -638,9 +638,11 @@ void PartSet_Module::onFeatureTriggered()
 
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
+  if (myWorkshop->currentOperation() && 
+      myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID())
+    myHasConstraintShown = mySketchMgr->isConstraintsShown();
   if (PartSet_SketcherMgr::constraintsIdList().contains(theCmdId)) {
     // Show constraints if a constraint was anOperation
-    myHasConstraintShown = mySketchMgr->isConstraintsShown();
     mySketchMgr->onShowConstraintsToggle(true);
   }
   ModuleBase_IModule::launchOperation(theCmdId);
