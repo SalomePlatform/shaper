@@ -62,6 +62,8 @@ bool SketcherPrs_Transformation::updatePoints(double theStep) const
   // Compute points of symbols
   for (i = 0; i < aNbB; i++) {
     aObj = anAttrB->object(i);
+    if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
+      continue;
     aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(i + 1, aP1);
   }  
