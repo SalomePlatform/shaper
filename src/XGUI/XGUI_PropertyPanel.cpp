@@ -474,8 +474,12 @@ void XGUI_PropertyPanel::closeEvent(QCloseEvent* theEvent)
 {
   ModuleBase_Operation* aOp = myOperationMgr->currentOperation();
   if (aOp) {
-    if (myOperationMgr->abortAllOperations()) {
-      theEvent->accept();
+    if (myOperationMgr->canStopOperation(aOp)) {
+      myOperationMgr->abortOperation(aOp);
+      if (myOperationMgr->hasOperation())
+        theEvent->ignore();
+      else
+        theEvent->accept();
     } else 
       theEvent->ignore();
   } else
