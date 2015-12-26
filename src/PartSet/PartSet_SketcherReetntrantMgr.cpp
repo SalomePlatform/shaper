@@ -25,6 +25,8 @@
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
 
+#include <QToolButton>
+
 PartSet_SketcherReetntrantMgr::PartSet_SketcherReetntrantMgr(ModuleBase_IWorkshop* theWorkshop)
 : QObject(theWorkshop),
   myWorkshop(theWorkshop),
@@ -324,9 +326,18 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
             aPreviousAttributeWidget = aWidgets[i];
         }
         // If the current widget is a selector, do nothing, it processes the mouse press
-        if (aPreviousAttributeWidget && !aPreviousAttributeWidget->isViewerSelector()) {
-          aPreviousAttributeWidget->focusTo();
-          aPreviousAttributeWidget->selectContent();
+        if (aPreviousAttributeWidget) {
+          if (!aPreviousAttributeWidget->isViewerSelector()) {
+            aPreviousAttributeWidget->focusTo();
+            aPreviousAttributeWidget->selectContent();
+          }
+          else {
+            // if there is no the next widget to be automatically activated, the Ok button in property
+            // panel should accept the focus(example is parallel constraint on sketch lines)
+            QToolButton* anOkBtn = aPanel->findChild<QToolButton*>(PROP_PANEL_OK);
+            if (anOkBtn)
+              anOkBtn->setFocus(Qt::TabFocusReason);
+          }
         }
       }
     }

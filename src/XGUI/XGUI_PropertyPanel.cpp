@@ -35,6 +35,8 @@
 #include <iostream>
 #endif
 
+//#define DEBUG_TAB_WIDGETS
+
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
     : ModuleBase_IPropertyPanel(theParent), 
     myActiveWidget(NULL),
@@ -208,17 +210,8 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
     isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
   activateWidget(NULL);
-  // if there is no the next widget to be automatically activated, the Ok button in property
-  // panel should accept the focus(example is parallel constraint on sketch lines)
-  QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-  if (anOkBtn)
-    anOkBtn->setFocus(Qt::TabFocusReason);
 }
 
-//#define DEBUG_TAB_WIDGETS
-
-#define DEBUG_TAB
-#ifdef DEBUG_TAB
 void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const bool theDebug)
 {
   QList<QWidget*> aWidgets;
@@ -320,65 +313,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
   }
   return isChangedFocus;
 }
-#else
-bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
-{
-  // it wraps the Tabs clicking to follow in the chain:
-  // controls, last control, Apply, Cancel, first control, controls
-  bool isChangedFocus = false;
 
-  if (theIsNext) { // forward by Tab
-    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
-    if (aCancelBtn->hasFocus()) {
-      // after cancel, the first control should be focused
-      QWidget* aFirstControl = 0;
-      for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
-        aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
-      if (aFirstControl)
-        ModuleBase_Tools::setFocus(aFirstControl, "XGUI_PropertyPanel::focusNextPrevChild()");
-        isChangedFocus = true;
-    }
-    else {
-      // after the last control, the Apply button should be focused
-      QWidget* aLastControl = 0;
-      for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
-        aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
-      if (aLastControl && aLastControl->hasFocus()) {
-        setFocusOnOkButton();
-        isChangedFocus = true;
-      }
-    }
-  }
-  else { // backward by SHIFT + Tab
-    QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-    if (anOkBtn->hasFocus()) {
-      // after Apply, the last control should be focused
-      QWidget* aLastControl = 0;
-      for (int i = myWidgets.size()-1; i >= 0 && !aLastControl; i--)
-        aLastControl = myWidgets[i]->getControlAcceptingFocus(false);
-      if (aLastControl)
-        ModuleBase_Tools::setFocus(aLastControl, "XGUI_PropertyPanel::focusNextPrevChild()");
-        isChangedFocus = true;
-    }
-    else {
-      // after the first control, the Cancel button should be focused
-      QWidget* aFirstControl = 0;
-      for (int i = 0, aSize = myWidgets.size(); i < aSize && !aFirstControl; i++)
-        aFirstControl = myWidgets[i]->getControlAcceptingFocus(true);
-      if (aFirstControl && aFirstControl->hasFocus()) {
-        QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
-        ModuleBase_Tools::setFocus(aCancelBtn, "XGUI_PropertyPanel::focusNextPrevChild()");
-        isChangedFocus = true;
-      }
-    }
-  }
-
-  if (!isChangedFocus)
-    isChangedFocus = ModuleBase_IPropertyPanel::focusNextPrevChild(theIsNext);
-  return isChangedFocus;
-}
-
-#endif
 void XGUI_PropertyPanel::activateNextWidget()
 {
   activateNextWidget(myActiveWidget);

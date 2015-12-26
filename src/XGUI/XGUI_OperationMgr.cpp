@@ -22,6 +22,9 @@
 #include "ModelAPI_CompositeFeature.h"
 #include "ModelAPI_Session.h"
 
+#include <XGUI_PropertyPanel.h>
+#include <QToolButton>
+
 #include <QMessageBox>
 #include <QApplication>
 #include <QKeyEvent>
@@ -540,15 +543,26 @@ bool XGUI_OperationMgr::onProcessEnter()
   ModuleBase_Operation* aOperation = currentOperation();
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
   ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-  if (!aActiveWgt || !aActiveWgt->processEnter()) {
-    if (!myWorkshop->module()->processEnter(aActiveWgt ? aActiveWgt->attributeID() : "")) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
-      if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
-        emit keyEnterReleased();
-        commitOperation();
+  bool isAborted = false;
+  if (!aActiveWgt) {
+    QWidget* aFocusWidget = aPanel->focusWidget();
+    QToolButton* aCancelBtn = aPanel->findChild<QToolButton*>(PROP_PANEL_CANCEL);
+    if (aFocusWidget && aCancelBtn && aFocusWidget == aCancelBtn) {
+      abortOperation(aOperation);
+      isAborted = true;
+    }
+  }
+  if (!isAborted) {
+    if (!aActiveWgt || !aActiveWgt->processEnter()) {
+      if (!myWorkshop->module()->processEnter(aActiveWgt ? aActiveWgt->attributeID() : "")) {
+        ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+        if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
+          emit keyEnterReleased();
+          commitOperation();
+        }
+        else
+          isAccepted = false;
       }
-      else
-        isAccepted = false;
     }
   }
   return isAccepted;
