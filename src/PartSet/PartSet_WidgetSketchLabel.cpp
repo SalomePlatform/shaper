@@ -338,10 +338,13 @@ void PartSet_WidgetSketchLabel::activateCustom()
 void PartSet_WidgetSketchLabel::deactivate()
 {
   ModuleBase_ModelWidget::deactivate();
+  bool aHidePreview = myPreviewDisplayed;
   erasePreviewPlanes();
   activateSelection(false);
 
   activateFilters(false);
+  if (aHidePreview)
+    myWorkshop->viewer()->update();
 }
 
 void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
