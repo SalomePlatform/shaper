@@ -247,9 +247,6 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
 
 bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 {
-  //bool isChangedFocus = ModuleBase_IPropertyPanel::focusNextPrevChild(theIsNext);
-  //return true;//isChangedFocus;
-
   // it wraps the Tabs clicking to follow in the chain:
   // controls, last control, Apply, Cancel, first control, controls
   bool isChangedFocus = false;
@@ -273,7 +270,13 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
         if (aFocusWidgetIndex == aChildrenCount-1) {
           // after the last widget focus should be set to "Apply"
           QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
-          aNewFocusWidget = anOkBtn;
+          if (anOkBtn->isEnabled())
+            aNewFocusWidget = anOkBtn;
+          else {
+            QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+            if (aCancelBtn->isEnabled())
+              aNewFocusWidget = aCancelBtn;
+          }
         }
         else {
           aNewFocusWidget = aChildren[aFocusWidgetIndex+1];
