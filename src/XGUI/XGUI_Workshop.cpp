@@ -1100,13 +1100,15 @@ void XGUI_Workshop::hidePropertyPanel()
 //******************************************************
 void XGUI_Workshop::showObjectBrowser()
 {
-  myObjectBrowser->parentWidget()->show();
+  if (!isSalomeMode())
+    myObjectBrowser->parentWidget()->show();
 }
 
 //******************************************************
 void XGUI_Workshop::hideObjectBrowser()
 {
-  myObjectBrowser->parentWidget()->hide();
+  if (!isSalomeMode())
+    myObjectBrowser->parentWidget()->hide();
 }
 
 //******************************************************
