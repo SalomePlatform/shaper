@@ -209,6 +209,21 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
     }
     isFoundWidget = isFoundWidget || (*anIt) == theWidget;
   }
+  // set focus to Ok/Cancel button in Property panel if there are no more active widgets
+  // it should be performed before activateWidget(NULL) because it emits some signals which
+  // can be processed by moudule for example as to activate another widget with setting focus
+  QWidget* aNewFocusWidget = 0;
+  QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+  if (anOkBtn->isEnabled())
+    aNewFocusWidget = anOkBtn;
+  else {
+    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+    if (aCancelBtn->isEnabled())
+      aNewFocusWidget = aCancelBtn;
+  }
+  if (aNewFocusWidget)
+    aNewFocusWidget->setFocus(Qt::TabFocusReason);
+
   activateWidget(NULL);
 }
 
@@ -222,10 +237,32 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
       for (int i = 0, aCount = aLayout->count(); i < aCount; i++) {
         QLayoutItem* anItem = aLayout->itemAt(i);
         QWidget* aWidget = anItem ? anItem->widget() : 0;
-        if (aWidget && aWidget->isVisible()) {
-          if (aWidget->focusPolicy() != Qt::NoFocus)
-            theWidgets.append(aWidget);
-          findDirectChildren(aWidget, theWidgets, false);
+        if (aWidget) {
+          if (aWidget->isVisible()) {
+            if (aWidget->focusPolicy() != Qt::NoFocus)
+              theWidgets.append(aWidget);
+            findDirectChildren(aWidget, theWidgets, false);
+          }
+        }
+        else if (anItem->layout()) {
+          QLayout* aLayout = anItem->layout();
+          for (int i = 0, aCount = aLayout->count(); i < aCount; i++) {
+            QLayoutItem* anItem = aLayout->itemAt(i);
+            QWidget* aWidget = anItem ? anItem->widget() : 0;
+            if (aWidget) {
+              if (aWidget->isVisible()) {
+                if (aWidget->focusPolicy() != Qt::NoFocus)
+                  theWidgets.append(aWidget);
+                findDirectChildren(aWidget, theWidgets, false);
+              }
+            }
+            else {
+              // TODO: improve recursive search for the case when here QLayout is used
+              // currently, the switch widget uses only 1 level of qlayout in qlayout using for
+              // example for construction plane feature. If there are more levels,
+              // it should be implemented here
+            }
+          }
         }
       }
     }
