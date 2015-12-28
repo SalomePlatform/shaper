@@ -168,7 +168,7 @@ protected:
    /// \param theY an Y coordinate of the point
    /// \return boolean result
    static bool isOrphanPoint(const FeaturePtr& theFeature, const CompositeFeaturePtr& theSketch,
-                             double theX, double theY);
+                             double theX, double theY, const bool theSearchInResults = false);
 
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
