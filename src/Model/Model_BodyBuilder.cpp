@@ -130,12 +130,14 @@ void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
         // This shape is already in document, store reference instead of shape;
         const TDF_Label aFoundLabel = aNS->Label();
         TDF_Reference::Set(aShapeLab, aFoundLabel);
+        aShapeLab.ForgetAttribute(TNaming_NamedShape::GetID());
         return;
       }
     }
 
     aBuilder.Generated(aShape);	
     // register name
+    aShapeLab.ForgetAttribute(TDF_Reference::GetID());
     if(!aBuilder.NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
       if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
