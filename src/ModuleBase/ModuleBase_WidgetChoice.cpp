@@ -56,6 +56,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
       int aId = 0;
       foreach(QString aBtnTxt, aList) {
         QToolButton* aBtn = new QToolButton(aGroupBox);
+        aBtn->setFocusPolicy(Qt::StrongFocus);
         aBtn->setCheckable(true);
         aBtn->setToolTip(aBtnTxt);
 
