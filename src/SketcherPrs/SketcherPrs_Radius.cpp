@@ -25,6 +25,9 @@ static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
+static const Standard_ExtCharacter MyEmptySymbol(' ');
+static const Standard_ExtCharacter MySummSymbol(0x03A3);
+
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), myPlane(thePlane)
@@ -103,6 +106,17 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
   // The value of vertical aligment is sometimes changed
   myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
+
+  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
+  std::set<std::string> aParams = aValue->usedParameters();
+  if (aParams.size() > 0) {
+    SetSpecialSymbol(MySummSymbol);
+    SetDisplaySpecialSymbol(AIS_DSS_Before);
+  }
+  else {
+    SetSpecialSymbol(MyEmptySymbol);
+    SetDisplaySpecialSymbol(AIS_DSS_Before);
+  }
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

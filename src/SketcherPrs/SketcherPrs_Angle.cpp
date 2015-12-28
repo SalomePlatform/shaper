@@ -26,6 +26,9 @@ IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
 
+static const Standard_ExtCharacter MyEmptySymbol(' ');
+static const Standard_ExtCharacter MySummSymbol(0x03A3);
+
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint, 
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint), myPlane(thePlane)
@@ -99,6 +102,17 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+
+  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
+  std::set<std::string> aParams = aValue->usedParameters();
+  if (aParams.size() > 0) {
+    SetSpecialSymbol(MySummSymbol);
+    SetDisplaySpecialSymbol(AIS_DSS_Before);
+  }
+  else {
+    SetSpecialSymbol(MyEmptySymbol);
+    SetDisplaySpecialSymbol(AIS_DSS_Before);
+  }
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
