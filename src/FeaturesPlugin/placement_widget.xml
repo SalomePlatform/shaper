@@ -2,9 +2,9 @@
 
 <source>
   <multi_selector id="placement_objects_list"
-    label="Select a solid objects"
+    label="Select solid objects"
     icon=":icons/cut_shape.png"
-    tooltip="Select a solid objects"
+    tooltip="Select solid objects"
     type_choice=""
     concealment="true" >
     <validator id="FeaturesPlugin_ValidatorTransform"/>

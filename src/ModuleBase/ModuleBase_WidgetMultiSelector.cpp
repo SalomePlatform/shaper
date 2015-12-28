@@ -124,9 +124,11 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     aMainLay->setColumnStretch(2, 1);
   }
 
+  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
   myListControl = new CustomListWidget(this);
   QString anObjName = QString::fromStdString(attributeID());
   myListControl->setObjectName(anObjName);
+  myListControl->setToolTip(aToolTip);
 
   aMainLay->addWidget(myListControl, 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);

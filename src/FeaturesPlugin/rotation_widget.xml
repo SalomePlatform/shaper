@@ -4,7 +4,7 @@
   <multi_selector id="main_objects"
     label="Main objects"
     icon=":icons/cut_shape.png"
-    tooltip="Select a solid objects"
+    tooltip="Select solid objects"
     type_choice="solid"
     use_choice="false"
     concealment="true">
