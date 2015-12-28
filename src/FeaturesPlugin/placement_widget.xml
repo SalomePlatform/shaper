@@ -2,7 +2,7 @@
 
 <source>
   <multi_selector id="placement_objects_list"
-    label="Select solid objects"
+    label="Select objects to move"
     icon=":icons/cut_shape.png"
     tooltip="Select solid objects"
     type_choice=""
