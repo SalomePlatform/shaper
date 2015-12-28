@@ -1155,6 +1155,11 @@ static void rotate(EntityWrapperPtr theSource, EntityWrapperPtr theDest,
       double aNewX = aVec->x() * theCos - aVec->y() * theSin;
       double aNewY = aVec->x() * theSin + aVec->y() * theCos;
       aDstAttr->setValue(theCenter->x() + aNewX, theCenter->y() + aNewY);
+      // set also parameters of the solver
+      double aCoord[2] = {aDstAttr->x(), aDstAttr->y()};
+      std::list<ParameterWrapperPtr>::const_iterator aDIt = theDest->parameters().begin();
+      for (int i = 0; aDIt != theDest->parameters().end(); ++aDIt, ++i)
+        (*aDIt)->setValue(aCoord[i]);
     }
     return;
   }
