@@ -365,17 +365,15 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
     ObjectPtr aObject = aObjects.front();
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
     bool anExternal = false;
-      std::shared_ptr<SketchPlugin_Feature> aSPFeature;
-      if (aSelectedFeature.get() != NULL)
-        aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature;
+    if (aSelectedFeature.get() != NULL)
+      aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
       if ((!aSPFeature && !aShape.IsNull()) ||
           (aSPFeature.get() && aSPFeature->isExternal())) {
         anExternal = true;
         ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
         if (!aFixedObject.get())
-          aObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
-        else
-          aObject = aFixedObject;
+          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
 
         double aX, aY;
         if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
@@ -390,12 +388,24 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
             setValueState(Stored); // in case of edge selection, Apply state should also be updated
           bool anOrphanPoint = aShape.ShapeType() == TopAbs_VERTEX ||
                                isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
-          setConstraintWith(aObject);
+          if (anExternal) {
+            anOrphanPoint = true; // we should not stop reentrant operation on external objects because
+            // they are not participate in the contour creation excepting external vertices
+            if (aShape.ShapeType() == TopAbs_VERTEX) {
+              FeaturePtr aFixedFeature = ModelAPI_Feature::feature(aFixedObject);
+              if (aFixedFeature.get() && aFixedFeature->getKind() == SketchPlugin_Point::ID()) {
+                anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY, true);
+              }
+            }
+          }
+
+          setConstraintWith(aFixedObject);
           // fignal updated should be flushed in order to visualize possible created external objects
           // e.g. selection of trihedron axis when input end arc point
           updateObject(feature());
-          if (!anOrphanPoint && !anExternal)
-            emit vertexSelected();
+
+          if (!anOrphanPoint)
+            emit vertexSelected(); // it stops the reentrant operation
 
           emit focusOutWidget(this);
         }
@@ -551,7 +561,7 @@ bool PartSet_WidgetPoint2D::useSelectedShapes() const
 
 bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
                                           const CompositeFeaturePtr& theSketch,
-                                          double theX, double theY)
+                                          double theX, double theY, const bool theSearchInResults)
 {
   bool anOrphanPoint = false;
   if (theFeature.get()) {
@@ -580,7 +590,9 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
 
     if (aPointAttr.get()) {
       std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
-      FeaturePtr aCoincidence = PartSet_Tools::findFirstCoincidence(theFeature, aPoint);
+      // we need to find coincidence features in results also, because external object(point)
+      // uses refs to me in another feature.
+      FeaturePtr aCoincidence = PartSet_Tools::findFirstCoincidence(theFeature, aPoint, theSearchInResults);
       anOrphanPoint = true;
       // if there is at least one concident line to the point, the point is not an orphant
       if (aCoincidence.get()) {
