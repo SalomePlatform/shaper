@@ -277,6 +277,12 @@ void PartSet_WidgetPoint2D::activateCustom()
   aModes << TopAbs_VERTEX;
   aModes << TopAbs_EDGE;
   myWorkshop->activateSubShapesSelection(aModes);
+
+  if (!isEditingMode()) {
+    FeaturePtr aFeature = feature();
+    if (aFeature.get() && aFeature->getKind() == SketchPlugin_Point::ID())
+      storeValue();
+  }
 }
 
 bool PartSet_WidgetPoint2D::canBeActivatedByMove()
