@@ -7,21 +7,21 @@ while [[ $# > 0 ]]; do
 
   case $key in
     debug|Debug)
-    BUILD_TYPE=Debug
-    shift
-    ;;
+      BUILD_TYPE=Debug
+      shift
+      ;;
     lcov|coverage)
-    BUILD_TYPE=Debug
-    USE_TEST_COVERAGE=ON
-    shift
-    ;;
+      BUILD_TYPE=Debug
+      USE_TEST_COVERAGE=ON
+      shift
+      ;;
     standalone|Standalone)
-    MODE=Standalone
-    shift
-    ;;
+      MODE=Standalone
+      shift
+      ;;
     *)
-    shift
-    ;;
+      shift
+      ;;
   esac
 done
 
