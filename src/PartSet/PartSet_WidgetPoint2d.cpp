@@ -368,11 +368,14 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
       std::shared_ptr<SketchPlugin_Feature> aSPFeature;
       if (aSelectedFeature.get() != NULL)
         aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-      if ((!aSPFeature) && (!aShape.IsNull())) {
+      if ((!aSPFeature && !aShape.IsNull()) ||
+          (aSPFeature.get() && aSPFeature->isExternal())) {
         anExternal = true;
         ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
         if (!aFixedObject.get())
           aObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+        else
+          aObject = aFixedObject;
 
         double aX, aY;
         if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
