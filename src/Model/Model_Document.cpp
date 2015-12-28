@@ -979,13 +979,18 @@ void Model_Document::setCurrentFeature(
     }
     // update for everyone the concealment flag immideately: on edit feature in the midle of history
     if (aWasChanged) {
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResList = anIter->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
-      for(; aRes != aResList.end(); aRes++) {
+      std::list<ResultPtr> aResults;
+      ModelAPI_Tools::allResults(anIter, aResults);
+      std::list<ResultPtr>::const_iterator aRes = aResults.begin();
+      for(; aRes != aResults.end(); aRes++) {
         if ((*aRes).get() && (*aRes)->data()->isValid() && !(*aRes)->isDisabled())
           std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->updateConcealmentFlag();
       }
-
+      // update the concealment status for disply in isConcealed of ResultBody
+      for(aRes = aResults.begin(); aRes != aResults.end(); aRes++) {
+        if ((*aRes).get() && (*aRes)->data()->isValid() && !(*aRes)->isDisabled())
+          (*aRes)->isConcealed();
+      }
     }
   }
   // unblock  the flush signals and up them after this

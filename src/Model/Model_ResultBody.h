@@ -28,6 +28,10 @@ class Model_ResultBody : public ModelAPI_ResultBody
   /// builders that tores the naming history: one per label to allow store several shapes to one 
   /// label; index in vector corresponds to the label tag
   //std::vector<TNaming_Builder*> myBuilders;
+
+  /// Flag that stores the previous state of "concealed": if it is changed,
+  /// The event is used to redisplay the body.
+  bool myWasConcealed;
 public:
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();

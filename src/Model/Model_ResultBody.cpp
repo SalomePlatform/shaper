@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Tools.h>
 #include <Config_PropManager.h>
+#include <ModelAPI_Events.h>
 // DEB
 //#include <TCollection_AsciiString.hxx>
 //#include <TDF_Tool.hxx>
@@ -17,6 +18,7 @@
 Model_ResultBody::Model_ResultBody()
 {
   myBuilder = new Model_BodyBuilder(this);
+  myWasConcealed = false;
 }
 
 void Model_ResultBody::initAttributes()
@@ -50,15 +52,32 @@ bool Model_ResultBody::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theSh
 
 bool Model_ResultBody::isConcealed()
 {
-  if (ModelAPI_ResultBody::isConcealed())
-    return true;
-  ResultPtr aThis = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
-  if (aThis.get()) {
-    ResultCompSolidPtr aParent = ModelAPI_Tools::compSolidOwner(aThis);
-    if (aParent.get()) {
-      if (aParent->isConcealed())
-        return true;
+  bool aResult = false;
+  if (ModelAPI_ResultBody::isConcealed()) {
+    aResult = true;
+  } else {
+    ResultPtr aThis = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
+    if (aThis.get()) {
+      ResultCompSolidPtr aParent = ModelAPI_Tools::compSolidOwner(aThis);
+      if (aParent.get()) {
+        if (aParent->isConcealed())
+          aResult = true;
+      }
     }
   }
-  return false;
+  if (myWasConcealed != aResult) {
+    myWasConcealed = aResult;
+    if (aResult) { // hidden unit must be redisplayed (hidden)
+      ModelAPI_EventCreator::get()->sendDeleted(document(), this->groupName());
+      // redisplay for the viewer (it must be disappeared also)
+      static Events_ID EVENT_DISP = 
+        Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), EVENT_DISP);
+    } else { // was not concealed become concealed => delete event
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+      ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+    }
+  }
+
+  return aResult;
 }

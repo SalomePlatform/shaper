@@ -820,6 +820,16 @@ void Model_Objects::synchronizeBackRefs()
       }
     }
   }
+  for(aFeatures.Initialize(myFeatures); aFeatures.More(); aFeatures.Next()) {
+    FeaturePtr aFeature = aFeatures.Value();
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
+    // update the concealment status for disply in isConcealed of ResultBody
+    std::list<ResultPtr>::iterator aRIter = aResults.begin();
+    for(; aRIter != aResults.cend(); aRIter++) {
+      (*aRIter)->isConcealed();
+    }
+  }
 }
 
 TDF_Label Model_Objects::resultLabel(
