@@ -79,7 +79,7 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
   std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter = aShapePairs.begin();
   for(; aPairsIter != aShapePairs.end(); aPairsIter++) {
     if (theFlag) { // disabled => make selection
-      aBuilder.Select(aPairsIter->first, aPairsIter->second);
+      aBuilder.Select(aPairsIter->second, aPairsIter->first);
     } else if (anEvol == TNaming_GENERATED) {
       aBuilder.Generated(aPairsIter->first, aPairsIter->second);
     } else if (anEvol == TNaming_MODIFY) {
@@ -89,7 +89,7 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
     } else if (anEvol == TNaming_PRIMITIVE) {
       aBuilder.Generated(aPairsIter->second);
     } else if (anEvol == TNaming_SELECTED) {
-      aBuilder.Select(aPairsIter->first, aPairsIter->second);
+      aBuilder.Select(aPairsIter->second, aPairsIter->first);
     }
   }
   // recursive call for all sub-labels
