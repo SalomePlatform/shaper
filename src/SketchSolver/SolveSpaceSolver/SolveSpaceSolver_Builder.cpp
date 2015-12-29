@@ -308,13 +308,16 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
     AttributePtr aPoint = theFeature->attribute(SketchPlugin_Point::COORD_ID());
     if (!aPoint->isInitialized())
       return aDummy;
-    EntityWrapperPtr aSub = createAttribute(aPoint, theGroupID, theSketchID);
+    EntityWrapperPtr aSub = theAttributes.empty() ? createAttribute(aPoint, theGroupID, theSketchID) :
+                            theAttributes.front();
     if (!aSub)
       return aDummy;
 
     const Slvs_Entity& aSubEnt =
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(aSub)->entity();
-    return EntityWrapperPtr(new SolveSpaceSolver_EntityWrapper(theFeature, aPoint, aSubEnt));
+    EntityWrapperPtr aResult(new SolveSpaceSolver_EntityWrapper(theFeature, aPoint, aSubEnt));
+    aResult->setSubEntities(theAttributes);
+    return aResult;
   }
 
   // wrong entity

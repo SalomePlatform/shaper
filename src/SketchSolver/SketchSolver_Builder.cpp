@@ -119,6 +119,8 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchSolver_Builder::point(EntityWrapperPtr theE
 {
   if (theEntity->type() != ENTITY_POINT)
     return std::shared_ptr<GeomAPI_Pnt2d>();
+  if (theEntity->subEntities().size() == 1) // SketchPlugin_Point wrapper
+    return point(theEntity->subEntities().front());
 
   double aXY[2];
   std::list<ParameterWrapperPtr> aParams = theEntity->parameters();

@@ -274,6 +274,13 @@ void SolveSpaceSolver_Storage::addCoincidentPoints(
 {
   if (theMaster->type() != ENTITY_POINT || theSlave->type() != ENTITY_POINT)
     return;
+  if (!theMaster->subEntities().empty() || !theSlave->subEntities().empty()) {
+    EntityWrapperPtr aSubMaster = theMaster->subEntities().empty() ?
+        theMaster : theMaster->subEntities().front();
+    EntityWrapperPtr aSubSlave = theSlave->subEntities().empty() ?
+        theSlave : theSlave->subEntities().front();
+    return addCoincidentPoints(aSubMaster, aSubSlave);
+  }
 
   // Search available coincidence
   CoincidentPointsMap::iterator aMasterFound = myCoincidentPoints.find(theMaster);
