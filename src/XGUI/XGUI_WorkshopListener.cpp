@@ -402,6 +402,11 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     bool aHide = !anObject->data()->isValid() || 
                  anObject->isDisabled() ||
                  !anObject->isDisplayed();
+    if (!aHide) { // check that this is not hidden result
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      bool isConcealed = aRes && aRes->isConcealed();
+      aHide = aRes && aRes->isConcealed();
+    }
     if (!aHide) {
       // setDisplayed has to be called in order to synchronize internal state of the object 
       // with list of displayed objects
