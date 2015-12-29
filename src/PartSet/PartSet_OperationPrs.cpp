@@ -284,6 +284,17 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
 {
   std::string anAttrType = theAttribute->attributeType();
 
+  /// workaround: start
+  /// this is a TEMPORARY correction in order to avoid crash by parameter edit
+  /// which is reproduced only on Linux Debian.
+  /// The possible reason is an empty AIS presentation visualized in the viewer.
+  /// The best solution is to analize whether the feature has shapes/results and only
+  /// in this case visualize custom presentation and hide it as soon as they disappear.
+  bool isAttributeArgument = theAttribute->isArgument();
+  if (!isAttributeArgument)
+    return false;
+  /// workaround: end
+
   return anAttrType == ModelAPI_AttributeSelectionList::typeId() ||
          anAttrType == ModelAPI_AttributeRefList::typeId() ||
          anAttrType == ModelAPI_AttributeRefAttr::typeId() ||
