@@ -329,6 +329,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
       anArcFeature->attribute(SketchPlugin_Arc::START_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       anArcFeature->attribute(SketchPlugin_Arc::END_ID()));
+  if (!aCenterAttr || !aStartAttr || !aEndAttr)
+    return;
   std::shared_ptr<GeomAPI_Pnt2d> aCenterPnt = aCenterAttr->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aStartPnt  = aStartAttr->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aEndPnt    = aEndAttr->pnt();

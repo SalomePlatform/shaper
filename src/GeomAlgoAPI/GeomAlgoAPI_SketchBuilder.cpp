@@ -47,7 +47,10 @@ const double shift = acos(1.0 - 3.0 * tolerance);
 
 /// \brief Search first vertex - the vertex with lowest x coordinate, which is used in 2 edges at least
 static const TopoDS_Vertex& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
-                                           const gp_Dir& theDirX, const gp_Dir& theDirY);
+                                            const gp_Dir& theDirX, const gp_Dir& theDirY);
+
+static gp_Dir calculateStartNormal(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
+                                   const TopoDS_Vertex& theStart, const gp_Dir& theNormal);
 
 /// \brief Search the vertex on the sketch candidate to be the next one in the loop
 static void findNextVertex(const TopoDS_Vertex& theStartVertex,
@@ -145,34 +148,24 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   std::list<TopoDS_Edge> aProcEdges;
 
   // Search the start vertex
-  TopoDS_Vertex aStartVertex = findStartVertex(aMapVE, aDirX, aDirY);
-  aProcVertexes.push_back(aStartVertex);
-
-  TopoDS_Vertex aCurVertex = aStartVertex;
+  TopoDS_Vertex aCurVertex = findStartVertex(aMapVE, aDirX, aDirY);
+  aProcVertexes.push_back(aCurVertex);
   gp_Dir aCurDir = aDirY.Reversed();
-  gp_Dir aCurNorm = aNorm.Reversed();
-
-  const BOPCol_ListOfShape& anEdgesList = aMapVE.FindFromKey(aStartVertex);
-  BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
-  for (; aEdIter.More(); aEdIter.Next()) {
-    const TopoDS_Edge& anEdge = static_cast<const TopoDS_Edge&>(aEdIter.Value());
-    gp_Dir aTang = getOuterEdgeDirection(anEdge, aStartVertex);
-    if (aTang.X() < 0.0) {
-      aCurNorm = aNorm;
-      break;
-    }
-  }
+  gp_Dir aCurNorm = calculateStartNormal(aMapVE, aCurVertex, aNorm);
 
   // Go through the edges and find loops
   TopoDS_Vertex aNextVertex;
   TopoDS_Edge aBindingEdge;
   gp_Dir aNextDir;
+  bool hasBranches = false;
   while (aMapVE.Extent() > 0) {
     if (aCurVertex.IsNull())
       return;
     if (!aProcEdges.empty())
       aBindingEdge = aProcEdges.back();
     findNextVertex(aCurVertex, aMapVE, aCurDir, aCurNorm, aNextVertex, aBindingEdge, aNextDir);
+    if (aMapVE.FindFromKey(aCurVertex).Size() > 2)
+      hasBranches = true;
     aCurNorm = aNorm;
 
     // Try to find next vertex in the list of already processed
@@ -198,13 +191,33 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         anEdgeIter = aProcEdges.end();
         anEdgeIter--;
       }
-      else if (aVertIter != aProcVertexes.begin()) {
+      else if (hasBranches) {
         // Check the orientation of the loop
         gp_Dir aCN = getOuterEdgeDirection(*anEdgeIter, *aVertIter);
         gp_Dir aCP = getOuterEdgeDirection(aProcEdges.back(), *aVertIter);
         aCN.Reverse();
         aCP.Reverse();
-        if (aCN.DotCross(aCP, aNorm) < -tolerance) {
+        bool isWrongOrient = false;
+        double aDotCross = aCN.DotCross(aCP, aNorm);
+        if (aDotCross < -tolerance)
+          isWrongOrient = true;
+        else if (aDotCross < 0.1) {
+          std::list<TopoDS_Edge>::iterator aEIt = anEdgeIter, aEIt1 = aProcEdges.end();
+          ++aEIt; --aEIt1;
+          if (aEIt != aEIt1) {
+            gp_XYZ aStartV = BRep_Tool::Pnt(*aVertIter).XYZ();
+            // verify all vertices in the loop to be inside the angle between aCN and aCP
+            std::list<TopoDS_Vertex>::iterator aVIt = aVertIter;
+            std::list<TopoDS_Vertex>::iterator aEndIt = aProcVertexes.end();
+            ++aVIt; ++aVIt; --aEndIt; --aEndIt;
+            for (; aVIt != aEndIt && !isWrongOrient; ++aVIt) {
+              gp_XYZ aDir(BRep_Tool::Pnt(*aVIt).XYZ() - aStartV);
+              isWrongOrient = aCN.XYZ().DotCross(aDir, aNorm.XYZ()) < -tolerance;
+            }
+          }
+        }
+
+        if (isWrongOrient) {
           // The found loop has wrong orientation and may contain sub-loops.
           // Need to check it once again with another initial direction.
           aCurVertex = *aVertIter;
@@ -227,6 +240,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         aCurNorm = aNorm.Reversed();
         continue;
       }
+
+      hasBranches = false;
 
       // When the orientation is correct or the edges looped through
       // the first element, create new face and remove unnecessary edges.
@@ -351,8 +366,9 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
         if (!aProcVertexes.empty()) {
           aNextVertex = aProcVertexes.back();
-          if (!aCurEdge.IsNull())
-            aNextDir = getOuterEdgeDirection(aCurEdge, aNextVertex);
+          aProcVertexes.clear();
+          aProcEdges.clear();
+          aProcVertexes.push_back(aNextVertex);
         }
       } else {  // there is no branching vertex in the list of proceeded,
                 // so we should revert the list and go the opposite way
@@ -370,11 +386,10 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       aProcVertexes.clear();
       aProcEdges.clear();
 
-      aStartVertex = findStartVertex(aMapVE, aDirX, aDirY);
-      aProcVertexes.push_back(aStartVertex);
-      aNextVertex = aStartVertex;
+      aNextVertex = findStartVertex(aMapVE, aDirX, aDirY);
+      aProcVertexes.push_back(aNextVertex);
       aNextDir = aDirY.Reversed();
-      aCurNorm = aNorm.Reversed();
+      aCurNorm = calculateStartNormal(aMapVE, aNextVertex, aNorm);
     }
 
     aCurVertex = aNextVertex;
@@ -503,6 +518,24 @@ const TopoDS_Vertex& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfSha
     }
   }
   return static_cast<const TopoDS_Vertex&>(theMapVE.FindKey(aStartVertexInd));
+}
+
+gp_Dir calculateStartNormal(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
+                            const TopoDS_Vertex& theStart, const gp_Dir& theNormal)
+{
+  gp_Dir aNorm = theNormal.Reversed();
+
+  const BOPCol_ListOfShape& anEdgesList = theMapVE.FindFromKey(theStart);
+  BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
+  for (; aEdIter.More(); aEdIter.Next()) {
+    const TopoDS_Edge& anEdge = static_cast<const TopoDS_Edge&>(aEdIter.Value());
+    gp_Dir aTang = getOuterEdgeDirection(anEdge, theStart);
+    if (aTang.X() < 0.0) {
+      aNorm = theNormal;
+      break;
+    }
+  }
+  return aNorm;
 }
 
 void findNextVertex(const TopoDS_Vertex& theStartVertex,
