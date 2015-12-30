@@ -60,11 +60,6 @@ ADD_SUBDIRECTORY (src/SketchSolver)
 ADD_SUBDIRECTORY (src/ModuleBase)
 ADD_SUBDIRECTORY (src/PartSet)
 
-IF(NOT ${HAVE_SALOME})
-    ADD_SUBDIRECTORY (src/AppElements)
-    ADD_SUBDIRECTORY (src/GeomApp)
-ENDIF(NOT ${HAVE_SALOME})
-
 ADD_SUBDIRECTORY (src/XGUI)
 ADD_SUBDIRECTORY (src/ExchangePlugin)
 ADD_SUBDIRECTORY (src/GeomValidators)
