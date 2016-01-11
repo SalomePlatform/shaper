@@ -91,23 +91,26 @@ SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESO
 #SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES} ${PROJECT_RESOURCES})
 SOURCE_GROUP ("Resource Files" FILES ${PROJECT_RESOURCES})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI 
-                    ${CMAKE_SOURCE_DIR}/src/Config
-                    ${CMAKE_SOURCE_DIR}/src/Events
-                    ${CMAKE_SOURCE_DIR}/src/ModuleBase
-                    ${CMAKE_SOURCE_DIR}/src/ModelAPI
-                    ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
-                    ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
-                    ${CMAKE_SOURCE_DIR}/src/SketchPlugin
-                    ${CMAKE_SOURCE_DIR}/src/ExchangePlugin
-                    ${CMAKE_SOURCE_DIR}/src/SketcherPrs
-                    ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
-                    ${CMAKE_SOURCE_DIR}/src/PartSetPlugin
-                    ${CMAKE_SOURCE_DIR}/src/GeomAPI
-                    ${CMAKE_SOURCE_DIR}/src/AppElements
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
+                    ${PROJECT_SOURCE_DIR}/src/Config
+                    ${PROJECT_SOURCE_DIR}/src/Events
+                    ${PROJECT_SOURCE_DIR}/src/ModuleBase
+                    ${PROJECT_SOURCE_DIR}/src/ModelAPI
+                    ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+                    ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+                    ${PROJECT_SOURCE_DIR}/src/SketchPlugin
+                    ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
+                    ${PROJECT_SOURCE_DIR}/src/SketcherPrs
+                    ${PROJECT_SOURCE_DIR}/src/FeaturesPlugin
+                    ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
+                    ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${CAS_INCLUDE_DIRS}
                     ${SUIT_INCLUDE}
 )
+
+IF(NOT ${HAVE_SALOME})
+  INCLUDE_DIRECTORIES(${APPELEMENTS_INCLUDE_DIR})
+ENDIF(NOT ${HAVE_SALOME})
 
 ADD_DEFINITIONS(-DPARTSET_EXPORTS ${CAS_DEFINITIONS})
 ADD_LIBRARY(PartSet SHARED 
@@ -125,3 +128,4 @@ ADD_DEPENDENCIES(PartSet ModuleBase)
 
 INSTALL(TARGETS PartSet DESTINATION bin)
 #INSTALL(FILES ${QM_RESOURCES} DESTINATION bin)
+
