@@ -506,19 +506,13 @@ void ModuleBase_WidgetMultiSelector::onDeleteItem()
   AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
   if (aSelectionListAttr.get()) {
     aDone = !anAttributeIds.empty();
-    //aSelectionListAttr->remove(anAttributeIds);
-    std::set<int>::const_iterator anIt = anAttributeIds.begin(), aLast = anAttributeIds.end();
-    for (; anIt != aLast; anIt++)
-      aSelectionListAttr->removeLast();
+    aSelectionListAttr->remove(anAttributeIds);
   }
   else {
     AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
     if (aRefListAttr.get()) {
       aDone = !anAttributeIds.empty();
-      //aRefListAttr->remove(anAttributeIds);
-      std::set<int>::const_iterator anIt = anAttributeIds.begin(), aLast = anAttributeIds.end();
-      for (; anIt != aLast; anIt++)
-        aRefListAttr->removeLast();
+      aRefListAttr->remove(anAttributeIds);
     }
   }
   if (aDone) {

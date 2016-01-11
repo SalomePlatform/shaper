@@ -10,7 +10,9 @@
 #include "Model_Events.h"
 #include "Model_Data.h"
 
+#include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
+#include <TDF_RelocationTable.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 
 #include <TopoDS.hxx>
@@ -83,8 +85,55 @@ void Model_AttributeSelectionList::removeLast()
   }
 }
 
+/// makes copy of all attributes on the given label and all sub-labels
+static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
+  TDF_AttributeIterator anAttrIter(theSource);
+  for(; anAttrIter.More(); anAttrIter.Next()) {
+    Handle(TDF_Attribute) aTargetAttr;
+    if (!theDestination.FindAttribute(anAttrIter.Value()->ID(), aTargetAttr)) {
+      // create a new attribute if not yet exists in the destination
+	    aTargetAttr = anAttrIter.Value()->NewEmpty();
+      theDestination.AddAttribute(aTargetAttr);
+    }
+    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); // no relocation, empty map
+    anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
+  }
+  // copy the sub-labels content
+  TDF_ChildIterator aSubLabsIter(theSource);
+  for(; aSubLabsIter.More(); aSubLabsIter.Next()) {
+    copyAttrs(aSubLabsIter.Value(), theDestination.FindChild(aSubLabsIter.Value().Tag()));
+  }
+}
+
 void Model_AttributeSelectionList::remove(const std::set<int>& theIndices)
 {
+  int anOldSize = mySize->Get();
+  int aRemoved = 0;
+  // iterate one by one and shifting the removed indicies
+  for(int aCurrent = 0; aCurrent < anOldSize; aCurrent++) {
+    if (theIndices.find(aCurrent) == theIndices.end()) { // not removed
+      if (aRemoved) { // but must be shifted to the removed position
+        TDF_Label aSource = mySize->Label().FindChild(aCurrent + 1);
+        TDF_Label aDest = mySize->Label().FindChild(aCurrent + 1 - aRemoved);
+        copyAttrs(aSource, aDest);
+        // remove the moved source
+        aSource.ForgetAllAttributes(Standard_True);
+      }
+    } else { // this is removed, so remove everything from this label
+      TDF_Label aLab = mySize->Label().FindChild(aCurrent + 1);
+      std::shared_ptr<Model_AttributeSelection> aOldAttr = 
+        std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
+      aOldAttr->setObject(owner());
+      REMOVE_BACK_REF(aOldAttr->context());
+      aLab.ForgetAllAttributes(Standard_True);
+      myTmpAttr.reset();
+      aRemoved++;
+    }
+  }
+  if (aRemoved) { // remove was performed, so, update the size and this attribute
+    mySize->Set(anOldSize - aRemoved);
+    owner()->data()->sendAttributeUpdated(this);
+  }
 }
 
 int Model_AttributeSelectionList::size()

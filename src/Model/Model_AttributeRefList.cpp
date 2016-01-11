@@ -214,6 +214,28 @@ void Model_AttributeRefList::removeLast()
 
 void Model_AttributeRefList::remove(const std::set<int>& theIndices)
 {
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
+  if (aDoc && !myRef->IsEmpty()) {
+    // collet labels that will be removed
+    TDF_LabelList aLabelsToRemove;
+    TDF_ListIteratorOfLabelList aLabIter(myRef->List());
+    for(int aCurrent = 0; aLabIter.More(); aLabIter.Next(), aCurrent++) {
+      if (theIndices.find(aCurrent) != theIndices.end())
+        aLabelsToRemove.Append(aLabIter.Value());
+    }
+    // remove labels
+    for(aLabIter.Initialize(aLabelsToRemove); aLabIter.More(); aLabIter.Next()) {
+      ObjectPtr anObj = aDoc->objects()->object(aLabIter.Value());
+      if (anObj.get()) {
+        myRef->Remove(aLabIter.Value());
+        REMOVE_BACK_REF(anObj);
+      }
+    }
+    if (!aLabelsToRemove.IsEmpty()) {
+      owner()->data()->sendAttributeUpdated(this);
+    }
+  }
 }
 
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)
