@@ -42,6 +42,10 @@ public:
   /// Removes the last element in the list
   MODEL_EXPORT virtual void removeLast();
 
+  /// Removes the elements from the list.
+  /// \param theIndices a list of indices of elements to be removed
+  MODEL_EXPORT virtual void remove(const std::set<int>& theIndices);
+
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
 

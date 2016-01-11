@@ -85,6 +85,9 @@ protected slots:
   /// Slot for copy command in a list pop-up menu
   void onCopyItem();
 
+  /// Slot for delete command in a list pop-up menu
+  void onDeleteItem();
+
   /// Slot is called on selection of list of selected items
   void onListSelection();
 
@@ -153,6 +156,7 @@ protected:
 
   /// An action for pop-up menu in a list control
   QAction* myCopyAction;
+  QAction* myDeleteAction;
 
   /// backup parameters of the model attribute. The class processes three types of attribute:
   /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter

@@ -212,6 +212,10 @@ void Model_AttributeRefList::removeLast()
   }
 }
 
+void Model_AttributeRefList::remove(const std::set<int>& theIndices)
+{
+}
+
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)
 {
   myIsInitialized = theLabel.FindAttribute(TDataStd_ReferenceList::GetID(), myRef) == Standard_True;

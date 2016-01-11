@@ -35,6 +35,10 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// Removes the last element in the list
   virtual void removeLast() = 0;
 
+  /// Removes the elements from the list.
+  /// \param theIndices a list of indices of elements to be removed
+  virtual void remove(const std::set<int>& theIndices) = 0;
+
   /// Returns the number of selection attributes in the list
   virtual int size() = 0;
 

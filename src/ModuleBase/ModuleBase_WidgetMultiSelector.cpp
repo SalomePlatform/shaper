@@ -37,6 +37,8 @@
 #include <memory>
 #include <string>
 
+const int ATTRIBUTE_SELECTION_INDEX_ROLE = Qt::UserRole + 1;
+
 /**
 * Customization of a List Widget to make it to be placed on full width of container
 */
@@ -129,6 +131,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QString anObjName = QString::fromStdString(attributeID());
   myListControl->setObjectName(anObjName);
   myListControl->setToolTip(aToolTip);
+  myListControl->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   aMainLay->addWidget(myListControl, 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);
@@ -142,6 +145,13 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myCopyAction->setEnabled(false);
   connect(myCopyAction, SIGNAL(triggered(bool)), SLOT(onCopyItem()));
   myListControl->addAction(myCopyAction);
+
+  myDeleteAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  myDeleteAction->setShortcut(QKeySequence::Delete);
+  myDeleteAction->setEnabled(false);
+  connect(myDeleteAction, SIGNAL(triggered(bool)), SLOT(onDeleteItem()));
+  myListControl->addAction(myDeleteAction);
+
   myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);
   connect(myListControl, SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
 }
@@ -426,15 +436,21 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
   if (aSelectionListAttr.get()) {
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
-      myListControl->addItem(aAttr->namingName().c_str());
+      QListWidgetItem* anItem = new QListWidgetItem(aAttr->namingName().c_str(), myListControl);
+      anItem->setData(ATTRIBUTE_SELECTION_INDEX_ROLE, i);
+      myListControl->addItem(anItem);
     }
   }
   else {
     AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
     for (int i = 0; i < aRefListAttr->size(); i++) {
       ObjectPtr anObject = aRefListAttr->object(i);
-      if (anObject.get())
-        myListControl->addItem(anObject->data()->name().c_str());
+      if (anObject.get()) {
+        QListWidgetItem* anItem = new QListWidgetItem(anObject->data()->name().c_str(),
+                                                      myListControl);
+        anItem->setData(ATTRIBUTE_SELECTION_INDEX_ROLE, i);
+        myListControl->addItem(anItem);
+      }
     }
   }
   // We have to call repaint because sometimes the List control is not updated
@@ -475,8 +491,48 @@ void ModuleBase_WidgetMultiSelector::onCopyItem()
 }
 
 //********************************************************************
+void ModuleBase_WidgetMultiSelector::onDeleteItem()
+{
+  // find attribute indices to delete
+  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
+  std::set<int> anAttributeIds;
+  foreach(QListWidgetItem* anItem, aItems) {
+    int anIndex = anItem->data(ATTRIBUTE_SELECTION_INDEX_ROLE).toInt();
+    if (anAttributeIds.find(anIndex) == anAttributeIds.end())
+      anAttributeIds.insert(anIndex);
+  }
+  // refill attribute by the items which indices are not in the list of ids
+  bool aDone = false;
+  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
+  if (aSelectionListAttr.get()) {
+    aDone = !anAttributeIds.empty();
+    //aSelectionListAttr->remove(anAttributeIds);
+    std::set<int>::const_iterator anIt = anAttributeIds.begin(), aLast = anAttributeIds.end();
+    for (; anIt != aLast; anIt++)
+      aSelectionListAttr->removeLast();
+  }
+  else {
+    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+    if (aRefListAttr.get()) {
+      aDone = !anAttributeIds.empty();
+      //aRefListAttr->remove(anAttributeIds);
+      std::set<int>::const_iterator anIt = anAttributeIds.begin(), aLast = anAttributeIds.end();
+      for (; anIt != aLast; anIt++)
+        aRefListAttr->removeLast();
+    }
+  }
+  if (aDone) {
+    restoreValue();
+    myWorkshop->setSelected(getAttributeSelection());
+  }
+}
+
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::onListSelection()
 {
   QList<QListWidgetItem*> aItems = myListControl->selectedItems();
   myCopyAction->setEnabled(!aItems.isEmpty());
+  myDeleteAction->setEnabled(!aItems.isEmpty());
+
+  //myWorkshop->setSelected(>setSelected(getAttributeSelection());
 }

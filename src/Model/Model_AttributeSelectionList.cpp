@@ -83,6 +83,10 @@ void Model_AttributeSelectionList::removeLast()
   }
 }
 
+void Model_AttributeSelectionList::remove(const std::set<int>& theIndices)
+{
+}
+
 int Model_AttributeSelectionList::size()
 {
   return mySize->Get();
