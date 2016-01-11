@@ -20,7 +20,7 @@
     <validator id="GeomValidators_ShapeType" parameters="empty,solid"/>
   </multi_selector>
   <multi_selector id="tool_objects" 
-    label="Tool object" 
+    label="Tool objects" 
     icon="" 
     tooltip="Select a tool solid"
     type_choice="Solids"

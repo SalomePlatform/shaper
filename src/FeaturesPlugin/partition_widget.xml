@@ -11,7 +11,7 @@
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
   <multi_selector id="tool_objects"
-    label="Tool object"
+    label="Tool objects"
     icon=":icons/cut_tool.png"
     tooltip="Select a tool face or solid"
     type_choice="Faces Solids"
