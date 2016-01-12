@@ -529,4 +529,7 @@ void ModuleBase_WidgetMultiSelector::onListSelection()
   myDeleteAction->setEnabled(!aItems.isEmpty());
 
   //myWorkshop->setSelected(>setSelected(getAttributeSelection());
+  QList<ModuleBase_ViewerPrs> aSelectedItems;
+  
+  emit itemsSelected(aSelectedItems);
 }

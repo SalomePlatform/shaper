@@ -81,6 +81,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
 
+signals:
+  /// Signals about items selected in the list view
+  void itemsSelected(const QList<ModuleBase_ViewerPrs>& theItems);
+
 protected slots:
   /// Slot for copy command in a list pop-up menu
   void onCopyItem();
