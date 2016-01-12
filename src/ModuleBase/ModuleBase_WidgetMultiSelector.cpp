@@ -14,6 +14,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Definitions.h>
+#include <ModuleBase_IModule.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -293,6 +294,15 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
 }
 
 //********************************************************************
+void ModuleBase_WidgetMultiSelector::getHighlighted(QList<ModuleBase_ViewerPrs>& theValues)
+{
+  std::set<int> anAttributeIds;
+  getSelectedAttributeIndices(anAttributeIds);
+  if (!anAttributeIds.empty())
+    convertIndicesToViewerSelection(anAttributeIds, theValues);
+}
+
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
   bool aValid = ModuleBase_WidgetSelector::isValidSelectionCustom(thePrs);
@@ -395,35 +405,7 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
 QList<ModuleBase_ViewerPrs> ModuleBase_WidgetMultiSelector::getAttributeSelection() const
 {
   QList<ModuleBase_ViewerPrs> aSelected;
-  // Restore selection in the viewer by the attribute selection list
-  if(myFeature) {
-    AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    if (aSelectionListAttr.get()) {
-      for (int i = 0; i < aSelectionListAttr->size(); i++) {
-        AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-        ResultPtr anObject = anAttr->context();
-        if (anObject.get()) {
-          TopoDS_Shape aShape;
-          std::shared_ptr<GeomAPI_Shape> aShapePtr = anAttr->value();
-          if (aShapePtr.get()) {
-            aShape = aShapePtr->impl<TopoDS_Shape>();
-          }
-          aSelected.append(ModuleBase_ViewerPrs(anObject, aShape, NULL));
-        }
-      }
-    }
-    else {
-      AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
-      if (aRefListAttr.get()) {
-        for (int i = 0; i < aRefListAttr->size(); i++) {
-          ObjectPtr anObject = aRefListAttr->object(i);
-          if (anObject.get()) {
-            aSelected.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
-          }
-        }
-      }
-    }
-  }
+  convertIndicesToViewerSelection(std::set<int>(), aSelected);
   return aSelected;
 }
 
@@ -494,13 +476,9 @@ void ModuleBase_WidgetMultiSelector::onCopyItem()
 void ModuleBase_WidgetMultiSelector::onDeleteItem()
 {
   // find attribute indices to delete
-  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
   std::set<int> anAttributeIds;
-  foreach(QListWidgetItem* anItem, aItems) {
-    int anIndex = anItem->data(ATTRIBUTE_SELECTION_INDEX_ROLE).toInt();
-    if (anAttributeIds.find(anIndex) == anAttributeIds.end())
-      anAttributeIds.insert(anIndex);
-  }
+  getSelectedAttributeIndices(anAttributeIds);
+
   // refill attribute by the items which indices are not in the list of ids
   bool aDone = false;
   AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
@@ -518,6 +496,8 @@ void ModuleBase_WidgetMultiSelector::onDeleteItem()
   if (aDone) {
     restoreValue();
     myWorkshop->setSelected(getAttributeSelection());
+
+    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeAllObjects, true);
   }
 }
 
@@ -527,9 +507,57 @@ void ModuleBase_WidgetMultiSelector::onListSelection()
   QList<QListWidgetItem*> aItems = myListControl->selectedItems();
   myCopyAction->setEnabled(!aItems.isEmpty());
   myDeleteAction->setEnabled(!aItems.isEmpty());
-
-  //myWorkshop->setSelected(>setSelected(getAttributeSelection());
-  QList<ModuleBase_ViewerPrs> aSelectedItems;
   
-  emit itemsSelected(aSelectedItems);
+  myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
+                                        true);
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::getSelectedAttributeIndices(std::set<int>& theAttributeIds)
+{
+  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
+  foreach(QListWidgetItem* anItem, aItems) {
+    int anIndex = anItem->data(ATTRIBUTE_SELECTION_INDEX_ROLE).toInt();
+    if (theAttributeIds.find(anIndex) == theAttributeIds.end())
+      theAttributeIds.insert(anIndex);
+  }
+}
+
+void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<int> theAttributeIds,
+                                                      QList<ModuleBase_ViewerPrs>& theValues) const
+{
+  if(myFeature.get() == NULL)
+    return;
+  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
+  if (aSelectionListAttr.get()) {
+    for (int i = 0; i < aSelectionListAttr->size(); i++) {
+      // filter by attribute indices only if the container is not empty otherwise return all items
+      if (!theAttributeIds.empty() && theAttributeIds.find(i) == theAttributeIds.end())
+        continue;
+      AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
+      ResultPtr anObject = anAttr->context();
+      if (anObject.get()) {
+        TopoDS_Shape aShape;
+        std::shared_ptr<GeomAPI_Shape> aShapePtr = anAttr->value();
+        if (aShapePtr.get()) {
+          aShape = aShapePtr->impl<TopoDS_Shape>();
+        }
+        theValues.append(ModuleBase_ViewerPrs(anObject, aShape, NULL));
+      }
+    }
+  }
+  else {
+    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+    if (aRefListAttr.get()) {
+      for (int i = 0; i < aRefListAttr->size(); i++) {
+        // filter by attribute indices only if the container is not empty otherwise return all items
+        if (!theAttributeIds.empty() && theAttributeIds.find(i) == theAttributeIds.end())
+          continue;
+        ObjectPtr anObject = aRefListAttr->object(i);
+        if (anObject.get()) {
+          theValues.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
+        }
+      }
+    }
+  }
 }

@@ -111,6 +111,10 @@ Q_OBJECT
     return false;
   }
 
+  /// Returns values which should be highlighted when the whidget is active
+  /// \param theValues a list of presentations
+  virtual void getHighlighted(QList<ModuleBase_ViewerPrs>& theValues) {};
+
   /// Restore value from attribute data to the widget's control. Emits signals before and after store
   /// \return True in success
   bool restoreValue();

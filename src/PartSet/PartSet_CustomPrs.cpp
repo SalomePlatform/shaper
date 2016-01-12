@@ -116,7 +116,9 @@ Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation()
   return Handle(PartSet_OperationPrs)::DownCast(anAISIO);
 }
 
-bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject, const bool theUpdateViewer)
+bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
+                                  const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                  const bool theUpdateViewer)
 {
 #ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
   return false;

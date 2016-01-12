@@ -81,7 +81,9 @@ ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& the
   return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);
 }
 
-bool ModuleBase_IModule::customizeObject(ObjectPtr theObject, const bool theUpdateViewer)
+bool ModuleBase_IModule::customizeObject(ObjectPtr theObject,
+                                         const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                         const bool theUpdateViewer)
 {
   return false;
 }

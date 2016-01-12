@@ -72,6 +72,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                             const bool theToValidate);
 
+  /// Returns values which should be highlighted when the whidget is active
+  /// \param theValues a list of presentations
+  virtual void getHighlighted(QList<ModuleBase_ViewerPrs>& theValues);
+
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
@@ -80,10 +84,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
  public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
-
-signals:
-  /// Signals about items selected in the list view
-  void itemsSelected(const QList<ModuleBase_ViewerPrs>& theItems);
 
 protected slots:
   /// Slot for copy command in a list pop-up menu
@@ -148,6 +148,17 @@ protected:
   /// For example, the "Edges" is converted to "edge"
   std::string validatorType(const QString& theType) const;
 
+protected:
+  /// Returns attribute indices selected in the widget selection list 
+  /// \param theIndices a list of indices
+  void getSelectedAttributeIndices(std::set<int>& theIndices);
+
+  /// Gets the feature attribute and fill a list of viewer presentation for the attribute
+  /// indices. If the the container of indices is empty, it returns all objects.
+  /// \param theAttributeIds indices in attribute list to be returned
+  /// \param theValues the result presentations, filled with object and shape of an attribute item
+  void convertIndicesToViewerSelection(std::set<int> theAttributeIds,
+                                       QList<ModuleBase_ViewerPrs>& theValues) const;
 protected:
   /// List control
   QListWidget* myListControl;

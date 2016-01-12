@@ -79,6 +79,8 @@ bool PartSet_OperationPrs::hasShapes()
   return !myFeatureShapes.empty() || !myFeatureResults.empty();
 }
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
@@ -98,6 +100,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 
   // create presentations on the base of the shapes
   Handle(Prs3d_Drawer) aDrawer = Attributes();
+
   QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
                                                         aLast = myFeatureShapes.end();
   for (; anIt != aLast; anIt++) {
@@ -134,6 +137,45 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
     StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
   }
+  QList<ModuleBase_ViewerPrs> aValues;
+  ModuleBase_IPropertyPanel* aPanel = myWorkshop->propertyPanel();
+  if (aPanel) {
+    ModuleBase_ModelWidget* aWidget = aPanel->activeWidget();
+    if (aWidget) {
+      aWidget->getHighlighted(aValues);
+    }
+  }
+
+  Standard_Real aPreviousWidth = Width();
+  setWidth(aDrawer, aPreviousWidth+3);
+  Handle(AIS_InteractiveContext) aContext = GetContext();
+  Quantity_NameOfColor anHColor = aContext->HilightColor();
+
+  aColor = Quantity_Color(anHColor);
+  aColor = Quantity_Color((1. + aColor.Red())/2., (1. + aColor.Green())/2.,
+                          (1. + aColor.Blue())/2., Quantity_TOC_RGB);
+  SetColor(aColor);
+
+  QList<ModuleBase_ViewerPrs>::const_iterator anIIt = aValues.begin(),
+                                              aILast = aValues.end();
+  for (; anIIt != aILast; anIIt++) {
+    ModuleBase_ViewerPrs aPrs = *anIIt;
+    ObjectPtr anObject = aPrs.object();
+    TopoDS_Shape aShape = aPrs.shape();
+    if (aShape.IsNull()) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      if (aResult.get()) {
+        GeomShapePtr aGeomShape = aResult->shape();
+        if (aGeomShape.get())
+          aShape = aGeomShape->impl<TopoDS_Shape>();
+      }
+    }
+    if (!aShape.IsNull()) {
+      ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
+      StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
+    }
+  }
+  setWidth(aDrawer, aPreviousWidth);
 }
 
 void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

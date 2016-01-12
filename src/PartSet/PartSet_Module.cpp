@@ -131,7 +131,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           SLOT(onViewTransformed(int)));
   connect(aViewer, SIGNAL(viewCreated(ModuleBase_IViewWindow*)),
           SLOT(onViewCreated(ModuleBase_IViewWindow*)));
-
   myMenuMgr = new PartSet_MenuMgr(this);
   myCustomPrs = new PartSet_CustomPrs(theWshop);
 
@@ -729,11 +728,12 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
-bool PartSet_Module::customizeObject(ObjectPtr theObject, const bool theUpdateViewer)
+bool PartSet_Module::customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
+                                     const bool theUpdateViewer)
 {
   bool isRedisplayed = false;
   if (myCustomPrs->isActive())
-    isRedisplayed = myCustomPrs->redisplay(theObject, theUpdateViewer);
+    isRedisplayed = myCustomPrs->redisplay(theObject, theFlag, theUpdateViewer);
 
   return isRedisplayed;
 }

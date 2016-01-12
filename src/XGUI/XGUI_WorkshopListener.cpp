@@ -571,7 +571,8 @@ bool XGUI_WorkshopListener::customizeCurrentObject()
     if (aFOperation) {
       FeaturePtr aCurrentFeature = aFOperation->feature();
       if (aCurrentFeature.get())
-        aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature, false);
+        aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+                                           ModuleBase_IModule::CustomizeAllObjects, false);
     }
   }
   return aCustomized;

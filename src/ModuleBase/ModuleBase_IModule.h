@@ -32,6 +32,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 {
   Q_OBJECT
  public:
+  /// enumeration to know which objects should be customized
+  enum ModuleBase_CustomizeFlag {
+    CustomizeDependedAndResults = 0x00000000,
+    CustomizeHighlightedObjects = 0x00000001,
+    CustomizeAllObjects = CustomizeDependedAndResults | CustomizeHighlightedObjects
+  };
 
    /// Constructor
    /// \param theParent instance of workshop interface
@@ -158,10 +164,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   * If the object is result with the color attribute value set, it is used,
   * otherwise the customize is applyed to the object's feature if it is a custom prs
   * \param theObject an object instance
+  * \param theFlag a flag of level of customization, which means that only part of sub-elements
+  * should be updated(e.g. only highlighted elements)
   * \param theUpdateViewer the parameter whether the viewer should be update immediately
   * \returns true if the object is modified
   */
-  virtual bool customizeObject(ObjectPtr theObject, const bool theUpdateViewer);
+  virtual bool customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
+                               const bool theUpdateViewer);
 
   /// This method is called on object browser creation for customization of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget

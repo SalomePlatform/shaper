@@ -11,6 +11,7 @@
 
 #include "PartSet_OperationPrs.h"
 
+#include <ModuleBase_IModule.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Feature.h>
@@ -53,7 +54,8 @@ public:
   /// \param theObject an object to redisplay
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is redisplayed
-  bool redisplay(const ObjectPtr& theObject, const bool theUpdateViewer);
+  bool redisplay(const ObjectPtr& theObject,
+                 const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag, const bool theUpdateViewer);
 
   /// Nullify the operation presentation. For example, it can be useful when the viewer/context
   /// is closed. If this is not performed and the presentation is assigned in another context,
