@@ -183,8 +183,11 @@ Q_OBJECT
   /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }
 
-  /// Returns true if the event is processed.
+  /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processEnter();
+
+  /// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processDelete();
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object

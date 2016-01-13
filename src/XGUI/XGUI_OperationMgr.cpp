@@ -35,6 +35,10 @@ XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
 : QObject(theParent), myWorkshop(theWorkshop)
 {
+  /// we need to install filter to the application in order to react to 'Delete' key button
+  /// this key can not be a short cut for a corresponded action because we need to set
+  /// the actions priority
+  qApp->installEventFilter(this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
@@ -108,13 +112,17 @@ ModuleBase_Operation* XGUI_OperationMgr::previousOperation(ModuleBase_Operation*
 
 bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
 {
+  bool isAccepted = false;
   if (theEvent->type() == QEvent::KeyRelease) {
     QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
     if(aKeyEvent) {
-      return onKeyReleased(aKeyEvent);
+      isAccepted = onKeyReleased(aKeyEvent);
     }
   }
-  return QObject::eventFilter(theObject, theEvent);
+  if (!isAccepted)
+    isAccepted = QObject::eventFilter(theObject, theEvent);
+
+  return isAccepted;
 }
 
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
@@ -499,11 +507,9 @@ void XGUI_OperationMgr::onOperationStopped()
 
 bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
-  QObject* aSender = sender();
-
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
-  bool isAccepted = true;
+  bool isAccepted = false;
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
@@ -525,7 +531,10 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
         }
       }
     }
-
+    case Qt::Key_Delete: {
+      isAccepted = onProcessDelete();
+    }
+    break;
     break;
     default:
       isAccepted = false;
@@ -539,32 +548,58 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 
 bool XGUI_OperationMgr::onProcessEnter()
 {
-  bool isAccepted = true;
+  bool isAccepted = false;
   ModuleBase_Operation* aOperation = currentOperation();
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-  ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+  ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
   bool isAborted = false;
-  if (!aActiveWgt) {
+  if (!anActiveWgt) {
     QWidget* aFocusWidget = aPanel->focusWidget();
     QToolButton* aCancelBtn = aPanel->findChild<QToolButton*>(PROP_PANEL_CANCEL);
     if (aFocusWidget && aCancelBtn && aFocusWidget == aCancelBtn) {
       abortOperation(aOperation);
+      isAccepted = true;
       isAborted = true;
     }
   }
   if (!isAborted) {
-    if (!aActiveWgt || !aActiveWgt->processEnter()) {
-      if (!myWorkshop->module()->processEnter(aActiveWgt ? aActiveWgt->attributeID() : "")) {
+    isAccepted = anActiveWgt && anActiveWgt->processEnter();
+    if (!isAccepted) {
+      isAccepted = myWorkshop->module()->processEnter(anActiveWgt ? anActiveWgt->attributeID() : "");
+      if (!isAccepted) {
+        /// functionality is similar to Apply click
         ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
         if (!aFOperation || myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
+          // key released is emitted to apply the current value to the model if it was modified in PP
           emit keyEnterReleased();
           commitOperation();
+          isAccepted = true;
         }
         else
           isAccepted = false;
       }
     }
   }
+  return isAccepted;
+}
+
+bool XGUI_OperationMgr::onProcessDelete()
+{
+  bool isAccepted = false;
+  ModuleBase_Operation* aOperation = currentOperation();
+  ModuleBase_ModelWidget* anActiveWgt = 0;
+  if (aOperation) {
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    if (aPanel)
+      anActiveWgt = aPanel->activeWidget();
+  }
+  if (anActiveWgt)
+    isAccepted = anActiveWgt->processDelete();
+  if (!isAccepted) {
+    workshop()->deleteObjects();
+    isAccepted = true;
+  }
+
   return isAccepted;
 }
 

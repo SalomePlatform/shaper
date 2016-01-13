@@ -62,7 +62,6 @@ void XGUI_ContextMenuMgr::createActions()
   aDesktop->addAction(aAction);
 
   addAction("DELETE_CMD", aAction);
-  aAction->setShortcut(Qt::Key_Delete);
   aAction->setShortcutContext(Qt::ApplicationShortcut);
 
   aAction = new QAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this);

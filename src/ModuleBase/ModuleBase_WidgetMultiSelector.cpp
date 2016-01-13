@@ -148,7 +148,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myListControl->addAction(myCopyAction);
 
   myDeleteAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
-  myDeleteAction->setShortcut(QKeySequence::Delete);
   myDeleteAction->setEnabled(false);
   connect(myDeleteAction, SIGNAL(triggered(bool)), SLOT(onDeleteItem()));
   myListControl->addAction(myDeleteAction);
@@ -330,6 +329,40 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
 }
 
 //********************************************************************
+bool ModuleBase_WidgetMultiSelector::processDelete()
+{
+  // find attribute indices to delete
+  std::set<int> anAttributeIds;
+  getSelectedAttributeIndices(anAttributeIds);
+
+  // refill attribute by the items which indices are not in the list of ids
+  bool aDone = false;
+  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
+  if (aSelectionListAttr.get()) {
+    aDone = !anAttributeIds.empty();
+    aSelectionListAttr->remove(anAttributeIds);
+  }
+  else {
+    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+    if (aRefListAttr.get()) {
+      aDone = !anAttributeIds.empty();
+      aRefListAttr->remove(anAttributeIds);
+    }
+  }
+  if (aDone) {
+    // update object is necessary to flush update signal. It leads to objects references map update
+    // and the operation presentation will not contain deleted items visualized as parameters of
+    // the feature.
+    updateObject(myFeature);
+
+    restoreValue();
+    myWorkshop->setSelected(getAttributeSelection());
+    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeAllObjects, true);
+  }
+  return true; // if the delete should be processed outsize, the method should return isDone
+}
+
+//********************************************************************
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
@@ -475,30 +508,7 @@ void ModuleBase_WidgetMultiSelector::onCopyItem()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onDeleteItem()
 {
-  // find attribute indices to delete
-  std::set<int> anAttributeIds;
-  getSelectedAttributeIndices(anAttributeIds);
-
-  // refill attribute by the items which indices are not in the list of ids
-  bool aDone = false;
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
-    aDone = !anAttributeIds.empty();
-    aSelectionListAttr->remove(anAttributeIds);
-  }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
-    if (aRefListAttr.get()) {
-      aDone = !anAttributeIds.empty();
-      aRefListAttr->remove(anAttributeIds);
-    }
-  }
-  if (aDone) {
-    restoreValue();
-    myWorkshop->setSelected(getAttributeSelection());
-
-    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeAllObjects, true);
-  }
+  processDelete();
 }
 
 //********************************************************************

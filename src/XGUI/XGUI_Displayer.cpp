@@ -501,8 +501,8 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
   if (aContext.IsNull())
     return;
   if (aContext->HasOpenedContext()) {
-    aContext->UnhilightSelected();
-    aContext->ClearSelected();
+    aContext->UnhilightSelected(false);
+    aContext->ClearSelected(false);
     foreach (ModuleBase_ViewerPrs aPrs, theValues) {
       const TopoDS_Shape& aShape = aPrs.shape();
       if (!aShape.IsNull()) {
@@ -525,8 +525,8 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
       }
     }
   } else {
-    aContext->UnhilightCurrents();
-    aContext->ClearCurrents();
+    aContext->UnhilightCurrents(false);
+    aContext->ClearCurrents(false);
     foreach (ModuleBase_ViewerPrs aPrs, theValues) {
       ObjectPtr anObject = aPrs.object();
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);

@@ -81,7 +81,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
- public slots:
+  /// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processDelete();
+
+public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
 

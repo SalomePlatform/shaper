@@ -279,6 +279,11 @@ bool ModuleBase_ModelWidget::processEnter()
   return false;
 }
 
+bool ModuleBase_ModelWidget::processDelete()
+{
+  return false;
+}
+
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);

@@ -13,6 +13,8 @@
 
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_IModule.h"
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Attribute.h>
@@ -79,8 +81,6 @@ bool PartSet_OperationPrs::hasShapes()
   return !myFeatureShapes.empty() || !myFeatureResults.empty();
 }
 
-#include <ModuleBase_IPropertyPanel.h>
-#include <ModuleBase_ModelWidget.h>
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
