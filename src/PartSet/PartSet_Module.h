@@ -4,6 +4,7 @@
 #define PartSet_Module_H
 
 #include "PartSet.h"
+#include "PartSet_Tools.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -305,7 +306,8 @@ protected:
   PartSet_CustomPrs* myCustomPrs;
   int myVisualLayerId;
 
-  bool myHasConstraintShown;
+  /// backup of the visible state to restore them by operation stop
+  QMap<PartSet_Tools::ConstraintVisibleState, bool> myHasConstraintShown;
 
   QModelIndex aActivePartIndex;
 };

@@ -9,6 +9,8 @@
 
 #include "PartSet.h"
 
+#include "PartSet_Tools.h"
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -109,6 +111,11 @@ public:
   /// \return a boolean value
   static bool isDistanceOperation(ModuleBase_Operation* theOperation);
 
+  /// Returns whether the feature kind is a sketch distance - lenght, distance or radius
+  /// \param theKind the feature kind
+  /// \return a boolean value
+  static bool isDistanceKind(std::string& theKind);
+
   /// Returns true if a mouse cursor is over viewer window
   bool isMouseOverWindow() { return myIsMouseOverWindow; }
 
@@ -169,7 +176,7 @@ public:
   bool canChangeCursor(ModuleBase_Operation* theOperation) const;
 
   /// Returns state of constraints showing flag 
-  bool isConstraintsShown() const { return myIsConstraintsShown; }
+  const QMap<PartSet_Tools::ConstraintVisibleState, bool>& showConstraintStates();
 
   /// Returns true if the object is a current sketch sub feature of a result of the feature
   /// \param theObject an object
@@ -222,7 +229,7 @@ public slots:
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
   /// Toggle show constraints
-  void onShowConstraintsToggle(bool);
+  void onShowConstraintsToggle(bool theState, int theType);
 
 private slots:
   /// Process the enter mouse to the view port. If the current operation is a create of
@@ -329,7 +336,7 @@ private:
   FeatureToSelectionMap myCurrentSelection;
   bool myPreviousUpdateViewerEnabled;
 
-  bool myIsConstraintsShown;
+  QMap<PartSet_Tools::ConstraintVisibleState, bool> myIsConstraintsShown;
 };
 
 

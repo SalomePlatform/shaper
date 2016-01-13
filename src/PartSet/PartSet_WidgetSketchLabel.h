@@ -9,6 +9,8 @@
 
 #include "PartSet.h"
 
+#include "PartSet_Tools.h"
+
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ViewerFilters.h>
 
@@ -17,6 +19,8 @@
 #include <GeomAPI_AISObject.h>
 
 #include <TopoDS_Shape.hxx>
+
+#include <QMap>
 
 class QLabel;
 class XGUI_OperationMgr;
@@ -38,7 +42,8 @@ class QStackedWidget;
 class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_WidgetValidated
 {
 Q_OBJECT
- public:
+
+public:
   /// Constructor
   /// \param theParent the parent object
   /// \param theWorkshop a reference to workshop
@@ -46,8 +51,9 @@ Q_OBJECT
   /// \param theParentId is Id of a parent of the current attribute
   /// \param toShowConstraints a current show constraints state
   PartSet_WidgetSketchLabel(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-                            const Config_WidgetAPI* theData,
-                            const std::string& theParentId, bool toShowConstraints);
+                      const Config_WidgetAPI* theData,
+                      const std::string& theParentId,
+                      const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints);
 
   virtual ~PartSet_WidgetSketchLabel();
 
@@ -75,16 +81,14 @@ Q_OBJECT
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
-  /// Set show constraints state
-  /// \param theOn a flag show constraints or not
-  void showConstraints(bool theOn);
-
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
   /// A show constraint toggled signal
-  void showConstraintToggled(bool);
+  /// \param theState a state of the check box
+  /// \param theType a ConstraintVisibleState value
+  void showConstraintToggled(bool theState, int theType);
 
 protected:
   /// Creates a backup of the current values of the attribute
@@ -132,6 +136,10 @@ protected:
   /// A slot called on set sketch plane view
   void onSetPlaneView();
 
+  /// Emits signal about check box state changed with information about ConstraintVisibleState
+  /// \param theOn a flag show constraints or not
+  void onShowConstraint(bool theOn);
+
  private:
    /// Create preview of planes for sketch plane selection
    /// \param theOrigin an origin of the plane
@@ -160,8 +168,9 @@ protected:
   AISObjectPtr myXYPlane;
   bool myPreviewDisplayed;
 
-  QCheckBox* myShowConstraints;
   QCheckBox* myViewInverted;
+
+  QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 
   QStackedWidget* myStackWidget;
 };

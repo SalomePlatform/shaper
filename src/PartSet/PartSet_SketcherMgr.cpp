@@ -159,7 +159,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
     myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false), myIsConstraintsShown(true)
+    myIsPopupMenuActive(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -181,6 +181,9 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   connect(aWorkshop, SIGNAL(applicationStarted()), this, SLOT(onApplicationStarted()));
+
+  myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
+  myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
@@ -806,12 +809,17 @@ bool PartSet_SketcherMgr::isEntity(const std::string& theId)
 
 bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)
 {
-  std::string aId = theOperation ? theOperation->id().toStdString() : "";
+  std::string anId = theOperation ? theOperation->id().toStdString() : "";
 
-  return (aId == SketchPlugin_ConstraintLength::ID()) ||
-         (aId == SketchPlugin_ConstraintDistance::ID()) ||
-         (aId == SketchPlugin_ConstraintRadius::ID()) ||
-         (aId == SketchPlugin_ConstraintAngle::ID());
+  return isDistanceKind(anId);
+}
+
+bool PartSet_SketcherMgr::isDistanceKind(std::string& theKind)
+{
+  return (theKind == SketchPlugin_ConstraintLength::ID()) ||
+         (theKind == SketchPlugin_ConstraintDistance::ID()) ||
+         (theKind == SketchPlugin_ConstraintRadius::ID()) ||
+         (theKind == SketchPlugin_ConstraintAngle::ID());
 }
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
@@ -872,7 +880,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverWindow = false;
-  myIsConstraintsShown = true;
+  myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
+  myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
@@ -1173,6 +1182,11 @@ bool PartSet_SketcherMgr::canChangeCursor(ModuleBase_Operation* theOperation) co
          myModule->sketchReentranceMgr()->isInternalEditActive();
 }
 
+const QMap<PartSet_Tools::ConstraintVisibleState, bool>& PartSet_SketcherMgr::showConstraintStates()
+{
+  return myIsConstraintsShown;
+}
+
 bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 {
   bool isFoundObject = false;
@@ -1440,14 +1454,15 @@ void PartSet_SketcherMgr::restoreSelection()
   }
 }
 
-void PartSet_SketcherMgr::onShowConstraintsToggle(bool theOn)
+void PartSet_SketcherMgr::onShowConstraintsToggle(bool theState, int theType)
 {
-  if (myIsConstraintsShown == theOn)
+  PartSet_Tools::ConstraintVisibleState aType = (PartSet_Tools::ConstraintVisibleState)theType;
+  if (myIsConstraintsShown.contains(aType) && myIsConstraintsShown[aType] == theState)
     return;
   if (myCurrentSketch.get() == NULL)
     return;
 
-  myIsConstraintsShown = theOn;
+  myIsConstraintsShown[aType] = theState;
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -1455,11 +1470,21 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(bool theOn)
   const QStringList& aConstrIds = constraintsIdList();
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
-    if (aConstrIds.contains(QString(aSubFeature->getKind().c_str()))) {
-      if (myIsConstraintsShown) 
-        aSubFeature->setDisplayed(true);
+    std::string aKind = aSubFeature->getKind();
+    if (aConstrIds.contains(QString(aKind.c_str()))) {
+      bool isTypedConstraint = false;
+      if (aType == PartSet_Tools::Dimensional) {
+        isTypedConstraint = isDistanceKind(aKind);
+      }
       else
-        aSubFeature->setDisplayed(false);
+        isTypedConstraint = !isDistanceKind(aKind);
+
+      if (isTypedConstraint) {
+        if (theState)
+          aSubFeature->setDisplayed(true);
+        else
+          aSubFeature->setDisplayed(false);
+      }
     }
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));

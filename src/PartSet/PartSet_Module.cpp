@@ -110,7 +110,7 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 : ModuleBase_IModule(theWshop),
-  myVisualLayerId(0), myHasConstraintShown(true)
+  myVisualLayerId(0)
 {
   new PartSet_IconFactory();
 
@@ -139,6 +139,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
   mySelectionFilters.Append(new PartSet_FilterInfinite(myWorkshop));
+
+  myHasConstraintShown[PartSet_Tools::Geometrical] = true;
+  myHasConstraintShown[PartSet_Tools::Dimensional] = true;
 }
 
 PartSet_Module::~PartSet_Module()
@@ -283,7 +286,13 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     aDisplayer->updateViewer();
   }
-  mySketchMgr->onShowConstraintsToggle(myHasConstraintShown);
+
+  QMap<PartSet_Tools::ConstraintVisibleState, bool>::const_iterator anIt = myHasConstraintShown.begin(),
+                                                                    aLast = myHasConstraintShown.end();
+  for (; anIt != aLast; anIt++) {
+    myHasConstraintShown[anIt.key()];
+    mySketchMgr->onShowConstraintsToggle(anIt.value(), myHasConstraintShown[anIt.key()]);
+  }
 }
 
 ModuleBase_Operation* PartSet_Module::currentOperation() const
@@ -487,11 +496,11 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, aWorkshop,
-      theWidgetApi, theParentId, mySketchMgr->isConstraintsShown());
+      theWidgetApi, theParentId, mySketchMgr->showConstraintStates());
     connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
-    connect(aLabelWgt, SIGNAL(showConstraintToggled(bool)),
-      mySketchMgr, SLOT(onShowConstraintsToggle(bool)));
+    connect(aLabelWgt, SIGNAL(showConstraintToggled(bool, int)),
+      mySketchMgr, SLOT(onShowConstraintsToggle(bool, int)));
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
     PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, aWorkshop,
@@ -638,11 +647,14 @@ void PartSet_Module::onFeatureTriggered()
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   if (myWorkshop->currentOperation() && 
-      myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID())
-    myHasConstraintShown = mySketchMgr->isConstraintsShown();
+      myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID()) {
+      const QMap<PartSet_Tools::ConstraintVisibleState, bool>& aShownStates = mySketchMgr->showConstraintStates();
+      myHasConstraintShown = aShownStates;
+  }
   if (PartSet_SketcherMgr::constraintsIdList().contains(theCmdId)) {
     // Show constraints if a constraint was anOperation
-    mySketchMgr->onShowConstraintsToggle(true);
+    mySketchMgr->onShowConstraintsToggle(true, PartSet_Tools::Geometrical);
+    mySketchMgr->onShowConstraintsToggle(true, PartSet_Tools::Dimensional);
   }
   ModuleBase_IModule::launchOperation(theCmdId);
 }

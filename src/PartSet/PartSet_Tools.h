@@ -40,6 +40,15 @@ class GeomAPI_Vertex;
  */
 class PARTSET_EXPORT PartSet_Tools
 {
+public:
+  /// \enum ConstraintVisibleState types of constraints which visible state can be
+  /// changed in the sketch widget
+  enum ConstraintVisibleState
+  {
+    Geometrical = 0, // all constrains excepting dimensional
+    Dimensional // lenght, distance, radius and angle constraints
+  };
+
  public:
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point

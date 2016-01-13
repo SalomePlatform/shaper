@@ -55,10 +55,10 @@
 
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
-                                                     ModuleBase_IWorkshop* theWorkshop,
-                                                     const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId,
-                                                     bool toShowConstraints)
+                        ModuleBase_IWorkshop* theWorkshop,
+                        const Config_WidgetAPI* theData,
+                        const std::string& theParentId,
+                        const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints)
 : ModuleBase_WidgetValidated(theParent, theWorkshop, theData, theParentId),
   myPreviewDisplayed(false)
 {
@@ -102,10 +102,23 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 
   aLayout->addWidget(aViewBox);
 
-  myShowConstraints = new QCheckBox(tr("Show constraints"), this);
-  connect(myShowConstraints, SIGNAL(toggled(bool)), this, SIGNAL(showConstraintToggled(bool)));
-  myShowConstraints->setChecked(toShowConstraints);
-  aLayout->addWidget(myShowConstraints);
+  QMap<PartSet_Tools::ConstraintVisibleState, QString> aStates;
+  aStates[PartSet_Tools::Geometrical] = tr("Show geometrical constraints");
+  aStates[PartSet_Tools::Dimensional] = tr("Show dimensional constraints");
+
+  QMap<PartSet_Tools::ConstraintVisibleState, QString>::const_iterator anIt = aStates.begin(),
+                                                        aLast = aStates.end();
+  for (; anIt != aLast; anIt++) {
+    QCheckBox* aShowConstraints = new QCheckBox(anIt.value(), this);
+    connect(aShowConstraints, SIGNAL(toggled(bool)), this, SLOT(onShowConstraint(bool)));
+    aLayout->addWidget(aShowConstraints);
+
+    PartSet_Tools::ConstraintVisibleState aState = anIt.key();
+    myShowConstraints[aState] = aShowConstraints;
+
+    if (toShowConstraints.contains(aState))
+      aShowConstraints->setChecked(toShowConstraints[aState]);
+  }
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
@@ -152,6 +165,24 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
     updateByPlaneSelected(aPrs);
     updateObject(myFeature);
   }
+}
+
+void PartSet_WidgetSketchLabel::onShowConstraint(bool theOn)
+{
+  QCheckBox* aSenderCheckBox = qobject_cast<QCheckBox*>(sender());
+
+  QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*>::const_iterator
+                          anIt = myShowConstraints.begin(), aLast = myShowConstraints.end();
+
+  PartSet_Tools::ConstraintVisibleState aState = PartSet_Tools::Geometrical;
+  bool aFound = false;
+  for (; anIt != aLast && !aFound; anIt++) {
+    aFound = anIt.value() == aSenderCheckBox;
+    if (aFound)
+      aState = anIt.key();
+  }
+  if (aFound)
+    emit showConstraintToggled(theOn, aState);
 }
 
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs)
@@ -471,12 +502,6 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
   aDirX->setValue(aXDir);
   std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   return aDir;
-}
-
-void PartSet_WidgetSketchLabel::showConstraints(bool theOn)
-{
-  myShowConstraints->setChecked(theOn);
-  emit showConstraintToggled(theOn);
 }
 
 XGUI_Workshop* PartSet_WidgetSketchLabel::workshop() const
