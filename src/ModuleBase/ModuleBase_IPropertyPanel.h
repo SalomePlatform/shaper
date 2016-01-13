@@ -103,8 +103,10 @@ public slots:
   * highlighting from the previous active widget
   * emits widgetActivated(theWidget) signal
   * \param theWidget which has to be activated
+  * \param theEmitSignal a flag to prohibit signal emit
   */
-  virtual void activateWidget(ModuleBase_ModelWidget* theWidget) = 0;
+  virtual void activateWidget(ModuleBase_ModelWidget* theWidget,
+                              const bool theEmitSignal = true) = 0;
 
 protected:
 

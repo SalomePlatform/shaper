@@ -332,6 +332,13 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
             aPreviousAttributeWidget->selectContent();
           }
           else {
+            // in case of shape multi selector, the widget does not lose focus by filling
+            // like it is in shape selector. So, if enter is pressed, the multi shape selector
+            // control should be deactivated. The focus is moved to Apply button and there
+            // should not be active control visualized in property panel
+            if (aPreviousAttributeWidget == aPanel->activeWidget()) {
+              aPanel->activateWidget(NULL, false);
+            }
             // if there is no the next widget to be automatically activated, the Ok button in property
             // panel should accept the focus(example is parallel constraint on sketch lines)
             QToolButton* anOkBtn = aPanel->findChild<QToolButton*>(PROP_PANEL_OK);

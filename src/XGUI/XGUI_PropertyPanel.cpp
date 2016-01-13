@@ -359,14 +359,14 @@ void XGUI_PropertyPanel::activateNextWidget()
   activateNextWidget(myActiveWidget);
 }
 
-void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
+void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget, const bool theEmitSignal)
 {
   std::string aPreviosAttributeID;
   if(myActiveWidget)
     aPreviosAttributeID = myActiveWidget->attributeID();
 
   // Avoid activation of already actve widget. It could happen on focusIn event many times
-  if (setActiveWidget(theWidget)) {
+  if (setActiveWidget(theWidget) && theEmitSignal) {
     emit widgetActivated(myActiveWidget);
     if (!myActiveWidget && !isEditingMode()) {
       emit noMoreWidgets(aPreviosAttributeID);
