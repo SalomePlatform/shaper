@@ -71,6 +71,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = new QAction(QIcon(":pictures/move.png"), XGUI_Workshop::MOVE_TO_END_COMMAND, this);
   addAction("MOVE_CMD", aAction);
 
+  aAction = new QAction(QIcon(":pictures/delete.png"), tr("Clean history"), this);
+  addAction("CLEAN_HISTORY_CMD", aAction);
+
   aAction = new QAction(QIcon(":pictures/color.png"), tr("Color..."), this);
   addAction("COLOR_CMD", aAction);
 
@@ -214,6 +217,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         else if (hasFeature && myWorkshop->canMoveFeature())
           action("MOVE_CMD")->setEnabled(true);
 
+        else if (hasFeature)
+          action("CLEAN_HISTORY_CMD")->setEnabled(true);
+
         if( aMgr->activeDocument() == aObject->document() )
         {
           action("RENAME_CMD")->setEnabled(true);
@@ -240,6 +246,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       if (hasFeature || hasParameter)
         action("DELETE_CMD")->setEnabled(true);
     }
+    if (allActive && hasFeature)
+      action("CLEAN_HISTORY_CMD")->setEnabled(true);
   }
 
   // Show/Hide command has to be disabled for objects from non active document
@@ -369,6 +377,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.clear();
   aList.append(action("DELETE_CMD"));
   aList.append(action("MOVE_CMD"));
+  aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
@@ -429,6 +438,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(mySeparator);
       aActions.append(action("DELETE_CMD"));
       //aActions.append(action("MOVE_CMD"));
+      aActions.append(action("CLEAN_HISTORY_CMD"));
       aActions.append(action("COLOR_CMD"));
   }
   theMenu->addActions(aActions);

@@ -57,6 +57,18 @@ QString addSlash(const QString& path)
 }
 
 //******************************************************************
+QString unionOfObjectNames(const QObjectPtrList& theObjects, const QString& theSeparator)
+{
+  QStringList aObjectNames;
+  foreach (ObjectPtr aObj, theObjects) {
+    if (!aObj->data()->isValid())
+      continue;
+    aObjectNames << QString::fromStdString(aObj->data()->name());
+  }
+  return aObjectNames.join(", ");
+}
+
+//******************************************************************
 bool isModelObject(FeaturePtr theFeature)
 {
   return theFeature && !theFeature->data();
@@ -190,9 +202,31 @@ bool isSubOfComposite(const ObjectPtr& theObject)
 
 //**************************************************************
 void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
+                                 const QObjectPtrList& theIgnoreList,
                                  std::set<FeaturePtr>& theDirectRefFeatures, 
                                  std::set<FeaturePtr>& theIndirectRefFeatures,
                                  std::set<FeaturePtr>& theAlreadyProcessed)
+{
+  refsDirectToFeatureInAllDocuments(theSourceObject, theObject, theIgnoreList, theDirectRefFeatures, 
+                                    theAlreadyProcessed);
+
+  // Run recursion. It is possible recursive dependency, like the following: plane, extrusion uses plane,
+  // axis is built on extrusion. Delete of a plane should check the dependency from the axis also.
+  std::set<FeaturePtr>::const_iterator aFeatureIt = theDirectRefFeatures.begin();
+  for (; aFeatureIt != theDirectRefFeatures.end(); ++aFeatureIt) {
+    std::set<FeaturePtr> aRecursiveRefFeatures;
+    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, theIgnoreList,
+      aRecursiveRefFeatures, aRecursiveRefFeatures, theAlreadyProcessed);
+    theIndirectRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
+  }
+
+}
+
+//**************************************************************
+void refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
+                                       const QObjectPtrList& theIgnoreList,
+                                       std::set<FeaturePtr>& theDirectRefFeatures, 
+                                       std::set<FeaturePtr>& theAlreadyProcessed)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (!aFeature.get())
@@ -209,7 +243,7 @@ void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectP
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
     // composite feature should not be deleted when the sub feature is to be deleted
-    if (!isSubOfComposite(theSourceObject, *anIt))
+    if (!isSubOfComposite(theSourceObject, *anIt) && !theIgnoreList.contains(*anIt))
       theDirectRefFeatures.insert(*anIt);
   }
 
@@ -264,20 +298,11 @@ void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectP
             }
           }
         }
-        if (aHasReferenceToObject && !isSubOfComposite(theSourceObject, aFeature))
+        if (aHasReferenceToObject && !isSubOfComposite(theSourceObject, aFeature) &&
+            !theIgnoreList.contains(aFeature))
           theDirectRefFeatures.insert(aFeature);
       }
     }
-  }
-
-  // Run recursion. It is possible recursive dependency, like the following: plane, extrusion uses plane,
-  // axis is built on extrusion. Delete of a plane should check the dependency from the axis also.
-  std::set<FeaturePtr>::const_iterator aFeatureIt = theDirectRefFeatures.begin();
-  for (; aFeatureIt != theDirectRefFeatures.end(); ++aFeatureIt) {
-    std::set<FeaturePtr> aRecursiveRefFeatures;
-    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, 
-      aRecursiveRefFeatures, aRecursiveRefFeatures, theAlreadyProcessed);
-    theIndirectRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
   }
 }
 

@@ -56,6 +56,12 @@ QString XGUI_EXPORT addSlash(const QString& path);
 
 // The model concerning tools
 
+/*! Unite object names in one string using the separator between values
+ \param theObjects a list of objects
+ \param theSeparator a separator
+ */
+QString unionOfObjectNames(const QObjectPtrList& theObjects, const QString& theSeparator);
+
 /*!
  Returns true if the feature is a model object
  \param theFeature a feature
@@ -111,6 +117,13 @@ void XGUI_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
 bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
 
 /*!
+*/
+void refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
+                                 const QObjectPtrList& theIgnoreList,
+                                 std::set<FeaturePtr>& theDirectRefFeatures, 
+                                 std::set<FeaturePtr>& theAlreadyProcessed);
+
+/*!
  Returns a container of references feature to the source object. The search happens in the object
  document and in other Part documents if the object belongs to the PartSet. The search is recursive,
  in other words it is applyed to set of the found objects until it is possible.
@@ -118,13 +131,15 @@ bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& 
  which has the object as a sub object.
  \param theSourceObject an object, which references are searched
  \param theObject an intermediate recursive object, should be set in the source object
+ \param theIgnoreList an ignore list, the found referernces which coincide with the objects are ignored
  \param theDirectRefFeatures direct references
- \param theIndirectRefFeatures indirect references
+ \param theIndirectRefFeatures indirect references. These are features that refers to the direct features
  \param theAlreadyProcessed set of processed elements, used for optimization (do not reanalyse processed)
  \return a boolean value
  */
 void XGUI_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
                                              const ObjectPtr& theObject,
+                                             const QObjectPtrList& theIgnoreList,
                                              std::set<FeaturePtr>& theDirectRefFeatures,
                                              std::set<FeaturePtr>& theIndirectRefFeatures,
                                              std::set<FeaturePtr>& theAlreadyProcessed);

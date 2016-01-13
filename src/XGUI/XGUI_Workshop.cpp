@@ -1129,6 +1129,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
   if (theId == "DELETE_CMD")
     deleteObjects();
+  else if (theId == "CLEAN_HISTORY_CMD")
+    cleanHistory();
   else if (theId == "MOVE_CMD")
     moveObjects();
   else if (theId == "COLOR_CMD")
@@ -1187,17 +1189,10 @@ void XGUI_Workshop::deleteObjects()
 
   // 1. start operation
   QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
-  aDescription += tr(" %1");
-  QStringList aObjectNames;
-  foreach (ObjectPtr aObj, anObjects) {
-    if (!aObj->data()->isValid())
-      continue;
-    aObjectNames << QString::fromStdString(aObj->data()->name());
-  }
-  aDescription = aDescription.arg(aObjectNames.join(", "));
+  aDescription += " " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
   ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
-
   operationMgr()->startOperation(anOpAction);
+
   // 3. delete objects
   std::set<FeaturePtr> anIgnoredFeatures;
   if (deleteFeatures(anObjects, anIgnoredFeatures, desktop(), true)) {
@@ -1205,6 +1200,66 @@ void XGUI_Workshop::deleteObjects()
   }
   else {
     operationMgr()->abortOperation(operationMgr()->currentOperation());
+  }
+}
+
+//**************************************************************
+void XGUI_Workshop::cleanHistory()
+{
+  if (!abortAllOperations())
+    return;
+
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+
+  // 1. find all referenced features
+  std::set<FeaturePtr> anUnusedFeatures;
+  std::set<FeaturePtr> aDirectRefFeatures;
+  foreach (ObjectPtr anObject, anObjects) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    if (aFeature.get()) {
+      std::set<FeaturePtr> alreadyProcessed;
+      aDirectRefFeatures.clear();
+      XGUI_Tools::refsDirectToFeatureInAllDocuments(anObject, anObject, anObjects,
+                                                    aDirectRefFeatures, alreadyProcessed);
+      if (aDirectRefFeatures.empty() && anUnusedFeatures.find(aFeature) == anUnusedFeatures.end())
+        anUnusedFeatures.insert(aFeature);
+    }
+  }
+
+  // 2. warn about the references remove, break the delete operation if the user chose it
+  if (!anUnusedFeatures.empty()) {
+    QStringList aNames;
+    foreach (const FeaturePtr& aFeature, anUnusedFeatures)
+      aNames.append(aFeature->name().c_str());
+    QString anUnusedNames = aNames.join(", ");
+
+    QString anActionId = "CLEAN_HISTORY_CMD";
+    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+
+    QMessageBox aMessageBox(desktop());
+    aMessageBox.setWindowTitle(aDescription);
+    aMessageBox.setIcon(QMessageBox::Warning);
+    aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+    aMessageBox.setDefaultButton(QMessageBox::No);
+
+    QString aText = QString(tr("Unused features are the following: %1.\nThese features will be deleted.\nWould you like to continue?")
+                   .arg(anUnusedNames));
+    aMessageBox.setText(aText);
+    if (aMessageBox.exec() == QMessageBox::No)
+      return;
+
+    // 1. start operation
+    aDescription += "by deleting of " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
+    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
+    operationMgr()->startOperation(anOpAction);
+
+    std::set<FeaturePtr> anIgnoredFeatures;
+    if (removeFeatures(anObjects, anIgnoredFeatures, anActionId)) {
+      operationMgr()->commitOperation();
+    }
+    else {
+      operationMgr()->abortOperation(operationMgr()->currentOperation());
+    }
   }
 }
 
@@ -1263,8 +1318,8 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
   std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
   foreach (ObjectPtr aDeletedObj, theList) {
     std::set<FeaturePtr> alreadyProcessed;
-    XGUI_Tools::refsToFeatureInAllDocuments(
-      aDeletedObj, aDeletedObj, aDirectRefFeatures, aIndirectRefFeatures, alreadyProcessed);
+    XGUI_Tools::refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, theList, aDirectRefFeatures,
+                                            aIndirectRefFeatures, alreadyProcessed);
     std::set<FeaturePtr> aDifference;
     std::set_difference(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end(), 
                         aDirectRefFeatures.begin(), aDirectRefFeatures.end(), 
@@ -1350,7 +1405,17 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
   }
 
   QString anActionId = "DELETE_CMD";
-  QString anId = QString::fromStdString(anActionId.toStdString().c_str());
+  removeFeatures(theList, theIgnoredFeatures, anActionId);
+}
+
+//**************************************************************
+bool XGUI_Workshop::removeFeatures(const QObjectPtrList& theList,
+                                   const std::set<FeaturePtr>& theIgnoredFeatures,
+                                   const QString& theActionId)
+{
+  bool isDone = false;
+
+  QString anId = QString::fromStdString(theActionId.toStdString().c_str());
   QStringList anObjectGroups = contextMenuMgr()->actionObjectGroups(anId);
   // 4. remove the parameter features
   foreach (ObjectPtr aObj, theList) {
@@ -1375,6 +1440,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
         qDebug(QString("remove feature :%1").arg(anInfoStr).toStdString().c_str());
 #endif
         aDoc->removeFeature(aFeature);
+        isDone = true;
       }
     }
   }

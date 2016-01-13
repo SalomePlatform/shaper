@@ -38,7 +38,7 @@ XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
   /// the actions priority
-  qApp->installEventFilter(this);
+  //qApp->installEventFilter(this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
