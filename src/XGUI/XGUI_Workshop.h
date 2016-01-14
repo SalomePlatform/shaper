@@ -168,6 +168,11 @@ Q_OBJECT
   //! Delete features
   void deleteObjects();
 
+  //! Searches for selected features unused in other (not selected) features. If one or several
+  //! selected features are found, a warning message proposes to delete them. It contains 
+  //! the list of features to be deleted.
+  void cleanHistory();
+
   //! Returns true if the selected feature can be moved to the position after the current feature
   //! \return boolean value
   bool canMoveFeature();
@@ -433,6 +438,15 @@ private:
   //! \param theSignal - void "updateUndoHistory" or "updateRedoHistory" SIGNAL;
   //! \param theSlot - onUndo(int) or onRedo(int) SLOT
   void addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot);
+
+
+  /// Calls removeFeature of the document for each object in the list
+  //! \param theList an objects to be deleted
+  //! \param theIgnoredFeatures a list of features to be ignored during delete
+  //! \param theActionId an action command key to find context menu object types enabled for remove
+  bool removeFeatures(const QObjectPtrList& theList,
+                      const std::set<FeaturePtr>& theIgnoredFeatures,
+                      const QString& theActionId);
 
   //! Creates list of actions (commands) by given history list from session
   QList<ActionInfo> processHistoryList(const std::list<std::string>&) const;
