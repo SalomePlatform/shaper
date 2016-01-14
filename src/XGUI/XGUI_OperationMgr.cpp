@@ -31,6 +31,45 @@
 
 //#define DEBUG_CURRENT_FEATURE
 
+/// Processes "Delete" key event of application. This key is used by several application actions.
+/// There is a logical order of the actions processing. So the key can not be set for actions
+/// as a shortcut. The class listens the key event and call operation manager processor.
+class XGUI_ShortCutListener : public QObject
+{
+public:
+  /// Constructor
+  /// \param theParent the parent to be deleted when the parent is deleted
+  /// \param theOperationMgr the class to perform deletion
+  XGUI_ShortCutListener(QObject* theParent, XGUI_OperationMgr* theOperationMgr)
+    : QObject(theParent), myOperationMgr(theOperationMgr)
+  {
+    qApp->installEventFilter(this);
+  }
+  ~XGUI_ShortCutListener() {}
+
+  /// Redefinition of virtual function to process Delete key release
+  virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
+  {
+    bool isAccepted = false;
+    if (theEvent->type() == QEvent::KeyRelease) {
+      QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+      if(aKeyEvent) {
+        switch (aKeyEvent->key()) {
+          case Qt::Key_Delete: {
+            isAccepted = myOperationMgr->onProcessDelete();
+          }
+        }
+      }
+    }
+    if (!isAccepted)
+      isAccepted = QObject::eventFilter(theObject, theEvent);
+    return isAccepted;
+  }
+
+private:
+  XGUI_OperationMgr* myOperationMgr; /// processor for key event
+};
+
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
 : QObject(theParent), myWorkshop(theWorkshop)
@@ -38,7 +77,7 @@ XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
   /// the actions priority
-  //qApp->installEventFilter(this);
+  XGUI_ShortCutListener* aShortCutListener = new XGUI_ShortCutListener(theParent, this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
@@ -530,9 +569,6 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
             aContext->HilightPreviousDetected(aView);
         }
       }
-    }
-    case Qt::Key_Delete: {
-      isAccepted = onProcessDelete();
     }
     break;
     break;
