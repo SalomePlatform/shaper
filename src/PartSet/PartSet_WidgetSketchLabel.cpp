@@ -185,6 +185,27 @@ void PartSet_WidgetSketchLabel::onShowConstraint(bool theOn)
     emit showConstraintToggled(theOn, aState);
 }
 
+void PartSet_WidgetSketchLabel::blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+                                               bool& isAttributeSetInitializedBlocked)
+{
+  ModuleBase_WidgetValidated::blockAttribute(theToBlock, isFlushesActived,
+                                             isAttributeSetInitializedBlocked);
+  // We do not restore the previous state of isAttributeSetInitializedBlocked for each of
+  // attributes. It it is necessary, these states should be append to the method attributes
+  // or stored in the widget
+
+  std::list<AttributePtr> anAttributes = myFeature->data()->attributes("");
+  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+  QStringList aValues;
+  for(; anIt != aLast; anIt++) {
+    AttributePtr anAttribute = *anIt;
+    if (theToBlock)
+      anAttribute->blockSetInitialized(true);
+    else
+      anAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
+  }
+}
+
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs)
 {
   // 1. hide main planes if they have been displayed

@@ -174,7 +174,10 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
     if (aData) {
       std::shared_ptr<GeomDataAPI_Dir> aNormal =
         std::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-      aHasSketchPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
+      // it is important to check whether the normal attribute is initialized
+      // because it is possible that normal values are filled when the plane is checked on validity
+      aHasSketchPlane = aNormal && aNormal->isInitialized() &&
+                        !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
 
       aMsg->setState(SketchPlugin_Point::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);

@@ -359,7 +359,7 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
     myWorkshop->setSelected(getAttributeSelection());
     myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeAllObjects, true);
   }
-  return true; // if the delete should be processed outsize, the method should return isDone
+  return aDone;
 }
 
 //********************************************************************

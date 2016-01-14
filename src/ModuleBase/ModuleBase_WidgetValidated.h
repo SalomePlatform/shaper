@@ -123,6 +123,15 @@ protected:
   /// \param toActivate a flag about activation or deactivation the filters
   void activateFilters(const bool toActivate);
 
+  /// Block the model flush of update and intialization of attribute
+  /// \param theToBlock flag whether the model is blocked or unblocked
+  /// \param isActive out value if model is blocked, in value if model is unblocked
+  /// to be used to restore flush state when unblocked
+  /// \param isAttributeSetInitializedBlocked out value if model is blocked
+  /// in value if model is unblocked to be used to restore previous state when unblocked
+  virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+                              bool& isAttributeSetInitializedBlocked);
+
 protected:
   /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop; 

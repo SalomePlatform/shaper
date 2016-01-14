@@ -136,17 +136,10 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
     return aValid;
   }
 
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
-
   // stores the current values of the widget attribute
-  Events_Loop* aLoop = Events_Loop::loop();
-  // blocks the flush signals to avoid the temporary objects visualization in the viewer
-  // they should not be shown in order to do not lose highlight by erasing them
-  bool isActive = aLoop->activateFlushes(false);
+  bool isFlushesActived, isAttributeSetInitializedBlocked;
+  blockAttribute(true, isFlushesActived, isAttributeSetInitializedBlocked);
 
-  aData->blockSendAttributeUpdated(true);
-  bool isAttributeBlocked = anAttribute->blockSetInitialized(true);
   storeAttributeValue();
 
   // saves the owner value to the widget attribute
@@ -157,10 +150,8 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
 
   // restores the current values of the widget attribute
   restoreAttributeValue(aValid);
-  aData->blockSendAttributeUpdated(false);
-  anAttribute->blockSetInitialized(isAttributeBlocked);
-  aLoop->activateFlushes(isActive);
 
+  blockAttribute(false, isFlushesActived, isAttributeSetInitializedBlocked);
   // In particular case the results are deleted and called as redisplayed inside of this
   // highlight-selection, to they must be flushed as soon as possible.
   // Example: selection of group-vertices subshapes with shift pressend on body. Without
@@ -168,8 +159,8 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   //  removed results still in the viewer.
   static Events_ID aDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
   static Events_ID aRedispEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  aLoop->flush(aDeletedEvent);
-  aLoop->flush(aRedispEvent);
+  Events_Loop::loop()->flush(aDeletedEvent);
+  Events_Loop::loop()->flush(aRedispEvent);
 
   storeValidState(theValue, aValid);
   return aValid;
@@ -211,6 +202,28 @@ void ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
   else {
     aViewer->removeSelectionFilter(aSelFilter);
     clearValidState();
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+                                                bool& isAttributeSetInitializedBlocked)
+{
+  Events_Loop* aLoop = Events_Loop::loop();
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+  if (theToBlock) {
+    // blocks the flush signals to avoid the temporary objects visualization in the viewer
+    // they should not be shown in order to do not lose highlight by erasing them
+    isFlushesActived = aLoop->activateFlushes(false);
+
+    aData->blockSendAttributeUpdated(true);
+    isAttributeSetInitializedBlocked = anAttribute->blockSetInitialized(true);
+  }
+  else {
+    aData->blockSendAttributeUpdated(false);
+    anAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
+    aLoop->activateFlushes(isFlushesActived);
   }
 }
 

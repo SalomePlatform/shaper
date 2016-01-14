@@ -121,6 +121,17 @@ protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+  /// Block the model flush of update and intialization of attribute
+  /// In additional to curstom realization it blocks initialization for all feature attributes
+  /// as the current attribute is selection but its modification leads to other attributes change
+  /// \param theToBlock flag whether the model is blocked or unblocked
+  /// \param isActive out value if model is blocked, in value if model is unblocked
+  /// to be used to restore flush state when unblocked
+  /// \param isAttributeSetInitializedBlocked out value if model is blocked
+  /// in value if model is unblocked to be used to restore previous state when unblocked
+  virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+                              bool& isAttributeSetInitializedBlocked);
+
   /// Erase preview planes, disconnect widget, change the view projection
   /// \param thePrs a selected presentation
   void updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs);
