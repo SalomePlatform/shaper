@@ -142,6 +142,16 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   myHasConstraintShown[PartSet_Tools::Geometrical] = true;
   myHasConstraintShown[PartSet_Tools::Dimensional] = true;
+
+  Config_PropManager::registerProp("Visualization", "operation_parameter_color",
+                          "Reference shape wireframe color in operation", Config_Prop::Color,
+                          PartSet_CustomPrs::OPERATION_PARAMETER_COLOR());
+  Config_PropManager::registerProp("Visualization", "operation_result_color",
+                          "Result shape wireframe color in operation", Config_Prop::Color,
+                          PartSet_CustomPrs::OPERATION_RESULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "operation_highlight_color",
+                          "Multi selector item color in operation", Config_Prop::Color,
+                          PartSet_CustomPrs::OPERATION_HIGHLIGHT_COLOR());
 }
 
 PartSet_Module::~PartSet_Module()

@@ -30,6 +30,15 @@ class XGUI_Workshop;
 class PartSet_CustomPrs
 {
 public:
+  /// Returns yellow color
+  static const std::string OPERATION_PARAMETER_COLOR() { return "255, 255, 0"; }
+  /// Returns green color
+  static const std::string OPERATION_RESULT_COLOR() { return "0,225, 0"; }
+  /// Returns color between white and color of highlight
+  /// highlight color is equal Quantity_Color(0.5,1,1) or QColor(122, 255,255) // 188
+  static const std::string OPERATION_HIGHLIGHT_COLOR() { return "188, 255, 255"; }
+
+public:
   /// Constructor
   /// \param theWorkshop a reference to workshop
   PARTSET_EXPORT PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop);
@@ -52,38 +61,55 @@ public:
   /// If the presentation is active[displayed], the shapes of the presentation is recomputed
   /// and the presentation is redisplayed.
   /// \param theObject an object to redisplay
+  /// \param theFlag an object AIS presentation type
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is redisplayed
   bool redisplay(const ObjectPtr& theObject,
-                 const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag, const bool theUpdateViewer);
+                 const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                 const bool theUpdateViewer);
 
-  /// Nullify the operation presentation. For example, it can be useful when the viewer/context
+  /// Nullify all internal presentations. For example, it can be useful when the viewer/context
   /// is closed. If this is not performed and the presentation is assigned in another context,
   /// it caused erroneus case because the presentation has linkage to the previous context.
   void clearPrs();
 
 private:
   /// Creates the AIS operation presentation
-  void initPrs();
+  /// \param theFlag an object AIS presentation type
+  void initPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
-  /// Returns the AIS presentation
-  Handle(PartSet_OperationPrs) getPresentation();
+  /// Gets an AIS presentation by the flag
+  /// \param theFlag an object AIS presentation type
+  /// \return the AIS prsentation
+  Handle(PartSet_OperationPrs) getPresentation(
+                            const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
   //! Returns workshop
   XGUI_Workshop* workshop() const;
 
   /// Displays the internal presentation in the viewer of workshop
+  /// \param theFlag an object AIS presentation type
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  bool displayPresentation(const bool theUpdateViewer);
+  /// \param returns whether the presentation is displayed/redisplayed
+  bool displayPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                           const bool theUpdateViewer);
 
   /// Erases the internal presentation from the viewer of workshop
+  /// \param theFlag an object AIS presentation type
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erasePresentation(const bool theUpdateViewer);
+  void erasePresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                         const bool theUpdateViewer);
+
+  /// Nullify the operation presentation. For example, it can be useful when the viewer/context
+  /// is closed. If this is not performed and the presentation is assigned in another context,
+  /// it caused erroneus case because the presentation has linkage to the previous context.
+  void clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
 private:
   bool myIsActive;
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
-  AISObjectPtr myOperationPrs; /// the AIS presentation, which is displayed/erased in the viewer
+  /// map of presentation type to AIS object
+  QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, AISObjectPtr> myPresentations;
 };
 
 #endif

@@ -37,7 +37,8 @@ IMPLEMENT_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 
 PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
-  : ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr()), myWorkshop(theWorkshop)
+: ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr()), myWorkshop(theWorkshop),
+ myUseAISWidth(false)
 {
   myShapeColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "1,1,0");
   myResultColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "0,1,0");
@@ -50,9 +51,6 @@ void PartSet_OperationPrs::setFeature(const FeaturePtr& theFeature)
 
 void PartSet_OperationPrs::updateShapes()
 {
-  myFeatureShapes.clear();
-  getFeatureShapes(myFeatureShapes);
-
   myFeatureResults.clear();
   if (myFeature)
     myFeatureResults = myFeature->results();
@@ -83,6 +81,17 @@ bool PartSet_OperationPrs::hasShapes()
   return aHasShapes;
 }
 
+void PartSet_OperationPrs::setColors(const Quantity_Color& theShapeColor, const Quantity_Color& theResultColor)
+{
+  myShapeColor = theShapeColor;
+  myResultColor = theResultColor;
+}
+
+void PartSet_OperationPrs::useAISWidth()
+{
+  myUseAISWidth = true;
+}
+
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
@@ -94,15 +103,13 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   if (!myWorkshop->module()->canDisplayObject(myFeature))
     return;
 
-  Quantity_Color aColor(1., 1., 0., Quantity_TOC_RGB); // yellow
-  SetColor(aColor);
-
+  SetColor(myShapeColor);
   thePresentation->Clear();
   XGUI_Displayer* aDisplayer = workshop()->displayer();
 
-  // create presentations on the base of the shapes
   Handle(Prs3d_Drawer) aDrawer = Attributes();
 
+  // create presentations on the base of the shapes
   QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
                                                         aLast = myFeatureShapes.end();
   for (; anIt != aLast; anIt++) {
@@ -118,13 +125,21 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
       // change deviation coefficient to provide more precise circle
       ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
+
+      if (myUseAISWidth) {
+        AISObjectPtr anAISPtr = aDisplayer->getAISObject(anObject);
+        if (anAISPtr.get()) {
+          Handle(AIS_InteractiveObject) anIO = anAISPtr->impl<Handle(AIS_InteractiveObject)>();
+          if (!anIO.IsNull())
+            setWidth(aDrawer, anIO->Width());
+        }
+      }
       StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
     }
   }
 
-  aColor = Quantity_Color(0., 1., 0., Quantity_TOC_RGB); // green
-  SetColor(aColor);
-
+  // create presentations on the base of the results
+  SetColor(myResultColor);
   std::list<ResultPtr>::const_iterator aRIt = myFeatureResults.begin(),
                                        aRLast = myFeatureResults.end();
   for (; aRIt != aRLast; aRIt++) {
@@ -147,37 +162,6 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       aWidget->getHighlighted(aValues);
     }
   }
-
-  Standard_Real aPreviousWidth = Width();
-  setWidth(aDrawer, aPreviousWidth+3);
-  Handle(AIS_InteractiveContext) aContext = GetContext();
-  Quantity_NameOfColor anHColor = aContext->HilightColor();
-
-  aColor = Quantity_Color(anHColor);
-  aColor = Quantity_Color((1. + aColor.Red())/2., (1. + aColor.Green())/2.,
-                          (1. + aColor.Blue())/2., Quantity_TOC_RGB);
-  SetColor(aColor);
-
-  QList<ModuleBase_ViewerPrs>::const_iterator anIIt = aValues.begin(),
-                                              aILast = aValues.end();
-  for (; anIIt != aILast; anIIt++) {
-    ModuleBase_ViewerPrs aPrs = *anIIt;
-    ObjectPtr anObject = aPrs.object();
-    TopoDS_Shape aShape = aPrs.shape();
-    if (aShape.IsNull()) {
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-      if (aResult.get()) {
-        GeomShapePtr aGeomShape = aResult->shape();
-        if (aGeomShape.get())
-          aShape = aGeomShape->impl<TopoDS_Shape>();
-      }
-    }
-    if (!aShape.IsNull()) {
-      ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
-      StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
-    }
-  }
-  setWidth(aDrawer, aPreviousWidth);
 }
 
 void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
@@ -255,22 +239,25 @@ void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
   }
 }
 
-void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
+                                            ModuleBase_IWorkshop* theWorkshop,
+                                            QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
-  if (!myFeature.get())
+  theObjectShapes.clear();
+  if (!theFeature.get())
     return;
 
   ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
 
   QList<GeomShapePtr> aShapes;
-  std::list<AttributePtr> anAttributes = myFeature->data()->attributes("");
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes("");
   std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
   for (; anIt != aLast; anIt++) {
     AttributePtr anAttribute = *anIt;
     if (!isSelectionAttribute(anAttribute))
       continue;
 
-    if (!aValidators->isCase(myFeature, anAttribute->id()))
+    if (!aValidators->isCase(theFeature, anAttribute->id()))
       continue; // this attribute is not participated in the current case
 
     std::string anAttrType = anAttribute->attributeType();
@@ -282,7 +269,7 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
         ResultPtr aResult = aSelAttribute->context();
         GeomShapePtr aShape = aSelAttribute->value();
-        addValue(aResult, aShape, myFeature, theObjectShapes);
+        addValue(aResult, aShape, theFeature, theObjectShapes);
       }
     }
     if (anAttrType == ModelAPI_AttributeRefList::typeId()) {
@@ -290,7 +277,7 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
       for (int i = 0; i < aCurSelList->size(); i++) {
         GeomShapePtr aShape;
-        addValue(aCurSelList->object(i), aShape, myFeature, theObjectShapes);
+        addValue(aCurSelList->object(i), aShape, theFeature, theObjectShapes);
       }
     }
     else {
@@ -302,7 +289,7 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
           anObject = anAttr->object();
         }
         else {
-          aShape = PartSet_Tools::findShapeBy2DPoint(anAttr, myWorkshop);
+          aShape = PartSet_Tools::findShapeBy2DPoint(anAttr, theWorkshop);
           // the distance point is not found if the point is selected in the 2nd time
           // TODO: after debug, this check can be removed
           if (!aShape.get())
@@ -319,10 +306,56 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
         AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
         anObject = anAttr->value();
       }
-      addValue(anObject, aShape, myFeature, theObjectShapes);
+      addValue(anObject, aShape, theFeature, theObjectShapes);
     }
   }
 }
+
+void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorkshop,
+                                                QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+{
+  theObjectShapes.clear();
+
+  QList<ModuleBase_ViewerPrs> aValues;
+  ModuleBase_IPropertyPanel* aPanel = theWorkshop->propertyPanel();
+  if (aPanel) {
+    ModuleBase_ModelWidget* aWidget = aPanel->activeWidget();
+    if (aWidget) {
+      aWidget->getHighlighted(aValues);
+    }
+  }
+
+  QList<GeomShapePtr> aShapes;
+  QList<ModuleBase_ViewerPrs>::const_iterator anIIt = aValues.begin(),
+                                              aILast = aValues.end();
+  for (; anIIt != aILast; anIIt++) {
+    ModuleBase_ViewerPrs aPrs = *anIIt;
+    ObjectPtr anObject = aPrs.object();
+
+    GeomShapePtr aGeomShape;
+
+    TopoDS_Shape aShape = aPrs.shape();
+    if (!aShape.IsNull()) {
+      aGeomShape = GeomShapePtr(new GeomAPI_Shape());
+      aGeomShape->setImpl(new TopoDS_Shape(aShape));
+    }
+    else {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      if (aResult.get()) {
+        aGeomShape = aResult->shape();
+      }
+    }
+
+    if (theObjectShapes.contains(anObject))
+      theObjectShapes[anObject].append(aGeomShape);
+    else {
+      QList<GeomShapePtr> aShapes;
+      aShapes.append(aGeomShape);
+      theObjectShapes[anObject] = aShapes;
+    }
+  }
+}
+
 
 bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute)
 {

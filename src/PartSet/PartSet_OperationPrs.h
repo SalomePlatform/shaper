@@ -57,6 +57,14 @@ public:
   /// Returns true if the feature contains shapes or results
   bool hasShapes();
 
+  /// Sets the colors for the presentation compute
+  /// \param theShapeColor an argument shapes color
+  /// \param theResultColor a color for operation result
+  void setColors(const Quantity_Color& theShapeColor, const Quantity_Color& theResultColor);
+
+  /// Switch on using of the AIS presentation with of the shape object increased on the delta
+  void useAISWidth();
+
   DEFINE_STANDARD_RTTI(PartSet_OperationPrs)
 
 protected:
@@ -68,6 +76,15 @@ protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                                 const Standard_Integer aMode) ;
+
+protected:
+  /// Reference to a feature object
+  FeaturePtr getFeature() { return myFeature; }
+
+  /// Returns map of feature shapes to be able to fill it outside this class, e.g. in friend
+  /// \return a map of object to shape
+  QMap<ObjectPtr, QList<GeomShapePtr> >& featureShapes() { return myFeatureShapes; }
+
 private:
   /// Return true if the object is visible. If the object is feature, it returns true
   /// if all results of the feature are shown
@@ -77,9 +94,22 @@ private:
   bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
 
   /// Fills the map by the feature object and shapes, which should be visuaziled
-  /// Gets the feature attribute, collect objects to whom the attribute refers
+  /// Gets feature attributes, collect objects to whom the attributes refer
+  /// \param theFeature a current feature
+  /// \param theWorkshop a current workshop
+  /// \param theObjectShapes an output map
   /// \param theObjectShape an output map of objects
-  void getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
+  static void getFeatureShapes(const FeaturePtr& theFeature,
+                               ModuleBase_IWorkshop* theWorkshop,
+                               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
+
+  /// Fills the map by the feature object and shapes, which should be visuaziled
+  /// Gets the active widget, obtain the highlighted presentations if it has such and
+  /// fill map by object and shapes
+  /// \param theWorkshop a current workshop
+  /// \param theObjectShapes an output map of objects
+  static void getHighlightedShapes(ModuleBase_IWorkshop* theWorkshop,
+                                   QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
 
   /// Returns true if the attribute type belong to reference attribute
   /// \param theAttribute an attribute
@@ -98,6 +128,10 @@ private:
 
   Quantity_Color myShapeColor; /// color of feature depended shapes
   Quantity_Color myResultColor; /// color of feature result
+
+  bool myUseAISWidth; /// flag if the width of a shape object should be used for the shape visualization
+
+  friend class PartSet_CustomPrs;
 };
 
 

@@ -581,9 +581,12 @@ bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& th
     // if a list of message objects contains the operation feature for case when
     // the feature is hidden, but arguments of the feature are modified
     // e.g. extrusion is hidden(h=0) but sketch is chosen
-    if (theForceRedisplay || theObjects.find(aCurrentFeature) != theObjects.end())
+    if (theForceRedisplay || theObjects.find(aCurrentFeature) != theObjects.end()) {
       aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
-                                           ModuleBase_IModule::CustomizeAllObjects, false);
+                                           ModuleBase_IModule::CustomizeDependedAndResults, false);
+      aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+                                           ModuleBase_IModule::CustomizeHighlightedObjects, false);
+    }
   }
   return aCustomized;
 }

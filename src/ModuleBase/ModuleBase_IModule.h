@@ -35,8 +35,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// enumeration to know which objects should be customized
   enum ModuleBase_CustomizeFlag {
     CustomizeDependedAndResults = 0x00000000,
-    CustomizeHighlightedObjects = 0x00000001,
-    CustomizeAllObjects = CustomizeDependedAndResults | CustomizeHighlightedObjects
+    CustomizeHighlightedObjects = 0x00000001
   };
 
    /// Constructor

@@ -357,7 +357,6 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 
     restoreValue();
     myWorkshop->setSelected(getAttributeSelection());
-    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeAllObjects, true);
   }
   return aDone;
 }
