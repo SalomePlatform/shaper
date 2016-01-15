@@ -31,15 +31,25 @@ protected:
   /// \brief Generate list of translated entities
   /// \param[out] theStartPoint start point of translation
   /// \param[out] theEndPoint   final point of translation
-  /// \param[out] theFullValue  applying translation using the disstance as a full or single value
-  /// \param[out] theEntities   list of entities and their translated copies
+  /// \param[out] theFullValue  applying translation using the distance as a full or single value
+  /// \param[out] theEntities   list of base entities
   void getAttributes(EntityWrapperPtr& theStartPoint, EntityWrapperPtr& theEndPoint,
-                     bool& theFullValue, std::list< std::list<EntityWrapperPtr> >& theEntities);
+                     bool& theFullValue, std::list<EntityWrapperPtr>& theEntities);
+
+  /// \brief This method is used in derived objects to check consistence of constraint.
+  virtual void adjustConstraint();
 
   /// \brief Update parameters (called from base class)
   virtual void updateLocal();
 
 private:
+  /// \brief Convert absolute coordinates to relative coordinates
+  virtual void getRelative(double theAbsX, double theAbsY, double& theRelX, double& theRelY);
+  /// \brief Convert relative coordinates to absolute coordinates
+  virtual void getAbsolute(double theRelX, double theRelY, double& theAbsX, double& theAbsY);
+  /// \brief Apply transformation for relative coordinates
+  virtual void transformRelative(double& theX, double& theY);
+
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
   virtual const std::string& nameNbObjects();
 
@@ -47,6 +57,8 @@ private:
   AttributePoint2DPtr myStartPointAttribute;
   AttributePoint2DPtr myEndPointAttribute;
   bool                myIsFullValue;
+
+  double myDelta[2]; ///< increment of translation
 };
 
 #endif

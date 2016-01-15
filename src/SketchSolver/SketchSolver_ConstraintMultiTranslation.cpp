@@ -10,7 +10,7 @@
 
 void SketchSolver_ConstraintMultiTranslation::getAttributes(
     EntityWrapperPtr& theStartPoint, EntityWrapperPtr& theEndPoint,
-    bool& theFullValue, std::list< std::list<EntityWrapperPtr> >& theEntities)
+    bool& theFullValue, std::list<EntityWrapperPtr>& theEntities)
 {
   DataPtr aData = myBaseConstraint->data();
   AttributePtr aStartPointAttr = aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
@@ -31,7 +31,7 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
   AttributeStringPtr aMethodTypeAttr = aData->string(SketchPlugin_MultiTranslation::VALUE_TYPE());
   theFullValue = aMethodTypeAttr->value() != "SingleValue";
 
-  getEntitiesAndCopies(theEntities);
+  getEntities(theEntities);
 }
 
 void SketchSolver_ConstraintMultiTranslation::process()
@@ -44,8 +44,8 @@ void SketchSolver_ConstraintMultiTranslation::process()
 
   EntityWrapperPtr aStartPoint, aEndPoint;
   bool aFullValue;
-  std::list<std::list<EntityWrapperPtr> > anEntitiesAndCopies;
-  getAttributes(aStartPoint, aEndPoint, aFullValue, anEntitiesAndCopies);
+  std::list<EntityWrapperPtr> aBaseEntities;
+  getAttributes(aStartPoint, aEndPoint, aFullValue, aBaseEntities);
   if (!myErrorMsg.empty())
     return;
 
@@ -55,11 +55,11 @@ void SketchSolver_ConstraintMultiTranslation::process()
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
   std::list<ConstraintWrapperPtr> aTransConstraints;
 
-  std::list< std::list<EntityWrapperPtr> >::iterator anEntIt = anEntitiesAndCopies.begin();
-  for (; anEntIt != anEntitiesAndCopies.end(); ++anEntIt) {
+  std::list<EntityWrapperPtr>::iterator anEntIt = aBaseEntities.begin();
+  for (; anEntIt != aBaseEntities.end(); ++anEntIt) {
     std::list<ConstraintWrapperPtr> aNewConstraints =
         aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
-        0.0, aFullValue, aStartPoint, aEndPoint, *anEntIt);
+        0.0, aFullValue, aStartPoint, aEndPoint, std::list<EntityWrapperPtr>(1, *anEntIt));
     aTransConstraints.insert(aTransConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
 
@@ -134,5 +134,44 @@ void SketchSolver_ConstraintMultiTranslation::updateLocal()
 
     myAdjusted = false;
   }
+}
+
+void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
+{
+  if (myAdjusted)
+    return;
+
+  // Obtain delta between start and end points of translation
+  EntityWrapperPtr aStart = myStorage->entity(
+      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::START_POINT_ID()));
+  std::list<ParameterWrapperPtr> aStartParams = aStart->parameters();
+  EntityWrapperPtr aEnd = myStorage->entity(
+      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::END_POINT_ID()));
+  std::list<ParameterWrapperPtr> aEndParams = aEnd->parameters();
+  myDelta[0] = aEndParams.front()->value() - aStartParams.front()->value();
+  myDelta[1] = aEndParams.back()->value() - aStartParams.back()->value();
+
+  SketchSolver_ConstraintMulti::adjustConstraint();
+}
+
+void SketchSolver_ConstraintMultiTranslation::getRelative(
+    double theAbsX, double theAbsY, double& theRelX, double& theRelY)
+{
+  theRelX = theAbsX;
+  theRelY = theAbsY;
+}
+
+void SketchSolver_ConstraintMultiTranslation::getAbsolute(
+    double theRelX, double theRelY, double& theAbsX, double& theAbsY)
+{
+  theAbsX = theRelX;
+  theAbsY = theRelY;
+}
+
+void SketchSolver_ConstraintMultiTranslation::transformRelative(double& theX, double& theY)
+{
+  // translate coordinates
+  theX += myDelta[0];
+  theY += myDelta[1];
 }
 

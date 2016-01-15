@@ -28,6 +28,8 @@
 #include <set>
 #include <memory>
 
+static const Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+
 // Initialization of constraint manager self pointer
 SketchSolver_Manager* SketchSolver_Manager::mySelf = 0;
 
@@ -89,6 +91,7 @@ void SketchSolver_Manager::processEvent(
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
+    bool isUpdateFlushed = stopSendUpdate();
     // Shows the message has at least one feature applicable for solver
     bool hasProperFeature = false;
 
@@ -122,9 +125,18 @@ void SketchSolver_Manager::processEvent(
       }
     }
 
+    bool needToUpdate = false;
     // Solve the set of constraints
     if (hasProperFeature)
-      resolveConstraints(isMovedEvt); // send update for movement in any case
+      needToUpdate = resolveConstraints();
+
+    // Features may be updated => now send events, but for all changed at once
+    if (isUpdateFlushed)
+      allowSendUpdate();
+    // send update for movement in any case
+    if (needToUpdate || isMovedEvt)
+      Events_Loop::loop()->flush(anUpdateEvent);
+
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
       std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
@@ -342,30 +354,27 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
 //  Function: resolveConstraints
 //  Purpose:  change entities according to available constraints
 // ============================================================================
-void SketchSolver_Manager::resolveConstraints(const bool theForceUpdate)
+bool SketchSolver_Manager::resolveConstraints()
 {
-  //myIsComputed = true;
   bool needToUpdate = false;
-  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  std::vector<SketchSolver_Group*>::iterator aGroupIter;
+  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+    if ((*aGroupIter)->resolveConstraints())
+      needToUpdate = true;
+  return needToUpdate;
+}
+
+bool SketchSolver_Manager::stopSendUpdate() const
+{
   // to avoid redisplay of each segment on update by solver one by one in the viewer
   bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
   if (isUpdateFlushed) {
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
   }
+  return isUpdateFlushed;
+}
 
-  std::vector<SketchSolver_Group*>::iterator aGroupIter;
-  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
-    if ((*aGroupIter)->resolveConstraints())
-      needToUpdate = true;
-
-  // Features may be updated => now send events, but for all changed at once
-  if (isUpdateFlushed) {
-    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
-  }
-  // Must be before flush because on "Updated" flush the results may be produced
-  // and the creation event is appeared with many new objects. If myIsComputed these
-  // events are missed in processEvents and some elements are not added.
-  //myIsComputed = false;
-  if (needToUpdate || theForceUpdate)
-    Events_Loop::loop()->flush(anUpdateEvent);
+void SketchSolver_Manager::allowSendUpdate() const
+{
+  Events_Loop::loop()->setFlushed(anUpdateEvent, true);
 }

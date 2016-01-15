@@ -2,12 +2,14 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
 
+#include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Line.h>
 
-void SketchSolver_ConstraintMulti::getEntitiesAndCopies(
-    std::list< std::list<EntityWrapperPtr> >& theEntAndCopies)
+void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theEntities)
 {
   myAdjusted = false;
   DataPtr aData = myBaseConstraint->data();
@@ -28,24 +30,20 @@ void SketchSolver_ConstraintMulti::getEntitiesAndCopies(
   }
 
   FeaturePtr aFeature;
-  std::list<EntityWrapperPtr> anEntities; // list of transformed entities
   std::list<ObjectPtr> anObjectList = aRefList->list();
   std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
   if ((myNumberOfCopies + 1) * myNumberOfObjects != aRefList->size()) // execute for the feature is not called yet
     myNumberOfCopies = aRefList->size() / myNumberOfObjects - 1;
 
   while (anObjIt != anObjectList.end()) {
-    anEntities.clear();
-    for (int i = 0; i <= myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
-      aFeature = ModelAPI_Feature::feature(*anObjIt);
-      if (!aFeature)
-        continue;
+    aFeature = ModelAPI_Feature::feature(*anObjIt++);
+    if (!aFeature)
+      continue;
 
-      myStorage->update(aFeature);
-      anEntities.push_back(myStorage->entity(aFeature));
-    }
-    if (!anEntities.empty())
-      theEntAndCopies.push_back(anEntities);
+    myStorage->update(aFeature);
+    theEntities.push_back(myStorage->entity(aFeature));
+    for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt)
+      ; // just skip copied features
   }
 }
 
@@ -77,16 +75,78 @@ void SketchSolver_ConstraintMulti::update(bool isForce)
 
 void SketchSolver_ConstraintMulti::adjustConstraint()
 {
-  if (myAdjusted)
-    return; // constraint already adjusted, don't do it once again
+  AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+      myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  if (!aRefList || aRefList->size() == 0) {
+    myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+    return;
+  }
 
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  FeaturePtr aFeature;
+  std::list<ObjectPtr> anObjectList = aRefList->list();
+  std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
+  while (anObjIt != anObjectList.end()) {
+    aFeature = ModelAPI_Feature::feature(*anObjIt++);
+    if (!aFeature)
+      continue;
 
-  const std::list<ConstraintWrapperPtr>& aConstraints = myStorage->constraint(myBaseConstraint);
-  std::list<ConstraintWrapperPtr>::const_iterator anIt = aConstraints.begin();
-  for (; anIt != aConstraints.end(); ++anIt)
-    aBuilder->adjustConstraint(*anIt);
-  myStorage->addConstraint(myBaseConstraint, aConstraints);
+    // Fill lists of coordinates of points composing a feature
+    std::list<double> aX, aY;
+    std::list<double>::iterator aXIt, aYIt;
+    double aXCoord, aYCoord;
+    EntityWrapperPtr anEntity = myStorage->entity(aFeature);
+    std::list<EntityWrapperPtr> aSubs = anEntity->subEntities();
+    std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
+    for (; aSIt != aSubs.end(); ++aSIt) {
+      if ((*aSIt)->type() != ENTITY_POINT)
+        continue;
+      std::list<ParameterWrapperPtr> aParameters = (*aSIt)->parameters();
+      aXCoord = aParameters.front()->value();
+      aYCoord = aParameters.back()->value();
+      getRelative(aXCoord, aYCoord, aXCoord, aYCoord);
+      aX.push_back(aXCoord);
+      aY.push_back(aYCoord);
+    }
+
+    // Calculate positions of copied features
+    for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
+      aFeature = ModelAPI_Feature::feature(*anObjIt);
+      if (!aFeature)
+        continue;
+      anEntity = myStorage->entity(aFeature);
+
+      if (!anEntity || !myStorage->isEventsBlocked())
+        aFeature->data()->blockSendAttributeUpdated(true);
+
+      std::list<AttributePtr> aPoints;
+      if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Arc::START_ID()));
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Arc::END_ID()));
+      } else if (aFeature->getKind() == SketchPlugin_Line::ID()) {
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Line::START_ID()));
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Line::END_ID()));
+      } else
+        aPoints = aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+
+      std::list<AttributePtr>::iterator aPtIt = aPoints.begin();
+      for (aXIt = aX.begin(), aYIt = aY.begin(); aPtIt != aPoints.end(); ++aXIt, ++aYIt, ++aPtIt) {
+        transformRelative(*aXIt, *aYIt);
+        getAbsolute(*aXIt, *aYIt, aXCoord, aYCoord);
+
+        std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPtIt);
+        aPoint2D->setValue(aXCoord, aYCoord);
+      }
+
+      // update feature in the storage if it is used by another constraints
+      if (anEntity)
+        myStorage->update(aFeature);
+
+      if (!anEntity || !myStorage->isEventsBlocked())
+        aFeature->data()->blockSendAttributeUpdated(false);
+    }
+  }
 
   myAdjusted = true;
 }

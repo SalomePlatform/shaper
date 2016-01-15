@@ -37,8 +37,8 @@ protected:
   virtual void process()
   { /* do nothing here */ }
 
-  /// \brief Collect entities and their copies, like circles and arcs
-  void getEntitiesAndCopies(std::list< std::list<EntityWrapperPtr> >& theEntAndCopies);
+  /// \brief Collect entities which translated or rotated (not their copies)
+  void getEntities(std::list<EntityWrapperPtr>& theEntities);
 
   /// \brief Generate list of attributes of constraint in order useful for SolveSpace constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
@@ -54,6 +54,14 @@ protected:
 
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
   virtual const std::string& nameNbObjects() = 0;
+  
+protected:
+  /// \brief Convert absolute coordinates to relative coordinates
+  virtual void getRelative(double theAbsX, double theAbsY, double& theRelX, double& theRelY) = 0;
+  /// \brief Convert relative coordinates to absolute coordinates
+  virtual void getAbsolute(double theRelX, double theRelY, double& theAbsX, double& theAbsY) = 0;
+  /// \brief Apply transformation for relative coordinates
+  virtual void transformRelative(double& theX, double& theY) = 0;
 
 protected:
   int myNumberOfObjects; ///< number of previous initial objects

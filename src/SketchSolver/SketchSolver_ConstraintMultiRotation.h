@@ -32,9 +32,9 @@ protected:
   /// \param[out] theCenter   central point of rotation
   /// \param[out] theAngle    rotation angle
   /// \param[out] theFullValue  applying translation using the disstance as a full or single value
-  /// \param[out] theEntities list of entities and their rotated copies
+  /// \param[out] theEntities list of base entities
   void getAttributes(EntityWrapperPtr& theCenter, double& theAngle, bool& theFullValue,
-                     std::list< std::list<EntityWrapperPtr> >& theEntities);
+                     std::list<EntityWrapperPtr>& theEntities);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
   virtual void adjustConstraint();
@@ -43,12 +43,23 @@ protected:
   virtual void updateLocal();
 
 private:
+  /// \brief Convert absolute coordinates to relative coordinates
+  virtual void getRelative(double theAbsX, double theAbsY, double& theRelX, double& theRelY);
+  /// \brief Convert relative coordinates to absolute coordinates
+  virtual void getAbsolute(double theRelX, double theRelY, double& theAbsX, double& theAbsY);
+  /// \brief Apply transformation for relative coordinates
+  virtual void transformRelative(double& theX, double& theY);
+
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
   virtual const std::string& nameNbObjects();
 
+private:
   AttributePoint2DPtr myCenterPointAttribute; ///< a center of rotation
   double              myAngle;           ///< angle of rotation
   bool                myIsFullValue;     ///< value whether the angle is a full or single for objects
+
+  double myCenterCoord[2]; ///< coordinates of rotation center
+  double myRotationVal[2]; ///< sinus and cosine of rotation angle
 };
 
 #endif

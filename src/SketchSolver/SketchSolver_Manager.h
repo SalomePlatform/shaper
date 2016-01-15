@@ -83,9 +83,9 @@ protected:
   void moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Goes through the list of groups and solve the constraints
-   *  \param theForceUpdate flushes the update event in any case: something changed or not
+   *  \return \c true, if groups are resolved, and features should be updated (send the Update event)
    */
-  void resolveConstraints(const bool theForceUpdate);
+  bool resolveConstraints();
 
 private:
   /** \brief Searches list of groups which interact with specified feature
@@ -101,6 +101,12 @@ private:
    */
   std::shared_ptr<ModelAPI_CompositeFeature> findWorkplane(
       std::shared_ptr<SketchPlugin_Feature> theFeature) const;
+
+  /// \brief Stop sending the Update event until all features updated
+  /// \return \c true, if the last flushed event is Update
+  bool stopSendUpdate() const;
+  /// \brief Allow to send the Update event
+  void allowSendUpdate() const;
 
 private:
   static SketchSolver_Manager*     mySelf;    ///< Self pointer to implement singleton functionality
