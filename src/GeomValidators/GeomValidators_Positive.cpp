@@ -10,6 +10,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <cmath>
+
 /// Global instance for validators factory
 GeomValidators_Positive MY_POSITIVE_INSTANCE;
 
