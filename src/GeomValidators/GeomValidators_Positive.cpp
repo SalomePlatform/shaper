@@ -25,6 +25,17 @@ bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
                                       std::string& theError) const
 {
+  double aMinValue = 1.e-5;
+  if(theArguments.size() == 1) {
+    std::list<std::string>::const_iterator anIt = theArguments.begin();
+    char *aErr;
+    double aValue = strtod((*anIt).c_str(), &aErr);
+    if(*aErr == 0) {
+      // very probably ok
+      aMinValue = aValue;
+    }
+  }
+
   if (theAttribute->attributeType() == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr aDouble =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
@@ -32,7 +43,7 @@ bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute,
       theError = "Double is not initialized.";
       return false;
     }
-    if (aDouble->value() <= 1.e-5) {
+    if (aDouble->value() <= aMinValue) {
       theError = "Double is not positive.";
       return false;
     }
@@ -45,7 +56,7 @@ bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute,
       theError = "Integer is not initialized.";
       return false;
     }
-    if (aInteger->value() <= 0) {
+    if (aInteger->value() <= floor(aMinValue)) {
       theError = "Integer is not positive.";
       return false;
     }
