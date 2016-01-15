@@ -194,7 +194,7 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+    std::set<ObjectPtr> anObjects = aUpdMsg->objects();
 
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                               (workshop()->operationMgr()->currentOperation());
@@ -203,7 +203,7 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
       FeaturePtr aFeature = aFOperation->feature();
       if (aFeature.get()) {
         std::set<ObjectPtr>::const_iterator aIt;
-        for (aIt = aObjects.begin(); aIt != aObjects.end() && !aFeatureChanged; ++aIt) {
+        for (aIt = anObjects.begin(); aIt != anObjects.end() && !aFeatureChanged; ++aIt) {
           aFeatureChanged = ModelAPI_Feature::feature(*aIt) == aFeature;
         }
       }
@@ -231,14 +231,14 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
                                      const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
 #ifdef DEBUG_FEATURE_UPDATED
-  std::set<ObjectPtr> aObjects = theMsg->objects();
+  std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
   QStringList anInfo;
-  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureUpdatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureUpdatedMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
@@ -266,16 +266,16 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
 //******************************************************
 void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
-  std::set<ObjectPtr> aObjects = theMsg->objects();
+  std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
 
 #ifdef DEBUG_FEATURE_REDISPLAY
   QStringList anInfo;
-  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureRedisplayMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureRedisplayMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
   XGUI_Workshop* aWorkshop = workshop();
@@ -283,7 +283,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
   bool aFirstVisualizedBody = false;
 
   bool aRedisplayed = false;
-  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
 
     // Hide the object if it is invalid or concealed one
@@ -355,8 +355,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       }
     }
   }
-  if (aRedisplayed) {
-    customizeCurrentObject();
+  bool isCustomized = customizeCurrentObject(anObjects, aRedisplayed);
+  if (aRedisplayed || isCustomized) {
     //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
@@ -367,22 +367,22 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
 //******************************************************
 void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
-  std::set<ObjectPtr> aObjects = theMsg->objects();
+  std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
 #ifdef DEBUG_FEATURE_CREATED
   QStringList anInfo;
-  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(aObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
   bool aFirstVisualizedBody = false;
 
   //bool aHasPart = false;
   bool aDisplayed = false;
-  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
     ObjectPtr anObject = *aIt;
 
 #ifdef DEBUG_RESULT_COMPSOLID
@@ -418,10 +418,11 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     }
   }
 
+  bool isCustomized = customizeCurrentObject(anObjects, aDisplayed);
+
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
   if (aDisplayed) {
-    customizeCurrentObject();
     //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
@@ -561,19 +562,28 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisual
   return aDisplayed;
 }
 
-bool XGUI_WorkshopListener::customizeCurrentObject()
+bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& theObjects,
+                                                   bool theForceRedisplay)
 {
-  bool aCustomized = false;
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
+  FeaturePtr aCurrentFeature;
   if (anOperationMgr->hasOperation()) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                       (anOperationMgr->currentOperation());
     if (aFOperation) {
-      FeaturePtr aCurrentFeature = aFOperation->feature();
-      if (aCurrentFeature.get())
-        aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
-                                           ModuleBase_IModule::CustomizeAllObjects, false);
+      aCurrentFeature = aFOperation->feature();
     }
+  }
+
+  bool aCustomized = false;
+  if (aCurrentFeature.get()) {
+    // the customize presentation should be redisplayed if force redislayed is true or
+    // if a list of message objects contains the operation feature for case when
+    // the feature is hidden, but arguments of the feature are modified
+    // e.g. extrusion is hidden(h=0) but sketch is chosen
+    if (theForceRedisplay || theObjects.find(aCurrentFeature) != theObjects.end())
+      aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+                                           ModuleBase_IModule::CustomizeAllObjects, false);
   }
   return aCustomized;
 }

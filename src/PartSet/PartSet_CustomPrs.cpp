@@ -49,13 +49,11 @@ bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature, const bool theUpd
   bool isModified = false;
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
 
-  if (anOperationPrs->canActivate(theFeature)) {
-    myIsActive = true;
-    anOperationPrs->setFeature(theFeature);
-    if (theFeature.get()) {
-      displayPresentation(theUpdateViewer);
-      isModified = true;
-    }
+  myIsActive = true;
+  anOperationPrs->setFeature(theFeature);
+  if (theFeature.get()) {
+    displayPresentation(theUpdateViewer);
+    isModified = true;
   }
   return isModified;
 }
@@ -77,10 +75,11 @@ bool PartSet_CustomPrs::deactivate(const bool theUpdateViewer)
   return isModified;
 }
 
-
-void PartSet_CustomPrs::displayPresentation(const bool theUpdateViewer)
+bool PartSet_CustomPrs::displayPresentation(const bool theUpdateViewer)
 {
+  bool isModified = false;
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
+  anOperationPrs->updateShapes();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->IsDisplayed(anOperationPrs)) {
@@ -89,17 +88,22 @@ void PartSet_CustomPrs::displayPresentation(const bool theUpdateViewer)
       XGUI_Workshop* aWorkshop = workshop();
       aWorkshop->displayer()->displayAIS(myOperationPrs, false/*load object in selection*/, theUpdateViewer);
       aContext->SetZLayer(anOperationPrs, aModule->getVisualLayerId());
+      isModified = true;
     }
   }
   else {
-    if (!anOperationPrs->hasShapes())
+    if (!anOperationPrs->hasShapes()) {
       erasePresentation(theUpdateViewer);
+      isModified = true;
+    }
     else {
       anOperationPrs->Redisplay();
+      isModified = true;
       if (theUpdateViewer)
         workshop()->displayer()->updateViewer();
     }
   }
+  return isModified;
 }
 
 void PartSet_CustomPrs::erasePresentation(const bool theUpdateViewer)
@@ -123,30 +127,7 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
 #ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
   return false;
 #endif
-
-  bool isModified = false;
-  // the presentation should be recomputed if the previous AIS depend on the result
-  // [it should be hiddend] or the new AIS depend on it [it should be visualized]
-  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation();
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull()) {
-    if (aContext->IsDisplayed(anOperationPrs)) {
-      // if there are performance poblems, to improve them, the necessity of redisplay can be checked
-      //bool aChanged = anOperationPrs->dependOn(theObject);
-      anOperationPrs->updateShapes();
-      //aChanged = aChanged || anOperationPrs->dependOn(theObject);
-      //if (aChanged)
-      anOperationPrs->Redisplay();
-      isModified = true;
-      if (theUpdateViewer)
-        workshop()->displayer()->updateViewer();
-    }
-    else {
-      anOperationPrs->updateShapes();
-      displayPresentation(theUpdateViewer);
-    }
-  }
-  return isModified;
+  return displayPresentation(theUpdateViewer);
 }
 
 void PartSet_CustomPrs::clearPrs()

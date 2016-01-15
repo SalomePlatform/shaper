@@ -74,15 +74,11 @@ private:
 
   /// Displays the internal presentation in the viewer of workshop
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void displayPresentation(const bool theUpdateViewer);
+  bool displayPresentation(const bool theUpdateViewer);
 
   /// Erases the internal presentation from the viewer of workshop
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   void erasePresentation(const bool theUpdateViewer);
-
-  /// Sets color, point size and width of the presentation
-  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void customizePresentation(const bool theUpdateViewer);
 
 private:
   bool myIsActive;

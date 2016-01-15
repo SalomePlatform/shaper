@@ -43,28 +43,10 @@ PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
   myResultColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "0,1,0");
 }
 
-bool PartSet_OperationPrs::canActivate(const FeaturePtr& theFeature)
-{
-  bool aHasSelectionAttribute = false;
-
-  std::list<AttributePtr> anAttributes = theFeature->data()->attributes("");
-  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
-  for (; anIt != aLast && !aHasSelectionAttribute; anIt++)
-    aHasSelectionAttribute = isSelectionAttribute(*anIt);
-
-  return aHasSelectionAttribute;
-}
-
 void PartSet_OperationPrs::setFeature(const FeaturePtr& theFeature)
 {
   myFeature = theFeature;
-  updateShapes();
 }
-
-/*bool PartSet_OperationPrs::dependOn(const ObjectPtr& theResult)
-{
-  return myFeatureShapes.contains(theResult);
-}*/
 
 void PartSet_OperationPrs::updateShapes()
 {
@@ -78,7 +60,27 @@ void PartSet_OperationPrs::updateShapes()
 
 bool PartSet_OperationPrs::hasShapes()
 {
-  return !myFeatureShapes.empty() || !myFeatureResults.empty();
+  bool aHasShapes = !myFeatureShapes.empty();
+  
+  // find a result which contains a shape
+  if (!aHasShapes && !myFeatureResults.empty()) {
+    std::list<ResultPtr>::const_iterator aRIt = myFeatureResults.begin(),
+                                         aRLast = myFeatureResults.end();
+    XGUI_Displayer* aDisplayer = workshop()->displayer();
+    for (; aRIt != aRLast; aRIt++) {
+      ResultPtr aResult = *aRIt;
+      if (!isVisible(aDisplayer, aResult))
+        continue;
+      GeomShapePtr aGeomShape = aResult->shape();
+      if (!aGeomShape.get())
+        continue;
+      TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
+      if (!aShape.IsNull())
+        aHasShapes = true;
+    }
+  }
+
+  return aHasShapes;
 }
 
 void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
@@ -325,17 +327,6 @@ void PartSet_OperationPrs::getFeatureShapes(QMap<ObjectPtr, QList<GeomShapePtr> 
 bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute)
 {
   std::string anAttrType = theAttribute->attributeType();
-
-  /// workaround: start
-  /// this is a TEMPORARY correction in order to avoid crash by parameter edit
-  /// which is reproduced only on Linux Debian.
-  /// The possible reason is an empty AIS presentation visualized in the viewer.
-  /// The best solution is to analize whether the feature has shapes/results and only
-  /// in this case visualize custom presentation and hide it as soon as they disappear.
-  bool isAttributeArgument = theAttribute->isArgument();
-  if (!isAttributeArgument)
-    return false;
-  /// workaround: end
 
   return anAttrType == ModelAPI_AttributeSelectionList::typeId() ||
          anAttrType == ModelAPI_AttributeRefList::typeId() ||

@@ -47,17 +47,9 @@ public:
   /// Constructor
   Standard_EXPORT PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop);
 
-  /// Returns true if the feature contains attributes, which has references to other features
-  /// \param theFeature a feature
-  /// \return boolean result
-  bool canActivate(const FeaturePtr& theFeature);
-
   /// Sets the operation feature. It is used in Compute method to group the feature parameter shapes
   /// theFeature a feature
   void setFeature(const FeaturePtr& theFeature);
-
-  /// Returns true if the presentation 
-  //bool dependOn(const ObjectPtr& theObject);
 
   // Recompute internal list of shaped dependent on the current feature
   void updateShapes();

@@ -68,8 +68,12 @@ protected:
   bool displayObject(ObjectPtr theObj, bool& theFirstVisualizedBody);
 
   /// Calls the module method of cusomize object for the feature of the current operation
+  /// Perform cusomize if the force redisplay flag is true or the list of objects contains the
+  /// current operation feature
+  /// \param theObjects a list of objects to find current operation feature if forced redisplay is false
+  /// \param theForceRedisplay a flag to customize object even always
   /// \return true if the object is modified
-  bool customizeCurrentObject();
+  bool customizeCurrentObject(const std::set<ObjectPtr>& theObjects, bool theForceRedisplay);
 
   /// Returns the workshop
   XGUI_Workshop* workshop() const;
