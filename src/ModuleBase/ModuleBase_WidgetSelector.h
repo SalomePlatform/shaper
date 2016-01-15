@@ -87,7 +87,7 @@ Q_OBJECT
   /// \return true if it is succeed
   virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape) = 0;
 
-   /// The methiod called when widget is activated
+  /// The methiod called when widget is activated
   virtual void activateCustom();
 
   /// Returns true if selected shape corresponds to requested shape types.

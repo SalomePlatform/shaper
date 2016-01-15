@@ -25,25 +25,31 @@
 //#define DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
 
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
-  : myWorkshop(theWorkshop), myIsActive(false), myFeature(FeaturePtr())
+  : myWorkshop(theWorkshop), myFeature(FeaturePtr())
 {
   initPresentation(ModuleBase_IModule::CustomizeArguments);
   initPresentation(ModuleBase_IModule::CustomizeResults);
   initPresentation(ModuleBase_IModule::CustomizeHighlightedObjects);
+
+  myIsActive[ModuleBase_IModule::CustomizeArguments] = false;
+  myIsActive[ModuleBase_IModule::CustomizeResults] = false;
+  myIsActive[ModuleBase_IModule::CustomizeHighlightedObjects] = false;
 }
 
-bool PartSet_CustomPrs::isActive()
+bool PartSet_CustomPrs::isActive(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
 {
-  return myIsActive;
+  return myIsActive[theFlag];
 }
 
-bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature, const bool theUpdateViewer)
+bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature,
+                                 const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                 const bool theUpdateViewer)
 {
 #ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
   return false;
 #endif
 
-  myIsActive = true;
+  myIsActive[theFlag] = true;
   myFeature = theFeature;
 
   bool isModified = false;
@@ -56,9 +62,10 @@ bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature, const bool theUpd
   return isModified;
 }
 
-bool PartSet_CustomPrs::deactivate(const bool theUpdateViewer)
+bool PartSet_CustomPrs::deactivate(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                   const bool theUpdateViewer)
 {
-  myIsActive = false;
+  myIsActive[theFlag] = false;
   bool isModified = false;
 
   erasePresentation(ModuleBase_IModule::CustomizeArguments, theUpdateViewer);

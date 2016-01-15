@@ -269,8 +269,10 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
   }
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (aFOperation)
-    myCustomPrs->activate(aFOperation->feature(), true);
+  if (aFOperation) {
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, true);
+  }
 }
 
 void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
@@ -278,13 +280,16 @@ void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
   ModuleBase_IModule::operationResumed(theOperation);
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (aFOperation)
-    myCustomPrs->activate(aFOperation->feature(), true);
+  if (aFOperation) {
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, true);
+  }
 }
 
 void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
-  bool isModified = myCustomPrs->deactivate(false);
+  bool isModified = myCustomPrs->deactivate(ModuleBase_IModule::CustomizeArguments, false) ||
+                    myCustomPrs->deactivate(ModuleBase_IModule::CustomizeResults, false);
 
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
@@ -750,11 +755,23 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     aDisplayer->updateViewer();
 }
 
+void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature, const ModuleBase_CustomizeFlag& theFlag,
+                                       const bool theUpdateViewer)
+{
+  myCustomPrs->activate(theFeature, theFlag, theUpdateViewer);
+}
+
+void PartSet_Module::deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag,
+                                         const bool theUpdateViewer)
+{
+  myCustomPrs->deactivate(theFlag, theUpdateViewer);
+}
+
 bool PartSet_Module::customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
                                      const bool theUpdateViewer)
 {
   bool isRedisplayed = false;
-  if (myCustomPrs->isActive())
+  if (myCustomPrs->isActive(theFlag))
     isRedisplayed = myCustomPrs->redisplay(theObject, theFlag, theUpdateViewer);
 
   return isRedisplayed;

@@ -45,18 +45,24 @@ public:
   PARTSET_EXPORT virtual ~PartSet_CustomPrs() {};
 
   /// Returns true if the presentation is active
-  bool isActive();
+  /// \param theFlag an object AIS presentation type
+  bool isActive(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
   /// Initializes the operation presentation by the parameter object and display the presentation
   /// \param theObject an operation feature source to fill the presentation
+  /// \param theFlag an object AIS presentation type
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is displayed
-  bool activate(const FeaturePtr& theObject, const bool theUpdateViewer);
+  bool activate(const FeaturePtr& theObject,
+                const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                const bool theUpdateViewer);
 
   /// Initializes the operation presentation by empty object and erase the presentation
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \param theFlag an object AIS presentation type
   /// \returns true if the presentation has been displayed and now it is erased
-  bool deactivate(const bool theUpdateViewer);
+  bool deactivate(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                  const bool theUpdateViewer);
 
   /// If the presentation is active[displayed], the shapes of the presentation is recomputed
   /// and the presentation is redisplayed.
@@ -112,11 +118,12 @@ private:
   Quantity_Color getShapeColor(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
 private:
-  bool myIsActive; /// State whether the presentation is activated/deactivated
   FeaturePtr myFeature; /// Reference to a feature object
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
   /// map of presentation type to AIS object
   QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, AISObjectPtr> myPresentations;
+  /// State whether the presentation is activated/deactivated
+  QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, bool> myIsActive;
 };
 
 #endif

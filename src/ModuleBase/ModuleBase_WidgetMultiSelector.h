@@ -65,6 +65,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
@@ -99,6 +102,9 @@ protected slots:
   void onListSelection();
 
 protected:
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;

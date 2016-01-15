@@ -160,15 +160,28 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theModes a list of modes
   virtual void activeSelectionModes(QIntList& theModes) {}
 
-  /** Update the object presentable properties such as color, lines width and other
-  * If the object is result with the color attribute value set, it is used,
-  * otherwise the customize is applyed to the object's feature if it is a custom prs
-  * \param theObject an object instance
-  * \param theFlag a flag of level of customization, which means that only part of sub-elements
-  * should be updated(e.g. only highlighted elements)
-  * \param theUpdateViewer the parameter whether the viewer should be update immediately
-  * \returns true if the object is modified
-  */
+  /// Activate custom presentation for the object. Default realization is empty.
+  /// \param theObject an object instance
+  /// \param theFlag a flag of level of customization, which means that only part of sub-elements
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediately
+  virtual void activateCustomPrs(const FeaturePtr& theFeature,
+                                 const ModuleBase_CustomizeFlag& theFlag,
+                                 const bool theUpdateViewer) {}
+
+  /// Deactivate custom presentation for the object. Default realization is empty.
+  /// \param theFlag a flag of level of customization, which means that only part of sub-elements
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediately
+  virtual void deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag,
+                                   const bool theUpdateViewer) {}
+
+  /// Update the object presentable properties such as color, lines width and other
+  /// If the object is result with the color attribute value set, it is used,
+  /// otherwise the customize is applyed to the object's feature if it is a custom prs
+  /// \param theObject an object instance
+  /// \param theFlag a flag of level of customization, which means that only part of sub-elements
+  /// should be updated(e.g. only highlighted elements)
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediately
+  /// \returns true if the object is modified
   virtual bool customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
                                const bool theUpdateViewer);
 

@@ -161,6 +161,23 @@ ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 }
 
 //********************************************************************
+void ModuleBase_WidgetMultiSelector::activateCustom()
+{
+  ModuleBase_WidgetSelector::activateCustom();
+
+  myWorkshop->module()->activateCustomPrs(myFeature,
+                            ModuleBase_IModule::CustomizeHighlightedObjects, true);
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::deactivate()
+{
+  ModuleBase_WidgetSelector::deactivate();
+
+  myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
+}
+
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
 {
   // the value is stored on the selection changed signal processing 
