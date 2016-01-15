@@ -103,7 +103,15 @@ private:
   /// Nullify the operation presentation. For example, it can be useful when the viewer/context
   /// is closed. If this is not performed and the presentation is assigned in another context,
   /// it caused erroneus case because the presentation has linkage to the previous context.
+  /// \param theFlag an object AIS presentation type
   void clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
+
+  /// Returns presentation colors according to the flag
+  /// \param theFlag an object AIS presentation type
+  /// \param theShapeColor a color for shapes
+  /// \param theShapeColor a color for results
+  void getAISColors(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                    Quantity_Color& theShapeColor, Quantity_Color& theResultColor);
 
 private:
   bool myIsActive;

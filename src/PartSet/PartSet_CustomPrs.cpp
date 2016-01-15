@@ -88,6 +88,11 @@ bool PartSet_CustomPrs::displayPresentation(const ModuleBase_IModule::ModuleBase
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->IsDisplayed(anOperationPrs)) {
     if (anOperationPrs->hasShapes()) {
+      // set color here because it can be changed in preferences
+      Quantity_Color aShapeColor, aResultColor;
+      getAISColors(theFlag, aShapeColor, aResultColor);
+      anOperationPrs->setColors(aShapeColor, aResultColor);
+
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       XGUI_Workshop* aWorkshop = workshop();
       aWorkshop->displayer()->displayAIS(myPresentations[theFlag], false/*load object in selection*/,
@@ -162,28 +167,32 @@ void PartSet_CustomPrs::initPresentation(const ModuleBase_IModule::ModuleBase_Cu
   Handle(PartSet_OperationPrs) anAISPrs = new PartSet_OperationPrs(myWorkshop);
   anOperationPrs->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
   if (theFlag == ModuleBase_IModule::CustomizeDependedAndResults) {
-    Quantity_Color aShapeColor = ModuleBase_Tools::color("Visualization", "operation_parameter_color",
-                                                         OPERATION_PARAMETER_COLOR());
-    Quantity_Color aResultColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
-                                                         OPERATION_RESULT_COLOR());
-    anAISPrs->setColors(aShapeColor, aResultColor);
-
     anOperationPrs->setPointMarker(5, 2.);
     anOperationPrs->setWidth(1);
   }
   else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects) {
-    Quantity_Color aShapeColor = ModuleBase_Tools::color("Visualization", "operation_highlight_color",
-                                                         OPERATION_HIGHLIGHT_COLOR());
-    Quantity_Color aResultColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
-                                                          OPERATION_RESULT_COLOR());
-    anAISPrs->setColors(aShapeColor, aResultColor);
-    //in this presentation we show the shapes wireframe similar to their highlight by OCCT
-    //so, we need to use the source AIS object width for the presentation width
     anAISPrs->useAISWidth();
   }
 
   if (anOperationPrs.get())
     myPresentations[theFlag] = anOperationPrs;
+}
+
+void PartSet_CustomPrs::getAISColors(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                     Quantity_Color& theShapeColor, Quantity_Color& theResultColor)
+{
+  if (theFlag == ModuleBase_IModule::CustomizeDependedAndResults) {
+    theShapeColor = ModuleBase_Tools::color("Visualization", "operation_parameter_color",
+                                            OPERATION_PARAMETER_COLOR());
+    theResultColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
+                                             OPERATION_RESULT_COLOR());
+  }
+  else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects) {
+    theShapeColor = ModuleBase_Tools::color("Visualization", "operation_highlight_color",
+                                            OPERATION_HIGHLIGHT_COLOR());
+    theResultColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
+                                             OPERATION_RESULT_COLOR());
+  }
 }
 
 XGUI_Workshop* PartSet_CustomPrs::workshop() const
