@@ -106,15 +106,14 @@ private:
   /// \param theFlag an object AIS presentation type
   void clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
-  /// Returns presentation colors according to the flag
+  /// Returns presentation color according to the flag
   /// \param theFlag an object AIS presentation type
-  /// \param theShapeColor a color for shapes
-  /// \param theShapeColor a color for results
-  void getAISColors(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
-                    Quantity_Color& theShapeColor, Quantity_Color& theResultColor);
+  /// \return theShapeColor a color
+  Quantity_Color getShapeColor(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
 private:
-  bool myIsActive;
+  bool myIsActive; /// State whether the presentation is activated/deactivated
+  FeaturePtr myFeature; /// Reference to a feature object
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
   /// map of presentation type to AIS object
   QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, AISObjectPtr> myPresentations;

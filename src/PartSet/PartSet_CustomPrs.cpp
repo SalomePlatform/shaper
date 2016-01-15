@@ -25,9 +25,10 @@
 //#define DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
 
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
-  : myWorkshop(theWorkshop), myIsActive(false)
+  : myWorkshop(theWorkshop), myIsActive(false), myFeature(FeaturePtr())
 {
-  initPresentation(ModuleBase_IModule::CustomizeDependedAndResults);
+  initPresentation(ModuleBase_IModule::CustomizeArguments);
+  initPresentation(ModuleBase_IModule::CustomizeResults);
   initPresentation(ModuleBase_IModule::CustomizeHighlightedObjects);
 }
 
@@ -43,13 +44,12 @@ bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature, const bool theUpd
 #endif
 
   myIsActive = true;
-
+  myFeature = theFeature;
 
   bool isModified = false;
-  getPresentation(ModuleBase_IModule::CustomizeDependedAndResults)->setFeature(theFeature);
-  getPresentation(ModuleBase_IModule::CustomizeHighlightedObjects)->setFeature(theFeature);
   if (theFeature.get()) {
-    displayPresentation(ModuleBase_IModule::CustomizeDependedAndResults, theUpdateViewer);
+    displayPresentation(ModuleBase_IModule::CustomizeArguments, theUpdateViewer);
+    displayPresentation(ModuleBase_IModule::CustomizeResults, theUpdateViewer);
     displayPresentation(ModuleBase_IModule::CustomizeHighlightedObjects, theUpdateViewer);
     isModified = true;
   }
@@ -61,37 +61,47 @@ bool PartSet_CustomPrs::deactivate(const bool theUpdateViewer)
   myIsActive = false;
   bool isModified = false;
 
-  getPresentation(ModuleBase_IModule::CustomizeDependedAndResults)->setFeature(FeaturePtr());
-  getPresentation(ModuleBase_IModule::CustomizeHighlightedObjects)->setFeature(FeaturePtr());
-
-  erasePresentation(ModuleBase_IModule::CustomizeDependedAndResults, theUpdateViewer);
+  erasePresentation(ModuleBase_IModule::CustomizeArguments, theUpdateViewer);
+  erasePresentation(ModuleBase_IModule::CustomizeResults, theUpdateViewer);
   erasePresentation(ModuleBase_IModule::CustomizeHighlightedObjects, theUpdateViewer);
   isModified = true;
 
   return isModified;
 }
 
-bool PartSet_CustomPrs::displayPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
-                                            const bool theUpdateViewer)
+bool PartSet_CustomPrs::displayPresentation(
+                                  const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                  const bool theUpdateViewer)
 {
   bool isModified = false;
+
+  // update the AIS objects content
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation(theFlag);
-  if (theFlag == ModuleBase_IModule::CustomizeDependedAndResults) {
-    PartSet_OperationPrs::getFeatureShapes(anOperationPrs->getFeature(), myWorkshop,
-                                           anOperationPrs->featureShapes());
-    anOperationPrs->updateShapes();
-  }
-  else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects) {
-    PartSet_OperationPrs::getHighlightedShapes(myWorkshop, anOperationPrs->featureShapes());
+  // do nothing if the feature can not be displayed [is moved from presentation, to be checked]
+  if (!myFeature.get() || !myWorkshop->module()->canDisplayObject(myFeature))
+    return isModified;
+
+  switch (theFlag) {
+    case ModuleBase_IModule::CustomizeArguments:
+      PartSet_OperationPrs::getFeatureShapes(myFeature, myWorkshop, anOperationPrs->featureShapes());
+      break;
+    case ModuleBase_IModule::CustomizeResults:
+      PartSet_OperationPrs::getResultShapes(myFeature, myWorkshop, anOperationPrs->featureShapes());
+      break;
+    case ModuleBase_IModule::CustomizeHighlightedObjects:
+      PartSet_OperationPrs::getHighlightedShapes(myWorkshop, anOperationPrs->featureShapes());
+      break;
+    default:
+      return isModified;
   }
 
+  // redisplay AIS objects
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->IsDisplayed(anOperationPrs)) {
     if (anOperationPrs->hasShapes()) {
       // set color here because it can be changed in preferences
-      Quantity_Color aShapeColor, aResultColor;
-      getAISColors(theFlag, aShapeColor, aResultColor);
-      anOperationPrs->setColors(aShapeColor, aResultColor);
+      Quantity_Color aShapeColor = getShapeColor(theFlag);
+      anOperationPrs->setShapeColor(aShapeColor);
 
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       XGUI_Workshop* aWorkshop = workshop();
@@ -157,7 +167,8 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
 
 void PartSet_CustomPrs::clearPrs()
 {
-  clearPresentation(ModuleBase_IModule::CustomizeDependedAndResults);
+  clearPresentation(ModuleBase_IModule::CustomizeArguments);
+  clearPresentation(ModuleBase_IModule::CustomizeResults);
   clearPresentation(ModuleBase_IModule::CustomizeHighlightedObjects);
 }
 
@@ -166,33 +177,39 @@ void PartSet_CustomPrs::initPresentation(const ModuleBase_IModule::ModuleBase_Cu
   AISObjectPtr anOperationPrs = AISObjectPtr(new GeomAPI_AISObject());
   Handle(PartSet_OperationPrs) anAISPrs = new PartSet_OperationPrs(myWorkshop);
   anOperationPrs->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
-  if (theFlag == ModuleBase_IModule::CustomizeDependedAndResults) {
+  if (theFlag == ModuleBase_IModule::CustomizeArguments ||
+      theFlag == ModuleBase_IModule::CustomizeResults) {
     anOperationPrs->setPointMarker(5, 2.);
     anOperationPrs->setWidth(1);
   }
-  else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects) {
+  else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects)
     anAISPrs->useAISWidth();
-  }
 
   if (anOperationPrs.get())
     myPresentations[theFlag] = anOperationPrs;
 }
 
-void PartSet_CustomPrs::getAISColors(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
-                                     Quantity_Color& theShapeColor, Quantity_Color& theResultColor)
+Quantity_Color PartSet_CustomPrs::getShapeColor(
+                                  const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
 {
-  if (theFlag == ModuleBase_IModule::CustomizeDependedAndResults) {
-    theShapeColor = ModuleBase_Tools::color("Visualization", "operation_parameter_color",
-                                            OPERATION_PARAMETER_COLOR());
-    theResultColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
-                                             OPERATION_RESULT_COLOR());
+  Quantity_Color aColor;
+  switch(theFlag) {
+    case ModuleBase_IModule::CustomizeArguments:
+      aColor = ModuleBase_Tools::color("Visualization", "operation_parameter_color",
+                                       OPERATION_PARAMETER_COLOR());
+    break;
+    case ModuleBase_IModule::CustomizeResults:
+      aColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
+                                       OPERATION_RESULT_COLOR());
+    break;
+    case ModuleBase_IModule::CustomizeHighlightedObjects:
+      aColor = ModuleBase_Tools::color("Visualization", "operation_highlight_color",
+                                       OPERATION_HIGHLIGHT_COLOR());
+    break;
+    default:
+    break;
   }
-  else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects) {
-    theShapeColor = ModuleBase_Tools::color("Visualization", "operation_highlight_color",
-                                            OPERATION_HIGHLIGHT_COLOR());
-    theResultColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
-                                             OPERATION_RESULT_COLOR());
-  }
+  return aColor;
 }
 
 XGUI_Workshop* PartSet_CustomPrs::workshop() const

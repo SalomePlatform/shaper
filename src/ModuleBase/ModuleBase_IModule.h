@@ -34,8 +34,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
  public:
   /// enumeration to know which objects should be customized
   enum ModuleBase_CustomizeFlag {
-    CustomizeDependedAndResults = 0x00000000,
-    CustomizeHighlightedObjects = 0x00000001
+    CustomizeArguments = 0, /// references of other objects referenced to the current feature
+    CustomizeResults, /// results of the current feature
+    CustomizeHighlightedObjects /// highlighted objects of the active widget
   };
 
    /// Constructor

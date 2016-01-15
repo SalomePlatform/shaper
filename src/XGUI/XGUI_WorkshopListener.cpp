@@ -583,7 +583,9 @@ bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& th
     // e.g. extrusion is hidden(h=0) but sketch is chosen
     if (theForceRedisplay || theObjects.find(aCurrentFeature) != theObjects.end()) {
       aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
-                                           ModuleBase_IModule::CustomizeDependedAndResults, false);
+                                           ModuleBase_IModule::CustomizeArguments, false);
+      aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+                                           ModuleBase_IModule::CustomizeResults, false);
       aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
                                            ModuleBase_IModule::CustomizeHighlightedObjects, false);
     }

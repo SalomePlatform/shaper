@@ -47,20 +47,12 @@ public:
   /// Constructor
   Standard_EXPORT PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop);
 
-  /// Sets the operation feature. It is used in Compute method to group the feature parameter shapes
-  /// theFeature a feature
-  void setFeature(const FeaturePtr& theFeature);
-
-  // Recompute internal list of shaped dependent on the current feature
-  void updateShapes();
-
   /// Returns true if the feature contains shapes or results
   bool hasShapes();
 
   /// Sets the colors for the presentation compute
-  /// \param theShapeColor an argument shapes color
-  /// \param theResultColor a color for operation result
-  void setColors(const Quantity_Color& theShapeColor, const Quantity_Color& theResultColor);
+  /// \param theColor an argument shapes color
+  void setShapeColor(const Quantity_Color& theColor);
 
   /// Switch on using of the AIS presentation with of the shape object increased on the delta
   void useAISWidth();
@@ -78,9 +70,6 @@ protected:
                                                 const Standard_Integer aMode) ;
 
 protected:
-  /// Reference to a feature object
-  FeaturePtr getFeature() { return myFeature; }
-
   /// Returns map of feature shapes to be able to fill it outside this class, e.g. in friend
   /// \return a map of object to shape
   QMap<ObjectPtr, QList<GeomShapePtr> >& featureShapes() { return myFeatureShapes; }
@@ -91,7 +80,7 @@ private:
   /// \param theDisplayer a displayer
   /// \param theObject an object
   /// \return a boolean value
-  bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
+  static bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
 
   /// Fills the map by the feature object and shapes, which should be visuaziled
   /// Gets feature attributes, collect objects to whom the attributes refer
@@ -102,6 +91,16 @@ private:
   static void getFeatureShapes(const FeaturePtr& theFeature,
                                ModuleBase_IWorkshop* theWorkshop,
                                QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
+
+  /// Fills the map by the feature object and shapes, which should be visuaziled
+  /// Gets feature attributes, collect objects to whom the attributes refer
+  /// \param theFeature a current feature
+  /// \param theWorkshop a current workshop
+  /// \param theObjectShapes an output map
+  /// \param theObjectShape an output map of objects
+  static void getResultShapes(const FeaturePtr& theFeature,
+                              ModuleBase_IWorkshop* theWorkshop,
+                              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
 
   /// Fills the map by the feature object and shapes, which should be visuaziled
   /// Gets the active widget, obtain the highlighted presentations if it has such and
@@ -117,18 +116,15 @@ private:
   static bool isSelectionAttribute(const AttributePtr& theAttribute);
 
   /// Converts the current workshop to XGUI workshop
+  /// \param theWorkshop an interface workshop
   /// \return a workshop instance
-  XGUI_Workshop* workshop() const;
+  static XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop);
 
 private:
-  ModuleBase_IWorkshop* myWorkshop;
-  FeaturePtr myFeature; /// Reference to a feature object
   QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes; /// visualized shapes
-  std::list<ResultPtr> myFeatureResults; /// visualized feature results
 
+  ModuleBase_IWorkshop* myWorkshop; /// current workshop
   Quantity_Color myShapeColor; /// color of feature depended shapes
-  Quantity_Color myResultColor; /// color of feature result
-
   bool myUseAISWidth; /// flag if the width of a shape object should be used for the shape visualization
 
   friend class PartSet_CustomPrs;

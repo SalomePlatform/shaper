@@ -33,58 +33,25 @@
 
 #include <QList>
 
+static const int AIS_DEFAULT_WIDTH = 2;
+
 IMPLEMENT_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 
 PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
-: ViewerData_AISShape(TopoDS_Shape()), myFeature(FeaturePtr()), myWorkshop(theWorkshop),
- myUseAISWidth(false)
+: ViewerData_AISShape(TopoDS_Shape()), myWorkshop(theWorkshop), myUseAISWidth(false)
 {
-  myShapeColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "1,1,0");
-  myResultColor = ModuleBase_Tools::color("Visualization", "construction_plane_color", "0,1,0");
-}
-
-void PartSet_OperationPrs::setFeature(const FeaturePtr& theFeature)
-{
-  myFeature = theFeature;
-}
-
-void PartSet_OperationPrs::updateShapes()
-{
-  myFeatureResults.clear();
-  if (myFeature)
-    myFeatureResults = myFeature->results();
+  myShapeColor = Quantity_Color(1, 1, 1, Quantity_TOC_RGB);
 }
 
 bool PartSet_OperationPrs::hasShapes()
 {
-  bool aHasShapes = !myFeatureShapes.empty();
-  
-  // find a result which contains a shape
-  if (!aHasShapes && !myFeatureResults.empty()) {
-    std::list<ResultPtr>::const_iterator aRIt = myFeatureResults.begin(),
-                                         aRLast = myFeatureResults.end();
-    XGUI_Displayer* aDisplayer = workshop()->displayer();
-    for (; aRIt != aRLast; aRIt++) {
-      ResultPtr aResult = *aRIt;
-      if (!isVisible(aDisplayer, aResult))
-        continue;
-      GeomShapePtr aGeomShape = aResult->shape();
-      if (!aGeomShape.get())
-        continue;
-      TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
-      if (!aShape.IsNull())
-        aHasShapes = true;
-    }
-  }
-
-  return aHasShapes;
+  return !myFeatureShapes.empty();
 }
 
-void PartSet_OperationPrs::setColors(const Quantity_Color& theShapeColor, const Quantity_Color& theResultColor)
+void PartSet_OperationPrs::setShapeColor(const Quantity_Color& theColor)
 {
-  myShapeColor = theShapeColor;
-  myResultColor = theResultColor;
+  myShapeColor = theColor;
 }
 
 void PartSet_OperationPrs::useAISWidth()
@@ -96,17 +63,10 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
-  if (!hasShapes())
-    return;
-  // when the feature can not be visualized in the module, the operation preview should not
-  // be visualized also
-  if (!myWorkshop->module()->canDisplayObject(myFeature))
-    return;
-
   SetColor(myShapeColor);
   thePresentation->Clear();
-  XGUI_Displayer* aDisplayer = workshop()->displayer();
 
+  XGUI_Displayer* aDisplayer = workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
 
   // create presentations on the base of the shapes
@@ -130,36 +90,18 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
         AISObjectPtr anAISPtr = aDisplayer->getAISObject(anObject);
         if (anAISPtr.get()) {
           Handle(AIS_InteractiveObject) anIO = anAISPtr->impl<Handle(AIS_InteractiveObject)>();
-          if (!anIO.IsNull())
-            setWidth(aDrawer, anIO->Width());
+          if (!anIO.IsNull()) {
+            int aWidth = anIO->Width();
+            /// workaround for zero width. Else, there will be a crash
+            if (aWidth == 0) { // width returns of TSolid shape is zero
+              bool isDisplayed = !anIO->GetContext().IsNull();
+              aWidth = AIS_DEFAULT_WIDTH;// default width value
+            }
+            setWidth(aDrawer, aWidth);
+          }
         }
       }
       StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
-    }
-  }
-
-  // create presentations on the base of the results
-  SetColor(myResultColor);
-  std::list<ResultPtr>::const_iterator aRIt = myFeatureResults.begin(),
-                                       aRLast = myFeatureResults.end();
-  for (; aRIt != aRLast; aRIt++) {
-    ResultPtr aResult = *aRIt;
-    if (!isVisible(aDisplayer, aResult))
-      continue;
-    GeomShapePtr aGeomShape = aResult->shape();
-    if (!aGeomShape.get())
-      continue;
-    TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
-    // change deviation coefficient to provide more precise circle
-    ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
-    StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
-  }
-  QList<ModuleBase_ViewerPrs> aValues;
-  ModuleBase_IPropertyPanel* aPanel = myWorkshop->propertyPanel();
-  if (aPanel) {
-    ModuleBase_ModelWidget* aWidget = aPanel->activeWidget();
-    if (aWidget) {
-      aWidget->getHighlighted(aValues);
     }
   }
 }
@@ -311,6 +253,38 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
   }
 }
 
+void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
+                                           ModuleBase_IWorkshop* theWorkshop,
+                                           QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+{
+  theObjectShapes.clear();
+
+  if (!theFeature.get())
+    return;
+
+  XGUI_Displayer* aDisplayer = workshop(theWorkshop)->displayer();
+
+  std::list<ResultPtr> aFeatureResults = theFeature->results();
+  std::list<ResultPtr>::const_iterator aRIt = aFeatureResults.begin(),
+                                       aRLast = aFeatureResults.end();
+  for (; aRIt != aRLast; aRIt++) {
+    ResultPtr aResult = *aRIt;
+    if (!isVisible(aDisplayer, aResult))
+      continue;
+    GeomShapePtr aGeomShape = aResult->shape();
+    if (!aGeomShape.get())
+      continue;
+
+    if (theObjectShapes.contains(aResult))
+      theObjectShapes[aResult].append(aGeomShape);
+    else {
+      QList<GeomShapePtr> aShapes;
+      aShapes.append(aGeomShape);
+      theObjectShapes[aResult] = aShapes;
+    }
+  }
+}
+
 void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorkshop,
                                                 QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
@@ -368,8 +342,8 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
          anAttrType == ModelAPI_AttributeReference::typeId();
 }
 
-XGUI_Workshop* PartSet_OperationPrs::workshop() const
+XGUI_Workshop* PartSet_OperationPrs::workshop(ModuleBase_IWorkshop* theWorkshop)
 {
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   return aConnector->workshop();
 }
