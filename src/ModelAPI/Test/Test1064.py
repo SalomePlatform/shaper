@@ -73,7 +73,7 @@ aSession.setActiveDocument(aPartSet)
 aPlane = aPartSet.addFeature("Plane")
 aPlane.string("CreationMethod").setValue("PlaneByFaceAndDistance")
 aPlane.real("distance").setValue(0)
-aPlane.selection("planeFace").selectSubShape("face", "Part_1/Extrusion_1_1/LateralFace_3")
+aPlane.selection("planeFace").selectSubShape("face", "Part_1/Extrusion_1_1/LateralFace_2")
 aSession.finishOperation()
 
 #=========================================================================
