@@ -42,9 +42,20 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
 
     myStorage->update(aFeature);
     theEntities.push_back(myStorage->entity(aFeature));
-    for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt)
-      ; // just skip copied features
+    myFeatures.insert(aFeature);
+    for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
+      // just add copied features into the list of objects
+      aFeature = ModelAPI_Feature::feature(*anObjIt);
+      if (aFeature)
+        myFeatures.insert(aFeature);
+    }
   }
+}
+
+bool SketchSolver_ConstraintMulti::remove()
+{
+  myFeatures.clear();
+  return SketchSolver_Constraint::remove();
 }
 
 void SketchSolver_ConstraintMulti::update()
@@ -52,14 +63,32 @@ void SketchSolver_ConstraintMulti::update()
   update(false);
 }
 
-
 void SketchSolver_ConstraintMulti::update(bool isForce)
 {
   cleanErrorMsg();
   AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributeIntegerPtr aNbObjects = myBaseConstraint->integer(nameNbObjects());
-  if (anInitialRefList->size() != myNumberOfObjects || aNbObjects->value()-1 != myNumberOfCopies) {
+  bool isUpdated= anInitialRefList->size() != myNumberOfObjects || aNbObjects->value()-1 != myNumberOfCopies;
+  if (!isUpdated) {
+    // additional check that the features and their copies are changed
+    AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+        myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+    if (aRefList && aRefList->size() != 0) {
+      FeaturePtr aFeature;
+      std::list<ObjectPtr> anObjectList = aRefList->list();
+      std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
+      for (; anObjIt != anObjectList.end(); ++anObjIt) {
+        aFeature = ModelAPI_Feature::feature(*anObjIt);
+        if (aFeature && myFeatures.find(aFeature) == myFeatures.end()) {
+          isUpdated = true;
+          break;
+        }
+      }
+    } else
+      isUpdated = true;
+  }
+  if (isUpdated) {
     remove();
     process();
     return;

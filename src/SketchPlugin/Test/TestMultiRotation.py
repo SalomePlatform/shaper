@@ -35,6 +35,15 @@ def createSketch(theSketch):
     theSketch.execute()
     return allFeatures
     
+def createLine(theSketch):
+    aSketchLine = theSketch.addFeature("SketchLine")
+    aStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
+    aEndPoint   = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
+    aStartPoint.setValue(7., 5.)
+    aEndPoint.setValue(1., 3.)
+    theSketch.execute()
+    return aSketchLine
+    
 def checkRotation(theObjects, theNbObjects, theCenterX, theCenterY, theAngle):
     # Verify distances of the objects and the number of copies
     aFeatures = []
@@ -159,11 +168,54 @@ aNbCopies.setValue(3)
 aSession.finishOperation()
 aRotated = aMultiRotation.reflist("ConstraintEntityB")
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+
 #=========================================================================
-# TODO: improve test
-# 1. Add more features into Rotation
-# 2. Move one of initial features and check the Rotated is moved too
+# Create new feature and add it into the Rotation
 #=========================================================================
+aSession.startOperation()
+aLine = createLine(aSketchFeature)
+aSession.finishOperation()
+aSession.startOperation()
+aResult = modelAPI_ResultConstruction(aLine.lastResult())
+assert(aResult is not None)
+aRotList.append(aResult)
+aSession.finishOperation()
+checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+#=========================================================================
+# Move line and check the copies are moved too
+#=========================================================================
+aSession.startOperation()
+aStartPoint = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
+aStartPoint.setValue(12., 5.)
+aSession.finishOperation()
+checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+#=========================================================================
+# Change number of copies and verify Rotation
+#=========================================================================
+aSession.startOperation()
+aNbCopies.setValue(2)
+aSession.finishOperation()
+checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+
+#=========================================================================
+# Remove a feature from the Rotation
+#=========================================================================
+aSession.startOperation()
+aRemoveIt = aRotList.object(0)
+aRotList.remove(aRemoveIt)
+aSession.finishOperation()
+checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+
+#=========================================================================
+# Clear the list of rotated features
+#=========================================================================
+aSession.startOperation()
+aRotList.clear()
+checkRotation(aRotated, 1, CENTER_X, CENTER_Y, ANGLE)
+# Add line once again
+aRotList.append(aResult)
+aSession.finishOperation()
+checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
 #=========================================================================
 # End of test
 #=========================================================================

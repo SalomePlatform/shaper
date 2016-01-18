@@ -34,6 +34,15 @@ def createSketch(theSketch):
     theSketch.execute()
     return allFeatures
     
+def createLine(theSketch):
+    aSketchLine = theSketch.addFeature("SketchLine")
+    aStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
+    aEndPoint   = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
+    aStartPoint.setValue(7., 5.)
+    aEndPoint.setValue(1., 3.)
+    theSketch.execute()
+    return aSketchLine
+    
 def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
     # Verify distances of the objects and the number of copies
     aFeatures = []
@@ -46,7 +55,7 @@ def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
     anInd = 0 
     for feat, next in zip(aFeatures[:-1], aFeatures[1:]):
         anInd = anInd + 1
-        if (anInd > theNbObjects):
+        if (anInd > theNbObjects-1):
             anInd = 0
             continue
         assert(feat.getKind() == next.getKind())
@@ -150,11 +159,54 @@ aNbCopies.setValue(3)
 aSession.finishOperation()
 aTranslated = aMultiTranslation.reflist("ConstraintEntityB")
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+
 #=========================================================================
-# TODO: improve test
-# 1. Add more features into translation
-# 2. Move one of initial features and check the translated is moved too
+# Create new feature and add it into the Rotation
 #=========================================================================
+aSession.startOperation()
+aLine = createLine(aSketchFeature)
+aSession.finishOperation()
+aSession.startOperation()
+aResult = modelAPI_ResultConstruction(aLine.lastResult())
+assert(aResult is not None)
+aTransList.append(aResult)
+aSession.finishOperation()
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+#=========================================================================
+# Move line and check the copies are moved too
+#=========================================================================
+aSession.startOperation()
+aStartPoint = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
+aStartPoint.setValue(12., 5.)
+aSession.finishOperation()
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+#=========================================================================
+# Change number of copies and verify Rotation
+#=========================================================================
+aSession.startOperation()
+aNbCopies.setValue(2)
+aSession.finishOperation()
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+
+#=========================================================================
+# Remove a feature from the Rotation
+#=========================================================================
+aSession.startOperation()
+aRemoveIt = aTransList.object(0)
+aTransList.remove(aRemoveIt)
+aSession.finishOperation()
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+
+#=========================================================================
+# Clear the list of rotated features
+#=========================================================================
+aSession.startOperation()
+aTransList.clear()
+checkTranslation(aTranslated, 1, DELTA_X, DELTA_Y)
+# Add line once again
+aTransList.append(aResult)
+aSession.finishOperation()
+checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
 #=========================================================================
 # End of test
 #=========================================================================

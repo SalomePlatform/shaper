@@ -22,7 +22,6 @@ __updated__ = "2015-03-17"
 # Auxiliary functions
 #=========================================================================
 def checkMirror(theListInit, theListMirr, theMirrorLine):
-    TOL = 1.e-8
     aListSize = theListInit.size()
     
     aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))
@@ -49,11 +48,11 @@ def checkMirror(theListInit, theListMirr, theMirrorLine):
             aDirX = aPointC.x() - aPointB.x()
             aDirY = aPointC.y() - aPointB.y()
             aDot = aLineDirX * aDirX + aLineDirY * aDirY
-            assert math.fabs(aDot) < TOL, "aDot = {0}".format(aDot)
+            assert(math.fabs(aDot) < 1.e-10)
             aDirX = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
             aDirY = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
             aCross = aLineDirX * aDirY - aLineDirY * aDirX
-            assert math.fabs(aCross) < TOL, "aCross = {0}".format(aCross)
+            assert(math.fabs(aCross) < 1.e-10)
 
 
 #=========================================================================

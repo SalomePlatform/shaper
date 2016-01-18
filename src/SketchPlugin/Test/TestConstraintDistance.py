@@ -29,7 +29,7 @@ import math
 __updated__ = "2014-10-28"
 
 
-def distance(pointA, pointB):
+def distancePointPoint(pointA, pointB):
     """
     subroutine to calculate distance between two points
     result of calculated distance is has 10**-5 precision
@@ -37,6 +37,23 @@ def distance(pointA, pointB):
     xdiff = math.pow((pointA.x() - pointB.x()), 2)
     ydiff = math.pow((pointA.y() - pointB.y()), 2)
     return round(math.sqrt(xdiff + ydiff), 5)
+
+def distancePointLine(point, line):
+    """
+    subroutine to calculate distance between point and line
+    result of calculated distance is has 10**-5 precision
+    """
+    aStartPoint = geomDataAPI_Point2D(line.attribute("StartPoint"))
+    aEndPoint = geomDataAPI_Point2D(line.attribute("EndPoint"))
+    # orthogonal direction
+    aDirX = -(aEndPoint.y() - aStartPoint.y())
+    aDirY = (aEndPoint.x() - aStartPoint.x())
+    aLen = math.sqrt(aDirX**2 + aDirY**2)
+    aDirX = aDirX / aLen
+    aDirY = aDirY / aLen
+    aVecX = point.x() - aStartPoint.x()
+    aVecY = point.y() - aStartPoint.y()
+    return round(math.fabs(aVecX * aDirX + aVecY * aDirY), 5)
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -70,7 +87,9 @@ aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the distance
 #=========================================================================
-assert (distance(aSketchPointCoords, aLineAStartPoint) != 25.)
+PT_PT_DIST = 25.
+aDist = distancePointPoint(aSketchPointCoords, aLineAStartPoint);
+assert (aDist != PT_PT_DIST)
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
 aDistance = aConstraint.real("ConstraintValue")
@@ -79,32 +98,70 @@ refattrB = aConstraint.refattr("ConstraintEntityB")
 assert (not aDistance.isInitialized())
 assert (not refattrA.isInitialized())
 assert (not refattrB.isInitialized())
-aDistance.setValue(25.)
 aLineResult = aSketchLine.firstResult()
 assert (aLineResult is not None)
 refattrA.setAttr(aSketchPointCoords)
 refattrB.setAttr(aLineAStartPoint)
 aSession.finishOperation()
-assert (aDistance.isInitialized())
 assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
+assert (aDistance.isInitialized())
+assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are different: {0} != {1}".format(aDistance.value(), aDist)
+#=========================================================================
+# Change distance value
+#=========================================================================
+aSession.startOperation()
+aDistance.setValue(PT_PT_DIST)
+aSession.finishOperation()
+assert (distancePointPoint(aSketchPointCoords, aLineAStartPoint) == PT_PT_DIST)
 #=========================================================================
 # Move line, check that distance is constant
 #=========================================================================
-assert (distance(aSketchPointCoords, aLineAStartPoint) == 25.)
 aSession.startOperation()
 aLineAStartPoint.setValue(0., 40.)
 aLineAEndPoint.setValue(100., 40.)
 aSession.finishOperation()
-assert (distance(aSketchPointCoords, aLineAStartPoint) == 25.)
+assert (distancePointPoint(aSketchPointCoords, aLineAStartPoint) == PT_PT_DIST)
 #=========================================================================
-# TODO: improve test
-# 1. remove constraint, move line's start point to
-#    check that constraint are not applied
-# 2. check constrained distance between:
-#    * point and line
-#    * two lines
+# Remove constraint, check the points are unconstrained now
 #=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aConstraint)
+aSession.finishOperation()
+aSession.startOperation()
+aSketchPointCoords.setValue(0., 0.)
+aSession.finishOperation()
+assert (distancePointPoint(aSketchPointCoords, aLineAStartPoint) != PT_PT_DIST)
+
+#=========================================================================
+# Add distance between point and line
+#=========================================================================
+PT_LINE_DIST = 50.
+aDist = distancePointLine(aSketchPointCoords, aSketchLine)
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
+aDistance = aConstraint.real("ConstraintValue")
+refattrA = aConstraint.refattr("ConstraintEntityA")
+refattrB = aConstraint.refattr("ConstraintEntityB")
+assert (not aDistance.isInitialized())
+assert (not refattrA.isInitialized())
+assert (not refattrB.isInitialized())
+aLineResult = aSketchLine.firstResult()
+assert (aLineResult is not None)
+refattrA.setObject(aLineResult)
+refattrB.setAttr(aSketchPointCoords)
+aSession.finishOperation()
+assert (refattrA.isInitialized())
+assert (refattrB.isInitialized())
+assert (aDistance.isInitialized())
+assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are different: {0} != {1}".format(aDistance.value(), aDist)
+#=========================================================================
+# Change distance value
+#=========================================================================
+aSession.startOperation()
+aDistance.setValue(PT_LINE_DIST)
+aSession.finishOperation()
+assert (distancePointLine(aSketchPointCoords, aSketchLine) == PT_LINE_DIST)
 #=========================================================================
 # End of test
 #=========================================================================

@@ -152,9 +152,6 @@ private:
   /// \brief Verifies is the feature valid
   bool checkFeatureValidity(FeaturePtr theFeature);
 
-  /// \brief Update just changed constraints
-  void updateConstraints();
-
 private:
   GroupID  myID; ///< Index of the group
   EntityID myWorkplaneID; ///< Index of workplane, the group is based on
@@ -162,7 +159,6 @@ private:
   ConstraintConstraintMap myConstraints; ///< List of constraints
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
   std::map<AttributePtr, SolverConstraintPtr> myParametricConstraints; ///< List of parametric constraints
-  std::set<ConstraintPtr> myChangedConstraints; ///< List of just updated constraints
 
   StoragePtr myStorage; ///< Container for the set of SolveSpace constraints and their entities
 

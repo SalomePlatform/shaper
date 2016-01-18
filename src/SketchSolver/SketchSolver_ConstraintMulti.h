@@ -32,6 +32,10 @@ public:
   /// \brief Update constraint
   void update(bool isForce);
 
+  /// \brief Tries to remove constraint
+  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  virtual bool remove();
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process()
@@ -68,6 +72,8 @@ protected:
   int myNumberOfCopies;  ///< number of previous copies of initial objects
 
   bool myAdjusted; ///< the constraint is already adjusted (to not do it several times)
+
+  std::set<FeaturePtr> myFeatures; ///< list of features and their copies to find whether some of them are disappeared
 };
 
 #endif

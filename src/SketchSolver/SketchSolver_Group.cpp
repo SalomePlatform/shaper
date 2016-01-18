@@ -172,30 +172,6 @@ bool SketchSolver_Group::changeConstraint(
   return true;
 }
 
-
-void SketchSolver_Group::updateConstraints()
-{
-  std::set<SolverConstraintPtr> aPostponed; // postponed constraints Multi-Rotation and Multi-Translation
-
-  ConstraintConstraintMap::iterator anIt = myConstraints.begin();
-  for (; anIt != myConstraints.end(); ++anIt) {
-    if (myChangedConstraints.find(anIt->first) == myChangedConstraints.end())
-      continue;
-    if (anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
-        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
-      aPostponed.insert(anIt->second);
-    else
-      anIt->second->update();
-  }
-
-  // Update postponed constraints
-  std::set<SolverConstraintPtr>::iterator aSCIter = aPostponed.begin();
-  for (; aSCIter != aPostponed.end(); ++aSCIter)
-    (*aSCIter)->update();
-
-  myChangedConstraints.clear();
-}
-
 static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, FeaturePtr theFeature)
 {
   ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
@@ -293,9 +269,6 @@ bool SketchSolver_Group::updateWorkplane()
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
-  if (!myChangedConstraints.empty())
-    updateConstraints();
-
   bool aResolved = false;
   bool isGroupEmpty = isEmpty();
   if (myStorage->isNeedToResolve() && !isGroupEmpty) {
