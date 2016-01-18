@@ -492,7 +492,7 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
-  anOpMgr->onKeyReleased(theEvent);
+  anOpMgr->onKeyReleased(theWnd->viewPort(), theEvent);
 }
 
 void PartSet_Module::onOperationActivatedByPreselection()

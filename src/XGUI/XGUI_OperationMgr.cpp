@@ -8,6 +8,7 @@
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ErrorMgr.h"
+#include <XGUI_ObjectsBrowser.h>
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ModelWidget.h>
@@ -56,7 +57,7 @@ public:
       if(aKeyEvent) {
         switch (aKeyEvent->key()) {
           case Qt::Key_Delete: {
-            isAccepted = myOperationMgr->onProcessDelete();
+            isAccepted = myOperationMgr->onProcessDelete(theObject);
           }
         }
       }
@@ -154,9 +155,8 @@ bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
   bool isAccepted = false;
   if (theEvent->type() == QEvent::KeyRelease) {
     QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-    if(aKeyEvent) {
-      isAccepted = onKeyReleased(aKeyEvent);
-    }
+    if(aKeyEvent)
+      isAccepted = onKeyReleased(theObject, aKeyEvent);
   }
   if (!isAccepted)
     isAccepted = QObject::eventFilter(theObject, theEvent);
@@ -544,7 +544,7 @@ void XGUI_OperationMgr::onOperationStopped()
   }
 }
 
-bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
+bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
 {
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
@@ -552,7 +552,7 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      isAccepted = onProcessEnter();
+      isAccepted = onProcessEnter(theObject);
     }
     break;
     case Qt::Key_N:
@@ -582,11 +582,16 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   return isAccepted;
 }
 
-bool XGUI_OperationMgr::onProcessEnter()
+bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
 {
   bool isAccepted = false;
   ModuleBase_Operation* aOperation = currentOperation();
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  // only property panel enter is processed in order to do not process enter in application dialogs
+  bool isPPChild = isChildObject(theObject, aPanel);
+  if (!isPPChild)
+    return isAccepted;
+
   ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
   bool isAborted = false;
   if (!anActiveWgt) {
@@ -619,20 +624,30 @@ bool XGUI_OperationMgr::onProcessEnter()
   return isAccepted;
 }
 
-bool XGUI_OperationMgr::onProcessDelete()
+bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
 {
   bool isAccepted = false;
   ModuleBase_Operation* aOperation = currentOperation();
   ModuleBase_ModelWidget* anActiveWgt = 0;
+  // firstly the widget should process Delete action
+  ModuleBase_IPropertyPanel* aPanel;
   if (aOperation) {
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    aPanel = aOperation->propertyPanel();
     if (aPanel)
       anActiveWgt = aPanel->activeWidget();
+    if (anActiveWgt) {
+      isAccepted = anActiveWgt->processDelete();
+    }
   }
-  if (anActiveWgt)
-    isAccepted = anActiveWgt->processDelete();
   if (!isAccepted) {
-    workshop()->deleteObjects();
+    // after widget, object browser and viewer should process delete
+    /// other widgets such as line edit controls should not lead to
+    /// processing delete by workshop
+    XGUI_ObjectsBrowser* aBrowser = workshop()->objectBrowser();
+    QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
+    if (isChildObject(theObject, aBrowser) ||
+        isChildObject(theObject, aViewPort))
+      workshop()->deleteObjects();
     isAccepted = true;
   }
 
@@ -645,3 +660,17 @@ XGUI_Workshop* XGUI_OperationMgr::workshop() const
   return aConnector->workshop();
 }
 
+bool XGUI_OperationMgr::isChildObject(const QObject* theObject, const QObject* theParent)
+{
+  bool isPPChild = false;
+  if (theParent && theObject) {
+    QObject* aParent = (QObject*)theObject;
+    while (aParent ) {
+      isPPChild = aParent == theParent;
+      if (isPPChild)
+        break;
+      aParent = aParent->parent();
+    }
+  }
+  return isPPChild;
+}

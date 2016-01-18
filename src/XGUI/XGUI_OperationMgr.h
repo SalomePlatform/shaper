@@ -160,18 +160,21 @@ protected: // TEMPORARY
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
   /// \param theEvent the mouse event
-  bool onKeyReleased(QKeyEvent* theEvent);
+  /// \param theObject a sender of the event
+  bool onKeyReleased(QObject *theObject, QKeyEvent* theEvent);
 
   /// The functionaly, that should be done by delete click
   /// Fistly the active widget processes it, then workshop. If no one does not
   /// process it, do nothing
-  bool onProcessDelete();
+  /// \param theObject a sender of the event
+  bool onProcessDelete(QObject* theObject);
 
   protected slots:
   /// The functionaly, that should be done by enter click
   /// Fistly the active widget processes it, then module. If no one does not
   /// process it, the current operation is committed
-  bool onProcessEnter();
+  /// \param theObject a sender of the event
+  bool onProcessEnter(QObject *theObject);
 
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
   /// If there is a suspended operation, restart it.
@@ -202,6 +205,11 @@ protected: // TEMPORARY
 
 private:
   XGUI_Workshop* workshop() const;
+
+  /// Checks if the object is a parent or a child under
+  /// \param theObject an investivated object
+  /// \param theParent a candidate to be a parent
+  static bool isChildObject(const QObject* theObject, const QObject* theParent);
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
