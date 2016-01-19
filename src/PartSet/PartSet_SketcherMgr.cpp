@@ -396,7 +396,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
-      // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
+
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       launchEditing();
       if (aFeature.get() != NULL) {
@@ -417,7 +417,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
-      // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
+
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
 
       // this is temporary commented in order to avoid the following wrong case:
@@ -463,9 +463,8 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       }
     }
   }
-      // TODO: Has to be uncommented when SALOME patch on draw mode become avialable
+
   aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
-  //aWorkshop->viewer()->enableSelection(myPreviousDrawModeEnabled);
   myIsDragging = false;
 }
 
@@ -506,10 +505,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // 2. the enable selection in the viewer should be temporary switched off in order to ignore
     // mouse press signal in the viewer(it call Select for AIS context and the dragged objects are
     // deselected). This flag should be restored in the slot, processed the mouse release signal.
-
-    // TODO: Has to be commented out when SALOME patch on draw mode become avialable
-    //ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
-    //aViewer->enableSelection(false);
 
     ModuleBase_Operation* aCurrentOperation = getCurrentOperation();
     if (!aCurrentOperation)
