@@ -15,6 +15,7 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeInteger.h
     ModelAPI_AttributeRefAttr.h
     ModelAPI_AttributeReference.h
+    ModelAPI_AttributeRefAttrList.h
     ModelAPI_AttributeRefList.h
     ModelAPI_AttributeSelection.h
     ModelAPI_AttributeSelectionList.h
@@ -52,6 +53,7 @@ SET(PROJECT_SOURCES
     ModelAPI_AttributeInteger.cpp
     ModelAPI_AttributeRefAttr.cpp
     ModelAPI_AttributeReference.cpp
+    ModelAPI_AttributeRefAttrList.cpp
     ModelAPI_AttributeRefList.cpp
     ModelAPI_AttributeSelection.cpp
     ModelAPI_AttributeSelectionList.cpp

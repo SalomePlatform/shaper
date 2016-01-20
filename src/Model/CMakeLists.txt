@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
     Model_AttributeReference.h
     Model_AttributeRefAttr.h
     Model_AttributeRefList.h
+    Model_AttributeRefAttrList.h
     Model_AttributeBoolean.h
     Model_AttributeIntArray.h
     Model_AttributeString.h
@@ -47,6 +48,7 @@ SET(PROJECT_SOURCES
     Model_AttributeReference.cpp
     Model_AttributeRefAttr.cpp
     Model_AttributeRefList.cpp
+    Model_AttributeRefAttrList.cpp
     Model_AttributeBoolean.cpp
     Model_AttributeIntArray.cpp
     Model_AttributeString.cpp
