@@ -108,6 +108,7 @@
 QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 
 //#define DEBUG_DELETE
+//#define DEBUG_FEATURE_NAME
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
@@ -597,7 +598,13 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   myModule->propertyPanelDefined(theOperation);
 
+#ifndef DEBUG_FEATURE_NAME
   myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
+#else
+  std::string aFeatureName = aFeature->name();
+  myPropertyPanel->setWindowTitle(QString("%1: %2").arg(theOperation->getDescription()->description())
+                                                  .arg(aFeatureName.c_str()));
+#endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
 }
@@ -1212,29 +1219,35 @@ void XGUI_Workshop::cleanHistory()
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
 
   // 1. find all referenced features
-  std::set<FeaturePtr> anUnusedFeatures;
+  QList<ObjectPtr> anUnusedObjects;
   std::set<FeaturePtr> aDirectRefFeatures;
   foreach (ObjectPtr anObject, anObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    // for parameter result, use the corresponded reature to be removed
+    if (!aFeature.get() && anObject->groupName() == ModelAPI_ResultParameter::group()) {
+      aFeature = ModelAPI_Feature::feature(anObject);
+    }
     if (aFeature.get()) {
       std::set<FeaturePtr> alreadyProcessed;
       aDirectRefFeatures.clear();
-      XGUI_Tools::refsDirectToFeatureInAllDocuments(anObject, anObject, anObjects,
+      XGUI_Tools::refsDirectToFeatureInAllDocuments(aFeature, aFeature, anObjects,
                                                     aDirectRefFeatures, alreadyProcessed);
-      if (aDirectRefFeatures.empty() && anUnusedFeatures.find(aFeature) == anUnusedFeatures.end())
-        anUnusedFeatures.insert(aFeature);
+      if (aDirectRefFeatures.empty() && !anUnusedObjects.contains(aFeature))
+        anUnusedObjects.append(aFeature);
     }
   }
 
   // 2. warn about the references remove, break the delete operation if the user chose it
-  if (!anUnusedFeatures.empty()) {
+  if (!anUnusedObjects.empty()) {
     QStringList aNames;
-    foreach (const FeaturePtr& aFeature, anUnusedFeatures)
+    foreach (const ObjectPtr& anObject, anUnusedObjects) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
       aNames.append(aFeature->name().c_str());
+    }
     QString anUnusedNames = aNames.join(", ");
 
     QString anActionId = "CLEAN_HISTORY_CMD";
-    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+    QString aDescription = contextMenuMgr()->action(anActionId)->text();
 
     QMessageBox aMessageBox(desktop());
     aMessageBox.setWindowTitle(aDescription);
@@ -1254,7 +1267,7 @@ void XGUI_Workshop::cleanHistory()
     operationMgr()->startOperation(anOpAction);
 
     std::set<FeaturePtr> anIgnoredFeatures;
-    if (removeFeatures(anObjects, anIgnoredFeatures, anActionId)) {
+    if (removeFeatures(anUnusedObjects, anIgnoredFeatures, anActionId)) {
       operationMgr()->commitOperation();
     }
     else {

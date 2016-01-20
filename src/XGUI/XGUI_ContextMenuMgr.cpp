@@ -217,7 +217,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         else if (hasFeature && myWorkshop->canMoveFeature())
           action("MOVE_CMD")->setEnabled(true);
 
-        else if (hasFeature)
+        else if (hasFeature || hasParameter)
           action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
         if( aMgr->activeDocument() == aObject->document() )
@@ -246,7 +246,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       if (hasFeature || hasParameter)
         action("DELETE_CMD")->setEnabled(true);
     }
-    if (allActive && hasFeature)
+    if (allActive && (hasFeature|| hasParameter))
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
   }
 
@@ -384,6 +384,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
 
   aList.clear();
   aList.append(action("DELETE_CMD"));
+  aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
