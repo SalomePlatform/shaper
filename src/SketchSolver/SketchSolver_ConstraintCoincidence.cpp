@@ -37,28 +37,3 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
   } else
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
 }
-
-
-static bool isBase(const std::list<ConstraintWrapperPtr>& theConstraints, AttributePtr theAttribute)
-{
-  AttributePtr anAttribute = theAttribute;
-  FeaturePtr aFeature;
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (aRefAttr) {
-    if (aRefAttr->isObject())
-      aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-    else
-      anAttribute = aRefAttr->attr();
-  }
-
-  std::list<ConstraintWrapperPtr>::const_iterator aCIt = theConstraints.begin();
-  for (; aCIt != theConstraints.end(); ++aCIt) {
-    std::list<EntityWrapperPtr> aSubs = (*aCIt)->entities();
-    std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-    for (; aSIt != aSubs.end(); ++aSIt)
-      if ((aFeature && (*aSIt)->isBase(aFeature)) ||
-         (!aFeature && (*aSIt)->isBase(anAttribute)))
-        return true;
-  }
-  return false;
-}
