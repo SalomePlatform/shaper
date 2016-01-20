@@ -12,11 +12,36 @@
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <Geom_Plane.hxx>
 #include <Precision.hxx>
+#include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
+#include <list>
+
+
+static TopoDS_Vertex findStartVertex(const TopoDS_Face& aFace)
+{
+  TopExp_Explorer anExp(aFace, TopAbs_VERTEX);
+  TopoDS_Vertex aStart = TopoDS::Vertex(anExp.Current());
+  gp_Pnt aStartPnt(BRep_Tool::Pnt(aStart));
+  TopoDS_Vertex aCurrent;
+  gp_Pnt aCurrentPnt;
+
+  for (anExp.Next(); anExp.More(); anExp.Next()) {
+    aCurrent = TopoDS::Vertex(anExp.Current());
+    aCurrentPnt = BRep_Tool::Pnt(aCurrent);
+    if ((aCurrentPnt.X() > aStartPnt.X()) ||
+        (aCurrentPnt.X() == aStartPnt.X() && aCurrentPnt.Y() > aStartPnt.Y()) ||
+        (aCurrentPnt.X() == aStartPnt.X() && aCurrentPnt.Y() == aStartPnt.Y() &&
+            aCurrentPnt.Z() > aStartPnt.Z())) {
+      aStart = aCurrent;
+      aStartPnt = aCurrentPnt;
+    }
+  }
+  return aStart;
+}
 
 void GeomAlgoAPI_SketchBuilder::createFaces(
     const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
@@ -61,24 +86,43 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     if (aFClass.PerformInfinitePoint() == TopAbs_IN)
       continue;
 
-    // remove internal edges from faces
-    TopExp_Explorer anExp(aFace, TopAbs_EDGE);
-    for (; anExp.More(); anExp.Next())
-      if (anExp.Current().Orientation() == TopAbs_INTERNAL)
-        break;
-    if (anExp.More()) {
-      TopoDS_Face aNewFace;
-      aBuilder.MakeFace(aNewFace, aPlane, Precision::Confusion());
-      TopoDS_Wire aWire;
-      aBuilder.MakeWire(aWire);
-      for (anExp.ReInit(); anExp.More(); anExp.Next())
-        if (anExp.Current().Orientation() != TopAbs_INTERNAL)
-          aBuilder.Add(aWire, anExp.Current());
-      aBuilder.Add(aNewFace, aWire);
-      aFace = aNewFace;
-    }
+    // to make faces equal on different platforms, we will find
+    // a vertex with greater coordinates and start wire from it
+    TopoDS_Vertex aStartVertex = findStartVertex(aFace);
+    TopoDS_Wire aNewWire;
+    aBuilder.MakeWire(aNewWire);
+    std::list<TopoDS_Edge> aSkippedEdges;
+    bool aStartFound = false;
 
-    // Store face
+    // remove internal edges from faces and make wire start from found vertex
+    TopExp_Explorer anExp(aFace, TopAbs_EDGE);
+    for (; anExp.More(); anExp.Next()) {
+      if (anExp.Current().Orientation() == TopAbs_INTERNAL)
+        continue;
+      if (!aStartFound) {
+        const TopoDS_Edge& anEdge = TopoDS::Edge(anExp.Current());
+        TopoDS_Vertex aV1, aV2;
+        TopExp::Vertices(anEdge, aV1, aV2);
+        if (aV1.IsSame(aStartVertex) == Standard_True)
+          aStartFound = true;
+        else
+          aSkippedEdges.push_back(anEdge);
+      }
+      if (aStartFound)
+        aBuilder.Add(aNewWire, anExp.Current());
+    }
+    // add skipped edges to the end of wire
+    std::list<TopoDS_Edge>::const_iterator aSkIt = aSkippedEdges.begin();
+    for (; aSkIt != aSkippedEdges.end(); ++aSkIt)
+      aBuilder.Add(aNewWire, *aSkIt);
+
+    // rebuild face
+    TopoDS_Face aNewFace;
+    aBuilder.MakeFace(aNewFace, aPlane, Precision::Confusion());
+    aBuilder.Add(aNewFace, aNewWire);
+    aFace = aNewFace;
+
+    // store face
     std::shared_ptr<GeomAPI_Shape> aResFace(new GeomAPI_Shape);
     aResFace->setImpl(new TopoDS_Face(aFace));
     theResultFaces.push_back(aResFace);
