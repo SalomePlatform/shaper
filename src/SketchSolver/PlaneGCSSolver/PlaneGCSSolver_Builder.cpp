@@ -135,10 +135,6 @@ static ConstraintWrapperPtr
 static void adjustAngle(ConstraintWrapperPtr theConstraint);
 /// \brief Update mirror points
 static void adjustMirror(ConstraintWrapperPtr theConstraint);
-/// \brief Update positions of rotated features
-static void adjustMultiRotation(ConstraintWrapperPtr theConstraint);
-/// \brief Update positions of translated features
-static void adjustMultiTranslation(ConstraintWrapperPtr theConstraint);
 
 /// \brief Transform points to be symmetric regarding to the mirror line
 static void makeMirrorPoints(EntityWrapperPtr theOriginal,
@@ -443,12 +439,6 @@ void PlaneGCSSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstraint
   // Update flags and parameters in constraints
   if (aType == CONSTRAINT_ANGLE)
     adjustAngle(theConstraint);
-  //else if (aType == CONSTRAINT_SYMMETRIC)
-  //  adjustMirror(theConstraint);
-  else if (aType == CONSTRAINT_MULTI_ROTATION)
-    adjustMultiRotation(theConstraint);
-  else if (aType == CONSTRAINT_MULTI_TRANSLATION)
-    adjustMultiTranslation(theConstraint);
 }
 
 EntityWrapperPtr PlaneGCSSolver_Builder::createFeature(
@@ -1095,23 +1085,6 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
   }
 }
 
-////void adjustMirror(ConstraintWrapperPtr theConstraint)
-////{
-////  std::vector<EntityWrapperPtr> aPoints;
-////  EntityWrapperPtr aMirrorLine;
-////
-////  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
-////  std::list<EntityWrapperPtr>::const_iterator anIt = aSubs.begin();
-////  for (; anIt != aSubs.end(); ++anIt) {
-////    if ((*anIt)->type() == ENTITY_POINT)
-////      aPoints.push_back(*anIt);
-////    else if ((*anIt)->type() == ENTITY_LINE)
-////      aMirrorLine = *anIt;
-////  }
-////
-////  makeMirrorPoints(aPoints[0], aPoints[1], aMirrorLine);
-////}
-
 void makeMirrorPoints(EntityWrapperPtr theOriginal,
                       EntityWrapperPtr theMirrored,
                       EntityWrapperPtr theMirrorLine)
@@ -1140,105 +1113,3 @@ void makeMirrorPoints(EntityWrapperPtr theOriginal,
   }
 }
 
-static void rotate(EntityWrapperPtr theSource, EntityWrapperPtr theDest,
-                   std::shared_ptr<GeomAPI_Pnt2d> theCenter,
-                   double theSin, double theCos)
-{
-  if (theSource->type() == ENTITY_POINT) {
-    // Rotate single point
-    std::shared_ptr<GeomDataAPI_Point2D> aSrcAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theSource->baseAttribute());
-    std::shared_ptr<GeomDataAPI_Point2D> aDstAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theDest->baseAttribute());
-    if (aSrcAttr && aDstAttr) {
-      std::shared_ptr<GeomAPI_XY> aVec = aSrcAttr->pnt()->xy()->decreased(theCenter->xy());
-      double aNewX = aVec->x() * theCos - aVec->y() * theSin;
-      double aNewY = aVec->x() * theSin + aVec->y() * theCos;
-      aDstAttr->setValue(theCenter->x() + aNewX, theCenter->y() + aNewY);
-      // set also parameters of the solver
-      double aCoord[2] = {aDstAttr->x(), aDstAttr->y()};
-      std::list<ParameterWrapperPtr>::const_iterator aDIt = theDest->parameters().begin();
-      for (int i = 0; aDIt != theDest->parameters().end(); ++aDIt, ++i)
-        (*aDIt)->setValue(aCoord[i]);
-    }
-    return;
-  }
-
-  FeaturePtr aDestFeature = theDest->baseFeature();
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(true);
-
-  // Rotate points of the feature
-  const std::list<EntityWrapperPtr>& aSrcSubs = theSource->subEntities();
-  const std::list<EntityWrapperPtr>& aDstSubs = theDest->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aSrcIt, aDstIt;
-  for (aSrcIt = aSrcSubs.begin(), aDstIt = aDstSubs.begin();
-       aSrcIt != aSrcSubs.end() && aDstIt != aDstSubs.end(); ++aSrcIt, ++aDstIt)
-    rotate(*aSrcIt, *aDstIt, theCenter, theSin, theCos);
-
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(false);
-}
-
-static void translate(EntityWrapperPtr theSource, EntityWrapperPtr theDest,
-                      std::shared_ptr<GeomAPI_XY> theDelta)
-{
-  if (theSource->type() == ENTITY_POINT) {
-    // Translate single point
-    std::shared_ptr<GeomDataAPI_Point2D> aSrcAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theSource->baseAttribute());
-    std::shared_ptr<GeomDataAPI_Point2D> aDstAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theDest->baseAttribute());
-    if (aSrcAttr && aDstAttr)
-      aDstAttr->setValue(aSrcAttr->x() + theDelta->x(), aSrcAttr->y() + theDelta->y());
-    return;
-  }
-
-  FeaturePtr aDestFeature = theDest->baseFeature();
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(true);
-
-  // Translate points of the feature
-  const std::list<EntityWrapperPtr>& aSrcSubs = theSource->subEntities();
-  const std::list<EntityWrapperPtr>& aDstSubs = theDest->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aSrcIt, aDstIt;
-  for (aSrcIt = aSrcSubs.begin(), aDstIt = aDstSubs.begin();
-       aSrcIt != aSrcSubs.end() && aDstIt != aDstSubs.end(); ++aSrcIt, ++aDstIt)
-    translate(*aSrcIt, *aDstIt, theDelta);
-
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(false);
-}
-
-void adjustMultiRotation(ConstraintWrapperPtr theConstraint)
-{
-  BuilderPtr aBuilder = PlaneGCSSolver_Builder::getInstance();
-
-  double anAngleRad = theConstraint->value() * PI / 180.0;
-  double aSin = sin(anAngleRad);
-  double aCos = cos(anAngleRad);
-
-  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-
-  std::shared_ptr<GeomAPI_Pnt2d> aCenter = aBuilder->point(*aSIt++);
-  std::list<EntityWrapperPtr>::const_iterator aPrevIt = aSIt++;
-  for (; aSIt != aSubs.end(); ++aPrevIt, ++aSIt)
-    rotate(*aPrevIt, *aSIt, aCenter, aSin, aCos);
-}
-
-void adjustMultiTranslation(ConstraintWrapperPtr theConstraint)
-{
-  BuilderPtr aBuilder = PlaneGCSSolver_Builder::getInstance();
-
-  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-
-  std::shared_ptr<GeomAPI_Pnt2d> aStartPnt = aBuilder->point(*aSIt++);
-  std::shared_ptr<GeomAPI_Pnt2d> aEndPnt = aBuilder->point(*aSIt++);
-  std::shared_ptr<GeomAPI_XY> aDelta = aEndPnt->xy()->decreased(aStartPnt->xy());
-
-  std::list<EntityWrapperPtr>::const_iterator aPrevIt = aSIt++;
-  for (; aSIt != aSubs.end(); ++aPrevIt, ++aSIt)
-    translate(*aPrevIt, *aSIt, aDelta);
-}

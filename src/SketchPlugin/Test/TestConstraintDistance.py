@@ -100,6 +100,8 @@ assert (not refattrA.isInitialized())
 assert (not refattrB.isInitialized())
 aLineResult = aSketchLine.firstResult()
 assert (aLineResult is not None)
+# the following line is necessary to check automatic calculation of a distance
+aConstraint.execute()
 refattrA.setAttr(aSketchPointCoords)
 refattrB.setAttr(aLineAStartPoint)
 aSession.finishOperation()

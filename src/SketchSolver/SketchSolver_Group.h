@@ -61,9 +61,6 @@ class SketchSolver_Group
     return mySketch->data() && mySketch->data()->isValid();
   }
 
-  /// \brief Verifies the constraint is complex, i.e. it needs another constraints to be created before
-  static bool isComplexConstraint(FeaturePtr theConstraint);
-
   /** \brief Adds or updates a constraint in the group
    *  \param[in] theConstraint constraint to be changed
    *  \return \c true if the constraint added or updated successfully

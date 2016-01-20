@@ -51,10 +51,6 @@ static void adjustTangency(ConstraintWrapperPtr theConstraint);
 static void adjustAngle(ConstraintWrapperPtr theConstraint);
 /// \brief Update mirror points
 static void adjustMirror(ConstraintWrapperPtr theConstraint);
-/// \brief Update positions of rotated features
-static void adjustMultiRotation(ConstraintWrapperPtr theConstraint);
-/// \brief Update positions of translated features
-static void adjustMultiTranslation(ConstraintWrapperPtr theConstraint);
 
 /// \brief Transform points to be symmetric regarding to the mirror line
 static void makeMirrorPoints(EntityWrapperPtr theOriginal,
@@ -121,6 +117,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
       SLVS_C_UNKNOWN, (Slvs_hGroup)theGroupID, aType, (Slvs_hEntity)theSketchID,
       theValue, aSlvsEntities[0], aSlvsEntities[1], aSlvsEntities[2], aSlvsEntities[3]);
   ConstraintWrapperPtr aResult(new SolveSpaceSolver_ConstraintWrapper(theConstraint, aConstraint));
+  aResult->setGroup(theGroupID);
   aResult->setValue(theValue);
   aResult->setEntities(aConstrAttrList);
   adjustConstraint(aResult);
@@ -156,6 +153,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
   aConstrAttrList.push_front(thePoint1);
 
   ConstraintWrapperPtr aResult(new SolveSpaceSolver_ConstraintWrapper(theConstraint, aConstraint));
+  aResult->setGroup(theGroupID);
   aResult->setValue(theValue);
   aResult->setIsFullValue(theFullValue);
   aResult->setEntities(aConstrAttrList);
@@ -189,6 +187,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
 
     ConstraintWrapperPtr aWrapper(new SolveSpaceSolver_ConstraintWrapper(
         theConstraint, aConstraint));
+    aWrapper->setGroup(theGroupID);
     aWrapper->setEntities(aConstrAttrList);
     aResult.push_back(aWrapper);
   }
@@ -265,10 +264,6 @@ void SolveSpaceSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstrai
     adjustAngle(theConstraint);
   else if (aType == CONSTRAINT_SYMMETRIC)
     adjustMirror(theConstraint);
-  else if (aType == CONSTRAINT_MULTI_ROTATION)
-    adjustMultiRotation(theConstraint);
-  else if (aType == CONSTRAINT_MULTI_TRANSLATION)
-    adjustMultiTranslation(theConstraint);
 }
 
 EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
@@ -788,127 +783,4 @@ void makeMirrorPoints(EntityWrapperPtr theOriginal,
     std::shared_ptr<GeomDataAPI_Point2D> aMirroredPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
     aMirroredPnt->setValue(aCoord[0], aCoord[1]);
   }
-}
-
-static void rotate(EntityWrapperPtr theSource, EntityWrapperPtr theDest,
-                   std::shared_ptr<GeomAPI_Pnt2d> theCenter,
-                   double theSin, double theCos)
-{
-  std::shared_ptr<SolveSpaceSolver_EntityWrapper> aSource =
-      std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theSource);
-  std::shared_ptr<SolveSpaceSolver_EntityWrapper> aDest =
-      std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theDest);
-
-  if (theSource->type() == ENTITY_POINT) {
-    // Rotate single point
-    std::shared_ptr<GeomDataAPI_Point2D> aSrcAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSource->baseAttribute());
-    std::shared_ptr<GeomDataAPI_Point2D> aDstAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aDest->baseAttribute());
-    if (aSrcAttr && aDstAttr) {
-      std::shared_ptr<GeomAPI_XY> aVec = aSrcAttr->pnt()->xy()->decreased(theCenter->xy());
-      double aNewX = aVec->x() * theCos - aVec->y() * theSin;
-      double aNewY = aVec->x() * theSin + aVec->y() * theCos;
-      aDstAttr->setValue(theCenter->x() + aNewX, theCenter->y() + aNewY);
-    }
-    return;
-  }
-
-  FeaturePtr aDestFeature = aDest->baseFeature();
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(true);
-
-  // Rotate points of the feature
-  const std::list<EntityWrapperPtr>& aSrcSubs = theSource->subEntities();
-  const std::list<EntityWrapperPtr>& aDstSubs = theDest->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aSrcIt, aDstIt;
-  for (aSrcIt = aSrcSubs.begin(), aDstIt = aDstSubs.begin();
-       aSrcIt != aSrcSubs.end() && aDstIt != aDstSubs.end(); ++aSrcIt, ++aDstIt)
-    rotate(*aSrcIt, *aDstIt, theCenter, theSin, theCos);
-
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(false);
-}
-
-static void translate(EntityWrapperPtr theSource, EntityWrapperPtr theDest,
-                      std::shared_ptr<GeomAPI_XY> theDelta)
-{
-  std::shared_ptr<SolveSpaceSolver_EntityWrapper> aSource =
-      std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theSource);
-  std::shared_ptr<SolveSpaceSolver_EntityWrapper> aDest =
-      std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theDest);
-
-  if (theSource->type() == ENTITY_POINT) {
-    // Translate single point
-    std::shared_ptr<GeomDataAPI_Point2D> aSrcAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSource->baseAttribute());
-    std::shared_ptr<GeomDataAPI_Point2D> aDstAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aDest->baseAttribute());
-    if (aSrcAttr && aDstAttr)
-      aDstAttr->setValue(aSrcAttr->x() + theDelta->x(), aSrcAttr->y() + theDelta->y());
-    return;
-  }
-
-  FeaturePtr aDestFeature = aDest->baseFeature();
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(true);
-
-  // Translate points of the feature
-  const std::list<EntityWrapperPtr>& aSrcSubs = theSource->subEntities();
-  const std::list<EntityWrapperPtr>& aDstSubs = theDest->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aSrcIt, aDstIt;
-  for (aSrcIt = aSrcSubs.begin(), aDstIt = aDstSubs.begin();
-       aSrcIt != aSrcSubs.end() && aDstIt != aDstSubs.end(); ++aSrcIt, ++aDstIt)
-    translate(*aSrcIt, *aDstIt, theDelta);
-
-  if (aDestFeature)
-    aDestFeature->data()->blockSendAttributeUpdated(false);
-}
-
-void adjustMultiRotation(ConstraintWrapperPtr theConstraint)
-{
-  BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
-
-  double anAngleValue = theConstraint->value();
-  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
-
-  bool isFullValue = theConstraint->isFullValue();
-  int aNbObjects = aSubs.size()-2;
-  if (isFullValue && aNbObjects > 0) {
-    anAngleValue /= aNbObjects;
-  }
-
-  double anAngleRad = anAngleValue * PI / 180.0;
-  double aSin = sin(anAngleRad);
-  double aCos = cos(anAngleRad);
-
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-
-  std::shared_ptr<GeomAPI_Pnt2d> aCenter = aBuilder->point(*aSIt++);
-  std::list<EntityWrapperPtr>::const_iterator aPrevIt = aSIt++;
-  for (; aSIt != aSubs.end(); ++aPrevIt, ++aSIt)
-    rotate(*aPrevIt, *aSIt, aCenter, aSin, aCos);
-}
-
-void adjustMultiTranslation(ConstraintWrapperPtr theConstraint)
-{
-  BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
-
-  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-
-  std::shared_ptr<GeomAPI_Pnt2d> aStartPnt = aBuilder->point(*aSIt++);
-  std::shared_ptr<GeomAPI_Pnt2d> aEndPnt = aBuilder->point(*aSIt++);
-  std::shared_ptr<GeomAPI_XY> aDelta = aEndPnt->xy()->decreased(aStartPnt->xy());
-
-  bool isFullValue = theConstraint->isFullValue();
-  int aNbObjects = aSubs.size()-3;
-  if (isFullValue && aNbObjects > 0) {
-    aDelta->setX(aDelta->x()/aNbObjects);
-    aDelta->setY(aDelta->y()/aNbObjects);
-  }
-
-  std::list<EntityWrapperPtr>::const_iterator aPrevIt = aSIt++;
-  for (; aSIt != aSubs.end(); ++aPrevIt, ++aSIt)
-    translate(*aPrevIt, *aSIt, aDelta);
 }

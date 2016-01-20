@@ -112,17 +112,8 @@ public:
    *  \return \c true if the entity was successfully removed
    */
   bool removeEntity(const Slvs_hEntity& theEntityID);
-  /** \brief Remove all entities, which are not used in constraints
-   */
-  void removeUnusedEntities();
   /// \brief Returns the entity by its ID
   const Slvs_Entity& getEntity(const Slvs_hEntity& theEntityID) const;
-  /// \brief Makes a full copy of the given entity
-  Slvs_hEntity copyEntity(const Slvs_hEntity& theCopied);
-  /// \brief Copy one entity to another
-  void copyEntity(const Slvs_hEntity& theFrom, const Slvs_hEntity& theTo);
-  /// \brief Check the entity is used in constraints
-  bool isUsedByConstraints(const Slvs_hEntity& theEntityID) const;
   /// \brief Returns maximal ID of entities in this storage
   const Slvs_hEntity& entityMaxID() const
   { return myEntityMaxID; }

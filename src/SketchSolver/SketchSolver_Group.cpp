@@ -517,18 +517,6 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
 }
 
 // ============================================================================
-//  Function: isComplexConstraint
-//  Class:    SketchSolver_Group
-//  Purpose:  verifies the constraint is complex, i.e. it needs another constraints to be created before
-// ============================================================================
-bool SketchSolver_Group::isComplexConstraint(FeaturePtr theConstraint)
-{
-  return theConstraint->getKind() == SketchPlugin_ConstraintFillet::ID() ||
-         theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID() ||
-         theConstraint->getKind() == SketchPlugin_ConstraintTangent::ID();
-}
-
-// ============================================================================
 //  Function: setTemporary
 //  Class:    SketchSolver_Group
 //  Purpose:  append given constraint to the group of temporary constraints

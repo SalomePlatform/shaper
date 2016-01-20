@@ -48,6 +48,16 @@ def lineLength(theLine):
     aVecY = aLineStart.y() - aLineEnd.y()
     return math.hypot(aVecX, aVecY)
 
+def arcLength(theArc):
+    aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
+    aStart  = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
+    aEnd    = geomDataAPI_Point2D(theArc.attribute("ArcEndPoint"))
+    # use the law of cosines to calculate angular length of arc
+    aRadius = math.hypot(aStart.x() - aCenter.x(), aStart.y() - aCenter.y())
+    aDist2 = (aEnd.x()-aStart.x())**2 + (aEnd.y()-aStart.y())**2
+    anAngle = math.acos(1. - aDist2 / (2. * aRadius**2))
+    return aRadius * anAngle
+
 
 #=========================================================================
 # Start of test
@@ -205,6 +215,28 @@ aLine1Len = lineLength(aSketchLine1)
 aLine2Len = lineLength(aSketchLine2)
 assert (math.fabs(aLine1Len - anExtLineLen) < 1.e-10)
 assert (math.fabs(aLine2Len - anExtLineLen) < 1.e-10)
+
+#=========================================================================
+# A constraint to make equal lengths of line and arc
+#=========================================================================
+# Third Line
+aSession.startOperation()
+aSketchLine3 = aSketchFeature.addFeature("SketchLine")
+aLine3StartPoint = geomDataAPI_Point2D(aSketchLine3.attribute("StartPoint"))
+aLine3EndPoint = geomDataAPI_Point2D(aSketchLine3.attribute("EndPoint"))
+aLine3StartPoint.setValue(20., 15.)
+aLine3EndPoint.setValue(20., 25.)
+aSession.finishOperation()
+aSession.startOperation()
+anEqArcLineLen = aSketchFeature.addFeature("SketchConstraintEqual")
+aRefObjectA = anEqArcLineLen.refattr("ConstraintEntityA")
+aRefObjectB = anEqArcLineLen.refattr("ConstraintEntityB")
+aRefObjectA.setObject(aSketchArc.lastResult())
+aRefObjectB.setObject(aSketchLine3.lastResult())
+aSession.finishOperation()
+aLine3Len = lineLength(aSketchLine3)
+anArcLen = arcLength(aSketchArc)
+assert (math.fabs(aLine3Len - anArcLen) < 1.e-7)
 #=========================================================================
 # End of test
 #=========================================================================
