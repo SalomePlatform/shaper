@@ -185,11 +185,14 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
   if (!myFeature)
     return false;
 
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
-     aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
-  }   
-   return true;
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
+    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
+  }
+  return true;
 }
 
 //********************************************************************
@@ -199,11 +202,13 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
   if (!myFeature)
     return false;
 
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     // Restore shape type
-    if (!aSelectionListAttr->selectionType().empty())
-      setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionListAttr->selectionType().c_str()));
+    setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionListAttr->selectionType().c_str()));
   }
   updateSelectionList();
   return true;
@@ -214,13 +219,17 @@ void ModuleBase_WidgetMultiSelector::storeAttributeValue()
 {
   ModuleBase_WidgetValidated::storeAttributeValue();
 
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     mySelectionType = aSelectionListAttr->selectionType();
     mySelectionCount = aSelectionListAttr->size();
   }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
     mySelectionCount = aRefListAttr->size();
   }
 }
@@ -230,9 +239,11 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
 {
   ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
 
-  // Store shape type
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     aSelectionListAttr->setSelectionType(mySelectionType);
 
     // restore selection in the attribute. Indeed there is only one stored object
@@ -240,8 +251,9 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
     for (int i = 0; i < aCountAppened; i++)
       aSelectionListAttr->removeLast();
   }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
     // restore objects in the attribute. Indeed there is only one stored object
     int aCountAppened = aRefListAttr->size() - mySelectionCount;
     for (int i = 0; i < aCountAppened; i++)
@@ -252,11 +264,16 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::clearAttribute()
 {
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get())
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     aSelectionListAttr->clear();
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+  }
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
     aRefListAttr->clear();
   }
 }
@@ -265,13 +282,17 @@ void ModuleBase_WidgetMultiSelector::clearAttribute()
 void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
                                                GeomShapePtr theShape)
 {
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
     aSelectionListAttr->append(aResult, theShape, myIsInValidate);
   }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
     aRefListAttr->append(theSelectedObject);
   }
 }
@@ -354,17 +375,20 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 
   // refill attribute by the items which indices are not in the list of ids
   bool aDone = false;
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     aDone = !anAttributeIds.empty();
     aSelectionListAttr->remove(anAttributeIds);
+
   }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
-    if (aRefListAttr.get()) {
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
       aDone = !anAttributeIds.empty();
       aRefListAttr->remove(anAttributeIds);
-    }
   }
   if (aDone) {
     // update object is necessary to flush update signal. It leads to objects references map update
@@ -463,8 +487,11 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
 {
   myListControl->clear();
 
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
       QListWidgetItem* anItem = new QListWidgetItem(aAttr->namingName().c_str(), myListControl);
@@ -472,8 +499,9 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
       myListControl->addItem(anItem);
     }
   }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
     for (int i = 0; i < aRefListAttr->size(); i++) {
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
@@ -484,6 +512,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
       }
     }
   }
+
   // We have to call repaint because sometimes the List control is not updated
   myListControl->repaint();
 }
@@ -554,8 +583,12 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
 {
   if(myFeature.get() == NULL)
     return;
-  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-  if (aSelectionListAttr.get()) {
+
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       // filter by attribute indices only if the container is not empty otherwise return all items
       if (!theAttributeIds.empty() && theAttributeIds.find(i) == theAttributeIds.end())
@@ -572,17 +605,16 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       }
     }
   }
-  else {
-    AttributeRefListPtr aRefListAttr = myFeature->data()->reflist(attributeID());
-    if (aRefListAttr.get()) {
-      for (int i = 0; i < aRefListAttr->size(); i++) {
-        // filter by attribute indices only if the container is not empty otherwise return all items
-        if (!theAttributeIds.empty() && theAttributeIds.find(i) == theAttributeIds.end())
-          continue;
-        ObjectPtr anObject = aRefListAttr->object(i);
-        if (anObject.get()) {
-          theValues.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
-        }
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
+    for (int i = 0; i < aRefListAttr->size(); i++) {
+      // filter by attribute indices only if the container is not empty otherwise return all items
+      if (!theAttributeIds.empty() && theAttributeIds.find(i) == theAttributeIds.end())
+        continue;
+      ObjectPtr anObject = aRefListAttr->object(i);
+      if (anObject.get()) {
+        theValues.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
       }
     }
   }
