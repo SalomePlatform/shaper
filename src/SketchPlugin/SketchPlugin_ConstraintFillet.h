@@ -60,7 +60,10 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
 
 private:
   std::list<FeaturePtr> myProducedFeatures; ///< list of constraints provided by the fillet
-  std::list<FeaturePtr> myBaseObjects;      ///< list of objects the fillet is based
+  std::list<FeaturePtr> myBaseEdges;      ///< list of objects the fillet is based
+  bool myListOfPointsChangedInCode; ///< flag to track that list of points changed in code
+  bool myRadiusChangedByUser; ///< flag to track that radius changed by user
+  bool myRadiusChangedInCode; ///< flag to track that radius changed in code
 };
 
 #endif

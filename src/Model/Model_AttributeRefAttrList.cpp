@@ -95,7 +95,7 @@ void Model_AttributeRefAttrList::remove(AttributePtr theAttr)
         (aTheObjLab.IsNull() && aDoc->objects()->object(aRefIter.Value()) != NULL)) {
       myRef->Append(aRefIter.Value());
       myIDs->Append(anIDIter.Value());
-    } else if (aTheObjLab.IsNull() && aDoc->objects()->object(aRefIter.Value()) != NULL) {
+    } else {
       aOneisDeleted = true;
     }
   }
@@ -293,7 +293,6 @@ void Model_AttributeRefAttrList::remove(const std::set<int>& theIndices)
         aOneisDeleted = true;
         ObjectPtr anObj = aDoc->objects()->object(aRefIter.Value());
         if (anObj.get()) {
-          myRef->Remove(aRefIter.Value());
           REMOVE_BACK_REF(anObj);
         }
       }

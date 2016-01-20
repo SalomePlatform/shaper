@@ -170,7 +170,7 @@ class SketchPlugin_SolverErrorValidator : public ModelAPI_FeatureValidator
  */
 class SketchPlugin_FilletVertexValidator : public ModelAPI_AttributeValidator
 {
- public:
+public:
   //! returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute (not used)

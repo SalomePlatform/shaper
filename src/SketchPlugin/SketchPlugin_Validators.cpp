@@ -22,11 +22,15 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
+
+#include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultConstruction.h>
 
+#include <GeomAPI_Vertex.h>
 #include <GeomDataAPI_Point2D.h>
 
 const double tolerance = 1.e-7;
@@ -201,7 +205,7 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
   return true;
 }
 
-bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute, 
+bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
                                              std::string& theError) const
 {
@@ -457,159 +461,142 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
 {
-  if(!theAttribute.get()) {
+  if(!theAttribute.get() || !theAttribute->isInitialized()) {
+    theError = "Error: List of points is not initialized.";
     return false;
   }
 
-  AttributeRefAttrPtr aBase = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  AttributePtr anAttrBase = aBase->attr();
-  if(aBase->isObject()) {
+  FeaturePtr aFilletFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrListPtr aPointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
+  if(aPointsRefList->size() == 0) {
+    theError = "Error: List of points is empty.";
     return false;
   }
 
-  // If we alredy have some result then:
-  // - if it is the same point all ok
-  // - if it is point on the fillet arc then it is not valid
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributePtr aBaseLinesAttribute = aFeature->attribute(SketchPlugin_Constraint::ENTITY_C());
-  AttributeRefListPtr aRefListOfBaseLines = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aBaseLinesAttribute);
-  std::list<ObjectPtr> anOldFeatList = aRefListOfBaseLines->list();
-  if(!aRefListOfBaseLines->list().empty()) {
-    FeaturePtr anOldFeatureA, anOldFeatureB;
-    std::list<ObjectPtr>::iterator aFeatIt = anOldFeatList.begin();
-    anOldFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
-    anOldFeatureB = ModelAPI_Feature::feature(*aFeatIt);
+  AttributeRefAttrListPtr aBasePointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(
+    aFilletFeature->attribute(SketchPlugin_Constraint::ENTITY_C()));
+  AttributeRefListPtr aResultEdgesRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+    aFilletFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
 
-    AttributePtr anAttrStartA = 
-      anOldFeatureA->attribute(anOldFeatureA->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::START_ID() : SketchPlugin_Arc::START_ID());
-    AttributePtr anAttrEndA = 
-      anOldFeatureA->attribute(anOldFeatureA->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::END_ID() : SketchPlugin_Arc::END_ID());
-    AttributePtr anAttrStartB = 
-      anOldFeatureB->attribute(anOldFeatureB->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::START_ID() : SketchPlugin_Arc::START_ID());
-    AttributePtr anAttrEndB = 
-      anOldFeatureB->attribute(anOldFeatureB->getKind() == SketchPlugin_Line::ID() ? SketchPlugin_Line::END_ID() : SketchPlugin_Arc::END_ID());
+  std::list<std::pair<ObjectPtr, AttributePtr>> aPointsList = aPointsRefList->list();
+  for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator anIt = aPointsList.cbegin(); anIt != aPointsList.cend(); anIt++) {
+    ObjectPtr anObject = (*anIt).first;
+    AttributePtr aPointAttribute = (*anIt).second;
 
-    std::shared_ptr<GeomAPI_Pnt2d> aBasePnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrBase)->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> aStartPntA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrStartA)->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> anEndPntA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrEndA)->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> aStartPntB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrStartB)->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> anEndPntB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrEndB)->pnt();
-    double aDistBaseStartA = aBasePnt->distance(aStartPntA);
-    double aDistBaseEndA = aBasePnt->distance(anEndPntA);
-    double aDistStartAStartB = aStartPntA->distance(aStartPntB);
-    double aDistStartAEndB = aStartPntA->distance(anEndPntB);
-    double aDistEndAStartB = anEndPntA->distance(aStartPntB);
-    double aDistEndAEndB = anEndPntA->distance(anEndPntB);
+    // If we alredy have some result then:
+    // - if it is the same point all ok, just skip it
+    // - if it is point on the fillet arc then it is not valid
+    if(aBasePointsRefList->size() > 0) {
+      if(aBasePointsRefList->isInList(aPointAttribute)) {
+        continue;
+      }
 
-    if((aDistBaseStartA < tolerance && (aDistStartAStartB < tolerance || aDistStartAEndB < tolerance)) ||
-      (aDistBaseEndA < tolerance && (aDistEndAStartB < tolerance || aDistEndAStartB < tolerance))) {
-      return true;
+      // Check that selected point not on the one of the result fillet arc.
+      for(int anIndex = 0; anIndex < aBasePointsRefList->size(); anIndex++) {
+        if(aResultEdgesRefList->size() > 0) {
+          FeaturePtr aResultArc;
+          aResultArc = ModelAPI_Feature::feature(aResultEdgesRefList->object(anIndex * 3 + 2));
+          AttributePtr anArcStart = aResultArc->attribute(SketchPlugin_Arc::START_ID());
+          AttributePtr anArcEnd = aResultArc->attribute(SketchPlugin_Arc::END_ID());
+          std::shared_ptr<GeomAPI_Pnt2d> anArcStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcStart)->pnt();
+          std::shared_ptr<GeomAPI_Pnt2d> anArcEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcEnd)->pnt();
+          std::shared_ptr<GeomAPI_Pnt2d> aSelectedPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttribute)->pnt();
+          double aDistSelectedArcStart = aSelectedPnt->distance(anArcStartPnt);
+          double aDistSelectedArcEnd = aSelectedPnt->distance(anArcEndPnt);
+          if(aDistSelectedArcStart < tolerance || aDistSelectedArcEnd < tolerance) {
+            return false;
+          }
+        }
+      }
     }
 
-    // Check that point not on fillet arc
-    AttributeRefListPtr aRefListOfFillet = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        aFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
-    std::list<ObjectPtr> aNewFeatList = aRefListOfFillet->list();
-    if(!aNewFeatList.empty()) {
-      aFeatIt = aNewFeatList.begin();
-      FeaturePtr aNewArc;
-      //aNewFeatureA = ModelAPI_Feature::feature(*aFeatIt++);
-      //aNewFeatureB = ModelAPI_Feature::feature(*aFeatIt++);
-      aFeatIt++; aFeatIt++;
-      aNewArc = ModelAPI_Feature::feature(*aFeatIt);
-      AttributePtr anArcStart = aNewArc->attribute(SketchPlugin_Arc::START_ID());
-      AttributePtr anArcEnd = aNewArc->attribute(SketchPlugin_Arc::END_ID());
-      std::shared_ptr<GeomAPI_Pnt2d> anArcStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcStart)->pnt();
-      std::shared_ptr<GeomAPI_Pnt2d> anArcEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcEnd)->pnt();
-      double aDistBaseArcStart = aBasePnt->distance(anArcStartPnt);
-      double aDistBaseArcEnd = aBasePnt->distance(anArcEndPnt);
-      if(aDistBaseArcStart < tolerance || aDistBaseArcEnd < tolerance) {
+    // Obtain constraint coincidence for the fillet point.
+    const std::set<AttributePtr>& aRefsList = aPointAttribute->owner()->data()->refsToMe();
+    FeaturePtr aConstraintCoincidence;
+    for(std::set<AttributePtr>::const_iterator anIt = aRefsList.cbegin(); anIt != aRefsList.cend(); ++anIt) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*anIt);
+      FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+        AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
+        AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+        if(anAttrRefA.get() && !anAttrRefA->isObject()) {
+          AttributePtr anAttrA = anAttrRefA->attr();
+          if(aPointAttribute == anAttrA) {
+            aConstraintCoincidence = aConstrFeature;
+            break;
+          }
+        }
+        if(anAttrRefB.get() && !anAttrRefB->isObject()) {
+          AttributePtr anAttrB = anAttrRefB->attr();
+          if(aPointAttribute == anAttrB) {
+            aConstraintCoincidence = aConstrFeature;
+            break;
+          }
+        }
+      }
+    }
+
+    if(!aConstraintCoincidence.get()) {
+      theError = "Error: one of the selected point does not have coicidence.";
+      return false;
+    }
+
+    // Get coincides from constraint.
+    std::set<FeaturePtr> aCoinsides;
+    SketchPlugin_Tools::findCoincidences(aConstraintCoincidence,
+                                         SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                         aCoinsides);
+    SketchPlugin_Tools::findCoincidences(aConstraintCoincidence,
+                                         SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                         aCoinsides);
+
+    // Remove points from set of coincides.
+    std::set<FeaturePtr> aNewSetOfCoincides;
+    for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
+      if((*anIt)->getKind() == SketchPlugin_Line::ID() ||
+         (*anIt)->getKind() == SketchPlugin_Arc::ID()) {
+        aNewSetOfCoincides.insert(*anIt);
+      }
+    }
+    aCoinsides = aNewSetOfCoincides;
+
+    // If we still have more than two coincides remove auxilary entities from set of coincides.
+    if(aCoinsides.size() > 2) {
+      aNewSetOfCoincides.clear();
+      for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
+        if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
+          aNewSetOfCoincides.insert(*anIt);
+        }
+      }
+      aCoinsides = aNewSetOfCoincides;
+    }
+
+    if(aCoinsides.size() != 2) {
+      theError = ("Error: One of the selected points does not have two suitable edges for fillet.");
+      return false;
+    }
+
+    // Check that lines not collinear
+    std::set<FeaturePtr>::iterator anIt = aCoinsides.begin();
+    FeaturePtr aFirstFeature = *anIt++;
+    FeaturePtr aSecondFeature = *anIt;
+    if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
+      std::string aStartAttr = SketchPlugin_Line::START_ID();
+      std::string anEndAttr = SketchPlugin_Line::END_ID();
+      std::shared_ptr<GeomAPI_Pnt2d> aFirstStartPnt, aFirstEndPnt, aSecondStartPnt, aSecondEndPnt;
+      aFirstStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(aStartAttr))->pnt();
+      aFirstEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
+      aSecondStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(aStartAttr))->pnt();
+      aSecondEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(anEndAttr))->pnt();
+      double aCheck1 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondStartPnt->y() - aFirstStartPnt->y()) -
+        (aSecondStartPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
+      double aCheck2 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondEndPnt->y() - aFirstStartPnt->y()) -
+        (aSecondEndPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
+      if(aCheck1 < 1.e-7 && aCheck2 < 1.e-7) {
         return false;
       }
-    }
-  }
-
-  const std::set<AttributePtr>& aRefsList = anAttrBase->owner()->data()->refsToMe();
-  std::set<AttributePtr>::const_iterator aIt;
-  FeaturePtr aCoincident;
-  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-      AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
-      AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
-      if(anAttrRefA.get() && !anAttrRefA->isObject()) {
-        AttributePtr anAttrA = anAttrRefA->attr();
-        if(anAttrBase == anAttrA) {
-          aCoincident = aConstrFeature;
-          break;
-        }
-      }
-      if(anAttrRefA.get() && !anAttrRefB->isObject()) {
-        AttributePtr anAttrB = anAttrRefB->attr();
-        if(anAttrBase == anAttrB) {
-          aCoincident = aConstrFeature;
-          break;
-        }
-      }
-    }
-  }
-
-  if(!aCoincident.get()) {
-    return false;
-  }
-
-  std::set<FeaturePtr> aCoinsides;
-  SketchPlugin_Tools::findCoincidences(aCoincident,
-                                       SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                       aCoinsides);
-  SketchPlugin_Tools::findCoincidences(aCoincident,
-                                       SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                       aCoinsides);
-  // Remove points
-  std::set<FeaturePtr> aNewLines;
-  for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
-    if((*anIt)->getKind() != SketchPlugin_Point::ID()) {
-      aNewLines.insert(*anIt);
-    }
-  }
-  aCoinsides = aNewLines;
-
-  // Remove auxilary lines
-  if(aCoinsides.size() > 2) {
-    aNewLines.clear();
-    for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
-      if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
-        aNewLines.insert(*anIt);
-      }
-    }
-    aCoinsides = aNewLines;
-  }
-
-  if(aCoinsides.size() != 2) {
-    return false;
-  }
-
-  // Check that lines not collinear
-  std::set<FeaturePtr>::iterator anIt = aCoinsides.begin();
-  FeaturePtr aFirstFeature = *anIt++;
-  FeaturePtr aSecondFeature = *anIt;
-  if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
-    std::string aStartAttr = SketchPlugin_Line::START_ID();
-    std::string anEndAttr = SketchPlugin_Line::END_ID();
-    std::shared_ptr<GeomAPI_Pnt2d> aFirstStartPnt, aFirstEndPnt, aSecondStartPnt, aSecondEndPnt;
-    aFirstStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(aStartAttr))->pnt();
-    aFirstEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
-    aSecondStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(aStartAttr))->pnt();
-    aSecondEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(anEndAttr))->pnt();
-    double aCheck1 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondStartPnt->y() - aFirstStartPnt->y()) -
-      (aSecondStartPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
-    double aCheck2 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondEndPnt->y() - aFirstStartPnt->y()) -
-      (aSecondEndPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
-    if(aCheck1 < 1.e-7 && aCheck2 < 1.e-7) {
-      return false;
     }
   }
 
