@@ -52,8 +52,26 @@ std::string getFeatureError(const FeaturePtr& theFeature)
   if (anError.empty()) {
     bool isDone = ( theFeature->data()->execState() == ModelAPI_StateDone
                  || theFeature->data()->execState() == ModelAPI_StateMustBeUpdated );
-    if (!isDone)
+    if (!isDone) {
       anError = toString(theFeature->data()->execState());
+      // If the feature is Composite and error is StateInvalidArgument,
+      // error text should include error of first invalid sub-feature. Otherwise
+      // it is not clear what is the reason of the invalid argument.
+      if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument) {
+        CompositeFeaturePtr aComposite =
+                    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+        if (aComposite) {
+          for (int i = 0, aSize = aComposite->numberOfSubs(); i < aSize; i++) {
+            FeaturePtr aSubFeature = aComposite->subFeature(i);
+            std::string aSubFeatureError = getFeatureError(aSubFeature);
+            if (!aSubFeatureError.empty()) {
+              anError = anError + " in " + aSubFeature->getKind() + ".\n" + aSubFeatureError;
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 
   return anError;
