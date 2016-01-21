@@ -16,6 +16,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Data.h>
@@ -103,6 +104,10 @@ class Model_Data : public ModelAPI_Data
   /// Returns the attribute that contains list of references to features
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeRefList>
     reflist(const std::string& theID);
+  /// Returns the attribute that contains list of references to features
+  /// or reference to an attribute of a feature
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeRefAttrList>
+    refattrlist(const std::string& theID);
   /// Returns the attribute that contains boolean value
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeBoolean>
     boolean(const std::string& theID);

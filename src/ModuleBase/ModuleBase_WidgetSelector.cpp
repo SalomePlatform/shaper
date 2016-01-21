@@ -151,17 +151,6 @@ bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPr
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  ObjectPtr anObject;
-  GeomShapePtr aShape;
-  getGeomSelection(thePrs, anObject, aShape);
-
-  setObject(anObject, aShape);
-  return true;
-}
-
-//********************************************************************
 void ModuleBase_WidgetSelector::deactivate()
 {
   ModuleBase_ModelWidget::deactivate();

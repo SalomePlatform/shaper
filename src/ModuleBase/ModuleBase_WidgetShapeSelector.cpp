@@ -111,25 +111,24 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
                                                GeomShapePtr theShape)
 {
   DataPtr aData = myFeature->data();
-  AttributeReferencePtr aRef = aData->reference(attributeID());
-  if (aRef) {
+  std::string aType = aData->attribute(attributeID())->attributeType();
+  if (aType == ModelAPI_AttributeReference::typeId()) {
+    AttributeReferencePtr aRef = aData->reference(attributeID());
     ObjectPtr aObject = aRef->value();
     if (!(aObject && aObject->isSame(theSelectedObject))) {
       aRef->setValue(theSelectedObject);
     }
-  } else {
+  } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    if (aRefAttr) {
-      ObjectPtr aObject = aRefAttr->object();
-      if (!(aObject && aObject->isSame(theSelectedObject))) {
-        aRefAttr->setObject(theSelectedObject);
-      }
-    } else {
-      AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-      if (aSelectAttr.get() != NULL) {
-        aSelectAttr->setValue(aResult, theShape);
-      }
+    ObjectPtr aObject = aRefAttr->object();
+    if (!(aObject && aObject->isSame(theSelectedObject))) {
+      aRefAttr->setObject(theSelectedObject);
+    }
+  } else if (aType == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
+    if (aSelectAttr.get() != NULL) {
+      aSelectAttr->setValue(aResult, theShape);
     }
   }
 }
@@ -274,4 +273,15 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
     if (!myIsObject)
       aRefAttr->setAttr(myRefAttribute);
   }
+}
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+{
+  ObjectPtr anObject;
+  GeomShapePtr aShape;
+  getGeomSelection(thePrs, anObject, aShape);
+
+  setObject(anObject, aShape);
+  return true;
 }

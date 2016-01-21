@@ -60,7 +60,7 @@ class Model_AttributeRefAttrList : public ModelAPI_AttributeRefAttrList
   MODEL_EXPORT virtual AttributePtr attribute(const int theIndex) const;
 
   /// Removes the last element in the list.
-  MODEL_EXPORT virtual void removeLast() = 0;
+  MODEL_EXPORT virtual void removeLast();
 
   /// Removes the elements from the list.
   /// \param theIndices a list of indices of elements to be removed

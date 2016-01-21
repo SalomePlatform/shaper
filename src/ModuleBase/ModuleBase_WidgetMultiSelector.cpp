@@ -247,9 +247,8 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
   AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr =
+    AttributeRefAttrListPtr aRefAttrListAttr = 
                  std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(anAttribute);
-
     bool isDone = false;
     if (!thePrs.shape().IsNull()) {
       GeomShapePtr aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
@@ -261,15 +260,21 @@ bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerP
         isDone = true;
       }
     }
-    if (!isDone)
-      ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
+    if (!isDone) {
+      //ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
+      ObjectPtr anObject;
+      GeomShapePtr aShape;
+      getGeomSelection(thePrs, anObject, aShape);
+      setObject(anObject, aShape);
+    }
   }
   else {
-    ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
-    /*ObjectPtr anObject;
+    //ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
+
+    ObjectPtr anObject;
     GeomShapePtr aShape;
     getGeomSelection(thePrs, anObject, aShape);
-    setObject(anObject, aShape);*/
+    setObject(anObject, aShape);
   }
   return true;
 }

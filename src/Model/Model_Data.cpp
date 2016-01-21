@@ -11,6 +11,7 @@
 #include <Model_AttributeReference.h>
 #include <Model_AttributeRefAttr.h>
 #include <Model_AttributeRefList.h>
+#include <Model_AttributeRefAttrList.h>
 #include <Model_AttributeBoolean.h>
 #include <Model_AttributeString.h>
 #include <Model_AttributeSelection.h>
@@ -146,6 +147,8 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr = new Model_AttributeRefAttr(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeRefList::typeId()) {
     anAttr = new Model_AttributeRefList(anAttrLab);
+  } else if (theAttrType == ModelAPI_AttributeRefAttrList::typeId()) {
+    anAttr = new Model_AttributeRefAttrList(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeIntArray::typeId()) {
     anAttr = new Model_AttributeIntArray(anAttrLab);
   } 
@@ -202,6 +205,7 @@ GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeSelection, selection);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeSelectionList, selectionList);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttr, refattr);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefList, reflist);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttrList, refattrlist);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeIntArray, intArray);
 
 std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
@@ -524,6 +528,15 @@ void Model_Data::referencesToObjects(
           ModelAPI_AttributeSelectionList>(anAttr->second);
       for(int a = aRef->size() - 1; a >= 0; a--) {
         aReferenced.push_back(aRef->value(a)->context());
+      }
+    } else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
+      std::shared_ptr<ModelAPI_AttributeRefAttrList> aRefAttr = std::dynamic_pointer_cast<
+          ModelAPI_AttributeRefAttrList>(anAttr->second);
+      std::list<std::pair<ObjectPtr, AttributePtr> > aRefs = aRefAttr->list();
+      std::list<std::pair<ObjectPtr, AttributePtr> >::const_iterator anIt = aRefs.begin(),
+                                                                     aLast = aRefs.end();
+      for (; anIt != aLast; anIt++) {
+        aReferenced.push_back(anIt->first);
       }
     } else if (aType == ModelAPI_AttributeInteger::typeId()) { // integer attribute
       AttributeIntegerPtr anAttribute =

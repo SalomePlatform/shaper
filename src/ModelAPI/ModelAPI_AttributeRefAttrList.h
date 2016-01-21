@@ -43,8 +43,7 @@ class ModelAPI_AttributeRefAttrList : public ModelAPI_Attribute
   virtual void clear() = 0;
 
   /// Returns number of features in the list
-  ///\param theWithEmpty if it is false, returns the number of not-empty referenced objects
-  virtual int size(const bool theWithEmpty = true) const = 0;
+  virtual int size() const = 0;
 
   /// Returns the list of features and attributes (if it is reference to the attribute)
   virtual std::list<std::pair<ObjectPtr, AttributePtr> > list() = 0;

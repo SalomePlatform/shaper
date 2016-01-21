@@ -104,6 +104,10 @@ Q_OBJECT
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const;
 
+  /// Fills the attribute with the value of the selected owner
+  /// \param thePrs a selected owner
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+
   /// Store the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
   /// \param theSelectedObject an object

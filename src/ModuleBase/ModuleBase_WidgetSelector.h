@@ -51,10 +51,6 @@ Q_OBJECT
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
-  /// Fills the attribute with the value of the selected owner
-  /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
