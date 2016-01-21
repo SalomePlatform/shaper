@@ -18,7 +18,7 @@
 #include <ModelAPI_Feature.h>
 #include <SketchPlugin_Constraint.h>
 
-
+class SketchSolver_ConstraintDistance;
 typedef std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > CoincidentPointsMap;
 
 
@@ -213,6 +213,9 @@ protected:
   std::map<AttributePtr, EntityWrapperPtr>                  myAttributeMap;
 
   CoincidentPointsMap myCoincidentPoints; ///< lists of coincident points (first is a master point, second is a set of slaves)
+
+  // to be able to update entities from constraints
+  friend class SketchSolver_ConstraintDistance;
 };
 
 typedef std::shared_ptr<SketchSolver_Storage> StoragePtr;

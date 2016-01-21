@@ -974,12 +974,10 @@ bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     return true;
 
   bool isFullyRemoved = removeConstraint((Slvs_hConstraint)aConstraint->id());
-  isFullyRemoved = SketchSolver_Storage::remove(theConstraint) && isFullyRemoved;
-
   // remove point-point coincidence
   if (aConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT)
     isFullyRemoved = removeCoincidence(theConstraint) && isFullyRemoved;
-  return isFullyRemoved;
+  return SketchSolver_Storage::remove(theConstraint) && isFullyRemoved;
 }
 
 bool SolveSpaceSolver_Storage::remove(EntityWrapperPtr theEntity)
@@ -1013,7 +1011,7 @@ bool SolveSpaceSolver_Storage::remove(EntityWrapperPtr theEntity)
   std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theEntity);
   bool isFullyRemoved = isCoincide ? true : removeEntity((Slvs_hEntity)anEntity->id());
-  return SketchSolver_Storage::remove(theEntity) && isFullyRemoved;
+  return (SketchSolver_Storage::remove(theEntity) || isCoincide) && isFullyRemoved;
 }
 
 bool SolveSpaceSolver_Storage::remove(ParameterWrapperPtr theParameter)

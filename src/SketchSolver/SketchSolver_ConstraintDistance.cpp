@@ -32,13 +32,23 @@ void SketchSolver_ConstraintDistance::getAttributes(
 
 void SketchSolver_ConstraintDistance::adjustConstraint()
 {
-  // Adjust point-line distance
-  if (getType() != CONSTRAINT_PT_LINE_DISTANCE)
-    return;
-
-  // Check the sign of distance is changed
   ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
+
+  // Adjust point-point distance if the points are equal
+  if (getType() == CONSTRAINT_PT_PT_DISTANCE) {
+    const std::list<EntityWrapperPtr>& aSubs = aConstraint->entities();
+    if (aSubs.front()->isEqual(aSubs.back())) {
+      // Change X coordinate of second point to eliminate coincidence
+      ParameterWrapperPtr aX = aSubs.back()->parameters().front();
+      aX->setValue(aX->value() + 1.0);
+      myStorage->update(aX);
+    }
+    return;
+  }
+
+  // Adjust point-line distance
   if (fabs(myPrevValue) == fabs(aConstraint->value())) {
+    // sign of distance is not changed
     aConstraint->setValue(myPrevValue);
     myStorage->addConstraint(myBaseConstraint, aConstraint);
     return;
