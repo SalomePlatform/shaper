@@ -50,6 +50,7 @@
 %shared_ptr(ModelAPI_AttributeReference)
 %shared_ptr(ModelAPI_AttributeRefAttr)
 %shared_ptr(ModelAPI_AttributeRefList)
+%shared_ptr(ModelAPI_AttributeRefAttrList)
 %shared_ptr(ModelAPI_AttributeBoolean)
 %shared_ptr(ModelAPI_AttributeSelection)
 %shared_ptr(ModelAPI_AttributeSelectionList)
@@ -85,6 +86,7 @@
 %include "ModelAPI_AttributeSelection.h"
 %include "ModelAPI_AttributeSelectionList.h"
 %include "ModelAPI_AttributeRefList.h"
+%include "ModelAPI_AttributeRefAttrList.h"
 %include "ModelAPI_Validator.h"
 %include "ModelAPI_AttributeValidator.h"
 %include "ModelAPI_FeatureValidator.h"
@@ -128,3 +130,4 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_AttributeSelection)     shared_ptr_cast<ModelAPI_AttributeSelection, ModelAPI_Attribute>;
 %template(modelAPI_AttributeSelectionList) shared_ptr_cast<ModelAPI_AttributeSelectionList, ModelAPI_Attribute>;
 %template(modelAPI_AttributeRefList)       shared_ptr_cast<ModelAPI_AttributeRefList, ModelAPI_Attribute>;
+%template(modelAPI_AttributeRefAttrList)   shared_ptr_cast<ModelAPI_AttributeRefAttrList, ModelAPI_Attribute>;

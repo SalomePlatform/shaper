@@ -32,6 +32,7 @@
   #include "ModelAPI_Validator.h"
   #include "ModelAPI_FeatureValidator.h"
   #include "ModelAPI_AttributeRefList.h"
+  #include "ModelAPI_AttributeRefAttrList.h"
   #include "ModelAPI_AttributeBoolean.h"
   #include "ModelAPI_Result.h"
   #include "ModelAPI_ResultConstruction.h"
