@@ -242,44 +242,6 @@ void ModuleBase_WidgetMultiSelector::storeAttributeValue()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
-  std::string aType = anAttribute->attributeType();
-  if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = 
-                 std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(anAttribute);
-    bool isDone = false;
-    if (!thePrs.shape().IsNull()) {
-      GeomShapePtr aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
-      aGeomShape->setImpl(new TopoDS_Shape(thePrs.shape()));
-
-      AttributePtr anAttribute = myWorkshop->module()->findAttribute(thePrs.object(), aGeomShape);
-      if (anAttribute.get()) {
-        aRefAttrListAttr->append(anAttribute);
-        isDone = true;
-      }
-    }
-    if (!isDone) {
-      //ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
-      ObjectPtr anObject;
-      GeomShapePtr aShape;
-      getGeomSelection(thePrs, anObject, aShape);
-      setObject(anObject, aShape);
-    }
-  }
-  else {
-    //ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
-
-    ObjectPtr anObject;
-    GeomShapePtr aShape;
-    getGeomSelection(thePrs, anObject, aShape);
-    setObject(anObject, aShape);
-  }
-  return true;
-}
-
-//********************************************************************
 void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
 {
   ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
@@ -354,9 +316,14 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
     aRefListAttr->append(theSelectedObject);
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    //AttributeRefAttrListPtr aRefAttrListAttr =
-    //             std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(anAttribute);
-    //aRefAttrListAttr->clear();
+    AttributeRefAttrListPtr aRefAttrListAttr =
+                 std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(anAttribute);
+
+    AttributePtr anAttribute = myWorkshop->module()->findAttribute(theSelectedObject, theShape);
+    if (anAttribute.get())
+      aRefAttrListAttr->append(anAttribute);
+    else
+      aRefAttrListAttr->append(theSelectedObject);
   }
 }
 

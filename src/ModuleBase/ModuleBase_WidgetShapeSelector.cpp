@@ -12,6 +12,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Filter.h>
+#include <ModuleBase_IModule.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
@@ -120,9 +121,15 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
     }
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    ObjectPtr aObject = aRefAttr->object();
-    if (!(aObject && aObject->isSame(theSelectedObject))) {
-      aRefAttr->setObject(theSelectedObject);
+
+    AttributePtr anAttribute = myWorkshop->module()->findAttribute(theSelectedObject, theShape);
+    if (anAttribute.get())
+      aRefAttr->setAttr(anAttribute);
+    else {
+      ObjectPtr aObject = aRefAttr->object();
+      if (!(aObject && aObject->isSame(theSelectedObject))) {
+        aRefAttr->setObject(theSelectedObject);
+      }
     }
   } else if (aType == ModelAPI_AttributeSelection::typeId()) {
     AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
@@ -273,15 +280,4 @@ void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
     if (!myIsObject)
       aRefAttr->setAttr(myRefAttribute);
   }
-}
-
-//********************************************************************
-bool ModuleBase_WidgetShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
-{
-  ObjectPtr anObject;
-  GeomShapePtr aShape;
-  getGeomSelection(thePrs, anObject, aShape);
-
-  setObject(anObject, aShape);
-  return true;
 }

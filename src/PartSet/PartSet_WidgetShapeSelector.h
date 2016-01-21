@@ -48,13 +48,6 @@ protected:
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
 
-  /// Store the values to the model attribute of the widget. It casts this attribute to
-  /// the specific type and set the given values
-  /// \param theSelectedObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
-
   /// Return an object and geom shape by the viewer presentation
   /// \param thePrs a selection
   /// \param theObject an output object
@@ -75,12 +68,6 @@ protected:
   /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
   void restoreAttributeValue(const bool theValid);
-
-  /// Found the sketch point attribute by the shape and set it in the feature attribute
-  /// otherwise set the selected object
-  /// \param theSelectedObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  void setPointAttribute(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
 protected:
   /// A reference to external objects manager

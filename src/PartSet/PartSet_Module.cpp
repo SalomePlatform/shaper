@@ -1046,9 +1046,23 @@ GeomShapePtr PartSet_Module::findShape(const AttributePtr& theAttribute)
 AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
                                            const GeomShapePtr& theGeomShape)
 {
-  TopoDS_Shape aTDSShape = theGeomShape->impl<TopoDS_Shape>();
-  return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape, 
-                                                      mySketchMgr->activeSketch());
+  AttributePtr anAttribute;
+  GeomShapePtr aGeomShape = theGeomShape;
+  if (!aGeomShape.get()) {
+    // processing shape of result, e.g. sketch circle center is selected, this is a result
+    // the geom shape is empty, the shape of result should be used
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get()) {
+      aGeomShape = aResult->shape();
+    }
+  }
+
+  if (aGeomShape.get()) {
+    TopoDS_Shape aTDSShape = aGeomShape->impl<TopoDS_Shape>();
+    return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape, 
+                                                 mySketchMgr->activeSketch());
+  }
+  return anAttribute;
 }
 
 //******************************************************

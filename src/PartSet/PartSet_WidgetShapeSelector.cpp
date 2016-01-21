@@ -53,28 +53,6 @@ bool PartSet_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_Viewer
   return aValid;
 }
 
-//********************************************************************
-void PartSet_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape)
-{
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theSelectedObject);
-  // Do check using of external feature
-  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  // Processing of sketch object
-  if (aSPFeature.get() != NULL) {
-    GeomShapePtr aShape = theShape;
-    if (!aShape.get()) {
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-      if (aResult.get()) {
-        aShape = aResult->shape();
-      }
-    }
-    setPointAttribute(theSelectedObject, aShape);
-  }
-  else
-    ModuleBase_WidgetShapeSelector::setObject(theSelectedObject, theShape);
-}
-
 void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
                                                    ObjectPtr& theObject,
                                                    GeomShapePtr& theShape)
@@ -118,39 +96,3 @@ void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
   myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 }
 
-//********************************************************************
-void PartSet_WidgetShapeSelector::setPointAttribute(ObjectPtr theSelectedObject, GeomShapePtr theShape)
-{
-  DataPtr aData = myFeature->data();
-  AttributePtr aAttr = aData->attribute(attributeID());
-  AttributeRefAttrPtr aRefAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
-  if (aRefAttr) {
-    // it is possible that the point feature is selected. It should be used itself
-    // instead of searching an attribute for the shape
-    bool aShapeIsResult = false;
-    /*ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-    if (aResult.get() != NULL) {
-      GeomShapePtr aShapePtr = aResult->shape();
-      // it is important to call isEqual of the shape of result.
-      // It is a GeomAPI_Vertex shape for the point. The shape of the parameter is 
-      // GeomAPI_Shape. It is important to use the realization of the isEqual method from
-      // GeomAPI_Vertex class
-      aShapeIsResult = aShapePtr.get() != NULL && aShapePtr->isEqual(theShape);
-    }*/
-
-    AttributePtr aPntAttr;
-    if (!aShapeIsResult) {
-      TopoDS_Shape aTDSShape = theShape->impl<TopoDS_Shape>();
-      aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theSelectedObject, aTDSShape, mySketch);
-    }
-    // this is an alternative, whether the attribute should be set or object in the attribute
-    // the first check is the attribute because the object already exist
-    // the object is set only if there is no selected attribute
-    // test case is - preselection for distance operation, which contains two points selected on lines
-    if (aPntAttr)
-      aRefAttr->setAttr(aPntAttr);
-    else
-      aRefAttr->setObject(theSelectedObject);
-  }
-}
