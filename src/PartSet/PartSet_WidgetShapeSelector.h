@@ -56,13 +56,6 @@ protected:
                                 ObjectPtr& theObject,
                                 GeomShapePtr& theShape);
 
-  /// Get the shape from the attribute if the attribute contain a shape
-  /// It processes the ref attr type of attributes. It obtains the referenced attribute,
-  /// results of the attribute feature. And it founds a vertes in the owners of the results
-  /// If the vertex is found, it creates a geom shape on it.
-  /// \return a shape
-  virtual GeomShapePtr getShape() const;
-
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute

@@ -13,11 +13,8 @@
 #include <ModuleBase_Definitions.h>
 #include <Config_WidgetAPI.h>
 
-#include <PartSet_Tools.h>
 #include <PartSet_ExternalObjectsMgr.h>
 #include <SketchPlugin_Feature.h>
-
-#include <SketchPlugin_ConstraintRigid.h>
 
 #include <XGUI_Workshop.h>
 
@@ -25,8 +22,6 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_Selection.h>
-#include <SelectMgr_IndexedMapOfOwner.hxx>
-#include <StdSelect_BRepOwner.hxx>
 
 PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
@@ -74,19 +69,6 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
     if (aShape.get() != NULL && !aShape->isNull())
       theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
   }
-}
-
-//********************************************************************
-GeomShapePtr PartSet_WidgetShapeSelector::getShape() const
-{
-  // an empty shape by default
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = aData->attribute(attributeID());
-  GeomShapePtr aShape = PartSet_Tools::findShapeBy2DPoint(anAttribute, myWorkshop);
-
-  if (!aShape.get())
-    aShape = ModuleBase_WidgetShapeSelector::getShape();
-  return aShape;
 }
 
 //********************************************************************

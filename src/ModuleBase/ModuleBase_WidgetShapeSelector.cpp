@@ -208,9 +208,15 @@ GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
   if (!aData->isValid())
     return aShape;
 
-  AttributeSelectionPtr aSelect = aData->selection(attributeID());
-  if (aSelect)
-    aShape = aSelect->value();
+  std::string aType = aData->attribute(attributeID())->attributeType();
+  if (aType == ModelAPI_AttributeReference::typeId()) {
+  } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+    aShape = myWorkshop->module()->findShape(aRefAttr);
+  } else if (aType == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
+    aShape = aSelectAttr->value();
+  }
 
   return aShape;
 }
