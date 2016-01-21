@@ -115,13 +115,57 @@ void SketchSolver_Constraint::process()
 void SketchSolver_Constraint::update()
 {
   cleanErrorMsg();
-
   std::list<ConstraintWrapperPtr> aWrapper = myStorage->constraint(myBaseConstraint);
+  std::list<ConstraintWrapperPtr>::iterator aWIt = aWrapper.begin();
+
+  // Check if attributes of constraint are changed, rebuild constraint
+  std::set<AttributePtr> anAttributes;
+  std::set<AttributePtr>::iterator aFoundAttr;
+  std::set<FeaturePtr> aFeatures;
+  std::set<FeaturePtr>::iterator aFoundFeat;
+  for (int anEntIndex = 0; anEntIndex < 4; ++anEntIndex) {
+    AttributePtr anAttr =
+        myBaseConstraint->attribute(SketchPlugin_Constraint::ATTRIBUTE(anEntIndex));
+    if (!anAttr)
+      continue;
+
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
+    if (aRefAttr) {
+      if (aRefAttr->isObject()) {
+        FeaturePtr aFeat = ModelAPI_Feature::feature(aRefAttr->object());
+        aFeatures.insert(aFeat);
+      } else
+        anAttributes.insert(aRefAttr->attr());
+    } else
+      anAttributes.insert(anAttr);
+  }
+  bool hasNewAttr = !(anAttributes.empty() && aFeatures.empty());
+  for (; hasNewAttr && aWIt != aWrapper.end(); ++ aWIt) {
+    const std::list<EntityWrapperPtr>& aSubs = (*aWIt)->entities();
+    std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
+    for (; hasNewAttr && aSIt != aSubs.end(); ++aSIt) {
+      if ((*aSIt)->baseAttribute()) {
+        aFoundAttr = anAttributes.find((*aSIt)->baseAttribute());
+        if (aFoundAttr != anAttributes.end())
+          anAttributes.erase(aFoundAttr);
+      } else {
+        aFoundFeat = aFeatures.find((*aSIt)->baseFeature());
+        if (aFoundFeat != aFeatures.end())
+          aFeatures.erase(aFoundFeat);
+      }
+      hasNewAttr = !(anAttributes.empty() && aFeatures.empty());
+    }
+  }
+  if (hasNewAttr) {
+    remove();
+    process();
+    return;
+  }
+
   AttributeDoublePtr aValueAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::VALUE()));
   if (aValueAttr) {
-    std::list<ConstraintWrapperPtr>::iterator aWIt = aWrapper.begin();
-    for (; aWIt != aWrapper.end(); ++aWIt)
+    for (aWIt = aWrapper.begin(); aWIt != aWrapper.end(); ++aWIt)
       if (fabs((*aWIt)->value() - aValueAttr->value()) > tolerance) {
         (*aWIt)->setValue(aValueAttr->value());
         myStorage->setNeedToResolve(true);

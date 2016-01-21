@@ -165,5 +165,13 @@ aDistance.setValue(PT_LINE_DIST)
 aSession.finishOperation()
 assert (distancePointLine(aSketchPointCoords, aSketchLine) == PT_LINE_DIST)
 #=========================================================================
+# Set distance between line boundaries
+#=========================================================================
+aSession.startOperation()
+refattrA.setAttr(aLineAStartPoint)
+refattrB.setAttr(aLineAEndPoint)
+aSession.finishOperation()
+assert (distancePointPoint(aLineAStartPoint, aLineAEndPoint) != PT_LINE_DIST)
+#=========================================================================
 # End of test
 #=========================================================================
