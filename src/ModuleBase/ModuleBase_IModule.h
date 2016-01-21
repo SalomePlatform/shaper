@@ -7,6 +7,9 @@
 #include "ModuleBase_IWorkshop.h"
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Attribute.h>
+
+#include <GeomAPI_Shape.h>
 
 #include <QString>
 #include <QObject>
@@ -236,6 +239,18 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Performs some GUI actions before an operation transaction is stopped
   /// Default realization is empty
   virtual void beforeOperationStopped(ModuleBase_Operation* theOperation) {};
+
+  /// Finds a shape by attribute if it is possible
+  /// \param theAttribute an attribute
+  /// \return a geom shape
+  virtual GeomShapePtr findShape(const AttributePtr& theAttribute) = 0;
+
+  /// Finds an attribute by geom shape if it is possible
+  /// \param theObject an object of the attribute
+  /// \param theGeomShape a geom shape
+  /// \return theAttribute
+  virtual AttributePtr findAttribute(const ObjectPtr& theObject,
+                                     const GeomShapePtr& theGeomShape) = 0;
 
 signals:
   /// Signal which is emitted when operation is launched

@@ -1031,6 +1031,27 @@ void PartSet_Module::beforeOperationStopped(ModuleBase_Operation* theOperation)
 }
 
 //******************************************************
+GeomShapePtr PartSet_Module::findShape(const AttributePtr& theAttribute)
+{
+  GeomShapePtr aGeomShape;
+
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if (anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
+    aGeomShape = PartSet_Tools::findShapeBy2DPoint(theAttribute, myWorkshop);
+  }
+  return aGeomShape;
+}
+
+//******************************************************
+AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
+                                           const GeomShapePtr& theGeomShape)
+{
+  TopoDS_Shape aTDSShape = theGeomShape->impl<TopoDS_Shape>();
+  return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape, 
+                                                      mySketchMgr->activeSketch());
+}
+
+//******************************************************
 void PartSet_Module::onBooleanOperationChange(int theOperation)
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();

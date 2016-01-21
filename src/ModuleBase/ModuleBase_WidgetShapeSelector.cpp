@@ -231,12 +231,8 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
       AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
       if (aRefAttr && aRefAttr->attr().get() != NULL) {
         //myIsObject = aRefAttr->isObject();
-        AttributePtr anAttr = aRefAttr->attr();
-        if (anAttr.get() != NULL) {
-          std::stringstream aName;
-          aName <<anAttr->owner()->data()->name()<<"/"<<anAttr->id();
-          myTextLine->setText(QString::fromStdString(aName.str()));
-        }
+        std::string anAttrName = generateName(aRefAttr->attr());
+        myTextLine->setText(QString::fromStdString(anAttrName));
       }
       else {
         myTextLine->setText(getDefaultValue().c_str());

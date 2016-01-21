@@ -116,6 +116,10 @@ protected:
   /// parameters of the current attribute
   virtual void storeAttributeValue();
 
+  /// Fills the attribute with the value of the selected owner
+  /// \param thePrs a selected owner
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+
   /// Clear attribute
   virtual void clearAttribute();
 

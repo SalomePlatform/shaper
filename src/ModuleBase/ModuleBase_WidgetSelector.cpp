@@ -170,3 +170,14 @@ void ModuleBase_WidgetSelector::deactivate()
   ModuleBase_ModelWidget::deactivate();
 }
 
+//********************************************************************
+std::string ModuleBase_WidgetSelector::generateName(const AttributePtr& theAttribute)
+{
+  std::string aName;
+  if (theAttribute.get() != NULL) {
+    std::stringstream aStreamName;
+    aStreamName << theAttribute->owner()->data()->name() << "/"<< theAttribute->id();
+    aName = aStreamName.str();
+  }
+  return aName;
+}

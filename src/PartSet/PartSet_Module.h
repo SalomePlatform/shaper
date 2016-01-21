@@ -244,6 +244,17 @@ public:
   /// Default realization is empty
   virtual void beforeOperationStopped(ModuleBase_Operation* theOperation);
 
+  /// Finds a shape by attribute if it is possible
+  /// \param theAttribute an attribute
+  /// \return a geom shape
+  virtual GeomShapePtr findShape(const AttributePtr& theAttribute);
+
+  /// Finds an attribute by geom shape if it is possible
+  /// \param theObject an object of the attribute
+  /// \param theGeomShape a geom shape
+  /// \return theAttribute
+  virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
