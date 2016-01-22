@@ -85,7 +85,7 @@ bool PartSet_CustomPrs::displayPresentation(
   // update the AIS objects content
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation(theFlag);
   // do nothing if the feature can not be displayed [is moved from presentation, to be checked]
-  if (!myFeature.get() || !myWorkshop->module()->canDisplayObject(myFeature))
+  if (!myFeature.get())
     return isModified;
 
   switch (theFlag) {
@@ -105,7 +105,9 @@ bool PartSet_CustomPrs::displayPresentation(
   // redisplay AIS objects
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->IsDisplayed(anOperationPrs)) {
-    if (anOperationPrs->hasShapes()) {
+    // when the feature can not be visualized in the module, the operation preview should not
+    // be visualized also
+    if (anOperationPrs->hasShapes() && myWorkshop->module()->canDisplayObject(myFeature)) {
       // set color here because it can be changed in preferences
       Quantity_Color aShapeColor = getShapeColor(theFlag);
       anOperationPrs->setShapeColor(aShapeColor);
@@ -119,7 +121,9 @@ bool PartSet_CustomPrs::displayPresentation(
     }
   }
   else {
-    if (!anOperationPrs->hasShapes()) {
+    // when the feature can not be visualized in the module, the operation preview should not
+    // be visualized also
+    if (!anOperationPrs->hasShapes() || !myWorkshop->module()->canDisplayObject(myFeature)) {
       erasePresentation(theFlag, theUpdateViewer);
       isModified = true;
     }
