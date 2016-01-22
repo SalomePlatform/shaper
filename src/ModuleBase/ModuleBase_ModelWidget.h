@@ -213,8 +213,9 @@ signals:
   void afterValuesRestored();
 
   /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theObject a sender of the event
   /// \param theEvent key release event
-  void keyReleased(QKeyEvent* theEvent);
+  void keyReleased(QObject* theObject, QKeyEvent* theEvent);
 
   /// The signal is emitted if the enter is clicked in the control of the widget
   void enterClicked();

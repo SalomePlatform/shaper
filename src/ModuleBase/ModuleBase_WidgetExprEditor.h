@@ -62,8 +62,9 @@ signals:
   void valueModified();
 
   /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theObject a sender of the event
   /// \param theEvent key release event
-  void keyReleased(QKeyEvent* theEvent);
+  void keyReleased(QObject* theObject, QKeyEvent* theEvent);
 
  protected:
   /// Perform completion by prefix

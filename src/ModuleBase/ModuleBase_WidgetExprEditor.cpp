@@ -135,7 +135,7 @@ void ExpressionEditor::keyPressEvent(QKeyEvent* theEvent)
     switch (theEvent->key()) {
       case Qt::Key_Enter:
       case Qt::Key_Return:
-        emit keyReleased(theEvent);
+        emit keyReleased(this, theEvent);
         // do not react to the Enter key, the property panel processes it
         return;
       break;
@@ -228,7 +228,8 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
   this->setLayout(aMainLay);
 
   connect(myEditor, SIGNAL(valueModified()), this, SIGNAL(valuesModified()));
-  connect(myEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
+  connect(myEditor, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
+          this, SIGNAL(keyReleased(QObject*, QKeyEvent*)));
 }
 
 ModuleBase_WidgetExprEditor::~ModuleBase_WidgetExprEditor()

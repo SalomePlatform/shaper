@@ -80,6 +80,7 @@ Q_OBJECT
   ModuleBase_Operation* previousOperation(ModuleBase_Operation* theOperation) const;
 
   /// Redefinition of virtual function
+  /// \param theObject a sender of the event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
   /// Start the operation and append it to the stack of operations
@@ -159,8 +160,8 @@ protected: // TEMPORARY
 
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
-  /// \param theEvent the mouse event
   /// \param theObject a sender of the event
+  /// \param theEvent the mouse event
   bool onKeyReleased(QObject *theObject, QKeyEvent* theEvent);
 
   /// The functionaly, that should be done by delete click

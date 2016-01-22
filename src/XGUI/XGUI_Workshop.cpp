@@ -1060,8 +1060,8 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
-  connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)),
-          myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
+  connect(myPropertyPanel, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
+          myOperationMgr,  SLOT(onKeyReleased(QObject*, QKeyEvent*)));
 
   connect(myPropertyPanel, SIGNAL(enterClicked()),
           myOperationMgr,  SLOT(onProcessEnter()));
