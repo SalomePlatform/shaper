@@ -235,15 +235,28 @@ void refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const O
     return;
   theAlreadyProcessed.insert(aFeature);
 
-  // 1. find references in the current document
+  //convert ignore object list to containt sub-features if the composite feature is in the list
+  QObjectPtrList aFullIgnoreList;
+  QObjectPtrList::const_iterator anIIt = theIgnoreList.begin(), anILast = theIgnoreList.end();
+  for (; anIIt != anILast; anIIt++) {
+    aFullIgnoreList.append(*anIIt);
+    CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anIIt);
+    if (aComposite.get()) {
+      int aNbSubs = aComposite->numberOfSubs();
+      for (int aSub = 0; aSub < aNbSubs; aSub++) {
+        aFullIgnoreList.append(aComposite->subFeature(aSub));
+      }
+    }
+  }
 
+  // 1. find references in the current document
   std::set<FeaturePtr> aRefFeatures;
   refsToFeatureInFeatureDocument(theObject, aRefFeatures);
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
     // composite feature should not be deleted when the sub feature is to be deleted
-    if (!isSubOfComposite(theSourceObject, *anIt) && !theIgnoreList.contains(*anIt))
+    if (!isSubOfComposite(theSourceObject, *anIt) && !aFullIgnoreList.contains(*anIt))
       theDirectRefFeatures.insert(*anIt);
   }
 

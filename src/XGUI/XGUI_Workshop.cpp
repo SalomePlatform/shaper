@@ -1217,20 +1217,30 @@ void XGUI_Workshop::cleanHistory()
     return;
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-
-  // 1. find all referenced features
-  QList<ObjectPtr> anUnusedObjects;
-  std::set<FeaturePtr> aDirectRefFeatures;
+  QObjectPtrList aFeatures;
   foreach (ObjectPtr anObject, anObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
     // for parameter result, use the corresponded reature to be removed
     if (!aFeature.get() && anObject->groupName() == ModelAPI_ResultParameter::group()) {
       aFeature = ModelAPI_Feature::feature(anObject);
     }
+    aFeatures.append(aFeature);
+  }
+
+  // 1. find all referenced features
+  QList<ObjectPtr> anUnusedObjects;
+  std::set<FeaturePtr> aDirectRefFeatures;
+  //foreach (ObjectPtr anObject, anObjects) {
+  foreach (ObjectPtr anObject, aFeatures) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    // for parameter result, use the corresponded reature to be removed
+    //if (!aFeature.get() && anObject->groupName() == ModelAPI_ResultParameter::group()) {
+    //  aFeature = ModelAPI_Feature::feature(anObject);
+    //}
     if (aFeature.get()) {
       std::set<FeaturePtr> alreadyProcessed;
       aDirectRefFeatures.clear();
-      XGUI_Tools::refsDirectToFeatureInAllDocuments(aFeature, aFeature, anObjects,
+      XGUI_Tools::refsDirectToFeatureInAllDocuments(aFeature, aFeature, aFeatures,
                                                     aDirectRefFeatures, alreadyProcessed);
       if (aDirectRefFeatures.empty() && !anUnusedObjects.contains(aFeature))
         anUnusedObjects.append(aFeature);
