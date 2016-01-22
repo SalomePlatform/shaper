@@ -144,6 +144,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Make some functionality after the objects are hidden in viewer
+  /// \param theObjects a list of hidden objects
+  virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects) {};
+
   /// Returns true if selection for the object can be activate.
   /// By default a result or feature of the current operation can not be activated
   /// \param theObject a model object

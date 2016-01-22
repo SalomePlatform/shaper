@@ -32,6 +32,8 @@ class ModuleBase_IViewWindow;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class XGUI_OperationMgr;
+class XGUI_Workshop;
+
 class QMouseEvent;
 
 /**
@@ -166,6 +168,11 @@ public:
   /// if it is a sketch operation
   /// \param theObject a model object
   bool canDisplayObject(const ObjectPtr& theObject) const;
+
+  /// Check the given objects either there are some results of the current sketch. If so,
+  /// it suggests to delete them as there are no functionality to show back hidden sketch objects
+  /// \param theObjects a list of hidden objects
+  virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects);
 
   /// Returns true if the mouse is over viewer or property panel value is changed
   /// \return boolean result
@@ -316,6 +323,9 @@ private:
                         const bool isToDisplay, const bool isFlushRedisplay = true);
 
 private:
+  /// Returns current workshop
+  XGUI_Workshop* workshop() const;
+  /// Returns operation manager
   XGUI_OperationMgr* operationMgr() const;
 
 private:

@@ -283,6 +283,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
   bool aFirstVisualizedBody = false;
 
   bool aRedisplayed = false;
+  //std::list<ObjectPtr> aHiddenObjects;
   for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
 
@@ -293,6 +294,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();
     }
+
 #ifdef DEBUG_RESULT_COMPSOLID
     ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aRes.get()) {
@@ -316,6 +318,9 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       }
     #endif
     if (aHide) {
+      //we should provide objects which are hidden in the viewer, e.g. sketch always should visualizes
+      // all sub-features, if some features are to be hidden, sould be proposed may be to removed #1223
+      //aHiddenObjects.push_back(aObj);
       aRedisplayed = aDisplayer->erase(aObj, false) || aRedisplayed;
       #ifdef DEBUG_FEATURE_REDISPLAY
         // Redisplay the visible object or the object of the current operation
@@ -355,6 +360,11 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       }
     }
   }
+  // this processing should be moved in another place in order to do not cause problems in
+  // flush messages chain
+  //if (aHiddenObjects.size() > 0)
+  //  myWorkshop->module()->processHiddenObject(aHiddenObjects);
+
   bool isCustomized = customizeCurrentObject(anObjects, aRedisplayed);
   if (aRedisplayed || isCustomized) {
     //VSV FitAll updated viewer by it self

@@ -77,6 +77,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QCursor>
+#include <QMessageBox>
 
 //#define DEBUG_DO_NOT_BY_ENTER
 
@@ -1160,6 +1161,84 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   return aCanDisplay;
 }
 
+void PartSet_SketcherMgr::processHiddenObject(const std::list<ObjectPtr>& theObjects)
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (getCurrentOperation());
+  if (aFOperation && myCurrentSketch.get()) {
+    // find results of the current operation
+    // these results should not be proposed to be deleted
+    FeaturePtr anOperationFeature = aFOperation->feature();
+    std::list<ResultPtr> anOperationResultList = anOperationFeature->results();
+    std::set<ResultPtr> anOperationResults;
+    std::list<ResultPtr>::const_iterator aRIt = anOperationResultList.begin(),
+                                        aRLast = anOperationResultList.end();
+    for (; aRIt != aRLast; aRIt++)
+      anOperationResults.insert(*aRIt);
+
+    std::set<FeaturePtr> anObjectsToBeDeleted;
+    QStringList anObjectsToBeDeletedNames;
+    std::list<ObjectPtr>::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
+    for (; anIt != aLast; anIt++) {
+      ObjectPtr anObject = *anIt;
+      bool aCanErase = true;
+      // when the sketch operation is active, results of sketch sub-feature can not be hidden
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+      // the result is found between current feature results
+      if (anOperationResults.find(aResult) != anOperationResults.end())
+        continue;
+
+      if (aResult.get()) {
+        // Display sketcher objects
+        for (int i = 0; i < myCurrentSketch->numberOfSubs() && aCanErase; i++) {
+          FeaturePtr aFeature = myCurrentSketch->subFeature(i);
+          std::list<ResultPtr> aResults = aFeature->results();
+          std::list<ResultPtr>::const_iterator anIt;
+          for (anIt = aResults.begin(); anIt != aResults.end() && aCanErase; ++anIt) {
+            aCanErase = *anIt != aResult;
+          }
+        }
+      }
+      if (!aCanErase) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        if (aFeature.get() && anObjectsToBeDeleted.find(aFeature) == anObjectsToBeDeleted.end()) {
+          anObjectsToBeDeleted.insert(aFeature);
+          anObjectsToBeDeletedNames.append(aFeature->name().c_str());
+        }
+      }
+    }
+    if (!anObjectsToBeDeleted.empty()) {
+      QString aFeatureNames = anObjectsToBeDeletedNames.join(", ");
+      QString aMessage = tr("The following features have incorrect presentation and \
+will be hidden: %1. Would you like to delete them?")
+                         .arg(aFeatureNames);
+      int anAnswer = QMessageBox::question(qApp->activeWindow(), tr("Features hide"),
+                                           aMessage, QMessageBox::Ok | QMessageBox::Cancel,
+                                           QMessageBox::Cancel);
+      if (anAnswer == QMessageBox::Ok) {
+        QObjectPtrList anObjects;
+        std::set<FeaturePtr>::const_iterator anIt = anObjectsToBeDeleted.begin(),
+                                             aLast = anObjectsToBeDeleted.end();
+        for (; anIt != aLast; anIt++)
+          anObjects.append(*anIt);
+        SessionPtr aMgr = ModelAPI_Session::get();
+        DocumentPtr aDoc = aMgr->activeDocument();
+        bool aIsOp = aMgr->isOperation();
+        if (!aIsOp)
+          aMgr->startOperation();
+        workshop()->deleteFeatures(anObjects);
+        //static Events_ID aDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+        //static Events_ID aRedispEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        //Events_Loop::loop()->flush(aDeletedEvent);
+        //Events_Loop::loop()->flush(aRedispEvent);
+
+        if (!aIsOp)
+          aMgr->finishOperation();
+      }
+    }
+  }
+}
+
 bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 {
   bool aCanDisplay = myIsMouseOverWindow;
@@ -1485,12 +1564,15 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(bool theState, int theType)
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
-XGUI_OperationMgr* PartSet_SketcherMgr::operationMgr() const
+XGUI_Workshop* PartSet_SketcherMgr::workshop() const
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  return aConnector->workshop();
+}
 
-  return aWorkshop->operationMgr();
+XGUI_OperationMgr* PartSet_SketcherMgr::operationMgr() const
+{
+  return workshop()->operationMgr();
 }
 

@@ -367,6 +367,11 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
   return mySketchMgr->canDisplayObject(theObject);
 }
 
+void PartSet_Module::processHiddenObject(const std::list<ObjectPtr>& theObjects)
+{
+  mySketchMgr->processHiddenObject(theObjects);
+}
+
 bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
 {
   bool aCanActivate = ModuleBase_IModule::canActivateSelection(theObject);

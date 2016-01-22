@@ -1418,7 +1418,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
   }
 
   QString anActionId = "DELETE_CMD";
-  removeFeatures(theList, theIgnoredFeatures, anActionId);
+  return removeFeatures(theList, theIgnoredFeatures, anActionId);
 }
 
 //**************************************************************
