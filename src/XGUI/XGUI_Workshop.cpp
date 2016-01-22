@@ -1179,9 +1179,6 @@ void XGUI_Workshop::deleteObjects()
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   if (!abortAllOperations())
     return;
-  // It is necessary to clear selection in order to avoid selection changed event during
-  // deletion and negative consequences connected with processing of already deleted items
-  mySelector->clearSelection();
   // check whether the object can be deleted. There should not be parts which are not loaded
   if (!XGUI_Tools::canRemoveOrRename(desktop(), anObjects))
     return;
@@ -1202,11 +1199,20 @@ void XGUI_Workshop::deleteObjects()
 
   // 3. delete objects
   std::set<FeaturePtr> anIgnoredFeatures;
-  if (deleteFeatures(anObjects, anIgnoredFeatures, desktop(), true)) {
-    operationMgr()->commitOperation();
-  }
-  else {
-    operationMgr()->abortOperation(operationMgr()->currentOperation());
+  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
+  findReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures);
+
+  bool doDeleteReferences = true;
+  if (isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures,
+                                    desktop(), doDeleteReferences)) {
+    // It is necessary to clear selection in order to avoid selection changed event during
+    // deletion and negative consequences connected with processing of already deleted items
+    mySelector->clearSelection();
+    if (deleteFeaturesInternal(anObjects, aDirectRefFeatures, aIndirectRefFeatures,
+                               anIgnoredFeatures, doDeleteReferences))
+      operationMgr()->commitOperation();
+    else
+      operationMgr()->abortOperation(operationMgr()->currentOperation());
   }
 }
 
@@ -1322,23 +1328,10 @@ void XGUI_Workshop::moveObjects()
 }
 
 //**************************************************************
-bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
-                                   const std::set<FeaturePtr>& theIgnoredFeatures,
-                                   QWidget* theParent,
-                                   const bool theAskAboutDeleteReferences)
+void XGUI_Workshop::findReferences(const QObjectPtrList& theList,
+                                   std::set<FeaturePtr>& aDirectRefFeatures,
+                                   std::set<FeaturePtr>& aIndirectRefFeatures)
 {
-#ifdef DEBUG_DELETE
-  QStringList aDInfo;
-  QObjectPtrList::const_iterator aDIt = theList.begin(), aDLast = theList.end();
-  for (; aDIt != aDLast; ++aDIt) {
-    aDInfo.append(ModuleBase_Tools::objectInfo((*aDIt)));
-  }
-  QString anInfoStr = aDInfo.join(", ");
-  qDebug(QString("deleteFeatures: %1, %2").arg(theList.size()).arg(anInfoStr).toStdString().c_str());
-#endif
-
-  // 1. find all referenced features
-  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
   foreach (ObjectPtr aDeletedObj, theList) {
     std::set<FeaturePtr> alreadyProcessed;
     XGUI_Tools::refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, theList, aDirectRefFeatures,
@@ -1349,11 +1342,17 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
                         std::inserter(aDifference, aDifference.begin()));
     aIndirectRefFeatures = aDifference;
   }
+}
 
-  bool doDeleteReferences = true;
+bool XGUI_Workshop::isDeleteFeatureWithReferences(const QObjectPtrList& theList,
+                                   const std::set<FeaturePtr>& aDirectRefFeatures,
+                                   const std::set<FeaturePtr>& aIndirectRefFeatures,
+                                   QWidget* theParent,
+                                   bool& doDeleteReferences)
+{
+  doDeleteReferences = true;
 
-  // 2. warn about the references remove, break the delete operation if the user chose it
-  if (theAskAboutDeleteReferences && !aDirectRefFeatures.empty()) {
+  if (!aDirectRefFeatures.empty()) {
     QStringList aDirectRefNames;
     foreach (const FeaturePtr& aFeature, aDirectRefFeatures)
       aDirectRefNames.append(aFeature->name().c_str());
@@ -1401,8 +1400,24 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theList,
       doDeleteReferences = false;
     }
   }
+  return true;
+}
 
-  // 3. remove referenced features
+bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theFeatures,
+                                   const std::set<FeaturePtr>& theIgnoredFeatures)
+{
+  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
+  findReferences(theFeatures, aDirectRefFeatures, aIndirectRefFeatures);
+  return deleteFeaturesInternal(theFeatures, aDirectRefFeatures, aIndirectRefFeatures,
+                                theIgnoredFeatures);
+}
+
+bool XGUI_Workshop::deleteFeaturesInternal(const QObjectPtrList& theList,
+                                           const std::set<FeaturePtr>& theIgnoredFeatures,
+                                           const std::set<FeaturePtr>& aDirectRefFeatures,
+                                           const std::set<FeaturePtr>& aIndirectRefFeatures,
+                                           const bool doDeleteReferences)
+{
   if (doDeleteReferences) {
     std::set<FeaturePtr> aFeaturesToDelete = aDirectRefFeatures;
     aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());

@@ -232,18 +232,12 @@ Q_OBJECT
    */
   bool abortAllOperations();
 
-  //! Delete features. Delete the referenced features. There can be a question with a list of referenced
-  //! objects.
+  //! Delete features. Delete the referenced features. There can be a question with a list of
+  //! referenced objects.
   //! \param theList an objects to be deleted
   //! \param theIgnoredFeatures a list of features to be ignored during delete
-  //! \param theParent a parent widget for the question message box
-  //! \param theAskAboutDeleteReferences if true, the message box with a list of references to the
-  //! objects features appear. If the user chose do not continue, the deletion is not performed
-  //! \return the success of the delete 
-  bool deleteFeatures(const QObjectPtrList& theList,
-                      const std::set<FeaturePtr>& theIgnoredFeatures = std::set<FeaturePtr>(),
-                      QWidget* theParent = 0,
-                      const bool theAskAboutDeleteReferences = false);
+  bool deleteFeatures(const QObjectPtrList& theFeatures,
+                      const std::set<FeaturePtr>& theIgnoredFeatures = std::set<FeaturePtr>());
 
   /// Deactivates the object, if it is active and the module returns that the activation
   /// of selection for the object is not possible currently(the current operation uses it)
@@ -359,6 +353,39 @@ signals:
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param isToConnect a boolean value whether connect or disconnect
   void connectToPropertyPanel(const bool isToConnect);
+
+  //! Find all referenced features. Return direct and indirect lists of referenced object
+  //! \param theList an objects to be checked
+  //! \param aDirectRefFeatures a list of direct reference features
+  //! \param aIndirectRefFeatures a list of features which depend on the feature through others
+  void findReferences(const QObjectPtrList& theList,
+                      std::set<FeaturePtr>& aDirectRefFeatures,
+                      std::set<FeaturePtr>& aIndirectRefFeatures);
+
+  //! Shows a dialog box about references. Ask whether they should be also removed.
+  //! \param theList an objects to be checked
+  //! \param aDirectRefFeatures a list of direct reference features
+  //! \param aIndirectRefFeatures a list of features which depend on the feature through others
+  //! \param theParent a parent widget for the question message box
+  //! \param doDeleteReferences if there are parameters between features, ask if they should be
+  //! replaced to their meaning without corresponded features remove
+  //! \return true if in message box answer is Yes
+  bool isDeleteFeatureWithReferences(const QObjectPtrList& theList,
+                                     const std::set<FeaturePtr>& aDirectRefFeatures,
+                                     const std::set<FeaturePtr>& aIndirectRefFeatures,
+                                     QWidget* theParent,
+                                     bool& doDeleteReferences);
+
+  //! \param theIgnoredFeatures a list of features to be ignored during delete
+  //! \param theList an objects to be checked
+  //! \param aDirectRefFeatures a list of direct reference features
+  //! \param aIndirectRefFeatures a list of features which depend on the feature through others
+  //! \param doDeleteReferences flag if referenced features should be removed also
+  bool deleteFeaturesInternal(const QObjectPtrList& theList,
+                              const std::set<FeaturePtr>& aDirectRefFeatures,
+                              const std::set<FeaturePtr>& aIndirectRefFeatures,
+                              const std::set<FeaturePtr>& theIgnoredFeatures,
+                              const bool doDeleteReferences = true);
 
 private:
   /// Display all results
