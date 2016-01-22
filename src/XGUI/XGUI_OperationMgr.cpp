@@ -631,12 +631,19 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
   ModuleBase_ModelWidget* anActiveWgt = 0;
   // firstly the widget should process Delete action
   ModuleBase_IPropertyPanel* aPanel;
+  bool isPPChildObject = false;
   if (aOperation) {
     aPanel = aOperation->propertyPanel();
-    if (aPanel)
-      anActiveWgt = aPanel->activeWidget();
-    if (anActiveWgt) {
-      isAccepted = anActiveWgt->processDelete();
+    if (aPanel) {
+      isPPChildObject = isChildObject(theObject, aPanel);
+      // process delete in active widget only if delete sender is child of property panel
+      // it is necessary for the case when OB is shown, user perform selection and click Delete
+      if (isPPChildObject) {
+        anActiveWgt = aPanel->activeWidget();
+        if (anActiveWgt) {
+          isAccepted = anActiveWgt->processDelete();
+        }
+      }
     }
   }
   if (!isAccepted) {
@@ -645,8 +652,10 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
     /// processing delete by workshop
     XGUI_ObjectsBrowser* aBrowser = workshop()->objectBrowser();
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
+    // property panel childe object is processed to process delete performed on Apply button of PP
     if (isChildObject(theObject, aBrowser) ||
-        isChildObject(theObject, aViewPort))
+        isChildObject(theObject, aViewPort) ||
+        isPPChildObject)
       workshop()->deleteObjects();
     isAccepted = true;
   }

@@ -281,7 +281,9 @@ bool ModuleBase_ModelWidget::processEnter()
 
 bool ModuleBase_ModelWidget::processDelete()
 {
-  return false;
+  // we consider that model objects eats delete key in order to
+  // do nothing by for example symbol delete in line edit or spin box
+  return true;
 }
 
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
