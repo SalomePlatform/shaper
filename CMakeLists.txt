@@ -1,9 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 
 PROJECT (NewGEOM)
-# to remove PlaneGCS dependency for the moment
-SET (NO_PlaneGCS Yes)
-SET (NewGeom_Version 2.1.01)
+SET (NewGeom_Version 2.1.2)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
