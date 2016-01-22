@@ -32,6 +32,9 @@ public:
   /// \brief Creates temporary constraint to fix the placement of the feature
   SolverConstraintPtr createFixedConstraint(FeaturePtr theFixedFeature) const;
 
+  /// \brief Creates temporary constraint to fix radius of the arc
+  SolverConstraintPtr createFixedArcRadiusConstraint(FeaturePtr theArc) const;
+
   /// \brief Creates temporary constraint to fix the feature after movement
   SolverConstraintPtr createMovementConstraint(FeaturePtr theFixedFeature) const;
 

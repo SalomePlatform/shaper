@@ -19,6 +19,7 @@
 #include <SketchPlugin_Constraint.h>
 
 class SketchSolver_ConstraintDistance;
+class SketchSolver_ConstraintFixedArcRadius;
 typedef std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > CoincidentPointsMap;
 
 
@@ -112,6 +113,10 @@ public:
 
   /// \brief Check the features is not removed
   bool isConsistent() const;
+
+  /// \brief Check the storage has constraints
+  bool isEmpty() const
+  { return myConstraintMap.empty(); }
 
   /// \brief Check the entity is fixed.
   ///        If the point is under verification, all coincident points are checked too.
@@ -216,6 +221,7 @@ protected:
 
   // to be able to update entities from constraints
   friend class SketchSolver_ConstraintDistance;
+  friend class SketchSolver_ConstraintFixedArcRadius;
 };
 
 typedef std::shared_ptr<SketchSolver_Storage> StoragePtr;

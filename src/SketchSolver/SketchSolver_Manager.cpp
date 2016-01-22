@@ -287,10 +287,21 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
 // ============================================================================
 void SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
+  bool isMoved = false;
   std::vector<SketchSolver_Group*>::iterator aGroupIt = myGroups.begin();
   for (; aGroupIt != myGroups.end(); aGroupIt++)
-    if (!(*aGroupIt)->isEmpty() && (*aGroupIt)->isInteract(theFeature))
+    if (!(*aGroupIt)->isEmpty() && (*aGroupIt)->isInteract(theFeature)) {
       (*aGroupIt)->moveFeature(theFeature);
+      isMoved = true;
+    }
+
+  if (!isMoved && theFeature->getKind() == SketchPlugin_Arc::ID()) {
+    // Workaround to move arc.
+    // If the arc has not been constrained, we will push it into empty group and apply movement.
+    for (aGroupIt = myGroups.begin(); aGroupIt != myGroups.end(); aGroupIt++)
+      if ((*aGroupIt)->isEmpty())
+        (*aGroupIt)->moveFeature(theFeature);
+  }
 }
 
 // ============================================================================

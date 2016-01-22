@@ -94,13 +94,11 @@ void SketchPlugin_Arc::execute()
     // compute and change the arc end point
     std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(END_ID()));
-    /* must be automatically done in attributeChanged
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
         new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
     std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
     if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance)
       anEndAttr->setValue(aProjection);
-    */
     std::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
     AttributeBooleanPtr isInversed =
         std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
@@ -249,64 +247,11 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     }
     return;
   }
-  if (!aCenterAttr->isInitialized())
-    return;
-  if (!aStartAttr->isInitialized())
-    return;
-  if (!anEndAttr->isInitialized())
+  if (!isFeatureValid())
     return;
 
   // update the points in accordance to the changed point changes
-  if (theID == END_ID() && !myEndUpdate) {
-    myEndUpdate = true;
-    // compute and change the arc end point
-    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
-        new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
-    std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
-    if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance) {
-      if (!isStable()) { // issue #855: trying to update only not-updated coordinate if it is possible
-        if (fabs(myXEndBefore - anEndAttr->x()) < 1.e-10) { // keep Y unchanged
-          double aVy = aCenterAttr->y() - anEndAttr->y();
-          double aVy2 = aVy * aVy;
-          double aR2 = aCircleForArc->radius() * aCircleForArc->radius();
-          if (aVy2 <= aR2) {
-            double aDX = sqrt(aR2 - aVy * aVy);
-            if (anEndAttr->x() > aCenterAttr->x())
-              aProjection->setX(aCenterAttr->x() + aDX);
-            else 
-              aProjection->setX(aCenterAttr->x() - aDX);
-            aProjection->setY(anEndAttr->y());
-          }
-        } else if (fabs(myYEndBefore - anEndAttr->y()) < 1.e-10) { // keep X unchanged
-          double aVx = aCenterAttr->x() - anEndAttr->x();
-          double aVx2 = aVx * aVx;
-          double aR2 = aCircleForArc->radius() * aCircleForArc->radius();
-          if (aVx2 <= aR2) {
-            double aDY = sqrt(aR2 - aVx * aVx);
-            if (anEndAttr->y() > aCenterAttr->y())
-              aProjection->setY(aCenterAttr->y() + aDY);
-            else 
-              aProjection->setY(aCenterAttr->y() - aDY);
-            aProjection->setX(anEndAttr->x());
-          }
-        }
-      }
-
-      anEndAttr->setValue(aProjection);
-    }
-    myXEndBefore = anEndAttr->x();
-    myYEndBefore = anEndAttr->y();
-    myEndUpdate = false;
-  } else if (theID == START_ID() && !myStartUpdate) {
-    myStartUpdate = true;
-    // compute and change the arc start point
-    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
-        new GeomAPI_Circ2d(aCenterAttr->pnt(), anEndAttr->pnt()));
-    std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(aStartAttr->pnt());
-    if (aProjection && aStartAttr->pnt()->distance(aProjection) > tolerance)
-      aStartAttr->setValue(aProjection);
-    myStartUpdate = false;
-  } else if (theID == CENTER_ID() && !myEndUpdate) {
+  if (theID == CENTER_ID() && !myEndUpdate) {
     myEndUpdate = true;
     // compute and change the arc end point
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(

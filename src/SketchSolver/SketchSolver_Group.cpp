@@ -19,6 +19,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
@@ -222,6 +223,17 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 
   // Secondly, search attributes of the feature in the list of the Multi constraints and update them
   updateMultiConstraints(myConstraints, theFeature);
+
+  // Workaround to process arcs.
+  // When move unconstrained arc, add temporary constraint to fix radius.
+  if (theFeature->getKind() == SketchPlugin_Arc::ID()) {
+    SolverConstraintPtr aFixedRadius = aBuilder->createFixedArcRadiusConstraint(theFeature);
+    if (aFixedRadius) {
+      aFixedRadius->process(myStorage, getId(), getWorkplaneId());
+      if (aFixedRadius->error().empty())
+        setTemporary(aFixedRadius);
+    }
+  }
 }
 
 // ============================================================================
@@ -270,7 +282,7 @@ bool SketchSolver_Group::updateWorkplane()
 bool SketchSolver_Group::resolveConstraints()
 {
   bool aResolved = false;
-  bool isGroupEmpty = isEmpty();
+  bool isGroupEmpty = isEmpty() && myStorage->isEmpty();
   if (myStorage->isNeedToResolve() && !isGroupEmpty) {
     if (!mySketchSolver)
       mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();

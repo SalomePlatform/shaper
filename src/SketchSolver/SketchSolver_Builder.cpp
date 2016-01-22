@@ -11,6 +11,7 @@
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>
 #include <SketchSolver_ConstraintFixed.h>
+#include <SketchSolver_ConstraintFixedArcRadius.h>
 #include <SketchSolver_ConstraintLength.h>
 #include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_ConstraintTangent.h>
@@ -105,6 +106,14 @@ SolverConstraintPtr SketchSolver_Builder::createFixedConstraint(FeaturePtr theFi
   if (!aData || !aData->isValid())
     return SolverConstraintPtr();
   return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theFixedFeature));
+}
+
+SolverConstraintPtr SketchSolver_Builder::createFixedArcRadiusConstraint(FeaturePtr theArc) const
+{
+  DataPtr aData = theArc->data();
+  if (!aData || !aData->isValid())
+    return SolverConstraintPtr();
+  return SolverConstraintPtr(new SketchSolver_ConstraintFixedArcRadius(theArc));
 }
 
 SolverConstraintPtr SketchSolver_Builder::createMovementConstraint(FeaturePtr theFixedFeature) const

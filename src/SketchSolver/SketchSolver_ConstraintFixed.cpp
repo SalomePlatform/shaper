@@ -69,7 +69,7 @@ void SketchSolver_ConstraintFixed::getAttributes(
   EntityWrapperPtr aSolverEntity;
   if (myBaseFeature) {
     // The feature is fixed.
-    myStorage->update(myBaseFeature, myGroupID);
+    myStorage->update(myBaseFeature/*, myGroupID*/);
     aSolverEntity = myStorage->entity(myBaseFeature);
   } else if (myBaseConstraint) {
     // Constraint Fixed is added by user.

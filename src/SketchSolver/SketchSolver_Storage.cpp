@@ -76,7 +76,7 @@ void SketchSolver_Storage::addConstraint(
   if (!theSolverConstraints.empty() || aFound == myConstraintMap.end())
     myConstraintMap[theConstraint] = theSolverConstraints;
   // block events if necessary
-  if (myEventsBlocked && theConstraint->data() && theConstraint->data()->isValid())
+  if (myEventsBlocked && theConstraint && theConstraint->data() && theConstraint->data()->isValid())
     theConstraint->data()->blockSendAttributeUpdated(myEventsBlocked);
 }
 
