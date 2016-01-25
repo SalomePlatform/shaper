@@ -416,6 +416,16 @@ bool Model_AttributeSelection::update()
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
       aShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aComp));
       selectConstruction(aContext, aShape);
+    } else {
+      // For correct naming selection, put the shape into the naming structure.
+      // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
+      TNaming_Builder aBuilder(aSelLab);
+      aBuilder.Generated(aContext->shape()->impl<TopoDS_Shape>());
+      std::shared_ptr<Model_Document> aMyDoc = 
+        std::dynamic_pointer_cast<Model_Document>(owner()->document());
+      std::string aName = aContext->data()->name();
+      aMyDoc->addNamingName(aSelLab, aName);
+      TDataStd_Name::Set(aSelLab, aName.c_str());
     }
     return setInvalidIfFalse(aSelLab, aContext->shape() && !aContext->shape()->isNull());
   }
