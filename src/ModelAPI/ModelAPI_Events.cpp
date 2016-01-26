@@ -226,3 +226,25 @@ void ModelAPI_ReplaceParameterMessage::setObject(ObjectPtr theObject)
 {
   myObject = theObject;
 }
+
+
+// =====   ModelAPI_SolverFailedMessage   =====
+ModelAPI_SolverFailedMessage::ModelAPI_SolverFailedMessage(const Events_ID theID, const void* theSender)
+  : Events_Message(theID, theSender)
+{
+}
+
+ModelAPI_SolverFailedMessage::~ModelAPI_SolverFailedMessage()
+{
+}
+
+void ModelAPI_SolverFailedMessage::setObjects(const std::set<ObjectPtr>& theObjects)
+{
+  myObjects = theObjects;
+}
+
+const std::set<ObjectPtr>& ModelAPI_SolverFailedMessage::objects() const
+{
+  return myObjects;
+}
+

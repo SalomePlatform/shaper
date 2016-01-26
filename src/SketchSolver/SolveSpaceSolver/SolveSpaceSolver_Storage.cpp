@@ -107,7 +107,7 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
       aConstraint->changeConstraint() = getConstraint(aConstrID);
       isUpdated = true;
       // check duplicated constraints based on different attributes
-      if (myDuplicatedConstraint && !hasDupConstraints && findSameConstraint(aConstraint))
+      if (myDuplicatedConstraint && findSameConstraint(aConstraint) && !hasDupConstraints)
         myDuplicatedConstraint = false;
     }
   }
@@ -492,8 +492,8 @@ bool SolveSpaceSolver_Storage::findSameConstraint(ConstraintWrapperPtr theConstr
           (*aCWIt)->type() == CONSTRAINT_MULTI_TRANSLATION)
         continue;
       if ((*aCWIt)->type() == theConstraint->type()) {
-        const Slvs_Constraint& aCComp = std::dynamic_pointer_cast<
-            SolveSpaceSolver_ConstraintWrapper>(*aCWIt)->constraint();
+        const Slvs_Constraint& aCComp = getConstraint((Slvs_hConstraint)(*aCWIt)->id());
+
         if (aCBase.ptA == aCComp.ptA && aCBase.ptB == aCComp.ptB &&
             aCBase.entityA == aCComp.entityA && aCBase.entityB == aCComp.entityB &&
             aCBase.entityC == aCComp.entityC && aCBase.entityD == aCComp.entityD &&
@@ -614,10 +614,8 @@ Slvs_hParam SolveSpaceSolver_Storage::updateParameter(const Slvs_Param& theParam
     // parameter already used, rewrite it
     int aPos = Search(theParam.h, myParameters);
     if (aPos >= 0 && aPos < (int)myParameters.size()) {
-      if (IsNotEqual(myParameters[aPos], theParam)) {
-        myUpdatedParameters.insert(theParam.h);
+      if (IsNotEqual(myParameters[aPos], theParam))
         setNeedToResolve(true);
-      }
       myParameters[aPos] = theParam;
       return theParam.h;
     }
@@ -772,7 +770,7 @@ Slvs_hConstraint SolveSpaceSolver_Storage::addConstraint(const Slvs_Constraint& 
         aConstraint.entityA == aCIt->entityA && aConstraint.entityB == aCIt->entityB &&
         aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD) {
       myDuplicatedConstraint = true;
-      return aCIt->h;
+      break;
     }
   }
 
@@ -964,13 +962,23 @@ bool SolveSpaceSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
       std::dynamic_pointer_cast<SolveSpaceSolver_ConstraintWrapper>(theConstraint);
 
   // verify whether the constraint has duplicated
+  bool hasSameID = false;
   SameConstraintMap::iterator anEqIt = myEqualConstraints.begin();
-  for (; anEqIt != myEqualConstraints.end(); ++anEqIt)
-    if (anEqIt->find(aConstraint) != anEqIt->end()) {
+  for (; anEqIt != myEqualConstraints.end(); ++anEqIt) {
+    std::set<ConstraintWrapperPtr>::const_iterator aFound = anEqIt->find(aConstraint);
+    if (aFound != anEqIt->end()) {
+      // verify there is a constraint with same ID
+      std::set<ConstraintWrapperPtr>::const_iterator anIt = anEqIt->begin();
+      ConstraintID anID = (*aFound)->id();
+      for (++anIt; anIt != anEqIt->end() && !hasSameID; ++anIt)
+        if ((*anIt)->id() == anID && aFound != anIt)
+          hasSameID = true;
+      // erase constraint
       anEqIt->erase(aConstraint);
       break;
     }
-  if (anEqIt != myEqualConstraints.end())
+  }
+  if (anEqIt != myEqualConstraints.end() && hasSameID)
     return true;
 
   bool isFullyRemoved = removeConstraint((Slvs_hConstraint)aConstraint->id());

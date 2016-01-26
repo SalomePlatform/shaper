@@ -46,10 +46,19 @@ public:
   /// \brief Revert solution to initial values
   virtual void undo();
 
+  /// \brief Check the constraint is conflicted with others
+  virtual bool isConflicting(const ConstraintID& theConstraint) const;
+
+private:
+  void collectConflicting();
+
 private:
   GCS::VEC_pD                myParameters;     ///< list of unknowns
   std::set<GCS::Constraint*> myConstraints;    ///< list of constraints already processed by the system
   GCS::System                myEquationSystem; ///< set of equations for solving in FreeGCS
+
+  GCS::VEC_I                 myConflictingIDs; ///< list of IDs of conflicting constraints
+  bool                       myConfCollected;  ///< specifies the conflicting constraints are already collected
 };
 
 #endif

@@ -50,7 +50,9 @@ static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
 static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
 
+/// Event ID that solver has conflicting constraints (comes with ModelAPI_SolverFailedMessage)
 static const char * EVENT_SOLVER_FAILED = "SolverFailed";
+/// Event ID that the problem in solver disappeared
 static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
 
 /// Event ID that order of objects in group is changed, so, tree must be fully rectreated (movement of feature)
@@ -303,6 +305,22 @@ class ModelAPI_ReplaceParameterMessage : public Events_Message
   MODELAPI_EXPORT ObjectPtr object() const;
   /// Sets an object
   MODELAPI_EXPORT void setObject(ObjectPtr theObject);
+};
+
+
+class ModelAPI_SolverFailedMessage : public Events_Message
+{
+public:
+  MODELAPI_EXPORT ModelAPI_SolverFailedMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT virtual ~ModelAPI_SolverFailedMessage();
+
+  /// Sets list of conflicting constraints
+  MODELAPI_EXPORT void setObjects(const std::set<ObjectPtr>& theObjects);
+  /// Returns list of conflicting constraints
+  MODELAPI_EXPORT const std::set<ObjectPtr>& objects() const;
+
+private:
+  std::set<ObjectPtr> myObjects;
 };
 
 #endif

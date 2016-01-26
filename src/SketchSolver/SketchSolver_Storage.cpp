@@ -652,6 +652,21 @@ void SketchSolver_Storage::blockEvents(bool isBlocked)
   myEventsBlocked = isBlocked;
 }
 
+std::set<ObjectPtr> SketchSolver_Storage::getConflictingConstraints(SolverPtr theSolver) const
+{
+  std::set<ObjectPtr> aConflicting;
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
+      aConstrIt = myConstraintMap.begin();
+  for (; aConstrIt != myConstraintMap.end(); ++aConstrIt) {
+    std::list<ConstraintWrapperPtr>::const_iterator anIt = aConstrIt->second.begin();
+    for (; anIt != aConstrIt->second.end(); ++anIt)
+      if (theSolver->isConflicting((*anIt)->id())) {
+        aConflicting.insert(aConstrIt->first);
+        break;
+      }
+  }
+  return aConflicting;
+}
 
 
 

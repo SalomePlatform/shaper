@@ -90,7 +90,11 @@ SketchSolver_SolveStatus SolveSpaceSolver_Solver::solve()
   //if (myEquationsSystem.constraints <= 0)
   //  return STATUS_EMPTYSET;
 
-  myEquationsSystem.calculateFaileds = myFindFaileds ? 1 : 0;
+  myEquationsSystem.calculateFaileds = 0;
+  if (myFindFaileds) {
+    myEquationsSystem.calculateFaileds = 1;
+    myEquationsSystem.faileds = myEquationsSystem.constraints;
+  }
 
   Events_LongOp::start(this);
   Slvs_Solve(&myEquationsSystem, myGroup);
@@ -191,5 +195,13 @@ bool SolveSpaceSolver_Solver::hasDegeneratedArcs() const
         anArcPoints[2][0] * anArcPoints[2][0] + anArcPoints[2][1] * anArcPoints[2][1] < aTol2)
       return true;
   }
+  return false;
+}
+
+bool SolveSpaceSolver_Solver::isConflicting(const ConstraintID& theConstraint) const
+{
+  for (int i = 0; i < myEquationsSystem.faileds; ++i)
+    if (myEquationsSystem.failed[i] == (Slvs_hConstraint)theConstraint)
+      return true;
   return false;
 }

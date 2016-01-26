@@ -14,6 +14,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -150,23 +151,32 @@ void SketchSolver_Manager::processEvent(
         break;
 
     if (aFGrIter != aFeatureGroups.end()) {
-      std::vector<SketchSolver_Group*>::iterator aGroupIter = myGroups.begin();
+      std::list<SketchSolver_Group*> aGroupsToResolve;
+      std::list<SketchSolver_Group*>::iterator aGroupIter = myGroups.begin();
       std::list<SketchSolver_Group*> aSeparatedGroups;
       while (aGroupIter != myGroups.end()) {
         if (!(*aGroupIter)->isWorkplaneValid()) {  // the group should be removed
           delete *aGroupIter;
-          int aShift = aGroupIter - myGroups.begin();
-          myGroups.erase(aGroupIter);
-          aGroupIter = myGroups.begin() + aShift;
+          std::list<SketchSolver_Group*>::iterator aRemoveIt = aGroupIter++;
+          myGroups.erase(aRemoveIt);
           continue;
         }
         if (!(*aGroupIter)->isConsistent()) {  // some constraints were removed, try to split the group
           (*aGroupIter)->splitGroup(aSeparatedGroups);
+          if (!(*aGroupIter)->getWorkplane()->string(
+              SketchPlugin_Sketch::SOLVER_ERROR())->value().empty())
+            aGroupsToResolve.push_back(*aGroupIter);
         }
         aGroupIter++;
       }
-      if (aSeparatedGroups.size() > 0)
+      if (aSeparatedGroups.size() > 0) {
         myGroups.insert(myGroups.end(), aSeparatedGroups.begin(), aSeparatedGroups.end());
+        aGroupsToResolve.insert(aGroupsToResolve.end(),
+            aSeparatedGroups.begin(), aSeparatedGroups.end());
+      }
+
+      if (!aGroupsToResolve.empty())
+        resolveConstraints(aGroupsToResolve);
     }
   }
   myIsComputed = false;
@@ -181,7 +191,7 @@ bool SketchSolver_Manager::changeWorkplane(CompositeFeaturePtr theSketch)
   bool aResult = true;  // changed when a workplane wrongly updated
   bool isUpdated = false;
   // Try to update specified workplane in all groups
-  std::vector<SketchSolver_Group*>::iterator aGroupIter;
+  std::list<SketchSolver_Group*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if ((*aGroupIter)->isBaseWorkplane(theSketch)) {
       isUpdated = true;
@@ -230,7 +240,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
     return true;
   } else if (aGroups.size() == 1) {  // Only one group => add feature into it
     GroupID aGroupId = *(aGroups.begin());
-    std::vector<SketchSolver_Group*>::iterator aGroupIter;
+    std::list<SketchSolver_Group*>::iterator aGroupIter;
     for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
       if ((*aGroupIter)->getId() == aGroupId) {
         // If the group is empty, the feature is not added (the constraint only)
@@ -242,7 +252,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
     std::set<GroupID>::const_iterator aGroupsIter = aGroups.begin();
 
     // Search first group
-    std::vector<SketchSolver_Group*>::iterator aFirstGroupIter;
+    std::list<SketchSolver_Group*>::iterator aFirstGroupIter;
     for (aFirstGroupIter = myGroups.begin(); aFirstGroupIter != myGroups.end(); aFirstGroupIter++)
       if ((*aFirstGroupIter)->getId() == *aGroupsIter)
         break;
@@ -250,23 +260,22 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
       return false;
 
     // Append other groups to the first one
-    std::vector<SketchSolver_Group*>::iterator anOtherGroupIter = aFirstGroupIter + 1;
+    std::list<SketchSolver_Group*>::iterator anOtherGroupIter = aFirstGroupIter;
+    ++anOtherGroupIter;
     for (aGroupsIter++; aGroupsIter != aGroups.end(); aGroupsIter++) {
       for (; anOtherGroupIter != myGroups.end(); anOtherGroupIter++)
         if ((*anOtherGroupIter)->getId() == *aGroupsIter)
           break;
       if (anOtherGroupIter == myGroups.end()) {  // Group disappears
-        anOtherGroupIter = aFirstGroupIter + 1;
+        anOtherGroupIter = aFirstGroupIter;
+        ++anOtherGroupIter;
         continue;
       }
 
       (*aFirstGroupIter)->mergeGroups(**anOtherGroupIter);
-      int aShiftFirst = aFirstGroupIter - myGroups.begin();
-      int aShiftOther = anOtherGroupIter - myGroups.begin();
-      delete *anOtherGroupIter;
-      myGroups.erase(anOtherGroupIter);
-      aFirstGroupIter = myGroups.begin() + aShiftFirst;
-      anOtherGroupIter = myGroups.begin() + aShiftOther;
+      std::list<SketchSolver_Group*>::iterator aRemoveIt = anOtherGroupIter++;
+      delete *aRemoveIt;
+      myGroups.erase(aRemoveIt);
     }
 
     if (aConstraint)
@@ -288,7 +297,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
 void SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   bool isMoved = false;
-  std::vector<SketchSolver_Group*>::iterator aGroupIt = myGroups.begin();
+  std::list<SketchSolver_Group*>::iterator aGroupIt = myGroups.begin();
   for (; aGroupIt != myGroups.end(); aGroupIt++)
     if (!(*aGroupIt)->isEmpty() && (*aGroupIt)->isInteract(theFeature)) {
       (*aGroupIt)->moveFeature(theFeature);
@@ -315,7 +324,7 @@ void SketchSolver_Manager::findGroups(
   std::shared_ptr<ModelAPI_CompositeFeature> aWP = findWorkplane(theFeature);
 
   SketchSolver_Group* anEmptyGroup = 0;  // appropriate empty group for specified constraint
-  std::vector<SketchSolver_Group*>::const_iterator aGroupIter;
+  std::list<SketchSolver_Group*>::const_iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if (aWP == (*aGroupIter)->getWorkplane() && (*aGroupIter)->isInteract(theFeature)) {
       if (!(*aGroupIter)->isEmpty())
@@ -339,7 +348,7 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
   // Already verified workplanes
   std::set<std::shared_ptr<ModelAPI_CompositeFeature> > aVerified;
 
-  std::vector<SketchSolver_Group*>::const_iterator aGroupIter;
+  std::list<SketchSolver_Group*>::const_iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++) {
     std::shared_ptr<ModelAPI_CompositeFeature> aWP = (*aGroupIter)->getWorkplane();
     if (aVerified.find(aWP) != aVerified.end())
@@ -365,11 +374,12 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
 //  Function: resolveConstraints
 //  Purpose:  change entities according to available constraints
 // ============================================================================
-bool SketchSolver_Manager::resolveConstraints()
+bool SketchSolver_Manager::resolveConstraints(const std::list<SketchSolver_Group*>& theGroups)
 {
   bool needToUpdate = false;
-  std::vector<SketchSolver_Group*>::iterator aGroupIter;
-  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+  const std::list<SketchSolver_Group*>& aGroupsToResolve = theGroups.empty() ? myGroups : theGroups;
+  std::list<SketchSolver_Group*>::const_iterator aGroupIter = aGroupsToResolve.begin();
+  for (; aGroupIter != aGroupsToResolve.end(); aGroupIter++)
     if ((*aGroupIter)->resolveConstraints())
       needToUpdate = true;
   return needToUpdate;

@@ -69,6 +69,15 @@ static void sendMessage(const char* theMessageName)
   Events_Loop::loop()->send(aMessage);
 }
 
+static void sendMessage(const char* theMessageName, const std::set<ObjectPtr>& theConflicting)
+{
+  std::shared_ptr<ModelAPI_SolverFailedMessage> aMessage =
+      std::shared_ptr<ModelAPI_SolverFailedMessage>(
+      new ModelAPI_SolverFailedMessage(Events_Loop::eventByName(theMessageName)));
+  aMessage->setObjects(theConflicting);
+  Events_Loop::loop()->send(aMessage);
+}
+
 
 
 // ========================================================
@@ -340,8 +349,11 @@ bool SketchSolver_Group::resolveConstraints()
 //      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
         if (myPrevResult != aResult || myPrevResult == STATUS_UNKNOWN) {
+          // Obtain list of conflicting constraints
+          std::set<ObjectPtr> aConflicting = myStorage->getConflictingConstraints(mySketchSolver);
+
           // the error message should be changed before sending the message
-          sendMessage(EVENT_SOLVER_FAILED);
+          sendMessage(EVENT_SOLVER_FAILED, aConflicting);
           myPrevResult = aResult;
         }
       }

@@ -178,8 +178,6 @@ private:
 
   bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
 
-  std::set<Slvs_hParam> myUpdatedParameters; ///< list of just updated parameters (cleared when isNeedToResolve() called)
-
   SameConstraintMap myEqualConstraints; ///< list of groups of equal constraints
 };
 

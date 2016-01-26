@@ -115,7 +115,7 @@ assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are differ
 aSession.startOperation()
 aDistance.setValue(PT_PT_DIST)
 aSession.finishOperation()
-assert (distancePointPoint(aSketchPointCoords, aLineAStartPoint) == PT_PT_DIST)
+assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
 #=========================================================================
 # Move line, check that distance is constant
 #=========================================================================
@@ -123,7 +123,7 @@ aSession.startOperation()
 aLineAStartPoint.setValue(0., 40.)
 aLineAEndPoint.setValue(100., 40.)
 aSession.finishOperation()
-assert (distancePointPoint(aSketchPointCoords, aLineAStartPoint) == PT_PT_DIST)
+assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
 #=========================================================================
 # Remove constraint, check the points are unconstrained now
 #=========================================================================
@@ -133,7 +133,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aSketchPointCoords.setValue(0., 0.)
 aSession.finishOperation()
-assert (distancePointPoint(aSketchPointCoords, aLineAStartPoint) != PT_PT_DIST)
+assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) > 1.e-10)
 
 #=========================================================================
 # Add distance between point and line
@@ -163,7 +163,7 @@ assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are differ
 aSession.startOperation()
 aDistance.setValue(PT_LINE_DIST)
 aSession.finishOperation()
-assert (distancePointLine(aSketchPointCoords, aSketchLine) == PT_LINE_DIST)
+assert (math.fabs(distancePointLine(aSketchPointCoords, aSketchLine) - PT_LINE_DIST) < 1.e-10)
 #=========================================================================
 # Set distance between line boundaries
 #=========================================================================
@@ -171,7 +171,7 @@ aSession.startOperation()
 refattrA.setAttr(aLineAStartPoint)
 refattrB.setAttr(aLineAEndPoint)
 aSession.finishOperation()
-assert (distancePointPoint(aLineAStartPoint, aLineAEndPoint) != PT_LINE_DIST)
+assert (math.fabs(distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE_DIST) < 1.e-10)
 #=========================================================================
 # End of test
 #=========================================================================

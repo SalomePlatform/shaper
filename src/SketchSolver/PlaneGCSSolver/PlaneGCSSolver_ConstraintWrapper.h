@@ -32,6 +32,8 @@ public:
   /// \brief Return ID of current entity
   virtual ConstraintID id() const
   { return myID; }
+  /// \brief Change constraint ID
+  void setId( const ConstraintID& theID);
 
   /// \brief Change group for the constraint
   virtual void setGroup(const GroupID& theGroup);

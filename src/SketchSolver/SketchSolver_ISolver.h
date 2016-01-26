@@ -47,6 +47,9 @@ public:
   /// \brief Revert solution to initial values
   virtual void undo() = 0;
 
+  /// \brief Check the constraint is conflicted with others
+  virtual bool isConflicting(const ConstraintID& theConstraint) const = 0;
+
 protected:
   GroupID myGroup;       ///< ID of the group to be solved
   bool    myFindFaileds; ///< flag to find conflicting or inappropriate constraints

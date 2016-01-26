@@ -131,6 +131,8 @@ public:
 
   /// \brief Initialize solver by constraints, entities and parameters
   virtual void initializeSolver(SolverPtr theSolver) = 0;
+  /// \brief Return list of conflicting constraints
+  std::set<ObjectPtr> getConflictingConstraints(SolverPtr theSolver) const;
 
   /// \brief Update SketchPlugin features after resolving constraints
   /// \param theFixedOnly [in]  if \c true the fixed points will be updated only

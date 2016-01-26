@@ -104,6 +104,7 @@ private:
   GCS::VEC_pD                      myParameters;         ///< list of parameters
   GCS::VEC_pD                      myConst;              ///< list of constants
   EntityID                         myEntityLastID;       ///< identifier of last added entity
+  ConstraintID                     myConstraintLastID;   ///< identifier of last added constraint
 
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >
                                   myArcConstraintMap;    ///< additional constraints for correct processing of the arcs

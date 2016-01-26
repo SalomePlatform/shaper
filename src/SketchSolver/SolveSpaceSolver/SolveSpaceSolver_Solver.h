@@ -80,6 +80,9 @@ public:
   /// \brief Revert solution to initial values
   virtual void undo();
 
+  /// \brief Check the constraint is conflicted with others
+  virtual bool isConflicting(const ConstraintID& theConstraint) const;
+
 private:
   /// \brief Check whether degenerated arcs exist
   bool hasDegeneratedArcs() const;

@@ -25,7 +25,8 @@
 
 PlaneGCSSolver_Storage::PlaneGCSSolver_Storage(const GroupID& theGroup)
   : SketchSolver_Storage(theGroup),
-    myEntityLastID(EID_SKETCH)
+    myEntityLastID(EID_SKETCH),
+    myConstraintLastID(CID_UNKNOWN)
 {
 }
 
@@ -65,6 +66,10 @@ bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr theConstraint)
   std::list<EntityWrapperPtr>::iterator anIt = anEntities.begin();
   for (; anIt != anEntities.end(); ++anIt)
     isUpdated = update(*anIt) || isUpdated;
+
+  // Change ID of constraints
+  if (aConstraint->id() == CID_UNKNOWN)
+    aConstraint->setId(++myConstraintLastID);
 
   return isUpdated;
 }
@@ -184,6 +189,10 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
   setNeedToResolve(true);
   myRemovedConstraints.insert(myRemovedConstraints.end(),
       aConstraint->constraints().begin(), aConstraint->constraints().end());
+
+  if (isFullyRemoved && theConstraint->id() == myConstraintLastID)
+    --myConstraintLastID;
+
   return isFullyRemoved;
 }
 

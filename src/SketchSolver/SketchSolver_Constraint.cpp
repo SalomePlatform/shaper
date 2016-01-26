@@ -133,7 +133,13 @@ void SketchSolver_Constraint::update()
     if (aRefAttr) {
       if (aRefAttr->isObject()) {
         FeaturePtr aFeat = ModelAPI_Feature::feature(aRefAttr->object());
-        aFeatures.insert(aFeat);
+        if (myBaseConstraint->getKind() != SketchPlugin_ConstraintLength::ID())
+          aFeatures.insert(aFeat);
+        else {
+          // Workaround for the Length constraint: add points of line, not line itself
+          anAttributes.insert(aFeat->attribute(SketchPlugin_Line::START_ID()));
+          anAttributes.insert(aFeat->attribute(SketchPlugin_Line::END_ID()));
+        }
       } else
         anAttributes.insert(aRefAttr->attr());
     } else
@@ -179,6 +185,7 @@ void SketchSolver_Constraint::update()
 bool SketchSolver_Constraint::remove()
 {
   cleanErrorMsg();
+  myType = CONSTRAINT_UNKNOWN;
   return myStorage->removeConstraint(myBaseConstraint);
 }
 
