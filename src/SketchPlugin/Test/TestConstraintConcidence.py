@@ -133,7 +133,7 @@ aSession.startOperation()
 aDocument.removeFeature(aConstraint)
 aSession.finishOperation()
 aSession.startOperation()
-aLineStartPoint.setValue(50., 0.)
+aLineStartPoint.setValue(70., 0.)
 aSession.finishOperation()
 assert (anArcEndPoint.x() != aLineStartPoint.x() or anArcEndPoint.y() != aLineStartPoint.y())
 
