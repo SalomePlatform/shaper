@@ -18,6 +18,47 @@ import math
 
 __updated__ = "2015-03-17"
 
+#=========================================================================
+# Auxiliary functions
+#=========================================================================
+def checkMirror(theListInit, theListMirr, theMirrorLine):
+    TOL = 1.e-8
+    aListSize = theListInit.size()
+    
+    aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))
+    aLineEndPoint = geomDataAPI_Point2D(theMirrorLine.attribute("EndPoint"))
+    aLineDirX = aLineEndPoint.x() - aLineStartPoint.x()
+    aLineDirY = aLineEndPoint.y() - aLineStartPoint.y()
+
+    for ind in range(0, aListSize):
+        aFeatureB = ModelAPI_Feature.feature(theListInit.object(ind))
+        aFeatureC = ModelAPI_Feature.feature(theListMirr.object(ind))
+        assert(aFeatureB is not None)
+        assert(aFeatureC is not None)
+        assert(aFeatureB.getKind() == aFeatureC.getKind())
+        
+        anAttributes = {}
+        if (aFeatureB.getKind() == "SketchLine"):
+            anAttributes = {'StartPoint':'StartPoint', 'EndPoint':'EndPoint'}
+        elif (aFeatureB.getKind() == "SketchArc"):
+            anAttributes = {'ArcCenter':'ArcCenter', 'ArcStartPoint':'ArcEndPoint', 'ArcEndPoint':'ArcStartPoint'}
+        
+        for key in anAttributes:
+            aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
+            aPointC = geomDataAPI_Point2D(aFeatureC.attribute(anAttributes[key]))
+            aDirX = aPointC.x() - aPointB.x()
+            aDirY = aPointC.y() - aPointB.y()
+            aDot = aLineDirX * aDirX + aLineDirY * aDirY
+            assert math.fabs(aDot) < TOL, "aDot = {0}".format(aDot)
+            aDirX = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
+            aDirY = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
+            aCross = aLineDirX * aDirY - aLineDirY * aDirX
+            assert math.fabs(aCross) < TOL, "aCross = {0}".format(aCross)
+
+
+#=========================================================================
+# Start of test
+#=========================================================================
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 #=========================================================================
@@ -113,44 +154,44 @@ aSession.startOperation()
 aMirror = aSketchFeature.addFeature("SketchConstraintMirror")
 aRefObjectA = aMirror.refattr("ConstraintEntityA")
 aRefObjectA.setObject(modelAPI_ResultConstruction(aMirrorLine.firstResult()))
-aRefListB = aMirror.reflist("ConstraintEntityB")
-aRefListB.append(aSketchArc1)
-aRefListB.append(aSketchLine1)
-aRefListB.append(aSketchLine2)
+aRefListInitial = aMirror.reflist("ConstraintMirrorList")
+aRefListInitial.append(aSketchArc1.lastResult())
+aRefListInitial.append(aSketchLine1.lastResult())
+aRefListInitial.append(aSketchLine2.lastResult())
 aMirror.execute()
 aSession.finishOperation()
 #=========================================================================
 # Verify the simmetricity of all mirrored objects
 #=========================================================================
+aRefListB = aMirror.reflist("ConstraintEntityB")
 aRefListC = aMirror.reflist("ConstraintEntityC")
-aListSize = aRefListB.size()
-aLineDirX = aLineEndPoint.x() - aLineStartPoint.x()
-aLineDirY = aLineEndPoint.y() - aLineStartPoint.y()
+assert (aRefListB.size() == 3)
+assert (aRefListC.size() == 3)
+checkMirror(aRefListB, aRefListC, aMirrorLine)
 
-for ind in range(0, aListSize):
-  aFeatureB = modelAPI_Feature(aRefListB.object(ind))
-  aFeatureC = modelAPI_Feature(aRefListC.object(ind))
-  assert(aFeatureB is not None)
-  assert(aFeatureC is not None)
-  assert(aFeatureB.getKind() == aFeatureC.getKind())
-  anAttributes = {}
-  print aFeatureB.getKind()
-  if (aFeatureB.getKind() == "SketchLine"):
-    anAttributes = {'StartPoint':'StartPoint', 'EndPoint':'EndPoint'}
-  elif (aFeatureB.getKind() == "SketchArc"):
-    anAttributes = {'ArcCenter':'ArcCenter', 'ArcStartPoint':'ArcEndPoint', 'ArcEndPoint':'ArcStartPoint'}
+#=========================================================================
+# Remove object from mirror
+#=========================================================================
+aSession.startOperation()
+aRefListInitial.remove(aSketchLine2.lastResult())
+aSession.finishOperation()
+assert (aRefListB.size() == 2)
+assert (aRefListC.size() == 2)
+checkMirror(aRefListB, aRefListC, aMirrorLine)
 
-  for key in anAttributes:
-    aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
-    aPointC = geomDataAPI_Point2D(aFeatureC.attribute(anAttributes[key]))
-    aDirX = aPointC.x() - aPointB.x()
-    aDirY = aPointC.y() - aPointB.y()
-    aDot = aLineDirX * aDirX + aLineDirY * aDirY
-    assert(math.fabs(aDot) < 1.e-10)
-    aDirX = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
-    aDirY = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
-    aCross = aLineDirX * aDirY - aLineDirY * aDirX
-    assert(math.fabs(aCross) < 1.e-10)
+#=========================================================================
+# Clear list of mirrored features
+#=========================================================================
+aSession.startOperation()
+aRefListInitial.clear()
+assert (aRefListB.size() == 0)
+assert (aRefListC.size() == 0)
+# add arc once again
+aRefListInitial.append(aSketchArc1.lastResult())
+aSession.finishOperation()
+assert (aRefListB.size() == 1)
+assert (aRefListC.size() == 1)
+checkMirror(aRefListB, aRefListC, aMirrorLine)
 #=========================================================================
 # End of test
 #=========================================================================

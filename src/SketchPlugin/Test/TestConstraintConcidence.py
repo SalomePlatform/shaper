@@ -18,20 +18,59 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+import math
 #=========================================================================
 # Initialization of the test
 #=========================================================================
 
 __updated__ = "2014-10-28"
+TOLERANCE = 1.e-7
 
+
+#=========================================================================
+# Auxiliary functions
+#=========================================================================
+def checkPointOnLine(point, line):
+    aStart = geomDataAPI_Point2D(line.attribute("StartPoint"))
+    aEnd   = geomDataAPI_Point2D(line.attribute("EndPoint"))
+    aDirX = aEnd.x() - aStart.x()
+    aDirY = aEnd.y() - aStart.y()
+    aVecX = point.x() - aStart.x()
+    aVecY = point.y() - aStart.y()
+    assert (math.fabs(aDirX * aVecY - aDirY * aVecX) <= TOLERANCE)
+
+def checkPointOnCircle(point, circle):
+    aCenter = geomDataAPI_Point2D(circle.attribute("CircleCenter"))
+    aRadius = circle.real("CircleRadius").value()
+    aDist = math.hypot(point.x() - aCenter.x(), point.y() - aCenter.y())
+    assert (math.fabs(aDist - aRadius) <= TOLERANCE)
+
+def checkPointOnArc(point, arc):
+    aStart  = geomDataAPI_Point2D(arc.attribute("ArcStartPoint"))
+    aCenter = geomDataAPI_Point2D(arc.attribute("ArcCenter"))
+    aRadius = math.hypot(aStart.x() - aCenter.x(), aStart.y() - aCenter.y())
+    aDist = math.hypot(point.x() - aCenter.x(), point.y() - aCenter.y())
+    assert (math.fabs(aDist - aRadius) <= TOLERANCE)
+
+
+#=========================================================================
+# Start of test
+#=========================================================================
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
+# add an origin
+aSession.startOperation()
+aFeature = aDocument.addFeature("Point")
+aFeature.real("x").setValue(0.)
+aFeature.real("y").setValue(0.)
+aFeature.real("z").setValue(0.)
+anOriginName = aFeature.name()
+aSession.finishOperation()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchCommonFeature = aDocument.addFeature("Sketch")
-aSketchFeature = featureToCompositeFeature(aSketchCommonFeature)
+aSketchFeature = featureToCompositeFeature(aDocument.addFeature("Sketch"))
 origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
 dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
@@ -79,20 +118,93 @@ assert (aLineStartPoint.y() == 0)
 deltaX = deltaY = 40.
 #  move line
 aSession.startOperation()
-anArcStartPoint.setValue(aLineStartPoint.x() + deltaX,
+aLineStartPoint.setValue(aLineStartPoint.x() + deltaX,
                          aLineStartPoint.y() + deltaY)
-anArcEndPoint.setValue(aLineEndPoint.x() + deltaX,
+aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
                        aLineEndPoint.y() + deltaY)
 aSession.finishOperation()
 # check that arc's points are moved also
 assert (anArcEndPoint.x() == aLineStartPoint.x())
 assert (anArcEndPoint.y() == aLineStartPoint.y())
 #=========================================================================
-# TODO: improve test
-# 1. remove constraint, move line to check that constraint are not applied
-# 2. make a new constraint when the points are distanced from each other,
-#    check that one from constrainted objects has moved
+# Remove coincidence and move the line
 #=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aConstraint)
+aSession.finishOperation()
+aSession.startOperation()
+aLineStartPoint.setValue(70., 0.)
+aSession.finishOperation()
+assert (anArcEndPoint.x() != aLineStartPoint.x() or anArcEndPoint.y() != aLineStartPoint.y())
+
+#=========================================================================
+# Add constraint point-on-line
+#=========================================================================
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
+reflistA.setAttr(anArcStartPoint)
+reflistB.setObject(aSketchLine.lastResult())
+aConstraint.execute()
+aSession.finishOperation()
+checkPointOnLine(anArcStartPoint, aSketchLine)
+#=========================================================================
+# Add constraint point-on-circle
+#=========================================================================
+aSession.startOperation()
+# create circle with center coincident with origin
+aSketchCircle = aSketchFeature.addFeature("SketchCircle")
+aCircleCenter = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
+aCircleRadius = aSketchCircle.real("CircleRadius")
+aCircleCenter.setValue(10., 10.)
+aCircleRadius.setValue(25.)
+aSession.finishOperation()
+# create origin
+aSession.startOperation()
+anOrigRes = modelAPI_Result(aDocument.objectByName("Construction", anOriginName))
+assert (anOrigRes)
+anOrigShape = anOrigRes.shape()
+assert (anOrigShape)
+anOrigin = aSketchFeature.addFeature("SketchPoint")
+anOriginCoord = geomDataAPI_Point2D(anOrigin.attribute("PointCoordindates"))
+anOriginCoord.setValue(0., 0.)
+anOrigin.selection("External").setValue(anOrigRes, anOrigShape)
+aSession.finishOperation()
+# coincidence between center of circle and the origin
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
+reflistA.setAttr(aCircleCenter)
+reflistB.setObject(anOrigin.lastResult())
+aSession.finishOperation()
+# point-on-circle
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
+reflistA.setObject(aSketchCircle.lastResult())
+reflistB.setAttr(aLineEndPoint)
+aConstraint.execute()
+aSession.finishOperation()
+checkPointOnCircle(aLineEndPoint, aSketchCircle)
+#=========================================================================
+# Add constraint point-on-arc
+#=========================================================================
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
+reflistA.setAttr(aCircleCenter)
+reflistB.setObject(aSketchArc.lastResult())
+aConstraint.execute()
+aSession.finishOperation()
+checkPointOnArc(aCircleCenter, aSketchArc)
+#=========================================================================
+# Check center of circle is still in origin
+#=========================================================================
+assert (aCircleCenter.x() == 0. and aCircleCenter.y() == 0.)
 #=========================================================================
 # End of test
 #=========================================================================
