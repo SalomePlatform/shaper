@@ -3,6 +3,9 @@
 #include <SketchSolver_Manager.h>
 
 #include <GeomAPI_Pnt2d.h>
+#include <SketchPlugin_Circle.h>
+
+#include <cmath>
 
 
 /// \brief Check whether the entities has only one shared point
@@ -49,6 +52,7 @@ void SketchSolver_ConstraintTangent::getAttributes(
   // Check the quantity of entities of each type and their order (arcs first)
   int aNbLines = 0;
   int aNbArcs = 0;
+  int aNbCircles = 0;
   bool isSwap = false; // whether need to swap arguments (arc goes before line)
   std::vector<EntityWrapperPtr>::iterator anEntIt = theAttributes.begin() + 2;
   for (; anEntIt != theAttributes.end(); ++anEntIt) {
@@ -58,14 +62,22 @@ void SketchSolver_ConstraintTangent::getAttributes(
       ++aNbArcs;
       isSwap = aNbLines > 0;
     }
+    else if ((*anEntIt)->type() == ENTITY_CIRCLE) {
+      ++aNbCircles;
+      isSwap = aNbLines > 0;
+    }
   }
 
-  if (aNbArcs < 1) {
+  if (aNbArcs < 1 && aNbCircles < 1) {
     myErrorMsg = SketchSolver_Error::INCORRECT_TANGENCY_ATTRIBUTE();
     return;
   }
-  if (aNbLines == 1 && aNbArcs == 1)
-    myType = CONSTRAINT_TANGENT_ARC_LINE;
+  if (aNbLines == 1) {
+    if (aNbArcs == 1)
+      myType = CONSTRAINT_TANGENT_ARC_LINE;
+    else if (aNbCircles == 1)
+      myType = CONSTRAINT_TANGENT_CIRCLE_LINE;
+  }
   else if (aNbArcs == 2)
     myType = CONSTRAINT_TANGENT_ARC_ARC;
   else {
@@ -73,7 +85,8 @@ void SketchSolver_ConstraintTangent::getAttributes(
     return;
   }
 
-  if (!hasSingleCoincidence(theAttributes[2], theAttributes[3]))
+  if (myType != CONSTRAINT_TANGENT_CIRCLE_LINE && 
+      !hasSingleCoincidence(theAttributes[2], theAttributes[3]))
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
 
   if (isSwap) {
@@ -81,4 +94,28 @@ void SketchSolver_ConstraintTangent::getAttributes(
     theAttributes[2] = theAttributes[3];
     theAttributes[3] = aTemp;
   }
+}
+
+void SketchSolver_ConstraintTangent::adjustConstraint()
+{
+  if (myType != CONSTRAINT_TANGENT_CIRCLE_LINE)
+    return;
+
+  ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
+  AttributePtr aCircleCenter = aConstraint->entities().front()->baseAttribute();
+  if (!aCircleCenter)
+    return;
+  FeaturePtr aCircle = ModelAPI_Feature::feature(aCircleCenter->owner());
+  AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+      aCircle->attribute(SketchPlugin_Circle::RADIUS_ID()));
+
+  if (fabs(aRadius->value()) == fabs(aConstraint->value()))
+    return;
+
+  aConstraint->setValue(aRadius->value());
+
+  // Adjust the sign of constraint value
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  aBuilder->adjustConstraint(aConstraint);
+  myStorage->addConstraint(myBaseConstraint, aConstraint);
 }

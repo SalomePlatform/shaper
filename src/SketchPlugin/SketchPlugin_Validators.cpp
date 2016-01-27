@@ -89,6 +89,47 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
   return true;
 }
 
+
+static bool hasCoincidentPoint(FeaturePtr theFeature1, FeaturePtr theFeature2)
+{
+  FeaturePtr aConstrFeature;
+  std::list<AttributePtr> anAttrList;
+  if (theFeature1->getKind() == SketchPlugin_Circle::ID() ||
+      theFeature2->getKind() == SketchPlugin_Circle::ID())
+    return false;
+  if (theFeature2->getKind() == SketchPlugin_Line::ID()) {
+    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Line::START_ID()));
+    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Line::END_ID()));
+  } else if (theFeature2->getKind() == SketchPlugin_Arc::ID()) {
+    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Arc::START_ID()));
+    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Arc::END_ID()));
+  }
+
+  const std::set<AttributePtr>& aRefsList = theFeature1->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aRefIt = aRefsList.begin();
+  for (; aRefIt != aRefsList.end(); ++aRefIt) {
+    aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
+    if (aConstrFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
+      continue;
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
+    AttributePtr anAttr = aRefAttr->attr();
+    if (anAttr->id() == SketchPlugin_Arc::CENTER_ID())
+      continue;
+
+    anAttr = aConstrFeature->attribute(SketchPlugin_Constraint::ENTITY_A());
+    if (anAttr == *aRefIt)
+      anAttr = aConstrFeature->attribute(SketchPlugin_Constraint::ENTITY_B());
+
+    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
+    anAttr = aRefAttr->attr();
+    for (std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
+         anIt != anAttrList.end(); ++anIt)
+      if (*anIt == anAttr)
+        return true;
+  }
+  return false;
+}
+
 bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments,
                                                 std::string& theError) const
@@ -114,11 +155,19 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
     AttributeRefAttrPtr aOtherAttr = anAttributeFeature->data()->refattr(aParamA);
     ObjectPtr aOtherObject = aOtherAttr->object();
     FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+    if (!aOtherFea)
+      return true;
+
+    if ((aRefFea->getKind() == SketchPlugin_Arc::ID() ||
+        aOtherFea->getKind() == SketchPlugin_Arc::ID()) &&
+        !hasCoincidentPoint(aRefFea, aOtherFea))
+      return false;
 
     if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Arc::ID()) {
-        theError = "It refers to a " + SketchPlugin_Line::ID() + ", but " + aParamA + " is not an "
-          + SketchPlugin_Arc::ID();
+      if (aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
+          aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
+        theError = "It refers to a " + SketchPlugin_Line::ID() + ", but " + aParamA + " is neither an "
+          + SketchPlugin_Arc::ID() + " nor " + SketchPlugin_Circle::ID();
         return false;
       }
     }
@@ -130,9 +179,16 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
         return false;
       }
     }
+    else if (aRefFea->getKind() == SketchPlugin_Circle::ID()) {
+      if (aOtherFea->getKind() != SketchPlugin_Line::ID()) {
+        theError = "It refers to an " + SketchPlugin_Circle::ID() + ", but " + aParamA + " is not a "
+          + SketchPlugin_Line::ID();
+        return false;
+      }
+    }
     else {
-      theError = "It refers to " + aRefFea->getKind() + "but should refer to " + SketchPlugin_Line::ID()
-        + " or " + SketchPlugin_Arc::ID();
+      theError = "It refers to " + aRefFea->getKind() + ", but should refer to " + SketchPlugin_Line::ID()
+        + " or " + SketchPlugin_Arc::ID() + " or " + SketchPlugin_Circle::ID();
       return false;
     }
     return true;
@@ -278,7 +334,6 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
   }
   return true;
 }
-
 
 bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                     const std::list<std::string>& theArguments,

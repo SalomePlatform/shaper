@@ -54,26 +54,10 @@ void SketchSolver_ConstraintDistance::adjustConstraint()
     return;
   }
 
-  // Get constraint parameters and check the sign of constraint value
+  // Adjust the sign of constraint value
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  std::shared_ptr<GeomAPI_Pnt2d> aPoint;
-  std::shared_ptr<GeomAPI_Lin2d> aLine;
-  std::list<EntityWrapperPtr> aSubs = aConstraint->entities();
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-  for (; aSIt != aSubs.end(); ++aSIt) {
-    if ((*aSIt)->type() == ENTITY_POINT)
-      aPoint = aBuilder->point(*aSIt);
-    else if ((*aSIt)->type() == ENTITY_LINE)
-      aLine = aBuilder->line(*aSIt);
-  }
-
-  std::shared_ptr<GeomAPI_XY> aLineVec = aLine->direction()->xy();
-  std::shared_ptr<GeomAPI_XY> aPtLineVec = aPoint->xy()->decreased(aLine->location()->xy());
-  if (aPtLineVec->cross(aLineVec) * aConstraint->value() < 0.0 || myIsNegative) {
-    aConstraint->setValue(aConstraint->value() * (-1.0));
-    myStorage->addConstraint(myBaseConstraint, aConstraint);
-    myIsNegative = true;
-  }
+  aBuilder->adjustConstraint(aConstraint);
+  myStorage->addConstraint(myBaseConstraint, aConstraint);
 }
 
 void SketchSolver_ConstraintDistance::update()

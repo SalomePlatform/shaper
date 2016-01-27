@@ -51,6 +51,8 @@ static void adjustTangency(ConstraintWrapperPtr theConstraint);
 static void adjustAngle(ConstraintWrapperPtr theConstraint);
 /// \brief Update mirror points
 static void adjustMirror(ConstraintWrapperPtr theConstraint);
+/// \brief Update a sign of the point-line distance constraint
+static void adjustPtLineDistance(ConstraintWrapperPtr theConstraint);
 
 /// \brief Transform points to be symmetric regarding to the mirror line
 static void makeMirrorPoints(EntityWrapperPtr theOriginal,
@@ -96,6 +98,15 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
   if (theType == CONSTRAINT_SYMMETRIC)
     return createMirror(theConstraint, theGroupID, theSketchID,
                         thePoint1, thePoint2, theEntity1);
+  else if (theType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
+    // replace by distance from center of circle to the line
+    const std::list<EntityWrapperPtr>& aSubs = theEntity1->subEntities();
+    EntityWrapperPtr aCenter = aSubs.front();
+    AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        aSubs.back()->baseAttribute());
+    return createConstraint(theConstraint, theGroupID, theSketchID,
+        CONSTRAINT_PT_LINE_DISTANCE, aRadius->value(), aCenter, EntityWrapperPtr(), theEntity2);
+  }
 
   int aType = ConstraintType::toSolveSpace(theType);
   if (aType == SLVS_C_UNKNOWN)
@@ -264,6 +275,8 @@ void SolveSpaceSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstrai
     adjustAngle(theConstraint);
   else if (aType == CONSTRAINT_SYMMETRIC)
     adjustMirror(theConstraint);
+  else if (aType == CONSTRAINT_PT_LINE_DISTANCE)
+    adjustPtLineDistance(theConstraint);
 }
 
 EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
@@ -294,10 +307,10 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
     return createLine(theFeature, theAttributes, theGroupID, theSketchID);
   // Circle
   else if (aFeatureKind == SketchPlugin_Circle::ID())
-    return createCircle(theFeature, theAttributes,theGroupID, theSketchID);
+    return createCircle(theFeature, theAttributes, theGroupID, theSketchID);
   // Arc
   else if (aFeatureKind == SketchPlugin_Arc::ID())
-    return createArc(theFeature, theAttributes,theGroupID, theSketchID);
+    return createArc(theFeature, theAttributes, theGroupID, theSketchID);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
   else if (aFeatureKind == SketchPlugin_Point::ID()) {
     AttributePtr aPoint = theFeature->attribute(SketchPlugin_Point::COORD_ID());
@@ -783,4 +796,25 @@ void makeMirrorPoints(EntityWrapperPtr theOriginal,
     std::shared_ptr<GeomDataAPI_Point2D> aMirroredPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
     aMirroredPnt->setValue(aCoord[0], aCoord[1]);
   }
+}
+
+void adjustPtLineDistance(ConstraintWrapperPtr theConstraint)
+{
+  BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPoint;
+  std::shared_ptr<GeomAPI_Lin2d> aLine;
+  std::list<EntityWrapperPtr> aSubs = theConstraint->entities();
+  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
+  for (; aSIt != aSubs.end(); ++aSIt) {
+    if ((*aSIt)->type() == ENTITY_POINT)
+      aPoint = aBuilder->point(*aSIt);
+    else if ((*aSIt)->type() == ENTITY_LINE)
+      aLine = aBuilder->line(*aSIt);
+  }
+
+  std::shared_ptr<GeomAPI_XY> aLineVec = aLine->direction()->xy();
+  std::shared_ptr<GeomAPI_XY> aPtLineVec = aPoint->xy()->decreased(aLine->location()->xy());
+  if (aPtLineVec->cross(aLineVec) * theConstraint->value() < 0.0)
+    theConstraint->setValue(theConstraint->value() * (-1.0));
 }
