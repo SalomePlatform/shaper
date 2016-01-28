@@ -107,6 +107,25 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
     return createConstraint(theConstraint, theGroupID, theSketchID,
         CONSTRAINT_PT_LINE_DISTANCE, aRadius->value(), aCenter, EntityWrapperPtr(), theEntity2);
   }
+  else if (theType == CONSTRAINT_COLLINEAR) {
+    // replace by two constraints point-on-line
+    std::list<ConstraintWrapperPtr> aConstraints;
+    const std::list<EntityWrapperPtr>& aSubs1 = theEntity1->subEntities();
+    const std::list<EntityWrapperPtr>& aSubs2 = theEntity2->subEntities();
+    std::list<EntityWrapperPtr>::const_iterator anIt1, anIt2;
+    for (anIt2 = aSubs2.begin(); anIt2 != aSubs2.end(); ++anIt2) {
+      for (anIt1 = aSubs1.begin(); anIt1 != aSubs1.end(); ++anIt1)
+        if ((*anIt1)->id() == (*anIt2)->id())
+          break;
+      if (anIt1 != aSubs1.end())
+        continue; // the lines have coincident point
+
+      std::list<ConstraintWrapperPtr> aC = createConstraint(theConstraint, theGroupID,
+          theSketchID, CONSTRAINT_PT_ON_LINE, theValue, *anIt2, EntityWrapperPtr(), theEntity1);
+      aConstraints.insert(aConstraints.end(), aC.begin(), aC.end());
+    }
+    return aConstraints;
+  }
 
   int aType = ConstraintType::toSolveSpace(theType);
   if (aType == SLVS_C_UNKNOWN)

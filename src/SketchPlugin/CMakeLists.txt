@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Constraint.h
     SketchPlugin_ConstraintBase.h
     SketchPlugin_ConstraintCoincidence.h
+    SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
     SketchPlugin_ConstraintLength.h
     SketchPlugin_ConstraintParallel.h
@@ -48,6 +49,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintBase.cpp
     SketchPlugin_ConstraintCoincidence.cpp
+    SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
     SketchPlugin_ConstraintLength.cpp
     SketchPlugin_ConstraintParallel.cpp
@@ -101,6 +103,7 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSketchArcCircle.py
                TestConstraintConcidence.py
+               TestConstraintCollinear.py
                TestConstraintLength.py
                TestConstraintDistance.py
                TestConstraintParallel.py

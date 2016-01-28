@@ -10,6 +10,7 @@
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
@@ -79,6 +80,8 @@ SketchSolver_ConstraintType SketchSolver_Constraint::TYPE(ConstraintPtr theConst
     return CONSTRAINT_RADIUS;
   else if (aType == SketchPlugin_ConstraintTangent::ID())
     return CONSTRAINT_TANGENT;
+  else if (aType == SketchPlugin_ConstraintCollinear::ID())
+    return CONSTRAINT_COLLINEAR;
   return CONSTRAINT_UNKNOWN;
 }
 

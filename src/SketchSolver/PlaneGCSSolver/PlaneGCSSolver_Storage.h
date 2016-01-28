@@ -100,6 +100,9 @@ private:
   /// \param theArc [in]  updated arc
   void processArc(const EntityWrapperPtr& theArc);
 
+  /// \brief Adjust parameters of points coincident with the given
+  void updateCoincident(const EntityWrapperPtr& thePoint);
+
 private:
   GCS::VEC_pD                      myParameters;         ///< list of parameters
   GCS::VEC_pD                      myConst;              ///< list of constants

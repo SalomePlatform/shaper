@@ -128,6 +128,11 @@ static ConstraintWrapperPtr
                           const SketchSolver_ConstraintType& theType,
                           std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity1,
                           std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity2);
+static ConstraintWrapperPtr
+  createConstraintCollinear(ConstraintPtr theConstraint,
+                           const GroupID& theGroupID,
+                           std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity1,
+                           std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity2);
 
 
 
@@ -245,6 +250,10 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createConstraint(
   case CONSTRAINT_TANGENT_CIRCLE_LINE:
   case CONSTRAINT_TANGENT_ARC_ARC:
     aResult = createConstraintTangent(theConstraint, theGroupID, theType,
+                  GCS_ENTITY_WRAPPER(theEntity1), GCS_ENTITY_WRAPPER(theEntity2));
+    break;
+  case CONSTRAINT_COLLINEAR:
+    aResult = createConstraintCollinear(theConstraint, theGroupID,
                   GCS_ENTITY_WRAPPER(theEntity1), GCS_ENTITY_WRAPPER(theEntity2));
     break;
   case CONSTRAINT_MULTI_TRANSLATION:
@@ -905,6 +914,29 @@ ConstraintWrapperPtr createConstraintHorizVert(
       theConstraint, aNewConstr, theType));
   aResult->setGroup(theGroupID);
   std::list<EntityWrapperPtr> aSubs(1, theEntity);
+  aResult->setEntities(aSubs);
+  return aResult;
+}
+
+ConstraintWrapperPtr createConstraintCollinear(
+    ConstraintPtr theConstraint,
+    const GroupID& theGroupID,
+    std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity1,
+    std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity2)
+{
+  std::shared_ptr<GCS::Line> aLine1 = std::dynamic_pointer_cast<GCS::Line>(theEntity1->entity());
+  std::shared_ptr<GCS::Line> aLine2 = std::dynamic_pointer_cast<GCS::Line>(theEntity2->entity());
+
+  // create two point-on-line constraints
+  std::list<GCSConstraintPtr> aConstrList;
+  aConstrList.push_back( GCSConstraintPtr(new GCS::ConstraintPointOnLine(aLine2->p1, *aLine1)) );
+  aConstrList.push_back( GCSConstraintPtr(new GCS::ConstraintPointOnLine(aLine2->p2, *aLine1)) );
+
+  ConstraintWrapperPtr aResult(new PlaneGCSSolver_ConstraintWrapper(
+      theConstraint, aConstrList, CONSTRAINT_COLLINEAR));
+  aResult->setGroup(theGroupID);
+  std::list<EntityWrapperPtr> aSubs(1, theEntity1);
+  aSubs.push_back(theEntity2);
   aResult->setEntities(aSubs);
   return aResult;
 }

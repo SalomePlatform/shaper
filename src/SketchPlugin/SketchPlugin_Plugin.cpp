@@ -8,6 +8,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintFillet.h>
@@ -113,6 +114,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_Arc);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
+  } else if (theFeatureID == SketchPlugin_ConstraintCollinear::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintCollinear);
   } else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintDistance);
   } else if (theFeatureID == SketchPlugin_ConstraintLength::ID()) {

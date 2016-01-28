@@ -306,8 +306,11 @@ void PlaneGCSSolver_Storage::changeGroup(EntityWrapperPtr theEntity, const Group
   theEntity->setGroup(theGroup);
   if (theGroup == myGroupID)
     makeVariable(theEntity);
-  else
+  else {
+    if (theEntity->type() == ENTITY_POINT)
+      update(theEntity);
     makeConstant(theEntity);
+  }
 }
 
 void PlaneGCSSolver_Storage::changeGroup(ParameterWrapperPtr theParam, const GroupID& theGroup)
@@ -382,6 +385,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
 void PlaneGCSSolver_Storage::makeConstant(const EntityWrapperPtr& theEntity)
 {
   toggleEntity(theEntity, myParameters, myConst);
+  if (theEntity->type() == ENTITY_POINT)
+    updateCoincident(theEntity);
 }
 
 void PlaneGCSSolver_Storage::makeVariable(const EntityWrapperPtr& theEntity)
@@ -420,6 +425,32 @@ void PlaneGCSSolver_Storage::toggleEntity(
     int aShift = anIt - theFrom.begin();
     theFrom.erase(anIt);
     anIt = theFrom.begin() + aShift;
+  }
+}
+
+void PlaneGCSSolver_Storage::updateCoincident(const EntityWrapperPtr& thePoint)
+{
+  CoincidentPointsMap::iterator anIt = myCoincidentPoints.begin();
+  for (; anIt != myCoincidentPoints.end(); ++anIt) {
+    if (anIt->first == thePoint || anIt->second.find(thePoint) != anIt->second.end()) {
+      std::set<EntityWrapperPtr> aCoincident = anIt->second;
+      aCoincident.insert(anIt->first);
+
+      const std::list<ParameterWrapperPtr>& aBaseParams = thePoint->parameters();
+      std::list<ParameterWrapperPtr> aParams;
+      std::list<ParameterWrapperPtr>::const_iterator aBaseIt, anUpdIt;
+
+      std::set<EntityWrapperPtr>::const_iterator aCoincIt = aCoincident.begin();
+      for (; aCoincIt != aCoincident.end(); ++aCoincIt)
+        if (*aCoincIt != thePoint && (*aCoincIt)->group() != GID_OUTOFGROUP) {
+          aParams = (*aCoincIt)->parameters();
+          aBaseIt = aBaseParams.begin();
+          for (anUpdIt = aParams.begin(); anUpdIt != aParams.end(); ++anUpdIt, ++aBaseIt)
+            (*anUpdIt)->setValue((*aBaseIt)->value());
+        }
+
+      break;
+    }
   }
 }
 

@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -250,6 +250,22 @@
           <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
         <validator id="PartSet_TangentSelection"/>
+      </feature>
+      
+    <!--  SketchConstraintCollinear  -->
+      <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon=":icons/collinear.png">
+        <sketch_shape_selector id="ConstraintEntityA" 
+            label="First line" tooltip="Select a line" shape_types="edge">
+          <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="PartSet_DifferentObjects"/>
+        </sketch_shape_selector>
+        
+        <sketch_shape_selector id="ConstraintEntityB"
+            label="Second line" tooltip="Select a line" shape_types="edge">
+          <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="PartSet_DifferentObjects"/>
+        </sketch_shape_selector>
+        <validator id="PartSet_CollinearSelection"/>
       </feature>
          
     </group>

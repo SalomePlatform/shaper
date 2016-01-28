@@ -314,6 +314,16 @@ bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection, 
   }
 }
 
+bool PartSet_CollinearSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    return isEmptySelectionValid(theOperation);
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return (aCount > 0) && (aCount < 3);
+  }
+}
+
 
 std::string PartSet_DifferentObjectsValidator::errorMessage(
                          const PartSet_DifferentObjectsValidator::ErrorType& theType,
