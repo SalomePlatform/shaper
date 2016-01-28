@@ -19,11 +19,11 @@ __updated__ = "2016-01-28"
 
 
 def checkCollinearVec(theX1, theY1, theX2, theY2):
-    TOL = 1.e-6
+    TOL = 2.e-6
     aLen1 = math.hypot(theX1, theY1)
     aLen2 = math.hypot(theX2, theY2)
     aDot = theX1 * theX2 + theY1 * theY2
-    assert math.fabs(math.fabs(aDot) - aLen1 * aLen2) < TOL**2, "aDot = {0}, aLen1 = {1}, aLen2 = {2}, aDiff = {3}".format(aDot, aLen1, aLen2, math.fabs(aDot) - aLen1 * aLen2)
+    assert (math.fabs(math.fabs(aDot) - aLen1 * aLen2) < TOL**2)
 
 def checkCollinear(theLine1, theLine2):
     aStartPoint1 = geomDataAPI_Point2D(theLine1.attribute("StartPoint"))
