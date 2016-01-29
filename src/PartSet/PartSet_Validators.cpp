@@ -324,6 +324,14 @@ bool PartSet_CollinearSelection::isValid(const ModuleBase_ISelection* theSelecti
   }
 }
 
+bool PartSet_MiddlePointSelection::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0)
+    return isEmptySelectionValid(theOperation);
+  else
+    return shapesNbLines(theSelection) == 1 && shapesNbPoints(theSelection) == 1;
+}
+
 
 std::string PartSet_DifferentObjectsValidator::errorMessage(
                          const PartSet_DifferentObjectsValidator::ErrorType& theType,

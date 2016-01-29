@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
     SketchPlugin_ConstraintLength.h
+    SketchPlugin_ConstraintMiddle.h
     SketchPlugin_ConstraintParallel.h
     SketchPlugin_ConstraintPerpendicular.h
     SketchPlugin_ConstraintRadius.h
@@ -52,6 +53,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
     SketchPlugin_ConstraintLength.cpp
+    SketchPlugin_ConstraintMiddle.cpp
     SketchPlugin_ConstraintParallel.cpp
     SketchPlugin_ConstraintPerpendicular.cpp
     SketchPlugin_ConstraintRadius.cpp
@@ -116,6 +118,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintTangent.py
                TestConstraintMirror.py
                TestConstraintAngle.py
+               TestConstraintMiddlePoint.py
                TestMultiRotation.py
                TestMultiTranslation.py
                TestFillet.py

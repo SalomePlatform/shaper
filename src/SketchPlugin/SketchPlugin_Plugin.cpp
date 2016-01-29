@@ -14,6 +14,7 @@
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
@@ -73,6 +74,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_SolverErrorValidator);
   aFactory->registerValidator("SketchPlugin_FilletVertexValidator",
                               new SketchPlugin_FilletVertexValidator);
+  aFactory->registerValidator("SketchPlugin_MiddlePointAttr",
+                              new SketchPlugin_MiddlePointAttrValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -136,6 +139,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintEqual);
   } else if (theFeatureID == SketchPlugin_ConstraintTangent::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintTangent);
+  } else if (theFeatureID == SketchPlugin_ConstraintMiddle::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintMiddle);
   } else if (theFeatureID == SketchPlugin_ConstraintMirror::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
   } else if (theFeatureID == SketchPlugin_ConstraintFillet::ID()) {

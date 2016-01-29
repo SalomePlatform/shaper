@@ -123,6 +123,14 @@ public:
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
 };
 
+//! \ingroup Validators
+//! A class to validate a selection for Middle point constraints operation
+class PartSet_MiddlePointSelection : public ModuleBase_SelectionValidator
+{
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const;
+};
+
 ////////////// Attribute validators ////////////////
 
 

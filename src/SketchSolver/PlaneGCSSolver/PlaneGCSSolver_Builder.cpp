@@ -133,6 +133,11 @@ static ConstraintWrapperPtr
                            const GroupID& theGroupID,
                            std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity1,
                            std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity2);
+static ConstraintWrapperPtr
+  createConstraintMiddlePoint(ConstraintPtr theConstraint,
+                              const GroupID& theGroupID,
+                              std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
+                              std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity);
 
 
 
@@ -201,6 +206,10 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createConstraint(
   case CONSTRAINT_PT_ON_LINE:
   case CONSTRAINT_PT_ON_CIRCLE:
     aResult = createConstraintPointOnEntity(theConstraint, theGroupID, theType,
+                  aPoint1, GCS_ENTITY_WRAPPER(theEntity1));
+    break;
+  case CONSTRAINT_MIDDLE_POINT:
+    aResult = createConstraintMiddlePoint(theConstraint, theGroupID,
                   aPoint1, GCS_ENTITY_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_PT_PT_DISTANCE:
@@ -815,6 +824,65 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
   aResult->setEntities(aSubs);
   return aResult;
 }
+
+// calculate length of the line
+static inline double lineLength(const GCS::Line& theLine)
+{
+  double aDir[2] = {*(theLine.p2.x) - *(theLine.p1.x), *(theLine.p2.y) - *(theLine.p1.y)};
+  return sqrt(aDir[0] * aDir[0] + aDir[1] * aDir[1]);
+}
+
+// check the point is on the line
+static inline bool isPointOnLine(const GCS::Point& thePoint, const GCS::Line& theLine)
+{
+  double aDir[2] = {*(theLine.p2.x) - *(theLine.p1.x), *(theLine.p2.y) - *(theLine.p1.y)};
+  double aVec[2] = {*(thePoint.x) - *(theLine.p1.x), *(thePoint.y) - *(theLine.p1.y)};
+  double aCross = aVec[0] * aDir[1] - aVec[1] * aDir[0];
+  return fabs(aCross) < tolerance;
+}
+
+ConstraintWrapperPtr createConstraintMiddlePoint(
+    ConstraintPtr theConstraint,
+    const GroupID& theGroupID,
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
+    std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity)
+{
+  GCSPointPtr aPoint = thePoint->point();
+  std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(theEntity->entity());
+  if (!aLine)
+    return ConstraintWrapperPtr();
+
+  std::list<GCSConstraintPtr> aConstrList;
+  aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintPointOnLine(*aPoint, *aLine)));
+  double aDist = lineLength(*aLine);
+  std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aDistance =
+      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(createParameter(theGroupID, aDist));
+  aConstrList.push_back(GCSConstraintPtr(
+      new GCS::ConstraintP2PDistance(*aPoint, aLine->p1, aDistance->parameter())));
+  aConstrList.push_back(GCSConstraintPtr(
+      new GCS::ConstraintP2PDistance(*aPoint, aLine->p2, aDistance->parameter())));
+
+  // Workaround to avoid conflicting constraints when the point is already placed on line
+  if (thePoint->group() != GID_UNKNOWN && isPointOnLine(*aPoint, *aLine)) {
+    std::shared_ptr<GeomDataAPI_Point2D> aCoord =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(thePoint->baseAttribute());
+    if (aCoord) {
+      *(aPoint->x) = (*(aLine->p1.x) + *(aLine->p2.x)) * 0.5;
+      *(aPoint->y) = (*(aLine->p1.y) + *(aLine->p2.y)) * 0.5;
+      aCoord->setValue(*(aPoint->x), *(aPoint->y));
+    }
+  }
+
+  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(new PlaneGCSSolver_ConstraintWrapper(
+      theConstraint, aConstrList, CONSTRAINT_MIDDLE_POINT));
+  aResult->setGroup(theGroupID);
+  std::list<EntityWrapperPtr> aSubs(1, thePoint);
+  aSubs.push_back(theEntity);
+  aResult->setEntities(aSubs);
+  aResult->setValueParameter(aDistance);
+  return aResult;
+}
+
 
 ConstraintWrapperPtr createConstraintDistancePointPoint(
     ConstraintPtr theConstraint,

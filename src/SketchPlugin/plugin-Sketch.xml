@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -266,6 +266,21 @@
           <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
         <validator id="PartSet_CollinearSelection"/>
+      </feature>
+
+      <!--  SketchConstraintMiddle  -->
+      <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line" icon=":icons/middlepoint.png">
+        <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+          <validator id="SketchPlugin_MiddlePointAttr" parameters="ConstraintEntityB"/>
+        </sketch_shape_selector>
+        <sketch_shape_selector id="ConstraintEntityB" label="Second object" tooltip="Select a second object" shape_types="vertex edge">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_MiddlePointAttr" parameters="ConstraintEntityA"/>
+        </sketch_shape_selector>
+        <validator id="PartSet_MiddlePointSelection"/>
       </feature>
          
     </group>

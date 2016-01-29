@@ -615,3 +615,49 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
 
   return true;
 }
+
+bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttribute, 
+                                                    const std::list<std::string>& theArguments,
+                                                    std::string& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
+  // there is a check whether the feature contains a point and a linear edge or two point values
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr anAttributeFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributeRefAttrPtr anOtherAttr = anAttributeFeature->data()->refattr(aParamA);
+
+  AttributeRefAttrPtr aRefAttrs[2] = {aRefAttr, anOtherAttr};
+  int aNbPoints = 0;
+  int aNbLines = 0;
+  for (int i = 0; i < 2; ++i) {
+    if (!aRefAttrs[i]->isObject())
+      ++aNbPoints;
+    else {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrs[i]->object());
+      if (!aFeature) {
+        if (aNbPoints + aNbLines != 0)
+          return true;
+        else continue;
+      }
+
+      if (aFeature->getKind() == SketchPlugin_Point::ID())
+        ++aNbPoints;
+      else if (aFeature->getKind() == SketchPlugin_Line::ID())
+        ++aNbLines;
+    }
+  }
+
+  if (aNbPoints != 1 || aNbLines != 1) {
+    theError = "Middle point constraint allows points and lines only";
+    return false;
+  }
+  return true;
+}

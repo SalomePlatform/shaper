@@ -203,6 +203,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_AngleSelection", new PartSet_AngleSelection);
   aFactory->registerValidator("PartSet_EqualSelection", new PartSet_EqualSelection);
   aFactory->registerValidator("PartSet_CollinearSelection", new PartSet_CollinearSelection);
+  aFactory->registerValidator("PartSet_MiddlePointSelection", new PartSet_MiddlePointSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
   aFactory->registerValidator("PartSet_SketchEntityValidator", new PartSet_SketchEntityValidator);

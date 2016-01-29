@@ -15,6 +15,7 @@
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
@@ -82,6 +83,8 @@ SketchSolver_ConstraintType SketchSolver_Constraint::TYPE(ConstraintPtr theConst
     return CONSTRAINT_TANGENT;
   else if (aType == SketchPlugin_ConstraintCollinear::ID())
     return CONSTRAINT_COLLINEAR;
+  else if (aType == SketchPlugin_ConstraintMiddle::ID())
+    return CONSTRAINT_MIDDLE_POINT;
   return CONSTRAINT_UNKNOWN;
 }
 
