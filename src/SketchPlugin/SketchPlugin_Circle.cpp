@@ -11,15 +11,69 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+
+namespace {
+  static const std::string& CIRCLE_TYPE()
+  {
+    static const std::string TYPE("CircleType");
+    return TYPE;
+  }
+  static const std::string CIRCLE_TYPE_CENTER_AND_RADIUS()
+  {
+    static const std::string TYPE("CenterRadius");
+    return TYPE;
+  }
+  static const std::string CIRCLE_TYPE_THREE_POINTS()
+  {
+    static const std::string TYPE("ThreePoints");
+    return TYPE;
+  }
+
+  static const std::string& FIRST_POINT_ID()
+  {
+    static const std::string FIRST_PNT("FirstPoint");
+    return FIRST_PNT;
+  }
+  static const std::string& SECOND_POINT_ID()
+  {
+    static const std::string SECOND_PNT("SecondPoint");
+    return SECOND_PNT;
+  }
+  static const std::string& THIRD_POINT_ID()
+  {
+    static const std::string THIRD_PNT("ThirdPoint");
+    return THIRD_PNT;
+  }
+  static const std::string& POINT_ID(int theIndex)
+  {
+    switch (theIndex) {
+    case 1: return FIRST_POINT_ID();
+    case 2: return SECOND_POINT_ID();
+    case 3: return THIRD_POINT_ID();
+    }
+
+    static const std::string DUMMY;
+    return DUMMY;
+  }
+}
+
+static void calculateCircleOnThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
+                                         const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPnt,
+                                         const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPnt,
+                                               std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                                               double&                         theRadius);
+
 
 SketchPlugin_Circle::SketchPlugin_Circle()
     : SketchPlugin_SketchEntity()
@@ -32,6 +86,13 @@ void SketchPlugin_Circle::initDerivedClassAttributes()
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
+
+  data()->addAttribute(CIRCLE_TYPE(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(FIRST_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(SECOND_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(THIRD_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+      data()->attribute(CIRCLE_TYPE()))->setValue(CIRCLE_TYPE_CENTER_AND_RADIUS());
 }
 
 void SketchPlugin_Circle::execute()
@@ -70,6 +131,46 @@ void SketchPlugin_Circle::execute()
   }
 }
 
+AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
+{
+  SketchPlugin_Sketch* aSketch = sketch();
+  if (aSketch) {
+    // compute a circle point in 3D view
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+    AttributeDoublePtr aRadiusAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(attribute(RADIUS_ID()));
+    if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
+        std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+
+        // make a visible circle
+        std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+            aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+        std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
+
+        double aRadius = aRadiusAttr->value();
+        std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(
+            aCenter, aNormal, aRadius);
+        if (aCircleShape && aRadius != 0) {
+          std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
+          // make a visible point
+          std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+          aShapes.push_back(aCenterPointShape);
+          aShapes.push_back(aCircleShape);
+
+          std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+          AISObjectPtr anAIS = thePrevious;
+          if (!anAIS)
+            anAIS = AISObjectPtr(new GeomAPI_AISObject);
+          anAIS->createShape(aCompound);
+          anAIS->setWidth(3);
+          return anAIS;
+        }
+    }
+  }
+  return AISObjectPtr();
+}
+
 void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
@@ -99,4 +200,108 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
       real(RADIUS_ID())->setValue(aCirc->radius());
     }
   }
+  else if (theID == CENTER_ID() || theID == RADIUS_ID()) {
+    std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+      data()->attribute(CIRCLE_TYPE()))->value();
+    if (aType == CIRCLE_TYPE_THREE_POINTS())
+      return;
+
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
+    if (!aCenterAttr->isInitialized())
+      return;
+    AttributeDoublePtr aRadiusAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(attribute(RADIUS_ID()));
+    if (!aRadiusAttr->isInitialized())
+      return;
+
+    // check the execute() was called and the shape was built
+    if (!lastResult())
+      return;
+
+    data()->blockSendAttributeUpdated(true);
+    std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aThirdPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
+    double aRadius = aRadiusAttr->value();
+    aFirstPnt->setValue(aCenterAttr->x() + aRadius, aCenterAttr->y());
+    aSecondPnt->setValue(aCenterAttr->x(), aCenterAttr->y() + aRadius);
+    aThirdPnt->setValue(aCenterAttr->x() - aRadius, aCenterAttr->y());
+    data()->blockSendAttributeUpdated(false);
+  }
+  else if (theID == FIRST_POINT_ID() || theID == SECOND_POINT_ID() || theID == THIRD_POINT_ID()) {
+    std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+      data()->attribute(CIRCLE_TYPE()))->value();
+    if (aType == CIRCLE_TYPE_CENTER_AND_RADIUS())
+      return;
+
+    data()->blockSendAttributeUpdated(true);
+
+    std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
+    int aNbInitialized = 0;
+    for (int i = 1; i <= 3; ++i) {
+      std::shared_ptr<GeomDataAPI_Point2D> aCurPnt =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(POINT_ID(i)));
+      if (aCurPnt->isInitialized())
+        aPoints[aNbInitialized++] = aCurPnt->pnt();
+    }
+
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+    AttributeDoublePtr aRadiusAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
+
+    if (aNbInitialized == 1)
+      aCenterAttr->setValue(aPoints[0]->x(), aPoints[0]->y());
+    else if (aNbInitialized == 2) {
+      std::shared_ptr<GeomAPI_XY> aCoord =
+          aPoints[0]->xy()->added(aPoints[1]->xy())->multiplied(0.5);
+      double aRadius = aPoints[0]->distance(aPoints[1]) * 0.5;
+      aCenterAttr->setValue(aCoord->x(), aCoord->y());
+      aRadiusAttr->setValue(aRadius);
+    } else {
+      std::shared_ptr<GeomAPI_Pnt2d> aCenter;
+      double aRadius;
+      calculateCircleOnThreePoints(aPoints[0], aPoints[1], aPoints[2], aCenter, aRadius);
+      if (aCenter) {
+        aCenterAttr->setValue(aCenter->x(), aCenter->y());
+        aRadiusAttr->setValue(aRadius);
+      }
+    }
+
+    data()->blockSendAttributeUpdated(false);
+  }
+}
+
+
+
+
+// ==========   Auxiliary functions   =========================
+void calculateCircleOnThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPnt,
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPnt,
+                                        std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                                        double&                         theRadius)
+{
+  std::shared_ptr<GeomAPI_XY> aVec12 = theSecondPnt->xy()->decreased(theFirstPnt->xy());
+  std::shared_ptr<GeomAPI_XY> aVec23 = theThirdPnt->xy()->decreased(theSecondPnt->xy());
+  std::shared_ptr<GeomAPI_XY> aVec31 = theFirstPnt->xy()->decreased(theThirdPnt->xy());
+  // square of parallelogram
+  double aSquare2 = aVec12->cross(aVec23);
+  aSquare2 *= aSquare2 * 2.0;
+  if (aSquare2 < 1.e-20)
+    return;
+  // coefficients to calculate center
+  double aCoeff1 = aVec23->dot(aVec23) / aSquare2 * aVec12->dot(aVec31->multiplied(-1.0));
+  double aCoeff2 = aVec31->dot(aVec31) / aSquare2 * aVec23->dot(aVec12->multiplied(-1.0));
+  double aCoeff3 = aVec12->dot(aVec12) / aSquare2 * aVec31->dot(aVec23->multiplied(-1.0));
+  // center
+  std::shared_ptr<GeomAPI_XY> aCenter = theFirstPnt->xy()->multiplied(aCoeff1)->added(
+      theSecondPnt->xy()->multiplied(aCoeff2))->added(theThirdPnt->xy()->multiplied(aCoeff3));
+  theCenter = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCenter));
+  // radius
+  theRadius = theFirstPnt->distance(theCenter);
 }

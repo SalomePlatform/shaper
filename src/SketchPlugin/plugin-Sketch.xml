@@ -27,13 +27,29 @@
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
-      <feature id="SketchCircle" title="Circle" tooltip="Create circle" icon=":icons/circle.png">
-        <sketch-2dpoint_selector id="CircleCenter" accept_expressions="0" title="Center" tooltip="Center coordinates"/>
-        <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
-          <validator id="GeomValidators_Positive"/>
-        </point2ddistance>
+
+      <!-- SketchCircle -->
+      <feature 
+        id="SketchCircle"
+        title="Circle"
+        tooltip="Create circle"
+        icon=":icons/circle.png">
+        <toolbox id="CircleType">
+          <box id="CenterRadius" title="Center and radius" icon=":icons/circle_pt_rad_32x32.png">
+            <sketch-2dpoint_selector id="CircleCenter" accept_expressions="0" title="Center" tooltip="Center coordinates"/>
+            <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
+              <validator id="GeomValidators_Positive"/>
+            </point2ddistance>
+          </box>
+          <box id="ThreePoints" title="Tree points" icon=":icons/circle_3pt_32x32.png">
+            <sketch-2dpoint_selector id="FirstPoint" accept_expressions="0" title="First point" tooltip="First point"/>
+            <sketch-2dpoint_selector id="SecondPoint" accept_expressions="0" title="Second point" tooltip="Second point"/>
+            <sketch-2dpoint_selector id="ThirdPoint" accept_expressions="0" title="Third point" tooltip="Third point"/>
+          </box>
+        </toolbox>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
+
       <feature id="SketchArc" title="Arc" tooltip="Create arc" icon=":icons/arc.png">
         <sketch-2dpoint_selector id="ArcCenter" accept_expressions="0" title="Center" tooltip="Center of a circle"/>
         <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"/>

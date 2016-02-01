@@ -16,7 +16,7 @@
  * \ingroup Plugins
  * \brief Feature for creation of the new circle in PartSet.
  */
-class SketchPlugin_Circle : public SketchPlugin_SketchEntity 
+class SketchPlugin_Circle : public SketchPlugin_SketchEntity, public GeomAPI_IPresentable
 {
  public:
   /// Circle feature kind
@@ -58,7 +58,6 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity
   SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature)
   {
   }
-  ;
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
@@ -67,6 +66,9 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity
 
   /// Called on change of any argument-attribute of this object
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
+  /// Returns the AIS preview
+  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Use plugin manager for features creation
   SketchPlugin_Circle();
