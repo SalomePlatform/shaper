@@ -16,6 +16,7 @@
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
@@ -67,12 +68,6 @@ namespace {
     return DUMMY;
   }
 }
-
-static void calculateCircleOnThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
-                                         const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPnt,
-                                         const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPnt,
-                                               std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                                               double&                         theRadius);
 
 
 SketchPlugin_Circle::SketchPlugin_Circle()
@@ -134,7 +129,7 @@ void SketchPlugin_Circle::execute()
 AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
 {
   SketchPlugin_Sketch* aSketch = sketch();
-  if (aSketch) {
+  if (aSketch && !isFeatureValid()) {
     // compute a circle point in 3D view
     std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
@@ -171,15 +166,37 @@ AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
   return AISObjectPtr();
 }
 
+bool SketchPlugin_Circle::isFeatureValid()
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aCenter = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_POINT_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aThirdPnt =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
+
+  return aCenter->isInitialized() && aFirstPnt->isInitialized() &&
+         aSecondPnt->isInitialized() && aThirdPnt->isInitialized();
+}
+
 void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
   if (!aData->isValid())
     return;
 
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(CENTER_ID()));
-  aPoint1->move(theDeltaX, theDeltaY);
+  aPoint->move(theDeltaX, theDeltaY);
+
+  aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(FIRST_POINT_ID()));
+  aPoint->move(theDeltaX, theDeltaY);
+  aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SECOND_POINT_ID()));
+  aPoint->move(theDeltaX, theDeltaY);
+  aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(THIRD_POINT_ID()));
+  aPoint->move(theDeltaX, theDeltaY);
 }
 
 bool SketchPlugin_Circle::isFixed() {
@@ -263,10 +280,12 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
       aCenterAttr->setValue(aCoord->x(), aCoord->y());
       aRadiusAttr->setValue(aRadius);
     } else {
-      std::shared_ptr<GeomAPI_Pnt2d> aCenter;
-      double aRadius;
-      calculateCircleOnThreePoints(aPoints[0], aPoints[1], aPoints[2], aCenter, aRadius);
+      std::shared_ptr<GeomAPI_Circ2d> aCircle(
+          new GeomAPI_Circ2d(aPoints[0], aPoints[1], aPoints[2]));
+
+      std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCircle->center();
       if (aCenter) {
+        double aRadius = aCircle->radius();
         aCenterAttr->setValue(aCenter->x(), aCenter->y());
         aRadiusAttr->setValue(aRadius);
       }
@@ -274,34 +293,4 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
 
     data()->blockSendAttributeUpdated(false);
   }
-}
-
-
-
-
-// ==========   Auxiliary functions   =========================
-void calculateCircleOnThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
-                                  const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPnt,
-                                  const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPnt,
-                                        std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                                        double&                         theRadius)
-{
-  std::shared_ptr<GeomAPI_XY> aVec12 = theSecondPnt->xy()->decreased(theFirstPnt->xy());
-  std::shared_ptr<GeomAPI_XY> aVec23 = theThirdPnt->xy()->decreased(theSecondPnt->xy());
-  std::shared_ptr<GeomAPI_XY> aVec31 = theFirstPnt->xy()->decreased(theThirdPnt->xy());
-  // square of parallelogram
-  double aSquare2 = aVec12->cross(aVec23);
-  aSquare2 *= aSquare2 * 2.0;
-  if (aSquare2 < 1.e-20)
-    return;
-  // coefficients to calculate center
-  double aCoeff1 = aVec23->dot(aVec23) / aSquare2 * aVec12->dot(aVec31->multiplied(-1.0));
-  double aCoeff2 = aVec31->dot(aVec31) / aSquare2 * aVec23->dot(aVec12->multiplied(-1.0));
-  double aCoeff3 = aVec12->dot(aVec12) / aSquare2 * aVec31->dot(aVec23->multiplied(-1.0));
-  // center
-  std::shared_ptr<GeomAPI_XY> aCenter = theFirstPnt->xy()->multiplied(aCoeff1)->added(
-      theSecondPnt->xy()->multiplied(aCoeff2))->added(theThirdPnt->xy()->multiplied(aCoeff3));
-  theCenter = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCenter));
-  // radius
-  theRadius = theFirstPnt->distance(theCenter);
 }

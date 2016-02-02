@@ -31,6 +31,12 @@ class GeomAPI_Circ2d : public GeomAPI_Interface
   GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                  const std::shared_ptr<GeomAPI_Dir2d>& theDir, double theRadius);
 
+  /// Creation of circle defined by three points lying on it
+  GEOMAPI_EXPORT
+  GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPoint);
+
   /// Return center of the circle
   GEOMAPI_EXPORT 
   const std::shared_ptr<GeomAPI_Pnt2d> center() const;

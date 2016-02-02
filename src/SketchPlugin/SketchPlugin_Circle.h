@@ -76,6 +76,10 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity, public GeomAPI_IPr
 protected:
   /// \brief Initializes attributes of derived class.
   virtual void initDerivedClassAttributes();
+
+private:
+  /// Returns true if all obligatory attributes are initialized
+  bool isFeatureValid();
 };
 
 #endif

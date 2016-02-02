@@ -44,6 +44,35 @@ static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
   return newCirc2d(theCenterX, theCenterY, aDir, aRadius);
 }
 
+static gp_Circ2d* newCirc2d(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+                            const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint,
+                            const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPoint)
+{
+  gp_XY aFirstPnt(theFirstPoint->x(), theFirstPoint->y());
+  gp_XY aSecondPnt(theSecondPoint->x(), theSecondPoint->y());
+  gp_XY aThirdPnt(theThirdPoint->x(), theThirdPoint->y());
+
+  gp_XY aVec12 = aSecondPnt - aFirstPnt;
+  gp_XY aVec23 = aThirdPnt - aSecondPnt;
+  gp_XY aVec31 = aFirstPnt - aThirdPnt;
+  // square of parallelogram
+  double aSquare2 = aVec12.Crossed(aVec23);
+  aSquare2 *= aSquare2 * 2.0;
+  if (aSquare2 < 1.e-20)
+    return NULL;
+  // coefficients to calculate center
+  double aCoeff1 = aVec23.Dot(aVec23) / aSquare2 * aVec12.Dot(aVec31.Reversed());
+  double aCoeff2 = aVec31.Dot(aVec31) / aSquare2 * aVec23.Dot(aVec12.Reversed());
+  double aCoeff3 = aVec12.Dot(aVec12) / aSquare2 * aVec31.Dot(aVec23.Reversed());
+  // center
+  gp_XY aCenter = aFirstPnt * aCoeff1 + aSecondPnt * aCoeff2 + aThirdPnt * aCoeff3;
+  // radius
+  double aRadius = (aFirstPnt - aCenter).Modulus();
+
+  gp_Dir2d aDir(aFirstPnt - aCenter);
+  return newCirc2d(aCenter.X(), aCenter.Y(), aDir, aRadius);
+}
+
 GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                                const std::shared_ptr<GeomAPI_Pnt2d>& theCirclePoint)
     : GeomAPI_Interface(
@@ -56,7 +85,13 @@ GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
     : GeomAPI_Interface(
         newCirc2d(theCenter->x(), theCenter->y(), theDir->impl<gp_Dir2d>(), theRadius))
 {
+}
 
+GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+                               const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint,
+                               const std::shared_ptr<GeomAPI_Pnt2d>& theThirdPoint)
+    : GeomAPI_Interface(newCirc2d(theFirstPoint, theSecondPoint, theThirdPoint))
+{
 }
 
 const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
@@ -89,12 +124,16 @@ const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
 
 const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::center() const
 {
+  if (!MY_CIRC2D)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
   const gp_Pnt2d& aCenter = MY_CIRC2D->Location();
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCenter.X(), aCenter.Y()));
 }
 
 double GeomAPI_Circ2d::radius() const
 {
+  if (!MY_CIRC2D)
+    return 0.0;
   return MY_CIRC2D->Radius();
 }
 
