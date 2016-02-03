@@ -13,30 +13,27 @@ using namespace std;
 
 void Model_AttributeDocRef::setValue(std::shared_ptr<ModelAPI_Document> theDoc)
 {
-  myDoc = theDoc;
-  TCollection_ExtendedString aNewID(theDoc->id().c_str());
-  if (!myIsInitialized || myComment->Get() != aNewID) {
-    myComment->Set(TCollection_ExtendedString(theDoc->id().c_str()));
+  if (myID->Get() != theDoc->id()) {
+    myID->Set(theDoc->id());
     owner()->data()->sendAttributeUpdated(this);
   }
 }
 
 std::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
 {
-  return myDoc;
+  return Model_Application::getApplication()->document(myID->Get());
+}
+
+int Model_AttributeDocRef::docId()
+{
+  return myID->Get();
 }
 
 Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
 {
-  myIsInitialized = theLabel.FindAttribute(TDataStd_Comment::GetID(), myComment) == Standard_True;
+  myIsInitialized = theLabel.FindAttribute(TDataStd_Integer::GetID(), myID) == Standard_True;
   if (!myIsInitialized) {
-    // create attribute: not initialized by value yet, just empty string
-    myComment = TDataStd_Comment::Set(theLabel, "");
-  } else {  // document was already referenced: try to set it as loaded by demand
-    Handle(Model_Application) anApp = Model_Application::getApplication();
-    string anID(TCollection_AsciiString(myComment->Get()).ToCString());
-    if (!anApp->hasDocument(anID)) {
-      anApp->setLoadByDemand(anID);
-    }
+    int aNewID = Model_Application::getApplication()->generateDocumentId();
+    myID = TDataStd_Integer::Set(theLabel, aNewID);
   }
 }

@@ -15,6 +15,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
 #include <Model_Document.h>
+#include <Model_Application.h>
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 
@@ -31,9 +32,14 @@
 void Model_ResultPart::initAttributes()
 {
   // append the color attribute. It is empty, the attribute will be filled by a request
-  data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId());
+  AttributeDocRefPtr aDocRef = std::dynamic_pointer_cast<ModelAPI_AttributeDocRef>(
+    data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId()));
   data()->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
   data()->addAttribute(BASE_REF_ID(), ModelAPI_AttributeReference::typeId());
+
+  if (aDocRef->isInitialized() && // initialized immideately means already exist and will be loaded
+      !Model_Application::getApplication()->hasDocument(aDocRef->docId()))
+    Model_Application::getApplication()->setLoadByDemand(data()->name());
 }
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
@@ -42,15 +48,11 @@ std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
     return baseRef()->partDoc();
   }
   DocumentPtr aRes = data()->document(DOC_REF())->value();
-  if (!aRes.get() && myIsInLoad) { // trying to get this document from the session
-    aRes = document()->subDocument(data()->name());
-  }
   return aRes;
 }
 
 Model_ResultPart::Model_ResultPart()
 {
-  myIsInLoad = false;
 }
 
 void Model_ResultPart::activate()
@@ -66,14 +68,18 @@ void Model_ResultPart::activate()
   bool isNewTransaction = false;
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
-    myIsInLoad = true;
+    Handle(Model_Application) anApp = Model_Application::getApplication();
     if (!aMgr->isOperation()) {
       aMgr->startOperation("Activation");
       isNewTransaction = true;
     }
-    std::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
-    myIsInLoad = false;
-    if (aDoc) {
+    if (anApp->isLoadByDemand(data()->name())) {
+      anApp->loadDocument(data()->name(), aDocRef->docId()); // if it is just ne part, load may fail
+    } else {
+      anApp->createDocument(aDocRef->docId());
+    }
+    std::shared_ptr<ModelAPI_Document> aDoc = aDocRef->value();
+    if (aDoc.get()) {
       aDoc->synchronizeTransactions();
       aDocRef->setValue(aDoc);
     }

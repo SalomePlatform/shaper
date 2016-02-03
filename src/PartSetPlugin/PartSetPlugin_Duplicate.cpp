@@ -5,6 +5,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include "PartSetPlugin_Duplicate.h"
+#include "PartSetPlugin_Part.h"
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Data.h>
@@ -14,14 +15,8 @@
 
 using namespace std;
 
-PartSetPlugin_Duplicate::PartSetPlugin_Duplicate()
+void PartSetPlugin_Duplicate::execute()
 {
-}
-
-void PartSetPlugin_Duplicate::initAttributes()
-{
-  PartSetPlugin_Part::initAttributes();
-
   std::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
   std::shared_ptr<ModelAPI_ResultPart> aSource;  // searching for source document attribute
@@ -34,21 +29,12 @@ void PartSetPlugin_Duplicate::initAttributes()
     aSource.reset();
   }
   if (aSource) {
+    // create a new Part feature
+    FeaturePtr aNewPart = aRoot->addFeature(PartSetPlugin_Part::ID(), false);
+    aNewPart->execute(); // to make result and generate a unique name
+
     std::shared_ptr<ModelAPI_Document> aCopy = aPManager->copy(
-        aSource->data()->document(ModelAPI_ResultPart::DOC_REF())->value(), data()->name());
-  } else { // invalid part copy: do nothing, keep this in empty name
-    data()->setName("");
+      aSource->data()->document(ModelAPI_ResultPart::DOC_REF())->value(),
+      std::dynamic_pointer_cast<ModelAPI_ResultPart>(aNewPart->firstResult())->partDoc()->id());
   }
-}
-
-void PartSetPlugin_Duplicate::execute()
-{
-  if (!data()->name().empty())
-    PartSetPlugin_Part::execute();
-}
-
-const std::string& PartSetPlugin_Duplicate::documentToAdd()
-{
-  // part must be added only to the module document
-  return ModelAPI_Session::get()->moduleDocument()->kind();
 }

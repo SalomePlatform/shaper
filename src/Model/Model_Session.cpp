@@ -38,13 +38,13 @@ static Model_Session* myImpl = new Model_Session();
 
 bool Model_Session::load(const char* theFileName)
 {
-  bool aRes = ROOT_DOC->load(theFileName, ROOT_DOC);
+  bool aRes = ROOT_DOC->load(theFileName, "root", ROOT_DOC);
   return aRes;
 }
 
 bool Model_Session::save(const char* theFileName, std::list<std::string>& theResults)
 {
-  return ROOT_DOC->save(theFileName, theResults);
+  return ROOT_DOC->save(theFileName, "root", theResults);
 }
 
 void Model_Session::closeAll()
@@ -186,34 +186,27 @@ FeaturePtr Model_Session::createFeature(string theFeatureID, Model_Document* the
 
 std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
 {
-  bool aFirstCall = !Model_Application::getApplication()->hasDocument("root");
+  Handle(Model_Application) anApp = Model_Application::getApplication();
+  bool aFirstCall = !anApp->hasRoot();
   if (aFirstCall) {
     // creation of the root document is always outside of the transaction, so, avoid checking it
     setCheckTransactions(false);
-  }
-  std::shared_ptr<ModelAPI_Document> aDoc = std::shared_ptr<ModelAPI_Document>(
-      Model_Application::getApplication()->getDocument("root"));
-  if (aFirstCall) {
+    anApp->createDocument(0); // 0 is a root ID
     // creation of the root document is always outside of the transaction, so, avoid checking it
     setCheckTransactions(true);
   }
-  return aDoc;
+  return anApp->rootDocument();
 }
 
-std::shared_ptr<ModelAPI_Document> Model_Session::document(std::string theDocID)
+std::shared_ptr<ModelAPI_Document> Model_Session::document(int theDocID)
 {
   return std::shared_ptr<ModelAPI_Document>(
-      Model_Application::getApplication()->getDocument(theDocID));
+      Model_Application::getApplication()->document(theDocID));
 }
 
 bool Model_Session::hasModuleDocument()
 {
-  return Model_Application::getApplication()->hasDocument("root");
-}
-
-bool Model_Session::hasDocument(std::string theDocID)
-{
-  return Model_Application::getApplication()->hasDocument(theDocID);
+  return Model_Application::getApplication()->hasRoot();
 }
 
 std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
@@ -302,12 +295,10 @@ std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments
     DocumentPtr anAPIDoc = *aDoc;
     std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(anAPIDoc);
     if (aDoc) {
-      const std::set<std::string> aSubs = aDoc->subDocuments(true);
-      std::set<std::string>::const_iterator aSubIter = aSubs.cbegin();
+      const std::set<int> aSubs = aDoc->subDocuments();
+      std::set<int>::const_iterator aSubIter = aSubs.cbegin();
       for(; aSubIter != aSubs.cend(); aSubIter++) {
-        if (!Model_Application::getApplication()->isLoadByDemand(*aSubIter)) {
-          aResult.push_back(Model_Application::getApplication()->getDocument(*aSubIter));
-        }
+        aResult.push_back(Model_Application::getApplication()->document(*aSubIter));
       }
     }
   }
@@ -320,11 +311,9 @@ bool Model_Session::isLoadByDemand(const std::string theDocID)
 }
 
 std::shared_ptr<ModelAPI_Document> Model_Session::copy(
-    std::shared_ptr<ModelAPI_Document> theSource, std::string theID)
+    std::shared_ptr<ModelAPI_Document> theSource, const int theDestID)
 {
-  // create a new document
-  std::shared_ptr<Model_Document> aNew = std::dynamic_pointer_cast<Model_Document>(
-      Model_Application::getApplication()->getDocument(theID));
+  std::shared_ptr<Model_Document> aNew = Model_Application::getApplication()->document(theDestID);
   // make a copy of all labels
   TDF_Label aSourceRoot = std::dynamic_pointer_cast<Model_Document>(theSource)->document()->Main()
       .Father();

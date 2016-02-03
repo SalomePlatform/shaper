@@ -34,14 +34,27 @@ public:
 
   //! Retuns the application: one per process    
   MODEL_EXPORT static Handle_Model_Application getApplication();
-  //! Returns the main document (on first call creates it) by the string identifier
-  MODEL_EXPORT const std::shared_ptr<Model_Document>& getDocument(std::string theDocID);
+  //! Returns the document by the identifier
+  //! \returns false of document is not yet created/not loaded
+  MODEL_EXPORT std::shared_ptr<Model_Document> document(const int theDocID);
   //! Returns true if document has been created
-  MODEL_EXPORT bool hasDocument(std::string theDocID);
+  MODEL_EXPORT bool hasDocument(const int theDocID);
+  //! Returns true if root document has been created
+  MODEL_EXPORT bool hasRoot();
+  //! Returns root document, if created (or null otherwise)
+  MODEL_EXPORT std::shared_ptr<Model_Document> rootDocument();
   //! Deletes the document from the application
-  MODEL_EXPORT void deleteDocument(std::string theDocID);
+  MODEL_EXPORT void deleteDocument(const int theDocID);
   //! Deletes all documents existing in the application
   MODEL_EXPORT void deleteAllDocuments();
+  //! Creates a new document an returns an id of this document
+  //! \param theDocID if it is zero, the root document is created
+  MODEL_EXPORT void createDocument(const int theDocID);
+  //! Loads document by the file name (if it is registered as load by demand)
+  //! \param theDocName name of the document file
+  //! \param theDocID the identifier of the loaded document (to be created)
+  //! \returns true if load is ok
+  MODEL_EXPORT bool loadDocument(const std::string theDocName, const int theDocID);
 
   //! Set path for the loaded by demand documents
   void setLoadPath(std::string thePath);
@@ -54,6 +67,9 @@ public:
   //! Closes and removes the documents that are not loaded by demand and
   //! not in the given list
   void removeUselessDocuments(std::list<std::shared_ptr<ModelAPI_Document> > theUsedDocs);
+
+  //! produces new unique identifier of the document
+  int generateDocumentId();
 
  public:
   // Redefined OCAF methods
@@ -68,8 +84,8 @@ public:
   Model_Application();
 
  private:
-  /// Map from string identifiers to created documents of an application
-  std::map<std::string, std::shared_ptr<Model_Document> > myDocs;
+  /// Map from identifiers to created documents of an application
+  std::map<int, std::shared_ptr<Model_Document> > myDocs;
   /// Path for the loaded by demand documents
   std::string myPath;
   /// Path for the loaded by demand documents

@@ -568,12 +568,6 @@ void Model_Objects::setUniqueName(FeaturePtr theFeature)
         isSameName = (*aRIter)->data()->name() == aName;
       }
     }
-    // for new Parts create names that are not in the Postponed list
-    if (!isSameName && (theFeature->getKind() == "Part" || theFeature->getKind() == "Duplicate")) {
-      std::shared_ptr<Model_Session> aSession = 
-        std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
-      isSameName = aSession->isLoadByDemand(aName) || aSession->hasDocument(aName);
-    }
 
     if (isSameName) {
       aNumObjects++;
@@ -600,6 +594,15 @@ void Model_Objects::initData(ObjectPtr theObj, TDF_Label theLab, const int theTa
     setUniqueName(aFeature);  // must be before "initAttributes" because duplicate part uses name
   }
   theObj->initAttributes();
+}
+
+std::shared_ptr<ModelAPI_Feature> Model_Objects::featureById(const int theId)
+{
+  if (theId > 0) {
+    TDF_Label aLab = featuresLabel().FindChild(theId, Standard_False);
+    return feature(aLab);
+  }
+  return std::shared_ptr<ModelAPI_Feature>(); // not found
 }
 
 void Model_Objects::synchronizeFeatures(

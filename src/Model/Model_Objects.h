@@ -95,6 +95,10 @@ class Model_Objects
   //! Returns the feature by zero-based index: features in the history or not
   std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
 
+  //! Returns feature by the id of the feature (produced by the Data "featureId" method)
+  std::shared_ptr<ModelAPI_Feature> featureById(const int theId);
+
+
   /// Creates a construction result
   std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

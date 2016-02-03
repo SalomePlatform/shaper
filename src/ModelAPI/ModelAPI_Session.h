@@ -80,8 +80,8 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns the root document of the application (that may contains sub-documents)
   virtual std::shared_ptr<ModelAPI_Document> moduleDocument() = 0;
 
-  /// Returns the document by ID, loads if not loaded yet. Returns null if no such document.
-  virtual std::shared_ptr<ModelAPI_Document> document(std::string theDocID) = 0;
+  /// Returns the document by ID. Returns null if no such document.
+  virtual std::shared_ptr<ModelAPI_Document> document(int theDocID) = 0;
 
   /// Return true if root document has been already created
   virtual bool hasModuleDocument() = 0;
@@ -100,8 +100,8 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual bool isLoadByDemand(const std::string theDocID) = 0;
 
   /// Copies the document to the new one with the given id
-  virtual std::shared_ptr<ModelAPI_Document> copy(std::shared_ptr<ModelAPI_Document> theSource,
-                                                    std::string theID) = 0;
+  virtual std::shared_ptr<ModelAPI_Document> copy(
+    std::shared_ptr<ModelAPI_Document> theSource, const int theDestID) =0;
 
   /// Returns the validators factory: the only one instance per application
   virtual ModelAPI_ValidatorsFactory* validators() = 0;

@@ -80,9 +80,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> moduleDocument();
 
   /// Returns the document by ID, loads if not loaded yet. Returns null if no such document.
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> document(std::string theDocID);
-  /// Return true if document with such ID has been already created
-  MODEL_EXPORT virtual bool hasDocument(std::string theDocID);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> document(int theDocID);
 
   /// Return true if root document has been already created
   MODEL_EXPORT virtual bool hasModuleDocument();
@@ -108,9 +106,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Processes the configuration file reading
   MODEL_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
-  /// Copies the document to the new one with the given id
+  /// Copies the document to the new one
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> copy(
-      std::shared_ptr<ModelAPI_Document> theSource, std::string theID);
+      std::shared_ptr<ModelAPI_Document> theSource, const int theDestID);
 
   /// Returns the validators factory: the only one instance per application
   MODEL_EXPORT virtual ModelAPI_ValidatorsFactory* validators();

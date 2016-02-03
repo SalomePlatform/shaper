@@ -66,11 +66,8 @@ public:
   virtual void moveFeature(std::shared_ptr<ModelAPI_Feature> theMoved, 
                            std::shared_ptr<ModelAPI_Feature> theAfterThis) = 0;
 
-  ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
-
   ///! Returns the id of the document
-  virtual const std::string& id() const = 0;
+  virtual const int id() const = 0;
 
   //! Returns the object in the group by the index (started from zero)
   //! \param theGroupID group that contains an object
@@ -118,6 +115,8 @@ public:
   //! wihtout this participation
   virtual void synchronizeTransactions() = 0;
 
+  //! Returns feature by the id of the feature (produced by the Data "featureId" method)
+  virtual std::shared_ptr<ModelAPI_Feature> featureById(const int theId) = 0;
 
   //! To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();

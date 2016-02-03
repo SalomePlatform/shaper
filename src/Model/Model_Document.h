@@ -36,16 +36,20 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual const std::string& kind() const {return myKind;}
 
   //! Loads the OCAF document from the file.
-  //! \param theFileName full name of the file to load
+  //! \param theDirName directory of the loaded file
+  //! \param theFileName a name of the file to load
   //! \param theThis the common shared pointer to the document to manage with it later
   //! \returns true if file was loaded successfully
-  MODEL_EXPORT virtual bool load(const char* theFileName, DocumentPtr theThis);
+  MODEL_EXPORT virtual bool load(
+    const char* theDirName, const char* theFileName, DocumentPtr theThis);
 
   //! Saves the OCAF document to the file.
-  //! \param theFileName full name of the file to store
+  //! \param theDirName directory where the document will be saved
+  //! \param theFileName a name of the document file to store
   //! \param theResults the result full file names that were stored by "save"
   //! \returns true if file was stored successfully
-  MODEL_EXPORT virtual bool save(const char* theFileName, std::list<std::string>& theResults);
+  MODEL_EXPORT virtual bool save(
+    const char* theDirName, const char* theFileName, std::list<std::string>& theResults);
 
   //! Removes document data
   //! \param theForever if it is false, document is just hiden (to keep possibility make it back on Undo/Redo)
@@ -104,14 +108,11 @@ class Model_Document : public ModelAPI_Document
   //! \returns index started from zero, or -1 if object is invisible or belongs to another document
   MODEL_EXPORT virtual const int index(std::shared_ptr<ModelAPI_Object> theObject);
 
-  //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
-
   //! Internal sub-document by ID
-  MODEL_EXPORT virtual std::shared_ptr<Model_Document> subDoc(std::string theDocID);
+  MODEL_EXPORT virtual std::shared_ptr<Model_Document> subDoc(int theDocID);
 
   ///! Returns the id of the document
-  MODEL_EXPORT virtual const std::string& id() const
+  MODEL_EXPORT virtual const int id() const
   {
     return myID;
   }
@@ -149,6 +150,9 @@ class Model_Document : public ModelAPI_Document
   //! on activation the transactions must be synchronised because all redos performed 
   //! wihtout this participation
   MODEL_EXPORT virtual void synchronizeTransactions();
+
+  //! Returns feature by the id of the feature (produced by the Data "featureId" method)
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> featureById(const int theId);
 
 
   /// Creates a construction cresults
@@ -210,7 +214,7 @@ class Model_Document : public ModelAPI_Document
   TDF_Label generalLabel() const;
 
   //! Creates new document with binary file format
-  Model_Document(const std::string theID, const std::string theKind);
+  Model_Document(const int theID, const std::string theKind);
 
   //! Returns the internal OCCT document of this interface
   Handle_TDocStd_Document document()
@@ -222,8 +226,8 @@ class Model_Document : public ModelAPI_Document
   //! \returns true if resulting transaction is not empty and can be undoed
   void compactNested();
 
-  //! Returns all sub documents
-  const std::set<std::string> subDocuments(const bool theActivatedOnly) const;
+  //! Returns all loaded sub documents
+  const std::set<int> subDocuments() const;
 
   //! The implementation of undo: with or without recoursive calls in the sub-documents
   void undoInternal(const bool theWithSubs, const bool theSynchronize);
@@ -272,7 +276,7 @@ class Model_Document : public ModelAPI_Document
   friend class DFBrowser;
 
  private:
-  std::string myID;  ///< identifier of the document in the application
+  int myID;  ///< identifier of the document in the application
   std::string myKind;  ///< kind of the document in the application
   Handle_TDocStd_Document myDoc;  ///< OCAF document
 

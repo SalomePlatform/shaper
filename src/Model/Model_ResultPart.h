@@ -23,7 +23,6 @@ class Model_ResultPart : public ModelAPI_ResultPart
 {
   TopoDS_Shape myShape; ///< shape of this part created from bodies (updated only of Part deactivation)
   std::shared_ptr<gp_Trsf> myTrsf; ///< if it is just copy of original shape, keep just transformation
-  bool myIsInLoad; ///< true if document of this part is in the loading process, so, it may be already received
  public:
 
   /// the reference to the base result document, may be null if this is the root, others make sequence of references

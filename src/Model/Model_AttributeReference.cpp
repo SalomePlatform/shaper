@@ -46,7 +46,9 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
       myRef->Label().ForgetAttribute(TDataStd_AsciiString::GetID());
     } else { // different document: store the document name (comment) and entry (string): external
       // if these attributes exist, the link is external: keep reference to access the label
-      TDataStd_Comment::Set(myRef->Label(), theObject->document()->id().c_str());
+      std::ostringstream anIdString; // string with document Id
+      anIdString<<theObject->document()->id();
+      TDataStd_Comment::Set(myRef->Label(), anIdString.str().c_str());
       TCollection_AsciiString anEntry;
       TDF_Tool::Entry(anObjLab, anEntry);
       TDataStd_AsciiString::Set(myRef->Label(), anEntry);
@@ -64,9 +66,9 @@ ObjectPtr Model_AttributeReference::value()
   if (isInitialized()) {
     Handle(TDataStd_Comment) aDocID;
     if (myRef->Label().FindAttribute(TDataStd_Comment::GetID(), aDocID)) { // external ref
-      DocumentPtr aRefDoc =
-        ModelAPI_Session::get()->document(TCollection_AsciiString(aDocID->Get()).ToCString());
-      if (aRefDoc) {
+      int anID = atoi(TCollection_AsciiString(aDocID->Get()).ToCString());
+      DocumentPtr aRefDoc = Model_Application::getApplication()->document(anID);
+      if (aRefDoc.get()) {
         Handle(TDataStd_AsciiString) anEntry;
         if (myRef->Label().FindAttribute(TDataStd_AsciiString::GetID(), anEntry)) {
           std::shared_ptr<Model_Document> aDR = std::dynamic_pointer_cast<Model_Document>(aRefDoc);

@@ -23,35 +23,51 @@ Handle(Model_Application) Model_Application::getApplication()
 }
 
 //=======================================================================
-const std::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
+std::shared_ptr<Model_Document> Model_Application::document(const int theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
-
-  static const std::string thePartSetKind("PartSet");
-  static const std::string thePartKind("Part");
-  bool isRoot = theDocID == "root"; // the document is root
-  std::shared_ptr<Model_Document> aNew(
-    new Model_Document(theDocID, isRoot ? thePartSetKind : thePartKind));
-  myDocs[theDocID] = aNew;
-
-  // load it if it must be loaded by demand
-  if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
-    aNew->load(myPath.c_str(), aNew);
-    myLoadedByDemand.erase(theDocID);  // done, don't do it anymore
-  } else {
-    aNew->setThis(aNew);
-    static Events_ID anId = ModelAPI_DocumentCreatedMessage::eventId();
-    std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::shared_ptr
-      <ModelAPI_DocumentCreatedMessage>(new ModelAPI_DocumentCreatedMessage(anId, this));
-    aMessage->setDocument(aNew);
-    Events_Loop::loop()->send(aMessage);
-  }
-
-  return myDocs[theDocID];
+  return std::shared_ptr<Model_Document>(); // not loaded, so return null
 }
 
-void Model_Application::deleteDocument(string theDocID)
+//=======================================================================
+void Model_Application::createDocument(const int theDocID)
+{
+  static const std::string thePartSetKind("PartSet");
+  static const std::string thePartKind("Part");
+  std::shared_ptr<Model_Document> aNew(
+    new Model_Document(theDocID, theDocID == 0 ? thePartSetKind : thePartKind));
+  myDocs[theDocID] = aNew;
+
+  aNew->setThis(aNew);
+  static Events_ID anId = ModelAPI_DocumentCreatedMessage::eventId();
+  std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::shared_ptr
+    <ModelAPI_DocumentCreatedMessage>(new ModelAPI_DocumentCreatedMessage(anId, this));
+  aMessage->setDocument(aNew);
+  Events_Loop::loop()->send(aMessage);
+}
+
+//=======================================================================
+bool Model_Application::loadDocument(const std::string theDocName, const int theDocID)
+{
+  static const std::string thePartKind("Part"); // root document is never loaded here
+  std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID, thePartKind));
+  myDocs[theDocID] = aNew;
+
+  bool aRes = true;
+  // load it if it must be loaded by demand
+  if (myLoadedByDemand.find(theDocName) != myLoadedByDemand.end() && !myPath.empty()) {
+    aRes = aNew->load(myPath.c_str(), theDocName.c_str(), aNew);
+    myLoadedByDemand.erase(theDocName);  // done, don't do it anymore
+  } else { // error
+    aRes = false;
+  }
+
+  return aRes;
+}
+
+//=======================================================================
+void Model_Application::deleteDocument(const int theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end()) {
     myDocs[theDocID]->close(true);
@@ -60,20 +76,34 @@ void Model_Application::deleteDocument(string theDocID)
   myLoadedByDemand.clear();
 }
 
+//=======================================================================
 void Model_Application::deleteAllDocuments()
 {
-  std::map<std::string, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
+  std::map<int, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
   for(; aDoc != myDocs.end(); aDoc++) {
-    aDoc->second->close(true);
+    if (!aDoc->second->isOpened()) // here is main document was closed before subs and closed subs
+      aDoc->second->close(true);
   }
   myDocs.clear();
   myLoadedByDemand.clear();
 }
 
 //=======================================================================
-bool Model_Application::hasDocument(std::string theDocID)
+bool Model_Application::hasDocument(const int theDocID)
 {
   return myDocs.find(theDocID) != myDocs.end();
+}
+
+//=======================================================================
+bool Model_Application::hasRoot()
+{
+  return !myDocs.empty();
+}
+
+//=======================================================================
+std::shared_ptr<Model_Document> Model_Application::rootDocument()
+{
+  return myDocs[0];
 }
 
 //=======================================================================
@@ -104,7 +134,7 @@ bool Model_Application::isLoadByDemand(std::string theID)
 void Model_Application::removeUselessDocuments(
   std::list<std::shared_ptr<ModelAPI_Document> > theUsedDocs)
 {
-  std::map<std::string, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
+  std::map<int, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
   while(aDoc != myDocs.end()) {
     bool aFound = false;
     std::list<std::shared_ptr<ModelAPI_Document> >::iterator aUsed = theUsedDocs.begin();
@@ -119,6 +149,13 @@ void Model_Application::removeUselessDocuments(
       aDoc++;
     }
   }
+}
+
+int Model_Application::generateDocumentId()
+{
+  int aResult = myDocs.size();
+  for(; myDocs.find(aResult) != myDocs.end(); aResult++); // count until the result id is unique
+  return aResult;
 }
 
 //=======================================================================

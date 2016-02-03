@@ -24,6 +24,9 @@ class ModelAPI_AttributeDocRef : public ModelAPI_Attribute
   /// Returns document referenced from this attribute
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> value() = 0;
 
+  /// Returns the persisten ID of the document
+  MODELAPI_EXPORT virtual int docId() = 0;
+
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string typeId()
   {

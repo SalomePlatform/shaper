@@ -18,7 +18,7 @@ __updated__ = "2014-12-26"
 aSession = ModelAPI_Session.get()
 # TODO: enable this assertion:
 assert(aSession.moduleDocument())
-assert(aSession.moduleDocument().id() == "root")
+assert(aSession.moduleDocument().id() == 0)
 assert(aSession.moduleDocument().kind() == "PartSet")
 assert(aSession.hasModuleDocument())
 # Create a new document
@@ -27,22 +27,22 @@ aSession.moduleDocument().addFeature("Part")
 aSession.finishOperation()
 
 assert(aSession.activeDocument())
-assert(aSession.activeDocument().id() == "Part_1")
+assert(aSession.activeDocument().id() == 1)
 assert(aSession.activeDocument().kind() == "Part")
 # Activate root doc
-aRootDoc = aSession.document("root")
+aRootDoc = aSession.document(0)
 assert(aRootDoc)
 aSession.startOperation()
 aSession.setActiveDocument(aRootDoc, False)
 aSession.finishOperation()
 assert(aSession.activeDocument())
-assert(aSession.activeDocument().id() == "root")
+assert(aSession.activeDocument().id() == 0)
 # check all opened docs
 allDocsList = aSession.allOpenedDocuments()
 assert(len(allDocsList) != 0)
 # Activate Part_1 doc back for further testing
 aSession.startOperation()
-aSession.setActiveDocument(aSession.document("Part_1"), False)
+aSession.setActiveDocument(aSession.document(1), False)
 aSession.finishOperation()
 #=========================================================================
 # Duplication of a document
@@ -66,7 +66,7 @@ aPart.addFeature("Duplicate")
 aSession.finishOperation()
 assert(aSession.moduleDocument().size("Parts") == 2)
 aCopyOfPart = aSession.activeDocument()
-assert(aCopyOfPart.id() == "Part_2")
+assert(aCopyOfPart.id() == 2)
 assert(aCopyOfPart.kind() == "Part")
 assert(aCopyOfPart.size("Features") == 1)
 assert(aCopyOfPart != aPart)
@@ -82,7 +82,7 @@ assert(aSession.moduleDocument().size("Parts") == 1)
 assert(aSession.activeDocument().id() == aCopyOfPart.id())
 # Remove another one document
 aSession.startOperation()
-aDoc2 = aSession.document("Part_2")
+aDoc2 = aSession.document(2)
 aSession.setActiveDocument(aDoc2, False)
 aDoc2.addFeature("Remove")
 aSession.finishOperation()

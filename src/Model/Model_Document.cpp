@@ -59,7 +59,7 @@ static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the curren
 static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 
-Model_Document::Model_Document(const std::string theID, const std::string theKind)
+Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
@@ -81,10 +81,10 @@ void Model_Document::setThis(DocumentPtr theDoc)
   myObjs->setOwner(theDoc);
 }
 
-/// Returns the file name of this document by the nameof directory and identifuer of a document
-static TCollection_ExtendedString DocFileName(const char* theFileName, const std::string& theID)
+/// Returns the file name of this document by the name of directory and identifier of a document
+static TCollection_ExtendedString DocFileName(const char* theDirName, const std::string& theID)
 {
-  TCollection_ExtendedString aPath((const Standard_CString) theFileName);
+  TCollection_ExtendedString aPath((const Standard_CString) theDirName);
   // remove end-separators
   while(aPath.Length() && 
         (aPath.Value(aPath.Length()) == '\\' || aPath.Value(aPath.Length()) == '/'))
@@ -100,13 +100,13 @@ bool Model_Document::isRoot() const
   return this == Model_Session::get()->moduleDocument().get();
 }
 
-bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
+bool Model_Document::load(const char* theDirName, const char* theFileName, DocumentPtr theThis)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
-    anApp->setLoadPath(theFileName);
+    anApp->setLoadPath(theDirName);
   }
-  TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
+  TCollection_ExtendedString aPath(DocFileName(theDirName, theFileName));
   PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
   Handle(TDocStd_Document) aLoaded;
   try {
@@ -177,7 +177,7 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     myDoc = aLoaded;
     myDoc->SetUndoLimit(UNDO_LIMIT);
     // to avoid the problem that feature is created in the current, not this, document
-    aSession->setActiveDocument(anApp->getDocument(myID), false);
+    aSession->setActiveDocument(anApp->document(myID), false);
     aSession->setCheckTransactions(false);
     if (myObjs)
       delete myObjs;
@@ -189,13 +189,25 @@ bool Model_Document::load(const char* theFileName, DocumentPtr theThis)
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
     // this is done in Part result "activate", so no needed here. Causes not-blue active part.
     // aSession->setActiveDocument(anApp->getDocument(myID), true);
+
+    // make sub-parts as loaded by demand
+    std::list<ResultPtr> aPartResults;
+    myObjs->allResults(ModelAPI_ResultPart::group(), aPartResults);
+    std::list<ResultPtr>::iterator aPartRes = aPartResults.begin();
+    for(; aPartRes != aPartResults.end(); aPartRes++) {
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
+      if (aPart.get())
+        anApp->setLoadByDemand(aPart->data()->name());
+    }
+
   } else { // open failed, but new documnet was created to work with it: inform the model
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
   } 
   return !isError;
 }
 
-bool Model_Document::save(const char* theFileName, std::list<std::string>& theResults)
+bool Model_Document::save(
+  const char* theDirName, const char* theFileName, std::list<std::string>& theResults)
 {
   // create a directory in the root document if it is not yet exist
   Handle(Model_Application) anApp = Model_Application::getApplication();
@@ -207,7 +219,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
 #endif
   }
   // filename in the dir is id of document inside of the given directory
-  TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
+  TCollection_ExtendedString aPath(DocFileName(theDirName, theFileName));
   PCDM_StoreStatus aStatus;
   try {
     aStatus = anApp->SaveAs(myDoc, aPath);
@@ -234,20 +246,22 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
   }
   myTransactionSave = myTransactions.size();
   if (isDone) {  // save also sub-documents if any
-    theResults.push_back(TCollection_AsciiString(aPath).ToCString());
-    const std::set<std::string> aSubs = subDocuments(false);
-    std::set<std::string>::iterator aSubIter = aSubs.begin();
-    for (; aSubIter != aSubs.end() && isDone; aSubIter++) {
-      if (anApp->isLoadByDemand(*aSubIter)) { 
+    // iterate all result parts to find all loaded or not yet loaded documents
+    std::list<ResultPtr> aPartResults;
+    myObjs->allResults(ModelAPI_ResultPart::group(), aPartResults);
+    std::list<ResultPtr>::iterator aPartRes = aPartResults.begin();
+    for(; aPartRes != aPartResults.end(); aPartRes++) {
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
+      if (!aPart->isActivated()) {
         // copy not-activated document that is not in the memory
-        std::string aDocName = *aSubIter;
+        std::string aDocName = aPart->data()->name();
         if (!aDocName.empty()) {
           // just copy file
           TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
           OSD_Path aPath(aSubPath);
           OSD_File aFile(aPath);
           if (aFile.Exists()) {
-            TCollection_AsciiString aDestinationDir(DocFileName(theFileName, aDocName));
+            TCollection_AsciiString aDestinationDir(DocFileName(theDirName, aDocName));
             OSD_Path aDestination(aDestinationDir);
             aFile.Copy(aDestination);
             theResults.push_back(aDestinationDir.ToCString());
@@ -257,7 +271,8 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
           }
         }
       } else { // simply save opened document
-        isDone = subDoc(*aSubIter)->save(theFileName, theResults);
+        isDone = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc())->
+          save(theDirName, aPart->data()->name().c_str(), theResults);
       }
     }
   }
@@ -274,8 +289,8 @@ void Model_Document::close(const bool theForever)
     aPM->setActiveDocument(DocumentPtr());
   }
   // close all subs
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++) {
     std::shared_ptr<Model_Document> aSub = subDoc(*aSubIter);
     if (aSub->myObjs) // if it was not closed before
@@ -322,8 +337,8 @@ void Model_Document::startOperation()
     (*myNestedNum.rbegin())++;
   myRedos.clear();
   // new command for all subs
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->startOperation();
 }
@@ -499,8 +514,8 @@ bool Model_Document::finishOperation()
 
   // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
   bool aResult = false;
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     if (subDoc(*aSubIter)->finishOperation())
       aResult = true;
@@ -594,8 +609,8 @@ void Model_Document::abortOperation()
     myDoc->ClearRedos();
   }
   // abort for all subs, flushes will be later, in the end of root abort
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->abortOperation();
   // references may be changed because they are set in attributes on the fly
@@ -623,8 +638,8 @@ bool Model_Document::canUndo()
       myTransactions.size() - aCurrentNum > 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++) {
     std::shared_ptr<Model_Document> aSub = subDoc(*aSubIter);
     if (aSub->myObjs) {// if it was not closed before
@@ -655,8 +670,8 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
 
   if (theWithSubs) {
     // undo for all subs
-    const std::set<std::string> aSubs = subDocuments(true);
-    std::set<std::string>::iterator aSubIter = aSubs.begin();
+    const std::set<int> aSubs = subDocuments();
+    std::set<int>::iterator aSubIter = aSubs.begin();
     for (; aSubIter != aSubs.end(); aSubIter++) {
       if (!subDoc(*aSubIter)->myObjs)
         continue;
@@ -681,8 +696,8 @@ bool Model_Document::canRedo()
   if (!myRedos.empty())
     return true;
   // check other subs contains operation that can be redoed
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++) {
     if (!subDoc(*aSubIter)->myObjs)
       continue;
@@ -706,8 +721,8 @@ void Model_Document::redo()
   }
 
   // redo for all subs
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->redo();
 
@@ -825,31 +840,26 @@ void Model_Document::updateHistory(const std::string theGroup)
   myObjs->updateHistory(theGroup);
 }
 
-std::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string theDocID)
+const std::set<int> Model_Document::subDocuments() const
 {
-  return Model_Application::getApplication()->getDocument(theDocID);
-}
-
-const std::set<std::string> Model_Document::subDocuments(const bool theActivatedOnly) const
-{
-  std::set<std::string> aResult;
+  std::set<int> aResult;
   std::list<ResultPtr> aPartResults;
   myObjs->allResults(ModelAPI_ResultPart::group(), aPartResults);
   std::list<ResultPtr>::iterator aPartRes = aPartResults.begin();
   for(; aPartRes != aPartResults.end(); aPartRes++) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aPartRes);
-    if (aPart && (!theActivatedOnly || aPart->isActivated())) {
-      aResult.insert(aPart->original()->data()->name());
+    if (aPart && aPart->isActivated()) {
+      aResult.insert(aPart->original()->partDoc()->id());
     }
   }
   return aResult;
 }
 
-std::shared_ptr<Model_Document> Model_Document::subDoc(std::string theDocID)
+std::shared_ptr<Model_Document> Model_Document::subDoc(int theDocID)
 {
   // just store sub-document identifier here to manage it later
   return std::dynamic_pointer_cast<Model_Document>(
-    Model_Application::getApplication()->getDocument(theDocID));
+    Model_Application::getApplication()->document(theDocID));
 }
 
 ObjectPtr Model_Document::object(const std::string& theGroupID, const int theIndex)
@@ -1162,6 +1172,11 @@ int Model_Document::numInternalFeatures()
 std::shared_ptr<ModelAPI_Feature> Model_Document::internalFeature(const int theIndex)
 {
   return myObjs->internalFeature(theIndex);
+}
+
+std::shared_ptr<ModelAPI_Feature> Model_Document::featureById(const int theId)
+{
+  return myObjs->featureById(theId);
 }
 
 void Model_Document::synchronizeTransactions()
