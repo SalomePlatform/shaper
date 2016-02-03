@@ -57,7 +57,6 @@ Q_OBJECT
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
-  void enterPressed();
   void enterReleased();
 
  protected slots:

@@ -36,7 +36,6 @@ ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,
                                                  const std::string& theParentId)
 : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId),
-  //myIsEnterPressedEmitted(false),
   myXPosition(-1), myYPosition(-1)
 {
 }
@@ -53,9 +52,6 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(&aDlg);
   anEditor->enableKeyPressEvent(true);
-  //if (!myIsEditing) {
-  //  connect(anEditor, SIGNAL(enterPressed()), this, SLOT(onEnterPressed()));
-  //}
 
   anEditor->setMinimum(0);
   anEditor->setMaximum(DBL_MAX);
@@ -77,10 +73,6 @@ void ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
   aDlg.move(aPoint);
   aDlg.exec();
 
-  //if (!myIsEditing) {
-  //  disconnect(anEditor, SIGNAL(keyReleased(QKeyEvent*)), this, SLOT(onEnterPressed()));
-  //}
-
   outText = anEditor->text();
   bool isDouble;
   double aValue = outText.toDouble(&isDouble);
@@ -98,8 +90,6 @@ bool ModuleBase_WidgetEditor::focusTo()
 
 void ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
 {
-  //myIsEnterPressedEmitted = false;
-
   // we need to emit the focus in event manually in order to save the widget as an active
   // in the property panel before the mouse leave event happens in the viewer. The module
   // ask an active widget and change the feature visualization if the widget is not the current one.
@@ -126,18 +116,12 @@ void ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
     // it is processed in operation manager
     //emit focusOutWidget(this);
 
-    //if (myIsEnterPressedEmitted)
     if (!myIsEditing)
       emit enterClicked(this);
   }
   else
     storeValue();
 }
-
-/*void ModuleBase_WidgetEditor::onEnterPressed()
-{
-  myIsEnterPressedEmitted = true;
-}*/
 
 void ModuleBase_WidgetEditor::setCursorPosition(const int theX, const int theY)
 {

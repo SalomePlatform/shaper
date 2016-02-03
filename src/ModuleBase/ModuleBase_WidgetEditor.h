@@ -50,9 +50,6 @@ Q_OBJECT
 
   void setCursorPosition(const int theX, const int theY);
 
-//protected slots:
-  //void onEnterPressed();
-
 private:
    void editedValue(double& outValue, QString& outText);
 
@@ -62,8 +59,6 @@ private:
 
    ///< the kinds of possible features
    QStringList myFeatureKinds;  
-
-   //bool myIsEnterPressedEmitted;
 
    int myXPosition, myYPosition;
 };

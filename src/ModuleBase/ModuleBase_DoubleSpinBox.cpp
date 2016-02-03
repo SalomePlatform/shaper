@@ -200,24 +200,18 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
 
 void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent* theEvent)
 {
-  bool isEmitKeyRelease = false;
   switch (theEvent->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return: {
       // do not react to the Enter key, the property panel processes it
       if (!myIsEmitKeyPressEvent)
         return;
-      else
-        isEmitKeyRelease = true;
     }
     break;
     default:
       break;
   }
   QDoubleSpinBox::keyPressEvent(theEvent);
-
-  if (isEmitKeyRelease)
-    emit enterPressed();
 }
 
 void ModuleBase_DoubleSpinBox::keyReleaseEvent(QKeyEvent* theEvent)
