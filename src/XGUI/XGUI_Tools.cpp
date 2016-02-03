@@ -241,7 +241,8 @@ void refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const O
   for (; anIIt != anILast; anIIt++) {
     aFullIgnoreList.append(*anIIt);
     CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anIIt);
-    if (aComposite.get()) {
+    // if the current feature is aborted, the composite is removed and has invalid data
+    if (aComposite.get() && aComposite->data()->isValid()) {
       int aNbSubs = aComposite->numberOfSubs();
       for (int aSub = 0; aSub < aNbSubs; aSub++) {
         aFullIgnoreList.append(aComposite->subFeature(aSub));
