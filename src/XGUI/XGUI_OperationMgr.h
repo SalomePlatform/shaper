@@ -20,6 +20,7 @@ class QKeyEvent;
 
 class ModuleBase_IWorkshop;
 class XGUI_Workshop;
+class XGUI_ShortCutListener;
 
 /**\class XGUI_OperationMgr
  * \ingroup GUI
@@ -41,6 +42,11 @@ Q_OBJECT
 
   /// Destructor
   virtual ~XGUI_OperationMgr();
+
+  /// Switch on short cut listener
+  void activate();
+  /// Switch off short cut listener
+  void deactivate();
 
   /// Set reference to workshop
   /// \param theWorkshop reference to workshop
@@ -219,6 +225,8 @@ private:
 
   /// Current workshop
   ModuleBase_IWorkshop* myWorkshop;
+
+  XGUI_ShortCutListener* myShortCutListener;
 };
 
 #endif

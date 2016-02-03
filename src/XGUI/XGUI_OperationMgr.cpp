@@ -48,11 +48,14 @@ public:
   }
   ~XGUI_ShortCutListener() {}
 
+  /// Switch on short cut listener
+  void setActive(const bool theIsActive) { myIsActive = theIsActive; }
+
   /// Redefinition of virtual function to process Delete key release
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
   {
     bool isAccepted = false;
-    if (theEvent->type() == QEvent::KeyRelease) {
+    if (myIsActive && theEvent->type() == QEvent::KeyRelease) {
       QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
       if(aKeyEvent) {
         switch (aKeyEvent->key()) {
@@ -69,6 +72,7 @@ public:
 
 private:
   XGUI_OperationMgr* myOperationMgr; /// processor for key event
+  bool myIsActive; /// boolean state whether the event filter perform own signal processing
 };
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
@@ -78,11 +82,21 @@ XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
   /// the actions priority
-  XGUI_ShortCutListener* aShortCutListener = new XGUI_ShortCutListener(theParent, this);
+  myShortCutListener = new XGUI_ShortCutListener(theParent, this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
 {
+}
+
+void XGUI_OperationMgr::activate()
+{
+  myShortCutListener->setActive(true);
+}
+
+void XGUI_OperationMgr::deactivate()
+{
+  myShortCutListener->setActive(false);
 }
 
 ModuleBase_Operation* XGUI_OperationMgr::currentOperation() const
@@ -652,7 +666,7 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
     /// processing delete by workshop
     XGUI_ObjectsBrowser* aBrowser = workshop()->objectBrowser();
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
-    // property panel childe object is processed to process delete performed on Apply button of PP
+    // property panel child object is processed to process delete performed on Apply button of PP
     if (isChildObject(theObject, aBrowser) ||
         isChildObject(theObject, aViewPort) ||
         isPPChildObject)

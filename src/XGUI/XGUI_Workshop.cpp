@@ -242,6 +242,7 @@ void XGUI_Workshop::activateModule()
   QIntList aModes;
   module()->activeSelectionModes(aModes);
   aDisplayer->activateObjects(aModes, aDisplayed);
+  myOperationMgr->activate();
 }
 
 void XGUI_Workshop::deactivateModule()
@@ -259,6 +260,8 @@ void XGUI_Workshop::deactivateModule()
   XGUI_Displayer* aDisplayer = displayer();
   QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
   aDisplayer->deactivateObjects(aDisplayed, true);
+
+  myOperationMgr->deactivate();
 }
 
 //******************************************************
