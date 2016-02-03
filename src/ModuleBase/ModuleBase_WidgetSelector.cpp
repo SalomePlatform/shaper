@@ -9,6 +9,10 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_IModule.h>
 
 #include <ModelAPI_ResultConstruction.h>
 
@@ -171,13 +175,26 @@ void ModuleBase_WidgetSelector::deactivate()
 }
 
 //********************************************************************
-std::string ModuleBase_WidgetSelector::generateName(const AttributePtr& theAttribute)
+std::string ModuleBase_WidgetSelector::generateName(const AttributePtr& theAttribute,
+                                                    ModuleBase_IWorkshop* theWorkshop)
 {
   std::string aName;
   if (theAttribute.get() != NULL) {
-    std::stringstream aStreamName;
-    aStreamName << theAttribute->owner()->data()->name() << "/"<< theAttribute->id();
-    aName = aStreamName.str();
+    ModuleBase_Operation* anOperation = theWorkshop->currentOperation();
+
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+    if (aFeature.get()) {
+      std::string aXmlCfg, aDescription;
+      theWorkshop->module()->getXMLRepresentation(aFeature->getKind(), aXmlCfg, aDescription);
+
+      ModuleBase_WidgetFactory aFactory(aXmlCfg, theWorkshop);
+      std::string anAttributeTitle;
+      aFactory.getAttributeTitle(aFeature->getKind(), theAttribute->id(), anAttributeTitle);
+
+      std::stringstream aStreamName;
+      aStreamName << theAttribute->owner()->data()->name() << "/"<< anAttributeTitle.c_str();
+      aName = aStreamName.str();
+    }
   }
   return aName;
 }

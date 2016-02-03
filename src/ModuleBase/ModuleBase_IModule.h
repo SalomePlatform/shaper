@@ -256,6 +256,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual AttributePtr findAttribute(const ObjectPtr& theObject,
                                      const GeomShapePtr& theGeomShape) = 0;
 
+  /// Returns XML information by the feature index
+  /// \param theFeatureId a feature id
+  /// \param theXmlCfg XML configuration
+  /// \param theDescription feature description
+  void getXMLRepresentation(const std::string& theFeatureId, std::string& theXmlCfg,
+                            std::string& theDescription);
+
 signals:
   /// Signal which is emitted when operation is launched
   void operationLaunched();
@@ -296,7 +303,6 @@ protected slots:
   virtual ModuleBase_Operation* getNewOperation(const std::string& theFeatureId);
 
 protected:
-
   /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
 

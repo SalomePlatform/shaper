@@ -105,12 +105,8 @@ ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& the
     }
   }
 
-  std::string aPluginFileName = myFeaturesInFiles[theFeatureId];
-  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
-  aWdgReader.readAll();
-  std::string aXmlCfg = aWdgReader.featureWidgetCfg(theFeatureId);
-  std::string aDescription = aWdgReader.featureDescription(theFeatureId);
-
+  std::string aXmlCfg, aDescription;
+  getXMLRepresentation(theFeatureId, aXmlCfg, aDescription);
   aFOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
   aFOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
 
@@ -199,4 +195,15 @@ bool ModuleBase_IModule::canActivateSelection(const ObjectPtr& theObject) const
 void ModuleBase_IModule::operationResumed(ModuleBase_Operation* theOperation) 
 {
   emit resumed(theOperation);
+}
+
+void ModuleBase_IModule::getXMLRepresentation(const std::string& theFeatureId,
+                                              std::string& theXmlCfg, std::string& theDescription)
+{
+  std::string aPluginFileName = myFeaturesInFiles[theFeatureId];
+  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
+  aWdgReader.readAll();
+
+  theXmlCfg = aWdgReader.featureWidgetCfg(theFeatureId);
+  theDescription = aWdgReader.featureDescription(theFeatureId);
 }

@@ -121,6 +121,45 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   thePage->alignToTop();
 }
 
+void ModuleBase_WidgetFactory::getAttributeTitle(const std::string& theFeatureKind,
+                                                 const std::string& theAttributeId,
+                                                 std::string& theTitle)
+{
+  if (!theTitle.empty())
+    return;
+
+  myParentId = myWidgetApi->widgetId();
+  if (!myWidgetApi->toChildWidget())
+    return;
+
+  do {  //Iterate over each node
+    std::string aWdgType = myWidgetApi->widgetType();
+    // Find title under PageGroup
+    if (myWidgetApi->isGroupBoxWidget() ||
+        ModuleBase_WidgetCreatorFactory::get()->hasPageWidget(aWdgType)) {
+
+      getAttributeTitle(theFeatureKind, theAttributeId, theTitle);
+    } else {
+      // Find title here
+      std::string anAttributeId = myWidgetApi->widgetId();
+      if (anAttributeId == theAttributeId) {
+        theTitle = QString::fromStdString(myWidgetApi->widgetLabel()).toStdString().c_str();
+        if (theTitle.empty())
+          theTitle = QString::fromStdString(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)).toStdString().c_str();
+
+      }
+      if (myWidgetApi->isPagedWidget()) {
+        //If current widget is toolbox or switch-casebox then fetch all
+        //it's pages recursively and setup into the widget.
+        myWidgetApi->toChildWidget();
+        do {
+          getAttributeTitle(theFeatureKind, theAttributeId, theTitle);
+        } while (myWidgetApi->toNextWidget() && theTitle.empty());
+      }
+    }
+  } while (myWidgetApi->toNextWidget() && theTitle.empty());
+}
+
 ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::string& theType,
                                                                 QWidget* theParent)
 {

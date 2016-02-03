@@ -48,7 +48,15 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
     return myModelWidgets;
   }
 
- protected:
+  /// Returns the value of the title key from XML definition of the attribute in the feature
+  /// \param theFeatureKind a value of a kind of a feature
+  /// \param theAttributeId a value of a kind of the attribute under the feature
+  /// \param theTitle the result title
+  void getAttributeTitle(const std::string& theFeatureKind,
+                         const std::string& theAttributeId,
+                         std::string& theTitle);
+
+protected:
   /// check if ModuleBase_Widget has expandable widgets in getControls
   bool hasExpandingControls(QWidget* theParent);
 

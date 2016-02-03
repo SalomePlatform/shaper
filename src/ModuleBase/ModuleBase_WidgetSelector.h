@@ -111,7 +111,8 @@ Q_OBJECT
   /// Returns a name in the next form: attribute_feature_name/attribute_id
   /// \param theAttribute a model attribute
   /// \return string value
-  static std::string generateName(const AttributePtr& theAttribite);
+  static std::string generateName(const AttributePtr& theAttribite,
+                                  ModuleBase_IWorkshop* theWorkshop);
 };
 
 #endif
