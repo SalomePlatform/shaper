@@ -1413,9 +1413,9 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theFeatures,
 }
 
 bool XGUI_Workshop::deleteFeaturesInternal(const QObjectPtrList& theList,
-                                           const std::set<FeaturePtr>& theIgnoredFeatures,
                                            const std::set<FeaturePtr>& aDirectRefFeatures,
                                            const std::set<FeaturePtr>& aIndirectRefFeatures,
+                                           const std::set<FeaturePtr>& theIgnoredFeatures,
                                            const bool doDeleteReferences)
 {
   if (doDeleteReferences) {
