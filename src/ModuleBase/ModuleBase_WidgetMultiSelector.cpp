@@ -207,7 +207,9 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
     // Restore shape type
-    setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionListAttr->selectionType().c_str()));
+    std::string aSelectionType = aSelectionListAttr->selectionType().c_str();
+    if (!aSelectionType.empty())
+      setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionType.c_str()));
   }
   updateSelectionList();
   return true;
