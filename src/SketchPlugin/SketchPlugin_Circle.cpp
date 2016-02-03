@@ -30,12 +30,12 @@ namespace {
     static const std::string TYPE("CircleType");
     return TYPE;
   }
-  static const std::string CIRCLE_TYPE_CENTER_AND_RADIUS()
+  static const std::string& CIRCLE_TYPE_CENTER_AND_RADIUS()
   {
     static const std::string TYPE("CenterRadius");
     return TYPE;
   }
-  static const std::string CIRCLE_TYPE_THREE_POINTS()
+  static const std::string& CIRCLE_TYPE_THREE_POINTS()
   {
     static const std::string TYPE("ThreePoints");
     return TYPE;

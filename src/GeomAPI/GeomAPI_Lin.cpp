@@ -43,6 +43,15 @@ GeomAPI_Lin::GeomAPI_Lin(const std::shared_ptr<GeomAPI_Pnt>& theStart,
 {
 }
 
+GeomAPI_Lin::GeomAPI_Lin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                         const std::shared_ptr<GeomAPI_Dir>& theDirection)
+    : GeomAPI_Interface(newLine(theOrigin->x(), theOrigin->y(), theOrigin->z(),
+                                theOrigin->x() + theDirection->x(),
+                                theOrigin->y() + theDirection->y(),
+                                theOrigin->z() + theDirection->z()))
+{
+}
+
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::location()
 {
   gp_Pnt aLoc = impl<gp_Lin>().Location();

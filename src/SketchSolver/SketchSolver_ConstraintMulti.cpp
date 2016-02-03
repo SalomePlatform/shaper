@@ -7,7 +7,9 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
 
 void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theEntities)
 {
@@ -155,8 +157,10 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
       } else if (aFeature->getKind() == SketchPlugin_Line::ID()) {
         aPoints.push_back(aFeature->attribute(SketchPlugin_Line::START_ID()));
         aPoints.push_back(aFeature->attribute(SketchPlugin_Line::END_ID()));
-      } else
-        aPoints = aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+      } else if (aFeature->getKind() == SketchPlugin_Circle::ID())
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
+      else if (aFeature->getKind() == SketchPlugin_Point::ID())
+        aPoints.push_back(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
 
       std::list<AttributePtr>::iterator aPtIt = aPoints.begin();
       for (aXIt = aX.begin(), aYIt = aY.begin(); aPtIt != aPoints.end(); ++aXIt, ++aYIt, ++aPtIt) {

@@ -25,6 +25,7 @@ static gp_Lin2d* newLine2d(const double theStartX, const double theStartY, const
   return new gp_Lin2d(aStart, gp_Dir2d(aDir));
 }
 
+
 GeomAPI_Lin2d::GeomAPI_Lin2d(const double theStartX, const double theStartY, const double theEndX,
                              const double theEndY)
     : GeomAPI_Interface(newLine2d(theStartX, theStartY, theEndX, theEndY))
@@ -36,6 +37,14 @@ GeomAPI_Lin2d::GeomAPI_Lin2d(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
     : GeomAPI_Interface(newLine2d(theStart->x(), theStart->y(), theEnd->x(), theEnd->y()))
 {
 }
+
+GeomAPI_Lin2d::GeomAPI_Lin2d(const std::shared_ptr<GeomAPI_Pnt2d>& theOrigin,
+                             const std::shared_ptr<GeomAPI_Dir2d>& theDirection)
+    : GeomAPI_Interface(newLine2d(theOrigin->x(), theOrigin->y(),
+        theOrigin->x() + theDirection->x(), theOrigin->y() + theDirection->y()))
+{
+}
+
 
 std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::location()
 {

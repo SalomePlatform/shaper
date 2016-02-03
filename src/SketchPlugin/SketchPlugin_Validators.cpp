@@ -125,6 +125,8 @@ static bool hasCoincidentPoint(FeaturePtr theFeature1, FeaturePtr theFeature2)
       anAttr = aConstrFeature->attribute(SketchPlugin_Constraint::ENTITY_B());
 
     aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
+    if (!aRefAttr)
+      continue;
     anAttr = aRefAttr->attr();
     for (std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
          anIt != anAttrList.end(); ++anIt)

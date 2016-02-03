@@ -41,6 +41,11 @@ const std::shared_ptr<GeomAPI_XYZ> GeomAPI_Dir::xyz()
   return std::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_DIR->X(), MY_DIR->Y(), MY_DIR->Z()));
 }
 
+void GeomAPI_Dir::reverse()
+{
+  MY_DIR->Reverse();
+}
+
 double GeomAPI_Dir::dot(const std::shared_ptr<GeomAPI_Dir>& theArg) const
 {
   return MY_DIR->Dot(theArg->impl<gp_Dir>());

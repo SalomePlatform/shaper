@@ -29,6 +29,10 @@ class GeomAPI_Lin2d : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   GeomAPI_Lin2d(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
                 const std::shared_ptr<GeomAPI_Pnt2d>& theEnd);
+  /// Creation of line defined by origin and direction
+  GEOMAPI_EXPORT
+  GeomAPI_Lin2d(const std::shared_ptr<GeomAPI_Pnt2d>& theOrigin,
+                const std::shared_ptr<GeomAPI_Dir2d>& theDirection);
 
   /// Returns point on the line (first point)
   GEOMAPI_EXPORT 

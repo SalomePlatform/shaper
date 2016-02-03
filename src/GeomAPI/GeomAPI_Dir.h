@@ -41,6 +41,9 @@ class GeomAPI_Dir : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   const std::shared_ptr<GeomAPI_XYZ> xyz();
 
+  /// inverses the direction
+  GEOMAPI_EXPORT void reverse();
+
   /// result is a scalar product of directions
   GEOMAPI_EXPORT 
   double dot(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
