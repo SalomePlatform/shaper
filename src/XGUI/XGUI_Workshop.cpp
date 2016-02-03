@@ -1066,8 +1066,8 @@ void XGUI_Workshop::createDockWidgets()
   connect(myPropertyPanel, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QObject*, QKeyEvent*)));
 
-  connect(myPropertyPanel, SIGNAL(enterClicked()),
-          myOperationMgr,  SLOT(onProcessEnter()));
+  connect(myPropertyPanel, SIGNAL(enterClicked(QObject*)),
+          myOperationMgr,  SLOT(onProcessEnter(QObject*)));
 }
 
 //******************************************************

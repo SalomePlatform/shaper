@@ -218,7 +218,8 @@ signals:
   void keyReleased(QObject* theObject, QKeyEvent* theEvent);
 
   /// The signal is emitted if the enter is clicked in the control of the widget
-  void enterClicked();
+  /// \param theObject a sender of the event
+  void enterClicked(QObject* theObject);
 
   /// The signal about the widget is get focus
   /// \param theWidget the model base widget

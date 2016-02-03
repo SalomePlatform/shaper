@@ -123,7 +123,9 @@ public slots:
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
 
 signals:
-  void enterClicked();
+  /// The signal is emitted if the enter is clicked in the control of the widget
+  /// \param theObject a sender of the event
+  void enterClicked(QObject* theObject);
 
 protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one

@@ -128,7 +128,7 @@ void ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
 
     //if (myIsEnterPressedEmitted)
     if (!myIsEditing)
-      emit enterClicked();
+      emit enterClicked(this);
   }
   else
     storeValue();

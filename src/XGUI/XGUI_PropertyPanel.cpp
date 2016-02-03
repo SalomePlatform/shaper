@@ -123,8 +123,8 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
             this,    SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
     connect(aWidget, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
             this,    SIGNAL(keyReleased(QObject*, QKeyEvent*)));
-    connect(aWidget, SIGNAL(enterClicked()),
-            this,    SIGNAL(enterClicked()));
+    connect(aWidget, SIGNAL(enterClicked(QObject*)),
+            this,    SIGNAL(enterClicked(QObject*)));
 
   }
 }
