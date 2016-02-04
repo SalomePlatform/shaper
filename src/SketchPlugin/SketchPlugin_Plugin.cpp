@@ -76,6 +76,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_FilletVertexValidator);
   aFactory->registerValidator("SketchPlugin_MiddlePointAttr",
                               new SketchPlugin_MiddlePointAttrValidator);
+  aFactory->registerValidator("SketchPlugin_ArcTangentPoint",
+                              new SketchPlugin_ArcTangentPointValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -192,6 +194,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistance::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintLength::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintParallel::ID(), aHasSketchPlane);
@@ -202,6 +205,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintVertical::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintEqual::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintTangent::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintMiddle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintFillet::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);

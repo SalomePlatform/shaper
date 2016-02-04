@@ -77,7 +77,9 @@
             <validator id="GeomValidators_Different" parameters="ArcStartPoint,ArcEndPoint,ArcPassedPoint"/>
           </box>
           <box id="Tangent" title="Tangent with edge" icon=":icons/arc_tang_32x32.png">
-            <sketch_shape_selector id="ArcTangentPoint" label="Start point" tooltip="Select point on line" shape_types="vertex" />
+            <sketch_shape_selector id="ArcTangentPoint" label="Start point" tooltip="Select point on line" shape_types="vertex">
+              <validator id="SketchPlugin_ArcTangentPoint" parameters="" />
+            </sketch_shape_selector>
             <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
             <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon=":icons/radius.png" tooltip="Set radius" obligatory="1">
               <validator id="GeomValidators_Positive"/>

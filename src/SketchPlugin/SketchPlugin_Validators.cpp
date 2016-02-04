@@ -650,3 +650,44 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
   }
   return true;
 }
+
+bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttribute,
+                                                    const std::list<std::string>& /*theArguments*/,
+                                                    std::string& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributePtr anAttr = aRefAttr->attr();
+  if (!anAttr) {
+    theError = "The attribute " + theAttribute->id() + " should be a point";
+    return false;
+  }
+
+  FeaturePtr anAttrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner());
+  const std::string& aFeatureType = anAttrFeature->getKind();
+  if (aFeatureType == SketchPlugin_Arc::ID()) {
+    // selected point should not be a center of arc
+    const std::string& aPntId = anAttr->id();
+    if (aPntId != SketchPlugin_Arc::START_ID() && aPntId != SketchPlugin_Arc::END_ID()) {
+      theError = "The attribute " + aPntId + " is not supported";
+      return false;
+    }
+  }
+  else if (aFeatureType == SketchPlugin_Line::ID()) {
+    // selected point should be bound point of line
+    const std::string& aPntId = anAttr->id();
+    if (aPntId != SketchPlugin_Line::START_ID() && aPntId != SketchPlugin_Line::END_ID()) {
+      theError = "The attribute " + aPntId + " is not supported";
+      return false;
+    }
+  }
+  else {
+    theError = "Unable to build tangent arc on " + anAttrFeature->getKind();
+    return false;
+  }
+
+  return true;
+}
