@@ -97,7 +97,7 @@ static std::list<AttributePtr> pointAttributes(FeaturePtr theFeature)
     aPoints.push_back(theFeature->attribute(SketchPlugin_Line::END_ID()));
   }
   else if (theFeature->getKind() == SketchPlugin_Point::ID())
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Point::ID()));
+    aPoints.push_back(theFeature->attribute(SketchPlugin_Point::COORD_ID()));
   return aPoints;
 }
 
