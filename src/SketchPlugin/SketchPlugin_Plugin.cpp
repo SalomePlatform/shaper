@@ -211,6 +211,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
+      // SketchRectangle is a python feature, so its ID is passed just as a string
+      aMsg->setState("SketchRectangle", aHasSketchPlane);
     }
   }
   return aMsg;

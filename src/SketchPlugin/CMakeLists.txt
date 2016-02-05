@@ -122,5 +122,6 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestMultiRotation.py
                TestMultiTranslation.py
                TestFillet.py
+               TestRectangle.py
                TestHighload.py
                TestSnowflake.py)

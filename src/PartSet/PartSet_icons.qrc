@@ -89,5 +89,6 @@
      <file>icons/plane_view.png</file>
      <file>icons/collinear.png</file>
      <file>icons/middlepoint.png</file>
+     <file>icons/rectangle.png</file>
  </qresource>
  </RCC>

@@ -133,7 +133,12 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
 {
   std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID, false);
   if (aNew) {
-    std::dynamic_pointer_cast<SketchPlugin_Feature>(aNew)->setSketch(this);
+    // the sketch cannot be specified for the macro-features defined in python
+    // like SketchRectangle, so we need to check the type of new feature
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(aNew);
+    if (aSketchFeature)
+      aSketchFeature->setSketch(this);
     data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(aNew);
   }
    // set as current also after it becomes sub to set correctly enabled for other sketch subs

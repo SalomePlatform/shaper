@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchRectangle SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -89,7 +89,9 @@
           </box>
         </toolbox>
       </feature>
+    </group>
 
+    <group id="Macro">
       <!--  SketchConstraintFillet  -->
       <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
         <!--<sketch_shape_selector id="ConstraintEntityA"

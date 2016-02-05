@@ -23,6 +23,7 @@
 %include "std_string.i"
 %include "std_list.i"
 %include "std_shared_ptr.i"
+%include "std_set.i"
 
 // directors
 %feature("director") ModelAPI_Plugin;
@@ -103,6 +104,8 @@
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 %template(DocumentList) std::list<std::shared_ptr<ModelAPI_Document> >;
+// std::set -> []
+%template(AttributeSet) std::set<std::shared_ptr<ModelAPI_Attribute> >;
 
 // std::dynamic_pointer_cast
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
