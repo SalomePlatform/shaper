@@ -7,7 +7,7 @@ class SketcherSetFillet(SketcherTestCase):
         l1 = self.sketch.addLine(0, 0, 0, 1)
         l2 = self.sketch.addLine(0, 1, 1, 1)
         self.sketch.setCoincident(l1.endPoint(), l2.startPoint())
-        self.sketch.setFillet(l1.result(), l2.result(), 10.0)
+        self.sketch.setFillet(l1.endPoint(), 10.0)
         model.do()
 
 if __name__ == "__main__":

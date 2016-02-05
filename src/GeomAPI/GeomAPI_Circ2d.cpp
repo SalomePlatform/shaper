@@ -55,15 +55,29 @@ static gp_Circ2d* newCirc2d(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
   gp_XY aVec12 = aSecondPnt - aFirstPnt;
   gp_XY aVec23 = aThirdPnt - aSecondPnt;
   gp_XY aVec31 = aFirstPnt - aThirdPnt;
+
+  // coefficients to calculate center
+  double aCoeff1, aCoeff2, aCoeff3;
+
   // square of parallelogram
   double aSquare2 = aVec12.Crossed(aVec23);
   aSquare2 *= aSquare2 * 2.0;
-  if (aSquare2 < 1.e-20)
-    return NULL;
-  // coefficients to calculate center
-  double aCoeff1 = aVec23.Dot(aVec23) / aSquare2 * aVec12.Dot(aVec31.Reversed());
-  double aCoeff2 = aVec31.Dot(aVec31) / aSquare2 * aVec23.Dot(aVec12.Reversed());
-  double aCoeff3 = aVec12.Dot(aVec12) / aSquare2 * aVec31.Dot(aVec23.Reversed());
+  if (aSquare2 < 1.e-20) {
+    // if two points are equal, build a circle on two different points as on diameter
+    double aSqLen12 = aVec12.SquareModulus();
+    double aSqLen23 = aVec23.SquareModulus();
+    double aSqLen31 = aVec31.SquareModulus();
+    if (aSqLen12 < Precision::SquareConfusion() &&
+        aSqLen23 < Precision::SquareConfusion() &&
+        aSqLen31 < Precision::SquareConfusion())
+      return NULL;
+    aCoeff1 = aCoeff2 = aCoeff3 = 1.0 / 3.0;
+  }
+  else {
+    aCoeff1 = aVec23.Dot(aVec23) / aSquare2 * aVec12.Dot(aVec31.Reversed());
+    aCoeff2 = aVec31.Dot(aVec31) / aSquare2 * aVec23.Dot(aVec12.Reversed());
+    aCoeff3 = aVec12.Dot(aVec12) / aSquare2 * aVec31.Dot(aVec23.Reversed());
+  }
   // center
   gp_XY aCenter = aFirstPnt * aCoeff1 + aSecondPnt * aCoeff2 + aThirdPnt * aCoeff3;
   // radius

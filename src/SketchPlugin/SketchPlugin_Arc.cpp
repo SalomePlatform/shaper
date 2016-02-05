@@ -518,6 +518,8 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
   if (theID == CENTER_ID()) {
     if (!isFeatureValid())
       return;
+    if (aCenterAttr->pnt()->distance(aStartAttr->pnt()) < tolerance)
+      return;
     data()->blockSendAttributeUpdated(true);
     // compute and change the arc end point
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
