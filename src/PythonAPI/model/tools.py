@@ -100,6 +100,16 @@ def fill_attribute(attribute, value):
             assert(isinstance(item, ModelAPI.ModelAPI_Object))
             attribute.append(item)
 
+    elif isinstance(attribute, ModelAPI.ModelAPI_AttributeRefAttrList):
+        attribute.clear()
+        if not value:
+            return
+
+        assert(isinstance(value, collections.Iterable))
+        for item in value:
+            assert(isinstance(item, ModelAPI.ModelAPI_Attribute))
+            attribute.append(item)
+
     elif isinstance(attribute, ModelAPI.ModelAPI_AttributeSelection):
         if value is None:
             attribute.setValue(None, None)

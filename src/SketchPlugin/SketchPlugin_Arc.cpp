@@ -382,8 +382,13 @@ static inline void calculatePassedPoint(
       theStartPoint->xy()->decreased(theCenter->xy())));
   std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
       theEndPoint->xy()->decreased(theCenter->xy())));
-  std::shared_ptr<GeomAPI_Dir2d> aMidDir(new GeomAPI_Dir2d(
-      aStartDir->xy()->added(aEndDir->xy())));
+  std::shared_ptr<GeomAPI_XY> aMidDirXY = aStartDir->xy()->added(aEndDir->xy());
+  if (aMidDirXY->dot(aMidDirXY) < tolerance * tolerance) {
+    // start and end directions are opposite, so middle direction will be orthogonal
+    aMidDirXY->setX(-aStartDir->y());
+    aMidDirXY->setY(aStartDir->x());
+  }
+  std::shared_ptr<GeomAPI_Dir2d> aMidDir(new GeomAPI_Dir2d(aMidDirXY));
   if ((aStartDir->cross(aMidDir) > 0) ^ !theArcReversed)
     aMidDir->reverse();
 

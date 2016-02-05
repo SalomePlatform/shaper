@@ -320,7 +320,7 @@ class Sketch(Interface):
             constraint.data().reflist("ConstraintEntityB").append(line_2)
         elif len(args) == 2:
             point, radius = args
-            self._fillAttribute(constraint.refattr("ConstraintEntityA"), point)
+            self._fillAttribute(constraint.data().refattrlist("ConstraintEntityA"), [point])
             self._fillAttribute(constraint.real("ConstraintValue"), radius)
         self.execute()
         return constraint

@@ -148,12 +148,14 @@ aSession.finishOperation()
 # Arc 2
 aSession.startOperation()
 aSketchArc2 = aSketchFeature.addFeature("SketchArc")
+aSketchArc2.string("ArcType").setValue("ThreePoints")
 anArc2Centr = geomDataAPI_Point2D(aSketchArc2.attribute("ArcCenter"))
-anArc2Centr.setValue(-10., 10.)
 anArc2StartPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcStartPoint"))
 anArc2StartPoint.setValue(0., 50.)
 anArc2EndPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcEndPoint"))
 anArc2EndPoint.setValue(-50., 0.)
+anArc2PassedPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcPassedPoint"))
+anArc2PassedPoint.setValue(-40., 40.)
 aSession.finishOperation()
 #=========================================================================
 # Link points of arcs by the coincidence constraint
@@ -225,6 +227,32 @@ assert(aLine2EndPointNew == aLine2EndPointPrev)
 assert(anArc2CenterNew == anArc2CenterPrev)
 assert(anArc2StartPointNew == anArc2StartPointPrev)
 assert(anArc2EndPointNew == anArc2EndPointPrev)
+aSession.startOperation()
+aSketchFeature.removeFeature(aTangency)
+aSession.finishOperation()
+
+#=========================================================================
+# TEST 4. Creating of tangency arc by the option of the SketchArc feature
+#=========================================================================
+aSession.startOperation()
+aSketchArc3 = aSketchFeature.addFeature("SketchArc")
+aSketchArc3.string("ArcType").setValue("Tangent")
+anArc3Start = aSketchArc3.refattr("ArcTangentPoint")
+anArc3Start.setAttr(anArc1StartPoint)
+anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcEndPoint"))
+anArc3EndPoint.setValue(100., 0.)
+aSession.finishOperation()
+anArc3Center = geomDataAPI_Point2D(aSketchArc2.attribute("ArcCenter"))
+anArc3StartPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcStartPoint"))
+
+anArc1VecX = anArc1EndPoint.x() - anArc1Centr.x()
+anArc1VecY = anArc1EndPoint.y() - anArc1Centr.y()
+aLen = math.sqrt(anArc1VecX**2 + anArc1VecY**2)
+anArc3VecX = anArc3StartPoint.x() - anArc3Center.x()
+anArc3VecY = anArc3StartPoint.y() - anArc3Center.y()
+aLen = aLen * math.sqrt(anArc3VecX**2 + anArc3VecY**2)
+aCross = anArc1VecX * anArc3VecY - anArc1VecY * anArc3VecX
+assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
 #=========================================================================
 # End of test
 #=========================================================================

@@ -28,12 +28,12 @@ def externalSketch(theDoc):
     dirx.setValue(1, 0, 0)
     norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
     norm.setValue(0, 0, 1)
-    # add circle
+    # add circle defined by 3 points
     circle = aSketchFeature.addFeature("SketchCircle")
-    circleCenter = geomDataAPI_Point2D(circle.attribute("CircleCenter"))
-    circleRadius = circle.real("CircleRadius")
-    circleCenter.setValue(-50., 50.)
-    circleRadius.setValue(10.)
+    circle.string("CircleType").setValue("ThreePoints")
+    geomDataAPI_Point2D(circle.attribute("FirstPoint")).setValue(-40., 50.)
+    geomDataAPI_Point2D(circle.attribute("SecondPoint")).setValue(-50., 60.)
+    geomDataAPI_Point2D(circle.attribute("ThirdPoint")).setValue(-60., 50.)
     # add line
     line = aSketchFeature.addFeature("SketchLine")
     lineStart = geomDataAPI_Point2D(line.attribute("StartPoint"))
