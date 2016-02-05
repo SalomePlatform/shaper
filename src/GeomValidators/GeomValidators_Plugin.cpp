@@ -4,6 +4,7 @@
 
 #include <GeomValidators_BodyShapes.h>
 #include <GeomValidators_BooleanArguments.h>
+#include <GeomValidators_BooleanSelection.h>
 #include <GeomValidators_ConstructionComposite.h>
 #include <GeomValidators_Different.h>
 #include <GeomValidators_DifferentShapes.h>
@@ -35,6 +36,7 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   aFactory->registerValidator("GeomValidators_PartitionArguments", new GeomValidators_PartitionArguments);
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_ZeroOffset", new GeomValidators_ZeroOffset);
+  aFactory->registerValidator("GeomValidators_BooleanSelection", new GeomValidators_BooleanSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

@@ -44,7 +44,9 @@ void GeomAPI_DataMapOfShapeShape::merge(const GeomAPI_DataMapOfShapeShape& theDa
 
 void GeomAPI_DataMapOfShapeShape::merge(const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMap)
 {
-  merge(*theDataMap.get());
+  if(theDataMap.get()) {
+    merge(*theDataMap.get());
+  }
 }
 
 bool GeomAPI_DataMapOfShapeShape::isBound (std::shared_ptr<GeomAPI_Shape> theKey)

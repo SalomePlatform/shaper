@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
     GeomValidators_Tools.h
     GeomValidators_ZeroOffset.h
     GeomValidators_Different.h
+    GeomValidators_BooleanSelection.h
 )
 
 SET(PROJECT_SOURCES
@@ -33,6 +34,7 @@ SET(PROJECT_SOURCES
     GeomValidators_Tools.cpp
     GeomValidators_ZeroOffset.cpp
     GeomValidators_Different.cpp
+    GeomValidators_BooleanSelection.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -54,4 +56,3 @@ INCLUDE_DIRECTORIES(
 )
 
 INSTALL(TARGETS GeomValidators DESTINATION plugins)
-

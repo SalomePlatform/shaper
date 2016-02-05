@@ -85,18 +85,28 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
     aTA = TopAbs_SOLID;
   }
 
-  // Map subshapes and shapes.
+  // Get free shapes.
   const TopoDS_Shape& aShapesComp = theCompound->impl<TopoDS_Shape>();
-  BOPCol_IndexedDataMapOfShapeListOfShape aMapEF;
-  BOPTools::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapEF);
-  if(aMapEF.IsEmpty()) {
+  for(TopoDS_Iterator anIter(aShapesComp); anIter.More(); anIter.Next() ) {
+    const TopoDS_Shape& aShape = anIter.Value();
+    if(aShape.ShapeType() > aTA) {
+      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+      aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
+      theFreeShapes.push_back(aGeomShape);
+    }
+  }
+
+  // Map subshapes and shapes.
+  BOPCol_IndexedDataMapOfShapeListOfShape aMapSA;
+  BOPTools::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
+  if(aMapSA.IsEmpty()) {
     return;
   }
 
   // Get all shapes with common subshapes and free shapes.
   NCollection_Map<TopoDS_Shape> aFreeShapes;
   NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
-  for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator anIter(aMapEF); anIter.More(); anIter.Next()) {
+  for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator anIter(aMapSA); anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
     BOPCol_ListOfShape& aListOfShape = anIter.ChangeValue();
     if(aListOfShape.IsEmpty()) {
@@ -120,7 +130,7 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
       aListOfShape.Clear();
       for(NCollection_List<TopoDS_Shape>::Iterator aTempIter(aTempList); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
-        for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator anIter(aMapEF); anIter.More(); anIter.Next()) {
+        for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator anIter(aMapSA); anIter.More(); anIter.Next()) {
           BOPCol_ListOfShape& aTempListOfShape = anIter.ChangeValue();
           if(aTempListOfShape.IsEmpty()) {
             continue;

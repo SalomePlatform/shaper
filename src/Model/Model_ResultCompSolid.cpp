@@ -171,10 +171,10 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
     bool aWasEmpty = mySubs.empty();
     Model_Objects* anObjects = std::dynamic_pointer_cast<Model_Document>(document())->objects();
     unsigned int aSubIndex = 0;
-    TopExp_Explorer aSolids(aThisShape, TopAbs_SOLID);
-    for(; aSolids.More(); aSolids.Next(), aSubIndex++) {
-      std::shared_ptr<GeomAPI_Shape> aSolidShape(new GeomAPI_Shape);
-      aSolidShape->setImpl(new TopoDS_Shape(aSolids.Current()));
+    TopoDS_Iterator aShapesIter(aThisShape);
+    for(; aShapesIter.More(); aShapesIter.Next(), aSubIndex++) {
+      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+      aShape->setImpl(new TopoDS_Shape(aShapesIter.Value()));
       ResultBodyPtr aSub;
       if (mySubs.size() <= aSubIndex) { // it is needed to create a new sub-result
         aSub = anObjects->createBody(this->data(), aSubIndex);
@@ -182,8 +182,8 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
       } else { // just update shape of this result
         aSub = mySubs[aSubIndex];
       }
-      if (!aSolidShape->isEqual(aSub->shape())) {
-        aSub->store(aSolidShape, false);
+      if (!aShape->isEqual(aSub->shape())) {
+        aSub->store(aShape, false);
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }

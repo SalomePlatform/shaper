@@ -12,6 +12,7 @@
 #include <BOPAlgo_Builder.hxx>
 #include <BOPAlgo_PaveFiller.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS_Iterator.hxx>
 
 //=================================================================================================
 GeomAlgoAPI_PaveFiller::GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape, const bool theIsMakeCompSolids)
@@ -26,7 +27,14 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape, const bool
   BOPAlgo_PaveFiller aPaveFiller;
   BOPCol_ListOfShape aListOfShape;
   for(ListOfShape::const_iterator anIt = theListOfShape.cbegin(); anIt != theListOfShape.cend(); anIt++) {
-    aListOfShape.Append((*anIt)->impl<TopoDS_Shape>());
+    const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
+    if(aShape.ShapeType() == TopAbs_COMPOUND) {
+      for(TopoDS_Iterator anIter(aShape); anIter.More(); anIter.Next()) {
+        aListOfShape.Append(anIter.Value());
+      }
+    } else {
+      aListOfShape.Append(aShape);
+    }
   }
   aPaveFiller.SetArguments(aListOfShape);
   aPaveFiller.Perform();

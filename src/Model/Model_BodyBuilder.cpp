@@ -225,8 +225,11 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
         TNaming_Builder aSubBuilder(aShapeLab.FindChild(aTag++));
         aSubBuilder.Generated(aSubIter.Value());
         if(!aName.IsEmpty()) {
+          TCollection_AsciiString aShapeType = aShape.ShapeType() == TopAbs_EDGE ? "_Edge_" :
+                                               aShape.ShapeType() == TopAbs_FACE ? "_Face_" :
+                                               aShape.ShapeType() == TopAbs_SOLID ? "_Solid_" : "_Shape_";
           std::string aSolidName = 
-            (aName + "_Solid_" + TCollection_AsciiString(aTag - theDecomposeSolidsTag)).ToCString(); 
+            (aName + aShapeType + TCollection_AsciiString(aTag - theDecomposeSolidsTag)).ToCString(); 
           std::shared_ptr<Model_Document> aDoc = 
             std::dynamic_pointer_cast<Model_Document>(document());
           aDoc->addNamingName(aSubBuilder.NamedShape()->Label(), aSolidName);

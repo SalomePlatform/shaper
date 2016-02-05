@@ -8,10 +8,7 @@
 
 #include <GeomAlgoAPI_DFLoader.h>
 
-#include <BRepAlgoAPI_BooleanOperation.hxx>
-#include <BRepAlgoAPI_Common.hxx>
-#include <BRepAlgoAPI_Cut.hxx>
-#include <BRepAlgoAPI_Fuse.hxx>
+#include <BOPAlgo_BOP.hxx>
 #include <TopTools_ListOfShape.hxx>
 
 //=================================================================================================
@@ -47,35 +44,35 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   }
 
   // Creating boolean operation.
-  BRepAlgoAPI_BooleanOperation* anOperation;
+  BOPAlgo_BOP* aBuilder = new BOPAlgo_BOP();
   switch (theOperationType) {
     case BOOL_CUT: {
-      anOperation = new BRepAlgoAPI_Cut();
+      aBuilder->SetOperation(BOPAlgo_CUT);
       break;
     }
     case BOOL_FUSE: {
-      anOperation = new BRepAlgoAPI_Fuse();
+      aBuilder->SetOperation(BOPAlgo_FUSE);
       break;
     }
     case BOOL_COMMON: {
-      anOperation = new BRepAlgoAPI_Common();
+      aBuilder->SetOperation(BOPAlgo_COMMON);
       break;
     }
     default: {
       return;
     }
   }
-  this->setImpl(anOperation);
-  this->setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
-  anOperation->SetArguments(anObjects);
-  anOperation->SetTools(aTools);
+  this->setImpl(aBuilder);
+  this->setBuilderType(OCCT_BOPAlgo_Builder);
+  aBuilder->SetArguments(anObjects);
+  aBuilder->SetTools(aTools);
 
   // Building and getting result.
-  anOperation->Build();
-  if(anOperation->IsDone() != Standard_True) {
+  aBuilder->Perform();
+  if(aBuilder->ErrorStatus() != 0) {
     return;
   }
-  TopoDS_Shape aResult = anOperation->Shape();
+  TopoDS_Shape aResult = aBuilder->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
