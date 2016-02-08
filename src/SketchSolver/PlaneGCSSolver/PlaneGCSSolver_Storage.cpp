@@ -404,8 +404,20 @@ static void getParametersToMove(const EntityWrapperPtr& theEntity, std::set<doub
 
   const std::list<EntityWrapperPtr> aSubs = theEntity->subEntities();
   std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-  for (; aSIt != aSubs.end(); ++aSIt)
-    getParametersToMove(*aSIt, theParamList);
+
+  if (theEntity->type() == ENTITY_ARC) {
+    // workaround for the arc processing, because the arc is fixed by a set of constraints,
+    // which will conflict with all parameters fixed:
+    // 1. take center
+    getParametersToMove(*aSIt++, theParamList);
+    // 2. take start point
+    getParametersToMove(*aSIt++, theParamList);
+    // 3. skip end point, radius and start angle, but take end angle parameter
+    getParametersToMove(*(++aSIt), theParamList);
+  } else {
+    for (; aSIt != aSubs.end(); ++aSIt)
+      getParametersToMove(*aSIt, theParamList);
+  }
 }
 
 void PlaneGCSSolver_Storage::toggleEntity(
