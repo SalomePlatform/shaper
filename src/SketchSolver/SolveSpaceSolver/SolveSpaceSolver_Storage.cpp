@@ -129,7 +129,7 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr theEntity)
   if (anEntity->baseAttribute()) {
     BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
     EntityWrapperPtr anUpdAttr = aBuilder->createAttribute(anEntity->baseAttribute(), GID_UNKNOWN);
-    if (anUpdAttr) {
+    if (anUpdAttr && !isFixed(theEntity)) {
       std::list<ParameterWrapperPtr> anUpdParams = anUpdAttr->parameters();
       std::list<ParameterWrapperPtr>::iterator anUpdIt = anUpdParams.begin();
       for (aPIt = aParams.begin(); aPIt != aParams.end() && anUpdIt != anUpdParams.end();
@@ -1129,10 +1129,17 @@ void SolveSpaceSolver_Storage::verifyFixed()
   for (; anAttrIt != myAttributeMap.end(); ++anAttrIt) {
     if (!anAttrIt->second)
       continue;
+    if (anAttrIt->second->group() == GID_OUTOFGROUP) {
+      Slvs_Entity anEnt = getEntity((Slvs_hEntity)anAttrIt->second->id());
+      if (anEnt.group != (Slvs_hEntity)GID_OUTOFGROUP)
+        anEnt.group = (Slvs_hEntity)GID_OUTOFGROUP;
+      updateEntity(anEnt);
+    }
+
     const std::list<ParameterWrapperPtr>& aParameters = anAttrIt->second->parameters();
     std::list<ParameterWrapperPtr>::const_iterator aParIt = aParameters.begin();
     for (; aParIt != aParameters.end(); ++aParIt)
-      if ((*aParIt)->group() == GID_OUTOFGROUP) {
+      if (anAttrIt->second->group() == GID_OUTOFGROUP || (*aParIt)->group() == GID_OUTOFGROUP) {
         Slvs_Param aParam = getParameter((Slvs_hParam)(*aParIt)->id());
         if (aParam.group != (Slvs_hParam)GID_OUTOFGROUP) {
           aParam.group = (Slvs_hParam)GID_OUTOFGROUP;

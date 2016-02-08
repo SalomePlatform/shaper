@@ -316,10 +316,10 @@ bool SketchSolver_Group::resolveConstraints()
           aResult = mySketchSolver->solve();
           if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET || isLastChance)
             break;
-          // try to update parameters and resolve once again
-          ConstraintConstraintMap::iterator aConstrIt = myConstraints.begin();
-          for (; aConstrIt != myConstraints.end(); ++aConstrIt)
-            aConstrIt->second->update();
+////          // try to update parameters and resolve once again
+////          ConstraintConstraintMap::iterator aConstrIt = myConstraints.begin();
+////          for (; aConstrIt != myConstraints.end(); ++aConstrIt)
+////            aConstrIt->second->update();
           isLastChance = true;
 
           removeTemporaryConstraints();

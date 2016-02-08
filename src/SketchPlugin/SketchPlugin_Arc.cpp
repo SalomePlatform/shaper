@@ -399,8 +399,6 @@ static inline void calculatePassedPoint(
 
 void SketchPlugin_Arc::updateDependentAttributes()
 {
-  data()->blockSendAttributeUpdated(true);
-
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
@@ -414,12 +412,19 @@ void SketchPlugin_Arc::updateDependentAttributes()
   AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       data()->attribute(ANGLE_ID()));
 
+  if (!aPassedPoint)
+    return;
+
+  data()->blockSendAttributeUpdated(true);
+
   calculatePassedPoint(aCenterAttr->pnt(), aStartAttr->pnt(), anEndAttr->pnt(),
                        isReversed(), aPassedPoint);
-  std::shared_ptr<GeomAPI_Circ2d> aCircle(
-      new GeomAPI_Circ2d(aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt()));
-  calculateArcAngleRadius(aCircle, aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt(),
-                          anAngleAttr, aRadiusAttr);
+  if (aRadiusAttr && anAngleAttr) {
+    std::shared_ptr<GeomAPI_Circ2d> aCircle(
+        new GeomAPI_Circ2d(aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt()));
+    calculateArcAngleRadius(aCircle, aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt(),
+                            anAngleAttr, aRadiusAttr);
+  }
   data()->blockSendAttributeUpdated(false);
 }
 
