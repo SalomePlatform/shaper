@@ -186,11 +186,13 @@ static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, Feat
 {
   ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
   for (; aCIt != theConstraints.end(); ++aCIt) {
-    if ((aCIt->second->getType() == CONSTRAINT_MULTI_ROTATION ||
-         aCIt->second->getType() == CONSTRAINT_MULTI_TRANSLATION)
+    SketchSolver_ConstraintType aType = aCIt->second->getType();
+    if ((aType == CONSTRAINT_MULTI_ROTATION ||
+         aType == CONSTRAINT_MULTI_TRANSLATION)
         && aCIt->second->isUsed(theFeature))
       std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
-    else if (aCIt->second->getType() == CONSTRAINT_TANGENT_CIRCLE_LINE
+    else if ((aType == CONSTRAINT_TANGENT_CIRCLE_LINE ||
+              aType == CONSTRAINT_SYMMETRIC)
              && aCIt->second->isUsed(theFeature))
       aCIt->second->update();
   }

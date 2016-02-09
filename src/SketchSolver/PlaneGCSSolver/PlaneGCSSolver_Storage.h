@@ -103,6 +103,12 @@ private:
   /// \brief Adjust parameters of points coincident with the given
   void updateCoincident(const EntityWrapperPtr& thePoint);
 
+  /// \brief Verifies the constraint should not be added into the solver
+  ///
+  /// This is a workaround method to avoid some kinds of conflicting constraints:
+  ///   * symmetric of two points placed on the mirror line (do not add perpendicular constraint)
+  bool isRedundant(GCSConstraintPtr theCheckedConstraint, ConstraintWrapperPtr theParentConstraint) const;
+
 private:
   GCS::VEC_pD                      myParameters;         ///< list of parameters
   GCS::VEC_pD                      myConst;              ///< list of constants

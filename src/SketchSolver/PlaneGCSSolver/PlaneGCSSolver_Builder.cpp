@@ -462,6 +462,8 @@ void PlaneGCSSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstraint
     adjustAngle(theConstraint);
   else if (aType == CONSTRAINT_PT_LINE_DISTANCE)
     adjustPtLineDistance(theConstraint);
+  else if (aType == CONSTRAINT_SYMMETRIC)
+    adjustMirror(theConstraint);
 }
 
 EntityWrapperPtr PlaneGCSSolver_Builder::createFeature(
@@ -1237,5 +1239,22 @@ void adjustPtLineDistance(ConstraintWrapperPtr theConstraint)
   std::shared_ptr<GeomAPI_XY> aPtLineVec = aPoint->xy()->decreased(aLine->location()->xy());
   if (aPtLineVec->cross(aLineVec) * theConstraint->value() < 0.0)
     theConstraint->setValue(theConstraint->value() * (-1.0));
+}
+
+void adjustMirror(ConstraintWrapperPtr theConstraint)
+{
+  std::vector<EntityWrapperPtr> aPoints;
+  EntityWrapperPtr aMirrorLine;
+
+  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
+  std::list<EntityWrapperPtr>::const_iterator anIt = aSubs.begin();
+  for (; anIt != aSubs.end(); ++anIt) {
+    if ((*anIt)->type() == ENTITY_POINT)
+      aPoints.push_back(*anIt);
+    else if ((*anIt)->type() == ENTITY_LINE)
+      aMirrorLine = *anIt;
+  }
+
+  makeMirrorPoints(aPoints[0], aPoints[1], aMirrorLine);
 }
 

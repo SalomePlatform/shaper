@@ -467,6 +467,24 @@ void PlaneGCSSolver_Storage::updateCoincident(const EntityWrapperPtr& thePoint)
 }
 
 
+bool PlaneGCSSolver_Storage::isRedundant(
+    GCSConstraintPtr theCheckedConstraint,
+    ConstraintWrapperPtr theParentConstraint) const
+{
+  if (theParentConstraint->type() == CONSTRAINT_SYMMETRIC) {
+    if (theCheckedConstraint->getTypeId() == GCS::Perpendicular) {
+      BuilderPtr aBuilder = PlaneGCSSolver_Builder::getInstance();
+      // check the initial point is placed on the mirror line
+      std::list<EntityWrapperPtr> aSubs = theParentConstraint->entities();
+      std::shared_ptr<GeomAPI_Pnt2d> aPoint = aBuilder->point(aSubs.front());
+      std::shared_ptr<GeomAPI_Lin2d> aLine = aBuilder->line(aSubs.back());
+      return aLine->distance(aPoint) < tolerance;
+    }
+  }
+
+  return false;
+}
+
 void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
 {
   std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
@@ -487,7 +505,8 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
           std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(*aCWIt);
       std::list<GCSConstraintPtr>::const_iterator anIt = aGCS->constraints().begin();
       for (; anIt != aGCS->constraints().end(); ++anIt)
-        aSolver->addConstraint(*anIt);
+        if (!isRedundant(*anIt, aGCS))
+          aSolver->addConstraint(*anIt);
     }
   }
   // additional constraints for arcs
