@@ -11,6 +11,7 @@
 #include "XGUI_Displayer.h"
 
 #include "SketcherPrs_SymbolPrs.h"
+#include "SketchPlugin_SketchEntity.h"
 
 #include "Events_Loop.h"
 
@@ -37,7 +38,8 @@ bool PartSet_OverconstraintListener::isConflictingObject(const ObjectPtr& theObj
 
 void PartSet_OverconstraintListener::getConflictingColor(std::vector<int>& theColor)
 {
-  Quantity_Color aColor = Quantity_Color(Quantity_NameOfColor::Quantity_NOC_RED);
+  Quantity_Color aColor = ModuleBase_Tools::color("Visualization", "sketch_overconstraint_color",
+                                                  SKETCH_OVERCONSTRAINT_COLOR);
 
   theColor.push_back(aColor.Red()*255.);
   theColor.push_back(aColor.Green()*255.);

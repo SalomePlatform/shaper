@@ -94,6 +94,10 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color", "Sketch dimension color",
                                    Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 
+  Config_PropManager::registerProp("Visualization", "sketch_overconstraint_color",
+                                   "Sketch overconstraint color",
+                                   Config_Prop::Color, SKETCH_OVERCONSTRAINT_COLOR);
+
   // register sketcher properties
 #ifdef SET_PLANES_COLOR_IN_PREFERENCES
   Config_PropManager::registerProp("Visualization", "yz_plane_color", "YZ plane color",
