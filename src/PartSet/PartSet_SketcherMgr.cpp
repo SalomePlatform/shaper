@@ -58,6 +58,8 @@
 #include <SketchPlugin_ConstraintFillet.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintAngle.h>
+#include <SketchPlugin_ConstraintCollinear.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
@@ -731,6 +733,10 @@ const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
     aIds << SketchPlugin_Arc::ID().c_str();
     aIds << SketchPlugin_Circle::ID().c_str();
     aIds << SketchPlugin_ConstraintFillet::ID().c_str();
+    aIds << SketchPlugin_Circle::ID().c_str();
+    // TODO
+    // SketchRectangle is a python feature, so its ID is passed just as a string
+    aIds << "SketchRectangle";
     aIds.append(constraintsIdList());
   }
   return aIds;
@@ -755,6 +761,8 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
     aIds << SketchPlugin_ConstraintAngle::ID().c_str();
     aIds << SketchPlugin_MultiRotation::ID().c_str();
     aIds << SketchPlugin_MultiTranslation::ID().c_str();
+    aIds << SketchPlugin_ConstraintCollinear::ID().c_str();
+    aIds << SketchPlugin_ConstraintMiddle::ID().c_str();
   }
   return aIds;
 }
