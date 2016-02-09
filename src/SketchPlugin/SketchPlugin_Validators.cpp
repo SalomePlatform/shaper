@@ -269,7 +269,7 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
     return false;
   }
 
-  int aType[2] = {0, 0}; // types of attributes: 0 - incorrect, 1 - line, 2 - circle, 3 - arc
+  std::string aType[2];
   std::list<std::string> anArguments;
   for (int i = 0; i < 2; i++) {
     ObjectPtr anObject = aRefAttr[i]->object();
@@ -284,29 +284,21 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
       return false;
     }
 
-    if (aFeature->getKind() == SketchPlugin_Line::ID()) {
-      aType[i] = 1;
-      continue;
+    aType[i] = aFeature->getKind();
+    if (aFeature->getKind() != SketchPlugin_Line::ID() &&
+        aFeature->getKind() != SketchPlugin_Circle::ID() &&
+        aFeature->getKind() != SketchPlugin_Arc::ID()) {
+      theError = "The " + aFeature->getKind() + " feature kind of attribute is wrong. It should be " +
+                 SketchPlugin_Line::ID() + " or " + SketchPlugin_Circle::ID() + " or " + 
+                 SketchPlugin_Arc::ID();
+      // wrong type of attribute
+      return false;
     }
-    if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
-      aType[i] = 2;
-      continue;
-    }
-    if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
-      aType[i] = 3;
-      continue;
-    }
-    theError = "The " + aFeature->getKind() + " feature kind of attribute is wrong. It should be " +
-               SketchPlugin_Line::ID() + " or " + SketchPlugin_Circle::ID() + " or " + 
-               SketchPlugin_Arc::ID();
-    // wrong type of attribute
-    return false;
   }
 
-  if ((aType[0] == 1 && aType[1] == 2) ||
-      (aType[0] == 2 && aType[1] == 1)) {
-    theError = "Feature with kinds " + SketchPlugin_Line::ID() + " and " +
-               SketchPlugin_Circle::ID() + "can not be equal.";
+  if ((aType[0] == SketchPlugin_Line::ID() || aType[1] == SketchPlugin_Line::ID()) &&
+      aType[0] != aType[1]) {
+    theError = "Feature with kinds " + aType[0] + " and " + aType[1] + "can not be equal.";
     return false;
   }
   return true;
