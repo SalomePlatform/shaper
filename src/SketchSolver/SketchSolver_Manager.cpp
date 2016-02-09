@@ -163,8 +163,8 @@ void SketchSolver_Manager::processEvent(
         }
         if (!(*aGroupIter)->isConsistent()) {  // some constraints were removed, try to split the group
           (*aGroupIter)->splitGroup(aSeparatedGroups);
-          if (!(*aGroupIter)->getWorkplane()->string(
-              SketchPlugin_Sketch::SOLVER_ERROR())->value().empty())
+          //if (!(*aGroupIter)->getWorkplane()->string(
+          //    SketchPlugin_Sketch::SOLVER_ERROR())->value().empty())
             aGroupsToResolve.push_back(*aGroupIter);
         }
         aGroupIter++;
