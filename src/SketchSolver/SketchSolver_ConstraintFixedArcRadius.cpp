@@ -53,7 +53,9 @@ void SketchSolver_ConstraintFixedArcRadius::fixFeature(EntityWrapperPtr theFeatu
 
 bool SketchSolver_ConstraintFixedArcRadius::remove()
 {
-  bool isFullyRemoved = SketchSolver_ConstraintFixed::remove();
+  bool isFullyRemoved = true;
+  if (myBaseFeature)
+    isFullyRemoved = myStorage->removeEntity(myBaseFeature) && isFullyRemoved;
   if (myRadiusConstraint)
     isFullyRemoved = myStorage->removeConstraint(ConstraintPtr()) &&
                      myStorage->remove(myRadiusConstraint) && isFullyRemoved;

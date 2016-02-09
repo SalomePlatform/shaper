@@ -129,7 +129,7 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr theEntity)
   if (anEntity->baseAttribute()) {
     BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
     EntityWrapperPtr anUpdAttr = aBuilder->createAttribute(anEntity->baseAttribute(), GID_UNKNOWN);
-    if (anUpdAttr && !isFixed(theEntity)) {
+    if (anUpdAttr) {
       std::list<ParameterWrapperPtr> anUpdParams = anUpdAttr->parameters();
       std::list<ParameterWrapperPtr>::iterator anUpdIt = anUpdParams.begin();
       for (aPIt = aParams.begin(); aPIt != aParams.end() && anUpdIt != anUpdParams.end();
