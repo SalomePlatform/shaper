@@ -57,6 +57,10 @@ class ModelAPI_Object: public ModelAPI_Entity
   /// Returns the feature is disabled or not.
   virtual bool isDisabled() = 0;
 
+  /// Returns the parameters of color definition in the resources config manager
+  virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+                               std::string& theDefault) {}
+
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);

@@ -5,6 +5,10 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <XGUI_CustomPrs.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_Displayer.h>
+
+#include <ModuleBase_IModule.h>
 
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Session.h>
@@ -30,18 +34,18 @@ void getColor(ResultPtr theResult, std::vector<int>& theColor)
   }
 }
 
-void getDefaultColor(ResultPtr theResult, std::vector<int>& theColor)
+void getDefaultColor(ObjectPtr theObject, std::vector<int>& theColor, const bool isEmptyColorValid)
 {
   theColor.clear();
   // get default color from the preferences manager for the given result
   if (theColor.empty()) {
     std::string aSection, aName, aDefault;
-    theResult->colorConfigInfo(aSection, aName, aDefault);
+    theObject->colorConfigInfo(aSection, aName, aDefault);
     if (!aSection.empty() && !aName.empty()) {
       theColor = Config_PropManager::color(aSection, aName, aDefault);
     }
   }
-  if (theColor.empty()) {
+  if (!isEmptyColorValid && theColor.empty()) {
     // all AIS objects, where the color is not set, are in black.
     // The color should be defined in XML or set in the attribute
     theColor = Config_PropManager::color("Visualization", "object_default_color", "#000000");
@@ -49,27 +53,48 @@ void getDefaultColor(ResultPtr theResult, std::vector<int>& theColor)
   }
 }
 
+XGUI_CustomPrs::XGUI_CustomPrs(XGUI_Workshop* theWorkshop)
+: myWorkshop(theWorkshop)
+{
+}
+
 void XGUI_CustomPrs::getResultColor(ResultPtr theResult, std::vector<int>& theColor)
 {
   getColor(theResult, theColor);
   if (theColor.empty())
-    getDefaultColor(theResult, theColor);
+    getDefaultColor(theResult, theColor, false);
 }
 
 bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                            std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
 {
-  std::vector<int> aColor;
+  bool aCustomized = false;
+  if (theResult.get()) {
+    std::vector<int> aColor;
+    getResultColor(theResult, aColor);
 
-  getResultColor(theResult, aColor);
-
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (aMgr->activeDocument() != theResult->document()) {
-    QColor aQColor(aColor[0], aColor[1], aColor[2]);
-    QColor aNewColor = QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
-    aColor[0] = aNewColor.red();
-    aColor[1] = aNewColor.green();
-    aColor[2] = aNewColor.blue();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (aMgr->activeDocument() != theResult->document()) {
+      QColor aQColor(aColor[0], aColor[1], aColor[2]);
+      QColor aNewColor = QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
+      aColor[0] = aNewColor.red();
+      aColor[1] = aNewColor.green();
+      aColor[2] = aNewColor.blue();
+    }
+    aCustomized = !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
   }
-  return !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+  else {
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    ObjectPtr anObject = aDisplayer->getObject(thePrs);
+    if (anObject.get()) {
+     std::vector<int> aColor;
+     ModuleBase_IModule* aModule = myWorkshop->module();
+     aModule->getColor(anObject, aColor);
+     if (aColor.empty())
+       getDefaultColor(anObject, aColor, true);
+     if (!aColor.empty())
+       thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+    }
+  }
+  return aCustomized;
 }

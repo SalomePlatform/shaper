@@ -12,6 +12,8 @@
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Result.h>
 
+class XGUI_Workshop;
+
 /**
 * Interface of a class which can provide specific customization of
 * object presentation
@@ -19,6 +21,10 @@
 class XGUI_CustomPrs : public GeomAPI_ICustomPrs
 {
 public:
+  /// Constructor
+  /// \param theWorkshop the current workshop instance
+  XGUI_EXPORT XGUI_CustomPrs(XGUI_Workshop* theWorkshop);
+
   XGUI_EXPORT virtual ~XGUI_CustomPrs() {};
 
   /// Modifies the given presentation in the custom way.
@@ -29,6 +35,9 @@ public:
   /// \param theResult a result object
   /// \param theColor a color in form of RGB vector
   static void getResultColor(ResultPtr theResult, std::vector<int>& theColor);
+
+protected:
+  XGUI_Workshop* myWorkshop; /// the current workshop
 };
 
 #endif

@@ -40,6 +40,14 @@ void SketchPlugin_ConstraintLength::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
 }
 
+void SketchPlugin_ConstraintLength::colorConfigInfo(std::string& theSection, std::string& theName,
+                                                    std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "sketch_dimension_color";
+  theDefault = SKETCH_DIMENSION_COLOR;
+}
+
 void SketchPlugin_ConstraintLength::execute()
 {
   std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
@@ -128,9 +136,6 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!anAIS) {
     anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane());
   }
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
-                                                    SKETCH_DIMENSION_COLOR);
-  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 

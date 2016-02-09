@@ -7,6 +7,7 @@
 #include <PartSet_CustomPrs.h>
 #include <PartSet_Module.h>
 #include "PartSet_OperationPrs.h"
+#include "PartSet_OverconstraintListener.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
@@ -173,7 +174,9 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
 #ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
   return false;
 #endif
-  return displayPresentation(theFlag, theUpdateViewer);
+  bool aRedisplayed = displayPresentation(theFlag, theUpdateViewer);
+
+  return aRedisplayed;
 }
 
 void PartSet_CustomPrs::clearPrs()

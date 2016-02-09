@@ -16,6 +16,7 @@
 #include <QMap>
 
 #include <string>
+#include <vector>
 #include <map>
 
 class QAction;
@@ -255,6 +256,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject,
                                      const GeomShapePtr& theGeomShape) = 0;
+
+  /// Returns color of the object
+  /// \param theObject a result of a feature object
+  /// \param theColor a vector of three values in [0, 255] range
+  virtual void getColor(const ObjectPtr& theObject, std::vector<int>& theColor) {}
 
   /// Returns XML information by the feature index
   /// \param theFeatureId a feature id

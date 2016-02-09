@@ -107,7 +107,7 @@ XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   myIsTrihedronActive(false)
 {
   enableUpdateViewer(true);
-  myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs());
+  myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs(theWorkshop));
 }
 
 XGUI_Displayer::~XGUI_Displayer()

@@ -14,6 +14,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 
 #include <GeomAPI_IPresentable.h>
+#include <GeomAPI_ICustomPrs.h>
 
 #include <list>
 
@@ -38,7 +39,8 @@
  *         Some feature's methods implemented here as dummy to
  *         Base class for all constraints.
  */
-class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomAPI_IPresentable
+class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomAPI_IPresentable,
+                                    public GeomAPI_ICustomPrs
 {
  public:
   /// Returns the AIS preview
@@ -52,6 +54,13 @@ class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomA
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
+
+      /// Customize presentation of the feature
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+  {
+    return theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+  }
 
  protected:
   /// \brief Use plugin manager for features creation

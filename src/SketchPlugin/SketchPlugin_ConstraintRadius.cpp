@@ -40,6 +40,14 @@ void SketchPlugin_ConstraintRadius::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
 }
 
+void SketchPlugin_ConstraintRadius::colorConfigInfo(std::string& theSection, std::string& theName,
+                                                    std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "sketch_dimension_color";
+  theDefault = SKETCH_DIMENSION_COLOR;
+}
+
 void SketchPlugin_ConstraintRadius::execute()
 {
   std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
@@ -148,11 +156,6 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   if (!anAIS) {
     anAIS = SketcherPrs_Factory::radiusConstraint(this, sketch()->coordinatePlane());
   }
-
-  // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
-                                                    SKETCH_DIMENSION_COLOR);
-  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 

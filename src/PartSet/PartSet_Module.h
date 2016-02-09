@@ -5,6 +5,7 @@
 
 #include "PartSet.h"
 #include "PartSet_Tools.h"
+#include "PartSet_OverconstraintListener.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -171,6 +172,10 @@ public:
   /// Returns sketch reentrant manager
   PartSet_SketcherReetntrantMgr* sketchReentranceMgr() { return mySketchReentrantMgr; }
 
+  /// Returns listener of overconstraint signal
+  /// \return the listener
+  PartSet_OverconstraintListener* overconstraintListener() { return myOverconstraintListener; }
+
   /// Performs functionality on closing document
   virtual void closeDocument();
 
@@ -259,6 +264,11 @@ public:
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
 
+  /// Returns color of the object
+  /// \param theObject a result of a feature object
+  /// \param theColor a vector of three values in [0, 255] range
+  virtual void getColor(const ObjectPtr& theObject, std::vector<int>& theColor);
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -332,6 +342,7 @@ protected:
   PartSet_MenuMgr* myMenuMgr;
   /// A default custom presentation, which is used for references objects of started operation
   PartSet_CustomPrs* myCustomPrs;
+  PartSet_OverconstraintListener* myOverconstraintListener;
   int myVisualLayerId;
 
   /// backup of the visible state to restore them by operation stop

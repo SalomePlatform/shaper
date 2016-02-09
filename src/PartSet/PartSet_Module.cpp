@@ -18,6 +18,7 @@
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
 #include "PartSet_WidgetChoice.h"
+#include "PartSet_OverconstraintListener.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -134,6 +135,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   myMenuMgr = new PartSet_MenuMgr(this);
   myCustomPrs = new PartSet_CustomPrs(theWshop);
 
+  myOverconstraintListener = new PartSet_OverconstraintListener(theWshop);
+
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 
@@ -163,6 +166,7 @@ PartSet_Module::~PartSet_Module()
       aFilter.Nullify();
   }
   delete myCustomPrs;
+  delete myOverconstraintListener;
 }
 
 void PartSet_Module::activateSelectionFilters()
@@ -1072,6 +1076,14 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
                                                  mySketchMgr->activeSketch());
   }
   return anAttribute;
+}
+
+//******************************************************
+void PartSet_Module::getColor(const ObjectPtr& theObject, std::vector<int>& theColor)
+{
+  if (myOverconstraintListener->isConflictingObject(theObject)) {
+    myOverconstraintListener->getConflictingColor(theColor);
+  }
 }
 
 //******************************************************

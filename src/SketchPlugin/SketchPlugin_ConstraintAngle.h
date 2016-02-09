@@ -45,6 +45,10 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
+  /// Retuns the parameters of color definition in the resources config manager
+  SKETCHPLUGIN_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+                                                   std::string& theDefault);
+
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);

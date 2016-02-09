@@ -42,6 +42,14 @@ void SketchPlugin_ConstraintDistance::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 }
 
+void SketchPlugin_ConstraintDistance::colorConfigInfo(std::string& theSection, std::string& theName,
+                                                      std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "sketch_dimension_color";
+  theDefault = SKETCH_DIMENSION_COLOR;
+}
+
 //*************************************************************************************
 void SketchPlugin_ConstraintDistance::execute()
 {
@@ -134,9 +142,6 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   if (!anAIS) {
     anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane());
   }
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
-                                                    SKETCH_DIMENSION_COLOR);
-  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 
