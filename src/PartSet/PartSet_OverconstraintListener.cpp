@@ -21,7 +21,7 @@
 
 #include <QString>
 
-#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
+//#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
 PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorkshop* theWorkshop)
 : myWorkshop(theWorkshop)
