@@ -857,6 +857,8 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
       aErased = true;
     }
   }
+  if (aErased && theUpdateViewer)
+    updateViewer();
   return aErased;
 }
 

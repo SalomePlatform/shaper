@@ -117,8 +117,21 @@ bool PartSet_OperationPrs::isVisible(XGUI_Displayer* theDisplayer, const ObjectP
   bool aVisible = false;
   GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aPrs.get() || aResult.get())
+  if (aPrs.get() || aResult.get()) {
     aVisible = theDisplayer->isVisible(theObject);
+    // compsolid is not visualized in the viewer, but should have presentation when all sub solids are
+    // visible. It is useful for highlight presentation where compsolid shape is selectable
+    if (!aVisible && aResult->groupName() == ModelAPI_ResultCompSolid::group()) {
+      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
+        bool anAllSubsVisible = aCompsolidResult->numberOfSubs() > 0;
+        for(int i = 0; i < aCompsolidResult->numberOfSubs() && anAllSubsVisible; i++) {
+          anAllSubsVisible = theDisplayer->isVisible(aCompsolidResult->subResult(i));
+        }
+        aVisible = anAllSubsVisible;
+      }
+    }
+  }
   else {
     // check if all results of the feature are visible
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
