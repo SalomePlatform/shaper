@@ -14,6 +14,8 @@
 class ModuleBase_IWorkshop;
 class XGUI_Workshop;
 
+#include <QString>
+
 #include <vector>
 #include <set>
 
@@ -49,10 +51,15 @@ public:
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
 protected:
-  /// Updates the internal container of conflicting object, redisplay necessary objects
+  /// Append objects to the internal container of conflicting object, redisplay necessary objects
   /// \param theObjects a list of new conflicting objects
   /// \return boolean value whether the list differs from the internal list
-  bool updateConflictingObjects(const std::set<ObjectPtr>& theObjects);
+  bool appendConflictingObjects(const std::set<ObjectPtr>& theObjects);
+
+  /// Removes objects from internal container of conflicting object, redisplay necessary objects
+  /// \param theObjects a list of repaired objects
+  /// \return boolean value whether the list differs from the internal list
+  bool repairConflictingObjects(const std::set<ObjectPtr>& theObjects);
 
   /// Obtains the object custom AIS presentation and change conflicting state if it exists
   /// \param theObject the object which presentation error state should be changed
@@ -64,8 +71,13 @@ protected:
   void redisplayObjects(const std::set<ObjectPtr>& theObjects);
 
 private:
-  //! Returns workshop
+  /// Returns workshop
   XGUI_Workshop* workshop() const;
+
+  /// Unite objects in one string information
+  /// \param theObjects a list of objects
+  /// \return a string info
+  static QString getObjectsInfo(const std::set<ObjectPtr>& theObjects);
 
 private:
   std::set<ObjectPtr> myConflictingObjects;
