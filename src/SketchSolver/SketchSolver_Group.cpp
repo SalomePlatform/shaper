@@ -98,6 +98,11 @@ SketchSolver_Group::~SketchSolver_Group()
 {
   myConstraints.clear();
   GroupIndexer::REMOVE_GROUP(myID);
+  // send the message that there is no more conflicting constraints
+  if (!myConflictingConstraints.empty()) {
+    sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
+    myConflictingConstraints.clear();
+  }
 }
 
 // ============================================================================
@@ -345,20 +350,31 @@ bool SketchSolver_Group::resolveConstraints()
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
         // the error message should be changed before sending the message
-        sendMessage(EVENT_SOLVER_REPAIRED);
+        sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
+        myConflictingConstraints.clear();
         myPrevResult = STATUS_OK;
       }
     } else {
       mySketchSolver->undo();
       if (!myConstraints.empty()) {
-//      Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
+        // the error message should be changed before sending the message
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
         if (myPrevResult != aResult || myPrevResult == STATUS_UNKNOWN) {
           // Obtain list of conflicting constraints
           std::set<ObjectPtr> aConflicting = myStorage->getConflictingConstraints(mySketchSolver);
 
-          // the error message should be changed before sending the message
-          sendMessage(EVENT_SOLVER_FAILED, aConflicting);
+          if (myConflictingConstraints.empty())
+            sendMessage(EVENT_SOLVER_FAILED, aConflicting);
+          else {
+            std::set<ObjectPtr>::iterator anIt = aConflicting.begin();
+            for (; anIt != aConflicting.end(); ++anIt)
+              myConflictingConstraints.erase(*anIt);
+            if (!myConflictingConstraints.empty()) {
+              // some constraints does not conflict, send corresponding message
+              sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
+            }
+          }
+          myConflictingConstraints = aConflicting;
           myPrevResult = aResult;
         }
       }

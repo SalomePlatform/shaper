@@ -162,6 +162,7 @@ private:
   SolverPtr mySketchSolver;  ///< Solver for set of equations obtained by constraints
 
   SketchSolver_SolveStatus myPrevResult; ///< Result of previous solution of the set of constraints
+  std::set<ObjectPtr>      myConflictingConstraints; ///< List of conflicting constraints
 };
 
 #endif
