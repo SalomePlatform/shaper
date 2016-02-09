@@ -51,16 +51,6 @@ void PartSet_OverconstraintListener::processEvent(
 {
 
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
-
-  /*
-  anIt = theConflictingObjects.begin();
-  aLast = theConflictingObjects.end();
-
-  QStringList anInfo;
-  for (; anIt != aLast; ++anIt) {
-    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
-  }
-  QString anInfoStr = anInfo.join(";\n");*/
   bool isRepaired = theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED);
   qDebug(QString("PartSet_OverconstraintListener::processEvent:\n %1").arg(isRepaired ? "REPAIRED" : "FAILED").toStdString().c_str());
 #endif
@@ -103,7 +93,7 @@ bool PartSet_OverconstraintListener::updateConflictingObjects(
   for (anIt = myConflictingObjects.begin(), aLast = myConflictingObjects.end() ; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (theConflictingObjects.find(anObject) == theConflictingObjects.end()) { // it is not found
-      //setConflictingObject(anObject, false);
+      setConflictingObject(anObject, false);
       aModifiedObjects.insert(anObject);
     }
   }
@@ -117,7 +107,7 @@ bool PartSet_OverconstraintListener::updateConflictingObjects(
   for (anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end() ; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
-      //setConflictingObject(anObject, true);
+      setConflictingObject(anObject, true);
       aModifiedObjects.insert(anObject);
       myConflictingObjects.insert(anObject);
     }
@@ -149,13 +139,10 @@ void PartSet_OverconstraintListener::redisplayObjects(
   aLoop->flush(EVENT_DISP);*/
 
   XGUI_Displayer* aDisplayer = workshop()->displayer();
-  //QObjectPtrList aObjects = aDisplayer->displayedObjects();
   bool aHidden;
   std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
-  //foreach(ObjectPtr aObj, aObjects) {
-    //TODO: replace by redisplay event.
     aHidden = !anObject->data() || !anObject->data()->isValid() || 
                anObject->isDisabled() || (!anObject->isDisplayed());
     if (!aHidden)
@@ -167,8 +154,6 @@ void PartSet_OverconstraintListener::redisplayObjects(
 void PartSet_OverconstraintListener::setConflictingObject(const ObjectPtr& theObject,
                                                           const bool theConflicting)
 {
-  return;
-
   AISObjectPtr anAISObject;
   GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
 
@@ -182,8 +167,8 @@ void PartSet_OverconstraintListener::setConflictingObject(const ObjectPtr& theOb
       if (!anAISIO.IsNull()) {
         if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
           Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
-          //if (!aPrs.IsNull())
-          //  aPrs->setConflictingConstraint(theConflicting);
+          if (!aPrs.IsNull())
+            aPrs->SetConflictingConstraint(theConflicting);
         }
       }
     }

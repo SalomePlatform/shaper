@@ -62,6 +62,12 @@ public:
   /// Return array of points where symbols will be placed
   const Handle(Graphic3d_ArrayOfPoints)& pointsArray() const { return myPntArray; }
 
+  /// Set state of the presentation, in case of conflicting state, the icon of the presentation is
+  /// visualized in error color. The state is stored in an internal field, so should be changed when
+  /// constraint become not conflicting
+  /// \param theConflicting a state
+  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting);
+
   /// Render of the presentation
   /// \param theWorkspace is OpenGl workspace
   void Render(const Handle(OpenGl_Workspace)& theWorkspace) const;
@@ -146,6 +152,10 @@ private:
   mutable Handle(OpenGl_VertexBuffer) myVboAttribs;
 
   Select3D_EntitySequence mySPoints;
+
+  bool myIsConflicting; /// state if the presentation is visualized in error state
+  Handle(Image_AlienPixMap) myErrorIcon;
+  Handle(Graphic3d_MarkerImage) myErrorImage;
 };
 
 #endif

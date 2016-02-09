@@ -77,6 +77,7 @@ SET(PROJECT_PICTURES
     icons/equal.png
     icons/tangent.png
     icons/mirror.png
+    icons/conflicting_icon.png
     icons/rotate.png
     icons/translate.png
 )

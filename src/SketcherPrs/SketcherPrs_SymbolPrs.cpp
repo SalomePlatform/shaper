@@ -249,7 +249,7 @@ std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsM
 
 SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint, 
                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
- : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane)
+ : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane), myIsConflicting(false)
 {
   SetAutoHilight(Standard_False);
 }
@@ -267,6 +267,24 @@ SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
 
 Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
 {
+  if (myIsConflicting) {
+    if (myErrorIcon.IsNull()) {
+      char* aEnv = getenv("NEWGEOM_ROOT_DIR");
+      if (aEnv != NULL) {
+        TCollection_AsciiString aFile(aEnv);
+        aFile+=FSEP;
+        aFile+="resources";
+        aFile += FSEP;
+        aFile += "conflicting_icon.png";
+        Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
+        if (aPixMap->Load(aFile)) {
+          myErrorIcon = aPixMap;
+        }
+      }
+    }
+    return myErrorIcon;
+  }
+
   if (myIconsMap.count(iconName()) == 1) {
     return myIconsMap[iconName()];
   }
@@ -412,6 +430,15 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
   }
 }
 
+void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting)
+{
+  if (myIsConflicting != theConflicting) {
+    myIsConflicting = theConflicting;
+    Handle(Image_AlienPixMap) anIcon = icon();
+    if (!anIcon.IsNull())
+      myAspect->SetMarkerImage(new Graphic3d_MarkerImage(anIcon));
+  }
+}
 
 void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace) const
 {
