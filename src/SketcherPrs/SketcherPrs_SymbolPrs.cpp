@@ -46,6 +46,8 @@
 /// Step between icons
 static const double MyDist = 0.02;
 
+//#define ICON_TO_DEBUG
+
 /// Function to convert opengl data type
 GLenum toGlDataType (const Graphic3d_TypeOfData theType, GLint& theNbComp)
 {
@@ -267,6 +269,7 @@ SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
 
 Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
 {
+#ifdef ICON_TO_DEBUG
   if (myIsConflicting) {
     if (myErrorIcon.IsNull()) {
       char* aEnv = getenv("NEWGEOM_ROOT_DIR");
@@ -284,6 +287,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
     }
     return myErrorIcon;
   }
+#endif
 
   if (myIconsMap.count(iconName()) == 1) {
     return myIconsMap[iconName()];
@@ -421,7 +425,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
 
 
 void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-                                            const Standard_Integer aMode)
+                                             const Standard_Integer aMode)
 {
   ClearSelected();
   if ((aMode == 0) || (aMode == SketcherPrs_Tools::Sel_Constraint)) {
@@ -430,18 +434,40 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
   }
 }
 
-void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting)
+void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
+                                                     const std::vector<int>& theColor)
 {
+#ifdef ICON_TO_DEBUG
   if (myIsConflicting != theConflicting) {
     myIsConflicting = theConflicting;
     Handle(Image_AlienPixMap) anIcon = icon();
     if (!anIcon.IsNull())
       myAspect->SetMarkerImage(new Graphic3d_MarkerImage(anIcon));
   }
+#else
+  if (theConflicting)
+  {
+    if (!myAspect.IsNull())
+      myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255., theColor[2] / 255.,
+                          Quantity_TOC_RGB));
+    myIsConflicting = true;
+  }
+  else
+  {
+    if (!myAspect.IsNull())
+      myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
+    myIsConflicting = false;
+  }
+#endif
 }
 
 void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace) const
 {
+  // this method is a combination of OCCT OpenGL functions. The main purpose is to have
+  // equal distance from the source object to symbol indpendently of zoom.
+  // It is base on OCCT 6.9.1 and might need changes when using later OCCT versions.
+  // The specific SHAPER modifications are marked by ShaperModification:start/end, other is OCCT code
+
   // do not update presentation for invalid or already removed objects: the presentation
   // should be removed soon
   if (!myConstraint->data().get() || !myConstraint->data()->isValid())
@@ -451,10 +477,12 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
   Handle(OpenGl_View) aView = theWorkspace->ActiveView();
   
+  // ShaperModification:start
   double aScale = aView->Camera()->Scale();
   // Update points coordinate taking the viewer scale into account
   if (!updatePoints(MyDist * aScale))
     return;
+  // ShaperModification:end
 
   Handle(Graphic3d_Buffer) aAttribs = myPntArray->Attributes();
 
@@ -474,7 +502,14 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   const Handle(OpenGl_PointSprite)& aSpriteNorm = anAspectMarker->SpriteRes(aCtx);
       
   if (!aSpriteNorm.IsNull() && !aSpriteNorm->IsDisplayList()) {
+#ifdef ICON_TO_DEBUG
     const bool toHilight = (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT) != 0;
+#else
+    // ShaperModification:start : filling the presentation with color if there is a conflict
+    const bool toHilight = (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT) != 0 || myIsConflicting;
+    // ShaperModification:end
+#endif
+
     const Handle(OpenGl_PointSprite)& aSprite = (toHilight && anAspectMarker->SpriteHighlightRes(aCtx)->IsValid())
                                               ? anAspectMarker->SpriteHighlightRes(aCtx)
                                               : aSpriteNorm;

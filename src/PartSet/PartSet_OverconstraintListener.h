@@ -61,11 +61,6 @@ protected:
   /// \return boolean value whether the list differs from the internal list
   bool repairConflictingObjects(const std::set<ObjectPtr>& theObjects);
 
-  /// Obtains the object custom AIS presentation and change conflicting state if it exists
-  /// \param theObject the object which presentation error state should be changed
-  /// \param theConflicting if true, the object state is erroneous, else correct
-  void setConflictingObject(const ObjectPtr& theObject, const bool theConflicting);
-
   /// Sends update object signal for each object in the container and flush it.
   /// \param theObjects a list of object to be redisplayed
   void redisplayObjects(const std::set<ObjectPtr>& theObjects);

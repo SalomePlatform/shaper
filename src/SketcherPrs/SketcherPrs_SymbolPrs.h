@@ -66,7 +66,8 @@ public:
   /// visualized in error color. The state is stored in an internal field, so should be changed when
   /// constraint become not conflicting
   /// \param theConflicting a state
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting);
+  /// \param theColor a color for conflicting object
+  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, const std::vector<int>& theColor);
 
   /// Render of the presentation
   /// \param theWorkspace is OpenGl workspace

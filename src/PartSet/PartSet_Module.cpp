@@ -61,6 +61,7 @@
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_DataModel.h>
 #include <XGUI_ErrorMgr.h>
+#include <XGUI_CustomPrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -776,6 +777,53 @@ void PartSet_Module::deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag
                                          const bool theUpdateViewer)
 {
   myCustomPrs->deactivate(theFlag, theUpdateViewer);
+}
+
+bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                           std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
+{
+  bool aCustomized = false;
+
+  if (theResult.get())
+    return aCustomized;
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  ObjectPtr anObject = aDisplayer->getObject(thePrs);
+  if (anObject.get()) {
+    bool isConflicting = myOverconstraintListener->isConflictingObject(anObject);
+    // customize sketcy symbol presentation
+    if (thePrs.get()) {
+      Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
+      if (!anAISIO.IsNull()) {
+        if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
+          Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
+          if (!aPrs.IsNull()) {
+            std::vector<int> aColor;
+            myOverconstraintListener->getConflictingColor(aColor);
+            aPrs->SetConflictingConstraint(isConflicting, aColor);
+            aCustomized = true;
+          }
+        }
+      }
+    }
+    // customize sketch dimension constraint presentation
+    if (!aCustomized) {
+      std::vector<int> aColor;
+      if (isConflicting) {
+        myOverconstraintListener->getConflictingColor(aColor);
+      }
+      if (aColor.empty())
+        XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
+      if (!aColor.empty()) {
+        thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+        aCustomized = true;
+      }
+    }
+  }
+
+  return aCustomized;
 }
 
 bool PartSet_Module::customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,

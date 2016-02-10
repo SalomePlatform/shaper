@@ -204,6 +204,10 @@ public:
   virtual void deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag,
                                    const bool theUpdateViewer);
 
+  /// Modifies the given presentation in the custom way.
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
+
   /// Update the object presentable properties such as color, lines width and other
   /// If the object is result with the color attribute value set, it is used,
   /// otherwise the customize is applyed to the object's feature if it is a custom prs

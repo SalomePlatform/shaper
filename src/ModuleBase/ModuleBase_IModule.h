@@ -10,6 +10,7 @@
 #include <ModelAPI_Attribute.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_ICustomPrs.h>
 
 #include <QString>
 #include <QObject>
@@ -181,6 +182,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theUpdateViewer the parameter whether the viewer should be update immediately
   virtual void deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag,
                                    const bool theUpdateViewer) {}
+
+  /// Modifies the given presentation in the custom way.
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     GeomCustomPrsPtr theCustomPrs) { return false; };
 
   /// Update the object presentable properties such as color, lines width and other
   /// If the object is result with the color attribute value set, it is used,

@@ -36,6 +36,16 @@ public:
   /// \param theColor a color in form of RGB vector
   static void getResultColor(ResultPtr theResult, std::vector<int>& theColor);
 
+  /// Returns the default object color. It obtains colorConfigInfo of the object
+  /// and find it in preferences. If there are no this color in preference and an empty
+  /// color is interpreted as invalid, it shows error message
+  /// \param theObject an investigated object
+  /// \param isEmptyColorValid boolean state about interpretation of empty color
+  /// \param theColor the result color
+  static void XGUI_EXPORT getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
+                                          std::vector<int>& theColor);
+
+
 protected:
   XGUI_Workshop* myWorkshop; /// the current workshop
 };

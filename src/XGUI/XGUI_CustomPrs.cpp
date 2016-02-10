@@ -34,7 +34,8 @@ void getColor(ResultPtr theResult, std::vector<int>& theColor)
   }
 }
 
-void getDefaultColor(ObjectPtr theObject, std::vector<int>& theColor, const bool isEmptyColorValid)
+void XGUI_CustomPrs::getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
+                                     std::vector<int>& theColor)
 {
   theColor.clear();
   // get default color from the preferences manager for the given result
@@ -62,7 +63,7 @@ void XGUI_CustomPrs::getResultColor(ResultPtr theResult, std::vector<int>& theCo
 {
   getColor(theResult, theColor);
   if (theColor.empty())
-    getDefaultColor(theResult, theColor, false);
+    getDefaultColor(theResult, false, theColor);
 }
 
 bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
@@ -84,16 +85,9 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
     aCustomized = !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
   }
   else {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    ObjectPtr anObject = aDisplayer->getObject(thePrs);
-    if (anObject.get()) {
-     std::vector<int> aColor;
-     ModuleBase_IModule* aModule = myWorkshop->module();
-     aModule->getColor(anObject, aColor);
-     if (aColor.empty())
-       getDefaultColor(anObject, aColor, true);
-     if (!aColor.empty())
-       thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+   if (!aCustomized) {
+      ModuleBase_IModule* aModule = myWorkshop->module();
+      aCustomized = aModule->customisePresentation(theResult, thePrs, theCustomPrs);
     }
   }
   return aCustomized;

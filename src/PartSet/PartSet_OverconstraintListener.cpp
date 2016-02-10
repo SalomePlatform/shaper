@@ -105,12 +105,14 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
                                                   const std::set<ObjectPtr>& theConflictingObjects)
 {
   std::set<ObjectPtr> aModifiedObjects;
+  std::vector<int> aColor;
+  getConflictingColor(aColor);
+
   // set error state for new objects and append them in the internal map of objects
   std::set<ObjectPtr>::const_iterator anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
-      setConflictingObject(anObject, true);
       aModifiedObjects.insert(anObject);
       myConflictingObjects.insert(anObject);
     }
@@ -131,7 +133,6 @@ bool PartSet_OverconstraintListener::repairConflictingObjects(
   for (anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end() ; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (theConflictingObjects.find(anObject) != theConflictingObjects.end()) { // it is found
-      setConflictingObject(anObject, false);
       myConflictingObjects.erase(anObject);
 
       aModifiedObjects.insert(anObject);
@@ -174,33 +175,6 @@ void PartSet_OverconstraintListener::redisplayObjects(
       aDisplayer->redisplay(anObject, false);
   }
   aDisplayer->updateViewer();
-}
-
-void PartSet_OverconstraintListener::setConflictingObject(const ObjectPtr& theObject,
-                                                          const bool theConflicting)
-{
-  if (!theObject.get() || !theObject->data()->isValid())
-    return;
-
-  AISObjectPtr anAISObject;
-  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-
-  if (aPrs.get() != NULL) {
-    XGUI_Workshop* aWorkshop = workshop();
-    XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-
-    anAISObject = aPrs->getAISObject(aDisplayer->getAISObject(theObject));
-    if (anAISObject.get()) {
-      Handle(AIS_InteractiveObject) anAISIO = anAISObject->impl<Handle(AIS_InteractiveObject)>();
-      if (!anAISIO.IsNull()) {
-        if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
-          if (!aPrs.IsNull())
-            aPrs->SetConflictingConstraint(theConflicting);
-        }
-      }
-    }
-  }
 }
 
 XGUI_Workshop* PartSet_OverconstraintListener::workshop() const
