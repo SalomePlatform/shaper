@@ -30,6 +30,7 @@
 
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
+class XGUI_Workshop;
 class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
@@ -75,6 +76,14 @@ public:
 
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
+
+  /// If there is found selected attribute, widgets are created and contains only a widget for the attribute
+  /// It is important for Property Panel filling by sketch point attribute
+  /// \param theOperation a started operation
+  /// \param theWidgets a list of created widgets
+  /// \return boolean result, false by default
+  virtual bool createWidgets(ModuleBase_Operation* theOperation,
+                             QList<ModuleBase_ModelWidget*>& theWidgets) const;
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
@@ -268,11 +277,6 @@ public:
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
 
-  /// Returns color of the object
-  /// \param theObject a result of a feature object
-  /// \param theColor a vector of three values in [0, 255] range
-  virtual void getColor(const ObjectPtr& theObject, std::vector<int>& theColor);
-
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -337,6 +341,9 @@ protected:
 
   //! Delete features
   virtual bool deleteObjects();
+
+  /// Returns the workshop
+  XGUI_Workshop* getWorkshop() const;
 
  private:
   SelectMgr_ListOfFilter mySelectionFilters;

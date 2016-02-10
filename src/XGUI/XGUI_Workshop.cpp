@@ -567,13 +567,15 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
     return;
 
   showPropertyPanel();
-  QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
-  ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
-
   myPropertyPanel->cleanContent();
-  aFactory.createWidget(myPropertyPanel->contentWidget());
 
-  QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+  QList<ModuleBase_ModelWidget*> aWidgets;
+  if (!module()->createWidgets(theOperation, aWidgets)) {
+    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+    ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
+    aFactory.createWidget(myPropertyPanel->contentWidget());
+    aWidgets = aFactory.getModelWidgets();
+  }
 
   // check compatibility of feature and widgets
   FeaturePtr aFeature = aFOperation->feature();

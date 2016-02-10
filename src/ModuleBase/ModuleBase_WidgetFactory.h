@@ -38,9 +38,14 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   virtual ~ModuleBase_WidgetFactory();
 
   /// Creates content widget for property panel
-  /// \param theParent a parent widget
-  void createWidget(ModuleBase_PageBase* theParent);
+  /// \param thePage a parent page
+  void createWidget(ModuleBase_PageBase* thePage);
 
+  /// Creates one widget for property panel for the widget with given index
+  /// \param theParent a parent widget
+  /// \param theWidgetId a widget index
+  void createWidget(ModuleBase_PageBase* thePage,
+                    const std::string& theWidgetId);
 
   /// Returns list of model widgets
   QList<ModuleBase_ModelWidget*> getModelWidgets() const
@@ -75,6 +80,12 @@ protected:
   /// Convert STD string to QT string
   /// \param theStdString is STD string
   static QString qs(const std::string& theStdString);
+
+  /// It updates internal config api to point in the structure to given id of widget
+  /// The method is recusive and it stops when the found flag is true
+  /// \param theWidgetId a widget id key value
+  /// \param theFound a flag about found windget and recursive search should be stopped
+  void moveToWidgetId(const std::string& theWidgetId, bool& theFound);
 
  private:
    /// API object for XML reading

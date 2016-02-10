@@ -121,11 +121,44 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   thePage->alignToTop();
 }
 
+void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage,
+                                            const std::string& theWidgetId)
+{
+  bool aFound = false;
+  moveToWidgetId(theWidgetId, aFound);
+  if (aFound) {
+    std::string aWdgType = myWidgetApi->widgetType();
+
+    // Create a ModelWidget
+    ModuleBase_ModelWidget* aWidget = createWidgetByType(aWdgType, thePage->pageWidget());
+    if (aWidget) {
+      if (!myWidgetApi->getBooleanAttribute(ATTR_INTERNAL, false)) {
+        thePage->addModelWidget(aWidget);
+      }
+      else {
+        aWidget->setVisible(false);
+      }
+    }
+  }
+  thePage->alignToTop();
+}
+
 void ModuleBase_WidgetFactory::getAttributeTitle(const std::string& theFeatureKind,
                                                  const std::string& theAttributeId,
                                                  std::string& theTitle)
 {
-  if (!theTitle.empty())
+  bool aFound = false;
+  moveToWidgetId(theAttributeId, aFound);
+  if (aFound) {
+    theTitle = QString::fromStdString(myWidgetApi->widgetLabel()).toStdString().c_str();
+    if (theTitle.empty())
+      theTitle = QString::fromStdString(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)).toStdString().c_str();
+  }
+}
+
+void ModuleBase_WidgetFactory::moveToWidgetId(const std::string& theWidgetId, bool& theFound)
+{
+  if (theFound)
     return;
 
   myParentId = myWidgetApi->widgetId();
@@ -136,28 +169,23 @@ void ModuleBase_WidgetFactory::getAttributeTitle(const std::string& theFeatureKi
     std::string aWdgType = myWidgetApi->widgetType();
     // Find title under PageGroup
     if (myWidgetApi->isGroupBoxWidget() ||
-        ModuleBase_WidgetCreatorFactory::get()->hasPageWidget(aWdgType)) {
-
-      getAttributeTitle(theFeatureKind, theAttributeId, theTitle);
-    } else {
+      ModuleBase_WidgetCreatorFactory::get()->hasPageWidget(aWdgType)) {
+      moveToWidgetId(theWidgetId, theFound);
+    }
+    else {
       // Find title here
       std::string anAttributeId = myWidgetApi->widgetId();
-      if (anAttributeId == theAttributeId) {
-        theTitle = QString::fromStdString(myWidgetApi->widgetLabel()).toStdString().c_str();
-        if (theTitle.empty())
-          theTitle = QString::fromStdString(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)).toStdString().c_str();
-
-      }
-      if (myWidgetApi->isPagedWidget()) {
+      theFound = anAttributeId == theWidgetId;
+      if (!theFound && myWidgetApi->isPagedWidget()) {
         //If current widget is toolbox or switch-casebox then fetch all
         //it's pages recursively and setup into the widget.
         myWidgetApi->toChildWidget();
         do {
-          getAttributeTitle(theFeatureKind, theAttributeId, theTitle);
-        } while (myWidgetApi->toNextWidget() && theTitle.empty());
+          moveToWidgetId(theWidgetId, theFound);
+        } while (!theFound && myWidgetApi->toNextWidget());
       }
     }
-  } while (myWidgetApi->toNextWidget() && theTitle.empty());
+  } while (!theFound && myWidgetApi->toNextWidget());
 }
 
 ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::string& theType,

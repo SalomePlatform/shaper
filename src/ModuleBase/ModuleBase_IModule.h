@@ -15,6 +15,7 @@
 #include <QString>
 #include <QObject>
 #include <QMap>
+#include <QList>
 
 #include <string>
 #include <vector>
@@ -121,6 +122,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Call back forlast tuning of property panel before operation performance
   /// It is called as on clearing of property panel as on filling with new widgets
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
+
+  /// Have an opportunity to create widgets for the current operation instead of standard creation in workshop
+  /// \param theOperation a started operation
+  /// \param theWidgets a list of created widgets
+  /// \return boolean result, false by default
+  virtual bool createWidgets(ModuleBase_Operation* theOperation,
+                             QList<ModuleBase_ModelWidget*>& theWidgets) const { return false; }
 
   //! Returns True if there are available Undos and there is not an active operation
   virtual bool canUndo() const;
@@ -261,11 +269,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject,
                                      const GeomShapePtr& theGeomShape) = 0;
-
-  /// Returns color of the object
-  /// \param theObject a result of a feature object
-  /// \param theColor a vector of three values in [0, 255] range
-  virtual void getColor(const ObjectPtr& theObject, std::vector<int>& theColor) {}
 
   /// Returns XML information by the feature index
   /// \param theFeatureId a feature id

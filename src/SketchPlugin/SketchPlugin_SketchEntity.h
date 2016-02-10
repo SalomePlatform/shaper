@@ -23,7 +23,7 @@
 #define SKETCH_ENTITY_COLOR "225,0,0"
 #define SKETCH_EXTERNAL_COLOR "170,0,225"
 #define SKETCH_AUXILIARY_COLOR "0,85,0"
-#define SKETCH_OVERCONSTRAINT_COLOR "255,0,0"
+#define SKETCH_OVERCONSTRAINT_COLOR "0,0,0"
 
 /**\class SketchPlugin_SketchEntity
  * \ingroup Plugins

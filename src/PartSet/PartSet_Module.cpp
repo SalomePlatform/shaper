@@ -37,6 +37,8 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_OperationFeature.h>
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_OperationDescription.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -94,6 +96,7 @@
 #include <QMessageBox>
 #include <QMainWindow>
 #include <QLineEdit>
+#include <QString>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Dir.h>
@@ -250,9 +253,7 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
       // the selection is cleared after commit the create operation
       // in order to do not use the same selected objects in the restarted operation
       // for common behaviour, the selection is cleared even if the operation is not restarted
-      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-      XGUI_Workshop* aWorkshop = aConnector->workshop();
-      aWorkshop->selector()->clearSelection();
+      getWorkshop()->selector()->clearSelection();
     }
   }
 }
@@ -420,9 +421,7 @@ void PartSet_Module::grantedOperationIds(ModuleBase_Operation* theOperation,
   myMenuMgr->grantedOperationIds(theOperation, theIds);
 
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-    XGUI_Workshop* aWorkshop = aConnector->workshop();
-
+    XGUI_Workshop* aWorkshop = getWorkshop();
     theIds.append(aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text());
   }
 }
@@ -448,8 +447,7 @@ void PartSet_Module::clearViewer()
 {
   myCustomPrs->clearPrs();
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   aDisplayer->deactivateSelectionFilters();
 }
@@ -466,6 +464,44 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
     aPanel->activateWidget(aPanel->modelWidgets().first());
 }
 
+bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
+                                   QList<ModuleBase_ModelWidget*>& theWidgets) const
+{
+  bool aProcessed = false;
+
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  XGUI_Workshop* aWorkshop = getWorkshop();
+  XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
+  if (mySketchMgr->activeSketch().get() && aFOperation && aPropertyPanel) {
+    ModuleBase_ISelection* aSelection = workshop()->selection();
+    // click on a point in sketch leads here with the point is highlighted, not yet selected
+    QList<ModuleBase_ViewerPrs> aPreselection = aSelection->getHighlighted();
+    if (aPreselection.size() == 1) {
+      ModuleBase_ViewerPrs aSelectedPrs = aPreselection[0];
+      ObjectPtr anObject = aSelectedPrs.object();
+
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+      FeaturePtr anOpFeature = aFOperation->feature();
+      TopoDS_Shape aShape = aSelectedPrs.shape();
+      // click on the digit of dimension constrain comes here with an empty shape, so we need the check
+      if (aFeature == anOpFeature && !aShape.IsNull()) {
+        AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aShape,
+                                                                         mySketchMgr->activeSketch());
+        if (anAttribute.get()) {
+          QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+          ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), workshop());
+
+          const std::string anAttributeId = anAttribute->id();
+          aFactory.createWidget(aPropertyPanel->contentWidget(), anAttributeId);
+
+          theWidgets = aFactory.getModelWidgets();
+          aProcessed = true;
+        }
+      }
+    }
+  }
+  return aProcessed;
+}
 
 void PartSet_Module::onSelectionChanged()
 {
@@ -518,8 +554,7 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
                                             Config_WidgetAPI* theWidgetApi, std::string theParentId)
 {
   ModuleBase_IWorkshop* aWorkshop = workshop();
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  XGUI_Workshop* aXUIWorkshop = aConnector->workshop();
+  XGUI_Workshop* aXUIWorkshop = getWorkshop();
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, aWorkshop,
@@ -588,8 +623,7 @@ bool PartSet_Module::deleteObjects()
 {
   bool isProcessed = false;
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
 
   //SessionPtr aMgr = ModelAPI_Session::get();
@@ -725,8 +759,7 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
 
   //Handle(V3d_View) aView = aViewer->activeView();
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   Handle(V3d_Viewer) aV3dViewer = aContext->CurrentViewer();
   Handle(V3d_View) aView;
@@ -787,8 +820,7 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
   if (theResult.get())
     return aCustomized;
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   ObjectPtr anObject = aDisplayer->getObject(thePrs);
   if (anObject.get()) {
@@ -858,8 +890,7 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PARTSET_CMD");
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = getWorkshop();
   QLabel* aHeader = aWorkshop->objectBrowser()->activeDocLabel();
 
   aActivatePartAction->setEnabled((aMgr->activeDocument() != aMgr->moduleDocument()));
@@ -959,8 +990,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     if (myWorkshop->currentOperation() && 
       (!aAllowActivationList.contains(myWorkshop->currentOperation()->id())))
       return;
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-    XGUI_Workshop* aWorkshop = aConnector->workshop();
+    XGUI_Workshop* aWorkshop = getWorkshop();
     XGUI_DataTree* aTreeView = aWorkshop->objectBrowser()->treeView();
     QLabel* aLabel = aWorkshop->objectBrowser()->activeDocLabel();
     QPalette aPalet = aLabel->palette();
@@ -1004,8 +1034,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   if (theIndex.column() != 0) // Use only first column
     return;
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
   // De not use non editable Indexes
   if ((aDataModel->flags(theIndex) & Qt::ItemIsSelectable) == 0)
@@ -1127,14 +1156,6 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
 }
 
 //******************************************************
-void PartSet_Module::getColor(const ObjectPtr& theObject, std::vector<int>& theColor)
-{
-  if (myOverconstraintListener->isConflictingObject(theObject)) {
-    myOverconstraintListener->getConflictingColor(theColor);
-  }
-}
-
-//******************************************************
 void PartSet_Module::onBooleanOperationChange(int theOperation)
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
@@ -1152,4 +1173,11 @@ void PartSet_Module::onBooleanOperationChange(int theOperation)
     aPanel->setWindowTitle(tr("Common"));
     break;
   }
+}
+
+//******************************************************
+XGUI_Workshop* PartSet_Module::getWorkshop() const
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  return aConnector->workshop();
 }
