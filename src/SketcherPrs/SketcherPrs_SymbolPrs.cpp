@@ -46,8 +46,6 @@
 /// Step between icons
 static const double MyDist = 0.02;
 
-//#define ICON_TO_DEBUG
-
 /// Function to convert opengl data type
 GLenum toGlDataType (const Graphic3d_TypeOfData theType, GLint& theNbComp)
 {
@@ -269,26 +267,6 @@ SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
 
 Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
 {
-#ifdef ICON_TO_DEBUG
-  if (myIsConflicting) {
-    if (myErrorIcon.IsNull()) {
-      char* aEnv = getenv("NEWGEOM_ROOT_DIR");
-      if (aEnv != NULL) {
-        TCollection_AsciiString aFile(aEnv);
-        aFile+=FSEP;
-        aFile+="resources";
-        aFile += FSEP;
-        aFile += "conflicting_icon.png";
-        Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
-        if (aPixMap->Load(aFile)) {
-          myErrorIcon = aPixMap;
-        }
-      }
-    }
-    return myErrorIcon;
-  }
-#endif
-
   if (myIconsMap.count(iconName()) == 1) {
     return myIconsMap[iconName()];
   }
@@ -437,14 +415,6 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
 void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
                                                      const std::vector<int>& theColor)
 {
-#ifdef ICON_TO_DEBUG
-  if (myIsConflicting != theConflicting) {
-    myIsConflicting = theConflicting;
-    Handle(Image_AlienPixMap) anIcon = icon();
-    if (!anIcon.IsNull())
-      myAspect->SetMarkerImage(new Graphic3d_MarkerImage(anIcon));
-  }
-#else
   if (theConflicting)
   {
     if (!myAspect.IsNull())
@@ -458,7 +428,6 @@ void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
       myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
     myIsConflicting = false;
   }
-#endif
 }
 
 void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace) const
@@ -502,13 +471,9 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   const Handle(OpenGl_PointSprite)& aSpriteNorm = anAspectMarker->SpriteRes(aCtx);
       
   if (!aSpriteNorm.IsNull() && !aSpriteNorm->IsDisplayList()) {
-#ifdef ICON_TO_DEBUG
-    const bool toHilight = (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT) != 0;
-#else
     // ShaperModification:start : filling the presentation with color if there is a conflict
     const bool toHilight = (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT) != 0 || myIsConflicting;
     // ShaperModification:end
-#endif
 
     const Handle(OpenGl_PointSprite)& aSprite = (toHilight && anAspectMarker->SpriteHighlightRes(aCtx)->IsValid())
                                               ? anAspectMarker->SpriteHighlightRes(aCtx)
