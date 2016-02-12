@@ -6,7 +6,7 @@
 
 #include "SketchPlugin_IntersectionPoint.h"
 
-#include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeSelection.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
@@ -19,7 +19,7 @@ SketchPlugin_IntersectionPoint::SketchPlugin_IntersectionPoint()
 
 void SketchPlugin_IntersectionPoint::initDerivedClassAttributes()
 {
-  data()->addAttribute(EXTERNAL_LINE_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(EXTERNAL_LINE_ID(), ModelAPI_AttributeSelection::typeId());
 
   SketchPlugin_Point::initDerivedClassAttributes();
 }
@@ -50,9 +50,9 @@ void SketchPlugin_IntersectionPoint::attributeChanged(const std::string& theID)
 
 void SketchPlugin_IntersectionPoint::computePoint()
 {
-  AttributeRefAttrPtr aLineRefAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(attribute(EXTERNAL_LINE_ID()));
-  ResultPtr aLineResult = std::dynamic_pointer_cast<ModelAPI_Result>(aLineRefAttr->object());
+  AttributeSelectionPtr aLineAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(attribute(EXTERNAL_LINE_ID()));
+  ResultPtr aLineResult = std::dynamic_pointer_cast<ModelAPI_Result>(aLineAttr->context());
   if (!aLineResult)
     return;
 

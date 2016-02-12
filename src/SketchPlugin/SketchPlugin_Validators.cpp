@@ -692,12 +692,12 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
 {
-  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+  if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
     return false;
   }
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aRefAttr->object());
+  AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anAttr->context());
   if (!aResult) {
     theError = "The attribute " + theAttribute->id() + " should be an object";
     return false;
@@ -713,7 +713,7 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
 
   // find a sketch
   std::shared_ptr<SketchPlugin_Sketch> aSketch;
-  std::set<AttributePtr> aRefs = aRefAttr->owner()->data()->refsToMe();
+  std::set<AttributePtr> aRefs = anAttr->owner()->data()->refsToMe();
   std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
   for (; anIt != aRefs.end(); ++anIt) {
     CompositeFeaturePtr aComp =
@@ -730,5 +730,5 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
 
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
   std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
-  return fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
+  return true;//fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
 }

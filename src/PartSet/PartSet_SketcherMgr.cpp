@@ -85,6 +85,8 @@
 
 //#define DEBUG_CURSOR
 
+//#define DEBUG_INTERSECTION_POINT
+
 /// Returns list of unique objects by sum of objects from List1 and List2
 /*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
                                        const QList<ModuleBase_ViewerPrs>& theList2)
@@ -862,8 +864,9 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (myPlaneFilter.IsNull()) 
     myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
+#ifndef DEBUG_INTERSECTION_POINT
   myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
-
+#endif
   bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
   if (aFOperation->isEditOperation()) {
