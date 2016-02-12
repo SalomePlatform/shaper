@@ -139,6 +139,14 @@ private:
   /// Breaks sequense of automatically resterted operations
   void resetFlags();
 
+  /// Copy some feature specific attributes from the source to a new feature
+  /// This is type for Circle and Arc features
+  /// \param theSourceFeature a source feature
+  /// \param theNewFeature a new feature
+  /// \return true is something is copied
+  static bool copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
+                                       const FeaturePtr& theNewFeature);
+
   /// Returns the workshop
   XGUI_Workshop* workshop() const;
 

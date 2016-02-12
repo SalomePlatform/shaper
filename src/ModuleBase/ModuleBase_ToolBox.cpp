@@ -5,6 +5,8 @@
 // Author:      Alexandre SOLOVYOV
 
 #include <ModuleBase_ToolBox.h>
+#include <ModuleBase_ModelWidget.h>
+
 #include <QButtonGroup>
 #include <QStackedWidget>
 #include <QHBoxLayout>
@@ -76,3 +78,26 @@ void ModuleBase_ToolBox::onButton( int theIndex )
   myStack->setCurrentIndex( theIndex );
 }
 
+bool ModuleBase_ToolBox::isOffToolBoxParent(ModuleBase_ModelWidget* theWidget)
+{
+  bool isOffToolBox = false;
+
+  QList<QWidget*> aControls = theWidget->getControls();
+  if (aControls.size() > 0) {
+    QWidget* aFirstControl = aControls.first();
+
+    QWidget* aWidget = aFirstControl;
+    QWidget* aParent = (QWidget*)aFirstControl->parent();
+    while (aParent) {
+      QStackedWidget* aStackedWidget = dynamic_cast<QStackedWidget*>(aParent);
+      if (aStackedWidget) {
+        int anIndex = aStackedWidget->currentIndex();
+        isOffToolBox = aStackedWidget->currentWidget() != aWidget;
+        break;
+      }
+      aWidget = aParent;
+      aParent = (QWidget*)aWidget->parent();
+    }
+  }
+  return isOffToolBox;
+}

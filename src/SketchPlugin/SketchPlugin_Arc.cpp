@@ -42,11 +42,11 @@ const double paramTolerance = 1.e-4;
 const double PI =3.141592653589793238463;
 
 namespace {
-  static const std::string& ARC_TYPE()
+  /*static const std::string& ARC_TYPE()
   {
     static const std::string TYPE("ArcType");
     return TYPE;
-  }
+  }*/
   static const std::string& ARC_TYPE_CENTER_START_END()
   {
     static const std::string TYPE("CenterStartEnd");
@@ -57,11 +57,11 @@ namespace {
     static const std::string TYPE("ThreePoints");
     return TYPE;
   }
-  static const std::string& ARC_TYPE_TANGENT()
+  /*static const std::string& ARC_TYPE_TANGENT()
   {
     static const std::string TYPE("Tangent");
     return TYPE;
-  }
+  }*/
 
   static const std::string& PASSED_POINT_ID()
   {
@@ -140,6 +140,9 @@ void SketchPlugin_Arc::initDerivedClassAttributes()
   data()->addAttribute(TANGENT_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), RADIUS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ANGLE_ID());
 }
 
 void SketchPlugin_Arc::execute()

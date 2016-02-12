@@ -14,6 +14,7 @@ class QButtonGroup;
 class QFrame;
 class QHBoxLayout;
 class QStackedWidget;
+class ModuleBase_ModelWidget;
 
 /**
  * \class ModuleBase_ToolBox
@@ -45,6 +46,12 @@ public:
   /// Set current item
   /// \param theIdx an index
   void setCurrentIndex( const int theIdx);
+
+  /// Found in the controls of the model widget parent in Stacked Widget
+  /// returns whether this controls are in the current widget of the stacked widgets
+  /// \param theWidget a model widget
+  /// \return boolean result
+  static bool isOffToolBoxParent(ModuleBase_ModelWidget* theWidget);
 
 signals:
   /// A signal which is emited on current item changed

@@ -26,6 +26,12 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity, public GeomAPI_IPr
     return MY_CIRCLE_ID;
   }
 
+  inline static const std::string& CIRCLE_TYPE()
+  {
+    static const std::string TYPE("CircleType");
+    return TYPE;
+  }
+
   /// 2D point - center of the circle
   inline static const std::string& CENTER_ID()
   {

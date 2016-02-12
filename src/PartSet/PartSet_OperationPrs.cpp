@@ -121,7 +121,7 @@ bool PartSet_OperationPrs::isVisible(XGUI_Displayer* theDisplayer, const ObjectP
     aVisible = theDisplayer->isVisible(theObject);
     // compsolid is not visualized in the viewer, but should have presentation when all sub solids are
     // visible. It is useful for highlight presentation where compsolid shape is selectable
-    if (!aVisible && aResult->groupName() == ModelAPI_ResultCompSolid::group()) {
+    if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultCompSolid::group()) {
       ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         bool anAllSubsVisible = aCompsolidResult->numberOfSubs() > 0;

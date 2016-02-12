@@ -6,6 +6,7 @@
 #include "PartSet_WidgetPoint2d.h"
 
 #include "ModelAPI_Session.h"
+#include "ModelAPI_AttributeString.h"
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_OperationFeature.h>
@@ -19,6 +20,8 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
@@ -47,9 +50,9 @@ ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() co
   if (!isActiveMgr())
     return aWidget;
 
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation) {
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if (anOperation) {
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
     if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector()))
       aWidget = myInternalActiveWidget;
@@ -233,15 +236,33 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
   return isDone;
 }
 
+/*bool isTangentArc(ModuleBase_Operation* theOperation)
+{
+  bool aTangentArc = false;
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                        (theOperation);
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+    FeaturePtr aFeature = aFOperation->feature();
+    if (aFeature.get() && aFeature->getKind() == SketchPlugin_Arc::ID()) {
+      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_Arc::ARC_TYPE());
+      std::string anArcType = aTypeAttr.get() ? aTypeAttr->value() : "";
+      aTangentArc = anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT();
+    }
+  }
+
+  return aTangentArc;
+}*/
+
 void PartSet_SketcherReetntrantMgr::onVertexSelected()
 {
   if (!isActiveMgr())
     return;
 
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation->id().toStdString() == SketchPlugin_Line::ID()) {
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  std::string anOperationId = anOperation->id().toStdString();
+  if (anOperationId == SketchPlugin_Line::ID()/* || isTangentArc(anOperation)*/) {
     /// If last line finished on vertex the lines creation sequence has to be break
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
@@ -375,8 +396,14 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
     if (aFOperation) {
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
+      FeaturePtr aPrevFeature = aFOperation->feature();
       aFOperation->commit();
       module()->launchOperation(aFOperation->id());
+      // allow the same attribute values in restarted operation
+      ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
+                                                                  myWorkshop->currentOperation());
+      copyReetntrantAttributes(aPrevFeature, aCurrentOperation->feature());
+
       myIsFlagsBlocked = false;
       resetFlags();
       // we should avoid processing of the signal about no more widgets attributes and 
@@ -391,6 +418,27 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
   }
 }
 
+bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
+                                                             const FeaturePtr& theNewFeature)
+{
+  bool aChanged;
+  std::string aTypeAttributeId;
+  if (theSourceFeature->getKind() == SketchPlugin_Circle::ID()) {
+    aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
+  }
+  if (theSourceFeature->getKind() == SketchPlugin_Arc::ID()) {
+    aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
+  }
+  if (!aTypeAttributeId.empty()) {
+    AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
+    AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
+    aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+    ModuleBase_ModelWidget::updateObject(theNewFeature);
+    aChanged = true;
+  }
+  return aChanged;
+}
+
 void PartSet_SketcherReetntrantMgr::createInternalFeature()
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -401,6 +449,8 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
 
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
     myInternalFeature = aSketch->addFeature(anOperationFeature->getKind());
+
+    bool isFeatureChanged = copyReetntrantAttributes(anOperationFeature, myInternalFeature);
     XGUI_PropertyPanel* aPropertyPanel = dynamic_cast<XGUI_PropertyPanel*>
                                                   (aFOperation->propertyPanel());
 
@@ -420,7 +470,10 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
                           !aWidget->getDefaultValue().empty() &&
                           !aWidget->isComputedDefault();
       aWidget->setFeature(myInternalFeature, isStoreValue);
+      if (!isStoreValue && isFeatureChanged)
+        aWidget->restoreValue();
     }
+
     ModuleBase_ModelWidget* aFirstWidget = ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
                                                                                         (aWidgets);
     if (aFirstWidget)
