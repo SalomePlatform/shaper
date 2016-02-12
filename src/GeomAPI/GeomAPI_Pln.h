@@ -13,6 +13,7 @@
 class GeomAPI_Ax3;
 class GeomAPI_Pnt;
 class GeomAPI_Dir;
+class GeomAPI_Lin;
 
 /**\class GeomAPI_Pln
  * \ingroup DataModel
@@ -37,11 +38,11 @@ class GeomAPI_Pln : public GeomAPI_Interface
 
   /// Returns a point of this plane
   GEOMAPI_EXPORT 
-  std::shared_ptr<GeomAPI_Pnt> location();
+  std::shared_ptr<GeomAPI_Pnt> location() const;
 
   /// Returns a plane normal
   GEOMAPI_EXPORT 
-  std::shared_ptr<GeomAPI_Dir> direction();
+  std::shared_ptr<GeomAPI_Dir> direction() const;
 
   /// Returns the plane coefficients (Ax+By+Cz+D=0)
   GEOMAPI_EXPORT 
@@ -50,6 +51,10 @@ class GeomAPI_Pln : public GeomAPI_Interface
   /// Returns true if planes are coincident.
   GEOMAPI_EXPORT
   bool isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, const double theTolerance = 1.e-7);
+
+  /// Returns intersection point or empty if no intersections
+  GEOMAPI_EXPORT
+    std::shared_ptr<GeomAPI_Pnt> intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const;
 };
 
 #endif

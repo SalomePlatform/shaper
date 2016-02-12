@@ -6,6 +6,7 @@
 
 #include <PlaneGCSSolver_EntityWrapper.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Sketch.h>
 
 PlaneGCSSolver_EntityWrapper::PlaneGCSSolver_EntityWrapper(
@@ -27,7 +28,8 @@ PlaneGCSSolver_EntityWrapper::PlaneGCSSolver_EntityWrapper(
   }
 
   // empty entity, probably this is a SketchPlugin_Point or SketchPlugin_Sketch
-  if (theFeature->getKind() == SketchPlugin_Point::ID())
+  if (theFeature->getKind() == SketchPlugin_Point::ID() ||
+      theFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
     myType = ENTITY_POINT;
   else if (theFeature->getKind() == SketchPlugin_Sketch::ID())
     myType = ENTITY_SKETCH;

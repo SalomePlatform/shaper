@@ -10,6 +10,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_IntersectionPoint.h>
 
 void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theEntities)
 {
@@ -159,7 +160,8 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
         aPoints.push_back(aFeature->attribute(SketchPlugin_Line::END_ID()));
       } else if (aFeature->getKind() == SketchPlugin_Circle::ID())
         aPoints.push_back(aFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
-      else if (aFeature->getKind() == SketchPlugin_Point::ID())
+      else if (aFeature->getKind() == SketchPlugin_Point::ID() ||
+               aFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
         aPoints.push_back(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
 
       std::list<AttributePtr>::iterator aPtIt = aPoints.begin();

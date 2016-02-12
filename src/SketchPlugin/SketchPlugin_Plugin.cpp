@@ -4,6 +4,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintAngle.h>
@@ -78,6 +79,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_MiddlePointAttrValidator);
   aFactory->registerValidator("SketchPlugin_ArcTangentPoint",
                               new SketchPlugin_ArcTangentPointValidator);
+  aFactory->registerValidator("SketchPlugin_IntersectionValidator",
+                              new SketchPlugin_IntersectionValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -115,6 +118,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_Sketch);
   } else if (theFeatureID == SketchPlugin_Point::ID()) {
     return FeaturePtr(new SketchPlugin_Point);
+  } else if (theFeatureID == SketchPlugin_IntersectionPoint::ID()) {
+    return FeaturePtr(new SketchPlugin_IntersectionPoint);
   } else if (theFeatureID == SketchPlugin_Line::ID()) {
     return FeaturePtr(new SketchPlugin_Line);
   } else if (theFeatureID == SketchPlugin_Circle::ID()) {
@@ -194,6 +199,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
                         !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
 
       aMsg->setState(SketchPlugin_Point::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_IntersectionPoint::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);

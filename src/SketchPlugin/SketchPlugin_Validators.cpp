@@ -30,8 +30,12 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <GeomAPI_Lin.h>
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomDataAPI_Point2D.h>
+
+#include <cmath>
 
 const double tolerance = 1.e-7;
 
@@ -682,4 +686,49 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
   }
 
   return true;
+}
+
+bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribute,
+                                                 const std::list<std::string>& theArguments,
+                                                 std::string& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aRefAttr->object());
+  if (!aResult) {
+    theError = "The attribute " + theAttribute->id() + " should be an object";
+    return false;
+  }
+
+  std::shared_ptr<GeomAPI_Edge> anEdge = std::dynamic_pointer_cast<GeomAPI_Edge>(aResult->shape());
+  if (!anEdge || !anEdge->isLine()) {
+    theError = "The attribute " + theAttribute->id() + " should be a line";
+    return false;
+  }
+
+  std::shared_ptr<GeomAPI_Dir> aLineDir = anEdge->line()->direction();
+
+  // find a sketch
+  std::shared_ptr<SketchPlugin_Sketch> aSketch;
+  std::set<AttributePtr> aRefs = aRefAttr->owner()->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
+  for (; anIt != aRefs.end(); ++anIt) {
+    CompositeFeaturePtr aComp =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*anIt)->owner());
+    if (aComp && aComp->getKind() == SketchPlugin_Sketch::ID()) {
+      aSketch = std::dynamic_pointer_cast<SketchPlugin_Sketch>(aComp);
+      break;
+    }
+  }
+  if (!aSketch) {
+    theError = "There is no sketch referring to the current feature";
+    return false;
+  }
+
+  std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
+  std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
+  return fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
 }

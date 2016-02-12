@@ -11,6 +11,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_SketchEntity.h
     SketchPlugin_Line.h
     SketchPlugin_Point.h
+    SketchPlugin_IntersectionPoint.h
     SketchPlugin_Circle.h
     SketchPlugin_Arc.h
     SketchPlugin_Constraint.h
@@ -45,6 +46,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_SketchEntity.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_Point.cpp
+    SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Circle.cpp
     SketchPlugin_Arc.cpp
     SketchPlugin_Constraint.cpp

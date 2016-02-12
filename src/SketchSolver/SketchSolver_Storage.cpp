@@ -14,6 +14,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_ConstraintRigid.h>
 
 
@@ -96,7 +97,8 @@ static std::list<AttributePtr> pointAttributes(FeaturePtr theFeature)
     aPoints.push_back(theFeature->attribute(SketchPlugin_Line::START_ID()));
     aPoints.push_back(theFeature->attribute(SketchPlugin_Line::END_ID()));
   }
-  else if (theFeature->getKind() == SketchPlugin_Point::ID())
+  else if (theFeature->getKind() == SketchPlugin_Point::ID() ||
+           theFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
     aPoints.push_back(theFeature->attribute(SketchPlugin_Point::COORD_ID()));
   return aPoints;
 }

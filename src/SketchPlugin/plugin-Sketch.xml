@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchRectangle SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
+        nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc SketchRectangle SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -17,10 +17,30 @@
         <validator id="SketchPlugin_SolverErrorValidator"/>
       <!--icon=":pictures/x_point.png"-->
       </feature>
+
+      <!-- SketchPoint -->
       <feature id="SketchPoint" title="Point" tooltip="Create point" icon=":icons/point.png">
         <sketch-2dpoint_selector id="PointCoordindates" accept_expressions="0" title="Point" tooltip="Point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
+      
+      <!-- Intersection Point -->
+      <feature
+        id="SketchIntersectionPoint"
+        title="Intersection Point"
+        tooltip="Create intersection point"
+        icon=":icons/point.png">
+        <sketch_shape_selector
+              id="ExternalLine"
+              label="Edge"
+              tooltip="Select external line."
+              shape_types="edge">
+          <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_IntersectionValidator"/>
+        </sketch_shape_selector>
+      </feature>
+      
+      <!-- SketchLine -->
       <feature id="SketchLine" title="Line" tooltip="Create line" icon=":icons/line.png">
         <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"/>

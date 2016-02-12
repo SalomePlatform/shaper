@@ -27,6 +27,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_IntersectionPoint.h>
 
 #include <math.h>
 
@@ -331,7 +332,8 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
   else if (aFeatureKind == SketchPlugin_Arc::ID())
     return createArc(theFeature, theAttributes, theGroupID, theSketchID);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
-  else if (aFeatureKind == SketchPlugin_Point::ID()) {
+  else if (aFeatureKind == SketchPlugin_Point::ID() || 
+           aFeatureKind == SketchPlugin_IntersectionPoint::ID()) {
     AttributePtr aPoint = theFeature->attribute(SketchPlugin_Point::COORD_ID());
     if (!aPoint->isInitialized())
       return aDummy;
