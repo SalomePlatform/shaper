@@ -194,7 +194,7 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const FeaturePtr theLine,
 }
 
 
-static double MyArrowSize = 24.;
+static double MyArrowSize = 20;
 double getArrowSize()
 {
   return MyArrowSize;
@@ -203,6 +203,11 @@ double getArrowSize()
 void setArrowSize(double theSize)
 {
   MyArrowSize = theSize;
+}
+
+int getDefaultArrowSize()
+{
+  return 20;
 }
 
 static double MyTextHeight = 16;

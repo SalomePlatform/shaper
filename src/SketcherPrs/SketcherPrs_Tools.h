@@ -82,6 +82,9 @@ namespace SketcherPrs_Tools {
   /// \param theSize a size value
   SKETCHERPRS_EXPORT void setArrowSize(double theSize);
 
+  /// Returns default value of dimension arrows size
+  SKETCHERPRS_EXPORT int getDefaultArrowSize();
+
   /// Set value of dimension text height
   /// \param theHeight a height value
   SKETCHERPRS_EXPORT void setTextHeight(double theHeight);

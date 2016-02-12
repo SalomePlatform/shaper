@@ -102,8 +102,24 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   SetMeasuredGeometry(aCirc, anAncorPnt);
   SetCustomValue(aRadius);
 
-  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  // Update variable aspect parameters (depending on viewer scale)
+  double anArrowLength = myAspect->ArrowAspect()->Length();
+   // This is not realy correct way to get viewer scale.
+  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+  double aDimensionValue = GetValue();
+  double aTextSize = 0.0;
+  GetValueString(aTextSize);
+
+  if(aTextSize > ((aDimensionValue - 2 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
+    myAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
+    myAspect->SetArrowOrientation(Prs3d_DAO_External);
+    myAspect->SetExtensionSize(aTextSize / aViewerScale - SketcherPrs_Tools::getArrowSize() / 2.0);
+  } else {
+    myAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
+    myAspect->SetArrowOrientation(Prs3d_DAO_Internal);
+  }
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+
   // The value of vertical aligment is sometimes changed
   myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 

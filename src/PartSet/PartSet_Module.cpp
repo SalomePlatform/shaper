@@ -776,7 +776,7 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   }
   if (aView.IsNull())
     return;
-  double aLen = aView->Convert(20);
+  double aLen = aView->Convert(SketcherPrs_Tools::getDefaultArrowSize());
 
   double aPrevLen = SketcherPrs_Tools::getArrowSize();
   SketcherPrs_Tools::setArrowSize(aLen);

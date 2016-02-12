@@ -37,12 +37,13 @@ static const Standard_ExtCharacter MySummSymbol(0x03A3);
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
 
-SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint, 
-                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-: AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln), 
-myConstraint(theConstraint), myPlane(thePlane)
+SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
+                                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+: AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln),
+  myConstraint(theConstraint),
+  myPlane(thePlane),
+  myAspect(new Prs3d_DimensionAspect())
 {
-  myAspect = new Prs3d_DimensionAspect();
   myAspect->MakeArrows3d(false);
   myAspect->MakeText3d(false);
   myAspect->MakeTextShaded(false);
@@ -54,7 +55,6 @@ myConstraint(theConstraint), myPlane(thePlane)
   SetDimensionAspect(myAspect);
 }
 
-
 void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                  const Handle(Prs3d_Presentation)& thePresentation, 
                                  const Standard_Integer theMode)
@@ -64,13 +64,27 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
     return;
 
   // compute flyout distance
-  double aD = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
   SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));
   SetMeasuredGeometry(aPnt1, aPnt2, myPlane->impl<gp_Ax3>());
 
   // Update variable aspect parameters (depending on viewer scale)
-  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
+  double anArrowLength = myAspect->ArrowAspect()->Length();
+   // This is not realy correct way to get viewer scale.
+  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+  double aDimensionValue = GetValue();
+  double aTextSize = 0.0;
+  GetValueString(aTextSize);
+
+  if(aTextSize > ((aDimensionValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
+    myAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
+    myAspect->SetArrowOrientation(Prs3d_DAO_External);
+    myAspect->SetExtensionSize(aTextSize / aViewerScale - SketcherPrs_Tools::getArrowSize() / 2.0);
+  } else {
+    myAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
+    myAspect->SetArrowOrientation(Prs3d_DAO_Internal);
+  }
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+
   // The value of vertical aligment is sometimes changed
   myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 
