@@ -104,9 +104,6 @@ signals:
   /// Emits by mouse leaving of the view port
   void leaveViewPort();
 
-  /// Signal emited on selection changed
-  void trihedronVisibilityChanged(bool theState);
-
 protected:
   /// processes the application signals to catch the mouse leaving state of the main window
   /// \param theObject
