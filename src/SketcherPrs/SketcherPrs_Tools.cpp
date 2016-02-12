@@ -26,6 +26,13 @@
 #include <BRep_Tool.hxx>
 #include <Precision.hxx>
 
+#include <AIS_Dimension.hxx>
+
+// it is not possible to use 0x2211 as summ symbol because it is not supported by
+// debian Linux platform
+static const Standard_ExtCharacter MyEmptySymbol(' ');
+static const Standard_ExtCharacter MySigmaSymbol(0x03A3);
+
 namespace SketcherPrs_Tools {
 
 ObjectPtr getResult(ModelAPI_Feature* theFeature, const std::string& theAttrName)
@@ -265,6 +272,18 @@ std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstrain
   aFlyoutPnt->setX(aCenter->x() + aFlyoutPnt->x() * aRadius / aLen);
   aFlyoutPnt->setY(aCenter->y() + aFlyoutPnt->y() * aRadius / aLen);
   return thePlane->to3D(aFlyoutPnt->x(), aFlyoutPnt->y());
+}
+
+void setDisplaySpecialSymbol(AIS_Dimension* theDimension, const bool& theToDisplay)
+{
+  if (theToDisplay) {
+    theDimension->SetSpecialSymbol(MySigmaSymbol);
+    theDimension->SetDisplaySpecialSymbol(AIS_DSS_Before);
+  }
+  else {
+    theDimension->SetSpecialSymbol(MyEmptySymbol);
+    theDimension->SetDisplaySpecialSymbol(AIS_DSS_No);
+  }
 }
 
 };

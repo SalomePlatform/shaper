@@ -30,10 +30,6 @@ static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 
-// it is not possible to use 0x2211 as summ symbol because it is not supported by
-// debian Linux platform
-static const Standard_ExtCharacter MySummSymbol(0x03A3);
-
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
 
@@ -89,11 +85,7 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 
   AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
-  std::set<std::string> aParams = aValue->usedParameters();
-  if (aParams.size() > 0) {
-    SetSpecialSymbol(MySummSymbol);
-    SetDisplaySpecialSymbol(AIS_DSS_Before);
-  }
+  SketcherPrs_Tools::setDisplaySpecialSymbol(this, aValue->usedParameters().size() > 0);
 
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

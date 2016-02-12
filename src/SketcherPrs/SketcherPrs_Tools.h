@@ -16,6 +16,7 @@
 #include <string>
 
 class GeomDataAPI_Point2D;
+class AIS_Dimension;
 
 //#define MyTextHeight 20
 
@@ -103,6 +104,12 @@ namespace SketcherPrs_Tools {
   SKETCHERPRS_EXPORT std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(
                                               const ModelAPI_Feature* theConstraint,
                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
+  /// Display/hide sigma symbol in the dimension presentation
+  /// \param theDimension a dimension constraint
+  /// \param theToDisplay a boolean value
+  SKETCHERPRS_EXPORT void setDisplaySpecialSymbol(AIS_Dimension* theDimension,
+                                                  const bool& theToDisplay);
 };
 
 #endif
