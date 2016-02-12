@@ -101,14 +101,7 @@ class ModuleBase_ViewerPrs
 
   /// Returns True if the current object is equal to the given one
   /// \param thePrs an object to compare
-  MODULEBASE_EXPORT bool operator==(const ModuleBase_ViewerPrs& thePrs)
-  {
-    bool aResult = (myResult.get() == thePrs.object().get());
-    bool aOwner = (myOwner.Access() == thePrs.owner().Access());
-    bool aShape = myShape.IsEqual(thePrs.shape()) == Standard_True;
-    bool aIO = (myInteractive == thePrs.interactive()) == Standard_True;
-    return aResult && aOwner && aShape && aIO;
-  }
+  MODULEBASE_EXPORT bool operator==(const ModuleBase_ViewerPrs& thePrs);
 
  private:
   ObjectPtr myResult;  /// the feature
