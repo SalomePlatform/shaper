@@ -495,7 +495,10 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
           aFactory.createWidget(aPropertyPanel->contentWidget(), anAttributeId);
 
           theWidgets = aFactory.getModelWidgets();
-          aProcessed = true;
+          // it is possible that the point does not present in XML definition,
+          // in this case, we assume that it is not processed by this module
+          // e.g. "Intersection point" feature
+          aProcessed = !theWidgets.isEmpty();
         }
       }
     }

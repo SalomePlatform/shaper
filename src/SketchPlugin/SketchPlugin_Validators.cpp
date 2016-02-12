@@ -696,14 +696,15 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
     return false;
   }
-  AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anAttr->context());
-  if (!aResult) {
-    theError = "The attribute " + theAttribute->id() + " should be an object";
-    return false;
+  AttributeSelectionPtr aLineAttr =
+                              std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  std::shared_ptr<GeomAPI_Edge> anEdge;
+  if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
+  } else if(aLineAttr->context() && aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
   }
 
-  std::shared_ptr<GeomAPI_Edge> anEdge = std::dynamic_pointer_cast<GeomAPI_Edge>(aResult->shape());
   if (!anEdge || !anEdge->isLine()) {
     theError = "The attribute " + theAttribute->id() + " should be a line";
     return false;
@@ -713,7 +714,7 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
 
   // find a sketch
   std::shared_ptr<SketchPlugin_Sketch> aSketch;
-  std::set<AttributePtr> aRefs = anAttr->owner()->data()->refsToMe();
+  std::set<AttributePtr> aRefs = aLineAttr->owner()->data()->refsToMe();
   std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
   for (; anIt != aRefs.end(); ++anIt) {
     CompositeFeaturePtr aComp =
@@ -730,5 +731,5 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
 
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
   std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
-  return true;//fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
+  return fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
 }

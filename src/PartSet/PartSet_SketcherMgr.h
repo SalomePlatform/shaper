@@ -142,6 +142,10 @@ public:
   /// \param theOperation a committed operation
   void commitNestedSketch(ModuleBase_Operation* theOperation);
 
+  /// Append the sketch plane filter into the current viewer
+  /// \param toActivate state whether the filter should be activated/deactivated
+  void activatePlaneFilter(const bool& toActivate);
+
   /// Commit the operation if it is possible. If the operation is dimention constraint,
   /// it gives widget editor to input dimention value
   void operationActivatedByPreselection();

@@ -5,6 +5,8 @@
 // Author:      Vitaly Smetannikov
 
 #include "PartSet_WidgetShapeSelector.h"
+#include "PartSet_Module.h"
+#include "PartSet_SketcherMgr.h"
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Session.h>
@@ -22,6 +24,7 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_Selection.h>
+#include <XGUI_Tools.h>
 
 PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
@@ -29,12 +32,24 @@ PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          const std::string& theParentId)
 : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId)
 {
+  myUseSketchPlane = theData->getBooleanAttribute("use_sketch_plane", true);
   myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), true);
 }
 
 PartSet_WidgetShapeSelector::~PartSet_WidgetShapeSelector()
 {
   delete myExternalObjectMgr;
+}
+
+//********************************************************************
+void PartSet_WidgetShapeSelector::activateSelectionAndFilters(bool toActivate)
+{
+  ModuleBase_WidgetShapeSelector::activateSelectionAndFilters(toActivate);
+  if (!myUseSketchPlane) {
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(aWorkshop->module());
+    aModule->sketchMgr()->activatePlaneFilter(false);
+  }
 }
 
 //********************************************************************

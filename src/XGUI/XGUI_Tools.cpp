@@ -2,6 +2,11 @@
 
 #include "XGUI_Tools.h"
 
+#include "XGUI_ModuleConnector.h"
+#include "XGUI_Workshop.h"
+
+#include "ModuleBase_IWorkshop.h"
+
 #include <TopoDS_Shape.hxx>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Result.h>
@@ -318,6 +323,12 @@ void refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const O
       }
     }
   }
+}
+
+XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop)
+{
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
+  return aConnector->workshop();
 }
 
 }

@@ -14,6 +14,8 @@
 #include <memory>
 
 class QWidget;
+class XGUI_Workshop;
+class ModuleBase_IWorkshop;
 
 /*!
  \ingroup GUI
@@ -150,6 +152,14 @@ void XGUI_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
 * \returns boolean value
 */
 bool XGUI_EXPORT isSubOfComposite(const ObjectPtr& theObject);
+
+/*!
+ Returns converted workshop
+ \param theWorkshop an interface workshop
+ \return XGUI workshop instance
+*/
+XGUI_EXPORT XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop);
+
 };
 
 #endif

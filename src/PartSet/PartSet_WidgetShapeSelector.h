@@ -42,6 +42,10 @@ Q_OBJECT
   /// Retrurns installed sketcher
   CompositeFeaturePtr sketch() const { return mySketch; }
 
+  /// Activate or deactivate selection and selection filters
+  /// \param toActivate boolean state whether it should be activated/deactivated
+  virtual void activateSelectionAndFilters(bool toActivate);
+
 protected:
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
@@ -68,6 +72,8 @@ protected:
 
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;
+
+  bool myUseSketchPlane; /// state whether the sketch plane filter should be switched on
 };
 
 #endif

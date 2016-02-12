@@ -52,13 +52,17 @@ void SketchPlugin_IntersectionPoint::computePoint()
 {
   AttributeSelectionPtr aLineAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(attribute(EXTERNAL_LINE_ID()));
-  ResultPtr aLineResult = std::dynamic_pointer_cast<ModelAPI_Result>(aLineAttr->context());
-  if (!aLineResult)
+
+  std::shared_ptr<GeomAPI_Edge> anEdge;
+  if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
+  } else if(aLineAttr->context() && aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
+  }
+  if(!anEdge.get())
     return;
 
-  std::shared_ptr<GeomAPI_Edge> aLinearEdge =
-      std::dynamic_pointer_cast<GeomAPI_Edge>(aLineResult->shape());
-  std::shared_ptr<GeomAPI_Lin> aLine = aLinearEdge->line();
+  std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
   std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
 
   std::shared_ptr<GeomAPI_Pnt> anIntersection = aSketchPlane->intersect(aLine);

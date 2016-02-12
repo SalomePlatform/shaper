@@ -62,6 +62,7 @@
 #include <SketchPlugin_ConstraintMiddle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
+#include <SketchPlugin_IntersectionPoint.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -84,8 +85,6 @@
 //#define DEBUG_DO_NOT_BY_ENTER
 
 //#define DEBUG_CURSOR
-
-//#define DEBUG_INTERSECTION_POINT
 
 /// Returns list of unique objects by sum of objects from List1 and List2
 /*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
@@ -735,7 +734,7 @@ const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
     aIds << SketchPlugin_Arc::ID().c_str();
     aIds << SketchPlugin_Circle::ID().c_str();
     aIds << SketchPlugin_ConstraintFillet::ID().c_str();
-    aIds << SketchPlugin_Circle::ID().c_str();
+    aIds << SketchPlugin_IntersectionPoint::ID().c_str();
     // TODO
     // SketchRectangle is a python feature, so its ID is passed just as a string
     aIds << "SketchRectangle";
@@ -864,9 +863,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (myPlaneFilter.IsNull()) 
     myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
-#ifndef DEBUG_INTERSECTION_POINT
   myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
-#endif
   bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
   if (aFOperation->isEditOperation()) {
@@ -987,6 +984,14 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
       }
     }
   }
+}
+
+void PartSet_SketcherMgr::activatePlaneFilter(const bool& toActivate)
+{
+  if (toActivate)
+    myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
+  else
+    myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 }
 
 void PartSet_SketcherMgr::operationActivatedByPreselection()
