@@ -81,7 +81,7 @@ void Model_Application::deleteAllDocuments()
 {
   std::map<int, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
   for(; aDoc != myDocs.end(); aDoc++) {
-    if (!aDoc->second->isOpened()) // here is main document was closed before subs and closed subs
+    if (aDoc->second->isOpened()) // here is main document was closed before subs and closed subs
       aDoc->second->close(true);
   }
   myDocs.clear();
