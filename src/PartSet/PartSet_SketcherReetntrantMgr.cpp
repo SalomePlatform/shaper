@@ -421,7 +421,7 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
 bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
                                                              const FeaturePtr& theNewFeature)
 {
-  bool aChanged;
+  bool aChanged = false;
   std::string aTypeAttributeId;
   if (theSourceFeature->getKind() == SketchPlugin_Circle::ID()) {
     aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
