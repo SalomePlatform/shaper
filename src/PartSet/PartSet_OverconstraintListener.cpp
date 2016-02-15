@@ -148,33 +148,16 @@ bool PartSet_OverconstraintListener::repairConflictingObjects(
 void PartSet_OverconstraintListener::redisplayObjects(
                                               const std::set<ObjectPtr>& theObjects)
 {
-/*static Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static Events_Loop* aLoop = Events_Loop::loop();
 
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
 
   std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
-  for (; anIt != aLast; anIt++) {
+  for (; anIt != aLast; anIt++)
     aECreator->sendUpdated(*anIt, EVENT_DISP);
 
-    //#ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
-    //  QString anInfoStr = ModuleBase_Tools::objectInfo(*anIt);
-    //  qDebug(QString("PartSet_OverconstraintListener::SEND UPDATED: %1").arg(anInfoStr).toStdString().c_str());
-    //#endif
-  }
-  aLoop->flush(EVENT_DISP);*/
-
-  XGUI_Displayer* aDisplayer = workshop()->displayer();
-  bool aHidden;
-  std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
-  for (; anIt != aLast; anIt++) {
-    ObjectPtr anObject = *anIt;
-    aHidden = !anObject->data() || !anObject->data()->isValid() || 
-               anObject->isDisabled() || (!anObject->isDisplayed());
-    if (!aHidden)
-      aDisplayer->redisplay(anObject, false);
-  }
-  aDisplayer->updateViewer();
+  aLoop->flush(EVENT_DISP);
 }
 
 XGUI_Workshop* PartSet_OverconstraintListener::workshop() const
