@@ -42,11 +42,6 @@ const double paramTolerance = 1.e-4;
 const double PI =3.141592653589793238463;
 
 namespace {
-  /*static const std::string& ARC_TYPE()
-  {
-    static const std::string TYPE("ArcType");
-    return TYPE;
-  }*/
   static const std::string& ARC_TYPE_CENTER_START_END()
   {
     static const std::string TYPE("CenterStartEnd");
@@ -57,21 +52,11 @@ namespace {
     static const std::string TYPE("ThreePoints");
     return TYPE;
   }
-  /*static const std::string& ARC_TYPE_TANGENT()
-  {
-    static const std::string TYPE("Tangent");
-    return TYPE;
-  }*/
 
   static const std::string& PASSED_POINT_ID()
   {
     static const std::string PASSED_PNT("ArcPassedPoint");
     return PASSED_PNT;
-  }
-  static const std::string& TANGENT_POINT_ID()
-  {
-    static const std::string TANGENT_PNT("ArcTangentPoint");
-    return TANGENT_PNT;
   }
   static const std::string& RADIUS_ID()
   {
@@ -381,6 +366,10 @@ static inline void calculatePassedPoint(
     bool theArcReversed,
     std::shared_ptr<GeomDataAPI_Point2D> thePassedPoint)
 {
+  if (theCenter->distance(theStartPoint) < tolerance ||
+      theCenter->distance(theEndPoint) < tolerance)
+    return;
+
   std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
       theStartPoint->xy()->decreased(theCenter->xy())));
   std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
@@ -425,8 +414,9 @@ void SketchPlugin_Arc::updateDependentAttributes()
   if (aRadiusAttr && anAngleAttr) {
     std::shared_ptr<GeomAPI_Circ2d> aCircle(
         new GeomAPI_Circ2d(aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt()));
-    calculateArcAngleRadius(aCircle, aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt(),
-                            anAngleAttr, aRadiusAttr);
+    if (aCircle->implPtr<void*>())
+      calculateArcAngleRadius(aCircle, aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt(),
+                              anAngleAttr, aRadiusAttr);
   }
   data()->blockSendAttributeUpdated(false);
 }

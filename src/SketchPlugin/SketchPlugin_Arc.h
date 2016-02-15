@@ -50,6 +50,12 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
     return TYPE;
   }
 
+  static const std::string& TANGENT_POINT_ID()
+  {
+    static const std::string TANGENT_PNT("ArcTangentPoint");
+    return TANGENT_PNT;
+  }
+
   /// Central 2D point of the circle which contains the arc
   inline static const std::string& CENTER_ID()
   {

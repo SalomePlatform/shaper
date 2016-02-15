@@ -147,6 +147,8 @@ private:
   static bool copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
                                        const FeaturePtr& theNewFeature);
 
+  static bool isTangentArc(ModuleBase_Operation* theOperation);
+
   /// Returns the workshop
   XGUI_Workshop* workshop() const;
 

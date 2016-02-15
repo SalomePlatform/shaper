@@ -7,6 +7,9 @@
 
 #include "ModelAPI_Session.h"
 #include "ModelAPI_AttributeString.h"
+#include "ModelAPI_AttributeRefAttr.h"
+
+#include "GeomDataAPI_Point2D.h"
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_OperationFeature.h>
@@ -17,6 +20,7 @@
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
+#include "ModuleBase_ToolBox.h"
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
@@ -101,24 +105,55 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
     return aProcessed;
 
   if  (myIsInternalEditOperation) {
-    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
-    if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                          (myWorkshop->currentOperation());
-      FeaturePtr aLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature() : FeaturePtr();
-      restartOperation();
-      aProcessed = true;
+    FeaturePtr aLastFeature = myRestartingMode == RM_LastFeatureUsed ? aFOperation->feature()
+                                                                     : FeaturePtr();
+    if (aLastFeature) {
+      ModuleBase_ModelWidget* anActiveWidget = module()->activeWidget();
+      ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
+      bool aWidgetIsFilled = false;
 
-      if (aLastFeature) {
-        ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
-        PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(aPanel->activeWidget());
-        if (aPoint2DWdg && aPoint2DWdg->canBeActivatedByMove()) {
-          QList<ModuleBase_ViewerPrs> aSelection;
-          aSelection.append(ModuleBase_ViewerPrs(aLastFeature, TopoDS_Shape(), NULL));
-          if (aPoint2DWdg->setSelection(aSelection, true))
-            aPanel->activateNextWidget(aPoint2DWdg);
+      //bool aCanBeActivatedByMove = false;
+      FeaturePtr aCurrentFeature = anActiveWidget->feature();
+      bool isLineFeature = false, isArcFeature = false;
+      if (aCurrentFeature->getKind() == SketchPlugin_Line::ID())
+        isLineFeature = anActiveWidget->attributeID() == SketchPlugin_Line::START_ID();
+      else if (isTangentArc(aFOperation))
+        isArcFeature = anActiveWidget->attributeID() == SketchPlugin_Arc::TANGENT_POINT_ID();
+
+      bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
+      if (aCanBeActivatedByMove) {
+        restartOperation();
+
+        anActiveWidget = module()->activeWidget();
+        aCurrentFeature = anActiveWidget->feature();
+        aProcessed = true;
+        if (isLineFeature) {
+          PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWidget);
+          if (aPoint2DWdg) { // line, start point should be equal last point of the last feature line
+            QList<ModuleBase_ViewerPrs> aSelection;
+            aSelection.append(ModuleBase_ViewerPrs(aLastFeature, TopoDS_Shape(), NULL));
+            aWidgetIsFilled = aPoint2DWdg->setSelection(aSelection, true);
+          }
+        }
+        else if (isArcFeature) { // arc, start point should be equal last point of the last feature arc
+          if (aCurrentFeature->getKind() == SketchPlugin_Arc::ID()) {
+            // get the last point of the previuos arc feature(geom point 2d)
+            std::shared_ptr<ModelAPI_Data> aData = aLastFeature->data();
+            std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = 
+                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                           aData->attribute(SketchPlugin_Arc::END_ID()));
+            // get point attribute on the current feature
+            AttributeRefAttrPtr aTangentPointAttr = aCurrentFeature->data()->refattr(
+                                                         SketchPlugin_Arc::TANGENT_POINT_ID());
+            aTangentPointAttr->setAttr(aPointAttr);
+            aWidgetIsFilled = true;
+          }
         }
       }
+      if (aWidgetIsFilled)
+        aPanel->activateNextWidget(anActiveWidget);
     }
   }
   return aProcessed;
@@ -236,23 +271,6 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
   return isDone;
 }
 
-/*bool isTangentArc(ModuleBase_Operation* theOperation)
-{
-  bool aTangentArc = false;
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                        (theOperation);
-  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-    FeaturePtr aFeature = aFOperation->feature();
-    if (aFeature.get() && aFeature->getKind() == SketchPlugin_Arc::ID()) {
-      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_Arc::ARC_TYPE());
-      std::string anArcType = aTypeAttr.get() ? aTypeAttr->value() : "";
-      aTangentArc = anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT();
-    }
-  }
-
-  return aTangentArc;
-}*/
-
 void PartSet_SketcherReetntrantMgr::onVertexSelected()
 {
   if (!isActiveMgr())
@@ -343,8 +361,12 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
         ModuleBase_ModelWidget* aPreviousAttributeWidget = 0;
         QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
         for (int i = 0, aNb = aWidgets.size(); i < aNb && !aPreviousAttributeWidget; i++) {
-          if (aWidgets[i]->attributeID() == thePreviousAttributeID)
+          if (aWidgets[i]->attributeID() == thePreviousAttributeID) {
+          /// workaround for the same attributes used in different stacked widgets(attribute types)
+          if (ModuleBase_ToolBox::isOffToolBoxParent(aWidgets[i]))
+            continue;
             aPreviousAttributeWidget = aWidgets[i];
+          }
         }
         // If the current widget is a selector, do nothing, it processes the mouse press
         if (aPreviousAttributeWidget) {
@@ -418,27 +440,6 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
   }
 }
 
-bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
-                                                             const FeaturePtr& theNewFeature)
-{
-  bool aChanged = false;
-  std::string aTypeAttributeId;
-  if (theSourceFeature->getKind() == SketchPlugin_Circle::ID()) {
-    aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
-  }
-  if (theSourceFeature->getKind() == SketchPlugin_Arc::ID()) {
-    aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
-  }
-  if (!aTypeAttributeId.empty()) {
-    AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
-    AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
-    aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
-    ModuleBase_ModelWidget::updateObject(theNewFeature);
-    aChanged = true;
-  }
-  return aChanged;
-}
-
 void PartSet_SketcherReetntrantMgr::createInternalFeature()
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -503,6 +504,43 @@ void PartSet_SketcherReetntrantMgr::resetFlags()
     myIsInternalEditOperation = false;
     myRestartingMode = RM_None;
   }
+}
+
+bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
+                                                             const FeaturePtr& theNewFeature)
+{
+  bool aChanged = false;
+  std::string aTypeAttributeId;
+  if (theSourceFeature->getKind() == SketchPlugin_Circle::ID()) {
+    aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
+  }
+  if (theSourceFeature->getKind() == SketchPlugin_Arc::ID()) {
+    aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
+  }
+  if (!aTypeAttributeId.empty()) {
+    AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
+    AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
+    aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+    ModuleBase_ModelWidget::updateObject(theNewFeature);
+    aChanged = true;
+  }
+  return aChanged;
+}
+
+bool PartSet_SketcherReetntrantMgr::isTangentArc(ModuleBase_Operation* theOperation)
+{
+  bool aTangentArc = false;
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                        (theOperation);
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+    FeaturePtr aFeature = aFOperation->feature();
+    if (aFeature.get() && aFeature->getKind() == SketchPlugin_Arc::ID()) {
+      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_Arc::ARC_TYPE());
+      std::string anArcType = aTypeAttr.get() ? aTypeAttr->value() : "";
+      aTangentArc = anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT();
+    }
+  }
+  return aTangentArc;
 }
 
 XGUI_Workshop* PartSet_SketcherReetntrantMgr::workshop() const
