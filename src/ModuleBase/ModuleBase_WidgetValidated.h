@@ -67,6 +67,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   //! Returns data object by AIS
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  //! Clear all validated cash in the widget
+  void clearValidatedCash();
+
 protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different

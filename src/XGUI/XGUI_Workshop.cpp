@@ -66,6 +66,8 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_OperationAction.h>
+#include <ModuleBase_PagedContainer.h>
+#include <ModuleBase_WidgetValidated.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -621,11 +623,13 @@ void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
     foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
        myModule->connectToPropertyPanel(aWidget, isToConnect);
-      if (isToConnect) {
+       if (isToConnect) {
         connect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+        connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
       }
       else {
         disconnect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+        disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
       }
     }
   }
@@ -896,6 +900,27 @@ void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
     operationMgr()->onValidateOperation();
 
   myModule->widgetStateChanged(thePreviousState);
+}
+
+//******************************************************
+void XGUI_Workshop::onValuesChanged()
+{
+  ModuleBase_ModelWidget* aSenderWidget = (ModuleBase_ModelWidget*)(sender());
+  if (!aSenderWidget || aSenderWidget->canSetValue())
+    return;
+
+  ModuleBase_ModelWidget* anActiveWidget = 0;
+  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+  if (anOperation) {
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+    if (aPanel)
+      anActiveWidget = aPanel->activeWidget();
+  }
+  if (anActiveWidget) {
+    ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
+                                                                           (anActiveWidget);
+    aWidgetValidated->clearValidatedCash();
+  }
 }
 
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)

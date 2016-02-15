@@ -307,6 +307,10 @@ signals:
   /// \param thePreviousState the previous state of the widget
   void onWidgetStateChanged(int thePreviousState);
 
+  /// Calls activate of the current widget again. It is possible that selection filters are
+  /// differs in the new state of paged container
+  void onValuesChanged();
+
   /// Show property panel
   void showPropertyPanel();
 

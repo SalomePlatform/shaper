@@ -61,6 +61,13 @@ ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& th
 }
 
 //********************************************************************
+void ModuleBase_WidgetValidated::clearValidatedCash()
+{
+  myValidPrs.clear();
+  myInvalidPrs.clear();
+}
+
+//********************************************************************
 void ModuleBase_WidgetValidated::storeAttributeValue()
 {
   myIsInValidate = true;
