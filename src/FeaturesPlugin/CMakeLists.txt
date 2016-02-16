@@ -109,4 +109,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCompSolids.py
                TestMultiBoolean.py
                TestSerialBoolean.py
-               TestGroup.py)
+               TestGroup.py
+               TestIntersection.py)
