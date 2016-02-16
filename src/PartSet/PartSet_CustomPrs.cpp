@@ -148,8 +148,10 @@ void PartSet_CustomPrs::erasePresentation(const ModuleBase_IModule::ModuleBase_C
 void PartSet_CustomPrs::clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
 {
   Handle(PartSet_OperationPrs) anOperationPrs = getPresentation(theFlag);
+  anOperationPrs->featureShapes().clear();
   if (!anOperationPrs.IsNull())
     anOperationPrs.Nullify();
+  myPresentations[theFlag] = AISObjectPtr();
 }
 
 Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation(
@@ -159,8 +161,10 @@ Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation(
 
   if (myPresentations.contains(theFlag)) {
     AISObjectPtr anOperationPrs = myPresentations[theFlag];
-    if (!anOperationPrs.get())
+    if (!anOperationPrs.get()) {
       initPresentation(theFlag);
+      anOperationPrs = myPresentations[theFlag];
+    }
     Handle(AIS_InteractiveObject) anAISIO = anOperationPrs->impl<Handle(AIS_InteractiveObject)>();
     aPresentation = Handle(PartSet_OperationPrs)::DownCast(anAISIO);
   }
@@ -174,7 +178,9 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
 #ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
   return false;
 #endif
-  bool aRedisplayed = displayPresentation(theFlag, theUpdateViewer);
+  bool aRedisplayed = false;
+  if (myIsActive[theFlag])
+    aRedisplayed = displayPresentation(theFlag, theUpdateViewer);
 
   return aRedisplayed;
 }

@@ -296,8 +296,9 @@ void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
-  bool isModified = myCustomPrs->deactivate(ModuleBase_IModule::CustomizeArguments, false) ||
-                    myCustomPrs->deactivate(ModuleBase_IModule::CustomizeResults, false);
+  bool isModifiedArgs = myCustomPrs->deactivate(ModuleBase_IModule::CustomizeArguments, false);
+  bool isModifiedResults = myCustomPrs->deactivate(ModuleBase_IModule::CustomizeResults, false);
+  bool isModified = isModifiedArgs || isModifiedResults;
 
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
