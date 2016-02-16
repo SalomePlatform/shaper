@@ -1,11 +1,11 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        GeomValidators_BooleanSelection.h
-// Created:     3 Feb 2016
+// File:        GeomValidators_IntersectionSelection.h
+// Created:     16 Feb 2016
 // Author:      Dmitry Bobylev
 
-#ifndef GeomValidators_BooleanSelection_H
-#define GeomValidators_BooleanSelection_H
+#ifndef GeomValidators_IntersectionSelection_H
+#define GeomValidators_IntersectionSelection_H
 
 #include <GeomValidators.h>
 
@@ -15,7 +15,7 @@
 /// \class GeomValidators_ZeroOffset
 /// \ingroup Validators
 /// \brief Validates selection for boolean operation.
-class GeomValidators_BooleanSelection: public ModelAPI_AttributeValidator
+class GeomValidators_IntersectionSelection: public ModelAPI_AttributeValidator
 {
 public:
   /// \return True if the attribute is valid. It checks whether the selection

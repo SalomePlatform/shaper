@@ -9,7 +9,7 @@
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="edge,face,solid"/>
+    <validator id="GeomValidators_IntersectionSelection"/>
   </multi_selector>
   <multi_selector id="tool_objects"
     label="Tool objects"
@@ -19,6 +19,6 @@
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="edge,face,solid"/>
+    <validator id="GeomValidators_IntersectionSelection"/>
   </multi_selector>
 </source>

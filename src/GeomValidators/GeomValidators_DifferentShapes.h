@@ -7,7 +7,7 @@
 #ifndef GeomValidators_DifferentShapes_H
 #define GeomValidators_DifferentShapes_H
 
-#include <ModelAPI.h>
+#include <GeomValidators.h>
 
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Attribute.h>
@@ -23,9 +23,9 @@ public:
   /// \param[in] theAttribute an attribute to check
   /// \param[in] theArguments a filter parameters
   /// \param[out] theError error message.
-  MODELAPI_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
-                                       const std::list<std::string>& theArguments,
-                                       std::string& theError) const;
+  GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
+                                             const std::list<std::string>& theArguments,
+                                             std::string& theError) const;
 };
 
 #endif
