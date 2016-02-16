@@ -40,8 +40,12 @@ bool GeomValidators_BooleanSelection::isValid(const AttributePtr& theAttribute,
         return false;
       }
       std::string aFeatureKind = aFeature->getKind();
-      if(aFeatureKind == "Sketch") {
-        theError = "Error: sketch shape is selected, but only objects are acceptable.";
+      if(aFeatureKind == "Sketch" || 
+         aFeatureKind == "Plane" ||
+         aFeatureKind == "Axis") {
+        theError = "Error: ";
+        theError += aFeatureKind;
+        theError += " shape is not allowed for selection.";
         return false;
       }
       aShape = aContext->shape();

@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Translation.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_Group.h
+    FeaturesPlugin_Intersection.h
     FeaturesPlugin_Partition.h
     FeaturesPlugin_Placement.h
     FeaturesPlugin_CompositeBoolean.h
@@ -35,6 +36,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Translation.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
+    FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Placement.cpp
     FeaturesPlugin_CompositeBoolean.cpp
@@ -66,6 +68,7 @@ SET(XML_RESOURCES
   group_widget.xml
   partition_widget.xml
   placement_widget.xml
+  intersection_widget.xml
 )
 
 INCLUDE_DIRECTORIES(
@@ -77,8 +80,8 @@ INCLUDE_DIRECTORIES(
 
 SET(PROJECT_LIBRARIES
     Events
-    ModelAPI 
-    GeomAPI 
+    ModelAPI
+    GeomAPI
     GeomAlgoAPI
 )
 

@@ -34,6 +34,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_ShapeTools.h
     GeomAlgoAPI_Partition.h
     GeomAlgoAPI_PaveFiller.h
+    GeomAlgoAPI_Intersection.h
 )
 
 SET(PROJECT_SOURCES
@@ -64,6 +65,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_ShapeTools.cpp
     GeomAlgoAPI_Partition.cpp
     GeomAlgoAPI_PaveFiller.cpp
+    GeomAlgoAPI_Intersection.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -72,8 +74,8 @@ SET(PROJECT_LIBRARIES
     ModelAPI
     ${CAS_OCAF}
     ${CAS_SHAPE}
-    ${CAS_TKBO} 
-    ${CAS_TKBool} 
+    ${CAS_TKBO}
+    ${CAS_TKBool}
     ${CAS_TKBRep}
     ${CAS_TKCAF}
     ${CAS_TKCAF}

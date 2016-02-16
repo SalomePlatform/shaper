@@ -37,6 +37,9 @@
       <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon=":icons/partition.png">
           <source path="partition_widget.xml"/>
       </feature>
+      <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon=":icons/intersection.png">
+          <source path="intersection_widget.xml"/>
+      </feature>
     </group>
     <group id="Collections">
       <feature id="Group"

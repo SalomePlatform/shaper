@@ -8,6 +8,7 @@
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Group.h>
+#include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Placement.h>
@@ -54,6 +55,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Boolean);
   } else if (theFeatureID == FeaturesPlugin_Group::ID()) {
     return FeaturePtr(new FeaturesPlugin_Group);
+  } else if (theFeatureID == FeaturesPlugin_Intersection::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Intersection);
   } else if (theFeatureID == FeaturesPlugin_Partition::ID()) {
     return FeaturePtr(new FeaturesPlugin_Partition);
   } else if (theFeatureID == FeaturesPlugin_Placement::ID()) {
