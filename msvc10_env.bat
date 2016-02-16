@@ -11,7 +11,7 @@ if exist "%ROOT_DIR%\localenv.bat" (
   echo Warning: file %ROOT_DIR%\localenv.bat does not exist; using default environment
 )
 
-rem --------------- Configuration -------------- 
+rem --------------- Configuration --------------
 
 rem --------------- Products path --------------
 if "%PDIR%" == "" (
@@ -118,7 +118,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
-@SET SOLVESPACE_ROOT_DIR=%PDIR%\solvespace-2.0
+@SET SOLVESPACE_ROOT_DIR=%PDIR%\solvespace-2.1
 @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 @SET _NO_DEBUG_HEAP=1
 @REM -------------------------
@@ -146,13 +146,13 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
-@REM DOXYGEN 
+@REM DOXYGEN
 @SET DOXYGEN_ROOT_DIR=%PDIR%\doxygen-1.8.3.1
 @SET PATH=%DOXYGEN_ROOT_DIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
-@REM GRAPHVIZ 
+@REM GRAPHVIZ
 @SET GRAPHVIZ_ROOT_DIR=%PDIR%\graphviz-2.38.0
 @SET GRAPHVIZHOME=%GRAPHVIZ_ROOT_DIR%
 @SET PATH=%GRAPHVIZ_ROOT_DIR%\bin;%PATH%
