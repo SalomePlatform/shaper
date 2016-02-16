@@ -5,6 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchSolver_Manager.h"
+#include "SketchSolver_Error.h"
 
 #include <Events_Loop.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -58,6 +59,9 @@ SketchSolver_Manager::SketchSolver_Manager()
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_MOVED));
+
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
 }
 
 SketchSolver_Manager::~SketchSolver_Manager()
@@ -82,6 +86,7 @@ BuilderPtr SketchSolver_Manager::builder()
 void SketchSolver_Manager::processEvent(
   const std::shared_ptr<Events_Message>& theMessage)
 {
+  checkConflictingConstraints(theMessage);
   if (myIsComputed)
     return;
   myIsComputed = true;
@@ -180,6 +185,41 @@ void SketchSolver_Manager::processEvent(
     }
   }
   myIsComputed = false;
+}
+
+void SketchSolver_Manager::checkConflictingConstraints(const std::shared_ptr<Events_Message>& theMessage)
+{
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_SOLVER_REPAIRED)) {
+    std::shared_ptr<ModelAPI_SolverFailedMessage> aMessage =
+        std::dynamic_pointer_cast<ModelAPI_SolverFailedMessage>(theMessage);
+    std::set<ObjectPtr> aSentObjs = aMessage->objects();
+    if (!aSentObjs.empty()) {
+      // Obtain sketch where the constraints are placed.
+      // It is enough to check only one constraint.
+      CompositeFeaturePtr aSketch;
+      FeaturePtr aConstraint = ModelAPI_Feature::feature(*aSentObjs.begin());
+      std::list<SketchSolver_Group*>::const_iterator aGrIt = myGroups.begin();
+      for (; aGrIt != myGroups.end(); ++aGrIt)
+        if ((*aGrIt)->isInteract(aConstraint)) {
+          aSketch = (*aGrIt)->getWorkplane();
+          break;
+        }
+
+      // Search failed groups built on the same sketch
+      if (aSketch) {
+        for (aGrIt = myGroups.begin(); aGrIt != myGroups.end(); ++aGrIt) {
+          SketchSolver_Group* aGroup = *aGrIt;
+          if (aGroup->isBaseWorkplane(aSketch) && aGroup->isFailed() &&
+              !aGroup->isInteract(aConstraint)) {
+            // reset error message on the sketch
+            aGroup->getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(
+                SketchSolver_Error::CONSTRAINTS());
+            break;
+          }
+        }
+      }
+    }
+  }
 }
 
 // ============================================================================

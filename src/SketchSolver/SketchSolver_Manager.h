@@ -109,6 +109,10 @@ private:
   /// \brief Allow to send the Update event
   void allowSendUpdate() const;
 
+  /// \brief If the message shows that any group is repaired after conflicting,
+  ///        find other groups on the same sketch, which have conflicts.
+  void checkConflictingConstraints(const std::shared_ptr<Events_Message>& theMessage);
+
 private:
   static SketchSolver_Manager*     mySelf;    ///< Self pointer to implement singleton functionality
   std::list<SketchSolver_Group*>   myGroups;  ///< Groups of constraints

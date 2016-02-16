@@ -61,6 +61,12 @@ class SketchSolver_Group
     return mySketch->data() && mySketch->data()->isValid();
   }
 
+  /// \brief Check the group has conflicting constraints
+  inline bool isFailed() const
+  {
+    return !myConflictingConstraints.empty();
+  }
+
   /** \brief Adds or updates a constraint in the group
    *  \param[in] theConstraint constraint to be changed
    *  \return \c true if the constraint added or updated successfully
