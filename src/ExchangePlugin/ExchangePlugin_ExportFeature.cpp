@@ -90,8 +90,14 @@ void ExchangePlugin_ExportFeature::execute()
     if (aCurShape.get() != NULL)
       aShapes.push_back(aCurShape);
   }
-  std::shared_ptr<GeomAPI_Shape> aShape =
-      GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+
+  // Store compound if we have more than one shape.
+  std::shared_ptr<GeomAPI_Shape> aShape;
+  if(aShapes.size() == 1) {
+    aShape = aShapes.front();
+  } else {
+    aShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+  }
 
   exportFile(aFilePath, aFormat, aShape);
 }
