@@ -16,6 +16,8 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Pnt2d.h>
 
+#include <Events_Error.h>
+
 #include <SketchPlugin_Constraint.h>
 
 #include <Graphic3d_AspectMarker3d.hxx>
@@ -48,9 +50,10 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
                                                                     SketchPlugin_Constraint::ENTITY_A());
   if (aPnt.get() == NULL)
     aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  if (aPnt.get() == NULL)
+  if (aPnt.get() == NULL) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Coincident");
     return;
-
+  }
   std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y());
   myPoint = aPoint->impl<gp_Pnt>();
 

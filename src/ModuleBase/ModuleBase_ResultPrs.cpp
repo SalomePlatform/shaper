@@ -11,6 +11,8 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_PlanarEdges.h>
 
+#include <Events_Error.h>
+
 #include <BRep_Builder.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d.hxx>
@@ -72,8 +74,10 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Standard_Integer theMode)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
-  if (!aShapePtr)
+  if (!aShapePtr) {
+    Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
     return;
+  }
 
   if (myIsSketchMode) {
     myFacesList.clear();
@@ -94,6 +98,8 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     ModuleBase_Tools::setDefaultDeviationCoefficient(myOriginalShape, Attributes());
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }
+  else
+    Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
 }
 
 

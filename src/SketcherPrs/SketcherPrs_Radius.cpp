@@ -12,6 +12,8 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
 
+#include <Events_Error.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
@@ -52,8 +54,10 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  if (!aFlyoutAttr->isInitialized())
+  if (!aFlyoutAttr->isInitialized()) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Radius");
     return; // can not create a good presentation
+  }
 
   // Get circle
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 

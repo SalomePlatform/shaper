@@ -20,6 +20,8 @@
 #include <TopExp.hxx>
 #include <BRep_Tool.hxx>
 
+#include <Events_Error.h>
+
 #define PI 3.1415926535897932
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension);
@@ -51,19 +53,23 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  if (!aFlyoutAttr->isInitialized())
+  if (!aFlyoutAttr->isInitialized()) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
     return; // can not create a good presentation
-
+  }
   std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = myPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
 
   AttributeRefAttrPtr anAttr1 = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  if (!anAttr1->isInitialized())
+  if (!anAttr1->isInitialized()) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
     return;
+  }
 
   AttributeRefAttrPtr anAttr2 = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
-  if (!anAttr2->isInitialized())
+  if (!anAttr2->isInitialized()) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
     return;
-
+  }
   // Get angle edges
   ObjectPtr aObj1 = anAttr1->object();
   ObjectPtr aObj2 = anAttr2->object();
@@ -71,8 +77,10 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   std::shared_ptr<GeomAPI_Shape> aShape1 = SketcherPrs_Tools::getShape(aObj1);
   std::shared_ptr<GeomAPI_Shape> aShape2 = SketcherPrs_Tools::getShape(aObj2);
 
-  if (!aShape1 && !aShape2)
+  if (!aShape1 && !aShape2) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
     return;
+  }
 
   TopoDS_Shape aTEdge1 = aShape1->impl<TopoDS_Shape>();
   TopoDS_Shape aTEdge2 = aShape2->impl<TopoDS_Shape>();

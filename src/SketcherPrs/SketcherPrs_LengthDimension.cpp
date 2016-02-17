@@ -14,6 +14,8 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
 
+#include <Events_Error.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_XYZ.h>
@@ -56,8 +58,10 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
                                  const Standard_Integer theMode)
 {
   gp_Pnt aPnt1, aPnt2;
-  if (!getPoints(aPnt1, aPnt2))
+  if (!getPoints(aPnt1, aPnt2)) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_LengthDimension");
     return;
+  }
 
   // compute flyout distance
   SetFlyout(SketcherPrs_Tools::getFlyoutDistance(myConstraint));

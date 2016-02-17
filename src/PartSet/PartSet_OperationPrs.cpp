@@ -27,6 +27,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultCompSolid.h>
 
+#include <Events_Error.h>
+
 #include <GeomAPI_IPresentable.h>
 
 #include <StdPrs_WFDeflectionShape.hxx>
@@ -70,6 +72,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   Handle(Prs3d_Drawer) aDrawer = Attributes();
 
   // create presentations on the base of the shapes
+  bool anEmptyAIS = true;
   QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
                                                         aLast = myFeatureShapes.end();
   for (; anIt != aLast; anIt++) {
@@ -102,8 +105,12 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
         }
       }
       StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
+      if (anEmptyAIS)
+        anEmptyAIS = false;
     }
   }
+  if (anEmptyAIS)
+    Events_Error::throwException("An empty AIS presentation: PartSet_OperationPrs");
 }
 
 void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

@@ -365,6 +365,7 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
 
   // Update points with default shift value
   if (!updatePoints(20)) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_SymbolPrs");
     return;
   }
 

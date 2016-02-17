@@ -10,6 +10,8 @@
 #include <Events_Error.h>
 #include <Events_Loop.h>
 
+//#define TROW_EMPTY_AIS_EXCEPTION
+
 Events_Error::Events_Error(const std::string& theDescription, const void* theSender)
     : Events_Message(Events_Error::errorID(), theSender)
 {
@@ -36,4 +38,17 @@ void Events_Error::send(const std::string& theDescription, const void* theSender
   std::shared_ptr<Events_Message> aNewOne = 
     std::shared_ptr<Events_Message>(new Events_Error(theDescription, theSender));
   Events_Loop::loop()->send(aNewOne);
+}
+
+void Events_Error::throwException(const std::string& theDescription)
+{
+#ifdef TROW_EMPTY_AIS_EXCEPTION
+  try {
+    throw std::invalid_argument(theDescription);
+  }
+  catch (...) {
+    Events_Error::send(
+        std::string("An exception: ") + theDescription);
+  }
+#endif
 }
