@@ -178,6 +178,14 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
 
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
     if (!anActiveWidget || !anActiveWidget->isViewerSelector()) {
+
+      // block of viewer update
+      // we need to block update content of the viewer because of Sketch Point feature
+      // in activate() the value of the point is initialized and it can be displayed
+      // but the default value is [0, 0]. So, we block update viewer contentent until
+      // onMouseRelease happens, which correct the point position
+      ModuleBase_ModelWidget::blockUpdateViewer(true);
+
       restartOperation();
       aProcessed = true;
 
@@ -189,6 +197,8 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
         aPoint2DWdg->onMouseRelease(theWnd, theEvent);
       }
+      // unblock viewer update
+      ModuleBase_ModelWidget::blockUpdateViewer(false);
     }
   }
 

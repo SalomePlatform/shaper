@@ -137,12 +137,14 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void removeFilters();
 
   /// Sets a flag to the displayer whether the internal viewer can be updated by 
-  /// the updateViewer method call. If it is not enabled, this method do nothing
+  /// the updateViewer method call. If it is not enabled, this method do nothing.
+  /// This state maintain recurse, if the update is blocked twice or three times, the
+  /// viewer will not be updated until it is unblocked necessary times(twice or three in the example).
   /// \param isEnabled a boolean value
   bool enableUpdateViewer(const bool isEnabled);
 
-  /// Returns myEnableUpdateViewer flag
-  bool isUpdateEnabled() const { return myEnableUpdateViewer; }
+  /// Returns true if the viewer update is not blocked
+  bool isUpdateEnabled() const;
 
   /// Updates the viewer
   void updateViewer() const;
@@ -327,8 +329,8 @@ private:
   /// Selection modes installed for external objects in local context
   QIntList myActiveSelectionModes;
 
-  /// the enable update viewer flag
-  bool myEnableUpdateViewer; 
+  /// Number of blocking of the viewer update. The viewer is updated only if it equals zero
+  int myViewerBlockedRecursiveCount;
 
   // Flag: use trihedgon for selection or not
   bool myIsTrihedronActive;

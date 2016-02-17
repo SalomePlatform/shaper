@@ -103,10 +103,9 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 }
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myWorkshop(theWorkshop), myEnableUpdateViewer(true), myNeedUpdate(false),
-  myIsTrihedronActive(false)
+  : myWorkshop(theWorkshop), myNeedUpdate(false),
+  myIsTrihedronActive(false), myViewerBlockedRecursiveCount(0)
 {
-  enableUpdateViewer(true);
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs(theWorkshop));
 }
 
@@ -253,7 +252,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
       emit beforeObjectErase(theObject, anObject);
-      aContext->Remove(anAIS, theUpdateViewer);
+      aContext->Remove(anAIS);
       aErased = true;
     }
   }
@@ -265,6 +264,10 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   qDebug(QString("erase object: %1").arg(aPtrStr.str().c_str()).toStdString().c_str());
   qDebug(getResult2AISObjectMapInfo().c_str());
 #endif
+
+  if (theUpdateViewer)
+    updateViewer();
+
   return aErased;
 }
 
@@ -744,20 +747,28 @@ ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) 
 
 bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
 {
-  bool aWasEnabled = myEnableUpdateViewer;
+  bool aWasEnabled = isUpdateEnabled();
+  if (isEnabled)
+    myViewerBlockedRecursiveCount--;
+  else
+    myViewerBlockedRecursiveCount++;
 
-  myEnableUpdateViewer = isEnabled;
-  if (myNeedUpdate && myEnableUpdateViewer) {
+  if (myNeedUpdate && isUpdateEnabled()) {
     updateViewer();
     myNeedUpdate = false;
   }
   return aWasEnabled;
 }
 
+bool XGUI_Displayer::isUpdateEnabled() const
+{
+  return myViewerBlockedRecursiveCount == 0;
+}
+
 void XGUI_Displayer::updateViewer() const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull() && myEnableUpdateViewer) {
+  if (!aContext.IsNull() && isUpdateEnabled()) {
     myWorkshop->viewer()->Zfitall();
     aContext->UpdateCurrentViewer();
   } else {
@@ -770,13 +781,15 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
-    aContext->Activate(theIO, theMode, theUpdateViewer);
+    aContext->Activate(theIO, theMode, false);
 
 #ifdef DEBUG_ACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
     anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
     qDebug(QString("activateAIS: theMode = %1, object = %2").arg(theMode).arg(anInfo).toStdString().c_str());
 #endif
+    if (theUpdateViewer)
+      updateViewer();
   }
 }
 
@@ -827,7 +840,7 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!aContext.IsNull() && !anAISIO.IsNull()) {
-    aContext->Display(anAISIO, 0/*wireframe*/, 0, theUpdateViewer, true, AIS_DS_Displayed);
+    aContext->Display(anAISIO, 0/*wireframe*/, 0, false/*update viewer*/, true, AIS_DS_Displayed);
     aDisplayed = true;
     aContext->Deactivate(anAISIO);
     aContext->Load(anAISIO);
@@ -842,6 +855,8 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
         }
       }
     }
+    if (theUpdateViewer)
+      updateViewer();
   }
   return aDisplayed;
 }
@@ -853,7 +868,7 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
   if (!aContext.IsNull()) {
     Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
     if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
-      aContext->Remove(anAISIO, theUpdateViewer);
+      aContext->Remove(anAISIO, false/*update viewer*/);
       aErased = true;
     }
   }

@@ -197,6 +197,10 @@ Q_OBJECT
   /// \param theObj is object for moving
   static void moveObject(ObjectPtr theObj);
 
+  /// Sends a message about block/unblock viewer updating
+  /// \param theValue a boolean value
+  static void blockUpdateViewer(const bool theValue);
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();
@@ -275,10 +279,6 @@ protected:
 
   /// The method called when widget is activated
   virtual void activateCustom() {};
-
-  /// Sends a message about block/unblock viewer updating
-  /// \param theValue a boolean value
-  static void blockUpdateViewer(const bool theValue);
 
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
