@@ -12,14 +12,14 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Attribute.h>
 
-/// \class GeomValidators_ZeroOffset
+/// \class GeomValidators_IntersectionSelection
 /// \ingroup Validators
-/// \brief Validates selection for boolean operation.
+/// \brief Validates selection for intersection operation.
 class GeomValidators_IntersectionSelection: public ModelAPI_AttributeValidator
 {
 public:
   /// \return True if the attribute is valid. It checks whether the selection
-  /// is acceptable for boolean operation.
+  /// is acceptable for intersection operation.
   /// \param[in] theAttribute an attribute to check.
   /// \param[in] theArguments a filter parameters.
   /// \param[out] theError error message.

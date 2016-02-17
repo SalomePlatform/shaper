@@ -12,7 +12,7 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Attribute.h>
 
-/// \class GeomValidators_ZeroOffset
+/// \class GeomValidators_BooleanSelection
 /// \ingroup Validators
 /// \brief Validates selection for boolean operation.
 class GeomValidators_BooleanSelection: public ModelAPI_AttributeValidator
