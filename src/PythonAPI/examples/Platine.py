@@ -147,7 +147,7 @@ def body_3():
     sketch.setRadius(arc.result(), r)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_1_1/Modified_1&Boolean_1_1/Modified_4")
+    bottom_e = sketch.addLine("Boolean_1_1/Modified_5&Boolean_1_1/Modified_8")
     sketch.setCoincident(bottom_e.result(), bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), bottom.endPoint())
 
@@ -162,7 +162,7 @@ def body_3():
 
 def body_4():
     # Create XOZ 2nd sketch
-    sketch = model.addSketch(part, "Boolean_2_1/Modified_8")
+    sketch = model.addSketch(part, "Boolean_2_1/Modified_4")
 
     # Create base polygon
     points = [(0, 0), (0, 1), (1, 0)]
@@ -171,11 +171,11 @@ def body_4():
     left, diagonal, bottom = sketch.addPolygon(*geom_points)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_2_1/Modified_8&Boolean_2_1/Modified_7")
+    bottom_e = sketch.addLine("Boolean_2_1/Modified_3&Boolean_2_1/Modified_4")
     sketch.setCoincident(bottom_e.endPoint(), bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), left.startPoint())
 
-    left_e = sketch.addLine("Boolean_2_1/Modified_4&Boolean_2_1/Modified_2")
+    left_e = sketch.addLine("Boolean_2_1/Modified_6&Boolean_2_1/Modified_8")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
 
     model.do()  #!!!
