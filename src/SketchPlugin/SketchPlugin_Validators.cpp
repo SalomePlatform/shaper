@@ -477,9 +477,9 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     aFilletFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
 
   std::list<std::pair<ObjectPtr, AttributePtr>> aPointsList = aPointsRefList->list();
-  for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator anIt = aPointsList.cbegin(); anIt != aPointsList.cend(); anIt++) {
-    ObjectPtr anObject = (*anIt).first;
-    AttributePtr aPointAttribute = (*anIt).second;
+  for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
+    ObjectPtr anObject = (*aPointsIt).first;
+    AttributePtr aPointAttribute = (*aPointsIt).second;
 
     // If we alredy have some result then:
     // - if it is the same point all ok, just skip it
