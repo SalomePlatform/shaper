@@ -41,10 +41,8 @@ AISObjectPtr SketchPlugin_ConstraintPerpendicular::getAISObject(AISObjectPtr the
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    anAIS = SketcherPrs_Factory::perpendicularConstraint(this, sketch()->coordinatePlane());
-  }
+  AISObjectPtr anAIS = SketcherPrs_Factory::perpendicularConstraint(this, sketch()->coordinatePlane(),
+                                                                    thePrevious);
   return anAIS;
 }
 

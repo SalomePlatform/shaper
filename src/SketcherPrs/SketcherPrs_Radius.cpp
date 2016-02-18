@@ -44,26 +44,27 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
 }
 
-void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                 const Handle(Prs3d_Presentation)& thePresentation, 
-                                 const Standard_Integer theMode)
+bool SketcherPrs_Radius::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
-  DataPtr aData = myConstraint->data();
+  bool aReadyToDisplay = false;
+
+  DataPtr aData = theConstraint->data();
 
   // Flyout point
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   if (!aFlyoutAttr->isInitialized()) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Radius");
-    return; // can not create a good presentation
+    return aReadyToDisplay; // can not create a good presentation
   }
 
   // Get circle
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
     (aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  if (!anAttr) return;
+  if (!anAttr)
+    return aReadyToDisplay;
 
   std::shared_ptr<ModelAPI_Feature> aCyrcFeature = ModelAPI_Feature::feature(anAttr->object());
   double aRadius = 1;
@@ -71,7 +72,62 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
   // it is possible that circle result becomes zero, in this case the presentation should disappear
   // for example, it happens when circle radius is set to zero
   if (!aCyrcFeature)
+    return aReadyToDisplay;
+  if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
+    aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
+    AttributeDoublePtr aCircRadius = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+      aCyrcFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
+    aRadius = aCircRadius->value();
+  } else { // arc
+    aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aCyrcFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
+    aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+  }
+  std::shared_ptr<GeomAPI_Pnt> aCenter = thePlane->to3D(aCenterAttr->x(), aCenterAttr->y());
+  std::shared_ptr<GeomAPI_Dir> aNormal = thePlane->normal();
+
+  GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
+    
+  std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(theConstraint, thePlane);
+
+  gp_Circ aCirc = aCircle.impl<gp_Circ>();
+  gp_Pnt anAncorPnt = anAnchor->impl<gp_Pnt>();
+  // anchor point should not coincide to the location point of the circle
+  // OCCT does not process this case.
+
+  aReadyToDisplay = anAncorPnt.Distance(aCirc.Location()) > 1e-7;
+  return aReadyToDisplay;
+}
+
+void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+                                 const Handle(Prs3d_Presentation)& thePresentation, 
+                                 const Standard_Integer theMode)
+{
+  if (!IsReadyToDisplay(myConstraint, myPlane)) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Radius");
     return;
+  }
+
+  DataPtr aData = myConstraint->data();
+
+  // Flyout point
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+    (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+
+  // Get circle
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
+    (aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+
+  std::shared_ptr<ModelAPI_Feature> aCyrcFeature = ModelAPI_Feature::feature(anAttr->object());
+  double aRadius = 1;
+  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
   if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
@@ -96,10 +152,7 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 
   gp_Circ aCirc = aCircle.impl<gp_Circ>();
   gp_Pnt anAncorPnt = anAnchor->impl<gp_Pnt>();
-  // anchor point should not coincide to the location point of the circle
-  // OCCT does not process this case.
-  if (anAncorPnt.Distance(aCirc.Location()) < 1e-7)
-    return;
+
   SetMeasuredGeometry(aCirc, anAncorPnt);
   SetCustomValue(aRadius);
 

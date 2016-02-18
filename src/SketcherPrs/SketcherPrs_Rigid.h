@@ -30,6 +30,13 @@ public:
 
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Rigid)
+
+  /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
+  /// \param theConstraint a constraint feature
+  /// \param thePlane a coordinate plane of current sketch
+  /// \return boolean result value
+  static bool IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 protected:
   virtual const char* iconName() const { return "anchor.png"; }
 

@@ -132,10 +132,8 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane());
-  }
+  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane(),
+                                                                      thePrevious);
   return anAIS;
 }
 

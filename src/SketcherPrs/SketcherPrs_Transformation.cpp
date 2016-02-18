@@ -35,13 +35,30 @@ SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theCons
 {
 }  
 
-bool SketcherPrs_Transformation::updatePoints(double theStep) const 
+bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                                  const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
 {
-  std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  bool aReadyToDisplay = false;
+
+  std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   // Get transformated objects list
   std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
+    return aReadyToDisplay;
+
+  int aNbB = anAttrB->size();
+  aReadyToDisplay = aNbB > 0;
+  return aReadyToDisplay;
+}
+
+bool SketcherPrs_Transformation::updatePoints(double theStep) const 
+{
+  if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
+
+  std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  // Get transformated objects list
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
 
   int aNbB = anAttrB->size();
   if (aNbB == 0)
@@ -50,7 +67,6 @@ bool SketcherPrs_Transformation::updatePoints(double theStep) const
   //if (!myPntArray.IsNull())
     //  mySPoints.Clear();
 #endif
-    return false;
   }
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();

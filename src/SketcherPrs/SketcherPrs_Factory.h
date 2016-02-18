@@ -16,8 +16,8 @@
 
 #define GET_CONSTRAINT_PRS(NAME) \
   static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
-                           const std::shared_ptr<GeomAPI_Ax3>& thePlane);
-
+                           const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
+                           AISObjectPtr thePrevious);
 
 /**
 * Class which creates constraints presentations

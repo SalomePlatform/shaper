@@ -191,10 +191,8 @@ AISObjectPtr SketchPlugin_MultiTranslation::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    anAIS = SketcherPrs_Factory::translateConstraint(this, sketch()->coordinatePlane());
-  }
+  AISObjectPtr anAIS = SketcherPrs_Factory::translateConstraint(this, sketch()->coordinatePlane(),
+                                                                thePrevious);
   return anAIS;
 }
 

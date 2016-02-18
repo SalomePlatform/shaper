@@ -27,29 +27,52 @@ SketcherPrs_Mirror::SketcherPrs_Mirror(ModelAPI_Feature* theConstraint,
 {
 }  
 
-
-bool SketcherPrs_Mirror::updatePoints(double theStep) const
+bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                          const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
 {
-  // Get axis of mirror
-  ObjectPtr aAxisObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  if (SketcherPrs_Tools::getShape(aAxisObj).get() == NULL)
-    return false;
+  bool aReadyToDisplay = false;
 
-  std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  // Get axis of mirror
+  ObjectPtr aAxisObj = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  if (SketcherPrs_Tools::getShape(aAxisObj).get() == NULL)
+    return aReadyToDisplay;
+
+  std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   // Get source objects
   std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
-    return false;
+    return aReadyToDisplay;
   // Get mirrored objects
   std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = aData->reflist(SketchPlugin_Constraint::ENTITY_C());
   if (anAttrC.get() == NULL)
-    return false;
+    return aReadyToDisplay;
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   int aNb = anAttrB->size();
   // If size of source objects and mirrored ones is not equal then the constraint is not computed
   if (aNb != anAttrC->size())
+    return aReadyToDisplay;
+
+  aReadyToDisplay = true;
+  return aReadyToDisplay;
+}
+
+bool SketcherPrs_Mirror::updatePoints(double theStep) const
+{
+  if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
+
+  // Get axis of mirror
+  ObjectPtr aAxisObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+
+  std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  // Get source objects
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  // Get mirrored objects
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = aData->reflist(SketchPlugin_Constraint::ENTITY_C());
+
+  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+  int aNb = anAttrB->size();
 
   myPntArray = new Graphic3d_ArrayOfPoints(2 * aNb);
   int i;

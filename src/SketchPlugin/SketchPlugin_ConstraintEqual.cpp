@@ -36,10 +36,8 @@ AISObjectPtr SketchPlugin_ConstraintEqual::getAISObject(AISObjectPtr thePrevious
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    anAIS = SketcherPrs_Factory::equalConstraint(this, sketch()->coordinatePlane());
-  }
+  AISObjectPtr anAIS = SketcherPrs_Factory::equalConstraint(this, sketch()->coordinatePlane(),
+                                                            thePrevious);
   return anAIS;
 }
 

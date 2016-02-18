@@ -30,15 +30,26 @@ SketcherPrs_Parallel::SketcherPrs_Parallel(ModelAPI_Feature* theConstraint,
   myPntArray->AddVertex(0., 0., 0.);
 }  
 
+bool SketcherPrs_Parallel::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                            const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+{
+  bool aReadyToDisplay = false;
+
+  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+
+  aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
+                    SketcherPrs_Tools::getShape(aObj2).get() != NULL;
+  return aReadyToDisplay;
+}
 
 bool SketcherPrs_Parallel::updatePoints(double theStep) const
 {
+  if (!IsReadyToDisplay(myConstraint, myPlane))
+    return false;
+
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  if (SketcherPrs_Tools::getShape(aObj1).get() == NULL)
-    return false;
-  if (SketcherPrs_Tools::getShape(aObj2).get() == NULL)
-    return false;
 
   // Compute position of symbols
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();

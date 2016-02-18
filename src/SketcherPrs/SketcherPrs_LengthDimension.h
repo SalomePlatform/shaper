@@ -31,6 +31,13 @@ public:
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   DEFINE_STANDARD_RTTI(SketcherPrs_LengthDimension)
+
+  /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
+  /// \param theConstraint a constraint feature
+  /// \param thePlane a coordinate plane of current sketch
+  /// \return boolean result value
+  static bool IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
@@ -41,7 +48,9 @@ protected:
     const Standard_Integer aMode);
 
 private:
-  bool getPoints(gp_Pnt& thePnt1, gp_Pnt& thePnt2);
+  static bool getPoints(ModelAPI_Feature* theConstraint,
+                 const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                 gp_Pnt& thePnt1, gp_Pnt& thePnt2);
 
   /// Constraint feature
   ModelAPI_Feature* myConstraint;

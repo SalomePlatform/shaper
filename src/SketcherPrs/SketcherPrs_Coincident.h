@@ -37,7 +37,14 @@ public:
   /// Defines color for the presentation
   /// \param aColor a color name
   Standard_EXPORT virtual void SetColor(const Quantity_NameOfColor aColor);
-   
+
+  /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
+  /// \param theConstraint a constraint feature
+  /// \param thePlane a coordinate plane of current sketch
+  /// \return boolean result value
+  static bool IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
   DEFINE_STANDARD_RTTI(SketcherPrs_Coincident)
 protected:
   /// Redefinition of virtual function

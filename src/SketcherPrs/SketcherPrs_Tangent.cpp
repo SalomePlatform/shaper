@@ -33,14 +33,24 @@ SketcherPrs_Tangent::SketcherPrs_Tangent(ModelAPI_Feature* theConstraint,
   myPntArray->AddVertex(0., 0., 0.);
 }  
 
+bool SketcherPrs_Tangent::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                           const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+{
+  bool aReadyToDisplay = false;
+
+  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+
+  aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
+                    SketcherPrs_Tools::getShape(aObj2).get() != NULL;
+
+  return aReadyToDisplay;
+}
+
 bool SketcherPrs_Tangent::updatePoints(double theStep) const
 {
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  if (SketcherPrs_Tools::getShape(aObj1).get() == NULL)
-    return false;
-  if (SketcherPrs_Tools::getShape(aObj2).get() == NULL)
-    return false;
 
   // Compute points coordinates
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();

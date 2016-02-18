@@ -43,33 +43,28 @@ SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
 }
 
-void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                const Handle(Prs3d_Presentation)& thePresentation, 
-                                const Standard_Integer theMode)
+bool SketcherPrs_Angle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                         const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
 {
-  DataPtr aData = myConstraint->data();
+  bool aReadyToDisplay = false;
+
+  DataPtr aData = theConstraint->data();
 
   // Flyout point
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  if (!aFlyoutAttr->isInitialized()) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
-    return; // can not create a good presentation
-  }
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = myPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+  if (!aFlyoutAttr->isInitialized())
+    return aReadyToDisplay; // can not create a good presentation
 
   AttributeRefAttrPtr anAttr1 = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  if (!anAttr1->isInitialized()) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
-    return;
-  }
+  if (!anAttr1->isInitialized())
+    return aReadyToDisplay;
 
   AttributeRefAttrPtr anAttr2 = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
-  if (!anAttr2->isInitialized()) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
-    return;
-  }
+  if (!anAttr2->isInitialized())
+    return aReadyToDisplay;
+
   // Get angle edges
   ObjectPtr aObj1 = anAttr1->object();
   ObjectPtr aObj2 = anAttr2->object();
@@ -77,10 +72,36 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   std::shared_ptr<GeomAPI_Shape> aShape1 = SketcherPrs_Tools::getShape(aObj1);
   std::shared_ptr<GeomAPI_Shape> aShape2 = SketcherPrs_Tools::getShape(aObj2);
 
-  if (!aShape1 && !aShape2) {
+  aReadyToDisplay = aShape1.get() && aShape2.get();
+  return aReadyToDisplay;
+}
+
+void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+                                const Handle(Prs3d_Presentation)& thePresentation, 
+                                const Standard_Integer theMode)
+{
+  DataPtr aData = myConstraint->data();
+
+  if (!IsReadyToDisplay(myConstraint, myPlane)) {
     Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
-    return;
+    return; // can not create a good presentation
   }
+
+  // Flyout point
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+    (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = myPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+
+  AttributeRefAttrPtr anAttr1 = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  AttributeRefAttrPtr anAttr2 = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
+
+  // Get angle edges
+  ObjectPtr aObj1 = anAttr1->object();
+  ObjectPtr aObj2 = anAttr2->object();
+
+  std::shared_ptr<GeomAPI_Shape> aShape1 = SketcherPrs_Tools::getShape(aObj1);
+  std::shared_ptr<GeomAPI_Shape> aShape2 = SketcherPrs_Tools::getShape(aObj2);
 
   TopoDS_Shape aTEdge1 = aShape1->impl<TopoDS_Shape>();
   TopoDS_Shape aTEdge2 = aShape2->impl<TopoDS_Shape>();

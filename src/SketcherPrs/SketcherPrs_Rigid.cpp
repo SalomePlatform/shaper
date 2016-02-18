@@ -46,26 +46,47 @@ SketcherPrs_Rigid::SketcherPrs_Rigid(ModelAPI_Feature* theConstraint,
   myPntArray->AddVertex(0., 0., 0.);
 }  
 
+bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  bool aReadyToDisplay = false;
+
+  std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  AttributePtr aRefAttr = anAttr->attr();
+  if (anAttr->isObject()) {
+    // The constraint attached to an object
+    ObjectPtr aObj = anAttr->object();
+    aReadyToDisplay =  SketcherPrs_Tools::getShape(aObj).get() != NULL;
+
+  } else {
+    // The constraint attached to a point
+    std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
+                                                                 SketchPlugin_Constraint::ENTITY_A());
+    aReadyToDisplay = aPnt.get() != NULL;
+  }
+  return aReadyToDisplay;
+}
 
 bool SketcherPrs_Rigid::updatePoints(double theStep) const 
 {
+  if (!IsReadyToDisplay(myConstraint, myPlane))
+    return false;
+
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
   AttributePtr aRefAttr = anAttr->attr();
   if (anAttr->isObject()) {
     // The constraint attached to an object
     ObjectPtr aObj = anAttr->object();
-    if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
-      return false;
 
     SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
     gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(1, aP1);
   } else {
     // The constraint attached to a point
-    std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-    if (aPnt.get() == NULL)
-      return false;
+    std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint,
+                                                  SketchPlugin_Constraint::ENTITY_A());
     std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y() + theStep);
     myPntArray->SetVertice(1, aPoint->impl<gp_Pnt>());
   }

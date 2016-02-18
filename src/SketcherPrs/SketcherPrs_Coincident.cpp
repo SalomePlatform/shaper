@@ -39,21 +39,36 @@ SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
   
 }  
 
+bool SketcherPrs_Coincident::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                              const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+{
+  bool aReadyToDisplay = false;
+
+  // Get point of the presentation
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
+                                                              SketchPlugin_Constraint::ENTITY_A());
+  if (aPnt.get() == NULL)
+    aPnt = SketcherPrs_Tools::getPoint(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+  
+  aReadyToDisplay = aPnt.get() != NULL;
+  return aReadyToDisplay;
+}
 
 
 void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  if (!IsReadyToDisplay(myConstraint, myPlane)) {
+    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Coincident");
+    return;
+  }
+
   // Get point of the presentation
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, 
                                                                     SketchPlugin_Constraint::ENTITY_A());
   if (aPnt.get() == NULL)
     aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  if (aPnt.get() == NULL) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Coincident");
-    return;
-  }
   std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y());
   myPoint = aPoint->impl<gp_Pnt>();
 

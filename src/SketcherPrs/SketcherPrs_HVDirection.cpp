@@ -13,6 +13,7 @@
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
 
+#include <Events_Error.h>
 
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
@@ -29,13 +30,24 @@ SketcherPrs_HVDirection::SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint
   myPntArray->AddVertex(0., 0., 0.);
 }  
 
+bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
+                                               const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+{
+  bool aReadyToDisplay = false;
+  ObjectPtr aObj = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+
+  aReadyToDisplay = SketcherPrs_Tools::getShape(aObj).get() != NULL;
+  return aReadyToDisplay;
+}
+
 bool SketcherPrs_HVDirection::updatePoints(double theStep) const 
 {
-  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
+  if (!SketcherPrs_HVDirection::IsReadyToDisplay(myConstraint, myPlane)) {
     return false;
+  }
 
   // Set point of the symbol
+  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
   myPntArray->SetVertice(1, aP1);

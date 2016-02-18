@@ -35,19 +35,23 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
     return thePrevious;
 
   AISObjectPtr anAIS = thePrevious;
-  if (anAIS.get() == NULL) {
-    std::shared_ptr<ModelAPI_Data> aData = data();
-    std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    ObjectPtr aObj = anAttr->object();
-    if (aObj.get() != NULL) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-      std::shared_ptr<SketchPlugin_Feature> aSkFea = 
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      if (!aSkFea->isExternal()) 
-        anAIS = SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane());
-    }
+
+  bool isValidRigid = false;
+  std::shared_ptr<ModelAPI_Data> aData = data();
+  AttributeRefAttrPtr anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj = anAttr->object();
+  if (aObj.get() != NULL) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    std::shared_ptr<SketchPlugin_Feature> aSkFea = 
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if (!aSkFea->isExternal()) 
+      isValidRigid = true;
   }
+
+  if (isValidRigid)
+    anAIS = SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane(), thePrevious);
+  else
+    anAIS = AISObjectPtr();
 
   return anAIS;
 }

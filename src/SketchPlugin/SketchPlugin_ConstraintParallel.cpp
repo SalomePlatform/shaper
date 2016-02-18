@@ -43,10 +43,8 @@ AISObjectPtr SketchPlugin_ConstraintParallel::getAISObject(AISObjectPtr thePrevi
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    anAIS = SketcherPrs_Factory::parallelConstraint(this, sketch()->coordinatePlane());
-  }
+  AISObjectPtr anAIS = SketcherPrs_Factory::parallelConstraint(this, sketch()->coordinatePlane(),
+                                                               thePrevious);
   return anAIS;
 }
 

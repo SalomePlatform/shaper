@@ -25,11 +25,10 @@ AISObjectPtr SketchPlugin_ConstraintCollinear::getAISObject(AISObjectPtr thePrev
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = thePrevious;
-  if (!anAIS) {
-    // TODO
-    //anAIS = SketcherPrs_Factory::collinearConstraint(this, sketch()->coordinatePlane());
-  }
+  AISObjectPtr anAIS;
+  // TODO
+  //AISObjectPtr anAIS = SketcherPrs_Factory::collinearConstraint(this, sketch()->coordinatePlane(),
+  //                                                              thePrevious);
   return anAIS;
 }
 
