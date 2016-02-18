@@ -480,6 +480,7 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
     ObjectPtr anObject = (*aPointsIt).first;
     AttributePtr aPointAttribute = (*aPointsIt).second;
+    std::shared_ptr<GeomAPI_Pnt2d> aSelectedPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttribute)->pnt();
 
     // If we alredy have some result then:
     // - if it is the same point all ok, just skip it
@@ -498,7 +499,6 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
           AttributePtr anArcEnd = aResultArc->attribute(SketchPlugin_Arc::END_ID());
           std::shared_ptr<GeomAPI_Pnt2d> anArcStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcStart)->pnt();
           std::shared_ptr<GeomAPI_Pnt2d> anArcEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcEnd)->pnt();
-          std::shared_ptr<GeomAPI_Pnt2d> aSelectedPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttribute)->pnt();
           double aDistSelectedArcStart = aSelectedPnt->distance(anArcStartPnt);
           double aDistSelectedArcEnd = aSelectedPnt->distance(anArcEndPnt);
           if(aDistSelectedArcStart < tolerance || aDistSelectedArcEnd < tolerance) {
@@ -553,10 +553,19 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     // Remove points from set of coincides.
     std::set<FeaturePtr> aNewSetOfCoincides;
     for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
-      if((*anIt)->getKind() == SketchPlugin_Line::ID() ||
-         (*anIt)->getKind() == SketchPlugin_Arc::ID()) {
-        aNewSetOfCoincides.insert(*anIt);
+      if((*anIt)->getKind() != SketchPlugin_Line::ID() &&
+         (*anIt)->getKind() != SketchPlugin_Arc::ID()) {
+           continue;
       }
+      if((*anIt)->getKind() == SketchPlugin_Arc::ID()) {
+        AttributePtr anArcCenter = (*anIt)->attribute(SketchPlugin_Arc::CENTER_ID());
+        std::shared_ptr<GeomAPI_Pnt2d> anArcCenterPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcCenter)->pnt();
+        double aDistSelectedArcCenter = aSelectedPnt->distance(anArcCenterPnt);
+        if(aDistSelectedArcCenter < tolerance) {
+          continue;
+        }
+      }
+      aNewSetOfCoincides.insert(*anIt);
     }
     aCoinsides = aNewSetOfCoincides;
 
