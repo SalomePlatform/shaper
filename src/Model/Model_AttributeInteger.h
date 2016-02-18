@@ -57,7 +57,7 @@ class Model_AttributeInteger : public ModelAPI_AttributeInteger
 
  protected:
   /// Initializes attributes
-  Model_AttributeInteger(TDF_Label& theLabel);
+  Model_AttributeInteger();
 
   friend class Model_Data;
 

@@ -11,9 +11,9 @@
 #include <ModelAPI_Expression.h>
 #include <ModelAPI_Object.h>
 
-Model_AttributeDouble::Model_AttributeDouble(TDF_Label& theLabel)
+Model_AttributeDouble::Model_AttributeDouble()
 {
-  myIsInitialized = true;
+  myIsInitialized = false;
 }
 
 void Model_AttributeDouble::setCalculatedValue(const double theValue)

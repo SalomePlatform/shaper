@@ -68,7 +68,7 @@ class GeomData_Point2D : public GeomDataAPI_Point2D
 
  protected:
   /// Initializes attributes
-  GEOMDATA_EXPORT GeomData_Point2D(TDF_Label& theLabel);
+  GEOMDATA_EXPORT GeomData_Point2D();
 
   friend class Model_Data;
 };

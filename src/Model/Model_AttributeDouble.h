@@ -59,7 +59,7 @@ class Model_AttributeDouble : public ModelAPI_AttributeDouble
 
  protected:
   /// Initializes attributes
-  Model_AttributeDouble(TDF_Label& theLabel);
+  Model_AttributeDouble();
 
   friend class Model_Data;
 };

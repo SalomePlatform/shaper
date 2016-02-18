@@ -73,7 +73,7 @@ class GeomData_Point : public GeomDataAPI_Point
 
  protected:
   /// Initializes attributes
-  GEOMDATA_EXPORT GeomData_Point(TDF_Label& theLabel);
+  GEOMDATA_EXPORT GeomData_Point();
 
   friend class Model_Data;
 };

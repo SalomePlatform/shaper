@@ -15,9 +15,9 @@
 
 #include <cassert>
 
-GeomData_Point2D::GeomData_Point2D(TDF_Label& theLabel)
+GeomData_Point2D::GeomData_Point2D()
 {
-  myIsInitialized = true;
+  myIsInitialized = false;
 }
 
 void GeomData_Point2D::setCalculatedValue(const double theX, const double theY)

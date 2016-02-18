@@ -39,7 +39,13 @@ XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorksh
     myErrorLabel(0),
     myWorkshop(theWorkshop)
 {
+  ModuleBase_ModelWidget* anActiveWidget = activeWidget();
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+  myAcceptAllToolTip = anAcceptAllAction->toolTip();
 
+  QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+  myAcceptToolTip = anOkAction->toolTip();
 }
 
 XGUI_ErrorMgr::~XGUI_ErrorMgr()
@@ -88,7 +94,7 @@ void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
     QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
     bool anEnabled = anError.isEmpty();
     anAcceptAllAction->setEnabled(anEnabled);
-    anAcceptAllAction->setToolTip(anError);
+    anAcceptAllAction->setToolTip(!anEnabled ? anError : myAcceptAllToolTip);
   }
 }
 
@@ -110,6 +116,7 @@ void XGUI_ErrorMgr::updateActionState(QAction* theAction, const QString& theErro
   bool anEnabled = theError.isEmpty();
 
   theAction->setEnabled(anEnabled);
+  theAction->setToolTip(anEnabled ? myAcceptToolTip : theError);
   // some operations have no property panel, so it is important to check that it is not null
   if (myPropertyPanel) {
     // update controls error information

@@ -228,20 +228,25 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
   } else {
     switch (theId) {
       case Accept:
-      case AcceptAll:
+      case AcceptAll: {
         aResult = new QAction(QIcon(":pictures/button_ok.png"), "", theParent);
-        break;
+        aResult->setToolTip("Apply");
+      }
+      break;
       case Abort:
       case AbortAll: {
         aResult = new QAction(QIcon(":pictures/button_cancel.png"), "", theParent);
-        if(theId == Abort) {
+        aResult->setToolTip("Cancel");
+        if (theId == Abort) {
           aResult->setShortcut(QKeySequence(Qt::Key_Escape));
         }
       }
       break;
-      case Help:
+      case Help: {
         aResult = new QAction(QIcon(":pictures/button_help.png"), "", theParent);
-        break;
+        aResult->setToolTip("Help");
+      }
+      break;
       default:
         break;
     }

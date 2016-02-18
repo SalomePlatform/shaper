@@ -20,23 +20,15 @@ static Standard_GUID kInvalidGUID("caee5ce4-34b1-4b29-abcb-685287d18096");
 
 Model_Expression::Model_Expression(TDF_Label& theLabel)
 {
-  myIsInitialized = true;
   if (!theLabel.FindAttribute(TDataStd_Name::GetID(), myText)) {
     myText = TDataStd_Name::Set(theLabel, TCollection_ExtendedString());
-//    myIsInitialized = false;
   }
   if (!theLabel.FindAttribute(TDataStd_Comment::GetID(), myError)) {
     myError = TDataStd_Comment::Set(theLabel, TCollection_ExtendedString());
-//    myIsInitialized = false;
   }
   if (!theLabel.FindAttribute(TDataStd_ExtStringList::GetID(), myUsedParameters)) {
     myUsedParameters = TDataStd_ExtStringList::Set(theLabel);
-//    myIsInitialized = false;
   }
-  // All this attributes should not set myIsInitialized = false.
-  // This attributes are optional and may absent in old files. So this is OK.
-  // The reason to set myIsInitialized = false is only absence of
-  // the value attribute.
 }
 
 void Model_Expression::setText(const std::string& theValue)
@@ -106,7 +98,8 @@ Model_ExpressionDouble::Model_ExpressionDouble(TDF_Label& theLabel)
         }
       }
     }
-  }
+  } else
+    myIsInitialized = true;
 }
 
 void Model_ExpressionDouble::setValue(const double theValue)
@@ -141,7 +134,8 @@ Model_ExpressionInteger::Model_ExpressionInteger(TDF_Label& theLabel)
   if (!theLabel.FindAttribute(TDataStd_Integer::GetID(), myInteger)) {
     myInteger = TDataStd_Integer::Set(theLabel, 0);
     myIsInitialized = false;
-  }
+  } else
+    myIsInitialized = true;
 }
 
 void Model_ExpressionInteger::setValue(const int theValue)

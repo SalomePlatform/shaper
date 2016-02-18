@@ -11,9 +11,9 @@
 #include <ModelAPI_Expression.h>
 #include <ModelAPI_Object.h>
 
-Model_AttributeInteger::Model_AttributeInteger(TDF_Label& theLabel)
+Model_AttributeInteger::Model_AttributeInteger()
 {
-  myIsInitialized = true;
+  myIsInitialized = false;
 }
 
 void Model_AttributeInteger::setCalculatedValue(const int theValue)

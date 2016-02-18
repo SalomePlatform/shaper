@@ -19,6 +19,7 @@
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_AttributeBoolean.h>
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -429,6 +430,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         // do not set a coincidence constraint in the attribute if the feature contains a point
         // with the same coordinates. It is important for line creation in order to do not set
         // the same constraints for the same points, oterwise the result line has zero length.
+        bool isAuxiliaryFeature = false;
         if (getPoint2d(aView, aShape, aX, aY)) {
           setPoint(aX, aY);
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
@@ -437,6 +439,13 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           if (MyFeaturesForCoincedence.contains(myFeature->getKind().c_str())) {
             setConstraintWith(aObject);
             setValueState(Stored); // in case of edge selection, Apply state should also be updated
+
+            FeaturePtr anObjectFeature = ModelAPI_Feature::feature(aObject);
+            std::string anAuxiliaryAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
+            AttributeBooleanPtr anAuxiliaryAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+                                              anObjectFeature->data()->attribute(anAuxiliaryAttribute));
+            if (anAuxiliaryAttr.get())
+              isAuxiliaryFeature = anAuxiliaryAttr->value();
           }
         }
         // it is important to perform updateObject() in order to the current value is 
@@ -446,7 +455,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         // points of the line becomes less than the tolerance. Validator of the line returns
         // false, the line will be aborted, but sketch stays valid.
         updateObject(feature());
-        if (!anOrphanPoint && !anExternal)
+        if (!anOrphanPoint && !anExternal && !isAuxiliaryFeature)
           emit vertexSelected();
         emit focusOutWidget(this);
       }

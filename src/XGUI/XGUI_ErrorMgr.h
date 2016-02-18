@@ -74,6 +74,8 @@ private:
   ModuleBase_IWorkshop* myWorkshop; /// workshop
   QDialog* myErrorDialog; /// contains the error message
   QLabel* myErrorLabel; /// contains an error information
+  QString myAcceptToolTip; /// cached tool tip value for enabled Accept action
+  QString myAcceptAllToolTip; /// cached tool tip value for enabled AcceptAll action
 };
 
 #endif // XGUI_ErrorMgr_H
