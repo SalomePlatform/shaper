@@ -37,6 +37,13 @@
 
 static const int AIS_DEFAULT_WIDTH = 2;
 
+//#define DEBUG_HIDE_COPY_ATTRIBUTE
+
+#ifdef DEBUG_HIDE_COPY_ATTRIBUTE
+#include <ModelAPI_AttributeBoolean.h>
+#include <SketchPlugin_SketchEntity.h>
+#endif
+
 IMPLEMENT_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 
@@ -180,8 +187,20 @@ void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
         }
         return;
       }
+#ifdef DEBUG_HIDE_COPY_ATTRIBUTE
+      else {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+        if (aFeature.get()) {
+          AttributeBooleanPtr aCopyAttr = aFeature->data()->boolean(SketchPlugin_SketchEntity::COPY_ID());
+          if (aCopyAttr.get()) {
+            bool isCopy = aCopyAttr->value();
+            if (isCopy)
+              return;
+          }
+        }
+      }
+#endif
     }
-
 
     GeomShapePtr aShape = theShape;
     if (!aShape.get()) {

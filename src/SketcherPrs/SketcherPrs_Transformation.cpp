@@ -48,6 +48,24 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
 
   int aNbB = anAttrB->size();
   aReadyToDisplay = aNbB > 0;
+
+#ifdef DEBUG_HIDE_COPY_ATTRIBUTE
+  // additional check
+  if (theConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
+    // If it is translation
+    AttributePoint2DPtr aStart = GeomDataAPI_Point2D::getPoint2D(aData,
+                                            SketchPlugin_MultiTranslation::START_POINT_ID());
+    AttributePoint2DPtr aEnd = GeomDataAPI_Point2D::getPoint2D(aData,
+                                            SketchPlugin_MultiTranslation::END_POINT_ID());
+
+    aReadyToDisplay = aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized();
+  }
+  else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
+    // if it is rotation
+    AttributePoint2DPtr aCenter = GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
+    aReadyToDisplay = aCenter.get() && aCenter->isInitialized();
+  }
+#endif
   return aReadyToDisplay;
 }
 
