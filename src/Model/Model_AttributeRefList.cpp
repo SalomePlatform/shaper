@@ -68,7 +68,7 @@ int Model_AttributeRefList::size(const bool theWithEmpty) const
   int aResult = 0;
   const TDF_LabelList& aList = myRef->List();
   for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-    if (!aLIter.Value().IsNull()) aResult++;
+    if (!aLIter.Value().IsNull() && !aLIter.Value().IsRoot()) aResult++;
   }
   return aResult;
 }
@@ -90,7 +90,7 @@ list<ObjectPtr> Model_AttributeRefList::list()
     const TDF_LabelList& aList = myRef->List();
     for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
       ObjectPtr anObj;
-      if (!aLIter.Value().IsNull())
+      if (!aLIter.Value().IsNull() && !aLIter.Value().IsRoot())
         anObj = aDoc->objects()->object(aLIter.Value());
       aResult.push_back(anObj);
     }
@@ -129,10 +129,10 @@ ObjectPtr Model_AttributeRefList::object(const int theIndex, const bool theWithE
     const TDF_LabelList& aList = myRef->List();
     int anIndex = -1;
     for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-      if (theWithEmpty || !aLIter.Value().IsNull())
+      if (theWithEmpty || (!aLIter.Value().IsNull() && !aLIter.Value().IsRoot()))
         anIndex++;
       if (anIndex == theIndex) {
-        if (aLIter.Value().IsNull()) { // null label => null sub
+        if (aLIter.Value().IsNull() || aLIter.Value().IsRoot()) { // null label => null sub
           return ObjectPtr();
         }
         return aDoc->objects()->object(aLIter.Value());
@@ -155,6 +155,8 @@ void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const Objec
         std::shared_ptr<Model_Data> aNewData = 
           std::dynamic_pointer_cast<Model_Data>(theNew->data());
         aNewLab = aNewData->label().Father();
+      } else {
+        aNewLab = aCurrentLab.Root(); // root means null object
       }
       // do the substitution
       ADD_BACK_REF(theNew);
