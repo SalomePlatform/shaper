@@ -60,6 +60,9 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 
   if (isDone)
     updateFocus();
+
+  // we need to forget about previous validation result as the current selection can influence on it
+  clearValidatedCash();
 }
 
 //********************************************************************
