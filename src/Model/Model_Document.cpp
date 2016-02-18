@@ -246,6 +246,7 @@ bool Model_Document::save(
   }
   myTransactionSave = myTransactions.size();
   if (isDone) {  // save also sub-documents if any
+    theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     // iterate all result parts to find all loaded or not yet loaded documents
     std::list<ResultPtr> aPartResults;
     myObjs->allResults(ModelAPI_ResultPart::group(), aPartResults);
