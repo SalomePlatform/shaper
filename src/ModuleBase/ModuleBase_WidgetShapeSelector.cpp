@@ -212,7 +212,10 @@ GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
   if (aType == ModelAPI_AttributeReference::typeId()) {
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    aShape = myWorkshop->module()->findShape(aRefAttr);
+    if (aRefAttr.get() && !aRefAttr->isObject()) {
+      AttributePtr anAttribute = aRefAttr->attr();
+      aShape = myWorkshop->module()->findShape(anAttribute);
+    }
   } else if (aType == ModelAPI_AttributeSelection::typeId()) {
     AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
     aShape = aSelectAttr->value();

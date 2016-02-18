@@ -49,6 +49,9 @@ bool SketcherPrs_Tangent::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_Tangent::updatePoints(double theStep) const
 {
+  if (!IsReadyToDisplay(myConstraint, myPlane))
+    return false;
+
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 

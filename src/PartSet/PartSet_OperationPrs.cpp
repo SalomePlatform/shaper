@@ -257,8 +257,20 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
       std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
         std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttribute);
       for (int i = 0; i < aCurSelList->size(); i++) {
-        GeomShapePtr aShape;
-        addValue(aCurSelList->object(i), aShape, theFeature, theObjectShapes);
+        ObjectPtr anObject = aCurSelList->object(i);
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+        // feature rectangle uses as parameters feature lines, so we should obtain line results
+        if (aFeature.get()) {
+          getResultShapes(aFeature, theWorkshop, theObjectShapes, false);
+        }
+        else {
+          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+          if (aResult.get()) {
+            GeomShapePtr aShape = aResult->shape();
+            if (aShape.get())
+              addValue(aResult, aShape, theFeature, theObjectShapes);
+          }
+        }
       }
     }
     else {
@@ -270,7 +282,8 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
           anObject = anAttr->object();
         }
         else {
-          aShape = PartSet_Tools::findShapeBy2DPoint(anAttr, theWorkshop);
+          AttributePtr anAttribute = anAttr->attr();
+          aShape = PartSet_Tools::findShapeBy2DPoint(anAttribute, theWorkshop);
           // the distance point is not found if the point is selected in the 2nd time
           // TODO: after debug, this check can be removed
           if (!aShape.get())
@@ -294,9 +307,11 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
 
 void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
                                            ModuleBase_IWorkshop* theWorkshop,
-                                           QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+                                           QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes,
+                                           const bool theListShouldBeCleared)
 {
-  theObjectShapes.clear();
+  if (theListShouldBeCleared)
+    theObjectShapes.clear();
 
   if (!theFeature.get())
     return;

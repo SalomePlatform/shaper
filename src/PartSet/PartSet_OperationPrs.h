@@ -100,7 +100,8 @@ private:
   /// \param theObjectShape an output map of objects
   static void getResultShapes(const FeaturePtr& theFeature,
                               ModuleBase_IWorkshop* theWorkshop,
-                              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
+                              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes,
+                              const bool theListShouldBeCleared = true);
 
   /// Fills the map by the feature object and shapes, which should be visuaziled
   /// Gets the active widget, obtain the highlighted presentations if it has such and

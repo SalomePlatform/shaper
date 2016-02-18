@@ -42,9 +42,8 @@ bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_HVDirection::updatePoints(double theStep) const 
 {
-  if (!SketcherPrs_HVDirection::IsReadyToDisplay(myConstraint, myPlane)) {
+  if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
-  }
 
   // Set point of the symbol
   ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
