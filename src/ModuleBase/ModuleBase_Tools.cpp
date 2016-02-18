@@ -18,6 +18,7 @@
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Session.h>
 
 #include <TopoDS_Iterator.hxx>
 
@@ -380,6 +381,30 @@ TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape)
     }
   }
   return aShapeType;
+}
+
+void getParameters(QStringList& theParameters)
+{
+  theParameters.clear();
+
+  SessionPtr aSession = ModelAPI_Session::get();
+  std::list<DocumentPtr> aDocList;
+  DocumentPtr anActiveDocument = aSession->activeDocument();
+  DocumentPtr aRootDocument = aSession->moduleDocument();
+  aDocList.push_back(anActiveDocument);
+  if (anActiveDocument != aRootDocument) {
+    aDocList.push_back(aRootDocument);
+  }
+  std::string aGroupId = ModelAPI_ResultParameter::group();
+  for(std::list<DocumentPtr>::const_iterator it = aDocList.begin(); it != aDocList.end(); ++it) {
+    DocumentPtr aDocument = *it;
+    int aSize = aDocument->size(aGroupId);
+    for (int i = 0; i < aSize; i++) {
+      ObjectPtr anObject = aDocument->object(aGroupId, i);
+      std::string aParameterName = anObject->data()->name();
+      theParameters.append(aParameterName.c_str());
+    }
+  }
 }
 
 } // namespace ModuleBase_Tools

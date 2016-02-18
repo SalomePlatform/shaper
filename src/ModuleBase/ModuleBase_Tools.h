@@ -159,13 +159,17 @@ MODULEBASE_EXPORT Quantity_Color color(const std::string& theSection,
                                        const std::string& theDefault);
 
 
-// Returns the object from the attribute
+/// Returns the object from the attribute
 /// \param theObj an object
 MODULEBASE_EXPORT ObjectPtr getObject(const AttributePtr& theAttribute);
 
-// Returns the object from the attribute
+/// Returns the object from the attribute
 /// \param theObj an object
 MODULEBASE_EXPORT TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape);
+
+/// Returns list of parameters accessible in the active part and partset
+/// \theParameters a list of parameter names
+MODULEBASE_EXPORT void getParameters(QStringList& theParameters);
 
 }
 

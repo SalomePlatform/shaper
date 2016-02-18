@@ -108,6 +108,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
                                const std::string& thePlaceHolder );
   virtual ~ModuleBase_WidgetExprEditor();
 
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
+
   /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 

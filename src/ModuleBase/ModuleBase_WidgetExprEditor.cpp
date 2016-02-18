@@ -236,6 +236,15 @@ ModuleBase_WidgetExprEditor::~ModuleBase_WidgetExprEditor()
 {
 }
 
+void ModuleBase_WidgetExprEditor::activateCustom()
+{
+  ModuleBase_ModelWidget::activateCustom();
+
+  QStringList aParameters;
+  ModuleBase_Tools::getParameters(aParameters);
+  myEditor->setCompletionList(aParameters);
+}
+
 void ModuleBase_WidgetExprEditor::initializeValueByActivate()
 {
 }
