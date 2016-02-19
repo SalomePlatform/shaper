@@ -1221,12 +1221,6 @@ void XGUI_Workshop::deleteObjects()
   if (!(hasFeature || hasParameter))
     return;
 
-  // 1. start operation
-  QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
-  aDescription += " " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
-  ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
-  operationMgr()->startOperation(anOpAction);
-
   // 3. delete objects
   std::set<FeaturePtr> anIgnoredFeatures;
   std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
@@ -1235,9 +1229,17 @@ void XGUI_Workshop::deleteObjects()
   bool doDeleteReferences = true;
   if (isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures,
                                     desktop(), doDeleteReferences)) {
+    // start operation
+    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+    aDescription += " " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
+    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
+    operationMgr()->startOperation(anOpAction);
+
     // It is necessary to clear selection in order to avoid selection changed event during
     // deletion and negative consequences connected with processing of already deleted items
     mySelector->clearSelection();
+
+    // delete and commit/abort operation in model
     if (deleteFeaturesInternal(anObjects, aDirectRefFeatures, aIndirectRefFeatures,
                                anIgnoredFeatures, doDeleteReferences))
       operationMgr()->commitOperation();
@@ -1382,41 +1384,58 @@ bool XGUI_Workshop::isDeleteFeatureWithReferences(const QObjectPtrList& theList,
 {
   doDeleteReferences = true;
 
+  QString aDirectNames, aIndirectNames;
   if (!aDirectRefFeatures.empty()) {
     QStringList aDirectRefNames;
     foreach (const FeaturePtr& aFeature, aDirectRefFeatures)
       aDirectRefNames.append(aFeature->name().c_str());
-    QString aDirectNames = aDirectRefNames.join(", ");
+    aDirectNames = aDirectRefNames.join(", ");
 
     QStringList aIndirectRefNames;
     foreach (const FeaturePtr& aFeature, aIndirectRefFeatures)
       aIndirectRefNames.append(aFeature->name().c_str());
-    QString aIndirectNames = aIndirectRefNames.join(", ");
+    aIndirectNames = aIndirectRefNames.join(", ");
+  }
 
-    bool canReplaceParameters = true;
-    foreach (ObjectPtr aObj, theList) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-      if (!std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult()).get()) { // the feature is not a parameter
-        canReplaceParameters = false;
-        break;
-      }
-    }
+  bool aCanReplaceParameters = !aDirectRefFeatures.empty();
+  QStringList aPartFeatureNames;
+  foreach (ObjectPtr aObj, theList) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    ResultPtr aFirstResult = aFeature->firstResult();
+    std::string aResultGroupName = aFirstResult->groupName();
+    if (aResultGroupName == ModelAPI_ResultPart::group())
+      aPartFeatureNames.append(aFeature->name().c_str());
 
-    QMessageBox aMessageBox(theParent);
-    aMessageBox.setWindowTitle(tr("Delete features"));
-    aMessageBox.setIcon(QMessageBox::Warning);
-    aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-    aMessageBox.setDefaultButton(QMessageBox::No);
+    if (aCanReplaceParameters && aResultGroupName != ModelAPI_ResultParameter::group())
+      aCanReplaceParameters = false;
+  }
+  QString aPartNames = aPartFeatureNames.join(", ");
 
-    QString aText;
-    if (canReplaceParameters) {
-      aText = QString(tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\n%2Or parameters could be replaced by their values.\nWould you like to continue?"))
-          .arg(aDirectNames).arg(aIndirectNames.isEmpty() ? QString() : QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames));
+  QMessageBox aMessageBox(theParent);
+  aMessageBox.setWindowTitle(tr("Delete features"));
+  aMessageBox.setIcon(QMessageBox::Warning);
+  aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+  aMessageBox.setDefaultButton(QMessageBox::No);
+
+  QString aText;
+  if (!aDirectNames.isEmpty() || !aIndirectNames.isEmpty()) {
+    if (aCanReplaceParameters) {
+      aText = QString(tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\nOr parameters could be replaced by their values.\n")
+                      .arg(aDirectNames));
+      if (!aIndirectNames.isEmpty())
+        aText += QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames);
       QPushButton *aReplaceButton = aMessageBox.addButton(tr("Replace"), QMessageBox::ActionRole);
     } else {
-      aText = QString(tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n%2Would you like to continue?"))
-          .arg(aDirectNames).arg(aIndirectNames.isEmpty() ? QString() : QString(tr("Also these features will be deleted: %1.\n")).arg(aIndirectNames));
+      aText = QString(tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n")).arg(aDirectNames);
+      if (!aIndirectNames.isEmpty())
+        aText += QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames);
     }
+  }
+  if (!aPartNames.isEmpty())
+    aText += QString(tr("The following parts will be deleted: %1.\n")).arg(aPartNames);
+
+  if (!aText.isEmpty()) {
+    aText += "Would you like to continue?";
     aMessageBox.setText(aText);
     aMessageBox.exec();
     QMessageBox::ButtonRole aButtonRole = aMessageBox.buttonRole(aMessageBox.clickedButton());
