@@ -21,9 +21,9 @@
 #include <list>
 
 
-static TopoDS_Vertex findStartVertex(const TopoDS_Face& aFace)
+static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape)
 {
-  TopExp_Explorer anExp(aFace, TopAbs_VERTEX);
+  TopExp_Explorer anExp(theShape, TopAbs_VERTEX);
   TopoDS_Vertex aStart = TopoDS::Vertex(anExp.Current());
   gp_Pnt aStartPnt(BRep_Tool::Pnt(aStart));
   TopoDS_Vertex aCurrent;
@@ -86,43 +86,51 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     if (aFClass.PerformInfinitePoint() == TopAbs_IN)
       continue;
 
-    // to make faces equal on different platforms, we will find
-    // a vertex with greater coordinates and start wire from it
-    TopoDS_Vertex aStartVertex = findStartVertex(aFace);
-    TopoDS_Wire aNewWire;
-    aBuilder.MakeWire(aNewWire);
-    std::list<TopoDS_Edge> aSkippedEdges;
-    bool aStartFound = false;
-
-    // remove internal edges from faces and make wire start from found vertex
-    TopExp_Explorer anExp(aFace, TopAbs_EDGE);
-    for (; anExp.More(); anExp.Next()) {
-      if (anExp.Current().Orientation() == TopAbs_INTERNAL)
-        continue;
-      if (!aStartFound) {
-        const TopoDS_Edge& anEdge = TopoDS::Edge(anExp.Current());
-        TopoDS_Vertex aV1, aV2;
-        TopExp::Vertices(anEdge, aV1, aV2);
-        if (aV1.IsSame(aStartVertex) == Standard_True)
-          aStartFound = true;
-        else
-          aSkippedEdges.push_back(anEdge);
-      }
-      if (aStartFound)
-        aBuilder.Add(aNewWire, anExp.Current());
-    }
-    // add skipped edges to the end of wire
-    std::list<TopoDS_Edge>::const_iterator aSkIt = aSkippedEdges.begin();
-    for (; aSkIt != aSkippedEdges.end(); ++aSkIt)
-      aBuilder.Add(aNewWire, *aSkIt);
-
     // rebuild face
     TopoDS_Face aNewFace;
     aBuilder.MakeFace(aNewFace, aPlane, Precision::Confusion());
-    aBuilder.Add(aNewFace, aNewWire);
-    aFace = aNewFace;
+
+    // iterate on wires
+    TopExp_Explorer aWireExp(aFace, TopAbs_WIRE);
+    for (; aWireExp.More(); aWireExp.Next()) {
+      TopoDS_Wire aWire = TopoDS::Wire(aWireExp.Current());
+
+      // to make faces equal on different platforms, we will find
+      // a vertex with greater coordinates and start wire from it
+      TopoDS_Vertex aStartVertex = findStartVertex(aWire);
+
+      TopoDS_Wire aNewWire;
+      aBuilder.MakeWire(aNewWire);
+      std::list<TopoDS_Edge> aSkippedEdges;
+      bool aStartFound = false;
+
+      // remove internal edges from faces and make wire start from found vertex
+      TopExp_Explorer anExp(aWire, TopAbs_EDGE);
+      for (; anExp.More(); anExp.Next()) {
+        if (anExp.Current().Orientation() == TopAbs_INTERNAL)
+          continue;
+        if (!aStartFound) {
+          const TopoDS_Edge& anEdge = TopoDS::Edge(anExp.Current());
+          TopoDS_Vertex aV1, aV2;
+          TopExp::Vertices(anEdge, aV1, aV2);
+          if (aV1.IsSame(aStartVertex) == Standard_True)
+            aStartFound = true;
+          else
+            aSkippedEdges.push_back(anEdge);
+        }
+        if (aStartFound)
+          aBuilder.Add(aNewWire, anExp.Current());
+      }
+      // add skipped edges to the end of wire
+      std::list<TopoDS_Edge>::const_iterator aSkIt = aSkippedEdges.begin();
+      for (; aSkIt != aSkippedEdges.end(); ++aSkIt)
+        aBuilder.Add(aNewWire, *aSkIt);
+
+      aBuilder.Add(aNewFace, aNewWire);
+    }
 
     // store face
+    aFace = aNewFace;
     std::shared_ptr<GeomAPI_Shape> aResFace(new GeomAPI_Shape);
     aResFace->setImpl(new TopoDS_Face(aFace));
     theResultFaces.push_back(aResFace);
