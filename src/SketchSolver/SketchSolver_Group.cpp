@@ -126,7 +126,13 @@ bool SketchSolver_Group::isInteract(FeaturePtr theFeature) const
   if (isEmpty())
     return true;
   // Check interaction with the storage
-  return myStorage->isInteract(theFeature);
+  bool isInteracted = myStorage->isInteract(theFeature);
+  ConstraintConstraintMap::const_iterator anIt = myConstraints.begin();
+  for (; !isInteracted && anIt != myConstraints.end(); ++anIt)
+    if (anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
+        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
+      isInteracted = anIt->second->isUsed(theFeature);
+  return isInteracted;
 }
 
 // ============================================================================

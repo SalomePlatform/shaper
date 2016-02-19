@@ -101,8 +101,7 @@ void SketchSolver_ConstraintMulti::update(bool isForce)
   updateLocal();
   if (isForce)
     myAdjusted = false;
-  // update parent object
-  SketchSolver_Constraint::update();
+  adjustConstraint();
 }
 
 void SketchSolver_ConstraintMulti::adjustConstraint()
@@ -184,4 +183,10 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
   }
 
   myAdjusted = true;
+}
+
+bool SketchSolver_ConstraintMulti::isUsed(FeaturePtr theFeature) const
+{
+  return myFeatures.find(theFeature) != myFeatures.end() ||
+         SketchSolver_Constraint::isUsed(theFeature);
 }

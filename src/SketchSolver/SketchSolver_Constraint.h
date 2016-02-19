@@ -58,9 +58,9 @@ public:
   { return myType; }
 
   /// \brief Verify the feature or any its attribute is used by constraint
-  bool isUsed(FeaturePtr theFeature) const;
+  virtual bool isUsed(FeaturePtr theFeature) const;
   /// \brief Verify the attribute is used by constraint
-  bool isUsed(AttributePtr theAttribute) const;
+  virtual bool isUsed(AttributePtr theAttribute) const;
 
   /// \brief Shows error message
   const std::string& error() const

@@ -36,6 +36,9 @@ public:
   /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
   virtual bool remove();
 
+  /// \brief Check the feature is a source or a copy of Multi-constraint
+  virtual bool isUsed(FeaturePtr theFeature) const;
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process()

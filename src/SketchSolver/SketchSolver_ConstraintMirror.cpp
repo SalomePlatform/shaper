@@ -119,7 +119,7 @@ void SketchSolver_ConstraintMirror::update()
     process();
     return;
   }
-  SketchSolver_Constraint::update();
+  //SketchSolver_Constraint::update();
 }
 
 void SketchSolver_ConstraintMirror::adjustConstraint()
