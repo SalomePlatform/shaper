@@ -24,6 +24,8 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
+#include <cmath>
+
 const double tolerance = 1e-7;
 
 namespace {
