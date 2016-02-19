@@ -455,14 +455,14 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     if (!aStartAttr->isInitialized() || !anEndAttr->isInitialized())
       return;
     // move center and passed point
-    std::shared_ptr<GeomAPI_Pnt2d> aStartPnt = aStartAttr->pnt();
-    std::shared_ptr<GeomAPI_Pnt2d> aEndPnt = anEndAttr->pnt();
+    std::shared_ptr<GeomAPI_XY> aStartPnt = aStartAttr->pnt()->xy();
+    std::shared_ptr<GeomAPI_XY> aEndPnt = anEndAttr->pnt()->xy();
     double aDist = aStartPnt->distance(aEndPnt);
     if (fabs(aDist) < tolerance)
       return;
-    std::shared_ptr<GeomAPI_XY> aDir = aEndPnt->xy()->decreased(aStartPnt->xy());
+    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
     std::shared_ptr<GeomAPI_Dir2d> aMidPerpDir(new GeomAPI_Dir2d(-aDir->y(), aDir->x()));
-    std::shared_ptr<GeomAPI_XY> aMidPnt = aStartPnt->xy()->added(aEndPnt->xy())->multiplied(0.5);
+    std::shared_ptr<GeomAPI_XY> aMidPnt = aStartPnt->added(aEndPnt)->multiplied(0.5);
 
     double anAngle = anAngleAttr->value() * PI / 180.0;
     adjustPeriod(anAngle);
@@ -470,12 +470,21 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       aMidPerpDir->reverse();
 
     double aRadius = aRadiusAttr->value();
-    aDist = sqrt(aRadius * aRadius - aDist * aDist / 4.0);
+    // The center is placed on a perpendicular bisector of a start-end points segment.
+    // If the radius is smaller that necessary, start and end points are moved too.
+    double aDist2 = aRadius * aRadius - aDist * aDist / 4.0;
+    aDist = aDist2 > 0.0 ? sqrt(aDist2) : 0.0;
+    // distance between middle point and start point (does not changed if the arc diameter is greater than start-end distance)
+    aDist2 = sqrt(aRadius * aRadius - aDist * aDist);
 
     std::shared_ptr<GeomAPI_XY> aCenter = aMidPnt->added(aMidPerpDir->xy()->multiplied(aDist));
+    aStartPnt = aMidPnt->added(aDir->xy()->multiplied(-aDist2));
+    aEndPnt = aMidPnt->added(aDir->xy()->multiplied(aDist2));
 
     data()->blockSendAttributeUpdated(true);
     aCenterAttr->setValue(aCenter->x(), aCenter->y());
+    aStartAttr->setValue(aStartPnt->x(), aStartPnt->y());
+    anEndAttr->setValue(aEndPnt->x(), aEndPnt->y());
     updateDependentAttributes();
     data()->blockSendAttributeUpdated(false);
     return;
