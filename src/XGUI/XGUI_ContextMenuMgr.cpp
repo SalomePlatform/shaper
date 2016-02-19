@@ -71,7 +71,7 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = new QAction(QIcon(":pictures/move.png"), XGUI_Workshop::MOVE_TO_END_COMMAND, this);
   addAction("MOVE_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/delete.png"), tr("Clean history"), this);
+  aAction = new QAction(QIcon(":pictures/clean_history.png"), tr("Clean history"), this);
   addAction("CLEAN_HISTORY_CMD", aAction);
 
   aAction = new QAction(QIcon(":pictures/color.png"), tr("Color..."), this);

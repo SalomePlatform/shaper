@@ -9,7 +9,7 @@
      <file>pictures/rebuild.png</file>
      <file>pictures/preferences.png</file>
      <file>pictures/copy.png</file>
-     
+
      <file>pictures/params_folder.png</file>
      <file>pictures/constr_folder.png</file>
      <file>pictures/constr_object.png</file>
@@ -19,7 +19,7 @@
      <file>pictures/properties.png</file>
      <file>pictures/features.png</file>
      <file>pictures/point_ico.png</file>
-     
+
      <file>pictures/x_point.png</file>
      <file>pictures/y_point.png</file>
      <file>pictures/z_point.png</file>
@@ -32,20 +32,21 @@
      <file>pictures/button_ok.png</file>
      <file>pictures/button_ok_error.png</file>
      <file>pictures/button_plus.png</file>
-   
+
      <file>pictures/assembly.png</file>
      <file>pictures/delete.png</file>
      <file>pictures/rename_edit.png</file>
      <file>pictures/eye_pencil.png</file>
      <file>pictures/eye_pencil_closed.png</file>
-   
+     <file>pictures/clean_history.png</file>
+
      <file>pictures/view_prefs.png</file>
      <file>pictures/module.png</file>
      <file>pictures/shading.png</file>
      <file>pictures/wireframe.png</file>
      <file>pictures/expression.png</file>
      <file>pictures/arrow.png</file>
-   
+
      <file>pictures/solid.png</file>
      <file>pictures/compsolid.png</file>
      <file>pictures/compoundofsolids.png</file>
@@ -53,5 +54,7 @@
      <file>pictures/vertex.png</file>
      <file>pictures/face.png</file>
      <file>pictures/compound.png</file>
+     <file>pictures/shell.png</file>
+     <file>pictures/wire.png</file>
  </qresource>
  </RCC>

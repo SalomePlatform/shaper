@@ -90,5 +90,8 @@
      <file>icons/collinear.png</file>
      <file>icons/middlepoint.png</file>
      <file>icons/rectangle.png</file>
+     <file>icons/intersection_point.png</file>
+     <file>icons/intersection.png</file>
+     <file>icons/move_to_end.png</file>
  </qresource>
  </RCC>
