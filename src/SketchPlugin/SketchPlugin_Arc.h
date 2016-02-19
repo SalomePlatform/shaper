@@ -129,6 +129,9 @@ private:
 
   /// Compose constraints to build tangency arc
   void tangencyArcConstraints();
+
+  /// Project end point of arc to the circle
+  void projectEndPoint();
 };
 
 #endif

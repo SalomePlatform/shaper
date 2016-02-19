@@ -523,19 +523,8 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
   }
 
   if (theID == CENTER_ID()) {
-    if (!isFeatureValid())
-      return;
-    if (aCenterAttr->pnt()->distance(aStartAttr->pnt()) < tolerance)
-      return;
-    data()->blockSendAttributeUpdated(true);
-    // compute and change the arc end point
-    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
-        new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
-    std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
-    if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance)
-      anEndAttr->setValue(aProjection);
-    updateDependentAttributes();
-    data()->blockSendAttributeUpdated(false);
+    if (isFeatureValid())
+      projectEndPoint();
     return;
   }
 
@@ -549,6 +538,11 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
   if (anArcType == ARC_TYPE_CENTER_START_END()) {
     if (!isFeatureValid())
       return;
+    if (theID == END_ID() && isStable()) {
+      // The arc is under construction, so its end point projected
+      // on the circle formed by center and start points
+      projectEndPoint();
+    }
     updateDependentAttributes();
   }
   else if (anArcType == ARC_TYPE_THREE_POINTS() &&
@@ -805,4 +799,26 @@ void SketchPlugin_Arc::tangencyArcConstraints()
     if(isUpdateFlushed)
       Events_Loop::loop()->setFlushed(anUpdateEvent, true);
   }
+}
+
+void SketchPlugin_Arc::projectEndPoint()
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(data()->attribute(START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(data()->attribute(END_ID()));
+
+  if (aCenterAttr->pnt()->distance(aStartAttr->pnt()) < tolerance)
+    return;
+  data()->blockSendAttributeUpdated(true);
+  // compute and change the arc end point
+  std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
+      new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
+  std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
+  if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance)
+    anEndAttr->setValue(aProjection);
+  updateDependentAttributes();
+  data()->blockSendAttributeUpdated(false);
 }
