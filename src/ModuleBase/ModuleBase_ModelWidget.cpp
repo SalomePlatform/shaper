@@ -22,6 +22,8 @@
 #include <QLabel>
 #include <QFocusEvent>
 
+//#define DEBUG_VALUE_STATE
+
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const Config_WidgetAPI* theData,
                                                const std::string& theParentId)
@@ -227,11 +229,32 @@ bool ModuleBase_ModelWidget::storeValue()
 
   return isDone;
 }
+#ifdef DEBUG_VALUE_STATE
+std::string getDebugInfo(const ModuleBase_ModelWidget::ValueState& theState)
+{
+  std::string anInfo;
+  switch (theState) {
+    case ModuleBase_ModelWidget::Stored:           anInfo = "Stored          "; break;
+    case ModuleBase_ModelWidget::ModifiedInPP:     anInfo = "ModifiedInPP    "; break;
+    case ModuleBase_ModelWidget::ModifiedInViewer: anInfo = "ModifiedInViewer"; break;
+    case ModuleBase_ModelWidget::Reset:            anInfo = "Reset           "; break;
+    default: break;
+  }
+  return anInfo;
+}
 
-ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState(const ModuleBase_ModelWidget::ValueState& theState)
+#endif
+ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState
+                                         (const ModuleBase_ModelWidget::ValueState& theState)
 {
   ValueState aState = myState;
+
   if (myState != theState && !myIsValueStateBlocked) {
+#ifdef DEBUG_VALUE_STATE
+    qDebug(QString("setValueState: previous state = %1,\t new state = %2")
+           .arg(getDebugInfo(myState).c_str())
+           .arg(getDebugInfo(theState).c_str()).toStdString().c_str());
+#endif
     myState = theState;
     emit valueStateChanged(aState);
   }

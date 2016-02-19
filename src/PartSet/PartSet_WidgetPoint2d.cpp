@@ -56,7 +56,8 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const Config_WidgetAPI* theData,
                                              const std::string& theParentId)
- : ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop)
+: ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop),
+  myValueIsCashed(false), myXValueInCash(0), myYValueInCash(0)
 {
   if (MyFeaturesForCoincedence.isEmpty()) {
     MyFeaturesForCoincedence << SketchPlugin_Line::ID().c_str()
@@ -119,14 +120,24 @@ bool PartSet_WidgetPoint2D::resetCustom()
     aDone = false;
   }
   else {
-    bool isOk;
-    double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
-    // it is important to block the spin box control in order to do not through out the
-    // locking of the validating state.
-    ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
-    ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
-    storeValueCustom();
-    aDone = true;
+    if (myValueIsCashed) {
+      // fill the control widgets by the cashed value
+      restoreCurentValue();
+      // store value to the model
+      storeValueCustom();
+      setValueState(Stored);
+      aDone = false;
+    }
+    else {
+      bool isOk;
+      double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+      // it is important to block the spin box control in order to do not through out the
+      // locking of the validating state.
+      ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
+      ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
+      storeValueCustom();
+      aDone = true;
+    }
   }
   return aDone;
 }
@@ -255,6 +266,24 @@ bool PartSet_WidgetPoint2D::restoreValueCustom()
   //  ModuleBase_Tools::setSpinText(myYSpin, QString::fromStdString(aTextY));
   //}
   return true;
+}
+
+void PartSet_WidgetPoint2D::storeCurentValue()
+{
+  // do not use cash if a variable is used
+  if (myXSpin->hasVariable() || myYSpin->hasVariable())
+    return;
+
+  myValueIsCashed = true;
+  myXValueInCash = myXSpin->value();
+  myYValueInCash = myYSpin->value();
+}
+
+void PartSet_WidgetPoint2D::restoreCurentValue()
+{
+  myValueIsCashed = false;
+  ModuleBase_Tools::setSpinValue(myXSpin, myXValueInCash);
+  ModuleBase_Tools::setSpinValue(myYSpin, myYValueInCash);
 }
 
 QList<QWidget*> PartSet_WidgetPoint2D::getControls() const
@@ -501,6 +530,8 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
 
   double aX, anY;
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, anY);
+  if (myState != ModifiedInViewer)
+    storeCurentValue();
   // we need to block the value state change 
   bool isBlocked = blockValueState(true);
   setPoint(aX, anY);

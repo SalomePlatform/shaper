@@ -117,7 +117,14 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom() const;
 
+  /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom();
+
+  /// Store current value in cashed value
+  void storeCurentValue();
+
+  /// Restore cashed value in the model attribute
+  void restoreCurentValue();
 
   /// Fills the widget with default values
   /// \return true if the widget current value is reset
@@ -182,6 +189,10 @@ private:
   //std::string myOptionParam;  /// Parameter name which has to be taken from previous feature
 
   CompositeFeaturePtr mySketch;
+
+  bool myValueIsCashed; /// boolean state if the value is cashed during value state change
+  double myXValueInCash; /// the cashed X value during value state change
+  double myYValueInCash; /// the cashed Y value during value state change
 };
 
 #endif
