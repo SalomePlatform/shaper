@@ -10,6 +10,7 @@
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintDistance.h"
+#include "SketchPlugin_ConstraintFillet.h"
 #include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
@@ -35,6 +36,7 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomDataAPI_Point2D.h>
 
+#include <algorithm>
 #include <cmath>
 
 const double tolerance = 1.e-7;
@@ -464,17 +466,15 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     return false;
   }
 
-  FeaturePtr aFilletFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  std::shared_ptr<SketchPlugin_ConstraintFillet> aFilletFeature = std::dynamic_pointer_cast<SketchPlugin_ConstraintFillet>(theAttribute->owner());
   AttributeRefAttrListPtr aPointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
   if(aPointsRefList->size() == 0) {
     theError = "Error: List of points is empty.";
     return false;
   }
 
-  AttributeRefAttrListPtr aBasePointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(
-    aFilletFeature->attribute(SketchPlugin_Constraint::ENTITY_C()));
-  AttributeRefListPtr aResultEdgesRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-    aFilletFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  std::list<AttributePtr> aBasePointsList = aFilletFeature->basePoints();
+  std::list<FeaturePtr> aResultEdgesList = aFilletFeature->resultEdges();
 
   std::list<std::pair<ObjectPtr, AttributePtr>> aPointsList = aPointsRefList->list();
   for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
@@ -485,16 +485,18 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     // If we alredy have some result then:
     // - if it is the same point all ok, just skip it
     // - if it is point on the fillet arc then it is not valid
-    if(aBasePointsRefList->size() > 0) {
-      if(aBasePointsRefList->isInList(aPointAttribute)) {
+    if(!aBasePointsList.empty()) {
+      if(std::find(aBasePointsList.begin(), aBasePointsList.end(), aPointAttribute) != aBasePointsList.end()) {
         continue;
       }
 
       // Check that selected point not on the one of the result fillet arc.
-      for(int anIndex = 0; anIndex < aBasePointsRefList->size(); anIndex++) {
-        if(aResultEdgesRefList->size() > 0) {
+      std::list<FeaturePtr>::iterator aResultEdgesIt = aResultEdgesList.begin();
+      for(unsigned int anIndex = 0; anIndex < aBasePointsList.size(); anIndex++) {
+        if(aResultEdgesList.size() > 0) {
           FeaturePtr aResultArc;
-          aResultArc = ModelAPI_Feature::feature(aResultEdgesRefList->object(anIndex * 3 + 2));
+          std::advance(aResultEdgesIt, 2);
+          aResultArc = *aResultEdgesIt++;
           AttributePtr anArcStart = aResultArc->attribute(SketchPlugin_Arc::START_ID());
           AttributePtr anArcEnd = aResultArc->attribute(SketchPlugin_Arc::END_ID());
           std::shared_ptr<GeomAPI_Pnt2d> anArcStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcStart)->pnt();

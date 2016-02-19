@@ -70,13 +70,6 @@ void SketchPlugin_ConstraintFillet::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttrList::typeId());
-  AttributePtr aResultEdgesRefList = data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId()); // Used to store result edges.
-  AttributePtr aBasePointsRefAttrList = data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefAttrList::typeId()); // Used to store base points.
-  // Initialize attribute not applicable for user.
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_C());
-  aResultEdgesRefList->setIsArgument(false);
-  aBasePointsRefAttrList->setIsArgument(false);
 }
 
 void SketchPlugin_ConstraintFillet::execute()
@@ -96,9 +89,7 @@ void SketchPlugin_ConstraintFillet::execute()
     aData->attribute(SketchPlugin_Constraint::VALUE()))->value();
 
   // Check the fillet result edges is not initialized yet.
-  AttributeRefListPtr aResultEdgesRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-    aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  bool anIsNeedNewObjects = aResultEdgesRefList->size() == 0;
+  bool anIsNeedNewObjects = myResultEdges.size() == 0;
 
   // Wait all constraints being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -106,6 +97,7 @@ void SketchPlugin_ConstraintFillet::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
+  std::list<FeaturePtr>::iterator aResultEdgesIt = myResultEdges.begin();
   for(int anIndex = 0; anIndex < aPointsRefList->size(); ++anIndex) {
     std::shared_ptr<GeomDataAPI_Point2D> aFilletPoint2d =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointsRefList->attribute(anIndex));
@@ -182,9 +174,9 @@ void SketchPlugin_ConstraintFillet::execute()
       aResultArc = sketch()->addFeature(SketchPlugin_Arc::ID());
     } else {
       // Obtain features from the list.
-      aResultEdgeA = ModelAPI_Feature::feature(aResultEdgesRefList->object(anIndex * 3));
-      aResultEdgeB = ModelAPI_Feature::feature(aResultEdgesRefList->object(anIndex * 3 + 1));
-      aResultArc = ModelAPI_Feature::feature(aResultEdgesRefList->object(anIndex * 3 + 2));
+      aResultEdgeA = *aResultEdgesIt++;
+      aResultEdgeB = *aResultEdgesIt++;
+      aResultArc = *aResultEdgesIt++;
     }
 
     // Calculate arc attributes
@@ -204,7 +196,7 @@ void SketchPlugin_ConstraintFillet::execute()
         aStartAttr = SketchPlugin_Arc::START_ID();
         aEndAttr = SketchPlugin_Arc::END_ID();
       } else { // wrong argument
-        aResultEdgesRefList->clear();
+        myResultEdges.clear();
         setError("Error: One of the points has wrong coincide feature");
         return;
       }
@@ -291,9 +283,9 @@ void SketchPlugin_ConstraintFillet::execute()
 
     if(anIsNeedNewObjects) {
       // attach new arc to the list
-      aResultEdgesRefList->append(aResultEdgeA->lastResult());
-      aResultEdgesRefList->append(aResultEdgeB->lastResult());
-      aResultEdgesRefList->append(aResultArc->lastResult());
+      myResultEdges.push_back(aResultEdgeA);
+      myResultEdges.push_back(aResultEdgeB);
+      myResultEdges.push_back(aResultArc);
 
       myProducedFeatures.push_back(aResultEdgeA);
       myProducedFeatures.push_back(aResultEdgeB);
@@ -442,14 +434,10 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
     }
 
     // Clear the list of fillet entities.
-    AttributeRefListPtr aResultEdgesRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-      data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
-    aResultEdgesRefList->clear();
+    myResultEdges.clear();
 
     // Clear the list of base points.
-    AttributeRefAttrListPtr aBasePointsRefAttrList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(
-        data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
-    aBasePointsRefAttrList->clear();
+    myBasePoints.clear();
 
     // Clear auxiliary flag on initial objects.
     std::list<FeaturePtr>::const_iterator aFeatureIt;
@@ -606,7 +594,7 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
 
       // Store base point for fillet.
       aBasePoints.insert(aFilletPointAttr);
-      aBasePointsRefAttrList->append(aFilletPointAttr);
+      myBasePoints.push_back(aFilletPointAttr);
 
       // Get base lines for fillet.
       FeaturePtr anOldFeatureA, anOldFeatureB;
