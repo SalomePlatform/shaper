@@ -90,9 +90,8 @@ def checkFillet(theObjects, theRadius):
     print "Check Fillet"
     aLine = []
     anArc = []
-    aSize = theObjects.size()
-    for i in range (0, aSize):
-        feat = ModelAPI_Feature.feature(theObjects.object(i))
+    aSize = len(theObjects)
+    for feat in theObjects:
         assert(feat is not None)
         if (feat.getKind() == "SketchLine"):
             aLine.append(feat)
@@ -184,6 +183,9 @@ aSession.finishOperation()
 aSession.startOperation()
 aFeaturesList = createSketch1(aSketchFeature)
 aSession.finishOperation()
+aSketchSubFeatures = []
+for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
+    aSketchSubFeatures.append(aSketchFeature.subFeature(aSubIndex))
 #=========================================================================
 # Global variables
 #=========================================================================
@@ -200,7 +202,14 @@ aRefAttrA.append(aEndPoint2)
 aRadius = aFillet.real("ConstraintValue")
 aRadius.setValue(FILLET_RADIUS1)
 aFillet.execute()
-aResObjects = aFillet.reflist("ConstraintEntityB")
+aResObjects = []
+for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
+    aSubFeature = aSketchFeature.subFeature(aSubIndex)
+    if aSubFeature not in aSketchSubFeatures:
+        if aSubFeature.getKind() == "SketchLine":
+            aResObjects.insert(0, aSubFeature)
+        elif aSubFeature.getKind() == "SketchArc":
+            aResObjects.append(aSubFeature)
 #=========================================================================
 # Verify the objects of fillet are created
 #=========================================================================
@@ -232,6 +241,9 @@ aSession.finishOperation()
 aSession.startOperation()
 aFeaturesList = createSketch2(aSketchFeature)
 aSession.finishOperation()
+aSketchSubFeatures = []
+for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
+    aSketchSubFeatures.append(aSketchFeature.subFeature(aSubIndex))
 #=========================================================================
 # Create the Fillet
 #=========================================================================
@@ -242,7 +254,14 @@ aRefAttrA.append(aStartPoint1)
 aRadius = aFillet.real("ConstraintValue")
 aRadius.setValue(FILLET_RADIUS1)
 aFillet.execute()
-aResObjects = aFillet.reflist("ConstraintEntityB")
+aResObjects = []
+for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
+    aSubFeature = aSketchFeature.subFeature(aSubIndex)
+    if aSubFeature not in aSketchSubFeatures:
+        if aSubFeature.getKind() == "SketchLine":
+            aResObjects.insert(0, aSubFeature)
+        elif aSubFeature.getKind() == "SketchArc":
+            aResObjects.append(aSubFeature)
 #=========================================================================
 # Verify the objects of fillet are created
 #=========================================================================
