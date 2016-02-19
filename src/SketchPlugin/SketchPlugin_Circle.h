@@ -86,6 +86,9 @@ protected:
 private:
   /// Returns true if all obligatory attributes are initialized
   bool isFeatureValid();
+
+  /// Update coordinates of representation by three points
+  void adjustThreePoints();
 };
 
 #endif

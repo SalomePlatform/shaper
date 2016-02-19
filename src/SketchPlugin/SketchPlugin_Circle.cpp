@@ -24,6 +24,8 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
+const double tolerance = 1e-7;
+
 namespace {
   static const std::string& CIRCLE_TYPE_CENTER_AND_RADIUS()
   {
@@ -117,6 +119,8 @@ void SketchPlugin_Circle::execute()
       aConstr2->setShape(aCircleShape);
       aConstr2->setIsInHistory(false);
       setResult(aConstr2, 1);
+
+      adjustThreePoints();
     }
   }
 }
@@ -218,31 +222,11 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
     if (aType == CIRCLE_TYPE_THREE_POINTS())
       return;
 
-    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
-    if (!aCenterAttr->isInitialized())
-      return;
-    AttributeDoublePtr aRadiusAttr = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(attribute(RADIUS_ID()));
-    if (!aRadiusAttr->isInitialized())
-      return;
-
     // check the execute() was called and the shape was built
     if (!lastResult())
       return;
 
-    data()->blockSendAttributeUpdated(true);
-    std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_POINT_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aThirdPnt =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
-    double aRadius = aRadiusAttr->value();
-    aFirstPnt->setValue(aCenterAttr->x() + aRadius, aCenterAttr->y());
-    aSecondPnt->setValue(aCenterAttr->x(), aCenterAttr->y() + aRadius);
-    aThirdPnt->setValue(aCenterAttr->x() - aRadius, aCenterAttr->y());
-    data()->blockSendAttributeUpdated(false);
+    adjustThreePoints();
   }
   else if (theID == FIRST_POINT_ID() || theID == SECOND_POINT_ID() || theID == THIRD_POINT_ID()) {
     std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
@@ -288,4 +272,34 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
 
     data()->blockSendAttributeUpdated(false);
   }
+}
+
+void SketchPlugin_Circle::adjustThreePoints()
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
+  if (!aCenterAttr->isInitialized())
+    return;
+  AttributeDoublePtr aRadiusAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(attribute(RADIUS_ID()));
+  if (!aRadiusAttr->isInitialized())
+    return;
+
+  data()->blockSendAttributeUpdated(true);
+  std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_POINT_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aThirdPnt =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
+  double aRadius = aRadiusAttr->value();
+
+  if (fabs(aFirstPnt->pnt()->distance(aCenterAttr->pnt()) - aRadius) > tolerance ||
+      fabs(aSecondPnt->pnt()->distance(aCenterAttr->pnt()) - aRadius) > tolerance ||
+      fabs(aThirdPnt->pnt()->distance(aCenterAttr->pnt()) - aRadius) > tolerance) {
+    aFirstPnt->setValue(aCenterAttr->x() + aRadius, aCenterAttr->y());
+    aSecondPnt->setValue(aCenterAttr->x(), aCenterAttr->y() + aRadius);
+    aThirdPnt->setValue(aCenterAttr->x() - aRadius, aCenterAttr->y());
+  }
+  data()->blockSendAttributeUpdated(false);
 }
