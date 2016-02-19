@@ -293,6 +293,11 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();
+
+      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
+      // be changed to the object becomes visible when the shape becomes not empty
+      if (!aHide && aRes.get())
+        aHide = !aRes->shape().get() || aRes->shape()->isNull();
     }
 
 #ifdef DEBUG_RESULT_COMPSOLID
@@ -416,6 +421,10 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       bool isConcealed = aRes && aRes->isConcealed();
       aHide = aRes && aRes->isConcealed();
+      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
+      // be changed to the object becomes visible when the shape becomes not empty
+      if (!aHide && aRes.get())
+        aHide = !aRes->shape().get() || aRes->shape()->isNull();
     }
     if (!aHide) {
       // setDisplayed has to be called in order to synchronize internal state of the object 
