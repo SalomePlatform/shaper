@@ -44,7 +44,7 @@ void Events_Error::throwException(const std::string& theDescription)
 {
 #ifdef THROW_EMPTY_AIS_EXCEPTION
   try {
-    throw std::invalid_argument(theDescription);
+    throw;
   }
   catch (...) {
     Events_Error::send(
