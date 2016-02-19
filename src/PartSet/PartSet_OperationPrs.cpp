@@ -10,6 +10,7 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_Tools.h"
 
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_IModule.h"
@@ -37,8 +38,10 @@
 
 static const int AIS_DEFAULT_WIDTH = 2;
 
-//#define DEBUG_HIDE_COPY_ATTRIBUTE
+//#define DEBUG_EMPTY_SHAPE
 
+// multi-rotation/translation operation
+//#define DEBUG_HIDE_COPY_ATTRIBUTE
 #ifdef DEBUG_HIDE_COPY_ATTRIBUTE
 #include <ModelAPI_AttributeBoolean.h>
 #include <SketchPlugin_SketchEntity.h>
@@ -75,7 +78,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   SetColor(myShapeColor);
   thePresentation->Clear();
 
-  XGUI_Displayer* aDisplayer = workshop(myWorkshop)->displayer();
+  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
 
   // create presentations on the base of the shapes
@@ -84,14 +87,14 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                                         aLast = myFeatureShapes.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = anIt.key();
-    if (!isVisible(aDisplayer, anObject))
-      continue;
     QList<GeomShapePtr> aShapes = anIt.value();
     QList<GeomShapePtr>::const_iterator aShIt = aShapes.begin(), aShLast = aShapes.end();
     for (; aShIt != aShLast; aShIt++) {
       GeomShapePtr aGeomShape = *aShIt;
-      if (!aGeomShape.get())
-        continue;
+      // the shape should not be checked here on empty value because it should be checked in
+      // appendShapeIfVisible() on the step of filling myFeatureShapes list
+      // the reason is to avoid empty AIS object visualized in the viewer
+      //if (!aGeomShape.get()) continue;
       TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
       // change deviation coefficient to provide more precise circle
       ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
@@ -169,23 +172,25 @@ bool isSubObject(const ObjectPtr& theObject, const FeaturePtr& theFeature)
   return isSub;
 }
 
-void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
-              const FeaturePtr& theFeature,
-              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+void PartSet_OperationPrs::addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
+                                    const FeaturePtr& theFeature, ModuleBase_IWorkshop* theWorkshop,
+                                    QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
   if (theObject.get()) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult.get()) {
       ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
       if (aCompsolidResult.get()) {
-        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          ResultPtr aSubResult = aCompsolidResult->subResult(i);
-          if (aSubResult.get()) {
-            GeomShapePtr aShape;
-            addValue(aSubResult, aShape, theFeature, theObjectShapes);
+        if (aCompsolidResult->numberOfSubs() > 0) {
+          for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+            ResultPtr aSubResult = aCompsolidResult->subResult(i);
+            if (aSubResult.get()) {
+              GeomShapePtr aShape;
+              addValue(aSubResult, aShape, theFeature, theWorkshop, theObjectShapes);
+            }
           }
+          return;
         }
-        return;
       }
 #ifdef DEBUG_HIDE_COPY_ATTRIBUTE
       else {
@@ -208,14 +213,31 @@ void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
       if (aResult.get())
         aShape = aResult->shape();
     }
-    if (!isSubObject(theObject, theFeature)) {
+    if (!isSubObject(theObject, theFeature))
+      appendShapeIfVisible(theWorkshop, theObject, aShape, theObjectShapes);
+  }
+}
+
+void PartSet_OperationPrs::appendShapeIfVisible(ModuleBase_IWorkshop* theWorkshop,
+                              const ObjectPtr& theObject,
+                              GeomShapePtr theGeomShape,
+                              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
+{
+  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
+  if (isVisible(aDisplayer, theObject)) {
+    if (theGeomShape.get()) {
       if (theObjectShapes.contains(theObject))
-        theObjectShapes[theObject].append(aShape);
+        theObjectShapes[theObject].append(theGeomShape);
       else {
         QList<GeomShapePtr> aShapes;
-        aShapes.append(aShape);
+        aShapes.append(theGeomShape);
         theObjectShapes[theObject] = aShapes;
       }
+    } else {
+  #ifdef DEBUG_EMPTY_SHAPE
+      qDebug(QString("Empty shape in result, result: %1")
+              .arg(ModuleBase_Tools::objectInfo(theObject)).toStdString().c_str());
+  #endif
     }
   }
 }
@@ -250,7 +272,7 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
         std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
         ResultPtr aResult = aSelAttribute->context();
         GeomShapePtr aShape = aSelAttribute->value();
-        addValue(aResult, aShape, theFeature, theObjectShapes);
+        addValue(aResult, aShape, theFeature, theWorkshop, theObjectShapes);
       }
     }
     if (anAttrType == ModelAPI_AttributeRefList::typeId()) {
@@ -259,7 +281,8 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
       for (int i = 0; i < aCurSelList->size(); i++) {
         ObjectPtr anObject = aCurSelList->object(i);
         FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-        // feature rectangle uses as parameters feature lines, so we should obtain line results
+        // if a feature is stored in the attribute, we should obtain the feature results
+        // e.g. feature rectangle uses parameters feature lines in the attribute
         if (aFeature.get()) {
           getResultShapes(aFeature, theWorkshop, theObjectShapes, false);
         }
@@ -268,7 +291,7 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
           if (aResult.get()) {
             GeomShapePtr aShape = aResult->shape();
             if (aShape.get())
-              addValue(aResult, aShape, theFeature, theObjectShapes);
+              addValue(aResult, aShape, theFeature, theWorkshop, theObjectShapes);
           }
         }
       }
@@ -300,7 +323,7 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
         AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
         anObject = anAttr->value();
       }
-      addValue(anObject, aShape, theFeature, theObjectShapes);
+      addValue(anObject, aShape, theFeature, theWorkshop, theObjectShapes);
     }
   }
 }
@@ -316,26 +339,15 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
   if (!theFeature.get())
     return;
 
-  XGUI_Displayer* aDisplayer = workshop(theWorkshop)->displayer();
+  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
 
   std::list<ResultPtr> aFeatureResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aRIt = aFeatureResults.begin(),
                                        aRLast = aFeatureResults.end();
   for (; aRIt != aRLast; aRIt++) {
     ResultPtr aResult = *aRIt;
-    if (!isVisible(aDisplayer, aResult))
-      continue;
     GeomShapePtr aGeomShape = aResult->shape();
-    if (!aGeomShape.get())
-      continue;
-
-    if (theObjectShapes.contains(aResult))
-      theObjectShapes[aResult].append(aGeomShape);
-    else {
-      QList<GeomShapePtr> aShapes;
-      aShapes.append(aGeomShape);
-      theObjectShapes[aResult] = aShapes;
-    }
+    appendShapeIfVisible(theWorkshop, aResult, aGeomShape, theObjectShapes);
   }
 }
 
@@ -373,14 +385,7 @@ void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorksho
         aGeomShape = aResult->shape();
       }
     }
-
-    if (theObjectShapes.contains(anObject))
-      theObjectShapes[anObject].append(aGeomShape);
-    else {
-      QList<GeomShapePtr> aShapes;
-      aShapes.append(aGeomShape);
-      theObjectShapes[anObject] = aShapes;
-    }
+    appendShapeIfVisible(theWorkshop, anObject, aGeomShape, theObjectShapes);
   }
 }
 
@@ -394,10 +399,4 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
          anAttrType == ModelAPI_AttributeRefAttr::typeId() ||
          anAttrType == ModelAPI_AttributeSelection::typeId() ||
          anAttrType == ModelAPI_AttributeReference::typeId();
-}
-
-XGUI_Workshop* PartSet_OperationPrs::workshop(ModuleBase_IWorkshop* theWorkshop)
-{
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
-  return aConnector->workshop();
 }

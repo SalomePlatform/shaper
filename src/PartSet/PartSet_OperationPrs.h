@@ -30,7 +30,6 @@
 
 DEFINE_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape)
 
-class XGUI_Workshop;
 class XGUI_Displayer;
 
 /**
@@ -116,10 +115,26 @@ private:
   /// \return a boolean value
   static bool isSelectionAttribute(const AttributePtr& theAttribute);
 
-  /// Converts the current workshop to XGUI workshop
-  /// \param theWorkshop an interface workshop
-  /// \return a workshop instance
-  static XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop);
+  /// Appends the shape for the result into the container if the result is visible and
+  /// the shape is not null.
+  /// \param theWorkshop a current workshop
+  /// \param theResult an object to be appended
+  /// \param theGeomShape a shape to be appended
+  /// \param theObjectShapes a filled container
+  static void addValue(const ObjectPtr& theObject, const GeomShapePtr& theShape,
+                const FeaturePtr& theFeature, ModuleBase_IWorkshop* theWorkshop,
+                QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
+
+  /// Appends the shape for the result into the container if the result is visible and
+  /// the shape is not null.
+  /// \param theWorkshop a current workshop
+  /// \param theObject an object to be appended
+  /// \param theGeomShape a shape to be appended
+  /// \param theObjectShapes a filled container
+  static void appendShapeIfVisible(ModuleBase_IWorkshop* theWorkshop,
+                                   const ObjectPtr& theObject,
+                                   GeomShapePtr theGeomShape,
+                                   QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
 
 private:
   QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes; /// visualized shapes
