@@ -74,6 +74,17 @@ public slots:
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 protected:
+  /// Store current value in cashed value
+  void storeCurentValue();
+
+  /// Restore cashed value in the model attribute
+  /// \return boolean state if the restored feature shoud be hidden
+  bool restoreCurentValue();
+
+  /// Fills the widget with default values
+  /// \return true if the widget current value is reset
+  virtual bool resetCustom();
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
@@ -96,6 +107,10 @@ protected:
 
   /// Reference to sketch
   CompositeFeaturePtr mySketch;
+
+  bool myValueIsCashed; /// boolean state if the value is cashed during value state change
+  bool myIsFeatureVisibleInCash; /// boolean value if the feature was visible when cash if filled
+  double myValueInCash; /// the cashed X value during value state change
 };
 
 #endif

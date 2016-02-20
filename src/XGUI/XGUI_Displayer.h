@@ -247,6 +247,13 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
   static int getSelectionMode(int theShapeType);
 
+  /// Return true if the object is visible. If the object is feature, it returns true
+  /// if all results of the feature are shown
+  /// \param theDisplayer a displayer
+  /// \param theObject an object
+  /// \return a boolean value
+  static bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
+
 signals:
   /// Signal on object display
   /// \param theObject a data object

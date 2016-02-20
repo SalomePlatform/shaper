@@ -124,7 +124,8 @@ protected:
   void storeCurentValue();
 
   /// Restore cashed value in the model attribute
-  void restoreCurentValue();
+  /// \return boolean state if the restored feature shoud be hidden
+  bool restoreCurentValue();
 
   /// Fills the widget with default values
   /// \return true if the widget current value is reset
@@ -191,6 +192,7 @@ private:
   CompositeFeaturePtr mySketch;
 
   bool myValueIsCashed; /// boolean state if the value is cashed during value state change
+  bool myIsFeatureVisibleInCash; /// boolean value if the feature was visible when cash if filled
   double myXValueInCash; /// the cashed X value during value state change
   double myYValueInCash; /// the cashed Y value during value state change
 };

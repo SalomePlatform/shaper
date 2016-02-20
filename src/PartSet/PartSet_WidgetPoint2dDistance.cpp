@@ -7,6 +7,10 @@
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
 
+#include <XGUI_Tools.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_Displayer.h>
+
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewWindow.h>
@@ -26,13 +30,32 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              ModuleBase_IWorkshop* theWorkshop,
                                                              const Config_WidgetAPI* theData,
                                                              const std::string& theParentId)
- : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId), myWorkshop(theWorkshop)
+: ModuleBase_WidgetDoubleValue(theParent, theData, theParentId), myWorkshop(theWorkshop),
+  myValueIsCashed(false), myIsFeatureVisibleInCash(true), myValueInCash(0)
 {
   myFirstPntName = theData->getProperty("first_point");
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
 {
+}
+
+bool PartSet_WidgetPoint2dDistance::resetCustom()
+{
+  bool aDone = false;
+  if (!isUseReset() || isComputedDefault() || mySpinBox->hasVariable()) {
+    aDone = false;
+  }
+  else {
+    if (myValueIsCashed) {
+      // if the restored value should be hidden, aDone = true to set
+      // reset state for the widget in the parent
+      aDone = restoreCurentValue();
+    }
+    else
+      aDone = ModuleBase_WidgetDoubleValue::resetCustom();
+  }
+  return aDone;
 }
 
 void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
@@ -115,10 +138,48 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, aY);
 
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
+  if (myState != ModifiedInViewer)
+    storeCurentValue();
+
   bool isBlocked = blockValueState(true);
   setPoint(feature(), aPnt);
   blockValueState(isBlocked);
   setValueState(ModifiedInViewer);
+}
+
+void PartSet_WidgetPoint2dDistance::storeCurentValue()
+{
+  // do not use cash if a variable is used
+  if (mySpinBox->hasVariable())
+    return;
+
+  myValueIsCashed = true;
+  myIsFeatureVisibleInCash = XGUI_Displayer::isVisible(
+                       XGUI_Tools::workshop(myWorkshop)->displayer(), myFeature);
+  myValueInCash = mySpinBox->value();
+}
+
+bool PartSet_WidgetPoint2dDistance::restoreCurentValue()
+{
+  bool aRestoredAndHidden = true;
+
+  bool isVisible = myIsFeatureVisibleInCash;
+  // fill the control widgets by the cashed value
+
+  myValueIsCashed = false;
+  myIsFeatureVisibleInCash = true;
+  ModuleBase_Tools::setSpinValue(mySpinBox, myValueInCash);
+
+  // store value to the model
+  storeValueCustom();
+  if (isVisible) {
+    setValueState(Stored);
+    aRestoredAndHidden = false;
+  }
+  else
+    aRestoredAndHidden = true;
+
+  return aRestoredAndHidden;
 }
 
 bool PartSet_WidgetPoint2dDistance::processEnter()

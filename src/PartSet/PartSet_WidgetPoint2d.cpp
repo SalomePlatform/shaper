@@ -8,6 +8,10 @@
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
 
+#include <XGUI_Tools.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_Displayer.h>
+
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
@@ -57,7 +61,8 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
                                              const Config_WidgetAPI* theData,
                                              const std::string& theParentId)
 : ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop),
-  myValueIsCashed(false), myXValueInCash(0), myYValueInCash(0)
+  myValueIsCashed(false), myIsFeatureVisibleInCash(true),
+  myXValueInCash(0), myYValueInCash(0)
 {
   if (MyFeaturesForCoincedence.isEmpty()) {
     MyFeaturesForCoincedence << SketchPlugin_Line::ID().c_str()
@@ -121,12 +126,9 @@ bool PartSet_WidgetPoint2D::resetCustom()
   }
   else {
     if (myValueIsCashed) {
-      // fill the control widgets by the cashed value
-      restoreCurentValue();
-      // store value to the model
-      storeValueCustom();
-      setValueState(Stored);
-      aDone = false;
+      // if the restored value should be hidden, aDone = true to set
+      // reset state for the widget in the parent
+      aDone = restoreCurentValue();
     }
     else {
       bool isOk;
@@ -275,15 +277,34 @@ void PartSet_WidgetPoint2D::storeCurentValue()
     return;
 
   myValueIsCashed = true;
+  myIsFeatureVisibleInCash = XGUI_Displayer::isVisible(
+                       XGUI_Tools::workshop(myWorkshop)->displayer(), myFeature);
   myXValueInCash = myXSpin->value();
   myYValueInCash = myYSpin->value();
 }
 
-void PartSet_WidgetPoint2D::restoreCurentValue()
+bool PartSet_WidgetPoint2D::restoreCurentValue()
 {
+  bool aRestoredAndHidden = true;
+
+  bool isVisible = myIsFeatureVisibleInCash;
+  // fill the control widgets by the cashed value
+
   myValueIsCashed = false;
+  myIsFeatureVisibleInCash = true;
   ModuleBase_Tools::setSpinValue(myXSpin, myXValueInCash);
   ModuleBase_Tools::setSpinValue(myYSpin, myYValueInCash);
+
+  // store value to the model
+  storeValueCustom();
+  if (isVisible) {
+    setValueState(Stored);
+    aRestoredAndHidden = false;
+  }
+  else
+    aRestoredAndHidden = true;
+
+  return aRestoredAndHidden;
 }
 
 QList<QWidget*> PartSet_WidgetPoint2D::getControls() const

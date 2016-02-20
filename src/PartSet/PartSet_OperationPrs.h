@@ -74,13 +74,6 @@ protected:
   QMap<ObjectPtr, QList<GeomShapePtr> >& featureShapes() { return myFeatureShapes; }
 
 private:
-  /// Return true if the object is visible. If the object is feature, it returns true
-  /// if all results of the feature are shown
-  /// \param theDisplayer a displayer
-  /// \param theObject an object
-  /// \return a boolean value
-  static bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
-
   /// Fills the map by the feature object and shapes, which should be visuaziled
   /// Gets feature attributes, collect objects to whom the attributes refer
   /// \param theFeature a current feature

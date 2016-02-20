@@ -129,39 +129,6 @@ void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
   // the presentation is not used in the selection
 }
 
-bool PartSet_OperationPrs::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& theObject)
-{
-  bool aVisible = false;
-  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aPrs.get() || aResult.get()) {
-    aVisible = theDisplayer->isVisible(theObject);
-    // compsolid is not visualized in the viewer, but should have presentation when all sub solids are
-    // visible. It is useful for highlight presentation where compsolid shape is selectable
-    if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultCompSolid::group()) {
-      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-      if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-        bool anAllSubsVisible = aCompsolidResult->numberOfSubs() > 0;
-        for(int i = 0; i < aCompsolidResult->numberOfSubs() && anAllSubsVisible; i++) {
-          anAllSubsVisible = theDisplayer->isVisible(aCompsolidResult->subResult(i));
-        }
-        aVisible = anAllSubsVisible;
-      }
-    }
-  }
-  else {
-    // check if all results of the feature are visible
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    aVisible = !aResults.empty();
-    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      aVisible = aVisible && theDisplayer->isVisible(*aIt);
-    }
-  }
-  return aVisible;
-}
-
 bool isSubObject(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 {
   bool isSub = false;
@@ -224,7 +191,7 @@ void PartSet_OperationPrs::appendShapeIfVisible(ModuleBase_IWorkshop* theWorksho
                               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
-  if (isVisible(aDisplayer, theObject)) {
+  if (XGUI_Displayer::isVisible(aDisplayer, theObject)) {
     if (theGeomShape.get()) {
       if (theObjectShapes.contains(theObject))
         theObjectShapes[theObject].append(theGeomShape);
