@@ -43,12 +43,7 @@ void Events_Error::send(const std::string& theDescription, const void* theSender
 void Events_Error::throwException(const std::string& theDescription)
 {
 #ifdef THROW_EMPTY_AIS_EXCEPTION
-  try {
-    throw;
-  }
-  catch (...) {
-    Events_Error::send(
-        std::string("An exception: ") + theDescription);
-  }
+  Events_Error::send(
+      std::string("An exception: ") + theDescription);
 #endif
 }
