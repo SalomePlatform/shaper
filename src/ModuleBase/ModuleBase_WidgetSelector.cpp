@@ -58,11 +58,11 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
   // calls validators for the feature and, as a result, updates the Apply button state.
   updateObject(myFeature);
 
-  if (isDone)
-    updateFocus();
-
   // we need to forget about previous validation result as the current selection can influence on it
   clearValidatedCash();
+
+  if (isDone)
+    updateFocus();
 }
 
 //********************************************************************
