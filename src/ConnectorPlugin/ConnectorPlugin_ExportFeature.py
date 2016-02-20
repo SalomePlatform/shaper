@@ -112,7 +112,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             return "EDGE"
         elif shape.isFace():
             return "FACE"
-        
+
         return "SOLID"
 
     ## Creates a group by given list of selected objects and the name
@@ -126,6 +126,11 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         groupType = ""
         for aSelIndex in range(0, aSelectionNum):
             aSelection = theSelectionList.value(aSelIndex)
+            # issue 1326: bodies that are already concealed did not exported, so groups should not be invalid
+            aContext =  ModelAPI.modelAPI_Result(aSelection.context())
+            if aContext is None or aContext.isConcealed() or aContext.isDisabled():
+                continue
+
             anID = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(self.shape, aSelection.value())
             if anID == 0:
                 #it may be a compound of objects if movement of the group to the end
@@ -141,10 +146,10 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
                 Ids.append(anID)
                 groupType = self.shapeType(aSelection.value())
 
-
-        aGroup = self.geompy.CreateGroup(self.brep, self.geompy.ShapeType[groupType])
-        self.geompy.UnionIDs(aGroup,Ids)
-        self.geompy.addToStudyInFather(self.brep, aGroup, theGroupName)
+        if len(Ids) <> 0:
+          aGroup = self.geompy.CreateGroup(self.brep, self.geompy.ShapeType[groupType])
+          self.geompy.UnionIDs(aGroup,Ids)
+          self.geompy.addToStudyInFather(self.brep, aGroup, theGroupName)
 
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):
