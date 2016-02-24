@@ -9,8 +9,8 @@ popd
 
 @SET SRC_DIR=%ROOT_DIR%\sources
 @SET OCC_LIB_PREFIX=d
-@SET NEWGEOM_ROOT_DIR=%ROOT_DIR%\install
-@SET SalomeAppConfig=%ROOT_DIR%\install\share\salome\resources\newgeom;%GUI_ROOT_DIR%\share\salome\resources\gui
+@SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
+@SET SalomeAppConfig=%ROOT_DIR%\install\share\salome\resources\shaper;%GUI_ROOT_DIR%\share\salome\resources\gui
 
 call %SRC_DIR%\env_Salome.bat d
 mkdir %ROOT_DIR%\build-eclipse

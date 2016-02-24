@@ -172,11 +172,11 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM OPENPARTS
-@SET NEWGEOM_ROOT_DIR=%ROOT_DIR%\install
-@SET NEW_GEOM_CONFIG_FILE=%NEWGEOM_ROOT_DIR%\plugins
-@SET PATH=%NEWGEOM_ROOT_DIR%\swig;%NEWGEOM_ROOT_DIR%\plugins;%NEWGEOM_ROOT_DIR%\bin;%PATH%
-@SET PYTHONPATH=%NEWGEOM_ROOT_DIR%\swig;%NEWGEOM_ROOT_DIR%\plugins;%NEWGEOM_ROOT_DIR%\addons;%NEWGEOM_ROOT_DIR%\pythonAPI;%PYTHONPATH%
-@SET NewGeomResources=%NEWGEOM_ROOT_DIR%\resources
+@SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
+@SET NEW_GEOM_CONFIG_FILE=%SHAPER_ROOT_DIR%\plugins
+@SET PATH=%SHAPER_ROOT_DIR%\swig;%SHAPER_ROOT_DIR%\plugins;%SHAPER_ROOT_DIR%\bin;%PATH%
+@SET PYTHONPATH=%SHAPER_ROOT_DIR%\swig;%SHAPER_ROOT_DIR%\plugins;%SHAPER_ROOT_DIR%\addons;%SHAPER_ROOT_DIR%\pythonAPI;%PYTHONPATH%
+@SET SHAPERResources=%SHAPER_ROOT_DIR%\resources
 
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)
