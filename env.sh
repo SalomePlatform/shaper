@@ -18,6 +18,6 @@ fi
 source env_config.sh
 
 # Path to solvespace-2
-export NEWGEOM_PDIR=/dn48/newgeom/common/products
+export SHAPER_PDIR=/dn48/newgeom/common/products
 # Path to install directory
-export NEWGEOM_ROOT_DIR=$(cd .. && pwd)/install
+export SHAPER_ROOT_DIR=$(cd .. && pwd)/install

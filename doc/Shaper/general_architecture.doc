@@ -3,7 +3,7 @@
 
 A Shaper module is made of Workshop (see XGUI_Workshop) which loads a Module (see ModuleBase_IModule), connecting its features with GUI, providing it with services for launching of operations, tools for user inputs and visualisation of results. The Module can consist of one or several plug-ins which provide implementation of Module features. Each plug-in can implement one or several features. These features can be structured by Workbenches within Workshop. Workshop provides introducing of these Workbenches within main window in form of menus or/and tool bars.
 \n
-Workshop interacts with a Module with help of specific interface defined in ModuleBase package. Each module for NewGeom application has to implement ModuleBase_IModile interface.
+Workshop interacts with a Module with help of specific interface defined in ModuleBase package. Each module for SHAPER application has to implement ModuleBase_IModile interface.
 \n
 A Module manages a one document (ModelAPI_Document). This document consists of a one root document and several, loaded by request, sub-documents. Each sub-document can be stored in a single file. 
 \n
@@ -30,11 +30,11 @@ Each sub-document contains a data of a one Part. When the user saves its session
 
 <h2>SALOME module definition</h2>
 
-The NewGeom package allows to launch the application as one of the module of SALOME platform. In that case all user interface elements are integrated into SALOME platform: the \ref Salome package is used for this connection.
+The SHAPERGUI package allows to launch the application as one of the module of SALOME platform. In that case all user interface elements are integrated into SALOME platform: the \ref Salome package is used for this connection.
 \n
 To integrate Shaper into SALOME the next steps are done:
 <ol>
-<li> LightApp_Module class from SALOME GUI LightApp package is redefined (see NewGeom_Module). This redefined class provides a connection between LightApp_Module interface and Workshop object of the application.</li>
+<li> LightApp_Module class from SALOME GUI LightApp package is redefined (see SHAPERGUI). This redefined class provides a connection between LightApp_Module interface and Workshop object of the application.</li>
 <li>Provide Workshop with a <i>SALOME</i> mode of launching in SALOME environment. In this case it is launched without its own main window, 3d viewer and main menu.</li>
 <li>In <i>SALOME</i> mode workshop uses:
   <ol>
@@ -48,9 +48,9 @@ To integrate Shaper into SALOME the next steps are done:
 </li>
 <li>Each workbench is defined as a menu in main menu bar of SALOME desktop and as a tool bar with corresponded title.</li>
 <li>Each feature in the workbench is defined as a menu item in the corresponded menu and a button in the corresponded tool bar.</li>
-<li>Object Browser of SALOME is hidden on activation of NewGEOM and restored on its deactivation.</li>
-<li>Object Browser and Property panel of NewGEOM is shown on activation of the module and hidden on its deactivation.</li>
-<li>Persistent of NewGEOM is compatible with persistent of SALOME. On saving of SALOME study the content of NewGEOM data structure is saved into study also and restored on restoring of study.</li>
+<li>Object Browser of SALOME is hidden on activation of SHAPER and restored on its deactivation.</li>
+<li>Object Browser and Property panel of SHAPER is shown on activation of the module and hidden on its deactivation.</li>
+<li>Persistent of SHAPER is compatible with persistent of SALOME. On saving of SALOME study the content of SHAPERM data structure is saved into study also and restored on restoring of study.</li>
 </ol>
 
 */

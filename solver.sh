@@ -2,7 +2,7 @@
 #
 # Modify plugins.xml to switch solver
 
-export PLUGINS_PATH=${PLUGINS_PATH:-${NEWGEOM_ROOT_DIR}/plugins/plugins.xml}
+export PLUGINS_PATH=${PLUGINS_PATH:-${SHAPER_ROOT_DIR}/plugins/plugins.xml}
 
 while [[ $# > 0 ]]; do
   key="$1"

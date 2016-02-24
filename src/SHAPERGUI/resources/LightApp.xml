@@ -19,19 +19,20 @@
 
 -->
 <document>
-  <section name="NewGeom">
+  <section name="SHAPER">
     <!-- Major module parameters -->
-    <parameter name="name" value="NewGeom"/>
-    <parameter name="icon" value="newgeom.png"/>
+    <parameter name="name" value="Shaper"/>
+    <parameter name="icon" value="shaper.png"/>
     <parameter name="version" value="2.1.2"/>
-    <parameter name="documentation" value="newgeom_help"/>
+    <parameter name="documentation" value="shaper_help"/>
   </section>
-  <section name="newgeom_help" >
+  <section name="shaper_help" >
     <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="Developer's Guide" value="%${NEWGEOM_ROOT_DIR}/doc/tui/index.html"/>
+    <parameter name="Developer's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/tui/SHAPER/index.html"/>
+    <parameter name="User's Guide"      value="%SHAPER_ROOT_DIR%/share/doc/salome/gui/SHAPER/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
-    <parameter name="NewGeom" value="${NEWGEOM_ROOT_DIR}/share/salome/resources/newgeom"/>
+    <parameter name="SHAPER" value="${SHAPER_ROOT_DIR}/share/salome/resources/shaper"/>
   </section>
 </document>

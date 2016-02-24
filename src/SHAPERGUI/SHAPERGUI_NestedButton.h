@@ -5,8 +5,8 @@
  *      Author: sbh
  */
 
-#ifndef SRC_NEWGEOM_NEWGEOM_NESTEDBUTTON_H_
-#define SRC_NEWGEOM_NEWGEOM_NESTEDBUTTON_H_
+#ifndef SRC_SHAPERGUI_NESTEDBUTTON_H_
+#define SRC_SHAPERGUI_NESTEDBUTTON_H_
 
 #include <QWidgetAction>
 
@@ -50,4 +50,4 @@ class SHAPERGUI_NestedButton : public QWidgetAction
   QToolButton* myThisButton; ///< main button
 };
 
-#endif /* SRC_NEWGEOM_NEWGEOM_NESTEDBUTTON_H_ */
+#endif /* SRC_SHAPERGUI_NESTEDBUTTON_H_ */

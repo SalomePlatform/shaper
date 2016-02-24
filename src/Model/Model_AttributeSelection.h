@@ -54,7 +54,7 @@ public:
   
   /// Returns an Id of the selection
   /// NOTE: This method has been added for temporary export of groups towards old GEOM
-  /// It should then be removed when a direct use of objects from NewGeom
+  /// It should then be removed when a direct use of objects from SHAPER
   /// will be possible from SMESH module of SALOME.
   MODEL_EXPORT virtual int Id();
 

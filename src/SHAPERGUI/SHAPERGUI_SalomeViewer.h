@@ -24,7 +24,7 @@ class SUIT_ViewManager;
 
 /**
 * \ingroup Salome
-* A class for providing access of NewGeom functionality to 
+* A class for providing access of SHAPERGUI functionality to 
 * SALOME view window functionality
 */
 class SHAPERGUI_SalomeView: public ModuleBase_IViewWindow
@@ -58,7 +58,7 @@ private:
 
 /**
 * \ingroup Salome
-* A class for providing access of NewGeom functionality to 
+* A class for providing access of SHAPERGUI functionality to 
 * SALOME viewer functionality
 */
 class SHAPERGUI_SalomeViewer : public ModuleBase_IViewer
@@ -102,7 +102,7 @@ Q_OBJECT
   virtual bool enableDrawMode(bool isEnabled);
 
   //! For some signals it disconnects the window from usual signal and connect it to the module ones
-  void reconnectActions(SUIT_ViewWindow* theWindow, const bool theUseNewGeomSlot);
+  void reconnectActions(SUIT_ViewWindow* theWindow, const bool theUseSHAPERSlot);
 
   //! Perfroms the fit all for the active view
   virtual void fitAll();

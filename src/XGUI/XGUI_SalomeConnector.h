@@ -93,7 +93,7 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns QAction instance by command string Id
   virtual QAction* command(const QString& theId) const = 0;
 
-  //! Returns list of defined actions (just by NewGeom module)
+  //! Returns list of defined actions (just by SHAPER module)
   virtual QList<QAction*> commandList() const = 0;
 
   //! Returns list of Ids of defined actions (just by NewGeom module)

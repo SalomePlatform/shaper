@@ -1,7 +1,7 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #
-# NewGeom unit test system
+# SHAPER unit test system
 # How to use:
 # INCLUDE(UnitTest)
 # ...
@@ -54,10 +54,10 @@ MACRO(ADD_UNIT_TESTS)
                COMMAND ${PYTHON_EXECUTABLE} ${aTestFileName})
       if (WIN32) # different path to libraries variable name
         SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH};NEW_GEOM_CONFIG_FILE=${_CONFIG_FILE}")
+               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH};SHAPER_CONFIG_FILE=${_CONFIG_FILE}")
       else()
         SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH};NEW_GEOM_CONFIG_FILE=${_CONFIG_FILE}")
+               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH};SHAPER_CONFIG_FILE=${_CONFIG_FILE}")
       endif()
       # Debug output...
       #MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFileName}")

@@ -1,7 +1,7 @@
 /*!
 \page first_feature_help How to create custom features or plugins
 
-A NewGeom module consists of one or several plug-ins which provide implementation of Module features. To extend the application functionality, developers are able to add their own features into existent plugins. Also, it is possible to create a custom plugin, if necessary. 
+A SHAPER module consists of one or several plug-ins which provide implementation of Module features. To extend the application functionality, developers are able to add their own features into existent plugins. Also, it is possible to create a custom plugin, if necessary. 
 \n
 This document describes the basic principles of plugin/feature system and shows how to use the API for writing a feature or plugin. Currently, the API is available for C++ and Python languages. Plugin, written in C++ is a shared object (dll); For Python, it is regular python module, with *.py extension. 
 \n

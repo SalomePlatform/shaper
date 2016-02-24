@@ -271,7 +271,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
     return myIconsMap[iconName()];
   }
   // Load icon for the presentation
-  char* aEnv = getenv("NEWGEOM_ROOT_DIR");
+  char* aEnv = getenv("SHAPER_ROOT_DIR");
   if (aEnv != NULL) {
     TCollection_AsciiString aFile(aEnv);
     aFile+=FSEP;

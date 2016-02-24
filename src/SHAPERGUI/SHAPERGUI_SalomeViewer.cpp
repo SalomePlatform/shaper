@@ -314,7 +314,7 @@ bool SHAPERGUI_SalomeViewer::enableDrawMode(bool isEnabled)
 
 //**********************************************
 void SHAPERGUI_SalomeViewer::reconnectActions(SUIT_ViewWindow* theWindow,
-                                            const bool theUseNewGeomSlot)
+                                            const bool theUseSHAPERSlot)
 {
   OCCViewer_ViewWindow* aWindow = dynamic_cast<OCCViewer_ViewWindow*>(theWindow);
   if (!aWindow)
@@ -324,7 +324,7 @@ void SHAPERGUI_SalomeViewer::reconnectActions(SUIT_ViewWindow* theWindow,
   if (!anAction)
     return;
 
-  if (theUseNewGeomSlot) {
+  if (theUseSHAPERSlot) {
     anAction->disconnect(anAction, SIGNAL(toggled(bool)),
                          theWindow, SLOT(onTrihedronShow(bool)));
     anAction->connect(anAction, SIGNAL(toggled(bool)),

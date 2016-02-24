@@ -300,12 +300,12 @@ void XGUI_Workshop::initMenu()
   //connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
   //salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
-  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current document into a NewGeom file"),
+  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."), tr("Export the current document into a native file"),
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
 
-  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import NewGeom..."), tr("Import a NewGeom file"),
+  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."), tr("Import native file"),
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
@@ -1128,7 +1128,7 @@ void XGUI_Workshop::hidePropertyPanel()
   // in SALOME mode, workstack made the PyConsole the active window,
   // set the focus on it. As a result, shortcuts of the application, like
   // are processed by this console. For example Undo actions.
-  // It is possible that this code is to be moved to NewGeom package
+  // It is possible that this code is to be moved to SHAPER package
   QMainWindow* aDesktop = desktop();
   ModuleBase_Tools::activateWindow(aDesktop, "XGUI_Workshop::hidePropertyPanel()");
   ModuleBase_Tools::setFocus(aDesktop, "XGUI_Workshop::showPropertyPanel()");

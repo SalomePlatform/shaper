@@ -3,10 +3,10 @@
 # This script uses:
 #
 # INST_ROOT - path of SALOME (env_products.sh)
-# NEWGEOM_PDIR - path of PRODUCTS for NEWGEOM (SolveSpace, lcov)
-# NEWGEOM_ROOT_DIR - path of NEWGEOM installation
+# SHAPER_PDIR - path of PRODUCTS for SHAPER (SolveSpace, lcov)
+# SHAPER_ROOT_DIR - path of SHAPER installation
 
-for path in INST_ROOT NEWGEOM_PDIR NEWGEOM_ROOT_DIR; do
+for path in INST_ROOT SHAPER_PDIR SHAPER_ROOT_DIR; do
   if [[ -z ${!path+x} ]]; then
     echo "${path} not found."; exit 1
   else
@@ -20,25 +20,25 @@ source ${INST_ROOT}/$(cd ${INST_ROOT} && ls *env_products.sh)
 set -u
 
 #------ SolveSpace ------
-export SOLVESPACE_ROOT_DIR=${NEWGEOM_PDIR}/solvespace-2.1
+export SOLVESPACE_ROOT_DIR=${SHAPER_PDIR}/solvespace-2.1
 export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 
 #------ PlaneGCS ------
-export PLANEGCS_ROOT_DIR=${NEWGEOM_PDIR}/planegcs-0.16
+export PLANEGCS_ROOT_DIR=${SHAPER_PDIR}/planegcs-0.16
 export LD_LIBRARY_PATH=${PLANEGCS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 
 #------ Eigen ------
-export EIGEN_ROOT_DIR=${NEWGEOM_PDIR}/eigen-3.2.7
+export EIGEN_ROOT_DIR=${SHAPER_PDIR}/eigen-3.2.7
 ##
 
 #------ Boost ------
-export BOOST_ROOT_DIR=${NEWGEOM_PDIR}/boost-1.52.0
+export BOOST_ROOT_DIR=${SHAPER_PDIR}/boost-1.52.0
 ##
 
 #------ lcov ------
-export LCOV_ROOT_DIR=${NEWGEOM_PDIR}/lcov-1.11
+export LCOV_ROOT_DIR=${SHAPER_PDIR}/lcov-1.11
 export PATH=${LCOV_ROOT_DIR}/bin:${PATH}
 ##
 
@@ -51,9 +51,9 @@ export LIB=${LD_LIBRARY_PATH}
 export PATH=${CASROOT}:${PATH}
 ##
 
-#------ NewGEOM ------
-export PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/plugins:${PATH}
-export PYTHONPATH=${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${NEWGEOM_ROOT_DIR}/addons:${NEWGEOM_ROOT_DIR}/PythonAPI:${PYTHONPATH}
-export LD_LIBRARY_PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
-export NEW_GEOM_CONFIG_FILE=${NEWGEOM_ROOT_DIR}/plugins
-export NewGeomResources=${NEWGEOM_ROOT_DIR}/resources
+#------ SHAPER ------
+export PATH=${SHAPER_ROOT_DIR}/bin:${SHAPER_ROOT_DIR}/plugins:${PATH}
+export PYTHONPATH=${SHAPER_ROOT_DIR}/swig:${SHAPER_ROOT_DIR}/plugins:${SHAPER_ROOT_DIR}/addons:${SHAPER_ROOT_DIR}/PythonAPI:${PYTHONPATH}
+export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/bin:${SHAPER_ROOT_DIR}/swig:${SHAPER_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
+export SHAPER_CONFIG_FILE=${SHAPER_ROOT_DIR}/plugins
+export SHAPERResources=${SHAPER_ROOT_DIR}/resources

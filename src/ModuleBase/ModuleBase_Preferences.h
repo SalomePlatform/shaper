@@ -42,7 +42,7 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   static SUIT_ResourceMgr* resourceMgr();
 
   /// Sets a resource manager
-  /// It is used in case of necessity to define external resource manager (not NewGeom)
+  /// It is used in case of necessity to define external resource manager (not SHAPER)
   /// \param theMgr resource manager
   static void setResourceMgr(SUIT_ResourceMgr* theMgr) { myResourceMgr = theMgr; }
 

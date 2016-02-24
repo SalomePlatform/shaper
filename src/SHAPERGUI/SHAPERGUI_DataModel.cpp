@@ -36,7 +36,7 @@ bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStr
   // If the file is Multi(contain all module files inside), the open SALOME functionality creates
   // these files in a temporary directory. After the open functionality is finished, it removes
   // these files (in the full SALOME mode).
-  // The postponed loading of the files is realized in the NewGEOM module. So, it is important do
+  // The postponed loading of the files is realized in the SHAPER module. So, it is important do
   // not remove the opened files.
   // The following code creates a new tmp directory with a copy of files.
   QString aTmpDir = theFiles.first();

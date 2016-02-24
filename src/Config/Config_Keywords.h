@@ -99,9 +99,6 @@ const static char* PLUGIN_LIBRARY = "library";
 const static char* PLUGIN_SCRIPT = "script";
 const static char* PLUGIN_DEPENDENCY = "dependency";
 
-const static char* PLUGIN_PLATFORM_SALOME = "salome";
-const static char* PLUGIN_PLATFORM_NEWGEOM = "openparts";
-
 /*
  * Hardcoded xml entities of dataModel.xml
  */

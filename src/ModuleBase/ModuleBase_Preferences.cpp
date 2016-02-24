@@ -26,7 +26,7 @@ SUIT_ResourceMgr* ModuleBase_Preferences::myResourceMgr = 0;
 SUIT_ResourceMgr* ModuleBase_Preferences::resourceMgr()
 {
   if (!myResourceMgr) {
-    myResourceMgr = new SUIT_ResourceMgr("NewGeom");
+    myResourceMgr = new SUIT_ResourceMgr("SHAPER");
     myResourceMgr->setCurrentFormat("xml");
   }
   return myResourceMgr;

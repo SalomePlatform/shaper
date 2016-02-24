@@ -114,10 +114,10 @@ Q_OBJECT
     return myProxyViewer;
   }
 
-  //! Returns list of defined actions (just by NewGeom module)
+  //! Returns list of defined actions (just by SHAPER module)
   virtual QList<QAction*> commandList() const;
 
-  //! Returns list of Ids of defined actions (just by NewGeom module)
+  //! Returns list of Ids of defined actions (just by SHAPER module)
   virtual QStringList commandIdList() const;
 
   /// Redefinition of virtual function. 

@@ -96,7 +96,7 @@ private:
 
 //******************************************************
 SHAPERGUI::SHAPERGUI()
-    : LightApp_Module("NewGeom"),
+    : LightApp_Module("SHAPER"),
       mySelector(0), myIsOpened(0), myPopupMgr(0)
 {
   myWorkshop = new XGUI_Workshop(this);
@@ -146,7 +146,7 @@ void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
   // if there are created viewer managers, we should try to create viewer
   // selector and initialize viewer with it. It sets interactive contect to the 
   // proxy viewer. If study is opened, CAM application calls this method before the open() of data model
-  // the NewGeom data model is specific and during open(load) redisplay signals are flushed, so
+  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
   // we need to connect to the viewer before it. Here, it seems the most appropriate place for this
   // according to SALOME architecture.
   if (!mySelector) {

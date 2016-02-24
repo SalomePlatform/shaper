@@ -9,7 +9,7 @@
 
 /**
 * \ingroup Salome
-* Redefinition of standard OCC selector in order to adapt it to NewGeom needs
+* Redefinition of standard OCC selector in order to adapt it to SHAPER needs
 */
 class SHAPERGUI_EXPORT SHAPERGUI_OCCSelector : public LightApp_OCCSelector
 {

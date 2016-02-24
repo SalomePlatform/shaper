@@ -1,4 +1,4 @@
-NewGEOM version 2.0.0
+SHAPER version 2.0.0
 
 Compilation on LINUX:
 =====================
@@ -31,7 +31,7 @@ Or without environment call:
 Compilation on Windows:
 =======================
   cd <sources_directory>
-  buildNewGEOM_rel.bat
+  buildSHAPER_rel.bat
 
 It will launch the Visual Studio 2010. In it build for: "ALL_BUILD" and then "INSTALL" projects.
 Launch:
@@ -43,6 +43,6 @@ For compilation on Windows basing on SALOME products already installed please us
 msvc9_env_Salome.bat
 
 SALOME_ROOT_DIR is needed to be correctly set or located in "SALOME" folder of
-parent to NewGEOM folder. For the current moment SALOME 7.3.0 compiled on
+parent to SHAPER folder. For the current moment SALOME 7.3.0 compiled on
 Visual Studio 2008 compiler is supported.
 
