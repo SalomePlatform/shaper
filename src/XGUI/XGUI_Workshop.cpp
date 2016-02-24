@@ -1305,6 +1305,21 @@ void XGUI_Workshop::cleanHistory()
 
     QString aText = QString(tr("Unused features are the following: %1.\nThese features will be deleted.\nWould you like to continue?")
                    .arg(anUnusedNames));
+    /*QString aText;
+    if (anUnusedNames.isEmpty()) {
+      aMessageBox.setStandardButtons(QMessageBox::Ok);
+      aMessageBox.setDefaultButton(QMessageBox::Ok);
+
+      aText = QString(tr("All features are relevant, there is nothing to be deleted"));
+    }
+    else {
+      aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+      aMessageBox.setDefaultButton(QMessageBox::No);
+
+      aText = QString(tr("Unused features are the following: %1.\nThese features will be deleted.\nWould you like to continue?")
+        .arg(anUnusedNames));
+    }*/
+
     aMessageBox.setText(aText);
     if (aMessageBox.exec() == QMessageBox::No)
       return;
@@ -1321,6 +1336,26 @@ void XGUI_Workshop::cleanHistory()
     else {
       operationMgr()->abortOperation(operationMgr()->currentOperation());
     }
+  }
+  else {
+    QString anActionId = "CLEAN_HISTORY_CMD";
+    QString aDescription = contextMenuMgr()->action(anActionId)->text();
+
+    QMessageBox aMessageBox(desktop());
+    aMessageBox.setWindowTitle(aDescription);
+    aMessageBox.setIcon(QMessageBox::Warning);
+    aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+    aMessageBox.setDefaultButton(QMessageBox::No);
+
+    QString aText;
+    aMessageBox.setStandardButtons(QMessageBox::Ok);
+    aMessageBox.setDefaultButton(QMessageBox::Ok);
+
+    aText = QString(tr("All features are relevant, there is nothing to be deleted"));
+    aMessageBox.setText(aText);
+
+    if (aMessageBox.exec() == QMessageBox::No)
+      return;
   }
 }
 
