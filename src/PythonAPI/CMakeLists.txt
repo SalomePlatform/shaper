@@ -3,8 +3,8 @@
 
 SET(CMAKE_AUTOMOC ON)
 
-INSTALL(DIRECTORY extension geom model examples DESTINATION PythonAPI)
-INSTALL(FILES shaper.py DESTINATION PythonAPI)
+INSTALL(DIRECTORY extension geom model examples DESTINATION ${SHAPER_INSTALL_PYTHON_API})
+INSTALL(FILES shaper.py DESTINATION ${SHAPER_INSTALL_PYTHON_API})
 
 # --------- Unit tests -----------
 INCLUDE(UnitTest)

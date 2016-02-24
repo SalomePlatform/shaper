@@ -15,10 +15,10 @@ INCLUDE(FindSUIT)
 
 IF(UNIX)
   IF(CMAKE_COMPILER_IS_GNUCC)
-    #C++11 is not supported on some platforms, disable it 
+    #C++11 is not supported on some platforms, disable it
     MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    
+
     #Supporting test coverage checks (gcov) in the DEBUG mode
     IF(USE_TEST_COVERAGE)
       INCLUDE(CodeCoverage)
@@ -26,17 +26,39 @@ IF(UNIX)
       SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
       SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
       SET(CMAKE_SHARED_LINKER_FLAGS "-lgcov")
-      
+
       SETUP_TARGET_FOR_COVERAGE(test_coverage  # Name for custom target.
                                 ctest          # Name of the test driver executable that runs the tests.
                                 coverage)      # Name of output directory.
     ENDIF(USE_TEST_COVERAGE)
-    
+
     #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")
     MESSAGE(STATUS "gcc flags are: " ${CMAKE_CXX_FLAGS})
     MESSAGE(STATUS "linker flags are: " ${CMAKE_SHARED_LINKER_FLAGS})
   ENDIF(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(UNIX)
+
+IF(${HAVE_SALOME})
+    SET(SHAPER_INSTALL_ADDONS bin/salome CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_BIN lib/salome CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_PLUGIN_FILES lib/salome CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_PYTHON_API bin/salome CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_PYTHON_FILES bin/salome CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_RESOURCES share/salome/resources/shaper CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_SWIG bin/salome CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_QM_RESOURCES share/salome/resources/shaper CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_XML_RESOURCES share/salome/resources/shaper CACHE INTERNAL "" FORCE)
+ELSE(${HAVE_SALOME})
+    SET(SHAPER_INSTALL_ADDONS addons CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_BIN bin CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_PLUGIN_FILES plugins CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_PYTHON_API PythonAPI CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_PYTHON_FILES plugins CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_RESOURCES resources CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_SWIG swig CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_QM_RESOURCES bin CACHE INTERNAL "" FORCE)
+    SET(SHAPER_INSTALL_XML_RESOURCES plugins CACHE INTERNAL "" FORCE)
+ENDIF(${HAVE_SALOME})
 
 #IF(CMAKE_BUILD_TYPE MATCHES Release)
 ADD_SUBDIRECTORY (doc)

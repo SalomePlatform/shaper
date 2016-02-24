@@ -82,9 +82,9 @@ ENDFOREACH()
 # check default solver in the list of solvers
 LIST(FIND SOLVERS ${DEFAULT_SOLVER} INDEX)
 IF(${INDEX} GREATER -1)
-  MESSAGE(STATUS "Default solver: ${DEFAULT_SOLVER}") 
+  MESSAGE(STATUS "Default solver: ${DEFAULT_SOLVER}")
 ELSE()
-  MESSAGE(FATAL_ERROR "Default solver: ${DEFAULT_SOLVER} is switched off.\nUnset NO_${DEFAULT_SOLVER} variable or define another default solver DEFAULT_SOLVER=<SOLVER> from the list: ${SOLVERS}.") 
+  MESSAGE(FATAL_ERROR "Default solver: ${DEFAULT_SOLVER} is switched off.\nUnset NO_${DEFAULT_SOLVER} variable or define another default solver DEFAULT_SOLVER=<SOLVER> from the list: ${SOLVERS}.")
 ENDIF()
 
 # prepare variables for configuration
@@ -102,5 +102,5 @@ CONFIGURE_FILE(
   "${CMAKE_CURRENT_BINARY_DIR}/plugins.xml"
   )
 
-INSTALL(TARGETS Config DESTINATION bin)
-INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
+INSTALL(TARGETS Config DESTINATION ${SHAPER_INSTALL_BIN})
+INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})

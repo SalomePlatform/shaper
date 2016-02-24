@@ -72,9 +72,9 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
-    ModelAPI 
-    Events 
-    Config 
+    ModelAPI
+    Events
+    Config
     GeomData
     GeomAPI
     GeomAlgoAPI
@@ -101,4 +101,4 @@ INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
 )
 
-INSTALL(TARGETS Model DESTINATION bin)
+INSTALL(TARGETS Model DESTINATION ${SHAPER_INSTALL_BIN})

@@ -52,8 +52,8 @@ export PATH=${CASROOT}:${PATH}
 ##
 
 #------ SHAPER ------
-export PATH=${SHAPER_ROOT_DIR}/bin:${SHAPER_ROOT_DIR}/plugins:${PATH}
-export PYTHONPATH=${SHAPER_ROOT_DIR}/swig:${SHAPER_ROOT_DIR}/plugins:${SHAPER_ROOT_DIR}/addons:${SHAPER_ROOT_DIR}/PythonAPI:${PYTHONPATH}
-export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/bin:${SHAPER_ROOT_DIR}/swig:${SHAPER_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
-export SHAPER_CONFIG_FILE=${SHAPER_ROOT_DIR}/plugins
-export SHAPERResources=${SHAPER_ROOT_DIR}/resources
+export PATH=${SHAPER_ROOT_DIR}/bin/salome:${SHAPER_ROOT_DIR}/lib/salome:${PATH}
+export PYTHONPATH=${SHAPER_ROOT_DIR}//bin/salome:${SHAPER_ROOT_DIR}/lib/salome:${PYTHONPATH}
+export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/bin/salome:${SHAPER_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
+export SHAPER_CONFIG_FILE=${SHAPER_ROOT_DIR}/share/salome/resources/shaper
+export SHAPERResources=${SHAPER_ROOT_DIR}/share/salome/resources/shaper

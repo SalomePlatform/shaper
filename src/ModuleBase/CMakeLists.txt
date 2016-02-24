@@ -24,11 +24,11 @@ SET(PROJECT_HEADERS
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
   ModuleBase_OperationAction.h
-  ModuleBase_OperationDescription.h	
+  ModuleBase_OperationDescription.h
   ModuleBase_OperationFeature.h
   ModuleBase_PageBase.h
   ModuleBase_PageGroupBox.h
-  ModuleBase_PageWidget.h	
+  ModuleBase_PageWidget.h
   ModuleBase_PagedContainer.h
   ModuleBase_ParamIntSpinBox.h
   ModuleBase_ParamSpinBox.h
@@ -80,7 +80,7 @@ SET(PROJECT_SOURCES
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
   ModuleBase_OperationAction.cpp
-  ModuleBase_OperationDescription.cpp	
+  ModuleBase_OperationDescription.cpp
   ModuleBase_OperationFeature.cpp
   ModuleBase_PageBase.cpp
   ModuleBase_PageGroupBox.cpp
@@ -133,7 +133,7 @@ SET(PROJECT_LIBRARIES
 	${ViewerData}
 )
 
-SET(PROJECT_AUTOMOC 
+SET(PROJECT_AUTOMOC
     ${CMAKE_CURRENT_BINARY_DIR}/ModuleBase_automoc.cpp
 )
 
@@ -158,5 +158,4 @@ ADD_DEFINITIONS(-DMODULEBASE_EXPORTS ${CAS_DEFINITIONS})
 ADD_LIBRARY(ModuleBase SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 TARGET_LINK_LIBRARIES(ModuleBase GeomAPI ${PROJECT_LIBRARIES})
 
-INSTALL(TARGETS ModuleBase DESTINATION bin)
-
+INSTALL(TARGETS ModuleBase DESTINATION ${SHAPER_INSTALL_BIN})

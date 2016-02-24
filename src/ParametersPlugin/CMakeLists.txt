@@ -10,7 +10,7 @@ SET(PROJECT_HEADERS
     ParametersPlugin_Validators.h
     ParametersPlugin_EvalListener.h
 )
- 
+
 SET(PROJECT_SOURCES
     ParametersPlugin_Plugin.cpp
     ParametersPlugin_Parameter.cpp
@@ -30,7 +30,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
                     ${SUIT_INCLUDE}
                     ${PYTHON_INCLUDE_DIR}
-) 
+)
 
 MESSAGE(STATUS "PYTHON_LIBRARIES (ParametersPlugin): ${PYTHON_LIBRARIES}")
 
@@ -47,8 +47,8 @@ ADD_LIBRARY(ParametersPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_
 
 TARGET_LINK_LIBRARIES(ParametersPlugin ${PROJECT_LIBRARIES})
 
-INSTALL(TARGETS ParametersPlugin DESTINATION plugins)
-INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
+INSTALL(TARGETS ParametersPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
+INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestParameterCreation.py
                TestParameterRename.py
