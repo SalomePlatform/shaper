@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 
-#ifndef NewGeom_SalomeViewer_H
-#define NewGeom_SalomeViewer_H
+#ifndef SHAPERGUI_SalomeViewer_H
+#define SHAPERGUI_SalomeViewer_H
 
-#include "NewGeom.h"
+#include "SHAPER_SHAPERGUI.h"
 
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
@@ -18,7 +18,7 @@ class SUIT_ViewWindow;
 class QMouseEvent;
 class QKeyEvent;
 
-class NewGeom_OCCSelector;
+class SHAPERGUI_OCCSelector;
 class OCCViewer_Viewer;
 class SUIT_ViewManager;
 
@@ -27,12 +27,12 @@ class SUIT_ViewManager;
 * A class for providing access of NewGeom functionality to 
 * SALOME view window functionality
 */
-class NewGeom_SalomeView: public ModuleBase_IViewWindow
+class SHAPERGUI_SalomeView: public ModuleBase_IViewWindow
 {
 public:
   /// Constructor
   /// \param theViewer a reference to a viewer
-  NewGeom_SalomeView(OCCViewer_Viewer* theViewer);
+  SHAPERGUI_SalomeView(OCCViewer_Viewer* theViewer);
 
   virtual Handle(V3d_View) v3dView() const;
 
@@ -61,15 +61,15 @@ private:
 * A class for providing access of NewGeom functionality to 
 * SALOME viewer functionality
 */
-class NewGeom_SalomeViewer : public ModuleBase_IViewer
+class SHAPERGUI_SalomeViewer : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent object
-  NewGeom_SalomeViewer(QObject* theParent);
+  SHAPERGUI_SalomeViewer(QObject* theParent);
 
-  ~NewGeom_SalomeViewer();
+  ~SHAPERGUI_SalomeViewer();
 
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const;
@@ -117,7 +117,7 @@ Q_OBJECT
 
   /// Set selector
   /// \param theSel a selector instance
-  void setSelector(NewGeom_OCCSelector* theSel);
+  void setSelector(SHAPERGUI_OCCSelector* theSel);
 
   /// Add selection filter to the viewer
   virtual void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
@@ -133,7 +133,7 @@ Q_OBJECT
   virtual void clearSelectionFilters();
 
   /// Returns current selector
-  NewGeom_OCCSelector* selector() const
+  SHAPERGUI_OCCSelector* selector() const
   {
     return mySelector;
   }
@@ -173,8 +173,8 @@ Q_OBJECT
   void onViewPortMapped();
 
  private:
-  NewGeom_OCCSelector* mySelector;
-  NewGeom_SalomeView* myView;
+  SHAPERGUI_OCCSelector* mySelector;
+  SHAPERGUI_SalomeView* myView;
   bool myIsSelectionChanged;
 };
 

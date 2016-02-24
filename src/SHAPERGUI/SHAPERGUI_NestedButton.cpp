@@ -1,11 +1,11 @@
 /*
- * NewGeom_NestedButton.cpp
+ * SHAPERGUI_NestedButton.cpp
  *
  *  Created on: Apr 13, 2015
  *      Author: sbh
  */
 
-#include <NewGeom_NestedButton.h>
+#include <SHAPERGUI_NestedButton.h>
 
 #include <QAction>
 #include <QFrame>
@@ -13,7 +13,7 @@
 #include <QToolButton>
 #include <QEvent>
 
-NewGeom_NestedButton::NewGeom_NestedButton(QObject* theParent,
+SHAPERGUI_NestedButton::SHAPERGUI_NestedButton(QObject* theParent,
                                            const QList<QAction*>& theNestedActions)
 : QWidgetAction(theParent),
   myNestedActions(theNestedActions),
@@ -23,11 +23,11 @@ NewGeom_NestedButton::NewGeom_NestedButton(QObject* theParent,
 {
 }
 
-NewGeom_NestedButton::~NewGeom_NestedButton()
+SHAPERGUI_NestedButton::~SHAPERGUI_NestedButton()
 {
 }
 
-void NewGeom_NestedButton::showAdditionalButtons(bool isShow)
+void SHAPERGUI_NestedButton::showAdditionalButtons(bool isShow)
 {
   myAdditionalButtonsWidget->setVisible(isShow);
   if (isShow) {
@@ -41,7 +41,7 @@ void NewGeom_NestedButton::showAdditionalButtons(bool isShow)
   }
 }
 
-QWidget * NewGeom_NestedButton::createWidget(QWidget * theParent)
+QWidget * SHAPERGUI_NestedButton::createWidget(QWidget * theParent)
 {
   myButtonFrame = new QFrame(theParent);
   QHBoxLayout* aBoxLay = new QHBoxLayout(myButtonFrame);
@@ -77,7 +77,7 @@ QWidget * NewGeom_NestedButton::createWidget(QWidget * theParent)
   return myButtonFrame;
 }
 
-bool NewGeom_NestedButton::event(QEvent* theEvent)
+bool SHAPERGUI_NestedButton::event(QEvent* theEvent)
 {
   if (theEvent->type() == QEvent::ActionChanged) {
     if (myThisButton) {
@@ -89,7 +89,7 @@ bool NewGeom_NestedButton::event(QEvent* theEvent)
 }
 
 
-void NewGeom_NestedButton::actionStateChanged()
+void SHAPERGUI_NestedButton::actionStateChanged()
 {
   if (isEnabled()) {
     QString s = "true";

@@ -1,5 +1,5 @@
 /*
- * NewGeom_NestedButton.h
+ * SHAPERGUI_NestedButton.h
  *
  *  Created on: Apr 13, 2015
  *      Author: sbh
@@ -19,15 +19,15 @@ class QToolButton;
  * \ingroup Salome
  * Custom (nested) button in salome mode.
  */
-class NewGeom_NestedButton : public QWidgetAction
+class SHAPERGUI_NestedButton : public QWidgetAction
 {
   Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent objects
    /// \param theNestedActions a list of nested actions
-  NewGeom_NestedButton(QObject* theParent, const QList<QAction*>& theNestedActions);
-  virtual ~NewGeom_NestedButton();
+  SHAPERGUI_NestedButton(QObject* theParent, const QList<QAction*>& theNestedActions);
+  virtual ~SHAPERGUI_NestedButton();
 
  private slots:
   /// Shows/hides the additional buttons widget

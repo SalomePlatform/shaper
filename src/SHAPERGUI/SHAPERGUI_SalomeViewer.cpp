@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include "NewGeom_SalomeViewer.h"
-#include "NewGeom_OCCSelector.h"
+#include "SHAPERGUI_SalomeViewer.h"
+#include "SHAPERGUI_OCCSelector.h"
 
 #include <OCCViewer_ViewPort3d.h>
 #include <OCCViewer_ViewFrame.h>
@@ -15,14 +15,14 @@
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 
-NewGeom_SalomeView::NewGeom_SalomeView(OCCViewer_Viewer* theViewer)
+SHAPERGUI_SalomeView::SHAPERGUI_SalomeView(OCCViewer_Viewer* theViewer)
 : ModuleBase_IViewWindow(), myCurrentView(0)
 {
   myViewer = theViewer;
 }
 
 
-Handle(V3d_View) NewGeom_SalomeView::v3dView() const
+Handle(V3d_View) SHAPERGUI_SalomeView::v3dView() const
 {
   Handle(V3d_View) aView;
   if (myCurrentView) {
@@ -32,7 +32,7 @@ Handle(V3d_View) NewGeom_SalomeView::v3dView() const
   return aView;
 }
 
-QWidget* NewGeom_SalomeView::viewPort() const
+QWidget* SHAPERGUI_SalomeView::viewPort() const
 {
   QWidget* aViewPort = 0;
   if (myCurrentView) {
@@ -48,13 +48,13 @@ QWidget* NewGeom_SalomeView::viewPort() const
 
 
 
-NewGeom_SalomeViewer::NewGeom_SalomeViewer(QObject* theParent)
+SHAPERGUI_SalomeViewer::SHAPERGUI_SalomeViewer(QObject* theParent)
     : ModuleBase_IViewer(theParent),
       mySelector(0), myView(0), myIsSelectionChanged(false)
 {
 }
 
-NewGeom_SalomeViewer::~NewGeom_SalomeViewer()
+SHAPERGUI_SalomeViewer::~SHAPERGUI_SalomeViewer()
 {
   if (myView)
     delete myView;
@@ -62,7 +62,7 @@ NewGeom_SalomeViewer::~NewGeom_SalomeViewer()
 
 
 //**********************************************
-Handle(AIS_InteractiveContext) NewGeom_SalomeViewer::AISContext() const
+Handle(AIS_InteractiveContext) SHAPERGUI_SalomeViewer::AISContext() const
 {
   if (mySelector && mySelector->viewer())
     return mySelector->viewer()->getAISContext();
@@ -71,7 +71,7 @@ Handle(AIS_InteractiveContext) NewGeom_SalomeViewer::AISContext() const
 }
 
 //**********************************************
-Handle(V3d_Viewer) NewGeom_SalomeViewer::v3dViewer() const
+Handle(V3d_Viewer) SHAPERGUI_SalomeViewer::v3dViewer() const
 {
   if (mySelector)
     return mySelector->viewer()->getViewer3d();
@@ -79,13 +79,13 @@ Handle(V3d_Viewer) NewGeom_SalomeViewer::v3dViewer() const
 }
 
 //**********************************************
-Handle(AIS_Trihedron) NewGeom_SalomeViewer::trihedron() const
+Handle(AIS_Trihedron) SHAPERGUI_SalomeViewer::trihedron() const
 {
   return mySelector->viewer()->getTrihedron();
 }
 
 //**********************************************
-Handle(V3d_View) NewGeom_SalomeViewer::activeView() const
+Handle(V3d_View) SHAPERGUI_SalomeViewer::activeView() const
 {
   if (mySelector) {
     OCCViewer_Viewer* aViewer = mySelector->viewer();
@@ -97,7 +97,7 @@ Handle(V3d_View) NewGeom_SalomeViewer::activeView() const
 }
 
 //**********************************************
-QWidget* NewGeom_SalomeViewer::activeViewPort() const
+QWidget* SHAPERGUI_SalomeViewer::activeViewPort() const
 {
   QWidget* aViewPort;
   if (mySelector) {
@@ -110,7 +110,7 @@ QWidget* NewGeom_SalomeViewer::activeViewPort() const
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
+void SHAPERGUI_SalomeViewer::setSelector(SHAPERGUI_OCCSelector* theSel)
 {
   if (mySelector) {
     if (mySelector == theSel)
@@ -128,7 +128,7 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
   OCCViewer_Viewer* aViewer = mySelector->viewer();
   SUIT_ViewManager* aMgr = aViewer->getViewManager();
 
-  myView = new NewGeom_SalomeView(mySelector->viewer());
+  myView = new SHAPERGUI_SalomeView(mySelector->viewer());
 
   // TODO: Provide ModuleBase_IViewWindow interface
   connect(aMgr, SIGNAL(lastViewClosed(SUIT_ViewManager*)), this, SIGNAL(lastViewClosed()));
@@ -160,21 +160,21 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onSelectionChanged()
+void SHAPERGUI_SalomeViewer::onSelectionChanged()
 {
   // Selection event must be sent only after mouse release
   myIsSelectionChanged = true;
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onMousePress(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
   myView->setCurrentView(theView);
   emit mousePress(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onMouseRelease(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
   myView->setCurrentView(theView);
   emit mouseRelease(myView, theEvent);
@@ -185,21 +185,21 @@ void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow* theView, QMouseEvent*
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
   myView->setCurrentView(theView);
   emit mouseDoubleClick(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
   myView->setCurrentView(theView);
   emit mouseMove(myView, theEvent);
 }
 
 //**********************************************
-bool NewGeom_SalomeViewer::canDragByMouse() const
+bool SHAPERGUI_SalomeViewer::canDragByMouse() const
 {
   OCCViewer_Viewer* aViewer = mySelector->viewer();
   SUIT_ViewWindow* aWnd = aViewer->getViewManager()->getActiveView();
@@ -212,25 +212,25 @@ bool NewGeom_SalomeViewer::canDragByMouse() const
 
 
 //**********************************************
-void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onKeyPress(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
 {
   emit keyPress(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
+void SHAPERGUI_SalomeViewer::onKeyRelease(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
 {
   emit keyRelease(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onTryCloseView(SUIT_ViewWindow*)
+void SHAPERGUI_SalomeViewer::onTryCloseView(SUIT_ViewWindow*)
 {
   emit tryCloseView(myView);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onDeleteView(SUIT_ViewWindow*)
+void SHAPERGUI_SalomeViewer::onDeleteView(SUIT_ViewWindow*)
 {
   if(myWindowScale.contains(myView->v3dView()))
     myWindowScale.remove(myView->v3dView());
@@ -238,7 +238,7 @@ void NewGeom_SalomeViewer::onDeleteView(SUIT_ViewWindow*)
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
+void SHAPERGUI_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
 {
   myView->setCurrentView(theView);
 
@@ -262,14 +262,14 @@ void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onActivated(SUIT_ViewManager* theMgr)
+void SHAPERGUI_SalomeViewer::onActivated(SUIT_ViewManager* theMgr)
 {
   myView->setCurrentView(theMgr->getActiveView());
   emit activated(myView);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
+void SHAPERGUI_SalomeViewer::enableSelection(bool isEnabled)
 {
   if (mySelector)
     if (mySelector->viewer()->isSelectionEnabled() != isEnabled)
@@ -281,7 +281,7 @@ void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
 }
 
 //**********************************************
-bool NewGeom_SalomeViewer::isSelectionEnabled() const
+bool SHAPERGUI_SalomeViewer::isSelectionEnabled() const
 {
   if (mySelector)
     return mySelector->viewer()->isSelectionEnabled();
@@ -289,14 +289,14 @@ bool NewGeom_SalomeViewer::isSelectionEnabled() const
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::enableMultiselection(bool isEnable)
+void SHAPERGUI_SalomeViewer::enableMultiselection(bool isEnable)
 {
   if (mySelector)
     mySelector->viewer()->enableMultiselection(isEnable);
 }
 
 //**********************************************
-bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
+bool SHAPERGUI_SalomeViewer::isMultiSelectionEnabled() const
 {
   if (mySelector)
     return mySelector->viewer()->isMultiSelectionEnabled();
@@ -304,7 +304,7 @@ bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
 }
 
 //**********************************************
-bool NewGeom_SalomeViewer::enableDrawMode(bool isEnabled)
+bool SHAPERGUI_SalomeViewer::enableDrawMode(bool isEnabled)
 {
   // TODO: Has to be replaced when SALOME patch become available
   if (mySelector)
@@ -313,7 +313,7 @@ bool NewGeom_SalomeViewer::enableDrawMode(bool isEnabled)
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::reconnectActions(SUIT_ViewWindow* theWindow,
+void SHAPERGUI_SalomeViewer::reconnectActions(SUIT_ViewWindow* theWindow,
                                             const bool theUseNewGeomSlot)
 {
   OCCViewer_ViewWindow* aWindow = dynamic_cast<OCCViewer_ViewWindow*>(theWindow);
@@ -339,7 +339,7 @@ void NewGeom_SalomeViewer::reconnectActions(SUIT_ViewWindow* theWindow,
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::fitAll()
+void SHAPERGUI_SalomeViewer::fitAll()
 {
   if (mySelector) {
     SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
@@ -351,7 +351,7 @@ void NewGeom_SalomeViewer::fitAll()
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double theZ, double theTwist)
+void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY, double theZ, double theTwist)
 {
   if (!mySelector) 
     return;
@@ -372,7 +372,7 @@ void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double th
 }
 
 //***************************************
-void NewGeom_SalomeViewer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+void SHAPERGUI_SalomeViewer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
@@ -381,7 +381,7 @@ void NewGeom_SalomeViewer::addSelectionFilter(const Handle(SelectMgr_Filter)& th
 }
 
 //***************************************
-void NewGeom_SalomeViewer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+void SHAPERGUI_SalomeViewer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
@@ -390,7 +390,7 @@ void NewGeom_SalomeViewer::removeSelectionFilter(const Handle(SelectMgr_Filter)&
 }
 
 //***************************************
-bool NewGeom_SalomeViewer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+bool SHAPERGUI_SalomeViewer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   bool aFoundFilter = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -405,7 +405,7 @@ bool NewGeom_SalomeViewer::hasSelectionFilter(const Handle(SelectMgr_Filter)& th
 }
 
 //***************************************
-void NewGeom_SalomeViewer::clearSelectionFilters()
+void SHAPERGUI_SalomeViewer::clearSelectionFilters()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
@@ -414,7 +414,7 @@ void NewGeom_SalomeViewer::clearSelectionFilters()
 }
 
 //***************************************
-void NewGeom_SalomeViewer::update()
+void SHAPERGUI_SalomeViewer::update()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
@@ -423,19 +423,19 @@ void NewGeom_SalomeViewer::update()
 }
 
 //***************************************
-void NewGeom_SalomeViewer::onViewTransformed(OCCViewer_ViewWindow::OperationType theType)
+void SHAPERGUI_SalomeViewer::onViewTransformed(OCCViewer_ViewWindow::OperationType theType)
 {
   emit viewTransformed((int) theType);
 }
 
 //***************************************
-void NewGeom_SalomeViewer::onViewPortMapped()
+void SHAPERGUI_SalomeViewer::onViewPortMapped()
 {
   emit trihedronVisibilityChanged(true);
 }
 
 //***************************************
-void NewGeom_SalomeViewer::activateViewer(bool toActivate)
+void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
 {
   if (!mySelector || !mySelector->viewer())
     return;
@@ -460,7 +460,7 @@ void NewGeom_SalomeViewer::activateViewer(bool toActivate)
   }
 }
 
-void NewGeom_SalomeViewer::Zfitall()
+void SHAPERGUI_SalomeViewer::Zfitall()
 {
   if (!mySelector || !mySelector->viewer())
     return;

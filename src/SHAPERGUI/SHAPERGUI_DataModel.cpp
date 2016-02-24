@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include "NewGeom_DataModel.h"
-#include "NewGeom_Module.h"
+#include "SHAPERGUI_DataModel.h"
+#include "SHAPERGUI.h"
 
 #include <XGUI_Workshop.h>
 
@@ -16,16 +16,16 @@
 #include <QFile>
 #include <QDir>
 
-NewGeom_DataModel::NewGeom_DataModel(NewGeom_Module* theModule)
+SHAPERGUI_DataModel::SHAPERGUI_DataModel(SHAPERGUI* theModule)
     : LightApp_DataModel(theModule), myStudyPath(""), myModule(theModule)
 {
 }
 
-NewGeom_DataModel::~NewGeom_DataModel()
+SHAPERGUI_DataModel::~SHAPERGUI_DataModel()
 {
 }
 
-bool NewGeom_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStringList theFiles)
+bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStringList theFiles)
 {
   LightApp_DataModel::open( thePath, theStudy, theFiles );
   if (theFiles.size() == 0)
@@ -70,7 +70,7 @@ bool NewGeom_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStrin
   return true;
 }
 
-bool NewGeom_DataModel::save(QStringList& theFiles)
+bool SHAPERGUI_DataModel::save(QStringList& theFiles)
 {
   LightApp_DataModel::save( theFiles );
   XGUI_Workshop* aWorkShop = myModule->workshop();
@@ -100,13 +100,13 @@ bool NewGeom_DataModel::save(QStringList& theFiles)
   return true;
 }
 
-bool NewGeom_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QStringList& theFiles)
+bool SHAPERGUI_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QStringList& theFiles)
 {
   myStudyPath = thePath;
   return save(theFiles);
 }
 
-bool NewGeom_DataModel::close()
+bool SHAPERGUI_DataModel::close()
 {
   myModule->workshop()->closeDocument();
   removeDirectory(myTmpDirectory);
@@ -114,30 +114,30 @@ bool NewGeom_DataModel::close()
   return LightApp_DataModel::close();
 }
 
-bool NewGeom_DataModel::create(CAM_Study* theStudy)
+bool SHAPERGUI_DataModel::create(CAM_Study* theStudy)
 {
   return true;
 }
 
-bool NewGeom_DataModel::isModified() const
+bool SHAPERGUI_DataModel::isModified() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   return aMgr->isModified();
 }
 
-bool NewGeom_DataModel::isSaved() const
+bool SHAPERGUI_DataModel::isSaved() const
 {
   return !isModified();
 }
 
-void NewGeom_DataModel::update(LightApp_DataObject* theObj, LightApp_Study* theStudy)
+void SHAPERGUI_DataModel::update(LightApp_DataObject* theObj, LightApp_Study* theStudy)
 {
   // Nothing to do here: we always keep the data tree in the up-to-date state
   // The only goal of this method is to hide default behavior from LightApp_DataModel
   return;
 }
 
-void NewGeom_DataModel::initRootObject()
+void SHAPERGUI_DataModel::initRootObject()
 {
   LightApp_Study* study = dynamic_cast<LightApp_Study*>( module()->application()->activeStudy() );
   CAM_ModuleObject *aModelRoot = dynamic_cast<CAM_ModuleObject*>(root());
@@ -148,7 +148,7 @@ void NewGeom_DataModel::initRootObject()
   }
 }
 
-void NewGeom_DataModel::removeDirectory(const QString& theDirectoryName)
+void SHAPERGUI_DataModel::removeDirectory(const QString& theDirectoryName)
 {
   Qtx::rmDir(theDirectoryName);
 }

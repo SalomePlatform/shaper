@@ -18,7 +18,7 @@ class ModuleBase_IViewWindow;
 /**
  * \ingroup GUI
  * A Base object for definition of connector object to
- * Salome Viewer. Reimplemented in NewGeom_SalomeViewer class
+ * Salome Viewer. Reimplemented in SHAPERGUI_SalomeViewer class
  */
 class MODULEBASE_EXPORT ModuleBase_IViewer : public QObject
 {

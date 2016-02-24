@@ -1,19 +1,19 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#ifndef NewGeom_H
-#define NewGeom_H
+#ifndef SHAPER_SHAPERGUI_H
+#define SHAPER_SHAPERGUI_H
 
-#if defined NewGeom_EXPORTS
+#if defined SHAPERGUI_EXPORTS
 #if defined WIN32
-#define NewGeom_EXPORT     __declspec( dllexport )
+#define SHAPERGUI_EXPORT     __declspec( dllexport )
 #else
-#define NewGeom_EXPORT
+#define SHAPERGUI_EXPORT
 #endif
 #else
 #if defined WIN32
-#define NewGeom_EXPORT     __declspec( dllimport )
+#define SHAPERGUI_EXPORT     __declspec( dllimport )
 #else
-#define NewGeom_EXPORT
+#define SHAPERGUI_EXPORT
 #endif
 #endif
 

@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 
-#include "NewGeom_Module.h"
-#include "NewGeom_DataModel.h"
-#include "NewGeom_OCCSelector.h"
-#include <NewGeom_NestedButton.h>
+#include "SHAPERGUI.h"
+#include "SHAPERGUI_DataModel.h"
+#include "SHAPERGUI_OCCSelector.h"
+#include <SHAPERGUI_NestedButton.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_PropertyPanel.h>
@@ -47,12 +47,12 @@
 
 
 extern "C" {
-NewGeom_EXPORT CAM_Module* createModule()
+SHAPERGUI_EXPORT CAM_Module* createModule()
 {
-  return new NewGeom_Module();
+  return new SHAPERGUI();
 }
 
-NewGeom_EXPORT char* getModuleVersion()
+SHAPERGUI_EXPORT char* getModuleVersion()
 {
   return (char*)"0.0";
 }
@@ -61,13 +61,13 @@ NewGeom_EXPORT char* getModuleVersion()
 /** 
 * Class for preferences management
 */
-class NewGeom_PrefMgr: public ModuleBase_IPrefMgr
+class SHAPERGUI_PrefMgr: public ModuleBase_IPrefMgr
 {
 public:
   /// Constructor
   /// \param theMgr preferences manager of SALOME
   /// \param theModName name of the module
-  NewGeom_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
+  SHAPERGUI_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
 
   virtual int addPreference(const QString& theLbl, int pId, 
                             SUIT_PreferenceMgr::PrefItemType theType,
@@ -95,7 +95,7 @@ private:
 
 
 //******************************************************
-NewGeom_Module::NewGeom_Module()
+SHAPERGUI::SHAPERGUI()
     : LightApp_Module("NewGeom"),
       mySelector(0), myIsOpened(0), myPopupMgr(0)
 {
@@ -103,19 +103,19 @@ NewGeom_Module::NewGeom_Module()
   connect(myWorkshop, SIGNAL(commandStatusUpdated()),
           this, SLOT(onUpdateCommandStatus()));
 
-  myProxyViewer = new NewGeom_SalomeViewer(this);
+  myProxyViewer = new SHAPERGUI_SalomeViewer(this);
 
   ModuleBase_Preferences::setResourceMgr(application()->resourceMgr());
   ModuleBase_Preferences::loadCustomProps();
 }
 
 //******************************************************
-NewGeom_Module::~NewGeom_Module()
+SHAPERGUI::~SHAPERGUI()
 {
 }
 
 //******************************************************
-void NewGeom_Module::initialize(CAM_Application* theApp)
+void SHAPERGUI::initialize(CAM_Application* theApp)
 {
   LightApp_Module::initialize(theApp);
   inspectSalomeModules();
@@ -129,19 +129,19 @@ void NewGeom_Module::initialize(CAM_Application* theApp)
 }
 
 //******************************************************
-void NewGeom_Module::windows(QMap<int, int>& theWndMap) const
+void SHAPERGUI::windows(QMap<int, int>& theWndMap) const
 {
   theWndMap.insert(LightApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea);
 }
 
 //******************************************************
-void NewGeom_Module::viewManagers(QStringList& theList) const
+void SHAPERGUI::viewManagers(QStringList& theList) const
 {
   theList.append(OCCViewer_Viewer::Type());
 }
 
 //******************************************************
-void NewGeom_Module::connectToStudy(CAM_Study* theStudy)
+void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
 {
   // if there are created viewer managers, we should try to create viewer
   // selector and initialize viewer with it. It sets interactive contect to the 
@@ -160,10 +160,10 @@ void NewGeom_Module::connectToStudy(CAM_Study* theStudy)
 }
 
 //******************************************************
-bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
+bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
 {
   bool isDone = LightApp_Module::activateModule(theStudy);
-  NewGeom_DataModel* aDataModel = dynamic_cast<NewGeom_DataModel*>(dataModel());
+  SHAPERGUI_DataModel* aDataModel = dynamic_cast<SHAPERGUI_DataModel*>(dataModel());
   aDataModel->initRootObject();
 
   if (isDone) {
@@ -248,7 +248,7 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
 }
 
 //******************************************************
-bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
+bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
 {
   myProxyViewer->activateViewer(false);
   setMenuShown(false);
@@ -292,7 +292,7 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 }
 
 //******************************************************
-void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
+void SHAPERGUI::onViewManagerAdded(SUIT_ViewManager* theMgr)
 {
   if (!mySelector) {
     mySelector = createSelector(theMgr);
@@ -302,7 +302,7 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
 }
 
 //******************************************************
-void NewGeom_Module::onViewManagerRemoved(SUIT_ViewManager* theMgr)
+void SHAPERGUI::onViewManagerRemoved(SUIT_ViewManager* theMgr)
 {
   if (mySelector) {
     if (theMgr->getType() == OCCViewer_Viewer::Type()) {
@@ -324,7 +324,7 @@ void NewGeom_Module::onViewManagerRemoved(SUIT_ViewManager* theMgr)
 }
 
 //******************************************************
-QtxPopupMgr* NewGeom_Module::popupMgr()
+QtxPopupMgr* SHAPERGUI::popupMgr()
 {
   if (!myPopupMgr)
     myPopupMgr = new QtxPopupMgr( 0, this );
@@ -332,7 +332,7 @@ QtxPopupMgr* NewGeom_Module::popupMgr()
 }
 
 //******************************************************
-void NewGeom_Module::onDefaultPreferences()
+void SHAPERGUI::onDefaultPreferences()
 {
   // reset main resources
   ModuleBase_Preferences::resetResourcePreferences(preferences());
@@ -343,17 +343,17 @@ void NewGeom_Module::onDefaultPreferences()
 }
 
 //******************************************************
-void NewGeom_Module::onUpdateCommandStatus()
+void SHAPERGUI::onUpdateCommandStatus()
 {
   getApp()->updateActions();
 }
 
 //******************************************************
-NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
+SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
 {
   if (theMgr->getType() == OCCViewer_Viewer::Type()) {
     OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
-    NewGeom_OCCSelector* aSelector = new NewGeom_OCCSelector(aViewer, getApp()->selectionMgr());
+    SHAPERGUI_OCCSelector* aSelector = new SHAPERGUI_OCCSelector(aViewer, getApp()->selectionMgr());
     LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
     QList<SUIT_Selector*> aList;
     aMgr->selectors(aList);
@@ -368,12 +368,12 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
 }
 
 //******************************************************
-CAM_DataModel* NewGeom_Module::createDataModel()
+CAM_DataModel* SHAPERGUI::createDataModel()
 {
-  return new NewGeom_DataModel(this);
+  return new SHAPERGUI_DataModel(this);
 }
 
-QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& theInfo)
+QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theInfo)
 {
   return addFeature(theWBName,
                     theInfo.id,
@@ -385,7 +385,7 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& 
 }
 
 //******************************************************
-QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& theId,
+QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
                                     const QString& theTitle, const QString& theTip,
                                     const QIcon& theIcon, const QKeySequence& theKeys,
                                     bool isCheckable)
@@ -421,12 +421,12 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
   return aAction;
 }
 
-bool NewGeom_Module::isFeatureOfNested(const QAction* theAction)
+bool SHAPERGUI::isFeatureOfNested(const QAction* theAction)
 {
-  return dynamic_cast<const NewGeom_NestedButton*>(theAction);
+  return dynamic_cast<const SHAPERGUI_NestedButton*>(theAction);
 }
 
-QAction* NewGeom_Module::addFeatureOfNested(const QString& theWBName,
+QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
                                             const ActionInfo& theInfo,
                                             const QList<QAction*>& theNestedActions)
 {
@@ -436,7 +436,7 @@ QAction* NewGeom_Module::addFeatureOfNested(const QString& theWBName,
   int aId = myActionsList.size();
   myActionsList.append(theInfo.id);
   SUIT_Desktop* aDesk = application()->desktop();
-  NewGeom_NestedButton* anAction = new NewGeom_NestedButton(aDesk, theNestedActions);
+  SHAPERGUI_NestedButton* anAction = new SHAPERGUI_NestedButton(aDesk, theNestedActions);
   anAction->setData(theInfo.id);
   anAction->setCheckable(theInfo.checkable);
   anAction->setChecked(theInfo.checked);
@@ -456,7 +456,7 @@ QAction* NewGeom_Module::addFeatureOfNested(const QString& theWBName,
 
 
 //******************************************************
-QAction* NewGeom_Module::addDesktopCommand(const QString& theId, const QString& theTitle,
+QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTitle,
                                            const QString& theTip, const QIcon& theIcon,
                                            const QKeySequence& theKeys, bool isCheckable,
                                            const char* theMenuSourceText, const int theMenuPosition)
@@ -477,13 +477,13 @@ QAction* NewGeom_Module::addDesktopCommand(const QString& theId, const QString& 
 }
 
 //******************************************************
-void NewGeom_Module::addDesktopMenuSeparator(const char* theMenuSourceText, const int theMenuPosition)
+void SHAPERGUI::addDesktopMenuSeparator(const char* theMenuSourceText, const int theMenuPosition)
 {
   int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
   createMenu(separator(), aMenu, -1, theMenuPosition);
 }
 
-bool NewGeom_Module::addActionInToolbar( QAction* theAction, const QString& theToolBarTitle )
+bool SHAPERGUI::addActionInToolbar( QAction* theAction, const QString& theToolBarTitle )
 {
   if( !theAction )
     return false;
@@ -501,7 +501,7 @@ bool NewGeom_Module::addActionInToolbar( QAction* theAction, const QString& theT
 }
 
 //******************************************************
-QList<QAction*> NewGeom_Module::commandList() const
+QList<QAction*> SHAPERGUI::commandList() const
 {
   QList<QAction*> aActions;
   for (int i = 0; i < myActionsList.size(); i++) {
@@ -513,19 +513,19 @@ QList<QAction*> NewGeom_Module::commandList() const
 }
 
 //******************************************************
-QStringList NewGeom_Module::commandIdList() const
+QStringList SHAPERGUI::commandIdList() const
 {
   return myActionsList;
 }
 
 //******************************************************
-QMainWindow* NewGeom_Module::desktop() const
+QMainWindow* SHAPERGUI::desktop() const
 {
   return application()->desktop();
 }
 
 //******************************************************
-QString NewGeom_Module::commandId(const QAction* theCmd) const
+QString SHAPERGUI::commandId(const QAction* theCmd) const
 {
   int aId = actionId(theCmd);
   if (aId < myActionsList.size())
@@ -534,7 +534,7 @@ QString NewGeom_Module::commandId(const QAction* theCmd) const
 }
 
 //******************************************************
-QAction* NewGeom_Module::command(const QString& theId) const
+QAction* SHAPERGUI::command(const QString& theId) const
 {
   int aId = myActionsList.indexOf(theId);
   if ((aId != -1) && (aId < myActionsList.size())) {
@@ -544,13 +544,13 @@ QAction* NewGeom_Module::command(const QString& theId) const
 }
 
 //******************************************************
-void NewGeom_Module::setNestedActions(const QString& theId, const QStringList& theActions)
+void SHAPERGUI::setNestedActions(const QString& theId, const QStringList& theActions)
 {
   myNestedActions[theId] = theActions;
 }
 
 //******************************************************
-QStringList NewGeom_Module::nestedActions(const QString& theId) const
+QStringList SHAPERGUI::nestedActions(const QString& theId) const
 {
   if (myNestedActions.contains(theId))
     return myNestedActions[theId];
@@ -558,13 +558,13 @@ QStringList NewGeom_Module::nestedActions(const QString& theId) const
 }
 
 //******************************************************
-void NewGeom_Module::setDocumentKind(const QString& theId, const QString& theKind)
+void SHAPERGUI::setDocumentKind(const QString& theId, const QString& theKind)
 {
   myDocumentType[theId] = theKind;
 }
 
 //******************************************************
-QString NewGeom_Module::documentKind(const QString& theId) const
+QString SHAPERGUI::documentKind(const QString& theId) const
 {
   if (myDocumentType.contains(theId))
     return myDocumentType[theId];
@@ -573,14 +573,14 @@ QString NewGeom_Module::documentKind(const QString& theId) const
 }
 
 //******************************************************
-void NewGeom_Module::selectionChanged()
+void SHAPERGUI::selectionChanged()
 {
   LightApp_Module::selectionChanged();
   myWorkshop->salomeViewerSelectionChanged();
 }
 
 //******************************************************
-void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle)
+void SHAPERGUI::contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle)
 {
   myWorkshop->contextMenuMgr()->updateViewerMenu();
   myWorkshop->contextMenuMgr()->addViewerMenu(theMenu);
@@ -589,7 +589,7 @@ void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, 
 
 
 //******************************************************
-void NewGeom_Module::createPreferences()
+void SHAPERGUI::createPreferences()
 {
   LightApp_Preferences* pref = preferences();
   if (!pref)
@@ -606,13 +606,13 @@ void NewGeom_Module::createPreferences()
   int catId = pref->addPreference(aModName, -1 );
   if ( catId == -1 )
     return;
-  NewGeom_PrefMgr aMgr(pref, aModName);
+  SHAPERGUI_PrefMgr aMgr(pref, aModName);
   ModuleBase_Preferences::createEditContent(&aMgr, catId);
   pref->retrieve();
 }
 
 //******************************************************
-void NewGeom_Module::preferencesChanged(const QString& theSection, const QString& theParam)
+void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& theParam)
 {
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   QString aVal = aResMgr->stringValue(theSection, theParam);
@@ -631,7 +631,7 @@ void NewGeom_Module::preferencesChanged(const QString& theSection, const QString
   myWorkshop->displayer()->redisplayObjects();
 }
 
-void NewGeom_Module::inspectSalomeModules()
+void SHAPERGUI::inspectSalomeModules()
 {
   QStringList aModuleNames;
   getApp()->modules(aModuleNames, false);
@@ -640,7 +640,7 @@ void NewGeom_Module::inspectSalomeModules()
   }
 }
 
-bool NewGeom_Module::abortAllOperations()
+bool SHAPERGUI::abortAllOperations()
 {
   return workshop()->operationMgr()->abortAllOperations();
 }

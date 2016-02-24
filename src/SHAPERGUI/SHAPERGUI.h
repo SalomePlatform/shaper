@@ -1,11 +1,11 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 
-#ifndef NewGeom_Module_H
-#define NewGeom_Module_H
+#ifndef SHAPERGUI_H
+#define SHAPERGUI_H
 
-#include "NewGeom.h"
-#include "NewGeom_SalomeViewer.h"
+#include "SHAPER_SHAPERGUI.h"
+#include "SHAPERGUI_SalomeViewer.h"
 
 #include <LightApp_Module.h>
 #include <XGUI_SalomeConnector.h>
@@ -16,7 +16,7 @@
 #include <QMap>
 
 class XGUI_Workshop;
-class NewGeom_OCCSelector;
+class SHAPERGUI_OCCSelector;
 class OCCViewer_Viewer;
 class CAM_Study;
 
@@ -25,12 +25,12 @@ class CAM_Study;
  * An implementation of SALOME connector class for implementation of
  * XGUI functionality as a module of SALOME
  */
-class NewGeom_EXPORT NewGeom_Module : public LightApp_Module, public XGUI_SalomeConnector
+class SHAPERGUI_EXPORT SHAPERGUI : public LightApp_Module, public XGUI_SalomeConnector
 {
 Q_OBJECT
  public:
-  NewGeom_Module();
-  virtual ~NewGeom_Module();
+  SHAPERGUI();
+  virtual ~SHAPERGUI();
 
   //----- LightAPP_Module interface ---------------
 
@@ -183,7 +183,7 @@ Q_OBJECT
  private:
    /// Create selector for OCC Viewer
    /// \param theMgr view manager
-  NewGeom_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
+  SHAPERGUI_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
 
   /// List of registered actions
   QStringList myActionsList;
@@ -192,10 +192,10 @@ Q_OBJECT
   XGUI_Workshop* myWorkshop;
 
   /// OCC viewer selector instance
-  NewGeom_OCCSelector* mySelector;
+  SHAPERGUI_OCCSelector* mySelector;
 
   /// Proxy viewer for connection to OCC Viewer in SALOME
-  NewGeom_SalomeViewer* myProxyViewer;
+  SHAPERGUI_SalomeViewer* myProxyViewer;
 
   /// Map of nested actions [ActionID: list of nested actions Id]
   QMap<QString, QStringList> myNestedActions;

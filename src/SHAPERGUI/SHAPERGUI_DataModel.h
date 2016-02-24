@@ -4,23 +4,23 @@
 #ifndef NEWGEOM_DATAMODEL_H
 #define NEWGEOM_DATAMODEL_H
 
-#include "NewGeom.h"
+#include "SHAPER_SHAPERGUI.h"
 #include <LightApp_DataModel.h>
 
-class NewGeom_Module;
+class SHAPERGUI;
 
 /**
 * \ingroup Salome
 * A Data Model class provides a connection of SALOME data structure and OpenParts application data model
 */
-class NewGeom_EXPORT NewGeom_DataModel : public LightApp_DataModel
+class SHAPERGUI_EXPORT SHAPERGUI_DataModel : public LightApp_DataModel
 {
   Q_OBJECT
  public:
    /// Constructor
    /// \param theModule a module instance
-  NewGeom_DataModel(NewGeom_Module* theModule);
-  virtual ~NewGeom_DataModel();
+  SHAPERGUI_DataModel(SHAPERGUI* theModule);
+  virtual ~SHAPERGUI_DataModel();
 
   /// Open a data file
   /// \param thePath a path to the directory
@@ -77,7 +77,7 @@ protected:
 
   /// it should be created because the files reading is postponed in the module. The directory
   // should be removed after the model document is closed.
-  NewGeom_Module* myModule;
+  SHAPERGUI* myModule;
 };
 
 #endif

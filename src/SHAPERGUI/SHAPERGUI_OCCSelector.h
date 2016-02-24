@@ -1,9 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#ifndef NewGeom_OCCSelector_H
-#define NewGeom_OCCSelector_H
+#ifndef SHAPERGUI_OCCSelector_H
+#define SHAPERGUI_OCCSelector_H
 
-#include "NewGeom.h"
+#include "SHAPER_SHAPERGUI.h"
 
 #include <LightApp_OCCSelector.h>
 
@@ -11,14 +11,14 @@
 * \ingroup Salome
 * Redefinition of standard OCC selector in order to adapt it to NewGeom needs
 */
-class NewGeom_EXPORT NewGeom_OCCSelector : public LightApp_OCCSelector
+class SHAPERGUI_EXPORT SHAPERGUI_OCCSelector : public LightApp_OCCSelector
 {
  public:
    /// Constructor
    /// \param theViewer a viewer
    /// \param theMgr a selection manager
-  NewGeom_OCCSelector(OCCViewer_Viewer* theViewer, SUIT_SelectionMgr* theMgr);
-  virtual ~NewGeom_OCCSelector();
+  SHAPERGUI_OCCSelector(OCCViewer_Viewer* theViewer, SUIT_SelectionMgr* theMgr);
+  virtual ~SHAPERGUI_OCCSelector();
 
  protected:
    /// Redifinition of virtual function
