@@ -288,7 +288,7 @@ void PartSet_SketcherReetntrantMgr::onVertexSelected()
 
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   std::string anOperationId = anOperation->id().toStdString();
-  if (anOperationId == SketchPlugin_Line::ID()/* || isTangentArc(anOperation)*/) {
+  if (anOperationId == SketchPlugin_Line::ID() || isTangentArc(anOperation)) {
     /// If last line finished on vertex the lines creation sequence has to be break
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
