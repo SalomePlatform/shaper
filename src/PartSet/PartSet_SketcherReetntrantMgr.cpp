@@ -69,6 +69,26 @@ bool PartSet_SketcherReetntrantMgr::isInternalEditActive() const
   return myIsInternalEditOperation;
 }
 
+void PartSet_SketcherReetntrantMgr::updateInternalEditActiveState()
+{
+  if  (myIsInternalEditOperation) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myWorkshop->currentOperation());
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      QString anError = myWorkshop->module()->getFeatureError(aFeature);
+      // stop started internal edit operation as soon as the operation becomes invalid
+      // it is especially important for the sketch tangent arc feature
+      if (!anError.isEmpty()) {
+        aFOperation->setEditOperation(false);
+        //workshop()->operationMgr()->updateApplyOfOperations();
+        beforeStopInternalEdit();
+        myIsInternalEditOperation = false;
+      }
+    }
+  }
+}
+
 bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* theOperation)
 {
   bool aProcessed = false;
@@ -350,7 +370,7 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
                                                      (myWorkshop->currentOperation());
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
-    aFOperation->setEditOperation(false);
+    aFOperation->setEditOperation(true/*, false*/);
     workshop()->operationMgr()->updateApplyOfOperations();
 
     createInternalFeature();

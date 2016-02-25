@@ -310,8 +310,10 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 {
   if (!isNestedEditOperation(getCurrentOperation()) ||
-      myModule->sketchReentranceMgr()->isInternalEditActive())
+      myModule->sketchReentranceMgr()->isInternalEditActive()) {
+    myModule->sketchReentranceMgr()->updateInternalEditActiveState();
     return;
+  }
   // it is necessary to restore current selection in order to restore it after the values are modified
   restoreSelection();
   myCurrentSelection.clear();
@@ -324,6 +326,8 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
   aDisplayer->enableUpdateViewer(myPreviousUpdateViewerEnabled);
   aDisplayer->updateViewer();
+
+
 }
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)

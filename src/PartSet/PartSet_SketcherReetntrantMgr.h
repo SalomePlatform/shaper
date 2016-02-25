@@ -54,6 +54,9 @@ public:
   /// Return true if the current edit operation is an internal
   bool isInternalEditActive() const;
 
+  /// Stop internal edit if the operation feature is invalid
+  void updateInternalEditActiveState();
+
   /// if the internal flags allow it and the manager is active, it starts an internal edit operation
   /// for the created operation.
   /// \param thePreviousAttributeID an index of the previous active attribute

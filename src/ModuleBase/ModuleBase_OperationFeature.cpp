@@ -49,11 +49,16 @@ ModuleBase_OperationFeature::~ModuleBase_OperationFeature()
   clearPreselection();
 }
 
-void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransaction)
+void ModuleBase_OperationFeature::setEditOperation(const bool& isEditState
+                                                   /*const bool theRestartTransaction*/)
 {
-  if (isEditOperation())
+  bool isCurrentEditState = isEditOperation();
+  if (isCurrentEditState == isEditState)
     return;
 
+  /*
+  // this case is obsolete as it was not approved for reentrant sketch operation
+  // it was implemented when isEditState did not exist and only edit operation can be set
   if (theRestartTransaction) {
     // finsh previous create operation
     emit beforeCommitted();
@@ -68,9 +73,8 @@ void ModuleBase_OperationFeature::setEditOperation(const bool theRestartTransact
     }
     ModelAPI_Session::get()->startOperation(anId.toStdString());
     emit beforeStarted();
-  }
-  else
-    myIsEditing = true;
+  } else*/
+  myIsEditing = isEditState;
 
   propertyPanel()->setEditingMode(isEditOperation());
 }

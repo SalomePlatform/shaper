@@ -67,9 +67,10 @@ Q_OBJECT
   /// Change the operation mode from create to edit.
   /// The transaction and the operation name in the model history of transaction are the same.
   /// It updates the edit state in the widgets of property panel
-  /// \param theRestartTransaction if true, the current model transaction is committed and
+  /// \param isEditState boolean state whether the operation should become editing or creating
+  // \param theRestartTransaction if true, the current model transaction is committed and
   /// the new one is started
-  void setEditOperation(const bool theRestartTransaction);
+  void setEditOperation(const bool& isEditState/*const bool theRestartTransaction*/);
 
   /// Returns the operation feature
   /// \return the feature
