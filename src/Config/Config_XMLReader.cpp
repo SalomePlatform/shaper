@@ -41,7 +41,7 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
    * to use environment variable (at least for the current moment)
    */
   if (prefix.empty()) {
-    char* anEnv = getenv("SHAPER_CONFIG_FILE");
+    char* anEnv = getenv("PLUGINS_CONFIG_FILE");
     if (anEnv) {
       prefix = std::string(anEnv);
     }
