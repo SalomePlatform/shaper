@@ -252,7 +252,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
       emit beforeObjectErase(theObject, anObject);
-      aContext->Remove(anAIS);
+      aContext->Remove(anAIS, false/*update viewer*/);
       aErased = true;
     }
   }
@@ -599,7 +599,7 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
       Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anIO.IsNull()) {
         emit beforeObjectErase(aObj, aAISObj);
-        aContext->Remove(anIO, false);
+        aContext->Remove(anIO, false/*update viewer*/);
         aErased = true;
       }
     }
