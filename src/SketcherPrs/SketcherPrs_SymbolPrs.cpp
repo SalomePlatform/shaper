@@ -271,11 +271,9 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
     return myIconsMap[iconName()];
   }
   // Load icon for the presentation
-  char* aEnv = getenv("SHAPER_ROOT_DIR");
+  char* aEnv = getenv("SHAPERResources");
   if (aEnv != NULL) {
     TCollection_AsciiString aFile(aEnv);
-    aFile+=FSEP;
-    aFile+="resources";
     aFile += FSEP;
     aFile += iconName();
     Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
