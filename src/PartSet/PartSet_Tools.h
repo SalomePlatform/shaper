@@ -46,7 +46,8 @@ public:
   enum ConstraintVisibleState
   {
     Geometrical = 0, // all constrains excepting dimensional
-    Dimensional // lenght, distance, radius and angle constraints
+    Dimensional,     // lenght, distance, radius and angle constraints
+    Any              // both, geometrical and dimensional, types of constraints
   };
 
  public:

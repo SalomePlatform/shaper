@@ -86,9 +86,9 @@ signals:
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
   /// A show constraint toggled signal
-  /// \param theState a state of the check box
   /// \param theType a ConstraintVisibleState value
-  void showConstraintToggled(bool theState, int theType);
+  /// \param theState a state of the check box
+  void showConstraintToggled(int theType, bool theState);
 
 protected:
   /// Creates a backup of the current values of the attribute

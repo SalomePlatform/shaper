@@ -315,7 +315,7 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
                                                                     aLast = myHasConstraintShown.end();
   for (; anIt != aLast; anIt++) {
     myHasConstraintShown[anIt.key()];
-    mySketchMgr->onShowConstraintsToggle(anIt.value(), myHasConstraintShown[anIt.key()]);
+    mySketchMgr->onShowConstraintsToggle(anIt.key(), anIt.value());
   }
 }
 
@@ -562,11 +562,11 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, aWorkshop,
-      theWidgetApi, theParentId, mySketchMgr->showConstraintStates());
+      theWidgetApi, theParentId, myHasConstraintShown);
     connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
-    connect(aLabelWgt, SIGNAL(showConstraintToggled(bool, int)),
-      mySketchMgr, SLOT(onShowConstraintsToggle(bool, int)));
+    connect(aLabelWgt, SIGNAL(showConstraintToggled(int, bool)),
+      mySketchMgr, SLOT(onShowConstraintsToggle(int, bool)));
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
     PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, aWorkshop,
@@ -713,13 +713,14 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   if (myWorkshop->currentOperation() && 
       myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID()) {
-      const QMap<PartSet_Tools::ConstraintVisibleState, bool>& aShownStates = mySketchMgr->showConstraintStates();
+      const QMap<PartSet_Tools::ConstraintVisibleState, bool>& aShownStates =
+                                                    mySketchMgr->showConstraintStates();
       myHasConstraintShown = aShownStates;
   }
   if (PartSet_SketcherMgr::constraintsIdList().contains(theCmdId)) {
     // Show constraints if a constraint was anOperation
-    mySketchMgr->onShowConstraintsToggle(true, PartSet_Tools::Geometrical);
-    mySketchMgr->onShowConstraintsToggle(true, PartSet_Tools::Dimensional);
+    mySketchMgr->onShowConstraintsToggle(PartSet_Tools::Geometrical, true);
+    mySketchMgr->onShowConstraintsToggle(PartSet_Tools::Dimensional, true);
   }
   ModuleBase_IModule::launchOperation(theCmdId);
 }

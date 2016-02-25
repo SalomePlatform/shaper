@@ -1152,29 +1152,85 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       }
     }
   }
-  if (!isObjectFound) 
-    return aCanDisplay;
-  
-  // 4. For created nested feature operation do not display the created feature if
-  // the mouse curstor leaves the OCC window.
-  // The correction cases, which ignores this condition:
-  // a. the property panel values modification
-  // b. the popup menu activated
-  // c. widget editor control
-  #ifndef DEBUG_DO_NOT_BY_ENTER
-  if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
-    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-    ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
-    // the active widget editor should not influence here. The presentation should be visible always
-    // when this widget is active.
-    if (!anEditorWdg && !myIsPopupMenuActive) {
-      // during a nested create operation, the feature is redisplayed only if the mouse over view
-      // of there was a value modified in the property panel after the mouse left the view
-      aCanDisplay = canDisplayCurrentCreatedFeature();
+  if (isObjectFound) {
+    // 4. For created nested feature operation do not display the created feature if
+    // the mouse curstor leaves the OCC window.
+    // The correction cases, which ignores this condition:
+    // a. the property panel values modification
+    // b. the popup menu activated
+    // c. widget editor control
+    #ifndef DEBUG_DO_NOT_BY_ENTER
+    if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
+      ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+      ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
+      // the active widget editor should not influence here. The presentation should be visible always
+      // when this widget is active.
+      if (!anEditorWdg && !myIsPopupMenuActive) {
+        // during a nested create operation, the feature is redisplayed only if the mouse over view
+        // of there was a value modified in the property panel after the mouse left the view
+        aCanDisplay = canDisplayCurrentCreatedFeature();
+      }
+    }
+    #endif
+  }
+
+  // checks the sketcher constraints visibility according to active sketch check box states
+  if (aCanDisplay) {
+    bool aProcessed = false;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get()) {
+      bool aConstraintDisplayed = canDisplayConstraint(aFeature, PartSet_Tools::Any, aProcessed);
+      if (aProcessed)
+        aCanDisplay = aConstraintDisplayed;
     }
   }
-  #endif
+
   return aCanDisplay;
+}
+
+bool PartSet_SketcherMgr::canDisplayConstraint(const FeaturePtr& theFeature,
+                                             const PartSet_Tools::ConstraintVisibleState& theState,
+                                             bool& isProcessed) const
+{
+  bool aSwitchedOn = true;
+
+  const QStringList& aConstrIds = constraintsIdList();
+
+  std::string aKind = theFeature->getKind();
+  if (aConstrIds.contains(QString(aKind.c_str()))) {
+    bool isTypedConstraint = false;
+
+    switch (theState) {
+      case PartSet_Tools::Dimensional: {
+        bool isDistance = isDistanceKind(aKind);
+        if (isDistance) {
+          isProcessed = true;
+          aSwitchedOn = myIsConstraintsShown[theState];
+        }
+      }
+      break;
+      case PartSet_Tools::Geometrical: {
+        bool isGeometrical = !isDistanceKind(aKind);
+        if (isGeometrical) {
+          isProcessed = true;
+          aSwitchedOn = myIsConstraintsShown[theState];
+        }
+      }
+      break;
+      case PartSet_Tools::Any: {
+        isProcessed = true;
+        bool isDistance = isDistanceKind(aKind);
+        if (isDistance)
+          aSwitchedOn = myIsConstraintsShown[PartSet_Tools::Dimensional];
+        else
+          aSwitchedOn = myIsConstraintsShown[PartSet_Tools::Geometrical];
+      }
+      break;
+    default:
+      break;
+    }
+  }
+  return aSwitchedOn;
 }
 
 void PartSet_SketcherMgr::processHiddenObject(const std::list<ObjectPtr>& theObjects)
@@ -1544,7 +1600,7 @@ void PartSet_SketcherMgr::restoreSelection()
   }
 }
 
-void PartSet_SketcherMgr::onShowConstraintsToggle(bool theState, int theType)
+void PartSet_SketcherMgr::onShowConstraintsToggle(int theType, bool theState)
 {
   PartSet_Tools::ConstraintVisibleState aType = (PartSet_Tools::ConstraintVisibleState)theType;
   if (myIsConstraintsShown.contains(aType) && myIsConstraintsShown[aType] == theState)
@@ -1557,25 +1613,12 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(bool theState, int theType)
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
 
-  const QStringList& aConstrIds = constraintsIdList();
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
-    std::string aKind = aSubFeature->getKind();
-    if (aConstrIds.contains(QString(aKind.c_str()))) {
-      bool isTypedConstraint = false;
-      if (aType == PartSet_Tools::Dimensional) {
-        isTypedConstraint = isDistanceKind(aKind);
-      }
-      else
-        isTypedConstraint = !isDistanceKind(aKind);
-
-      if (isTypedConstraint) {
-        if (theState)
-          aSubFeature->setDisplayed(true);
-        else
-          aSubFeature->setDisplayed(false);
-      }
-    }
+    bool aProcessed = false;
+    bool aConstraintDisplayed = canDisplayConstraint(aSubFeature, aType, aProcessed);
+    if (aProcessed)
+      aSubFeature->setDisplayed(aConstraintDisplayed);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }

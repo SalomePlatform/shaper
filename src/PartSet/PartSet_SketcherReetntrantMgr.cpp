@@ -115,7 +115,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
       bool aWidgetIsFilled = false;
 
       //bool aCanBeActivatedByMove = false;
-      FeaturePtr aCurrentFeature = anActiveWidget->feature();
+      FeaturePtr aCurrentFeature = aFOperation->feature();
       bool isLineFeature = false, isArcFeature = false;
       if (aCurrentFeature->getKind() == SketchPlugin_Line::ID())
         isLineFeature = anActiveWidget->attributeID() == SketchPlugin_Line::START_ID();

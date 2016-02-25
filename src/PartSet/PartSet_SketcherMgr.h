@@ -173,6 +173,16 @@ public:
   /// \param theObject a model object
   bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Returns whether the constraint object can be displayed. It depends on the sketch check
+  /// box states
+  /// \param theObject a model object
+  /// \param theState the constraint visible state state to be checked
+  /// \param isProcessed an output parameter if it is processed
+  /// \return result value
+  bool canDisplayConstraint(const FeaturePtr& theObject,
+                            const PartSet_Tools::ConstraintVisibleState& theState,
+                            bool& isProcessed) const;
+
   /// Check the given objects either there are some results of the current sketch. If so,
   /// it suggests to delete them as there are no functionality to show back hidden sketch objects
   /// \param theObjects a list of hidden objects
@@ -240,7 +250,7 @@ public slots:
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
   /// Toggle show constraints
-  void onShowConstraintsToggle(bool theState, int theType);
+  void onShowConstraintsToggle(int theType, bool theState);
 
 private slots:
   /// Process the enter mouse to the view port. If the current operation is a create of

@@ -182,7 +182,7 @@ void PartSet_WidgetSketchLabel::onShowConstraint(bool theOn)
       aState = anIt.key();
   }
   if (aFound)
-    emit showConstraintToggled(theOn, aState);
+    emit showConstraintToggled(aState, theOn);
 }
 
 void PartSet_WidgetSketchLabel::blockAttribute(const bool& theToBlock, bool& isFlushesActived,
