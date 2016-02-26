@@ -34,6 +34,13 @@
 
 #include <QTimer>
 
+// the define to check the activated object as a sub-feature by argument of
+// the operation feature. E.g. rectangle feature(operation), line(in argument) to be not activated
+//#define DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
+#ifdef DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
+#include <ModelAPI_AttributeRefList.h>
+#endif
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -187,6 +194,25 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
       if (theObj == (*aIt))
         return true;
     }
+#ifdef DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
+    FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObj);
+    std::list<AttributePtr> anAttributes = aFeature->data()->attributes(
+                                            ModelAPI_AttributeRefList::typeId());
+    std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+    bool aFoundObject = false;
+    for (; anIt != aLast && !aFoundObject; anIt++) {
+      std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
+                                       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIt);
+      for (int i = 0, aNb = aCurSelList->size(); i < aNb && !aFoundObject; i++) {
+        ObjectPtr anObject = aCurSelList->object(i);
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+        if (aFeature.get()) {
+          aFoundObject = anObjectFeature == aFeature;
+        }
+      }
+    }
+    return aFoundObject;
+#endif
   }
   return false;
 }

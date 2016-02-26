@@ -410,6 +410,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   if (theEvent->button() != Qt::LeftButton)
     return;
 
+  bool isCoincidenceEnabled = MyFeaturesForCoincedence.contains(myFeature->getKind().c_str());
+
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   Handle(V3d_View) aView = theWnd->v3dView();
   // TODO: This fragment doesn't work because bug in OCC Viewer. It can be used after fixing.
@@ -427,11 +429,13 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
       aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
       if ((!aSPFeature && !aShape.IsNull()) ||
           (aSPFeature.get() && aSPFeature->isExternal())) {
-        anExternal = true;
-        ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
-        if (!aFixedObject.get())
-          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
-
+          ResultPtr aFixedObject;
+          if (isCoincidenceEnabled) {
+          anExternal = true;
+          aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
+          if (!aFixedObject.get())
+            aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+        }
         double aX, aY;
         if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
           // do not create a constraint to the point, which already used by the feature
@@ -455,8 +459,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
               }
             }
           }
-
-          setConstraintWith(aFixedObject);
+          if (aFixedObject.get())
+            setConstraintWith(aFixedObject);
           // fignal updated should be flushed in order to visualize possible created external objects
           // e.g. selection of trihedron axis when input end arc point
           updateObject(feature());
@@ -486,7 +490,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
-          if (MyFeaturesForCoincedence.contains(myFeature->getKind().c_str())) {
+          if (isCoincidenceEnabled) {
             setConstraintWith(aObject);
             setValueState(Stored); // in case of edge selection, Apply state should also be updated
 
