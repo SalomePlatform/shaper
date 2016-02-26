@@ -49,6 +49,14 @@ public:
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
 
+  /// Returns true if the object with the shape are in list
+  /// \param theContext object where the sub-shape was selected
+  /// \param theSubShape selected sub-shape (if null, the whole context is selected)
+  /// \returns true if the pair is found in the attirbute
+  MODEL_EXPORT virtual bool isInList(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false);
+
   /// The type of all elements selection
   /// \returns the index of the OCCT enumeration of the type of shape
   MODEL_EXPORT virtual const std::string selectionType() const;

@@ -281,12 +281,12 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-    //if (!aSelectionListAttr->isInList(aResult, theShape, myIsInValidate))
+    if (!aSelectionListAttr->isInList(aResult, theShape, myIsInValidate))
       aSelectionListAttr->append(aResult, theShape, myIsInValidate);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
-    //if (!aRefListAttr->isInList(theSelectedObject))
+    if (!aRefListAttr->isInList(theSelectedObject))
       aRefListAttr->append(theSelectedObject);
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
@@ -294,11 +294,11 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
     AttributePtr anAttribute = myWorkshop->module()->findAttribute(theSelectedObject, theShape);
 
     if (anAttribute.get()) {
-      //if (!aRefAttrListAttr->isInList(anAttribute))
+      if (!aRefAttrListAttr->isInList(anAttribute))
         aRefAttrListAttr->append(anAttribute);
     }
     else {
-      //if (!aRefAttrListAttr->isInList(theSelectedObject))
+      if (!aRefAttrListAttr->isInList(theSelectedObject))
         aRefAttrListAttr->append(theSelectedObject);
     }
   }

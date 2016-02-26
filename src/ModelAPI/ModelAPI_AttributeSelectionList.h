@@ -42,6 +42,14 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// Returns the number of selection attributes in the list
   virtual int size() = 0;
 
+  /// Returns true if the object with the shape are in list
+  /// \param theContext object where the sub-shape was selected
+  /// \param theSubShape selected sub-shape (if null, the whole context is selected)
+  /// \returns true if the pair is found in the attirbute
+  virtual bool isInList(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false) = 0;
+
   /// The type of all elements selection
   /// \returns the index of the enumeration of the type of shape
   virtual const std::string selectionType() const = 0;

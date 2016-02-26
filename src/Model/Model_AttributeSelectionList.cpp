@@ -141,6 +141,13 @@ int Model_AttributeSelectionList::size()
   return mySize->Get();
 }
 
+bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
+                                            const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+                                            const bool theTemporarily)
+{
+  return false;
+}
+
 const std::string Model_AttributeSelectionList::selectionType() const
 {
   return TCollection_AsciiString(mySelectionType->Get()).ToCString();
