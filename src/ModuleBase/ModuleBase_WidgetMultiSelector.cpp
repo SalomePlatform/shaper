@@ -676,7 +676,6 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
                                                  (QList<ModuleBase_ViewerPrs>& theValues)
 {
   std::map<ObjectPtr, std::set<GeomShapePtr> > aGeomSelection = convertSelection(theValues);
-
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = aData->attribute(attributeID());
   std::string aType = anAttribute->attributeType();
@@ -706,23 +705,24 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
     aRefListAttr->remove(anIndicesToBeRemoved);
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    /*AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
+    std::set<AttributePtr> anAttributes;
+    QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+    ObjectPtr anObject;
+    GeomShapePtr aShape;
+    for (; anIt != aLast; anIt++) {
+      ModuleBase_ViewerPrs aPrs = *anIt;
+      getGeomSelection(aPrs, anObject, aShape);
+      AttributePtr anAttr = myWorkshop->module()->findAttribute(anObject, aShape);
+      if (anAttr.get() && anAttributes.find(anAttr) == anAttributes.end())
+        anAttributes.insert(anAttr);
+    }
+
+    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
     for (int i = 0; i < aRefAttrListAttr->size(); i++) {
       bool aFound = false;
       if (aRefAttrListAttr->isAttribute(i)) {
         AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
-        ObjectPtr anAttrObject = anAttribute->owner();
-        if (aGeomSelection.find(anAttrObject) != aGeomSelection.end()) {
-          std::set<GeomShapePtr> aShapes = aGeomSelection[anAttrObject];
-          std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
-          for (; anIt != aLast && !aFound; anIt++) {
-            GeomShapePtr aCShape = *anIt;
-            if (aCShape.get()) {
-              AttributePtr aCAttr = myWorkshop->module()->findAttribute(anAttrObject, aCShape);
-              aFound = aCAttr == anAttribute;
-            }
-          }
-        }
+        aFound = anAttributes.find(anAttribute) != anAttributes.end();
       }
       else {
         aFound = findInSelection(aRefAttrListAttr->object(i), GeomShapePtr(), aGeomSelection);
@@ -730,7 +730,7 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
       if (!aFound)
         anIndicesToBeRemoved.insert(i);
     }
-    aRefAttrListAttr->remove(anIndicesToBeRemoved);*/
+    aRefAttrListAttr->remove(anIndicesToBeRemoved);
   }
 }
 
