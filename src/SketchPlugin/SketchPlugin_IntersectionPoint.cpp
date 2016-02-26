@@ -7,6 +7,8 @@
 #include "SketchPlugin_IntersectionPoint.h"
 
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
@@ -20,6 +22,7 @@ SketchPlugin_IntersectionPoint::SketchPlugin_IntersectionPoint()
 void SketchPlugin_IntersectionPoint::initDerivedClassAttributes()
 {
   data()->addAttribute(EXTERNAL_LINE_ID(), ModelAPI_AttributeSelection::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 
   SketchPlugin_Point::initDerivedClassAttributes();
 }

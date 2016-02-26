@@ -48,7 +48,8 @@ void PartSet_WidgetShapeSelector::activateSelectionAndFilters(bool toActivate)
   if (!myUseSketchPlane) {
     XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
     PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(aWorkshop->module());
-    aModule->sketchMgr()->activatePlaneFilter(false);
+    bool isUsePlaneFilterOnly = !toActivate;
+    aModule->sketchMgr()->activatePlaneFilter(isUsePlaneFilterOnly);
   }
 }
 
