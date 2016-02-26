@@ -14,7 +14,6 @@ SketchPlugin_SketchEntity::SketchPlugin_SketchEntity()
 void SketchPlugin_SketchEntity::initAttributes()
 {
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 
   initDerivedClassAttributes();
 
