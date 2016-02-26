@@ -44,8 +44,6 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrs& the
 //********************************************************************
 void ModuleBase_WidgetSelector::onSelectionChanged()
 {
-  clearAttribute();
-
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
 
   bool isDone = setSelection(aSelected, true/*false*/);

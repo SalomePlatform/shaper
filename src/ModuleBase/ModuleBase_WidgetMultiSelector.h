@@ -116,9 +116,6 @@ protected:
   /// parameters of the current attribute
   virtual void storeAttributeValue();
 
-  /// Clear attribute
-  virtual void clearAttribute();
-
   /// Set the focus on the last item in  the list
   virtual void updateFocus();
 
@@ -168,6 +165,26 @@ protected:
   /// \param theValues the result presentations, filled with object and shape of an attribute item
   void convertIndicesToViewerSelection(std::set<int> theAttributeIds,
                                        QList<ModuleBase_ViewerPrs>& theValues) const;
+
+  /// Iterates throgh the model attribute list and remove elements which do not present in the list
+  /// \param theValues the wrapped selection values
+  virtual void removeUnusedAttributeObjects(QList<ModuleBase_ViewerPrs>& theValues);
+
+  /// Converts viewer presentation selection list to objects and shapes map
+  /// \param theValues the wrapped selection values
+  /// \return selection list
+  std::map<ObjectPtr, std::set<GeomShapePtr> > convertSelection
+                                          (QList<ModuleBase_ViewerPrs>& theValues);
+
+  /// Returns true if the object and shape present in the container
+  /// \param theObject a model object, a set of shapes is searched by it
+  /// \param theShape a shape to be in the set of the object shapes
+  /// \param theGeomSelection a map built on selection
+  /// \return boolean result
+  static bool findInSelection(const ObjectPtr& theObject,
+                            const GeomShapePtr& theShape,
+                            const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection);
+
 protected:
   /// List control
   QListWidget* myListControl;

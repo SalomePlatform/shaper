@@ -63,9 +63,6 @@ Q_OBJECT
   void onSelectionChanged();
 
  protected:
-  /// Set an empty value to attribute
-  virtual void clearAttribute() = 0;
-
   /// Update focus after the attribute value change
   virtual void updateFocus() = 0;
 

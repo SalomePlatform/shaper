@@ -94,9 +94,6 @@ Q_OBJECT
   /// Computes and updates name of selected object in the widget
   virtual void updateSelectionName();
 
-  /// Clear attribute
-  virtual void clearAttribute();
-
   // Update focus after the attribute value change
   virtual void updateFocus();
 

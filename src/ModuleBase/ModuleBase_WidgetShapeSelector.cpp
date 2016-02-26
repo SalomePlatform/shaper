@@ -161,13 +161,6 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelectio
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::clearAttribute()
-{
-  // In order to make reselection possible, set empty object and shape should be done
-  setObject(ObjectPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
-}
-
-//********************************************************************
 bool ModuleBase_WidgetShapeSelector::restoreValueCustom()
 {
   bool isBlocked = this->blockSignals(true);

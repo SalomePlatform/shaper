@@ -37,8 +37,11 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                                               const bool theToValidate)
 {
-  if (theValues.empty())
+  if (theValues.empty()) {
+    // In order to make reselection possible, set empty object and shape should be done
+    setSelectionCustom(ModuleBase_ViewerPrs());
     return false;
+  }
   // it removes the processed value from the parameters list
   ModuleBase_ViewerPrs aValue = theValues.takeFirst();
   bool isDone = false;

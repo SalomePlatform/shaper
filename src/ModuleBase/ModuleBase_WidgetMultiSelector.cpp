@@ -272,26 +272,6 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::clearAttribute()
-{
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = aData->attribute(attributeID());
-  std::string aType = anAttribute->attributeType();
-  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
-    aSelectionListAttr->clear();
-  }
-  else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
-    aRefListAttr->clear();
-  }
-  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
-    aRefAttrListAttr->clear();
-  }
-}
-
-//********************************************************************
 void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
                                                GeomShapePtr theShape)
 {
@@ -301,20 +281,26 @@ void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-    aSelectionListAttr->append(aResult, theShape, myIsInValidate);
+    //if (!aSelectionListAttr->isInList(aResult, theShape, myIsInValidate))
+      aSelectionListAttr->append(aResult, theShape, myIsInValidate);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
-    aRefListAttr->append(theSelectedObject);
+    //if (!aRefListAttr->isInList(theSelectedObject))
+      aRefListAttr->append(theSelectedObject);
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
-
     AttributePtr anAttribute = myWorkshop->module()->findAttribute(theSelectedObject, theShape);
-    if (anAttribute.get())
-      aRefAttrListAttr->append(anAttribute);
-    else
-      aRefAttrListAttr->append(theSelectedObject);
+
+    if (anAttribute.get()) {
+      //if (!aRefAttrListAttr->isInList(anAttribute))
+        aRefAttrListAttr->append(anAttribute);
+    }
+    else {
+      //if (!aRefAttrListAttr->isInList(theSelectedObject))
+        aRefAttrListAttr->append(theSelectedObject);
+    }
   }
 }
 
@@ -344,6 +330,10 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
     // this emit is necessary to call store/restore method an restore type of selection
     //emit valuesChanged();
   //}
+
+  /// remove unused objects from the model attribute
+  removeUnusedAttributeObjects(theValues);
+
   theValues.clear();
   if (!aSkippedValues.empty())
     theValues.append(aSkippedValues);
@@ -680,4 +670,111 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       }
     }
   }
+}
+
+void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
+                                                 (QList<ModuleBase_ViewerPrs>& theValues)
+{
+  std::map<ObjectPtr, std::set<GeomShapePtr> > aGeomSelection = convertSelection(theValues);
+
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = aData->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  std::set<GeomShapePtr> aShapes;
+  std::set<int> anIndicesToBeRemoved;
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    // iteration through data model to find not selected elements to remove them
+    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
+    for (int i = 0; i < aSelectionListAttr->size(); i++) {
+      AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
+      bool aFound = findInSelection(anAttr->context(), anAttr->value(), aGeomSelection);
+      if (!aFound)
+        anIndicesToBeRemoved.insert(i);
+    }
+    aSelectionListAttr->remove(anIndicesToBeRemoved);
+  }
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
+    for (int i = 0; i < aRefListAttr->size(); i++) {
+      ObjectPtr anObject = aRefListAttr->object(i);
+      if (anObject.get()) {
+        bool aFound = findInSelection(anObject, GeomShapePtr(), aGeomSelection);
+        if (!aFound)
+          anIndicesToBeRemoved.insert(i);
+      }
+    }
+    aRefListAttr->remove(anIndicesToBeRemoved);
+  }
+  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
+    /*AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
+    for (int i = 0; i < aRefAttrListAttr->size(); i++) {
+      bool aFound = false;
+      if (aRefAttrListAttr->isAttribute(i)) {
+        AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
+        ObjectPtr anAttrObject = anAttribute->owner();
+        if (aGeomSelection.find(anAttrObject) != aGeomSelection.end()) {
+          std::set<GeomShapePtr> aShapes = aGeomSelection[anAttrObject];
+          std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
+          for (; anIt != aLast && !aFound; anIt++) {
+            GeomShapePtr aCShape = *anIt;
+            if (aCShape.get()) {
+              AttributePtr aCAttr = myWorkshop->module()->findAttribute(anAttrObject, aCShape);
+              aFound = aCAttr == anAttribute;
+            }
+          }
+        }
+      }
+      else {
+        aFound = findInSelection(aRefAttrListAttr->object(i), GeomShapePtr(), aGeomSelection);
+      }
+      if (!aFound)
+        anIndicesToBeRemoved.insert(i);
+    }
+    aRefAttrListAttr->remove(anIndicesToBeRemoved);*/
+  }
+}
+
+std::map<ObjectPtr, std::set<GeomShapePtr> > ModuleBase_WidgetMultiSelector::convertSelection
+                                                     (QList<ModuleBase_ViewerPrs>& theValues)
+{
+  // convert prs list to objects map
+  std::map<ObjectPtr, std::set<GeomShapePtr> > aGeomSelection;
+  std::set<GeomShapePtr> aShapes;
+  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  ObjectPtr anObject;
+  GeomShapePtr aShape;
+  GeomShapePtr anEmptyShape(new GeomAPI_Shape());
+  for (; anIt != aLast; anIt++) {
+    ModuleBase_ViewerPrs aPrs = *anIt;
+    getGeomSelection(aPrs, anObject, aShape);
+    aShapes.clear();
+    if (aGeomSelection.find(anObject) != aGeomSelection.end()) // found
+      aShapes = aGeomSelection[anObject];
+    // we need to know if there was an empty shape in selection for the object
+    if (!aShape.get())
+      aShape = anEmptyShape;
+    if (aShape.get() && aShapes.find(aShape) == aShapes.end()) // not found
+      aShapes.insert(aShape);
+    aGeomSelection[anObject] = aShapes;
+  }
+  return aGeomSelection;
+}
+
+bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
+                              const GeomShapePtr& theShape,
+                              const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection)
+{
+  bool aFound = false;
+  GeomShapePtr anEmptyShape(new GeomAPI_Shape());
+  GeomShapePtr aShape = theShape.get() ? theShape : anEmptyShape;
+  if (theGeomSelection.find(theObject) != theGeomSelection.end()) {// found
+    const std::set<GeomShapePtr>& aShapes = theGeomSelection.at(theObject);
+    std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
+    for (; anIt != aLast && !aFound; anIt++) {
+      GeomShapePtr aCShape = *anIt;
+      if (aCShape.get())
+        aFound = aCShape->isEqual(aShape);
+    }
+  }
+  return aFound;
 }

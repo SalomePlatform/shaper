@@ -461,11 +461,6 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
 {
-  if(!theAttribute.get() || !theAttribute->isInitialized()) {
-    theError = "Error: List of points is not initialized.";
-    return false;
-  }
-
   std::shared_ptr<SketchPlugin_ConstraintFillet> aFilletFeature = std::dynamic_pointer_cast<SketchPlugin_ConstraintFillet>(theAttribute->owner());
   AttributeRefAttrListPtr aPointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
   if(aPointsRefList->size() == 0) {
