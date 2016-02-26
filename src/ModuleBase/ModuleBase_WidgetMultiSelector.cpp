@@ -310,6 +310,10 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
 {
   QList<ModuleBase_ViewerPrs> aSkippedValues;
 
+  /// remove unused objects from the model attribute.
+  /// It should be performed before new attributes append.
+  removeUnusedAttributeObjects(theValues);
+
   QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   bool isDone = false;
   for (; anIt != aLast; anIt++) {
@@ -332,7 +336,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
   //}
 
   /// remove unused objects from the model attribute
-  removeUnusedAttributeObjects(theValues);
+  //removeUnusedAttributeObjects(theValues);
 
   theValues.clear();
   if (!aSkippedValues.empty())
