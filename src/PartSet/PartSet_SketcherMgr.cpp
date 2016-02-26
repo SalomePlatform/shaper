@@ -864,6 +864,12 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     aFeature->setDisplayed(true);
   }
 
+  if(myCirclePointFilter.IsNull()) {
+    myCirclePointFilter = new PartSet_CirclePointFilter(myModule->workshop());
+  }
+
+  myModule->workshop()->viewer()->addSelectionFilter(myCirclePointFilter);
+
   if (myPlaneFilter.IsNull()) 
     myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
@@ -898,6 +904,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
+    // TODO: move this outside of if-else
+    myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 
     // Erase all sketcher objects
@@ -940,6 +948,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
       myCurrentSketch->setDisplayed(true);
     
     myCurrentSketch = CompositeFeaturePtr();
+
+    myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 
     Events_Loop::loop()->flush(aDispEvent);

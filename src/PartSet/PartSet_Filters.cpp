@@ -8,14 +8,15 @@
 
 #include <ModuleBase_IWorkshop.h>
 #include "ModuleBase_IModule.h"
+#include <ModuleBase_ResultPrs.h>
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
-#include <FeaturesPlugin_Group.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
+#include <StdSelect_BRepOwner.hxx>
 
 
 IMPLEMENT_STANDARD_HANDLE(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter);
@@ -50,7 +51,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
         else {
           FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
           if (aFeature) {
-            aValid = aFeature->getKind() != FeaturesPlugin_Group::ID();
+            aValid = aFeature->getKind() != "Group";
           } else 
             aValid = Standard_True;
         }
@@ -63,4 +64,67 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
   qDebug(QString("PartSet_GlobalFilter::IsOk = %1").arg(aValid).toStdString().c_str());
 #endif
   return aValid;
+}
+
+IMPLEMENT_STANDARD_HANDLE(PartSet_CirclePointFilter, SelectMgr_Filter);
+IMPLEMENT_STANDARD_RTTIEXT(PartSet_CirclePointFilter, SelectMgr_Filter);
+
+Standard_Boolean PartSet_CirclePointFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+{
+  ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
+  if(!anOperation) {
+    return Standard_True;
+  }
+
+  if(theOwner->HasSelectable() == Standard_False) {
+    return Standard_True;
+  }
+
+  Handle(StdSelect_BRepOwner) aBrepOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
+  if(aBrepOwner.IsNull()) {
+    return Standard_True;
+  }
+
+  const TopoDS_Shape& aShape = aBrepOwner->Shape();
+  if(aShape.IsNull() || aShape.ShapeType() != TopAbs_VERTEX) {
+    return Standard_True;
+  }
+
+  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(theOwner->Selectable());
+  if(aResultPrs.IsNull()) {
+    return Standard_True;
+  }
+
+  std::shared_ptr<GeomAPI_AISObject> aGeomAISObj(new GeomAPI_AISObject());
+  aGeomAISObj->setImpl(new Handle(AIS_InteractiveObject)(aResultPrs));
+  ObjectPtr anObj = myWorkshop->findPresentedObject(aGeomAISObj);
+  if(!anObj.get()) {
+    return Standard_True;
+  }
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+  if(!aResult.get()) {
+    return Standard_True;
+  }
+
+  DocumentPtr aDocument = aResult->document();
+  if(!aDocument.get()) {
+    return Standard_True;
+  }
+
+  FeaturePtr aFeature = aDocument->feature(aResult);
+  if(!aFeature.get() || aFeature->getKind() != "SketchCircle") {
+    return Standard_True;
+  }
+
+  const TopoDS_Shape anOwnerShape = aResultPrs->Shape();
+  if(anOwnerShape.ShapeType() == TopAbs_EDGE) {
+    return Standard_False;
+  }
+
+#ifdef DEBUG_FILTERS
+  qDebug(QString("PartSet_ShapeDocumentFilter::IsOk = %1").arg(aValid).toStdString().c_str());
+#endif
+
+  return Standard_True;
 }

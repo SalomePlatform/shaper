@@ -9,6 +9,7 @@
 
 #include "PartSet.h"
 
+#include "PartSet_Filters.h"
 #include "PartSet_Tools.h"
 
 #include <ModelAPI_Feature.h>
@@ -356,6 +357,7 @@ private:
 
   CompositeFeaturePtr myCurrentSketch;
 
+  Handle(PartSet_CirclePointFilter) myCirclePointFilter;
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
   FeatureToSelectionMap myCurrentSelection;
   bool myPreviousUpdateViewerEnabled;

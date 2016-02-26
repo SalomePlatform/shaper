@@ -31,4 +31,32 @@ public:
   DEFINE_STANDARD_RTTI(PartSet_GlobalFilter)
 };
 
+
+/// \class PartSet_CirclePointFilter
+/// \ingroup GUI
+/// \brief A filter which provide filtering of selection in 3d viewer.
+/// Installing of this filter disables selection of point on circle in sketch
+DEFINE_STANDARD_HANDLE(PartSet_CirclePointFilter, SelectMgr_Filter);
+class PartSet_CirclePointFilter: public SelectMgr_Filter
+{
+public:
+
+  /// Constructor
+  /// \param theWorkshop instance of workshop interface
+  Standard_EXPORT PartSet_CirclePointFilter(ModuleBase_IWorkshop* theWorkshop):
+    SelectMgr_Filter(),
+    myWorkshop(theWorkshop) {};
+
+  /// Returns True if the given owner is acceptable for selection
+  /// \param theOwner the selected owner
+  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+
+  DEFINE_STANDARD_RTTI(PartSet_CirclePointFilter)
+
+private:
+
+  /// Reference to workshop
+  ModuleBase_IWorkshop* myWorkshop;
+};
+
 #endif
