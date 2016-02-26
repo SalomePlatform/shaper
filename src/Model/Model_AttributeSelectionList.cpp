@@ -145,6 +145,11 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
 {
+  for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
+    AttributeSelectionPtr anAttr = value(anIndex);
+    if (anAttr->context() == theContext && anAttr->value()->isEqual(theSubShape))
+      return true;
+  }
   return false;
 }
 
