@@ -259,7 +259,7 @@ void SketchPlugin_ConstraintFillet::execute()
     aResultEdgeB->execute();
     // update fillet arc: make the arc correct for sure, so, it is not needed to process the "attribute updated"
     // by arc; moreover, it may cause cyclicity in hte mechanism of updater
-    aResultArc->data()->blockSendAttributeUpdated(true);
+    //aResultArc->data()->blockSendAttributeUpdated(true);
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aResultArc->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(aCenter->x(), aCenter->y());
     if(isReversed) {
@@ -278,7 +278,7 @@ void SketchPlugin_ConstraintFillet::execute()
     }
     aStartPoint->setValue(aTangentPntA->x(), aTangentPntA->y());
     aEndPoint->setValue(aTangentPntB->x(), aTangentPntB->y());
-    aResultArc->data()->blockSendAttributeUpdated(false);
+    //aResultArc->data()->blockSendAttributeUpdated(false);
     aResultArc->execute();
 
     if(anIsNeedNewObjects) {
