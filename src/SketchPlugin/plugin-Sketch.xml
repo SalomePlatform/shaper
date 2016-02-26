@@ -89,10 +89,6 @@
             <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"/>
             <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
             <sketch-2dpoint_selector id="ArcPassedPoint" accept_expressions="0" title="Passed point" tooltip="Passed point"/>
-            <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon=":icons/radius.png" tooltip="Set radius" obligatory="0">
-              <validator id="GeomValidators_Positive"/>
-            </doublevalue>
-            <doublevalue id="ArcAngle" label="Angle:" icon=":icons/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"/>
             <validator id="GeomValidators_Different" parameters="ArcStartPoint,ArcEndPoint,ArcPassedPoint"/>
           </box>
           <box id="Tangent" title="Tangent with edge" icon=":icons/arc_tang_32x32.png">
@@ -100,12 +96,12 @@
               <validator id="SketchPlugin_ArcTangentPoint" parameters="" />
             </sketch_shape_selector>
             <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
-            <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon=":icons/radius.png" tooltip="Set radius" obligatory="0">
-              <validator id="GeomValidators_Positive"/>
-            </doublevalue>
-            <doublevalue id="ArcAngle" label="Angle:" icon=":icons/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"/>
           </box>
         </toolbox>
+        <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon=":icons/radius.png" tooltip="Set radius" obligatory="0">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue>
+        <doublevalue id="ArcAngle" label="Angle:" icon=":icons/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
     </group>
