@@ -1973,8 +1973,14 @@ void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
   int aSize = theDoc->size(theGroup);
   for (int i = 0; i < aSize; i++) {
     aObj = theDoc->object(theGroup, i);
-    if (aObj->isDisplayed())
+    if (aObj->isDisplayed()) {
+      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
+      // be changed to the object becomes visible when the shape becomes not empty
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aRes.get() && (!aRes->shape().get() || aRes->shape()->isNull()))
+        continue;
       myDisplayer->display(aObj, false);
+    }
   }
   if (theUpdateViewer)
     myDisplayer->updateViewer();
