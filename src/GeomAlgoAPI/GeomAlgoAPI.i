@@ -14,12 +14,12 @@
 %include "std_shared_ptr.i"
 
 // all supported interfaces
+%include "GeomAlgoAPI_MakeShape.h"
 %include "GeomAlgoAPI_Boolean.h"
 %include "GeomAlgoAPI_CompoundBuilder.h"
 %include "GeomAlgoAPI_DFLoader.h"
 %include "GeomAlgoAPI_EdgeBuilder.h"
 %include "GeomAlgoAPI_FaceBuilder.h"
-%include "GeomAlgoAPI_MakeShape.h"
 %include "GeomAlgoAPI_MakeShapeCustom.h"
 %include "GeomAlgoAPI_MakeShapeList.h"
 %include "GeomAlgoAPI_MakeSweep.h"
