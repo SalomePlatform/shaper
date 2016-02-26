@@ -1574,6 +1574,9 @@ void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
 
 void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 {
+  if (!myCurrentSketch.get())
+    return;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
   QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
@@ -1600,6 +1603,9 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 
 void PartSet_SketcherMgr::restoreSelection()
 {
+  if (!myCurrentSketch.get())
+    return;
+
   //qDebug(QString("restoreSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);

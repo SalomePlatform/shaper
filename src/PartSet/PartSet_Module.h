@@ -66,6 +66,12 @@ public:
   // Remove default selection filters of the module from the current viewer
   virtual void deactivateSelectionFilters();
 
+  // Stores the current selection
+  virtual void storeSelection();
+
+  // Restores the current selection
+  virtual void restoreSelection();
+
   /// Creates custom widgets for property panel
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi, std::string theParentId);

@@ -322,7 +322,16 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
         arg(!isEqualShapes || isCustomized).arg(isEqualShapes).arg(isCustomized).toStdString().c_str());
     #endif
     if (!isEqualShapes || isCustomized) {
+      /// if shapes are equal and presentation are customized, selection should be restored
+      bool aNeedToRestoreSelection = isEqualShapes && isCustomized;
+      if (aNeedToRestoreSelection)
+        myWorkshop->module()->storeSelection();
+
       aContext->Redisplay(aAISIO, false);
+
+      if (aNeedToRestoreSelection)
+        myWorkshop->module()->restoreSelection();
+
       aRedisplayed = true;
       #ifdef DEBUG_FEATURE_REDISPLAY
         qDebug("  Redisplay happens");

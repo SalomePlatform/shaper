@@ -193,6 +193,16 @@ void PartSet_Module::deactivateSelectionFilters()
   }
 }
 
+void PartSet_Module::storeSelection()
+{
+  sketchMgr()->storeSelection();
+}
+
+void PartSet_Module::restoreSelection()
+{
+  sketchMgr()->restoreSelection();
+}
+
 void PartSet_Module::registerValidators()
 {
   //Registering of validators

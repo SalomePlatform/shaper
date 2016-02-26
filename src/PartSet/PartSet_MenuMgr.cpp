@@ -352,8 +352,6 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
 
     anOpMgr->startOperation(anOpAction);
   }
-  myModule->sketchMgr()->storeSelection();
-
   if (anObjects.size() > 0) {
     QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
     for (; anIt != aLast; anIt++) {
@@ -376,7 +374,6 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
     anOpMgr->commitOperation();
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  myModule->sketchMgr()->restoreSelection();
 }
 
 bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const

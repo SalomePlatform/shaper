@@ -57,6 +57,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Remove default selection filters of the module from the current viewer
   virtual void deactivateSelectionFilters() {};
 
+  // Stores the current selection
+  virtual void storeSelection() {};
+
+  // Restores the current selection
+  virtual void restoreSelection() {};
+
   /// Reads description of features from XML file 
   virtual void createFeatures();
 

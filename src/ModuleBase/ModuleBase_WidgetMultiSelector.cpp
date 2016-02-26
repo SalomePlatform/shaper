@@ -335,9 +335,6 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
     //emit valuesChanged();
   //}
 
-  /// remove unused objects from the model attribute
-  //removeUnusedAttributeObjects(theValues);
-
   theValues.clear();
   if (!aSkippedValues.empty())
     theValues.append(aSkippedValues);
