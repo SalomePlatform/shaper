@@ -29,7 +29,7 @@
         id="SketchIntersectionPoint"
         title="Intersection Point"
         tooltip="Create intersection point"
-        icon=":icons/point.png">
+        icon=":icons/intersection_point.png">
         <sketch_shape_selector
               id="ExternalLine"
               label="Edge"
