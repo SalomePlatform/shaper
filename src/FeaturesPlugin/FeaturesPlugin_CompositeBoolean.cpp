@@ -23,6 +23,8 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <sstream>
+
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::initAttributes()
 {
@@ -417,16 +419,20 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         std::shared_ptr<GeomAlgoAPI_MakeSweep> aSweepAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(aSolidAlgo);
         if(aSweepAlgo.get()) {
           //Insert to faces
+          int aToFaceIndex = 1;
           const ListOfShape& aToFaces = aSweepAlgo->toFaces();
           for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
             std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
             if(aSubShapes->isBound(aToFace)) {
               aToFace = aSubShapes->find(aToFace);
             }
-            theResultBody->generated(aToFace, aToName, aToTag++);
+            std::ostringstream aStr;
+            aStr << aToName << "_" << aToFaceIndex++;
+            theResultBody->generated(aToFace, aStr.str(), aToTag++);
           }
 
           //Insert from faces
+          int aFromFaceIndex = 1;
           const ListOfShape& aFromFaces = aSweepAlgo->fromFaces();
           if (aFromTag < aToTag) aFromTag = aToTag;
           for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
@@ -434,7 +440,9 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
             if(aSubShapes->isBound(aFromFace)) {
               aFromFace = aSubShapes->find(aFromFace);
             }
-            theResultBody->generated(aFromFace, aFromName, aFromTag++);
+            std::ostringstream aStr;
+            aStr << aFromName << "_" << aFromFaceIndex++;
+            theResultBody->generated(aFromFace, aStr.str(), aFromTag++);
           }
         }
       }

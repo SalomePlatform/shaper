@@ -19,6 +19,8 @@
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <sstream>
+
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 {
@@ -173,6 +175,7 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
   theResultBody->loadAndOrientGeneratedShapes(&thePrismAlgo, theBasis, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aSubShapes);
 
   //Insert to faces
+  int aToFaceIndex = 1;
   const std::string aToName = "ToFace";
   int aToTag = 2;
   const ListOfShape& aToFaces = thePrismAlgo.toFaces();
@@ -181,10 +184,13 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
     if(aSubShapes->isBound(aToFace)) {
       aToFace = aSubShapes->find(aToFace);
     }
-    theResultBody->generated(aToFace, aToName, aToTag++);
+    std::ostringstream aStr;
+    aStr << aToName << "_" << aToFaceIndex++;
+    theResultBody->generated(aToFace, aStr.str(), aToTag++);
   }
 
   //Insert from faces
+  int aFromFaceIndex = 1;
   const std::string aFromName = "FromFace";
   int aFromTag = aToTag > 10000 ? aToTag : 10000;
   const ListOfShape& aFromFaces = thePrismAlgo.fromFaces();
@@ -193,6 +199,8 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
     if(aSubShapes->isBound(aFromFace)) {
       aFromFace = aSubShapes->find(aFromFace);
     }
-    theResultBody->generated(aFromFace, aFromName, aFromTag++);
+    std::ostringstream aStr;
+    aStr << aFromName << "_" << aFromFaceIndex++;
+    theResultBody->generated(aFromFace, aStr.str(), aFromTag++);
   }
 }

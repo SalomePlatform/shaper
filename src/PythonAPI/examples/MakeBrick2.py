@@ -45,7 +45,7 @@ mybox = model.addExtrusion(mypart, mybase.selectFace(), 50)
 
 thisface = "Extrusion_1_1/LateralFace_2"
 thisxmin = "Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_2"
-thiszmax = "Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1"
+thiszmax = "Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1_1"
 
 mystand = model.addSketch(mypart, thisface)
 circle = mystand.addCircle(0, 25, 5)

@@ -48,7 +48,7 @@ thisface = "Extrusion_1_1/LateralFace_2"
 thisxmin = "Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_2"
 thisxmax = "Extrusion_1_1/LateralFace_2&Extrusion_1_1/LateralFace_1"
 thiszmin = "Sketch_1/Edge5_1"
-thiszmax = "Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1"
+thiszmax = "Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1_1"
 
 mystand = model.addSketch(mypart, thisface)
 

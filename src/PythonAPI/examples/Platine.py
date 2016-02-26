@@ -87,7 +87,7 @@ def bottom_body():
     sketch.setCoincident(arc.endPoint(), h1.startPoint())
 
     # Binding
-    left_e = sketch.addLine("Extrusion_1_1/LateralFace_4&Extrusion_1_1/ToFace_1")
+    left_e = sketch.addLine("Extrusion_1_1/LateralFace_4&Extrusion_1_1/ToFace_1_1")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
     sketch.setCoincident(left_e.endPoint(), left.startPoint())
 

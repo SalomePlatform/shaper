@@ -182,6 +182,7 @@ void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_Resul
   std::shared_ptr<GeomAlgoAPI_MakeSweep> aSweepAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
   if(aSweepAlgo.get()) {
     //Insert to faces
+    int aToFaceIndex = 1;
     const std::string aToName = "ToFace";
     int aToTag = 2;
     const ListOfShape& aToFaces = aSweepAlgo->toFaces();
@@ -190,10 +191,13 @@ void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_Resul
       if(aDataMap->isBound(aToFace)) {
         aToFace = aDataMap->find(aToFace);
       }
-      theResultBody->generated(aToFace, aToName, aToTag++);
+      std::ostringstream aStr;
+      aStr << aToName << "_" << aToFaceIndex++;
+      theResultBody->generated(aToFace, aStr.str(), aToTag++);
     }
 
     //Insert from faces
+    int aFromFaceIndex = 1;
     const std::string aFromName = "FromFace";
     int aFromTag = aToTag > 10000 ? aToTag : 10000;
     const ListOfShape& aFromFaces = aSweepAlgo->fromFaces();
@@ -202,7 +206,9 @@ void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_Resul
       if(aDataMap->isBound(aFromFace)) {
         aFromFace = aDataMap->find(aFromFace);
       }
-      theResultBody->generated(aFromFace, aFromName, aFromTag++);
+      std::ostringstream aStr;
+      aStr << aFromName << "_" << aFromFaceIndex++;
+      theResultBody->generated(aFromFace, aStr.str(), aFromTag++);
     }
   }
 }
