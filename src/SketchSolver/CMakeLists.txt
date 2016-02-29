@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
     SketchSolver_Constraint.h
     SketchSolver_ConstraintAngle.h
     SketchSolver_ConstraintCoincidence.h
+    SketchSolver_ConstraintCollinear.h
     SketchSolver_ConstraintDistance.h
     SketchSolver_ConstraintEqual.h
     SketchSolver_ConstraintLength.h
@@ -33,6 +34,7 @@ SET(PROJECT_SOURCES
     SketchSolver_Constraint.cpp
     SketchSolver_ConstraintAngle.cpp
     SketchSolver_ConstraintCoincidence.cpp
+    SketchSolver_ConstraintCollinear.cpp
     SketchSolver_ConstraintDistance.cpp
     SketchSolver_ConstraintEqual.cpp
     SketchSolver_ConstraintLength.cpp

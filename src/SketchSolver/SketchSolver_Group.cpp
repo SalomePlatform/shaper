@@ -169,6 +169,9 @@ bool SketchSolver_Group::changeConstraint(
       Events_Error::send(aConstraint->error(), this);
     }
     myConstraints[theConstraint] = aConstraint;
+
+    if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+      notifyCoincidenceChanged(myConstraints[theConstraint]);
   }
   else
     myConstraints[theConstraint]->update();
@@ -561,6 +564,8 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
   for (; aCIter != myConstraints.end(); aCIter++)
     if (aCIter->first == theConstraint) {
       aCIter->second->remove(); // the constraint is not fully removed
+      if (aCIter->first->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+        notifyCoincidenceChanged(aCIter->second);
       break;
     }
   if (aCIter != myConstraints.end())
@@ -674,3 +679,13 @@ std::list<FeaturePtr> SketchSolver_Group::selectApplicableFeatures(const std::se
   return aResult;
 }
 
+void SketchSolver_Group::notifyCoincidenceChanged(SolverConstraintPtr theCoincidence)
+{
+  const std::list<EntityWrapperPtr>& aCoincident = theCoincidence->attributes();
+  EntityWrapperPtr anAttr1 = aCoincident.front();
+  EntityWrapperPtr anAttr2 = aCoincident.back();
+
+  ConstraintConstraintMap::iterator anIt = myConstraints.begin();
+  for (; anIt != myConstraints.end(); ++anIt)
+    anIt->second->notifyCoincidenceChanged(anAttr1, anAttr2);
+}

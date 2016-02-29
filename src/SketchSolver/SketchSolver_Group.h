@@ -155,6 +155,10 @@ private:
   /// \brief Verifies is the feature valid
   bool checkFeatureValidity(FeaturePtr theFeature);
 
+  /// \brief Notify all interested constraints that coincidence appears or removed
+  /// \param[in] theCoincidence  coincidence constraint
+  void notifyCoincidenceChanged(SolverConstraintPtr theCoincidence);
+
 private:
   GroupID  myID; ///< Index of the group
   EntityID myWorkplaneID; ///< Index of workplane, the group is based on

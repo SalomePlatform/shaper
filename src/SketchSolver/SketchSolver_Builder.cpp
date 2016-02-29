@@ -8,6 +8,7 @@
 #include <SketchSolver_Constraint.h>
 #include <SketchSolver_ConstraintAngle.h>
 #include <SketchSolver_ConstraintCoincidence.h>
+#include <SketchSolver_ConstraintCollinear.h>
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>
 #include <SketchSolver_ConstraintFixed.h>
@@ -28,6 +29,7 @@
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -77,6 +79,8 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
 
   if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintCoincidence(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintCollinear(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintDistance(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintEqual::ID()) {

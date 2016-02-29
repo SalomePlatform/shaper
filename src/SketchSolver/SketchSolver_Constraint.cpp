@@ -201,6 +201,7 @@ void SketchSolver_Constraint::getAttributes(
 {
   static const int anInitNbOfAttr = 4;
   theAttributes.assign(anInitNbOfAttr, EntityWrapperPtr());
+  myAttributes.clear();
 
   DataPtr aData = myBaseConstraint->data();
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
@@ -225,6 +226,7 @@ void SketchSolver_Constraint::getAttributes(
 
     myStorage->update(*anIter/*, myGroupID*/);
     EntityWrapperPtr anEntity = myStorage->entity(*anIter);
+    myAttributes.push_back(anEntity);
 
     SketchSolver_EntityType aType = anEntity->type();
     if (aType == ENTITY_UNKNOWN)

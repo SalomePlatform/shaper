@@ -57,10 +57,18 @@ public:
   virtual SketchSolver_ConstraintType getType() const
   { return myType; }
 
+  /// \brief Returns list of attributes of constraint
+  const std::list<EntityWrapperPtr>& attributes() const
+  { return myAttributes; }
+
   /// \brief Verify the feature or any its attribute is used by constraint
   virtual bool isUsed(FeaturePtr theFeature) const;
   /// \brief Verify the attribute is used by constraint
   virtual bool isUsed(AttributePtr theAttribute) const;
+
+  /// \brief Notify constraint, that coincidence appears or removed
+  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1, EntityWrapperPtr theCoincAttr2)
+  { /* implement in derived class */ }
 
   /// \brief Shows error message
   const std::string& error() const
@@ -90,6 +98,7 @@ protected:
   ConstraintPtr myBaseConstraint; ///< base SketchPlugin constraint
   StoragePtr    myStorage; ///< storage, which contains all information about entities and constraints
   SketchSolver_ConstraintType myType; ///< type of constraint
+  std::list<EntityWrapperPtr> myAttributes; ///< attributes of constraint
 
   std::string   myErrorMsg; ///< error message
 };
