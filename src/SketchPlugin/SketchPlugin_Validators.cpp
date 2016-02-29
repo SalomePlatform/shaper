@@ -468,8 +468,26 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     return false;
   }
 
-  std::list<AttributePtr> aBasePointsList = aFilletFeature->basePoints();
-  std::list<FeaturePtr> aResultEdgesList = aFilletFeature->resultEdges();
+  std::map<AttributePtr, SketchPlugin_ConstraintFillet::FilletFeatures> aPointsFeaturesMap = aFilletFeature->pointsFeaturesMap();
+  std::set<AttributePtr> aSetOfPointsOnResultEdges;
+  for(std::map<AttributePtr, SketchPlugin_ConstraintFillet::FilletFeatures>::iterator aPointsIter = aPointsFeaturesMap.begin();
+      aPointsIter != aPointsFeaturesMap.end();
+      ++aPointsIter) {
+    const SketchPlugin_ConstraintFillet::FilletFeatures& aFeatures = aPointsIter->second;
+    const std::list<FeaturePtr>& aResultEdges = aFeatures.resultEdges;
+    for(std::list<FeaturePtr>::const_iterator aResultIter = aResultEdges.cbegin();
+        aResultIter != aResultEdges.cend();
+        ++aResultIter) {
+      FeaturePtr aResultFeature = *aResultIter;
+      if(aResultFeature->getKind() == SketchPlugin_Line::ID()) {
+        aSetOfPointsOnResultEdges.insert(aResultFeature->attribute(SketchPlugin_Line::START_ID()));
+        aSetOfPointsOnResultEdges.insert(aResultFeature->attribute(SketchPlugin_Line::END_ID()));
+      } else if(aResultFeature->getKind() == SketchPlugin_Arc::ID()) {
+        aSetOfPointsOnResultEdges.insert(aResultFeature->attribute(SketchPlugin_Arc::START_ID()));
+        aSetOfPointsOnResultEdges.insert(aResultFeature->attribute(SketchPlugin_Arc::END_ID()));
+      }
+    }
+  }
 
   std::list<std::pair<ObjectPtr, AttributePtr>> aPointsList = aPointsRefList->list();
   for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
@@ -479,29 +497,15 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
 
     // If we alredy have some result then:
     // - if it is the same point all ok, just skip it
-    // - if it is point on the fillet arc then it is not valid
-    if(!aBasePointsList.empty()) {
-      if(std::find(aBasePointsList.begin(), aBasePointsList.end(), aPointAttribute) != aBasePointsList.end()) {
+    // - if it is point on the fillet result edge then it is not valid
+    if(!aPointsFeaturesMap.empty()) {
+      if(aPointsFeaturesMap.find(aPointAttribute) != aPointsFeaturesMap.end()) {
         continue;
       }
 
-      // Check that selected point not on the one of the result fillet arc.
-      std::list<FeaturePtr>::iterator aResultEdgesIt = aResultEdgesList.begin();
-      for(unsigned int anIndex = 0; anIndex < aBasePointsList.size(); anIndex++) {
-        if(aResultEdgesList.size() > 0) {
-          FeaturePtr aResultArc;
-          std::advance(aResultEdgesIt, 2);
-          aResultArc = *aResultEdgesIt++;
-          AttributePtr anArcStart = aResultArc->attribute(SketchPlugin_Arc::START_ID());
-          AttributePtr anArcEnd = aResultArc->attribute(SketchPlugin_Arc::END_ID());
-          std::shared_ptr<GeomAPI_Pnt2d> anArcStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcStart)->pnt();
-          std::shared_ptr<GeomAPI_Pnt2d> anArcEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcEnd)->pnt();
-          double aDistSelectedArcStart = aSelectedPnt->distance(anArcStartPnt);
-          double aDistSelectedArcEnd = aSelectedPnt->distance(anArcEndPnt);
-          if(aDistSelectedArcStart < tolerance || aDistSelectedArcEnd < tolerance) {
-            return false;
-          }
-        }
+      // Check that selected point not on the one of the fillet result edge.
+      if(aSetOfPointsOnResultEdges.find(aPointAttribute) != aSetOfPointsOnResultEdges.end()) {
+        return false;
       }
     }
 

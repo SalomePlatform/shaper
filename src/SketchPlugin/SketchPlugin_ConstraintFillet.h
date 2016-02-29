@@ -25,6 +25,12 @@
 class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
 {
  public:
+   struct FilletFeatures {
+    std::list<FeaturePtr> baseEdges; ///< list of objects the fillet is based
+    std::list<FeaturePtr> resultEdges; ///< list of result edges
+    std::list<FeaturePtr> resultConstraints; ///< list of constraints provided by the fillet
+   };
+
   /// Fillet constraint kind
   inline static const std::string& ID()
   {
@@ -58,23 +64,18 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintFillet();
 
-  /// \return base points list;
-  SKETCHPLUGIN_EXPORT const std::list<AttributePtr> basePoints() const {return myBasePoints;};
-
-  /// \return base edges list;
-  SKETCHPLUGIN_EXPORT const std::list<FeaturePtr> baseEdges() const {return myBaseEdges;};
-
-  /// \return result edges list;
-  SKETCHPLUGIN_EXPORT const std::list<FeaturePtr> resultEdges() const {return myResultEdges;};
+  /// \return map of base points and features;
+  SKETCHPLUGIN_EXPORT const std::map<AttributePtr, FilletFeatures> pointsFeaturesMap() const {
+    return myPointFeaturesMap;
+  };
 
 private:
-  std::list<AttributePtr> myBasePoints; ///< list of base points
-  std::list<FeaturePtr> myBaseEdges;      ///< list of objects the fillet is based
-  std::list<FeaturePtr> myResultEdges;      ///< list of result edges
-  std::list<FeaturePtr> myProducedFeatures; ///< list of constraints provided by the fillet
+  std::set<AttributePtr> myNewPoints; ///< set of new points
+  std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; ///< map of point and features for fillet
   bool myListOfPointsChangedInCode; ///< flag to track that list of points changed in code
   bool myRadiusChangedByUser; ///< flag to track that radius changed by user
   bool myRadiusChangedInCode; ///< flag to track that radius changed in code
+  bool myRadiusInitialized; /// < flag to track that radius initialized
 };
 
 #endif
