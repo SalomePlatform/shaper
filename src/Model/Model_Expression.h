@@ -64,6 +64,36 @@ class Model_ExpressionDouble :
     public ModelAPI_ExpressionDouble
 {
  public:
+  /// Sets the text of this Expression
+  MODEL_EXPORT virtual void setText(const std::string& theText) {
+    Model_Expression::setText(theText);
+  };
+
+  /// Returns the text of this Expression
+  MODEL_EXPORT virtual std::string text() const {
+    return Model_Expression::text();
+  };
+
+  /// Allows to set expression (text) error (by the parameters listener)
+  MODEL_EXPORT virtual void setError(const std::string& theError) {
+    Model_Expression::setError(theError);
+  };
+
+  /// Returns an expression error
+  MODEL_EXPORT virtual std::string error() {
+    return Model_Expression::error();
+  };
+
+  /// Defines the used parameters (by the parameters listener)
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters) {
+    Model_Expression::setUsedParameters(theUsedParameters);
+  };
+
+  /// Returns the used parameters
+  MODEL_EXPORT virtual std::set<std::string> usedParameters() const {
+    return Model_Expression::usedParameters();
+  };
+
   /// Defines the double value
   MODEL_EXPORT virtual void setValue(const double theValue);
 
@@ -96,6 +126,36 @@ class Model_ExpressionInteger :
     public ModelAPI_ExpressionInteger
 {
  public:
+  /// Sets the text of this Expression
+  MODEL_EXPORT virtual void setText(const std::string& theText) {
+    Model_Expression::setText(theText);
+  };
+
+  /// Returns the text of this Expression
+  MODEL_EXPORT virtual std::string text() const {
+    return Model_Expression::text();
+  };
+
+  /// Allows to set expression (text) error (by the parameters listener)
+  MODEL_EXPORT virtual void setError(const std::string& theError) {
+    Model_Expression::setError(theError);
+  };
+
+  /// Returns an expression error
+  MODEL_EXPORT virtual std::string error() {
+    return Model_Expression::error();
+  };
+
+  /// Defines the used parameters (by the parameters listener)
+  MODEL_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters) {
+    Model_Expression::setUsedParameters(theUsedParameters);
+  };
+
+  /// Returns the used parameters
+  MODEL_EXPORT virtual std::set<std::string> usedParameters() const {
+    return Model_Expression::usedParameters();
+  };
+
   /// Defines the integer value
   MODEL_EXPORT virtual void setValue(const int theValue);
 
