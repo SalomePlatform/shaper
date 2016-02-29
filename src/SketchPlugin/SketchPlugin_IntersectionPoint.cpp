@@ -22,7 +22,6 @@ SketchPlugin_IntersectionPoint::SketchPlugin_IntersectionPoint()
 void SketchPlugin_IntersectionPoint::initDerivedClassAttributes()
 {
   data()->addAttribute(EXTERNAL_LINE_ID(), ModelAPI_AttributeSelection::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 
   SketchPlugin_Point::initDerivedClassAttributes();
 }
