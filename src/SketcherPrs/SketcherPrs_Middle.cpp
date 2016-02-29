@@ -27,7 +27,6 @@ SketcherPrs_Middle::SketcherPrs_Middle(ModelAPI_Feature* theConstraint,
 {
   myPntArray = new Graphic3d_ArrayOfPoints(2);
   myPntArray->AddVertex(0., 0., 0.);
-  myPntArray->AddVertex(0., 0., 0.);
 }  
 
 bool SketcherPrs_Middle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
@@ -38,8 +37,10 @@ bool SketcherPrs_Middle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
 
-  aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
-                    SketcherPrs_Tools::getShape(aObj2).get() != NULL;
+  // one object is a feature Line, other object is a point result. We check shape of point result
+  aReadyToDisplay = aObj1.get() && aObj2.get() &&
+                    (SketcherPrs_Tools::getShape(aObj1).get() != NULL ||
+                     SketcherPrs_Tools::getShape(aObj2).get() != NULL);
 
   return aReadyToDisplay;
 }
@@ -48,16 +49,30 @@ bool SketcherPrs_Middle::updatePoints(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
+  ObjectPtr aPointObject;
 
-  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+  // find a line result to set middle symbol near it
+  AttributePtr anAttribute = SketcherPrs_Tools::getAttribute(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  if (!anAttribute.get()) {
+    ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+    std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
+    if (aShape.get() && aShape->isEdge())
+      aPointObject = aObj;
+  }
+  if (!aPointObject.get()) {
+    ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+    std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
+    if (aShape.get() && aShape->isEdge())
+      aPointObject = aObj;
+  }
+
+  if (!aPointObject.get())
+    return false;
 
   // Set points of the presentation
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
-  gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
+  gp_Pnt aP1 = aMgr->getPosition(aPointObject, this, theStep);
   myPntArray->SetVertice(1, aP1);
-  myPntArray->SetVertice(2, aP2);
   return true;
 }
 
@@ -68,18 +83,31 @@ void SketcherPrs_Middle::drawLines(const Handle(Prs3d_Presentation)& thePrs, Qua
   Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
-  // Draw first line
-  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aObj);
-  if (aLine.get() == NULL)
-    return;
-  drawShape(aLine, thePrs);
+  // Draw objects
+  ObjectPtr aObject = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  drawLine(thePrs, theColor, aObject);
 
-  // Draw second line
-  aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  aLine = SketcherPrs_Tools::getShape(aObj);
-  if (aLine.get() == NULL)
-    return;
-  drawShape(aLine, thePrs);
+  aObject = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  drawLine(thePrs, theColor, aObject);
+}
+
+void SketcherPrs_Middle::drawLine(const Handle(Prs3d_Presentation)& thePrs,
+                                  Quantity_Color theColor, const ObjectPtr& theObject) const
+{
+  FeaturePtr aLineFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (aLineFeature.get()) {
+    std::list<ResultPtr> aResults = aLineFeature->results();
+    if (aResults.size() == 1) {
+      ResultPtr aResult = aResults.front();
+      std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aResult);
+      if (aLine.get() != NULL)
+        drawShape(aLine, thePrs);
+    }
+  }
+  else {
+    std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(theObject);
+    if (aLine.get() != NULL)
+      drawShape(aLine, thePrs);
+  }
 }
 

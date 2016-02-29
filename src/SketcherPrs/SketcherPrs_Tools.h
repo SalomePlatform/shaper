@@ -12,6 +12,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Ax3.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Attribute.h>
 #include <ModelAPI_Feature.h>
 #include <string>
 
@@ -39,6 +40,12 @@ namespace SketcherPrs_Tools {
     /// Selection mode foe text of dimension
     Sel_Dimension_Text
   };
+
+  /// Returns attribute object referenced by feature
+  /// \param theFeature a feature
+  /// \param theAttrName an attribute name
+  SKETCHERPRS_EXPORT AttributePtr getAttribute(ModelAPI_Feature* theFeature,
+                                               const std::string& theAttrName);
 
   /// Returns result object referenced by feature
   /// \param theFeature a feature

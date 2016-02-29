@@ -35,13 +35,17 @@ public:
                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 protected:
 
-  virtual const char* iconName() const { return "equal.png"; }
+  virtual const char* iconName() const { return "middlepoint.png"; }
 
   virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
   virtual bool updatePoints(double theStep) const;
+
+  /// Draw shape of the object. Find shape result if the object is feature
+  void drawLine(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor,
+                const ObjectPtr& theObject) const;
 };
 
 #endif

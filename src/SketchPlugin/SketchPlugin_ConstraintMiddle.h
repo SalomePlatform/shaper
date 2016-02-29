@@ -13,7 +13,7 @@
 
 /** \class SketchPlugin_ConstraintMiddle
  *  \ingroup Plugins
- *  \brief Feature for creation of a new constraintwhich places a point in the middle of a line
+ *  \brief Feature for creation of a new constraint which places a point in the middle of a line
  *
  *  This constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()

@@ -35,6 +35,13 @@ static const Standard_ExtCharacter MySigmaSymbol(0x03A3);
 
 namespace SketcherPrs_Tools {
 
+AttributePtr getAttribute(ModelAPI_Feature* theFeature, const std::string& theAttrName)
+{
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(theAttrName);
+  return !anAttr->isObject() ? anAttr->attr() : AttributePtr();
+}
+
 ObjectPtr getResult(ModelAPI_Feature* theFeature, const std::string& theAttrName)
 {
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();

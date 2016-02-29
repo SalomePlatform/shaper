@@ -68,18 +68,8 @@ void SketcherPrs_Collinear::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
   Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
-  // Draw first line
-  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aObj);
-  if (aLine.get() == NULL)
-    return;
-  drawShape(aLine, thePrs);
-
-  // Draw second line
-  aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  aLine = SketcherPrs_Tools::getShape(aObj);
-  if (aLine.get() == NULL)
-    return;
-  drawShape(aLine, thePrs);
+  // Draw constrained lines
+  addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
+  addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
 }
 

@@ -6,6 +6,8 @@
 
 #include "SketchPlugin_ConstraintMiddle.h"
 
+#include "SketcherPrs_Factory.h"
+
 SketchPlugin_ConstraintMiddle::SketchPlugin_ConstraintMiddle()
 {
 }
@@ -25,10 +27,8 @@ AISObjectPtr SketchPlugin_ConstraintMiddle::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS;
-  // TODO
-  //AISObjectPtr anAIS = SketcherPrs_Factory::collinearConstraint(this, sketch()->coordinatePlane(),
-  //                                                              thePrevious);
+  AISObjectPtr anAIS = SketcherPrs_Factory::middleConstraint(this, sketch()->coordinatePlane(),
+                                                             thePrevious);
   return anAIS;
 }
 

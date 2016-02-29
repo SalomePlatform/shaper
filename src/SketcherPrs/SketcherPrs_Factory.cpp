@@ -7,6 +7,7 @@
 #include "SketcherPrs_Factory.h"
 
 #include "SketcherPrs_Coincident.h"
+#include "SketcherPrs_Collinear.h"
 #include "SketcherPrs_Parallel.h"
 #include "SketcherPrs_Perpendicular.h"
 #include "SketcherPrs_Rigid.h"
@@ -15,6 +16,7 @@
 #include "SketcherPrs_Tangent.h"
 #include "SketcherPrs_Radius.h"
 #include "SketcherPrs_LengthDimension.h"
+#include "SketcherPrs_Middle.h"
 #include "SketcherPrs_Mirror.h"
 #include "SketcherPrs_Transformation.h"
 #include "SketcherPrs_Angle.h"
@@ -39,6 +41,7 @@ AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
 }
 
 CONSTRAINT_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
+CONSTRAINT_PRS_IMPL(collinearConstraint, SketcherPrs_Collinear);
 CONSTRAINT_PRS_IMPL(parallelConstraint, SketcherPrs_Parallel);
 CONSTRAINT_PRS_IMPL(perpendicularConstraint, SketcherPrs_Perpendicular);
 CONSTRAINT_PRS_IMPL(rigidConstraint, SketcherPrs_Rigid);
@@ -46,6 +49,7 @@ CONSTRAINT_PRS_IMPL(equalConstraint, SketcherPrs_Equal);
 CONSTRAINT_PRS_IMPL(tangentConstraint, SketcherPrs_Tangent);
 CONSTRAINT_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
 CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
+CONSTRAINT_PRS_IMPL(middleConstraint, SketcherPrs_Middle);
 CONSTRAINT_PRS_IMPL(mirrorConstraint, SketcherPrs_Mirror);
 CONSTRAINT_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
 

@@ -6,6 +6,8 @@
 
 #include "SketchPlugin_ConstraintCollinear.h"
 
+#include "SketcherPrs_Factory.h"
+
 SketchPlugin_ConstraintCollinear::SketchPlugin_ConstraintCollinear()
 {
 }
@@ -25,10 +27,8 @@ AISObjectPtr SketchPlugin_ConstraintCollinear::getAISObject(AISObjectPtr thePrev
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS;
-  // TODO
-  //AISObjectPtr anAIS = SketcherPrs_Factory::collinearConstraint(this, sketch()->coordinatePlane(),
-  //                                                              thePrevious);
+  AISObjectPtr anAIS = SketcherPrs_Factory::collinearConstraint(this, sketch()->coordinatePlane(),
+                                                                thePrevious);
   return anAIS;
 }
 

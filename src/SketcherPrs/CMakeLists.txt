@@ -73,6 +73,7 @@ ENDIF()
 
 
 SET(PROJECT_PICTURES
+    icons/collinear.png
     icons/parallel.png
     icons/perpendicular.png
     icons/anchor.png
@@ -80,6 +81,7 @@ SET(PROJECT_PICTURES
     icons/vertical.png
     icons/equal.png
     icons/tangent.png
+    icons/middlepoint.png
     icons/mirror.png
     icons/rotate.png
     icons/translate.png

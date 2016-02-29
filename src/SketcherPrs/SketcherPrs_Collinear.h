@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:        SketcherPrs_Collinear.h
-// Created:     29 February 2016
+// Created:     29 Feb 2016
 // Author:      Natalia ERMOLAEVA
 
 #ifndef SketcherPrs_Collinear_H
@@ -35,7 +35,7 @@ public:
                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 protected:
 
-  virtual const char* iconName() const { return "equal.png"; }
+  virtual const char* iconName() const { return "collinear.png"; }
 
   virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
 
