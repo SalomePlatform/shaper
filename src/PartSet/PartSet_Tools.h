@@ -111,6 +111,20 @@ public:
                                std::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                std::shared_ptr<GeomDataAPI_Point2D> thePoint2);
 
+  /// Finds in the feature's sub-features first Point2D attribute with the given point coordinates
+  /// \param theFeature a feature with sub-feature attributes
+  /// \param thePoint a point to provided searched coordinates
+  /// \return found point or null
+  static std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPointInArgumentFeatures(
+                  const FeaturePtr& theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
+  /// Finds in the feature first Point2D attribute with the given point coordinates
+  /// \param theFeature a feature with point attributes
+  /// \param thePoint a point to provided searched coordinates
+  /// \return found point or null
+  static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPoint(const FeaturePtr& theFeature,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
   /// Creates constrains of the current 
   /// \param theSketch a sketch feature
   /// \param theFeature a source feature

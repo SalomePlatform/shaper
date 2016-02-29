@@ -386,16 +386,33 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
 
 void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
 {
+  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
+  if (feature()->isMacro()) {
+    AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
+    std::shared_ptr<GeomDataAPI_Point2D> anAttrPoint =
+                               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
+    if (anAttrPoint.get()) {
+      // the macro feature will be removed after the operation is stopped, so we need to build
+      // coicidence to possible sub-features
+      aFeaturePoint = PartSet_Tools::findFirstEqualPointInArgumentFeatures(feature(),
+                                                                 anAttrPoint->pnt());
+    }
+  }
+  else {
+    AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
+    aFeaturePoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
+  }
+  if (!aFeaturePoint.get())
+    return;
+
   // Create point-edge coincedence
   FeaturePtr aFeature = mySketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
   std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
 
   std::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
-  std::shared_ptr<GeomDataAPI_Point2D> aThisPoint = 
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
-  aRef1->setAttr(aThisPoint);
+
+  aRef1->setAttr(aFeaturePoint);
 
   std::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
@@ -409,8 +426,6 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   // the contex menu release by the right button should not be processed by this widget
   if (theEvent->button() != Qt::LeftButton)
     return;
-
-  bool isCoincidenceEnabled = MyFeaturesForCoincedence.contains(myFeature->getKind().c_str());
 
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   Handle(V3d_View) aView = theWnd->v3dView();
@@ -429,13 +444,11 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
       aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
       if ((!aSPFeature && !aShape.IsNull()) ||
           (aSPFeature.get() && aSPFeature->isExternal())) {
-          ResultPtr aFixedObject;
-          if (isCoincidenceEnabled) {
-          anExternal = true;
-          aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
-          if (!aFixedObject.get())
-            aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
-        }
+        ResultPtr aFixedObject;
+        anExternal = true;
+        aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
+        if (!aFixedObject.get())
+          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
         double aX, aY;
         if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
           // do not create a constraint to the point, which already used by the feature
@@ -487,20 +500,19 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
         bool isAuxiliaryFeature = false;
         if (getPoint2d(aView, aShape, aX, aY)) {
           setPoint(aX, aY);
+          feature()->execute();
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
-          if (isCoincidenceEnabled) {
-            setConstraintWith(aObject);
-            setValueState(Stored); // in case of edge selection, Apply state should also be updated
+          setConstraintWith(aObject);
+          setValueState(Stored); // in case of edge selection, Apply state should also be updated
 
-            FeaturePtr anObjectFeature = ModelAPI_Feature::feature(aObject);
-            std::string anAuxiliaryAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
-            AttributeBooleanPtr anAuxiliaryAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
-                                              anObjectFeature->data()->attribute(anAuxiliaryAttribute));
-            if (anAuxiliaryAttr.get())
-              isAuxiliaryFeature = anAuxiliaryAttr->value();
-          }
+          FeaturePtr anObjectFeature = ModelAPI_Feature::feature(aObject);
+          std::string anAuxiliaryAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
+          AttributeBooleanPtr anAuxiliaryAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+                                            anObjectFeature->data()->attribute(anAuxiliaryAttribute));
+          if (anAuxiliaryAttr.get())
+            isAuxiliaryFeature = anAuxiliaryAttr->value();
         }
         // it is important to perform updateObject() in order to the current value is 
         // processed by Sketch Solver. Test case: line is created from a previous point

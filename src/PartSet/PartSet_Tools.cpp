@@ -185,26 +185,6 @@ std::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
   return ModelAPI_Session::get()->moduleDocument();
 }
 
-/*std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
-                                                                      double theX, double theY)
-{
-  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
-                                                                 new GeomAPI_Pnt2d(theX, theY));
-  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes =
-                                    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
-                                                                    aLast = anAttiributes.end();
-  std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
-  for (; anIt != aLast && !aFPoint; anIt++) {
-    std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = std::dynamic_pointer_cast<
-        GeomDataAPI_Point2D>(*anIt);
-    if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
-      aFPoint = aCurPoint;
-  }
-
-  return aFPoint;
-}*/
-
 void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
                                     const std::string& theAttribute)
 {
@@ -308,14 +288,73 @@ void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
 }*/
 
 
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPointInArgumentFeatures(
+                  const FeaturePtr& theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
+
+  // may be feature is not updated yet, execute is not performed and references features
+  // are not created. Case: rectangle macro feature
+  ModuleBase_ModelWidget::updateObject(theFeature);
+
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(
+                                          ModelAPI_AttributeRefList::typeId());
+  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+  for (; anIt != aLast && !aFeaturePoint.get(); anIt++) {
+    std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
+                                      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIt);
+    for (int i = 0, aNb = aCurSelList->size(); i < aNb && !aFeaturePoint.get(); i++) {
+      ObjectPtr anObject = aCurSelList->object(i);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+      if (aFeature.get())
+        aFeaturePoint = PartSet_Tools::findFirstEqualPoint(aFeature, thePoint);
+    }
+  }
+  return aFeaturePoint;
+}
+
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPoint(const FeaturePtr& theFeature,
+                                                      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+
+  // find the given point in the feature attributes
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+                                    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+      aLast = anAttiributes.end();
+  for (; anIt != aLast && !aFPoint; anIt++) {
+    std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+    if (aCurPoint && (aCurPoint->pnt()->distance(thePoint) < Precision::Confusion())) {
+      aFPoint = aCurPoint;
+      break;
+    }
+  }
+  return aFPoint;
+}
+
 void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr theFeature,
                                    const std::string& theAttribute, double theClickedX,
                                    double theClickedY)
 {
+  if (!theFeature.get())
+    return;
+
+  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
+      new GeomAPI_Pnt2d(theClickedX, theClickedY));
+
   // find a feature point by the selection mode
-  //std::shared_ptr<GeomDataAPI_Point2D> aPoint = featurePoint(theMode);
-  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
+  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
+  if (theFeature->isMacro()) {
+    // the macro feature will be removed after the operation is stopped, so we need to build
+    // coicidence to possible sub-features
+    aFeaturePoint = PartSet_Tools::findFirstEqualPointInArgumentFeatures(theFeature, aClickedPoint);
+  }
+  else {
+    aFeaturePoint = std::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
+  }
   if (!aFeaturePoint)
     return;
 
@@ -328,25 +367,12 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
   std::list<ObjectPtr> aFeatures = aRefList->list();
   std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes;
-  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
-      new GeomAPI_Pnt2d(theClickedX, theClickedY));
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
     if (!aFeature.get() || theFeature == aFeature)
       continue;
-    // find the given point in the feature attributes
-    anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-    std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
-        aLast = anAttiributes.end();
-    std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
-    for (; anIt != aLast && !aFPoint; anIt++) {
-      std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-      if (aCurPoint && (aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())) {
-        aFPoint = aCurPoint;
-        break;
-      }
-    }
+    std::shared_ptr<GeomDataAPI_Point2D> aFPoint = PartSet_Tools::findFirstEqualPoint(aFeature,
+                                                                                aClickedPoint);
     if (aFPoint)
       PartSet_Tools::createConstraint(theSketch, aFPoint, aFeaturePoint);
   }
