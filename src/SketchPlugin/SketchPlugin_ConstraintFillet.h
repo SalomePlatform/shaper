@@ -70,6 +70,10 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
   };
 
 private:
+  /// \ Removes all produced features and restore base edges.
+  void clearResults();
+
+private:
   std::set<AttributePtr> myNewPoints; ///< set of new points
   std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; ///< map of point and features for fillet
   bool myListOfPointsChangedInCode; ///< flag to track that list of points changed in code

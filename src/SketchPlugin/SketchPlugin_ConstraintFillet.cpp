@@ -496,42 +496,7 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
         myRadiusChangedInCode = false;
       }
 
-      // Clear auxiliary flag on initial objects.
-      for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
-          aPointsIter != myPointFeaturesMap.end();) {
-        const FilletFeatures& aFilletFeatures = aPointsIter->second;
-        std::list<FeaturePtr>::const_iterator aFeatureIt;
-        for(aFeatureIt = aFilletFeatures.baseEdges.cbegin();
-            aFeatureIt != aFilletFeatures.baseEdges.cend();
-            ++aFeatureIt) {
-          (*aFeatureIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
-        }
-        ++aPointsIter;
-      }
-
-      // And remove all produced features.
-      DocumentPtr aDoc = sketch()->document();
-      for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
-          aPointsIter != myPointFeaturesMap.end();) {
-        // Remove all produced constraints.
-        const FilletFeatures& aFilletFeatures = aPointsIter->second;
-        std::list<FeaturePtr>::const_iterator aFeatureIt;
-        for(aFeatureIt = aFilletFeatures.resultConstraints.cbegin();
-            aFeatureIt != aFilletFeatures.resultConstraints.cend();
-            ++aFeatureIt) {
-          aDoc->removeFeature(*aFeatureIt);
-        }
-
-        // Remove all result edges.
-        for(aFeatureIt = aFilletFeatures.resultEdges.cbegin();
-            aFeatureIt != aFilletFeatures.resultEdges.cend();
-            ++aFeatureIt) {
-          aDoc->removeFeature(*aFeatureIt);
-        }
-
-        // Remove point from map.
-        myPointFeaturesMap.erase(aPointsIter++);
-      }
+      clearResults();
 
       return;
     }
@@ -698,6 +663,10 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
       }
     }
 
+    if(abs(aPrevRadius - aMinimumRadius) > tolerance) {
+      clearResults(); // if radius changed clear all results;
+    }
+
     // Set new default radius if it was not changed by user.
     if(!myRadiusChangedByUser) {
       myRadiusChangedInCode = true;
@@ -729,6 +698,46 @@ bool SketchPlugin_ConstraintFillet::isMacro() const
 {
   return true;
 }
+
+void SketchPlugin_ConstraintFillet::clearResults()
+{
+  // Clear auxiliary flag on initial objects.
+  for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
+      aPointsIter != myPointFeaturesMap.end();) {
+    const FilletFeatures& aFilletFeatures = aPointsIter->second;
+    std::list<FeaturePtr>::const_iterator aFeatureIt;
+    for(aFeatureIt = aFilletFeatures.baseEdges.cbegin();
+        aFeatureIt != aFilletFeatures.baseEdges.cend();
+        ++aFeatureIt) {
+      (*aFeatureIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
+    }
+    ++aPointsIter;
+  }
+
+  // And remove all produced features.
+  DocumentPtr aDoc = sketch()->document();
+  for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
+      aPointsIter != myPointFeaturesMap.end();) {
+    // Remove all produced constraints.
+    const FilletFeatures& aFilletFeatures = aPointsIter->second;
+    std::list<FeaturePtr>::const_iterator aFeatureIt;
+    for(aFeatureIt = aFilletFeatures.resultConstraints.cbegin();
+        aFeatureIt != aFilletFeatures.resultConstraints.cend();
+        ++aFeatureIt) {
+      aDoc->removeFeature(*aFeatureIt);
+    }
+
+    // Remove all result edges.
+    for(aFeatureIt = aFilletFeatures.resultEdges.cbegin();
+        aFeatureIt != aFilletFeatures.resultEdges.cend();
+        ++aFeatureIt) {
+      aDoc->removeFeature(*aFeatureIt);
+    }
+
+    // Remove point from map.
+    myPointFeaturesMap.erase(aPointsIter++);
+  }
+};
 
 
 // =========   Auxiliary functions   =================
