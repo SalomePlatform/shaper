@@ -8,6 +8,7 @@ FIND_PACKAGE(Freetype REQUIRED)
 SET(PROJECT_HEADERS
     SketcherPrs.h
     SketcherPrs_Coincident.h
+    SketcherPrs_Collinear.h
     SketcherPrs_Factory.h
     SketcherPrs_Parallel.h
     SketcherPrs_Tools.h
@@ -21,6 +22,7 @@ SET(PROJECT_HEADERS
     SketcherPrs_SensitivePoint.h
     SketcherPrs_Radius.h
     SketcherPrs_LengthDimension.h
+    SketcherPrs_Middle.h
     SketcherPrs_Mirror.h
     SketcherPrs_Transformation.h
     SketcherPrs_Angle.h
@@ -28,6 +30,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     SketcherPrs_Coincident.cpp
+    SketcherPrs_Collinear.cpp
     SketcherPrs_Factory.cpp
     SketcherPrs_Parallel.cpp
     SketcherPrs_Tools.cpp
@@ -41,6 +44,7 @@ SET(PROJECT_SOURCES
     SketcherPrs_SensitivePoint.cpp
     SketcherPrs_Radius.cpp
     SketcherPrs_LengthDimension.cpp
+    SketcherPrs_Middle.cpp
     SketcherPrs_Mirror.cpp
     SketcherPrs_Transformation.cpp
     SketcherPrs_Angle.cpp
