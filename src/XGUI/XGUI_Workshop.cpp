@@ -1436,6 +1436,11 @@ bool XGUI_Workshop::isDeleteFeatureWithReferences(const QObjectPtrList& theList,
   QStringList aPartFeatureNames;
   foreach (ObjectPtr aObj, theList) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    // invalid feature data means that the feature is already removed in model,
+    // we needn't process it. E.g. delete of feature from create operation. The operation abort
+    // will delete the operation
+    if (!aFeature->data()->isValid())
+      continue;
     ResultPtr aFirstResult = aFeature->firstResult();
     std::string aResultGroupName = aFirstResult->groupName();
     if (aResultGroupName == ModelAPI_ResultPart::group())

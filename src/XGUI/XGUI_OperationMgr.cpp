@@ -667,7 +667,7 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
     XGUI_ObjectsBrowser* aBrowser = workshop()->objectBrowser();
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
     // property panel child object is processed to process delete performed on Apply button of PP
-    if (isChildObject(theObject, aBrowser) ||
+    if (theObject == aBrowser->treeView() ||
         isChildObject(theObject, aViewPort) ||
         isPPChildObject)
       workshop()->deleteObjects();
