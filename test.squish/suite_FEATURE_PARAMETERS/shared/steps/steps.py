@@ -117,7 +117,8 @@ def step(context):
 
 @Then("Check that Circle does not allow using expressions")
 def step(context):
-    clickButton(waitForObject(":SALOME*.Circle_QToolButton"))
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    activateItem(waitForObjectItem(":Sketch_QMenu", "Circle"))
     mouseClick(waitForObject(":Center.qt_spinbox_lineedit_QLineEdit"), 90, 4, 0, Qt.LeftButton)
     type(waitForObject(":Center.X _ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":Center.X _ModuleBase_ParamSpinBox"), "a")
@@ -137,7 +138,8 @@ def step(context):
 
 @Then("Check that Arc does not allow using expressions")
 def step(context):
-    clickButton(waitForObject(":SALOME*.Arc_QToolButton"))
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    activateItem(waitForObjectItem(":Sketch_QMenu", "Arc"))
     mouseClick(waitForObject(":Center.qt_spinbox_lineedit_QLineEdit_3"), 156, 6, 0, Qt.LeftButton)
     type(waitForObject(":Center.X _ModuleBase_ParamSpinBox_2"), "A")
     type(waitForObject(":Center.X _ModuleBase_ParamSpinBox_2"), "<Ctrl+A>")
@@ -174,12 +176,14 @@ def step(context):
 
 @Then("Check that Fillet does not allow using expressions")
 def step(context):
-    clickButton(waitForObject(":SALOME*.Line_QToolButton"))
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    activateItem(waitForObjectItem(":Sketch_QMenu", "Line"))
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 131, 282, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 209, 98, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 283, 275, 0, Qt.LeftButton)
     clickButton(waitForObject(":Line.property_panel_cancel_QToolButton"))
-    clickButton(waitForObject(":SALOME*.Fillet_QToolButton"))
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    activateItem(waitForObjectItem(":Sketch_QMenu", "Fillet"))
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 211, 99, 0, Qt.LeftButton)
     type(waitForObject(":Fillet.ConstraintValue_ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":Fillet.ConstraintValue_ModuleBase_ParamSpinBox"), "<Keypad_1>")
