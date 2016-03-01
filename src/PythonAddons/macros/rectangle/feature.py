@@ -106,8 +106,8 @@ class SketchPlugin_Rectangle(model.Feature):
                 aRefAttrB.setAttr(aLine.attribute("StartPoint"))
             # Flags which show horizontal or vertical constraint is build for correponding line
             self.__isHV = [False, False, False, False]
-        # Update coordinates of created lines
-        self.updateLines()
+            # Update coordinates of created lines
+            self.updateLines()
         # Add horizontal and vertical constraint for the lines which already have result
         for i in range (0, aNbLines):
             if self.__isHV[i]:

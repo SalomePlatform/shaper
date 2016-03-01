@@ -418,7 +418,7 @@ void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   aRef2->setObject(theObject);
 
-  aFeature->execute();
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }
 
 void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
