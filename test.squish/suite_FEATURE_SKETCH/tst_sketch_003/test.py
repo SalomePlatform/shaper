@@ -53,7 +53,7 @@ def main():
     #[step} Open just saved file  
     open("RESULTS_PATH + sketch_003.hdf")
     #[step] Activate SHAPER
-    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
+    clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
     
     #[step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

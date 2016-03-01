@@ -30,7 +30,7 @@ def set_defaults():
     waitForObject(":SALOME*_STD_TabDesktop").resize(1024, 768)
 
 def activate_SHAPER():
-    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
+    clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
     clickButton(waitForObject(":Activate module.New_QPushButton"))
 
 def close_application():

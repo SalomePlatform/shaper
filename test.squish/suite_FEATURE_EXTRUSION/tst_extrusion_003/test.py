@@ -19,7 +19,7 @@ def main():
     open(DATA_PATH + "/for_extrusion_003.hdf")
 
     # [step] Activate SHAPER
-    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
+    clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
 
     # [step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

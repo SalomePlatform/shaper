@@ -21,7 +21,7 @@ def main():
     open(os.path.join(DATA_PATH, "for_sketch_004.hdf"))
     
     #[step] Activate SHAPER
-    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
+    clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
     
     #[step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

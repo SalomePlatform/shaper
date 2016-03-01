@@ -20,7 +20,7 @@ def main():
     open(DATA_PATH + "/for_sketch_013.hdf")
     
     #[step] Activate SHAPER
-    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
+    clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
     
     #[step] Edit 'Sketch_1'
     waitForObjectItem(":Object browser_XGUI_DataTree", "Sketch\\_1")
