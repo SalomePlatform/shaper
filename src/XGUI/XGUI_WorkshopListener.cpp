@@ -575,9 +575,16 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisual
     aDisplayed = aDisplayer->display(theObj, false);
     if (aNb == 0)
       theFirstVisualizedBody = true;
-  } else 
+  } else {
     aDisplayed = aDisplayer->display(theObj, false);
-
+    if (aDisplayed) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+      if (aResult.get() != NULL) {
+        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+          theFirstVisualizedBody = aShapePtr.get() != NULL;
+      }
+    }
+  }
   return aDisplayed;
 }
 
