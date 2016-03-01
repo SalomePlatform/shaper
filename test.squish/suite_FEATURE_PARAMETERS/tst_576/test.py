@@ -5,7 +5,7 @@ def main():
     
     startApplication("salome_run.sh")
    
-    activate_newgeom()
+    activate_SHAPER()
     
     clickButton(waitForObject(":SALOME*.Parameter_QToolButton"))
     type(waitForObject(":Parameter_QLineEdit"), "a")

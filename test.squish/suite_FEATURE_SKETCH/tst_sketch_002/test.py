@@ -24,7 +24,7 @@ def sketch():
     test.vp("VP2")
 
 def main():
-    # [project] NewGEOM
+    # [project] SHAPER
     #[Scenario] Sketch_002
     #[Topic] Parallel objects
     #[Tested functionality]Parallelism between main lines
@@ -37,9 +37,9 @@ def main():
 
     set_defaults()
     
-    #[step] Activate NewGeom
+    #[step] Activate SHAPER
     #[step]Click 'New' button
-    activate_newgeom()
+    activate_SHAPER()
     #[section] Creation of main lines and make them parallel
     
     sketch_create(help_points("XY_plane"), lambda: sketch())

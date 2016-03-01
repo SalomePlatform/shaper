@@ -1,5 +1,5 @@
 def main():
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] Extrusion_006
     # [Topic] 'Extrusion_cut by planes' functionality
     # [Tested functionality]
@@ -18,8 +18,8 @@ def main():
     # [step] Open 'for_extrusion_006.hdf'
     open(DATA_PATH + "/for_extrusion_006.hdf")
 
-    # [step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    # [step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
 
     # [step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

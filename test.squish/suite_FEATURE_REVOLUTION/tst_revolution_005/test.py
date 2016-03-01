@@ -1,5 +1,5 @@
 def main():
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] Revolution_005
     # [Topic] 'RevolutionFuse by planes and offsets' functionality
     # [Tested functionality]
@@ -18,8 +18,8 @@ def main():
     # [step] Open 'for_revolution_005.hdf'
     open(DATA_PATH + "/for_revolution_005.hdf")
 
-    # [step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    # [step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
 
     # [step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

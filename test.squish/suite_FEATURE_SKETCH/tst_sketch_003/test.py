@@ -2,7 +2,7 @@ def sketch():
     circle_create_in_view((302, 221), (436, 287))
     
 def main():
-    #[project] NewGEOM
+    #[project] SHAPER
     #[Scenario] Sketch_003
     #[Topic]
     #[Tested functionality] Saving and opening studies
@@ -18,10 +18,10 @@ def main():
 
     set_defaults()
     #[section] Creation of 3D model
-    #[step] Activate NewGeom
+    #[step] Activate SHAPER
     #[step]Click 'New' button
     
-    activate_newgeom()
+    activate_SHAPER()
     #[step] Create new part
     part_create()
     #[step] Create sketch, consisting from one circle
@@ -52,8 +52,8 @@ def main():
     #[step] File - Open 
     #[step} Open just saved file  
     open("RESULTS_PATH + sketch_003.hdf")
-    #[step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    #[step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
     
     #[step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

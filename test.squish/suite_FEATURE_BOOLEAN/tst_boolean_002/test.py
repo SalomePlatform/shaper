@@ -1,5 +1,5 @@
 def main():
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] Boolean_002
     # [Topic] 'Boolean fuse' functionality
     # [Tested functionality]
@@ -18,8 +18,8 @@ def main():
     # [step] Open 'for_extrusion_001.hdf'
     open(DATA_PATH + "/for_boolean_001.hdf")
 
-    # [step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    # [step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
 
     # [step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

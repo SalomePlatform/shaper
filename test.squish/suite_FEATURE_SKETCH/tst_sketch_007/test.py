@@ -1,6 +1,6 @@
 
 def main():
-    #[project] NewGEOM
+    #[project] SHAPER
     #[Scenario] Sketch_007
     #[Topic] Perpendicular lines
     #[Tested functionality] 'Perpendicular' constraint
@@ -19,8 +19,8 @@ def main():
     #[step] Open 'for_sketch_006.hdf'
     open(DATA_PATH + "/for_sketch_007.hdf")
     
-    #[step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    #[step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
     
     #[step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

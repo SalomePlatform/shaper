@@ -313,7 +313,7 @@
 :SALOME*.Mirror_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Mirror'}
 :SALOME*.Modules_QtxToolBar	{name='SalomeModules' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Modules'}
 :SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
-:SALOME*.NewGeom_QToolButton	{text='NewGeom' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.SHAPER_QToolButton	{text='SHAPER' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.New_QToolButton	{text='New' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.OCC scene:1 - viewer:1 - 3D_SOCC_ViewWindow	{type='SOCC_ViewWindow' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='OCC scene:1 - viewer:1 - 3D'}
 :SALOME*.OCC scene:1 - viewer:1_OCCViewer_ViewFrame	{type='OCCViewer_ViewFrame' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='OCC scene:1 - viewer:1'}

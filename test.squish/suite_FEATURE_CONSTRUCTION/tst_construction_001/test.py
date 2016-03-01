@@ -1,5 +1,5 @@
 def main():
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] Construction_001
     # [Topic] 'Construction of point, axis and plane' functionality
     # [Tested functionality]
@@ -18,8 +18,8 @@ def main():
     # [step] Open 'for_construction_001.hdf'
     open(DATA_PATH + "/for_construction_001.hdf")
 
-    # [step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    # [step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
 
     # [step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

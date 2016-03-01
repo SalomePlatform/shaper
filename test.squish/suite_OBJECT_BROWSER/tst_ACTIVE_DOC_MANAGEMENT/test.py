@@ -56,7 +56,7 @@ def main():
     source(findFile("scripts", "common.py"))
     
     startApplication("salome_run.sh")
-    activate_newgeom()
+    activate_SHAPER()
 
     #[step] Check that default elements are enabled: Parameters (0), Constructions (4), Parts (0)
     waitForObjectItem(":Object browser_XGUI_DataTree", "Constructions (4)")

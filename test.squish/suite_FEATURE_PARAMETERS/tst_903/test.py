@@ -8,7 +8,7 @@ def main():
     
     startApplication("salome_run.sh")
    
-    activate_newgeom()
+    activate_SHAPER()
 
     #[step] Click menu Part->Parameter    
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Part"))

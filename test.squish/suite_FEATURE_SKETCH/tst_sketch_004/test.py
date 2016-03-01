@@ -1,7 +1,7 @@
 import os
     
 def main():
-    #[project] NewGEOM
+    #[project] SHAPER
     #[Scenario] Sketch_004
     #[Topic] 'Distance' constraint
     #[Tested functionality]
@@ -20,8 +20,8 @@ def main():
     #[step] Open 'for_sketch_004.hdf'
     open(os.path.join(DATA_PATH, "for_sketch_004.hdf"))
     
-    #[step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    #[step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
     
     #[step] Activate Part_1
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")

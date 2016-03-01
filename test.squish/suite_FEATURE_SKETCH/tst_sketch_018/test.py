@@ -1,6 +1,6 @@
 
 def main():
-    #[project] NewGEOM
+    #[project] SHAPER
     #[Scenario] Sketch_018
     #[Topic] 'Tangency' functionality
     #[Tested functionality] 
@@ -19,8 +19,8 @@ def main():
     #[step] Open 'for_sketch_018.hdf'
     open(DATA_PATH + "/for_sketch_018.hdf")
     
-    #[step] Activate NewGeom
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    #[step] Activate SHAPER
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
     
     #[step] Edit 'Sketch_1'
     waitForObjectItem(":Object browser_XGUI_DataTree", "Sketch\\_1")

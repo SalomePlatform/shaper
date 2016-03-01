@@ -5,7 +5,7 @@ def main():
     
     startApplication("salome_run.sh")
     
-    activate_newgeom()
+    activate_SHAPER()
     
     #[step] Create parameter 'aa = 4'
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Part"))

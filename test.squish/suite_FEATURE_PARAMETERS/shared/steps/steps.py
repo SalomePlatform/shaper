@@ -33,7 +33,7 @@ import __builtin__
 @Given("Launch application in salome mode")
 def step(context):
     startApplication("salome_run.sh")
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
     clickButton(waitForObject(":Activate module.New_QPushButton"))
 
 @When("Create parameter a=30")

@@ -59,7 +59,7 @@ def sketch():
 def main():
     source(findFile("scripts", "common.py"))
     
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] Sketch_001
     #[Topic] Creation of objects in sketch
     #[Tested functionality] Creation of objects during sketching by 2 ways: direct input of coordinates and clicking in viewer. Creation of auxiliary objects 
@@ -72,9 +72,9 @@ def main():
 
     set_defaults()
     
-    #[step] Activate NewGeom
+    #[step] Activate SHAPER
     #[step]Click 'New' button
-    activate_newgeom()
+    activate_SHAPER()
     
     #[section] Creation of sketch and objects inside it
     #[step] Part - New part

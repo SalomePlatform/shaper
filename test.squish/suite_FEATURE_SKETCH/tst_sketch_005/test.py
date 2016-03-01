@@ -27,7 +27,7 @@ def sketch():
 
 def main():
     
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] Sketch_005
     #[Topic] Fixed point
     #[Tested functionality] 
@@ -41,9 +41,9 @@ def main():
 
     set_defaults()
     
-    #[step] Activate NewGeom
+    #[step] Activate SHAPER
     #[step]Click 'New' button
-    activate_newgeom()
+    activate_SHAPER()
     
     #[section] Creation of sketch and objects inside it
     #[step] Part - New part

@@ -13,7 +13,7 @@ def main():
     startApplication("salome_run.sh")
     set_defaults()
     
-    activate_newgeom()
+    activate_SHAPER()
 
     sketch_create(help_points("XY_plane"), lambda: sketch_circle())
     sketch_create(help_points("XY_plane"), lambda: sketch_lines())

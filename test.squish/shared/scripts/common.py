@@ -2,7 +2,7 @@ import os
 
 testSettings.logScreenshotOnError = True
 testSettings.logScreenshotOnFail = True
-# RESULTS_PATH = "/dn48/newgeom/eso/sources/test.squish/shared/testresults/"
+# RESULTS_PATH = "/dn48/SHAPER/eso/sources/test.squish/shared/testresults/"
 DATA_PATH = os.getenv('TEST_DATA_DIR')
 
 g_points = {"XY_plane": (332, 250), "XZ_plane": (355, 207)}  # one of the construction planes
@@ -29,8 +29,8 @@ def getSpinBoxRealName(name):
 def set_defaults():
     waitForObject(":SALOME*_STD_TabDesktop").resize(1024, 768)
 
-def activate_newgeom():
-    clickButton(waitForObject(":SALOME*.NewGeom_QToolButton"))
+def activate_SHAPER():
+    clickButton(waitForObject(":SALOME*.SHAPER_QToolButton"))
     clickButton(waitForObject(":Activate module.New_QPushButton"))
 
 def close_application():

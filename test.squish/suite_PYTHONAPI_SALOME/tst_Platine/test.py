@@ -8,7 +8,7 @@ def set_parameter_value(name, value):
     clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
 
 def main():
-    # [project] NewGEOM
+    # [project] SHAPER
     # [Scenario] 'Platine' model created by PythonAPI
     # [Topic] PythonAPI functionality
     # [Tested functionality]
@@ -25,7 +25,7 @@ def main():
     set_defaults()
 
     # [step] Activate Shaper module and create new file
-    activate_newgeom()
+    activate_SHAPER()
 
     # [step] In Python console type: import examples.Platine
     type(waitForObject(":Python Console_PyConsole_EnhEditor"), "import examples.Platine")
