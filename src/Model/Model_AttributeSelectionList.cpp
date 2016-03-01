@@ -147,8 +147,10 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
 {
   for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
     AttributeSelectionPtr anAttr = value(anIndex);
-    if (anAttr->context() == theContext && anAttr->value()->isEqual(theSubShape))
-      return true;
+    if (anAttr.get() && anAttr->value().get()) {
+      if (anAttr->context() == theContext && anAttr->value()->isEqual(theSubShape))
+        return true;
+    }
   }
   return false;
 }
