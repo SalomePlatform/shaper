@@ -27,7 +27,7 @@
     <!-- Major module parameters -->
     <parameter name="name" value="Shaper"/>
     <parameter name="icon" value="shaper.png"/>
-    <parameter name="version" value="2.1.2"/>
+    <parameter name="version" value="@SHAPER_Version@"/>
     <parameter name="documentation" value="shaper_help"/>
   </section>
   <section name="shaper_help" >
@@ -38,6 +38,6 @@
   </section>
   <section name="resources">
     <!-- Module resources -->
-    <parameter name="SHAPER" value="${SHAPER_ROOT_DIR}/share/salome/resources/shaper"/>
+    <parameter name="SHAPER" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
   </section>
 </document>

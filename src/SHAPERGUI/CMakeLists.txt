@@ -25,8 +25,8 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_RESOURCES
-	resources/LightApp.xml
-	resources/SalomeApp.xml
+	${CMAKE_CURRENT_BINARY_DIR}/LightApp.xml
+	${CMAKE_CURRENT_BINARY_DIR}/SalomeApp.xml
 	resources/shaper.png
 )
 
@@ -67,6 +67,16 @@ ADD_DEPENDENCIES(SHAPER XGUI)
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
 TARGET_LINK_LIBRARIES(SHAPER ${PROJECT_LIBRARIES})
+
+# configuration
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/resources/LightApp.xml.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/LightApp.xml"
+  )
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/resources/SalomeApp.xml.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/SalomeApp.xml"
+  )
 
 INSTALL(TARGETS SHAPER DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${PROJECT_RESOURCES} DESTINATION ${SHAPER_INSTALL_RESOURCES})
