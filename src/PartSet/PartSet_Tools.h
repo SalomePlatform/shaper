@@ -115,7 +115,7 @@ public:
   /// \param theFeature a feature with sub-feature attributes
   /// \param thePoint a point to provided searched coordinates
   /// \return found point or null
-  static std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPointInArgumentFeatures(
+  static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPointInArgumentFeatures(
                   const FeaturePtr& theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Finds in the feature first Point2D attribute with the given point coordinates
