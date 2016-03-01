@@ -89,6 +89,8 @@ bool SketcherPrs_Mirror::updatePoints(double theStep) const
   // Get position of each mirrored object
   for (i = 0; i < aNb; i++) {
     aObj = anAttrC->object(i);
+    if (SketcherPrs_Tools::getShape(aObj).get() == NULL)
+      continue;
     aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(aNb + i + 1, aP1);
   }  
