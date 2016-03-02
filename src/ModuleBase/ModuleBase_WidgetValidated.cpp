@@ -202,17 +202,21 @@ bool ModuleBase_WidgetValidated::isFilterActivated() const
   return aViewer->hasSelectionFilter(aSelFilter);
 }
 
-void ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
+bool ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
 {
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
   Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
+  bool aHasSelectionFilter = aViewer->hasSelectionFilter(aSelFilter);
+
   if (toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else {
     aViewer->removeSelectionFilter(aSelFilter);
     clearValidState();
   }
+
+  return aHasSelectionFilter;
 }
 
 //********************************************************************

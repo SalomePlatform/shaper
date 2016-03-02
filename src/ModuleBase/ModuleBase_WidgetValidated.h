@@ -124,7 +124,8 @@ protected:
 
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param toActivate a flag about activation or deactivation the filters
-  void activateFilters(const bool toActivate);
+  /// \return true if the selection filter of the widget is activated in viewer context
+  bool activateFilters(const bool toActivate);
 
   /// Block the model flush of update and intialization of attribute
   /// \param theToBlock flag whether the model is blocked or unblocked

@@ -479,12 +479,12 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      activateSelectionAndFilters(false);
+      bool aWasActivated = activateSelectionAndFilters(false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
-
-      activateSelectionAndFilters(true);
+      if (aWasActivated)
+        activateSelectionAndFilters(true);
       break;
     }
   }

@@ -115,7 +115,7 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
+bool ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
 {
   updateSelectionName();
 
@@ -124,7 +124,7 @@ void ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
   } else {
     myWorkshop->deactivateSubShapesSelection();
   }
-  activateFilters(toActivate);
+  return activateFilters(toActivate);
 }
 
 //********************************************************************

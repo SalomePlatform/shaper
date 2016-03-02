@@ -44,7 +44,8 @@ Q_OBJECT
   virtual bool isViewerSelector() { return true; }
 
   /// Activate or deactivate selection and selection filters
-  virtual void activateSelectionAndFilters(bool toActivate);
+  /// \return true if the selection filter of the widget is activated in viewer context
+  virtual bool activateSelectionAndFilters(bool toActivate);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
