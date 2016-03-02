@@ -29,6 +29,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
@@ -578,9 +579,9 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisual
   } else {
     aDisplayed = aDisplayer->display(theObj, false);
     if (aDisplayed) {
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
-      if (aResult.get() != NULL) {
-        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+      ResultPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(theObj);
+      if (aGroup.get() != NULL) {
+        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aGroup);
           theFirstVisualizedBody = aShapePtr.get() != NULL;
       }
     }
