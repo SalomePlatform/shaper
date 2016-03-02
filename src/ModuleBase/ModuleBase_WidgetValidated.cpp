@@ -9,6 +9,8 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_Tools.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
@@ -304,6 +306,8 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getFilteredSelected()
   if (!anOBSelected.isEmpty())
     ModuleBase_ISelection::appendSelected(anOBSelected, aSelected);
 
+  filterCompSolids(aSelected);
+
   return aSelected;
 }
 
@@ -318,6 +322,44 @@ void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrs>
     if (isValidInFilters(*anIt))
       aValidatedValues.append(*anIt);
   }
+  if (aValidatedValues.size() != theValues.size()) {
+    theValues.clear();
+    theValues = aValidatedValues;
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrs>& theValues)
+{
+  std::set<ResultCompSolidPtr> aCompSolids;
+  QList<ModuleBase_ViewerPrs> aValidatedValues;
+
+  // Collect compsolids.
+  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  for (; anIt != aLast; anIt++) {
+    const ModuleBase_ViewerPrs& aViewerPrs = *anIt;
+    ObjectPtr anObject = aViewerPrs.object();
+    ResultCompSolidPtr aResultCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
+    if(aResultCompSolid.get()) {
+      aCompSolids.insert(aResultCompSolid);
+    }
+  }
+
+  // Filter sub-solids of compsolids.
+  anIt = theValues.begin();
+  for (; anIt != aLast; anIt++) {
+    const ModuleBase_ViewerPrs& aViewerPrs = *anIt;
+    ObjectPtr anObject = aViewerPrs.object();
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aResult);
+    if(aResCompSolidPtr.get() && (aCompSolids.find(aResCompSolidPtr) != aCompSolids.end())) {
+      // Skip sub-solid of compsolid.
+      continue;
+    } else {
+      aValidatedValues.append(*anIt);
+    }
+  }
+
   if (aValidatedValues.size() != theValues.size()) {
     theValues.clear();
     theValues = aValidatedValues;
