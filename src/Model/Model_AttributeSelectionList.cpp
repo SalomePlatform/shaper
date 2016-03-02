@@ -85,6 +85,44 @@ void Model_AttributeSelectionList::removeLast()
   }
 }
 
+#include <TNaming_Builder.hxx>
+#include <TNaming_Iterator.hxx>
+
+// copies named shapes: we need the implementation of this 
+static void CopyNS(const Handle(TNaming_NamedShape)& theFrom,
+  const Handle(TDF_Attribute)& theTo)
+{ 
+  TDF_Label aLab = theTo->Label();
+  TNaming_Builder B(aLab);
+
+  TNaming_Iterator It (theFrom);
+  for ( ;It.More() ; It.Next()) {
+    const TopoDS_Shape& OS     = It.OldShape();
+    const TopoDS_Shape& NS     = It.NewShape();
+    TNaming_Evolution   Status = It.Evolution();
+
+    switch (Status) {
+    case TNaming_PRIMITIVE :
+      B.Generated(NS);
+      break;
+    case TNaming_GENERATED :
+      B.Generated(OS, NS);
+      break;
+    case TNaming_MODIFY : 
+      B.Modify(OS, NS);
+      break;
+    case TNaming_DELETE : 
+      B.Delete (OS);
+      break;
+    case TNaming_SELECTED :
+      B.Select(NS, OS);
+      break;
+    default:
+      break;
+    }
+  }
+}
+
 /// makes copy of all attributes on the given label and all sub-labels
 static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
   TDF_AttributeIterator anAttrIter(theSource);
@@ -95,8 +133,14 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
 	    aTargetAttr = anAttrIter.Value()->NewEmpty();
       theDestination.AddAttribute(aTargetAttr);
     }
-    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); // no relocation, empty map
-    anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
+    // for named shape copy exact shapes (in NamedShape Paste method the CopyTool is used)
+    Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(anAttrIter.Value());
+    if (aNS.IsNull()) {
+      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); // no relocation, empty map
+      anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
+    } else {
+      CopyNS(aNS, aTargetAttr);
+    }
   }
   // copy the sub-labels content
   TDF_ChildIterator aSubLabsIter(theSource);
