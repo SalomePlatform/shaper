@@ -418,6 +418,7 @@ void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   aRef2->setObject(theObject);
 
+  // we need to flush created signal in order to coincidence is processed by solver
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }
 

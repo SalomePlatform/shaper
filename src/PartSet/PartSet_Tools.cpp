@@ -14,6 +14,9 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Events.h>
+
+#include <Events_Loop.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -255,8 +258,8 @@ void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   aRef2->setAttr(thePoint2);
 
-  if (aFeature)  // TODO: generate an error if feature was not created
-    aFeature->execute();
+  // we need to flush created signal in order to coincidence is processed by solver
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }
 
 /*std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::
