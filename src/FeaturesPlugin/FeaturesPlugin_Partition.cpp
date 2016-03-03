@@ -102,12 +102,12 @@ void FeaturesPlugin_Partition::execute()
 
   if(isCombine) {
     // Create single result.
-    if(!aTools.empty()) {
-      // This is a workaround for naming. Passing compound of objects as argument instead each object separately.
-      std::shared_ptr<GeomAPI_Shape> aCompoud = GeomAlgoAPI_CompoundBuilder::compound(anObjects);
-      anObjects.clear();
-      anObjects.push_back(aCompoud);
-    }
+    //if(!aTools.empty()) {
+    //  // This is a workaround for naming. Passing compound of objects as argument instead each object separately.
+    //  std::shared_ptr<GeomAPI_Shape> aCompoud = GeomAlgoAPI_CompoundBuilder::compound(anObjects);
+    //  anObjects.clear();
+    //  anObjects.push_back(aCompoud);
+    //}
     std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(anObjects, aTools));
 
     // Checking that the algorithm worked properly.
@@ -131,7 +131,10 @@ void FeaturesPlugin_Partition::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
       aMakeShapeList.appendAlgo(aPartitionAlgo);
       GeomAPI_DataMapOfShapeShape& aMapOfShapes = *aPartitionAlgo->mapOfSubShapes().get();
-      loadNamingDS(aResultBody, anObjects.front(), aToolsForNaming, aPartitionAlgo->shape(), aMakeShapeList, aMapOfShapes);
+      std::shared_ptr<GeomAPI_Shape> aBaseShape = anObjects.front();
+      anObjects.pop_front();
+      aToolsForNaming.insert(aToolsForNaming.end(), anObjects.begin(), anObjects.end());
+      loadNamingDS(aResultBody, aBaseShape, aToolsForNaming, aPartitionAlgo->shape(), aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
     }
