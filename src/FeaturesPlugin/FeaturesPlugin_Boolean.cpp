@@ -130,7 +130,7 @@ void FeaturesPlugin_Boolean::execute()
     case GeomAlgoAPI_Boolean::BOOL_CUT:
     case GeomAlgoAPI_Boolean::BOOL_COMMON:{
       if((anObjects.empty() && aCompSolidsObjects.empty()) || aTools.empty()) {
-        std::string aFeatureError = "Not enough objects for boolean operation";
+        std::string aFeatureError = "Error: Not enough objects for boolean operation.";
         setError(aFeatureError);
         return;
       }
@@ -144,17 +144,17 @@ void FeaturesPlugin_Boolean::execute()
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo.isDone()) {
-          static const std::string aFeatureError = "Boolean algorithm failed";
+          static const std::string aFeatureError = "Error: Boolean algorithm failed.";
           setError(aFeatureError);
           return;
         }
         if(aBoolAlgo.shape()->isNull()) {
-          static const std::string aShapeError = "Resulting shape is Null";
+          static const std::string aShapeError = "Error: Resulting shape is Null.";
           setError(aShapeError);
           return;
         }
         if(!aBoolAlgo.isValid()) {
-          std::string aFeatureError = "Warning: resulting shape is not valid";
+          std::string aFeatureError = "Error: Resulting shape is not valid.";
           setError(aFeatureError);
           return;
         }
@@ -192,17 +192,17 @@ void FeaturesPlugin_Boolean::execute()
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone()) {
-          static const std::string aFeatureError = "Boolean algorithm failed";
+          static const std::string aFeatureError = "Error: Boolean algorithm failed.";
           setError(aFeatureError);
           return;
         }
         if(aBoolAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Resulting shape is Null";
+          static const std::string aShapeError = "Error: Resulting shape is Null.";
           setError(aShapeError);
           return;
         }
         if(!aBoolAlgo->isValid()) {
-          std::string aFeatureError = "Warning: resulting shape is not valid";
+          std::string aFeatureError = "Error: Resulting shape is not valid.";
           setError(aFeatureError);
           return;
         }
@@ -217,7 +217,7 @@ void FeaturesPlugin_Boolean::execute()
         aShapesToAdd.push_back(aBoolAlgo->shape());
         std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
         if(!aFillerAlgo->isDone()) {
-          std::string aFeatureError = "PaveFiller algorithm failed";
+          std::string aFeatureError = "Error: PaveFiller algorithm failed.";
           setError(aFeatureError);
           return;
         }
@@ -236,7 +236,7 @@ void FeaturesPlugin_Boolean::execute()
     }
     case GeomAlgoAPI_Boolean::BOOL_FUSE: {
       if((anObjects.size() + aTools.size() + aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
-        std::string aFeatureError = "Not enough objects for boolean operation";
+        std::string aFeatureError = "Error: Not enough objects for boolean operation.";
         setError(aFeatureError);
         return;
       }
@@ -320,17 +320,17 @@ void FeaturesPlugin_Boolean::execute()
 
         // Checking that the algorithm worked properly.
         if(!aFuseAlgo->isDone()) {
-          static const std::string aFeatureError = "Boolean algorithm failed";
+          static const std::string aFeatureError = "Error: Boolean algorithm failed.";
           setError(aFeatureError);
           return;
         }
         if(aFuseAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Resulting shape is Null";
+          static const std::string aShapeError = "Error: Resulting shape is Null.";
           setError(aShapeError);
           return;
         }
         if(!aFuseAlgo->isValid()) {
-          std::string aFeatureError = "Warning: resulting shape is not valid";
+          std::string aFeatureError = "Error: Resulting shape is not valid.";
           setError(aFeatureError);
           return;
         }
@@ -352,17 +352,17 @@ void FeaturesPlugin_Boolean::execute()
         }
         std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
         if(!aFillerAlgo->isDone()) {
-          std::string aFeatureError = "PaveFiller algorithm failed";
+          std::string aFeatureError = "Error: PaveFiller algorithm failed.";
           setError(aFeatureError);
           return;
         }
         if(aFillerAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Resulting shape is Null";
+          static const std::string aShapeError = "Error: Resulting shape is Null.";
           setError(aShapeError);
           return;
         }
         if(!aFillerAlgo->isValid()) {
-          std::string aFeatureError = "Warning: resulting shape is not valid";
+          std::string aFeatureError = "Error: Resulting shape is not valid.";
           setError(aFeatureError);
           return;
         }
@@ -381,7 +381,7 @@ void FeaturesPlugin_Boolean::execute()
       break;
     }
     default: {
-      std::string anOperationError = "Error: wrong type of operation";
+      std::string anOperationError = "Error: Wrong type of operation";
       setError(anOperationError);
       return;
     }

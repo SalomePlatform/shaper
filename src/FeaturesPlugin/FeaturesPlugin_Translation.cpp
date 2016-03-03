@@ -93,17 +93,17 @@ void FeaturesPlugin_Translation::execute()
 
       // Checking that the algorithm worked properly.
       if(!aTranslationAlgo.isDone()) {
-        static const std::string aFeatureError = "Translation algorithm failed";
+        static const std::string aFeatureError = "Error: Translation algorithm failed.";
         setError(aFeatureError);
         break;
       }
       if(aTranslationAlgo.shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
       if(!aTranslationAlgo.isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }

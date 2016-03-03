@@ -80,7 +80,7 @@ void FeaturesPlugin_Intersection::execute()
       return;
     }
     if (!anIntersectionAlgo.isValid()) {
-      std::string aFeatureError = "Error: resulting shape is not valid";
+      std::string aFeatureError = "Error: Resulting shape is not valid.";
       setError(aFeatureError);
       return;
     }

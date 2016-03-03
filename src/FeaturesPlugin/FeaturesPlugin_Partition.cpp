@@ -93,7 +93,7 @@ void FeaturesPlugin_Partition::execute()
   bool isCombine = boolean(COMBINE_ID())->value();
 
   if(anObjects.empty()/* || aTools.empty()*/) {
-    std::string aFeatureError = "Not enough objects for partition operation";
+    std::string aFeatureError = "Error: Not enough objects for partition operation.";
     setError(aFeatureError);
     return;
   }
@@ -112,17 +112,17 @@ void FeaturesPlugin_Partition::execute()
 
     // Checking that the algorithm worked properly.
     if (!aPartitionAlgo->isDone()) {
-      static const std::string aFeatureError = "Partition algorithm failed";
+      static const std::string aFeatureError = "Error: Partition algorithm failed.";
       setError(aFeatureError);
       return;
     }
     if (aPartitionAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Resulting shape is Null";
+      static const std::string aShapeError = "Error: Resulting shape is Null.";
       setError(aShapeError);
       return;
     }
     if (!aPartitionAlgo->isValid()) {
-      std::string aFeatureError = "Warning: resulting shape is not valid";
+      std::string aFeatureError = "Error: Resulting shape is not valid.";
       setError(aFeatureError);
       return;
     }
@@ -147,17 +147,17 @@ void FeaturesPlugin_Partition::execute()
 
       // Checking that the algorithm worked properly.
       if (!aPartitionAlgo->isDone()) {
-        static const std::string aFeatureError = "Partition algorithm failed";
+        static const std::string aFeatureError = "Error: Partition algorithm failed.";
         setError(aFeatureError);
         return;
       }
       if (aPartitionAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         return;
       }
       if (!aPartitionAlgo->isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         return;
       }

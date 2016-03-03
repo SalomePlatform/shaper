@@ -70,7 +70,7 @@ void FeaturesPlugin_Placement::execute()
   }
   std::shared_ptr<GeomAPI_Shape> aStartShape = anObjRef->value();
   if(!aStartShape) {
-    static const std::string aSelectionError = "The start shape selection is bad";
+    static const std::string aSelectionError = "Error: The start shape selection is bad.";
     setError(aSelectionError);
     return;
   }
@@ -82,7 +82,7 @@ void FeaturesPlugin_Placement::execute()
     aStartShapeContext = aContextRes->shape();
   }
   if(!aStartShapeContext.get()) {
-    static const std::string aContextError = "The start shape selection context is bad";
+    static const std::string aContextError = "Error: The start shape selection context is bad.";
     setError(aContextError);
     return;
   }
@@ -91,7 +91,7 @@ void FeaturesPlugin_Placement::execute()
   anObjRef = selection(END_SHAPE_ID());
   std::shared_ptr<GeomAPI_Shape> anEndShape = anObjRef->value();
   if(!anEndShape) {
-    static const std::string aSelectionError = "The end shape selection is bad";
+    static const std::string aSelectionError = "Error: The end shape selection is bad.";
     setError(aSelectionError);
     return;
   }
@@ -102,7 +102,7 @@ void FeaturesPlugin_Placement::execute()
     anEndShapeContext = aContextRes->shape();
   }
   if(!anEndShapeContext.get()) {
-    static const std::string aContextError = "The end shape selection context is bad";
+    static const std::string aContextError = "Error: The end shape selection context is bad.";
     setError(aContextError);
     return;
   }
@@ -113,7 +113,7 @@ void FeaturesPlugin_Placement::execute()
     if (aShapes[i]->isFace()) {
       std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShapes[i]));
       if (!aFace->isPlanar()) {
-        static const std::string aPlanarityError = "One of selected faces is not planar";
+        static const std::string aPlanarityError = "Error: One of selected faces is not planar.";
         setError(aPlanarityError);
         return;
       }
@@ -121,7 +121,7 @@ void FeaturesPlugin_Placement::execute()
     else if (aShapes[i]->isEdge()) {
       std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShapes[i]));
       if (!anEdge->isLine()) {
-        static const std::string aLinearityError = "One of selected endges is not linear";
+        static const std::string aLinearityError = "Error: One of selected endges is not linear.";
         setError(aLinearityError);
         return;
       }
@@ -136,7 +136,7 @@ void FeaturesPlugin_Placement::execute()
   GeomAlgoAPI_Placement aPlacementAlgo(
     aStartShapeContext, anEndShapeContext, aStartShape, anEndShape, isReverse, isCentering, true);
   if(!aPlacementAlgo.isDone()) {
-    static const std::string aFeatureError = "Placement algorithm failed";
+    static const std::string aFeatureError = "Error: Placement algorithm failed.";
     setError(aFeatureError);
     return;
   }
@@ -159,17 +159,17 @@ void FeaturesPlugin_Placement::execute()
 
       // Checking that the algorithm worked properly.
       if(!aTransformAlgo.isDone()) {
-        static const std::string aFeatureError = "Transform algorithm failed";
+        static const std::string aFeatureError = "Error: Transform algorithm failed.";
         setError(aFeatureError);
         break;
       }
       if(aTransformAlgo.shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
       if(!aTransformAlgo.isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
