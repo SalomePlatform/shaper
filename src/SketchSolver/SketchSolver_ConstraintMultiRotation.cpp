@@ -143,8 +143,12 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   myCenterCoord[0] = aParams.front()->value();
   myCenterCoord[1] = aParams.back()->value();
 
-  myRotationVal[0] = sin(myAngle * PI / 180.0);
-  myRotationVal[1] = cos(myAngle * PI / 180.0);
+  double anAngleValue = myAngle;
+  if (myIsFullValue && myNumberOfCopies > 0)
+    anAngleValue /= myNumberOfCopies;
+
+  myRotationVal[0] = sin(anAngleValue * PI / 180.0);
+  myRotationVal[1] = cos(anAngleValue * PI / 180.0);
 
   SketchSolver_ConstraintMulti::adjustConstraint();
 }

@@ -56,7 +56,6 @@ private:
 private:
   AttributePoint2DPtr myCenterPointAttribute; ///< a center of rotation
   double              myAngle;           ///< angle of rotation
-  bool                myIsFullValue;     ///< value whether the angle is a full or single for objects
 
   double myCenterCoord[2]; ///< coordinates of rotation center
   double myRotationVal[2]; ///< sinus and cosine of rotation angle

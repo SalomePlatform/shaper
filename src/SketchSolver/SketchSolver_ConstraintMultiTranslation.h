@@ -56,7 +56,6 @@ private:
 private:
   AttributePoint2DPtr myStartPointAttribute;
   AttributePoint2DPtr myEndPointAttribute;
-  bool                myIsFullValue;
 
   double myDelta[2]; ///< increment of translation
 };

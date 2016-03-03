@@ -24,7 +24,8 @@ public:
       SketchSolver_Constraint(theConstraint),
       myNumberOfObjects(0),
       myNumberOfCopies(0),
-      myAdjusted(false)
+      myAdjusted(false),
+      myIsFullValue(false)
   {}
 
   /// \brief Update constraint
@@ -73,6 +74,7 @@ protected:
 protected:
   int myNumberOfObjects; ///< number of previous initial objects
   int myNumberOfCopies;  ///< number of previous copies of initial objects
+  bool myIsFullValue;    ///< value whether the angle/distance is a full or single for objects
 
   bool myAdjusted; ///< the constraint is already adjusted (to not do it several times)
 
