@@ -191,9 +191,18 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
 {
   for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
     AttributeSelectionPtr anAttr = value(anIndex);
-    if (anAttr.get() && anAttr->value().get()) {
-      if (anAttr->context() == theContext && anAttr->value()->isEqual(theSubShape))
-        return true;
+    if (anAttr.get()) {
+      if (anAttr->context() == theContext) { // contexts are equal, so, check that values are also
+        std::shared_ptr<GeomAPI_Shape> aValue = anAttr->value();
+        if (!aValue.get()) {
+          if (!theSubShape.get()) { // both are null
+            return true;
+          }
+        } else {
+          if (aValue->isEqual(theSubShape)) // shapes are equal
+            return true;
+        }
+      }
     }
   }
   return false;
