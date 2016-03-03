@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
     SketchSolver_ConstraintDistance.h
     SketchSolver_ConstraintEqual.h
     SketchSolver_ConstraintLength.h
+    SketchSolver_ConstraintMiddle.h
     SketchSolver_ConstraintMirror.h
     SketchSolver_ConstraintFixed.h
     SketchSolver_ConstraintFixedArcRadius.h
@@ -38,6 +39,7 @@ SET(PROJECT_SOURCES
     SketchSolver_ConstraintDistance.cpp
     SketchSolver_ConstraintEqual.cpp
     SketchSolver_ConstraintLength.cpp
+    SketchSolver_ConstraintMiddle.cpp
     SketchSolver_ConstraintMirror.cpp
     SketchSolver_ConstraintFixed.cpp
     SketchSolver_ConstraintFixedArcRadius.cpp

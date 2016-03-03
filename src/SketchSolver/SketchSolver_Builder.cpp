@@ -14,6 +14,7 @@
 #include <SketchSolver_ConstraintFixed.h>
 #include <SketchSolver_ConstraintFixedArcRadius.h>
 #include <SketchSolver_ConstraintLength.h>
+#include <SketchSolver_ConstraintMiddle.h>
 #include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_ConstraintTangent.h>
 #include <SketchSolver_ConstraintMultiRotation.h>
@@ -33,6 +34,7 @@
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
@@ -87,6 +89,8 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintLength(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintMiddle::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintMiddle(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintMirror(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintTangent::ID()) {

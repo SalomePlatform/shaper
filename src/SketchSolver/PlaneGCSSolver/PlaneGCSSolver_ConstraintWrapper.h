@@ -28,6 +28,9 @@ public:
   /// \brief Return list of constraints
   const std::list<GCSConstraintPtr>& constraints() const
   { return myGCSConstraints; }
+  /// \brief Change list of constraints
+  void setConstraints(const std::list<GCSConstraintPtr>& theConstraints)
+  { myGCSConstraints = theConstraints; }
 
   /// \brief Return ID of current entity
   virtual ConstraintID id() const

@@ -67,9 +67,45 @@ bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr theConstraint)
   for (; anIt != anEntities.end(); ++anIt)
     isUpdated = update(*anIt) || isUpdated;
 
-  // Change ID of constraints
-  if (aConstraint->id() == CID_UNKNOWN)
+  if (aConstraint->id() == CID_UNKNOWN) {
+    const std::list<EntityWrapperPtr>& aSubs = aConstraint->entities();
+    // check middle-point constraint conflicts with point-on-line
+    if (aConstraint->type() == CONSTRAINT_MIDDLE_POINT) {
+      std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
+          anIt = myConstraintMap.begin();
+      for (; anIt != myConstraintMap.end(); ++anIt) {
+        EntityWrapperPtr aPoint, aLine;
+        ConstraintWrapperPtr aCurrentConstr = anIt->second.front();
+        if (aCurrentConstr->type() != CONSTRAINT_PT_ON_LINE)
+          continue;
+        const std::list<EntityWrapperPtr>& aCurSubs = aCurrentConstr->entities();
+        std::list<EntityWrapperPtr>::const_iterator aSIt1, aSIt2;
+        for (aSIt1 = aSubs.begin(); aSIt1 != aSubs.end(); ++aSIt1) {
+          if ((*aSIt1)->type() == ENTITY_POINT)
+            aPoint = *aSIt1;
+          else if((*aSIt1)->type() == ENTITY_LINE)
+            aLine = *aSIt1;
+          else
+            continue;
+          for (aSIt2 = aCurSubs.begin(); aSIt2 != aCurSubs.end(); ++aSIt2)
+            if ((*aSIt1)->id() == (*aSIt2)->id())
+              break;
+          if (aSIt2 == aCurSubs.end())
+            break;
+        }
+        // point-on-line found, change it to bisector
+        if (aSIt1 == aSubs.end()) {
+          std::list<GCSConstraintPtr> aConstrList = aConstraint->constraints();
+          aConstrList.pop_front();
+          aConstraint->setConstraints(aConstrList);
+          break;
+        }
+      }
+    }
+
+    // Change ID of constraints
     aConstraint->setId(++myConstraintLastID);
+  }
 
   return isUpdated;
 }

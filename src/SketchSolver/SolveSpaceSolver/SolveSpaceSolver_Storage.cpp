@@ -798,6 +798,29 @@ Slvs_hConstraint SolveSpaceSolver_Storage::updateConstraint(const Slvs_Constrain
   // Constraint is not found, add new one
   Slvs_Constraint aConstraint = theConstraint;
   aConstraint.h = 0;
+
+  // Firstly, check middle-point constraint conflicts with point-on-line
+  if (aConstraint.type == SLVS_C_AT_MIDPOINT) {
+    std::vector<Slvs_Constraint>::const_iterator anIt = myConstraints.begin();
+    for (; anIt != myConstraints.end(); ++anIt)
+      if (anIt->type == SLVS_C_PT_ON_LINE &&
+          anIt->ptA == aConstraint.ptA &&
+          anIt->entityA == aConstraint.entityA)
+        break;
+    if (anIt != myConstraints.end()) {
+      // change the constraint to the lengths equality to avoid conflicts
+      Slvs_Entity aLine = getEntity(aConstraint.entityA);
+      Slvs_Entity aNewLine1 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroupID,
+          myWorkplaneID, aLine.point[0], aConstraint.ptA);
+      aNewLine1.h = addEntity(aNewLine1);
+      Slvs_Entity aNewLine2 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroupID,
+          myWorkplaneID, aLine.point[1], aConstraint.ptA);
+      aNewLine2.h = addEntity(aNewLine2);
+      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroupID, SLVS_C_EQUAL_LENGTH_LINES,
+          myWorkplaneID, 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aNewLine1.h, aNewLine2.h);
+    }
+  }
+
   return addConstraint(aConstraint);
 }
 
