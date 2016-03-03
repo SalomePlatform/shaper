@@ -85,9 +85,9 @@ void SketchSolver_ConstraintTangent::getAttributes(
     return;
   }
 
-  if (myType != CONSTRAINT_TANGENT_CIRCLE_LINE && 
+  if (myType == CONSTRAINT_TANGENT_ARC_LINE && 
       !hasSingleCoincidence(theAttributes[2], theAttributes[3]))
-    myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+    myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
 
   if (isSwap) {
     EntityWrapperPtr aTemp = theAttributes[2];
