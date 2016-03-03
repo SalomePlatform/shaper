@@ -77,17 +77,9 @@ class SketchPlugin_Rectangle(model.Feature):
         # Retrieving list of already created lines
         aLinesList = self.reflist(self.LINES_LIST_ID())
         aNbLines = aLinesList.size()
-        if aNbLines == 0:
-            # Search the sketch containing this rectangle
-            self.__sketch = None
-            aRefs = self.data().refsToMe();
-            for iter in aRefs:
-                aFeature = ModelAPI.objectToFeature(iter.owner())
-                if aFeature.getKind() == "Sketch":
-                    self.__sketch = ModelAPI.featureToCompositeFeature(aFeature)
-                    break
-            # Create lines to compose the rectangle
-            for i in range (0, 4):
+        if aNbLines == 1:
+            # Create 1-4 lines to compose the rectangle
+            for i in range (0, 3):
                 aLine = self.__sketch.addFeature("SketchLine")
                 aLinesList.append(aLine)
             aNbLines = aLinesList.size()
@@ -126,16 +118,34 @@ class SketchPlugin_Rectangle(model.Feature):
 
     def attributeChanged(self, theID):
         if theID == self.START_ID() or theID == self.END_ID():
+            # Search the sketch containing this rectangle
+            self.__sketch = None
+            aRefs = self.data().refsToMe();
+            for iter in aRefs:
+                aFeature = ModelAPI.objectToFeature(iter.owner())
+                if aFeature.getKind() == "Sketch":
+                    self.__sketch = ModelAPI.featureToCompositeFeature(aFeature)
+                    break
+
+            aLinesList = self.reflist(self.LINES_LIST_ID())
+            aNbLines = aLinesList.size()
+            if aNbLines == 0:
+                # Create first line to be able to create a coincidence with selected point/feature
+                for i in range (0, 1):
+                    aLine = self.__sketch.addFeature("SketchLine")
+                    aLinesList.append(aLine)
+
             aStartPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.START_ID()))
             aEndPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.END_ID()))
-            if aStartPoint.isInitialized() and aEndPoint.isInitialized:
-                self.updateLines()
+            if aStartPoint.isInitialized() and aEndPoint.isInitialized():
+              self.updateLines()
+            else:
+              self.updateStartPoint()
 
     def updateLines(self):
         # Retrieving list of already created lines
         aLinesList = self.reflist(self.LINES_LIST_ID())
         aNbLines = aLinesList.size()
-
         aStartPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.START_ID()))
         aEndPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.END_ID()))
         aX = [aStartPoint.x(), aStartPoint.x(), aEndPoint.x(), aEndPoint.x()]
@@ -148,3 +158,18 @@ class SketchPlugin_Rectangle(model.Feature):
             aLineEnd = GeomDataAPI.geomDataAPI_Point2D(aLine.attribute("EndPoint"))
             aLineStart.setValue(aX[i-1], aY[i-1])
             aLineEnd.setValue(aX[i], aY[i])
+
+    def updateStartPoint(self):
+        # Retrieving list of already created lines
+        aLinesList = self.reflist(self.LINES_LIST_ID())
+        aNbLines = aLinesList.size()
+
+        aStartPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.START_ID()))
+        aX = aStartPoint.x()
+        aY = aStartPoint.y()
+
+        # Update coordinates of rectangle lines
+        for i in range (0, aNbLines):
+            aLine = ModelAPI.objectToFeature(aLinesList.object(i))
+            aLineStart = GeomDataAPI.geomDataAPI_Point2D(aLine.attribute("EndPoint"))
+            aLineStart.setValue(aX, aY)
