@@ -164,7 +164,8 @@ protected:
 
    /// Create a coincidence constraint between the attribute and the parameter object
    /// \theObject a result object
-   void setConstraintWith(const ObjectPtr& theObject);
+   /// \return true if succed
+   bool setConstraintWith(const ObjectPtr& theObject);
 
    /// Returns if the feature is an orphan point, circle or an arc. Returns true if it
    /// has no a coincident to other lines. It processes point, circle and arc features

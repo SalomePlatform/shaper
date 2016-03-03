@@ -384,7 +384,7 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
   return false;
 }
 
-void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
+bool PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
   if (feature()->isMacro()) {
@@ -403,7 +403,7 @@ void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
     aFeaturePoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
   }
   if (!aFeaturePoint.get())
-    return;
+    return false;
 
   // Create point-edge coincedence
   FeaturePtr aFeature = mySketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
@@ -420,6 +420,8 @@ void PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
 
   // we need to flush created signal in order to coincidence is processed by solver
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+
+  return true;
 }
 
 void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -505,7 +507,11 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
-          setConstraintWith(aObject);
+          if (!setConstraintWith(aObject)) {
+            gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
+            PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
+            setPoint(aX, aY);
+          }
           setValueState(Stored); // in case of edge selection, Apply state should also be updated
 
           FeaturePtr anObjectFeature = ModelAPI_Feature::feature(aObject);
