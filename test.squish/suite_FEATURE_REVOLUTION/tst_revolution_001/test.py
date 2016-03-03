@@ -46,8 +46,9 @@ def main():
     mouseClick(waitForObject(":Revolution.Select a sketch face_QListWidget"), 10, 10, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 431, 180, 0, Qt.LeftButton)
     # [step] Select vector
-    mouseClick(waitForObject(":Revolution_QLineEdit"), 10, 10, 0, Qt.LeftButton)
-    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 311, 282, 0, Qt.LeftButton)
+
+    mouseClick(waitForObject(":Revolution_QLineEdit"), 186, 8, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 307, 328, 0, Qt.LeftButton)
 
     # [step] Fit all [vp AFTER_SELECTION]
     fit_all()

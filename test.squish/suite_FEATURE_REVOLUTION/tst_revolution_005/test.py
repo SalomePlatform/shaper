@@ -76,8 +76,8 @@ def main():
     clickButton(waitForObject(":Revolution_QToolButton_3"))
 
     # [step] Select face 'To' (biggest one)
-    mouseClick(waitForObject(":To_QLineEdit_3"), 10, 10, 0, Qt.LeftButton)
-    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 463, 171, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":To_QLineEdit_3"), 56, 5, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 209, 30, 0, Qt.LeftButton)
 
     # [step] Fit all
 

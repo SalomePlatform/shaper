@@ -91,7 +91,8 @@ def main():
     mouseClick(waitForObject(":SALOME*_OCCViewer_ViewPort3d"), 10, 450, 0, Qt.LeftButton)  # close tool bar extension bar
 
     # [check] Check that operation has been executed successfully
-    fit_all()
+    
+    #fit_all()
     test.vp("REVOLUTION_CUT")
 
     # [step] Close application without saving
