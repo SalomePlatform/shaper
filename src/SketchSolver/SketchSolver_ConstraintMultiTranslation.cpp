@@ -148,8 +148,14 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
   EntityWrapperPtr aEnd = myStorage->entity(
       myBaseConstraint->attribute(SketchPlugin_MultiTranslation::END_POINT_ID()));
   std::list<ParameterWrapperPtr> aEndParams = aEnd->parameters();
+
   myDelta[0] = aEndParams.front()->value() - aStartParams.front()->value();
   myDelta[1] = aEndParams.back()->value() - aStartParams.back()->value();
+
+  if (myIsFullValue && myNumberOfCopies > 0) {
+    myDelta[0] /= myNumberOfCopies;
+    myDelta[1] /= myNumberOfCopies;
+  }
 
   SketchSolver_ConstraintMulti::adjustConstraint();
 }
