@@ -196,6 +196,7 @@ bool SketchSolver_Group::changeConstraint(
   return true;
 }
 
+// Update constraints if they contain specific feature
 static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, FeaturePtr theFeature)
 {
   ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
@@ -209,6 +210,18 @@ static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, Feat
               aType == CONSTRAINT_SYMMETRIC)
              && aCIt->second->isUsed(theFeature))
       aCIt->second->update();
+  }
+}
+
+// Recalculate slave features of the Multi constraints
+static void updateMultiConstraints(ConstraintConstraintMap& theConstraints)
+{
+  ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
+  for (; aCIt != theConstraints.end(); ++aCIt) {
+    SketchSolver_ConstraintType aType = aCIt->second->getType();
+    if ((aType == CONSTRAINT_MULTI_ROTATION ||
+         aType == CONSTRAINT_MULTI_TRANSLATION))
+      std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
   }
 }
 
@@ -356,6 +369,7 @@ bool SketchSolver_Group::resolveConstraints()
     }
     if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {  // solution succeeded, store results into correspondent attributes
       myStorage->refresh();
+      updateMultiConstraints(myConstraints);
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
         // the error message should be changed before sending the message
