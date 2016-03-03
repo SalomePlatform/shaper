@@ -12,6 +12,7 @@
 #include "SketchPlugin_ConstraintDistance.h"
 #include "SketchPlugin_ConstraintFillet.h"
 #include "SketchPlugin_ConstraintRigid.h"
+#include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
@@ -457,6 +458,45 @@ bool SketchPlugin_SolverErrorValidator::isNotObligatory(std::string theFeature, 
   return true;
 }
 
+static bool hasSameTangentFeature(const std::set<AttributePtr>& theRefsList, const FeaturePtr theFeature)
+{
+  for(std::set<AttributePtr>::const_iterator anIt = theRefsList.cbegin(); anIt != theRefsList.cend(); ++anIt) {
+    std::shared_ptr<ModelAPI_Attribute> aAttr = (*anIt);
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    if (aFeature->getKind() == SketchPlugin_ConstraintTangent::ID()) {
+      AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aFeature->attribute(SketchPlugin_ConstraintTangent::ENTITY_A()));
+      AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        aFeature->attribute(SketchPlugin_ConstraintTangent::ENTITY_B()));
+      if(anAttrRefA.get()) {
+        ResultPtr aResA = std::dynamic_pointer_cast<ModelAPI_Result>(anAttrRefA->object());
+        if(aResA.get()) {
+          DocumentPtr aDoc = aResA->document();
+          if(aDoc.get()) {
+            FeaturePtr aFeatureA = aDoc->feature(aResA);
+            if(aFeatureA.get() && aFeatureA == theFeature) {
+              return true;
+            }
+          }
+        }
+      }
+      if(anAttrRefB.get()) {
+        ResultPtr aResB = std::dynamic_pointer_cast<ModelAPI_Result>(anAttrRefB->object());
+        if(aResB.get()) {
+          DocumentPtr aDoc = aResB->document();
+          if(aDoc.get()) {
+            FeaturePtr aFeatureB = aDoc->feature(aResB);
+            if(aFeatureB.get() && aFeatureB == theFeature) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
 bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
@@ -582,14 +622,31 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     }
 
     if(aCoinsides.size() != 2) {
-      theError = ("Error: One of the selected points does not have two suitable edges for fillet.");
+      theError = "Error: One of the selected points does not have two suitable edges for fillet.";
       return false;
     }
 
-    // Check that lines not collinear
+    // Check that selected edges don't have tangent constraint.
     std::set<FeaturePtr>::iterator anIt = aCoinsides.begin();
     FeaturePtr aFirstFeature = *anIt++;
     FeaturePtr aSecondFeature = *anIt;
+    const std::set<AttributePtr>& aFirstFeatureRefsList = aFirstFeature->data()->refsToMe();
+    if(hasSameTangentFeature(aFirstFeatureRefsList, aSecondFeature)) {
+      theError = "Error: Edges in selected point has tangent constraint.";
+      return false;
+    }
+
+    std::list<ResultPtr> aFirstResults = aFirstFeature->results();
+    for(std::list<ResultPtr>::iterator aResIt = aFirstResults.begin(); aResIt != aFirstResults.end(); ++aResIt) {
+      ResultPtr aRes = *aResIt;
+      const std::set<AttributePtr>& aResRefsList = aRes->data()->refsToMe();
+      if(hasSameTangentFeature(aResRefsList, aSecondFeature)) {
+        theError = "Error: Edges in selected point has tangent constraint.";
+        return false;
+      }
+    }
+
+    // Check that lines not collinear
     if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
       std::string aStartAttr = SketchPlugin_Line::START_ID();
       std::string anEndAttr = SketchPlugin_Line::END_ID();
