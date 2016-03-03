@@ -185,7 +185,9 @@ void SketchPlugin_ConstraintFillet::execute()
     } else {
       // Copy edges and create arc.
       aResultEdgeA = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aBaseEdgeA, sketch());
+      aResultEdgeA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
       aResultEdgeB = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aBaseEdgeB, sketch());
+      aResultEdgeB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
       aResultArc = sketch()->addFeature(SketchPlugin_Arc::ID());
 
       aFilletFeatures.resultEdges.push_back(aResultEdgeA);
