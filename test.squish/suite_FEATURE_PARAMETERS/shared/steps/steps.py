@@ -77,7 +77,8 @@ def step(context):
 
 @Then("Check that Point does not allow using expressions")
 def step(context):
-    clickButton(waitForObject(":SALOME*.SketchPoint_QToolButton"))
+    activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
+    activateItem(waitForObjectItem(":Sketch_QMenu", "Point"))
     mouseClick(waitForObject(":Point.qt_spinbox_lineedit_QLineEdit"), 41, 6, 0, Qt.LeftButton)
     type(waitForObject(":Point.X _ModuleBase_ParamSpinBox"), "<Ctrl+A>")
     type(waitForObject(":Point.X _ModuleBase_ParamSpinBox"), "a")
@@ -181,7 +182,7 @@ def step(context):
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 131, 282, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 209, 98, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 283, 275, 0, Qt.LeftButton)
-    clickButton(waitForObject(":Line.property_panel_cancel_QToolButton"))
+    #TODO_1 clickButton(waitForObject(":Line.property_panel_cancel_QToolButton"))
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Sketch"))
     activateItem(waitForObjectItem(":Sketch_QMenu", "Fillet"))
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 211, 99, 0, Qt.LeftButton)
