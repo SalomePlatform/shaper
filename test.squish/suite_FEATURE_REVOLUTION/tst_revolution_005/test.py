@@ -96,9 +96,10 @@ def main():
     test.vp("PLANE_TO_30")
 
     # [step] Select face 'From' (smallest one)
-    mouseClick(waitForObject(":From_QLineEdit_3"), 10, 10, 0, Qt.LeftButton)
-    sendEvent("QMouseEvent", waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), QEvent.MouseButtonPress, 504, 252, Qt.LeftButton, 1, 0)
-    sendEvent("QMouseEvent", waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), QEvent.MouseButtonRelease, 504, 252, Qt.LeftButton, 0, 0)
+
+    mouseClick(waitForObject(":From_QLineEdit_3"), 32, 10, 0, Qt.LeftButton)
+    sendEvent("QMouseEvent", waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), QEvent.MouseButtonPress, 518, 361, Qt.LeftButton, 1, 0)
+    sendEvent("QMouseEvent", waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), QEvent.MouseButtonRelease, 518, 361, Qt.LeftButton, 0, 0)
 
     # [check] Check that preview is updated [vp PLANE_FROM]
     fit_all()

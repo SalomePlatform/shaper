@@ -17,9 +17,9 @@ Changes made in this file can be lost!
   <parameter value="false" name="auto_bring_to_front"/>
  </section>
  <section name="MRU">
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_003.hdf" name="item_000"/>
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_004.hdf" name="item_001"/>
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_005.hdf" name="item_002"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_005.hdf" name="item_000"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_003.hdf" name="item_001"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_004.hdf" name="item_002"/>
   <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_001.hdf" name="item_003"/>
   <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_boolean_001.hdf" name="item_004"/>
   <parameter value="/dn20/salome/mpv/CEA_Reactor7.hdf" name="item_005"/>
@@ -96,7 +96,7 @@ Changes made in this file can be lost!
   <parameter value="bt=1;fn=;tm=0;ts=false;c1=#000000;c2=#000000;gt=-1;gr=" name="background"/>
  </section>
  <section name="desktop">
-  <parameter value="1024x768+595+140" name="geometry"/>
+  <parameter value="1024x768+233+73" name="geometry"/>
  </section>
  <section name="salome">
   <parameter value="7.7.0dev" name="version"/>
