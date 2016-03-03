@@ -96,7 +96,7 @@ void FeaturesPlugin_RevolutionBoolean::makeSolids(const ListOfShape& theFaces,
     // Checking that the algorithm worked properly.
     if(!aRevolAlgo->isDone()  || !aRevolAlgo->shape().get() || aRevolAlgo->shape()->isNull() ||
        !aRevolAlgo->isValid()) {
-      setError("Revolution algorithm failed");
+      setError("Error: Revolution algorithm failed.");
       theResults.clear();
       return;
     }

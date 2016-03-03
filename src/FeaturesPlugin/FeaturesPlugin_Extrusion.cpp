@@ -65,13 +65,13 @@ void FeaturesPlugin_Extrusion::execute()
       ResultPtr aContext = aFaceSel->context();
       std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
       if(!aContextShape.get()) {
-        static const std::string aContextError = "The selection context is bad";
+        static const std::string aContextError = "Error: The selection context is bad.";
         setError(aContextError);
         return;
       }
       ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
       if(!aConstruction.get()) {
-        static const std::string aFaceError = "Can not find basis for extrusion";
+        static const std::string aFaceError = "Error: Can not find basis for extrusion.";
         setError(aFaceError);
         return;
       }
@@ -130,7 +130,7 @@ void FeaturesPlugin_Extrusion::execute()
 
     GeomAlgoAPI_Prism aPrismAlgo(aBaseShape, aToShape, aToSize, aFromShape, aFromSize);
     if(!aPrismAlgo.isDone()) {
-      static const std::string aPrismAlgoError = "Extrusion algorithm failed";
+      static const std::string aPrismAlgoError = "Error: Extrusion algorithm failed.";
       setError(aPrismAlgoError);
       aResultIndex = 0;
       break;
@@ -138,13 +138,13 @@ void FeaturesPlugin_Extrusion::execute()
 
     // Check if shape is valid
     if(!aPrismAlgo.shape().get() || aPrismAlgo.shape()->isNull()) {
-      static const std::string aShapeError = "Resulting shape is Null";
+      static const std::string aShapeError = "Error: Resulting shape is Null.";
       setError(aShapeError);
       aResultIndex = 0;
       break;
     }
     if(!aPrismAlgo.isValid()) {
-      std::string aPrismAlgoError = "Warning: resulting shape is not valid";
+      std::string aPrismAlgoError = "Error: Resulting shape is not valid.";
       setError(aPrismAlgoError);
       aResultIndex = 0;
       break;

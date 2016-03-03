@@ -122,6 +122,10 @@ protected:
   /// \param theValues a list of presentations.
   void filterPresentations(QList<ModuleBase_ViewerPrs>& theValues);
 
+  /// Remove subshapes of compsolids if whole compsolid is present.
+  /// \param theValues a list of presentations.
+  void filterCompSolids(QList<ModuleBase_ViewerPrs>& theValues);
+
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param toActivate a flag about activation or deactivation the filters
   /// \return true if the selection filter of the widget is activated in viewer context

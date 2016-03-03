@@ -157,7 +157,7 @@ void FeaturesPlugin_CompositeSketch::execute()
 
   if(aErrorsNum > 0) {
     std::ostringstream aStringStream;
-    aStringStream << "Warning: could not create solid(s) from " << aErrorsNum << " face(s).";
+    aStringStream << "Error: Could not create solid(s) from " << aErrorsNum << " face(s).";
     setError(aStringStream.str());
   }
 

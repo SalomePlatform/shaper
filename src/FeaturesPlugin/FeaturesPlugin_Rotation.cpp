@@ -90,17 +90,17 @@ void FeaturesPlugin_Rotation::execute()
 
       // Checking that the algorithm worked properly.
       if(!aRotationAlgo.isDone()) {
-        static const std::string aFeatureError = "Rotation algorithm failed";
+        static const std::string aFeatureError = "Error: Rotation algorithm failed.";
         setError(aFeatureError);
         break;
       }
       if(aRotationAlgo.shape()->isNull()) {
-        static const std::string aShapeError = "Resulting shape is Null";
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
       if(!aRotationAlgo.isValid()) {
-        std::string aFeatureError = "Warning: resulting shape is not valid";
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }

@@ -65,6 +65,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Entity already fixed");
     return MY_ERROR_VALUE;
   }
+  /// Tangency constraint has been built with wrong attributes (for example, line and arc have two coincident points)
+  inline static const std::string& TANGENCY_FAILED()
+  {
+    static const std::string MY_ERROR_VALUE("Unable to create tangency constraint on given attributes");
+    return MY_ERROR_VALUE;
+  }
   /// Crash in SolveSpace
   inline static const std::string& SOLVESPACE_CRASH()
   {

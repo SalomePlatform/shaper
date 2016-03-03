@@ -905,6 +905,17 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
   return std::shared_ptr<ModelAPI_Feature>(); // null feature means the higher than first
 }
 
+// recursive function to check if theSub is a child of theMain composite feature
+// through all the hierarchy of parents
+static bool isSub(const CompositeFeaturePtr theMain, const FeaturePtr theSub) {
+  CompositeFeaturePtr aParent = ModelAPI_Tools::compositeOwner(theSub);
+  if (!aParent.get())
+    return false;
+  if (aParent == theMain)
+    return true;
+  return isSub(theMain, aParent);
+}
+
 void Model_Document::setCurrentFeature(
   std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theVisible)
 {
@@ -970,7 +981,7 @@ void Model_Document::setCurrentFeature(
 
     bool aDisabledFlag = !aPassed;
     if (aMain.get()) {
-      if (aMain->isSub(anIter)) // sub-elements of not-disabled feature are not disabled
+      if (isSub(aMain, anIter)) // sub-elements of not-disabled feature are not disabled
         aDisabledFlag = false;
       else if (anOwners.find(anIter) != anOwners.end()) // disable the higher-level feature is the nested is the current
         aDisabledFlag = true;

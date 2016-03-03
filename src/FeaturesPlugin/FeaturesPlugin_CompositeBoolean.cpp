@@ -198,7 +198,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo.isDone() || aBoolAlgo.shape()->isNull() || !aBoolAlgo.isValid()) {
-          setError("Boolean algorithm failed");
+          setError("Error: Boolean algorithm failed.");
           return;
         }
 
@@ -236,7 +236,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
-          setError("Boolean algorithm failed");
+          setError("Error: Boolean algorithm failed.");
           return;
         }
 
@@ -250,7 +250,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
         aShapesToAdd.push_back(aBoolAlgo->shape());
         std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
         if(!aFillerAlgo->isDone()) {
-          std::string aFeatureError = "PaveFiller algorithm failed";
+          std::string aFeatureError = "Error: PaveFiller algorithm failed.";
           setError(aFeatureError);
           return;
         }
@@ -327,7 +327,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
 
       // Checking that the algorithm worked properly.
       if(!aFuseAlgo->isDone() || aFuseAlgo->shape()->isNull() || !aFuseAlgo->isValid()) {
-        static const std::string aFeatureError = "Boolean algorithm failed";
+        static const std::string aFeatureError = "Error: Boolean algorithm failed.";
         setError(aFeatureError);
         return;
       }
@@ -341,17 +341,17 @@ void FeaturesPlugin_CompositeBoolean::execute()
         aNotUsedSolids.push_back(aShape);
         std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aNotUsedSolids, true));
         if(!aFillerAlgo->isDone()) {
-          std::string aFeatureError = "PaveFiller algorithm failed";
+          std::string aFeatureError = "Error: PaveFiller algorithm failed.";
           setError(aFeatureError);
           return;
         }
         if(aFillerAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Resulting shape is Null";
+          static const std::string aShapeError = "Error: Resulting shape is Null.";
           setError(aShapeError);
           return;
         }
         if(!aFillerAlgo->isValid()) {
-          std::string aFeatureError = "Warning: resulting shape is not valid";
+          std::string aFeatureError = "Error: Resulting shape is not valid.";
           setError(aFeatureError);
           return;
         }
@@ -368,7 +368,7 @@ void FeaturesPlugin_CompositeBoolean::execute()
       break;
     }
     default: {
-      setError("Error: wrong type of boolean operation");
+      setError("Error: Wrong type of boolean operation.");
       return;
     }
   }
