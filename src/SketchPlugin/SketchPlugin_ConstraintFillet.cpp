@@ -95,49 +95,6 @@ void SketchPlugin_ConstraintFillet::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
-  // Remove unused items.
-  for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
-      aPointsIter != myPointFeaturesMap.end();) {
-    if(myNewPoints.find(aPointsIter->first) == myNewPoints.end()) {
-      // Clear auxiliary flag on initial objects.
-      const FilletFeatures& aFilletFeatures = aPointsIter->second;
-      std::list<FeaturePtr>::const_iterator aFeatureIt;
-      for(aFeatureIt = aFilletFeatures.baseEdges.cbegin();
-          aFeatureIt != aFilletFeatures.baseEdges.cend();
-          ++aFeatureIt) {
-        (*aFeatureIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
-      }
-    }
-    ++aPointsIter;
-  }
-
-  DocumentPtr aDoc = sketch()->document();
-  for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
-      aPointsIter != myPointFeaturesMap.end();) {
-    if(myNewPoints.find(aPointsIter->first) != myNewPoints.end()) {
-      ++aPointsIter; // keep this point and result features.
-    } else {
-      // Remove all produced constraints.
-      const FilletFeatures& aFilletFeatures = aPointsIter->second;
-      std::list<FeaturePtr>::const_iterator aFeatureIt;
-      for(aFeatureIt = aFilletFeatures.resultConstraints.cbegin();
-          aFeatureIt != aFilletFeatures.resultConstraints.cend();
-          ++aFeatureIt) {
-        aDoc->removeFeature(*aFeatureIt);
-      }
-
-      // Remove all result edges.
-      for(aFeatureIt = aFilletFeatures.resultEdges.cbegin();
-          aFeatureIt != aFilletFeatures.resultEdges.cend();
-          ++aFeatureIt) {
-        aDoc->removeFeature(*aFeatureIt);
-      }
-
-      // Remove point from map.
-      myPointFeaturesMap.erase(aPointsIter++);
-    }
-  }
-
   for(std::set<AttributePtr>::iterator aPointsIter = myNewPoints.begin();
       aPointsIter != myNewPoints.end();
       ++aPointsIter) {
@@ -159,8 +116,8 @@ void SketchPlugin_ConstraintFillet::execute()
     }
     FeaturePtr aBaseEdgeA, aBaseEdgeB;
     if(!anIsNeedNewObjects) {
-      aBaseEdgeA = aFilletFeatures.baseEdges.front();
-      aBaseEdgeB = aFilletFeatures.baseEdges.back();
+      aBaseEdgeA = aFilletFeatures.baseEdgesState.front().first;
+      aBaseEdgeB = aFilletFeatures.baseEdgesState.back().first;
     } else {
       // Obtain constraint coincidence for the fillet point.
       FeaturePtr aConstraintCoincidence;
@@ -206,8 +163,10 @@ void SketchPlugin_ConstraintFillet::execute()
       aBaseEdgeA = *aLinesIt++;
       aBaseEdgeB = *aLinesIt;
 
-      aFilletFeatures.baseEdges.push_back(aBaseEdgeA);
-      aFilletFeatures.baseEdges.push_back(aBaseEdgeB);
+      std::pair<FeaturePtr, bool> aBasePairA = std::make_pair(aBaseEdgeA, aBaseEdgeA->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
+      std::pair<FeaturePtr, bool> aBasePairB = std::make_pair(aBaseEdgeB, aBaseEdgeB->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
+      aFilletFeatures.baseEdgesState.push_back(aBasePairA);
+      aFilletFeatures.baseEdgesState.push_back(aBasePairB);
     }
 
     if(!aBaseEdgeA.get() || !aBaseEdgeB.get()) {
@@ -479,6 +438,9 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
       return;
     }
 
+    // Clear results.
+    clearResults();
+
     // Clear list of new points.
     myNewPoints.clear();
 
@@ -486,18 +448,12 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
     AttributeRefAttrListPtr aRefListOfFilletPoints = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(
       data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
     AttributeDoublePtr aRadiusAttribute = real(VALUE());
-    double aPrevRadius = aRadiusAttribute->value();
     int aListSize = aRefListOfFilletPoints->size();
-    if(aListSize == 0) {
+    if(aListSize == 0 && !myRadiusChangedByUser) {
       // If list is empty reset radius to zero (if it was not changed by user).
-      if(!myRadiusChangedByUser) {
-        myRadiusChangedInCode = true;
-        aRadiusAttribute->setValue(0);
-        myRadiusChangedInCode = false;
-      }
-
-      clearResults();
-
+      myRadiusChangedInCode = true;
+      aRadiusAttribute->setValue(0);
+      myRadiusChangedInCode = false;
       return;
     }
 
@@ -514,13 +470,6 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
         myNewPoints.clear();
         setError("Error: One of the selected points is invalid.");
         return;
-      }
-
-      // If point was previously selected, skip it.
-      if(myPointFeaturesMap.find(aFilletPointAttr) != myPointFeaturesMap.end()) {
-        myNewPoints.insert(aFilletPointAttr);
-        aMinimumRadius = aPrevRadius;
-        continue;
       }
 
       // If point or coincident point is already in list remove it from attribute.
@@ -663,10 +612,6 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
       }
     }
 
-    if(abs(aPrevRadius - aMinimumRadius) > tolerance) {
-      clearResults(); // if radius changed clear all results;
-    }
-
     // Set new default radius if it was not changed by user.
     if(!myRadiusChangedByUser) {
       myRadiusChangedInCode = true;
@@ -705,11 +650,11 @@ void SketchPlugin_ConstraintFillet::clearResults()
   for(std::map<AttributePtr, FilletFeatures>::iterator aPointsIter = myPointFeaturesMap.begin();
       aPointsIter != myPointFeaturesMap.end();) {
     const FilletFeatures& aFilletFeatures = aPointsIter->second;
-    std::list<FeaturePtr>::const_iterator aFeatureIt;
-    for(aFeatureIt = aFilletFeatures.baseEdges.cbegin();
-        aFeatureIt != aFilletFeatures.baseEdges.cend();
+    std::list<std::pair<FeaturePtr, bool>>::const_iterator aFeatureIt;
+    for(aFeatureIt = aFilletFeatures.baseEdgesState.cbegin();
+        aFeatureIt != aFilletFeatures.baseEdgesState.cend();
         ++aFeatureIt) {
-      (*aFeatureIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(false);
+      aFeatureIt->first->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(aFeatureIt->second);
     }
     ++aPointsIter;
   }

@@ -26,7 +26,7 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
 {
  public:
    struct FilletFeatures {
-    std::list<FeaturePtr> baseEdges; ///< list of objects the fillet is based
+    std::list<std::pair<FeaturePtr, bool>> baseEdgesState; ///< list of objects the fillet is based and its states
     std::list<FeaturePtr> resultEdges; ///< list of result edges
     std::list<FeaturePtr> resultConstraints; ///< list of constraints provided by the fillet
    };
