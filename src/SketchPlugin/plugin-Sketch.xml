@@ -25,7 +25,7 @@
       </feature>
       
       <!-- Intersection Point -->
-      <feature
+      <!-- feature
         id="SketchIntersectionPoint"
         title="Intersection Point"
         tooltip="Create intersection point"
@@ -41,7 +41,7 @@
           <validator id="SketchPlugin_IntersectionValidator"/>
         </sketch_shape_selector>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
-      </feature>
+      </feature -->
       
       <!-- SketchLine -->
       <feature id="SketchLine" title="Line" tooltip="Create line" icon=":icons/line.png">
@@ -326,6 +326,7 @@
       </feature>
       
     <!--  SketchConstraintCollinear  -->
+      <!--
       <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon=":icons/collinear.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
@@ -340,6 +341,7 @@
         </sketch_shape_selector>
         <validator id="PartSet_CollinearSelection"/>
       </feature>
+      -->
 
       <!--  SketchConstraintMiddle  -->
       <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line" icon=":icons/middlepoint.png">
