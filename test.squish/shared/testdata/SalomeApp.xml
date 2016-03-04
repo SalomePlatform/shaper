@@ -17,12 +17,17 @@ Changes made in this file can be lost!
   <parameter value="false" name="auto_bring_to_front"/>
  </section>
  <section name="MRU">
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_005.hdf" name="item_000"/>
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_003.hdf" name="item_001"/>
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_004.hdf" name="item_002"/>
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_001.hdf" name="item_003"/>
-  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_boolean_001.hdf" name="item_004"/>
-  <parameter value="/dn20/salome/mpv/CEA_Reactor7.hdf" name="item_005"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_construction_001.hdf" name="item_000"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_005.hdf" name="item_001"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_extrusion_006.hdf" name="item_002"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_extrusion_003.hdf" name="item_003"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_extrusion_002.hdf" name="item_004"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_extrusion_001.hdf" name="item_005"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_003.hdf" name="item_006"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_004.hdf" name="item_007"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_revolution_001.hdf" name="item_008"/>
+  <parameter value="/dn48/newgeom/nds/V2.2.0_coldrex/sources/test.squish/shared/testdata/for_boolean_001.hdf" name="item_009"/>
+  <parameter value="/dn20/salome/mpv/CEA_Reactor7.hdf" name="item_010"/>
  </section>
  <section name="OCCViewer">
   <parameter value="bt=1;fn=;tm=0;ts=false;c1=#238891;c2=#238891;gt=-1;gr=" name="background"/>
