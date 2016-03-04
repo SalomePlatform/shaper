@@ -752,6 +752,19 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
     return false;
   }
 
+  // Check the tangent point is equal to arc end
+  FeaturePtr anArc = std::dynamic_pointer_cast<ModelAPI_Feature>(aRefAttr->owner());
+  std::shared_ptr<GeomDataAPI_Point2D> anEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      anArc->attribute(SketchPlugin_Arc::END_ID()));
+  if (anEndPoint->isInitialized()) {
+    std::shared_ptr<GeomDataAPI_Point2D> aTangPt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
+    if (aTangPt->pnt()->distance(anEndPoint->pnt()) < tolerance) {
+      theError = "Unable to build arc on same points";
+      return false;
+    }
+  }
+
   return true;
 }
 
