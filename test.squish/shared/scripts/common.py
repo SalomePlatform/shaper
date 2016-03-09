@@ -401,9 +401,9 @@ def partition(main_objects, tool_object):
     for main_object in main_objects:
         mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), main_object[0], main_object[1], 33554432, Qt.LeftButton)
 
-    mouseClick(waitForObject(":Partition.Tool object_QListWidget"), 116, 69, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":Boolean.Tool object_QListWidget"), 83, 132, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), tool_object[0], tool_object[1], 0, Qt.LeftButton)
-    clickButton(waitForObject(":Partition.property_panel_ok_QToolButton"))
+    clickButton(waitForObject(":Boolean.property_panel_ok_QToolButton"))
 
 def plane(point, distance):
     mouseClick(waitForObjectItem(":SALOME*_QMenuBar", "Construction"))

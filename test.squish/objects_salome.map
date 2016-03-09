@@ -313,7 +313,6 @@
 :SALOME*.Mirror_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Mirror'}
 :SALOME*.Modules_QtxToolBar	{name='SalomeModules' type='QtxToolBar' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Modules'}
 :SALOME*.New part_QToolButton	{text='New part' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
-:SALOME*.Shaper_QToolButton	{text='Shaper' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.New_QToolButton	{text='New' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.OCC scene:1 - viewer:1 - 3D_SOCC_ViewWindow	{type='SOCC_ViewWindow' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='OCC scene:1 - viewer:1 - 3D'}
 :SALOME*.OCC scene:1 - viewer:1_OCCViewer_ViewFrame	{type='OCCViewer_ViewFrame' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='OCC scene:1 - viewer:1'}
@@ -351,6 +350,7 @@
 :SALOME*.Rotation_QToolButton_2	{occurrence='2' text='Rotation' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Rotation_XGUI_PropertyPanel	{name='property_panel_dock' type='XGUI_PropertyPanel' visible='1' window=':SALOME*_STD_TabDesktop' windowTitle='Rotation'}
 :SALOME*.Save_QToolButton	{text='Save' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
+:SALOME*.Shaper_QToolButton	{text='Shaper' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Show/Hide trihedron_QToolButton	{text='Show/Hide trihedron' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.SketchPoint_QToolButton	{container=':SALOME*.Sketch_QtxToolBar' text='Point' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
 :SALOME*.Sketch_QToolButton	{text='Sketch' type='QToolButton' unnamed='1' visible='1' window=':SALOME*_STD_TabDesktop'}
@@ -445,6 +445,7 @@
 :property_panel_dock.Main objects_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Main objects' type='QLabel' unnamed='1' visible='1'}
 :property_panel_dock.Operation type_QGroupBox	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' title='Operation type' type='QGroupBox' unnamed='1' visible='1'}
 :property_panel_dock.Tool object_QLabel	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' text='Tool object' type='QLabel' unnamed='1' visible='1'}
+:property_panel_dock.property_panel_cancel_QToolButton	{container=':SALOME*.property_panel_dock_XGUI_PropertyPanel' name='property_panel_cancel' type='QToolButton' visible='1'}
 :splitter.frame_QFrame	{container=':Save File.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_2	{container=':Open File.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :stackedWidget.treeView_QTreeView	{container=':frame.stackedWidget_QStackedWidget' name='treeView' type='QTreeView' visible='1'}

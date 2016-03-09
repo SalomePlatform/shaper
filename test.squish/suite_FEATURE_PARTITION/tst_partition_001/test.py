@@ -21,26 +21,25 @@ def main():
     # [step] Activate SHAPER
     clickButton(waitForObject(":SALOME*.Shaper_QToolButton"))
 
-    # [step] Activate Part_1
-    waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)")
-    clickItem(":Object browser_XGUI_DataTree", "Part\\_1 (Not loaded)", 71, 10, 0, Qt.LeftButton)
-    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Part\\_1 (Not loaded)", 70, 9, 0)
+    openItemContextMenu(waitForObject(":Object browser_XGUI_DataTree"), "Part\\_1 (Not loaded)", 95, 7, 0)
     activateItem(waitForObjectItem(":_QMenu", "Activate"))
+    clickButton(waitForObject(":SALOME*.Fit All_QToolButton"))
 
     # [step] Fit all
-    test.vp("VP_AFTER_LOAD")
     fit_all()
     test.vp("VP_FITALL")
 
     # [step] Create partition with horizontal plane [vp VP_PARTITION_1]
-    partition([(290, 170)], (270, 200))
+    partition([(290, 170)], (176, 213))
+
     test.vp("VP_PARTITION_1")
 
     # [step] Create partition with vertical plane [vp VP_PARTITION_2]
-    partition([(360, 230), (320, 340)], (380, 240))
+    partition([(260, 165), (295, 366)], (453, 432))
+
     test.vp("VP_PARTITION_2")
 
-    # [step] Hide one of parts obtained in the viewer: select it, call context menu - Hide
+    #[step] Hide one of parts obtained in the viewer: select it, call context menu - Hide
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 291, 198, 0, Qt.LeftButton)
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 291, 198, 0, Qt.RightButton)
     activateItem(waitForObjectItem(":_QtxMenu", "Hide"))
