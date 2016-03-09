@@ -42,7 +42,9 @@ def main():
     clickItem(":Object browser_XGUI_DataTree", "Part\\_1.Constructions (3)", -10, 10, 0, Qt.LeftButton)
     waitForObjectItem(":Object browser_XGUI_DataTree", "Part\\_1.Bodies (1)")
     clickItem(":Object browser_XGUI_DataTree", "Part\\_1.Bodies (1)", -10, 10, 0, Qt.LeftButton)
-    test.vp("VP_TREE")
+    # Tree is under modification, so it can not be checked by a picture
+    # Moreover a mask for a text should be provided to check it on different platforms
+    #test.vp("VP_TREE")
 
     # [step] Change parameter values: L = 64, E = 5, P = 80
     set_parameter_value("L", 64)
