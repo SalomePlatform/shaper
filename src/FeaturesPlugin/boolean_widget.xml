@@ -6,9 +6,9 @@
     buttons_dir="horizontal"
     label="Operation type" 
     tooltip="Type of boolean operation"
-    string_list="Cut Fuse Common"
+    string_list="Cut Fuse Common Smash"
     use_in_title="true"
-    icons_list=":icons/bool_cut.png :icons/bool_fuse.png :icons/bool_common.png"
+    icons_list=":icons/bool_cut.png :icons/bool_fuse.png :icons/bool_common.png :icons/bool_smash.png"
     default="0"
   />
   <multi_selector id="main_objects"

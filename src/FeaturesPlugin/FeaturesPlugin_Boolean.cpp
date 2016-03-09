@@ -71,7 +71,7 @@ void FeaturesPlugin_Boolean::execute()
       ModelAPI_AttributeInteger>(data()->attribute(FeaturesPlugin_Boolean::TYPE_ID()));
   if (!aTypeAttr)
     return;
-  GeomAlgoAPI_Boolean::OperationType aType = (GeomAlgoAPI_Boolean::OperationType)aTypeAttr->value();
+  OperationType aType = (FeaturesPlugin_Boolean::OperationType)aTypeAttr->value();
 
   ListOfShape anObjects, aTools, anEdgesAndFaces;
   std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
@@ -127,8 +127,8 @@ void FeaturesPlugin_Boolean::execute()
   int aResultIndex = 0;
 
   switch(aType) {
-    case GeomAlgoAPI_Boolean::BOOL_CUT:
-    case GeomAlgoAPI_Boolean::BOOL_COMMON:{
+    case BOOL_CUT:
+    case BOOL_COMMON:{
       if((anObjects.empty() && aCompSolidsObjects.empty()) || aTools.empty()) {
         std::string aFeatureError = "Error: Not enough objects for boolean operation.";
         setError(aFeatureError);
@@ -140,7 +140,7 @@ void FeaturesPlugin_Boolean::execute()
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
         ListOfShape aListWithObject;
         aListWithObject.push_back(anObject);
-        GeomAlgoAPI_Boolean aBoolAlgo(aListWithObject, aTools, aType);
+        GeomAlgoAPI_Boolean aBoolAlgo(aListWithObject, aTools, (GeomAlgoAPI_Boolean::OperationType)aType);
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo.isDone()) {
@@ -188,7 +188,9 @@ void FeaturesPlugin_Boolean::execute()
           }
         }
 
-        std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedInOperationSolids, aTools, aType));
+        std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
+                                                                               aTools,
+                                                                               (GeomAlgoAPI_Boolean::OperationType)aType));
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone()) {
@@ -234,7 +236,7 @@ void FeaturesPlugin_Boolean::execute()
       }
       break;
     }
-    case GeomAlgoAPI_Boolean::BOOL_FUSE: {
+    case BOOL_FUSE: {
       if((anObjects.size() + aTools.size() + aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
         std::string aFeatureError = "Error: Not enough objects for boolean operation.";
         setError(aFeatureError);
@@ -316,7 +318,9 @@ void FeaturesPlugin_Boolean::execute()
       } else if(anObjects.empty() && aTools.size() == 1) {
         aShape = aTools.front();
       } else if((anObjects.size() + aTools.size()) > 1){
-        std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects, aTools, aType));
+        std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
+                                                                               aTools,
+                                                                               (GeomAlgoAPI_Boolean::OperationType)aType));
 
         // Checking that the algorithm worked properly.
         if(!aFuseAlgo->isDone()) {
@@ -378,6 +382,132 @@ void FeaturesPlugin_Boolean::execute()
       loadNamingDS(aResultBody, aBackShape, anOriginalShapes, aShape, aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
+      break;
+    }
+    case BOOL_SMASH: {
+      if((anObjects.empty() && aCompSolidsObjects.empty()) || aTools.empty()) {
+        std::string aFeatureError = "Error: Not enough objects for boolean operation.";
+        setError(aFeatureError);
+        return;
+      }
+
+      // List of original solids for naming.
+      ListOfShape anOriginalShapes;
+      anOriginalShapes.insert(anOriginalShapes.end(), anObjects.begin(), anObjects.end());
+      anOriginalShapes.insert(anOriginalShapes.end(), aTools.begin(), aTools.end());
+
+      // Collecting all solids which will be smashed.
+      ListOfShape aShapesToSmash;
+      aShapesToSmash.insert(aShapesToSmash.end(), anObjects.begin(), anObjects.end());
+
+      // Collecting solids from compsolids which will not be modified in boolean operation and will be added to result.
+      ListOfShape aShapesToAdd;
+      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
+        anIt != aCompSolidsObjects.end(); anIt++) {
+        std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
+        ListOfShape& aUsedInOperationSolids = anIt->second;
+        anOriginalShapes.push_back(aCompSolid);
+        aShapesToSmash.insert(aShapesToSmash.end(), aUsedInOperationSolids.begin(), aUsedInOperationSolids.end());
+
+        // Collect solids from compsolid which will not be modified in boolean operation.
+        for(GeomAPI_ShapeExplorer anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
+          std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
+          ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
+          for(; anIt != aUsedInOperationSolids.end(); anIt++) {
+            if(aSolidInCompSolid->isEqual(*anIt)) {
+              break;
+            }
+          }
+          if(anIt == aUsedInOperationSolids.end()) {
+            aShapesToAdd.push_back(aSolidInCompSolid);
+          }
+        }
+      }
+
+      GeomAlgoAPI_MakeShapeList aMakeShapeList;
+      GeomAPI_DataMapOfShapeShape aMapOfShapes;
+      if(!aShapesToAdd.empty()) {
+        // Cut objects with not used solids.
+        std::shared_ptr<GeomAlgoAPI_Boolean> anObjectsCutAlgo(new GeomAlgoAPI_Boolean(aShapesToSmash,
+                                                                                      aShapesToAdd,
+                                                                                      GeomAlgoAPI_Boolean::BOOL_CUT));
+
+        if(GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-7) {
+          aShapesToSmash.clear();
+          aShapesToSmash.push_back(anObjectsCutAlgo->shape());
+          aMakeShapeList.appendAlgo(anObjectsCutAlgo);
+          aMapOfShapes.merge(anObjectsCutAlgo->mapOfSubShapes());
+        }
+
+        // Cut tools with not used solids.
+        std::shared_ptr<GeomAlgoAPI_Boolean> aToolsCutAlgo(new GeomAlgoAPI_Boolean(aTools,
+                                                                                   aShapesToAdd,
+                                                                                   GeomAlgoAPI_Boolean::BOOL_CUT));
+
+        if(GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-7) {
+          aTools.clear();
+          aTools.push_back(aToolsCutAlgo->shape());
+          aMakeShapeList.appendAlgo(aToolsCutAlgo);
+          aMapOfShapes.merge(aToolsCutAlgo->mapOfSubShapes());
+        }
+      }
+
+      // Cut objects with tools.
+      std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aShapesToSmash,
+                                                                             aTools,
+                                                                             GeomAlgoAPI_Boolean::BOOL_CUT));
+
+      // Checking that the algorithm worked properly.
+      if(!aBoolAlgo->isDone()) {
+        static const std::string aFeatureError = "Error: Boolean algorithm failed.";
+        setError(aFeatureError);
+        return;
+      }
+      if(aBoolAlgo->shape()->isNull()) {
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
+        setError(aShapeError);
+        return;
+      }
+      if(!aBoolAlgo->isValid()) {
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
+        setError(aFeatureError);
+        return;
+      }
+      aMakeShapeList.appendAlgo(aBoolAlgo);
+      aMapOfShapes.merge(aBoolAlgo->mapOfSubShapes());
+
+      // Put all (cut result, tools and not used solids) to PaveFiller.
+      aShapesToAdd.push_back(aBoolAlgo->shape());
+      aShapesToAdd.insert(aShapesToAdd.end(), aTools.begin(), aTools.end());
+
+      std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+      if(!aFillerAlgo->isDone()) {
+        std::string aFeatureError = "Error: PaveFiller algorithm failed.";
+        setError(aFeatureError);
+        return;
+      }
+      if(aFillerAlgo->shape()->isNull()) {
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
+        setError(aShapeError);
+        return;
+      }
+      if(!aFillerAlgo->isValid()) {
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
+        setError(aFeatureError);
+        return;
+      }
+
+      std::shared_ptr<GeomAPI_Shape> aShape = aFillerAlgo->shape();
+      aMakeShapeList.appendAlgo(aFillerAlgo);
+      aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
+
+      std::shared_ptr<GeomAPI_Shape> aFrontShape = anOriginalShapes.front();
+      anOriginalShapes.pop_front();
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
+      loadNamingDS(aResultBody, aFrontShape, anOriginalShapes, aShape, aMakeShapeList, aMapOfShapes);
+      setResult(aResultBody, aResultIndex);
+      aResultIndex++;
+
       break;
     }
     default: {

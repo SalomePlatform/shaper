@@ -23,7 +23,7 @@ class QButtonGroup;
 *   <choice id="bool_type" 
 *     label="Type" 
 *     tooltip="Type of boolean operation"
-*     string_list="Cut Fuse Common"
+*     string_list="Cut Fuse Common Smash"
 *   />
 * \endcode
 * Aditionally can be used: 

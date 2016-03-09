@@ -8,79 +8,67 @@
 #define FeaturesPlugin_Cut_H_
 
 #include "FeaturesPlugin.h"
+
+#include <GeomAlgoAPI_MakeShape.h>
+
 #include <ModelAPI_Feature.h>
 
-#include <GeomAlgoAPI_Boolean.h>
-
-class GeomAlgoAPI_MakeShapeList;
-
-/**\class FeaturesPlugin_Boolean
- * \ingroup Plugins
- * \brief Feature for applying of Boolean operations on Solids.
- *
- * Supports three kinds of Boolean operations: Cut, Fuse and Common.
- * For all of them requires two Solids: object and tool.
- */
+/// \class FeaturesPlugin_Boolean
+/// \ingroup Plugins
+/// \brief Feature for applying of Boolean operations on Solids.
+/// Supports four kinds of Boolean operations: Cut, Fuse, Common and Smash.
 class FeaturesPlugin_Boolean : public ModelAPI_Feature
 {
 public:
-  /// Extrusion kind
+  enum OperationType {
+    BOOL_CUT,
+    BOOL_FUSE,
+    BOOL_COMMON,
+    BOOL_SMASH
+  };
+
+  /// Feature kind.
   inline static const std::string& ID()
   {
     static const std::string MY_ID("Boolean");
     return MY_ID;
   }
-  /// attribute name of referenced object
+
+  /// Attribute name of main objects.
   inline static const std::string& OBJECT_LIST_ID()
   {
     static const std::string MY_OBJECT_LIST_ID("main_objects");
     return MY_OBJECT_LIST_ID;
   }
-  /// attribute name of referenced object
-  inline static const std::string& OBJECT_ID()
-  {
-    static const std::string MY_OBJECT_ID("main_object");
-    return MY_OBJECT_ID;
-  }
-  /// attribute name of tool object
-  inline static const std::string& TOOL_ID()
-  {
-    static const std::string MY_TOOL_ID("tool_object");
-    return MY_TOOL_ID;
-  }
-  /// attribute name of tool object
+
+  /// Attribute name of tool objects.
   inline static const std::string& TOOL_LIST_ID()
   {
     static const std::string MY_TOOL_LIST_ID("tool_objects");
     return MY_TOOL_LIST_ID;
   }
-  /// attribute name of operation type
+
+  /// Attribute name of operation type.
   inline static const std::string& TYPE_ID()
   {
     static const std::string MY_TYPE_ID("bool_type");
     return MY_TYPE_ID;
   }
 
-  enum {
-    BOOL_CUT,
-    BOOL_FUSE,
-    BOOL_COMMON
-  };
-
-  /// Returns the kind of a feature
+  /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
     static std::string MY_KIND = FeaturesPlugin_Boolean::ID();
     return MY_KIND;
   }
 
-  /// Creates a new part document if needed
+  /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
 
-  /// Request for initialization of data model of the feature: adding all attributes
+  /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Use plugin manager for features creation
+  /// Use plugin manager for features creation.
   FeaturesPlugin_Boolean();
 
 private:
