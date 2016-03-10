@@ -71,6 +71,7 @@ const static char* ATTR_INTERNAL = "internal";
 const static char* ATTR_OBLIGATORY = "obligatory";
 const static char* ATTR_CONCEALMENT = "concealment";
 const static char* ATTR_USE_RESET = "use_reset";
+const static char* ATTR_GREED = "greed";
 
 // WDG_INFO properties
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

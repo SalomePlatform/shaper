@@ -26,6 +26,7 @@ class QLayout;
 class QDoubleSpinBox;
 class ModuleBase_ParamIntSpinBox;
 class ModuleBase_ParamSpinBox;
+class ModuleBase_IWorkshop;
 
 namespace ModuleBase_Tools {
 
@@ -171,6 +172,10 @@ MODULEBASE_EXPORT TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theSha
 /// \theParameters a list of parameter names
 MODULEBASE_EXPORT void getParameters(QStringList& theParameters);
 
+/// Returns list of parameters accessible in the active part and partset
+/// \theParameters a list of parameter names
+MODULEBASE_EXPORT std::string findGreedAttribute(ModuleBase_IWorkshop* theWorkshop,
+                                                 const FeaturePtr& theFeature);
 }
 
 #endif

@@ -26,6 +26,7 @@
 class ModuleBase_ModelWidget;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
+class ModuleBase_IWorkshop;
 
 class QKeyEvent;
 
@@ -105,7 +106,7 @@ Q_OBJECT
   //ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
   /// Activates widgets by preselection if it is accepted. Emits signal if the activation is correct
-  virtual void activateByPreselection();
+  virtual void activateByPreselection(ModuleBase_IWorkshop* theWorkshop);
 
   /// If the operation works with feature which is sub-feature of another one
   /// then this variable has to be initialised by parent feature 

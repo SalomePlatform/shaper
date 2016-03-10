@@ -374,7 +374,8 @@
             label="Segments:"
             tooltip="Select list of mirroring objects"
             type_choice="Edges"
-            use_external="true">
+            use_external="true"
+            greed ="true">
             <validator id="SketchPlugin_MirrorAttr" />
         </sketch_multi_selector>
       </feature>

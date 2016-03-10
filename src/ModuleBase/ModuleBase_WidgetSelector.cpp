@@ -190,7 +190,7 @@ std::string ModuleBase_WidgetSelector::generateName(const AttributePtr& theAttri
 
       ModuleBase_WidgetFactory aFactory(aXmlCfg, theWorkshop);
       std::string anAttributeTitle;
-      aFactory.getAttributeTitle(aFeature->getKind(), theAttribute->id(), anAttributeTitle);
+      aFactory.getAttributeTitle(theAttribute->id(), anAttributeTitle);
 
       std::stringstream aStreamName;
       aStreamName << theAttribute->owner()->data()->name() << "/"<< anAttributeTitle.c_str();

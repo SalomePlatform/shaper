@@ -451,7 +451,7 @@ void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
     // if the operation can be committed after the controls filling, the method perform should
     // be stopped. Otherwise unnecessary presentations can be shown(e.g. operation prs in sketch)
     if (!aFOperation->isEditOperation()) {
-      aFOperation->activateByPreselection();
+      aFOperation->activateByPreselection(moduleConnector());
       if (operationMgr()->currentOperation() != aFOperation)
         return;
     }

@@ -54,12 +54,14 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   }
 
   /// Returns the value of the title key from XML definition of the attribute in the feature
-  /// \param theFeatureKind a value of a kind of a feature
   /// \param theAttributeId a value of a kind of the attribute under the feature
   /// \param theTitle the result title
-  void getAttributeTitle(const std::string& theFeatureKind,
-                         const std::string& theAttributeId,
+  void getAttributeTitle(const std::string& theAttributeId,
                          std::string& theTitle);
+
+  /// Returns the identifier of the first found attribute where greed field value is set and true
+  /// \param theAttributeId an outpup parameter with  attribute
+  void getGreedAttribute(std::string& theAttributeId);
 
 protected:
   /// check if ModuleBase_Widget has expandable widgets in getControls

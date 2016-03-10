@@ -8,6 +8,9 @@
 
 #include <ModuleBase_ParamIntSpinBox.h>
 #include <ModuleBase_ParamSpinBox.h>
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IModule.h>
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -405,6 +408,20 @@ void getParameters(QStringList& theParameters)
       theParameters.append(aParameterName.c_str());
     }
   }
+}
+
+std::string findGreedAttribute(ModuleBase_IWorkshop* theWorkshop, const FeaturePtr& theFeature)
+{
+  std::string anAttributeId;
+
+  std::string aXmlCfg, aDescription;
+  theWorkshop->module()->getXMLRepresentation(theFeature->getKind(), aXmlCfg, aDescription);
+
+  ModuleBase_WidgetFactory aFactory(aXmlCfg, theWorkshop);
+  std::string anAttributeTitle;
+  aFactory.getGreedAttribute(anAttributeId);
+
+  return anAttributeId;
 }
 
 } // namespace ModuleBase_Tools

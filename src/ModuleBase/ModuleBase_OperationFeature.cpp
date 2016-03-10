@@ -15,6 +15,7 @@
 #include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_ISelection.h"
 #include "ModuleBase_IViewer.h"
+#include "ModuleBase_Tools.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -330,33 +331,55 @@ bool ModuleBase_OperationFeature::commit()
   return false;
 }
 
-void ModuleBase_OperationFeature::activateByPreselection()
+void ModuleBase_OperationFeature::activateByPreselection(ModuleBase_IWorkshop* theWorkshop)
 {
   if (myPreSelection.empty())
     return;
 
   ModuleBase_ISelection::filterSelectionOnEqualPoints(myPreSelection);
 
-  ModuleBase_ModelWidget* aFilledWgt = 0;
+  std::string aGreedAttributeId = ModuleBase_Tools::findGreedAttribute(theWorkshop, myFeature);
+
   ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();
+  ModuleBase_ModelWidget* aFilledWgt = 0;
   if (aPropertyPanel) {
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
+    QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
+    ModuleBase_ModelWidget* aWgt = 0;
     if (!aWidgets.empty()) {
-      ModuleBase_ModelWidget* aWgt = 0;
-      QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-      bool isSet = false;
-      // 1. apply the selection to controls
-      for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
-        aWgt = (*aWIt);
-        if (!aWgt->canSetValue())
-          continue;
-        aPropertyPanel->setPreselectionWidget(aWgt);
-        if (!aWgt->setSelection(myPreSelection, true)) {
-          isSet = false;
-          break;
-        } else {
-          isSet = true;
-          aFilledWgt = aWgt;
+      if (!aGreedAttributeId.empty()) {
+        // set preselection to greed widget
+        for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
+          aWgt = (*aWIt);
+          if (aWgt->attributeID() == aGreedAttributeId) {
+            aPropertyPanel->setPreselectionWidget(aWgt);
+            aWgt->setSelection(myPreSelection, true);
+            aPropertyPanel->setPreselectionWidget(NULL);
+            break;
+          }
+        }
+        // activate first not greed widget
+        std::string aFirstAttributeId = aWidgets.front()->attributeID();
+        if (aFirstAttributeId == aGreedAttributeId) // activate next widget after greeded
+          aFilledWgt = aWidgets.front();
+        else
+          aFilledWgt = NULL; // activate first widget of the panel
+      }
+      else {
+        bool isSet = false;
+        // 1. apply the selection to controls
+        for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
+          aWgt = (*aWIt);
+          if (!aWgt->canSetValue())
+            continue;
+          aPropertyPanel->setPreselectionWidget(aWgt);
+          if (!aWgt->setSelection(myPreSelection, true)) {
+            isSet = false;
+            break;
+          } else {
+            isSet = true;
+            aFilledWgt = aWgt;
+          }
         }
       }
       aPropertyPanel->setPreselectionWidget(NULL);
@@ -371,9 +394,9 @@ void ModuleBase_OperationFeature::activateByPreselection()
       if (aFilledWgt)
         emit activatedByPreselection();
     }
-    // 4. activate the next obligatory widget
-    aPropertyPanel->activateNextWidget(aFilledWgt);
   }
+  // 4. activate the next obligatory widget
+  aPropertyPanel->activateNextWidget(aFilledWgt);
 
   clearPreselection();
 }
