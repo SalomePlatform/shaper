@@ -117,7 +117,8 @@
         <sketch_multi_selector id="ConstraintEntityA"
             label="Points:"
             tooltip="Select points for fillets"
-            type_choice="Vertices">
+            type_choice="Vertices"
+            greed ="true">
           <validator id="SketchPlugin_FilletVertexValidator"/>
         </sketch_multi_selector>
         <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false">
@@ -389,7 +390,8 @@
             label="Segments:"
             tooltip="Select list of translating objects"
             type_choice="Edges"
-            use_external="true">
+            use_external="true"
+            greed ="true">
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
         <toolbox id="ValueType">
@@ -451,7 +453,8 @@
             label="Segments:"
             tooltip="Select list of rotating objects"
             type_choice="Edges"
-            use_external="true">
+            use_external="true"
+            greed ="true">
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
         <sketch_shape_selector
