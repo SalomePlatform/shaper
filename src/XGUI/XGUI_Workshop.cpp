@@ -435,6 +435,79 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
   return aHasNested;
 }
 
+void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  if (!aFOperation)
+    return;
+
+  showPropertyPanel();
+  myPropertyPanel->cleanContent();
+
+  QList<ModuleBase_ModelWidget*> aWidgets;
+  if (!module()->createWidgets(theOperation, aWidgets)) {
+    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+    ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
+    aFactory.createWidget(myPropertyPanel->contentWidget());
+    aWidgets = aFactory.getModelWidgets();
+  }
+
+  // check compatibility of feature and widgets
+  FeaturePtr aFeature = aFOperation->feature();
+  foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+    if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
+      std::string anErrorMsg = "The feature '" + aFeature->getKind() + "' has no attribute '"
+          + aWidget->attributeID() + "' used by widget '"
+          + aWidget->metaObject()->className() + "'.";
+      Events_Error::send(anErrorMsg);
+      myPropertyPanel->cleanContent();
+      return;
+    }
+  }
+
+  foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+    bool isStoreValue = !aFOperation->isEditOperation() &&
+                        !aWidget->getDefaultValue().empty() &&
+                        !aWidget->isComputedDefault();
+    aWidget->setFeature(aFOperation->feature(), isStoreValue);
+    aWidget->enableFocusProcessing();
+  }
+
+  myPropertyPanel->setModelWidgets(aWidgets);
+  aFOperation->setPropertyPanel(myPropertyPanel);
+
+  myModule->propertyPanelDefined(theOperation);
+
+#ifndef DEBUG_FEATURE_NAME
+  myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
+#else
+  std::string aFeatureName = aFeature->name();
+  myPropertyPanel->setWindowTitle(QString("%1: %2").arg(theOperation->getDescription()->description())
+                                                  .arg(aFeatureName.c_str()));
+#endif
+
+  myErrorMgr->setPropertyPanel(myPropertyPanel);
+}
+
+void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
+{
+  XGUI_PropertyPanel* aPropertyPanel = propertyPanel();
+  if (aPropertyPanel) {
+    const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
+    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+       myModule->connectToPropertyPanel(aWidget, isToConnect);
+       if (isToConnect) {
+        connect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+        connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
+      }
+      else {
+        disconnect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
+        disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
+      }
+    }
+  }
+}
+
 //******************************************************
 void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
 {
@@ -527,78 +600,6 @@ void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
   aFOperation->setGrantedOperationIds(aGrantedIds);
 }
 
-void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
-{
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-  if (!aFOperation)
-    return;
-
-  showPropertyPanel();
-  myPropertyPanel->cleanContent();
-
-  QList<ModuleBase_ModelWidget*> aWidgets;
-  if (!module()->createWidgets(theOperation, aWidgets)) {
-    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
-    ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
-    aFactory.createWidget(myPropertyPanel->contentWidget());
-    aWidgets = aFactory.getModelWidgets();
-  }
-
-  // check compatibility of feature and widgets
-  FeaturePtr aFeature = aFOperation->feature();
-  foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-    if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
-      std::string anErrorMsg = "The feature '" + aFeature->getKind() + "' has no attribute '"
-          + aWidget->attributeID() + "' used by widget '"
-          + aWidget->metaObject()->className() + "'.";
-      Events_Error::send(anErrorMsg);
-      myPropertyPanel->cleanContent();
-      return;
-    }
-  }
-
-  foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-    bool isStoreValue = !aFOperation->isEditOperation() &&
-                        !aWidget->getDefaultValue().empty() &&
-                        !aWidget->isComputedDefault();
-    aWidget->setFeature(aFOperation->feature(), isStoreValue);
-    aWidget->enableFocusProcessing();
-  }
-
-  myPropertyPanel->setModelWidgets(aWidgets);
-  aFOperation->setPropertyPanel(myPropertyPanel);
-
-  myModule->propertyPanelDefined(theOperation);
-
-#ifndef DEBUG_FEATURE_NAME
-  myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
-#else
-  std::string aFeatureName = aFeature->name();
-  myPropertyPanel->setWindowTitle(QString("%1: %2").arg(theOperation->getDescription()->description())
-                                                  .arg(aFeatureName.c_str()));
-#endif
-
-  myErrorMgr->setPropertyPanel(myPropertyPanel);
-}
-
-void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
-{
-  XGUI_PropertyPanel* aPropertyPanel = propertyPanel();
-  if (aPropertyPanel) {
-    const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
-    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-       myModule->connectToPropertyPanel(aWidget, isToConnect);
-       if (isToConnect) {
-        connect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
-        connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
-      }
-      else {
-        disconnect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
-        disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
-      }
-    }
-  }
-}
 
 /*
  * Saves document with given name.
