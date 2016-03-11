@@ -28,9 +28,8 @@
 
 PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              ModuleBase_IWorkshop* theWorkshop,
-                                                             const Config_WidgetAPI* theData,
-                                                             const std::string& theParentId)
-: ModuleBase_WidgetDoubleValue(theParent, theData, theParentId), myWorkshop(theWorkshop),
+                                                             const Config_WidgetAPI* theData)
+: ModuleBase_WidgetDoubleValue(theParent, theData), myWorkshop(theWorkshop),
   myValueIsCashed(false), myIsFeatureVisibleInCash(true), myValueInCash(0)
 {
   myFirstPntName = theData->getProperty("first_point");

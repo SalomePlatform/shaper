@@ -42,9 +42,8 @@
 
 PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent, 
                                                          PartSet_Module* theModule,
-                                                         const Config_WidgetAPI* theData,
-                                                         const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId), myModule(theModule), myUseBody(true)
+                                                         const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData), myModule(theModule), myUseBody(true)
 {
   QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);

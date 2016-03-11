@@ -26,9 +26,7 @@ public:
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
-  ModuleBase_WidgetCheckGroupBox(QWidget* theParent, const Config_WidgetAPI* theData,
-                                 const std::string& theParentId);
+  ModuleBase_WidgetCheckGroupBox(QWidget* theParent, const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetCheckGroupBox();
 
   void setTitle(const QString& theTitle);

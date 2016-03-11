@@ -28,9 +28,8 @@
 
 PartSet_WidgetShapeSelector::PartSet_WidgetShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
-                                                         const Config_WidgetAPI* theData,
-                                                         const std::string& theParentId)
-: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId)
+                                                         const Config_WidgetAPI* theData)
+: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
   myUseSketchPlane = theData->getBooleanAttribute("use_sketch_plane", true);
   myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), true);

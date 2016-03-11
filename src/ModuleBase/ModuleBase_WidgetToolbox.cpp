@@ -18,9 +18,8 @@
 #include <QVBoxLayout>
 #include <QIcon>
 
-ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
-                                                   const std::string& theParentId)
-: ModuleBase_PagedContainer(theParent, theData, theParentId)
+ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData)
+: ModuleBase_PagedContainer(theParent, theData)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aMainLayout);

@@ -32,11 +32,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration.
-  /// \param theParentId is Id of a parent of the current attribute
   /// \param thePlaceHolder a string of placeholder
   ModuleBase_WidgetLineEdit( QWidget* theParent,
                              const Config_WidgetAPI* theData,
-                             const std::string& theParentId,
                              const std::string& thePlaceHolder );
   virtual ~ModuleBase_WidgetLineEdit();
 

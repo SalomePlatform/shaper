@@ -49,8 +49,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// \param theParent a parent widget
   ModuleBase_PageBase* createPageByType(const std::string& theType,
                                         QWidget* theParent,
-                                        Config_WidgetAPI* theWidgetApi,
-                                        std::string theParentId);
+                                        Config_WidgetAPI* theWidgetApi);
 
   /// Create widget by its type
   /// \param theType a type
@@ -58,7 +57,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                              QWidget* theParent,
                                              Config_WidgetAPI* theWidgetApi,
-                                             std::string theParentId,
                                              ModuleBase_IWorkshop* theWorkshop);
 
 private:

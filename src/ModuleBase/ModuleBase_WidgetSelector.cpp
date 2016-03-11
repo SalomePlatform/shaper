@@ -20,9 +20,8 @@
 
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
-                                                     const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId)
- : ModuleBase_WidgetValidated(theParent, theWorkshop, theData, theParentId)
+                                                     const Config_WidgetAPI* theData)
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData)
 {
 }
 

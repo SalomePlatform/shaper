@@ -25,9 +25,7 @@ Q_OBJECT
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
-  ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData,
-                             const std::string& theParentId);
+  ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData);
 
   virtual ~ModuleBase_WidgetBoolValue();
 

@@ -42,10 +42,8 @@ Q_OBJECT
   /// \param theParent the parent object
   /// \param theWorkshop a current workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
-   PartSet_WidgetPoint2dDistance(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-                                 const Config_WidgetAPI* theData,
-                                 const std::string& theParentId);
+  PartSet_WidgetPoint2dDistance(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+                                const Config_WidgetAPI* theData);
 
   virtual ~PartSet_WidgetPoint2dDistance();
 

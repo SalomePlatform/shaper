@@ -14,9 +14,8 @@
 #include <QEvent>
 
 ModuleBase_WidgetErrorLabel::ModuleBase_WidgetErrorLabel(QWidget* theParent,
-                                               const Config_WidgetAPI* theData,
-                                               const std::string& theParentId)
-    : ModuleBase_WidgetLabel(theParent, theData, theParentId)
+                                                         const Config_WidgetAPI* theData)
+: ModuleBase_WidgetLabel(theParent, theData)
 {
   myDefaultStyle = myLabel->styleSheet();
   myLabel->setContentsMargins(0,0,0,4);

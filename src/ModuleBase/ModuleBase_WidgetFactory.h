@@ -98,9 +98,6 @@ protected:
 
   /// List of created model widgets
   QList<ModuleBase_ModelWidget*> myModelWidgets;
-
-  /// Id of current parent
-  std::string myParentId;
 };
 
 #endif /* ModuleBase_WidgetFactory_H_ */

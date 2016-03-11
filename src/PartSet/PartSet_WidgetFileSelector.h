@@ -29,11 +29,9 @@ public:
   /// \param theParent the parent object
   /// \param theWorkshop instance of workshop interface
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
   PartSet_WidgetFileSelector(QWidget* theParent,
                              ModuleBase_IWorkshop* theWorkshop,
-                             const Config_WidgetAPI* theData,
-                             const std::string& theParentId);
+                             const Config_WidgetAPI* theData);
 
   virtual ~PartSet_WidgetFileSelector() {}
 

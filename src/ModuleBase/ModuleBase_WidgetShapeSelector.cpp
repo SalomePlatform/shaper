@@ -66,9 +66,8 @@
 
 ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
-                                                     const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId)
- : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId)
+                                                     const Config_WidgetAPI* theData)
+: ModuleBase_WidgetSelector(theParent, theWorkshop, theData)
 {
   QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);

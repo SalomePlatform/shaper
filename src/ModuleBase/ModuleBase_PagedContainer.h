@@ -24,9 +24,7 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
    /// A constructor
    /// \param theParent a parent widget
    /// \param theData a data of the widget
-   /// \param theParentId an Id of the parent object
-  ModuleBase_PagedContainer(QWidget* theParent, const Config_WidgetAPI* theData,
-                           const std::string& theParentId);
+  ModuleBase_PagedContainer(QWidget* theParent, const Config_WidgetAPI* theData);
   virtual ~ModuleBase_PagedContainer();
 
   /// Add a new page

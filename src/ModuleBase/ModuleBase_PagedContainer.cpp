@@ -17,9 +17,8 @@
 #include <QVBoxLayout>
 
 
-ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent, const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId),
+ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent, const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData),
   myIsFocusOnCurrentPage(false)
 {
   // it is not obligatory to be ignored when property panel tries to activate next active widget

@@ -25,9 +25,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
-  ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
-                           const std::string& theParentId);
+  ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetToolbox();
 
   /// Defines if it is supported to set the value in this widget

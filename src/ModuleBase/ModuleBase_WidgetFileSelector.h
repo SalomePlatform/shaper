@@ -44,10 +44,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetFileSelector(QWidget* theParent,
-                                const Config_WidgetAPI* theData,
-                                const std::string& theParentId);
+                                const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetFileSelector();
 
   virtual QList<QWidget*> getControls() const;

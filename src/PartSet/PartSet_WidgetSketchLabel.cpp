@@ -57,9 +57,8 @@
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                         ModuleBase_IWorkshop* theWorkshop,
                         const Config_WidgetAPI* theData,
-                        const std::string& theParentId,
                         const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints)
-: ModuleBase_WidgetValidated(theParent, theWorkshop, theData, theParentId),
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData),
   myPreviewDisplayed(false)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);

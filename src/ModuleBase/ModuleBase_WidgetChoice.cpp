@@ -22,9 +22,8 @@
 
 
 ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent, 
-                                                 const Config_WidgetAPI* theData, 
-                                                 const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId), myCombo(0), myButtons(0)
+                                                 const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData), myCombo(0), myButtons(0)
 {
   QHBoxLayout* aLayout = new QHBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);

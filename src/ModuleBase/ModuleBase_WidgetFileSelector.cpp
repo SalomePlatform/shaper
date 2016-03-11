@@ -31,9 +31,8 @@
 #include <string>
 
 ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
-                                                             const Config_WidgetAPI* theData,
-                                                             const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId)
+                                                             const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData)
 {
   myTitle = QString::fromStdString(theData->getProperty("title"));
   myType = (theData->getProperty("type") == "save") ? WFS_SAVE : WFS_OPEN;

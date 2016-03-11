@@ -74,7 +74,7 @@ public:
 
   /// Creates custom widgets for property panel
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
-                                                     Config_WidgetAPI* theWidgetApi, std::string theParentId);
+                                                     Config_WidgetAPI* theWidgetApi);
 
   /// Returns the active widget, by default it is the property panel active widget
   /// If the internal edit operation is started, this is the first widget of the operation

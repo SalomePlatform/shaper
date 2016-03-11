@@ -18,9 +18,8 @@
 #include <QStackedLayout>
 #include <QVBoxLayout>
 
-ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent, const Config_WidgetAPI* theData,
-                                                 const std::string& theParentId)
-: ModuleBase_PagedContainer(theParent, theData, theParentId)
+ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent, const Config_WidgetAPI* theData)
+: ModuleBase_PagedContainer(theParent, theData)
 {
   QVBoxLayout*  aMainLay = new QVBoxLayout(this);
   //aMainLay->setContentsMargins(2, 4, 2, 2);

@@ -38,11 +38,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// \param theParent the parent object
   /// \param theWorkshop a reference to workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetValidated(QWidget* theParent,
                              ModuleBase_IWorkshop* theWorkshop,
-                             const Config_WidgetAPI* theData,
-                             const std::string& theParentId);
+                             const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetValidated();
 
   /// Checks whether all active viewer filters validate the presentation

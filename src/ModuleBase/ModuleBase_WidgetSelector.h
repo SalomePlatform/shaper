@@ -34,9 +34,8 @@ Q_OBJECT
   /// \param theParent the parent object
   /// \param theWorkshop instance of workshop interface
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-                            const Config_WidgetAPI* theData, const std::string& theParentId);
+                            const Config_WidgetAPI* theData);
 
   virtual ~ModuleBase_WidgetSelector();
 

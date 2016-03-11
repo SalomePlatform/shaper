@@ -14,9 +14,8 @@
 #include <QWidget>
 
 PartSet_WidgetEditor::PartSet_WidgetEditor(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-                                           const Config_WidgetAPI* theData,
-                                           const std::string& theParentId)
- : ModuleBase_WidgetEditor(theParent, theData, theParentId), myWorkshop(theWorkshop)
+                                           const Config_WidgetAPI* theData)
+ : ModuleBase_WidgetEditor(theParent, theData), myWorkshop(theWorkshop)
 {
 }
 

@@ -31,9 +31,8 @@
 
 PartSet_WidgetMultiSelector::PartSet_WidgetMultiSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
-                                                         const Config_WidgetAPI* theData,
-                                                         const std::string& theParentId)
-: ModuleBase_WidgetMultiSelector(theParent, theWorkshop, theData, theParentId)
+                                                         const Config_WidgetAPI* theData)
+: ModuleBase_WidgetMultiSelector(theParent, theWorkshop, theData)
 {
   myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), false);
 }

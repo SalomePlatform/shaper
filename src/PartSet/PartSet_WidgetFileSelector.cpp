@@ -15,10 +15,9 @@
 
 PartSet_WidgetFileSelector::PartSet_WidgetFileSelector(QWidget* theParent,
                                                        ModuleBase_IWorkshop* theWorkshop,
-                                                       const Config_WidgetAPI* theData,
-                                                       const std::string& theParentId)
-: ModuleBase_WidgetFileSelector(theParent, theData, theParentId)
-, myWorkshop(theWorkshop)
+                                                       const Config_WidgetAPI* theData)
+: ModuleBase_WidgetFileSelector(theParent, theData),
+  myWorkshop(theWorkshop)
 {
 }
 

@@ -32,9 +32,8 @@ Q_OBJECT
   /// \param theParent the parent object
   /// \param theModule a reference to a module object
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
-  PartSet_WidgetSketchCreator(QWidget* theParent, PartSet_Module* theModule, 
-    const Config_WidgetAPI* theData, const std::string& theParentId);
+  PartSet_WidgetSketchCreator(QWidget* theParent, PartSet_Module* theModule,
+                              const Config_WidgetAPI* theData);
 
   virtual ~PartSet_WidgetSketchCreator();
 

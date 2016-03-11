@@ -75,9 +75,8 @@ private:
 
 ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
-                                                     const std::string& theParentId,
                                                      const std::string& thePlaceHolder )
-    : ModuleBase_ModelWidget(theParent, theData, theParentId)
+: ModuleBase_ModelWidget(theParent, theData)
 {
   QFormLayout* aMainLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);

@@ -71,7 +71,6 @@ ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 
 void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
 {
-  myParentId = myWidgetApi->widgetId();
   if (!myWidgetApi->toChildWidget())
     return;
 
@@ -160,7 +159,6 @@ void ModuleBase_WidgetFactory::getGreedAttribute(std::string& theAttributeId)
   if (!theAttributeId.empty())
     return;
 
-  myParentId = myWidgetApi->widgetId();
   if (!myWidgetApi->toChildWidget())
     return;
 
@@ -193,7 +191,6 @@ void ModuleBase_WidgetFactory::moveToWidgetId(const std::string& theWidgetId, bo
   if (theFound)
     return;
 
-  myParentId = myWidgetApi->widgetId();
   if (!myWidgetApi->toChildWidget())
     return;
 
@@ -234,13 +231,13 @@ ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::strin
   else if (theType == WDG_CHECK_GROUP) {
     QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
     ModuleBase_WidgetCheckGroupBox* aPage = new ModuleBase_WidgetCheckGroupBox(theParent,
-                                                                myWidgetApi, myParentId);
+                                                                myWidgetApi);
     aPage->setTitle(aGroupName);
     aResult = aPage;
   }
   if (!aResult)
     aResult = ModuleBase_WidgetCreatorFactory::get()->createPageByType(theType, theParent,
-                                                                       myWidgetApi, myParentId);
+                                                                       myWidgetApi);
 
   ModuleBase_ModelWidget* aWidget = dynamic_cast<ModuleBase_ModelWidget*>(aResult);
   if (aWidget)
@@ -255,44 +252,44 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
   ModuleBase_ModelWidget* result = NULL;
 
   if (theType == WDG_INFO) {
-    result = new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetLabel(theParent, myWidgetApi);
   } else if (theType == WDG_ERRORINFO) {
-    result = new ModuleBase_WidgetErrorLabel(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetErrorLabel(theParent, myWidgetApi);
   } else if (theType == WDG_DOUBLEVALUE) {
-    result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi);
   } else if (theType == WDG_INTEGERVALUE) {
-    result = new ModuleBase_WidgetIntValue(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetIntValue(theParent, myWidgetApi);
   } else if (theType == WDG_SHAPE_SELECTOR) {
-    result = new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi);
   } else if (theType == WDG_BOOLVALUE) {
-    result = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi);
   //} else if (theType == WDG_DOUBLEVALUE_EDITOR) {
-  //  result = new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
+  //  result = new ModuleBase_WidgetEditor(theParent, myWidgetApi);
   } else if (theType == WDG_FILE_SELECTOR) {
-    result = new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetFileSelector(theParent, myWidgetApi);
   } else if (theType == WDG_CHOICE) {
-    result = new ModuleBase_WidgetChoice(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetChoice(theParent, myWidgetApi);
   } else if (theType == WDG_STRINGVALUE) {
     std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
-    result = new ModuleBase_WidgetLineEdit( theParent, myWidgetApi, myParentId, aPlaceHolder );
+    result = new ModuleBase_WidgetLineEdit( theParent, myWidgetApi, aPlaceHolder );
   } else if (theType == WDG_EXPR_EDITOR) {
     std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
-    result = new ModuleBase_WidgetExprEditor( theParent, myWidgetApi, myParentId, aPlaceHolder );
+    result = new ModuleBase_WidgetExprEditor( theParent, myWidgetApi, aPlaceHolder );
   } else if (theType == WDG_MULTISELECTOR) {
-    result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi);
   } else if (theType == WDG_TOOLBOX) {
-    result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi);
   } else if (theType == WDG_SWITCH) {
-    result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi, myParentId);
+    result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi);
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE ||
              theType == NODE_VALIDATOR) {
     // Do nothing for "box" and "case"
     result = NULL;
   } else {
-    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myParentId);
+    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi);
     if (!result)
       result = ModuleBase_WidgetCreatorFactory::get()->createWidgetByType(theType, theParent,
-                                                              myWidgetApi, myParentId, myWorkshop);
+                                                              myWidgetApi, myWorkshop);
     #ifdef _DEBUG
     if (!result) {
       qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type %s", theType.c_str());

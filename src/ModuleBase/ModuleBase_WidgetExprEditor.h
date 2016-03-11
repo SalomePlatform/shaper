@@ -104,7 +104,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// \param thePlaceHolder a placeholder string
   ModuleBase_WidgetExprEditor( QWidget* theParent,
                                const Config_WidgetAPI* theData,
-                               const std::string& theParentId,
                                const std::string& thePlaceHolder );
   virtual ~ModuleBase_WidgetExprEditor();
 

@@ -58,9 +58,8 @@ static QStringList MyFeaturesForCoincedence;
 
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
                                              ModuleBase_IWorkshop* theWorkshop,
-                                             const Config_WidgetAPI* theData,
-                                             const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop),
+                                             const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData), myWorkshop(theWorkshop),
   myValueIsCashed(false), myIsFeatureVisibleInCash(true),
   myXValueInCash(0), myYValueInCash(0)
 {

@@ -39,12 +39,11 @@ Q_OBJECT
                      ModifiedInViewer, /// modification performed by viewer events
                      Reset }; /// the value is reset
 
-   /// Constructor
+  /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
-  ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData,
-                         const std::string& theParentId);
+  /// \param theData a low-level API for reading xml definitions of widgets
+  ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData);
   /// Destructor
   virtual ~ModuleBase_ModelWidget()
   {
@@ -157,13 +156,6 @@ Q_OBJECT
   std::string attributeID() const
   {
     return myAttributeID;
-  }
-
-  /// Returns the parent of the attribute
-  /// \returns the string value
-  std::string parentID() const
-  {
-    return myParentId;
   }
 
   /// \return Current feature
@@ -291,9 +283,6 @@ protected slots:
 
   /// The attribute name of the model feature
   std::string myAttributeID;
-
-  /// Name of parent
-  std::string myParentId;
 
   /// A feature which is processing by active operation
   FeaturePtr myFeature;

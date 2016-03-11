@@ -33,9 +33,8 @@
 #include <QLayout>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
-                                                 const Config_WidgetAPI* theData,
-                                                 const std::string& theParentId)
-: ModuleBase_WidgetDoubleValue(theParent, theData, theParentId),
+                                                 const Config_WidgetAPI* theData)
+: ModuleBase_WidgetDoubleValue(theParent, theData),
   myXPosition(-1), myYPosition(-1)
 {
 }

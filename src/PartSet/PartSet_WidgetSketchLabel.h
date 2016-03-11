@@ -48,11 +48,9 @@ public:
   /// \param theParent the parent object
   /// \param theWorkshop a reference to workshop
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
   /// \param toShowConstraints a current show constraints state
   PartSet_WidgetSketchLabel(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                       const Config_WidgetAPI* theData,
-                      const std::string& theParentId,
                       const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints);
 
   virtual ~PartSet_WidgetSketchLabel();

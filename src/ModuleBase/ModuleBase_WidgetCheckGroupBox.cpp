@@ -18,9 +18,8 @@
 #include <QList>
 
 ModuleBase_WidgetCheckGroupBox::ModuleBase_WidgetCheckGroupBox(QWidget* theParent,
-                                                               const Config_WidgetAPI* theData,
-                                                               const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId),
+                                                               const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData),
   ModuleBase_PageBase()
 {
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());

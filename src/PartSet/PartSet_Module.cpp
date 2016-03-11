@@ -564,15 +564,16 @@ void PartSet_Module::onOperationActivatedByPreselection()
   mySketchMgr->operationActivatedByPreselection();
 }
 
-ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
-                                            Config_WidgetAPI* theWidgetApi, std::string theParentId)
+ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType,
+                                                           QWidget* theParent,
+                                                           Config_WidgetAPI* theWidgetApi)
 {
   ModuleBase_IWorkshop* aWorkshop = workshop();
   XGUI_Workshop* aXUIWorkshop = getWorkshop();
   ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, aWorkshop,
-      theWidgetApi, theParentId, myHasConstraintShown);
+                                                               theWidgetApi, myHasConstraintShown);
     connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
     connect(aLabelWgt, SIGNAL(showConstraintToggled(int, bool)),
@@ -580,39 +581,39 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
     PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, aWorkshop,
-                                                                 theWidgetApi, theParentId);
+                                                                 theWidgetApi);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
   }else if (theType == "sketch-2dpoint_flyout_selector") {
     PartSet_WidgetPoint2DFlyout* aPointWgt = new PartSet_WidgetPoint2DFlyout(theParent, aWorkshop,
-                                                                 theWidgetApi, theParentId);
+                                                                             theWidgetApi);
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
   } else if (theType == "point2ddistance") {
     PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent,
-                                                        aWorkshop, theWidgetApi, theParentId);
+                                                                     aWorkshop, theWidgetApi);
     aDistanceWgt->setSketch(mySketchMgr->activeSketch());
     aWgt = aDistanceWgt;
   } else if (theType == "sketch_shape_selector") {
     PartSet_WidgetShapeSelector* aShapeSelectorWgt =
-      new PartSet_WidgetShapeSelector(theParent, aWorkshop, theWidgetApi, theParentId);
+                          new PartSet_WidgetShapeSelector(theParent, aWorkshop, theWidgetApi);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
   } else if (theType == "sketch_multi_selector") {
     PartSet_WidgetMultiSelector* aShapeSelectorWgt =
-      new PartSet_WidgetMultiSelector(theParent, aWorkshop, theWidgetApi, theParentId);
+                          new PartSet_WidgetMultiSelector(theParent, aWorkshop, theWidgetApi);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
-    aWgt = new PartSet_WidgetEditor(theParent, aWorkshop, theWidgetApi, theParentId);
+    aWgt = new PartSet_WidgetEditor(theParent, aWorkshop, theWidgetApi);
   } else if (theType == "export_file_selector") {
-    aWgt = new PartSet_WidgetFileSelector(theParent, aWorkshop, theWidgetApi, theParentId);
+    aWgt = new PartSet_WidgetFileSelector(theParent, aWorkshop, theWidgetApi);
   } else if (theType == "sketch_launcher") {
-    aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi, theParentId);
+    aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi);
   } else if (theType == "module_choice") {
-    aWgt = new PartSet_WidgetChoice(theParent, theWidgetApi, theParentId);
+    aWgt = new PartSet_WidgetChoice(theParent, theWidgetApi);
     connect(aWgt, SIGNAL(itemSelected(int)), SLOT(onBooleanOperationChange(int)));
   }
   return aWgt;

@@ -84,10 +84,9 @@ protected:
 
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
-                                                               const Config_WidgetAPI* theData,
-                                                               const std::string& theParentId)
- : ModuleBase_WidgetSelector(theParent, theWorkshop, theData, theParentId),
-   mySelectionCount(0)
+                                                               const Config_WidgetAPI* theData)
+: ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
+  mySelectionCount(0)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);

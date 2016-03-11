@@ -35,9 +35,8 @@
 #endif
 
 ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
-                                                           const Config_WidgetAPI* theData,
-                                                           const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId)
+                                                     const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData)
 {
   QFormLayout* aControlLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aControlLay);

@@ -102,7 +102,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theMenu a popup menu to be shown in the viewer
   /// \param theStdActions a map of standard actions
   /// \return true if items are added and there is no necessity to provide standard menu
-  virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const { return false; }
+  virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
+  { return false; }
 
   /// Add menu items for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser
@@ -112,9 +113,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theType a type of widget
   /// \param theParent the parent object
   /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from
-  /// \param theParentId is Id of a parent of the current attribute
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
-                                      Config_WidgetAPI* theWidgetApi, std::string theParentId)
+                                                     Config_WidgetAPI* theWidgetApi)
   {
     return 0;
   }

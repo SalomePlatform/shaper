@@ -41,18 +41,18 @@ public:
   /// Create page by its type
   /// \param theType a type
   /// \param theParent a parent widget
+  /// \param theData a low-level API for reading xml definitions of widgets
   virtual ModuleBase_PageBase* createPageByType(const std::string& theType,
                                                 QWidget* theParent,
-                                                Config_WidgetAPI* theWidgetApi,
-                                                std::string theParentId) = 0;
+                                                Config_WidgetAPI* theWidgetApi) = 0;
 
   /// Create widget by its type
-   /// \param theType a type
-   /// \param theParent a parent widget
+  /// \param theType a type
+  /// \param theParent a parent widget
+  /// \param theData a low-level API for reading xml definitions of widgets
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                                      QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi,
-                                                     std::string theParentId,
                                                      ModuleBase_IWorkshop* theWorkshop) = 0;
 };
 

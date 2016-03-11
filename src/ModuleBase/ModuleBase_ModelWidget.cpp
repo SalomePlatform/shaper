@@ -25,10 +25,8 @@
 //#define DEBUG_VALUE_STATE
 
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
-                                               const Config_WidgetAPI* theData,
-                                               const std::string& theParentId)
+                                               const Config_WidgetAPI* theData)
     : QWidget(theParent),
-      myParentId(theParentId),
       myIsEditing(false),
       myState(Stored),
       myIsValueStateBlocked(false)
