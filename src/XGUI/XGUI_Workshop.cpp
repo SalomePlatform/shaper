@@ -885,7 +885,8 @@ void XGUI_Workshop::onValuesChanged()
   if (anActiveWidget) {
     ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                            (anActiveWidget);
-    aWidgetValidated->clearValidatedCash();
+    if (aWidgetValidated)
+      aWidgetValidated->clearValidatedCash();
   }
 }
 

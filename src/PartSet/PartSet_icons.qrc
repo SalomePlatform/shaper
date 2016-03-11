@@ -2,8 +2,11 @@
  <qresource>
      <file>icons/angle.png</file>
      <file>icons/angle_32x32.png</file>
+     <file>icons/angle_backward.png</file>
      <file>icons/angle_up.png</file>
+     <file>icons/angle_direct.png</file>
      <file>icons/angle_down.png</file>
+     <file>icons/angle_supplementary.png</file>
      <file>icons/arc.png</file>
      <file>icons/arc_base_32x32.png</file>
      <file>icons/arc_3pt_32x32.png</file>

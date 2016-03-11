@@ -16,6 +16,7 @@
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 
 #include <TopExp.hxx>
 #include <BRep_Tool.hxx>
@@ -87,6 +88,10 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     return; // can not create a good presentation
   }
 
+  std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
+      ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  AngleType anAngleType = (AngleType)(aTypeAttr->value());
+
   // Flyout point
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
@@ -108,7 +113,24 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   TopoDS_Edge aEdge1 = TopoDS::Edge(aTEdge1);
   TopoDS_Edge aEdge2 = TopoDS::Edge(aTEdge2);
-  SetMeasuredGeometry(aEdge1, aEdge2);
+
+  switch (anAngleType) {
+    case ANGLE_DIRECT: {
+      SetMeasuredGeometry(aEdge1, aEdge2);
+    }
+    break;
+    case ANGLE_SUPPLEMENTARY: {
+      SetMeasuredGeometry(aEdge1, aEdge2);
+      }
+      break;
+    case ANGLE_BACKWARD: {
+      SetMeasuredGeometry(aEdge2, aEdge1);
+      }
+      break;
+    default:
+      break;
+  }
+
 
   const gp_Pnt& aCenter = CenterPoint();
   const gp_Pnt& aFirst = FirstPoint();

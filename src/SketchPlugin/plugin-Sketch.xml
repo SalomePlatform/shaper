@@ -206,6 +206,16 @@
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Angle" id="ConstraintValue" default="computed" min="0" max="180" />
         <validator id="PartSet_AngleSelection"/>
+        <module_choice id="angle_type"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Operation type"
+          tooltip="Type of angle"
+          string_list="Direct Supplementary Backward"
+          icons_list=":icons/angle_direct.png :icons/angle_supplementary.png :icons/angle_backward.png"
+          default="0"
+          />
+
       </feature>
 
       <!--  SketchConstraintParallel  -->
