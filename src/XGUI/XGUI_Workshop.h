@@ -258,6 +258,15 @@ Q_OBJECT
   /// \param theUpdateViewer update viewer flag
   void synchronizeGroupInViewer(const DocumentPtr& theDoc, const std::string& theGroup, bool theUpdateViewer);
 
+  /// Update the property panel content by the XML description of the operation and set the panel
+  /// into the operation
+  /// \param theOperation an operation
+  void setPropertyPanel(ModuleBase_Operation* theOperation);
+
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param isToConnect a boolean value whether connect or disconnect
+  void connectToPropertyPanel(const bool isToConnect);
+
   /// A constant string used for "Move to end" command definition
   /// It is used for specific processing of Undo/Redo for this command.
   static QString MOVE_TO_END_COMMAND;
@@ -348,15 +357,6 @@ signals:
   /// and set them into the operation. Secondly, it asks the module about ids of granted operations.
   /// \param theOperation an operation
    void setGrantedFeatures(ModuleBase_Operation* theOperation);
-
-  /// Update the property panel content by the XML description of the operation and set the panel
-  /// into the operation
-  /// \param theOperation an operation
-  void setPropertyPanel(ModuleBase_Operation* theOperation);
-
-  /// Connects or disconnects to the value changed signal of the property panel widgets
-  /// \param isToConnect a boolean value whether connect or disconnect
-  void connectToPropertyPanel(const bool isToConnect);
 
   //! Find all referenced features. Return direct and indirect lists of referenced object
   //! \param theList an objects to be checked

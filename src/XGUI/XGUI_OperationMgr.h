@@ -134,9 +134,6 @@ signals:
   /// Emitted when current operation is aborted
   void operationAborted(ModuleBase_Operation* theOperation);
 
-  /// Signal is emitted after the current operation is filled with existing preselection.
-  void operationActivatedByPreselection();
-
   /// Signal is emitted after the key released click.
   void keyEnterReleased();
 

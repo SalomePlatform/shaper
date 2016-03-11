@@ -149,7 +149,8 @@ public:
 
   /// Commit the operation if it is possible. If the operation is dimention constraint,
   /// it gives widget editor to input dimention value
-  void operationActivatedByPreselection();
+  /// \return true if the operation is stopped after activation
+  bool operationActivatedByPreselection();
 
   /// Returns True if there are available Undos and the sketch manager allows undo
   /// \return the boolean result
@@ -283,6 +284,12 @@ private:
   /// Member myCurrentSketch has to be correctly defined
   void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
                   Point& thePoint);
+
+  /// Show distance value editor if it is a distance operation and all attribute references
+  /// are filled by preseletion
+  /// \return true if the value is accepted
+  static bool setDistanceValueByPreselection(ModuleBase_Operation* theOperation,
+                                             ModuleBase_IWorkshop* theWorkshop);
 
   typedef QMap<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
                                                                        FeatureToSelectionMap;

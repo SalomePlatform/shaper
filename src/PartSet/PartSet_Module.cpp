@@ -125,10 +125,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
 
-  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  connect(anOpMgr, SIGNAL(operationActivatedByPreselection()),
-          this, SLOT(onOperationActivatedByPreselection()));
-
   ModuleBase_IViewer* aViewer = theWshop->viewer();
   connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)),
           this, SLOT(onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
@@ -275,6 +271,86 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 }
 
 void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
+{
+  ModuleBase_IWorkshop* anIWorkshop = workshop();
+  if (!theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
+    anIWorkshop->updateCommandStatus();
+  }
+  else {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                                 (theOperation);
+    if (aFOperation) {
+      XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(anIWorkshop);
+      XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
+      ModuleBase_ModelWidget* aFilledWidget = 0;
+      bool aPostonedWidgetActivation = false;
+      FeaturePtr aFeature = aFOperation->feature();
+
+      std::string aGreedAttributeId = ModuleBase_Tools::findGreedAttribute(anIWorkshop, aFeature);
+      // if there is a greed attribute, automatic commit by preselection for this feature is prohibited
+      aWorkshop->setPropertyPanel(aFOperation);
+
+      // filling the operation values by the current selection
+      // if the operation can be committed after the controls filling, the method perform should
+      // be stopped. Otherwise unnecessary presentations can be shown(e.g. operation prs in sketch)
+      bool isOperationCommitted = false;
+      if (!aFOperation->isEditOperation()) {
+        aFilledWidget = aFOperation->activateByPreselection(aGreedAttributeId);
+        if (currentOperation() != aFOperation)
+          isOperationCommitted = true;
+        else {
+          if (aGreedAttributeId.empty()) {
+            // a signal should be emitted before the next widget activation
+            // because, the activation of the next widget will give a focus to the widget. As a result
+            // the value of the widget is initialized. And commit may happens until the value is entered.
+            if (aFilledWidget) {
+              if (mySketchReentrantMgr->canBeCommittedByPreselection())
+                isOperationCommitted = mySketchMgr->operationActivatedByPreselection();
+              // activate the next obligatory widget
+              if (!isOperationCommitted)
+                aPropertyPanel->activateNextWidget(aFilledWidget);
+            }
+          }
+          else { // there is a greed widget
+            const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
+            std::string aFirstAttributeId = aWidgets.front()->attributeID();
+            // activate next widget after greeded if it is the first widget in the panel
+            // else the first panel widget is already activated by operation start
+            if (aFirstAttributeId == aGreedAttributeId)
+              aPostonedWidgetActivation = true;
+          }
+        }
+      } if (!isOperationCommitted) {
+        anIWorkshop->updateCommandStatus();
+        aWorkshop->connectToPropertyPanel(true);
+        operationStartedInternal(aFOperation);
+
+        // the objects of the current operation should be deactivated
+        QObjectPtrList anObjects;
+        anObjects.append(aFeature);
+        std::list<ResultPtr> aResults = aFeature->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+          anObjects.append(*aIt);
+        }
+        QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
+        for (; anIt != aLast; anIt++)
+          aWorkshop->deactivateActiveObject(*anIt, false);
+        if (anObjects.size() > 0) {
+          XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+          aDisplayer->updateViewer();
+        }
+      }
+      if (aPostonedWidgetActivation) {
+        // if the widget is an empty in the chain of activated widgets, the current operation
+        // is restarted. It should be performed after functionality of the operation starting
+        aPropertyPanel->activateNextWidget(aFilledWidget);
+      }
+    }
+  }
+}
+
+void PartSet_Module::operationStartedInternal(ModuleBase_Operation* theOperation)
 {
   /// Restart sketcher operations automatically
   mySketchReentrantMgr->operationStarted(theOperation);
@@ -555,13 +631,6 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
   anOpMgr->onKeyReleased(theWnd->viewPort(), theEvent);
-}
-
-void PartSet_Module::onOperationActivatedByPreselection()
-{
-  if (!mySketchReentrantMgr->canBeCommittedByPreselection())
-    return;
-  mySketchMgr->operationActivatedByPreselection();
 }
 
 ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType,

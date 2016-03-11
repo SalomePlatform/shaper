@@ -312,10 +312,6 @@ protected slots:
   /// \param theEvent the key event
   void onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
-  /// SLOT, that is called by the current operation filling with the preselection.
-  /// It commits the operation of it is can be committed
-  void onOperationActivatedByPreselection();
-
   /// A slot called on view window creation
   void onViewCreated(ModuleBase_IViewWindow*);
 
@@ -337,6 +333,12 @@ protected:
   /// \param theWidget a property contol widget
   /// \param isToConnect a boolean value whether connect or disconnect
   virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
+
+  /// Realizes some functionality by an operation start
+  /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
+  /// Activate the operation presentation
+  /// \param theOperation a started operation
+  virtual void operationStartedInternal(ModuleBase_Operation* theOperation);
 
  private slots:
    void onTreeViewDoubleClick(const QModelIndex&);

@@ -331,14 +331,14 @@ bool ModuleBase_OperationFeature::commit()
   return false;
 }
 
-void ModuleBase_OperationFeature::activateByPreselection(ModuleBase_IWorkshop* theWorkshop)
+ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
+                                              const std::string& theGreedAttributeId)
 {
+  ModuleBase_ModelWidget* aWidget = 0;
   if (myPreSelection.empty())
-    return;
-
+    return aWidget;
+  // equal vertices should not be used here
   ModuleBase_ISelection::filterSelectionOnEqualPoints(myPreSelection);
-
-  std::string aGreedAttributeId = ModuleBase_Tools::findGreedAttribute(theWorkshop, myFeature);
 
   ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();
   ModuleBase_ModelWidget* aFilledWgt = 0;
@@ -347,23 +347,18 @@ void ModuleBase_OperationFeature::activateByPreselection(ModuleBase_IWorkshop* t
     QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
     ModuleBase_ModelWidget* aWgt = 0;
     if (!aWidgets.empty()) {
-      if (!aGreedAttributeId.empty()) {
+      if (!theGreedAttributeId.empty()) {
         // set preselection to greed widget
         for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
           aWgt = (*aWIt);
-          if (aWgt->attributeID() == aGreedAttributeId) {
+          if (aWgt->attributeID() == theGreedAttributeId) {
             aPropertyPanel->setPreselectionWidget(aWgt);
             aWgt->setSelection(myPreSelection, true);
             aPropertyPanel->setPreselectionWidget(NULL);
+            aFilledWgt = aWgt;
             break;
           }
         }
-        // activate first not greed widget
-        std::string aFirstAttributeId = aWidgets.front()->attributeID();
-        if (aFirstAttributeId == aGreedAttributeId) // activate next widget after greeded
-          aFilledWgt = aWidgets.front();
-        else
-          aFilledWgt = NULL; // activate first widget of the panel
       }
       else {
         bool isSet = false;
@@ -387,18 +382,11 @@ void ModuleBase_OperationFeature::activateByPreselection(ModuleBase_IWorkshop* t
       // it is better to perform it not in setSelection of each widget, but do it here,
       // after the preselection is processed
       ModuleBase_ModelWidget::updateObject(myFeature);
-
-      // 3. a signal should be emitted before the next widget activation
-      // because, the activation of the next widget will give a focus to the widget. As a result
-      // the value of the widget is initialized. And commit may happens until the value is entered.
-      if (aFilledWgt)
-        emit activatedByPreselection();
     }
   }
-  // 4. activate the next obligatory widget
-  aPropertyPanel->activateNextWidget(aFilledWgt);
-
   clearPreselection();
+
+  return aFilledWgt;
 }
 
 void ModuleBase_OperationFeature::setParentFeature(CompositeFeaturePtr theParent)

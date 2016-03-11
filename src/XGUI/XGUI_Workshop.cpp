@@ -439,42 +439,7 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
 void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
 {
   setGrantedFeatures(theOperation);
-
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                               (theOperation);
-  if (!aFOperation)
-    return;
-
-  if (aFOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    setPropertyPanel(aFOperation);
-    // filling the operation values by the current selection
-    // if the operation can be committed after the controls filling, the method perform should
-    // be stopped. Otherwise unnecessary presentations can be shown(e.g. operation prs in sketch)
-    if (!aFOperation->isEditOperation()) {
-      aFOperation->activateByPreselection(moduleConnector());
-      if (operationMgr()->currentOperation() != aFOperation)
-        return;
-    }
-  }
-  updateCommandStatus();
-
-  connectToPropertyPanel(true);
-  myModule->operationStarted(aFOperation);
-
-  // the objects of the current operation should be deactivated
-  QObjectPtrList anObjects;
-  FeaturePtr aFeature = aFOperation->feature();
-  anObjects.append(aFeature);
-  std::list<ResultPtr> aResults = aFeature->results();
-  std::list<ResultPtr>::const_iterator aIt;
-  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    anObjects.append(*aIt);
-  }
-  QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
-  for (; anIt != aLast; anIt++)
-    deactivateActiveObject(*anIt, false);
-  if (anObjects.size() > 0)
-    myDisplayer->updateViewer();
+  myModule->operationStarted(theOperation);
 }
 
 //******************************************************

@@ -105,8 +105,10 @@ Q_OBJECT
   /// \return Currently installed property panel
   //ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
-  /// Activates widgets by preselection if it is accepted. Emits signal if the activation is correct
-  virtual void activateByPreselection(ModuleBase_IWorkshop* theWorkshop);
+  /// Activates widgets by preselection if it is accepted.
+  /// \param theGreeAttributeId a greed attribute id if there is in the current feature
+  /// \return last filled widget
+  virtual ModuleBase_ModelWidget* activateByPreselection(const std::string& theGreedAttributeId);
 
   /// If the operation works with feature which is sub-feature of another one
   /// then this variable has to be initialised by parent feature 
@@ -123,10 +125,6 @@ Q_OBJECT
   /// Returns the previous to the operation current feature
   /// \return theFeature a feature
   FeaturePtr previousCurrentFeature();
-
-signals:
-  /// The operation is filled with existing preselection
-  void activatedByPreselection(); 
 
  public slots:
   /// Starts operation

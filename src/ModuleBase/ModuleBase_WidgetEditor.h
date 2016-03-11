@@ -44,12 +44,17 @@ Q_OBJECT
   /// Shous popup window under cursor for data editing
   /// \param theSendSignals a flag whether the signals should be sent or the value
   /// is to be applyed directly
-  void showPopupEditor(const bool theSendSignals = true);
+  /// \return true if the editor value is accepted
+  bool showPopupEditor(const bool theSendSignals = true);
 
   void setCursorPosition(const int theX, const int theY);
 
 private:
-   void editedValue(double& outValue, QString& outText);
+  /// Show editor
+  /// \param theOutValue a result value
+  /// \param theOutText a result text
+  /// \return true if the editor value is accepted
+  bool editedValue(double& theOutValue, QString& theOutText);
 
  private:
    ///< the current widget feature

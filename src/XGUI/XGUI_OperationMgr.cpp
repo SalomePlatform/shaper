@@ -194,11 +194,6 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                        (theOperation);
-  if (aFOperation)
-    connect(aFOperation, SIGNAL(activatedByPreselection()),
-            SIGNAL(operationActivatedByPreselection()));
 
   bool isStarted = theOperation->start();
   if (isStarted)

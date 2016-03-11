@@ -23,6 +23,7 @@
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_Tools.h>
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ISelection.h>
@@ -1008,85 +1009,30 @@ void PartSet_SketcherMgr::activatePlaneFilter(const bool& toActivate)
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 }
 
-void PartSet_SketcherMgr::operationActivatedByPreselection()
+bool PartSet_SketcherMgr::operationActivatedByPreselection()
 {
+  bool isOperationStopped = false;
   ModuleBase_Operation* anOperation = getCurrentOperation();
   if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
     /// Commit sketcher operations automatically
+    /// distance operation are able to show popup editor to modify the distance value
+    /// after entering the value, the operation should be committed/aborted(by Esc key)
+    bool aCanCommitOperation = true;
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                             (anOperation);
-    if (aFOperation) {
-      if (PartSet_SketcherMgr::isDistanceOperation(aFOperation)) {
-        FeaturePtr aFeature = aFOperation->feature();
-        // editor is shown only if all attribute references are filled by preseletion
-        bool anAllRefAttrInitialized = true;
+    if (aFOperation && PartSet_SketcherMgr::isDistanceOperation(aFOperation))
+      aCanCommitOperation = setDistanceValueByPreselection(anOperation, myModule->workshop());
 
-        std::list<AttributePtr> aRefAttrs = aFeature->data()->attributes(
-                                                    ModelAPI_AttributeRefAttr::typeId());
-        std::list<AttributePtr>::const_iterator anIt = aRefAttrs.begin(), aLast = aRefAttrs.end();
-        for (; anIt != aLast && anAllRefAttrInitialized; anIt++) {
-          anAllRefAttrInitialized = (*anIt)->isInitialized();
-        }
-        if (anAllRefAttrInitialized) {
-          // Activate dimension value editing on double click
-          ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-          QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-          // Find corresponded widget to activate value editing
-          foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-            if (aWgt->attributeID() == "ConstraintValue") {
-              // the featue should be displayed in order to find the AIS text position,
-              // the place where the editor will be shown
-              aFeature->setDisplayed(true);
-              /// the execute is necessary to perform in the feature compute for flyout position
-              aFeature->execute();
-
-              Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-              Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-
-              PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
-              if (anEditor) {
-                int aX = 0, anY = 0;
-
-                ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-                XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-                XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-                AISObjectPtr anAIS = aDisplayer->getAISObject(aFeature);
-                Handle(AIS_InteractiveObject) anAISIO;
-                if (anAIS.get() != NULL) {
-                  anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
-                }
-                if (anAIS.get() != NULL) {
-                  Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
-
-                  if (!anAISIO.IsNull()) {
-                    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
-                    if (!aDim.IsNull()) {
-                      gp_Pnt aPosition = aDim->GetTextPosition();
-
-                      ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-                      Handle(V3d_View) aView = aViewer->activeView();
-                      int aCX, aCY;
-                      aView->Convert(aPosition.X(), aPosition.Y(), aPosition.Z(), aCX, aCY);
-
-                      QWidget* aViewPort = aViewer->activeViewPort();
-                      QPoint aGlPoint = aViewPort->mapToGlobal(QPoint(aCX, aCY));
-                      aX = aGlPoint.x();
-                      anY = aGlPoint.y();
-                    }
-                  }
-                  anEditor->setCursorPosition(aX, anY);
-                  anEditor->showPopupEditor(false);
-                }
-              }
-            }
-          }
-        }
-      }
+    if (aCanCommitOperation)
+      isOperationStopped = anOperation->commit();
+    else {
+      anOperation->abort();
+      isOperationStopped = true;
     }
-    anOperation->commit();
   }
+  return isOperationStopped;
 }
 
 bool PartSet_SketcherMgr::canUndo() const
@@ -1368,6 +1314,79 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
    myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
   myPlaneFilter->setPlane(thePln);
+}
+
+bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* theOperation,
+                                                         ModuleBase_IWorkshop* theWorkshop)
+{
+  bool isValueAccepted = false;
+
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                              (theOperation);
+  FeaturePtr aFeature = aFOperation->feature();
+  // editor is shown only if all attribute references are filled by preseletion
+  bool anAllRefAttrInitialized = true;
+
+  std::list<AttributePtr> aRefAttrs = aFeature->data()->attributes(
+                                              ModelAPI_AttributeRefAttr::typeId());
+  std::list<AttributePtr>::const_iterator anIt = aRefAttrs.begin(), aLast = aRefAttrs.end();
+  for (; anIt != aLast && anAllRefAttrInitialized; anIt++) {
+    anAllRefAttrInitialized = (*anIt)->isInitialized();
+  }
+  if (anAllRefAttrInitialized) {
+    // Activate dimension value editing on double click
+    ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+    QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+    // Find corresponded widget to activate value editing
+    foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+      if (aWgt->attributeID() == "ConstraintValue") {
+        // the featue should be displayed in order to find the AIS text position,
+        // the place where the editor will be shown
+        aFeature->setDisplayed(true);
+        /// the execute is necessary to perform in the feature compute for flyout position
+        aFeature->execute();
+
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
+        PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
+        if (anEditor) {
+          int aX = 0, anY = 0;
+
+          XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(theWorkshop);
+          XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+          AISObjectPtr anAIS = aDisplayer->getAISObject(aFeature);
+          Handle(AIS_InteractiveObject) anAISIO;
+          if (anAIS.get() != NULL) {
+            anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+          }
+          if (anAIS.get() != NULL) {
+            Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+
+            if (!anAISIO.IsNull()) {
+              Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAISIO);
+              if (!aDim.IsNull()) {
+                gp_Pnt aPosition = aDim->GetTextPosition();
+
+                ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+                Handle(V3d_View) aView = aViewer->activeView();
+                int aCX, aCY;
+                aView->Convert(aPosition.X(), aPosition.Y(), aPosition.Z(), aCX, aCY);
+
+                QWidget* aViewPort = aViewer->activeViewPort();
+                QPoint aGlPoint = aViewPort->mapToGlobal(QPoint(aCX, aCY));
+                aX = aGlPoint.x();
+                anY = aGlPoint.y();
+              }
+            }
+            anEditor->setCursorPosition(aX, anY);
+            isValueAccepted = anEditor->showPopupEditor(false);
+          }
+        }
+      }
+    }
+  }
+  return isValueAccepted;
 }
 
 void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
