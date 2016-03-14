@@ -27,7 +27,7 @@ ADD_UNIT_TESTS(
   TestSketcherSetRigid.py
   TestSketcherSetLength.py
   TestSketcherSetRadius.py
-  TestSketcherSetAngle.py
+  #TestSketcherSetAngle.py
   TestSketcherSetEqual.py
   TestSketcherSetFillet.py
 
