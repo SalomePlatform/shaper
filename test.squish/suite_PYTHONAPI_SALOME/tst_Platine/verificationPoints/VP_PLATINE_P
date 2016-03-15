@@ -6,6 +6,7 @@
    <Rect width="41" x="359" y="112" height="39" type="negative"/>
    <Rect width="53" x="353" y="421" height="42" type="negative"/>
    <Rect width="49" x="85" y="-7" height="14" type="negative"/>
+   <Rect width="49" x="531" y="383" height="32" type="negative"/>
   </Mask>
   <Algorithm description="Simple comparison (pixel by pixel)" name="simplecompare">
    <Parameter description="Threshold" name="threshold">0.0002</Parameter>
