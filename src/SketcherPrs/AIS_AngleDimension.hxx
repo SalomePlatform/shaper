@@ -210,7 +210,7 @@ public:
   //! Sets state if the create arc should be built depending on the input geometry orientation
   //! or to be always oriented in [0,0,1]. The last case propose angles more than 180 degree.
   //! @param theSecondAttach [in] the second attachment point.
-  void SetGeometryOrientedAngle(const Standard_Boolean& theState);
+  void SetGeometryOrientedAngle(const Standard_Boolean& theState, const Standard_Boolean& theUseReverse);
 
 public:
 
@@ -341,6 +341,7 @@ protected:
 
 private:
   Standard_Boolean myGeometryOrientedAngle;
+  Standard_Boolean myUseReverse;
 
   gp_Pnt myFirstPoint;
   gp_Pnt mySecondPoint;

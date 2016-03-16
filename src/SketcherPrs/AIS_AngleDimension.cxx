@@ -277,7 +277,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
 //=======================================================================
 void AIS_AngleDimension::Init()
 {
-  SetGeometryOrientedAngle (Standard_False);
+  SetGeometryOrientedAngle (Standard_False, Standard_False);
   SetSpecialSymbol (THE_DEGREE_SYMBOL);
   SetDisplaySpecialSymbol (AIS_DSS_After);
   SetFlyout (15.0);
@@ -339,10 +339,22 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
 
   gp_Pln aPlane = aConstructPlane.Value();
   if (myGeometryOrientedAngle) {
-    gp_Ax1 anAxis = aPlane.Axis();
-    gp_Dir aDir = anAxis.Direction();
-    aDir.Reverse();
-    aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
+    gp_Dir aCPlaneDir = aPlane.Axis().Direction();
+    bool aCPlaneDirToReverse = aCPlaneDir.X() < 0 || aCPlaneDir.Y() < 0 || aCPlaneDir.Z() < 0;
+    // have similar direction for all cases
+    if (!aCPlaneDirToReverse && myUseReverse) {
+      gp_Ax1 anAxis = aPlane.Axis();
+      gp_Dir aDir = anAxis.Direction();
+      aDir.Reverse();
+      aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
+    }
+
+    if (aCPlaneDirToReverse && !myUseReverse) {
+      gp_Ax1 anAxis = aPlane.Axis();
+      gp_Dir aDir = anAxis.Direction();
+      aDir.Reverse();
+      aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
+    }
   }
   
   // construct circle forming the arc
@@ -355,8 +367,7 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
   gp_Circ aCircle = aConstructCircle.Value();
 
   // construct the arc
-  Standard_Boolean isArcSense = !myGeometryOrientedAngle;
-  GC_MakeArcOfCircle aConstructArc(aCircle, theFirstAttach, theSecondAttach, isArcSense);
+  GC_MakeArcOfCircle aConstructArc(aCircle, theFirstAttach, theSecondAttach, Standard_True);
   if (!aConstructArc.IsDone())
   {
     return;
@@ -1242,9 +1253,11 @@ void AIS_AngleDimension::SetTextPosition (const gp_Pnt& theTextPos)
 //function : SetGeometryOrientedAngle
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetGeometryOrientedAngle(const Standard_Boolean& theState)
+void AIS_AngleDimension::SetGeometryOrientedAngle(const Standard_Boolean& theState,
+                                                  const Standard_Boolean& theUseReverse)
 {
   myGeometryOrientedAngle = theState;
+  myUseReverse = theUseReverse;
 }
 
 //=======================================================================

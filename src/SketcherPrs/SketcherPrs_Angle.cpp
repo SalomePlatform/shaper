@@ -116,13 +116,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   switch (anAngleType) {
     case ANGLE_DIRECT: {
-      SetGeometryOrientedAngle(false);
+      SetGeometryOrientedAngle(true, false);
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
     case ANGLE_SUPPLEMENTARY: {
       // to calculate center, first and end points
-      SetGeometryOrientedAngle(false);
+      SetGeometryOrientedAngle(false, false);
       SetMeasuredGeometry(aEdge1, aEdge2);
       gp_Pnt aCenterPnt = CenterPoint();
       gp_Pnt aFirstPnt = FirstPoint();
@@ -133,7 +133,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     }
     break;
     case ANGLE_BACKWARD: {
-      SetGeometryOrientedAngle(true);
+      SetGeometryOrientedAngle(true, true);
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
