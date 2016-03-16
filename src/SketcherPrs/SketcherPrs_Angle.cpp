@@ -116,37 +116,25 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   switch (anAngleType) {
     case ANGLE_DIRECT: {
-      /*gp_Pnt aPnt1(200, 100, 0);
-      gp_Pnt aPnt2(100, 100, 0);
-      gp_Pnt aPnt3(200, 200, 0);
-      //SetMeasuredGeometry(aPnt1, aPnt2, aPnt3);
-      SetMeasuredGeometry(aPnt3, aPnt2, aPnt1);
-      gp_Pln aPlane(aPnt2, gp_Dir(0, 0, 1));
-      SetCustomPlane(aPlane);
-      */
+      SetGeometryOrientedAngle(false);
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
     case ANGLE_SUPPLEMENTARY: {
       // to calculate center, first and end points
+      SetGeometryOrientedAngle(false);
       SetMeasuredGeometry(aEdge1, aEdge2);
-      /*
       gp_Pnt aCenterPnt = CenterPoint();
       gp_Pnt aFirstPnt = FirstPoint();
       gp_Pnt aSecondPnt = SecondPoint();
-
-      //gp_Pnt aFirstPnt(200, 100, 0);
-      //gp_Pnt aCenterPnt(100, 100, 0);
-      //gp_Pnt aSecondPnt(200, 200, 0);
       double anEdge2Length = aCenterPnt.Distance(aSecondPnt);
-
       aSecondPnt = aCenterPnt.Translated (gp_Vec(aCenterPnt, aSecondPnt).Normalized() * (-anEdge2Length));
       SetMeasuredGeometry(aFirstPnt, aCenterPnt, aSecondPnt);
-      */
     }
     break;
     case ANGLE_BACKWARD: {
-      SetMeasuredGeometry(aEdge2, aEdge1);
+      SetGeometryOrientedAngle(true);
+      SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
     default:

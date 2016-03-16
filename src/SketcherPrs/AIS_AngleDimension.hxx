@@ -207,6 +207,11 @@ public:
 
   Standard_EXPORT virtual const gp_Pnt GetTextPosition () const;
 
+  //! Sets state if the create arc should be built depending on the input geometry orientation
+  //! or to be always oriented in [0,0,1]. The last case propose angles more than 180 degree.
+  //! @param theSecondAttach [in] the second attachment point.
+  void SetGeometryOrientedAngle(const Standard_Boolean& theState);
+
 public:
 
   DEFINE_STANDARD_RTTI (AIS_AngleDimension)
@@ -335,6 +340,7 @@ protected:
                                                   const gp_Pnt& theSecondPoint) const;
 
 private:
+  Standard_Boolean myGeometryOrientedAngle;
 
   gp_Pnt myFirstPoint;
   gp_Pnt mySecondPoint;

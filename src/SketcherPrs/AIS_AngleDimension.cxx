@@ -277,6 +277,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
 //=======================================================================
 void AIS_AngleDimension::Init()
 {
+  SetGeometryOrientedAngle (Standard_False);
   SetSpecialSymbol (THE_DEGREE_SYMBOL);
   SetDisplaySpecialSymbol (AIS_DSS_After);
   SetFlyout (15.0);
@@ -337,7 +338,13 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
   }
 
   gp_Pln aPlane = aConstructPlane.Value();
-
+  if (myGeometryOrientedAngle) {
+    gp_Ax1 anAxis = aPlane.Axis();
+    gp_Dir aDir = anAxis.Direction();
+    aDir.Reverse();
+    aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
+  }
+  
   // construct circle forming the arc
   gce_MakeCirc aConstructCircle (theCenter, aPlane, theRadius);
   if (!aConstructCircle.IsDone())
@@ -348,7 +355,8 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
   gp_Circ aCircle = aConstructCircle.Value();
 
   // construct the arc
-  GC_MakeArcOfCircle aConstructArc (aCircle, theFirstAttach, theSecondAttach, Standard_True);
+  Standard_Boolean isArcSense = !myGeometryOrientedAngle;
+  GC_MakeArcOfCircle aConstructArc(aCircle, theFirstAttach, theSecondAttach, isArcSense);
   if (!aConstructArc.IsDone())
   {
     return;
@@ -363,7 +371,8 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
   gp_Vec aCenterToFirstVec  (theCenter, theFirstAttach);
   gp_Vec aCenterToSecondVec (theCenter, theSecondAttach);
   const Standard_Real anAngle = aCenterToFirstVec.Angle (aCenterToSecondVec);
-  const Standard_Integer aNbPoints = Max (4, Standard_Integer (50.0 * anAngle / M_PI));
+  const Standard_Integer aNbPoints = myGeometryOrientedAngle ? 40 :
+                                     Max (4, Standard_Integer (50.0 * anAngle / M_PI));
 
   GCPnts_UniformAbscissa aMakePnts (anArcAdaptor, aNbPoints);
   if (!aMakePnts.IsDone())
@@ -1227,6 +1236,15 @@ void AIS_AngleDimension::SetTextPosition (const gp_Pnt& theTextPos)
 
   myIsTextPositionFixed = Standard_True;
   myFixedTextPosition = theTextPos;
+}
+
+//=======================================================================
+//function : SetGeometryOrientedAngle
+//purpose  : 
+//=======================================================================
+void AIS_AngleDimension::SetGeometryOrientedAngle(const Standard_Boolean& theState)
+{
+  myGeometryOrientedAngle = theState;
 }
 
 //=======================================================================

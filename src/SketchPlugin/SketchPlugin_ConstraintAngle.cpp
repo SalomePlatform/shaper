@@ -169,10 +169,16 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
     aEndA = aStartA;
   if (aDist[1][0] > aDist[1][1])
     aEndB = aStartB;
+
   std::shared_ptr<GeomAPI_Dir2d> aDirA(new GeomAPI_Dir2d(aEndA->xy()->decreased(anInter->xy())));
   std::shared_ptr<GeomAPI_Dir2d> aDirB(new GeomAPI_Dir2d(aEndB->xy()->decreased(anInter->xy())));
 
-  anAngle = fabs(aDirA->angle(aDirB)) * 180.0 / PI;
+  double aDirAngle = aDirA->angle(aDirB);
+  if (aDirAngle < 0)
+    aDirAngle += 2.0 * PI;
+  anAngle = fabs(aDirAngle) * 180.0 / PI;
+  //anAngle = fabs(aDirA->angle(aDirB)) * 180.0 / PI;
+
   return anAngle;
 }
 
