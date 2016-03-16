@@ -117,6 +117,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   switch (anAngleType) {
     case ANGLE_DIRECT: {
       SetGeometryOrientedAngle(true, false);
+      SetArrowVisible(Standard_False, Standard_True);
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
@@ -129,11 +130,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       gp_Pnt aSecondPnt = SecondPoint();
       double anEdge2Length = aCenterPnt.Distance(aSecondPnt);
       aSecondPnt = aCenterPnt.Translated (gp_Vec(aCenterPnt, aSecondPnt).Normalized() * (-anEdge2Length));
+      SetArrowVisible(Standard_True, Standard_False);
       SetMeasuredGeometry(aFirstPnt, aCenterPnt, aSecondPnt);
     }
     break;
     case ANGLE_BACKWARD: {
       SetGeometryOrientedAngle(true, true);
+      SetArrowVisible(Standard_False, Standard_True);
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;

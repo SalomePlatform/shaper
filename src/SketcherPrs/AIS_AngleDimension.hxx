@@ -212,6 +212,12 @@ public:
   //! @param theSecondAttach [in] the second attachment point.
   void SetGeometryOrientedAngle(const Standard_Boolean& theState, const Standard_Boolean& theUseReverse);
 
+  //! Sets visible state of angle arrows. Default value is true for both
+  //! @param theFirstArrowVisible [in] the visibility of the first arrow.
+  //! @param theSecondArrowVisible [in] the visibility of the second arrow.
+  void SetArrowVisible(const Standard_Boolean& theFirstArrowVisible,
+                       const Standard_Boolean& theSecondArrowVisible);
+
 public:
 
   DEFINE_STANDARD_RTTI (AIS_AngleDimension)
@@ -342,6 +348,9 @@ protected:
 private:
   Standard_Boolean myGeometryOrientedAngle;
   Standard_Boolean myUseReverse;
+
+  Standard_Boolean myFirstArrowVisible;
+  Standard_Boolean mySecondArrowVisible;
 
   gp_Pnt myFirstPoint;
   gp_Pnt mySecondPoint;

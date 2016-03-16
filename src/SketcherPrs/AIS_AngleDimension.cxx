@@ -278,6 +278,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
 void AIS_AngleDimension::Init()
 {
   SetGeometryOrientedAngle (Standard_False, Standard_False);
+  SetArrowVisible(Standard_True, Standard_True);
   SetSpecialSymbol (THE_DEGREE_SYMBOL);
   SetDisplaySpecialSymbol (AIS_DSS_After);
   SetFlyout (15.0);
@@ -339,8 +340,8 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
 
   gp_Pln aPlane = aConstructPlane.Value();
   if (myGeometryOrientedAngle) {
-    gp_Dir aCPlaneDir = aPlane.Axis().Direction();
-    bool aCPlaneDirToReverse = aCPlaneDir.X() < 0 || aCPlaneDir.Y() < 0 || aCPlaneDir.Z() < 0;
+    gp_Dir aCPlaneDir = GetPlane().Axis().Direction();
+    bool aCPlaneDirToReverse = !(aCPlaneDir.X() < 0 || aCPlaneDir.Y() < 0 || aCPlaneDir.Z() < 0);
     // have similar direction for all cases
     if (!aCPlaneDirToReverse && myUseReverse) {
       gp_Ax1 anAxis = aPlane.Axis();
@@ -714,8 +715,8 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
       if (theMode == ComputeMode_All || theMode == ComputeMode_Line)
       {
         DrawArc (thePresentation,
-                 isArrowsExternal ? aFirstAttach : aFirstArrowEnd,
-                 isArrowsExternal ? aSecondAttach : aSecondArrowEnd,
+                 (isArrowsExternal || !myFirstArrowVisible) ? aFirstAttach : aFirstArrowEnd,
+                 (isArrowsExternal || !mySecondArrowVisible) ? aSecondAttach : aSecondArrowEnd,
                  myCenterPoint,
                  Abs (GetFlyout()),
                  theMode);
@@ -727,7 +728,7 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
     {
       DrawExtension (thePresentation,
                      anExtensionSize,
-                     isArrowsExternal ? aFirstArrowEnd : aFirstAttach,
+                     (isArrowsExternal && myFirstArrowVisible) ? aFirstArrowEnd : aFirstAttach,
                      aFirstExtensionDir,
                      aLabelString,
                      aLabelWidth,
@@ -740,7 +741,7 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
     {
       DrawExtension (thePresentation,
                      anExtensionSize,
-                     isArrowsExternal ? aSecondArrowEnd : aSecondAttach,
+                     (isArrowsExternal && mySecondArrowVisible) ? aSecondArrowEnd : aSecondAttach,
                      aSecondExtensionDir,
                      aLabelString,
                      aLabelWidth,
@@ -756,8 +757,8 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
     Prs3d_Root::NewGroup (thePresentation);
 
     DrawArc (thePresentation,
-             isArrowsExternal ? aFirstAttach  : aFirstArrowEnd,
-             isArrowsExternal ? aSecondAttach : aSecondArrowEnd,
+             (isArrowsExternal || !myFirstArrowVisible) ? aFirstAttach  : aFirstArrowEnd,
+             (isArrowsExternal || !mySecondArrowVisible) ? aSecondAttach : aSecondArrowEnd,
              myCenterPoint,
              Abs(GetFlyout ()),
              theMode);
@@ -768,15 +769,17 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
   {
     Prs3d_Root::NewGroup (thePresentation);
 
-    DrawArrow (thePresentation, aFirstArrowBegin,  gp_Dir (aFirstArrowVec));
-    DrawArrow (thePresentation, aSecondArrowBegin, gp_Dir (aSecondArrowVec));
+    if (myFirstArrowVisible)
+      DrawArrow (thePresentation, aFirstArrowBegin,  gp_Dir (aFirstArrowVec));
+    if (mySecondArrowVisible)
+      DrawArrow (thePresentation, aSecondArrowBegin, gp_Dir (aSecondArrowVec));
   }
 
   if ((theMode == ComputeMode_All || theMode == ComputeMode_Line) && isArrowsExternal)
   {
     Prs3d_Root::NewGroup (thePresentation);
 
-    if (aHPosition != LabelPosition_Left)
+    if (aHPosition != LabelPosition_Left && myFirstArrowVisible)
     {
       DrawExtension (thePresentation,
                      aDimensionAspect->ArrowTailSize(),
@@ -788,7 +791,7 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
                      LabelPosition_None);
     }
 
-    if (aHPosition != LabelPosition_Right)
+    if (aHPosition != LabelPosition_Right && mySecondArrowVisible)
     {
       DrawExtension (thePresentation,
                      aDimensionAspect->ArrowTailSize(),
@@ -1258,6 +1261,17 @@ void AIS_AngleDimension::SetGeometryOrientedAngle(const Standard_Boolean& theSta
 {
   myGeometryOrientedAngle = theState;
   myUseReverse = theUseReverse;
+}
+
+//=======================================================================
+//function : SetArrowVisible
+//purpose  : 
+//=======================================================================
+void AIS_AngleDimension::SetArrowVisible(const Standard_Boolean& theFirstArrowVisible,
+                                         const Standard_Boolean& theSecondArrowVisible)
+{
+  myFirstArrowVisible = theFirstArrowVisible;
+  mySecondArrowVisible = theSecondArrowVisible;
 }
 
 //=======================================================================
