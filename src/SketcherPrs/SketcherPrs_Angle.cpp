@@ -90,7 +90,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
-  AngleType anAngleType = (AngleType)(aTypeAttr->value());
+  SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
 
   // Flyout point
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
@@ -115,13 +115,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   TopoDS_Edge aEdge2 = TopoDS::Edge(aTEdge2);
 
   switch (anAngleType) {
-    case ANGLE_DIRECT: {
+    case SketcherPrs_Tools::ANGLE_DIRECT: {
       SetGeometryOrientedAngle(true, false);
       SetArrowVisible(Standard_False, Standard_True);
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
-    case ANGLE_SUPPLEMENTARY: {
+    case SketcherPrs_Tools::ANGLE_SUPPLEMENTARY: {
       // to calculate center, first and end points
       SetGeometryOrientedAngle(false, false);
       SetMeasuredGeometry(aEdge1, aEdge2);
@@ -134,7 +134,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       SetMeasuredGeometry(aFirstPnt, aCenterPnt, aSecondPnt);
     }
     break;
-    case ANGLE_BACKWARD: {
+    case SketcherPrs_Tools::ANGLE_BACKWARD: {
       SetGeometryOrientedAngle(true, true);
       SetArrowVisible(Standard_False, Standard_True);
       SetMeasuredGeometry(aEdge1, aEdge2);
@@ -157,13 +157,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   SetFlyout(aDist);
 
   // Angle value is in degrees
-  AttributeDoublePtr aVal = aData->real(SketchPlugin_Constraint::VALUE());
+  AttributeDoublePtr aVal = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
   SetCustomValue(aVal->value() * PI / 180.0);
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
 
-  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
+  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
   SketcherPrs_Tools::setDisplaySpecialSymbol(this, aValue->usedParameters().size() > 0);
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);

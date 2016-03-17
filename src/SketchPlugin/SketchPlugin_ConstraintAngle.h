@@ -37,8 +37,15 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
   /// attribute name of operation type
   inline static const std::string& TYPE_ID()
   {
-    static const std::string MY_TYPE_ID("angle_type");
+    static const std::string MY_TYPE_ID("AngleType");
     return MY_TYPE_ID;
+  }
+
+  /// attribute name of operation type
+  inline static const std::string& ANGLE_VALUE_ID()
+  {
+    static const std::string MY_ANGLE_VALUE_ID("AngleValue");
+    return MY_ANGLE_VALUE_ID;
   }
 
   /// \brief Creates a new part document if needed
@@ -70,6 +77,9 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
 
   /// Calculate current value of the angle
   double calculateAngle();
+
+  /// Update value of VALUE attribute by the combination of the current angle type and angle value
+  void updateAngleValue();
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintAngle();

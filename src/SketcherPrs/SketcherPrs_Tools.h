@@ -41,6 +41,13 @@ namespace SketcherPrs_Tools {
     Sel_Dimension_Text
   };
 
+  /// Type of angle
+  enum AngleType{
+    ANGLE_DIRECT,   ///< Angle from the first line to the second line
+    ANGLE_SUPPLEMENTARY,  ///< Additional angle to the angle from first to second line
+    ANGLE_BACKWARD ///< Angle from the second line to the first line
+  };
+
   /// Returns attribute object referenced by feature
   /// \param theFeature a feature
   /// \param theAttrName an attribute name

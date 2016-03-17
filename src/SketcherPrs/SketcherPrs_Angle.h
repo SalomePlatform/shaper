@@ -23,14 +23,6 @@ DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension)
 class SketcherPrs_Angle : public AIS_AngleDimension
 {
 public:
-  /// Type of angle
-  enum AngleType{
-    ANGLE_DIRECT,   ///< Angle from the first line to the second line
-    ANGLE_SUPPLEMENTARY,  ///< Additional angle to the angle from first to second line
-    ANGLE_BACKWARD ///< Angle from the second line to the first line
-  };
-
-public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
