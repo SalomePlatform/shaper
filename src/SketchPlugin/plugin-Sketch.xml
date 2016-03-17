@@ -211,8 +211,8 @@
           buttons_dir="horizontal"
           label="Angle type"
           tooltip="Type of angle"
-          string_list="Direct Supplementary Backward"
-          icons_list=":icons/angle_direct.png :icons/angle_supplementary.png :icons/angle_backward.png"
+          string_list="Direct Complementary Additional"
+          icons_list=":icons/angle_direct.png :icons/angle_complementary.png :icons/angle_backward.png"
           default="0"
           />
 

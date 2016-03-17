@@ -44,7 +44,7 @@ namespace SketcherPrs_Tools {
   /// Type of angle
   enum AngleType{
     ANGLE_DIRECT,   ///< Angle from the first line to the second line
-    ANGLE_SUPPLEMENTARY,  ///< Additional angle to the angle from first to second line
+    ANGLE_COMPLEMENTARY,  ///< Additional angle to the angle from first to second line
     ANGLE_BACKWARD ///< Angle from the second line to the first line
   };
 

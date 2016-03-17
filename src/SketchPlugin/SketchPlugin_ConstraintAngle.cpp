@@ -198,7 +198,7 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT:
     break;
-    case SketcherPrs_Tools::ANGLE_SUPPLEMENTARY:
+    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
       anAngle = 180 - anAngle;
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:

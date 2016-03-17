@@ -121,7 +121,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       SetMeasuredGeometry(aEdge1, aEdge2);
     }
     break;
-    case SketcherPrs_Tools::ANGLE_SUPPLEMENTARY: {
+    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
       // to calculate center, first and end points
       SetGeometryOrientedAngle(false, false);
       SetMeasuredGeometry(aEdge1, aEdge2);
