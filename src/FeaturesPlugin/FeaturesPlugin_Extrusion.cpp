@@ -14,6 +14,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeReference.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Prism.h>
@@ -34,6 +35,9 @@ void FeaturesPlugin_Extrusion::initAttributes()
     LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // extrusion works with faces always
   aSelection->setSelectionType("FACE");
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+                                    FeaturesPlugin_Extrusion::LIST_ID());
+
 
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
@@ -48,14 +52,28 @@ void FeaturesPlugin_Extrusion::initAttributes()
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TO_OBJECT_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FROM_OBJECT_ID());
+
+  // Composite Sketch attribute
+  data()->addAttribute(FeaturesPlugin_CompositeSketch::SKETCH_OBJECT_ID(),
+                       ModelAPI_AttributeReference::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+                       FeaturesPlugin_CompositeSketch::SKETCH_OBJECT_ID());
 }
 
 //=================================================================================================
 void FeaturesPlugin_Extrusion::execute()
 {
+  /// feature extrusion does not have the next attribute
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  if (aFacesSelectionList.get() && !aFacesSelectionList->isInitialized()) {
+    AttributeReferencePtr aSketchAttr = reference(SKETCH_OBJECT_ID());
+    if (aSketchAttr.get() && aSketchAttr->isInitialized())
+      setSketchObjectToList();
+  }
+
   // Getting faces.
   ListOfShape aFacesList;
-  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  //AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
   for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
     AttributeSelectionPtr aFaceSel = aFacesSelectionList->value(anIndex);
     std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();
@@ -202,5 +220,22 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
     std::ostringstream aStr;
     aStr << aFromName << "_" << aFromFaceIndex++;
     theResultBody->generated(aFromFace, aStr.str(), aFromTag++);
+  }
+}
+
+//=================================================================================================
+void FeaturesPlugin_Extrusion::setSketchObjectToList()
+{
+  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+                                                       reference(SKETCH_OBJECT_ID())->value());
+
+  if(aSketchFeature.get() && !aSketchFeature->results().empty()) {
+    ResultPtr aSketchRes = aSketchFeature->results().front();
+    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
+    if(aConstruction.get()) {
+      AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+      if (aFacesSelectionList.get() && aFacesSelectionList->size() == 0)
+        aFacesSelectionList->append(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+    }
   }
 }

@@ -8,8 +8,9 @@
 #define FeaturesPlugin_Extrusion_H_
 
 #include <FeaturesPlugin.h>
-#include <ModelAPI_Feature.h>
 #include <GeomAlgoAPI_Prism.h>
+
+#include <FeaturesPlugin_CompositeSketch.h>
 
 class GeomAPI_Shape;
 class ModelAPI_ResultBody;
@@ -23,7 +24,7 @@ class ModelAPI_ResultBody;
  * bounding planes if they were set. Direction of extrusion is taken from the face
  * plane or if the bounding faces were set then it will be from the bottom to the top plane.
  */
-class FeaturesPlugin_Extrusion : public ModelAPI_Feature
+class FeaturesPlugin_Extrusion : public FeaturesPlugin_CompositeSketch
 {
  public:
   /// Extrusion kind
@@ -111,11 +112,23 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Extrusion();
+
+protected:
+  /// Init attributes for extrusion.
+  virtual void initMakeSolidsAttributes() {};
+
+  /// Create solid from face with extrusion.
+  virtual void makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
+                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape) {};
+
 private:
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBasis);
+
+  /// Set the sub-object to list of exturusion base.
+  void setSketchObjectToList();
 };
 
 #endif

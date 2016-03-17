@@ -116,8 +116,11 @@ void FeaturesPlugin_CompositeSketch::execute()
     return;
   }
 
-  if (!selection(SKETCH_SELECTION_ID())->isInitialized() || selection(SKETCH_SELECTION_ID())->context() != aSketchRes) {
-    selection(SKETCH_SELECTION_ID())->setValue(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+  /// feature extrusion does not have the next attribute
+  if (data()->attribute(SKETCH_SELECTION_ID()).get()) {
+    if (!selection(SKETCH_SELECTION_ID())->isInitialized() || selection(SKETCH_SELECTION_ID())->context() != aSketchRes) {
+      selection(SKETCH_SELECTION_ID())->setValue(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+    }
   }
   int aSketchFacesNum = aConstruction->facesNum();
   if(aSketchFacesNum == 0) {
