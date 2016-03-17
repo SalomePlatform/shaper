@@ -7,6 +7,7 @@
     label="Operation type" 
     tooltip="Type of boolean operation"
     string_list="Cut Fuse Common"
+    use_in_title="true"
     icons_list=":icons/bool_cut.png :icons/bool_fuse.png :icons/bool_common.png"
     default="0"
   />

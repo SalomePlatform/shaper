@@ -683,7 +683,8 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi);
   } else if (theType == "module_choice") {
     aWgt = new PartSet_WidgetChoice(theParent, theWidgetApi);
-    connect(aWgt, SIGNAL(itemSelected(int)), SLOT(onBooleanOperationChange(int)));
+    connect(aWgt, SIGNAL(itemSelected(ModuleBase_ModelWidget*, int)),
+            this, SLOT(onChoiceChanged(ModuleBase_ModelWidget*, int)));
   }
   return aWgt;
 }
@@ -1241,22 +1242,20 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
 }
 
 //******************************************************
-void PartSet_Module::onBooleanOperationChange(int theOperation)
+void PartSet_Module::onChoiceChanged(ModuleBase_ModelWidget* theWidget,
+                                     int theIndex)
 {
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (!aOperation)
+  PartSet_WidgetChoice* aChoiceWidget = dynamic_cast<PartSet_WidgetChoice*>(theWidget);
+  if (!aChoiceWidget)
     return;
-  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-  switch (theOperation) {
-  case 0:
-    aPanel->setWindowTitle(tr("Cut"));
-    break;
-  case 1:
-    aPanel->setWindowTitle(tr("Fuse"));
-    break;
-  case 2:
-    aPanel->setWindowTitle(tr("Common"));
-    break;
+
+  QString aChoiceTitle = aChoiceWidget->getPropertyPanelTitle(theIndex);
+  if (!aChoiceTitle.isEmpty()) {
+    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+    if (!aOperation)
+      return;
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    aPanel->setWindowTitle(aChoiceTitle);
   }
 }
 

@@ -54,8 +54,13 @@ Q_OBJECT
   /// \return a controls list
   virtual QList<QWidget*> getControls() const;
 
+  /// Returns text value for the property panel title
+  /// \param theIndex a button index
+  /// \return the title value
+  QString getPropertyPanelTitle(int theIndex);
+
 signals:
-  void itemSelected(int);
+  void itemSelected(ModuleBase_ModelWidget* theWidget, int theIndex);
 
 protected:
   /// Saves the internal parameters to the given feature
@@ -75,6 +80,9 @@ private:
   /// The control
   QComboBox* myCombo;
   QButtonGroup* myButtons;
+
+  // XML definition of titles
+  QStringList myButtonTitles;
 };
 
 #endif

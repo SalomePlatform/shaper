@@ -209,7 +209,7 @@
         <module_choice id="AngleType"
           widget_type="radiobuttons"
           buttons_dir="horizontal"
-          label="Operation type"
+          label="Angle type"
           tooltip="Type of angle"
           string_list="Direct Supplementary Backward"
           icons_list=":icons/angle_direct.png :icons/angle_supplementary.png :icons/angle_backward.png"

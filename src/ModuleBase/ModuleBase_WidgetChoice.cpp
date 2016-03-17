@@ -33,6 +33,9 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
   std::string aTypes = theData->getProperty("string_list");
   QStringList aList = QString(aTypes.c_str()).split(' ');
 
+  if (theData->getBooleanAttribute("use_in_title", false))
+    myButtonTitles = QString(aTypes.c_str()).split(" ");
+
   // Widget type can be combobox or radiobuttons
   std::string aWgtType = theData->getProperty("widget_type");
   if ((aWgtType.length() > 0) && (aWgtType == "radiobuttons")) {
@@ -77,7 +80,6 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     }
     myButtons->button(0)->setChecked(true);
     connect(myButtons, SIGNAL(buttonClicked(int)), this, SLOT(onCurrentIndexChanged(int)));
-    connect(myButtons, SIGNAL(buttonClicked(int)), this, SIGNAL(itemSelected(int)));
   } else {
     myLabel = new QLabel(aLabelText, this);
     if (!aLabelIcon.isEmpty())
@@ -95,7 +97,6 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     myCombo->addItems(aList);
 
     connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
-    connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SIGNAL(itemSelected(int)));
   }
 }
 
@@ -130,7 +131,7 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
       bool isBlocked = myButtons->blockSignals(true);
       myButtons->button(aIntAttr->value())->setChecked(true);
       myButtons->blockSignals(isBlocked);
-      emit itemSelected(aIntAttr->value());
+      emit itemSelected(this, aIntAttr->value());
     }
   }
   return true;
@@ -158,9 +159,19 @@ QList<QWidget*> ModuleBase_WidgetChoice::getControls() const
   return aControls;
 }
 
+QString ModuleBase_WidgetChoice::getPropertyPanelTitle(int theIndex)
+{
+  QString aTitle;
+  if (myButtonTitles.length() > theIndex)
+    aTitle = tr(myButtonTitles[theIndex].toStdString().c_str());
+  return aTitle;
+}
+
 void ModuleBase_WidgetChoice::onCurrentIndexChanged(int theIndex)
 {
   emit valuesChanged();
   // Don't transfer focus
   // emit focusOutWidget(this);
+
+  emit itemSelected(this, theIndex);
 }
