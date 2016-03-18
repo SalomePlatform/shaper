@@ -120,10 +120,10 @@ void PartSet_WidgetSketchCreator::activateCustom()
 
     //setVisibleSelectionControl(true);
   }
-  else {
-    setVisibleSelectionControl(false);
-    emit focusOutWidget(this);
-  }
+  //else {
+  //  setVisibleSelectionControl(false);
+  //  emit focusOutWidget(this);
+  //}
 }
 
 void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelectionControl)
@@ -141,6 +141,8 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
     else { // hide current control
       if (aWidget == this)
         aWidget->setVisible(false);
+      else
+        aWidget->setVisible(true);
     }
   }
 }
@@ -173,15 +175,58 @@ bool PartSet_WidgetSketchCreator::isSelectionMode() const
   return !aHasValueInList;//aHasSub || aHasValueInList;
 }
 
+void PartSet_WidgetSketchCreator::onSelectionChanged()
+{
+  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
+
+  if (aSelected.size() == 1) { // plane or planar face of not sketch object
+    startSketchOperation();
+  }
+  else if (aSelected.size() > 1) {
+    QList<ModuleBase_ViewerPrs>::const_iterator anIt = aSelected.begin(), aLast = aSelected.end();
+    bool aProcessed;
+    for (; anIt != aLast; anIt++) {
+      ModuleBase_ViewerPrs aValue = *anIt;
+      if (isValidInFilters(aValue))
+        aProcessed = setSelectionCustom(aValue);
+    }
+    if (aProcessed) {
+      emit valuesChanged();
+      updateObject(myFeature);
+      setVisibleSelectionControl(false);
+      emit focusOutWidget(this);
+    }
+  }
+}
+
+//********************************************************************
+void PartSet_WidgetSketchCreator::setObject(ObjectPtr theSelectedObject,
+                                            GeomShapePtr theShape)
+{
+  std::string anAttributeId = myAttributeListID;
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = aData->attribute(anAttributeId);
+  if (anAttribute.get()) {
+    std::string aType = anAttribute->attributeType();
+    if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+      AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(anAttributeId);
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
+      if (!aSelectionListAttr->isInList(aResult, theShape, myIsInValidate))
+        aSelectionListAttr->append(aResult, theShape, myIsInValidate);
+    }
+  }
+}
 void PartSet_WidgetSketchCreator::onStarted()
 {
   disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
 
   setVisibleSelectionControl(true);
+}
 
-  /*
+void PartSet_WidgetSketchCreator::startSketchOperation()
+{
   // Check that model already has bodies
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_Displayer* aDisp = aWorkshop->displayer();
   QObjectPtrList aObjList = aDisp->displayedObjects();
@@ -195,9 +240,9 @@ void PartSet_WidgetSketchCreator::onStarted()
         break;
       }
     }
-  }
+  }*/
 
-  if (aHasBody) {
+  //if (aHasBody) {
     // Launch Sketch operation
     CompositeFeaturePtr aCompFeature = 
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
@@ -218,7 +263,8 @@ void PartSet_WidgetSketchCreator::onStarted()
       aFOperation->setFeature(aSketch);
     myModule->sendOperation(aFOperation);
     //connect(anOperation, SIGNAL(aborted()), aWorkshop->operationMgr(), SLOT(abortAllOperations()));
-  } else {
+  //}
+  /* else {
     // Break current operation
     std::string anOperationName = feature()->getKind();
     QString aTitle = tr( anOperationName.c_str() );
@@ -237,6 +283,9 @@ bool PartSet_WidgetSketchCreator::focusTo()
     // if (aCompFeature->numberOfSubs() == 0)
     //   return ModuleBase_ModelWidget::focusTo(); 
     connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
+    // we need to call activate here as the widget has no focus accepted controls
+    // if these controls are added here, activate will happens automatically after focusIn()
+    activate();
     return true;
   }
   else {

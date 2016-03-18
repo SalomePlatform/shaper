@@ -68,16 +68,32 @@ protected:
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const;
 
+  /// Store the values to the model attribute of the widget. It casts this attribute to
+  /// the specific type and set the given values
+  /// \param theSelectedObject an object
+  /// \param theShape a selected shape, which is used in the selection attribute
+  /// \return true if it is succeed
+  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+
 private:
   /// Returns true if the selection mode is active. This is when composition feature has no
   ///  a sub-object and the attribute list is empty
   /// \return boolean value
   bool isSelectionMode() const;
 
+protected slots:
+  /// Slot which is called on selection event
+  // NDS: virtual is temporary
+  virtual void onSelectionChanged();
+
 private slots:
   void onStarted();
 
   void onResumed(ModuleBase_Operation* theOp);
+
+private:
+  /// Append new Sketch, set the selected plane for the sketch and start Edit operation.
+  void startSketchOperation();
 
 private:
   std::string myAttributeListID;

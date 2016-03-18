@@ -2,6 +2,7 @@
 
 <source>
   <sketch_launcher id="sketch"
+    attribute_list_id="base"
     label="Select: 1. Planar face of non-sketch object or a plane. Sketch creation will be started.
 2. An existing sketch face or contour. Extrusion will be filled with them. 3.A shape on existing result: wires/edge/vertices.
 Extrusion will be filled with them"

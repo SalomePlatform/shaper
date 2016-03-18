@@ -58,24 +58,29 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
- private slots:
-   /// Slot which is called on selection event
-  void onSelectionChanged();
+// NDS: protected is temporary
+protected slots:
+  /// Slot which is called on selection event
+  // NDS: virtual is temporary
+  virtual void onSelectionChanged();
 
  protected:
   /// Update focus after the attribute value change
+  // NDS: has body is temporary
    virtual void updateFocus() {};
 
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-   virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
+  // NDS: has body is temporary
+  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const = 0;
 
   /// Computes and updates name of selected object in the widget
+  // NDS: has body is temporary
   virtual void updateSelectionName() {};
 
   /// Store the values to the model attribute of the widget. It casts this attribute to
@@ -83,7 +88,7 @@ Q_OBJECT
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape) {};
+  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape) = 0;
 
   /// The methiod called when widget is activated
   virtual void activateCustom();
