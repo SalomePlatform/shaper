@@ -154,6 +154,8 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   gp_Pnt aFlyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
   gp_XYZ aFlyDir = aFlyPnt.XYZ() - aCenter.XYZ();
   double aDist = aFlyDir.Dot(aBisector.XYZ());
+  // make a positive distance in order to AIS angle presentation is not reversed
+  aDist = fabs(aDist);
   SetFlyout(aDist);
 
   // Angle value is in degrees

@@ -190,19 +190,32 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   if (aDirAngle < 0)
     aDirAngle += 2.0 * PI;
   anAngle = fabs(aDirAngle) * 180.0 / PI;
-  //anAngle = fabs(aDirA->angle(aDirB)) * 180.0 / PI;
+  /// an angle value should be corrected by the current angle type
+  anAngle = getAngleForType(anAngle);
+  return anAngle;
+}
 
+double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
+{
+  double anAngle = theAngle;
+
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
+  std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->normal();
+  bool aPositiveNormal = !(aNormal->x() < 0 || aNormal->y() < 0 || aNormal->z() < 0);
+
+  std::shared_ptr<ModelAPI_Data> aData = data();
   std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
   SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT:
+      anAngle = aPositiveNormal ? theAngle : 360 - theAngle;
     break;
     case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
-      anAngle = 180 - anAngle;
+      anAngle = 180 - theAngle;
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:
-      anAngle = 360 - anAngle;
+      anAngle = aPositiveNormal ? 360 - theAngle : theAngle;
     break;
     default:
       break;
@@ -216,22 +229,8 @@ void SketchPlugin_ConstraintAngle::updateAngleValue()
     ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   double anAngle = aValueAttr->value();
 
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
-  SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
-  switch (anAngleType) {
-    case SketcherPrs_Tools::ANGLE_DIRECT:
-    break;
-    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
-      anAngle = 180 - anAngle;
-    break;
-    case SketcherPrs_Tools::ANGLE_BACKWARD:
-      anAngle = 360 - anAngle;
-    break;
-    default:
-      break;
-  }
+  /// an angle value should be corrected by the current angle type
+  anAngle = getAngleForType(anAngle);
   aValueAttr = std::dynamic_pointer_cast<
                   ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
   aValueAttr->setValue(anAngle);

@@ -78,6 +78,12 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
   /// Calculate current value of the angle
   double calculateAngle();
 
+  /// Converts the angle value according to the current angle type and sketch plane normal.
+  /// The in/out angle is in degree.
+  /// \param theAngle a source for the calculated angle
+  /// \param a double angle value
+  double getAngleForType(double theAngle);
+
   /// Update value of VALUE attribute by the combination of the current angle type and angle value
   void updateAngleValue();
 
