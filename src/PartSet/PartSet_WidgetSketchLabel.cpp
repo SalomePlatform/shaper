@@ -317,13 +317,19 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const bool theValid)
 
 bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
 {
+  return fillSketchPlaneBySelection(feature(), thePrs);
+}
+
+bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const FeaturePtr& theFeature,
+                                                           const ModuleBase_ViewerPrs& thePrs)
+{
   bool isOwnerSet = false;
 
   const GeomShapePtr& aShape = thePrs.shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
 
-  if (thePrs.object() && (feature() != thePrs.object())) {
-    DataPtr aData = feature()->data();
+  if (thePrs.object() && (theFeature != thePrs.object())) {
+    DataPtr aData = theFeature->data();
     AttributeSelectionPtr aSelAttr = 
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
@@ -477,7 +483,8 @@ AISObjectPtr PartSet_WidgetSketchLabel::createPreviewPlane(std::shared_ptr<GeomA
 }
 
 
-std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const TopoDS_Shape& theShape)
+std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const FeaturePtr& theFeature,
+                                                                       const TopoDS_Shape& theShape)
 {
   if (theShape.IsNull())
     return std::shared_ptr<GeomAPI_Dir>();
@@ -494,7 +501,7 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
     return std::shared_ptr<GeomAPI_Dir>();
 
   // set plane parameters to feature
-  std::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   double anA, aB, aC, aD;
   aPlane->coefficients(anA, aB, aC, aD);
 

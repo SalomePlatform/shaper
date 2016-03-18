@@ -79,6 +79,9 @@ public:
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
+  static bool fillSketchPlaneBySelection(const FeaturePtr& theFeature,
+                                         const ModuleBase_ViewerPrs& thePrs);
+
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
@@ -163,7 +166,8 @@ protected:
 
   /// Set sketch plane by shape
   /// \param theShape a planar face
-  std::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);
+  static std::shared_ptr<GeomAPI_Dir> setSketchPlane(const FeaturePtr& theFeature,
+                                                     const TopoDS_Shape& theShape);
 
   /// Erase preview planes
   void erasePreviewPlanes();

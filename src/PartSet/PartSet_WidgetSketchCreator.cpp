@@ -6,6 +6,7 @@
 
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_Module.h"
+#include "PartSet_WidgetSketchLabel.h"
 
 #include <Config_Keywords.h>
 
@@ -180,7 +181,7 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
 
   if (aSelected.size() == 1) { // plane or planar face of not sketch object
-    startSketchOperation();
+    startSketchOperation(aSelected.front());
   }
   else if (aSelected.size() > 1) {
     QList<ModuleBase_ViewerPrs>::const_iterator anIt = aSelected.begin(), aLast = aSelected.end();
@@ -223,7 +224,7 @@ void PartSet_WidgetSketchCreator::onStarted()
   setVisibleSelectionControl(true);
 }
 
-void PartSet_WidgetSketchCreator::startSketchOperation()
+void PartSet_WidgetSketchCreator::startSketchOperation(const ModuleBase_ViewerPrs& theValue)
 {
   // Check that model already has bodies
   /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
@@ -254,6 +255,9 @@ void PartSet_WidgetSketchCreator::startSketchOperation()
     DocumentPtr aDoc = aMgr->activeDocument();
     FeaturePtr aPreviousCurrentFeature = aDoc->currentFeature(false);
     FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
+
+    PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(aSketch, theValue);
+
     aDoc->setCurrentFeature(aPreviousCurrentFeature, false);
 
     // start edit operation for the sketch

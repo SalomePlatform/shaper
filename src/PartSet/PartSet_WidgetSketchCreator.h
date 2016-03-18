@@ -93,7 +93,8 @@ private slots:
 
 private:
   /// Append new Sketch, set the selected plane for the sketch and start Edit operation.
-  void startSketchOperation();
+  /// \param theValue a selected object to obtain a plane for sketch
+  void startSketchOperation(const ModuleBase_ViewerPrs& theValue);
 
 private:
   std::string myAttributeListID;
