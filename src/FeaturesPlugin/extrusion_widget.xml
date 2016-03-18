@@ -2,10 +2,13 @@
 
 <source>
   <sketch_launcher id="sketch"
-    label="Sketch"
+    label="Select: 1. Planar face of non-sketch object or a plane. Sketch creation will be started.
+2. An existing sketch face or contour. Extrusion will be filled with them. 3.A shape on existing result: wires/edge/vertices.
+Extrusion will be filled with them"
     icon=":icons/sketch.png"
     use_body="false"
-    tooltip="Create or edit a sketch">
+    tooltip="Create or edit a sketch"
+    shape_types="vertex edge face">
   </sketch_launcher>
   <toolbox id="CreationMethod">
     <box id="BySizes" title="By sizes" icon=":icons/dimension_up_down_32x32.png">

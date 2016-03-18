@@ -14,6 +14,7 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_PropertyPanel.h>
 
 #include <GeomAPI_Face.h>
 
@@ -37,21 +38,31 @@
 
 #include <QLabel>
 #include <QLineEdit>
-#include <QFormLayout>
+//#include <QFormLayout>
+#include <QVBoxLayout>
 #include <QMessageBox>
 
 PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent, 
                                                          PartSet_Module* theModule,
                                                          const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData), myModule(theModule), myUseBody(true)
+: ModuleBase_WidgetSelector(theParent, theModule->workshop(), theData),
+  myModule(theModule), myUseBody(true)
 {
-  QFormLayout* aLayout = new QFormLayout(this);
+  myAttributeListID = theData->getProperty("attribute_list_id");
+
+  //QFormLayout* aLayout = new QFormLayout(this);
+  QVBoxLayout* aLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::zeroMargins(aLayout);
+
   ModuleBase_Tools::adjustMargins(aLayout);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
+
   myLabel = new QLabel(aLabelText, this);
-  if (!aLabelIcon.isEmpty())
+  myLabel->setWordWrap(true);
+  aLayout->addWidget(myLabel);
+  /*if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
 
 
@@ -68,7 +79,10 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
     myUseBody = QVariant(aUseBody).toBool();
   }
 
-  aLayout->addRow(myLabel, myTextLine);
+  aLayout->addRow(myLabel, myTextLine);*/
+
+  std::string aTypes = theData->getProperty("shape_types");
+  myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
 }
 
 PartSet_WidgetSketchCreator::~PartSet_WidgetSketchCreator()
@@ -78,18 +92,18 @@ PartSet_WidgetSketchCreator::~PartSet_WidgetSketchCreator()
 QList<QWidget*> PartSet_WidgetSketchCreator::getControls() const
 {
   QList<QWidget*> aControls;
-  aControls.append(myTextLine);
+  aControls.append(myLabel);
   return aControls;
 }
 
 bool PartSet_WidgetSketchCreator::restoreValueCustom()
 {
-  CompositeFeaturePtr aCompFeature = 
+  /*CompositeFeaturePtr aCompFeature = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   if (aCompFeature->numberOfSubs() > 0) {
     FeaturePtr aSubFeature = aCompFeature->subFeature(0);
     myTextLine->setText(QString::fromStdString(aSubFeature->data()->name()));
-  }
+  }*/
   return true;
 }
 
@@ -100,16 +114,72 @@ bool PartSet_WidgetSketchCreator::storeValueCustom() const
 
 void PartSet_WidgetSketchCreator::activateCustom()
 {
-  CompositeFeaturePtr aCompFeature = 
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  if (aCompFeature->numberOfSubs() == 0)
-    connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
+  if (isSelectionMode()) {
+    ModuleBase_WidgetSelector::activateCustom();
+    //connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
+
+    //setVisibleSelectionControl(true);
+  }
+  else {
+    setVisibleSelectionControl(false);
+    emit focusOutWidget(this);
+  }
+}
+
+void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelectionControl)
+{
+  // hide current widget, activate the next widget
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+  const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
+  foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
+    if (theSelectionControl) { // hide other controls
+      if (aWidget != this)
+        aWidget->setVisible(false);
+    }
+    else { // hide current control
+      if (aWidget == this)
+        aWidget->setVisible(false);
+    }
+  }
+}
+
+QIntList PartSet_WidgetSketchCreator::getShapeTypes() const
+{
+  QIntList aShapeTypes;
+  foreach(QString aType, myShapeTypes) {
+    aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
+  }
+  return aShapeTypes;
+}
+
+void PartSet_WidgetSketchCreator::deactivate()
+{
+  if (isSelectionMode()) {
+    ModuleBase_WidgetSelector::activateCustom();
+  }
+}
+
+bool PartSet_WidgetSketchCreator::isSelectionMode() const
+{
+  //CompositeFeaturePtr aCompFeature =
+  //  std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  //bool aHasSub = aCompFeature->numberOfSubs() > 0;
+
+  AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
+  bool aHasValueInList = anAttrList.get() && anAttrList->size() > 0;
+
+  return !aHasValueInList;//aHasSub || aHasValueInList;
 }
 
 void PartSet_WidgetSketchCreator::onStarted()
 {
   disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
 
+  setVisibleSelectionControl(true);
+
+  /*
   // Check that model already has bodies
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -156,26 +226,30 @@ void PartSet_WidgetSketchCreator::onStarted()
         tr("There are no bodies found. Operation aborted."), QMessageBox::Ok);
     ModuleBase_Operation* aOp = myModule->workshop()->currentOperation();
     aOp->abort();
-  }
+  }*/
 }
 
 bool PartSet_WidgetSketchCreator::focusTo()
 {
-  CompositeFeaturePtr aCompFeature = 
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  if (aCompFeature->numberOfSubs() == 0)
-    return ModuleBase_ModelWidget::focusTo(); 
-
-  connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
-  SessionPtr aMgr = ModelAPI_Session::get();
-  // Open transaction that is general for the previous nested one: it will be closed on nested commit
-  bool aIsOp = aMgr->isOperation();
-  if (!aIsOp) {
-    const static std::string aNestedOpID("Parameters modification");
-    aMgr->startOperation(aNestedOpID, true);
+  if (isSelectionMode()) {
+    //CompositeFeaturePtr aCompFeature = 
+    //   std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    // if (aCompFeature->numberOfSubs() == 0)
+    //   return ModuleBase_ModelWidget::focusTo(); 
+    connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
+    return true;
   }
-
-  restoreValue();
+  else {
+    connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
+    SessionPtr aMgr = ModelAPI_Session::get();
+    // Open transaction that is general for the previous nested one: it will be closed on nested commit
+    bool aIsOp = aMgr->isOperation();
+    if (!aIsOp) {
+      const static std::string aNestedOpID("Parameters modification");
+      aMgr->startOperation(aNestedOpID, true);
+    }
+    restoreValue();
+  }
   return false;
 }
 

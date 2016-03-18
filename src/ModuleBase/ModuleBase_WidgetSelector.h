@@ -64,26 +64,26 @@ Q_OBJECT
 
  protected:
   /// Update focus after the attribute value change
-  virtual void updateFocus() = 0;
+   virtual void updateFocus() {};
 
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const = 0;
+   virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const = 0;
 
   /// Computes and updates name of selected object in the widget
-  virtual void updateSelectionName() = 0;
+  virtual void updateSelectionName() {};
 
   /// Store the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape) = 0;
+  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape) {};
 
   /// The methiod called when widget is activated
   virtual void activateCustom();

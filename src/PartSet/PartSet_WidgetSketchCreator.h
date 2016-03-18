@@ -9,7 +9,7 @@
 
 #include "PartSet.h"
 
-#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_WidgetSelector.h>
 
 class QLabel;
 class QLineEdit;
@@ -24,10 +24,11 @@ class ModuleBase_Operation;
 * it will transfer a focus to next widget. It is supposed that the widget will be placed as 
 * a first widget in property panel
 */
-class PARTSET_EXPORT PartSet_WidgetSketchCreator : public ModuleBase_ModelWidget
+class PARTSET_EXPORT PartSet_WidgetSketchCreator : public ModuleBase_WidgetSelector
 {
 Q_OBJECT
- public:
+
+public:
   /// Constructor
   /// \param theParent the parent object
   /// \param theModule a reference to a module object
@@ -46,6 +47,9 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
+
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -56,12 +60,27 @@ protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+  /// Visualization of the current control or others in PP
+  /// \param theSelectionControl state whether the control should be shown/hidden
+  void setVisibleSelectionControl(const bool theSelectionControl);
+
+  /// Retunrs a list of possible shape types
+  /// \return a list of shapes
+  virtual QIntList getShapeTypes() const;
+
+private:
+  /// Returns true if the selection mode is active. This is when composition feature has no
+  ///  a sub-object and the attribute list is empty
+  /// \return boolean value
+  bool isSelectionMode() const;
+
 private slots:
   void onStarted();
 
   void onResumed(ModuleBase_Operation* theOp);
 
 private:
+  std::string myAttributeListID;
 
   PartSet_Module* myModule;
 
@@ -70,6 +89,9 @@ private:
 
   /// Input control of the widget
   QLineEdit* myTextLine;
+
+  /// List of accepting shapes types
+  QStringList myShapeTypes;
 
   /// To check if we need to use body for composite feature or not
   bool myUseBody;

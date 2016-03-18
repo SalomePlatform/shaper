@@ -63,6 +63,12 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 }
 
 //********************************************************************
+QList<ModuleBase_ViewerPrs> ModuleBase_WidgetSelector::getAttributeSelection() const
+{
+  return QList<ModuleBase_ViewerPrs>();
+}
+
+//********************************************************************
 bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
                                                const ResultPtr& theResult) const
 {
