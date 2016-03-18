@@ -35,6 +35,9 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetDoubleValue();
 
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
+
   /// Select the internal content if it can be selected. It is empty in the default realization
   virtual void selectContent();
 

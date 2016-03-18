@@ -13,15 +13,43 @@
 #include <QToolTip>
 #include <QApplication>
 
+#include <QStringListModel>
+#include <QCompleter>
+#include <QShortcut>
+
 #include <string>
 #include <iostream>
 
+//#define DEBUG_COMPLETE_WITH_PARAMETERS
 
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
     : ModuleBase_DoubleSpinBox(theParent, thePrecision),
       myAcceptVariables(true)
 {
+#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
+  myCompleter = new QCompleter(this);
+  myCompleter->setWidget(this);
+  myCompleter->setCompletionMode(QCompleter::PopupCompletion);
+
+  myCompleterModel = new QStringListModel(this);
+  myCompleter->setModel(myCompleterModel);
+  // Use sorted model to accelerate completion (QCompleter will use binary search)
+  myCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+  myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+
+  lineEdit()->setCompleter(myCompleter);
+#endif
+
   connectSignalsAndSlots();
+}
+
+void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
+{
+#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
+  theList.sort();
+  theList.removeDuplicates();
+  myCompleterModel->setStringList(theList);
+#endif
 }
 
 /*!

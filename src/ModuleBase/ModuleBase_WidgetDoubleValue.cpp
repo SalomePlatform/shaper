@@ -31,6 +31,8 @@
 #include <iostream>
 #endif
 
+//#define DEBUG_COMPLETE_WITH_PARAMETERS
+
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData)
     : ModuleBase_ModelWidget(theParent, theData)
@@ -93,6 +95,16 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 {
+}
+
+void ModuleBase_WidgetDoubleValue::activateCustom()
+{
+  ModuleBase_ModelWidget::activateCustom();
+#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
+  QStringList aParameters;
+  ModuleBase_Tools::getParameters(aParameters);
+  mySpinBox->setCompletionList(aParameters);
+#endif
 }
 
 bool ModuleBase_WidgetDoubleValue::resetCustom()

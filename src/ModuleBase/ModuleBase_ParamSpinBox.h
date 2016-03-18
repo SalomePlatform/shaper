@@ -8,6 +8,9 @@
 
 #include <QValidator>
 
+class QStringListModel;
+class QCompleter;
+
 /**
 * \ingroup GUI
 * An extension of a double spin box which let to use parameters and expressions for value definition
@@ -30,6 +33,10 @@ public:
    \param thePrecision a precision of values display
    */
   explicit ModuleBase_ParamSpinBox( QWidget* theParent = 0, int thePrecision = -12 );
+
+  /// Set list of completion strings
+  void setCompletionList(QStringList&);
+
   virtual ~ModuleBase_ParamSpinBox();
 
   virtual void stepBy(int);
@@ -52,7 +59,7 @@ public:
   /// Returns True if the input value contains variable
   bool hasVariable() const;
 
- protected:
+protected:
    /// Returns True if the given text contains variable
    /// \param theText a text string
   bool hasVariable(const QString& theText) const;
@@ -82,6 +89,9 @@ public:
   QString myTextValue;
 
   bool myAcceptVariables;
+
+  QStringListModel* myCompleterModel;
+  QCompleter* myCompleter;
 };
 
 #endif
