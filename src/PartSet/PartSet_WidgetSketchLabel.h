@@ -79,6 +79,8 @@ public:
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
+  static bool canFillSketch(const ModuleBase_ViewerPrs& thePrs);
+
   static bool fillSketchPlaneBySelection(const FeaturePtr& theFeature,
                                          const ModuleBase_ViewerPrs& thePrs);
 

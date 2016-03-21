@@ -115,12 +115,12 @@ bool PartSet_WidgetSketchCreator::storeValueCustom() const
 
 void PartSet_WidgetSketchCreator::activateCustom()
 {
-  if (isSelectionMode()) {
-    ModuleBase_WidgetSelector::activateCustom();
+  //if (isSelectionMode()) {
+  //  ModuleBase_WidgetSelector::activateCustom();
     //connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
 
     //setVisibleSelectionControl(true);
-  }
+  //}
   //else {
   //  setVisibleSelectionControl(false);
   //  emit focusOutWidget(this);
@@ -180,16 +180,16 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
 {
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
 
-  if (aSelected.size() == 1) { // plane or planar face of not sketch object
-    startSketchOperation(aSelected.front());
+  if (startSketchOperation(aSelected)) {
+
   }
-  else if (aSelected.size() > 1) {
+  else {// if (aSelected.size() > 1) {
     QList<ModuleBase_ViewerPrs>::const_iterator anIt = aSelected.begin(), aLast = aSelected.end();
-    bool aProcessed;
+    bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
       ModuleBase_ViewerPrs aValue = *anIt;
       if (isValidInFilters(aValue))
-        aProcessed = setSelectionCustom(aValue);
+        aProcessed = setSelectionCustom(aValue) || aProcessed;
     }
     if (aProcessed) {
       emit valuesChanged();
@@ -217,15 +217,23 @@ void PartSet_WidgetSketchCreator::setObject(ObjectPtr theSelectedObject,
     }
   }
 }
-void PartSet_WidgetSketchCreator::onStarted()
-{
-  disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
+//void PartSet_WidgetSketchCreator::onStarted()
+//{
+//  disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
+//}
 
-  setVisibleSelectionControl(true);
-}
-
-void PartSet_WidgetSketchCreator::startSketchOperation(const ModuleBase_ViewerPrs& theValue)
+bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues)
 {
+  bool aSketchStarted = false;
+
+  if (theValues.size() != 1)
+    return aSketchStarted;
+
+  ModuleBase_ViewerPrs aValue = theValues.front();
+  if (!PartSet_WidgetSketchLabel::canFillSketch(aValue))
+    return aSketchStarted;
+
+  aSketchStarted = true;
   // Check that model already has bodies
   /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -256,7 +264,7 @@ void PartSet_WidgetSketchCreator::startSketchOperation(const ModuleBase_ViewerPr
     FeaturePtr aPreviousCurrentFeature = aDoc->currentFeature(false);
     FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
 
-    PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(aSketch, theValue);
+    PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(aSketch, aValue);
 
     aDoc->setCurrentFeature(aPreviousCurrentFeature, false);
 
@@ -277,22 +285,27 @@ void PartSet_WidgetSketchCreator::startSketchOperation(const ModuleBase_ViewerPr
     ModuleBase_Operation* aOp = myModule->workshop()->currentOperation();
     aOp->abort();
   }*/
+  return aSketchStarted;
 }
 
 bool PartSet_WidgetSketchCreator::focusTo()
 {
   if (isSelectionMode()) {
+    setVisibleSelectionControl(true);
+
     //CompositeFeaturePtr aCompFeature = 
     //   std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
     // if (aCompFeature->numberOfSubs() == 0)
     //   return ModuleBase_ModelWidget::focusTo(); 
-    connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
+    //connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
     // we need to call activate here as the widget has no focus accepted controls
     // if these controls are added here, activate will happens automatically after focusIn()
-    activate();
+    ModuleBase_WidgetSelector::activateCustom();
     return true;
   }
   else {
+    setVisibleSelectionControl(false);
+
     connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
     SessionPtr aMgr = ModelAPI_Session::get();
     // Open transaction that is general for the previous nested one: it will be closed on nested commit

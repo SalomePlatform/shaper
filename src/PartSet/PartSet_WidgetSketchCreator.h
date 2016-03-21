@@ -87,14 +87,15 @@ protected slots:
   virtual void onSelectionChanged();
 
 private slots:
-  void onStarted();
+  //void onStarted();
 
   void onResumed(ModuleBase_Operation* theOp);
 
 private:
   /// Append new Sketch, set the selected plane for the sketch and start Edit operation.
-  /// \param theValue a selected object to obtain a plane for sketch
-  void startSketchOperation(const ModuleBase_ViewerPrs& theValue);
+  /// \param theValues a selection list
+  /// \return true if the sketch is started
+  bool startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues);
 
 private:
   std::string myAttributeListID;

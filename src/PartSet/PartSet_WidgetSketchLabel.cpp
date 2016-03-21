@@ -320,6 +320,32 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
   return fillSketchPlaneBySelection(feature(), thePrs);
 }
 
+#include <GeomAPI_Face.h>
+bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrs& thePrs)
+{
+  bool aCanFillSketch = true;
+  // avoid any selection on sketch object
+  ObjectPtr anObject = thePrs.object();
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if (aResult.get()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+    if (aFeature->getKind() == SketchPlugin_Sketch::ID())
+      aCanFillSketch = false;
+  }
+  // check plane or planar face of any non-sketch object
+  if (aCanFillSketch) {
+    const TopoDS_Shape aShape = thePrs.shape();
+    if (aShape.ShapeType() == TopAbs_FACE) {
+      std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face());
+      aGeomFace->setImpl(new TopoDS_Shape(aShape));
+      aCanFillSketch = aGeomFace.get() && aGeomFace->isPlanar();
+    }
+    else
+      aCanFillSketch = false;
+  }
+  return aCanFillSketch;
+}
+
 bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const FeaturePtr& theFeature,
                                                            const ModuleBase_ViewerPrs& thePrs)
 {
