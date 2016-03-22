@@ -19,13 +19,16 @@ PartSet_WidgetMultiSelectorComposite::~PartSet_WidgetMultiSelectorComposite()
 
 bool PartSet_WidgetMultiSelectorComposite::focusTo()
 {
-  bool aHasSubObjects = hasSubObjects();
+  bool aCanHaveFocus = true;
 
+  if (hasSubObjects()) {
   // disable widget controls
-  if (aHasSubObjects)
     disableControls();
-
-  return !aHasSubObjects;
+    aCanHaveFocus = false;
+  }
+  else
+    aCanHaveFocus = ModuleBase_WidgetMultiSelector::focusTo();
+  return aCanHaveFocus;
 }
 
 void PartSet_WidgetMultiSelectorComposite::setEditingMode(bool isEditing)
