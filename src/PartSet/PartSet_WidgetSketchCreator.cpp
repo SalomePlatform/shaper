@@ -140,7 +140,7 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
     }
   } else {
     bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
-    myPreviewPlanes->showPreviewPlanes(myWorkshop);
+    myPreviewPlanes->erasePreviewPlanes(myWorkshop);
     if (aHidePreview)
       aWorkshop->viewer()->update();
   }
@@ -262,7 +262,9 @@ bool PartSet_WidgetSketchCreator::focusTo()
 
     // we need to call activate here as the widget has no focus accepted controls
     // if these controls are added here, activate will happens automatically after focusIn()
-    activateCustom();
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
+    XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+    aPanel->activateWidget(this, false);
     return true;
   }
   else {
@@ -279,6 +281,17 @@ bool PartSet_WidgetSketchCreator::focusTo()
     restoreValue();
   }
   return false;
+}
+
+void PartSet_WidgetSketchCreator::deactivate()
+{
+  ModuleBase_WidgetSelector::deactivate();
+
+  bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
+  myPreviewPlanes->erasePreviewPlanes(myWorkshop);
+  if (aHidePreview)
+    XGUI_Tools::workshop(myWorkshop)->viewer()->update();
+
 }
 
 void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)

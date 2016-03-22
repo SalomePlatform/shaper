@@ -47,6 +47,9 @@ public:
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
+
   /// Editing mode depends on mode of current operation. This value is defined by it.
   virtual void setEditingMode(bool isEditing);
 
