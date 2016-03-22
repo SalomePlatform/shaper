@@ -101,7 +101,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QString aTypesStr = aPropertyTypes.c_str();
   QStringList aShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
 
-  myIsUseChoice = theData->getBooleanAttribute("use_choice", true);
+  myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
 
   if (!aShapeTypes.empty())
     myTypeCombo->addItems(aShapeTypes);

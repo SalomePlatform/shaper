@@ -12,7 +12,8 @@
         <export_file_selector id="file_path" type="save" title="Export file" path="">
           <validator id="ExchangePlugin_ExportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES-5.1,IGES|IGS:IGES-5.3" />
         </export_file_selector>
-        <multi_selector id="selection_list" tooltip="Select a set of objects" type_choice="Vertices Edges Faces Solids Objects">
+        <multi_selector id="selection_list" tooltip="Select a set of objects"
+                        type_choice="Vertices Edges Faces Solids Objects" use_choice="true">
           <validator id="GeomValidators_Finite"/>
         </multi_selector>
       </feature>

@@ -114,20 +114,6 @@ bool PartSet_WidgetSketchCreator::storeValueCustom() const
   return true;
 }
 
-void PartSet_WidgetSketchCreator::activateCustom()
-{
-  //if (isSelectionMode()) {
-  //  ModuleBase_WidgetSelector::activateCustom();
-    //connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
-
-    //setVisibleSelectionControl(true);
-  //}
-  //else {
-  //  setVisibleSelectionControl(false);
-  //  emit focusOutWidget(this);
-  //}
-}
-
 void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelectionControl)
 {
   // hide current widget, activate the next widget
@@ -157,12 +143,6 @@ QIntList PartSet_WidgetSketchCreator::getShapeTypes() const
   return aShapeTypes;
 }
 
-void PartSet_WidgetSketchCreator::deactivate()
-{
-  if (isSelectionMode())
-    ModuleBase_WidgetSelector::deactivate();
-}
-
 void PartSet_WidgetSketchCreator::setEditingMode(bool isEditing)
 {
   ModuleBase_ModelWidget::setEditingMode(isEditing);
@@ -172,24 +152,17 @@ void PartSet_WidgetSketchCreator::setEditingMode(bool isEditing)
 
 bool PartSet_WidgetSketchCreator::isSelectionMode() const
 {
-  //CompositeFeaturePtr aCompFeature =
-  //  std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  //bool aHasSub = aCompFeature->numberOfSubs() > 0;
-
   AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
   bool aHasValueInList = anAttrList.get() && anAttrList->size() > 0;
 
-  return !aHasValueInList;//aHasSub || aHasValueInList;
+  return !aHasValueInList;
 }
 
 void PartSet_WidgetSketchCreator::onSelectionChanged()
 {
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
 
-  if (startSketchOperation(aSelected)) {
-
-  }
-  else {// if (aSelected.size() > 1) {
+  if (!startSketchOperation(aSelected)) {
     QList<ModuleBase_ViewerPrs>::const_iterator anIt = aSelected.begin(), aLast = aSelected.end();
     bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
@@ -201,6 +174,8 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
       emit valuesChanged();
       updateObject(myFeature);
       setVisibleSelectionControl(false);
+      // manually deactivation because the widget was not activated as has no focus acceptin controls
+      deactivate();
       emit focusOutWidget(this);
     }
   }
@@ -223,10 +198,6 @@ void PartSet_WidgetSketchCreator::setObject(ObjectPtr theSelectedObject,
     }
   }
 }
-//void PartSet_WidgetSketchCreator::onStarted()
-//{
-//  disconnect(myModule, SIGNAL(operationLaunched()), this, SLOT(onStarted()));
-//}
 
 bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues)
 {
@@ -240,57 +211,33 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
     return aSketchStarted;
 
   aSketchStarted = true;
-  // Check that model already has bodies
-  /*XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  XGUI_Displayer* aDisp = aWorkshop->displayer();
-  QObjectPtrList aObjList = aDisp->displayedObjects();
-  bool aHasBody = !myUseBody;
-  ResultBodyPtr aBody;
-  if(!aHasBody) {
-    foreach(ObjectPtr aObj, aObjList) {
-      aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
-      if (aBody.get() != NULL) {
-        aHasBody = true;
-        break;
-      }
-    }
-  }*/
 
-  //if (aHasBody) {
-    // Launch Sketch operation
-    CompositeFeaturePtr aCompFeature = 
-      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  // manually deactivation because the widget was not activated as has no focus acceptin controls
+  deactivate();
 
-    /// add sketch feature without current feature change.
-    /// it is important to do not change the current feature in order to
-    /// after sketch edition, the extrusion cut feature becomes current
-    SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->activeDocument();
-    FeaturePtr aPreviousCurrentFeature = aDoc->currentFeature(false);
-    FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
+  // Launch Sketch operation
+  CompositeFeaturePtr aCompFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
 
-    PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(aSketch, aValue);
+  /// add sketch feature without current feature change.
+  /// it is important to do not change the current feature in order to
+  /// after sketch edition, the extrusion cut feature becomes current
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+  FeaturePtr aPreviousCurrentFeature = aDoc->currentFeature(false);
+  FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
 
-    aDoc->setCurrentFeature(aPreviousCurrentFeature, false);
+  PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(aSketch, aValue);
 
-    // start edit operation for the sketch
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                             (myModule->createOperation("Sketch"));
-    if (aFOperation)
-      aFOperation->setFeature(aSketch);
-    myModule->sendOperation(aFOperation);
-    //connect(anOperation, SIGNAL(aborted()), aWorkshop->operationMgr(), SLOT(abortAllOperations()));
-  //}
-  /* else {
-    // Break current operation
-    std::string anOperationName = feature()->getKind();
-    QString aTitle = tr( anOperationName.c_str() );
-    QMessageBox::warning(this, aTitle,
-        tr("There are no bodies found. Operation aborted."), QMessageBox::Ok);
-    ModuleBase_Operation* aOp = myModule->workshop()->currentOperation();
-    aOp->abort();
-  }*/
+  aDoc->setCurrentFeature(aPreviousCurrentFeature, false);
+
+  // start edit operation for the sketch
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                            (myModule->createOperation("Sketch"));
+  if (aFOperation)
+    aFOperation->setFeature(aSketch);
+  myModule->sendOperation(aFOperation);
+
   return aSketchStarted;
 }
 
@@ -299,14 +246,9 @@ bool PartSet_WidgetSketchCreator::focusTo()
   if (isSelectionMode()) {
     setVisibleSelectionControl(true);
 
-    //CompositeFeaturePtr aCompFeature = 
-    //   std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-    // if (aCompFeature->numberOfSubs() == 0)
-    //   return ModuleBase_ModelWidget::focusTo(); 
-    //connect(myModule, SIGNAL(operationLaunched()), SLOT(onStarted()));
     // we need to call activate here as the widget has no focus accepted controls
     // if these controls are added here, activate will happens automatically after focusIn()
-    ModuleBase_WidgetSelector::activateCustom();
+    activateCustom();
     return true;
   }
   else {

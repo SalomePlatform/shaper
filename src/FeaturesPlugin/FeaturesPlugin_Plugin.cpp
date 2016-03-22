@@ -19,6 +19,7 @@
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
+#include <FeaturesPlugin_ValidatorExtrusionBase.h>
 #include <FeaturesPlugin_Validators.h>
 
 #include <ModelAPI_Session.h>
@@ -38,6 +39,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("FeaturesPlugin_ValidatorTransform",
                               new FeaturesPlugin_ValidatorTransform);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorExtrusionBase",
+                              new FeaturesPlugin_ValidatorExtrusionBase);
   aFactory->registerValidator("FeaturesPlugin_PipeLocationsValidator",
                               new FeaturesPlugin_PipeLocationsValidator);
 

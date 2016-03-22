@@ -222,7 +222,6 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_MiddlePointSelection", new PartSet_MiddlePointSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
-  aFactory->registerValidator("PartSet_SketchEntityValidator", new PartSet_SketchEntityValidator);
 }
 
 void PartSet_Module::registerFilters()

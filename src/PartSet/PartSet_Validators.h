@@ -165,22 +165,6 @@ private:
 
 };
 
-/**
-* \ingroup Validators
-* A validator which checks that objects selected for feature attributes are different (not the same)
-*/
-class PartSet_SketchEntityValidator : public ModelAPI_AttributeValidator
-{
- public:
-  //! Returns true if the attribute is good for the feature attribute
-  //! \param theAttribute an attribute
-  //! \param theArguments a list of arguments (names of attributes to check)
-  //! \param theError an output error string
-  virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments,
-                       std::string& theError) const;
-};
-
 /**\class PartSet_CoincidentAttr
  * \ingroup Validators
  * \brief Validator to check whether there is a coincident constraint between

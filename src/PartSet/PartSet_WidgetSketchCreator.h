@@ -47,9 +47,6 @@ public:
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
-  /// The methiod called when widget is deactivated
-  virtual void deactivate();
-
   /// Editing mode depends on mode of current operation. This value is defined by it.
   virtual void setEditingMode(bool isEditing);
 
@@ -59,9 +56,6 @@ protected:
   virtual bool storeValueCustom() const;
 
   virtual bool restoreValueCustom();
-
-  /// The methiod called when widget is activated
-  virtual void activateCustom();
 
   /// Visualization of the current control or others in PP
   /// \param theSelectionControl state whether the control should be shown/hidden
@@ -90,8 +84,6 @@ protected slots:
   virtual void onSelectionChanged();
 
 private slots:
-  //void onStarted();
-
   void onResumed(ModuleBase_Operation* theOp);
 
 private:
