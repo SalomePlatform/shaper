@@ -334,8 +334,14 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrs& thePrs
   }
   // check plane or planar face of any non-sketch object
   if (aCanFillSketch) {
+    std::shared_ptr<GeomAPI_Face> aGeomFace;
     const TopoDS_Shape aShape = thePrs.shape();
-    if (aShape.ShapeType() == TopAbs_FACE) {
+    if (aShape.IsNull()) {
+      GeomShapePtr aGeomShape = aResult->shape();
+      std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face(aGeomShape));
+      aCanFillSketch = aGeomFace.get() && aGeomFace->isPlanar();
+    }
+    else if (aShape.ShapeType() == TopAbs_FACE) {
       std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face());
       aGeomFace->setImpl(new TopoDS_Shape(aShape));
       aCanFillSketch = aGeomFace.get() && aGeomFace->isPlanar();
