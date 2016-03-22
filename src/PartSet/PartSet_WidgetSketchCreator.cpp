@@ -7,6 +7,7 @@
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_Module.h"
 #include "PartSet_WidgetSketchLabel.h"
+#include "PartSet_PreviewPlanes.h"
 
 #include <Config_Keywords.h>
 
@@ -17,6 +18,7 @@
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_Tools.h>
+#include <XGUI_ViewerProxy.h>
 
 #include <GeomAPI_Face.h>
 
@@ -48,7 +50,7 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
                                                          PartSet_Module* theModule,
                                                          const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theModule->workshop(), theData),
-  myModule(theModule), myUseBody(true)
+  myModule(theModule)
 {
   myAttributeListID = theData->getProperty("attribute_list_id");
 
@@ -76,15 +78,12 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
 
   myLabel->setToolTip(aToolTip);
 
-  QString aUseBody = QString::fromStdString(theData->getProperty(USE_BODY));
-  if(!aUseBody.isEmpty()) {
-    myUseBody = QVariant(aUseBody).toBool();
-  }
-
   aLayout->addRow(myLabel, myTextLine);*/
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
+
+  myPreviewPlanes = new PartSet_PreviewPlanes();
 }
 
 PartSet_WidgetSketchCreator::~PartSet_WidgetSketchCreator()
@@ -131,6 +130,19 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
       else
         aWidget->setVisible(true);
     }
+  }
+
+  if (theSelectionControl) {
+    bool aBodyIsVisualized = myPreviewPlanes->hasVisualizedBodies(myWorkshop);
+    if (!aBodyIsVisualized) {
+      // We have to select a plane before any operation
+      myPreviewPlanes->showPreviewPlanes(myWorkshop);
+    }
+  } else {
+    bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
+    myPreviewPlanes->showPreviewPlanes(myWorkshop);
+    if (aHidePreview)
+      aWorkshop->viewer()->update();
   }
 }
 
@@ -214,6 +226,8 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
 
   // manually deactivation because the widget was not activated as has no focus acceptin controls
   deactivate();
+  bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
+  myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
   // Launch Sketch operation
   CompositeFeaturePtr aCompFeature = 
@@ -309,33 +323,24 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
 
 
     // Add Selected body were created the sketcher to list of selected objects
-    if(myUseBody) {
-      std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
-      AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
-      if (aSelList.get()) {
-        DataPtr aData = aSketchFeature->data();
-        AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                                      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-        ResultPtr aRes = aSelAttr.get() ? aSelAttr->context() : ResultPtr();
-        if (aRes.get()) {
-          SessionPtr aMgr = ModelAPI_Session::get();
-          ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-          AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
-          std::string aValidatorID, anError;
-          aSelList->append(aRes, GeomShapePtr());
-          if (aFactory->validate(anAttribute, aValidatorID, anError))
-            updateObject(aCompFeature);
-          else
-            aSelList->clear();
-        }
+    std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
+    AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
+    if (aSelList.get()) {
+      DataPtr aData = aSketchFeature->data();
+      AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                                    (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+      ResultPtr aRes = aSelAttr.get() ? aSelAttr->context() : ResultPtr();
+      if (aRes.get()) {
+        SessionPtr aMgr = ModelAPI_Session::get();
+        ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+        AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
+        std::string aValidatorID, anError;
+        aSelList->append(aRes, GeomShapePtr());
+        if (aFactory->validate(anAttribute, aValidatorID, anError))
+          updateObject(aCompFeature);
+        else
+          aSelList->clear();
       }
-    }
-    else {
-      // this is a workarount to display the feature results in the operation selection mode
-      // if this is absent, sketch point/line local selection is available on extrusion cut result
-      static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-      ModelAPI_EventCreator::get()->sendUpdated(feature(), anUpdateEvent);
-      updateObject(feature());
     }
   }
 }

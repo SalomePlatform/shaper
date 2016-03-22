@@ -7,6 +7,7 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Tools.h"
 #include "PartSet_Module.h"
+#include "PartSet_PreviewPlanes.h"
 
 #include "SketchPlugin_SketchEntity.h"
 
@@ -16,6 +17,7 @@
 #include <XGUI_Selection.h>
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_ActionsMgr.h>
+#include <XGUI_Tools.h>
 #include <XGUI_ModuleConnector.h>
 
 #include <ModuleBase_Operation.h>
@@ -58,8 +60,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                         ModuleBase_IWorkshop* theWorkshop,
                         const Config_WidgetAPI* theData,
                         const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints)
-: ModuleBase_WidgetValidated(theParent, theWorkshop, theData),
-  myPreviewDisplayed(false)
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -122,6 +123,8 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
+
+  myPreviewPlanes = new PartSet_PreviewPlanes();
 }
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
@@ -209,7 +212,7 @@ void PartSet_WidgetSketchLabel::blockAttribute(const bool& theToBlock, bool& isF
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs)
 {
   // 1. hide main planes if they have been displayed
-  erasePreviewPlanes();
+  myPreviewPlanes->erasePreviewPlanes(myWorkshop);
   // 2. if the planes were displayed, change the view projection
   const GeomShapePtr& aShape = thePrs.shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
@@ -258,13 +261,14 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   myStackWidget->setCurrentIndex(1);
   //myLabel->setText("");
   //myLabel->setToolTip("");
-  disconnect(workshop()->selector(), SIGNAL(selectionChanged()), 
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  disconnect(aWorkshop->selector(), SIGNAL(selectionChanged()), 
               this, SLOT(onSelectionChanged()));
   // 4. deactivate face selection filter
   activateFilters(false);
 
   // 5. Clear selection mode and define sketching mode
-  //XGUI_Displayer* aDisp = workshop()->displayer();
+  //XGUI_Displayer* aDisp = aWorkshop->displayer();
   //aDisp->closeLocalContexts();
   emit planeSelected(plane());
   // after the plane is selected in the sketch, the sketch selection should be activated
@@ -273,7 +277,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   activateSelection(true);
 
   // 6. Update sketcher actions
-  XGUI_ActionsMgr* anActMgr = workshop()->actionsMgr();
+  XGUI_ActionsMgr* anActMgr = aWorkshop->actionsMgr();
   myWorkshop->updateCommandStatus();
   myWorkshop->viewer()->update();
 }
@@ -400,36 +404,26 @@ void PartSet_WidgetSketchLabel::activateCustom()
   }
 
   myStackWidget->setCurrentIndex(0);
-  bool aBodyIsVisualized = false;
-  XGUI_Displayer* aDisp = workshop()->displayer();
-  QObjectPtrList aDisplayed = aDisp->displayedObjects();
-  foreach (ObjectPtr anObj, aDisplayed) {
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-    if (aResult.get() != NULL) {
-      aBodyIsVisualized = aResult->groupName() == ModelAPI_ResultBody::group();
-      if (aBodyIsVisualized)
-        break;
-    }
-  }
-
+  bool aBodyIsVisualized = myPreviewPlanes->hasVisualizedBodies(myWorkshop);
   if (!aBodyIsVisualized) {
     // We have to select a plane before any operation
-    showPreviewPlanes();
+    myPreviewPlanes->showPreviewPlanes(myWorkshop);
   }
   activateSelection(true);
 
   //myLabel->setText(myText);
   //myLabel->setToolTip(myTooltip);
 
-  connect(workshop()->selector(), SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  connect(XGUI_Tools::workshop(myWorkshop)->selector(), SIGNAL(selectionChanged()),
+          this, SLOT(onSelectionChanged()));
   activateFilters(true);
 }
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
   ModuleBase_ModelWidget::deactivate();
-  bool aHidePreview = myPreviewDisplayed;
-  erasePreviewPlanes();
+  bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
+  myPreviewPlanes->erasePreviewPlanes(myWorkshop);
   activateSelection(false);
 
   activateFilters(false);
@@ -452,66 +446,6 @@ void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
   } else {
     myWorkshop->deactivateSubShapesSelection();
   }
-}
-
-void PartSet_WidgetSketchLabel::erasePreviewPlanes()
-{
-  if (myPreviewDisplayed) {
-    XGUI_Displayer* aDisp = workshop()->displayer();
-    aDisp->eraseAIS(myYZPlane, false);
-    aDisp->eraseAIS(myXZPlane, false);
-    aDisp->eraseAIS(myXYPlane, false);
-    myPreviewDisplayed = false;
-  }
-}
-
-void PartSet_WidgetSketchLabel::showPreviewPlanes()
-{
-  if (myPreviewDisplayed)
-    return;
-
-  if (!myYZPlane) { // If planes are not created
-    // Create Preview
-    std::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
-    std::shared_ptr<GeomAPI_Dir> aYZDir(new GeomAPI_Dir(1, 0, 0));
-    // -1, not 1 for correct internal sketch coords (issue 898)
-    std::shared_ptr<GeomAPI_Dir> aXZDir(new GeomAPI_Dir(0, -1, 0));
-    std::shared_ptr<GeomAPI_Dir> aXYDir(new GeomAPI_Dir(0, 0, 1));
-
-    std::vector<int> aYZRGB, aXZRGB, aXYRGB;
-    aYZRGB = Config_PropManager::color("Visualization", "yz_plane_color",
-                                                        YZ_PLANE_COLOR);
-    aXZRGB = Config_PropManager::color("Visualization", "xz_plane_color",
-                                                        XZ_PLANE_COLOR);
-    aXYRGB = Config_PropManager::color("Visualization", "xy_plane_color",
-                                                        XY_PLANE_COLOR);
-    int aR[] = {aYZRGB[0], aYZRGB[1], aYZRGB[2]};
-    int aG[] = {aXZRGB[0], aXZRGB[1], aXZRGB[2]};
-    int aB[] = {aXYRGB[0], aXYRGB[1], aXYRGB[2]};
-
-    myYZPlane = createPreviewPlane(anOrigin, aYZDir, aR);
-    myXZPlane = createPreviewPlane(anOrigin, aXZDir, aG);
-    myXYPlane = createPreviewPlane(anOrigin, aXYDir, aB);
-  }
-  XGUI_Displayer* aDisp = workshop()->displayer();
-  aDisp->displayAIS(myYZPlane, true, false);
-  aDisp->displayAIS(myXZPlane, true, false);
-  aDisp->displayAIS(myXYPlane, true, false);
-  myPreviewDisplayed = true;
-}
-
-
-AISObjectPtr PartSet_WidgetSketchLabel::createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin, 
-                                                           std::shared_ptr<GeomAPI_Dir> theNorm, 
-                                                           const int theRGB[3])
-{
-  double aSize = Config_PropManager::integer("Sketch planes", "planes_size", PLANE_SIZE);
-  std::shared_ptr<GeomAPI_Shape> aFace = GeomAlgoAPI_FaceBuilder::square(theOrigin, theNorm, aSize);
-  AISObjectPtr aAIS = AISObjectPtr(new GeomAPI_AISObject());
-  aAIS->createShape(aFace);
-  aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thickness", SKETCH_WIDTH));
-  aAIS->setColor(theRGB[0], theRGB[1], theRGB[2]);
-  return aAIS;
 }
 
 
@@ -563,13 +497,6 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Fea
   std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   return aDir;
 }
-
-XGUI_Workshop* PartSet_WidgetSketchLabel::workshop() const
-{
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  return aConnector->workshop();
-}
-
 
 void PartSet_WidgetSketchLabel::onSetPlaneView()
 {

@@ -116,9 +116,4 @@ const static char* NODE_ICON = "icon";
 const static char* SHOW_EMPTY = "show_empty";
 const static char* LINK_ITEM = "from_result";
 
-/*
- * Hardcoded xml entities for composite features
- */
-const static char* USE_BODY = "use_body";
-
 #endif /* CONFIG_KEYWORDS_H_ */

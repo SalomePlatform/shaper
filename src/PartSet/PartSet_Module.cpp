@@ -4,6 +4,7 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Validators.h"
 #include "PartSet_Tools.h"
+#include "PartSet_PreviewPlanes.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_WidgetPoint2DFlyout.h"

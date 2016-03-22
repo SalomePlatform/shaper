@@ -15,7 +15,7 @@ class QLabel;
 class QLineEdit;
 class PartSet_Module;
 class ModuleBase_Operation;
-
+class PartSet_PreviewPlanes;
 
 /**
 * \ingroup Modules
@@ -106,9 +106,8 @@ private:
   /// List of accepting shapes types
   QStringList myShapeTypes;
 
-  /// To check if we need to use body for composite feature or not
-  bool myUseBody;
-
+  /// class to show/hide preview planes
+  PartSet_PreviewPlanes* myPreviewPlanes;
 };
 
 #endif

@@ -5,7 +5,6 @@
     <sketch_launcher id="sketch"
       label="Sketch"
       icon=":icons/sketch.png"
-      use_body="false"
       tooltip="Create or edit a sketch">
     </sketch_launcher>
     <toolbox id="CreationMethod">

@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	PartSet_Module.h
 	PartSet_OperationPrs.h
         PartSet_OverconstraintListener.h
+        PartSet_PreviewPlanes.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
@@ -39,6 +40,7 @@ SET(PROJECT_SOURCES
 	PartSet_Module.cpp
 	PartSet_OperationPrs.cpp
         PartSet_OverconstraintListener.cpp
+        PartSet_PreviewPlanes.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp

@@ -14,25 +14,19 @@
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ViewerFilters.h>
 
-#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
-#include <GeomAPI_AISObject.h>
 
 #include <TopoDS_Shape.hxx>
 
 #include <QMap>
+
+class PartSet_PreviewPlanes;
 
 class QLabel;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 class QCheckBox;
 class QStackedWidget;
-
-/// the plane edge width
-#define SKETCH_WIDTH        "4"
-
-/// face of the square-face displayed for selection of general plane
-#define PLANE_SIZE          "200"
 
 /**
 * \ingroup Modules
@@ -155,33 +149,15 @@ protected:
   void onShowConstraint(bool theOn);
 
  private:
-   /// Create preview of planes for sketch plane selection
-   /// \param theOrigin an origin of the plane
-   /// \param theNorm a normal vector of the plane
-   /// \param theRGB a color of plane presentation [r, g, b] array
-  AISObjectPtr createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin, 
-                                  std::shared_ptr<GeomAPI_Dir> theNorm, 
-                                  const int theRGB[3]);
-
-  //! Returns workshop
-  XGUI_Workshop* workshop() const;
-
   /// Set sketch plane by shape
   /// \param theShape a planar face
   static std::shared_ptr<GeomAPI_Dir> setSketchPlane(const FeaturePtr& theFeature,
                                                      const TopoDS_Shape& theShape);
 
-  /// Erase preview planes
-  void erasePreviewPlanes();
 
-  /// Show preview planes
-  void showPreviewPlanes();
-
-
-  AISObjectPtr myYZPlane;
-  AISObjectPtr myXZPlane;
-  AISObjectPtr myXYPlane;
-  bool myPreviewDisplayed;
+private:
+  /// class to show/hide preview planes
+  PartSet_PreviewPlanes* myPreviewPlanes;
 
   QCheckBox* myViewInverted;
 

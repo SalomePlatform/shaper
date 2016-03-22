@@ -7,7 +7,6 @@
 2. An existing sketch face or contour. Extrusion will be filled with them. 3.A shape on existing result: wires/edge/vertices.
 Extrusion will be filled with them"
     icon=":icons/sketch.png"
-    use_body="false"
     tooltip="Create or edit a sketch"
     shape_types="face objects">
   </sketch_launcher>
