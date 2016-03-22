@@ -36,7 +36,14 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// Editing mode depends on mode of current operation. This value is defined by it.
+  virtual void setEditingMode(bool isEditing);
+
 private:
+  /// Returns true if the current composite feature contains at least one sub-object
+  /// \return boolean value
+  bool hasSubObjects() const;
+
   /// Disable controls by setting them focus policy NoFocus and disabling them
   void disableControls();
 };

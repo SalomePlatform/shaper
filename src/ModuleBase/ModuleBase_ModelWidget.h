@@ -170,7 +170,7 @@ Q_OBJECT
   void setFeature(const FeaturePtr& theFeature, const bool theToStoreValue = false);
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
-  void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
+  virtual void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
 
   /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }

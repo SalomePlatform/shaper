@@ -16,6 +16,7 @@
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_Tools.h>
 
 #include <GeomAPI_Face.h>
 
@@ -130,8 +131,7 @@ void PartSet_WidgetSketchCreator::activateCustom()
 void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelectionControl)
 {
   // hide current widget, activate the next widget
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
   XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
   const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
   foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
@@ -159,9 +159,15 @@ QIntList PartSet_WidgetSketchCreator::getShapeTypes() const
 
 void PartSet_WidgetSketchCreator::deactivate()
 {
-  if (isSelectionMode()) {
-    ModuleBase_WidgetSelector::activateCustom();
-  }
+  if (isSelectionMode())
+    ModuleBase_WidgetSelector::deactivate();
+}
+
+void PartSet_WidgetSketchCreator::setEditingMode(bool isEditing)
+{
+  ModuleBase_ModelWidget::setEditingMode(isEditing);
+  if (isEditing)
+    setVisibleSelectionControl(false);
 }
 
 bool PartSet_WidgetSketchCreator::isSelectionMode() const
@@ -326,8 +332,10 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
   CompositeFeaturePtr aSketchFeature = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
   if (aSketchFeature->numberOfSubs() == 0) {
+    // do nothing, selection control should be shown
+
     // Abort operation
-    SessionPtr aMgr = ModelAPI_Session::get();
+    //SessionPtr aMgr = ModelAPI_Session::get();
     // Close transaction
     /*
     bool aIsOp = aMgr->isOperation();
@@ -336,8 +344,17 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       aMgr->startOperation(aNestedOpID, true);
     }
     */
-    theOp->abort();
+    //theOp->abort();
   } else {
+    // Update value in attribute selection list
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
+    XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+    const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
+    foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
+      if (aWidget->attributeID() == myAttributeListID)
+        aWidget->restoreValue();
+    }
+
     // Hide sketcher result
     std::list<ResultPtr> aResults = aSketchFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
@@ -346,22 +363,23 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
     }
     aSketchFeature->setDisplayed(false);
 
+    // restore value in the selection control
+
+
+    // Add Selected body were created the sketcher to list of selected objects
     if(myUseBody) {
-      // Add Selected body were created the sketcher to list of selected objects
-      DataPtr aData = aSketchFeature->data();
-      AttributeSelectionPtr aSelAttr = 
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-      if (aSelAttr.get()) {
-        ResultPtr aRes = aSelAttr->context();
-        GeomShapePtr aShape = aSelAttr->value();
+      std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
+      AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
+      if (aSelList.get()) {
+        DataPtr aData = aSketchFeature->data();
+        AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                                      (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+        ResultPtr aRes = aSelAttr.get() ? aSelAttr->context() : ResultPtr();
         if (aRes.get()) {
-          std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
           SessionPtr aMgr = ModelAPI_Session::get();
           ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
           AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
           std::string aValidatorID, anError;
-          AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
           aSelList->append(aRes, GeomShapePtr());
           if (aFactory->validate(anAttribute, aValidatorID, anError))
             updateObject(aCompFeature);

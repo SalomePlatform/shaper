@@ -19,17 +19,32 @@ PartSet_WidgetMultiSelectorComposite::~PartSet_WidgetMultiSelectorComposite()
 
 bool PartSet_WidgetMultiSelectorComposite::focusTo()
 {
+  bool aHasSubObjects = hasSubObjects();
+
+  // disable widget controls
+  if (aHasSubObjects)
+    disableControls();
+
+  return !aHasSubObjects;
+}
+
+void PartSet_WidgetMultiSelectorComposite::setEditingMode(bool isEditing)
+{
+  ModuleBase_ModelWidget::setEditingMode(isEditing);
+  bool aHasSubObjects = hasSubObjects();
+  if (aHasSubObjects)
+    disableControls();
+}
+
+bool PartSet_WidgetMultiSelectorComposite::hasSubObjects() const
+{
+  bool aHasSubObjects = false;
+
   bool aCanSetFocus = true;
   CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   if (aComposite.get())
-    aCanSetFocus = aComposite->numberOfSubs() == 0;
-
-  // disable widget controls
-  if (!aCanSetFocus) {
-    disableControls();
-  }
-
-  return aCanSetFocus;
+    aHasSubObjects = aComposite->numberOfSubs() > 0;
+  return aHasSubObjects;
 }
 
 void PartSet_WidgetMultiSelectorComposite::disableControls()
