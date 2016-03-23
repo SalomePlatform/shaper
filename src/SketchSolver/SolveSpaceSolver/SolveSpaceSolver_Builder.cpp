@@ -731,8 +731,8 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
   // while changing angle value several times
   double cosA = cos(aConstraint->value() * PI / 180.0);
   double sinA = sin(aConstraint->value() * PI / 180.0);
-  if (aDir[0]->cross(aDir[1]) < 0.0)
-    sinA *= -1.0;
+  //if (aDir[0]->cross(aDir[1]) < 0.0)
+  //  sinA *= -1.0;
   int aLineToUpd = 1;
   if (isFixed[1][0] && isFixed[1][1]) {
     sinA *= -1.0;
@@ -766,11 +766,9 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
   const std::list<EntityWrapperPtr>& anUpdPoints = (*anUpdLine)->subEntities();
   std::list<EntityWrapperPtr>::const_iterator aPIt = anUpdPoints.begin();
   for (int i = 0; aPIt != anUpdPoints.end(); ++aPIt, ++i) {
-    double aCoord[2] = {aNewPoints[i]->x(), aNewPoints[i]->y()};
-    const std::list<ParameterWrapperPtr>& aParams = (*aPIt)->parameters();
-    std::list<ParameterWrapperPtr>::const_iterator aParIt = aParams.begin();
-    for (int j = 0; aParIt != aParams.end(); ++j, ++aParIt)
-      (*aParIt)->setValue(aCoord[j]);
+    std::shared_ptr<GeomDataAPI_Point2D> aPnt2D =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aPIt)->baseAttribute());
+    aPnt2D->setValue(aNewPoints[i]);
   }
 }
 

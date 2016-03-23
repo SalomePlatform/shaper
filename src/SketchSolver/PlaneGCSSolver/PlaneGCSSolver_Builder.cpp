@@ -1183,15 +1183,12 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
     }
   }
 
-  double anAngle = aLine[0]->direction()->angle(aLine[1]->direction()) / PI * 180;
-  if (anAngle * aConstraint->value() < 0.0)
-    aConstraint->setValue(-aConstraint->value());
-  if ((90.0 - fabs(anAngle)) * (fabs(aConstraint->value()) - 90.0) > 0.0) {
-    if (aConstraint->value() < 0.0)
-      aConstraint->setValue(-180.0 - aConstraint->value());
-    else
-      aConstraint->setValue(180.0 - aConstraint->value());
-  }
+  bool isReversed = false;
+  for (int i = 0; i < 2; i++)
+    if (aLine[i]->direction()->dot(aDir[i]) < 0.0)
+      isReversed = !isReversed;
+  if (isReversed)
+    aConstraint->setValue(aConstraint->value() - 180.0);
 }
 
 void makeMirrorPoints(EntityWrapperPtr theOriginal,
