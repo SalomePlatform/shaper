@@ -178,6 +178,14 @@ void FeaturesPlugin_Extrusion::execute()
 }
 
 //=================================================================================================
+void FeaturesPlugin_Extrusion::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  if (aFacesSelectionList.get() && aFacesSelectionList->size() > 0)
+    aFacesSelectionList->clear();
+}
+
+//=================================================================================================
 void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                             std::shared_ptr<GeomAPI_Shape> theBasis)
@@ -239,3 +247,4 @@ void FeaturesPlugin_Extrusion::setSketchObjectToList()
     }
   }
 }
+

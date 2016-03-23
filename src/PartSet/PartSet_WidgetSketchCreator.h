@@ -15,6 +15,7 @@ class QLabel;
 class QLineEdit;
 class PartSet_Module;
 class ModuleBase_Operation;
+class ModuleBase_IWorkshop;
 class PartSet_PreviewPlanes;
 
 /**
@@ -53,12 +54,22 @@ public:
   /// Editing mode depends on mode of current operation. This value is defined by it.
   virtual void setEditingMode(bool isEditing);
 
+  /// Check if the current and the parent operations are a composite. If the parent operation contains
+  /// attribute selection list, the method returns false if it is invalid in this attibute validator
+  /// \param theWorkshop a current workshop
+  /// \return boolean value
+  static bool canCommitCurrentSketch(ModuleBase_IWorkshop* theWorkshop);
+
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
 
   virtual bool restoreValueCustom();
+
+  /// Sets the selection control visible and set the current widget as active in property panel
+  /// It leads to connect to onSelectionChanged slot
+  void activateSelectionControl();
 
   /// Visualization of the current control or others in PP
   /// \param theSelectionControl state whether the control should be shown/hidden

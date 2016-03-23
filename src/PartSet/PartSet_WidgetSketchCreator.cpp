@@ -45,6 +45,7 @@
 //#include <QFormLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QMainWindow>
 
 PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent, 
                                                          PartSet_Module* theModule,
@@ -113,6 +114,17 @@ bool PartSet_WidgetSketchCreator::storeValueCustom() const
   return true;
 }
 
+void PartSet_WidgetSketchCreator::activateSelectionControl()
+{
+  setVisibleSelectionControl(true);
+
+  // we need to call activate here as the widget has no focus accepted controls
+  // if these controls are added here, activate will happens automatically after focusIn()
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
+  XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+  aPanel->activateWidget(this, false);
+}
+
 void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelectionControl)
 {
   // hide current widget, activate the next widget
@@ -162,6 +174,54 @@ void PartSet_WidgetSketchCreator::setEditingMode(bool isEditing)
     setVisibleSelectionControl(false);
 }
 
+bool PartSet_WidgetSketchCreator::canCommitCurrentSketch(ModuleBase_IWorkshop* theWorkshop)
+{
+  bool aCanCommit = true;
+  ModuleBase_Operation* anOperation = theWorkshop->currentOperation();
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(theWorkshop);
+  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+  // check if the operation is nested
+  if (anOperation && anOpMgr->operationsCount() > 1) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+    FeaturePtr aCurrentFeature = aFOperation ? aFOperation->feature() : FeaturePtr();
+
+    ModuleBase_Operation* aPOperation =  anOpMgr->previousOperation(anOperation);
+    ModuleBase_OperationFeature* aFPOperation = dynamic_cast<ModuleBase_OperationFeature*>(aPOperation);
+    FeaturePtr aParentFeature = aFPOperation ? aFPOperation->feature() : FeaturePtr();
+
+    CompositeFeaturePtr aCompositeFeature = 
+                             std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCurrentFeature);
+    CompositeFeaturePtr aPCompositeFeature = 
+                             std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aParentFeature);
+    // check if both features are composite: extrusion and sketch
+    if (aCompositeFeature.get() && aPCompositeFeature.get()) {
+      aPCompositeFeature->execute(); // to fill attribute selection list
+      std::list<AttributePtr> aSelListAttributes = aParentFeature->data()->attributes(
+                                                        ModelAPI_AttributeSelectionList::typeId());
+      if (aSelListAttributes.size() == 1) {
+        AttributePtr aFirstAttribute = aSelListAttributes.front();
+
+        SessionPtr aMgr = ModelAPI_Session::get();
+        ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+        std::string aValidatorID, anError;
+        bool isValidPComposite = aFactory->validate(aFirstAttribute, aValidatorID, anError);
+        if (!isValidPComposite) {
+          int anAnswer = QMessageBox::question(
+              aWorkshop->desktop(), tr("Apply current feature"),
+                            tr("The current feature can not be used as an argument of the parent feature.\n\
+                               After apply it will be deleted. Would you like to continue?"),
+                            QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+          if (anAnswer == QMessageBox::Ok)
+            aCanCommit = true;
+          else
+            aCanCommit = false;
+        }
+      }
+    }
+  }
+  return aCanCommit;
+}
+
 bool PartSet_WidgetSketchCreator::isSelectionMode() const
 {
   AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
@@ -197,18 +257,7 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
 void PartSet_WidgetSketchCreator::setObject(ObjectPtr theSelectedObject,
                                             GeomShapePtr theShape)
 {
-  std::string anAttributeId = myAttributeListID;
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = aData->attribute(anAttributeId);
-  if (anAttribute.get()) {
-    std::string aType = anAttribute->attributeType();
-    if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-      AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(anAttributeId);
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-      if (!aSelectionListAttr->isInList(aResult, theShape, myIsInValidate))
-        aSelectionListAttr->append(aResult, theShape, myIsInValidate);
-    }
-  }
+  // do nothing because all processing is in onSelectionChanged()
 }
 
 bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues)
@@ -258,17 +307,11 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
 bool PartSet_WidgetSketchCreator::focusTo()
 {
   if (isSelectionMode()) {
-    setVisibleSelectionControl(true);
-
-    // we need to call activate here as the widget has no focus accepted controls
-    // if these controls are added here, activate will happens automatically after focusIn()
-    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
-    XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
-    aPanel->activateWidget(this, false);
+    activateSelectionControl();
     return true;
   }
   else {
-    setVisibleSelectionControl(false);
+    //setVisibleSelectionControl(false);
 
     connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
     SessionPtr aMgr = ModelAPI_Session::get();
@@ -296,27 +339,42 @@ void PartSet_WidgetSketchCreator::deactivate()
 
 void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
 {
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
+
   CompositeFeaturePtr aCompFeature = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  CompositeFeaturePtr aSketchFeature = 
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
-  if (aSketchFeature->numberOfSubs() == 0) {
-    // do nothing, selection control should be shown
-
-    // Abort operation
-    //SessionPtr aMgr = ModelAPI_Session::get();
-    // Close transaction
-    /*
-    bool aIsOp = aMgr->isOperation();
-    if (aIsOp) {
-      const static std::string aNestedOpID("Parameters cancelation");
-      aMgr->startOperation(aNestedOpID, true);
-    }
-    */
-    //theOp->abort();
+  //CompositeFeaturePtr aSketchFeature = 
+  //  std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
+  if (aCompFeature->numberOfSubs() == 0) {
+    // do nothing, selection control should be hidden
+    setVisibleSelectionControl(false);
   } else {
+    // check if the created sketch is invalid. Validate attribute selection list
+    // Shetch should be deleted if the attribute is invalid.
+    AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
+    
+    SessionPtr aMgr = ModelAPI_Session::get();
+    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+    std::string aValidatorID, anError;
+    bool isValidPComposite = aFactory->validate(anAttrList, aValidatorID, anError);
+    /// if the sketch is not appropriate fro extrusion, it should be deleted and
+    /// the selection control should be activated again
+    if (!isValidPComposite) {
+      CompositeFeaturePtr aSketchFeature = 
+               std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
+
+      QObjectPtrList anObjects;
+      anObjects.append(aSketchFeature);
+      std::set<FeaturePtr> anIgnoredFeatures;
+      aWorkshop->deleteFeatures(anObjects, anIgnoredFeatures);
+
+      // do nothing, selection control should be shown
+      activateSelectionControl();
+      return;
+    }
+    // do nothing, selection control should be hidden
+    setVisibleSelectionControl(false);
     // Update value in attribute selection list
-    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
     XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
     foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
@@ -325,6 +383,8 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
     }
 
     // Hide sketcher result
+    CompositeFeaturePtr aSketchFeature = 
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
     std::list<ResultPtr> aResults = aSketchFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {

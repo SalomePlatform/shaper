@@ -95,6 +95,10 @@ public:
   /// \param theFeature feature for editing
   virtual void editFeature(FeaturePtr theFeature);
 
+  /// Returns true if the operation can be committed. Result in default implementation is true.
+  /// \return boolean value
+  virtual bool canCommitOperation() const;
+
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
   virtual void launchOperation(const QString& theCmdId);

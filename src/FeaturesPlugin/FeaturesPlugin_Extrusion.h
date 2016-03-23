@@ -110,6 +110,10 @@ class FeaturesPlugin_Extrusion : public FeaturesPlugin_CompositeSketch
   /// Request for initialization of data model of the feature: adding all attributes
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
+  /// This method to inform that sub-feature is removed and must be removed from the internal data
+  /// structures of the owner (the remove from the document will be done outside just after)
+  FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
+
   /// Use plugin manager for features creation
   FeaturesPlugin_Extrusion();
 

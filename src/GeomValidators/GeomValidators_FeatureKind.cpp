@@ -11,6 +11,11 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Object.h>
 
+//#define DEBUG_EXTRUSION_INVALID_SKETCH
+#ifdef DEBUG_EXTRUSION_INVALID_SKETCH
+  #include <ModelAPI_CompositeFeature.h>
+#endif
+
 bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
                                       std::string& theError) const
@@ -43,6 +48,11 @@ bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
       else {
         FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
         isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
+#ifdef DEBUG_EXTRUSION_INVALID_SKETCH
+        CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+        if (aComp.get() && aComp->numberOfSubs() == 1)
+          return false;
+#endif
       }
     }
   }

@@ -49,6 +49,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -802,6 +803,11 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
 {
   storeConstraintsState(theFeature->getKind());
   ModuleBase_IModule::editFeature(theFeature);
+}
+
+bool PartSet_Module::canCommitOperation() const
+{
+  return PartSet_WidgetSketchCreator::canCommitCurrentSketch(myWorkshop);
 }
 
 void PartSet_Module::launchOperation(const QString& theCmdId)
