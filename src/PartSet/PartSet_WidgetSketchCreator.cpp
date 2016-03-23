@@ -195,7 +195,16 @@ bool PartSet_WidgetSketchCreator::canCommitCurrentSketch(ModuleBase_IWorkshop* t
                              std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aParentFeature);
     // check if both features are composite: extrusion and sketch
     if (aCompositeFeature.get() && aPCompositeFeature.get()) {
+      // selection attribute list is currently filled in execute(), so we need to call it
+      // if there is no opened transaction, it should be started and finished
+      SessionPtr aMgr = ModelAPI_Session::get();
+      bool aIsOp = aMgr->isOperation();
+      if (!aIsOp)
+        aMgr->startOperation();
       aPCompositeFeature->execute(); // to fill attribute selection list
+      if (!aIsOp)
+        aMgr->finishOperation();
+
       std::list<AttributePtr> aSelListAttributes = aParentFeature->data()->attributes(
                                                         ModelAPI_AttributeSelectionList::typeId());
       if (aSelListAttributes.size() == 1) {
