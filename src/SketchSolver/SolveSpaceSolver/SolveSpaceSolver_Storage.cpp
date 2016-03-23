@@ -832,6 +832,21 @@ bool SolveSpaceSolver_Storage::removeConstraint(const Slvs_hConstraint& theConst
     myConstraints.erase(myConstraints.begin() + aPos);
     myConstrMaxID = myConstraints.empty() ? SLVS_E_UNKNOWN : myConstraints.back().h;
     myNeedToResolve = true;
+
+    if (myDuplicatedConstraint) {
+      // Find a constraint with same type uses same arguments
+      std::vector<Slvs_Constraint>::iterator aCIt = myConstraints.begin();
+      for (; aCIt != myConstraints.end(); aCIt++) {
+        if (aConstraint.type != aCIt->type)
+          continue;
+        if (aConstraint.ptA == aCIt->ptA && aConstraint.ptB == aCIt->ptB &&
+            aConstraint.entityA == aCIt->entityA && aConstraint.entityB == aCIt->entityB &&
+            aConstraint.entityC == aCIt->entityC && aConstraint.entityD == aCIt->entityD) {
+          myDuplicatedConstraint = false;
+          break;
+        }
+      }
+    }
   }
   return true;
 }

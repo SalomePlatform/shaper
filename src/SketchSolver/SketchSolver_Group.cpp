@@ -268,11 +268,15 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   // Workaround to process arcs.
   // When move unconstrained arc, add temporary constraint to fix radius.
   if (theFeature->getKind() == SketchPlugin_Arc::ID()) {
+    bool hasDup = myStorage->hasDuplicatedConstraint();
     SolverConstraintPtr aFixedRadius = aBuilder->createFixedArcRadiusConstraint(theFeature);
     if (aFixedRadius) {
       aFixedRadius->process(myStorage, getId(), getWorkplaneId());
-      if (aFixedRadius->error().empty())
+      hasDup = myStorage->hasDuplicatedConstraint() && !hasDup;
+      if (aFixedRadius->error().empty() && !hasDup)
         setTemporary(aFixedRadius);
+      else
+        aFixedRadius->remove();
     }
   }
 }
