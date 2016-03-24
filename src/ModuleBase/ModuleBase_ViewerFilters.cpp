@@ -13,6 +13,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <GeomAPI_Edge.h>
+
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_Axis.hxx>
@@ -89,20 +91,13 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
         case TopAbs_VERTEX:
           {
             gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-            return aPlane.Distance(aPnt) < Precision::Confusion();
+            return aPlane.SquareDistance(aPnt) < Precision::SquareConfusion();
           }
         case TopAbs_EDGE:
           {
-            TopoDS_Edge aEdge = TopoDS::Edge(aShape);
-            Standard_Real aFirst, aLast;
-            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aFirst, aLast);
-            gp_Pnt aFirstPnt = aCurve->Value(aFirst);
-            gp_Pnt aMidPnt = aCurve->Value((aFirst + aLast) / 2.);
-            gp_Pnt aLastPnt = aCurve->Value(aLast);
-            bool aD1 = aPlane.Distance(aFirstPnt) < Precision::Confusion();
-            bool aD2 = aPlane.Distance(aMidPnt) < Precision::Confusion();
-            bool aD3 = aPlane.Distance(aLastPnt) < Precision::Confusion();
-            return aD1 && aD2 && aD3;
+            std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge);
+            anEdge->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
+            return anEdge->isInPlane(myPlane);
           }
         default:
           // The object can be selected in Object browser and contain, for example, compound.

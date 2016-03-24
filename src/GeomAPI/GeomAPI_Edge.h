@@ -9,6 +9,7 @@
 
 #include <GeomAPI_Shape.h>
 
+class GeomAPI_Pln;
 class GeomAPI_Pnt;
 class GeomAPI_Circ;
 class GeomAPI_Lin;
@@ -64,6 +65,10 @@ public:
   /// Returns range of parameter on the curve
   GEOMAPI_EXPORT 
   void getRange(double& theFirst, double& theLast) const;
+
+  /// Returns true, if the edge is fully placed in the specified plane
+  GEOMAPI_EXPORT
+  bool isInPlane(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 };
 
 #endif

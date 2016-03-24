@@ -5,6 +5,7 @@
 // Author:      Artem ZHIDKOV
 
 #include<GeomAPI_Edge.h>
+#include<GeomAPI_Pln.h>
 #include<GeomAPI_Pnt.h>
 #include<GeomAPI_Circ.h>
 #include<GeomAPI_Dir.h>
@@ -19,6 +20,7 @@
 #include <Geom_Circle.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <gp_Ax1.hxx>
+#include <gp_Pln.hxx>
 
 GeomAPI_Edge::GeomAPI_Edge()
   : GeomAPI_Shape()
@@ -171,4 +173,40 @@ void GeomAPI_Edge::getRange(double& theFirst, double& theLast) const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, theFirst, theLast);
+}
+
+bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
+{
+  double aFirst, aLast;
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+
+  double A, B, C, D;
+  thePlane->coefficients(A, B, C, D);
+  gp_Pln aPlane(A, B, C, D);
+
+  bool inPlane = false;
+  if (aCurve->IsKind(STANDARD_TYPE(Geom_Line))) {
+    // check start and end points on the plane
+    gp_Pnt aFirstPnt = aCurve->Value(aFirst);
+    gp_Pnt aLastPnt = aCurve->Value(aLast);
+    inPlane = aPlane.SquareDistance(aFirstPnt) < Precision::SquareConfusion() &&
+              aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
+  } else if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle))) {
+    // check the center on the plane and normals are collinear
+    Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
+    gp_Pnt aCenter = aCirc->Location();
+    Standard_Real aDot = aPlane.Axis().Direction().Dot(aCirc->Axis().Direction());
+    inPlane = aPlane.SquareDistance(aCenter) < Precision::SquareConfusion() &&
+              Abs(Abs(aDot) - 1.0) < Precision::Confusion();
+  } else {
+    // three points checking
+    gp_Pnt aFirstPnt = aCurve->Value(aFirst);
+    gp_Pnt aMidPnt = aCurve->Value((aFirst + aLast) / 2.);
+    gp_Pnt aLastPnt = aCurve->Value(aLast);
+    inPlane = aPlane.SquareDistance(aFirstPnt) < Precision::SquareConfusion() &&
+              aPlane.SquareDistance(aMidPnt) < Precision::SquareConfusion() &&
+              aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
+  }
+  return inPlane;
 }
