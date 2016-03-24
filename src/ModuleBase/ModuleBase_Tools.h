@@ -28,6 +28,8 @@ class ModuleBase_ParamIntSpinBox;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IWorkshop;
 
+class GeomAPI_Shape;
+
 namespace ModuleBase_Tools {
 
 /*
@@ -176,6 +178,19 @@ MODULEBASE_EXPORT void getParameters(QStringList& theParameters);
 /// \theParameters a list of parameter names
 MODULEBASE_EXPORT std::string findGreedAttribute(ModuleBase_IWorkshop* theWorkshop,
                                                  const FeaturePtr& theFeature);
+
+/// Set the object to the attribute depending on the attribute type. If it is a list,
+/// the values are appended if they are not in the list yet.
+/// \param theAttribute an attribute where the object and shape are set
+/// \param theObject an object
+/// \param theShape a shape
+/// \param theWorkshop to find an attribute for the given shape for attribute reference
+/// \param theTemporarily if it is true, do not store and name the added in the data framework
+///        It is useful for attribute selection
+MODULEBASE_EXPORT void setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
+                                 const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                 ModuleBase_IWorkshop* theWorkshop,
+                                 const bool theTemporarily = false);
 }
 
 #endif

@@ -126,10 +126,10 @@ protected:
 
   /// Append the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
-  /// \param theSelectedObject an object
+  /// \param theObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+  void setObject(ObjectPtr theObject, GeomShapePtr theShape);
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different

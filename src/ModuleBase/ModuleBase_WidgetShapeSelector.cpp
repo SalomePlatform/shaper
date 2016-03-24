@@ -107,36 +107,12 @@ bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theSelectedObject,
+void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObject,
                                                GeomShapePtr theShape)
 {
   DataPtr aData = myFeature->data();
-  std::string aType = aData->attribute(attributeID())->attributeType();
-  if (aType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr aRef = aData->reference(attributeID());
-    ObjectPtr aObject = aRef->value();
-    if (!(aObject && aObject->isSame(theSelectedObject))) {
-      aRef->setValue(theSelectedObject);
-    }
-  } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-
-    AttributePtr anAttribute = myWorkshop->module()->findAttribute(theSelectedObject, theShape);
-    if (anAttribute.get())
-      aRefAttr->setAttr(anAttribute);
-    else {
-      ObjectPtr aObject = aRefAttr->object();
-      if (!(aObject && aObject->isSame(theSelectedObject))) {
-        aRefAttr->setObject(theSelectedObject);
-      }
-    }
-  } else if (aType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-    if (aSelectAttr.get() != NULL) {
-      aSelectAttr->setValue(aResult, theShape);
-    }
-  }
+  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
+                              myWorkshop, myIsInValidate);
 }
 
 //********************************************************************

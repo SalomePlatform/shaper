@@ -35,9 +35,6 @@ void FeaturesPlugin_Extrusion::initAttributes()
     LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
   // extrusion works with faces always
   aSelection->setSelectionType("FACE");
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
-                                    FeaturesPlugin_Extrusion::LIST_ID());
-
 
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
@@ -73,7 +70,6 @@ void FeaturesPlugin_Extrusion::execute()
 
   // Getting faces.
   ListOfShape aFacesList;
-  //AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
   for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
     AttributeSelectionPtr aFaceSel = aFacesSelectionList->value(anIndex);
     std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();

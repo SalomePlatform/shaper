@@ -27,6 +27,14 @@ class FeaturesPlugin_CompositeBoolean : public ModelAPI_CompositeFeature
     return MY_SKETCH_OBJECT_ID;
   }
 
+  /// attribute name of references sketch entities list, it should contain a sketch result or
+  /// a pair a sketch result to sketch face
+  inline static const std::string& LIST_ID()
+  {
+    static const std::string MY_GROUP_LIST_ID("base");
+    return MY_GROUP_LIST_ID;
+  }
+
   /// Attribute name of sketch feature.
   inline static const std::string& SKETCH_SELECTION_ID()
   {
@@ -89,6 +97,9 @@ protected:
                     const std::shared_ptr<GeomAPI_Shape> theResultShape,
                     GeomAlgoAPI_MakeShape& theMakeShape,
                     GeomAPI_DataMapOfShapeShape& theMapOfShapes);
+
+  /// Set the sub-object to list of exturusion base.
+  void setSketchObjectToList();
 
 protected:
   /// Type of boolean operation.

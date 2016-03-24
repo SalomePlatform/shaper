@@ -16,6 +16,10 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeRefAttrList.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultCompSolid.h>
@@ -39,6 +43,7 @@
 #include <QColor>
 
 #include <sstream>
+#include <string>
 
 const double tolerance = 1e-7;
 
@@ -422,6 +427,67 @@ std::string findGreedAttribute(ModuleBase_IWorkshop* theWorkshop, const FeatureP
   aFactory.getGreedAttribute(anAttributeId);
 
   return anAttributeId;
+}
+
+void setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
+               const GeomShapePtr& theShape, ModuleBase_IWorkshop* theWorkshop,
+               const bool theTemporarily)
+{
+  if (!theAttribute.get())
+    return;
+
+  std::string aType = theAttribute->attributeType();
+  if (aType == ModelAPI_AttributeReference::typeId()) {
+    AttributeReferencePtr aRef = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    ObjectPtr aObject = aRef->value();
+    if (!(aObject && aObject->isSame(theObject))) {
+      aRef->setValue(theObject);
+    }
+  } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+
+    AttributePtr anAttribute = theWorkshop->module()->findAttribute(theObject, theShape);
+    if (anAttribute.get())
+      aRefAttr->setAttr(anAttribute);
+    else {
+      ObjectPtr aObject = aRefAttr->object();
+      if (!(aObject && aObject->isSame(theObject))) {
+        aRefAttr->setObject(theObject);
+      }
+    }
+  } else if (aType == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr aSelectAttr =
+                             std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aSelectAttr.get() != NULL) {
+      aSelectAttr->setValue(aResult, theShape, theTemporarily);
+    }
+  }
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+                         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (!aSelectionListAttr->isInList(aResult, theShape, theTemporarily))
+      aSelectionListAttr->append(aResult, theShape, theTemporarily);
+  }
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
+    if (!aRefListAttr->isInList(theObject))
+      aRefListAttr->append(theObject);
+  }
+  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
+    AttributeRefAttrListPtr aRefAttrListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
+    AttributePtr anAttribute = theWorkshop->module()->findAttribute(theObject, theShape);
+
+    if (anAttribute.get()) {
+      if (!aRefAttrListAttr->isInList(anAttribute))
+        aRefAttrListAttr->append(anAttribute);
+    }
+    else {
+      if (!aRefAttrListAttr->isInList(theObject))
+        aRefAttrListAttr->append(theObject);
+    }
+  }
 }
 
 } // namespace ModuleBase_Tools

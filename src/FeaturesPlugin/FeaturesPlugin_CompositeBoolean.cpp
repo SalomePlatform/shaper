@@ -29,11 +29,17 @@
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::initAttributes()
 {
+  AttributeSelectionListPtr aSelection = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
+    LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+
   data()->addAttribute(SKETCH_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+                                                               SKETCH_OBJECT_ID());
 
   // Boolean works with solids always.
   data()->addAttribute(BOOLEAN_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-  AttributeSelectionListPtr aSelection = data()->selectionList(BOOLEAN_OBJECTS_ID());
+  aSelection = data()->selectionList(BOOLEAN_OBJECTS_ID());
   aSelection->setSelectionType("SOLID");
 
   initMakeSolidsAttributes();
@@ -96,6 +102,9 @@ bool FeaturesPlugin_CompositeBoolean::isSub(ObjectPtr theObject) const
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  if (aFacesSelectionList.get() && aFacesSelectionList->size() > 0)
+    aFacesSelectionList->clear();
 }
 
 //=================================================================================================
@@ -115,6 +124,14 @@ void FeaturesPlugin_CompositeBoolean::erase()
 //=================================================================================================
 void FeaturesPlugin_CompositeBoolean::execute()
 {
+  /// feature extrusion does not have the next attribute
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  if (aFacesSelectionList.get() && !aFacesSelectionList->isInitialized()) {
+    AttributeReferencePtr aSketchAttr = reference(SKETCH_OBJECT_ID());
+    if (aSketchAttr.get() && aSketchAttr->isInitialized())
+      setSketchObjectToList();
+  }
+
   // Getting faces to create solids.
   std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
                                                      reference(SKETCH_OBJECT_ID())->value());
@@ -457,6 +474,23 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
       theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
                                                  aModTag, aModName, theMapOfShapes);
       theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDelTag);
+    }
+  }
+}
+
+//=================================================================================================
+void FeaturesPlugin_CompositeBoolean::setSketchObjectToList()
+{
+  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+                                                       reference(SKETCH_OBJECT_ID())->value());
+
+  if(aSketchFeature.get() && !aSketchFeature->results().empty()) {
+    ResultPtr aSketchRes = aSketchFeature->results().front();
+    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
+    if(aConstruction.get()) {
+      AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+      if (aFacesSelectionList.get() && aFacesSelectionList->size() == 0)
+        aFacesSelectionList->append(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
     }
   }
 }

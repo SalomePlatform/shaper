@@ -102,10 +102,10 @@ Q_OBJECT
 
   /// Store the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
-  /// \param theSelectedObject an object
+  /// \param theObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+  virtual void setObject(ObjectPtr theObject, GeomShapePtr theShape);
 
   /// Get the shape from the attribute if the attribute contains a shape, e.g. selection attribute
   /// \return a shape

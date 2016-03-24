@@ -14,6 +14,7 @@
 class QLabel;
 class QLineEdit;
 class PartSet_Module;
+class ModelAPI_Tools;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 class PartSet_PreviewPlanes;
@@ -81,10 +82,10 @@ protected:
 
   /// Store the values to the model attribute of the widget. It casts this attribute to
   /// the specific type and set the given values
-  /// \param theSelectedObject an object
+  /// \param theObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
+  virtual void setObject(ObjectPtr theObject, GeomShapePtr theShape);
 
 private:
   /// Returns true if the selection mode is active. This is when composition feature has no
@@ -105,6 +106,11 @@ private:
   /// \param theValues a selection list
   /// \return true if the sketch is started
   bool startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues);
+
+  /// Appends the selection to the sketch base attribute 
+  /// \param theValue a selection value from the viewer
+  /// \return true if the value is set
+  bool setBaseAttributeSelection(const ModuleBase_ViewerPrs& theValue);
 
 private:
   std::string myAttributeListID;

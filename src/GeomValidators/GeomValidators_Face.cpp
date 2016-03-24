@@ -8,6 +8,8 @@
 
 #include <GeomAPI_Face.h>
 
+#include <GeomAbs_SurfaceType.hxx>
+
 #include <Events_Error.h>
 
 #include <QString>
@@ -16,7 +18,7 @@
 typedef std::map<std::string, GeomAbs_SurfaceType> FaceTypes;
 static FaceTypes MyFaceTypes;
 
-GeomAbs_SurfaceType GeomValidators_Face::faceType(const std::string& theType)
+GeomAbs_SurfaceType faceType(const std::string& theType)
 {
   if (MyFaceTypes.size() == 0) {
     MyFaceTypes["plane"] = GeomAbs_Plane;

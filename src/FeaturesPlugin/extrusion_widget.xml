@@ -7,8 +7,6 @@
 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it."
-    icon=":icons/sketch.png"
-    tooltip="Create or edit a sketch"
     shape_types="face objects">
   </sketch_launcher>
   <composite_multi_selector id="base"

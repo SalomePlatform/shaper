@@ -21,6 +21,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_Tools.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -271,36 +272,12 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theSelectedObject,
+void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theObject,
                                                GeomShapePtr theShape)
 {
   DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = aData->attribute(attributeID());
-  std::string aType = anAttribute->attributeType();
-  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theSelectedObject);
-    if (!aSelectionListAttr->isInList(aResult, theShape, myIsInValidate))
-      aSelectionListAttr->append(aResult, theShape, myIsInValidate);
-  }
-  else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
-    if (!aRefListAttr->isInList(theSelectedObject))
-      aRefListAttr->append(theSelectedObject);
-  }
-  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
-    AttributePtr anAttribute = myWorkshop->module()->findAttribute(theSelectedObject, theShape);
-
-    if (anAttribute.get()) {
-      if (!aRefAttrListAttr->isInList(anAttribute))
-        aRefAttrListAttr->append(anAttribute);
-    }
-    else {
-      if (!aRefAttrListAttr->isInList(theSelectedObject))
-        aRefAttrListAttr->append(theSelectedObject);
-    }
-  }
+  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
+                              myWorkshop, myIsInValidate);
 }
 
 //********************************************************************

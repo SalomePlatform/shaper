@@ -249,7 +249,7 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
     for (; anIt != aLast; anIt++) {
       ModuleBase_ViewerPrs aValue = *anIt;
       if (isValidInFilters(aValue))
-        aProcessed = setSelectionCustom(aValue) || aProcessed;
+        aProcessed = setBaseAttributeSelection(aValue) || aProcessed;
     }
     if (aProcessed) {
       emit valuesChanged();
@@ -263,10 +263,14 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
 }
 
 //********************************************************************
-void PartSet_WidgetSketchCreator::setObject(ObjectPtr theSelectedObject,
+void PartSet_WidgetSketchCreator::setObject(ObjectPtr theObject,
                                             GeomShapePtr theShape)
 {
-  // do nothing because all processing is in onSelectionChanged()
+  DataPtr aData = myFeature->data();
+  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
+                              myWorkshop, myIsInValidate);
+
+  //::setObject(aData->attribute(attributeID()), theObject, theShape);
 }
 
 bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues)
@@ -425,4 +429,18 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       }
     }
   }
+}
+
+bool PartSet_WidgetSketchCreator::setBaseAttributeSelection(const ModuleBase_ViewerPrs& theValue)
+{
+  bool isDone = false;
+  ObjectPtr anObject;
+  GeomShapePtr aShape;
+  getGeomSelection(theValue, anObject, aShape);
+
+  std::string anAttributeId = myAttributeListID;
+  DataPtr aData = myFeature->data();
+  ModuleBase_Tools::setObject(aData->attribute(anAttributeId), anObject, aShape,
+                              myWorkshop, false);
+  return true;
 }
