@@ -11,7 +11,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Object.h>
 
-//#define DEBUG_EXTRUSION_INVALID_SKETCH
+#define DEBUG_EXTRUSION_INVALID_SKETCH
 #ifdef DEBUG_EXTRUSION_INVALID_SKETCH
   #include <ModelAPI_CompositeFeature.h>
 #endif

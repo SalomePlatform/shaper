@@ -6,9 +6,9 @@
       <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
           <source path="extrusion_widget.xml"/>
       </feature>
-      <feature id="ExtrusionSketch" title="ExtrusionSketch" tooltip="Create a solids by extrusion of a sketch" icon=":icons/extrusionsketch.png">
+      <!--<feature id="ExtrusionSketch" title="ExtrusionSketch" tooltip="Create a solids by extrusion of a sketch" icon=":icons/extrusionsketch.png">
           <source path="extrusionsketch_widget.xml"/>
-      </feature>
+      </feature>-->
       <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="" icon=":icons/extrusion_cut.png">
         <source path="extrusioncut_widget.xml"/>
       </feature>
@@ -20,9 +20,9 @@
       <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon=":icons/revol.png">
           <source path="revolution_widget.xml"/>
       </feature>
-      <feature id="RevolutionSketch" title="RevolutionSketch" tooltip="Create a solids by revolution of a sketch" icon=":icons/revolsketch.png">
+      <!--<feature id="RevolutionSketch" title="RevolutionSketch" tooltip="Create a solids by revolution of a sketch" icon=":icons/revolsketch.png">
           <source path="revolutionsketch_widget.xml"/>
-      </feature>
+      </feature>-->
       <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revol_cut.png">
         <source path="revolutioncut_widget.xml"/>
       </feature>

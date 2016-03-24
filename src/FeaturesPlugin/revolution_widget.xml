@@ -18,13 +18,6 @@
   </composite_multi_selector>
   <toolbox id="CreationMethod">
     <box id="ByAngles" title="By angles" icon=":icons/angle_up_down_32x32.png">
-      <multi_selector id="base"
-        label="Select a sketch face"
-        icon=":icons/sketch.png"
-        tooltip="Select a sketch face"
-        type_choice="Faces">
-        <validator id="GeomValidators_FeatureKind" parameters="Sketch"/>
-      </multi_selector>
       <shape_selector id="axis_object"
                       icon=":icons/axis.png"
                       label="Axis"
@@ -55,13 +48,6 @@
       </groupbox>
     </box>
     <box id="ByPlanesAndOffsets" title="By bounding planes and angles" icon=":icons/plane_inverted_32x32.png">
-      <multi_selector id="base"
-        label="Select a sketch face"
-        icon=":icons/sketch.png"
-        tooltip="Select a sketch face"
-        type_choice="Faces">
-        <validator id="GeomValidators_FeatureKind" parameters="Sketch"/>
-      </multi_selector>
       <shape_selector id="axis_object"
                       icon=":icons/axis.png"
                       label="Axis"

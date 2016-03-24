@@ -88,6 +88,8 @@ void FeaturesPlugin_CompositeSketch::removeFeature(std::shared_ptr<ModelAPI_Feat
   AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
   if (aFacesSelectionList.get() && aFacesSelectionList->size() > 0)
     aFacesSelectionList->clear();
+
+  data()->reference(SKETCH_OBJECT_ID())->setValue(ObjectPtr());
 }
 
 //=================================================================================================
