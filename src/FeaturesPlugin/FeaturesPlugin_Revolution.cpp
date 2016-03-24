@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -51,14 +52,28 @@ void FeaturesPlugin_Revolution::initAttributes()
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TO_OBJECT_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FROM_OBJECT_ID());
+
+  // Composite Sketch attribute
+  data()->addAttribute(FeaturesPlugin_CompositeSketch::SKETCH_OBJECT_ID(),
+                       ModelAPI_AttributeReference::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+                       FeaturesPlugin_CompositeSketch::SKETCH_OBJECT_ID());
 }
 
 //=================================================================================================
 void FeaturesPlugin_Revolution::execute()
 {
+  /// sub feature of the composite should be set in the base list
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  if (aFacesSelectionList.get() && !aFacesSelectionList->isInitialized()) {
+    AttributeReferencePtr aSketchAttr = reference(SKETCH_OBJECT_ID());
+    if (aSketchAttr.get() && aSketchAttr->isInitialized())
+      setSketchObjectToList();
+  }
+
   // Getting faces.
   ListOfShape aFacesList;
-  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  aFacesSelectionList = selectionList(LIST_ID());
   for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
     AttributeSelectionPtr aFaceSel = aFacesSelectionList->value(anIndex);
     std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();

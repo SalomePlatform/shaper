@@ -28,7 +28,7 @@ void FeaturesPlugin_CompositeSketch::initAttributes()
   data()->addAttribute(SKETCH_SELECTION_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SKETCH_SELECTION_ID());
 
-  initMakeSolidsAttributes();
+  //initMakeSolidsAttributes();
 }
 
 //=================================================================================================
@@ -85,6 +85,9 @@ bool FeaturesPlugin_CompositeSketch::isSub(ObjectPtr theObject) const
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
+  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+  if (aFacesSelectionList.get() && aFacesSelectionList->size() > 0)
+    aFacesSelectionList->clear();
 }
 
 //=================================================================================================
@@ -215,3 +218,20 @@ void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_Resul
     }
   }
 }
+//=================================================================================================
+void FeaturesPlugin_CompositeSketch::setSketchObjectToList()
+{
+  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+                                                       reference(SKETCH_OBJECT_ID())->value());
+
+  if(aSketchFeature.get() && !aSketchFeature->results().empty()) {
+    ResultPtr aSketchRes = aSketchFeature->results().front();
+    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
+    if(aConstruction.get()) {
+      AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
+      if (aFacesSelectionList.get() && aFacesSelectionList->size() == 0)
+        aFacesSelectionList->append(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+    }
+  }
+}
+

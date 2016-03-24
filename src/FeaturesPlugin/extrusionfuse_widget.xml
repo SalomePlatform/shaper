@@ -3,10 +3,20 @@
 <source>
   <groupbox title="Extrusion">
     <sketch_launcher id="sketch"
-      label="Sketch"
-      icon=":icons/sketch.png"
-      tooltip="Create or edit a sketch">
+      attribute_list_id="base"
+      label="Select:&lt;br /&gt;
+1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
+2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
+3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it."
+      shape_types="face objects">
     </sketch_launcher>
+    <composite_multi_selector id="base"
+      label="Select a sketch face"
+      icon=":icons/sketch.png"
+      tooltip="Select a sketch face"
+      type_choice="Faces Objects">
+      <validator id="FeaturesPlugin_ValidatorExtrusionBase" parameters="Sketch"/>
+    </composite_multi_selector>
     <toolbox id="CreationMethod">
       <box id="BySizes" title="By sizes" icon=":icons/dimension_up_down_32x32.png">
         <groupbox>

@@ -60,7 +60,7 @@ void FeaturesPlugin_Extrusion::initAttributes()
 //=================================================================================================
 void FeaturesPlugin_Extrusion::execute()
 {
-  /// feature extrusion does not have the next attribute
+  /// sub feature of the composite should be set in the base list
   AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
   if (aFacesSelectionList.get() && !aFacesSelectionList->isInitialized()) {
     AttributeReferencePtr aSketchAttr = reference(SKETCH_OBJECT_ID());
@@ -174,14 +174,6 @@ void FeaturesPlugin_Extrusion::execute()
 }
 
 //=================================================================================================
-void FeaturesPlugin_Extrusion::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
-{
-  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
-  if (aFacesSelectionList.get() && aFacesSelectionList->size() > 0)
-    aFacesSelectionList->clear();
-}
-
-//=================================================================================================
 void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                             std::shared_ptr<GeomAPI_Shape> theBasis)
@@ -224,23 +216,6 @@ void FeaturesPlugin_Extrusion::loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
     std::ostringstream aStr;
     aStr << aFromName << "_" << aFromFaceIndex++;
     theResultBody->generated(aFromFace, aStr.str(), aFromTag++);
-  }
-}
-
-//=================================================================================================
-void FeaturesPlugin_Extrusion::setSketchObjectToList()
-{
-  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
-                                                       reference(SKETCH_OBJECT_ID())->value());
-
-  if(aSketchFeature.get() && !aSketchFeature->results().empty()) {
-    ResultPtr aSketchRes = aSketchFeature->results().front();
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
-    if(aConstruction.get()) {
-      AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
-      if (aFacesSelectionList.get() && aFacesSelectionList->size() == 0)
-        aFacesSelectionList->append(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
-    }
   }
 }
 

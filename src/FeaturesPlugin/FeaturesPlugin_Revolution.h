@@ -10,7 +10,7 @@
 #include <FeaturesPlugin.h>
 
 #include <GeomAlgoAPI_Revolution.h>
-#include <ModelAPI_Feature.h>
+#include <FeaturesPlugin_CompositeSketch.h>
 
 class GeomAPI_Shape;
 class ModelAPI_ResultBody;
@@ -21,7 +21,7 @@ class ModelAPI_ResultBody;
  *  Revolution creates the lateral faces based on edges of the base face and
  *  the start and end faces and/or start and end angles.
  */
-class FeaturesPlugin_Revolution : public ModelAPI_Feature
+class FeaturesPlugin_Revolution : public FeaturesPlugin_CompositeSketch
 {
  public:
   /// Revolution kind.
@@ -29,14 +29,6 @@ class FeaturesPlugin_Revolution : public ModelAPI_Feature
   {
     static const std::string MY_REVOLUTION_ID("Revolution");
     return MY_REVOLUTION_ID;
-  }
-
-  /// Attribute name of references sketch entities list, it should contain a sketch result or
-  /// a pair a sketch result to sketch face.
-  inline static const std::string& LIST_ID()
-  {
-    static const std::string MY_GROUP_LIST_ID("base");
-    return MY_GROUP_LIST_ID;
   }
 
   /// Attribute name of an revolution axis.

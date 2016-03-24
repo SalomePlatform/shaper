@@ -34,6 +34,14 @@ class FeaturesPlugin_CompositeSketch : public ModelAPI_CompositeFeature
     return MY_SKETCH_SELECTION_ID;
   }
 
+  /// attribute name of references sketch entities list, it should contain a sketch result or
+  /// a pair a sketch result to sketch face
+  inline static const std::string& LIST_ID()
+  {
+    static const std::string MY_GROUP_LIST_ID("base");
+    return MY_GROUP_LIST_ID;
+  }
+
   /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
 
@@ -66,16 +74,20 @@ protected:
   FeaturesPlugin_CompositeSketch(){};
 
   /// Define this function to init attributes for extrusion/revolution.
-  virtual void initMakeSolidsAttributes() = 0;
+  //virtual void initMakeSolidsAttributes() {};
 
   /// Define this function to create solids from faces with extrusion/revolution.
   virtual void makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
-                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape) = 0;
+                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape) {};
 
   /// Results naming.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
                     const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape);
+
+  /// Set the sub-object to list of exturusion base.
+  void setSketchObjectToList();
+
 };
 
 #endif

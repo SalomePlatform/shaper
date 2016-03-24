@@ -33,13 +33,6 @@ class FeaturesPlugin_Extrusion : public FeaturesPlugin_CompositeSketch
     static const std::string MY_EXTRUSION_ID("Extrusion");
     return MY_EXTRUSION_ID;
   }
-  /// attribute name of references sketch entities list, it should contain a sketch result or
-  /// a pair a sketch result to sketch face
-  inline static const std::string& LIST_ID()
-  {
-    static const std::string MY_GROUP_LIST_ID("base");
-    return MY_GROUP_LIST_ID;
-  }
 
   /// attribute name of an object to which the extrusion grows
   inline static const std::string& AXIS_OBJECT_ID()
@@ -110,29 +103,14 @@ class FeaturesPlugin_Extrusion : public FeaturesPlugin_CompositeSketch
   /// Request for initialization of data model of the feature: adding all attributes
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
-  /// This method to inform that sub-feature is removed and must be removed from the internal data
-  /// structures of the owner (the remove from the document will be done outside just after)
-  FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
-
   /// Use plugin manager for features creation
   FeaturesPlugin_Extrusion();
-
-protected:
-  /// Init attributes for extrusion.
-  virtual void initMakeSolidsAttributes() {};
-
-  /// Create solid from face with extrusion.
-  virtual void makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
-                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape) {};
 
 private:
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(GeomAlgoAPI_Prism& thePrismAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBasis);
-
-  /// Set the sub-object to list of exturusion base.
-  void setSketchObjectToList();
 };
 
 #endif
