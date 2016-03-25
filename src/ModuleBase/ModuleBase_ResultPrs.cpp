@@ -28,7 +28,12 @@
 #include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 
+//#define DEBUG_WIRE
 
+#ifdef DEBUG_WIRE
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <TopExp.hxx>
+#endif
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);
@@ -68,6 +73,18 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   SetAutoHilight(aCompSolid.get() == NULL);
 }
 
+bool ModuleBase_ResultPrs::isValidShapeType(const TopAbs_ShapeEnum& theBaseType,
+                                            const TopAbs_ShapeEnum& theCheckedType)
+{
+  bool aValid = theBaseType == theCheckedType;
+  if (!aValid) {
+    // currently this functionality is for all, as we have no separate wire selection mode
+    // lately it should be corrected to have the following check only for sketch presentations
+    aValid = theBaseType == TopAbs_FACE && theCheckedType == TopAbs_WIRE;
+  }
+  return aValid;
+}
+
 
 void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
@@ -102,6 +119,21 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
 }
 
+#ifdef DEBUG_WIRE
+void debugInfo(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
+{
+  TopTools_IndexedMapOfShape aSubShapes;
+  TopExp::MapShapes (theShape, theType, aSubShapes);
+
+  Standard_Boolean isComesFromDecomposition = !((aSubShapes.Extent() == 1) && (theShape == aSubShapes (1)));
+  int anExtent = aSubShapes.Extent();
+  for (Standard_Integer aShIndex = 1; aShIndex <= aSubShapes.Extent(); ++aShIndex)
+  {
+    const TopoDS_Shape& aSubShape = aSubShapes (aShIndex);
+    int aValue = 0;
+  }
+}
+#endif
 
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
@@ -110,9 +142,15 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
     // In order to avoid using custom selection modes
     return;
 
-  
   if (myIsSketchMode) {
     if (aMode == AIS_Shape::SelectionMode(TopAbs_FACE)) {
+#ifdef DEBUG_WIRE
+      const TopoDS_Shape& aShape = Shape();
+      debugInfo(aShape, TopAbs_VERTEX); // 24
+      debugInfo(aShape, TopAbs_EDGE); // 12
+      debugInfo(aShape, TopAbs_WIRE); // 0
+      debugInfo(aShape, TopAbs_FACE); // 0
+#endif
       BRep_Builder aBuilder;
       TopoDS_Compound aComp;
       aBuilder.MakeCompound(aComp);
@@ -121,7 +159,16 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
       for (aIt = myFacesList.cbegin(); aIt != myFacesList.cend(); ++aIt) {
         TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
         aBuilder.Add(aComp, aFace);
+        // for sketch presentation in the face mode wires should be selectable also
+        // accoring to #1343 Improvement of Extrusion and Revolution operations
+        appendWiresSelection(aSelection, aFace);
       }
+#ifdef DEBUG_WIRE
+      debugInfo(aComp, TopAbs_VERTEX); // 24
+      debugInfo(aComp, TopAbs_EDGE); // 12
+      debugInfo(aComp, TopAbs_WIRE); // 4
+      debugInfo(aComp, TopAbs_FACE); // 2
+#endif
       Set(aComp);
     } else
       Set(myOriginalShape);
@@ -171,6 +218,24 @@ bool ModuleBase_ResultPrs::hasCompSolidSelectionMode() const
   return false;
 }
 
+void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
+                                                const TopoDS_Shape& theShape)
+{
+  static TopAbs_ShapeEnum TypOfSel
+          = AIS_Shape::SelectionType(AIS_Shape::SelectionMode(TopAbs_WIRE));
+  // POP protection against crash in low layers
+  Standard_Real aDeflection = Prs3d::GetDeflection(theShape, myDrawer);
+  try {
+    StdSelect_BRepSelectionTool::Load(theSelection,
+                                      this,
+                                      theShape,
+                                      TypOfSel,
+                                      aDeflection,
+                                      myDrawer->HLRAngle(),
+                                      myDrawer->IsAutoTriangulation());
+  } catch ( Standard_Failure ) {
+  }
+}
 
 TopoDS_Shape ModuleBase_ResultPrs::getSelectionShape() const
 {

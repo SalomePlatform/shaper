@@ -13,6 +13,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_ResultPrs.h>
 
 #include <ModelAPI_ResultConstruction.h>
 
@@ -105,15 +106,17 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
 
   QIntList::const_iterator anIt = aShapeTypes.begin(), aLast = aShapeTypes.end();
   for (; anIt != aLast; anIt++) {
-    if (aShapeType == *anIt)
+    TopAbs_ShapeEnum aCurrentShapeType = (TopAbs_ShapeEnum)*anIt;
+    if (aShapeType == aCurrentShapeType)
       aValid = true;
-    else if (*anIt == TopAbs_FACE) {
+    else if (aCurrentShapeType == TopAbs_FACE) {
       // try to process the construction shape only if there is no a selected shape in the viewer
       if (!theShape.get() && theResult.get()) {
         ResultConstructionPtr aCResult =
                                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult);
         aValid = aCResult.get() && aCResult->facesNum() > 0;
       }
+      aValid = ModuleBase_ResultPrs::isValidShapeType(aCurrentShapeType, aShapeType);
     }
   }
   return aValid;

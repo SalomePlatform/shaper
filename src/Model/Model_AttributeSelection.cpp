@@ -686,6 +686,7 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   if (!theAdditionalName.empty())
     aName<<theAdditionalName<<"/";
   if (theShape.ShapeType() == TopAbs_FACE) aName<<"Face";
+  else if (theShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
   else if (theShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
   else if (theShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
 

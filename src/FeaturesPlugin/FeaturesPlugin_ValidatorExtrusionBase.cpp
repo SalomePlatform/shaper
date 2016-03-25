@@ -17,7 +17,7 @@ bool FeaturesPlugin_ValidatorExtrusionBase::isValid(const AttributePtr& theAttri
 {
   bool aValid = true;
 
-  GeomValidators_FeatureKind* aValidator = new GeomValidators_FeatureKind();
+  /*GeomValidators_FeatureKind* aValidator = new GeomValidators_FeatureKind();
   // check whether the selection is on the sketch
   bool aFeatureKindValid = aValidator->isValid(theAttribute, theArguments, theError);
   if (!aFeatureKindValid) {
@@ -26,6 +26,6 @@ bool FeaturesPlugin_ValidatorExtrusionBase::isValid(const AttributePtr& theAttri
     std::list<std::string> anArguments;
     anArguments.push_back("face");
     aValid = aShapeType->isValid(theAttribute, anArguments, theError);
-  }
+  }*/
   return aValid;
 }
