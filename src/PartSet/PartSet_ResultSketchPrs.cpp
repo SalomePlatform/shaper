@@ -76,10 +76,45 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+  thePresentation->Clear();
+
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
   if (!aShapePtr) {
     Events_Error::throwException("An empty AIS presentation: PartSet_ResultSketchPrs");
     return;
+  }
+
+  {
+    std::vector<int> aColor;
+    aColor = Config_PropManager::color("Visualization", "result_body_color",
+                                         SKETCH_AUXILIARY_COLOR);
+    Standard_Real anAuxiliaryWidth = 3.;
+    Standard_Integer anAuxiliaryLineStyle = 0;
+
+    SetColor(Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
+
+    //thePresentation->Clear();
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    setWidth(aDrawer, anAuxiliaryWidth);
+    // set line style
+    Handle(Prs3d_LineAspect) aLineAspect;
+
+    Aspect_TypeOfLine aType = (Aspect_TypeOfLine)anAuxiliaryLineStyle;
+    if (aDrawer->HasOwnLineAspect()) {
+      aLineAspect = aDrawer->LineAspect();
+    }
+    if (aDrawer->HasOwnWireAspect()) {
+      aLineAspect = aDrawer->WireAspect();
+    }
+    Quantity_Color aCurrentColor;
+    Aspect_TypeOfLine aPrevLineType;
+    Standard_Real aCurrentWidth;
+    aLineAspect->Aspect()->Values(aCurrentColor, aPrevLineType, aCurrentWidth);
+    bool isChangedLineType = aType != aPrevLineType;
+    if (isChangedLineType) {
+      aLineAspect->SetTypeOfLine(aType);
+    }
+    // end of set line style
   }
 
   myFacesList.clear();
@@ -122,6 +157,10 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
     }
   }
   if (anAuxiliaryResults.size() > 0) {
+    Quantity_Color aPrevColor;
+    Color(aPrevColor);
+    Standard_Real aPrevWidth = Width();
+
     std::vector<int> aColor;
     aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
                                          SKETCH_AUXILIARY_COLOR);
@@ -144,11 +183,11 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
       aLineAspect = aDrawer->WireAspect();
     }
     Quantity_Color aCurrentColor;
-    Aspect_TypeOfLine aCurrentType;
+    Aspect_TypeOfLine aPrevLineType;
     Standard_Real aCurrentWidth;
-    aLineAspect->Aspect()->Values(aCurrentColor, aCurrentType, aCurrentWidth);
-    bool isChanged = aType != aCurrentType;
-    if (isChanged) {
+    aLineAspect->Aspect()->Values(aCurrentColor, aPrevLineType, aCurrentWidth);
+    bool isChangedLineType = aType != aPrevLineType;
+    if (isChangedLineType) {
       aLineAspect->SetTypeOfLine(aType);
     }
     // end of set line style
@@ -172,6 +211,13 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
     }
     myAuxiliaryCompound = aComp;
     StdPrs_WFDeflectionShape::Add(thePresentation, aComp, aDrawer);
+
+    // restore presentation properties
+    //SetColor(aPrevColor);
+    //setWidth(aDrawer, aPrevWidth);
+    //if (isChangedLineType) {
+    //  aLineAspect->SetTypeOfLine(aPrevLineType);
+    //}
   }
 }
 
