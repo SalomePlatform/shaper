@@ -942,3 +942,18 @@ void PartSet_Tools::sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite
   }
   Events_Loop::loop()->flush(theEventId);
 }
+
+bool PartSet_Tools::isAuxiliarySketchEntity(const ObjectPtr& theObject)
+{
+  bool isAuxiliaryFeature = false;
+
+  FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObject);
+  std::string anAuxiliaryAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
+  AttributeBooleanPtr anAuxiliaryAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+                                    anObjectFeature->data()->attribute(anAuxiliaryAttribute));
+  if (anAuxiliaryAttr.get())
+    isAuxiliaryFeature = anAuxiliaryAttr->value();
+
+
+  return isAuxiliaryFeature;
+}

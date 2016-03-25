@@ -513,13 +513,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
             setPoint(aX, aY);
           }
           setValueState(Stored); // in case of edge selection, Apply state should also be updated
-
-          FeaturePtr anObjectFeature = ModelAPI_Feature::feature(aObject);
-          std::string anAuxiliaryAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
-          AttributeBooleanPtr anAuxiliaryAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
-                                            anObjectFeature->data()->attribute(anAuxiliaryAttribute));
-          if (anAuxiliaryAttr.get())
-            isAuxiliaryFeature = anAuxiliaryAttr->value();
+          isAuxiliaryFeature = PartSet_Tools::isAuxiliarySketchEntity(aObject);
         }
         // it is important to perform updateObject() in order to the current value is 
         // processed by Sketch Solver. Test case: line is created from a previous point

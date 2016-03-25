@@ -256,6 +256,13 @@ public:
   /// Sends redisplay event for all sub-features of the composite. Flush it.
   static void sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite,
                                    const Events_ID theId);
+
+  /**
+   * Returns true if the object is a sketch entity, where auxiliary attribute has true vlaue
+   * \param theObject a result or feature
+   * \return boolean result
+   */
+  static bool isAuxiliarySketchEntity(const ObjectPtr& theObject);
 };
 
 #endif

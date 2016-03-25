@@ -249,6 +249,11 @@ public:
   /// Returns the viewer Z layer
   int getVisualLayerId() const { return myVisualLayerId; }
 
+  /// Create specific for the module presentation
+  /// \param theResult an object for presentation
+  /// \return created presentation or NULL(default value)
+  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
+
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 

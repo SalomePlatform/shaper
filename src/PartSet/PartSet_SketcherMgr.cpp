@@ -12,6 +12,7 @@
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_WidgetEditor.h"
+#include "PartSet_ResultSketchPrs.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -612,8 +613,7 @@ void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMo
       QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
       // Find corresponded widget to activate value editing
       foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-        if (aWgt->attributeID() == "ConstraintValue" ||
-            aWgt->attributeID() == "AngleValue") {
+        if (aWgt->attributeID() == "ConstraintValue") {
           PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
           if (anEditor)
             anEditor->showPopupEditor();
@@ -784,6 +784,17 @@ void PartSet_SketcherMgr::sketchSelectionModes(QIntList& theModes)
   theModes.append(SketcherPrs_Tools::Sel_Constraint);
   theModes.append(TopAbs_VERTEX);
   theModes.append(TopAbs_EDGE);
+}
+
+Handle(AIS_InteractiveObject) PartSet_SketcherMgr::createPresentation(const ResultPtr& theResult)
+{
+  Handle(AIS_InteractiveObject) aPrs;
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
+  if (aFeature.get() && aFeature->getKind() == SketchPlugin_Sketch::ID()) {
+    aPrs = new PartSet_ResultSketchPrs(theResult);
+  }
+  return aPrs;
 }
 
 bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)

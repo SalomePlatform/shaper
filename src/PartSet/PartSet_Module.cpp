@@ -1015,6 +1015,11 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
   aMenu.exec(aHeader->mapToGlobal(thePnt));
 }
 
+Handle(AIS_InteractiveObject) PartSet_Module::createPresentation(const ResultPtr& theResult)
+{
+  return mySketchMgr->createPresentation(theResult);
+}
+
 
 ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
 {

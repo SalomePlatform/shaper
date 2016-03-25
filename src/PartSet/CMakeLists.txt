@@ -26,6 +26,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetFileSelector.h
 	PartSet_Filters.h
 	PartSet_FilterInfinite.h
+	PartSet_ResultSketchPrs.h
 	PartSet_SketcherMgr.h
 	PartSet_SketcherReetntrantMgr.h
 	PartSet_MenuMgr.h
@@ -54,6 +55,7 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetFileSelector.cpp
 	PartSet_Filters.cpp
 	PartSet_FilterInfinite.cpp
+	PartSet_ResultSketchPrs.cpp
 	PartSet_SketcherMgr.cpp
 	PartSet_SketcherReetntrantMgr.cpp
 	PartSet_MenuMgr.cpp

@@ -73,13 +73,7 @@ public:
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
   /// Returns True if the presentation is in sketch mode
-  Standard_EXPORT bool isSketchMode() const { return myIsSketchMode; }
-
-  /// Returns a list of faces
-  Standard_EXPORT const std::list<std::shared_ptr<GeomAPI_Shape> >& facesList() { return myFacesList; }
-
-  /// Returns true if the object is used in CompSolid selection mode
-  Standard_EXPORT bool hasCompSolidSelectionMode() const;
+  Standard_EXPORT bool isSketchMode() const { return false; }
 
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
@@ -97,21 +91,12 @@ private:
   /// \param theShape a shape
   void appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
                             const TopoDS_Shape& theShape);
-  /// Returns shape dependent on CompSolid selection mode
-  /// In case CompSolid selection mode it returns parent's compsolid shape
-  TopoDS_Shape getSelectionShape() const;
 
   /// Reference to result object
   ResultPtr myResult;
 
-  /// A sketch mode flag
-  bool myIsSketchMode;
-
   /// Original shape of the result object
   TopoDS_Shape myOriginalShape;
-
-  /// List of faces
-  std::list<std::shared_ptr<GeomAPI_Shape> > myFacesList;
 };
 
 

@@ -28,13 +28,6 @@
 #include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 
-//#define DEBUG_WIRE
-
-#ifdef DEBUG_WIRE
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <TopExp.hxx>
-#endif
-
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 
@@ -48,18 +41,9 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
 
 
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
-  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myIsSketchMode(false)
+  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
-  std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
-    std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
-  if (aWirePtr) {
-    if (aWirePtr->hasPlane() ) {
-      // If this is a wire with plane defined thin it is a sketch-like object
-      // It must have invisible faces
-      myIsSketchMode = true;
-    }
-  }
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
   Handle(Prs3d_Drawer) aDrawer = Attributes();
@@ -96,17 +80,6 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     return;
   }
 
-  if (myIsSketchMode) {
-    myFacesList.clear();
-    ResultConstructionPtr aConstruction = 
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myResult);
-    if (aConstruction.get()) {
-      int aFacesNum = aConstruction->facesNum();
-      for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
-        myFacesList.push_back(aConstruction->face(aFaceIndex));
-      }
-    }
-  }
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   if (!myOriginalShape.IsNull()) {
     Set(myOriginalShape);
@@ -119,22 +92,6 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
 }
 
-#ifdef DEBUG_WIRE
-void debugInfo(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
-{
-  TopTools_IndexedMapOfShape aSubShapes;
-  TopExp::MapShapes (theShape, theType, aSubShapes);
-
-  Standard_Boolean isComesFromDecomposition = !((aSubShapes.Extent() == 1) && (theShape == aSubShapes (1)));
-  int anExtent = aSubShapes.Extent();
-  for (Standard_Integer aShIndex = 1; aShIndex <= aSubShapes.Extent(); ++aShIndex)
-  {
-    const TopoDS_Shape& aSubShape = aSubShapes (aShIndex);
-    int aValue = 0;
-  }
-}
-#endif
-
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
@@ -142,37 +99,6 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
     // In order to avoid using custom selection modes
     return;
 
-  if (myIsSketchMode) {
-    if (aMode == AIS_Shape::SelectionMode(TopAbs_FACE)) {
-#ifdef DEBUG_WIRE
-      const TopoDS_Shape& aShape = Shape();
-      debugInfo(aShape, TopAbs_VERTEX); // 24
-      debugInfo(aShape, TopAbs_EDGE); // 12
-      debugInfo(aShape, TopAbs_WIRE); // 0
-      debugInfo(aShape, TopAbs_FACE); // 0
-#endif
-      BRep_Builder aBuilder;
-      TopoDS_Compound aComp;
-      aBuilder.MakeCompound(aComp);
-      aBuilder.Add(aComp, myOriginalShape);
-      std::list<std::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
-      for (aIt = myFacesList.cbegin(); aIt != myFacesList.cend(); ++aIt) {
-        TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
-        aBuilder.Add(aComp, aFace);
-        // for sketch presentation in the face mode wires should be selectable also
-        // accoring to #1343 Improvement of Extrusion and Revolution operations
-        appendWiresSelection(aSelection, aFace);
-      }
-#ifdef DEBUG_WIRE
-      debugInfo(aComp, TopAbs_VERTEX); // 24
-      debugInfo(aComp, TopAbs_EDGE); // 12
-      debugInfo(aComp, TopAbs_WIRE); // 4
-      debugInfo(aComp, TopAbs_FACE); // 2
-#endif
-      Set(aComp);
-    } else
-      Set(myOriginalShape);
-  } 
   if (aMode == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) {
     // Limit selection area only by actual object (Shape)
     ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
@@ -200,24 +126,6 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
   AIS_Shape::ComputeSelection(aSelection, aMode);
 }
 
-
-bool ModuleBase_ResultPrs::hasCompSolidSelectionMode() const
-{
-  if (!HasInteractiveContext()) 
-    return false;
-
-  Handle(AIS_InteractiveContext) aContext = GetContext();
-  TColStd_ListOfInteger aModes;
-  aContext->ActivatedModes(this, aModes);
-
-  TColStd_ListIteratorOfListOfInteger aIt(aModes);
-  for (; aIt.More(); aIt.Next()) {
-    if (aIt.Value() == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) 
-      return true;
-  }
-  return false;
-}
-
 void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
                                                 const TopoDS_Shape& theShape)
 {
@@ -236,21 +144,6 @@ void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection
   } catch ( Standard_Failure ) {
   }
 }
-
-TopoDS_Shape ModuleBase_ResultPrs::getSelectionShape() const
-{
-  if (hasCompSolidSelectionMode()) {
-    // In case of CompSolid mode use shape from Parent for highlighting
-    ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
-    if (aCompSolid.get()) {
-      std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aCompSolid);
-      if (aShapePtr.get()) 
-        return aShapePtr->impl<TopoDS_Shape>();
-    }
-  } 
-  return myOriginalShape;
-}
-
 
 void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
                                            const SelectMgr_SequenceOfOwner& theOwners)

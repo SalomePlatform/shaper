@@ -161,7 +161,10 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
         std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr.get() != NULL) {
           anAIS = AISObjectPtr(new GeomAPI_AISObject());
-          anAIS->setImpl(new Handle(AIS_InteractiveObject)(new ModuleBase_ResultPrs(aResult)));
+          Handle(AIS_InteractiveObject) anAISPrs = myWorkshop->module()->createPresentation(aResult);
+          if (anAISPrs.IsNull())
+            anAISPrs = new ModuleBase_ResultPrs(aResult);
+          anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
           //anAIS->createShape(aShapePtr);
           isShading = true;
         }

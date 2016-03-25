@@ -238,6 +238,11 @@ public:
   /// \param theModes a list of modes
   static void sketchSelectionModes(QIntList& theModes);
 
+  /// Create specific for the module presentation
+  /// \param theResult an object for presentation
+  /// \return created presentation or NULL(default value)
+  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
+
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param theWidget a property contol widget
   /// \param isToConnect a boolean value whether connect or disconnect

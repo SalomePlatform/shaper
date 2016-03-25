@@ -66,6 +66,11 @@ void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
+Handle(AIS_InteractiveObject) ModuleBase_IModule::createPresentation(const ResultPtr& theResult)
+{
+  return Handle(AIS_InteractiveObject)();
+}
+
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   return ModelAPI_Tools::getFeatureError(theFeature).c_str();
