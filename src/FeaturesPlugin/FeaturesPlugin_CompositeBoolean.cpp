@@ -23,6 +23,7 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <map>
 #include <sstream>
 
 //=================================================================================================
@@ -420,7 +421,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
         if(aSweepAlgo.get()) {
           //Insert to faces
           int aToFaceIndex = 1;
-          const ListOfShape& aToFaces = aSweepAlgo->toFaces();
+          const ListOfShape& aToFaces = aSweepAlgo->toShapes();
           for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
             std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
             if(aSubShapes->isBound(aToFace)) {
@@ -433,7 +434,7 @@ void FeaturesPlugin_CompositeBoolean::loadNamingDS(std::shared_ptr<ModelAPI_Resu
 
           //Insert from faces
           int aFromFaceIndex = 1;
-          const ListOfShape& aFromFaces = aSweepAlgo->fromFaces();
+          const ListOfShape& aFromFaces = aSweepAlgo->fromShapes();
           if (aFromTag < aToTag) aFromTag = aToTag;
           for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
             std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;

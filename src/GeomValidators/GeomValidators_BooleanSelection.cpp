@@ -27,27 +27,27 @@ bool GeomValidators_BooleanSelection::isValid(const AttributePtr& theAttribute,
       theError = "Error: empty attribute selection.";
       return false;
     }
+    ResultPtr aContext = anAttrSelection->context();
+    if(!aContext.get()) {
+      theError = "Error: empty selection context.";
+      return false;
+    }
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aContext);
+    if(!aFeature.get()) {
+      theError = "Error: empty feature.";
+      return false;
+    }
+    std::string aFeatureKind = aFeature->getKind();
+    if(aFeatureKind == "Sketch" || 
+        aFeatureKind == "Plane" ||
+        aFeatureKind == "Axis") {
+      theError = "Error: ";
+      theError += aFeatureKind;
+      theError += " shape is not allowed for selection.";
+      return false;
+    }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
     if(!aShape.get()) {
-      ResultPtr aContext = anAttrSelection->context();
-      if(!aContext.get()) {
-        theError = "Error: empty selection context.";
-        return false;
-      }
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aContext);
-      if(!aFeature.get()) {
-        theError = "Error: empty feature.";
-        return false;
-      }
-      std::string aFeatureKind = aFeature->getKind();
-      if(aFeatureKind == "Sketch" || 
-         aFeatureKind == "Plane" ||
-         aFeatureKind == "Axis") {
-        theError = "Error: ";
-        theError += aFeatureKind;
-        theError += " shape is not allowed for selection.";
-        return false;
-      }
       aShape = aContext->shape();
     }
     if(!aShape.get()) {

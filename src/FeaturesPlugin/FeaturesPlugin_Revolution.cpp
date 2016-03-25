@@ -194,7 +194,7 @@ void FeaturesPlugin_Revolution::loadNamingDS(GeomAlgoAPI_Revolution& theRevolAlg
   int aToFaceIndex = 1;
   const std::string aToName = "ToFace";
   int aToTag = 2;
-  const ListOfShape& aToFaces = theRevolAlgo.toFaces();
+  const ListOfShape& aToFaces = theRevolAlgo.toShapes();
   for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
     std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
     if(aSubShapes->isBound(aToFace)) {
@@ -209,7 +209,7 @@ void FeaturesPlugin_Revolution::loadNamingDS(GeomAlgoAPI_Revolution& theRevolAlg
   int aFromFaceIndex = 1;
   const std::string aFromName = "FromFace";
   int aFromTag = aToTag > 10000 ? aToTag : 10000;
-  const ListOfShape& aFromFaces = theRevolAlgo.fromFaces();
+  const ListOfShape& aFromFaces = theRevolAlgo.fromShapes();
   for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
     std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
     if(aSubShapes->isBound(aFromFace)) {

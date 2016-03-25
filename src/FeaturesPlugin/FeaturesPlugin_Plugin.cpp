@@ -11,6 +11,7 @@
 #include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Partition.h>
+#include <FeaturesPlugin_Pipe.h>
 #include <FeaturesPlugin_Placement.h>
 #include <FeaturesPlugin_Revolution.h>
 #include <FeaturesPlugin_RevolutionSketch.h>
@@ -18,6 +19,7 @@
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
+#include <FeaturesPlugin_Validators.h>
 
 #include <ModelAPI_Session.h>
 
@@ -35,7 +37,9 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("FeaturesPlugin_ValidatorTransform",
-                              new FeaturesPlugin_ValidatorTransform);  
+                              new FeaturesPlugin_ValidatorTransform);
+  aFactory->registerValidator("FeaturesPlugin_PipeLocationsValidator",
+                              new FeaturesPlugin_PipeLocationsValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -59,6 +63,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Intersection);
   } else if (theFeatureID == FeaturesPlugin_Partition::ID()) {
     return FeaturePtr(new FeaturesPlugin_Partition);
+  } else if (theFeatureID == FeaturesPlugin_Pipe::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Pipe);
   } else if (theFeatureID == FeaturesPlugin_Placement::ID()) {
     return FeaturePtr(new FeaturesPlugin_Placement);
   } else if (theFeatureID == FeaturesPlugin_ExtrusionCut::ID()) {

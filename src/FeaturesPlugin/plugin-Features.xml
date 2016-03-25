@@ -30,6 +30,11 @@
         <source path="revolutionfuse_widget.xml"/>
       </feature>
     </group>
+    <group id="Pipe">
+      <feature id="Pipe" title="Pipe" tooltip="Generates extrusion along a path" icon=":icons/pipe.png">
+        <source path="pipe_widget.xml"/>
+      </feature>
+    </group>
     <group id="Boolean">
       <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png">
           <source path="boolean_widget.xml"/>

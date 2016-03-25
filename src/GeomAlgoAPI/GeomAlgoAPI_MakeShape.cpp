@@ -18,7 +18,7 @@
 
 //=================================================================================================
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
-: myBuilderType(UNKNOWN),
+: myBuilderType(Unknown),
   myDone(false)
 {
 }
@@ -150,8 +150,8 @@ void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theSha
       myMap.reset(new GeomAPI_DataMapOfShapeShape);
     }
 
-    const TopoDS_Shape& aTopoDSSHape = myShape->impl<TopoDS_Shape>();
-    for(TopExp_Explorer anExp(aTopoDSSHape,TopAbs_FACE); anExp.More(); anExp.Next()) {
+    const TopoDS_Shape& aTopoDSShape = myShape->impl<TopoDS_Shape>();
+    for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_FACE); anExp.More(); anExp.Next()) {
       std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
       myMap->bind(aCurrentShape, aCurrentShape);
@@ -178,5 +178,18 @@ void GeomAlgoAPI_MakeShape::initialize() {
       myShape->setImpl(new TopoDS_Shape(implPtr<BOPAlgo_Builder>()->Shape()));
       break;
     }
+  }
+
+  if(myMap.get()) {
+    myMap->clear();
+  } else {
+    myMap.reset(new GeomAPI_DataMapOfShapeShape);
+  }
+
+  const TopoDS_Shape& aTopoDSShape = myShape->impl<TopoDS_Shape>();
+  for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_FACE); anExp.More(); anExp.Next()) {
+    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+    aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
+    myMap->bind(aCurrentShape, aCurrentShape);
   }
 }

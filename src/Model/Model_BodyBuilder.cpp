@@ -307,6 +307,22 @@ void Model_BodyBuilder::generated(const std::shared_ptr<GeomAPI_Shape>& theOldSh
   builder(theTag)->Generated(anOldShape, aNewShape);
   if(!theName.empty()) 
     buildName(theTag, theName);
+  TopAbs_ShapeEnum aGenShapeType = aNewShape.ShapeType();
+  if(aGenShapeType == TopAbs_WIRE || aGenShapeType == TopAbs_SHELL) {
+    TopAbs_ShapeEnum anExplodeShapeType = aGenShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
+    const TDF_Label aLabel = builder(theTag)->NamedShape()->Label();
+    int aTag = 1;
+    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+    for(TopExp_Explorer anExp(aNewShape, anExplodeShapeType); anExp.More(); anExp.Next()) {
+      TDF_Label aChildLabel = aLabel.FindChild(aTag);
+      TNaming_Builder aBuilder(aChildLabel);
+      aBuilder.Generated(anOldShape, anExp.Current());
+      TCollection_AsciiString aChildName = TCollection_AsciiString((data()->name() + "/" + theName + "_").c_str()) + aTag;
+      aDoc->addNamingName(aChildLabel, aChildName.ToCString());
+      TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
+      aTag++;
+    }
+  }
 }
 
 
@@ -406,7 +422,7 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
 {
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
-  bool isBuilt = theName.empty();
+  bool isBuilt = !theName.empty();
   TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
@@ -417,15 +433,31 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
     theMS->generated(aRShape, aList);
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
-      TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 	  
+      TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
       if (theSubShapes.isBound(*anIt)) {
         std::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
         aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
       }
       if (!aRoot.IsSame (aNewShape)) {
         builder(theTag)->Generated(aRoot,aNewShape);
-        if(!isBuilt) 
-          buildName(theTag, theName);	
+        if(isBuilt)
+          buildName(theTag, theName);
+      }
+      TopAbs_ShapeEnum aGenShapeType = aNewShape.ShapeType();
+      if(aGenShapeType == TopAbs_WIRE || aGenShapeType == TopAbs_SHELL) {
+        TopAbs_ShapeEnum anExplodeShapeType = aGenShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
+        const TDF_Label aLabel = builder(theTag)->NamedShape()->Label();
+        int aTag = 1;
+        std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+        for(TopExp_Explorer anExp(aNewShape, anExplodeShapeType); anExp.More(); anExp.Next()) {
+          TDF_Label aChildLabel = aLabel.FindChild(aTag);
+          TNaming_Builder aBuilder(aChildLabel);
+          aBuilder.Generated(aRoot, anExp.Current());
+          TCollection_AsciiString aChildName = TCollection_AsciiString((data()->name() + "/" + theName + "_").c_str()) + aTag;
+          aDoc->addNamingName(aChildLabel, aChildName.ToCString());
+          TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
+          aTag++;
+        }
       }
     }
   }

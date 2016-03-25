@@ -70,6 +70,10 @@ public:
   GEOMAPI_EXPORT
   virtual ShapeType shapeType() const;
 
+  /// \return the shape type as string.
+  GEOMAPI_EXPORT
+  virtual std::string shapeTypeStr() const;
+
   /// Computes boundary dimensions of the shape
   /// Returns False if it is not possible
   GEOMAPI_EXPORT 

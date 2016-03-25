@@ -1,0 +1,60 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <toolbox id="creation_method">
+    <box id="simple" title="Simple pipe by objects and path" icon=":icons/pipe_simple_32x32.png">
+      <multi_selector id="base_objects"
+                      label="Base objects:"
+                      tooltip="Select a base objects"
+                      type_choice="face objects"
+                      use_choice="false">
+        <validator id="GeomValidators_BaseForGeneration"/>
+      </multi_selector>
+      <shape_selector id="path_object"
+                      label="Path object:"
+                      tooltip="Select an edge or wire for path"
+                      shape_types="edge wire">
+      </shape_selector>
+    </box>
+    <box id="binormal" title="Pipe by objects, path and Bi-Normal" icon=":icons/pipe_binormal_32x32.png">
+      <multi_selector id="base_objects"
+                      label="Base objects:"
+                      tooltip="Select a base objects"
+                      type_choice="face objects"
+                      use_choice="false">
+        <validator id="GeomValidators_BaseForGeneration"/>
+      </multi_selector>
+      <shape_selector id="path_object"
+                      label="Path object:"
+                      tooltip="Select an edge or wire for path"
+                      shape_types="edge wire">
+      </shape_selector>
+      <shape_selector id="binormal"
+                      label="Bi-Normal:"
+                      tooltip="Select an edge for Bi-Normal"
+                      shape_types="edge">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+    </box>
+    <box id="locations" title="Pipe by objects, path and locations" icon=":icons/pipe_locations_32x32.png">
+      <multi_selector id="base_objects"
+                      label="Base objects:"
+                      tooltip="Select a base objects"
+                      type_choice="face objects"
+                      use_choice="false">
+        <validator id="GeomValidators_BaseForGeneration"/>
+      </multi_selector>
+      <multi_selector id="locations_objects"
+                      label="Locations:"
+                      tooltip="Select one or more vertices to specify the locations"
+                      type_choice="vertex">
+      </multi_selector>
+      <shape_selector id="path_object"
+                      label="Path object:"
+                      tooltip="Select an edge or wire for path"
+                      shape_types="edge wire">
+      </shape_selector>
+    </box>
+  </toolbox>
+  <validator id="FeaturesPlugin_PipeLocationsValidator"/>
+</source>

@@ -185,7 +185,7 @@ void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_Resul
     int aToFaceIndex = 1;
     const std::string aToName = "ToFace";
     int aToTag = 2;
-    const ListOfShape& aToFaces = aSweepAlgo->toFaces();
+    const ListOfShape& aToFaces = aSweepAlgo->toShapes();
     for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
       std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
       if(aDataMap->isBound(aToFace)) {
@@ -200,7 +200,7 @@ void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_Resul
     int aFromFaceIndex = 1;
     const std::string aFromName = "FromFace";
     int aFromTag = aToTag > 10000 ? aToTag : 10000;
-    const ListOfShape& aFromFaces = aSweepAlgo->fromFaces();
+    const ListOfShape& aFromFaces = aSweepAlgo->fromShapes();
     for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
       std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
       if(aDataMap->isBound(aFromFace)) {

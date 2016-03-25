@@ -14,6 +14,7 @@
 #include <GeomValidators_ShapeType.h>
 #include <GeomValidators_ZeroOffset.h>
 #include <GeomValidators_IntersectionSelection.h>
+#include <GeomValidators_BaseForGeneration.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -39,6 +40,7 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   aFactory->registerValidator("GeomValidators_ZeroOffset", new GeomValidators_ZeroOffset);
   aFactory->registerValidator("GeomValidators_BooleanSelection", new GeomValidators_BooleanSelection);
   aFactory->registerValidator("GeomValidators_IntersectionSelection", new GeomValidators_IntersectionSelection);
+  aFactory->registerValidator("GeomValidators_BaseForGeneration", new GeomValidators_BaseForGeneration);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

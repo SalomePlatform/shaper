@@ -117,8 +117,8 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBaseShape
       std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
       aFromShape->setImpl(new TopoDS_Shape(aPrismBuilder->FirstShape(aFace)));
       aToShape->setImpl(new TopoDS_Shape(aPrismBuilder->LastShape(aFace)));
-      this->addFromFace(aFromShape);
-      this->addToFace(aToShape);
+      this->addFromShape(aFromShape);
+      this->addToShape(aToShape);
     }
   } else {
     std::shared_ptr<GeomAPI_Shape> aBoundingFromShape = theFromShape ? theFromShape : aBasePlane;
@@ -268,7 +268,7 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBaseShape
     for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-      this->addToFace(aShape);
+      this->addToShape(aShape);
     }
     aResult = aToCutBuilder->Shape();
 
@@ -283,7 +283,7 @@ void GeomAlgoAPI_Prism::build(const std::shared_ptr<GeomAPI_Shape>& theBaseShape
     for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-      this->addFromFace(aShape);
+      this->addFromShape(aShape);
     }
     aResult = aFromCutBuilder->Shape();
 

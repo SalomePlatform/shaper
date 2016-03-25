@@ -20,9 +20,9 @@ class GeomAlgoAPI_MakeShape : public GeomAPI_Interface
 public:
   /// Builder type enum
   enum BuilderType {
+    Unknown,
     OCCT_BRepBuilderAPI_MakeShape,
-    OCCT_BOPAlgo_Builder,
-    UNKNOWN
+    OCCT_BOPAlgo_Builder
   };
 
 public:
@@ -45,7 +45,7 @@ public:
   template<class T> void initialize(T* theBuilder, const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
   {
     setImpl(theBuilder);
-    myBuilderType = theBuilder;
+    myBuilderType = theBuilderType;
     initialize();
   }
 

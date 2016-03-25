@@ -23,6 +23,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <algorithm>
+#include <map>
 
 //=================================================================================================
 FeaturesPlugin_Boolean::FeaturesPlugin_Boolean()

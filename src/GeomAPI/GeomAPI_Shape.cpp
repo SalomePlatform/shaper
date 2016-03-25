@@ -94,6 +94,53 @@ GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
   return (ShapeType)aShape.ShapeType();
 }
 
+std::string GeomAPI_Shape::shapeTypeStr() const
+{
+  ShapeType aShapeType = shapeType();
+  std::string aShapeTypeStr;
+
+  switch(aShapeType) {
+    case COMPOUND: {
+      aShapeTypeStr = "Compound";
+      break;
+    }
+    case COMPSOLID: {
+      aShapeTypeStr = "CompSolid";
+      break;
+    }
+    case SOLID: {
+      aShapeTypeStr = "Solid";
+      break;
+    }
+    case SHELL: {
+      aShapeTypeStr = "Shell";
+      break;
+    }
+    case FACE: {
+      aShapeTypeStr = "Face";
+      break;
+    }
+    case WIRE: {
+      aShapeTypeStr = "Wire";
+      break;
+    }
+    case EDGE: {
+      aShapeTypeStr = "Edge";
+      break;
+    }
+    case VERTEX: {
+      aShapeTypeStr = "Vertex";
+      break;
+    }
+    case SHAPE: {
+      aShapeTypeStr = "Shape";
+      break;
+    }
+  }
+
+  return aShapeTypeStr;
+}
+
 bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmin,
                                 double& theXmax, double& theYmax, double& theZmax) const
 {

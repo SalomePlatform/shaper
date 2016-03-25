@@ -182,7 +182,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
   if (myTmpContext.get() || myTmpSubShape.get()) {
-    return myTmpSubShape;
+    return myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape();
   }
 
   std::shared_ptr<GeomAPI_Shape> aResult;

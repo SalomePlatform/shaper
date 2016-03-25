@@ -97,5 +97,9 @@
      <file>icons/intersection_point.png</file>
      <file>icons/intersection.png</file>
      <file>icons/move_to_end.png</file>
+     <file>icons/pipe.png</file>
+     <file>icons/pipe_simple_32x32.png</file>
+     <file>icons/pipe_binormal_32x32.png</file>
+     <file>icons/pipe_locations_32x32.png</file>
  </qresource>
  </RCC>

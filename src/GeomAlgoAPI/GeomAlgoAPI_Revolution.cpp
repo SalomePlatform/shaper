@@ -140,8 +140,8 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
       aFromShape->setImpl(new TopoDS_Shape(aRevolBuilder->FirstShape(aFace)));
       aToShape->setImpl(new TopoDS_Shape(aRevolBuilder->LastShape(aFace)));
-      this->addFromFace(aFromShape);
-      this->addToFace(aToShape);
+      this->addFromShape(aFromShape);
+      this->addToShape(aToShape);
     }
   } else if(theFromShape && theToShape) { // Case 2: When both bounding planes were set.
     // Making revolution to the 360 angle.
@@ -249,12 +249,12 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       if(aFaceSurface == aFromSurface) {
         std::shared_ptr<GeomAPI_Shape> aFSHape(new GeomAPI_Shape);
         aFSHape->setImpl(new TopoDS_Shape(aFaceOnResult));
-        this->addFromFace(aFSHape);
+        this->addFromShape(aFSHape);
       }
       if(aFaceSurface == aToSurface) {
         std::shared_ptr<GeomAPI_Shape> aTSHape(new GeomAPI_Shape);
         aTSHape->setImpl(new TopoDS_Shape(aFaceOnResult));
-        this->addToFace(aTSHape);
+        this->addToShape(aTSHape);
       }
     }
   } else { //Case 3: When only one bounding plane was set.
@@ -324,7 +324,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
     for(TopTools_ListIteratorOfListOfShape anIt(aBndShapes); anIt.More(); anIt.Next()) {
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-      isFromFaceSet ? this->addFromFace(aShape) : this->addToFace(aShape);
+      isFromFaceSet ? this->addFromShape(aShape) : this->addToShape(aShape);
     }
 
     // Try to cut with base face. If it can not be done then keep result of cut with bounding plane.
@@ -366,7 +366,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
     for(TopTools_ListIteratorOfListOfShape anIt(aBsShapes); anIt.More(); anIt.Next()) {
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-      isFromFaceSet ? this->addToFace(aShape) : this->addFromFace(aShape);
+      isFromFaceSet ? this->addToShape(aShape) : this->addFromShape(aShape);
     }
 
     TopExp_Explorer anExp(aResult, TopAbs_SOLID);
@@ -408,7 +408,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       if(aFaceSurface == aBoundingSurface) {
         std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(aFaceOnResult));
-        isFromFaceSet ? this->addFromFace(aShape) : this->addToFace(aShape);
+        isFromFaceSet ? this->addFromShape(aShape) : this->addToShape(aShape);
       }
     }
   }

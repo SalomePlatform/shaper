@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Group.h
     FeaturesPlugin_Intersection.h
     FeaturesPlugin_Partition.h
+    FeaturesPlugin_Pipe.h
     FeaturesPlugin_Placement.h
     FeaturesPlugin_CompositeBoolean.h
     FeaturesPlugin_CompositeSketch.h
@@ -26,6 +27,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_RevolutionCut.h
     FeaturesPlugin_RevolutionFuse.h
     FeaturesPlugin_ValidatorTransform.h
+    FeaturesPlugin_Validators.h
 )
 
 SET(PROJECT_SOURCES
@@ -38,6 +40,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Group.cpp
     FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
+    FeaturesPlugin_Pipe.cpp
     FeaturesPlugin_Placement.cpp
     FeaturesPlugin_CompositeBoolean.cpp
     FeaturesPlugin_CompositeSketch.cpp
@@ -50,6 +53,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_RevolutionCut.cpp
     FeaturesPlugin_RevolutionFuse.cpp
     FeaturesPlugin_ValidatorTransform.cpp
+    FeaturesPlugin_Validators.cpp
 )
 
 SET(XML_RESOURCES
@@ -69,6 +73,7 @@ SET(XML_RESOURCES
   partition_widget.xml
   placement_widget.xml
   intersection_widget.xml
+  pipe_widget.xml
 )
 
 INCLUDE_DIRECTORIES(

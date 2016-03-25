@@ -35,6 +35,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Partition.h
     GeomAlgoAPI_PaveFiller.h
     GeomAlgoAPI_Intersection.h
+    GeomAlgoAPI_Pipe.h
 )
 
 SET(PROJECT_SOURCES
@@ -66,6 +67,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Partition.cpp
     GeomAlgoAPI_PaveFiller.cpp
     GeomAlgoAPI_Intersection.cpp
+    GeomAlgoAPI_Pipe.cpp
 )
 
 SET(PROJECT_LIBRARIES

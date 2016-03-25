@@ -24,11 +24,13 @@
 #include <IntAna_IntConicQuad.hxx>
 #include <IntAna_Quadric.hxx>
 #include <NCollection_Vector.hxx>
+#include <ShapeAnalysis.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Shell.hxx>
+#include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 
@@ -297,4 +299,28 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::fitPlaneToBox(const std::
   aResultShape->setImpl(new TopoDS_Shape(BRepLib_MakeFace(aFacePln, UMin, UMax, VMin, VMax).Face()));
 
   return aResultShape;
+}
+
+//=================================================================================================
+void GeomAlgoAPI_ShapeTools::findBounds(const std::shared_ptr<GeomAPI_Shape> theShape,
+                                        std::shared_ptr<GeomAPI_Vertex>& theV1,
+                                        std::shared_ptr<GeomAPI_Vertex>& theV2)
+{
+  if(!theShape.get()) {
+    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex);
+    aVertex->setImpl(new TopoDS_Vertex());
+    theV1 = aVertex;
+    theV2 = aVertex;
+    return;
+  }
+
+  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+  TopoDS_Vertex aV1, aV2;
+  ShapeAnalysis::FindBounds(aShape, aV1, aV2);
+
+  std::shared_ptr<GeomAPI_Vertex> aGeomV1(new GeomAPI_Vertex()), aGeomV2(new GeomAPI_Vertex());
+  aGeomV1->setImpl(new TopoDS_Vertex(aV1));
+  aGeomV2->setImpl(new TopoDS_Vertex(aV2));
+  theV1 = aGeomV1;
+  theV2 = aGeomV2;
 }

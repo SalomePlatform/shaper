@@ -7,37 +7,37 @@
 #include "GeomAlgoAPI_MakeSweep.h"
 
 //=================================================================================================
-const ListOfShape& GeomAlgoAPI_MakeSweep::fromFaces() const
+const ListOfShape& GeomAlgoAPI_MakeSweep::fromShapes() const
 {
-  return myFromFaces;
+  return myFromShapes;
 }
 
 //=================================================================================================
-const ListOfShape& GeomAlgoAPI_MakeSweep::toFaces() const
+const ListOfShape& GeomAlgoAPI_MakeSweep::toShapes() const
 {
-  return myToFaces;
+  return myToShapes;
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeSweep::addFromFace(const std::shared_ptr<GeomAPI_Shape> theFace)
+void GeomAlgoAPI_MakeSweep::addFromShape(const std::shared_ptr<GeomAPI_Shape> theFace)
 {
-  myFromFaces.push_back(theFace);
+  myFromShapes.push_back(theFace);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeSweep::setFromFaces(const ListOfShape& theListOfFaces)
+void GeomAlgoAPI_MakeSweep::setFromShapes(const ListOfShape& theListOfFaces)
 {
-  myFromFaces = theListOfFaces;
+  myFromShapes = theListOfFaces;
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeSweep::addToFace(const std::shared_ptr<GeomAPI_Shape> theFace)
+void GeomAlgoAPI_MakeSweep::addToShape(const std::shared_ptr<GeomAPI_Shape> theFace)
 {
-  myToFaces.push_back(theFace);
+  myToShapes.push_back(theFace);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeSweep::setToFaces(const ListOfShape& theListOfFaces)
+void GeomAlgoAPI_MakeSweep::setToShapes(const ListOfShape& theListOfFaces)
 {
-  myToFaces = theListOfFaces;
+  myToShapes = theListOfFaces;
 }
