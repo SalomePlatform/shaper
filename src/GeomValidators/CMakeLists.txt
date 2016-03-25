@@ -19,7 +19,6 @@ SET(PROJECT_HEADERS
     GeomValidators_Different.h
     GeomValidators_BooleanSelection.h
     GeomValidators_IntersectionSelection.h
-    GeomValidators_BaseForGeneration.h
 )
 
 SET(PROJECT_SOURCES
@@ -38,7 +37,6 @@ SET(PROJECT_SOURCES
     GeomValidators_Different.cpp
     GeomValidators_BooleanSelection.cpp
     GeomValidators_IntersectionSelection.cpp
-    GeomValidators_BaseForGeneration.cpp
 )
 
 SET(PROJECT_LIBRARIES

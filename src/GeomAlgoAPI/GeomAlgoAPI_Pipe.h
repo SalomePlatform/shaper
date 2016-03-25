@@ -51,7 +51,7 @@ public:
   /// \param[in] theShape base shape.
   /// \param[out] theHistory generated shapes.
   GEOMALGOAPI_EXPORT void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
-                                    ListOfShape& theHistory) override;
+                                    ListOfShape& theHistory);
 
 private:
   void build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
