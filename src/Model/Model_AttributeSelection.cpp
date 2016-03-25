@@ -474,7 +474,7 @@ bool Model_AttributeSelection::update()
         return setInvalidIfFalse(aSelLab, false);
       }
 
-      if (aShapeType == TopAbs_FACE) { // compound is for the whole sketch selection
+      if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) { // compound is for the whole sketch selection
         // If this is a wire with plane defined thin it is a sketch-like object
         if (!aConstructionContext->facesNum()) // no faces, update can not work correctly
           return setInvalidIfFalse(aSelLab, false);
@@ -552,6 +552,13 @@ bool Model_AttributeSelection::update()
           }
         }
         if (aNewSelected) { // store this new selection
+          if (aShapeType == TopAbs_WIRE) { // just get a wire from face to have wire
+            TopExp_Explorer aWireExp(aNewSelected->impl<TopoDS_Shape>(), TopAbs_WIRE);
+            if (aWireExp.More()) {
+              aNewSelected.reset(new GeomAPI_Shape);
+              aNewSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aWireExp.Current()));
+            }
+          }
           selectConstruction(aContext, aNewSelected);
           owner()->data()->sendAttributeUpdated(this);
           return setInvalidIfFalse(aSelLab, true);
