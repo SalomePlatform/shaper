@@ -87,7 +87,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   {
     std::vector<int> aColor;
     aColor = Config_PropManager::color("Visualization", "result_body_color",
-                                         SKETCH_AUXILIARY_COLOR);
+                                       ("200,200,230"));
     Standard_Real anAuxiliaryWidth = 3.;
     Standard_Integer anAuxiliaryLineStyle = 0;
 
