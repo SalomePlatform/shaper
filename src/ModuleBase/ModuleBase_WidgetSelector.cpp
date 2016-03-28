@@ -46,9 +46,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 {
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
   bool isDone = setSelection(aSelected, true/*false*/);
-
-  if (isDone)
-   updateOnSelectionChanged(isDone);
+  updateOnSelectionChanged(isDone);
 }
 
 //********************************************************************

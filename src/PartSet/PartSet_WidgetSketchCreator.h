@@ -91,6 +91,10 @@ protected:
   /// \param theDone a state whether the selection is set
   void updateOnSelectionChanged(const bool theDone);
 
+protected slots:
+  /// Slot which is called on selection event
+  virtual void onSelectionChanged();
+
 private:
   /// Returns true if the selection mode is active. This is when composition feature has no
   ///  a sub-object and the attribute list is empty

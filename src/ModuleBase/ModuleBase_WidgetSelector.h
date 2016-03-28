@@ -58,7 +58,7 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
-private slots:
+protected slots:
   /// Slot which is called on selection event
   virtual void onSelectionChanged();
 

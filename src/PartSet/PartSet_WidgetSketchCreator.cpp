@@ -269,6 +269,13 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theV
 }
 
 //********************************************************************
+void PartSet_WidgetSketchCreator::onSelectionChanged()
+{
+  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
+  bool isDone = setSelection(aSelected, true/*false*/);
+}
+
+//********************************************************************
 void PartSet_WidgetSketchCreator::updateOnSelectionChanged(const bool theDone)
 {
 }
