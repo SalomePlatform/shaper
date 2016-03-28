@@ -72,9 +72,6 @@ public:
   /// Returns result object
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
-  /// Returns True if the presentation is in sketch mode
-  Standard_EXPORT bool isSketchMode() const { return false; }
-
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
   /// Redefinition of virtual function

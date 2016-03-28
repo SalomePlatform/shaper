@@ -71,6 +71,11 @@ Handle(AIS_InteractiveObject) ModuleBase_IModule::createPresentation(const Resul
   return Handle(AIS_InteractiveObject)();
 }
 
+bool ModuleBase_IModule::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
+{
+  return true;
+}
+
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   return ModelAPI_Tools::getFeatureError(theFeature).c_str();

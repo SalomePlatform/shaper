@@ -16,6 +16,7 @@
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_SketcherReetntrantMgr.h"
+#include "PartSet_ResultSketchPrs.h"
 #include "PartSet_MenuMgr.h"
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
@@ -1041,6 +1042,17 @@ ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
     }
   }
   return anObject;
+}
+
+bool PartSet_Module::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
+{
+  bool aCanBeShaged = true;
+
+  Handle(PartSet_ResultSketchPrs) aPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theAIS);
+  if (!aPrs.IsNull()) 
+    aCanBeShaged = false;
+
+  return aCanBeShaged;
 }
 
 void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const

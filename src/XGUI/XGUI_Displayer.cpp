@@ -179,7 +179,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
   return aDisplayed;
 }
 
-bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
+bool canBeShaded(Handle(AIS_InteractiveObject) theAIS, ModuleBase_IModule* theModule)
 {
   Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(theAIS);
   if (!aShapePrs.IsNull()) {
@@ -191,10 +191,7 @@ bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
       return false;
     else {
       // Check that the presentation is not a sketch
-      Handle(ModuleBase_ResultPrs) aPrs = Handle(ModuleBase_ResultPrs)::DownCast(theAIS);
-      if (!aPrs.IsNull()) 
-        return !aPrs->isSketchMode();
-      return true;
+      return theModule->canBeShaded(theAIS);
     }
   }
   return false;
@@ -1069,7 +1066,7 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
     return false;
 
   Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-  return ::canBeShaded(anAIS);
+  return ::canBeShaded(anAIS, myWorkshop->module());
 }
 
 bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,

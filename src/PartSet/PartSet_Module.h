@@ -257,6 +257,11 @@ public:
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  //! Returns true if the presentation can be shown in shading mode
+  //! \param theAIS presentation to be checked
+  //! \return boolean value
+  virtual bool canBeShaded(Handle(AIS_InteractiveObject) theAIS) const;
+
   /// Update state of pop-up menu items in viewer
   /// \param theStdActions - a map of standard actions
   virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
