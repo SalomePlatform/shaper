@@ -54,6 +54,30 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     return MY_COPY_ID;
   }
 
+  /// Width of the auxiliary line
+  inline static const double SKETCH_LINE_WIDTH_AUXILIARY()
+  {
+    return 1;
+  }
+
+  /// Width of the line
+  inline static const double SKETCH_LINE_WIDTH()
+  {
+    return 3;
+  }
+
+  /// Style of the auxiliary line
+  inline static const int SKETCH_LINE_STYLE_AUXILIARY()
+  {
+    return  3;
+  }
+
+  /// Style of the line
+  inline static const int SKETCH_LINE_STYLE()
+  {
+    return  0;
+  }
+
   /// Request for initialization of data model of the feature: adding all attributes
   virtual void initAttributes();
 
@@ -108,12 +132,12 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
 
     if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
       if (isConstruction) {
-        isCustomized = thePrs->setWidth(1) || isCustomized;
-        isCustomized = thePrs->setLineStyle(3) || isCustomized;
+        isCustomized = thePrs->setWidth(SKETCH_LINE_WIDTH_AUXILIARY()) || isCustomized;
+        isCustomized = thePrs->setLineStyle(SKETCH_LINE_STYLE_AUXILIARY()) || isCustomized;
       }
       else {
-        isCustomized = thePrs->setWidth(3) || isCustomized;
-        isCustomized = thePrs->setLineStyle(0) || isCustomized;
+        isCustomized = thePrs->setWidth(SKETCH_LINE_WIDTH()) || isCustomized;
+        isCustomized = thePrs->setLineStyle(SKETCH_LINE_STYLE()) || isCustomized;
       }
     }
     else if (aShapeType == 7) { // otherwise this is a vertex

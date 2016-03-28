@@ -71,7 +71,6 @@ bool PartSet_ResultSketchPrs::isValidShapeType(const TopAbs_ShapeEnum& theBaseTy
   return aValid;
 }
 
-
 void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
@@ -86,15 +85,15 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
 
   {
     std::vector<int> aColor;
-    aColor = Config_PropManager::color("Visualization", "result_body_color",
-                                       ("200,200,230"));
-    Standard_Real anAuxiliaryWidth = 3.;
-    Standard_Integer anAuxiliaryLineStyle = 0;
+    aColor = Config_PropManager::color("Visualization", "result_construction_color",
+                                       ModelAPI_ResultConstruction::DEFAULT_COLOR());
+    Standard_Real anAuxiliaryWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
+    Standard_Integer anAuxiliaryLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
 
-    SetColor(Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    setColor(aDrawer, Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
 
     //thePresentation->Clear();
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
     setWidth(aDrawer, anAuxiliaryWidth);
     // set line style
     Handle(Prs3d_LineAspect) aLineAspect;
@@ -144,6 +143,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   CompositeFeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
                                                                           (aResultFeature);
   std::list<ResultPtr> anAuxiliaryResults;
+  /// append auxiliary shapes
   for (int i = 0; i < aSketchFeature->numberOfSubs(); i++) {
     FeaturePtr aFeature = aSketchFeature->subFeature(i);
     if (PartSet_Tools::isAuxiliarySketchEntity(aFeature)) {
@@ -155,7 +155,25 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
           anAuxiliaryResults.push_back(aResult);
       }
     }
+    else {
+    /// append not-edges shapes, e.g. center of a circle, an arc, a point feature
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
+      for (; aResIter != aRes.cend(); aResIter++) {
+        std::shared_ptr<ModelAPI_ResultConstruction> aConstr = std::dynamic_pointer_cast<
+            ModelAPI_ResultConstruction>(*aResIter);
+        if (aConstr) {
+          std::shared_ptr<GeomAPI_Shape> aGeomShape = aConstr->shape();
+          if (aGeomShape.get()) {
+            const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
+            if (aShape.ShapeType() != TopAbs_EDGE)
+              anAuxiliaryResults.push_back(aConstr);
+          }
+        }
+      }
+    }
   }
+
   if (anAuxiliaryResults.size() > 0) {
     Quantity_Color aPrevColor;
     Color(aPrevColor);
@@ -164,13 +182,13 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
     std::vector<int> aColor;
     aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
                                          SKETCH_AUXILIARY_COLOR);
-    Standard_Real anAuxiliaryWidth = 1.;
-    Standard_Integer anAuxiliaryLineStyle = 3;
+    Standard_Real anAuxiliaryWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
+    Standard_Integer anAuxiliaryLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
 
-    SetColor(Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    setColor(aDrawer, Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
 
     //thePresentation->Clear();
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
     setWidth(aDrawer, anAuxiliaryWidth);
     // set line style
     Handle(Prs3d_LineAspect) aLineAspect;
