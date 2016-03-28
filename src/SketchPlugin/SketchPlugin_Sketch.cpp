@@ -110,13 +110,6 @@ void SketchPlugin_Sketch::execute()
     }
   }
 
-  if (aFeaturesPreview.empty()) {
-    // no good features for generation of preview => erase result if exists
-    if (firstResult().get() && !firstResult()->isDisabled())
-      removeResults(0, false);
-    return;
-  }
-
   // Collect all edges as one big wire
   std::shared_ptr<GeomAPI_PlanarEdges> aBigWire(new GeomAPI_PlanarEdges);
   std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aShapeIt = aFeaturesPreview.begin();
