@@ -53,6 +53,10 @@ private:
   void appendShapeSelection(const Handle(SelectMgr_Selection)& theSelection,
                             const TopoDS_Shape& theShape, const TopAbs_ShapeEnum& theTypeOfSelection);
 
+  /// Sets color/line style/width of the presentation depending on the parameter state
+  /// \param isAuxiliary a boolean value if the properties are for auxiliary objects
+  void setAuxiliaryPresentationStyle(const bool isAuxiliary);
+
   /// Reference to result object
   ResultPtr myResult;
 

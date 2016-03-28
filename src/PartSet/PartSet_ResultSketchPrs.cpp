@@ -83,38 +83,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
     return;
   }
 
-  {
-    std::vector<int> aColor;
-    aColor = Config_PropManager::color("Visualization", "result_construction_color",
-                                       ModelAPI_ResultConstruction::DEFAULT_COLOR());
-    Standard_Real anAuxiliaryWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
-    Standard_Integer anAuxiliaryLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
-    setColor(aDrawer, Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
-
-    //thePresentation->Clear();
-    setWidth(aDrawer, anAuxiliaryWidth);
-    // set line style
-    Handle(Prs3d_LineAspect) aLineAspect;
-
-    Aspect_TypeOfLine aType = (Aspect_TypeOfLine)anAuxiliaryLineStyle;
-    if (aDrawer->HasOwnLineAspect()) {
-      aLineAspect = aDrawer->LineAspect();
-    }
-    if (aDrawer->HasOwnWireAspect()) {
-      aLineAspect = aDrawer->WireAspect();
-    }
-    Quantity_Color aCurrentColor;
-    Aspect_TypeOfLine aPrevLineType;
-    Standard_Real aCurrentWidth;
-    aLineAspect->Aspect()->Values(aCurrentColor, aPrevLineType, aCurrentWidth);
-    bool isChangedLineType = aType != aPrevLineType;
-    if (isChangedLineType) {
-      aLineAspect->SetTypeOfLine(aType);
-    }
-    // end of set line style
-  }
+  setAuxiliaryPresentationStyle(false);
 
   myFacesList.clear();
   ResultConstructionPtr aConstruction = 
@@ -125,7 +94,6 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
       myFacesList.push_back(aConstruction->face(aFaceIndex));
     }
   }
-
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   if (!myOriginalShape.IsNull()) {
     Set(myOriginalShape);
@@ -137,8 +105,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   else
     Events_Error::throwException("An empty AIS presentation: PartSet_ResultSketchPrs");
 
-
-  // create auxiliary shapes
+  // visualize auxiliary shapes and sketch construction elements(point, center of a circle)
   FeaturePtr aResultFeature = ModelAPI_Feature::feature(myResult);
   CompositeFeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
                                                                           (aResultFeature);
@@ -175,45 +142,11 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   }
 
   if (anAuxiliaryResults.size() > 0) {
-    Quantity_Color aPrevColor;
-    Color(aPrevColor);
-    Standard_Real aPrevWidth = Width();
-
-    std::vector<int> aColor;
-    aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
-                                         SKETCH_AUXILIARY_COLOR);
-    Standard_Real anAuxiliaryWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
-    Standard_Integer anAuxiliaryLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
-
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
-    setColor(aDrawer, Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
-
-    //thePresentation->Clear();
-    setWidth(aDrawer, anAuxiliaryWidth);
-    // set line style
-    Handle(Prs3d_LineAspect) aLineAspect;
-
-    Aspect_TypeOfLine aType = (Aspect_TypeOfLine)anAuxiliaryLineStyle;
-    if (aDrawer->HasOwnLineAspect()) {
-      aLineAspect = aDrawer->LineAspect();
-    }
-    if (aDrawer->HasOwnWireAspect()) {
-      aLineAspect = aDrawer->WireAspect();
-    }
-    Quantity_Color aCurrentColor;
-    Aspect_TypeOfLine aPrevLineType;
-    Standard_Real aCurrentWidth;
-    aLineAspect->Aspect()->Values(aCurrentColor, aPrevLineType, aCurrentWidth);
-    bool isChangedLineType = aType != aPrevLineType;
-    if (isChangedLineType) {
-      aLineAspect->SetTypeOfLine(aType);
-    }
-    // end of set line style
+    setAuxiliaryPresentationStyle(true);
 
     BRep_Builder aBuilder;
     TopoDS_Compound aComp;
     aBuilder.MakeCompound(aComp);
-
     std::list<ResultPtr>::const_iterator anIt = anAuxiliaryResults.begin(),
                                          aLast = anAuxiliaryResults.end();
     for (; anIt != aLast; anIt++) {
@@ -228,14 +161,8 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
       }
     }
     myAuxiliaryCompound = aComp;
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
     StdPrs_WFDeflectionShape::Add(thePresentation, aComp, aDrawer);
-
-    // restore presentation properties
-    //SetColor(aPrevColor);
-    //setWidth(aDrawer, aPrevWidth);
-    //if (isChangedLineType) {
-    //  aLineAspect->SetTypeOfLine(aPrevLineType);
-    //}
   }
 }
 
@@ -318,5 +245,49 @@ void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Select
                                       myDrawer->HLRAngle(),
                                       myDrawer->IsAutoTriangulation());
   } catch ( Standard_Failure ) {
+  }
+}
+
+void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxiliary)
+{
+  std::vector<int> aColor;
+  Standard_Real aWidth;
+  Standard_Integer aLineStyle;
+ 
+  if (!isAuxiliary) {
+    aColor = Config_PropManager::color("Visualization", "result_construction_color",
+                                        ModelAPI_ResultConstruction::DEFAULT_COLOR());
+    aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
+    aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
+  }
+  else {
+    aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
+                                         SKETCH_AUXILIARY_COLOR);
+    aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
+    aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
+  }
+
+  Handle(Prs3d_Drawer) aDrawer = Attributes();
+  setColor(aDrawer, Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255.,
+           Quantity_TOC_RGB));
+
+  setWidth(aDrawer, aWidth);
+  // set line style
+  Handle(Prs3d_LineAspect) aLineAspect;
+
+  Aspect_TypeOfLine aType = (Aspect_TypeOfLine)aLineStyle;
+  if (aDrawer->HasOwnLineAspect()) {
+    aLineAspect = aDrawer->LineAspect();
+  }
+  if (aDrawer->HasOwnWireAspect()) {
+    aLineAspect = aDrawer->WireAspect();
+  }
+  Quantity_Color aCurrentColor;
+  Aspect_TypeOfLine aPrevLineType;
+  Standard_Real aCurrentWidth;
+  aLineAspect->Aspect()->Values(aCurrentColor, aPrevLineType, aCurrentWidth);
+  bool isChangedLineType = aType != aPrevLineType;
+  if (isChangedLineType) {
+    aLineAspect->SetTypeOfLine(aType);
   }
 }
