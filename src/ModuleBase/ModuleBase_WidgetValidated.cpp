@@ -35,30 +35,6 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
-                                              const bool theToValidate)
-{
-  if (theValues.empty()) {
-    // In order to make reselection possible, set empty object and shape should be done
-    setSelectionCustom(ModuleBase_ViewerPrs());
-    return false;
-  }
-  // it removes the processed value from the parameters list
-  ModuleBase_ViewerPrs aValue = theValues.takeFirst();
-  bool isDone = false;
-
-  if (!theToValidate || isValidInFilters(aValue)) {
-    isDone = setSelectionCustom(aValue);
-    // updateObject - to update/redisplay feature
-    // it is commented in order to perfom it outside the method
-    //updateObject(myFeature);
-    // to storeValue()
-    //emit valuesChanged();
-  }
-  return isDone;
-}
-
-//********************************************************************
 ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& theAIS) const
 {
   return myPresentedObject;
@@ -67,6 +43,9 @@ ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& th
 //********************************************************************
 void ModuleBase_WidgetValidated::clearValidatedCash()
 {
+#ifdef DEBUG_VALID_STATE
+  qDebug("clearValidatedState");
+#endif
   myValidPrs.clear();
   myInvalidPrs.clear();
 }
@@ -214,7 +193,7 @@ bool ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
     aViewer->addSelectionFilter(aSelFilter);
   else {
     aViewer->removeSelectionFilter(aSelFilter);
-    clearValidState();
+    clearValidatedCash();
   }
 
   return aHasSelectionFilter;
@@ -280,16 +259,6 @@ bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrs& theVa
     theValid = false;
 
   return aValidPrs || anInvalidPrs;
-}
-
-//********************************************************************
-void ModuleBase_WidgetValidated::clearValidState()
-{
-#ifdef DEBUG_VALID_STATE
-  qDebug("clearValidState");
-#endif
-  myValidPrs.clear();
-  myInvalidPrs.clear();
 }
 
 //********************************************************************

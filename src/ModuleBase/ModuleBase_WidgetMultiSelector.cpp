@@ -272,15 +272,6 @@ void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::setObject(ObjectPtr theObject,
-                                               GeomShapePtr theShape)
-{
-  DataPtr aData = myFeature->data();
-  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
-                              myWorkshop, myIsInValidate);
-}
-
-//********************************************************************
 bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
                                                   const bool theToValidate)
 {

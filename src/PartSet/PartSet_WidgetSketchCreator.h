@@ -52,6 +52,13 @@ public:
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValues the wrapped selection values
+  /// \param theToValidate a validation of the values flag
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
+
   /// Editing mode depends on mode of current operation. This value is defined by it.
   virtual void setEditingMode(bool isEditing);
 
@@ -80,23 +87,15 @@ protected:
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const;
 
-  /// Store the values to the model attribute of the widget. It casts this attribute to
-  /// the specific type and set the given values
-  /// \param theObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theObject, GeomShapePtr theShape);
+  /// Emits model changed info, updates the current control by selection change
+  /// \param theDone a state whether the selection is set
+  void updateOnSelectionChanged(const bool theDone);
 
 private:
   /// Returns true if the selection mode is active. This is when composition feature has no
   ///  a sub-object and the attribute list is empty
   /// \return boolean value
   bool isSelectionMode() const;
-
-protected slots:
-  /// Slot which is called on selection event
-  // NDS: virtual is temporary
-  virtual void onSelectionChanged();
 
 private slots:
   void onResumed(ModuleBase_Operation* theOp);

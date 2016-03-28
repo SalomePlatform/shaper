@@ -25,7 +25,8 @@ Q_OBJECT
  public:
    /// Constructor
    /// \param parent a parent widget
-  XGUI_EXPORT XGUI_ErrorDialog(QWidget* parent);XGUI_EXPORT virtual ~XGUI_ErrorDialog();
+  XGUI_EXPORT XGUI_ErrorDialog(QWidget* parent);
+  XGUI_EXPORT virtual ~XGUI_ErrorDialog();
 
  public slots:
    /// Update dialog box

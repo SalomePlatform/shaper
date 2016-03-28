@@ -33,6 +33,7 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
+#include <GeomAPI_Face.h>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketcherPrs_Tools.h>
@@ -141,10 +142,9 @@ bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theVal
     return true;
 
   ModuleBase_ViewerPrs aPrs = theValues.first();
-  bool aDone = ModuleBase_WidgetValidated::setSelection(theValues, theToValidate);
+  bool aDone = setSelectionInternal(theValues, theToValidate);
   if (aDone)
     updateByPlaneSelected(aPrs);
-
   return aDone;
 }
 
@@ -162,8 +162,7 @@ void PartSet_WidgetSketchLabel::onSelectionChanged()
   if (aSelected.empty())
     return;
   ModuleBase_ViewerPrs aPrs = aSelected.first();
-
-  bool aDone = ModuleBase_WidgetValidated::setSelection(aSelected, false);
+  bool aDone = setSelectionInternal(aSelected, false);
   if (aDone) {
     updateByPlaneSelected(aPrs);
     updateObject(myFeature);
@@ -207,6 +206,26 @@ void PartSet_WidgetSketchLabel::blockAttribute(const bool& theToBlock, bool& isF
     else
       anAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
   }
+}
+
+bool PartSet_WidgetSketchLabel::setSelectionInternal(const QList<ModuleBase_ViewerPrs>& theValues,
+                                                     const bool theToValidate)
+{
+  bool aDone = false;
+  ModuleBase_ViewerPrs aValue;
+  if (theValues.empty()) {
+    // In order to make reselection possible, set empty object and shape should be done
+    setSelectionCustom(ModuleBase_ViewerPrs());
+    aDone = false;
+  }
+  else {
+    // it removes the processed value from the parameters list
+    aValue = theValues.first();//.takeFirst();
+    if (!theToValidate || isValidInFilters(aValue))
+      aDone = setSelectionCustom(aValue);
+  }
+
+  return aDone;
 }
 
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs)
@@ -324,7 +343,6 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
   return fillSketchPlaneBySelection(feature(), thePrs);
 }
 
-#include <GeomAPI_Face.h>
 bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrs& thePrs)
 {
   bool aCanFillSketch = true;

@@ -45,8 +45,15 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrs& the
 void ModuleBase_WidgetSelector::onSelectionChanged()
 {
   QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
-
   bool isDone = setSelection(aSelected, true/*false*/);
+
+  if (isDone)
+   updateOnSelectionChanged(isDone);
+}
+
+//********************************************************************
+void ModuleBase_WidgetSelector::updateOnSelectionChanged(const bool theDone)
+{
   // "false" flag should be used here, it connects to the #26658 OCC bug, when the user click in 
   // the same place repeatedly without mouse moved. In the case validation by filters is not
   // perfromed, so an invalid object is selected. E.g. distance constraint, selection of a point.
@@ -59,7 +66,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
   // we need to forget about previous validation result as the current selection can influence on it
   clearValidatedCash();
 
-  if (isDone)
+  if (theDone)
     updateFocus();
 }
 
@@ -133,6 +140,15 @@ bool ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
     myWorkshop->deactivateSubShapesSelection();
   }
   return activateFilters(toActivate);
+}
+
+//********************************************************************
+void ModuleBase_WidgetSelector::setObject(ObjectPtr theObject,
+                                          GeomShapePtr theShape)
+{
+  DataPtr aData = myFeature->data();
+  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
+                              myWorkshop, myIsInValidate);
 }
 
 //********************************************************************

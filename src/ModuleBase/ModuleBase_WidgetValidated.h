@@ -43,24 +43,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
                              const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetValidated();
 
-  /// Checks whether all active viewer filters validate the presentation
-  /// \param thePrs a selected presentation in the view
-  /// \return a boolean value
-  bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
-
   /// Checks all widget validator if the owner is valid
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
-
-  /// Set the given wrapped value to the current widget
-  /// This value should be processed in the widget according to the needs
-  /// The method is called by the current operation to process the operation preselection.
-  /// It is redefined to check the value validity and if it is, fill the attribute with by value
-  /// \param theValues the wrapped selection values
-  /// \param theToValidate a flag on validation of the values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
-                            const bool theToValidate);
 
   //! Returns data object by AIS
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
@@ -69,6 +55,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   void clearValidatedCash();
 
 protected:
+  /// Checks whether all active viewer filters validate the presentation
+  /// \param thePrs a selected presentation in the view
+  /// \return a boolean value
+  bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
+
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
@@ -89,6 +80,26 @@ protected:
   /// \param thePrs a selected owner
   virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs) = 0;
 
+  /// Returns a list of selected presentations in the viewer and object browser
+  /// The presentations from the object browser are filtered by the AIS context filters
+  /// \return a list of presentations
+  QList<ModuleBase_ViewerPrs> getFilteredSelected();
+
+  /// It obtains selection filters from the workshop and activates them in the active viewer
+  /// \param toActivate a flag about activation or deactivation the filters
+  /// \return true if the selection filter of the widget is activated in viewer context
+  bool activateFilters(const bool toActivate);
+
+  /// Block the model flush of update and intialization of attribute
+  /// \param theToBlock flag whether the model is blocked or unblocked
+  /// \param isActive out value if model is blocked, in value if model is unblocked
+  /// to be used to restore flush state when unblocked
+  /// \param isAttributeSetInitializedBlocked out value if model is blocked
+  /// in value if model is unblocked to be used to restore previous state when unblocked
+  virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+                              bool& isAttributeSetInitializedBlocked);
+
+private:
   /// Checks the current attibute in all attribute validators
   // \return true if all validators return that the attribute is valid
   bool isValidAttribute() const;
@@ -107,14 +118,6 @@ protected:
   /// \param theValid a valid state
   void storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid);
 
-  /// Removes all presentations from internal maps.
-  void clearValidState();
-
-  /// Returns a list of selected presentations in the viewer and object browser
-  /// The presentations from the object browser are filtered by the AIS context filters
-  /// \return a list of presentations
-  QList<ModuleBase_ViewerPrs> getFilteredSelected();
-
   /// Applies AIS context filters to the parameter list. The not approved presentations are
   /// removed from the parameters.
   /// \param theValues a list of presentations.
@@ -124,31 +127,16 @@ protected:
   /// \param theValues a list of presentations.
   void filterCompSolids(QList<ModuleBase_ViewerPrs>& theValues);
 
-  /// It obtains selection filters from the workshop and activates them in the active viewer
-  /// \param toActivate a flag about activation or deactivation the filters
-  /// \return true if the selection filter of the widget is activated in viewer context
-  bool activateFilters(const bool toActivate);
-
-  /// Block the model flush of update and intialization of attribute
-  /// \param theToBlock flag whether the model is blocked or unblocked
-  /// \param isActive out value if model is blocked, in value if model is unblocked
-  /// to be used to restore flush state when unblocked
-  /// \param isAttributeSetInitializedBlocked out value if model is blocked
-  /// in value if model is unblocked to be used to restore previous state when unblocked
-  virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
-                              bool& isAttributeSetInitializedBlocked);
-
 protected:
   /// Reference to workshop
-  ModuleBase_IWorkshop* myWorkshop; 
-
+  ModuleBase_IWorkshop* myWorkshop;
   /// The widget is in validation mode: store is performed, restore is not
-  bool myIsInValidate; 
+  bool myIsInValidate;
 
 private:
   ObjectPtr myPresentedObject; /// back up of the filtered object
-  QList<ModuleBase_ViewerPrs> myValidPrs;
-  QList<ModuleBase_ViewerPrs> myInvalidPrs;
+  QList<ModuleBase_ViewerPrs> myValidPrs; /// cash of valid selection presentations
+  QList<ModuleBase_ViewerPrs> myInvalidPrs; /// cash of invalid selection presentations
 };
 
 #endif /* MODULEBASE_WIDGETVALIDATED_H_ */

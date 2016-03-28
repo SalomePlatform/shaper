@@ -58,13 +58,15 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
-// NDS: protected is temporary
-protected slots:
+private slots:
   /// Slot which is called on selection event
-  // NDS: virtual is temporary
   virtual void onSelectionChanged();
 
- protected:
+protected:
+  /// Emits model changed info, updates the current control by selection change
+  /// \param theDone a state whether the selection is set
+  virtual void updateOnSelectionChanged(const bool theDone);
+
   /// Update focus after the attribute value change
   // NDS: has body is temporary
    virtual void updateFocus() {};
@@ -88,7 +90,7 @@ protected slots:
   /// \param theSelectedObject an object
   /// \param theShape a selected shape, which is used in the selection attribute
   /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape) = 0;
+  void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
 
   /// The methiod called when widget is activated
   virtual void activateCustom();

@@ -129,6 +129,15 @@ protected:
   virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
                               bool& isAttributeSetInitializedBlocked);
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// The method is called by the current operation to process the operation preselection.
+  /// It is redefined to do nothing if the plane of the sketch has been already set.
+  /// \param theValues the wrapped selection values
+  /// \param theToValidate a validation flag
+  bool setSelectionInternal(const QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
+
   /// Erase preview planes, disconnect widget, change the view projection
   /// \param thePrs a selected presentation
   void updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs);

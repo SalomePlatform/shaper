@@ -243,18 +243,19 @@ bool PartSet_WidgetSketchCreator::isSelectionMode() const
   return !aHasValueInList;
 }
 
-void PartSet_WidgetSketchCreator::onSelectionChanged()
+bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                               const bool theToValidate)
 {
-  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
-
-  if (!startSketchOperation(aSelected)) {
-    QList<ModuleBase_ViewerPrs>::const_iterator anIt = aSelected.begin(), aLast = aSelected.end();
+  bool aDone = false;
+  if (!startSketchOperation(theValues)) {
+    QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
     bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
       ModuleBase_ViewerPrs aValue = *anIt;
-      if (isValidInFilters(aValue))
+      if (!theToValidate || isValidInFilters(aValue))
         aProcessed = setBaseAttributeSelection(aValue) || aProcessed;
     }
+    aDone = aProcessed;
     if (aProcessed) {
       emit valuesChanged();
       updateObject(myFeature);
@@ -264,17 +265,12 @@ void PartSet_WidgetSketchCreator::onSelectionChanged()
       emit focusOutWidget(this);
     }
   }
+  return aDone;
 }
 
 //********************************************************************
-void PartSet_WidgetSketchCreator::setObject(ObjectPtr theObject,
-                                            GeomShapePtr theShape)
+void PartSet_WidgetSketchCreator::updateOnSelectionChanged(const bool theDone)
 {
-  DataPtr aData = myFeature->data();
-  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
-                              myWorkshop, myIsInValidate);
-
-  //::setObject(aData->attribute(attributeID()), theObject, theShape);
 }
 
 bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues)

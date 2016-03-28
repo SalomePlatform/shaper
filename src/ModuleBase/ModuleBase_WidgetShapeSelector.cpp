@@ -107,12 +107,27 @@ bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObject,
-                                               GeomShapePtr theShape)
+bool ModuleBase_WidgetShapeSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                                                  const bool theToValidate)
 {
-  DataPtr aData = myFeature->data();
-  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
-                              myWorkshop, myIsInValidate);
+  if (theValues.empty()) {
+    // In order to make reselection possible, set empty object and shape should be done
+    setSelectionCustom(ModuleBase_ViewerPrs());
+    return false;
+  }
+  // it removes the processed value from the parameters list
+  ModuleBase_ViewerPrs aValue = theValues.takeFirst();
+  bool isDone = false;
+
+  if (!theToValidate || isValidInFilters(aValue)) {
+    isDone = setSelectionCustom(aValue);
+    // updateObject - to update/redisplay feature
+    // it is commented in order to perfom it outside the method
+    //updateObject(myFeature);
+    // to storeValue()
+    //emit valuesChanged();
+  }
+  return isDone;
 }
 
 //********************************************************************

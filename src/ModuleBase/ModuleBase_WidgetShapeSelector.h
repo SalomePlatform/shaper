@@ -68,6 +68,15 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetShapeSelector();
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// The method is called by the current operation to process the operation preselection.
+  /// It is redefined to check the value validity and if it is, fill the attribute with by value
+  /// \param theValues the wrapped selection values
+  /// \param theToValidate a flag on validation of the values
+  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+                            const bool theToValidate);
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -99,13 +108,6 @@ Q_OBJECT
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const;
-
-  /// Store the values to the model attribute of the widget. It casts this attribute to
-  /// the specific type and set the given values
-  /// \param theObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  /// \return true if it is succeed
-  virtual void setObject(ObjectPtr theObject, GeomShapePtr theShape);
 
   /// Get the shape from the attribute if the attribute contains a shape, e.g. selection attribute
   /// \return a shape
