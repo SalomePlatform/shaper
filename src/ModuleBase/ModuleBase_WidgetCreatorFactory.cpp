@@ -36,7 +36,8 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
 {
   std::set<std::string>::const_iterator anIt, aLast;
   /// fill map of panels
-  const std::set<std::string>& aPanelTypes = theCreator->panelTypes();
+  std::set<std::string> aPanelTypes;
+  theCreator->panelTypes(aPanelTypes);
   for (anIt = aPanelTypes.begin(), aLast = aPanelTypes.end(); anIt != aLast; anIt++) {
     std::string aKey = *anIt;
     if (!myPanelToCreator.contains(aKey))
@@ -48,7 +49,8 @@ used by another widget creator");
   }
 
   /// fill map of widgets
-  const std::set<std::string>& aTypes = theCreator->widgetTypes();
+  std::set<std::string> aTypes;
+  theCreator->widgetTypes(aTypes);
   for (anIt = aTypes.begin(), aLast = aTypes.end(); anIt != aLast; anIt++) {
     std::string aKey = *anIt;
     if (!myCreators.contains(aKey))
@@ -60,7 +62,8 @@ used by another widget creator");
   }
 
   /// fill map of pages
-  const std::set<std::string>& aPTypes = theCreator->pageTypes();
+  std::set<std::string> aPTypes;
+  theCreator->pageTypes(aPTypes);
   for (anIt = aPTypes.begin(), aLast = aPTypes.end(); anIt != aLast; anIt++) {
     std::string aKey = *anIt;
     if (!myPageToCreator.contains(aKey))

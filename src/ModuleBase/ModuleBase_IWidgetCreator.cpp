@@ -10,17 +10,23 @@ ModuleBase_IWidgetCreator::~ModuleBase_IWidgetCreator()
 {
 }
 
-const std::set<std::string>& ModuleBase_IWidgetCreator::panelTypes()
+QWidget* ModuleBase_IWidgetCreator::createPanelByType(const std::string& theType,
+                                                      QWidget* theParent)
 {
-  return std::set<std::string>();
+  return 0;
 }
 
-const std::set<std::string>& ModuleBase_IWidgetCreator::pageTypes()
+ModuleBase_PageBase* ModuleBase_IWidgetCreator::createPageByType(const std::string& theType,
+                                                                 QWidget* theParent,
+                                                                 Config_WidgetAPI* theWidgetApi)
 {
-  return std::set<std::string>();
+  return 0;
 }
 
-const std::set<std::string>& ModuleBase_IWidgetCreator::widgetTypes()
+ModuleBase_ModelWidget* ModuleBase_IWidgetCreator::createWidgetByType(const std::string& theType,
+                                                                 QWidget* theParent,
+                                                                 Config_WidgetAPI* theWidgetApi,
+                                                                 ModuleBase_IWorkshop* theWorkshop)
 {
-  return std::set<std::string>();
+  return 0;
 }
