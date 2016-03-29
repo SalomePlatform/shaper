@@ -74,8 +74,10 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   std::string aWType = myWidgetApi->widgetType();
   if (aWType == NODE_FEATURE) {
     QWidget* aPanel = createPanel(thePage->pageWidget());
-    thePage->addWidget(aPanel);
-    return;
+    if (aPanel) {
+      thePage->addWidget(aPanel);
+      return;
+    }
   }
 
   if (!myWidgetApi->toChildWidget())
