@@ -32,6 +32,8 @@ class MODULEBASE_EXPORT ModuleBase_PageBase
   void addModelWidget(ModuleBase_ModelWidget* theWidget);
   /// Adds the given ModuleBase_PageBase to the page
   void addPageWidget(ModuleBase_PageBase* theWidget);
+  /// Adds the given widget to the page
+  void addWidget(QWidget* theWidget);
   /// Removes all items from page's layout
   void clearPage();
   /// Passes focus from page to the first ModuleBase_ModelWidget contained on the page
@@ -45,7 +47,9 @@ class MODULEBASE_EXPORT ModuleBase_PageBase
   /// Pure Virtual. Allows to derived class to lay out the widget properly;
   virtual void placeModelWidget(ModuleBase_ModelWidget* theWidget) = 0;
   /// Pure Virtual. Allows to derived class to lay out the page properly;
-  virtual void placePageWidget(ModuleBase_PageBase* theWidget) = 0;
+  virtual void placePageWidget(ModuleBase_PageBase* theWidget);
+  /// Pure Virtual. Allows to derived class to lay out the page properly;
+  virtual void placeWidget(QWidget* theWidget) = 0;
   /// Pure Virtual. Returns layout of the page.
   virtual QLayout* pageLayout() = 0;
   /// Pure Virtual. Allows to derived class to insert page stretch properly.

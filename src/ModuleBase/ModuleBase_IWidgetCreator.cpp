@@ -4,10 +4,23 @@
 
 ModuleBase_IWidgetCreator::ModuleBase_IWidgetCreator()
 {
-
 }
 
 ModuleBase_IWidgetCreator::~ModuleBase_IWidgetCreator()
 {
+}
 
+const std::set<std::string>& ModuleBase_IWidgetCreator::panelTypes()
+{
+  return std::set<std::string>();
+}
+
+const std::set<std::string>& ModuleBase_IWidgetCreator::pageTypes()
+{
+  return std::set<std::string>();
+}
+
+const std::set<std::string>& ModuleBase_IWidgetCreator::widgetTypes()
+{
+  return std::set<std::string>();
 }

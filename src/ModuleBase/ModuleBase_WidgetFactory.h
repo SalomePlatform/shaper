@@ -67,6 +67,11 @@ protected:
   /// check if ModuleBase_Widget has expandable widgets in getControls
   bool hasExpandingControls(QWidget* theParent);
 
+  /// creates panel control, if the corresponded parameter is provided by feature
+  /// \param theParent a parent widget
+  /// \return true if the panel is created
+  QWidget* createPanel(QWidget* theParent);
+
   /// Create page by its type
   /// \param theType a type
   /// \param theParent a parent widget

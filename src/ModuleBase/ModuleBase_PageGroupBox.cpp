@@ -39,10 +39,9 @@ void ModuleBase_PageGroupBox::placeModelWidget(ModuleBase_ModelWidget* theWidget
 
 }
 
-void ModuleBase_PageGroupBox::placePageWidget(ModuleBase_PageBase* theWidget)
+void ModuleBase_PageGroupBox::placeWidget(QWidget* theWidget)
 {
-  QWidget* aWidget = dynamic_cast<QWidget*>(theWidget);
-  if (!aWidget) {
+  if (!theWidget) {
     #ifdef _DEBUG
     std::cout << "ModuleBase_PageGroupBox::placePageWidget: can not cast page" << std::endl;
     #endif
@@ -50,7 +49,7 @@ void ModuleBase_PageGroupBox::placePageWidget(ModuleBase_PageBase* theWidget)
   }
   const int kCol = 0;
   const int kRow = myMainLayout->count();
-  myMainLayout->addWidget(aWidget, kRow, kCol);
+  myMainLayout->addWidget(theWidget, kRow, kCol);
   myMainLayout->setRowStretch(kRow, 0);
 }
 

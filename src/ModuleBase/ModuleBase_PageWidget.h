@@ -34,7 +34,7 @@ class MODULEBASE_EXPORT ModuleBase_PageWidget : public QFrame, public ModuleBase
   /// Adds the given widget to page's layout
   virtual void placeModelWidget(ModuleBase_ModelWidget* theWidget);
   /// Adds the given page to page's layout
-  virtual void placePageWidget(ModuleBase_PageBase* theWidget);
+  virtual void placeWidget(QWidget* theWidget);
   /// Returns page's layout (QGridLayout)
   virtual QLayout* pageLayout();
   /// Adds a stretch to page's layout

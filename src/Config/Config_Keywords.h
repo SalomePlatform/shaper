@@ -21,6 +21,9 @@ const static char* NODE_VALIDATOR = "validator";
 const static char* NODE_SELFILTER = "selection_filter";
 const static char* NODE_XMLPARENT = "libxml_parent";
 
+// Property panels
+const static char* PROPERTY_PANEL_ID = "property_panel_id";
+
 // Widgets
 const static char* WDG_INFO = "label";
 const static char* WDG_ERRORINFO = "error_label";

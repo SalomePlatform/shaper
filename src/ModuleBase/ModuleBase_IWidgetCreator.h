@@ -31,12 +31,23 @@ public:
   ~ModuleBase_IWidgetCreator();
 
   /// Returns a container of possible page types, which this creator can process
-  /// \returns types
-  virtual const std::set<std::string>& pageTypes() = 0;
+  /// \returns list of type names
+  virtual const std::set<std::string>& panelTypes();
+
+  /// Returns a container of possible page types, which this creator can process
+  /// \returns list of type names
+  virtual const std::set<std::string>& pageTypes();
 
   /// Returns a container of possible widget types, which this creator can process
-  /// \returns types
-  virtual const std::set<std::string>& widgetTypes() = 0;
+  /// \returns list of type names
+  virtual const std::set<std::string>& widgetTypes();
+
+  /// Create panel control by its type.
+  /// \param theType a panel type
+  /// \param theParent a parent widget
+  /// \return created widget or null
+  virtual QWidget* createPanelByType(const std::string& theType,
+                                     QWidget* theParent) {};
 
   /// Create page by its type
   /// \param theType a type
@@ -44,7 +55,7 @@ public:
   /// \param theData a low-level API for reading xml definitions of widgets
   virtual ModuleBase_PageBase* createPageByType(const std::string& theType,
                                                 QWidget* theParent,
-                                                Config_WidgetAPI* theWidgetApi) = 0;
+                                                Config_WidgetAPI* theWidgetApi) {};
 
   /// Create widget by its type
   /// \param theType a type
@@ -53,7 +64,7 @@ public:
   virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                                      QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi,
-                                                     ModuleBase_IWorkshop* theWorkshop) = 0;
+                                                     ModuleBase_IWorkshop* theWorkshop) {};
 };
 
 typedef std::shared_ptr<ModuleBase_IWidgetCreator> WidgetCreatorPtr;

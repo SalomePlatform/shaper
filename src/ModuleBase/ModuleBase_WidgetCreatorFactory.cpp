@@ -34,9 +34,22 @@ ModuleBase_WidgetCreatorFactory::~ModuleBase_WidgetCreatorFactory()
 
 void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& theCreator)
 {
+  std::set<std::string>::const_iterator anIt, aLast;
+  /// fill map of panels
+  const std::set<std::string>& aPanelTypes = theCreator->panelTypes();
+  for (anIt = aPanelTypes.begin(), aLast = aPanelTypes.end(); anIt != aLast; anIt++) {
+    std::string aKey = *anIt;
+    if (!myPanelToCreator.contains(aKey))
+      myPanelToCreator[aKey] = theCreator;
+    else {
+      Events_Error::send("The" + aKey + " panel XML definition has been already \
+used by another widget creator");
+    }
+  }
+
+  /// fill map of widgets
   const std::set<std::string>& aTypes = theCreator->widgetTypes();
-  std::set<std::string>::const_iterator anIt = aTypes.begin(), aLast = aTypes.end();
-  for (; anIt != aLast; anIt++) {
+  for (anIt = aTypes.begin(), aLast = aTypes.end(); anIt != aLast; anIt++) {
     std::string aKey = *anIt;
     if (!myCreators.contains(aKey))
       myCreators[aKey] = theCreator;
@@ -46,6 +59,7 @@ used by another widget creator");
     }
   }
 
+  /// fill map of pages
   const std::set<std::string>& aPTypes = theCreator->pageTypes();
   for (anIt = aPTypes.begin(), aLast = aPTypes.end(); anIt != aLast; anIt++) {
     std::string aKey = *anIt;
@@ -56,6 +70,21 @@ used by another widget creator");
 used by another widget creator");
     }
   }
+}
+
+bool ModuleBase_WidgetCreatorFactory::hasPanelWidget(const std::string& theType)
+{
+  return myPanelToCreator.contains(theType);
+}
+
+QWidget* ModuleBase_WidgetCreatorFactory::createPanel(const std::string& theType, QWidget* theParent)
+{
+  QWidget* aPanel = 0;
+  if (myPanelToCreator.contains(theType)) {
+    WidgetCreatorPtr aCreator = myPanelToCreator[theType];
+    aPanel = aCreator->createPanelByType(theType, theParent);
+  }
+  return aPanel;
 }
 
 bool ModuleBase_WidgetCreatorFactory::hasPageWidget(const std::string& theType)

@@ -38,6 +38,11 @@ void ModuleBase_PageBase::addPageWidget(ModuleBase_PageBase* thePage)
   placePageWidget(thePage);
 }
 
+void ModuleBase_PageBase::addWidget(QWidget* theWidget)
+{
+  placeWidget(theWidget);
+}
+
 void ModuleBase_PageBase::clearPage()
 {
   myWidgetList.clear();
@@ -98,4 +103,10 @@ void ModuleBase_PageBase::alignToTop()
   if(!hasExpanding) {
     addPageStretch();
   }
+}
+
+void ModuleBase_PageBase::placePageWidget(ModuleBase_PageBase* theWidget)
+{
+  QWidget* aWidget = dynamic_cast<QWidget*>(theWidget);
+  placeWidget(aWidget);
 }

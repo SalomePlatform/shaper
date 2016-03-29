@@ -71,6 +71,13 @@ ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 
 void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
 {
+  std::string aWType = myWidgetApi->widgetType();
+  if (aWType == NODE_FEATURE) {
+    QWidget* aPanel = createPanel(thePage->pageWidget());
+    thePage->addWidget(aPanel);
+    return;
+  }
+
   if (!myWidgetApi->toChildWidget())
     return;
 
@@ -215,6 +222,15 @@ void ModuleBase_WidgetFactory::moveToWidgetId(const std::string& theWidgetId, bo
       }
     }
   } while (!theFound && myWidgetApi->toNextWidget());
+}
+
+QWidget* ModuleBase_WidgetFactory::createPanel(QWidget* theParent)
+{
+  QWidget* aPanel = 0;
+  std::string aPanelName = myWidgetApi->getProperty(PROPERTY_PANEL_ID);
+  if (!aPanelName.empty() && ModuleBase_WidgetCreatorFactory::get()->hasPanelWidget(aPanelName))
+    aPanel = ModuleBase_WidgetCreatorFactory::get()->createPanel(aPanelName, theParent);
+  return aPanel;
 }
 
 ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::string& theType,

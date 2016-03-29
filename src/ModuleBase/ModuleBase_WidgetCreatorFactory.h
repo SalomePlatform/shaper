@@ -40,13 +40,26 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// \param theCreator a new widget creator
   void registerCreator(const WidgetCreatorPtr& theCreator);
 
+  /// Returns true if there is a creator, which can make a panel by the type
+  /// \param theType a type
+  /// \return a boolean value
+  bool hasPanelWidget(const std::string& theType);
+
+  /// Create panel by its type
+  /// \param theType a type
+  /// \param theParent a parent widget
+  /// \return a created panel or null
+  QWidget* createPanel(const std::string& theType, QWidget* theParent);
+
   /// Returns true if there is a creator, which can make a page by the type
   /// \param theType a type
+  /// \return a boolean value
   bool hasPageWidget(const std::string& theType);
 
   /// Create page by its type
   /// \param theType a type
   /// \param theParent a parent widget
+  /// \return a created page or null
   ModuleBase_PageBase* createPageByType(const std::string& theType,
                                         QWidget* theParent,
                                         Config_WidgetAPI* theWidgetApi);
@@ -54,6 +67,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Create widget by its type
   /// \param theType a type
   /// \param theParent a parent widget
+  /// \return a created widget or null
   ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                              QWidget* theParent,
                                              Config_WidgetAPI* theWidgetApi,
@@ -63,11 +77,14 @@ private:
   /// Constructor is hidden
   ModuleBase_WidgetCreatorFactory();
 
-  /// Map of widget type in XML to creator
-  QMap<std::string, WidgetCreatorPtr> myCreators;
+  /// Map of widget panel in XML to creator
+  QMap<std::string, WidgetCreatorPtr> myPanelToCreator;
 
   /// Map of widget page in XML to creator
   QMap<std::string, WidgetCreatorPtr> myPageToCreator;
+
+  /// Map of widget type in XML to creator
+  QMap<std::string, WidgetCreatorPtr> myCreators;
 };
 
 typedef std::shared_ptr<ModuleBase_WidgetCreatorFactory> WidgetCreatorFactoryPtr;
