@@ -118,7 +118,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
   if (theWidgets.empty()) return;
   foreach (ModuleBase_ModelWidget* aWidget, theWidgets) {
     connect(aWidget, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
-            this,    SLOT(activateWidget(ModuleBase_ModelWidget*)));
+            this,    SLOT(onFocusInWidget(ModuleBase_ModelWidget*)));
     connect(aWidget, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
             this,    SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
     connect(aWidget, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
@@ -160,6 +160,12 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   // it is possible that the property panel widgets have not been visualized
   // (e.g. on start operation), so it is strictly important to do not check visualized state
   activateNextWidget(theWidget, false);
+}
+
+void XGUI_PropertyPanel::onFocusInWidget(ModuleBase_ModelWidget* theWidget)
+{
+  if (theWidget->canSetValue())
+    activateWidget(theWidget);
 }
 
 void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)

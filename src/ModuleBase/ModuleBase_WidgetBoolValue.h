@@ -29,6 +29,8 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetBoolValue();
 
+  virtual bool canSetValue() const { return false; };
+
   virtual QList<QWidget*> getControls() const;
 
   virtual void setHighlighted(bool isHighlighted);

@@ -120,6 +120,10 @@ public slots:
   */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget, const bool theEmitSignal = true);
 
+   /// Activates the parameter widget if it can accept focus
+   /// \param theWidget a widget where focus in event happened
+  void onFocusInWidget(ModuleBase_ModelWidget* theWidget);
+
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
 
 signals:
