@@ -111,20 +111,21 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
       if (myWidgetApi->isPagedWidget()) {
         //If current widget is toolbox or switch-casebox then fetch all
         //it's pages recursively and setup into the widget.
-        myWidgetApi->toChildWidget();
-        do {
-          QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
-          QString aCaseId = qs(myWidgetApi->getProperty(_ID));
-          ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
-          createWidget(aPage);
-          if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX) {
-            ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
+        if (myWidgetApi->toChildWidget()) {
+          do {
+            QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
+            QString aCaseId = qs(myWidgetApi->getProperty(_ID));
+            ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
+            createWidget(aPage);
+            if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX) {
+              ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
 
-            QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
-            QPixmap anIcon( anIconPath );
-            aContainer->addPage( aPage, aPageName, aCaseId, anIcon );
-          }
-        } while (myWidgetApi->toNextWidget());
+              QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
+              QPixmap anIcon( anIconPath );
+              aContainer->addPage( aPage, aPageName, aCaseId, anIcon );
+            }
+          } while (myWidgetApi->toNextWidget());
+        }
       }
     }
   } while (myWidgetApi->toNextWidget());
@@ -201,10 +202,11 @@ void ModuleBase_WidgetFactory::getGreedAttribute(std::string& theAttributeId)
       if (theAttributeId.empty() && myWidgetApi->isPagedWidget()) {
         //If current widget is toolbox or switch-casebox then fetch all
         //it's pages recursively and setup into the widget.
-        myWidgetApi->toChildWidget();
-        do {
-          getGreedAttribute(theAttributeId);
-        } while (theAttributeId.empty() && myWidgetApi->toNextWidget());
+        if (myWidgetApi->toChildWidget()) {
+          do {
+            getGreedAttribute(theAttributeId);
+          } while (theAttributeId.empty() && myWidgetApi->toNextWidget());
+        }
       }
     }
   } while (theAttributeId.empty() && myWidgetApi->toNextWidget());
@@ -232,10 +234,11 @@ void ModuleBase_WidgetFactory::moveToWidgetId(const std::string& theWidgetId, bo
       if (!theFound && myWidgetApi->isPagedWidget()) {
         //If current widget is toolbox or switch-casebox then fetch all
         //it's pages recursively and setup into the widget.
-        myWidgetApi->toChildWidget();
-        do {
-          moveToWidgetId(theWidgetId, theFound);
-        } while (!theFound && myWidgetApi->toNextWidget());
+        if (myWidgetApi->toChildWidget()) {
+          do {
+            moveToWidgetId(theWidgetId, theFound);
+          } while (!theFound && myWidgetApi->toNextWidget());
+        }
       }
     }
   } while (!theFound && myWidgetApi->toNextWidget());

@@ -46,11 +46,18 @@ bool Config_WidgetAPI::toNextWidget()
 bool Config_WidgetAPI::toChildWidget()
 {
   if (myCurrentNode && hasChild(myCurrentNode)) {
-    myCurrentNode = myCurrentNode->children;
-    while (myCurrentNode && !isElementNode(myCurrentNode)) {
-      myCurrentNode = myCurrentNode->next;
+    xmlNodePtr aChildNode = myCurrentNode->children;
+    // it is possible that among child nodes, there is no an element node, so
+    // we should not change the current node until not-zero node is found
+    // otherwise, it may happens that the current node is null and the node tree information
+    // is lost
+    while (aChildNode && !isElementNode(aChildNode)) {
+      aChildNode = aChildNode->next;
     }
-    return myCurrentNode != NULL;
+    if (aChildNode != NULL) {
+      myCurrentNode = aChildNode;
+      return true;
+    }
   }
   return false;
 }
