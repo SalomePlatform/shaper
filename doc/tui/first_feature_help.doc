@@ -144,14 +144,14 @@ Python:
 \endcode
 
 <h3>Creation of a Qt panel and custom controls in the plugin</h3>
-Plugin allows creating of a specific property panel content and a custom widget. The specific property panel content will be shown in the application property panel. The custom widget will be shown in the Property Panel (possible among other standard and custom widgets, or just single widget per Property Panel).
+Plugin allows creating of a specific property panel content and a custom widget. The panel content will be shown instead of controls container in the application property panel. The custom widget will be shown among other standard and custom widgets in the Property Panel.
 
-To provide this SHAPER has a widget creator interface and a factory of the creators. Each plugin which creates panels or custom widgets should implement own creator and register it in this factory by some unique string-ID. This creator will make a new control by this name.
+To provide this SHAPER has a widget creator interface and a factory of the creators. Each plugin which creates panels or custom widgets should implement own creator and register it in this factory by some unique string-ID. This creator will be obtained by this name and create new controls.
 Steps to create the Qt property panel content are the following:
 <ol>
   <li>append Qt library dependencies in plugin project</li>
-  <li>write the custom panel content. It should be a child of a QWidget.</li>
-  <li>define a unique panel name. Put this name in the "property_panel_id" section of the feature. If this XML section is filled, possible XML children sections will be ignored. The following example serves to create custom panel:</li>
+  <li>write the custom panel content. It should be a child of a QWidget. It is necessary to put it in the application Property Panel.</li>
+  <li>define a unique panel name. Put this name in the "property_panel_id" section of the feature. If this XML section is filled, XML sections of feature attributes should not be defined, they will be ignored. The following example creates a custom panel:</li>
     \code
     <plugin>
       <workbench id="FooTab">
@@ -165,17 +165,17 @@ Steps to create the Qt property panel content are the following:
     <li>write a widget creator, which will create an instance of a panel content by the unique name. This creator must inherit SHAPER widget creator interface. It will implement a virtual method of a panel creation.</li>
     <li>create an instance of the widget creator and register it in the widget creator factory.</li>
 </ol>
-@ref SamplePanelPlugin_Plugin is an example plugin to create a custom property panel.
+SamplePanelPlugin_Plugin is an example plugin to create a custom property panel.
 
 
-Steps to create the custom widget are the following:
+Steps to create a custom widget are the following:
 <ol>
   <li>append Qt library dependencies in plugin project</li>
   <li>write the custom widget. It should be a child of a SHAPER model widget. It provides a set of standard Qt controls and methods to apply these controls content into the model and back. So, the next virtual methods should be implemented:</li>
   <ol>
     <li>provides all internal Qt widgets (to let application to listen "value changed" Qt events, etc.)</li>
-    </li>store of the values from controls to data model by request</li>
-    </li>fill Qt widgets with the values from data model by request</li>
+    <li>store of the values from controls to data model by request</li>
+    <li>fill Qt widgets with the values from data model by request</li>
   </ol>
   <li>define a unique key value for the custom widget, add a section with this key in the XML, for an example:</li>
     \code
