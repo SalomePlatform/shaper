@@ -142,7 +142,58 @@ Python:
     d = data().real("DoubleCounterData").value()
 	print "User input: ", d
 \endcode
-To sum everything up, we:
+
+<h3>Creation of a Qt panel and custom controls in the plugin</h3>
+Plugin allows creating of a specific property panel content and a custom widget. The specific property panel content will be shown in the application property panel. The custom widget will be shown in the Property Panel (possible among other standard and custom widgets, or just single widget per Property Panel).
+
+To provide this SHAPER has a widget creator interface and a factory of the creators. Each plugin which creates panels or custom widgets should implement own creator and register it in this factory by some unique string-ID. This creator will make a new control by this name.
+Steps to create the Qt property panel content are the following:
+<ol>
+  <li>append Qt library dependencies in plugin project</li>
+  <li>write the custom panel content. It should be a child of a QWidget.</li>
+  <li>define a unique panel name. Put this name in the "property_panel_id" section of the feature. If this XML section is filled, possible XML children sections will be ignored. The following example serves to create custom panel:</li>
+    \code
+    <plugin>
+      <workbench id="FooTab">
+        <group id="Counters">
+          <feature id="CppDoubleCounter" title="Counter" property_panel_id = "CountersPanel">
+          </feature>
+        </group>
+      </workbench>
+    </plugin>
+    \endcode
+    <li>write a widget creator, which will create an instance of a panel content by the unique name. This creator must inherit SHAPER widget creator interface. It will implement a virtual method of a panel creation.</li>
+    <li>create an instance of the widget creator and register it in the widget creator factory.</li>
+</ol>
+@ref SamplePanelPlugin_Plugin is an example plugin to create a custom property panel.
+
+
+Steps to create the custom widget are the following:
+<ol>
+  <li>append Qt library dependencies in plugin project</li>
+  <li>write the custom widget. It should be a child of a SHAPER model widget. It provides a set of standard Qt controls and methods to apply these controls content into the model and back. So, the next virtual methods should be implemented:</li>
+  <ol>
+    <li>provides all internal Qt widgets (to let application to listen "value changed" Qt events, etc.)</li>
+    </li>store of the values from controls to data model by request</li>
+    </li>fill Qt widgets with the values from data model by request</li>
+  </ol>
+  <li>define a unique key value for the custom widget, add a section with this key in the XML, for an example:</li>
+    \code
+    <plugin>
+      <workbench id="FooTab">
+        <group id="Counters">
+          <feature id="CppDoubleCounter" title="Counter">
+            <sample_combo_box id="ComboValue" values="Value_1, Value_2"/>
+          </feature>
+        </group>
+      </workbench>
+    </plugin>
+    \endcode
+    <li>write a widget creator, which will create an instance of a custom widget by the unique name. This creator must inherit SHAPER widget creator interface. It will implement a virtual method of a widget creation. In this method some information is accessible, which can be useful in this widget. This is API of an XML configuration of this widget and a workshop instance to obtain some information about application state if needed.</li>
+    <li>create an instance of the widget creator and register it in the widget creator factory.</li>
+</ol>
+
+<h3>To sum everything up, we:</h3>
 <ol>
 <li>Declared two custom plugins in the plugins.xml</li>
 <li>Declared a feature for each plugin</li>
