@@ -21,7 +21,7 @@ class SamplePanelPlugin_Feature : public ModelAPI_Feature
   /// SketchShape feature kind
   inline static const std::string& ID()
   {
-    static const std::string MY_SAMPLE_PANEL_FEATURE_ID("SamplePanelFeature");
+    static const std::string MY_SAMPLE_PANEL_FEATURE_ID("QtPanelFeature");
     return MY_SAMPLE_PANEL_FEATURE_ID;
   }
 
