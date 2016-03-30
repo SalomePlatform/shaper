@@ -1,0 +1,9 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<plugin>
+  <workbench id="Sample">
+    <group id="Features">
+      <feature id="SamplePanelFeature" property_panel_id="SampePanel" title="Sample Panel Feature"/>
+    </group>
+  </workbench>
+</plugin>

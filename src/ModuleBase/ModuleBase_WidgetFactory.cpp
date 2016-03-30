@@ -76,6 +76,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
     QWidget* aPanel = createPanel(thePage->pageWidget());
     if (aPanel) {
       thePage->addWidget(aPanel);
+      thePage->alignToTop();
       return;
     }
   }

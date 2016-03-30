@@ -94,6 +94,14 @@ std::string Config_WidgetReader::dumpNode(xmlNodePtr theNode)
 {
   std::string result = "";
   if (!hasChild(theNode)) {
+    // feature which has the next property should be dumped itself
+    std::string anOwnPanel = getProperty(theNode, PROPERTY_PANEL_ID);
+    if (!anOwnPanel.empty()) {
+      xmlBufferPtr buffer = xmlBufferCreate();
+      int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 0);
+      result = std::string((char*) (buffer->content));
+      xmlBufferFree(buffer);
+    }
     return result;
   }
   //Replace all "source" nodes with content;

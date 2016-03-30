@@ -31,10 +31,12 @@ public:
   ~ModuleBase_IWidgetCreator();
 
   /// Returns a container of possible page types, which this creator can process
+  /// The default implementation is empty
   /// \param theTypes a list of type names
   virtual void panelTypes(std::set<std::string>& theTypes) {}
 
   /// Returns a container of possible page types, which this creator can process
+  /// The default implementation is empty
   /// \param a list of type names
   virtual void pageTypes(std::set<std::string>& theTypes) {}
 
@@ -43,6 +45,7 @@ public:
   virtual void widgetTypes(std::set<std::string>& theTypes) {}
 
   /// Create panel control by its type.
+  /// The default implementation is empty
   /// \param theType a panel type
   /// \param theParent a parent widget
   /// \return created widget or null
@@ -50,6 +53,7 @@ public:
                                      QWidget* theParent);
 
   /// Create page by its type
+  /// The default implementation is empty
   /// \param theType a type
   /// \param theParent a parent widget
   /// \param theData a low-level API for reading xml definitions of widgets
@@ -58,6 +62,7 @@ public:
                                                 Config_WidgetAPI* theWidgetApi);
 
   /// Create widget by its type
+  /// The default implementation is empty
   /// \param theType a type
   /// \param theParent a parent widget
   /// \param theData a low-level API for reading xml definitions of widgets
