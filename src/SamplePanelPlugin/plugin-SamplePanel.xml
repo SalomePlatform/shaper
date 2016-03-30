@@ -3,7 +3,7 @@
 <plugin>
   <workbench id="Sample">
     <group id="Features">
-      <feature id="SamplePanelFeature" property_panel_id="SampePanel" title="Sample Panel Feature"/>
+      <feature id="QtPanelFeature" property_panel_id="SamplePanel" title="Qt Panel Feature"/>
     </group>
   </workbench>
 </plugin>

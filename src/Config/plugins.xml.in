@@ -17,4 +17,7 @@
 -->
   <plugin library="GeomValidators"/>
   <plugin library="DFBrowser" internal="true"/>
+<!--
+  <plugin library="SamplePanelPlugin" configuration="plugin-SamplePanel.xml"/>
+-->
 </plugins>

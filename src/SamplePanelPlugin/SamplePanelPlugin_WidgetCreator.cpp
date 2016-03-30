@@ -11,7 +11,7 @@
 SamplePanelPlugin_WidgetCreator::SamplePanelPlugin_WidgetCreator()
 : ModuleBase_IWidgetCreator()
 {
-  myPanelTypes.insert("SampePanel");
+  myPanelTypes.insert("QtPanel");
 }
 
 void SamplePanelPlugin_WidgetCreator::panelTypes(std::set<std::string>& theTypes)
@@ -26,7 +26,7 @@ QWidget* SamplePanelPlugin_WidgetCreator::createPanelByType(const std::string& t
   if (myPanelTypes.find(theType) == myPanelTypes.end())
     return aWidget;
 
-  if (theType == "SampePanel") {
+  if (theType == "QtPanel") {
     aWidget = new SamplePanelPlugin_Panel(theParent);
   }
 
