@@ -164,7 +164,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::onFocusInWidget(ModuleBase_ModelWidget* theWidget)
 {
-  if (theWidget->canSetValue())
+  if (theWidget->canAcceptFocus())
     activateWidget(theWidget);
 }
 

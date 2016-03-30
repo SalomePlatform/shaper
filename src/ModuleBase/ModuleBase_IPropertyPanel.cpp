@@ -39,7 +39,7 @@ ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
     if (!aValidators->isCase(aWgt->feature(), aWgt->attributeID()))
       continue; // this attribute is not participated in the current case
 
-    if (!aWgt->canSetValue())
+    if (!aWgt->canAcceptFocus())
       continue;
 
     /// workaround for the same attributes used in different stacked widgets(attribute types)

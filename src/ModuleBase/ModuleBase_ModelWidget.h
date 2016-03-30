@@ -93,7 +93,7 @@ Q_OBJECT
 
   /// Defines if it is supported to set the value in this widget
   /// By default it returns true
-  virtual bool canSetValue() const { return true; };
+  virtual bool canAcceptFocus() const { return true; };
 
   //! Returns the widget error, get it from the attribute validator and state of the widget
   //! If the feature is correct, it returns an empty value

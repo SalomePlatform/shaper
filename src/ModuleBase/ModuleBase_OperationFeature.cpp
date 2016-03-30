@@ -365,7 +365,7 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
         // 1. apply the selection to controls
         for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
           aWgt = (*aWIt);
-          if (!aWgt->canSetValue())
+          if (!aWgt->canAcceptFocus())
             continue;
           aPropertyPanel->setPreselectionWidget(aWgt);
           if (!aWgt->setSelection(myPreSelection, true)) {

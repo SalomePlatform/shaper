@@ -64,11 +64,11 @@ public:
   /// Sets widget processed by preselection
   virtual void setPreselectionWidget(ModuleBase_ModelWidget* theWidget) = 0;
 
-  /// Returns the first widget, where canSetValue returns true 
+  /// Returns the first widget, where canAcceptFocus returns true 
   /// \return a widget or null
   ModuleBase_ModelWidget* findFirstAcceptingValueWidget();
 
-  /// Returns the first widget, where canSetValue returns true 
+  /// Returns the first widget, where canAcceptFocus returns true 
   /// \return a widget or null
   static ModuleBase_ModelWidget* findFirstAcceptingValueWidget(
                           const QList<ModuleBase_ModelWidget*>& theWidgets);

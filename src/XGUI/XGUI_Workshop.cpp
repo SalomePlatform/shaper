@@ -872,7 +872,7 @@ void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
 void XGUI_Workshop::onValuesChanged()
 {
   ModuleBase_ModelWidget* aSenderWidget = (ModuleBase_ModelWidget*)(sender());
-  if (!aSenderWidget || aSenderWidget->canSetValue())
+  if (!aSenderWidget || aSenderWidget->canAcceptFocus())
     return;
 
   ModuleBase_ModelWidget* anActiveWidget = 0;
