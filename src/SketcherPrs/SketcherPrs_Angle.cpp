@@ -6,6 +6,7 @@
 
 #include "SketcherPrs_Angle.h"
 #include "SketcherPrs_Tools.h"
+#include "SketcherPrs_DimensionStyleListener.h"
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_Constraint.h>
@@ -42,6 +43,13 @@ SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
   
   SetDimensionAspect(myAspect);
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
+
+  myStyleListener = new SketcherPrs_DimensionStyleListener();
+}
+
+SketcherPrs_Angle::~SketcherPrs_Angle()
+{
+  delete myStyleListener;
 }
 
 bool SketcherPrs_Angle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
@@ -167,6 +175,8 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
   SketcherPrs_Tools::setDisplaySpecialSymbol(this, aValue->usedParameters().size() > 0);
+
+  myStyleListener->updateDimensions(this, aValue);
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

@@ -6,6 +6,7 @@
 
 #include "SketcherPrs_Radius.h"
 #include "SketcherPrs_Tools.h"
+#include "SketcherPrs_DimensionStyleListener.h"
 
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_Constraint.h>
@@ -42,6 +43,13 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   
   SetDimensionAspect(myAspect);
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
+
+  myStyleListener = new SketcherPrs_DimensionStyleListener();
+}
+
+SketcherPrs_Radius::~SketcherPrs_Radius()
+{
+  delete myStyleListener;
 }
 
 bool SketcherPrs_Radius::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
@@ -179,6 +187,8 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 
   AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
   SketcherPrs_Tools::setDisplaySpecialSymbol(this, aValue->usedParameters().size() > 0);
+
+  myStyleListener->updateDimensions(this, aValue);
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

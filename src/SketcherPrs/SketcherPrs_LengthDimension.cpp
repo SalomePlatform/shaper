@@ -6,6 +6,8 @@
 
 #include "SketcherPrs_LengthDimension.h"
 #include "SketcherPrs_Tools.h"
+#include "SketcherPrs_Tools.h"
+#include "SketcherPrs_DimensionStyleListener.h"
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -13,9 +15,6 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
-
-#include <SketcherPrs_Tools.h>
-#include <SketcherPrs_DimensionStyleListener.h>
 
 #include <Events_Error.h>
 #include <Events_Loop.h>

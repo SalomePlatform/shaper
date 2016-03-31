@@ -14,6 +14,8 @@
 #include <AIS_RadiusDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
+class SketcherPrs_DimensionStyleListener;
+
 DEFINE_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension)
 
 /**
@@ -28,6 +30,9 @@ public:
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
+  /// Destructor
+  Standard_EXPORT ~SketcherPrs_Radius();
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Radius)
 
@@ -54,6 +59,9 @@ private:
   std::shared_ptr<GeomAPI_Ax3> myPlane;
 
   Handle(Prs3d_DimensionAspect) myAspect;
+
+  /// Listener to update dimension visualization style
+  SketcherPrs_DimensionStyleListener* myStyleListener;
 };
 
 #endif

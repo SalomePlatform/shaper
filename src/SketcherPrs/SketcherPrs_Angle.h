@@ -14,6 +14,8 @@
 #include <AIS_AngleDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
+class SketcherPrs_DimensionStyleListener;
+
 DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension)
 
 /**
@@ -28,6 +30,9 @@ public:
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Angle(ModelAPI_Feature* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
+  /// Destructor
+  Standard_EXPORT ~SketcherPrs_Angle();
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Angle)
 
@@ -54,6 +59,9 @@ private:
   std::shared_ptr<GeomAPI_Ax3> myPlane;
 
   Handle(Prs3d_DimensionAspect) myAspect;
+
+  /// Listener to update dimension visualization style
+  SketcherPrs_DimensionStyleListener* myStyleListener;
 };
 
 
