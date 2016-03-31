@@ -15,6 +15,7 @@
 #include <SketchPlugin_Circle.h>
 
 #include <SketcherPrs_Tools.h>
+#include <SketcherPrs_DimensionStyleListener.h>
 
 #include <Events_Error.h>
 #include <Events_Loop.h>
@@ -55,26 +56,12 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
   SetDimensionAspect(myAspect);
 
-  Events_Loop* aLoop = Events_Loop::loop();
-  const Events_ID kDocCreatedEvent =
-                SketcherPrs_ParameterStyleMessage::eventId();
-  aLoop->registerListener(this, kDocCreatedEvent, NULL, false);
+  myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
 
 SketcherPrs_LengthDimension::~SketcherPrs_LengthDimension()
 {
-  Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->removeListener(this);
-}
-
-void SketcherPrs_LengthDimension::processEvent(const std::shared_ptr<Events_Message>& theMessage)
-{
-  const Events_ID kParameterStyleEvent = SketcherPrs_ParameterStyleMessage::eventId();
-  if (theMessage->eventID() == kParameterStyleEvent) {
-    std::shared_ptr<SketcherPrs_ParameterStyleMessage> aMessage = std::dynamic_pointer_cast<
-                                            SketcherPrs_ParameterStyleMessage>(theMessage);
-    myStyle = aMessage->style();
-  }
+  delete myStyleListener;
 }
 
 bool SketcherPrs_LengthDimension::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
@@ -126,16 +113,9 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 
   AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
-  bool aHasParameters = aValue->usedParameters().size() > 0;
-  if (aHasParameters) {
-    bool isParameterValueStyle = myStyle == SketcherPrs_ParameterStyleMessage::ParameterValue;
-    SketcherPrs_Tools::setDisplaySpecialSymbol(this, isParameterValueStyle);
-    SketcherPrs_Tools::setDisplayParameter(this, aValue->text(), !isParameterValueStyle);
-  }
-  else {
-    SketcherPrs_Tools::setDisplaySpecialSymbol(this, false);
-    SketcherPrs_Tools::setDisplayParameter(this, aValue->text(), false);
-  }
+
+  myStyleListener->updateDimensions(this, aValue);
+
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 }
 

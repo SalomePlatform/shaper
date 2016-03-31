@@ -15,8 +15,7 @@
 
 #include <SketcherPrs_Tools.h>
 
-#include <Events_Listener.h>
-
+class SketcherPrs_DimensionStyleListener;
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension)
 
@@ -25,7 +24,7 @@ DEFINE_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension)
 * A class for representation of linear dimension constraint.
 * It supports SketchPlugin_ConstraintLength and SketchPlugin_ConstraintDistance features.
 */
-class SketcherPrs_LengthDimension : public AIS_LengthDimension, public Events_Listener
+class SketcherPrs_LengthDimension : public AIS_LengthDimension
 {
 public:
   /// Constructor
@@ -38,10 +37,6 @@ public:
   Standard_EXPORT ~SketcherPrs_LengthDimension();
 
   DEFINE_STANDARD_RTTI(SketcherPrs_LengthDimension)
-
-  /// Process the ModelAPI_DocumentCreatedMessage to fulfill a document
-  /// from the message with origin and planes
-  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature
@@ -71,8 +66,8 @@ private:
 
   Handle(Prs3d_DimensionAspect) myAspect;
 
-  /// Style how the parameter of dimension should be visualized
-  SketcherPrs_ParameterStyleMessage::ParameterStyle myStyle;
+  /// Listener to update dimension visualization style
+  SketcherPrs_DimensionStyleListener* myStyleListener;
 };
 
 #endif
