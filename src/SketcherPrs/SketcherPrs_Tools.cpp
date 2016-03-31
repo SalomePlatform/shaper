@@ -293,4 +293,30 @@ void setDisplaySpecialSymbol(AIS_Dimension* theDimension, const bool& theToDispl
   }
 }
 
+void setDisplayParameter(AIS_Dimension* theDimension, const std::string& theParameter,
+                         const bool& theToDisplay)
+{
+   if (theToDisplay) {
+    theDimension->DimensionAspect()->MakeUnitsDisplayed(true);
+    theDimension->SetDisplayUnits(TCollection_AsciiString(theParameter.c_str()));
+    theDimension->DimensionAspect()->SetValueStringFormat("");
+  }
+  else {
+    theDimension->DimensionAspect()->MakeUnitsDisplayed(false);
+    theDimension->SetDisplayUnits(TCollection_AsciiString()); // THE_UNDEFINED_UNITS in AIS_Dimension
+    theDimension->DimensionAspect()->SetValueStringFormat("%g");
+  }
+}
+
+void sendExpressionShownEvent(const bool& theState)
+{
+  static Events_ID anId = SketcherPrs_ParameterStyleMessage::eventId();
+  std::shared_ptr<SketcherPrs_ParameterStyleMessage> aMessage = std::shared_ptr
+    <SketcherPrs_ParameterStyleMessage>(new SketcherPrs_ParameterStyleMessage(anId, 0));
+  aMessage->setStyle(theState ? SketcherPrs_ParameterStyleMessage::ParameterText
+                              : SketcherPrs_ParameterStyleMessage::ParameterValue);
+  Events_Loop::loop()->send(aMessage);
+  Events_Loop::loop()->flush(anId);
+}
+
 };

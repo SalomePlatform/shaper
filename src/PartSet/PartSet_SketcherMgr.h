@@ -247,14 +247,24 @@ public:
   /// \param thePreviousState the previous widget value state
   void widgetStateChanged(int thePreviousState);
 
+  /// If the current operation is a dimention one, the style of dimension visualization is send for
+  /// the current object
+  /// \param theObject an object to be customized
+  void customizePresentation(const ObjectPtr& theObject);
+
+  /// Update sketch presentations according to the the state
+  /// \param theType a type of sketch visualization style
+  /// \param theState a boolean state
+  void updateBySketchParameters(const PartSet_Tools::ConstraintVisibleState& theType,
+                                bool theState);
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
+private slots:
   /// Toggle show constraints
   void onShowConstraintsToggle(int theType, bool theState);
-
-private slots:
   /// Process the enter mouse to the view port. If the current operation is a create of
   /// a nested sketch feature, it updates internal flags to display the feature on mouse move
   void onEnterViewPort();

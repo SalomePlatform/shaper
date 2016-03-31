@@ -145,6 +145,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   myHasConstraintShown[PartSet_Tools::Geometrical] = true;
   myHasConstraintShown[PartSet_Tools::Dimensional] = true;
+  myHasConstraintShown[PartSet_Tools::Dimensional] = false;
 
   Config_PropManager::registerProp("Visualization", "operation_parameter_color",
                           "Reference shape wireframe color in operation", Config_Prop::Color,
@@ -401,7 +402,7 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
                                                                     aLast = myHasConstraintShown.end();
   for (; anIt != aLast; anIt++) {
     myHasConstraintShown[anIt.key()];
-    mySketchMgr->onShowConstraintsToggle(anIt.key(), anIt.value());
+    mySketchMgr->updateBySketchParameters(anIt.key(), anIt.value());
   }
 }
 
@@ -790,22 +791,34 @@ void PartSet_Module::onFeatureTriggered()
   ModuleBase_IModule::onFeatureTriggered();
 }
 
+void PartSet_Module::editFeature(FeaturePtr theFeature)
+{
+  storeConstraintsState(theFeature->getKind());
+  ModuleBase_IModule::editFeature(theFeature);
+}
+
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
-  if (myWorkshop->currentOperation() && 
-      myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID()) {
-      const QMap<PartSet_Tools::ConstraintVisibleState, bool>& aShownStates =
-                                                    mySketchMgr->showConstraintStates();
-      myHasConstraintShown = aShownStates;
-  }
-  if (PartSet_SketcherMgr::constraintsIdList().contains(theCmdId)) {
-    // Show constraints if a constraint was anOperation
-    mySketchMgr->onShowConstraintsToggle(PartSet_Tools::Geometrical, true);
-    mySketchMgr->onShowConstraintsToggle(PartSet_Tools::Dimensional, true);
-  }
+  storeConstraintsState(theCmdId.toStdString());
   ModuleBase_IModule::launchOperation(theCmdId);
 }
 
+void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
+{
+  if (myWorkshop->currentOperation() && 
+      myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID()) {
+    const QMap<PartSet_Tools::ConstraintVisibleState, bool>& aShownStates =
+                                                  mySketchMgr->showConstraintStates();
+    myHasConstraintShown = aShownStates;
+  }
+  if (PartSet_SketcherMgr::constraintsIdList().contains(theFeatureKind.c_str())) {
+    // Show constraints if a constraint was anOperation
+    mySketchMgr->updateBySketchParameters(PartSet_Tools::Geometrical, true);
+    mySketchMgr->updateBySketchParameters(PartSet_Tools::Dimensional, true);
+    mySketchMgr->updateBySketchParameters(PartSet_Tools::Expressions,
+                                          myHasConstraintShown[PartSet_Tools::Expressions]);
+  }
+}
 
 void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) 
 {
@@ -911,7 +924,7 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
   ObjectPtr anObject = aDisplayer->getObject(thePrs);
   if (anObject.get()) {
     bool isConflicting = myOverconstraintListener->isConflictingObject(anObject);
-    // customize sketcy symbol presentation
+    // customize sketch symbol presentation
     if (thePrs.get()) {
       Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
       if (!anAISIO.IsNull()) {
@@ -939,6 +952,9 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
         aCustomized = true;
       }
     }
+
+    // customize dimentional constrains
+    sketchMgr()->customizePresentation(anObject);
   }
 
   return aCustomized;

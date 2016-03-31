@@ -113,6 +113,53 @@ void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID
   aListeners.push_back(theListener);
 }
 
+void Events_Loop::removeListener(Events_Listener* theListener)
+{
+  // remove the listener in myListeners map
+  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::const_reverse_iterator
+                                                          anIt = myListeners.rbegin();
+  while(anIt != myListeners.rend()) {
+    std::map<void*, std::list<Events_Listener*> > aLMap = anIt->second;
+    std::map<void*, std::list<Events_Listener*> >::const_reverse_iterator aLIt = aLMap.rbegin();
+    while (aLIt != aLMap.rend()) {
+      std::list<Events_Listener*> aListeners = aLIt->second;
+      std::list<Events_Listener*>::const_reverse_iterator aLsIt = aListeners.rbegin();
+      for (; aLsIt != aListeners.rend(); aLsIt++) {
+        if (*aLsIt == theListener) {
+          aListeners.remove(theListener);
+          aLMap[aLIt->first] = aListeners;
+          myListeners[anIt->first] = aLMap;
+          break;
+        }
+      }
+      if (aListeners.empty()) {
+        aLMap.erase(aLIt->first);
+        myListeners[anIt->first] = aLMap;
+        if (aLMap.empty())
+          break; // avoid incrementation of the iterator if the the container is empty
+      }
+      aLIt++;
+    }
+    if (anIt->second.empty()) {
+      myListeners.erase(anIt->first);
+      if (myListeners.empty())
+        break; // avoid incrementation of the iterator if the the container is empty
+    }
+    anIt++;
+  }
+
+  // remove the listener in myImmediateListeners map
+  std::map<char*, Events_Listener*>::const_reverse_iterator anImIt = myImmediateListeners.rbegin();
+  while(anImIt != myImmediateListeners.rend()) {
+    if (anImIt->second == theListener) {
+      myImmediateListeners.erase(anImIt->first);
+      if (myImmediateListeners.empty())
+        break; // avoid incrementation of the iterator if the the container is empty
+    }
+    anImIt++;
+  }
+}
+
 void Events_Loop::flush(const Events_ID& theID)
 {
   if (!myFlushActive)

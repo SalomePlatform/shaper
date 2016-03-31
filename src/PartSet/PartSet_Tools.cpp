@@ -890,3 +890,18 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
   }
   return anAttribute;
 }
+
+void PartSet_Tools::sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite,
+                                         const Events_ID theEventId)
+{
+  if (!theComposite.get())
+    return;
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  for (int i = 0; i < theComposite->numberOfSubs(); i++) {
+    FeaturePtr aSubFeature = theComposite->subFeature(i);
+    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+    aECreator->sendUpdated(aSubFeature, theEventId);
+  }
+  Events_Loop::loop()->flush(theEventId);
+}

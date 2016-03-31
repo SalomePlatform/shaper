@@ -63,6 +63,10 @@ class Events_Loop
   EVENTS_EXPORT void registerListener(Events_Listener* theListener, const Events_ID theID,
                                       void* theSender = 0, bool theImmediate = false);
 
+  //! Remove the listener from internal maps if it was registered there
+  //! \param theListener a listener
+  EVENTS_EXPORT void removeListener(Events_Listener* theListener);
+
   //! Initializes sending of a group-message by the given ID
   EVENTS_EXPORT void flush(const Events_ID& theID);
 

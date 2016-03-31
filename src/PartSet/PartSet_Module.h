@@ -91,6 +91,10 @@ public:
   virtual bool createWidgets(ModuleBase_Operation* theOperation,
                              QList<ModuleBase_ModelWidget*>& theWidgets) const;
 
+  /// Launching of a edit operation on the feature 
+  /// \param theFeature feature for editing
+  virtual void editFeature(FeaturePtr theFeature);
+
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
   virtual void launchOperation(const QString& theCmdId);
@@ -322,6 +326,11 @@ protected slots:
   void onChoiceChanged(ModuleBase_ModelWidget* theWidget, int theIndex);
 
 protected:
+  /// Sets the constraints states in internal map. If the feature kind is a dimensional constraint
+  /// other dimensions are shown.
+  /// \param theFeatureKindId a feature kind
+  void storeConstraintsState(const std::string& theFeatureKindId);
+
   /// Register validators for this module
   virtual void registerValidators();
 

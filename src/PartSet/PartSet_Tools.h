@@ -19,6 +19,8 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
 
+#include <Events_Message.h>
+
 #include <TopoDS_Shape.hxx>
 
 #include <memory>
@@ -47,6 +49,7 @@ public:
   {
     Geometrical = 0, // all constrains excepting dimensional
     Dimensional,     // lenght, distance, radius and angle constraints
+    Expressions,     // parameter text should be shown in dimensional constraint
     Any              // both, geometrical and dimensional, types of constraints
   };
 
@@ -249,6 +252,10 @@ public:
   * \param theStartCoin the coincedence feature
   */
   static std::shared_ptr<GeomAPI_Pnt2d> getCoincedencePoint(FeaturePtr theStartCoin);
+
+  /// Sends redisplay event for all sub-features of the composite. Flush it.
+  static void sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite,
+                                   const Events_ID theId);
 };
 
 #endif

@@ -189,6 +189,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
 
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
+  myIsConstraintsShown[PartSet_Tools::Expressions] = false;
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
@@ -898,6 +899,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   myIsMouseOverWindow = false;
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
+  myIsConstraintsShown[PartSet_Tools::Expressions] = false;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
@@ -1536,6 +1538,15 @@ void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
   }
 }
 
+void PartSet_SketcherMgr::customizePresentation(const ObjectPtr& theObject)
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                           (getCurrentOperation());
+  if (aFOperation && (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
+                      PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)))
+    SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
+}
+
 ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 {
   return myModule->workshop()->currentOperation();
@@ -1643,24 +1654,45 @@ void PartSet_SketcherMgr::restoreSelection()
 void PartSet_SketcherMgr::onShowConstraintsToggle(int theType, bool theState)
 {
   PartSet_Tools::ConstraintVisibleState aType = (PartSet_Tools::ConstraintVisibleState)theType;
-  if (myIsConstraintsShown.contains(aType) && myIsConstraintsShown[aType] == theState)
-    return;
+
+  updateBySketchParameters(aType, theState);
+}
+
+void PartSet_SketcherMgr::updateBySketchParameters(
+                                   const PartSet_Tools::ConstraintVisibleState& theType,
+                                   bool theState)
+{
   if (myCurrentSketch.get() == NULL)
     return;
 
-  myIsConstraintsShown[aType] = theState;
+  bool aPrevState = myIsConstraintsShown[theType];
+  myIsConstraintsShown[theType] = theState;
 
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-
-  for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
-    FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
-    bool aProcessed = false;
-    bool aConstraintDisplayed = canDisplayConstraint(aSubFeature, aType, aProcessed);
-    if (aProcessed)
-      aSubFeature->setDisplayed(aConstraintDisplayed);
+  switch (theType) {
+    case PartSet_Tools::Geometrical:
+    case PartSet_Tools::Dimensional: {
+      if (aPrevState != theState) {
+        ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+        XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+        for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+          FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
+          bool aProcessed = false;
+          bool aConstraintDisplayed = canDisplayConstraint(aSubFeature, theType, aProcessed);
+          if (aProcessed)
+            aSubFeature->setDisplayed(aConstraintDisplayed);
+        }
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      }
+    }
+    break;
+    case PartSet_Tools::Expressions: {
+      /// call all sketch features redisplay, the expression state will be corrected in customize
+      /// of distance presentation
+      Events_ID anEventId = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      PartSet_Tools::sendSubFeaturesEvent(myCurrentSketch, anEventId);
+    }
+    break;
   }
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 XGUI_Workshop* PartSet_SketcherMgr::workshop() const

@@ -104,6 +104,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   QMap<PartSet_Tools::ConstraintVisibleState, QString> aStates;
   aStates[PartSet_Tools::Geometrical] = tr("Show geometrical constraints");
   aStates[PartSet_Tools::Dimensional] = tr("Show dimensional constraints");
+  aStates[PartSet_Tools::Expressions] = tr("Show existing expressions");
 
   QMap<PartSet_Tools::ConstraintVisibleState, QString>::const_iterator anIt = aStates.begin(),
                                                         aLast = aStates.end();
