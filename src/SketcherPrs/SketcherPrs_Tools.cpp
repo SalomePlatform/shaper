@@ -31,7 +31,7 @@
 // it is not possible to use 0x2211 as summ symbol because it is not supported by
 // debian Linux platform
 static const Standard_ExtCharacter MyEmptySymbol(' ');
-static const Standard_ExtCharacter MySigmaSymbol(0x03A3);
+static const Standard_ExtCharacter MySigmaSymbol('=');//0x03A3); // using equal instead of sigma
 
 namespace SketcherPrs_Tools {
 
