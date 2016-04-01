@@ -32,6 +32,10 @@
 
 /// Returns ResultPart object if the given object is a Part feature
 /// Otherwise returns NULL
+
+#define SELECTABLE_COLOR QColor(80, 80, 80)
+#define DISABLED_COLOR QColor(200, 200, 200)
+
 ResultPartPtr getPartResult(ModelAPI_Object* theObj)
 {
   ModelAPI_Feature* aFeature = dynamic_cast<ModelAPI_Feature*>(theObj);
@@ -371,14 +375,22 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       case Qt::DecorationRole:
         return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
       case Qt::ForegroundRole:
-        if ((theIndex.flags() & Qt::ItemIsEditable) == 0)
-          return QBrush(Qt::lightGray);
+        {
+          Qt::ItemFlags aFlags = theIndex.flags();
+          if (aFlags == Qt::ItemFlags())
+            return QBrush(DISABLED_COLOR);
+          if (!aFlags.testFlag(Qt::ItemIsEditable))
+            return QBrush(SELECTABLE_COLOR);
+        }
         return ACTIVE_COLOR;
     }
   } else { // an object or sub-document
     if (theRole == Qt::ForegroundRole) {
-      if ((theIndex.flags() & Qt::ItemIsEditable) == 0)
-        return QBrush(Qt::lightGray);
+      Qt::ItemFlags aFlags = theIndex.flags();
+      if (aFlags == Qt::ItemFlags())
+        return QBrush(DISABLED_COLOR);
+      if (!aFlags.testFlag(Qt::ItemIsEditable))
+        return QBrush(SELECTABLE_COLOR);
       return ACTIVE_COLOR;
     }
 
