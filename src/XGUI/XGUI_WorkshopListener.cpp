@@ -570,20 +570,16 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisual
     return aDisplayed;
 
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObj);
-  if (aBody.get() != NULL) {
-    int aNb = aDisplayer->objectsCount();
-    aDisplayed = aDisplayer->display(theObj, false);
-    if (aNb == 0)
-      theFirstVisualizedBody = true;
-  } else {
-    aDisplayed = aDisplayer->display(theObj, false);
-    if (aDisplayed) {
-      ResultPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(theObj);
-      if (aGroup.get() != NULL) {
-        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aGroup);
-          theFirstVisualizedBody = aShapePtr.get() != NULL;
-      }
+  int aNb = aDisplayer->objectsCount();
+  aDisplayed = aDisplayer->display(theObj, false);
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+  if (aNb == 0 && aResult.get()) {
+    std::string aResultGroupName = aResult->groupName();
+    if (aResultGroupName == ModelAPI_ResultBody::group() ||
+        aResultGroupName == ModelAPI_ResultGroup::group()) {
+      std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+      theFirstVisualizedBody = aShapePtr.get() != NULL;
     }
   }
   return aDisplayed;
