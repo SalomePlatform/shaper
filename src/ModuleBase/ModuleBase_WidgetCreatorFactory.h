@@ -16,6 +16,8 @@
 
 #include <ModuleBase_IWidgetCreator.h>
 
+#include <ModelAPI_Feature.h>
+
 class ModuleBase_ModelWidget;
 class ModuleBase_PageBase;
 class ModuleBase_IWorkshop;
@@ -48,8 +50,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Create panel by its type
   /// \param theType a type
   /// \param theParent a parent widget
+  /// \param theFeature a feature to fill the panel
   /// \return a created panel or null
-  QWidget* createPanel(const std::string& theType, QWidget* theParent);
+  QWidget* createPanelByType(const std::string& theType, QWidget* theParent,
+                             const FeaturePtr& theFeature);
 
   /// Returns true if there is a creator, which can make a page by the type
   /// \param theType a type

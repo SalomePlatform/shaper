@@ -1,7 +1,7 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 INCLUDE(Common)
-INCLUDE(UnitTest)
+SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
     SamplePanelPlugin.h

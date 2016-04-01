@@ -73,12 +73,14 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
 {
   std::string aWType = myWidgetApi->widgetType();
   if (aWType == NODE_FEATURE) {
-    QWidget* aPanel = createPanel(thePage->pageWidget());
-    if (aPanel) {
-      thePage->addWidget(aPanel);
-      thePage->alignToTop();
+    // if XML definition of the feature contains the next key, the widgets should not be created,
+    // but a specific panel should be made. However, to provide persistent of the panel values,
+    // we need to get into the panel the feature of the operation. As a result this panel should
+    // be created after the feature creating(create operation). The method setPanel() of this
+    // class is used for this. Here, we just return to avoid the widgets creation.
+    std::string aPanelName = myWidgetApi->getProperty(PROPERTY_PANEL_ID);
+    if (!aPanelName.empty())
       return;
-    }
   }
 
   if (!myWidgetApi->toChildWidget())
@@ -128,6 +130,18 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   } while (myWidgetApi->toNextWidget());
 
   thePage->alignToTop();
+}
+
+void ModuleBase_WidgetFactory::createPanel(ModuleBase_PageBase* thePage,
+                                           const FeaturePtr& theFeature)
+{
+  std::string aPanelName = myWidgetApi->getProperty(PROPERTY_PANEL_ID);
+  if (!aPanelName.empty() && ModuleBase_WidgetCreatorFactory::get()->hasPanelWidget(aPanelName)) {
+    QWidget* aPanel = ModuleBase_WidgetCreatorFactory::get()->createPanelByType(aPanelName,
+                                                               thePage->pageWidget(), theFeature);
+    thePage->addWidget(aPanel);
+    thePage->alignToTop();
+  }
 }
 
 void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage,
@@ -225,15 +239,6 @@ void ModuleBase_WidgetFactory::moveToWidgetId(const std::string& theWidgetId, bo
       }
     }
   } while (!theFound && myWidgetApi->toNextWidget());
-}
-
-QWidget* ModuleBase_WidgetFactory::createPanel(QWidget* theParent)
-{
-  QWidget* aPanel = 0;
-  std::string aPanelName = myWidgetApi->getProperty(PROPERTY_PANEL_ID);
-  if (!aPanelName.empty() && ModuleBase_WidgetCreatorFactory::get()->hasPanelWidget(aPanelName))
-    aPanel = ModuleBase_WidgetCreatorFactory::get()->createPanel(aPanelName, theParent);
-  return aPanel;
 }
 
 ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::string& theType,

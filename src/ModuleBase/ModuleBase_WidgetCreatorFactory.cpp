@@ -80,12 +80,14 @@ bool ModuleBase_WidgetCreatorFactory::hasPanelWidget(const std::string& theType)
   return myPanelToCreator.contains(theType);
 }
 
-QWidget* ModuleBase_WidgetCreatorFactory::createPanel(const std::string& theType, QWidget* theParent)
+QWidget* ModuleBase_WidgetCreatorFactory::createPanelByType(const std::string& theType,
+                                                            QWidget* theParent,
+                                                            const FeaturePtr& theFeature)
 {
   QWidget* aPanel = 0;
   if (myPanelToCreator.contains(theType)) {
     WidgetCreatorPtr aCreator = myPanelToCreator[theType];
-    aPanel = aCreator->createPanelByType(theType, theParent);
+    aPanel = aCreator->createPanelByType(theType, theParent, theFeature);
   }
   return aPanel;
 }

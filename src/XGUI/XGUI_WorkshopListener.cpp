@@ -167,8 +167,10 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
 
     if (anOperationMgr->startOperation(anOperation)) {
       ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
-      if (aFOperation)
+      if (aFOperation) {
         workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
+        workshop()->propertyPanel()->createContentPanel(aFOperation->feature());
+      }
       if (!anOperation->getDescription()->hasXmlRepresentation()) {
         if (anOperation->commit())
           workshop()->updateCommandStatus();

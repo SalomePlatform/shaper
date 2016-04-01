@@ -25,8 +25,15 @@ class SamplePanelPlugin_Feature : public ModelAPI_Feature
     return MY_SAMPLE_PANEL_FEATURE_ID;
   }
 
+  /// Total number of objects, initial and translated objects
+  inline static const std::string& VALUE_ID()
+  {
+    static const std::string MY_VALUE_ID("Value");
+    return MY_VALUE_ID;
+  }
+
   /// Request for initialization of data model of the object: adding all attributes
-  virtual void initAttributes() {};
+  virtual void initAttributes();
 
   /// Returns the unique kind of a feature
   virtual const std::string& getKind() {

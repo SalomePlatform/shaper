@@ -36,9 +36,11 @@ public:
   /// Create panel control by its type.
   /// \param theType a panel type
   /// \param theParent a parent widget
+  /// \param theFeature a feature to fill the panel
   /// \return created widget or null
   virtual QWidget* createPanelByType(const std::string& theType,
-                                     QWidget* theParent);
+                                     QWidget* theParent,
+                                     const FeaturePtr& theFeature);
 private:
   std::set<std::string> myPanelTypes; /// types of panels
 };

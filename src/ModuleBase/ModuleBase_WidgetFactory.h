@@ -41,6 +41,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   /// \param thePage a parent page
   void createWidget(ModuleBase_PageBase* thePage);
 
+  /// Creates property panel content for the feature
+  /// \param thePage a parent page
+  /// \param theFeature a feature to fill the panel
+  void createPanel(ModuleBase_PageBase* thePage, const FeaturePtr& theFeature);
+
   /// Creates one widget for property panel for the widget with given index
   /// \param theParent a parent widget
   /// \param theWidgetId a widget index
@@ -66,11 +71,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 protected:
   /// check if ModuleBase_Widget has expandable widgets in getControls
   bool hasExpandingControls(QWidget* theParent);
-
-  /// creates panel control, if the corresponded parameter is provided by feature
-  /// \param theParent a parent widget
-  /// \return true if the panel is created
-  QWidget* createPanel(QWidget* theParent);
 
   /// Create page by its type
   /// \param theType a type

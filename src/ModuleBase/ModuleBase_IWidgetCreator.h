@@ -5,6 +5,8 @@
 
 #include "ModuleBase.h"
 
+#include "ModelAPI_Feature.h"
+
 #include <set>
 #include <string>
 #include <memory>
@@ -48,9 +50,11 @@ public:
   /// The default implementation is empty
   /// \param theType a panel type
   /// \param theParent a parent widget
+  /// \param theFeature a feature modified in the panel
   /// \return created widget or null
   virtual QWidget* createPanelByType(const std::string& theType,
-                                     QWidget* theParent);
+                                     QWidget* theParent,
+                                     const FeaturePtr& theFeature);
 
   /// Create page by its type
   /// The default implementation is empty

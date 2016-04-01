@@ -53,6 +53,9 @@ Q_OBJECT
   void setWorkshop(ModuleBase_IWorkshop* theWorkshop)
   { myWorkshop = theWorkshop; };
 
+  /// Current workshop
+  ModuleBase_IWorkshop* workshop() const { return myWorkshop; }
+
   /// Returns the current operation or NULL
   /// \return the current operation
   ModuleBase_Operation* currentOperation() const;
@@ -208,8 +211,6 @@ protected: // TEMPORARY
   void onOperationResumed();
 
 private:
-  XGUI_Workshop* workshop() const;
-
   /// Checks if the object is a parent or a child under
   /// \param theObject an investivated object
   /// \param theParent a candidate to be a parent

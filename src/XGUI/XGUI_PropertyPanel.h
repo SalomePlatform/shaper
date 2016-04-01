@@ -106,10 +106,14 @@ Q_OBJECT
   XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
 
 public slots:
-
-   /// \brief Update all widgets in property panel with values from the given feature
-   /// \param theFeature a Feature to update values in widgets
+  /// \brief Update all widgets in property panel with values from the given feature
+  /// \param theFeature a Feature to update values in widgets
   void updateContentWidget(FeaturePtr theFeature);
+
+  /// \brief If the XML definition of the feature contains information about specific
+  /// content of the property panel, it creates the panel and allow filling it by the given feature
+  /// \param theFeature a Feature to fill property panel
+  void createContentPanel(FeaturePtr theFeature);
 
   /**
   * Makes the given widget active, highlights it and removes

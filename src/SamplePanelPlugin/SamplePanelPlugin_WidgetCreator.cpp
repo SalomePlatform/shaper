@@ -20,14 +20,17 @@ void SamplePanelPlugin_WidgetCreator::panelTypes(std::set<std::string>& theTypes
 }
 
 QWidget* SamplePanelPlugin_WidgetCreator::createPanelByType(const std::string& theType,
-                                                            QWidget* theParent)
+                                                            QWidget* theParent,
+                                                            const FeaturePtr& theFeature)
 {
   QWidget* aWidget = 0;
   if (myPanelTypes.find(theType) == myPanelTypes.end())
     return aWidget;
 
   if (theType == "QtPanel") {
-    aWidget = new SamplePanelPlugin_Panel(theParent);
+    SamplePanelPlugin_Panel* aPanel = new SamplePanelPlugin_Panel(theParent);
+    aPanel->setFeature(theFeature);
+    aWidget = aPanel;
   }
 
   return aWidget;

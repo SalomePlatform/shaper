@@ -11,7 +11,8 @@ ModuleBase_IWidgetCreator::~ModuleBase_IWidgetCreator()
 }
 
 QWidget* ModuleBase_IWidgetCreator::createPanelByType(const std::string& theType,
-                                                      QWidget* theParent)
+                                                      QWidget* theParent,
+                                                      const FeaturePtr& theFeature)
 {
   return 0;
 }

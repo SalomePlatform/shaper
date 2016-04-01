@@ -8,7 +8,8 @@
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ErrorMgr.h"
-#include <XGUI_ObjectsBrowser.h>
+#include "XGUI_Tools.h"
+#include "XGUI_ObjectsBrowser.h"
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ModelWidget.h>
@@ -233,7 +234,7 @@ bool XGUI_OperationMgr::commitAllOperations()
   bool isCompositeCommitted = false;
   while (hasOperation()) {
     ModuleBase_Operation* anOperation = currentOperation();
-    if (workshop()->errorMgr()->isApplyEnabled()) {
+    if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled()) {
       onCommitOperation();
     } else {
       abortOperation(anOperation);
@@ -259,12 +260,12 @@ void XGUI_OperationMgr::onValidateOperation()
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                           (currentOperation());
   if(aFOperation && aFOperation->feature().get())
-    workshop()->errorMgr()->updateActions(aFOperation->feature());
+    XGUI_Tools::workshop(myWorkshop)->errorMgr()->updateActions(aFOperation->feature());
 }
 
 void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperation)
 {
-  XGUI_ErrorMgr* anErrorMgr = workshop()->errorMgr();
+  XGUI_ErrorMgr* anErrorMgr = XGUI_Tools::workshop(myWorkshop)->errorMgr();
   if (theOperation) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation)
@@ -356,7 +357,7 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId)
       else if (canStopOperation(aCurrentOp)) {
         // the started operation is granted in the parrent operation,
         // e.g. current - Line in Sketch, started Circle 
-        if (workshop()->errorMgr()->isApplyEnabled() && aCurrentOp->isModified())
+        if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() && aCurrentOp->isModified())
           aCurrentOp->commit();
         else
           abortOperation(aCurrentOp);
@@ -661,23 +662,17 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
     // after widget, object browser and viewer should process delete
     /// other widgets such as line edit controls should not lead to
     /// processing delete by workshop
-    XGUI_ObjectsBrowser* aBrowser = workshop()->objectBrowser();
+    XGUI_ObjectsBrowser* aBrowser = XGUI_Tools::workshop(myWorkshop)->objectBrowser();
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
     // property panel child object is processed to process delete performed on Apply button of PP
     if (theObject == aBrowser->treeView() ||
         isChildObject(theObject, aViewPort) ||
         isPPChildObject)
-      workshop()->deleteObjects();
+      XGUI_Tools::workshop(myWorkshop)->deleteObjects();
     isAccepted = true;
   }
 
   return isAccepted;
-}
-
-XGUI_Workshop* XGUI_OperationMgr::workshop() const
-{
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  return aConnector->workshop();
 }
 
 bool XGUI_OperationMgr::isChildObject(const QObject* theObject, const QObject* theParent)

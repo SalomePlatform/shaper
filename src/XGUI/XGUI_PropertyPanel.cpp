@@ -15,6 +15,8 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageWidget.h>
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_OperationDescription.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -153,6 +155,25 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
   }
   // the repaint is used here to immediately react in GUI to the values change.
   repaint();
+}
+
+void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
+{
+  // Invalid feature case on abort of the operation
+  if (theFeature.get() == NULL)
+    return;
+  if (theFeature->isAction() || !theFeature->data())
+    return;
+
+  if (myWidgets.empty()) {
+    ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+    QString aXmlRepr = anOperation->getDescription()->xmlRepresentation();
+
+    ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myOperationMgr->workshop());
+    aFactory.createPanel(contentWidget(), theFeature);
+    /// Apply button should be update if the feature was modified by the panel
+    myOperationMgr->onValidateOperation();
+  }
 }
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
