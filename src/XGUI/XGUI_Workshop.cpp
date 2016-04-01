@@ -1409,6 +1409,8 @@ bool XGUI_Workshop::isDeleteFeatureWithReferences(const QObjectPtrList& theList,
     if (!aFeature->data()->isValid())
       continue;
     ResultPtr aFirstResult = aFeature->firstResult();
+    if (!aFirstResult.get())
+      continue;
     std::string aResultGroupName = aFirstResult->groupName();
     if (aResultGroupName == ModelAPI_ResultPart::group())
       aPartFeatureNames.append(aFeature->name().c_str());
