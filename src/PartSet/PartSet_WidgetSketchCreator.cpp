@@ -414,7 +414,7 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       aLoop->flush(aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
       // Add Selected body were created the sketcher to list of selected objects
-      std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::BOOLEAN_OBJECTS_ID();
+      std::string anObjectsAttribute = FeaturesPlugin_CompositeBoolean::OBJECTS_ID();
       AttributeSelectionListPtr aSelList = aCompFeature->data()->selectionList(anObjectsAttribute);
       if (aSelList.get()) {
         DataPtr aData = aSketchFeature->data();

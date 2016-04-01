@@ -9,7 +9,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_BodyBuilder.h>
-#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -18,27 +17,34 @@
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_Revolution.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <sstream>
 
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::initAttributes()
+void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int theInitFlags)
 {
-  data()->addAttribute(SKETCH_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
-  data()->addAttribute(SKETCH_SELECTION_ID(), ModelAPI_AttributeSelection::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SKETCH_SELECTION_ID());
+  // Initialize sketch launcher.
+  if(theInitFlags & InitSketchLauncher) {
+    data()->addAttribute(SKETCH_ID(), ModelAPI_AttributeReference::typeId());
+    ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SKETCH_ID());
+  }
 
-  //initMakeSolidsAttributes();
+  // Initialize selection list.
+  if(theInitFlags & InitBaseObjectsList) {
+    data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
+  }
 }
 
 //=================================================================================================
 std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::addFeature(std::string theID)
 {
-  std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID, false);
-  if (aNew) {
-    data()->reference(SKETCH_OBJECT_ID())->setValue(aNew);
+  FeaturePtr aNew = document()->addFeature(theID, false);
+  if(aNew) {
+    data()->reference(SKETCH_ID())->setValue(aNew);
   }
-  // set as current also after it becomes sub to set correctly enabled for other sketch subs
+
+  // Set as current also after it becomes sub to set correctly enabled for other sketch subs.
   document()->setCurrentFeature(aNew, false);
   return aNew;
 }
@@ -46,194 +52,301 @@ std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::addFeature(std
 //=================================================================================================
 int FeaturesPlugin_CompositeSketch::numberOfSubs(bool forTree) const
 {
-  ObjectPtr aObj = data()->reference(SKETCH_OBJECT_ID())->value();
-  return aObj.get()? 1 : 0;
+  ObjectPtr aObj = data()->reference(SKETCH_ID())->value();
+  return aObj.get() ? 1 : 0;
 }
 
 //=================================================================================================
 std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex, bool forTree)
 {
-  if (theIndex == 0)
-    return std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_OBJECT_ID())->value());
+  if(theIndex == 0) {
+    return std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_ID())->value());
+  }
+
   return std::shared_ptr<ModelAPI_Feature>();
 }
 
 //=================================================================================================
 int FeaturesPlugin_CompositeSketch::subFeatureId(const int theIndex) const
 {
-  if (theIndex == 0) {
-    FeaturePtr aFeature = 
-      std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_OBJECT_ID())->value());
-    if (aFeature.get())
+  if(theIndex == 0) {
+    FeaturePtr aFeature =
+      std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_ID())->value());
+    if(aFeature.get()) {
       return aFeature->data()->featureId();
+    }
   }
+
   return -1;
 }
 
 //=================================================================================================
 bool FeaturesPlugin_CompositeSketch::isSub(ObjectPtr theObject) const
 {
-  // check is this feature of result
+  // Check is this feature of result
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  if (!aFeature)
+  if(!aFeature.get()) {
     return false;
- 
-  ObjectPtr aSub = data()->reference(SKETCH_OBJECT_ID())->value();
+  }
+
+  ObjectPtr aSub = data()->reference(SKETCH_ID())->value();
   return aSub == theObject;
 }
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
-  if (aFacesSelectionList.get() && aFacesSelectionList->size() > 0)
-    aFacesSelectionList->clear();
+  AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
+  if(aBaseObjectsSelectionList.get() && aBaseObjectsSelectionList->size() > 0) {
+    aBaseObjectsSelectionList->clear();
+  }
 
-  data()->reference(SKETCH_OBJECT_ID())->setValue(ObjectPtr());
+  reference(SKETCH_ID())->setValue(ObjectPtr());
 }
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::erase()
 {
-  if (data().get() && data()->isValid()) { // on abort of sketch of this composite it may be invalid
-    FeaturePtr aSketch =
-      std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_OBJECT_ID())->value());
-    if (aSketch.get() && aSketch->data()->isValid()) {
+  if(data().get() && data()->isValid()) { // on abort of sketch of this composite it may be invalid
+    FeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_Feature>(reference(SKETCH_ID())->value());
+    if(aSketch.get() && aSketch->data()->isValid()) {
       document()->removeFeature(aSketch);
     }
   }
+
   ModelAPI_CompositeFeature::erase();
 }
 
-
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::execute()
+void FeaturesPlugin_CompositeSketch::setSketchObjectToList()
 {
-  // Getting faces to create solids.
-  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
-                                                     reference(SKETCH_OBJECT_ID())->value());
-  if(!aSketchFeature || aSketchFeature->results().empty()) {
+  AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
+  if(!aBaseObjectsSelectionList.get() || aBaseObjectsSelectionList->isInitialized()) {
     return;
   }
+
+  AttributeReferencePtr aSketchLauncherRef = reference(SKETCH_ID());
+  if(!aSketchLauncherRef.get() || !aSketchLauncherRef->isInitialized()) {
+    return;
+  }
+
+  FeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aSketchLauncherRef->value());
+
+  if(!aSketchFeature.get() || aSketchFeature->results().empty()) {
+    return;
+  }
+
   ResultPtr aSketchRes = aSketchFeature->results().front();
   ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
   if(!aConstruction.get()) {
     return;
   }
 
-  /// feature extrusion does not have the next attribute
-  if (data()->attribute(SKETCH_SELECTION_ID()).get()) {
-    if (!selection(SKETCH_SELECTION_ID())->isInitialized() || selection(SKETCH_SELECTION_ID())->context() != aSketchRes) {
-      selection(SKETCH_SELECTION_ID())->setValue(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
-    }
+  if(aBaseObjectsSelectionList->size() == 0) {
+    aBaseObjectsSelectionList->append(aSketchRes, GeomShapePtr());
   }
-  int aSketchFacesNum = aConstruction->facesNum();
-  if(aSketchFacesNum == 0) {
+}
+
+//=================================================================================================
+void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesList,
+                                                   const bool theIsMakeShells)
+{
+  theBaseShapesList.clear();
+
+  ListOfShape aBaseFacesList;
+  AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
+  if(!aBaseObjectsSelectionList.get()) {
+    setError("Error: Could not get base objects selection list.");
     return;
   }
-  ListOfShape aFacesList;
-  for(int aFaceIndex = 0; aFaceIndex < aSketchFacesNum; aFaceIndex++) {
-    std::shared_ptr<GeomAPI_Shape> aFace = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
-    aFacesList.push_back(aFace);
+  if(aBaseObjectsSelectionList->size() == 0) {
+    setError("Error: Base objects list is empty.");
+    return;
+  }
+  for(int anIndex = 0; anIndex < aBaseObjectsSelectionList->size(); anIndex++) {
+    AttributeSelectionPtr aBaseObjectSelection = aBaseObjectsSelectionList->value(anIndex);
+    if(!aBaseObjectSelection.get()) {
+      setError("Error: One of the selected base objects is empty.");
+      return;
+    }
+    GeomShapePtr aBaseShape = aBaseObjectSelection->value();
+    if(aBaseShape.get() && !aBaseShape->isNull()) {
+      aBaseShape->shapeType() == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                                       theBaseShapesList.push_back(aBaseShape);
+    } else {
+      // This may be the whole sketch result selected, check and get faces.
+      ResultConstructionPtr aConstruction =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
+      if(!aConstruction.get()) {
+        setError("Error: One of selected sketches does not have results.");
+        return;
+      }
+      int aFacesNum = aConstruction->facesNum();
+      if(aFacesNum == 0) {
+        // Probably it can be construction.
+        aBaseShape = aConstruction->shape();
+        if(aBaseShape.get() && !aBaseShape->isNull()) {
+          aBaseShape->shapeType() == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                                           theBaseShapesList.push_back(aBaseShape);
+        }
+      } else {
+        for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
+          GeomShapePtr aBaseFace = aConstruction->face(aFaceIndex);
+          if(!aBaseFace.get() || aBaseFace->isNull()) {
+            setError("Error: One of the faces on selected sketch is Null.");
+            return;
+          }
+          aBaseFacesList.push_back(aBaseFace);
+        }
+      }
+    }
   }
 
   // Searching faces with common edges.
-  ListOfShape aShells;
-  ListOfShape aFreeFaces;
-  std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aFacesList);
-  GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
-  aShells.insert(aShells.end(), aFreeFaces.begin(), aFreeFaces.end());
-
-  // Generating result for each shell and face.
-  int aErrorsNum = 0;
-  int aResultIndex = 0;
-  for(ListOfShape::const_iterator anIter = aShells.cbegin(); anIter != aShells.cend(); anIter++) {
-    std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape;
-
-    std::shared_ptr<GeomAPI_Shape> aBaseFace = *anIter;
-    makeSolid(aBaseFace, aMakeShape);
-    if(!aMakeShape.get()) {
-      aErrorsNum++;
-      continue;
-    }
-
-    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    loadNamingDS(aResultBody, aBaseFace, aMakeShape);
-    setResult(aResultBody, aResultIndex);
-    aResultIndex++;
+  if(theIsMakeShells) {
+    ListOfShape aShells;
+    ListOfShape aFreeFaces;
+    GeomShapePtr aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
+    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
+    theBaseShapesList.insert(theBaseShapesList.end(), aFreeFaces.begin(), aFreeFaces.end());
+    theBaseShapesList.insert(theBaseShapesList.end(), aShells.begin(), aShells.end());
+  } else {
+    theBaseShapesList.insert(theBaseShapesList.end(), aBaseFacesList.begin(), aBaseFacesList.end());
   }
-
-  if(aErrorsNum > 0) {
-    std::ostringstream aStringStream;
-    aStringStream << "Error: Could not create solid(s) from " << aErrorsNum << " face(s).";
-    setError(aStringStream.str());
-  }
-
-  // Remove the rest results if there were produced in the previous pass.
-  removeResults(aResultIndex);
 }
 
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                                  const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                                                  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape)
+bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
-  //load result
-  theResultBody->storeGenerated(theBaseShape, theMakeShape->shape());
-
-  //Insert lateral face : Face from Edge
-  const std::string aLatName = "LateralFace";
-  const int aLatTag = 1;
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aDataMap = theMakeShape->mapOfSubShapes();
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::EDGE, aLatTag, aLatName, *aDataMap.get());
-
-  std::shared_ptr<GeomAlgoAPI_MakeSweep> aSweepAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
-  if(aSweepAlgo.get()) {
-    //Insert to faces
-    int aToFaceIndex = 1;
-    const std::string aToName = "ToFace";
-    int aToTag = 2;
-    const ListOfShape& aToFaces = aSweepAlgo->toShapes();
-    for(ListOfShape::const_iterator anIt = aToFaces.cbegin(); anIt != aToFaces.cend(); anIt++) {
-      std::shared_ptr<GeomAPI_Shape> aToFace = *anIt;
-      if(aDataMap->isBound(aToFace)) {
-        aToFace = aDataMap->find(aToFace);
-      }
-      std::ostringstream aStr;
-      aStr << aToName << "_" << aToFaceIndex++;
-      theResultBody->generated(aToFace, aStr.str(), aToTag++);
-    }
-
-    //Insert from faces
-    int aFromFaceIndex = 1;
-    const std::string aFromName = "FromFace";
-    int aFromTag = aToTag > 10000 ? aToTag : 10000;
-    const ListOfShape& aFromFaces = aSweepAlgo->fromShapes();
-    for(ListOfShape::const_iterator anIt = aFromFaces.cbegin(); anIt != aFromFaces.cend(); anIt++) {
-      std::shared_ptr<GeomAPI_Shape> aFromFace = *anIt;
-      if(aDataMap->isBound(aFromFace)) {
-        aFromFace = aDataMap->find(aFromFace);
-      }
-      std::ostringstream aStr;
-      aStr << aFromName << "_" << aFromFaceIndex++;
-      theResultBody->generated(aFromFace, aStr.str(), aFromTag++);
-    }
+  // Check that algo is done.
+  if(!theMakeShape->isDone()) {
+    setError("Error:" + getKind() + "algorithm failed.");
+    return false;
   }
+
+  // Check if shape is not null.
+  if(!theMakeShape->shape().get() || theMakeShape->shape()->isNull()) {
+    setError("Error: Resulting shape is null.");
+    return false;
+  }
+
+  // Check that resulting shape is valid.
+  if(!theMakeShape->isValid()) {
+    setError("Error: Resulting shape is not valid.");
+    return false;
+  }
+
+  return true;
 }
+
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::setSketchObjectToList()
+void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape,
+                                                 const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                                 const int theResultIndex)
 {
-  std::shared_ptr<ModelAPI_Feature> aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
-                                                       reference(SKETCH_OBJECT_ID())->value());
+  // Create result body.
+  ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
 
-  if(aSketchFeature.get() && !aSketchFeature->results().empty()) {
-    ResultPtr aSketchRes = aSketchFeature->results().front();
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
-    if(aConstruction.get()) {
-      AttributeSelectionListPtr aFacesSelectionList = selectionList(LIST_ID());
-      if (aFacesSelectionList.get() && aFacesSelectionList->size() == 0)
-        aFacesSelectionList->append(aSketchRes, std::shared_ptr<GeomAPI_Shape>());
+  // Store generated shape.
+  aResultBody->storeGenerated(theBaseShape, theMakeShape->shape());
+
+  // Store generated edges/faces.
+  int aGenTag = 1;
+  storeGenerationHistory(aResultBody, theBaseShape, theMakeShape, aGenTag);
+
+  setResult(aResultBody, theResultIndex);
+}
+
+//=================================================================================================
+void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theResultBody,
+                                                            const GeomShapePtr theBaseShape,
+                                                            const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                                            int& theTag)
+{
+  GeomAPI_Shape::ShapeType aBaseShapeType = theBaseShape->shapeType();
+  GeomAPI_Shape::ShapeType aShapeTypeToExplode;
+  std::string aGenName = "Generated_";
+
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
+  switch(aBaseShapeType) {
+    case GeomAPI_Shape::VERTEX: {
+      aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
+      aGenName += "Edge";
+      break;
     }
+    case GeomAPI_Shape::EDGE:
+    case GeomAPI_Shape::WIRE: {
+      std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
+      GeomAlgoAPI_ShapeTools::findBounds(theBaseShape, aV1, aV2);
+      ListOfShape aV1History, aV2History;
+      theMakeShape->generated(aV1, aV1History);
+      theMakeShape->generated(aV2, aV2History);
+      theResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", theTag++);
+      theResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", theTag++);
+    }
+    case GeomAPI_Shape::FACE:
+    case GeomAPI_Shape::SHELL: {
+      aShapeTypeToExplode = GeomAPI_Shape::EDGE;
+      aGenName += "Face";
+      break;
+    }
+  }
+  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, aShapeTypeToExplode,
+                                              theTag++, aGenName, *aMapOfSubShapes.get());
+
+  std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
+  if(aMakeSweep.get()) {
+    // Store from shapes.
+    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, aMakeSweep->fromShapes(), "From_", theTag);
+
+    // Store to shapes.
+    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, aMakeSweep->toShapes(), "To_", theTag);
   }
 }
 
+//=================================================================================================
+void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
+                                                 const GeomAPI_Shape::ShapeType theBaseShapeType,
+                                                 const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                                                 const ListOfShape& theShapes,
+                                                 const std::string theName,
+                                                 int& theTag)
+{
+  GeomAPI_Shape::ShapeType aShapeTypeToExplore = GeomAPI_Shape::FACE;
+  std::string aShapeTypeStr = "Face";
+  switch(theBaseShapeType) {
+    case GeomAPI_Shape::VERTEX: {
+      aShapeTypeToExplore = GeomAPI_Shape::VERTEX;
+      aShapeTypeStr = "Vertex";
+      break;
+    }
+    case GeomAPI_Shape::EDGE:
+    case GeomAPI_Shape::WIRE: {
+      aShapeTypeToExplore = GeomAPI_Shape::EDGE;
+      aShapeTypeStr = "Edge";
+      break;
+    }
+    case GeomAPI_Shape::FACE:
+    case GeomAPI_Shape::SHELL: {
+      aShapeTypeToExplore = GeomAPI_Shape::FACE;
+      aShapeTypeStr = "Face";
+      break;
+    }
+  }
+
+  // Store shapes.
+  int aShapeIndex = 1;
+  std::string aName = theName + aShapeTypeStr;
+  for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
+    GeomShapePtr aShape = *anIt;
+    for(GeomAPI_ShapeExplorer anExp(aShape, aShapeTypeToExplore); anExp.more(); anExp.next()) {
+      GeomShapePtr aSubShape = anExp.current();
+      if(theMapOfSubShapes->isBound(aSubShape)) {
+        aSubShape = theMapOfSubShapes->find(aSubShape);
+      }
+      std::ostringstream aStr;
+      aStr << aName << "_" << aShapeIndex++;
+      theResultBody->generated(aSubShape, aStr.str(), theTag++);
+    }
+  }
+}

@@ -7,17 +7,19 @@
 #ifndef FeaturesPlugin_RevolutionFuse_H_
 #define FeaturesPlugin_RevolutionFuse_H_
 
-#include <FeaturesPlugin_RevolutionBoolean.h>
+#include "FeaturesPlugin_RevolutionBoolean.h"
 
-/** \class FeaturesPlugin_RevolutionFuse
- *  \ingroup Plugins
- *  \brief This feature allows to create sketch, revol faces from this sketch and
- *         fuse result with other objects in a single operation.
- */
+/// \class FeaturesPlugin_RevolutionFuse
+/// \ingroup Plugins
+/// \brief This feature allows to create sketch, revol faces from this sketch and
+///        fuse result with other objects in a single operation.
 class FeaturesPlugin_RevolutionFuse : public FeaturesPlugin_RevolutionBoolean
 {
  public:
-  /// Feature kind.
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_RevolutionFuse();
+
+   /// Feature kind.
   inline static const std::string& ID()
   {
     static const std::string MY_REVOLUTION_ID("RevolutionFuse");
@@ -30,9 +32,6 @@ class FeaturesPlugin_RevolutionFuse : public FeaturesPlugin_RevolutionBoolean
     static std::string MY_KIND = FeaturesPlugin_RevolutionFuse::ID();
     return MY_KIND;
   }
-
-  /// Use plugin manager for features creation.
-  FeaturesPlugin_RevolutionFuse();
 };
 
 #endif

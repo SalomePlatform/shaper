@@ -24,13 +24,28 @@ GeomAlgoAPI_MakeShapeList::GeomAlgoAPI_MakeShapeList(const ListOfMakeShape& theM
 //=================================================================================================
 void GeomAlgoAPI_MakeShapeList::init(const ListOfMakeShape& theMakeShapeList)
 {
+  if(myMap.get()) {
+    myMap->clear();
+  } else {
+    myMap.reset(new GeomAPI_DataMapOfShapeShape);
+  }
+
   myListOfMakeShape = theMakeShapeList;
+
+  for(ListOfMakeShape::const_iterator anIt = theMakeShapeList.cbegin();
+      anIt != theMakeShapeList.cend(); ++anIt) {
+    myMap->merge((*anIt)->mapOfSubShapes());
+  }
 }
 
 //=================================================================================================
 void GeomAlgoAPI_MakeShapeList::appendAlgo(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
   myListOfMakeShape.push_back(theMakeShape);
+  if(!myMap.get()) {
+    myMap.reset(new GeomAPI_DataMapOfShapeShape());
+  }
+  myMap->merge(theMakeShape->mapOfSubShapes());
 }
 
 //=================================================================================================

@@ -7,17 +7,19 @@
 #ifndef FeaturesPlugin_ExtrusionFuse_H_
 #define FeaturesPlugin_ExtrusionFuse_H_
 
-#include <FeaturesPlugin_ExtrusionBoolean.h>
+#include "FeaturesPlugin_ExtrusionBoolean.h"
 
-/** \class FeaturesPlugin_ExtrusionFuse
- *  \ingroup Plugins
- *  \brief This feature allows to create sketch, extrude faces from this sketch and
- *         fuse result with other objects in a single operation.
- */
+/// \class FeaturesPlugin_ExtrusionFuse
+/// \ingroup Plugins
+/// \brief This feature allows to create sketch, extrude faces from this sketch and
+///        fuse result with other objects in a single operation.
 class FeaturesPlugin_ExtrusionFuse : public FeaturesPlugin_ExtrusionBoolean
 {
- public:
-  /// Feature kind.
+public:
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_ExtrusionFuse();
+
+   /// Feature kind.
   inline static const std::string& ID()
   {
     static const std::string MY_EXTRUSION_ID("ExtrusionFuse");
@@ -30,9 +32,6 @@ class FeaturesPlugin_ExtrusionFuse : public FeaturesPlugin_ExtrusionBoolean
     static std::string MY_KIND = FeaturesPlugin_ExtrusionFuse::ID();
     return MY_KIND;
   }
-
-  /// Use plugin manager for features creation.
-  FeaturesPlugin_ExtrusionFuse();
 };
 
 #endif

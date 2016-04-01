@@ -6,7 +6,9 @@
 
 #include "FeaturesPlugin_RevolutionFuse.h"
 
+//=================================================================================================
 FeaturesPlugin_RevolutionFuse::FeaturesPlugin_RevolutionFuse()
 {
-  myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_FUSE;
+  myFeature = this;
+  myOperationType = BOOL_FUSE;
 }

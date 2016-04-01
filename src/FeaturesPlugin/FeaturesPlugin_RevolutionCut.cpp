@@ -6,7 +6,9 @@
 
 #include "FeaturesPlugin_RevolutionCut.h"
 
+//=================================================================================================
 FeaturesPlugin_RevolutionCut::FeaturesPlugin_RevolutionCut()
 {
-  myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_CUT;
+  myFeature = this;
+  myOperationType = BOOL_CUT;
 }

@@ -7,16 +7,18 @@
 #ifndef FeaturesPlugin_RevolutionCut_H_
 #define FeaturesPlugin_RevolutionCut_H_
 
-#include <FeaturesPlugin_RevolutionBoolean.h>
+#include "FeaturesPlugin_RevolutionBoolean.h"
 
-/** \class FeaturesPlugin_RevolutionCut
- *  \ingroup Plugins
- *  \brief This feature allows to create sketch, revol faces from this sketch and
- *         cut result from other objects in a single operation.
- */
+/// \class FeaturesPlugin_RevolutionCut
+/// \ingroup Plugins
+/// \brief This feature allows to create sketch, revol faces from this sketch and
+///        cut result from other objects in a single operation.
 class FeaturesPlugin_RevolutionCut : public FeaturesPlugin_RevolutionBoolean
 {
- public:
+public:
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_RevolutionCut();
+
   /// Feature kind.
   inline static const std::string& ID()
   {
@@ -30,9 +32,6 @@ class FeaturesPlugin_RevolutionCut : public FeaturesPlugin_RevolutionBoolean
     static std::string MY_KIND = FeaturesPlugin_RevolutionCut::ID();
     return MY_KIND;
   }
-
-  /// Use plugin manager for features creation.
-  FeaturesPlugin_RevolutionCut();
 };
 
 #endif

@@ -17,16 +17,16 @@
       type_choice="Faces Objects">
       <validator id="FeaturesPlugin_ValidatorExtrusionBase" parameters="Sketch"/>
     </composite_multi_selector>
+    <shape_selector id="axis_object"
+                    icon=":icons/axis.png"
+                    label="Axis"
+                    tooltip="Select an edge for axis"
+                    shape_types="edge"
+                    default="">
+      <validator id="GeomValidators_ShapeType" parameters="line"/>
+    </shape_selector>
     <toolbox id="CreationMethod">
       <box id="ByAngles" title="By angles" icon=":icons/angle_up_down_32x32.png">
-        <shape_selector id="axis_object"
-                        icon=":icons/axis.png"
-                        label="Axis"
-                        tooltip="Select an edge for axis"
-                        shape_types="edge"
-                        default="">
-          <validator id="GeomValidators_ShapeType" parameters="line"/>
-        </shape_selector>
         <groupbox>
           <doublevalue
             id="to_angle"
@@ -49,14 +49,6 @@
         </groupbox>
       </box>
       <box id="ByPlanesAndOffsets" title="By bounding planes and angles" icon=":icons/plane_inverted_32x32.png">
-        <shape_selector id="axis_object"
-                        icon=":icons/axis.png"
-                        label="Axis"
-                        tooltip="Select an edge for axis"
-                        shape_types="edge"
-                        default="">
-          <validator id="GeomValidators_ShapeType" parameters="line"/>
-        </shape_selector>
         <groupbox title="From">
           <shape_selector id="from_object"
                           icon=":icons/plane.png"
@@ -90,7 +82,7 @@
       </box>
     </toolbox>
   </groupbox>
-  <multi_selector id="boolean_objects"
+  <multi_selector id="main_objects"
     label="Fuse with:"
     icon=":icons/cut_shape.png"
     tooltip="Objects to Fuse"

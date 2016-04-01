@@ -93,6 +93,9 @@ protected:
   /// \param[in] theShape new shape.
   void setShape(const std::shared_ptr<GeomAPI_Shape> theShape);
 
+protected:
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap; ///< Data map to keep correct orientation of sub-shapes.
+
 private:
   /// \brief Initializes internals.
   void initialize();
@@ -101,7 +104,6 @@ private:
   GeomAlgoAPI_MakeShape::BuilderType myBuilderType; ///< Type of make shape builder.
   bool myDone; ///< Builder status.
   std::shared_ptr<GeomAPI_Shape> myShape; ///< Resulting shape.
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap; ///< Data map to keep correct orientation of sub-shapes.
 };
 
 typedef std::list<std::shared_ptr<GeomAlgoAPI_MakeShape> > ListOfMakeShape;

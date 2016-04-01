@@ -17,6 +17,14 @@
       type_choice="Faces Objects">
       <validator id="FeaturesPlugin_ValidatorExtrusionBase" parameters="Sketch"/>
     </composite_multi_selector>
+    <shape_selector id="direction_object"
+                    icon=":icons/axis.png"
+                    label="Direction"
+                    tooltip="Select an edge for direction"
+                    shape_types="edge"
+                    default="">
+      <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+    </shape_selector>
     <toolbox id="CreationMethod">
       <box id="BySizes" title="By sizes" icon=":icons/dimension_up_down_32x32.png">
         <groupbox>
@@ -74,7 +82,7 @@
       </box>
     </toolbox>
   </groupbox>
-  <multi_selector id="boolean_objects"
+  <multi_selector id="main_objects"
     label="Fuse with:"
     icon=":icons/cut_shape.png"
     tooltip="Objects to Fuse"

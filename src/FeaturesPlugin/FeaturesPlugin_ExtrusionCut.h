@@ -7,17 +7,19 @@
 #ifndef FeaturesPlugin_ExtrusionCut_H_
 #define FeaturesPlugin_ExtrusionCut_H_
 
-#include <FeaturesPlugin_ExtrusionBoolean.h>
+#include "FeaturesPlugin_ExtrusionBoolean.h"
 
-/** \class FeaturesPlugin_ExtrusionCut
- *  \ingroup Plugins
- *  \brief This feature allows to create sketch, extrude faces from this sketch and
- *         cut result from other objects in a single operation.
- */
+/// \class FeaturesPlugin_ExtrusionCut
+/// \ingroup Plugins
+/// \brief This feature allows to create sketch, extrude faces from this sketch and
+///        cut result from other objects in a single operation.
 class FeaturesPlugin_ExtrusionCut : public FeaturesPlugin_ExtrusionBoolean
 {
- public:
-  /// Feature kind.
+public:
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_ExtrusionCut();
+
+   /// Feature kind.
   inline static const std::string& ID()
   {
     static const std::string MY_EXTRUSION_ID("ExtrusionCut");
@@ -30,9 +32,6 @@ class FeaturesPlugin_ExtrusionCut : public FeaturesPlugin_ExtrusionBoolean
     static std::string MY_KIND = FeaturesPlugin_ExtrusionCut::ID();
     return MY_KIND;
   }
-
-  /// Use plugin manager for features creation.
-  FeaturesPlugin_ExtrusionCut();
 };
 
 #endif

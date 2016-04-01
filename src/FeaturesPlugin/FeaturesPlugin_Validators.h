@@ -7,6 +7,7 @@
 #ifndef FeaturesPlugin_Validators_H_
 #define FeaturesPlugin_Validators_H_
 
+#include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_FeatureValidator.h>
 
 /// \class FeaturesPlugin_PipeLocationsValidator
@@ -25,6 +26,26 @@ class FeaturesPlugin_PipeLocationsValidator : public ModelAPI_FeatureValidator
 
   /// Returns true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+};
+
+/// \class FeaturesPlugin_ValidatorBaseForGeneration
+/// \ingroup Validators
+/// \brief A validator for selection base for generation. Allows to select faces on sketch,
+/// whole sketch(if it has at least one face), and following objects: vertex, edge, wire, face.
+class FeaturesPlugin_ValidatorBaseForGeneration : public ModelAPI_AttributeValidator
+{
+public:
+  //! Returns true if attribute has selection type listed in the parameter arguments.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        std::string& theError) const;
+
+private:
+  bool isValidAttribute(const AttributePtr& theAttribute,
+                        std::string& theError) const;
 };
 
 #endif

@@ -160,8 +160,10 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
 {
   bool aValid = true;
   if (!theObject.get()) {
-    aValid = false;
-    theError = "The object is empty";
+    if(theShapeType != Empty) {
+      aValid = false;
+      theError = "The object is empty";
+    }
   }
   else {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);

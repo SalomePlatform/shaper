@@ -6,7 +6,9 @@
 
 #include "FeaturesPlugin_ExtrusionFuse.h"
 
+//=================================================================================================
 FeaturesPlugin_ExtrusionFuse::FeaturesPlugin_ExtrusionFuse()
 {
-  myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_FUSE;
+  myFeature = this;
+  myOperationType = BOOL_FUSE;
 }

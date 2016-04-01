@@ -7,46 +7,31 @@
 #ifndef FeaturesPlugin_CompositeSketch_H_
 #define FeaturesPlugin_CompositeSketch_H_
 
-#include <FeaturesPlugin.h>
+#include "FeaturesPlugin.h"
 
 #include <ModelAPI_CompositeFeature.h>
 
-#include <GeomAlgoAPI_Boolean.h>
+#include <ModelAPI_ResultBody.h>
 
-/** \class FeaturesPlugin_CompositeSketch
- *  \ingroup Plugins
- *  \brief Interface for the composite sketch feature.
- */
+/// \class FeaturesPlugin_CompositeSketch
+/// \ingroup Plugins
+/// \brief Interface for the composite sketch feature.
 class FeaturesPlugin_CompositeSketch : public ModelAPI_CompositeFeature
 {
- public:
+public:
   /// Attribute name of sketch feature.
-  inline static const std::string& SKETCH_OBJECT_ID()
+  inline static const std::string& SKETCH_ID()
   {
-    static const std::string MY_SKETCH_OBJECT_ID("sketch");
-    return MY_SKETCH_OBJECT_ID;
+    static const std::string MY_SKETCH_ID("sketch");
+    return MY_SKETCH_ID;
   }
 
-  /// Attribute name of sketch feature selection: needed for naming of the selected sketch.
-  inline static const std::string& SKETCH_SELECTION_ID()
+  /// Attribute name of base objects.
+  inline static const std::string& BASE_OBJECTS_ID()
   {
-    static const std::string MY_SKETCH_SELECTION_ID("sketch_selection");
-    return MY_SKETCH_SELECTION_ID;
+    static const std::string MY_BASE_OBJECTS_ID("base");
+    return MY_BASE_OBJECTS_ID;
   }
-
-  /// attribute name of references sketch entities list, it should contain a sketch result or
-  /// a pair a sketch result to sketch face
-  inline static const std::string& LIST_ID()
-  {
-    static const std::string MY_GROUP_LIST_ID("base");
-    return MY_GROUP_LIST_ID;
-  }
-
-  /// Creates a new part document if needed.
-  FEATURESPLUGIN_EXPORT virtual void execute();
-
-  /// Request for initialization of data model of the feature: adding all attributes.
-  FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
   /// Appends a feature to the sketch sub-elements container.
   FEATURESPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
@@ -64,29 +49,52 @@ class FeaturesPlugin_CompositeSketch : public ModelAPI_CompositeFeature
   FEATURESPLUGIN_EXPORT virtual bool isSub(ObjectPtr theObject) const;
 
   /// This method to inform that sub-feature is removed and must be removed from the internal data
-  /// structures of the owner (the remove from the document will be done outside just after)
+  /// structures of the owner (the remove from the document will be done outside just after).
   FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
-  /// removes also all sub-sketch
+  /// Removes also all sub-sketch.
   FEATURESPLUGIN_EXPORT virtual void erase();
 
 protected:
+  enum InitFlags {
+    InitSketchLauncher   = 1 << 0,
+    InitBaseObjectsList  = 1 << 1
+  };
+
   FeaturesPlugin_CompositeSketch(){};
 
-  /// Define this function to init attributes for extrusion/revolution.
-  //virtual void initMakeSolidsAttributes() {};
+  /// Initializes composite sketch attributes.
+  void initCompositeSketchAttribtues(const int theInitFlags);
 
-  /// Define this function to create solids from faces with extrusion/revolution.
-  virtual void makeSolid(const std::shared_ptr<GeomAPI_Shape> theFace,
-                         std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape) {};
-
-  /// Results naming.
-  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape);
-
-  /// Set the sub-object to list of exturusion base.
+  /// Sets the sub-object to list of base.
   void setSketchObjectToList();
+
+  /// \brief Returns list of base shapes.
+  /// \param[out] theBaseShapesList list of base shapes (warning: list not cleared).
+  /// \param[in] theIsMakeShells if true make shells from faces with shared edges.
+  void getBaseShapes(ListOfShape& theBaseShapesList, const bool theIsMakeShells = true);
+
+  /// Checks make shape algo.
+  bool isMakeShapeValid(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
+
+  /// Stores result of generation.
+  void storeResult(const GeomShapePtr theBaseShape,
+                   const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                   const int theIndex = 0);
+
+  /// Stores generation history.
+  void storeGenerationHistory(ResultBodyPtr theResultBody,
+                              const GeomShapePtr theBaseShape,
+                              const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                              int& theTag);
+
+  /// Used to store from and to shapes.
+  void storeShapes(ResultBodyPtr theResultBody,
+                   const GeomAPI_Shape::ShapeType theBaseShapeType,
+                   const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                   const ListOfShape& theShapes,
+                   const std::string theName,
+                   int& theTag);
 
 };
 

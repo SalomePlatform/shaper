@@ -6,7 +6,9 @@
 
 #include "FeaturesPlugin_ExtrusionCut.h"
 
+//=================================================================================================
 FeaturesPlugin_ExtrusionCut::FeaturesPlugin_ExtrusionCut()
 {
-  myBooleanOperationType = GeomAlgoAPI_Boolean::BOOL_CUT;
+  myFeature = this;
+  myOperationType = BOOL_CUT;
 }

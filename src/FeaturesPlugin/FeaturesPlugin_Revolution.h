@@ -7,52 +7,49 @@
 #ifndef FeaturesPlugin_Revolution_H_
 #define FeaturesPlugin_Revolution_H_
 
-#include <FeaturesPlugin.h>
+#include "FeaturesPlugin.h"
 
-#include <GeomAlgoAPI_Revolution.h>
-#include <FeaturesPlugin_CompositeSketch.h>
+#include "FeaturesPlugin_CompositeSketch.h"
 
-class GeomAPI_Shape;
-class ModelAPI_ResultBody;
+#include <GeomAlgoAPI_MakeShape.h>
 
-/** \class FeaturesPlugin_Revolution
- *  \ingroup Plugins
- *  \brief Feature for creation of revolution from the planar face.
- *  Revolution creates the lateral faces based on edges of the base face and
- *  the start and end faces and/or start and end angles.
- */
-class FeaturesPlugin_Revolution : public FeaturesPlugin_CompositeSketch
+/// \class FeaturesPlugin_Revolution
+/// \ingroup Plugins
+/// \brief Feature for creation of revolution from the planar face.
+/// Revolution creates the lateral faces based on edges of the base face and
+/// the start and end faces and/or start and end angles.
+class FeaturesPlugin_Revolution: public FeaturesPlugin_CompositeSketch
 {
- public:
-  /// Revolution kind.
+public:
+  /// Feature kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_REVOLUTION_ID("Revolution");
-    return MY_REVOLUTION_ID;
+    static const std::string MY_ID("Revolution");
+    return MY_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("CreationMethod");
+    return MY_CREATION_METHOD_ID;
   }
 
   /// Attribute name of an revolution axis.
   inline static const std::string& AXIS_OBJECT_ID()
   {
-    static const std::string MY_AXIS_ID("axis_object");
-    return MY_AXIS_ID;
+    static const std::string MY_AXIS_OBJECT_ID("axis_object");
+    return MY_AXIS_OBJECT_ID;
   }
 
-  /// attribute name for creation method
-  inline static const std::string& CREATION_METHOD()
-  {
-    static const std::string METHOD_ATTR("CreationMethod");
-    return METHOD_ATTR;
-  }
-
-  /// Attribute name of revolution angle.
+  /// Attribute name of revolution to angle.
   inline static const std::string& TO_ANGLE_ID()
   {
     static const std::string MY_TO_ANGLE_ID("to_angle");
     return MY_TO_ANGLE_ID;
   }
 
-  /// Attribute name of revolution angle.
+  /// Attribute name of revolution from angle.
   inline static const std::string& FROM_ANGLE_ID()
   {
     static const std::string MY_FROM_ANGLE_ID("from_angle");
@@ -66,21 +63,21 @@ class FeaturesPlugin_Revolution : public FeaturesPlugin_CompositeSketch
     return MY_TO_OBJECT_ID;
   }
 
-  /// attribute name of extrusion offset.
+  /// Attribute name of revolution offset.
   inline static const std::string& TO_OFFSET_ID()
   {
     static const std::string MY_TO_OFFSET_ID("to_offset");
     return MY_TO_OFFSET_ID;
   }
 
-  /// Attribute name of tool object.
+  /// Attribute name of an object from which the revolution grows.
   inline static const std::string& FROM_OBJECT_ID()
   {
     static const std::string MY_FROM_OBJECT_ID("from_object");
     return MY_FROM_OBJECT_ID;
   }
 
-  /// attribute name of extrusion offset.
+  /// Attribute name of revolution offset.
   inline static const std::string& FROM_OFFSET_ID()
   {
     static const std::string MY_FROM_OFFSET_ID("from_offset");
@@ -103,11 +100,13 @@ class FeaturesPlugin_Revolution : public FeaturesPlugin_CompositeSketch
   /// Use plugin manager for features creation.
   FeaturesPlugin_Revolution();
 
-private:
-  /// Load Naming data structure of the feature to the document.
-  void loadNamingDS(GeomAlgoAPI_Revolution& theRevolAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBasis);
+  protected:
+  /// Generates revolutions.
+  /// \param[out] theBaseShapes list of base shapes.
+  /// \param[out] theMakeShapes list of according algos.
+  /// \return false in case one of algo failed.
+  bool makeRevolutions(ListOfShape& theBaseShapes,
+                       ListOfMakeShape& theMakeShapes);
 };
 
 #endif
