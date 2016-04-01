@@ -145,7 +145,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   myHasConstraintShown[PartSet_Tools::Geometrical] = true;
   myHasConstraintShown[PartSet_Tools::Dimensional] = true;
-  myHasConstraintShown[PartSet_Tools::Dimensional] = false;
+  myHasConstraintShown[PartSet_Tools::Expressions] = false;
 
   Config_PropManager::registerProp("Visualization", "operation_parameter_color",
                           "Reference shape wireframe color in operation", Config_Prop::Color,
