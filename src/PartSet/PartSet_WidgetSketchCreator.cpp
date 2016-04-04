@@ -328,6 +328,11 @@ bool PartSet_WidgetSketchCreator::focusTo()
 {
   if (isSelectionMode()) {
     activateSelectionControl();
+
+    SessionPtr aMgr = ModelAPI_Session::get();
+    bool aIsOp = aMgr->isOperation();
+    if (!aIsOp)
+      aMgr->startOperation(myFeature->getKind());
     return true;
   }
   else {
