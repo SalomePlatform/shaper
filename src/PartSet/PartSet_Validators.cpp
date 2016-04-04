@@ -638,6 +638,7 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   QList<FeaturePtr> aCoinsideLines;
+  QList<FeaturePtr> aCoins;
 
   bool isObject = aRefAttr->isObject();
   ObjectPtr anObject = aRefAttr->object();
@@ -663,9 +664,9 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
         AttributePtr aAR = aRAttr->attr();
         if (aAR->id() != SketchPlugin_Arc::CENTER_ID()) // ignore constraint to center of arc
           aCoinList.insert(aConstrFeature);
-          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines,
+          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
                                           SketchPlugin_ConstraintCoincidence::ENTITY_A());
-          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines,
+          PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
                                           SketchPlugin_ConstraintCoincidence::ENTITY_B());
       }
     }

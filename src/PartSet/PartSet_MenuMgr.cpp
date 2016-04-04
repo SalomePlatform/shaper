@@ -153,10 +153,11 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
         FeaturePtr aCoincident = PartSet_Tools::findFirstCoincidence(aFeature, aSelPnt);
         // If we have coincidence then add Detach menu
         if (aCoincident.get() != NULL) {
+          QList<FeaturePtr> aCoins;
           mySelectedFeature = aCoincident;
-          PartSet_Tools::findCoincidences(mySelectedFeature, myCoinsideLines,
+          PartSet_Tools::findCoincidences(mySelectedFeature, myCoinsideLines, aCoins,
                                           SketchPlugin_ConstraintCoincidence::ENTITY_A());
-          PartSet_Tools::findCoincidences(mySelectedFeature, myCoinsideLines,
+          PartSet_Tools::findCoincidences(mySelectedFeature, myCoinsideLines, aCoins,
                                           SketchPlugin_ConstraintCoincidence::ENTITY_B());
           if (myCoinsideLines.size() > 0) {
             aIsDetach = true;

@@ -470,7 +470,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
             if (aShape.ShapeType() == TopAbs_VERTEX) {
               FeaturePtr aFixedFeature = ModelAPI_Feature::feature(aFixedObject);
               if (aFixedFeature.get() && aFixedFeature->getKind() == SketchPlugin_Point::ID()) {
-                anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY, true);
+                anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY);
               }
             }
           }
@@ -650,7 +650,7 @@ bool PartSet_WidgetPoint2D::useSelectedShapes() const
 
 bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
                                           const CompositeFeaturePtr& theSketch,
-                                          double theX, double theY, const bool theSearchInResults)
+                                          double theX, double theY)
 {
   bool anOrphanPoint = false;
   if (theFeature.get()) {
@@ -681,14 +681,15 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
       std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
       // we need to find coincidence features in results also, because external object(point)
       // uses refs to me in another feature.
-      FeaturePtr aCoincidence = PartSet_Tools::findFirstCoincidence(theFeature, aPoint, theSearchInResults);
+      FeaturePtr aCoincidence = PartSet_Tools::findFirstCoincidence(theFeature, aPoint);
       anOrphanPoint = true;
       // if there is at least one concident line to the point, the point is not an orphant
       if (aCoincidence.get()) {
         QList<FeaturePtr> aCoinsideLines;
-        PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines,
+        QList<FeaturePtr> aCoins;
+        PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines, aCoins,
                                         SketchPlugin_ConstraintCoincidence::ENTITY_A());
-        PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines,
+        PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines, aCoins,
                                         SketchPlugin_ConstraintCoincidence::ENTITY_B());
         QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(),
                                           aLast = aCoinsideLines.end();

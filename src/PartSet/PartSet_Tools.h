@@ -235,8 +235,7 @@ public:
   * \return the coincidence feature or null
   */
   static FeaturePtr findFirstCoincidence(const FeaturePtr& theFeature,
-                                         std::shared_ptr<GeomAPI_Pnt2d> thePoint,
-                                         const bool theSearchInResults = false);
+                                         std::shared_ptr<GeomAPI_Pnt2d> thePoint);
 
   /**
   * Returns list of features connected in a councedence feature point
@@ -245,6 +244,7 @@ public:
   * \param theAttr the attribute name
   */
   static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
+                               QList<FeaturePtr>& theCoincidencies,
                                std::string theAttr);
 
   /**
