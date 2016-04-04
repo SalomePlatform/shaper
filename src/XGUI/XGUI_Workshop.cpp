@@ -1202,6 +1202,7 @@ void XGUI_Workshop::deleteObjects()
     ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
     operationMgr()->startOperation(anOpAction);
 
+    // WORKAROUND, should be done before each object remove, if it presents in XGUI_DataModel tree
     // It is necessary to clear selection in order to avoid selection changed event during
     // deletion and negative consequences connected with processing of already deleted items
     mySelector->clearSelection();
@@ -1295,6 +1296,11 @@ void XGUI_Workshop::cleanHistory()
     aDescription += "by deleting of " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
     ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
     operationMgr()->startOperation(anOpAction);
+
+    // WORKAROUND, should be done before each object remove, if it presents in XGUI_DataModel tree
+    // It is necessary to clear selection in order to avoid selection changed event during
+    // deletion and negative consequences connected with processing of already deleted items
+    mySelector->clearSelection();
 
     std::set<FeaturePtr> anIgnoredFeatures;
     if (removeFeatures(anUnusedObjects, anIgnoredFeatures, anActionId)) {
