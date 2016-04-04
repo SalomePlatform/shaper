@@ -218,7 +218,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           action("MOVE_CMD")->setEnabled(true);
 
         else if (hasFeature || hasParameter)
-          action("CLEAN_HISTORY_CMD")->setEnabled(true);
+          action("CLEAN_HISTORY_CMD")->setEnabled(!hasSubFeature);
 
         if( aMgr->activeDocument() == aObject->document() )
         {
@@ -246,7 +246,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       if (hasFeature || hasParameter)
         action("DELETE_CMD")->setEnabled(true);
     }
-    if (allActive && (hasFeature|| hasParameter))
+    if (!hasSubFeature && allActive && (hasFeature|| hasParameter))
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
   }
 
