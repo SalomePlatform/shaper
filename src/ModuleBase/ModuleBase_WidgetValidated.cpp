@@ -4,6 +4,7 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_WidgetSelectorStore.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -26,12 +27,14 @@ ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
                                                        ModuleBase_IWorkshop* theWorkshop,
                                                        const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
-  myWorkshop(theWorkshop), myIsInValidate(false)
+  myWorkshop(theWorkshop)
 {
+  myAttributeStore = new ModuleBase_WidgetSelectorStore();
 }
 
 ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 {
+  delete myAttributeStore;
 }
 
 //********************************************************************
@@ -54,12 +57,21 @@ void ModuleBase_WidgetValidated::clearValidatedCash()
 void ModuleBase_WidgetValidated::storeAttributeValue()
 {
   myIsInValidate = true;
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+
+  myAttributeStore->storeAttributeValue(anAttribute, myWorkshop);
 }
 
 //********************************************************************
 void ModuleBase_WidgetValidated::restoreAttributeValue(const bool theValid)
 {
   myIsInValidate = false;
+
+  DataPtr aData = myFeature->data();
+  AttributePtr anAttribute = myFeature->attribute(attributeID());
+
+  myAttributeStore->restoreAttributeValue(anAttribute, myWorkshop);
 }
 
 //********************************************************************

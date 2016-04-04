@@ -22,6 +22,7 @@
 class QWidget;
 class ModuleBase_IWorkshop;
 class ModuleBase_ISelection;
+class ModuleBase_WidgetSelectorStore;
 class ModelAPI_Validator;
 class Config_WidgetAPI;
 class Handle_SelectMgr_EntityOwner;
@@ -137,6 +138,9 @@ private:
   ObjectPtr myPresentedObject; /// back up of the filtered object
   QList<ModuleBase_ViewerPrs> myValidPrs; /// cash of valid selection presentations
   QList<ModuleBase_ViewerPrs> myInvalidPrs; /// cash of invalid selection presentations
+
+  /// store to backup parameters of the model
+  ModuleBase_WidgetSelectorStore* myAttributeStore;
 };
 
 #endif /* MODULEBASE_WIDGETVALIDATED_H_ */

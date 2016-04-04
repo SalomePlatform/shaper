@@ -88,17 +88,6 @@ Q_OBJECT
 
   virtual bool restoreValueCustom();
 
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
-  virtual void storeAttributeValue();
-
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
-  /// \param theValid a boolean flag, if restore happens for valid parameters
-  virtual void restoreAttributeValue(const bool theValid);
-
   /// Computes and updates name of selected object in the widget
   virtual void updateSelectionName();
 
@@ -128,18 +117,6 @@ Q_OBJECT
 
   /// List of accepting shapes types
   QStringList myShapeTypes;
-
-  /// backup parameters of the model attribute. The class processes three types of attribute:
-  /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter
-  /// values are reserved in the backup
-  /// An attribute object
-  ObjectPtr myObject;
-  /// An attribute shape
-  GeomShapePtr myShape;
-  /// A reference of the attribute
-  AttributePtr myRefAttribute;
-  /// A boolean value whether refAttr uses reference of object
-  bool myIsObject;
 };
 
 #endif

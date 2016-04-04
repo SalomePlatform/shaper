@@ -55,7 +55,7 @@ protected:
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
-  void restoreAttributeValue(const bool theValid);
+  virtual void restoreAttributeValue(const bool theValid);
 
   /// Return an object and geom shape by the viewer presentation
   /// \param thePrs a selection

@@ -490,6 +490,28 @@ void setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
   }
 }
 
+GeomShapePtr getShape(const AttributePtr& theAttribute, ModuleBase_IWorkshop* theWorkshop)
+{
+  GeomShapePtr aShape;
+  if (!theAttribute.get())
+    return aShape;
+
+  std::string aType = theAttribute->attributeType();
+  if (aType == ModelAPI_AttributeReference::typeId()) {
+  } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    if (aRefAttr.get() && !aRefAttr->isObject()) {
+      AttributePtr anAttribute = aRefAttr->attr();
+      aShape = theWorkshop->module()->findShape(anAttribute);
+    }
+  } else if (aType == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr aSelectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+                                                                                 (theAttribute);
+    aShape = aSelectAttr->value();
+  }
+  return aShape;
+}
+
 } // namespace ModuleBase_Tools
 
 

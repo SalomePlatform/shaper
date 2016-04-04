@@ -109,11 +109,6 @@ protected:
 
   virtual bool restoreValueCustom();
 
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
-  virtual void storeAttributeValue();
-
   /// Set the focus on the last item in  the list
   virtual void updateFocus();
 
@@ -123,12 +118,6 @@ protected:
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
   virtual QIntList getShapeTypes() const;
-
-  /// Creates a backup of the current values of the attribute
-  /// It should be realized in the specific widget because of different
-  /// parameters of the current attribute
-  /// \param theValid a boolean flag, if restore happens for valid parameters
-  virtual void restoreAttributeValue(const bool theValid);
 
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
@@ -189,15 +178,6 @@ protected:
   /// An action for pop-up menu in a list control
   QAction* myCopyAction;
   QAction* myDeleteAction;
-
-  /// backup parameters of the model attribute. The class processes three types of attribute:
-  /// Reference, RefAttr and Selection. Depending on the attribute type, only the attribute parameter
-  /// values are reserved in the backup
-  /// Variable of selection type
-  std::string mySelectionType;
-
-  /// Variable of GeomSelection
-  int mySelectionCount; // number of elements in the attribute selection list when store
 
   /// A flag to store use_choice parameter state
   bool myIsUseChoice;

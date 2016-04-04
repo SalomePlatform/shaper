@@ -53,6 +53,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetLineEdit.h
   ModuleBase_WidgetMultiSelector.h
   ModuleBase_WidgetSelector.h
+  ModuleBase_WidgetSelectorStore.h
   ModuleBase_WidgetShapeSelector.h
   ModuleBase_WidgetSwitch.h
   ModuleBase_WidgetToolbox.h
@@ -108,6 +109,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetLineEdit.cpp
   ModuleBase_WidgetMultiSelector.cpp
   ModuleBase_WidgetSelector.cpp
+  ModuleBase_WidgetSelectorStore.cpp
   ModuleBase_WidgetShapeSelector.cpp
   ModuleBase_WidgetSwitch.cpp
   ModuleBase_WidgetToolbox.cpp

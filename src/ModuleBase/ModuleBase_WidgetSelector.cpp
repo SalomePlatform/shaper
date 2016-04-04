@@ -141,15 +141,6 @@ bool ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::setObject(ObjectPtr theObject,
-                                          GeomShapePtr theShape)
-{
-  DataPtr aData = myFeature->data();
-  ModuleBase_Tools::setObject(aData->attribute(attributeID()), theObject, theShape,
-                              myWorkshop, myIsInValidate);
-}
-
-//********************************************************************
 void ModuleBase_WidgetSelector::activateCustom()
 {
   connect(myWorkshop, SIGNAL(selectionChanged()), this,
@@ -184,7 +175,8 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrs& t
   GeomShapePtr aShape;
   getGeomSelection(thePrs, anObject, aShape);
 
-  setObject(anObject, aShape);
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  ModuleBase_Tools::setObject(anAttribute, anObject, aShape, myWorkshop, false);
   return true;
 }
 

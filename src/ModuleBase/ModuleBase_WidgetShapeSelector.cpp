@@ -184,22 +184,10 @@ GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
 {
   GeomShapePtr aShape;
   DataPtr aData = myFeature->data();
-  if (!aData->isValid())
-    return aShape;
-
-  std::string aType = aData->attribute(attributeID())->attributeType();
-  if (aType == ModelAPI_AttributeReference::typeId()) {
-  } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    if (aRefAttr.get() && !aRefAttr->isObject()) {
-      AttributePtr anAttribute = aRefAttr->attr();
-      aShape = myWorkshop->module()->findShape(anAttribute);
-    }
-  } else if (aType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-    aShape = aSelectAttr->value();
+  if (aData->isValid()) {
+    AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+    aShape = ModuleBase_Tools::getShape(anAttribute, myWorkshop);
   }
-
   return aShape;
 }
 
@@ -232,40 +220,5 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
         myTextLine->setText(getDefaultValue().c_str());
       }
     }
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::storeAttributeValue()
-{
-  ModuleBase_WidgetValidated::storeAttributeValue();
-
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
-
-  myObject = ModuleBase_Tools::getObject(anAttribute);
-  myShape = getShape();
-  myRefAttribute = AttributePtr();
-  myIsObject = false;
-  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-  if (aRefAttr) {
-    myIsObject = aRefAttr->isObject();
-    myRefAttribute = aRefAttr->attr();
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::restoreAttributeValue(bool theValid)
-{
-  ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
-
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
-
-  setObject(myObject, myShape);
-  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-  if (aRefAttr) {
-    if (!myIsObject)
-      aRefAttr->setAttr(myRefAttribute);
   }
 }

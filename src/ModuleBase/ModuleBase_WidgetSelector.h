@@ -85,13 +85,6 @@ protected:
   // NDS: has body is temporary
   virtual void updateSelectionName() {};
 
-  /// Store the values to the model attribute of the widget. It casts this attribute to
-  /// the specific type and set the given values
-  /// \param theSelectedObject an object
-  /// \param theShape a selected shape, which is used in the selection attribute
-  /// \return true if it is succeed
-  void setObject(ObjectPtr theSelectedObject, GeomShapePtr theShape);
-
   /// The methiod called when widget is activated
   virtual void activateCustom();
 

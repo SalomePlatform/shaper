@@ -191,6 +191,14 @@ MODULEBASE_EXPORT void setObject(const AttributePtr& theAttribute, const ObjectP
                                  const std::shared_ptr<GeomAPI_Shape>& theShape,
                                  ModuleBase_IWorkshop* theWorkshop,
                                  const bool theTemporarily = false);
+
+/// Returns the shape of the attribute. If the attribute is AttributeRefAttrPtr, the shape is found
+/// using current module of the given workshop.
+/// \param theAttribute an attribute where the shape is set
+/// \param theWorkshop to find a shape for the given attribute
+MODULEBASE_EXPORT std::shared_ptr<GeomAPI_Shape> getShape(const AttributePtr& theAttribute,
+                                                          ModuleBase_IWorkshop* theWorkshop);
+
 }
 
 #endif

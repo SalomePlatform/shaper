@@ -86,8 +86,7 @@ protected:
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData)
-: ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
-  mySelectionCount(0)
+: ModuleBase_WidgetSelector(theParent, theWorkshop, theData)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -213,62 +212,6 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
   }
   updateSelectionList();
   return true;
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::storeAttributeValue()
-{
-  ModuleBase_WidgetValidated::storeAttributeValue();
-
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = aData->attribute(attributeID());
-  std::string aType = anAttribute->attributeType();
-  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
-    mySelectionType = aSelectionListAttr->selectionType();
-    mySelectionCount = aSelectionListAttr->size();
-  }
-  else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
-    mySelectionCount = aRefListAttr->size();
-  }
-  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
-    mySelectionCount = aRefAttrListAttr->size();
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::restoreAttributeValue(bool theValid)
-{
-  ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
-
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = aData->attribute(attributeID());
-  std::string aType = anAttribute->attributeType();
-  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
-    aSelectionListAttr->setSelectionType(mySelectionType);
-
-    // restore selection in the attribute. Indeed there is only one stored object
-    int aCountAppened = aSelectionListAttr->size() - mySelectionCount;
-    for (int i = 0; i < aCountAppened; i++)
-      aSelectionListAttr->removeLast();
-  }
-  else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
-    // restore objects in the attribute. Indeed there is only one stored object
-    int aCountAppened = aRefListAttr->size() - mySelectionCount;
-    for (int i = 0; i < aCountAppened; i++)
-      aRefListAttr->removeLast();
-  }
-  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
-    // restore objects in the attribute. Indeed there is only one stored object
-    int aCountAppened = aRefAttrListAttr->size() - mySelectionCount;
-    for (int i = 0; i < aCountAppened; i++)
-      aRefAttrListAttr->removeLast();
-  }
 }
 
 //********************************************************************
@@ -624,7 +567,7 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       TopoDS_Shape aShape;
       AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
       if (anAttribute.get()) {
-        GeomShapePtr aGeomShape = myWorkshop->module()->findShape(anAttribute);
+        GeomShapePtr aGeomShape = ModuleBase_Tools::getShape(anAttribute, myWorkshop);
         theValues.append(ModuleBase_ViewerPrs(anObject, aGeomShape, NULL));
       }
     }
