@@ -57,21 +57,14 @@ void ModuleBase_WidgetValidated::clearValidatedCash()
 void ModuleBase_WidgetValidated::storeAttributeValue()
 {
   myIsInValidate = true;
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
-
-  myAttributeStore->storeAttributeValue(anAttribute, myWorkshop);
+  myAttributeStore->storeAttributeValue(attributeToValidate(), myWorkshop);
 }
 
 //********************************************************************
 void ModuleBase_WidgetValidated::restoreAttributeValue(const bool theValid)
 {
   myIsInValidate = false;
-
-  DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
-
-  myAttributeStore->restoreAttributeValue(anAttribute, myWorkshop);
+  myAttributeStore->restoreAttributeValue(attributeToValidate(), myWorkshop);
 }
 
 //********************************************************************
@@ -125,6 +118,12 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
 }
 
 //********************************************************************
+AttributePtr ModuleBase_WidgetValidated::attributeToValidate() const
+{
+  return myFeature->attribute(attributeID());
+}
+
+//********************************************************************
 bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& theValue)
 {
   bool aValid = false;
@@ -140,6 +139,7 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
 
   // stores the current values of the widget attribute
   bool isFlushesActived, isAttributeSetInitializedBlocked;
+
   blockAttribute(true, isFlushesActived, isAttributeSetInitializedBlocked);
 
   storeAttributeValue();
@@ -179,7 +179,7 @@ bool ModuleBase_WidgetValidated::isValidAttribute() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
+  AttributePtr anAttribute = attributeToValidate();
   std::string aValidatorID, anError;
   return aFactory->validate(anAttribute, aValidatorID, anError);
 }
@@ -217,7 +217,7 @@ void ModuleBase_WidgetValidated::blockAttribute(const bool& theToBlock, bool& is
 {
   Events_Loop* aLoop = Events_Loop::loop();
   DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = myFeature->attribute(attributeID());
+  AttributePtr anAttribute = attributeToValidate();
   if (theToBlock) {
     // blocks the flush signals to avoid the temporary objects visualization in the viewer
     // they should not be shown in order to do not lose highlight by erasing them

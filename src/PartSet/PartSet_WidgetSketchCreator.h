@@ -75,6 +75,11 @@ protected:
 
   virtual bool restoreValueCustom();
 
+  /// Retunrs attribute, which should be validated. In default implementation,
+  /// this is an attribute of ID
+  /// \return an attribute
+  virtual AttributePtr attributeToValidate() const;
+
   /// Sets the selection control visible and set the current widget as active in property panel
   /// It leads to connect to onSelectionChanged slot
   void activateSelectionControl();
@@ -109,11 +114,6 @@ private:
   /// \param theValues a selection list
   /// \return true if the sketch is started
   bool startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues);
-
-  /// Appends the selection to the sketch base attribute 
-  /// \param theValue a selection value from the viewer
-  /// \return true if the value is set
-  bool setBaseAttributeSelection(const ModuleBase_ViewerPrs& theValue);
 
 private:
   std::string myAttributeListID;

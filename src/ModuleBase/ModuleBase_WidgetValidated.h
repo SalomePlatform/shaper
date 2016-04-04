@@ -14,6 +14,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Attribute.h>
 
 #include <SelectMgr_ListOfFilter.hxx>
 
@@ -60,6 +61,11 @@ protected:
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
   bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
+
+  /// Retunrs attribute, which should be validated. In default implementation,
+  /// this is an attribute of ID
+  /// \return an attribute
+  virtual AttributePtr attributeToValidate() const;
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
