@@ -175,7 +175,7 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrs& t
   GeomShapePtr aShape;
   getGeomSelection(thePrs, anObject, aShape);
 
-  ModuleBase_Tools::setObject(attributeToValidate(), anObject, aShape, myWorkshop, false);
+  ModuleBase_Tools::setObject(attributeToValidate(), anObject, aShape, myWorkshop, myIsInValidate);
   return true;
 }
 
