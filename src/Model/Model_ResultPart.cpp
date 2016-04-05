@@ -67,12 +67,12 @@ void Model_ResultPart::activate()
   // activation may cause changes in current features in document, so it must be in transaction
   bool isNewTransaction = false;
   SessionPtr aMgr = ModelAPI_Session::get();
+  if (!aMgr->isOperation()) { // open transaction even document is not created to set current docs in setActiveDocument
+    aMgr->startOperation("Activation");
+    isNewTransaction = true;
+  }
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
     Handle(Model_Application) anApp = Model_Application::getApplication();
-    if (!aMgr->isOperation()) {
-      aMgr->startOperation("Activation");
-      isNewTransaction = true;
-    }
     if (anApp->isLoadByDemand(data()->name())) {
       anApp->loadDocument(data()->name(), aDocRef->docId()); // if it is just ne part, load may fail
     } else {

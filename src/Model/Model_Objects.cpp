@@ -509,7 +509,7 @@ const int Model_Objects::index(std::shared_ptr<ModelAPI_Object> theObject)
 int Model_Objects::size(const std::string& theGroupID)
 {
   createHistory(theGroupID);
-  return myHistory[theGroupID].size();
+  return int(myHistory[theGroupID].size());
 }
 
 void Model_Objects::allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults)
@@ -762,8 +762,30 @@ void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& t
     std::set<AttributePtr>::iterator aCurrentIter = aData->refsToMe().begin();
     while(aCurrentIter != aData->refsToMe().end()) {
       if (theNewRefs.find(*aCurrentIter) == theNewRefs.end()) {
-        aData->removeBackReference(*aCurrentIter);
-        aCurrentIter = aData->refsToMe().begin(); // reinitialize iteration after delete
+        // for external references from other documents this system is not working: refs are collected from
+        // different Model_Objects, so before remove check this external object exists and still referenced
+        bool aLeaveIt = false;
+        if ((*aCurrentIter)->owner().get() && (*aCurrentIter)->owner()->document() != myDoc &&
+            (*aCurrentIter)->owner()->data().get() && (*aCurrentIter)->owner()->data()->isValid()) {
+          std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > > aRefs;
+          (*aCurrentIter)->owner()->data()->referencesToObjects(aRefs);
+          std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >::iterator
+            aRefIter = aRefs.begin();
+          for(; aRefIter != aRefs.end(); aRefIter++) {
+            if ((*aCurrentIter)->id() == aRefIter->first) {
+              std::list<std::shared_ptr<ModelAPI_Object> >::iterator anOIt;
+              for(anOIt = aRefIter->second.begin(); anOIt != aRefIter->second.end(); anOIt++) {
+                if (*anOIt == theObject) {
+                  aLeaveIt = true;
+                }
+              }
+            }
+          }
+        }
+        if (!aLeaveIt) {
+          aData->removeBackReference(*aCurrentIter);
+          aCurrentIter = aData->refsToMe().begin(); // reinitialize iteration after delete
+        } else aCurrentIter++;
       } else aCurrentIter++;
     }
   }
@@ -809,6 +831,7 @@ void Model_Objects::synchronizeBackRefs()
       synchronizeBackRefsForObject(anEmpty, aFeature);
     } else {
       synchronizeBackRefsForObject(aFound->second, aFeature);
+      allRefs.erase(aFound); // to check that all refs are counted
     }
     // also for results
     std::list<ResultPtr> aResults;
@@ -820,6 +843,7 @@ void Model_Objects::synchronizeBackRefs()
         synchronizeBackRefsForObject(anEmpty, *aRIter);
       } else {
         synchronizeBackRefsForObject(aFound->second, *aRIter);
+        allRefs.erase(aFound); // to check that all refs are counted
       }
     }
   }
@@ -832,6 +856,11 @@ void Model_Objects::synchronizeBackRefs()
     for(; aRIter != aResults.cend(); aRIter++) {
       (*aRIter)->isConcealed();
     }
+  }
+  // the rest all refs means that feature references to the external document feature: process also them
+  std::map<ObjectPtr, std::set<AttributePtr> >::iterator anExtIter = allRefs.begin();
+  for(; anExtIter != allRefs.end(); anExtIter++) {
+    synchronizeBackRefsForObject(anExtIter->second, anExtIter->first);
   }
 }
 
@@ -1023,7 +1052,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
   if (!theFeature->data() || !theFeature->data()->isValid() || theFeature->isDisabled())
     return;
   // check that results are presented on all labels
-  int aResSize = theFeature->results().size();
+  int aResSize = int(theFeature->results().size());
   TDF_ChildIterator aLabIter(resultLabel(theFeature->data(), 0).Father());
   for(; aLabIter.More(); aLabIter.Next()) {
     // here must be GUID of the feature

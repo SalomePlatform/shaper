@@ -68,7 +68,7 @@ aSession.finishOperation()
 #=========================================================================
 # Make a plane in PartSet on lateral face of the Extrusion
 #=========================================================================
-aSession.startOperation()
+aSession.startOperation("Make Plane")
 aSession.setActiveDocument(aPartSet)
 aPlane = aPartSet.addFeature("Plane")
 aPlane.string("CreationMethod").setValue("PlaneByFaceAndDistance")
@@ -79,7 +79,7 @@ aSession.finishOperation()
 #=========================================================================
 # Update the sketch edges in order to update the plane on the lateral face automatically
 #=========================================================================
-aSession.startOperation()
+aSession.startOperation("UpdateLine")
 geomDataAPI_Point2D(aLine1.attribute("EndPoint")).setValue(400, 0)
 geomDataAPI_Point2D(aLine2.attribute("StartPoint")).setValue(400, 0)
 aSession.finishOperation()

@@ -60,7 +60,7 @@ void Model_ResultCompSolid::storeModified(const std::shared_ptr<GeomAPI_Shape>& 
 
 int Model_ResultCompSolid::numberOfSubs(bool forTree) const
 {
-  return mySubs.size();
+  return int(mySubs.size());
 }
 
 std::shared_ptr<ModelAPI_ResultBody> Model_ResultCompSolid::subResult(const int theIndex,

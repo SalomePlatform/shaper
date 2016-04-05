@@ -432,7 +432,11 @@ bool Model_AttributeSelection::update()
 
   if (aSelLab.IsAttribute(kPART_REF_ID)) { // it is reference to the part object
     std::shared_ptr<GeomAPI_Shape> aNoSelection;
-    return setInvalidIfFalse(aSelLab, selectPart(aContext, aNoSelection, true));
+    bool aResult = selectPart(aContext, aNoSelection, true);
+    if (aResult) {
+      owner()->data()->sendAttributeUpdated(this);
+    }
+    return setInvalidIfFalse(aSelLab, aResult);
   }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {

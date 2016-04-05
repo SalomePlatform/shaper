@@ -244,7 +244,7 @@ bool Model_Document::save(
         break;
     }
   }
-  myTransactionSave = myTransactions.size();
+  myTransactionSave = int(myTransactions.size());
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     // iterate all result parts to find all loaded or not yet loaded documents
@@ -739,7 +739,7 @@ std::list<std::string> Model_Document::undoList() const
   // the number of skipped current operations (on undo they will be aborted)
   int aSkipCurrent = isOperation() ? 1 : 0;
   std::list<Transaction>::const_reverse_iterator aTrIter = myTransactions.crbegin();
-  int aNumUndo = myTransactions.size();
+  int aNumUndo = int(myTransactions.size());
   if (!myNestedNum.empty())
     aNumUndo = *myNestedNum.rbegin();
   for( ; aNumUndo > 0; aTrIter++, aNumUndo--) {
@@ -1249,6 +1249,9 @@ AttributeSelectionListPtr Model_Document::selectionInPartFeature()
     mySelectionFeature->data()->setName(aName);
     mySelectionFeature->setDoc(myObjs->owner());
     mySelectionFeature->initAttributes();
+    mySelectionFeature->init(); // to make it enabled and Update correctly
+    // this update may cause recomputation of the part after selection on it, that is not needed
+    mySelectionFeature->data()->blockSendAttributeUpdated(true);
   }
   return mySelectionFeature->selectionList("selection");
 }

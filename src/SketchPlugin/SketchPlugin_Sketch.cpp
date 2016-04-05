@@ -267,7 +267,7 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
         std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
       }
     }
-  } else if (theID == SketchPlugin_Sketch::NORM_ID() || theID == SketchPlugin_Sketch::DIRX_ID()) {
+  } else if (theID == NORM_ID() || theID == DIRX_ID() || theID == ORIGIN_ID()) {
     // send all sub-elements are also updated: all entities become created on different plane
     static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     std::list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();

@@ -20,12 +20,12 @@ aSession = ModelAPI_Session.get()
 #=========================================================================
 def testImport(theType, theFile, theVolume, theDelta):
     # Create a part for import
-    aSession.startOperation()
+    aSession.startOperation("Create part for import")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
     aSession.finishOperation()
     aPart = aSession.activeDocument()
     
-    aSession.startOperation()
+    aSession.startOperation("Import file")
     aFeatureKind = "Import"
     anImportFeature = aPart.addFeature(aFeatureKind)
     assert anImportFeature, "{0}: Can not create a feature {1}".format(theType, aFeatureKind)

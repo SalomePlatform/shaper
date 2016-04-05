@@ -32,12 +32,12 @@ def removeFile(theFileName):
 #=========================================================================
 def testExport(theType, theFormat, theFile, theVolume, theDelta):
     # Import a reference part 
-    aSession.startOperation()
+    aSession.startOperation("Add part")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
     aSession.finishOperation()
     aPart = aSession.activeDocument()
     
-    aSession.startOperation()
+    aSession.startOperation("Import screw")
     anImportFeature = aPart.addFeature("Import")
     anImportFeature.string("file_path").setValue("Data/screw.step")
     anImportFeature.execute()
@@ -45,7 +45,7 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     
     removeFile(theFile)
     # Export a part
-    aSession.startOperation()
+    aSession.startOperation("Export part")
     aFeatureKind = "Export"
     anExportFeature = aPart.addFeature(aFeatureKind)
     assert anExportFeature, "{0}: Can not create a feature {1}".format(theType, aFeatureKind)

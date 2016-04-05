@@ -206,7 +206,7 @@ void findRandomColor(std::vector<int>& theValues)
     fillColorMap();
   }
 
-  int aSize = myColorMap.size();
+  size_t aSize = myColorMap.size();
   int anIndex = rand() % aSize;
   if (myColorMap.find(anIndex) != myColorMap.end()) {
     theValues = myColorMap.at(anIndex);
@@ -252,7 +252,7 @@ FeaturePtr findPartFeature(const DocumentPtr& theMain, const DocumentPtr& theSub
 CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
 {
   if (theFeature.get() && theFeature->data()->isValid()) {
-    const std::set<std::shared_ptr<ModelAPI_Attribute> > aRefs = theFeature->data()->refsToMe();
+    const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = theFeature->data()->refsToMe();
     std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.begin();
     for(; aRefIter != aRefs.end(); aRefIter++) {
       CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>

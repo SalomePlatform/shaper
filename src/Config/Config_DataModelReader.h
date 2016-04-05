@@ -36,7 +36,7 @@ class Config_DataModelReader : public Config_XMLReader
   CONFIG_EXPORT std::string rootType() const { return myRootTypes; }
 
   /// Returns number of folders under root 
-  CONFIG_EXPORT int rootFoldersNumber() const { return myRootFolderNames.size(); }
+  CONFIG_EXPORT int rootFoldersNumber() const { return int(myRootFolderNames.size()); }
 
   /// Returns name of the folder by its Id
   /// \param theId id of the folder
@@ -65,7 +65,7 @@ class Config_DataModelReader : public Config_XMLReader
   CONFIG_EXPORT std::string subType() const { return mySubTypes; }
 
   /// Returns number of folders under sub document 
-  CONFIG_EXPORT int subFoldersNumber() const { return mySubFolderNames.size(); }
+  CONFIG_EXPORT int subFoldersNumber() const { return int(mySubFolderNames.size()); }
 
   /// Returns name of the folder by its Id
   /// \param theId id of the folder
