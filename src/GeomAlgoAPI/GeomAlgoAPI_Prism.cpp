@@ -91,13 +91,12 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   std::shared_ptr<GeomAPI_Pnt> aBaseLoc;
   std::shared_ptr<GeomAPI_Dir> aBaseDir;
   GeomShapePtr aBasePlane;
-  if(theDirection.get()) {
-    aDirVec = theDirection->impl<gp_Dir>();
-  } else {
-    BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
-    if(aBaseShape.ShapeType() == TopAbs_VERTEX ||
-       aBaseShape.ShapeType() == TopAbs_EDGE ||
-       aFindPlane.Found() != Standard_True) {
+  const bool isBoundingShapesSet = theFromShape.get() || theToShape.get();
+  BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
+  if(aBaseShape.ShapeType() == TopAbs_VERTEX || aBaseShape.ShapeType() == TopAbs_EDGE ||
+     aFindPlane.Found() != Standard_True) {
+    // Direction and both bounding planes should be set or empty.
+    if(!theDirection.get() || (isBoundingShapesSet && (!theToShape.get() || !theFromShape.get()))) {
       return;
     }
 
@@ -110,19 +109,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
   }
 
-  //std::shared_ptr<GeomAPI_Face> aBaseFace;
-  //if(theBaseShape->shapeType() == GeomAPI_Shape::FACE) {
-  //  aBaseFace = std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(theBaseShape));
-  //} else if(theBaseShape->shapeType() == GeomAPI_Shape::SHELL){
-  //  GeomAPI_ShapeExplorer anExp(theBaseShape, GeomAPI_Shape::FACE);
-  //  if(anExp.more()) {
-  //    GeomShapePtr aFaceOnShell = anExp.current();
-  //    aBaseFace = std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(aFaceOnShell));
-  //  }
-  //}
-
   TopoDS_Shape aResult;
-  bool isBoundingShapesSet = theFromShape || theToShape;
   if(!isBoundingShapesSet) {
     // Moving base shape.
     gp_Trsf aTrsf;
