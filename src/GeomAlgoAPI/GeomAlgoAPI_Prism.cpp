@@ -31,6 +31,8 @@
 #include <TopoDS_Solid.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
+#include <BRepTools.hxx>
+
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const double       theToSize,
@@ -100,6 +102,9 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       return;
     }
 
+    aBaseDir = theDirection;
+    aDirVec = theDirection->impl<gp_Dir>();
+  } else {
     Handle(Geom_Plane) aPlane = aFindPlane.Plane();
     gp_Pnt aLoc = aPlane->Axis().Location();
     aDirVec = aPlane->Axis().Direction();
@@ -136,7 +141,21 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     aResult = aPrismBuilder->Shape();
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aMovedBase, TopAbs_FACE); anExp.More(); anExp.Next()) {
+    TopAbs_ShapeEnum aShapeTypeToExp;
+    switch(aMovedBase.ShapeType()) {
+      case TopAbs_VERTEX:
+        aShapeTypeToExp = TopAbs_VERTEX;
+        break;
+      case TopAbs_EDGE:
+      case TopAbs_WIRE:
+        aShapeTypeToExp = TopAbs_EDGE;
+        break;
+      case TopAbs_FACE:
+      case TopAbs_SHELL:
+        aShapeTypeToExp = TopAbs_FACE;
+        break;
+    }
+    for(TopExp_Explorer anExp(aMovedBase, aShapeTypeToExp); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aFace = anExp.Current();
       GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
       aFromShape->setImpl(new TopoDS_Shape(aPrismBuilder->FirstShape(aFace)));
@@ -295,6 +314,9 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       this->addToShape(aShape);
     }
     aResult = aToCutBuilder->Shape();
+    if(aResult.ShapeType() == TopAbs_COMPOUND) {
+      aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+    }
 
     // Cutting with from plane.
     BRepAlgoAPI_Cut* aFromCutBuilder = new BRepAlgoAPI_Cut(aResult, aFromSolid);
@@ -311,8 +333,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     }
     aResult = aFromCutBuilder->Shape();
 
-    TopExp_Explorer anExp(aResult, TopAbs_SOLID);
-    if(!anExp.More()) {
+    TopoDS_Iterator anIt(aResult);
+    if(!anIt.More()) {
       return;
     }
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
