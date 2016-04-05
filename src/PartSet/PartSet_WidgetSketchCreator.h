@@ -76,7 +76,14 @@ public:
   /// \return boolean value
   static bool canCommitCurrentSketch(ModuleBase_IWorkshop* theWorkshop);
 
+  /// Sets the sub-object to list of base.
+  static void setSketchObjectToList(const CompositeFeaturePtr& theFeature,
+                                    const AttributePtr& theAttribute);
+
 protected:
+  /// If there is no operation in current session, start operation for modify parameters
+  void openTransaction();
+
   /// Checks whether the selection presentation contains preview planes
   /// \param theValue a selection information
   /// \return a boolean value

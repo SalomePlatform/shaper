@@ -118,36 +118,6 @@ void FeaturesPlugin_CompositeSketch::erase()
 }
 
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::setSketchObjectToList()
-{
-  AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
-  if(!aBaseObjectsSelectionList.get() || aBaseObjectsSelectionList->isInitialized()) {
-    return;
-  }
-
-  AttributeReferencePtr aSketchLauncherRef = reference(SKETCH_ID());
-  if(!aSketchLauncherRef.get() || !aSketchLauncherRef->isInitialized()) {
-    return;
-  }
-
-  FeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aSketchLauncherRef->value());
-
-  if(!aSketchFeature.get() || aSketchFeature->results().empty()) {
-    return;
-  }
-
-  ResultPtr aSketchRes = aSketchFeature->results().front();
-  ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
-  if(!aConstruction.get()) {
-    return;
-  }
-
-  if(aBaseObjectsSelectionList->size() == 0) {
-    aBaseObjectsSelectionList->append(aSketchRes, GeomShapePtr());
-  }
-}
-
-//=================================================================================================
 void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesList,
                                                    const bool theIsMakeShells)
 {

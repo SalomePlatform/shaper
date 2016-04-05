@@ -76,9 +76,6 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
 {
   theMakeShapes.clear();
 
-  /// Sub-feature of the composite should be set in the base list.
-  setSketchObjectToList();
-
   // Getting base shapes.
   getBaseShapes(theBaseShapes);
 

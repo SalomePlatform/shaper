@@ -66,9 +66,6 @@ protected:
   /// Initializes composite sketch attributes.
   void initCompositeSketchAttribtues(const int theInitFlags);
 
-  /// Sets the sub-object to list of base.
-  void setSketchObjectToList();
-
   /// \brief Returns list of base shapes.
   /// \param[out] theBaseShapesList list of base shapes (warning: list not cleared).
   /// \param[in] theIsMakeShells if true make shells from faces with shared edges.

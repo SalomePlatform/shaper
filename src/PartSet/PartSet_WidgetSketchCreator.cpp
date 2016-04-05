@@ -28,6 +28,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <SketchPlugin_SketchEntity.h>
 #include <FeaturesPlugin_CompositeBoolean.h>
@@ -123,6 +124,17 @@ AttributePtr PartSet_WidgetSketchCreator::attribute() const
     anAttribute = ModuleBase_WidgetSelector::attribute();
 
   return anAttribute;
+}
+
+//********************************************************************
+void PartSet_WidgetSketchCreator::openTransaction()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aIsOp = aMgr->isOperation();
+  if (!aIsOp) {
+    const static std::string aNestedOpID("Parameters modification");
+    aMgr->startOperation(aNestedOpID, true);
+  }
 }
 
 //********************************************************************
@@ -248,12 +260,13 @@ bool PartSet_WidgetSketchCreator::canCommitCurrentSketch(ModuleBase_IWorkshop* t
       bool aIsOp = aMgr->isOperation();
       if (!aIsOp)
         aMgr->startOperation();
-      aPCompositeFeature->execute(); // to fill attribute selection list
 
       std::list<AttributePtr> aSelListAttributes = aParentFeature->data()->attributes(
                                                         ModelAPI_AttributeSelectionList::typeId());
       if (aSelListAttributes.size() == 1) {
         AttributePtr aFirstAttribute = aSelListAttributes.front();
+        /// Sub-feature of the composite should be set in the base list.
+        setSketchObjectToList(aPCompositeFeature, aFirstAttribute);
 
         SessionPtr aMgr = ModelAPI_Session::get();
         ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
@@ -280,6 +293,34 @@ bool PartSet_WidgetSketchCreator::canCommitCurrentSketch(ModuleBase_IWorkshop* t
     }
   }
   return aCanCommit;
+}
+
+void PartSet_WidgetSketchCreator::setSketchObjectToList(const CompositeFeaturePtr& theCompositeFeature,
+                                                        const AttributePtr& theAttribute)
+{
+  if (!theCompositeFeature.get() || theCompositeFeature->numberOfSubs() != 1)
+    return;
+
+  AttributeSelectionListPtr aBaseObjectsSelectionList =
+                     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!aBaseObjectsSelectionList.get() || aBaseObjectsSelectionList->isInitialized()) {
+    return;
+  }
+
+  FeaturePtr aSketchFeature = theCompositeFeature->subFeature(0);
+  if(!aSketchFeature.get() || aSketchFeature->results().empty()) {
+    return;
+  }
+
+  ResultPtr aSketchRes = aSketchFeature->results().front();
+  ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
+  if(!aConstruction.get()) {
+    return;
+  }
+
+  if(aBaseObjectsSelectionList->size() == 0) {
+    aBaseObjectsSelectionList->append(aSketchRes, GeomShapePtr());
+  }
 }
 
 bool PartSet_WidgetSketchCreator::isSelectionMode() const
@@ -377,24 +418,14 @@ bool PartSet_WidgetSketchCreator::focusTo()
 {
   if (isSelectionMode()) {
     activateSelectionControl();
-
-    SessionPtr aMgr = ModelAPI_Session::get();
-    bool aIsOp = aMgr->isOperation();
-    if (!aIsOp)
-      aMgr->startOperation(myFeature->getKind());
+    // Open transaction that is general for the previous nested one: it will be closed on nested commit
+    openTransaction();
     return true;
   }
   else {
-    //setVisibleSelectionControl(false);
-
     connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
-    SessionPtr aMgr = ModelAPI_Session::get();
     // Open transaction that is general for the previous nested one: it will be closed on nested commit
-    bool aIsOp = aMgr->isOperation();
-    if (!aIsOp) {
-      const static std::string aNestedOpID("Parameters modification");
-      aMgr->startOperation(aNestedOpID, true);
-    }
+    openTransaction();
     restoreValue();
   }
   return false;

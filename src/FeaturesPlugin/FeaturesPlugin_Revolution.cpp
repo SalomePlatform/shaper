@@ -74,9 +74,6 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
 {
   theMakeShapes.clear();
 
-  /// Sub-feature of the composite should be set in the base list.
-  setSketchObjectToList();
-
   // Getting base shapes.
   getBaseShapes(theBaseShapes);
 
