@@ -36,10 +36,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("FeaturesPlugin_ValidatorTransform",
                               new FeaturesPlugin_ValidatorTransform);
-  aFactory->registerValidator("FeaturesPlugin_ValidatorCompositeLauncherE",
-                              new FeaturesPlugin_ValidatorCompositeLauncher);
   aFactory->registerValidator("FeaturesPlugin_ValidatorCompositeLauncher",
-                              new FeaturesPlugin_ValidatorCompositeLauncher_);
+                              new FeaturesPlugin_ValidatorCompositeLauncher);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBaseForGeneration",
                               new FeaturesPlugin_ValidatorBaseForGeneration);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPipeLocations",

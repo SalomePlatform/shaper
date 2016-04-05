@@ -34,6 +34,7 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
     MyShapeTypes["face"]   = Face;
     MyShapeTypes["solid"]  = Solid;
     MyShapeTypes["plane"]  = Plane;
+    MyShapeTypes["shell"]  = Shell;
   }
   std::string aType = std::string(theType.c_str());
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
@@ -220,6 +221,8 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
       aValid = theShape->isSolid() || theShape->isCompSolid() ||
                theShape->isCompoundOfSolids();
       break;
+    case Shell:
+      aValid = theShape->shapeType() == GeomAPI_Shape::SHELL;
     case Compound:
       aValid = theShape->isCompound();
       break;

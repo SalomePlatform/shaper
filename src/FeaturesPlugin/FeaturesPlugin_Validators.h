@@ -64,21 +64,6 @@ public:
                         std::string& theError) const;
 };
 
-/// \class FeaturesPlugin_ValidatorCompositeLauncher
-/// \ingroup Validators
-/// \brief A validator for selection at composite feature start
-class FeaturesPlugin_ValidatorCompositeLauncher_: public ModelAPI_AttributeValidator
-{
-public:
-  //! Returns true if attribute has selection type listed in the parameter arguments.
-  //! \param[in] theAttribute the checked attribute.
-  //! \param[in] theArguments arguments of the attribute.
-  //! \param[out] theError error message.
-   virtual bool isValid(const AttributePtr& theAttribute,
-                        const std::list<std::string>& theArguments,
-                        std::string& theError) const;
-};
-
 /// \class FeaturesPlugin_ValidatorCanBeEmpty
 /// \ingroup Validators
 /// \brief A validator for extrusion direction attribute and bounding planes for extrusion and

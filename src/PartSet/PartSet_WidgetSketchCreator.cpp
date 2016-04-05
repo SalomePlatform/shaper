@@ -129,19 +129,36 @@ AttributePtr PartSet_WidgetSketchCreator::attribute() const
 bool PartSet_WidgetSketchCreator::isValidSelection(const ModuleBase_ViewerPrs& theValue)
 {
   bool aValid = false;
-  if (getValidState(theValue, aValid)) {
-    return aValid;
-  }
-  // check selection to create new sketh (XML current attribute)
-  aValid = isValidSelectionForAttribute(theValue, attribute());
-  if (!aValid) {
-    // check selection to fill list attribute (myAttributeListID)
-    myIsCustomAttribute = true;
+  if (myIsCustomAttribute) {
+    // check only suiting of the value to custom attribute (myAttributeListID)
+    // do not cash of validation to avoid using states, stored for XML attribute
+    // there is an alternative is to call clearValidatedCash() in setSelection()
     aValid = isValidSelectionForAttribute(theValue, attribute());
-    myIsCustomAttribute = false;
+  }
+  else { /// if the validated attribute is already custom
+    if (getValidState(theValue, aValid)) {
+      return aValid;
+    }
+    aValid = isValidSelectionCustom(theValue);
+    if (!aValid)
+      // check selection to create new sketh (XML current attribute)
+      aValid = isValidSelectionForAttribute(theValue, attribute());
+    if (!aValid) {
+      // check selection to fill list attribute (myAttributeListID)
+      bool isCustomAttribute = myIsCustomAttribute;
+      myIsCustomAttribute = true;
+      aValid = isValidSelectionForAttribute(theValue, attribute());
+      myIsCustomAttribute = isCustomAttribute;
+    }
   }
   storeValidState(theValue, aValid);
   return aValid;
+}
+
+//********************************************************************
+bool PartSet_WidgetSketchCreator::isValidSelectionCustom(const ModuleBase_ViewerPrs& theValue)
+{
+  return PartSet_WidgetSketchLabel::canFillSketch(theValue);
 }
 
 void PartSet_WidgetSketchCreator::activateSelectionControl()
@@ -286,7 +303,7 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theV
       if (!theToValidate || isValidInFilters(aValue))
         aProcessed = setSelectionCustom(aValue) || aProcessed;
     }
-    myIsCustomAttribute = true;
+    myIsCustomAttribute = false;
     aDone = aProcessed;
     if (aProcessed) {
       emit valuesChanged();

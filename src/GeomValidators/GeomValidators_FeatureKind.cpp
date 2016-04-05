@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Object.h>
 
 #define DEBUG_EXTRUSION_INVALID_SKETCH
@@ -100,6 +101,21 @@ bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
         if (aFeature.get() != NULL)
           isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
       }
+    }
+  }
+  if (anAttributeType == ModelAPI_AttributeReference::typeId()) {
+    AttributeReferencePtr aRefAttr = 
+                      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    ObjectPtr anObject = aRefAttr->value();
+    // a context of the selection attribute is a feature result. It can be a case when the result
+    // of the feature is null, e.g. the feature is modified and has not been executed yet.
+    // The validator returns an invalid result here. The case is an extrusion built on a sketch
+    // feature. A new sketch element creation leads to an empty result.
+    if (!anObject.get())
+      isSketchEntities = false;
+    else {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+      isSketchEntities = anEntityKinds.find(aFeature->getKind()) != anEntityKinds.end();
     }
   }
   if (!isSketchEntities) {

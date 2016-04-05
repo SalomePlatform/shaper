@@ -181,43 +181,40 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
     return false;
   }
+  if (theArguments.size() != 2) {
+    theError = "Wrong parameters in XML definition for " + theAttribute->attributeType() + " type";
+    return false;
+  }
+  // first argument is for the base attribute, second - for skipping feature kind
+  std::list<std::string>::const_iterator anIt = theArguments.begin();
+  std::string aBaseAttributeId = *anIt;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  AttributePtr aBaseAttribute = aFeature->attribute(aBaseAttributeId);
+  if (!aBaseAttribute.get()) {
+    theError = "Wrong parameters in XML definition for " + theAttribute->attributeType() + " type";
+    return false;
+  }
+  if (aBaseAttribute->isInitialized()) // when base list of composite feature is already filled,
+    // this validator is not necessary anymore
+    return true;
 
-  bool aValid = true;
+  anIt++;
+  std::string aFeatureAttributeKind = *anIt;
   GeomValidators_FeatureKind* aValidator = new GeomValidators_FeatureKind();
   // check whether the selection is on the sketch
-  bool aFeatureKindValid = aValidator->isValid(theAttribute, theArguments, theError);
-  if (!aFeatureKindValid) {
-    // check if selection has Face selected
-    GeomValidators_ShapeType* aShapeType = new GeomValidators_ShapeType();
-    std::list<std::string> anArguments;
-    anArguments.push_back("face");
-    aValid = aShapeType->isValid(theAttribute, anArguments, theError);
-  }
-  return aValid;
-}
-
-//=================================================================================================
-bool FeaturesPlugin_ValidatorCompositeLauncher_::isValid(const AttributePtr& theAttribute,
-                                                        const std::list<std::string>& theArguments,
-                                                        std::string& theError) const
-{
-  FeaturesPlugin_ValidatorBaseForGeneration aBaseValidator;
-
-  if(aBaseValidator.isValid(theAttribute, theArguments, theError)) {
-    return true;
-  }
-
-  // Check that face selected.
-  GeomValidators_ShapeType aShapeType;
   std::list<std::string> anArguments;
+  anArguments.push_back(aFeatureAttributeKind);
+
+  bool aFeatureKind = aValidator->isValid(theAttribute, theArguments, theError);
+  bool aPlanarFace = false;
+  // check if selection has Face selected
+  GeomValidators_ShapeType* aShapeType = new GeomValidators_ShapeType();
+  anArguments.clear();
   anArguments.push_back("face");
-  if(aShapeType.isValid(theAttribute, anArguments, theError)) {
-    return true;
-  }
+  aPlanarFace = aShapeType->isValid(theAttribute, anArguments, theError);
 
-  theError = "Selected shape is not suitable for this operation";
-
-  return false;
+  bool aValid = !aFeatureKind && aPlanarFace;
+  return aValid;
 }
 
 //=================================================================================================

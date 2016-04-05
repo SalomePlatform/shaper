@@ -77,6 +77,11 @@ public:
   static bool canCommitCurrentSketch(ModuleBase_IWorkshop* theWorkshop);
 
 protected:
+  /// Checks whether the selection presentation contains preview planes
+  /// \param theValue a selection information
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& theValue);
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
