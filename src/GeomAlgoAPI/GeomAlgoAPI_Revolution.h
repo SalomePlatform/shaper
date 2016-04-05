@@ -7,8 +7,10 @@
 #ifndef GeomAlgoAPI_Revolution_H_
 #define GeomAlgoAPI_Revolution_H_
 
-#include <GeomAlgoAPI.h>
-#include <GeomAlgoAPI_MakeSweep.h>
+#include "GeomAlgoAPI.h"
+
+#include "GeomAlgoAPI_MakeSweep.h"
+
 #include <GeomAPI_Ax1.h>
 
 /// \class GeomAlgoAPI_Revolution
@@ -29,10 +31,10 @@ public:
   /// \param[in] theAxis axis for revolution.
   /// \param[in] theToAngle to angle.
   /// \param[in] theFromAngle from angle.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                            std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                            double                         theToAngle,
-                                            double                         theFromAngle);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
+                                            const std::shared_ptr<GeomAPI_Ax1> theAxis,
+                                            const double                       theToAngle,
+                                            const double                       theFromAngle);
 
   /// \brief Creates revolution for the given shape.
   /// \param[in] theBaseShape face for revolution.
@@ -41,21 +43,21 @@ public:
   /// \param[in] theToAngle to angle.
   /// \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.
   /// \param[in] theFromAngle from angle.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                            std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                            std::shared_ptr<GeomAPI_Shape> theToShape,
-                                            double                         theToAngle,
-                                            std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                            double                         theFromAngle);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
+                                            const std::shared_ptr<GeomAPI_Ax1> theAxis,
+                                            const GeomShapePtr                 theToShape,
+                                            const double                       theToAngle,
+                                            const GeomShapePtr                 theFromShape,
+                                            const double                       theFromAngle);
 
 private:
   /// Builds resulting shape.
-  void build(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-             const std::shared_ptr<GeomAPI_Ax1>&   theAxis,
-             const std::shared_ptr<GeomAPI_Shape>& theToShape,
-             double                                theToAngle,
-             const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-             double                                theFromAngle);
+  void build(const GeomShapePtr&                 theBaseShape,
+             const std::shared_ptr<GeomAPI_Ax1>& theAxis,
+             const GeomShapePtr&                 theToShape,
+             const double                        theToAngle,
+             const GeomShapePtr&                 theFromShape,
+             const double                        theFromAngle);
 };
 
 #endif

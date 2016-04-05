@@ -30,6 +30,7 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
     MyShapeTypes["edge"]   = Edge;
     MyShapeTypes["line"]   = Line;
     MyShapeTypes["circle"] = Circle;
+    MyShapeTypes["wire"]   = Wire;
     MyShapeTypes["face"]   = Face;
     MyShapeTypes["solid"]  = Solid;
     MyShapeTypes["plane"]  = Plane;
@@ -197,31 +198,34 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
   }
   else {
     switch (theShapeType) {
+    case Vertex:
+      aValid = theShape->isVertex();
+      break;
     case Edge:
       aValid = theShape->isEdge();
       break;
-      case Line:
-        aValid = theShape->isEdge() && !GeomAPI_Curve(theShape).isCircle();
+    case Line:
+      aValid = theShape->isEdge() && !GeomAPI_Curve(theShape).isCircle();
       break;
-      case Circle:
-        aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isCircle();
+    case Circle:
+      aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isCircle();
       break;
-      case Vertex:
-        aValid = theShape->isVertex();
+    case Wire:
+      aValid = theShape->shapeType() == GeomAPI_Shape::WIRE;
       break;
-      case Solid:
-        aValid = theShape->isSolid() || theShape->isCompSolid() ||
-                 theShape->isCompoundOfSolids();
-        break;
-      case Face:
-        aValid = theShape->isFace();
-        break;
-      case Compound:
-        aValid = theShape->isCompound();
-        break;
-      default:
-        aValid = false;
-        break;
+    case Face:
+      aValid = theShape->isFace();
+      break;
+    case Solid:
+      aValid = theShape->isSolid() || theShape->isCompSolid() ||
+               theShape->isCompoundOfSolids();
+      break;
+    case Compound:
+      aValid = theShape->isCompound();
+      break;
+    default:
+      aValid = false;
+      break;
     }
   }
   return aValid;

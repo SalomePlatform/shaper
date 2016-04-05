@@ -91,6 +91,11 @@ std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const
   return std::shared_ptr<GeomAPI_Dir>();
 }
 
+bool GeomAPI_PlanarEdges::isPlanar() const
+{
+  return true;
+}
+
 void GeomAPI_PlanarEdges::setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                    const std::shared_ptr<GeomAPI_Dir>& theDirX,
                                    const std::shared_ptr<GeomAPI_Dir>& theNorm)

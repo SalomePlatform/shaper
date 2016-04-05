@@ -30,10 +30,6 @@ public:
   GEOMAPI_EXPORT 
   virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theFace) const;
 
-  /// Returns true if the face is a planar face
-  GEOMAPI_EXPORT 
-  bool isPlanar() const;
-
   /// Returns true if the face is a cylindrical face
   GEOMAPI_EXPORT 
   bool isCylindrical() const;

@@ -31,5 +31,5 @@
       </multi_selector>
     </box>
   </toolbox>
-  <validator id="FeaturesPlugin_PipeLocationsValidator"/>
+  <validator id="FeaturesPlugin_ValidatorPipeLocations"/>
 </source>

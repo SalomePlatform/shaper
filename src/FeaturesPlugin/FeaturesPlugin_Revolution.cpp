@@ -92,8 +92,14 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aSelection->context()->shape()));
   }
   if(anEdge.get()) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
-                                                          anEdge->line()->direction()));
+    if(anEdge->isLine()) {
+      anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
+                                                            anEdge->line()->direction()));
+    }
+  }
+
+  if(!anAxis.get()) {
+    return false;
   }
 
   // Getting angles.

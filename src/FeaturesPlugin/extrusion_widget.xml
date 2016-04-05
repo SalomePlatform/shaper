@@ -13,7 +13,7 @@
                             label="Base objects:"
                             tooltip="Select a base objects"
                             type_choice="faces objects">
-    <validator id="FeaturesPlugin_ValidatorExtrusionBase" parameters="Sketch"/>
+    <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="vertex,edge,wire,face,shell"/>
   </composite_multi_selector>
   <shape_selector id="direction_object"
                   icon=":icons/axis.png"
@@ -82,4 +82,5 @@
     </box>
   </toolbox>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,base,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
+  <validator id="FeaturesPlugin_ValidatorCanBeEmpty" parameters="CreationMethod,BySizes,base,to_object,from_object,direction_object"/>
 </source>

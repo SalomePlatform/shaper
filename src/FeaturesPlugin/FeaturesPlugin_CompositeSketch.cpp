@@ -220,7 +220,7 @@ bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(const std::shared_ptr<Geom
 {
   // Check that algo is done.
   if(!theMakeShape->isDone()) {
-    setError("Error:" + getKind() + "algorithm failed.");
+    setError("Error: " + getKind() + " algorithm failed.");
     return false;
   }
 

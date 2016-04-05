@@ -26,17 +26,17 @@ public:
   /// \brief Creates extrusion for the given shape along a path.
   /// \param[in] theBaseShape base shape(vertex, edge, wire of face).
   /// \param[in] thePathShape path shape(edge or wire).
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Pipe(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                      const std::shared_ptr<GeomAPI_Shape> thePathShape);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
+                                      const GeomShapePtr thePathShape);
 
   /// \brief Creates extrusion for the given shape along a path.
   /// \param[in] theBaseShape base shape(vertex, edge, wire of face).
   /// \param[in] thePathShape path shape(edge or wire).
   /// \param[in] theBiNormal edge or wire to preserve the constant angle between the normal vector
   /// to the base object and the BiNormal vector.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Pipe(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                      const std::shared_ptr<GeomAPI_Shape> thePathShape,
-                                      const std::shared_ptr<GeomAPI_Shape> theBiNormal);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
+                                      const GeomShapePtr thePathShape,
+                                      const GeomShapePtr theBiNormal);
 
   /// \brief Creates extrusion for the given shape along a path.
   /// \param[in] theBaseShapes base shape(vertex, edge, wire of face).
@@ -45,30 +45,30 @@ public:
   /// to the base object and the BiNormal vector.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
                                       const ListOfShape& theLocations,
-                                      const std::shared_ptr<GeomAPI_Shape> thePathShape);
+                                      const GeomShapePtr thePathShape);
 
   /// \return the list of shapes generated from theShape.
   /// \param[in] theShape base shape.
   /// \param[out] theHistory generated shapes.
-  GEOMALGOAPI_EXPORT void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
+  GEOMALGOAPI_EXPORT void generated(const GeomShapePtr theShape,
                                     ListOfShape& theHistory);
 
 private:
-  void build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-             const std::shared_ptr<GeomAPI_Shape> thePathShape);
+  void build(const GeomShapePtr theBaseShape,
+             const GeomShapePtr thePathShape);
 
-  void build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-             const std::shared_ptr<GeomAPI_Shape> thePathShape,
-             const std::shared_ptr<GeomAPI_Shape> theBiNormal);
+  void build(const GeomShapePtr theBaseShape,
+             const GeomShapePtr thePathShape,
+             const GeomShapePtr theBiNormal);
 
   void build(const ListOfShape& theBaseShapes,
              const ListOfShape& theLocations,
-             const std::shared_ptr<GeomAPI_Shape> thePathShape);
+             const GeomShapePtr thePathShape);
 
 private:
   //bool myIsPipeShellUsed;
-  std::shared_ptr<GeomAPI_Shape> myBaseShape;
-  std::shared_ptr<GeomAPI_Shape> myPathShape;
+  GeomShapePtr myBaseShape;
+  GeomShapePtr myPathShape;
 };
 
 #endif

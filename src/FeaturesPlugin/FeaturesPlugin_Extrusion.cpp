@@ -14,6 +14,10 @@
 
 #include <GeomAlgoAPI_Prism.h>
 
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Lin.h>
+
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 {
@@ -78,6 +82,23 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   // Getting base shapes.
   getBaseShapes(theBaseShapes);
 
+  //Getting direction.
+  std::shared_ptr<GeomAPI_Dir> aDir;
+  std::shared_ptr<GeomAPI_Edge> anEdge;
+  AttributeSelectionPtr aSelection = selection(DIRECTION_OBJECT_ID());
+  if(aSelection.get() && aSelection->value().get() && aSelection->value()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aSelection->value()));
+  } else if(aSelection->context().get() &&
+            aSelection->context()->shape().get() &&
+            aSelection->context()->shape()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aSelection->context()->shape()));
+  }
+  if(anEdge.get()) {
+    if(anEdge->isLine()) {
+      aDir = anEdge->line()->direction();
+    }
+  }
+
   // Getting sizes.
   double aToSize = 0.0;
   double aFromSize = 0.0;
@@ -95,7 +116,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   GeomShapePtr aFromShape;
 
   if(string(CREATION_METHOD())->value() == "ByPlanesAndOffsets") {
-    AttributeSelectionPtr aSelection = selection(TO_OBJECT_ID());
+    aSelection = selection(TO_OBJECT_ID());
     if(aSelection.get()) {
       aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aSelection->value());
       if(!aToShape.get() && aSelection->context().get()) {
@@ -115,7 +136,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   for(ListOfShape::const_iterator anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIter;
 
-    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo(new GeomAlgoAPI_Prism(aBaseShape,
+    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo(new GeomAlgoAPI_Prism(aBaseShape, aDir,
                                                                         aToShape, aToSize,
                                                                         aFromShape, aFromSize));
     if(!isMakeShapeValid(aPrismAlgo)) {

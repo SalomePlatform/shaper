@@ -4,21 +4,19 @@
 // Created:     2 Dec 2014
 // Author:      Artem ZHIDKOV
 
-#include <GeomAPI_Face.h>
-#include <GeomAPI_Dir.h>
-#include <GeomAPI_Pln.h>
-#include <GeomAPI_Pnt.h>
+#include "GeomAPI_Face.h"
 
-#include <TopoDS_Shape.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS.hxx>
+#include "GeomAPI_Dir.h"
+#include "GeomAPI_Pln.h"
+#include "GeomAPI_Pnt.h"
+
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <Geom_Surface.hxx>
-#include <Geom_Plane.hxx>
 #include <Geom_CylindricalSurface.hxx>
-#include <GeomLib_IsPlanarSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Face.hxx>
 
 GeomAPI_Face::GeomAPI_Face()
   : GeomAPI_Shape()
@@ -61,18 +59,6 @@ bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
     return false;
 
   return true;
-}
-
-bool GeomAPI_Face::isPlanar() const
-{
-  const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
-  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
-  Handle(Geom_RectangularTrimmedSurface) aTrimmed = 
-    Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
-  if (!aTrimmed.IsNull())
-    aSurf = aTrimmed->BasisSurface();
-  GeomLib_IsPlanarSurface isPlanar(aSurf);
-  return isPlanar.IsPlanar() == Standard_True;
 }
 
 bool GeomAPI_Face::isCylindrical() const

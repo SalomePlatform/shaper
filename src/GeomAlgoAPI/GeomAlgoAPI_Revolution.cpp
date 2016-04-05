@@ -45,32 +45,32 @@ static TopoDS_Solid makeSolidFromShape(const TopoDS_Shape& theShape);
 static TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint);
 
 //=================================================================================================
-GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                               std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                               double                         theToAngle,
-                                               double                         theFromAngle)
+GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
+                                               const std::shared_ptr<GeomAPI_Ax1> theAxis,
+                                               const double                       theToAngle,
+                                               const double                       theFromAngle)
 {
-  build(theBaseShape, theAxis, std::shared_ptr<GeomAPI_Shape>(), theToAngle, std::shared_ptr<GeomAPI_Shape>(), theFromAngle);
+  build(theBaseShape, theAxis, GeomShapePtr(), theToAngle, GeomShapePtr(), theFromAngle);
 }
 
 //=================================================================================================
-GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                               std::shared_ptr<GeomAPI_Ax1>   theAxis,
-                                               std::shared_ptr<GeomAPI_Shape> theToShape,
-                                               double                         theToAngle,
-                                               std::shared_ptr<GeomAPI_Shape> theFromShape,
-                                               double                         theFromAngle)
+GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
+                                               const std::shared_ptr<GeomAPI_Ax1> theAxis,
+                                               const GeomShapePtr                 theToShape,
+                                               const double                       theToAngle,
+                                               const GeomShapePtr                 theFromShape,
+                                               const double                       theFromAngle)
 {
   build(theBaseShape, theAxis, theToShape, theToAngle, theFromShape, theFromAngle);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                                   const std::shared_ptr<GeomAPI_Ax1>&   theAxis,
-                                   const std::shared_ptr<GeomAPI_Shape>& theToShape,
-                                   double                                theToAngle,
-                                   const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-                                   double                                theFromAngle)
+void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseShape,
+                                   const std::shared_ptr<GeomAPI_Ax1>& theAxis,
+                                   const GeomShapePtr&                 theToShape,
+                                   const double                        theToAngle,
+                                   const GeomShapePtr&                 theFromShape,
+                                   const double                        theFromAngle)
 {
   if(!theBaseShape || !theAxis ||
     (((!theFromShape && !theToShape) || (theFromShape && theToShape && theFromShape->isEqual(theToShape)))
@@ -86,7 +86,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
   } else if(theBaseShape->shapeType() == GeomAPI_Shape::SHELL) {
     GeomAPI_ShapeExplorer anExp(theBaseShape, GeomAPI_Shape::FACE);
     if(anExp.more()) {
-      std::shared_ptr<GeomAPI_Shape> aFaceOnShell = anExp.current();
+      GeomShapePtr aFaceOnShell = anExp.current();
       aBaseFace = TopoDS::Face(aFaceOnShell->impl<TopoDS_Shape>());
     }
   }
@@ -137,7 +137,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
     // Setting naming.
     for(TopExp_Explorer anExp(aRotatedBase, TopAbs_FACE); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aFace = anExp.Current();
-      std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
+      GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
       aFromShape->setImpl(new TopoDS_Shape(aRevolBuilder->FirstShape(aFace)));
       aToShape->setImpl(new TopoDS_Shape(aRevolBuilder->LastShape(aFace)));
       this->addFromShape(aFromShape);
@@ -217,7 +217,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
     }
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
-      std::shared_ptr<GeomAPI_Shape> aCompound(new GeomAPI_Shape);
+      GeomShapePtr aCompound(new GeomAPI_Shape);
       aCompound->setImpl(new TopoDS_Shape(aResult));
       ListOfShape aCompSolids, aFreeSolids;
       GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCompSolids, aFreeSolids);
@@ -247,12 +247,12 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       Handle(Geom_Surface) aFromSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedFromFace));
       Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedToFace));
       if(aFaceSurface == aFromSurface) {
-        std::shared_ptr<GeomAPI_Shape> aFSHape(new GeomAPI_Shape);
+        GeomShapePtr aFSHape(new GeomAPI_Shape);
         aFSHape->setImpl(new TopoDS_Shape(aFaceOnResult));
         this->addFromShape(aFSHape);
       }
       if(aFaceSurface == aToSurface) {
-        std::shared_ptr<GeomAPI_Shape> aTSHape(new GeomAPI_Shape);
+        GeomShapePtr aTSHape(new GeomAPI_Shape);
         aTSHape->setImpl(new TopoDS_Shape(aFaceOnResult));
         this->addToShape(aTSHape);
       }
@@ -322,7 +322,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
     // Setting naming.
     const TopTools_ListOfShape& aBndShapes = aBoundingCutBuilder->Modified(aBoundingFace);
     for(TopTools_ListIteratorOfListOfShape anIt(aBndShapes); anIt.More(); anIt.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      GeomShapePtr aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
       isFromFaceSet ? this->addFromShape(aShape) : this->addToShape(aShape);
     }
@@ -364,7 +364,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
 
     const TopTools_ListOfShape& aBsShapes = aBaseCutBuilder->Modified(aBoundingFace);
     for(TopTools_ListIteratorOfListOfShape anIt(aBsShapes); anIt.More(); anIt.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      GeomShapePtr aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(anIt.Value()));
       isFromFaceSet ? this->addToShape(aShape) : this->addFromShape(aShape);
     }
@@ -377,7 +377,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
     }
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
-      std::shared_ptr<GeomAPI_Shape> aCompound(new GeomAPI_Shape);
+      GeomShapePtr aCompound(new GeomAPI_Shape);
       aCompound->setImpl(new TopoDS_Shape(aResult));
       ListOfShape aCompSolids, aFreeSolids;
       GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCompSolids, aFreeSolids);
@@ -406,7 +406,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
       Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aFaceOnResult));
       Handle(Geom_Surface) aBoundingSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedBoundingFace));
       if(aFaceSurface == aBoundingSurface) {
-        std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+        GeomShapePtr aShape(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(aFaceOnResult));
         isFromFaceSet ? this->addFromShape(aShape) : this->addToShape(aShape);
       }
@@ -417,7 +417,7 @@ void GeomAlgoAPI_Revolution::build(const std::shared_ptr<GeomAPI_Shape>& theBase
   if(aResult.IsNull()) {
     return;
   }
-  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+  GeomShapePtr aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aShape);
   this->setDone(true);

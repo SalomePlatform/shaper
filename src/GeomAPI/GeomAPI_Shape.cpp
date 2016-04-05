@@ -4,13 +4,18 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#include<GeomAPI_Shape.h>
+#include "GeomAPI_Shape.h"
 
-#include <TopoDS_Shape.hxx>
-#include <TopoDS_Iterator.hxx>
+#include <BRep_Tool.hxx>
 #include <BRepBndLib.hxx>
-#include <Bnd_Box.hxx>
+#include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepTools.hxx>
+#include <Bnd_Box.hxx>
+#include <Geom_Plane.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Iterator.hxx>
+#include <TopoDS_Shape.hxx>
 
 #include <sstream>
 
@@ -88,10 +93,72 @@ bool GeomAPI_Shape::isCompSolid() const
   return !aShape.IsNull() && aShape.ShapeType() == TopAbs_COMPSOLID;
 }
 
+bool GeomAPI_Shape::isPlanar() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+
+  if(aShape.IsNull()) {
+    return false;
+  }
+
+  TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+
+  if(aShapeType == TopAbs_VERTEX) {
+    return true;
+  } else if(aShapeType == TopAbs_EDGE || aShapeType ==  TopAbs_WIRE || aShapeType == TopAbs_SHELL) {
+    BRepBuilderAPI_FindPlane aFindPlane(aShape);
+    return aFindPlane.Found() == Standard_True;
+  } else if(aShapeType == TopAbs_FACE) {
+    const Handle(Geom_Surface)& aSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
+    Handle(Standard_Type) aType = aSurface->DynamicType();
+
+    if(aType == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
+      Handle(Geom_RectangularTrimmedSurface) aTrimSurface = Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
+      aType = aTrimSurface->BasisSurface()->DynamicType();
+    }
+    return (aType == STANDARD_TYPE(Geom_Plane));
+  } else {
+    return false;
+  }
+}
+
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
 {
   const TopoDS_Shape& aShape = impl<TopoDS_Shape>();
-  return (ShapeType)aShape.ShapeType();
+
+  ShapeType aST = GeomAPI_Shape::SHAPE;
+
+  switch(aShape.ShapeType()) {
+  case TopAbs_COMPOUND:
+    aST = GeomAPI_Shape::COMPOUND;
+    break;
+  case TopAbs_COMPSOLID:
+    aST = GeomAPI_Shape::COMPSOLID;
+    break;
+  case TopAbs_SOLID:
+    aST = GeomAPI_Shape::SOLID;
+    break;
+  case TopAbs_SHELL:
+    aST = GeomAPI_Shape::SHELL;
+    break;
+  case TopAbs_FACE:
+    aST = GeomAPI_Shape::FACE;
+    break;
+  case TopAbs_WIRE:
+    aST = GeomAPI_Shape::WIRE;
+    break;
+  case TopAbs_EDGE:
+    aST = GeomAPI_Shape::EDGE;
+    break;
+  case TopAbs_VERTEX:
+    aST = GeomAPI_Shape::VERTEX;
+    break;
+  case TopAbs_SHAPE:
+    aST = GeomAPI_Shape::SHAPE;
+    break;
+  }
+
+  return aST;
 }
 
 std::string GeomAPI_Shape::shapeTypeStr() const

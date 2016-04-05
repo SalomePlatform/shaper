@@ -54,6 +54,9 @@ class GeomAPI_PlanarEdges : public GeomAPI_Shape
   /// Returns Z direction vector
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Dir> norm() const;
 
+  /// Returns whether the shape is planar
+  GEOMAPI_EXPORT virtual bool isPlanar() const;
+
   /// Set working plane
   /// \param theOrigin origin of the plane axis
   /// \param theDirX X direction of the plane axis

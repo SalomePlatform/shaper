@@ -31,10 +31,11 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
     Edge,
     Line,
     Circle,
+    Wire,
     Face,
+    Plane,
     Solid,
     Compound,
-    Plane,
     AnyShape
   };
 

@@ -15,7 +15,7 @@
       icon=":icons/sketch.png"
       tooltip="Select a sketch face"
       type_choice="Faces Objects">
-      <validator id="FeaturesPlugin_ValidatorExtrusionBase" parameters="Sketch"/>
+      <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="face,shell"/>
     </composite_multi_selector>
     <shape_selector id="direction_object"
                     icon=":icons/axis.png"
@@ -91,4 +91,5 @@
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,sketch_selection,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
+  <validator id="FeaturesPlugin_ValidatorCanBeEmpty" parameters="CreationMethod,BySizes,base,to_object,from_object,direction_object"/>
 </source>

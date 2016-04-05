@@ -24,14 +24,14 @@
 
 static bool getBase(TopoDS_Shape& theBaseOut,
                     TopAbs_ShapeEnum& theBaseTypeOut,
-                    const std::shared_ptr<GeomAPI_Shape> theBaseShape);
+                    const GeomShapePtr theBaseShape);
 static bool getPath(TopoDS_Wire& thePathOut,
-                    const std::shared_ptr<GeomAPI_Shape> thePathShape);
+                    const GeomShapePtr thePathShape);
 static bool buildPipe(BRepOffsetAPI_MakePipeShell* thePipeBuilder);
 
 //=================================================================================================
-GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                   const std::shared_ptr<GeomAPI_Shape> thePathShape)
+GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
+                                   const GeomShapePtr thePathShape)
 : /*myIsPipeShellUsed(false),*/
   myBaseShape(theBaseShape),
   myPathShape(thePathShape)
@@ -40,9 +40,9 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const std::shared_ptr<GeomAPI_Shape> theBaseS
 }
 
 //=================================================================================================
-GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                   const std::shared_ptr<GeomAPI_Shape> thePathShape,
-                                   const std::shared_ptr<GeomAPI_Shape> theBiNormal)
+GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
+                                   const GeomShapePtr thePathShape,
+                                   const GeomShapePtr theBiNormal)
 //: myIsPipeShellUsed(true)
 {
   build(theBaseShape, thePathShape, theBiNormal);
@@ -51,15 +51,15 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const std::shared_ptr<GeomAPI_Shape> theBaseS
 //=================================================================================================
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
                                    const ListOfShape& theLocations,
-                                   const std::shared_ptr<GeomAPI_Shape> thePathShape)
+                                   const GeomShapePtr thePathShape)
 //: myIsPipeShellUsed(true)
 {
   build(theBaseShapes, theLocations, thePathShape);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                             const std::shared_ptr<GeomAPI_Shape> thePathShape)
+void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
+                             const GeomShapePtr thePathShape)
 {
   // Getting base shape.
   if(!theBaseShape.get()) {
@@ -97,7 +97,7 @@ void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
   this->initialize(aPipeBuilder);
 
   // Setting naming.
-  std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
+  GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
   aFromShape->setImpl(new TopoDS_Shape(aPipeBuilder->FirstShape()));
   aToShape->setImpl(new TopoDS_Shape(aPipeBuilder->LastShape()));
   this->addFromShape(aFromShape);
@@ -105,16 +105,16 @@ void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
 
   // Setting result.
   TopoDS_Shape aResultShape = aPipeBuilder->Shape();
-  std::shared_ptr<GeomAPI_Shape> aResultGeomShape(new GeomAPI_Shape());
+  GeomShapePtr aResultGeomShape(new GeomAPI_Shape());
   aResultGeomShape->setImpl(new TopoDS_Shape(aResultShape));
   this->setShape(aResultGeomShape);
   this->setDone(true);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                             const std::shared_ptr<GeomAPI_Shape> thePathShape,
-                             const std::shared_ptr<GeomAPI_Shape> theBiNormal)
+void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
+                             const GeomShapePtr thePathShape,
+                             const GeomShapePtr theBiNormal)
 {
   // Getting base shape.
   TopoDS_Shape aBaseShape;
@@ -170,7 +170,7 @@ void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
   }
 
   // Setting naming.
-  std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
+  GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
   aFromShape->setImpl(new TopoDS_Shape(aPipeBuilder->FirstShape()));
   aToShape->setImpl(new TopoDS_Shape(aPipeBuilder->LastShape()));
   this->addFromShape(aFromShape);
@@ -178,7 +178,7 @@ void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
 
   // Setting result.
   TopoDS_Shape aResultShape = aPipeBuilder->Shape();
-  std::shared_ptr<GeomAPI_Shape> aResultGeomShape(new GeomAPI_Shape());
+  GeomShapePtr aResultGeomShape(new GeomAPI_Shape());
   aResultGeomShape->setImpl(new TopoDS_Shape(aResultShape));
   this->setShape(aResultGeomShape);
   this->setDone(true);
@@ -187,7 +187,7 @@ void GeomAlgoAPI_Pipe::build(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
 //=================================================================================================
 void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
                              const ListOfShape& theLocations,
-                             const std::shared_ptr<GeomAPI_Shape> thePathShape)
+                             const GeomShapePtr thePathShape)
 {
   if(theBaseShapes.empty() || (!theLocations.empty() && theLocations.size() != theBaseShapes.size())) {
     return;
@@ -213,7 +213,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   ListOfShape::const_iterator aBaseIt = theBaseShapes.cbegin();
   ListOfShape::const_iterator aLocIt = theLocations.cbegin();
   while(aBaseIt != theBaseShapes.cend()) {
-    std::shared_ptr<GeomAPI_Shape> aBase = *aBaseIt;
+    GeomShapePtr aBase = *aBaseIt;
     TopoDS_Shape aBaseShape;
     TopAbs_ShapeEnum aBaseShapeType;
     if(!getBase(aBaseShape, aBaseShapeType, aBase)) {
@@ -226,7 +226,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
     }
 
     if(aHasLocations) {
-      std::shared_ptr<GeomAPI_Shape> aLocation = *aLocIt;
+      GeomShapePtr aLocation = *aLocIt;
       if(!aLocation.get() || aLocation->shapeType() != GeomAPI_Shape::VERTEX) {
         delete aPipeBuilder;
         return;
@@ -261,7 +261,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   }
 
   // Setting naming.
-  std::shared_ptr<GeomAPI_Shape> aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
+  GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
   aFromShape->setImpl(new TopoDS_Shape(aPipeBuilder->FirstShape()));
   aToShape->setImpl(new TopoDS_Shape(aPipeBuilder->LastShape()));
   this->addFromShape(aFromShape);
@@ -269,59 +269,24 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
 
   // Setting result.
   TopoDS_Shape aResultShape = aPipeBuilder->Shape();
-  std::shared_ptr<GeomAPI_Shape> aResultGeomShape(new GeomAPI_Shape());
+  GeomShapePtr aResultGeomShape(new GeomAPI_Shape());
   aResultGeomShape->setImpl(new TopoDS_Shape(aResultShape));
   this->setShape(aResultGeomShape);
   this->setDone(true);
 }
 
 //=================================================================================================
-void GeomAlgoAPI_Pipe::generated(const std::shared_ptr<GeomAPI_Shape> theShape,
+void GeomAlgoAPI_Pipe::generated(const GeomShapePtr theShape,
                                  ListOfShape& theHistory)
 {
   GeomAlgoAPI_MakeShape::generated(theShape, theHistory);
-
-  //if(myIsPipeShellUsed) {
-  //  GeomAlgoAPI_MakeShape::generated(theShape, theHistory);
-  //  return;
-  //}
-
-  //BRepOffsetAPI_MakePipe* aMakePipe = implPtr<BRepOffsetAPI_MakePipe>();
-  //const TopoDS_Shape& aProfile = theShape->impl<TopoDS_Shape>();
-  //const TopAbs_ShapeEnum aProfileShapeType = aProfile.ShapeType();
-  //if(aProfileShapeType != TopAbs_VERTEX && aProfileShapeType != TopAbs_EDGE) {
-  //  return;
-  //}
-  //const TopoDS_Shape& aBaseShape = myBaseShape->impl<TopoDS_Shape>();
-  //TopExp_Explorer anExp(aBaseShape, aProfileShapeType);
-  //Standard_Boolean ahasShape = Standard_False;
-  //for(; anExp.More(); anExp.Next()) {
-  //  if(anExp.Current().IsSame(aProfile)) {
-  //    ahasShape = Standard_True;
-  //    break;
-  //  }
-  //}
-  //if(!ahasShape) {
-  //  return;
-  //}
-  //TopExp_Explorer aShapeExplorer(myPathShape->impl<TopoDS_Shape>(), TopAbs_EDGE);
-  //for(; aShapeExplorer.More(); aShapeExplorer.Next ()) {
-  //  const TopoDS_Shape& aSpine = aShapeExplorer.Current();
-  //  const TopoDS_Shape& aGeneratedShape = aMakePipe->Generated(aSpine, aProfile);
-  //  if(aGeneratedShape.IsNull()) {
-  //    continue;
-  //  }
-  //  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-  //  aShape->setImpl(new TopoDS_Shape(aGeneratedShape));
-  //  theHistory.push_back(aShape);
-  //}
 }
 
 // Auxilary functions:
 //=================================================================================================
 bool getBase(TopoDS_Shape& theBaseOut,
              TopAbs_ShapeEnum& theBaseTypeOut,
-             const std::shared_ptr<GeomAPI_Shape> theBaseShape)
+             const GeomShapePtr theBaseShape)
 {
   if(!theBaseShape.get()) {
     return false;
@@ -350,7 +315,7 @@ bool getBase(TopoDS_Shape& theBaseOut,
 
 //=================================================================================================
 bool getPath(TopoDS_Wire& thePathOut,
-             const std::shared_ptr<GeomAPI_Shape> thePathShape)
+             const GeomShapePtr thePathShape)
 {
   if(!thePathShape.get()) {
     return false;

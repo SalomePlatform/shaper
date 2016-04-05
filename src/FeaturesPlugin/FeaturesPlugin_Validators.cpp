@@ -11,8 +11,10 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <GeomValidators_ShapeType.h>
+
 //=================================================================================================
-bool FeaturesPlugin_PipeLocationsValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                     const std::list<std::string>& theArguments,
                                                     std::string& theError) const
 {
@@ -56,7 +58,7 @@ bool FeaturesPlugin_PipeLocationsValidator::isValid(const std::shared_ptr<ModelA
 }
 
 //=================================================================================================
-bool FeaturesPlugin_PipeLocationsValidator::isNotObligatory(std::string theFeature, std::string theAttribute)
+bool FeaturesPlugin_ValidatorPipeLocations::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return false;
 }
@@ -66,10 +68,15 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
                                                         const std::list<std::string>& theArguments,
                                                         std::string& theError) const
 {
+  if(theArguments.empty()) {
+    theError = "Validator parameters is empty.";
+    return false;
+  }
+
   // Checking attribute.
-  if(!isValidAttribute(theAttribute, theError)) {
+  if(!isValidAttribute(theAttribute, theArguments, theError)) {
     if(theError.empty()) {
-      theError = "Attribute contains shape with unacceptable type.";
+      theError = "Attribute contains unacceptable shape.";
     }
     return false;
   }
@@ -79,6 +86,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
 
 //=================================================================================================
 bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const AttributePtr& theAttribute,
+                                                                 const std::list<std::string>& theArguments,
                                                                  std::string& theError) const
 {
   if(!theAttribute.get()) {
@@ -91,7 +99,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     AttributeSelectionListPtr aListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
       // If at least one attribute is invalid, the result is false.
-      if(!isValidAttribute(aListAttr->value(anIndex), theError)) {
+      if(!isValidAttribute(aListAttr->value(anIndex), theArguments, theError)) {
         return false;
       }
     }
@@ -142,19 +150,155 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     }
 
     // Check that object is a shape with allowed type.
-    aShape = aContext->shape();
-    GeomAPI_Shape::ShapeType aShapeType = aShape->shapeType();
-    if(aShapeType != GeomAPI_Shape::VERTEX &&
-       aShapeType != GeomAPI_Shape::EDGE &&
-       aShapeType != GeomAPI_Shape::WIRE &&
-       aShapeType != GeomAPI_Shape::FACE) {
+    GeomValidators_ShapeType aShapeTypeValidator;
+    if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
       theError = "Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, \
-                  whole sketch(if it has at least one face), and following objects: vertex, edge, wire, face.";
+                  whole sketch(if it has at least one face), and whole objects with shape types: ";
+      std::list<std::string>::const_iterator anIt = theArguments.cbegin();
+      theError += *anIt;
+      for(++anIt; anIt != theArguments.cend(); ++anIt) {
+        theError += ", " + *anIt;
+      }
       return false;
     }
 
   } else {
     theError = "Following attribute does not supported: " + anAttributeType + ".";
+    return false;
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theAttribute,
+                                                        const std::list<std::string>& theArguments,
+                                                        std::string& theError) const
+{
+  FeaturesPlugin_ValidatorBaseForGeneration aBaseValidator;
+
+  if(aBaseValidator.isValid(theAttribute, theArguments, theError)) {
+    return true;
+  }
+
+  // Check that face selected.
+  GeomValidators_ShapeType aShapeType;
+  std::list<std::string> anArguments;
+  anArguments.push_back("face");
+  if(aShapeType.isValid(theAttribute, anArguments, theError)) {
+    return true;
+  }
+
+  theError = "Selected shape is not suitable for this operation";
+
+  return false;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                 const std::list<std::string>& theArguments,
+                                                 std::string& theError) const
+{
+  if(theArguments.size() != 5 && theArguments.size() != 6) {
+    theError = "Validator should be used with 6 parameters for extrusion and with 5 for revolution.";
+    return false;
+  }
+
+  std::list<std::string>::const_iterator anArgsIt = theArguments.begin(), aLast = theArguments.end();
+
+  std::string aSelectedMethod;
+  if(theFeature->string(*anArgsIt)) {
+    aSelectedMethod = theFeature->string(*anArgsIt)->value();
+  }
+  ++anArgsIt;
+  std::string aCreationMethod = *anArgsIt;
+  ++anArgsIt;
+
+  AttributePtr aCheckAttribute = theFeature->attribute(*anArgsIt);
+  ++anArgsIt;
+
+  if(isShapesCanBeEmpty(aCheckAttribute, theError)) {
+    return true;
+  }
+
+  if(aSelectedMethod == aCreationMethod) {
+    ++anArgsIt;
+    ++anArgsIt;
+  }
+
+  for(; anArgsIt != theArguments.cend(); ++anArgsIt) {
+    AttributeSelectionPtr aSelAttr = theFeature->selection(*anArgsIt);
+    if(!aSelAttr.get()) {
+      theError = "Could not get selection attribute \"" + *anArgsIt + "\".";
+      return false;
+    }
+
+    GeomShapePtr aShape = aSelAttr->value();
+    if(!aShape.get()) {
+      ResultPtr aContext = aSelAttr->context();
+      if(!aContext.get()) {
+        theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
+        return false;
+      }
+
+      aShape = aContext->shape();
+    }
+
+    if(!aShape.get()) {
+      theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorCanBeEmpty::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  return false;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorCanBeEmpty::isShapesCanBeEmpty(const AttributePtr& theAttribute,
+                                                            std::string& theError) const
+{
+  if(!theAttribute.get()) {
+    return true;
+  }
+
+  std::string anAttributeType = theAttribute->attributeType();
+  if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
+      // If at least one attribute is invalid, the result is false.
+      if(!isShapesCanBeEmpty(aListAttr->value(anIndex), theError)) {
+        return false;
+      }
+    }
+  } else if(anAttributeType == ModelAPI_AttributeSelection::typeId()) {
+    // Getting context.
+    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    ResultPtr aContext = anAttr->context();
+    if(!aContext.get()) {
+      return false;
+    }
+
+    GeomShapePtr aShape = anAttr->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if(!aShape.get()) {
+      aShape = aContextShape;
+    }
+    if(!aShape.get()) {
+      return false;
+    }
+
+    if(aShape->shapeType() == GeomAPI_Shape::VERTEX ||
+       aShape->shapeType() == GeomAPI_Shape::EDGE ||
+       !aShape->isPlanar()) {
+      return false;
+    }
+  } else {
     return false;
   }
 
