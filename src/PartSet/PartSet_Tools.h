@@ -54,6 +54,10 @@ public:
   };
 
  public:
+  /// Returns default value of AIS presentation
+  /// \return integer value
+  static int getAISDefaultWidth();
+
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point
   /// \param theView a 3D view

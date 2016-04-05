@@ -257,7 +257,7 @@ void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxilia
   if (!isAuxiliary) {
     aColor = Config_PropManager::color("Visualization", "result_construction_color",
                                         ModelAPI_ResultConstruction::DEFAULT_COLOR());
-    aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
+    aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
     aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
   }
   else {

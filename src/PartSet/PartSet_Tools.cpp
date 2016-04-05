@@ -74,6 +74,12 @@
 #endif
 
 const double PRECISION_TOLERANCE = 0.000001;
+const int AIS_DEFAULT_WIDTH = 2;
+
+int PartSet_Tools::getAISDefaultWidth()
+{
+  return AIS_DEFAULT_WIDTH;
+}
 
 gp_Pnt PartSet_Tools::convertClickToPoint(QPoint thePoint, Handle(V3d_View) theView)
 {

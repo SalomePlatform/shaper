@@ -36,8 +36,6 @@
 
 #include <QList>
 
-static const int AIS_DEFAULT_WIDTH = 2;
-
 //#define DEBUG_EMPTY_SHAPE
 
 // multi-rotation/translation operation
@@ -108,7 +106,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
             /// workaround for zero width. Else, there will be a crash
             if (aWidth == 0) { // width returns of TSolid shape is zero
               bool isDisplayed = !anIO->GetContext().IsNull();
-              aWidth = AIS_DEFAULT_WIDTH;// default width value
+              aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
             }
             setWidth(aDrawer, aWidth);
           }
