@@ -89,9 +89,10 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& t
 }
 
 //********************************************************************
-void PartSet_WidgetShapeSelector::restoreAttributeValue(const bool theValid)
+void PartSet_WidgetShapeSelector::restoreAttributeValue(const AttributePtr& theAttribute,
+                                                        const bool theValid)
 {
-  ModuleBase_WidgetShapeSelector::restoreAttributeValue(theValid);
+  ModuleBase_WidgetShapeSelector::restoreAttributeValue(theAttribute, theValid);
   myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 }
 

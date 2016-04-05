@@ -51,7 +51,7 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
                                                          PartSet_Module* theModule,
                                                          const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theModule->workshop(), theData),
-  myModule(theModule)
+  myModule(theModule), myIsCustomAttribute(false)
 {
   myAttributeListID = theData->getProperty("attribute_list_id");
 
@@ -114,9 +114,34 @@ bool PartSet_WidgetSketchCreator::storeValueCustom() const
   return true;
 }
 
-AttributePtr PartSet_WidgetSketchCreator::attributeToValidate() const
+AttributePtr PartSet_WidgetSketchCreator::attribute() const
 {
-  return myFeature->attribute(myAttributeListID);
+  AttributePtr anAttribute;
+  if (myIsCustomAttribute)
+    anAttribute = myFeature->attribute(myAttributeListID);
+  else
+    anAttribute = ModuleBase_WidgetSelector::attribute();
+
+  return anAttribute;
+}
+
+//********************************************************************
+bool PartSet_WidgetSketchCreator::isValidSelection(const ModuleBase_ViewerPrs& theValue)
+{
+  bool aValid = false;
+  if (getValidState(theValue, aValid)) {
+    return aValid;
+  }
+  // check selection to create new sketh (XML current attribute)
+  aValid = isValidSelectionForAttribute(theValue, attribute());
+  if (!aValid) {
+    // check selection to fill list attribute (myAttributeListID)
+    myIsCustomAttribute = true;
+    aValid = isValidSelectionForAttribute(theValue, attribute());
+    myIsCustomAttribute = false;
+  }
+  storeValidState(theValue, aValid);
+  return aValid;
 }
 
 void PartSet_WidgetSketchCreator::activateSelectionControl()
@@ -253,7 +278,7 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theV
 {
   bool aDone = false;
   if (!startSketchOperation(theValues)) {
-    ModuleBase_WidgetSelector::setSelection(theValues, theToValidate);
+    myIsCustomAttribute = true;
     QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
     bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
@@ -261,6 +286,7 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theV
       if (!theToValidate || isValidInFilters(aValue))
         aProcessed = setSelectionCustom(aValue) || aProcessed;
     }
+    myIsCustomAttribute = true;
     aDone = aProcessed;
     if (aProcessed) {
       emit valuesChanged();

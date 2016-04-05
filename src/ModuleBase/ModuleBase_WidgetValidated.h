@@ -45,10 +45,13 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
                              const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetValidated();
 
-  /// Checks all widget validator if the owner is valid
+  /// Checks all widget validator if the owner is valid. Firstly it checks custom widget validating,
+  /// next, the attribute's validating. It trying on the give selection to current attribute by
+  /// setting the value inside and calling validators. After this, the previous attribute value is
+  /// restored.The valid/invalid value is cashed.
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
-  bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
+  virtual bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
 
   //! Returns data object by AIS
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
@@ -62,21 +65,31 @@ protected:
   /// \return a boolean value
   bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
 
+  /// Checks all attribute validators returns valid. It tries on the given selection
+  /// to current attribute by setting the value inside and calling validators. After this,
+  /// the previous attribute value is restored.The valid/invalid value is cashed.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  bool isValidSelectionForAttribute(const ModuleBase_ViewerPrs& theValue,
+                                    const AttributePtr& theAttribute);
+
   /// Retunrs attribute, which should be validated. In default implementation,
   /// this is an attribute of ID
   /// \return an attribute
-  virtual AttributePtr attributeToValidate() const;
+  virtual AttributePtr attribute() const;
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
-  virtual void storeAttributeValue();
+  /// \param theAttribute an attribute to be stored
+  virtual void storeAttributeValue(const AttributePtr& theAttribute);
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
+  /// \param theAttribute an attribute to be restored
   /// \param theValid a boolean flag, if restore happens for valid parameters
-  virtual void restoreAttributeValue(const bool theValid);
+  virtual void restoreAttributeValue(const AttributePtr& theAttribute, const bool theValid);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
@@ -98,23 +111,26 @@ protected:
   bool activateFilters(const bool toActivate);
 
   /// Block the model flush of update and intialization of attribute
+  /// \param theAttribute an attribute of blocking
   /// \param theToBlock flag whether the model is blocked or unblocked
   /// \param isActive out value if model is blocked, in value if model is unblocked
   /// to be used to restore flush state when unblocked
   /// \param isAttributeSetInitializedBlocked out value if model is blocked
   /// in value if model is unblocked to be used to restore previous state when unblocked
-  virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
-                              bool& isAttributeSetInitializedBlocked);
+  virtual void blockAttribute(const AttributePtr& theAttribute, const bool& theToBlock,
+                              bool& isFlushesActived, bool& isAttributeSetInitializedBlocked);
 
 private:
   /// Checks the current attibute in all attribute validators
-  // \return true if all validators return that the attribute is valid
-  bool isValidAttribute() const;
+  /// \param theAttribute an attribute to be validated
+  /// \return true if all validators return that the attribute is valid
+  bool isValidAttribute(const AttributePtr& theAttribute) const;
 
   /// Returns true if the workshop validator filter has been already activated
   /// \return boolean value
   bool isFilterActivated() const;
 
+protected:
   /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
   /// \param theValid a valid state
@@ -125,6 +141,7 @@ private:
   /// \param theValid a valid state
   void storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid);
 
+private:
   /// Applies AIS context filters to the parameter list. The not approved presentations are
   /// removed from the parameters.
   /// \param theValues a list of presentations.

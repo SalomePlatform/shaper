@@ -63,7 +63,7 @@ protected:
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
-  void restoreAttributeValue(const bool theValid);
+  void restoreAttributeValue(const AttributePtr& theAttribute, const bool theValid);
 
 protected:
   /// A reference to external objects manager

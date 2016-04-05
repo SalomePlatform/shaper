@@ -54,9 +54,10 @@ bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Viewer
 }
 
 //********************************************************************
-void PartSet_WidgetMultiSelector::restoreAttributeValue(const bool theValid)
+void PartSet_WidgetMultiSelector::restoreAttributeValue(const AttributePtr& theAttribute,
+                                                        const bool theValid)
 {
-  ModuleBase_WidgetMultiSelector::restoreAttributeValue(theValid);
+  ModuleBase_WidgetMultiSelector::restoreAttributeValue(theAttribute, theValid);
 
   myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 }

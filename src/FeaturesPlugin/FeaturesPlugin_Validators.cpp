@@ -10,7 +10,9 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeReference.h>
 
+#include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
 //=================================================================================================
@@ -172,6 +174,30 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
 
 //=================================================================================================
 bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theAttribute,
+                                                        const std::list<std::string>& theArguments,
+                                                        std::string& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
+  bool aValid = true;
+  GeomValidators_FeatureKind* aValidator = new GeomValidators_FeatureKind();
+  // check whether the selection is on the sketch
+  bool aFeatureKindValid = aValidator->isValid(theAttribute, theArguments, theError);
+  if (!aFeatureKindValid) {
+    // check if selection has Face selected
+    GeomValidators_ShapeType* aShapeType = new GeomValidators_ShapeType();
+    std::list<std::string> anArguments;
+    anArguments.push_back("face");
+    aValid = aShapeType->isValid(theAttribute, anArguments, theError);
+  }
+  return aValid;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorCompositeLauncher_::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         std::string& theError) const
 {

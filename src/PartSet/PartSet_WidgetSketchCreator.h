@@ -62,6 +62,14 @@ public:
   /// Editing mode depends on mode of current operation. This value is defined by it.
   virtual void setEditingMode(bool isEditing);
 
+  /// Checks all widget validator if the owner is valid. Firstly it checks custom widget validating,
+  /// next, the attribute's validating. It trying on the give selection to current attribute by
+  /// setting the value inside and calling validators. After this, the previous attribute value is
+  /// restored.The valid/invalid value is cashed.
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
+
   /// Check if the current and the parent operations are a composite. If the parent operation contains
   /// attribute selection list, the method returns false if it is invalid in this attibute validator
   /// \param theWorkshop a current workshop
@@ -78,7 +86,7 @@ protected:
   /// Retunrs attribute, which should be validated. In default implementation,
   /// this is an attribute of ID
   /// \return an attribute
-  virtual AttributePtr attributeToValidate() const;
+  virtual AttributePtr attribute() const;
 
   /// Sets the selection control visible and set the current widget as active in property panel
   /// It leads to connect to onSelectionChanged slot
@@ -119,6 +127,10 @@ private:
   std::string myAttributeListID;
 
   PartSet_Module* myModule;
+
+  /// Flag if the attribute() should return the attribute list ID or XML attribute
+  /// to store selection and check validation
+  bool myIsCustomAttribute;
 
   /// Label of the widget
   QLabel* myLabel;

@@ -54,17 +54,18 @@ void ModuleBase_WidgetValidated::clearValidatedCash()
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::storeAttributeValue()
+void ModuleBase_WidgetValidated::storeAttributeValue(const AttributePtr& theAttribute)
 {
   myIsInValidate = true;
-  myAttributeStore->storeAttributeValue(attributeToValidate(), myWorkshop);
+  myAttributeStore->storeAttributeValue(theAttribute, myWorkshop);
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::restoreAttributeValue(const bool theValid)
+void ModuleBase_WidgetValidated::restoreAttributeValue(const AttributePtr& theAttribute,
+                                                       const bool theValid)
 {
   myIsInValidate = false;
-  myAttributeStore->restoreAttributeValue(attributeToValidate(), myWorkshop);
+  myAttributeStore->restoreAttributeValue(theAttribute, myWorkshop);
 }
 
 //********************************************************************
@@ -118,7 +119,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
 }
 
 //********************************************************************
-AttributePtr ModuleBase_WidgetValidated::attributeToValidate() const
+AttributePtr ModuleBase_WidgetValidated::attribute() const
 {
   return myFeature->attribute(attributeID());
 }
@@ -130,30 +131,37 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   if (getValidState(theValue, aValid)) {
     return aValid;
   }
-
   aValid = isValidSelectionCustom(theValue);
-  if (!aValid) {
-    storeValidState(theValue, aValid);
-    return aValid;
-  }
+  if (aValid)
+    aValid = isValidSelectionForAttribute(theValue, attribute());
+
+  storeValidState(theValue, aValid);
+  return aValid;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(const ModuleBase_ViewerPrs& theValue,
+                                                              const AttributePtr& theAttribute)
+{
+  bool aValid = false;
 
   // stores the current values of the widget attribute
   bool isFlushesActived, isAttributeSetInitializedBlocked;
 
-  blockAttribute(true, isFlushesActived, isAttributeSetInitializedBlocked);
+  blockAttribute(theAttribute, true, isFlushesActived, isAttributeSetInitializedBlocked);
 
-  storeAttributeValue();
+  storeAttributeValue(theAttribute);
 
   // saves the owner value to the widget attribute
   aValid = setSelectionCustom(theValue);
   if (aValid)
     // checks the attribute validity
-    aValid = isValidAttribute();
+    aValid = isValidAttribute(theAttribute);
 
   // restores the current values of the widget attribute
-  restoreAttributeValue(aValid);
+  restoreAttributeValue(theAttribute, aValid);
 
-  blockAttribute(false, isFlushesActived, isAttributeSetInitializedBlocked);
+  blockAttribute(theAttribute, false, isFlushesActived, isAttributeSetInitializedBlocked);
   // In particular case the results are deleted and called as redisplayed inside of this
   // highlight-selection, to they must be flushed as soon as possible.
   // Example: selection of group-vertices subshapes with shift pressend on body. Without
@@ -164,7 +172,6 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
   Events_Loop::loop()->flush(aDeletedEvent);
   Events_Loop::loop()->flush(aRedispEvent);
 
-  storeValidState(theValue, aValid);
   return aValid;
 }
 
@@ -175,13 +182,12 @@ bool ModuleBase_WidgetValidated::isValidSelectionCustom(const ModuleBase_ViewerP
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidAttribute() const
+bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribute) const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  AttributePtr anAttribute = attributeToValidate();
   std::string aValidatorID, anError;
-  return aFactory->validate(anAttribute, aValidatorID, anError);
+  return aFactory->validate(theAttribute, aValidatorID, anError);
 }
 
 bool ModuleBase_WidgetValidated::isFilterActivated() const
@@ -212,23 +218,24 @@ bool ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute,
+                                                const bool& theToBlock,
+                                                bool& isFlushesActived,
                                                 bool& isAttributeSetInitializedBlocked)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   DataPtr aData = myFeature->data();
-  AttributePtr anAttribute = attributeToValidate();
   if (theToBlock) {
     // blocks the flush signals to avoid the temporary objects visualization in the viewer
     // they should not be shown in order to do not lose highlight by erasing them
     isFlushesActived = aLoop->activateFlushes(false);
 
     aData->blockSendAttributeUpdated(true);
-    isAttributeSetInitializedBlocked = anAttribute->blockSetInitialized(true);
+    isAttributeSetInitializedBlocked = theAttribute->blockSetInitialized(true);
   }
   else {
     aData->blockSendAttributeUpdated(false);
-    anAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
+    theAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
     aLoop->activateFlushes(isFlushesActived);
   }
 }

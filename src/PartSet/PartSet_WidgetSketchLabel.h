@@ -91,13 +91,16 @@ protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
-  virtual void storeAttributeValue();
+  /// \param theAttribute an attribute to be stored
+  virtual void storeAttributeValue(const AttributePtr& theAttribute);
 
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
+  /// \param theAttribute an attribute to be restored
   /// \param theValid a boolean flag, if restore happens for valid parameters
-  virtual void restoreAttributeValue(const bool theValid);
+  virtual void restoreAttributeValue(const AttributePtr& theAttribute,
+                                     const bool theValid);
 
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
@@ -126,7 +129,8 @@ protected:
   /// to be used to restore flush state when unblocked
   /// \param isAttributeSetInitializedBlocked out value if model is blocked
   /// in value if model is unblocked to be used to restore previous state when unblocked
-  virtual void blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+  virtual void blockAttribute(const AttributePtr& theAttribute, const bool& theToBlock,
+                              bool& isFlushesActived,
                               bool& isAttributeSetInitializedBlocked);
 
   /// Set the given wrapped value to the current widget

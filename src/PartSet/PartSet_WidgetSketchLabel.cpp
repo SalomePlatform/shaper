@@ -187,10 +187,11 @@ void PartSet_WidgetSketchLabel::onShowConstraint(bool theOn)
     emit showConstraintToggled(aState, theOn);
 }
 
-void PartSet_WidgetSketchLabel::blockAttribute(const bool& theToBlock, bool& isFlushesActived,
+void PartSet_WidgetSketchLabel::blockAttribute(const AttributePtr& theAttribute,
+                                               const bool& theToBlock, bool& isFlushesActived,
                                                bool& isAttributeSetInitializedBlocked)
 {
-  ModuleBase_WidgetValidated::blockAttribute(theToBlock, isFlushesActived,
+  ModuleBase_WidgetValidated::blockAttribute(theAttribute, theToBlock, isFlushesActived,
                                              isAttributeSetInitializedBlocked);
   // We do not restore the previous state of isAttributeSetInitializedBlocked for each of
   // attributes. It it is necessary, these states should be append to the method attributes
@@ -318,14 +319,15 @@ void PartSet_WidgetSketchLabel::enableFocusProcessing()
   myStackWidget->installEventFilter(this);
 }
 
-void PartSet_WidgetSketchLabel::storeAttributeValue()
+void PartSet_WidgetSketchLabel::storeAttributeValue(const AttributePtr& theAttribute)
 {
-  ModuleBase_WidgetValidated::storeAttributeValue();
+  ModuleBase_WidgetValidated::storeAttributeValue(theAttribute);
 }
 
-void PartSet_WidgetSketchLabel::restoreAttributeValue(const bool theValid)
+void PartSet_WidgetSketchLabel::restoreAttributeValue(const AttributePtr& theAttribute,
+                                                      const bool theValid)
 {
-  ModuleBase_WidgetValidated::restoreAttributeValue(theValid);
+  ModuleBase_WidgetValidated::restoreAttributeValue(theAttribute, theValid);
 
   // it is not necessary to save the previous plane value because the plane is chosen once
   DataPtr aData = feature()->data();
