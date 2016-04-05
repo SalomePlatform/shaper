@@ -32,14 +32,14 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
     MyShapeTypes["circle"] = Circle;
     MyShapeTypes["wire"]   = Wire;
     MyShapeTypes["face"]   = Face;
-    MyShapeTypes["solid"]  = Solid;
     MyShapeTypes["plane"]  = Plane;
     MyShapeTypes["shell"]  = Shell;
+    MyShapeTypes["solid"]  = Solid;
   }
   std::string aType = std::string(theType.c_str());
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
     return MyShapeTypes[aType];
-  
+
   Events_Error::send("Shape type defined in XML is not implemented!");
   return AnyShape;
 }
@@ -217,12 +217,13 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
     case Face:
       aValid = theShape->isFace();
       break;
+    case Shell:
+      aValid = theShape->shapeType() == GeomAPI_Shape::SHELL;
+      break;
     case Solid:
       aValid = theShape->isSolid() || theShape->isCompSolid() ||
                theShape->isCompoundOfSolids();
       break;
-    case Shell:
-      aValid = theShape->shapeType() == GeomAPI_Shape::SHELL;
     case Compound:
       aValid = theShape->isCompound();
       break;

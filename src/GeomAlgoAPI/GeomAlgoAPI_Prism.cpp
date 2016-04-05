@@ -100,6 +100,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     case TopAbs_SHELL:
       aShapeTypeToExp = TopAbs_FACE;
       break;
+    default:
+      return;
   }
 
   // Getting direction.

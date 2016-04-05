@@ -34,8 +34,8 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
     Wire,
     Face,
     Plane,
-    Solid,
     Shell,
+    Solid,
     Compound,
     AnyShape
   };

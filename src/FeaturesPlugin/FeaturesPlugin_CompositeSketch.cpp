@@ -171,8 +171,14 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
     }
     GeomShapePtr aBaseShape = aBaseObjectSelection->value();
     if(aBaseShape.get() && !aBaseShape->isNull()) {
-      aBaseShape->shapeType() == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                                       theBaseShapesList.push_back(aBaseShape);
+      GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
+      if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE && aST != GeomAPI_Shape::WIRE &&
+         aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
+        setError("Error: Selected shapes has unsupported type.");
+        return;
+      }
+      aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                   theBaseShapesList.push_back(aBaseShape);
     } else {
       // This may be the whole sketch result selected, check and get faces.
       ResultConstructionPtr aConstruction =
@@ -186,8 +192,14 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
         // Probably it can be construction.
         aBaseShape = aConstruction->shape();
         if(aBaseShape.get() && !aBaseShape->isNull()) {
-          aBaseShape->shapeType() == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                                           theBaseShapesList.push_back(aBaseShape);
+          GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
+          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE && aST != GeomAPI_Shape::WIRE &&
+             aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
+            setError("Error: Selected shapes has unsupported type.");
+            return;
+          }
+          aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                       theBaseShapesList.push_back(aBaseShape);
         }
       } else {
         for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
